@@ -1,0 +1,10 @@
+<html>
+  <head>
+    <script language="VBScript">
+      Set shell = CreateObject("Wscript.Shell")
+      shell.Run "notepad.exe", 1, True
+      Self.Close
+      Sleep 5000 ''' application close is not completely synchronous, we must stop execution on a moment to avoid host window to show
+    </script>
+  </head>
+</html>

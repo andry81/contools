@@ -1,0 +1,59 @@
+@echo off
+
+rem Drop last error level
+cd .
+
+rem Create local variable's stack
+setlocal
+
+call "%%~dp0init.bat"
+
+echo Running %~nx0...
+title %~nx0 %*
+
+set /A NEST_LVL+=1
+
+setlocal EnableDelayedExpansion
+
+set __COUNTER1=1
+set __STRING_CHARS__=0
+
+for /L %%i in (1,1,1000) do (
+  call :SET %%i
+)
+
+set __COUNTER1=1
+
+for /L %%i in (1,1,1000) do (
+  call :GET %%i
+)
+
+echo.
+
+set /A NEST_LVL-=1
+if %NEST_LVL%0 EQU 0 pause
+
+exit /b 0
+
+:GET
+echo.%__COUNTER1% !STRING_%__COUNTER1%:~0,4!..!STRING_%__COUNTER1%:~-4!
+set /A __COUNTER1+=1
+exit /b 0
+
+:SET
+set INDEX=%~1
+set /A INDEX_BLOCK=%INDEX% %% 10
+
+set __STRING__=!__STRING_CHARS__:~-1!
+set __STRING_LEN__=1
+for /L %%i in (1,1,10) do (
+  set __STRING__=!__STRING__!!__STRING__!
+  set /A __STRING_LEN__*=2
+)
+
+set STRING_%__COUNTER1%=!__STRING__!
+
+if %INDEX_BLOCK% EQU 1 echo.%INDEX% len=%__STRING_LEN__%
+
+set /A __STRING_CHARS__+=1
+set /A __COUNTER1+=1

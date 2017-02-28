@@ -1,0 +1,419 @@
+#!/bin/bash
+
+# Script to find bash shell version and call bash shell interpreter from the
+# "/usr/local/bin" directory if has any, otherwise call from the "/bin"
+# directory bypassing any user mount point redirection that may exist on the
+# way.
+
+if /bin/test "${BASH+set}" != set -o "${BASH_VERSINFO+set}" != "set" -o ${BASH_VERSINFO[0]:-0} -lt 3 >/dev/null 2>&1; then
+  echo "bash_entry: error: script designed only for the Bash version 3.x or higher." >&2
+  exit 253
+fi
+
+if [[ -n "$BASH" ]]; then
+
+function BashEntryFunc()
+{
+  local BashEntryPath="$1"
+  [[ -n "$BashEntryPath" ]] || return 1
+
+  trap ':' RETURN # set to empty command to avoid reset from child function calls
+
+  function GetAbsolutePathFromDirPath()
+  {
+    # drop return value
+    RETURN_VALUE="$1"
+
+    local DirPath="$1"
+    local RelativePath="$2"
+
+    # WORKAROUND:
+    #   Because some versions of readlink can not handle windows native absolute
+    #   paths correctly, then always try to convert directory path to a backend
+    #   path before the readlink in case if the path has specific native path
+    #   characters.
+    if [[ "${DirPath:1:1}" == ":" ]]; then
+      ConvertNativePathToBackend "$DirPath"
+      DirPath="$RETURN_VALUE"
+    fi
+
+    if [[ -n "$DirPath" && -x "/bin/readlink.exe" ]]; then
+      if [[ "${RelativePath:0:1}" != '/' ]]; then
+        RETURN_VALUE="`/bin/readlink.exe -m "$DirPath${RelativePath:+/}$RelativePath"`"
+      else
+        RETURN_VALUE="`/bin/readlink.exe -m "$RelativePath"`"
+      fi
+    fi
+
+    return 0
+  }
+
+  function ConvertBackendPathToNative()
+  {
+    # cygwin/msys2 uses cygpath command to convert paths
+    # msys/mingw uses old style conversion through the "cmd.exe ^/C" call
+
+    # drop return value
+    RETURN_VALUE="$1"
+
+    local PathToConvert="$1"
+    local Flags="$2"
+
+    local ConvertedPath=""
+
+    if [[ "${Flags/i/}" != "$Flags" ]]; then
+      # w/ user mount points bypassing
+      ExctractPathIgnoringUserMountPoints -w "$PathToConvert"
+      return $?
+    fi
+
+    [[ -n "$PathToConvert" ]] || return 1
+
+    GetAbsolutePathFromDirPath "$PathToConvert"
+
+    case "$OSTYPE" in
+      "msys" | "mingw")
+        while true; do
+          # in msys2 and higher we must use /bin/cygpath.exe to convert the path
+          if [[ "$OSTYPE" == "msys" && -f "/bin/cygpath.exe" ]]; then
+            ConvertedPath="`/bin/cygpath.exe -w "$RETURN_VALUE"`"
+            break
+          fi
+          local ComSpecInternal="${COMSPEC//\\//}" # workaround for a "command not found" in the msys shell
+          # msys replaces mount point path properly if it ends by '/' character
+          RETURN_VALUE="${RETURN_VALUE%/}/"
+          EscapeString "$RETURN_VALUE" '' 2
+          # msys automatically converts argument to the native path if it begins from '/' character
+          ConvertedPath="`"$ComSpecInternal" '^/C' \(echo $RETURN_VALUE\)`"
+          break
+        done
+      ;;
+
+      "cygwin")
+        ConvertedPath="`/bin/cygpath.exe -w "$RETURN_VALUE"`"
+      ;;
+      
+      *)
+        return 2
+      ;;
+    esac
+
+    # remove last slash
+    ConvertedPath="${ConvertedPath%[/\\]}"
+    # convert all slashes to backward slashes
+    RETURN_VALUE="${ConvertedPath//\//\\}"
+
+    return 0
+  }
+
+  function FindChar()
+  {
+    # drop return value
+    RETURN_VALUE=""
+
+    # (Required) String which would be searched.
+    local String="$1"
+    # (Required) Chars for search.
+    local Chars="$2"
+
+    if [[ -z "$String" ]]; then
+      RETURN_VALUE="-1"
+      return 1
+    fi
+    if [[ -z "$Chars" ]]; then
+      RETURN_VALUE="-1"
+      return 2
+    fi
+
+    local StringLen="${#String}"
+    local CharsLen="${#Chars}"
+    local i
+    local j
+    for (( i=0; i < StringLen; i++ )); do
+      for (( j=0; j < CharsLen; j++ )); do
+        if [[ "${String:$i:1}" == "${Chars:$j:1}" ]]; then
+          RETURN_VALUE="$i"
+          return 0
+          break
+        fi
+      done
+    done
+
+    RETURN_VALUE="-1"
+
+    return 3
+  }
+
+  function EscapeString()
+  {
+    # drop return value
+    RETURN_VALUE=""
+
+    # (Required) String which would be escaped.
+    local String="$1"
+    # (Optional) Set of characters in string which are gonna be escaped.
+    local EscapeChars="$2"
+    # (Optional) Type of escaping:
+    #   0 - String will be quoted by the " character, so escape any character from
+    #       "EscapeChars" by the \ character.
+    #   1 - String will be quoted by the ' character, so the ' character should be
+    #       escaped by the \' sequance. The "EscapeChars" variable doesn't used in this case.
+    #   2 - String will be used in the cmd.exe shell, so quote any character from
+    #       the "EscapeChars" variable by the ^ character.
+    local EscapeType="${3:-0}"
+
+    if [[ -z "$String" ]]; then
+      RETURN_VALUE="$String"
+      return 1
+    fi
+
+    if [[ -z "$EscapeChars" ]]; then
+      case $EscapeType in
+        0) EscapeChars='$!&|\`"' ;;
+        2) EscapeChars='^?*&|<>()"' ;;
+      esac
+    fi
+
+    local EscapedString=""
+    local StringCharEscapeOffset=-1
+    local i
+    for (( i=0; i<${#String}; i++ )); do
+      local StringChar="${String:$i:1}"
+      case $EscapeType in
+        0)
+          FindChar "$EscapeChars" "$StringChar"
+          StringCharEscapeOffset="$RETURN_VALUE"
+          if (( StringCharEscapeOffset < 0 )); then
+            EscapedString="$EscapedString$StringChar"
+          else
+            EscapedString="$EscapedString\\$StringChar"
+          fi
+        ;;
+        1)
+          if [[ "$StringChar" != "'" ]]; then
+            EscapedString="$EscapedString$StringChar"
+          else
+            EscapedString="$EscapedString'\\''"
+          fi
+        ;;
+        *)
+          FindChar "$EscapeChars" "$StringChar"
+          StringCharEscapeOffset="$RETURN_VALUE"
+          if (( StringCharEscapeOffset >= 0 )); then
+            EscapedString="$EscapedString^"
+          fi
+          EscapedString="$EscapedString$StringChar"
+        ;;
+      esac
+    done
+
+    [[ -n "$EscapedString" ]] || return 2
+
+    RETURN_VALUE="$EscapedString"
+
+    return 0
+  }
+
+  function ConvertNativePathToBackend()
+  {
+    # drop return value
+    RETURN_VALUE="$1"
+
+    # Convert all back slashes to slashes.
+    local PathToConvert="${1//\\//}"
+
+    [[ -n "$PathToConvert" ]] || return 1
+
+    # workaround for the bash 3.1.0 bug for the expression "${arg:X:Y}",
+    # where "Y == 0" or "Y + X >= ${#arg}"
+    local PathToConvertLen=${#PathToConvert}
+    local PathPrefixes=('' '')
+    local PathSuffix=""
+    if (( PathToConvertLen > 0 )); then
+      PathPrefixes[0]="${PathToConvert:0:1}"
+    fi
+    if (( PathToConvertLen > 1 )); then
+      PathPrefixes[1]="${PathToConvert:1:1}"
+    fi
+    if (( PathToConvertLen >= 3 )); then
+      PathSuffix="${PathToConvert:2}"
+    fi
+    PathSuffix="${PathSuffix%/}"
+
+    # Convert path drive prefix too.
+    if [[ "${PathPrefixes[0]}" != '/' && "${PathPrefixes[0]}" != '.' && "${PathPrefixes[1]}" == ':' ]]; then
+      case "$OSTYPE" in
+        "cygwin") PathToConvert="/cygdrive/${PathPrefixes[0]}$PathSuffix" ;;
+        *)
+          PathToConvert="/${PathPrefixes[0]}$PathSuffix"
+          # add slash to the end of path in case of drive only path
+          (( ! ${#PathSuffix} )) && PathToConvert="$PathToConvert/"
+        ;;
+      esac
+    fi
+
+    RETURN_VALUE="$PathToConvert"
+
+    return 0
+  }
+
+  function ExctractPathIgnoringUserMountPoints()
+  {
+    # Split the path into 2 paths by exracting builtin paths from the beginning of
+    # the path in this order:
+    # "/usr/bin" => "/usr/lib" => "/usr" => "/lib" => "/<drive>/" => "/"
+    # That is because, the Cygwin backend has the redirection of
+    # "/usr/bin" and "/usr/lib" into "/bin" and "/lib" paths respectively, but
+    # doesn't has the redirection of the "/usr" itself, when the Msys backend has
+    # the redirection of the "/usr" path to the "/" but does not has for the
+    # "/usr/bin" path.
+
+    # Examples:
+    # 1. path=/usr/bin       => prefix=/usr/bin/    suffix=
+    # 2. path=/usr/lib       => prefix=/usr/lib/    suffix=
+    # 3. path=/usr           => prefix=/usr/        suffix=
+    # 4. path=/lib           => prefix=/lib/        suffix=
+    # 5. path=/usr/local/bin => prefix=/usr/        suffix=local/bin
+    # 6. path=/tmp           => prefix=/            suffix=tmp
+    # Specific to Msys behaviour:
+    # 7. path=/c/            => prefix=/c/          suffix=
+    # 8. path=/c             => prefix=/            suffix=c
+    # Specific to Cygwin behaviour:
+    # 9. path=/cygdrive/c    => prefix=/cygdrive/c  suffix=
+
+    local Flags="$1"
+    if [[ "${Flags:0:1}" == '-' ]]; then
+      shift
+    else
+      Flags=''
+    fi
+    local PathToConvert="$1"
+
+    # drop return value
+    RETURN_VALUE=""
+
+    (( ${#PathToConvert} )) || return 1
+
+    local DoConvertToBackendTypePath=1
+    if [[ "${Flags//w/}" != "$Flags" ]]; then
+      DoConvertToBackendTypePath=0 # convert to native path
+    elif [[ "${Flags//b/}" != "$Flags" ]]; then # explicit flag
+      DoConvertToBackendTypePath=1 # convert to backend path
+    fi
+
+    # enable nocase match
+    local oldShopt=""
+    function LocalReturn()
+    {
+      if [[ -n "$oldShopt" ]]; then
+        # Restore state
+        eval $oldShopt
+      fi
+      unset -f "${FUNCNAME[0]}" # drop function after execution
+    }
+
+    trap LocalReturn RETURN || return 253
+
+    oldShopt="$(shopt -p nocasematch)" # Read state before change
+    if [[ "$oldShopt" != "shopt -s nocasematch" ]]; then
+      shopt -s nocasematch
+    else
+      oldShopt=''
+    fi
+
+    # The case patterns w/o * ending character.
+    # If / character at the end then it is required.
+    local PathPrefixes=(/usr/bin /usr/lib /usr /lib '/[a-zA-Z]/' '/cygdrive/[a-zA-Z]' /)
+
+    local PathPrefix
+    local PathSuffix
+
+    local IsFound=0
+
+    for PathPrefix in "${PathPrefixes[@]}"; do
+      PathSuffix="${PathToConvert#$PathPrefix}"
+      if [[ "$PathSuffix" != "$PathToConvert" ]] &&
+         [[ -z "$PathSuffix" || "${PathSuffix:0:1}" == '/' || "${PathPrefix%/}" != "$PathPrefix" ]]; then
+        IsFound=1
+        PathPrefix="${PathToConvert%$PathSuffix}"
+        break
+      fi
+    done
+
+    if (( ! IsFound )); then
+      PathPrefix="$PWD" # current path as base if builtin is not found
+      PathSuffix="$PathToConvert"
+    fi
+
+    PathPrefix="${PathPrefix%/}/" # forward slash at the end
+    PathSuffix="${PathSuffix#/}"  # no forward slash at the begin
+    PathSuffix="${PathSuffix%/}"  # no forward slash at the end
+
+    local ConvertedPath
+
+    # bypassing mounting points
+    case "$OSTYPE" in
+      "msys" | "mingw")
+        while true; do
+          # in msys2 and higher we must use /bin/cygpath.exe to convert the path
+          if [[ "$OSTYPE" == "msys" && -f "/bin/cygpath.exe" ]]; then
+            ConvertedPath="`/bin/cygpath.exe -w "$RETURN_VALUE"`"
+            break
+          fi
+          local ComSpecInternal="${COMSPEC//\\//}" # workaround for a "command not found" in the msys shell
+          # msys replaces mount point path properly if it ends by '/' character
+          RETURN_VALUE="${PathPrefix%/}/"
+          EscapeString "$RETURN_VALUE" '' 2
+          # msys automatically converts argument to the native path if it begins from '/' character
+          ConvertedPath="$("$ComSpecInternal" '^/C' \(echo $RETURN_VALUE\))"
+          break
+        done
+        ;;
+
+      "cygwin")
+        ConvertedPath="`/bin/cygpath.exe -w "$PathPrefix"`"
+        ;;
+      
+      *)
+        RETURN_VALUE="${PathPrefix%/}${PathSuffix:+/}$PathSuffix"
+        return 2
+        ;;
+    esac
+
+    # remove last slash
+    ConvertedPath="${ConvertedPath%[/\\]}"
+    # convert to declared path type with replacemant of all backward slashes
+    if (( DoConvertToBackendTypePath )); then
+      ConvertNativePathToBackend "${ConvertedPath//\//\\}"
+      RETURN_VALUE="$RETURN_VALUE${PathSuffix:+/}$PathSuffix"
+    else
+      RETURN_VALUE="${ConvertedPath//\\//}${PathSuffix:+/}$PathSuffix"
+    fi
+
+    return 0
+  }
+
+  ExctractPathIgnoringUserMountPoints -b "$BashEntryPath"
+  export BASH_ENTRY_PATH="$RETURN_VALUE"
+
+  return 0
+}
+
+if [[ ! -n "$BASH_ENTRY_PATH" ]]; then
+  BashEntryFunc "/usr/local/bin/bash"
+  if [[ -z "$BASH_ENTRY_PATH" || ! -f "$BASH_ENTRY_PATH" ]]; then
+    BashEntryFunc "/bin/bash"
+  fi
+fi
+
+if [[ -n "$BASH_ENTRY_PATH" ]]; then
+  # do cache path to shell to avoid redundant execution in a child shells
+  "$BASH_ENTRY_PATH" "$@"
+else
+  /bin/bash "$@"
+fi
+
+# always exit with current exit code
+exit $?
+
+fi
