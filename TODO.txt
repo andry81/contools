@@ -1,0 +1,25 @@
+Common:
+  - rewrite setvarsfromfile.bat, tests
+  - implement svn diff --git support into gen_branch_workingset.bat/sync_branch_workingsset.bat, tests
+  - scm/svn/* tests
+  - tests for index_patch_file.bat on patch with "Index: ", "@@ " and "GIT binary patch" sequences not in the beginning of lines
+
+Tests for autodetect (-ad) in svn_get_branch_workingset.bat:
+  - in WC directory w/o .svn subdirectory, but w/ .svn subdirectory in parent directory
+  - in WC directory w/o .svn subdirectory, but w/ .svn subdirectory in child directory
+  - in local repo (file:///) directory
+  - in directory not under SVN control (w/o autodetect, and with autodetect but w/o .svn subdirectory inside parent/child directories)
+
+Tests for svn_changeset.bat:
+  - in WC directory w/o .svn subdirectory, but w/ .svn subdirectory in parent directory
+  - на WC директории без подпапки .svn, но c папкой .svn в parent каталоге
+  - in local repo (file:///) directory
+  - in directory not under SVN control
+
+Tests for svn_changeset.bat:
+  - in WC directory w/o .svn subdirectory, but w/ .svn subdirectory in parent directory
+  - output from the script on SVN WC directory w/o .svn subdirectory, but w/ .svn subdirectory in parent directory w/ flags -offline -wcroot flags should be the same to the output w/o -offline flag and w/ --depth infinity --non-interactive flags
+  - in local repo (file:///) directory
+  - in directory not under SVN control
+
+so on...
