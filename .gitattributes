@@ -125,6 +125,8 @@ Scripts/Config/env/vars_winxp.lst -text
 Scripts/Config/msys.vars -text
 Scripts/Config/msysdvlpr.vars -text
 Scripts/Config/tmpl/runas_admin.lnk.dat -text
+TestTools/branch_workingset/gen.bat -text
+TestTools/branch_workingset/sync.bat -text
 TestTools/genstrings.py -text
 TestTools/genstrings.tcl -text
 Tests/batscripts/init.bat -text
