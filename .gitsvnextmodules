@@ -1,0 +1,16 @@
+[submodule "Scripts/TestsExternal"]
+	path = Scripts/TestsExternal
+	owner = Scripts
+	url = https://svn.code.sf.net/p/contools/external_tests/trunk/Scripts/Tests
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
+[submodule "Scripts/ToolsExternal"]
+	path = Scripts/ToolsExternal
+	owner = Scripts
+	url = https://svn.code.sf.net/p/contools/external_tests/trunk/Scripts/Tools
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
