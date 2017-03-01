@@ -1,0 +1,215 @@
+* Changes_EN.txt
+* 201X.XX.XX
+* ConsoleTools
+
+For more details, see README_EN.txt.
+
+review #10 - 201X.XX.XX (ConsoleTools_rv10.zip)
+ - FIXED: bash hashlib/tests hash collisions check.
+ - FIXED: bash hashlib/tests slowdown by excessive creation of child bash.exe
+   subprocesses.
+ - FIXED: bash hashlib/tests execution for STORE_IN_MEMORY=1
+ - FIXED: all bash tests execution from ./ path directory.
+ - FIXED: *_cygwin*.bat execution in latest cygwin environment.
+ - FIXED: regenum.bat/regquery.bat execution with back slash at the end of
+   registry path.
+ - NEW: envvarcmp.exe/printf.exe utilities to test and print environment
+   variables in batch scripts without need to compare/print environment
+   variables internally by a batch script (to avoid batch execution artefacts
+   like invalid expresion/command and so on).
+   Refactored and added tests for batch scripts using envvarcmp.exe/printf.exe
+   utilities.
+ - NEW: 3dparty utilities as referenced from scripts: 7-zip, hashdeep,
+   XMLStarlet, sigcheck.exe, cecho*.exe, strings.exe.
+ - NEW: batch scripts to automate build process in windows from cmd.exe:
+   add_files_to_archive.bat, export_build_vars.bat,
+   extract_files_from_archive.bat, gen_publish_app_dir.bat,
+   parse_cmd_build_params.bat, set_project_build_time.bat,
+   write_var_to_file.bat,
+   xcopy_archive_from_stagein_all_dirs.bat, xcopy_archive_to_stage.bat,
+   xcopy_archive_to_stageout_all_dirs.bat, xcopy_publish_stage_dir.bat,
+   xcopy_to_bin.bat, xcopy_to_stage.bat
+   (mainly to automate build processes from cmd.exe in another projects).
+ - NEW: lock/unlock/wait primitives over batch scripts:
+   lock_mutex.bat, try_lock_mutex.bat, unlock_mutex.bat, wait_mutex.bat,
+   wait_mutexes.bat
+   (implementation over cmd.exe I/O subsystem and temporary directories).
+ - NEW: scripts to support build environment under NSIS 3.x compiler:
+   find_errors_nsis_log.nsis, gen_executables_macro_list.bat,
+   gen_install_files_section*.bat, gen_nsis_defines.bat,
+   gen_nsis_search_paths.bat, gen_scripts_macro_list.bat,
+   gen_uninstall_files_section*.bat.
+ - NEW: scripts to support operations over SVN client:
+   extract_branch_info_param.bat, extract_last_changed_rev.bat,
+   extract_url_root.bat, extract_url_scheme.bat, gen_branch_workingset.bat,
+   gen_branch_workingset_time.bat, make_url_absolute.bat,
+   make_url_canonical.bat, svn_check_out.bat, sync_branch_workingset.bat.
+ - NEW: scripts to support operations over a build server with SVN:
+   check_svn_up_change.bat, gen_diff_svn_changeset_lst.bat,
+   print_svn_changesets_diff_lst.bat.
+ - NEW: scripts to support operations over Jenkins build server:
+   convert_svn_changeset_xml_to_lst.bat.
+ - NEW: scripts for basic operations:
+   canonicalpath.bat, copy.bat, del_file.bat, exec_once_or_exit.bat,
+   extract_version.bat, gen_diff_dir_hash_lst.bat,
+   gen_dir_hash_lst.bat, gen_product_ver.bat, get_base_dir_name.bat,
+   get_date_as_filename.bat, get_filesize.bat, get_newest_file.bat,
+   get_path_subtract.bat, get_time_as_filename.bat, has_dir_files.bat, if_.bat,
+   print_file_string.bat, print_hash_lst.bat, print_product_ver.bat,
+   query_session_id.bat, runas_admin.bat, runas_admin.lnk,
+   strlocase.bat, strtrim.bat, strupcase.bat, timediff.bat, timestamp.bat,
+   winpath.bat, xcopy_dir.bat, xcopy_file.bat.
+ - CHANGED: replaced strlen.bat script by the fast_strlen.bat implementation.
+ - CHANGED: bash testlib refactor, TestUserInit/TestUserExit now calls from
+   most inner test process (no need export prefix for variables now).
+ - MISC: Overall code refactor and cleanup.
+
+review #9 - 2014.06.20 (ConsoleTools_rv9.zip)
+ - FIXED: bug in the setvarsfromfile.bat under the windows 8
+ - NEW: added script "which.bat" to find a file in the PATH environment
+   variable.
+
+review #8 - 2014.04.29 (ConsoleTools_rv8.zip)
+ - NEW: scripts: "funclib.sh", "traplib.sh", "synclib.sh" and "testlib.sh".
+ - NEW: added new functionality for "hashlib.sh".
+ - NEW: added include guards in all libraries which can be included by the
+   source command.
+ - NEW: replaced most of the calls to the "trap ... RETURN" command by the
+   PushTrap* functions to eliminate issues of the trap command.
+ - NEW: script tests for the "hashlib.sh" and "traplib.sh" libraries.
+ - NEW: added 3d party the cecho utility to colorize output in the *.bat
+   scripts. See the
+   "http://www.codeproject.com/Articles/17033/Add-Colors-to-Batch-Files" for the
+   details.
+ - FIXED: bug in the CleanupDir function which has tried to cleanup the current
+   directory instead of requested if the requested one is passed in as empty
+   string.
+ - FIXED: various bug fixes in functions for converting the native paths to
+   backend and vice versa.
+ - FIXED: various bug fixes for the bash_entry script.
+ - FIXED: various bug fixes for the mountdir.sh/unmountdir.sh scripts.
+ - FIXED: workarounds for the bug from the bash 3.1.0 where
+   the expression "${arg:X:Y}", where "Y == 0" or "Y + X >= ${#arg}" has invalid
+   evaluation result.
+ - FIXED: workarounds for the bug from the bash 4.1 and lower where
+   the expression "${@:X}" in any command arguments implicitly rejoined by the
+   bash command arguments separator (has to declare IFS=$' \t' to eliminate
+   the bugged behaviour).
+ - MISC: many other improvements and changes.
+
+review #7 - 2014.02.21 (ConsoleTools_rv7.zip)
+ - NEW: the abspath.bat and dospath.bat scripts.
+ - NEW: the hashlib.sh script with crc32 hash functions.
+ - NEW: the regexp.sh script with generalized regexp functions.
+ - NEW: scripts for creation Windows shortcut file via Windows Scripting Host.
+ - FIXED: the sar.pl escape sequence processing for the replace pattern
+   argument.
+ - FIXED: the exit code in the "bash_entry" script.
+ - FIXED: handling the line return characters and white spaces in the
+   "mountdir.sh" and "unmountdir.sh" scripts.
+ - FIXED: set "mountdir.sh" and "unmountdir.sh" scripts to use for the backend
+   mount utility additionally to changing of the mount points storage. Now no
+   need to restart a backend shell session to update the mount points table in
+   the memory.
+ - CHANGED: the start.bat script separated into 2 scripts:
+   start32.bat/start64.bat.
+ - DEPRICATED: the cat2.sh script.
+ - MISC: other improvements and changes.
+
+review #6 - 2013.03.23 (ConsoleTools_rv6.zip)
+ - NEW: added baselib.sh script to support the shell basic operations.
+ - NEW: added cygsetuplib.sh, cygsetupdiff.sh and cygsetupprint.sh scripts to
+   extract, print and diff package lists from the setup.ini file which is used
+   internally by the cygwin setup utility.
+ - NEW: functions in filelib.sh and stringlib.sh scripts.
+ - FIXED: case where the readlink under in the cygwin returns incorrect path if
+   path have had backslash characters.
+ - CHANGED: reduced explicit calls to new subshells.
+ - CHANGED: replaced TOOLS_PATH variables with a current directory if it has not
+   been properly defined before the use.
+ - CHANGED: the IFS variable to be always local in functions to avoid change a
+   global one.
+ - AWARE: The pipetimes utility still has not enough precision to measure the
+   pipe times due to the lack in the Windows API layer (read/write of the pipe
+   times in the file sctructure is empty).
+ - DEPRICATED: the Changes_RU.txt and the README_RU.txt files because of out of
+   effort to support them. Учи английский ;)
+ - MISC: all scripts mostly updated from the GnuBuilds project
+   (sourceforge.net/projects/gnubuilds) on the moment of the review #18.
+
+review #5 - 2012.08.29 (ConsoleTools_rv5.zip)
+ - Added the autogen tool as a part of the project build process.
+ - Changed the way the pipetimes.exe utility measuring the piping times
+   (but in some heavy logging cases it is still not enough for good precision).
+ - Changed all unix shell scripts to return a result via global variable instead
+   of print it in case of including via "source" command to reduce quantity of
+   console shell-process instantiation duaring scripts execution.
+ - Changed all cmd shell scripts to drop all internal variables via
+   endlocal command with option to do not drop required set of variables.
+ - Changed command arguments format for the strchr script, improved handling of
+   the control characters.
+ - Changed command arguments format for the strlen script, improved handling of
+   the control characters.
+ - Added reg_cygwin, reg_msys, run_cygwin, run_msys and remount_cygwin scripts
+   to automate environment cleanup, check, registration and run in it.
+ - Script stresc.bat renamed to cstresc.bat.
+ - Added stresc.bat script for escaping the batch file variables.
+ - Added strrep.bat script for replacing characters in the batch variables.
+ - Added winver.bat script.
+ - Added cygver.sh and cygver.bat scripts.
+ - Added msysver.bat script.
+ - Added resetenv.bat script to automate the clean and the update of the
+   environment variables.
+ - Added print_merged_logs.sh script which prints merged logs which stored and
+   indexed by the pipetimes utility.
+ - Added tee2.sh script to duplicating output in the specified file descriptor.
+ - Added cat2.sh script.
+ - Added dos2unix.bat and unix2dos.bat scripts.
+ - Made direct usage of TOOLS_PATH variable in scripts instead of adding it to
+   the PATH variable. Now you always should define TOOLS_PATH variable before
+   the use of the scripts if you don't want to add scripts search paths into
+   variable PATH. If TOOLS_PATH would not defined to anything then the script
+   will define it as a path to the directory where the script is.
+ - Removed script execperl.sh as redundant.
+ - License is changed to the Boost license.
+ - Other changes, improvements and fixes.
+
+review #4 - 2009.05.17 (ConsoleTools_rv4.zip)
+ - Removed expandpath.sh script functionality into filelib.sh script.
+ - Added new functions in filelib.sh script.
+ - Script execfunc.sh turned to use "GetFilePath" function instead of "which"
+   command.
+ - Some changes and fixes.
+
+review #3 - 2009.05.12 (ConsoleTools_rv3.zip)
+ - Added filesize.bat script.
+ - Added filelib.sh script.
+ - Improved sar.pl script.
+ - Fixed check on when bash script was included instead of executed.
+ - Fixed execfunc.sh script.
+ - Fixed mountdir.sh script.
+ - Fixed unmountdir.sh script.
+ - Some fixes.
+
+review #2 - 2009.05.10 (ConsoleTools_rv2.zip)
+ - Added thlibautocfg utility.
+ - Added pipetimes utility.
+ - Added pipetimes perl script (less preciser than the same utility).
+ - Added sar perl script (Perl version 5.6.0 or higher required).
+ - Added sarf javascript script (Windows Scripting Host required).
+ - Added gccmrt bash script (Cygwin/Mingw system required).
+ - Added expandpath bash script (Cygwin/Mingw system required).
+ - Added stringlib bash script.
+ - Added perllib bash script (Cygwin/Mingw system required).
+ - Added mountdir bash script (Cygwin/Msys system required).
+ - Added unmountdir bash script (Cygwin/Msys system required).
+ - Added execfunc bash script.
+ - Added execperl bash script.
+ - Added execbat bash script (cmd.exe required).
+ - Added description for scripts and utilities.
+ - Added solution for Microsoft Visual Studio 2005 (ConsoleTools.sln).
+ - License changed to LGPL.
+ - Some fixes.
+
+review #1 - 2009.03.08 (ConsoleTools_rv1.zip)
+ - Scripts for cmd.exe interpreter under WindowsNT.
