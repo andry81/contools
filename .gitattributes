@@ -510,6 +510,7 @@ Utilities/Sources/pipetimes/help.tpl -text
 Utilities/Sources/pipetimes/pipetimes.cpp -text
 Utilities/Sources/pipetimes/version.def -text
 Utilities/Sources/pipetimes/version.tpl -text
+Utilities/Sources/printargs/Source.cpp -text
 Utilities/Sources/printf/help.def -text
 Utilities/Sources/printf/help.tpl -text
 Utilities/Sources/printf/printf.cpp -text
