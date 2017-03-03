@@ -94,15 +94,15 @@ exit /b
 :CMD_END
 
 "%TOOLS_PATH%\envvarcmp.exe" STRING_ESCAPED STRING_REFERENCE "" ^
-  "PASSED: %__COUNTER1%: (%LASTERRORLEVEL% == %STRING_LEN%) RESULT=`{$0}` STRING=`${__STRING__}` REFERENCE=`{$1}` CHARS=`${__CHARS__}`" ^
-  "FAILED: %__COUNTER1%: (%LASTERRORLEVEL% == %STRING_LEN%) RESULT=`{$0}` STRING=`${__STRING__}` REFERENCE=`{$1}` CHARS=`${__CHARS__}` (`{$0hs}` != `{$1hs}`)"
+  "PASSED: %__COUNTER1%: (%LASTERRORLEVEL% == %STRING_LEN%) RESULT=`{0}` STRING=`${__STRING__}` REFERENCE=`{1}` CHARS=`${__CHARS__}`" ^
+  "FAILED: %__COUNTER1%: (%LASTERRORLEVEL% == %STRING_LEN%) RESULT=`{0}` STRING=`${__STRING__}` REFERENCE=`{1}` CHARS=`${__CHARS__}` (`{0hs}` != `{1hs}`)"
 if %ERRORLEVEL% NEQ 0 goto TEST_END
 
 rem additional test on string length equalness
 if %LASTERRORLEVEL% NEQ %STRING_LEN% (
   "%TOOLS_PATH%\envvarcmp.exe" STRING_ESCAPED STRING_REFERENCE "" ^
-    "FAILED: %__COUNTER1%: (%LASTERRORLEVEL% == %STRING_LEN%) RESULT=`{$0}` STRING=`${__STRING__}` REFERENCE=`{$1}` CHARS=`${__CHARS__}`" ^
-    "FAILED: %__COUNTER1%: (%LASTERRORLEVEL% == %STRING_LEN%) RESULT=`{$0}` STRING=`${__STRING__}` REFERENCE=`{$1}` CHARS=`${__CHARS__}` (`{$0hs}` != `{$1hs}`)"
+    "FAILED: %__COUNTER1%: (%LASTERRORLEVEL% == %STRING_LEN%) RESULT=`{0}` STRING=`${__STRING__}` REFERENCE=`{1}` CHARS=`${__CHARS__}`" ^
+    "FAILED: %__COUNTER1%: (%LASTERRORLEVEL% == %STRING_LEN%) RESULT=`{0}` STRING=`${__STRING__}` REFERENCE=`{1}` CHARS=`${__CHARS__}` (`{0hs}` != `{1hs}`)"
   goto TEST_END
 )
 

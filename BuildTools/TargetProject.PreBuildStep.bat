@@ -30,12 +30,19 @@ set "THLIBAUTOCFG_CMD_LINE_FLAGS="
 if %UNICODE_ENABLED% NEQ 0 set THLIBAUTOCFG_CMD_LINE_FLAGS=%THLIBAUTOCFG_CMD_LINE_FLAGS%u
 
 set "THLIBAUTOCFG_CMD_LINE="
-if not "%THLIBAUTOCFG_CMD_LINE_FLAGS%" == "" set "THLIBAUTOCFG_CMD_LINE= -%THLIBAUTOCFG_CMD_LINE_FLAGS%"
+if not "%THLIBAUTOCFG_CMD_LINE_FLAGS%" == "" set "THLIBAUTOCFG_CMD_LINE=-%THLIBAUTOCFG_CMD_LINE_FLAGS% "
 
 if exist "%CONSOLE_HELP_FILE%.txt" (
   echo   "%CONSOLE_HELP_FILE%_inl.hpp"
-  echo ^>"%TOOLS_PATH%\thlibautocfg.exe" -txt2c%THLIBAUTOCFG_CMD_LINE% "%CONSOLE_HELP_FILE%.txt" "%CONSOLE_HELP_FILE%_inl.hpp"
-  "%TOOLS_PATH%\thlibautocfg.exe" -txt2c%THLIBAUTOCFG_CMD_LINE% "%CONSOLE_HELP_FILE%.txt" "%CONSOLE_HELP_FILE%_inl.hpp"
+  call :CMD "%TOOLS_PATH%\thlibautocfg.exe" -txt2c %THLIBAUTOCFG_CMD_LINE%"%CONSOLE_HELP_FILE%.txt" "%CONSOLE_HELP_FILE%_inl.hpp"
 )
 
-if exist "%CONSOLE_HELP_FILE%.txt" echo Last Error Code: %ERRORLEVEL%
+rem avoid output of this sequence: "error:"
+echo Last return code: %ERRORLEVEL%
+
+exit /b
+
+:CMD
+echo.^>%*
+(%*)
+exit /b 0

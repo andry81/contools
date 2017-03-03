@@ -38,11 +38,11 @@ Usage: envvarcmp.exe [/? | <VarName1> <VarName2> [<PrintPrefix> [<EqualString> [
 
     Common placeholders:
       ${<VarName>} - <VarName> environment variable value.
-      {$0}   - first environment variable's value.
-      {$1}   - second environment variable's value.
-      {$0hs} - first environment variable's hexidecimal string
+      {0}    - first environment variable's value.
+      {1}    - second environment variable's value.
+      {0hs}  - first environment variable's hexidecimal string
                (00-FF per character).
-      {$1hs} - second environment variable's hexidecimal string
+      {1hs}  - second environment variable's hexidecimal string
                (00-FF per character).
       \{     - '{' character escape
 
