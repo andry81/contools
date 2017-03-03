@@ -83,8 +83,8 @@ set VARNAME=TEST_%__COUNTER1%_VALUE_%__COUNTER2%
 call set "VARVALUE_ACTUAL=%%%VARNAME%%%"
 
 "%TOOLS_PATH%\envvarcmp.exe" VARVALUE_ACTUAL VARVALUE_REFERENCE "" ^
-  "PASSED: %__COUNTER1%.%__COUNTER2%: %VARNAME%=`{$0}`" ^
-  "FAILED: %__COUNTER1%.%__COUNTER2%: %VARNAME%=`{$0}` REFERENCE=`{$1}` (`{$0hs}` != `{$1hs}`)"
+  "PASSED: %__COUNTER1%.%__COUNTER2%: %VARNAME%=`{0}`" ^
+  "FAILED: %__COUNTER1%.%__COUNTER2%: %VARNAME%=`{0}` REFERENCE=`{1}` (`{0hs}` != `{1hs}`)"
 
 if %ERRORLEVEL% NEQ 0 goto TEST_END
 

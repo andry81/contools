@@ -1,3 +1,9 @@
+Utilities/Sources/_common/help.txt
+Utilities/Sources/_common/help_inl.hpp
+Utilities/Sources/_common/version.hpp
+Utilities/Sources/callf/help.txt
+Utilities/Sources/callf/help_inl.hpp
+Utilities/Sources/callf/version.hpp
 Utilities/Sources/clearcache/help.txt
 Utilities/Sources/clearcache/help_inl.hpp
 Utilities/Sources/clearcache/version.hpp

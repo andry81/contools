@@ -1,7 +1,7 @@
 [+ AutoGen5 template txt=%s.txt +]
 printf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build [+ AppBuildNum +].
-  Print in style of c-function printf, replacing any backslashes in string
-  arguments with c-escapes.
+  Print in style of c-function printf, replacing specific backslashed
+  character pairs in string arguments with characters.
 
 Usage: printf.exe [/?] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
   Description:
@@ -10,10 +10,10 @@ Usage: printf.exe [/?] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
 
     <FormatString> placeholders:
       ${<VarName>} - <VarName> environment variable value.
-      {$0}   - first argument value.
-      {$N}   - N'th argument value.
-      {$0hs} - first arguments hexidecimal string (00-FF per character).
-      {$Nhs} - N'th arguments hexidecimal string (00-FF per character).
+      {0}    - first argument value.
+      {N}    - N'th argument value.
+      {0hs}  - first arguments hexidecimal string (00-FF per character).
+      {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
       \{     - '{' character escape
 
     Arguments placeholders:
