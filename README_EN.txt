@@ -1,6 +1,12 @@
 * README_EN.txt
-* 2017.02.11
+* 2017.03.04
 * ConsoleTools
+
+WARNING:
+  THIS DOCUMENTATION IS OBSOLETE.
+  A new version of console utilities is UNDER CONSTRUCTION.
+  Use the SVN access to find out new scripts and features:
+    https://svn.code.sf.net/p/contools/contools/trunk
 
 1. DESCRIPTION
 2. LICENSE
@@ -33,9 +39,9 @@ http://www.boost.org/users/license.html)
 3. INSTALLATION
 -------------------------------------------------------------------------------
 Scripts doesn't required to be built and installed. Windows executable utilities
-can be built if necessary under Microsoft Visual Studio C++ 2008. The utilities
-may require an installed Microsoft Visual C++ 2008 Redistributables at runtime
-(Redist\msvc2008\VC_*Runtime.exe).
+can be built if necessary under Microsoft Visual Studio C++ 2015 Community
+Edition. The utilities does not require an installed Microsoft Visual C++ 2015
+Redistributables at runtime.
 
 -------------------------------------------------------------------------------
 4. FILES
@@ -106,6 +112,60 @@ Script runs run_msysdvlpr.bat under UAC promotion.
 -------------------------------------------------------------------------------
 4.2. Windows Batch scripts
 -------------------------------------------------------------------------------
+
+!!!
+
+BEWARE OF DIFFERENCES WHEN TYPE A BATCH FILE CODE PEACE IN A CONSOLE WINDOW AND
+RUN AN ACTUAL BATCH FILE. THERE IS DIFFERENT VARIABLE EXPANSION PASS STAGES!
+
+!!!
+
+Example for the actual batch file example.bat:
+1. @echo off
+   set "AAA=C:\111\%%BBB%%"
+   set "BBB=222\333"
+   call set "DDD=%AAA%"
+   echo "DDD=%DDD%"
+   rem output is: "DDD=C:\111\222\333"
+
+Example for direct input into a console window:
+1. set "AAA=C:\111\%BBB%"
+   set "BBB=222\333"
+   call set "DDD=%AAA%"
+   echo "DDD=%DDD%"
+   rem output is: "DDD=C:\111\222\333"
+
+Differences between these 2 examples are in how the `set "AAA=C:\111\%BBB%'
+would be expanded.
+In actual batch script it will always be expanded. In a windows console it would
+only be expanded IF THE `BBB' VARIABLE HAS BEEN SET BEFORE (NOT EMPTY),
+OTHERWISE IT WILL BE LEFT AS IS.
+
+SO YOU HAVE TO INPUT `set "BBB="` IN SECOND EXAMPLE FOR A CONSOLE WINDOW TO
+AVOID EARLY EXPANSION OF THE `set "AAA=C:\111\%BBB%"':
+
+1. set "BBB="
+   set "AAA=C:\111\%BBB%"
+
+!!!
+
+BEWARE OF VARIABLES EXISTED BEFORE YOU INVOKE BATCH INSTRUCTIONS, OTHERWISE THE
+RESULT WOULD BE DIFFERENT THAN YOU THINK OF.
+
+!!!
+
+To automatically drop created variables from the batch script you can use these
+instructions:
+
+setlocal
+endlocal
+
+!!!
+
+BEWARE OF THE ENDLOCAL INSTRUCTION WHICH CALLS AUTOMATICALLY WHEN SCRIPT EXISTS.
+BEWARE OF THE SETLOCAL INSTRUCTION WHICH WORKS ONLY IN A SCRIPT.
+
+!!!
 
 -------------------------------------------------------------------------------
      abspath.bat
@@ -981,7 +1041,7 @@ Examples:
 5.1. Error message `reg_cygwin.bat: error: (1) Failed to run cygcheck utility to detect cygwin dll version.'
 -------------------------------------------------------------------------------
 Solution:
- 1. Reintall cygwin referenced by the path from CYGWIN_PATH variable from the
+ 1. Reintall cygwin referenced by the path from CYGWIN_PATH variable in the
     Scripts/Config/cygwin.vars configuration file or
  2. Fix path to the cygwin installation directory in the registry:
     (x64) HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Cygnus Solutions\Cygwin\mounts v2\/
