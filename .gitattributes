@@ -106,8 +106,6 @@ BuildTools/msys/share/guile/ice-9/weak-vector.scm -text
 /Changes_EN.txt -text
 Projects/ConsoleTools.sln -text
 /README_EN.txt -text
-Redist/msvc2008/VC_x64Runtime.exe -text
-Redist/msvc2008/VC_x86Runtime.exe -text
 Scripts/Build/reg_cygwin.bat -text
 Scripts/Build/reg_msys.bat -text
 Scripts/Build/reg_msysdvlpr.bat -text
