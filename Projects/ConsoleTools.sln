@@ -7,6 +7,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConsoleTools", "ConsoleTools", "{D5783557-7EFF-4CA6-A13C-D6A17BA6B8DE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Common", "_Common", "{F126B620-6E7E-42F0-8F64-346B41108838}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Header Files", "Header Files", "{2909C0F5-E8D4-4975-A49C-2B246EE0DE17}"
+	ProjectSection(SolutionItems) = preProject
+		..\Utilities\Sources\_common\common.hpp = ..\Utilities\Sources\_common\common.hpp
+		..\Utilities\Sources\_common\printf.hpp = ..\Utilities\Sources\_common\printf.hpp
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thlibautocfg", "..\Utilities\Projects\thlibautocfg.vcxproj", "{6163FDF1-845E-4C24-8A88-B99DC955CA2D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pipetimes", "..\Utilities\Projects\pipetimes.vcxproj", "{636E0F9A-7A52-4C2F-8031-8A35D5DC417F}"
@@ -15,17 +23,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "envvarcmp", "..\Utilities\P
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "printf", "..\Utilities\Projects\printf.vcxproj", "{C75114FC-8991-4739-8CF6-ADFBAA2BA818}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "printargs", "..\Utilities\Projects\printargs.vcxproj", "{3BF4DB3A-DD04-4457-A474-D9A534D59B81}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "callf", "..\Utilities\Projects\callf.vcxproj", "{B9C215D3-6B7B-4A49-ACD7-4F8DFA69F337}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "clearcache", "..\Utilities\Projects\clearcache.vcxproj", "{DE71ED8C-9F4E-47AC-8E1D-E0053E42F575}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Common", "_Common", "{F126B620-6E7E-42F0-8F64-346B41108838}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Header Files", "Header Files", "{2909C0F5-E8D4-4975-A49C-2B246EE0DE17}"
-	ProjectSection(SolutionItems) = preProject
-		..\Utilities\Sources\_common\common.hpp = ..\Utilities\Sources\_common\common.hpp
-		..\Utilities\Sources\_common\printf.hpp = ..\Utilities\Sources\_common\printf.hpp
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,10 @@ Global
 		{C75114FC-8991-4739-8CF6-ADFBAA2BA818}.Debug|Win32.Build.0 = Debug|Win32
 		{C75114FC-8991-4739-8CF6-ADFBAA2BA818}.Release|Win32.ActiveCfg = Release|Win32
 		{C75114FC-8991-4739-8CF6-ADFBAA2BA818}.Release|Win32.Build.0 = Release|Win32
+		{3BF4DB3A-DD04-4457-A474-D9A534D59B81}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3BF4DB3A-DD04-4457-A474-D9A534D59B81}.Debug|Win32.Build.0 = Debug|Win32
+		{3BF4DB3A-DD04-4457-A474-D9A534D59B81}.Release|Win32.ActiveCfg = Release|Win32
+		{3BF4DB3A-DD04-4457-A474-D9A534D59B81}.Release|Win32.Build.0 = Release|Win32
 		{B9C215D3-6B7B-4A49-ACD7-4F8DFA69F337}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B9C215D3-6B7B-4A49-ACD7-4F8DFA69F337}.Debug|Win32.Build.0 = Debug|Win32
 		{B9C215D3-6B7B-4A49-ACD7-4F8DFA69F337}.Release|Win32.ActiveCfg = Release|Win32
@@ -61,14 +67,15 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F07D205C-DA64-4448-B3ED-735FC7EA4B21} = {D5783557-7EFF-4CA6-A13C-D6A17BA6B8DE}
+		{F126B620-6E7E-42F0-8F64-346B41108838} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
+		{2909C0F5-E8D4-4975-A49C-2B246EE0DE17} = {F126B620-6E7E-42F0-8F64-346B41108838}
 		{6163FDF1-845E-4C24-8A88-B99DC955CA2D} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{636E0F9A-7A52-4C2F-8031-8A35D5DC417F} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{62FC9063-64A6-47AD-90E8-7706570F6B58} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{C75114FC-8991-4739-8CF6-ADFBAA2BA818} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
+		{3BF4DB3A-DD04-4457-A474-D9A534D59B81} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{B9C215D3-6B7B-4A49-ACD7-4F8DFA69F337} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{DE71ED8C-9F4E-47AC-8E1D-E0053E42F575} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
-		{F126B620-6E7E-42F0-8F64-346B41108838} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
-		{2909C0F5-E8D4-4975-A49C-2B246EE0DE17} = {F126B620-6E7E-42F0-8F64-346B41108838}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
