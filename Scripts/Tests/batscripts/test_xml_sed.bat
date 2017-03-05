@@ -26,7 +26,8 @@ set __COUNTER1=1
 set LASTERROR=0
 
 rem 0X
-call :TEST "test_xml_sed/01" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
+call :TEST "test_xml_sed/xpath_filter_list/01_empty" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
+call :TEST "test_xml_sed/xpath_filter_list/02" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
 
 if %LASTERROR% EQU 0 echo.
 
