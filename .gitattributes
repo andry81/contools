@@ -129,6 +129,8 @@ Scripts/TestTools/branch_workingset/gen.bat -text
 Scripts/TestTools/branch_workingset/sync.bat -text
 Scripts/TestTools/genstrings.py -text
 Scripts/TestTools/genstrings.tcl -text
+Scripts/Tests/batscripts/_testdata/test_xml_sed/01/input.txt -text
+Scripts/Tests/batscripts/_testdata/test_xml_sed/01/output.txt -text
 Scripts/Tests/batscripts/init.bat -text
 Scripts/Tests/batscripts/test_all.bat -text
 Scripts/Tests/batscripts/test_cstresc.bat -text
@@ -142,6 +144,7 @@ Scripts/Tests/batscripts/test_stresc.bat -text
 Scripts/Tests/batscripts/test_strlen.bat -text
 Scripts/Tests/batscripts/test_strlen_speed.bat -text
 Scripts/Tests/batscripts/test_strrep.bat -text
+Scripts/Tests/batscripts/test_xml_sed.bat -text
 Scripts/Tests/hashlib/test1.sh -text
 Scripts/Tests/hashlib/test2.sh -text
 Scripts/Tests/hashlib/test3.sh -text
@@ -466,6 +469,7 @@ Scripts/Tools/wtee.exe -text
 Scripts/Tools/xcopy/xcopy_convert_excludes.bat -text
 Scripts/Tools/xcopy_dir.bat -text
 Scripts/Tools/xcopy_file.bat -text
+Scripts/Tools/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed -text
 Scripts/Tools/xml/xml.exe -text
 Scripts/Tools/xml/xml_to_xpath_list.bat -text
 Scripts/Tools/xml/xml_to_xpath_list_for_files.bat -text

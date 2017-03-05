@@ -17,6 +17,8 @@ call "%%~dp0test_make_url_canonical.bat"
 call "%%~dp0test_make_url_absolute.bat"
 rem call "%%~dp0test_setvarsfromfile.bat"
 
+call "%%~dp0test_xml_sed.bat"
+
 set /A NEST_LVL-=1
 
 if %NEST_LVL%0 EQU 0 (
