@@ -25,9 +25,13 @@ set /A NEST_LVL+=1
 set __COUNTER1=1
 set LASTERROR=0
 
-rem 0X
+rem xpath_filter_list/0X
 call :TEST "test_xml_sed/xpath_filter_list/01_empty" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
 call :TEST "test_xml_sed/xpath_filter_list/02" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
+
+rem xpath_search_list/0X
+call :TEST "test_xml_sed/xpath_search_list/01_empty" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
+call :TEST "test_xml_sed/xpath_search_list/02" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
 
 if %LASTERROR% EQU 0 echo.
 
