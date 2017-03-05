@@ -16,6 +16,9 @@ Utilities/Sources/help_inl.hpp
 Utilities/Sources/pipetimes/help.txt
 Utilities/Sources/pipetimes/help_inl.hpp
 Utilities/Sources/pipetimes/version.hpp
+Utilities/Sources/printargs/help.txt
+Utilities/Sources/printargs/help_inl.hpp
+Utilities/Sources/printargs/version.hpp
 Utilities/Sources/printf/help.txt
 Utilities/Sources/printf/help_inl.hpp
 Utilities/Sources/printf/version.hpp
