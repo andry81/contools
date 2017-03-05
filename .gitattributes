@@ -129,8 +129,10 @@ Scripts/TestTools/branch_workingset/gen.bat -text
 Scripts/TestTools/branch_workingset/sync.bat -text
 Scripts/TestTools/genstrings.py -text
 Scripts/TestTools/genstrings.tcl -text
-Scripts/Tests/batscripts/_testdata/test_xml_sed/01/input.txt -text
-Scripts/Tests/batscripts/_testdata/test_xml_sed/01/output.txt -text
+Scripts/Tests/batscripts/_testdata/test_xml_sed/xpath_filter_list/01_empty/input.txt -text
+Scripts/Tests/batscripts/_testdata/test_xml_sed/xpath_filter_list/01_empty/output.txt -text
+Scripts/Tests/batscripts/_testdata/test_xml_sed/xpath_filter_list/02/input.txt -text
+Scripts/Tests/batscripts/_testdata/test_xml_sed/xpath_filter_list/02/output.txt -text
 Scripts/Tests/batscripts/init.bat -text
 Scripts/Tests/batscripts/test_all.bat -text
 Scripts/Tests/batscripts/test_cstresc.bat -text
