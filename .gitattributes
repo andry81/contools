@@ -477,6 +477,7 @@ Utilities/Binaries/callf.exe -text
 Utilities/Binaries/clearcache.exe -text
 Utilities/Binaries/envvarcmp.exe -text
 Utilities/Binaries/pipetimes.exe -text
+Utilities/Binaries/printargs.exe -text
 Utilities/Binaries/printf.exe -text
 Utilities/Binaries/thlibautocfg.exe -text
 Utilities/Projects/TargetProject.PreBuildStep.CommandLine.var -text
