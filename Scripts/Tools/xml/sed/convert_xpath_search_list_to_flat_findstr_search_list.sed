@@ -33,10 +33,19 @@
     # remove 1t and 3d lines from Pattern Space
     s/.*\n\(.*\)\n.*/\1/
   }
+
+  # print Pattern Space
+  p
 }
 
 # for strings beginning not by #-character (including empty strings)
 /^#/ !{
+  # for empty string
+  /./ !{
+    # print Pattern Space
+    p
+  }
+
   # for not empty string
   /./ {
     # append Pattern Space to Buffer Space
@@ -46,14 +55,9 @@
     # append 2d line to 1t line with "|" character between
     s/\n/|/
 
-    # escape all findstr regex characters in 1t line of Pattern Space
+    # convert some characters in 1t line of Pattern Space
     s@\\@/@g
     #s@:@/@g
-    s/\./\\\./g
-    s/\[/\\\[/g
-    s/\]/\\\]/g
-    s/\^/\\\^/g
-    s/\$/\\\$/g
 
     # print Pattern Space
     p
