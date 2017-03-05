@@ -384,6 +384,7 @@ Scripts/Tools/print_hash_lst.bat -text
 Scripts/Tools/print_merged_logs.sh -text
 Scripts/Tools/print_product_ver.bat -text
 Scripts/Tools/print_product_ver_from_archive.bat -text
+Scripts/Tools/printargs.exe -text
 Scripts/Tools/printdospath.bat -text
 Scripts/Tools/printf.exe -text
 Scripts/Tools/printfile.bat -text
