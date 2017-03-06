@@ -64,6 +64,7 @@ if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0..\.."
 set "TOOLS_PATH=%TOOLS_PATH:\=/%"
 if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
 
+set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 set "?~dp0=%~dp0"
 
@@ -174,7 +175,7 @@ call "%%TOOLS_PATH%%/get_datetime.bat"
 set "SYNC_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
 set "SYNC_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 
-set "GEN_BRANCH_TEMP_FILE_DIR=%TEMP%\gen_branch_workingset_%SYNC_DATE%_%SYNC_TIME%"
+set "GEN_BRANCH_TEMP_FILE_DIR=%TEMP%\%?~n0%.%SYNC_DATE%.%SYNC_TIME%"
 set "BRANCH_ROOT_INFO_FILE_TMP=%GEN_BRANCH_TEMP_FILE_DIR%\$root_info.txt"
 
 rem create temporary files to store local context output

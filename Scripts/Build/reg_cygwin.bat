@@ -100,7 +100,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 set CYGWIN_VER_1_7_X=0
 if not "%CYGWIN_VER_STR%" == "" (
-  for /F "tokens=1,2,* delims=." %%i in ("%CYGWIN_VER_STR%") do (
+  for /F "eol= tokens=1,2,* delims=." %%i in ("%CYGWIN_VER_STR%") do (
     rem If Cygwin version is 1.7 or higher, then no need to check registry installation,
     rem because the Cygwin with version 1.7 and higher implements mingw style of working.
     if %%i0 GTR 10 (
