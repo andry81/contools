@@ -32,3 +32,8 @@ x:/base3/file3_$[]^.txt|/file3[2]
 # 	File: 	"."
 # ----
 .|/common[4]
+
+# ---
+# 	File: 	" 	"
+# ----
+.|/common[5]
