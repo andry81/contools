@@ -10,16 +10,22 @@
 
 # for strings beginning by #-character (comments and header values before xpath list)
 /^#/ {
-  # header value: File : "<BasePath>"
-  /^#[[:space:]]*File:[[:space:]]*"\?\([^"]*\)"\?/ {
+  # header value: `File : "<BasePath>"'
+  /^#[[:space:]]*File:[[:space:]]*\"\?\([^\"[:space:]]*\)\"\?/ {
     # append Pattern Space to Buffer Space
     H
     # extract <BasePath>
-    s/^#[[:space:]]*File:[[:space:]]*"\?\([^"]*\)"\?/\1/
+    s/^#[[:space:]]*File:[[:space:]]*\"\?\([^\"[:space:]]*\)\"\?/\1/
 
-    # if 1t line of Pattern Space is empty, then set "." to 1t line of Pattern Space
-    /./ !{
-      s/^$/./
+    # sed workaround for trim spaces and quotes around <BasePath> if previous pattern has failed
+    s/^[[:space:]]*\([^[:space:]]\)/\1/
+    s/\([^[:space:]]\)[[:space:]]*$/\1/
+    s/^\"//
+    s/\"$//
+
+    # if 1t line of Pattern Space is empty or has only space/tab characters, then set "." to 1t line of Pattern Space
+    /[^[:space:]]/ !{
+      s/.*/./
     }
 
     # append Pattern Space to Buffer Space
@@ -39,31 +45,34 @@
 /^#/ !{
   # for not empty string
   /./ {
-    # append Pattern Space to Buffer Space
-    H
-    # copy Buffer Space to Pattern Space
-    g
-    # append 2d line to 1t line with "|" character between
-    s/\n/|/
+    # for string has not space/tab characters
+    /[^[:space:]]/ {
+      # append Pattern Space to Buffer Space
+      H
+      # copy Buffer Space to Pattern Space
+      g
+      # append 2d line to 1t line with "|" character between
+      s/\n/|/
 
-    # escape all findstr regex characters in 1t line of Pattern Space
-    s@\\@/@g
-    #s@:@/@g
-    s/\./\\\./g
-    s/\[/\\\[/g
-    s/\]/\\\]/g
-    s/\^/\\\^/g
-    s/\$/\\\$/g
+      # escape all findstr regex characters in 1t line of Pattern Space
+      s@\\@/@g
+      #s@:@/@g
+      s/\./\\./g
+      s/\[/\\[/g
+      s/\]/\\]/g
+      s/\^/\\^/g
+      s/\$/\\$/g
 
-    # print Pattern Space
-    p
-    # copy Buffer Space to Pattern Space
-    g
-    # remove 2d line from Pattern Space
-    s/\(.*\)\n.*/\1/
-    # copy Pattern Space to Buffer Space
-    h
-    # delete Pattern Space and branch to beginning
-    d
+      # print Pattern Space
+      p
+      # copy Buffer Space to Pattern Space
+      g
+      # remove 2d line from Pattern Space
+      s/\(.*\)\n.*/\1/
+      # copy Pattern Space to Buffer Space
+      h
+      # delete Pattern Space and branch to beginning
+      d
+    }
   }
 }

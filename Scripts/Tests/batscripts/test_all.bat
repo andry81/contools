@@ -18,6 +18,7 @@ call "%%~dp0test_make_url_absolute.bat"
 rem call "%%~dp0test_setvarsfromfile.bat"
 
 call "%%~dp0test_xml_sed.bat"
+call "%%~dp0test_xml__filter_xpath_list_by_xpath_list.bat"
 
 set /A NEST_LVL-=1
 

@@ -1,0 +1,44 @@
+/common[1]/subdir1
+/common[2]/subdir1
+
+# ---
+# 	File: 	"x:\base1\file1.txt"
+# ----
+/dir1/file1[1]/subdir1
+/dir1/file1[2]/subdir1
+
+# ---
+# 	File: 	.
+# ----
+/common[3]/subdir1
+/common[4]/subdir1
+
+# ---
+# 	File: 	x:\base2\file2.txt
+# ----
+/dir2/file2[1]/subdir1
+/dir2/file2[2]/subdir1
+
+# ---
+# 	File:
+# ----
+/common[5]/subdir1
+/common[6]/subdir1
+
+# ---
+# 	File: 	"x:\base3\file3_$[]^.txt"
+# ----
+/dir3/file3[1]/subdir1
+/dir3/file3[2]/subdir1
+
+# ---
+# 	File: 	"."
+# ----
+/common[7]/subdir1
+/common[8]/subdir1
+
+# ---
+# 	File: 	" 	"
+# ----
+/common[9]/subdir1
+/common[10]/subdir1

@@ -26,14 +26,11 @@ set /A NEST_LVL+=1
 set __COUNTER1=1
 set LASTERROR=0
 
-rem xpath_filter_list/0X
-call :TEST "xpath_filter_list/01_empty" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
-call :TEST "xpath_filter_list/11_inexact" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
-call :TEST "xpath_filter_list/12_exact" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_exact_list.sed"
-
-rem xpath_search_list/0X
-call :TEST "xpath_search_list/01_empty" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
-call :TEST "xpath_search_list/02" -n -f "%%TOOLS_PATH%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
+call :TEST "01_empty"
+call :TEST "11_inexact"
+call :TEST "12_exact"           -exact
+call :TEST "21_inexact_w_props"
+call :TEST "22_exact_w_props"   -exact
 
 if %LASTERROR% EQU 0 echo.
 
@@ -48,16 +45,16 @@ set INTERRORLEVEL=0
 set "TEST_DATA_DIR=%?~n0%/%~1"
 shift
 
-set "TEST_DATA_SED_CMD_LINE="
-:TEST_DATA_SED_CMD_LINE_LOOP
-if "%~1" == "" goto TEST_DATA_SED_CMD_LINE_LOOP_END
+set "TEST_DATA_CMD_LINE="
+:TEST_DATA_CMD_LINE_LOOP
+if "%~1" == "" goto TEST_DATA_CMD_LINE_LOOP_END
 
-set TEST_DATA_SED_CMD_LINE=%TEST_DATA_SED_CMD_LINE%%1 
+set TEST_DATA_CMD_LINE=%TEST_DATA_CMD_LINE%%1 
 shift
 
-goto TEST_DATA_SED_CMD_LINE_LOOP
+goto TEST_DATA_CMD_LINE_LOOP
 
-:TEST_DATA_SED_CMD_LINE_LOOP_END
+:TEST_DATA_CMD_LINE_LOOP_END
 
 set TEST_DO_TEARDOWN=0
 if %TEST_SETUP%0 EQU 0 (
@@ -78,15 +75,18 @@ if %TEST_DO_TEARDOWN%0 NEQ 0 (
 goto TEST_END
 
 :TEST_IMPL
-call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_DIR%%\input.txt"
+call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_DIR%%\xpath_in.txt"
 set "TEST_DATA_IN_FILE=%RETURN_VALUE%"
+
+call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_DIR%%\xpath_filter.txt"
+set "TEST_DATA_FILTER_FILE=%RETURN_VALUE%"
 
 call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_DIR%%\output.txt"
 set "TEST_DATA_REF_FILE=%RETURN_VALUE%"
 
 rem builtin commands
 (
-  "%TOOLS_PATH%/gnuwin32/bin/sed.exe" %TEST_DATA_SED_CMD_LINE% "%TEST_DATA_IN_FILE%"
+  call "%%TOOLS_PATH%%/xml/filter_xpath_list_by_xpath_list.bat" %%TEST_DATA_CMD_LINE%% "%%TEST_DATA_IN_FILE%%" "%%TEST_DATA_FILTER_FILE%%"
 ) > "%TEST_DATA_OUT_FILE%" || ( call set "INTERRORLEVEL=%%ERRORLEVEL%%" & set "LASTERROR=20" & goto LOCAL_EXIT1 )
 
 if not exist "%TEST_DATA_OUT_FILE%" ( set "LASTERROR=21" & goto LOCAL_EXIT1 )
