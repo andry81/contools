@@ -44,7 +44,6 @@ if not "%FLAG%" == "" (
 )
 
 set CODE_PAGE=%~1
-
 shift
 
 set "CMD_VA_ARGS="
@@ -53,14 +52,14 @@ set "CMD_VA_ARGS="
 if "%~1" == "" goto PROCESS_FILES_LOOP_END
 
 set CMD_VA_ARGS=%CMD_VA_ARGS%%1 
+shift
+
+goto PROCESS_FILES_LOOP
 
 :PROCESS_FILES_LOOP_END
 
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="
-
-shift
-
 if "%CODE_PAGE%" == "" goto NOCODEPAGE
 
 for /F "usebackq eol= tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
