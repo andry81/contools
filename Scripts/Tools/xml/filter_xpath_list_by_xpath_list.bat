@@ -23,6 +23,7 @@ rem      and filter is "/tag1/tag2", then for -exact match only 3d
 rem      and 4th lines will be filtered, otherwise - from 3d to 6th.
 rem      If filter is "/tag1/tag2[@val=VALUE]", then exactly 4th
 rem      line will be filtered no matter does flag set or not.
+rem  -ignore-props - ignore `[@...]' suffix while matching xpaths.
 
 rem Drop last error level
 cd .
@@ -39,6 +40,7 @@ set "?~dp0=%~dp0"
 
 rem script flags
 set FLAG_EXACT=0
+set FLAG_IGNORE_PROPS=1
 
 :FLAGS_LOOP
 
@@ -51,6 +53,9 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if not "%FLAG%" == "" (
   if "%FLAG%" == "-exact" (
     set FLAG_EXACT=1
+    shift
+  ) else if "%FLAG%" == "-ignore-props" (
+    set FLAG_IGNORE_PROPS=1
     shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
@@ -110,7 +115,11 @@ exit /b %LASTERROR%
 
 :MAIN
 rem create filter list, append "/" to end of each xpath for exact/subdir match
-set SED_FILTER_PREFIX_CMD_LINE=-e "/^#/ !{ /[^\/]\[@/ { s/\([^\/]\)\[@/\1\/[@/; }; /\/\[@/ !{ /[^[[:space:]]]/ { /\/$/ !{ s/$/\//; } } } }"
+if %FLAG_IGNORE_PROPS% NEQ 0 (
+  set SED_FILTER_PREFIX_CMD_LINE=-e "/^#/ !{ /[^\/]\[@/ { s/\([^\/]\)\[@/\1\/[@/; }; /\/\[@/ !{ /[^[[:space:]]]/ { /\/$/ !{ s/$/\//; } } }; /\[@.*/ { s/\[@.*//; } }"
+) else (
+  set SED_FILTER_PREFIX_CMD_LINE=-e "/^#/ !{ /[^\/]\[@/ { s/\([^\/]\)\[@/\1\/[@/; }; /\/\[@/ !{ /[^[[:space:]]]/ { /\/$/ !{ s/$/\//; } } } }"
+)
 if %FLAG_EXACT% NEQ 0 (
   set "SED_FILTER_SUFFIX_CMD_FILE=convert_xpath_filter_list_to_flat_findstr_pttn_exact_list.sed"
 ) else (
