@@ -218,6 +218,7 @@ Scripts/Tools/ToolAdaptors/mkdir.sh -text
 Scripts/Tools/ToolAdaptors/outofmem.bat -text
 Scripts/Tools/ToolAdaptors/rm.sh -text
 Scripts/Tools/ToolAdaptors/rmdir.sh -text
+Scripts/Tools/ToolAdaptors/runas_admin.bat -text
 Scripts/Tools/ToolAdaptors/tortoisesvn/TortoiseProc.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/cmd_as_admin.bat -text
@@ -298,6 +299,7 @@ Scripts/Tools/cygwin/bin/cygsigsegv-2.dll -text
 Scripts/Tools/cygwin/bin/cygwin1.dll -text
 Scripts/Tools/cygwin/bin/diff.exe -text
 Scripts/Tools/cygwin/bin/patch.exe -text
+Scripts/Tools/cygwin/bin/sed.exe -text
 Scripts/Tools/cygwin/etc/fstab -text
 Scripts/Tools/del_file.bat -text
 Scripts/Tools/del_file_pttn.bat -text
@@ -423,7 +425,6 @@ Scripts/Tools/regenum.bat -text
 Scripts/Tools/regexplib.sh -text
 Scripts/Tools/regquery.bat -text
 Scripts/Tools/resetenv.bat -text
-Scripts/Tools/runas_admin.bat -text
 Scripts/Tools/sar.pl -text
 Scripts/Tools/sarf.js -text
 Scripts/Tools/scm/index_patch_file.bat -text

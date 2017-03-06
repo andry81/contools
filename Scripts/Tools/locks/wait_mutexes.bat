@@ -34,16 +34,16 @@ set /A LOCK_WAITER_INDEX+=1
 goto PREPARE_LOCK_WAITERS_IMPL
 
 :PREPARE_LOCK_WAITER
-set "PRE_LOCK_FILE=prelock_mutex0_%LOCK_NAME%"
-set "LOCK_DIR=lock_mutex0_%LOCK_NAME%"
+set "PRE_LOCK_FILE=prelock_mutex0.%LOCK_NAME%"
+set "LOCK_DIR=lock_mutex0.%LOCK_NAME%"
 
 call "%%TOOLS_PATH%%/uuidgen.bat"
 
-set "WAITER_FILE=waiter_%RETURN_VALUE%"
+set "WAITER_FILE=waiter.%RETURN_VALUE%"
 set "WAITER_FILE_%LOCK_WAITER_INDEX%="
 
 rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
-set "OLD_LOCK_DIR=%LOCK_DIR%_%RETURN_VALUE%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VALUE%"
 
 :PRE_LOCK_LOOP0
 rem prelock via redirection to file
@@ -110,7 +110,7 @@ call set "LOCK_DIR=%%LOCK_DIR_%LOCK_WAITER_INDEX%%%"
 
 call "%%TOOLS_PATH%%/uuidgen.bat"
 
-set "OLD_LOCK_DIR=%LOCK_DIR%_%RETURN_VALUE%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VALUE%"
 
 rem prelock via redirection to file
 (

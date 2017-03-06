@@ -12,8 +12,9 @@ if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
 set "TOOLS_PATH=%TOOLS_PATH:\=/%"
 if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
 
-set "?~dp0=%~dp0"
+set "?~n0=%~n0"
 set "?~nx0=%~nx0"
+set "?~dp0=%~dp0"
 
 rem drop last error level
 cd .
@@ -69,8 +70,7 @@ goto :EOF
 :PROCESS_ARCHIVE_FILE
 
 call "%%TOOLS_PATH%%/uuidgen.bat"
-
-set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%TEMP%\gen_uninstall_files_section_from_archive_%RETURN_VALUE%"
+set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%TEMP%\%?~n0%.%RETURN_VALUE%"
 
 mkdir "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%"
 rem safe all directory files remove except the directory

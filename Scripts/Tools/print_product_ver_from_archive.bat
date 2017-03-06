@@ -18,8 +18,7 @@ rem add EULA acception into registry to avoid EULA acception GUI dialog in the b
 reg add HKCU\Software\Sysinternals\SigCheck /v EulaAccepted /t REG_DWORD /d 0x00000001 /f >nul 2>nul
 
 call "%%TOOLS_PATH%%/uuidgen.bat"
-
-set "TEMP_EXTRACT_DIR_PATH=%TEMP%\7zip_tmp_%RETURN_VALUE%"
+set "TEMP_EXTRACT_DIR_PATH=%TEMP%\%~n0.%RETURN_VALUE%"
 
 mkdir "%TEMP_EXTRACT_DIR_PATH%" || (
   echo.%~nx0: error: could not create temporary extraction directory: "%TEMP_EXTRACT_DIR_PATH%".

@@ -11,13 +11,13 @@ setlocal
 
 call "%%~dp0get_datetime.bat"
 
-set "LOCK_DIR_NAME_SUFFIX=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
+set "LOCK_DIR_NAME_SUFFIX=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%.%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 set LASTERROR=0
 
 rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of write redirection lock
-rmdir /S /Q "%TEMP%\lock_%~1" >nul 2>&1
+rmdir /S /Q "%TEMP%\lock.%~1" >nul 2>&1
 
-mkdir "%TEMP%\lock_%~1" && (
+mkdir "%TEMP%\lock.%~1" && (
   rem IMPL to use "goto :EOF" in next command instead of "exit /b %ERRORLEVEL%" under "block" command - "( )"
   call :IMPL %%*
   goto :EOF
@@ -26,9 +26,9 @@ exit /b -1024
 
 :IMPL
 rem call IMPL2 to recover exit code from commands like "exit /b"
-call :IMPL2 %%* 9> "%TEMP%\lock_%~1\lock0_%LOCK_DIR_NAME_SUFFIX%.txt"
+call :IMPL2 %%* 9> "%TEMP%\lock.%~1\lock0.%LOCK_DIR_NAME_SUFFIX%.txt"
 set LASTERROR=%ERRORLEVEL%
-rmdir /S /Q "%TEMP%\lock_%~1"
+rmdir /S /Q "%TEMP%\lock.%~1"
 exit /b %LASTERROR%
 
 :IMPL2

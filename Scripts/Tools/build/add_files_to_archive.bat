@@ -44,7 +44,7 @@ rem   archive file around being updated archive file.
 rem   For example: pushd c:\ && ( 7za.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
 
 call "%%TOOLS_PATH%%/uuidgen.bat"
-set "TEMP_DIR_PATH=%TEMP%\7zip_tmp_%RETURN_VALUE%"
+set "TEMP_DIR_PATH=%TEMP%\%~n0.%RETURN_VALUE%"
 
 mkdir "%TEMP_DIR_PATH%" || (
   popd

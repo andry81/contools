@@ -59,7 +59,7 @@ copy /Y "%~dp0runas_admin.lnk.dat" "%~dp0runas_admin.lnk">nul
 if %ERRORLEVEL% NEQ 0 goto PAUSE_AND_EXIT
 
 set UAC_READY=1
-call "%%~dp0runas_admin.lnk" ^(%%*^)
+call "%%~dpcmd_admin.lnk" ^(%%*^)
 goto :EOF
 
 :UAC_READY

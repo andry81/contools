@@ -16,6 +16,7 @@ rem    "*.pdb:*.ilk:*.map" "*.pdb.7z" "/S /Y /H" || exit /b 1
 
 setlocal
 
+set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
 set "MSG_TOKEN=%~1"
@@ -98,8 +99,8 @@ call "%%TOOLS_PATH%%/get_path_subtract.bat" "%%ARCHIVE_FROM_STAGE_DIR_PATH%%" "%
 set "ARCHIVE_DIR_PREFIX_PATH=%RETURN_VALUE%"
 
 call "%%TOOLS_PATH%%/uuidgen.bat"
+set "XCOPY_ARCHIVE_EXCLUDE_FILES_FILE=%TEMP%\%?~n0%.%RETURN_VALUE%.txt"
 
-set "XCOPY_ARCHIVE_EXCLUDE_FILES_FILE=%TEMP%\xcopy_excludes_%RETURN_VALUE%.txt"
 call :DEL_XCOPY_ARCHIVE_EXCLUDE_FILES_FILE || exit /b 10
 
 set "ARCHIVE_STAGE_FILE_PATH_LIST="

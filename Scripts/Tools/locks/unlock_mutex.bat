@@ -11,12 +11,12 @@ if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
 call "%%TOOLS_PATH%%/uuidgen.bat"
 
 set "LOCK_PATH=%TEMP%"
-set "PRE_LOCK_FILE=prelock_mutex0_%LOCK_NAME%"
-set "LOCK_DIR=lock_mutex0_%LOCK_NAME%"
+set "PRE_LOCK_FILE=prelock_mutex0.%LOCK_NAME%"
+set "LOCK_DIR=lock_mutex0.%LOCK_NAME%"
 set "UNLOCK_DIR=unlock0"
 set "UNLOCK_FILE=unlock0"
 
-set "OLD_LOCK_DIR=%LOCK_DIR%_%RETURN_VALUE%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VALUE%"
 
 :PRE_LOCK_LOOP
 rem prelock via redirection to file
