@@ -1,3 +1,5 @@
+import sys
+
 class ProductKey:
   def __init__(self, fileName = None):
     self.keyFile = None
@@ -35,7 +37,10 @@ class ProductKey:
               if isinstance(d, str):
                   d = ord(d)
               dwAccumulator = d + dwAccumulator
-              rpk[j+rpkOffset] =  (dwAccumulator / 24) if (dwAccumulator / 24) <= 255 else 255 
+              if sys.version_info[0] >= 3:
+                rpk[j+rpkOffset] = (dwAccumulator // 24) if (dwAccumulator // 24) <= 255 else 255
+              else:
+                rpk[j+rpkOffset] = (dwAccumulator / 24) if (dwAccumulator / 24) <= 255 else 255
               dwAccumulator = dwAccumulator % 24
               j = j - 1
           i = i - 1
