@@ -11,15 +11,15 @@
 /common[1]/subdir1/subdir2[@type="string"]
 /common[1]/subdir1/subdir2[@val="{{COMMON1}}"]
 /common[2]/subdir1/
-/common[2]/subdir1/[@name="name1"]
+/common[2]/subdir1/[@name="name2"]
 /common[2]/subdir1/[@type="string"]
 /common[2]/subdir1/[@val="{{COMMON2}}"]
 /common[2]/subdir1a/
-/common[2]/subdir1a/[@name="name1"]
+/common[2]/subdir1a/[@name="name2"]
 /common[2]/subdir1a/[@type="string"]
 /common[2]/subdir1a/[@val="{{COMMON2}}"]
 /common[2]/subdir1/subdir2/
-/common[2]/subdir1/subdir2/[@name="name1"]
+/common[2]/subdir1/subdir2/[@name="name2"]
 /common[2]/subdir1/subdir2/[@type="string"]
 /common[2]/subdir1/subdir2/[@val="{{COMMON2}}"]
 
@@ -29,27 +29,27 @@
 /dir1/file1[1]/subdir1
 /dir1/file1[1]/subdir1[@name="name1"]
 /dir1/file1[1]/subdir1[@type="string"]
-/dir1/file1[1]/subdir1[@type="{{FILE1}}"]
+/dir1/file1[1]/subdir1[@val="{{FILE1}}"]
 /dir1/file1[1]/subdir1a
 /dir1/file1[1]/subdir1a[@name="name1"]
 /dir1/file1[1]/subdir1a[@type="string"]
-/dir1/file1[1]/subdir1a[@type="{{FILE1}}"]
+/dir1/file1[1]/subdir1a[@val="{{FILE1}}"]
 /dir1/file1[1]/subdir1/subdir2
 /dir1/file1[1]/subdir1/subdir2[@name="name1"]
 /dir1/file1[1]/subdir1/subdir2[@type="string"]
-/dir1/file1[1]/subdir1/subdir2[@type="{{FILE1}}"]
+/dir1/file1[1]/subdir1/subdir2[@val="{{FILE1}}"]
 /dir1/file1[2]/subdir1/
-/dir1/file1[2]/subdir1/[@name="name1"]
+/dir1/file1[2]/subdir1/[@name="name2"]
 /dir1/file1[2]/subdir1/[@type="string"]
-/dir1/file1[2]/subdir1/[@type="{{FILE2}}"]
+/dir1/file1[2]/subdir1/[@val="{{FILE2}}"]
 /dir1/file1[2]/subdir1a/
-/dir1/file1[2]/subdir1a/[@name="name1"]
+/dir1/file1[2]/subdir1a/[@name="name2"]
 /dir1/file1[2]/subdir1a/[@type="string"]
-/dir1/file1[2]/subdir1a/[@type="{{FILE2}}"]
+/dir1/file1[2]/subdir1a/[@val="{{FILE2}}"]
 /dir1/file1[2]/subdir1/subdir2/
-/dir1/file1[2]/subdir1/subdir2/[@name="name1"]
+/dir1/file1[2]/subdir1/subdir2/[@name="name2"]
 /dir1/file1[2]/subdir1/subdir2/[@type="string"]
-/dir1/file1[2]/subdir1/subdir2/[@type="{{FILE2}}"]
+/dir1/file1[2]/subdir1/subdir2/[@val="{{FILE2}}"]
 
 # ---
 # 	File: 	.
@@ -67,15 +67,15 @@
 /common[3]/subdir1/subdir2[@type="string"]
 /common[3]/subdir1/subdir2[@val="{{COMMON1}}"]
 /common[4]/subdir1/
-/common[4]/subdir1/[@name="name1"]
+/common[4]/subdir1/[@name="name2"]
 /common[4]/subdir1/[@type="string"]
 /common[4]/subdir1/[@val="{{COMMON2}}"]
 /common[4]/subdir1a/
-/common[4]/subdir1a/[@name="name1"]
+/common[4]/subdir1a/[@name="name2"]
 /common[4]/subdir1a/[@type="string"]
 /common[4]/subdir1a/[@val="{{COMMON2}}"]
 /common[4]/subdir1/subdir2/
-/common[4]/subdir1/subdir2/[@name="name1"]
+/common[4]/subdir1/subdir2/[@name="name2"]
 /common[4]/subdir1/subdir2/[@type="string"]
 /common[4]/subdir1/subdir2/[@val="{{COMMON2}}"]
 
@@ -85,27 +85,27 @@
 /dir2/file2[1]/subdir1
 /dir2/file2[1]/subdir1[@name="name1"]
 /dir2/file2[1]/subdir1[@type="string"]
-/dir2/file2[1]/subdir1[@type="{{FILE1}}"]
+/dir2/file2[1]/subdir1[@val="{{FILE1}}"]
 /dir2/file2[1]/subdir1a
 /dir2/file2[1]/subdir1a[@name="name1"]
 /dir2/file2[1]/subdir1a[@type="string"]
-/dir2/file2[1]/subdir1a[@type="{{FILE1}}"]
+/dir2/file2[1]/subdir1a[@val="{{FILE1}}"]
 /dir2/file2[1]/subdir1/subdir2
 /dir2/file2[1]/subdir1/subdir2[@name="name1"]
 /dir2/file2[1]/subdir1/subdir2[@type="string"]
-/dir2/file2[1]/subdir1/subdir2[@type="{{FILE1}}"]
+/dir2/file2[1]/subdir1/subdir2[@val="{{FILE1}}"]
 /dir2/file2[2]/subdir1/
 /dir2/file2[2]/subdir1/[@name="name2"]
 /dir2/file2[2]/subdir1/[@type="string"]
-/dir2/file2[2]/subdir1/[@type="{{FILE2}}"]
+/dir2/file2[2]/subdir1/[@val="{{FILE2}}"]
 /dir2/file2[2]/subdir1a/
 /dir2/file2[2]/subdir1a/[@name="name2"]
 /dir2/file2[2]/subdir1a/[@type="string"]
-/dir2/file2[2]/subdir1a/[@type="{{FILE2}}"]
+/dir2/file2[2]/subdir1a/[@val="{{FILE2}}"]
 /dir2/file2[2]/subdir1/subdir2/
 /dir2/file2[2]/subdir1/subdir2/[@name="name2"]
 /dir2/file2[2]/subdir1/subdir2/[@type="string"]
-/dir2/file2[2]/subdir1/subdir2/[@type="{{FILE2}}"]
+/dir2/file2[2]/subdir1/subdir2/[@val="{{FILE2}}"]
 
 # ---
 # 	File:
@@ -123,15 +123,15 @@
 /common[5]/subdir1/subdir2[@type="string"]
 /common[5]/subdir1/subdir2[@val="{{COMMON1}}"]
 /common[6]/subdir1/
-/common[6]/subdir1/[@name="name1"]
+/common[6]/subdir1/[@name="name2"]
 /common[6]/subdir1/[@type="string"]
 /common[6]/subdir1/[@val="{{COMMON2}}"]
 /common[6]/subdir1a/
-/common[6]/subdir1a/[@name="name1"]
+/common[6]/subdir1a/[@name="name2"]
 /common[6]/subdir1a/[@type="string"]
 /common[6]/subdir1a/[@val="{{COMMON2}}"]
 /common[6]/subdir1/subdir2/
-/common[6]/subdir1/subdir2/[@name="name1"]
+/common[6]/subdir1/subdir2/[@name="name2"]
 /common[6]/subdir1/subdir2/[@type="string"]
 /common[6]/subdir1/subdir2/[@val="{{COMMON2}}"]
 
@@ -141,27 +141,27 @@
 /dir3/file3[1]/subdir1
 /dir3/file3[1]/subdir1[@name="name1"]
 /dir3/file3[1]/subdir1[@type="string"]
-/dir3/file3[1]/subdir1[@type="{{FILE1}}"]
+/dir3/file3[1]/subdir1[@val="{{FILE1}}"]
 /dir3/file3[1]/subdir1a
 /dir3/file3[1]/subdir1a[@name="name1"]
 /dir3/file3[1]/subdir1a[@type="string"]
-/dir3/file3[1]/subdir1a[@type="{{FILE1}}"]
+/dir3/file3[1]/subdir1a[@val="{{FILE1}}"]
 /dir3/file3[1]/subdir1/subdir2
 /dir3/file3[1]/subdir1/subdir2[@name="name1"]
 /dir3/file3[1]/subdir1/subdir2[@type="string"]
-/dir3/file3[1]/subdir1/subdir2[@type="{{FILE1}}"]
+/dir3/file3[1]/subdir1/subdir2[@val="{{FILE1}}"]
 /dir3/file3[2]/subdir1/
 /dir3/file3[2]/subdir1/[@name="name2"]
 /dir3/file3[2]/subdir1/[@type="string"]
-/dir3/file3[2]/subdir1/[@type="{{FILE2}}"]
+/dir3/file3[2]/subdir1/[@val="{{FILE2}}"]
 /dir3/file3[2]/subdir1a/
 /dir3/file3[2]/subdir1a/[@name="name2"]
 /dir3/file3[2]/subdir1a/[@type="string"]
-/dir3/file3[2]/subdir1a/[@type="{{FILE2}}"]
+/dir3/file3[2]/subdir1a/[@val="{{FILE2}}"]
 /dir3/file3[2]/subdir1/subdir2/
 /dir3/file3[2]/subdir1/subdir2/[@name="name2"]
 /dir3/file3[2]/subdir1/subdir2/[@type="string"]
-/dir3/file3[2]/subdir1/subdir2/[@type="{{FILE2}}"]
+/dir3/file3[2]/subdir1/subdir2/[@val="{{FILE2}}"]
 
 # ---
 # 	File: 	"."
@@ -179,15 +179,15 @@
 /common[7]/subdir1/subdir2[@type="string"]
 /common[7]/subdir1/subdir2[@val="{{COMMON1}}"]
 /common[8]/subdir1/
-/common[8]/subdir1/[@name="name1"]
+/common[8]/subdir1/[@name="name2"]
 /common[8]/subdir1/[@type="string"]
 /common[8]/subdir1/[@val="{{COMMON2}}"]
 /common[8]/subdir1a/
-/common[8]/subdir1a/[@name="name1"]
+/common[8]/subdir1a/[@name="name2"]
 /common[8]/subdir1a/[@type="string"]
 /common[8]/subdir1a/[@val="{{COMMON2}}"]
 /common[8]/subdir1/subdir2/
-/common[8]/subdir1/subdir2/[@name="name1"]
+/common[8]/subdir1/subdir2/[@name="name2"]
 /common[8]/subdir1/subdir2/[@type="string"]
 /common[8]/subdir1/subdir2/[@val="{{COMMON2}}"]
 
@@ -207,14 +207,14 @@
 /common[9]/subdir1/subdir2[@type="string"]
 /common[9]/subdir1/subdir2[@val="{{COMMON1}}"]
 /common[10]/subdir1/
-/common[10]/subdir1/[@name="name1"]
+/common[10]/subdir1/[@name="name2"]
 /common[10]/subdir1/[@type="string"]
 /common[10]/subdir1/[@val="{{COMMON2}}"]
 /common[10]/subdir1a/
-/common[10]/subdir1a/[@name="name1"]
+/common[10]/subdir1a/[@name="name2"]
 /common[10]/subdir1a/[@type="string"]
 /common[10]/subdir1a/[@val="{{COMMON2}}"]
 /common[10]/subdir1/subdir2/
-/common[10]/subdir1/subdir2/[@name="name1"]
+/common[10]/subdir1/subdir2/[@name="name2"]
 /common[10]/subdir1/subdir2/[@type="string"]
 /common[10]/subdir1/subdir2/[@val="{{COMMON2}}"]
