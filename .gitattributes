@@ -247,6 +247,7 @@ Scripts/Tools/admin/ProductKey/PrintProductKeyFromReg.vbs -text
 Scripts/Tools/admin/ProductKey/ProductKey.py -text
 Scripts/Tools/admin/ProductKey/ProductKey.vbs -text
 Scripts/Tools/admin/ProductKey/README_EN.txt -text
+Scripts/Tools/admin/ProductKey/WinReg.py -text
 Scripts/Tools/admin/RunDll/ExportImportWindowsCreds.bat -text
 Scripts/Tools/admin/RunDll/SafelyRemoveHotPlugDevice.bat -text
 Scripts/Tools/admin/RunDll/UserControl.bat -text
