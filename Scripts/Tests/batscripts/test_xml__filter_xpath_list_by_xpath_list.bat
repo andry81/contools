@@ -14,7 +14,7 @@ set __CTRL_SETLOCAL=1
 
 call "%%~dp0init.bat" || goto :EOF
 
-set "?~n0=%~n0"
+set "TEST_DATA_FILE_SCRIPT_NAME=%~n0"
 set "?~nx0=%~nx0"
 set "?~dp0=%~dp0"
 
@@ -26,11 +26,13 @@ set /A NEST_LVL+=1
 set __COUNTER1=1
 set LASTERROR=0
 
-call :TEST "01_empty"
-call :TEST "11_inexact"
-call :TEST "12_exact"           -exact
-call :TEST "21_inexact_w_props"
-call :TEST "22_exact_w_props"   -exact
+call :TEST "_common/01_empty.txt"   "01_empty"
+call :TEST "_common/02_base.txt"    "11_inexact"
+call :TEST "_common/02_base.txt"    "12_exact"                  -exact
+call :TEST "_common/02_base.txt"    "21_inexact_w_props"
+call :TEST "_common/02_base.txt"    "22_exact_w_props"          -exact
+call :TEST "_common/02_base.txt"    "31_inexact_ignore_props"           -ignore-props
+call :TEST "_common/02_base.txt"    "32_exact_ignore_props"     -exact  -ignore-props
 
 if %LASTERROR% EQU 0 echo.
 
@@ -42,7 +44,9 @@ setlocal
 set LASTERROR=0
 set INTERRORLEVEL=0
 
-set "TEST_DATA_DIR=%?~n0%/%~1"
+set "TEST_DATA_FILE_IN=%~1"
+set "TEST_DATA_FILE_REF_DIR=%~2"
+shift
 shift
 
 set "TEST_DATA_CMD_LINE="
@@ -75,13 +79,23 @@ if %TEST_DO_TEARDOWN%0 NEQ 0 (
 goto TEST_END
 
 :TEST_IMPL
-call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_DIR%%\xpath_in.txt"
+if not "%TEST_DATA_BASE_DIR%\%TEST_DATA_FILE_SCRIPT_NAME%\%TEST_DATA_FILE_IN%" == "" (
+  call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_FILE_SCRIPT_NAME%%\%%TEST_DATA_FILE_IN%%"
+) else (
+  call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_FILE_SCRIPT_NAME%%\%%TEST_DATA_FILE_REF_DIR%%\xpath_in.txt"
+)
 set "TEST_DATA_IN_FILE=%RETURN_VALUE%"
 
-call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_DIR%%\xpath_filter.txt"
+call :GET_TEST_DATA_FILE_DIR "%%TEST_DATA_IN_FILE%%"
+set "TEST_DATA_FILE_IN_DIR=%RETURN_VALUE%"
+
+call :GET_TEST_DATA_FILE_NAME "%%TEST_DATA_IN_FILE%%"
+set "TEST_DATA_FILE_IN_NAME=%RETURN_VALUE%"
+
+call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_FILE_SCRIPT_NAME%%\%%TEST_DATA_FILE_REF_DIR%%\xpath_filter.txt"
 set "TEST_DATA_FILTER_FILE=%RETURN_VALUE%"
 
-call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_DIR%%\output.txt"
+call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_FILE_SCRIPT_NAME%%\%%TEST_DATA_FILE_REF_DIR%%\output.txt"
 set "TEST_DATA_REF_FILE=%RETURN_VALUE%"
 
 rem builtin commands
@@ -125,6 +139,15 @@ exit /b 0
 set "RETURN_VALUE=%~dpf1"
 exit /b 0
 
+:GET_TEST_DATA_FILE_DIR
+set "FILE_PATH=%~dp1"
+call set "RETURN_VALUE=%%FILE_PATH:%TEST_DATA_BASE_DIR%\%TEST_DATA_FILE_SCRIPT_NAME%\=%%"
+exit /b 0
+
+:GET_TEST_DATA_FILE_NAME
+set "RETURN_VALUE=%~nx1"
+exit /b 0
+
 :TEST_TEARDOWN
 if %TEST_SETUP%0 EQU 0 exit /b -1
 set "TEST_SETUP="
@@ -139,9 +162,11 @@ exit /b 0
 :TEST_REPORT
 if %LASTERROR% NEQ 0 (
   rem copy workingset on error
-  mkdir "%TEST_SRC_BASE_DIR%\_output\%TEST_TEMP_DIR_NAME%\reference\%TEST_DATA_DIR:*/=%"
+  mkdir "%TEST_SRC_BASE_DIR%\_output\%TEST_TEMP_DIR_NAME%\%TEST_DATA_FILE_IN_DIR%"
+  mkdir "%TEST_SRC_BASE_DIR%\_output\%TEST_TEMP_DIR_NAME%\%TEST_DATA_FILE_REF_DIR%"
   call "%%TOOLS_PATH%%/xcopy_dir.bat" "%%TEST_TEMP_DIR_PATH%%" "%%TEST_SRC_BASE_DIR%%\_output\%%TEST_TEMP_DIR_NAME%%" /Y /H /E > nul
-  call "%%TOOLS_PATH%%/xcopy_dir.bat" "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_DIR%%" "%%TEST_SRC_BASE_DIR%%\_output\%%TEST_TEMP_DIR_NAME%%\reference\%TEST_DATA_DIR:*/=%" /Y /H /E > nul
+  call "%%TOOLS_PATH%%/xcopy_file.bat" "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_FILE_SCRIPT_NAME%%\%%TEST_DATA_FILE_IN_DIR%%" "%%TEST_DATA_FILE_IN_NAME%%" "%%TEST_SRC_BASE_DIR%%\_output\%%TEST_TEMP_DIR_NAME%%\%TEST_DATA_FILE_IN_DIR%" /Y /H /E > nul
+  call "%%TOOLS_PATH%%/xcopy_dir.bat" "%%TEST_DATA_BASE_DIR%%\%%TEST_DATA_FILE_SCRIPT_NAME%%\%%TEST_DATA_FILE_REF_DIR%%" "%%TEST_SRC_BASE_DIR%%\_output\%%TEST_TEMP_DIR_NAME%%\%TEST_DATA_FILE_REF_DIR%" /Y /H /E > nul
 
   echo.FAILED: %__COUNTER1%: ERROR=%LASTERROR%.%INTERRORLEVEL% REFERENCE=`%TEST_DATA_REF_FILE%` OUTPUT=`%TEST_SRC_BASE_DIR%\_output\%TEST_TEMP_DIR_NAME%`
   echo.

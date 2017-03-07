@@ -40,7 +40,7 @@ set "?~dp0=%~dp0"
 
 rem script flags
 set FLAG_EXACT=0
-set FLAG_IGNORE_PROPS=1
+set FLAG_IGNORE_PROPS=0
 
 :FLAGS_LOOP
 
