@@ -500,9 +500,11 @@ Scripts/Tools/xml/filter_xpath_list_by_xpath_list.bat -text
 Scripts/Tools/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_exact_list.sed -text
 Scripts/Tools/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed -text
 Scripts/Tools/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed -text
+Scripts/Tools/xml/vbs/xml_preformat.vbs -text
 Scripts/Tools/xml/xml.exe -text
 Scripts/Tools/xml/xml_to_xpath_list.bat -text
 Scripts/Tools/xml/xml_to_xpath_list_for_files.bat -text
+Scripts/Tools/xml/xml_vbs_preformat_for_files.bat -text
 Scripts/Tools/xml/xslt/xml_to_xpath_leaf_list.xslt -text
 Scripts/Tools/xml/xslt/xml_to_xpath_leaf_list_no_props.xslt -text
 Scripts/Tools/xml/xslt/xml_to_xpath_node_list.xslt -text
