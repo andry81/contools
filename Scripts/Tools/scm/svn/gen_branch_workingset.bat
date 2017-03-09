@@ -404,7 +404,7 @@ if not "%SVN_BRANCH_REL_SUB_PATH%" == "" (
 ) >&2
 
 rem test if SVN_BRANCH_SUB_PATH inside current directory path
-if not "%CD%\%SVN_BRANCH_REL_SUB_PATH%" == "%SVN_BRANCH_SUB_PATH%" (
+if /i not "%CD%\%SVN_BRANCH_REL_SUB_PATH%" == "%SVN_BRANCH_SUB_PATH%" (
   echo.%?~nx0%: error: current directory path is not base path for SVN branch path: SVN_BRANCH_SUB_PATH="%SVN_BRANCH_SUB_PATH%" CD="%CD%".
   exit /b 17
 ) >&2

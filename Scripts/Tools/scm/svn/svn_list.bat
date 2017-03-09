@@ -98,7 +98,7 @@ if not "%SVN_BRANCH_REL_SUB_PATH%" == "" (
 )
 
 if not "%SVN_BRANCH_REL_SUB_PATH%" == "" ^
-if not "%SVN_WCROOT_PATH%\%SVN_BRANCH_REL_SUB_PATH%" == "%CD%" (
+if /i not "%SVN_WCROOT_PATH%\%SVN_BRANCH_REL_SUB_PATH%" == "%CD%" (
   echo.%?~nx0%: error: SVN WC root path must be absolute and current directory path must be from the SVN WC root path: SVN_WCROOT_PATH="%SVN_WCROOT_PATH%" CD="%CD%".
   exit /b 250
 ) >&2
@@ -123,7 +123,7 @@ if not exist "%SVN_WCROOT_PATH%\.svn\wc.db" (
 :CHECK_WCROOT_PATH_DB_END
 
 if %FLAG_SVN_OFFLINE% NEQ 0 (
-  if not "%SVN_WCROOT_PATH%" == "%CD%" (
+  if /i not "%SVN_WCROOT_PATH%" == "%CD%" (
     pushd "%SVN_WCROOT_PATH%" && (
       call :IMPL
       popd
