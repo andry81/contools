@@ -191,7 +191,7 @@ Scripts/Tools/7zip/7zxa.dll -text
 Scripts/Tools/7zip/history.txt -text
 Scripts/Tools/7zip/license.txt -text
 Scripts/Tools/7zip/readme.txt -text
-Scripts/Tools/Setup.hta -text
+Scripts/Tools/ToolAdaptors/Setup.hta -text
 Scripts/Tools/ToolAdaptors/autoconf.sh -text
 Scripts/Tools/ToolAdaptors/autogen.sh -text
 Scripts/Tools/ToolAdaptors/automake.sh -text
