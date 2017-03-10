@@ -3,12 +3,12 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   Script tryes to call x64 cmd interpreter under x32 process mode if it is
-rem   in the Windows x64 environment otherwise it calls a cmd interpreter
-rem   under the same process mode (x32 under x32 or x64 under x64).
+rem   Script tryes to call x64 cmd interpreter under any process mode if it is
+rem   in the Windows x64 environment otherwise it exits with -256 error level
+rem   under the Windows 32-bit.
 
-rem   If current process mode is not the x64 process mode, then the cmd.exe
-rem   calls with the /K flag.
+rem   If current process mode is not the x64 process mode but not the x86
+rem   either, then the cmd.exe calls with the /K flag.
 rem   Always waits started process, even if non console process.
 
 rem   The "%SystemRoot%\Sysnative" directory doesn't exist on the Windows XP x64
@@ -28,17 +28,19 @@ rem   to the 32bit cmd.exe under the Windows x32 environment (for the details
 rem   search for the article
 rem   "Jailed 32-Bit Processes on Windows x64" on the internet).
 
-if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
+if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
 rem in case of wrong PROCESSOR_ARCHITECTURE value
-if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
+if not "%PROCESSOR_ARCHITEW6432%" == "" goto WOW64
+exit /b -256
 
+:X64
 if "%~1" == "" exit /b -1
 
 start "" /B /WAIT %*
 rem Exit with current error level.
 goto :EOF
 
-:NOTX64
+:WOW64
 rem Workaround:
 rem   Last slash character in the path is required otherwise the command
 rem   "if not exist" will fail under Windows 7 x64 in the x32 cmd shell!
@@ -49,7 +51,7 @@ if not exist "%SystemRoot%\Sysnative\" (
   ) else if exist "linkd.exe" (
     linkd.exe "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
     "%SystemRoot%\Sysnative\cmd.exe" /K @(if "%~1" == "" exit /b -1) ^|^| start "" /B /WAIT %*
-  ) else exit /b -1
+  ) exit /b -256
 ) else (
-  "%SystemRoot%\Sysnative\cmd.exe" /K @(if "%~1" == "" exit /b -1) ^|^| start "" /B /WAIT %*
+  "%SystemRoot%\System32\cmd.exe" /K @(if "%~1" == "" exit /b -1) ^|^| start "" /B /WAIT %*
 )

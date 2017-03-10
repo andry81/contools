@@ -7,6 +7,8 @@ rem   Script tryes to call x32 cmd interpreter under any process mode otherwise
 rem   it calls a cmd interpreter under current process mode
 rem   (x32 under x32 or x64 under x64).
 
+rem   If current process mode is not the x32 process mode, then the cmd.exe
+rem   calls with the /C flag.
 rem   Always waits started process, even if non console process.
 
 if "%~1" == "" exit /b -1
@@ -20,7 +22,6 @@ rem Exit with current error level.
 goto :EOF
 
 :X64
-rem just in case
 if exist "%SystemRoot%\Syswow64\" (
   "%SystemRoot%\Syswow64\cmd.exe" /C start "" /B /WAIT %*
 ) else (
