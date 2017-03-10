@@ -1,14 +1,13 @@
 <html>
   <head>
-    <title>PwSetup Preinstall</title> 
+    <title>View Sample</title> 
       <hta:application
-        id="objPwSetup"
-        applicationname="PwSetupPreinstall"
+        id="objView"
+        applicationname="appView"
         scroll="no"
         singleinstance="yes"
         windowstate="normal"
         border="thin" />
-      <hta:application id="TestListView" />
 
       <script language="VBScript" type="text/vbscript">
 '<![CDATA[
@@ -53,25 +52,22 @@ End Sub
 ' ============================================================================ 
 
 Sub reloadHTA()
-  location.reload( True )
+  location.reload(True)
 End Sub
 
 ']]>
       </script>
     </head>
     <body onload = "onloadBody()">
+      <hr />
       <form>
       <table border = "1">
         <tr>
         <td>
-          <OBJECT id="lvListView"
-                  classid="clsid:BDD1F04B-858B-11D1-B16A-00C0F0283628"
-          >
-          </OBJECT>
+          <object id="lvListView" classid="clsid:BDD1F04B-858B-11D1-B16A-00C0F0283628"></object>
         </td>
         </tr>
       </table>
-      <hr />
       <input type="BUTTON" value="reload" onclick="reloadHTA()">
       </form>
     </body>
