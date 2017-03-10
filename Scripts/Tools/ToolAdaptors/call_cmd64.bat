@@ -3,9 +3,11 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   Script tryes to call x64 cmd interpreter under any process mode if it is
-rem   in the Windows x64 environment otherwise it exits with -256 error level
-rem   under the Windows 32-bit.
+rem   Script tryes to call x64 cmd interpreter under any process mode otherwise
+rem   it exits with -256 error level.
+
+rem   If current process mode is not the x64 process mode and x64 cmd.exe can
+rem   be called, then the cmd.exe calls with the /C flag.
 
 rem   The "%SystemRoot%\Sysnative" directory doesn't exist on the Windows XP x64
 rem   and lower. It can be available only after Windows Vista x64,
@@ -32,7 +34,7 @@ if not "%PROCESSOR_ARCHITEW6432%" == "" goto :WOW64
 exit /b -256
 
 :X64
-call %%*
+call %*
 rem Exit with current error level.
 goto :EOF
 
@@ -47,7 +49,7 @@ if not exist "%SystemRoot%\Sysnative\" (
   ) else if exist "linkd.exe" (
     linkd.exe "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
     "%SystemRoot%\Sysnative\cmd.exe" /C %*
-  ) exit /b -256
+  ) else exit /b -256
 ) else (
   "%SystemRoot%\Sysnative\cmd.exe" /C %*
 )

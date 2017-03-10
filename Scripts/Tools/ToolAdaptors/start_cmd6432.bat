@@ -3,12 +3,13 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   Script tryes to call x64 cmd interpreter under any process mode if it is
-rem   in the Windows x64 environment otherwise it calls a cmd interpreter
-rem   under the same process mode (x32 under x32 or x64 under x64).
+rem   Script tryes to call x64 cmd interpreter under any process mode otherwise
+rem   it calls a cmd interpreter under current process mode
+rem   (x32 under x32 or x64 under x64).
 
 rem   If current process mode is not the x64 process mode, then the cmd.exe
 rem   calls with the /C flag.
+
 rem   Waits only console process.
 
 rem   The "%SystemRoot%\Sysnative" directory doesn't exist on the Windows XP x64
@@ -35,7 +36,9 @@ rem in case of wrong PROCESSOR_ARCHITECTURE value
 if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
 
 :X64
-start "" /B /WAIT %*
+rem Workaround:
+rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
+start "" /B /WAIT "%SystemRoot%\System32\cmd.exe" /C %*
 rem Exit with current error level.
 goto :EOF
 

@@ -3,12 +3,12 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   Script tryes to call x64 cmd interpreter under any process mode if it is
-rem   in the Windows x64 environment otherwise it exits with -256 error level
-rem   under the Windows 32-bit.
+rem   Script tryes to call x64 cmd interpreter under any process mode otherwise
+rem   it exits with -256 error level.
 
-rem   If current process mode is not the x64 process mode but not the x86
-rem   either, then the cmd.exe calls with the /K flag.
+rem   If current process mode is not the x64 process mode and x64 cmd.exe can
+rem   be called, then the cmd.exe calls with the /K flag.
+
 rem   Doesn't wait started process.
 
 rem   The "%SystemRoot%\Sysnative" directory doesn't exist on the Windows XP x64
@@ -36,7 +36,9 @@ exit /b -256
 :X64
 if "%~1" == "" exit /b -1
 
-start "" /B %*
+rem Workaround:
+rem   The "start" calls cmd.exe with /K parameter, but /K must be used only in different process mode, so call cmd.exe explicitly with /C paramater.
+start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
 rem Exit with current error level.
 goto :EOF
 
@@ -47,11 +49,17 @@ rem   "if not exist" will fail under Windows 7 x64 in the x32 cmd shell!
 if not exist "%SystemRoot%\Sysnative\" (
   if exist "mklink.exe" (
     mklink.exe /D "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
-    "%SystemRoot%\Sysnative\cmd.exe" /K @(if "%~1" == "" exit /b -1) ^|^| start "" /B %*
+    rem Workaround:
+    rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
+    "%SystemRoot%\Sysnative\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
   ) else if exist "linkd.exe" (
     linkd.exe "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
-    "%SystemRoot%\Sysnative\cmd.exe" /K @(if "%~1" == "" exit /b -1) ^|^| start "" /B %*
-  ) exit /b -256
+    rem Workaround:
+    rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
+    "%SystemRoot%\Sysnative\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+  ) else exit /b -256
 ) else (
-  "%SystemRoot%\Sysnative\cmd.exe" /K @(if "%~1" == "" exit /b -1) ^|^| start "" /B %*
+  rem Workaround:
+  rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
+  "%SystemRoot%\Sysnative\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
 )

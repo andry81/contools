@@ -9,21 +9,21 @@ rem   (x32 under x32 or x64 under x64).
 
 rem   If current process mode is not the x32 process mode, then the cmd.exe
 rem   calls with the /C flag.
+
 rem   Doesn't wait started process.
 
 if "%~1" == "" exit /b -1
 
-if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
-rem in case of wrong PROCESSOR_ARCHITECTURE value
-if "%PROCESSOR_ARCHITEW6432%" == "" goto X64
+if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
-start "" /B %*
-rem Exit with current error level.
-goto :EOF
-
-:X64
 if exist "%SystemRoot%\Syswow64\" (
-  "%SystemRoot%\Syswow64\cmd.exe" /C start "" /B %*
-) else (
-  "%SystemRoot%\System32\cmd.exe" /C start "" /B %*
+  rem Workaround:
+  rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
+  "%SystemRoot%\Syswow64\cmd.exe" /C start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+  exit /b
 )
+
+:X86
+rem Workaround:
+rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
+start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
