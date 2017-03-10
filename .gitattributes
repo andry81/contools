@@ -191,13 +191,11 @@ Scripts/Tools/7zip/7zxa.dll -text
 Scripts/Tools/7zip/history.txt -text
 Scripts/Tools/7zip/license.txt -text
 Scripts/Tools/7zip/readme.txt -text
-Scripts/Tools/ToolAdaptors/Setup.hta -text
 Scripts/Tools/ToolAdaptors/autoconf.sh -text
 Scripts/Tools/ToolAdaptors/autogen.sh -text
 Scripts/Tools/ToolAdaptors/automake.sh -text
 Scripts/Tools/ToolAdaptors/bash_entry -text
 Scripts/Tools/ToolAdaptors/cat.sh -text
-Scripts/Tools/ToolAdaptors/cmd.hta -text
 Scripts/Tools/ToolAdaptors/cmd.lnk -text
 Scripts/Tools/ToolAdaptors/cmd.vbs -text
 Scripts/Tools/ToolAdaptors/cmd2.vbs -text
@@ -207,6 +205,8 @@ Scripts/Tools/ToolAdaptors/cmd_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/cmd_noconsole.vbs -text
 Scripts/Tools/ToolAdaptors/cp.sh -text
 Scripts/Tools/ToolAdaptors/dos2unix.sh -text
+Scripts/Tools/ToolAdaptors/hta/Samples/run_notepad.hta -text
+Scripts/Tools/ToolAdaptors/hta/Samples/view_example.hta -text
 Scripts/Tools/ToolAdaptors/make_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/make_shortcut_cmd.bat -text
 Scripts/Tools/ToolAdaptors/make_shortcut_cmd_c.bat -text
