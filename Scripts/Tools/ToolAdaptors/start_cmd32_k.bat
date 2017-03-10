@@ -4,20 +4,19 @@ rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
 rem   Script tryes to call x32 cmd interpreter under any process mode otherwise
-rem   it calls a cmd interpreter under current process mode
-rem   (x32 under x32 or x64 under x64).
+rem   it exits with -256 error level.
 
-rem   If current process mode is not the x32 process mode, then the cmd.exe
-rem   calls with the /K flag.
+rem   If current process mode is not the x32 process mode and x32 cmd.exe can
+rem   be called, then the cmd.exe calls with the /K flag.
 
 rem   Waits only console process.
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
-if exist "%SystemRoot%\Syswow64\" (
-  "%SystemRoot%\Syswow64\cmd.exe" /K %*
-  exit /b
-)
+if not exist "%SystemRoot%\Syswow64\" exit /b -256
+
+"%SystemRoot%\Syswow64\cmd.exe" /K %*
+exit /b
 
 :X86
 if "%~1" == "" exit /b -1
