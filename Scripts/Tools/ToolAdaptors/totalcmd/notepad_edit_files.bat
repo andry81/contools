@@ -4,6 +4,7 @@ setlocal
 
 rem script flags
 set FLAG_WAIT_EXIT=0
+set FLAG_NOTEPADPLUSPLUS=0
 
 :FLAGS_LOOP
 
@@ -16,6 +17,9 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if not "%FLAG%" == "" (
   if "%FLAG%" == "-wait" (
     set FLAG_WAIT_EXIT=1
+    shift
+  ) else if "%FLAG%" == "-npp" (
+    set FLAG_NOTEPADPLUSPLUS=1
     shift
   )
 
@@ -41,7 +45,7 @@ rem read selected file names into variable
 if "%~1" == "" goto CURDIR_FILTER_LOOP_END
 rem ignore a sub directory open, files in a sub directory must be selected explicitly in a panel!
 if exist "%~1\" goto IGNORE
-set FILES_LIST=%FILES_LIST% %~1
+set FILES_LIST=%FILES_LIST% %1
 set /A NUM_FILES+=1
 
 :IGNORE
@@ -55,9 +59,21 @@ goto CURDIR_FILTER_LOOP
 if %NUM_FILES% EQU 0 exit /b 0
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%EDITOR%%" -multiInst -nosession %%FILES_LIST%%
+  if %FLAG_NOTEPADPLUSPLUS% NEQ 0 (
+    call :CMD start /B /WAIT "" "%%EDITOR%%" -multiInst -nosession %%FILES_LIST%%
+  ) else (
+    for %%i in (%FILES_LIST%) do (
+      call :CMD start /B /WAIT "" "%%EDITOR%%" %%i
+    )
+  )
 ) else (
-  call :CMD start /B "" "%%EDITOR%%" -multiInst -nosession %%FILES_LIST%%
+  if %FLAG_NOTEPADPLUSPLUS% NEQ 0 (
+    call :CMD start /B "" "%%EDITOR%%" -multiInst -nosession %%FILES_LIST%%
+  ) else (
+    for %%i in (%FILES_LIST%) do (
+      call :CMD start /B "" "%%EDITOR%%" %%i
+    )
+  )
 )
 
 exit /b 0
