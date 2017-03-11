@@ -10,7 +10,7 @@ if exist "%~1\" (
   exit /b 2
 ) >&2
 
-for /F "usebackq tokens=* delims=" %%i in ("%~1") do (
+for /F "usebackq eol=# tokens=* delims=" %%i in ("%~1") do (
   set %%i
 )
 

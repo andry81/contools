@@ -205,6 +205,9 @@ Scripts/Tools/ToolAdaptors/hta/Samples/view_example.hta -text
 Scripts/Tools/ToolAdaptors/lnk/cmd.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_minimized.lnk -text
+Scripts/Tools/ToolAdaptors/lnk/cmd_sysnative.lnk -text
+Scripts/Tools/ToolAdaptors/lnk/cmd_sysnative_admin.lnk -text
+Scripts/Tools/ToolAdaptors/lnk/cmd_sysnative_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/runas_admin.bat -text
@@ -251,6 +254,12 @@ Scripts/Tools/ToolAdaptors/totalcmd/cmda.user.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_sorted_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/externals_edit.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/icobundle/COPYING -text
+Scripts/Tools/ToolAdaptors/totalcmd/icobundle/README.txt -text
+Scripts/Tools/ToolAdaptors/totalcmd/icobundle/icobundl.exe -text
+Scripts/Tools/ToolAdaptors/totalcmd/icobundle/icocheck.exe -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/cmd32.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/cmd64.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare-files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare-sorted-files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare_files.ico -text
