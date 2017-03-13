@@ -488,6 +488,7 @@ Scripts/Tools/scm/svn/jenkins/convert_svn_changeset_xml_to_lst.bat -text
 Scripts/Tools/scm/svn/make_url_absolute.bat -text
 Scripts/Tools/scm/svn/make_url_canonical.bat -text
 Scripts/Tools/scm/svn/print_svn_changesets_diff_lst.bat -text
+Scripts/Tools/scm/svn/remove_branch_workingset_files.bat -text
 Scripts/Tools/scm/svn/svn_changeset.bat -text
 Scripts/Tools/scm/svn/svn_check_out.bat -text
 Scripts/Tools/scm/svn/svn_list.bat -text
