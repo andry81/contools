@@ -12,7 +12,6 @@ Tests for autodetect (-ad) in svn_get_branch_workingset.bat:
 
 Tests for svn_changeset.bat:
   - in WC directory w/o .svn subdirectory, but w/ .svn subdirectory in parent directory
-  - на WC директории без подпапки .svn, но c папкой .svn в parent каталоге
   - in local repo (file:///) directory
   - in directory not under SVN control
 
