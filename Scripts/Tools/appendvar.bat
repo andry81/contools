@@ -89,6 +89,13 @@ if "%__NEW_VALUE%" == "" (
   exit /b 2
 )
 
+rem remove trailing "\" character
+if not "%__NEW_VALUE%" == "" (
+  if "\" == "%__NEW_VALUE:~-1%" (
+    set "__NEW_VALUE=%__NEW_VALUE:~0,-1%"
+  )
+)
+
 rem set local at least
 if %__FLAG_SET_GLOBAL_REGISTRY%%__FLAG_SET_LOCAL% EQU 0 set __FLAG_SET_LOCAL=1
 if %__FLAG_SET_GLOBAL_REGISTRY% EQU 0 goto SET_GLOBAL_END
