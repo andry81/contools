@@ -77,8 +77,16 @@ set "__SEPARATOR=%__SEPARATOR:~0,1%"
 
 set "__NEW_VALUE=%~2"
 
+rem remove trailing separator character
 if not "%__NEW_VALUE%" == "" (
   if "%__SEPARATOR%" == "%__NEW_VALUE:~-1%" (
+    set "__NEW_VALUE=%__NEW_VALUE:~0,-1%"
+  )
+)
+
+rem remove trailing "\" character
+if not "%__NEW_VALUE%" == "" (
+  if "\" == "%__NEW_VALUE:~-1%" (
     set "__NEW_VALUE=%__NEW_VALUE:~0,-1%"
   )
 )
@@ -87,13 +95,6 @@ if "%__NEW_VALUE%" == "" (
   if "%~2" == "" exit /b 0
   rem the variable value is a separator character only
   exit /b 2
-)
-
-rem remove trailing "\" character
-if not "%__NEW_VALUE%" == "" (
-  if "\" == "%__NEW_VALUE:~-1%" (
-    set "__NEW_VALUE=%__NEW_VALUE:~0,-1%"
-  )
 )
 
 rem set local at least
