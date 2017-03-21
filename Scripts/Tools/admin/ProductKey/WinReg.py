@@ -21,9 +21,8 @@ class WinRegStatics:
 
   @staticmethod
   def static_uninit():
-    if sys.version_info[0] < 3:
-      # invalidate reference
-      WinRegStatics.winreg = None
+    # invalidate reference
+    WinRegStatics.winreg = None
     WinRegStatics.platform_architecture = None
     WinRegStatics.platform_machine = None
 
@@ -53,8 +52,8 @@ class WinReg:
     # WARNING:
     #  Python 32 bit should use registry redirection on 64 bit OS.
     #  Python 64 bit should use 64 bit registry on 64 bit .
-    #  Explicitly use wow64 flag to override behaviour for Pythin 32 bit.
-    #  Explicitly use sam flags to override behaviour for Pythin 64 bit.
+    #  Explicitly use wow64 flag to override behaviour for Python 32 bit.
+    #  Explicitly use sam flags to override behaviour for Python 64 bit.
     if wow64:
       if sam is None:
         sam = WinRegStatics.winreg.KEY_WOW64_64KEY
