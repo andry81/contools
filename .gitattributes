@@ -208,6 +208,7 @@ Scripts/Tools/ToolAdaptors/lnk/cmd_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_sysnative.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_sysnative_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_sysnative_minimized.lnk -text
+Scripts/Tools/ToolAdaptors/lnk/cmd_wow64.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/runas_admin.bat -text
