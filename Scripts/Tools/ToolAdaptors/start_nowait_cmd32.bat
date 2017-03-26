@@ -19,7 +19,7 @@ if not exist "%SystemRoot%\Syswow64\" exit /b -256
 
 rem Workaround:
 rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-"%SystemRoot%\Syswow64\cmd.exe" /C start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+start "" /B "%SystemRoot%\Syswow64\cmd.exe" /C %*
 exit /b
 
 :X86

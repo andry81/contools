@@ -10,7 +10,7 @@ rem   (x32 under x32 or x64 under x64).
 rem   If current process mode is not the x64 process mode, then the cmd.exe
 rem   calls with the /C flag.
 
-rem   Waits only console process.
+rem   Waits started process.
 
 rem   The "%SystemRoot%\Sysnative" directory doesn't exist on the Windows XP x64
 rem   and lower. It can be available only after Windows Vista x64,

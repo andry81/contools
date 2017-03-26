@@ -15,9 +15,10 @@ if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
 if not exist "%SystemRoot%\Syswow64\" exit /b -256
 
-rem Workaround:
-rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-"%SystemRoot%\Syswow64\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+rem Call cmd.exe explicitly with /K paramater.
+if "%~1" == "" (
+  "%SystemRoot%\Syswow64\cmd.exe" /K
+) else start "" /B "%SystemRoot%\Syswow64\cmd.exe" /K %*
 exit /b
 
 :X86

@@ -3,13 +3,13 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   Script tryes to call x64 cmd interpreter under any process mode otherwise
+rem   Script tryes to start a command line under x64 cmd interpreter otherwise
 rem   it exits with -256 error level.
 
-rem   If current process mode is not the x64 process mode and x64 cmd.exe can
-rem   be called, then the cmd.exe calls with the /K flag.
+rem   If current process mode is not the x32 process mode and x32 cmd.exe can
+rem   be called, then the cmd.exe calls with the /C flag.
 
-rem   Always waits started process, even if non console process.
+rem   Doesn't wait started process.
 
 rem   The "%SystemRoot%\Sysnative" directory doesn't exist on the Windows XP x64
 rem   and lower. It can be available only after Windows Vista x64,
@@ -36,9 +36,7 @@ exit /b -256
 :X64
 if "%~1" == "" exit /b -1
 
-rem Workaround:
-rem   The "start" calls cmd.exe with /K parameter, but /K must be used only in different process mode, so call cmd.exe explicitly with /C paramater.
-start "" /B /WAIT "%SystemRoot%\System32\cmd.exe" /C %*
+start "" /B %*
 rem Exit with current error level.
 goto :EOF
 
@@ -51,15 +49,15 @@ if not exist "%SystemRoot%\Sysnative\" (
     mklink.exe /D "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
     rem Workaround:
     rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-    "%SystemRoot%\Sysnative\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B /WAIT "%SystemRoot%\System32\cmd.exe" /C %*
+    start "" /B "%SystemRoot%\Sysnative\cmd.exe" /C %*
   ) else if exist "linkd.exe" (
     linkd.exe "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
     rem Workaround:
     rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-    "%SystemRoot%\Sysnative\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B /WAIT "%SystemRoot%\System32\cmd.exe" /C %*
+    start "" /B "%SystemRoot%\Sysnative\cmd.exe" /C %*
   ) else exit /b -256
 ) else (
   rem Workaround:
   rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-  "%SystemRoot%\Sysnative\cmd.exe" /K ^(if "%~1" == "" exit /b -1^) ^|^| start "" /B /WAIT "%SystemRoot%\System32\cmd.exe" /C %*
+  start "" /B "%SystemRoot%\Sysnative\cmd.exe" /C %*
 )

@@ -9,7 +9,7 @@ rem   it exits with -256 error level.
 rem   If current process mode is not the x32 process mode and x32 cmd.exe can
 rem   be called, then the cmd.exe calls with the /K flag.
 
-rem   Waits only console process.
+rem   Waits started process.
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 

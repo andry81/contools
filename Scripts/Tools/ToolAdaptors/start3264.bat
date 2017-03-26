@@ -3,9 +3,8 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   Script tryes to call x32 cmd interpreter under any process mode otherwise
-rem   it calls a cmd interpreter under current process mode
-rem   (x32 under x32 or x64 under x64).
+rem   Script tryes to start a command line under x32 cmd interpreter otherwise
+rem   it calls a cmd interpreter for x64 process mode
 
 rem   If current process mode is not the x32 process mode, then the cmd.exe
 rem   calls with the /C flag.
@@ -22,6 +21,4 @@ if exist "%SystemRoot%\Syswow64\" (
 )
 
 :X86
-rem Workaround:
-rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-start "" /B /WAIT "%SystemRoot%\System32\cmd.exe" /C %*
+start "" /B /WAIT %*
