@@ -10,7 +10,7 @@ rem   (x32 under x32 or x64 under x64).
 rem   If current process mode is not the x32 process mode, then the cmd.exe
 rem   calls with the /K flag.
 
-rem   Waits only console process.
+rem   Waits started process.
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 

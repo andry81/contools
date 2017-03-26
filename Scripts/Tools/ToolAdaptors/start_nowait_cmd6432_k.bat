@@ -49,22 +49,26 @@ rem   "if not exist" will fail under Windows 7 x64 in the x32 cmd shell!
 if not exist "%SystemRoot%\Sysnative\" (
   if exist "mklink.exe" (
     mklink.exe /D "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
-    rem Workaround:
-    rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-    "%SystemRoot%\Sysnative\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+    rem Call cmd.exe explicitly with /K paramater.
+    if "%~1" == "" (
+      "%SystemRoot%\Sysnative\cmd.exe" /K
+    ) else start "" /B "%SystemRoot%\Sysnative\cmd.exe" /K %*
     exit /b
   ) else if exist "linkd.exe" (
     linkd.exe "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
-    rem Workaround:
-    rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-    "%SystemRoot%\Sysnative\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+    rem Call cmd.exe explicitly with /K paramater.
+    if "%~1" == "" (
+      "%SystemRoot%\Sysnative\cmd.exe" /K
+    ) else start "" /B "%SystemRoot%\Sysnative\cmd.exe" /K %*
     exit /b
   )
-  rem Workaround:
-  rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-  "%SystemRoot%\System32\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+  rem Call cmd.exe explicitly with /K paramater.
+  if "%~1" == "" (
+    "%SystemRoot%\System32\cmd.exe" /K
+  ) else start "" /B "%SystemRoot%\System32\cmd.exe" /K %*
 ) else (
-  rem Workaround:
-  rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-  "%SystemRoot%\Sysnative\cmd.exe" /K if "%~1" == "" ^(exit /b -1^) else start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+  rem Call cmd.exe explicitly with /K paramater.
+  if "%~1" == "" (
+    "%SystemRoot%\Sysnative\cmd.exe" /K
+  ) else start "" /B "%SystemRoot%\Sysnative\cmd.exe" /K %*
 )

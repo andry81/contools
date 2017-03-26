@@ -51,15 +51,15 @@ if not exist "%SystemRoot%\Sysnative\" (
     mklink.exe /D "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
     rem Workaround:
     rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-    "%SystemRoot%\Sysnative\cmd.exe" /C start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+    start "" /B "%SystemRoot%\Sysnative\cmd.exe" /C %*
   ) else if exist "linkd.exe" (
     linkd.exe "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
     rem Workaround:
     rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-    "%SystemRoot%\Sysnative\cmd.exe" /C start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+    start "" /B "%SystemRoot%\Sysnative\cmd.exe" /C %*
   ) else exit /b -256
 ) else (
   rem Workaround:
   rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
-  "%SystemRoot%\Sysnative\cmd.exe" /C start "" /B "%SystemRoot%\System32\cmd.exe" /C %*
+  start "" /B "%SystemRoot%\Sysnative\cmd.exe" /C %*
 )
