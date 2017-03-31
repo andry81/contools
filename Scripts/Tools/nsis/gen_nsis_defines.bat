@@ -2,10 +2,15 @@
 
 setlocal
 
-if not exist "%SETUP_ROOT%" (
-  echo.%~nx0: error: SETUP_ROOT variable is not set.>&2
+if "%SETUP_ROOT%" == "" (
+  echo.%~nx0: error: SETUP_ROOT is not set.
   exit /b 1
-)
+) >&2
+
+if not exist "%SETUP_ROOT%\" (
+  echo.%~nx0: error: path does not exist: SETUP_ROOT="%SETUP_ROOT%\".
+  exit /b 2
+) >&2
 
 rem drop last error level
 cd .
@@ -61,7 +66,7 @@ call :DEFINE COMPONENTS_LIST "%%COMPONENTS_LIST%%"
 echo.
 call :DEFINE_NOCHECK PARENT.PRODUCT_VERSION "%%PARENT.PRODUCT_VERSION%%"
 rem dump PARENT.PRODUCT_VERSION_* variables
-for /F "usebackq eol= tokens=1,* delims==" %%i in (`set PARENT.PRODUCT_VERSION_ 2^>nul`) do call :DEFINE "%%%%i" "%%%%j"
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`set PARENT.PRODUCT_VERSION_ 2^>nul`) do call :DEFINE "%%i" "%%j"
 call :DEFINE_NOCHECK PARENT.BUILD_NUMBER "%%PARENT.BUILD_NUMBER%%"
 if not "%PARENT.BUILD_NUMBER%" == "" (
   call :DEFINE_NOCHECK PARENT.BUILD_NUMBER_VERSION_SUFFIX "b%%PARENT.BUILD_NUMBER%%"
@@ -71,7 +76,7 @@ if not "%PARENT.BUILD_NUMBER%" == "" (
 echo.
 call :DEFINE PRODUCT_VERSION "%PRODUCT_VERSION%"
 rem dump PRODUCT_VERSION_* variables
-for /F "usebackq eol= tokens=1,* delims==" %%i in (`set PRODUCT_VERSION_ 2^>nul`) do call :DEFINE "%%%%i" "%%%%j"
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`set PRODUCT_VERSION_ 2^>nul`) do call :DEFINE "%%i" "%%j"
 call :DEFINE_NOCHECK BUILD_NUMBER "%%BUILD_NUMBER%%"
 if not "%BUILD_NUMBER%" == "" (
   call :DEFINE_NOCHECK BUILD_NUMBER_VERSION_SUFFIX "b%%BUILD_NUMBER%%"
@@ -83,7 +88,7 @@ echo.
 if "%APP_TARGETS_LIST%" == "" goto APP_TARGETS_LIST_END
 
 rem dump variables with <app_target_name> as part of name
-for /D %%i in (%APP_TARGETS_LIST%) do call :TARGET_APP_LIST_HANDLER "%%%%i"
+for /D %%i in (%APP_TARGETS_LIST%) do call :TARGET_APP_LIST_HANDLER "%%i"
 echo.
 goto APP_TARGETS_LIST_END
 
