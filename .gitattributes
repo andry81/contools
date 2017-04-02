@@ -260,7 +260,9 @@ Scripts/Tools/ToolAdaptors/totalcmd/icobundle/README.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/icobundl.exe -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/icocheck.exe -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/cmd32.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/cmd32_admin.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/cmd64.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/cmd64_admin.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare-files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare-sorted-files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare_files.ico -text
