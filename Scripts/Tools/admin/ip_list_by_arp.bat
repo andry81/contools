@@ -7,15 +7,23 @@ set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
 
 chcp 65001 >nul
 
-set "host="
-for /f "usebackq tokens=1,* delims= " %%i in (`net view /all`) do (
+echo.ArpIp ^<= NsLookupIp ^<= MAC ^(DnsName^)
+echo.========================================
+for /f "usebackq tokens=1,2,* delims= " %%i in (`arp -a`) do (
     set "host=%%~i"
-    if "!host:~0,2!" == "\\" (
-        for /f "usebackq tokens=1,* delims= " %%x in (`nslookup "%%i" 2^>nul`) do (
+    set "mac=%%~j"
+    if not "!host:~0,1!" == "" if /i not "!host:~0,1!" == "I" (
+        set "server="
+        for /f "usebackq tokens=1,* delims= " %%x in (`nslookup "!host!" 2^>nul`) do (
+            if /i "%%x" == "Server:" (
+              set "server=%%y"
+            ) else if /i "%%x" == "Name:" (
+              set "server=%%y"
+            )
             if /i "%%x" == "Address:" (
-                echo.!host! = %%y
+                echo.!host! ^<= %%y ^<= !mac! ^(!server!^)
                 rem resolve NETBIOS name into ip through the ping
-                for /f "usebackq tokens=* delims=" %%i in (`ping -w 200 -n 1 "!host:~2!" 2^>nul`) do (
+                for /f "usebackq tokens=* delims=" %%i in (`ping -w 200 -n 1 "!host!" 2^>nul`) do (
                     set line=%%i
                     if not "!line!" == "" (
                         if /i not "!line:pinging=!" == "!line!" echo.  !line!
@@ -25,6 +33,7 @@ for /f "usebackq tokens=1,* delims= " %%i in (`net view /all`) do (
                 echo.
             )
         )
+        echo.----------------------------------------
     )
 )
 
