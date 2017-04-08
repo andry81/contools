@@ -272,8 +272,10 @@ Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/profile.vars -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_cmd_to_run_notepad_and_wait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_notepad_and_wait.vbs -text
-Scripts/Tools/ToolAdaptors/vbs/cmd_console.vbs -text
-Scripts/Tools/ToolAdaptors/vbs/cmd_noconsole.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/call.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/call_nowait.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/call_nowindow.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/call_nowindow_nowait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut_cmd.bat -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut_cmd_c.bat -text
