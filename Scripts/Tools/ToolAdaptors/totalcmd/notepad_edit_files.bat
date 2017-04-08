@@ -5,6 +5,7 @@ setlocal
 rem script flags
 set FLAG_WAIT_EXIT=0
 set FLAG_NOTEPADPLUSPLUS=0
+set "BARE_FLAGS="
 
 :FLAGS_LOOP
 
@@ -17,11 +18,13 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if not "%FLAG%" == "" (
   if "%FLAG%" == "-wait" (
     set FLAG_WAIT_EXIT=1
-    shift
   ) else if "%FLAG%" == "-npp" (
     set FLAG_NOTEPADPLUSPLUS=1
-    shift
+  ) else (
+    set BARE_FLAGS=%BARE_FLAGS% %1
   )
+
+  shift
 
   rem read until no flags
   goto FLAGS_LOOP
@@ -60,18 +63,18 @@ if %NUM_FILES% EQU 0 exit /b 0
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   if %FLAG_NOTEPADPLUSPLUS% NEQ 0 (
-    call :CMD start /B /WAIT "" "%%EDITOR%%" -multiInst -nosession %%FILES_LIST%%
+    call :CMD start /B /WAIT "" "%%EDITOR%%" -multiInst%%BARE_FLAGS%% %%FILES_LIST%%
   ) else (
     for %%i in (%FILES_LIST%) do (
-      call :CMD start /B /WAIT "" "%%EDITOR%%" %%i
+      call :CMD start /B /WAIT "" "%%EDITOR%%"%%BARE_FLAGS%% %%i
     )
   )
 ) else (
   if %FLAG_NOTEPADPLUSPLUS% NEQ 0 (
-    call :CMD start /B "" "%%EDITOR%%" -multiInst -nosession %%FILES_LIST%%
+    call :CMD start /B "" "%%EDITOR%%" -multiInst%%BARE_FLAGS%% %%FILES_LIST%%
   ) else (
     for %%i in (%FILES_LIST%) do (
-      call :CMD start /B "" "%%EDITOR%%" %%i
+      call :CMD start /B "" "%%EDITOR%%"%%BARE_FLAGS%% %%i
     )
   )
 )
