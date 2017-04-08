@@ -30,7 +30,7 @@
 For Notepad++:
 
 cmd_noconsole.vbs
-notepad_edit_files.bat -wait -npp "%P" %S
+notepad_edit_files.bat -wait -npp -nosession "%P" %S
 
 For Windows Notepad:
 
@@ -44,7 +44,7 @@ notepad_edit_files.bat "%P" %S
 
 For Notepad++:
 
-notepad_edit_files.bat -npp
+notepad_edit_files.bat -npp -nosession
 "%P" %S
 
 For Windows Notepad:
