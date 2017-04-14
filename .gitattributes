@@ -191,6 +191,7 @@ Scripts/Tools/7zip/7zxa.dll -text
 Scripts/Tools/7zip/history.txt -text
 Scripts/Tools/7zip/license.txt -text
 Scripts/Tools/7zip/readme.txt -text
+Scripts/Tools/PrintUserSessionId.cmd -text
 Scripts/Tools/ToolAdaptors/call_cmd32.bat -text
 Scripts/Tools/ToolAdaptors/call_cmd3264.bat -text
 Scripts/Tools/ToolAdaptors/call_cmd3264_k.bat -text
@@ -311,6 +312,8 @@ Scripts/Tools/appendvar.bat -text
 Scripts/Tools/assert_msvc.bat -text
 Scripts/Tools/baselib.sh -text
 Scripts/Tools/build/add_files_to_archive.bat -text
+Scripts/Tools/build/env_generators/base.bat -text
+Scripts/Tools/build/env_generators/cmake.bat -text
 Scripts/Tools/build/export_build_vars.bat -text
 Scripts/Tools/build/extract_files_from_archive.bat -text
 Scripts/Tools/build/gen_publish_app_dir.bat -text
