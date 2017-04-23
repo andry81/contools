@@ -1,4 +1,5 @@
 * text=auto !eol
+BuildTools/TargetProject.PostBuildStep.bat -text
 BuildTools/TargetProject.PreBuildStep.bat -text
 BuildTools/msys/bin/autogen.exe -text
 BuildTools/msys/bin/msys-1.0.dll -text
