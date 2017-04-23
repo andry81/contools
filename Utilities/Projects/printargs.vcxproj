@@ -47,6 +47,7 @@
     <OutDir>$(SolutionDir)..\Output\Utilities\$(ProjectName)\$(Configuration)-$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)..\Output\Utilities\$(ProjectName)\$(Configuration)-$(Platform)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\Output\Utilities\$(ProjectName)\$(Configuration)-$(Platform)\</OutDir>
@@ -71,7 +72,6 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(ProjectDir)..\Binaries\$(ProjectName)_d.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -94,7 +94,6 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(ProjectDir)..\Binaries\$(ProjectName).exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

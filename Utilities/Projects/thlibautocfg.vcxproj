@@ -44,6 +44,7 @@
     <OutDir>$(SolutionDir)..\Output\Utilities\$(ProjectName)\$(Configuration)-$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)..\Output\Utilities\$(ProjectName)\$(Configuration)-$(Platform)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\Output\Utilities\$(ProjectName)\$(Configuration)-$(Platform)\</OutDir>
@@ -70,7 +71,6 @@
       <Command />
     </PreLinkEvent>
     <Link>
-      <OutputFile>$(ProjectDir)..\Binaries\$(ProjectName)_d.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -78,7 +78,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command />
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(ProjectDir)..\Binaries\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -98,7 +98,6 @@
       <Command />
     </PreLinkEvent>
     <Link>
-      <OutputFile>$(ProjectDir)..\Binaries\$(ProjectName).exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -109,7 +108,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command />
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(ProjectDir)..\Binaries\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
