@@ -70,20 +70,20 @@ namespace {
         }
 
         // {0}
-        const int var_v0 = strncmp(p, "{0}", 4);
+        const int var_v0 = strncmp(p, "{0}", 3);
         if (!var_v0) {
           parsed_str.append(last_offset, p);
-          last_offset = p + 4;
+          last_offset = p + 3;
           parsed_str.append(v0_value);
           found = true;
         }
 
         // {1}
         if (!found) {
-          const int var_v1 = strncmp(p, "{1}", 4);
+          const int var_v1 = strncmp(p, "{1}", 3);
           if (!var_v1) {
             parsed_str.append(last_offset, p);
-            last_offset = p + 4;
+            last_offset = p + 3;
             parsed_str.append(v1_value);
             found = true;
           }
@@ -91,10 +91,10 @@ namespace {
 
         // {0hs}
         if (!found) {
-          const int var_v0 = strncmp(p, "{0hs}", 6);
+          const int var_v0 = strncmp(p, "{0hs}", 5);
           if (!var_v0) {
             parsed_str.append(last_offset, p);
-            last_offset = p + 6;
+            last_offset = p + 5;
             const size_t v0_value_len = strlen(v0_value);
             for(size_t i = 0; i < v0_value_len; i++) {
               parsed_str.append(hextbl[v0_value[i]]);
@@ -105,10 +105,10 @@ namespace {
 
         // {1hs}
         if (!found) {
-          const int var_v1 = strncmp(p, "{1hs}", 6);
+          const int var_v1 = strncmp(p, "{1hs}", 5);
           if (!var_v1) {
             parsed_str.append(last_offset, p);
-            last_offset = p + 6;
+            last_offset = p + 5;
             const size_t v1_value_len = strlen(v1_value);
             for(size_t i = 0; i < v1_value_len; i++) {
               parsed_str.append(hextbl[v1_value[i] - '0']);
