@@ -35,14 +35,14 @@ Usage: callf.exe [/?] <ApplicationNameFormatString> [<CommandLineFormatString> [
     255 - unspecified error
 
   Examples:
-    1. callf_d.exe "${WINDIR}\system32\cmd.exe" "{0} {1}" "/c" "echo.Hello World!"
-    2. callf_d.exe "${COMSPEC}" "{0} {1}" "/c" "echo.Hello World!"
-    3. callf_d.exe "{0}" "{1} {2}" "${COMSPEC}" "/c" "echo.Hello World!"
-    4. callf_d.exe "" "{0} {1} {2}" "\"cmd.exe\"" "/c" "echo.Hello World!"
-    5. callf_d.exe "" "{0} {1} {2}" "\"${WINDIR}\system32\cmd.exe\"" "/c" "echo.Hello World!"
+    1. callf.exe "${WINDIR}\system32\cmd.exe" "{0} {1}" "/c" "echo.Hello World!"
+    2. callf.exe "${COMSPEC}" "{0} {1}" "/c" "echo.Hello World!"
+    3. callf.exe "{0}" "{1} {2}" "${COMSPEC}" "/c" "echo.Hello World!"
+    4. callf.exe "" "{0} {1} {2}" "\"cmd.exe\"" "/c" "echo.Hello World!"
+    5. callf.exe "" "{0} {1} {2}" "\"${WINDIR}\system32\cmd.exe\"" "/c" "echo.Hello World!"
 
-    6. callf_d.exe "${COMSPEC}" "/c (echo.Special case characters: ^|^&""|& ^ |&""^|^& ^^ ^|^&""|& ^ |&""^|^&)&pause"
-    7. callf_d.exe "${COMSPEC}" "/c (echo.Special case characters: ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^&)&pause"
+    6. callf.exe "${COMSPEC}" "/c (echo.Special case characters: ^|^&""|& ^ |&""^|^& ^^ ^|^&""|& ^ |&""^|^&)&pause"
+    7. callf.exe "${COMSPEC}" "/c (echo.Special case characters: ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^&)&pause"
 
     First 5 examples should print:
             Hello Wold!
