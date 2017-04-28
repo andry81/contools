@@ -46,17 +46,24 @@ if not "%FLAG%" == "" (
   goto FLAGS_LOOP
 )
 
+set NUM_CMD_VA_ARGS=0
 set "CMD_VA_ARGS="
 
 :PROCESS_FILES_LOOP
 if "%~1" == "" goto PROCESS_FILES_LOOP_END
 
 set CMD_VA_ARGS=%CMD_VA_ARGS%%1 
+set /A NUM_CMD_VA_ARGS+=1
 shift
 
 goto PROCESS_FILES_LOOP
 
 :PROCESS_FILES_LOOP_END
+
+if %NUM_CMD_VA_ARGS% EQU 0 (
+  echo.%?~nx0%: error: must set at least one wildcard token or directory path.
+  exit /b 255
+) >&2
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S %CMD_VA_ARGS%`) do (
   echo.%%i
