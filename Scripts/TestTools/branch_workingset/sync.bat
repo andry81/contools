@@ -9,6 +9,7 @@ rem  -fresh - remove root branch directory content before checkout it.
 rem  -ac - auto cleanup all branches before relocate/switch/revert/update to mainly remove all locks.
 rem  -ar - auto revert any branch changes.
 rem  -as - auto switch to URL from workingset if previous is different (relative path change).
+rem  -fs - force switch from URL w/o common version control ancestry with the requested switch location (see error E195012 and --ignore-ancestry svn.exe flag)
 rem  -arloc - auto relocate to URL from workingset if previous is different (absolute path change, overrides flag -as).
 
 setlocal

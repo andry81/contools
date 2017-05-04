@@ -150,7 +150,7 @@ if %ARG_SVN_WCROOT% NEQ 0 (
 )
 
 if %FLAG_SVN_OFFLINE% NEQ 0 (
-  call "%%TOOLS_PATH%%/sqlite/sqlite.bat" -batch ".svn/wc.db" ".headers off" "with new_nodes as ( select case when kind != 'dir' then local_relpath else local_relpath || '/' end as local_relpath_new from nodes_base where local_relpath != ''%%SQLITE_EXP_REVISION_RANGE_SUFFIX%%) select %%SQLITE_EXP_SELECT_CMD_LINE%%order by local_relpath_new asc"
+  call "%%TOOLS_PATH%%/sqlite/sqlite.bat" -batch ".svn/wc.db" ".headers off" "with new_nodes as ( select case when kind != 'dir' then local_relpath else local_relpath || '/' end as local_relpath_new from nodes_base where local_relpath != ''%%SQLITE_EXP_REVISION_RANGE_SUFFIX%% and presence != 'not-present') select %%SQLITE_EXP_SELECT_CMD_LINE%%order by local_relpath_new asc"
 ) else (
   svn ls %SVN_CMD_FLAG_ARGS%
 )
