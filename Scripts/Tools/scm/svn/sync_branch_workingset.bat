@@ -26,10 +26,10 @@ rem  -ac - auto cleanup all branches before relocate/switch/revert/update to mai
 rem  -ar - auto revert any branch changes.
 rem  -as - auto switch to URL from workingset if previous is different (relative path change).
 rem  -fs - force switch from URL w/o common version control ancestry with the requested switch location (see error E195012 and --ignore-ancestry svn.exe flag)
-rem  -arloc - auto relocate to URL from workingset if previous is different (absolute path change, overrides flag -as).
+rem  -arloc - auto relocate to URL from workingset if previous is different (repository location change).
 
 rem Examples:
-rem 1. call sync_branch_workingset.bat -R branch/current root_info.txt root_diff.patch workingset.lst workingset
+rem 1. call sync_branch_workingset.bat -R branch/current root_info.txt root_diff.patch root_externals.lst workingset.lst workingset
 rem    svn info branch/current > root_info_synced.txt
 rem    svn diff branch/current > root_diff_synced.patch
 rem    svn pget svn:externals branch/current -R > root_externals_synced.lst
@@ -38,16 +38,11 @@ rem    dir branch/current /S > dir_branch_synched.txt
 rem KNOWN ISSUES:
 rem 1. By default, script won't synchronize externals to the workingset and auto cleanup/revert/switch/relocate working copy before synchronization.
 rem    You have to explicitly pass -R/-ac/-ar/-as/arloc flags respectively to enable that logic.
-rem 2. Update a directory to a particular revision where a subdirectory was existed but been deleted may restore that subdirectory in a tree conflict state.
-rem    To resolve this issue the script tries to revert the directory immediately just after the update.
-rem 3. If the -r flag is not set (--ignore-externals is not used), then the script will leave renamed/removed external directories intact in the working copy,
+rem 2. If the -r flag is not set (--ignore-externals is not used), then the script will leave renamed/removed external directories intact in the working copy,
 rem    because script does not implement external directories explicit remove in this case.
-rem 4. Versioned directories should not begin by the #-character, because it is used to mark directories as externals, otherwise synchronization may throw errors.
+rem 3. Versioned directories should not begin by the #-character, because it is used to mark directories as externals, otherwise synchronization may throw errors.
 rem    Versioned files should not be the files $info.txt, $changeset.lst, $diff.patch, $diff_copy.lst, $diff_added.lst, $diff_removed.lst, $externals.lst, $files.lst, $status.txt,
 rem    because they are used to store svn.exe output information, otherwise the script may throw errors.
-rem 5. If directory while updating has changed from external version control into internal version control (been referenced as an external but goes to update as a part of repository)
-rem    then the svn will report it as an "obstructing working copy" and leave it as is w/o attempt to remote the external subdirectory.
-rem    To resolve it the script must to explicitly process being removed externals, see the `TODO: Add PREPROCESS_EXTERNAL_REMOVE step' section in the code.
 
 rem Drop last error level
 cd .
@@ -64,9 +59,9 @@ set "?~dp0=%~dp0"
 
 rem script flags
 set FLAG_SVN_EXTERNALS_RECURSIVE=0
-set FLAG_SVN_DONT_IGNORE_EXTERNALS_IN_COMMANDS=0
 set "FLAG_SVN_EXTERNALS_PROPGET="
 set "FLAG_TEXT_SVN_IGNORE_EXTERNALS=--ignore-externals"
+set FLAG_SVN_IGNORE_EXTERNALS=1
 set FLAG_SVN_FRESH_CHECKOUT=0
 set FLAG_SVN_AUTO_CLEANUP=0
 set FLAG_SVN_AUTO_REVERT=0
@@ -89,7 +84,7 @@ if not "%FLAG%" == "" (
     set "FLAG_SVN_EXTERNALS_PROPGET=-R"
     shift
   ) else if "%FLAG%" == "-r" (
-    set FLAG_SVN_DONT_IGNORE_EXTERNALS_IN_COMMANDS=1
+    set FLAG_SVN_IGNORE_EXTERNALS=0
     set "FLAG_TEXT_SVN_IGNORE_EXTERNALS="
     shift
   ) else (
@@ -152,9 +147,10 @@ if "%BRANCH_PATH:~-1%" == "/" set "BRANCH_PATH=%BRANCH_PATH:~0,-1%"
 set "BRANCH_ROOT_INFO_FILE=%~dpf2"
 set "BRANCH_ROOT_CHANGESET_FILE=%~dpf3"
 set "BRANCH_ROOT_DIFF_FILE=%~dpf4"
+set "BRANCH_ROOT_EXTERNALS_FILE=%~dpf5"
 
-set "BRANCH_WORKINGSET_FILE=%~dpf5"
-set "BRANCH_WORKINGSET_CATALOG_DIR=%~dpf6"
+set "BRANCH_WORKINGSET_FILE=%~dpf6"
+set "BRANCH_WORKINGSET_CATALOG_DIR=%~dpf7"
 
 call "%%TOOLS_PATH%%/get_datetime.bat"
 set "SYNC_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
@@ -163,6 +159,10 @@ set "SYNC_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RE
 set "SYNC_BRANCH_TEMP_FILE_DIR=%TEMP%\%?~n0%.%SYNC_DATE%.%SYNC_TIME%"
 set "BRANCH_INFO_FILE_TMP=%SYNC_BRANCH_TEMP_FILE_DIR%\$info.txt"
 set "BRANCH_DIFF_FILE_TMP=%SYNC_BRANCH_TEMP_FILE_DIR%\$diff.patch"
+set "BRANCH_FROM_EXTERNALS_FILE_TMP=%SYNC_BRANCH_TEMP_FILE_DIR%\$externals_from.txt"
+set "BRANCH_FROM_EXTERNALS_LIST_FILE_TMP=%SYNC_BRANCH_TEMP_FILE_DIR%\$externals_from.lst"
+set "BRANCH_EXTERNALS_DIFF_LIST_FILE_TMP=%SYNC_BRANCH_TEMP_FILE_DIR%\$externals_diff.lst"
+set "BRANCH_FILES_FILE_TMP=%SYNC_BRANCH_TEMP_FILE_DIR%\$files.lst"
 
 rem create temporary files to store local context output
 if exist "%SYNC_BRANCH_TEMP_FILE_DIR%" (
@@ -207,7 +207,7 @@ echo.  Branch  : "%BRANCH_PATH%"
 echo.  File    : "%BRANCH_WORKINGSET_FILE%"
 echo.  Catalog : "%BRANCH_WORKINGSET_CATALOG_DIR%"
 if %FLAG_SVN_EXTERNALS_RECURSIVE% NEQ 0 set set "SYNC_BRANCH_FLAGS=%SYNC_BRANCH_FLAGS%Recursively "
-if %FLAG_SVN_DONT_IGNORE_EXTERNALS_IN_COMMANDS% NEQ 0 set set "SYNC_BRANCH_FLAGS=%SYNC_BRANCH_FLAGS%DoubleRecursively "
+if %FLAG_SVN_IGNORE_EXTERNALS% EQU 0 set set "SYNC_BRANCH_FLAGS=%SYNC_BRANCH_FLAGS%DoubleRecursively "
 if %FLAG_SVN_FRESH_CHECKOUT% NEQ 0 set "SYNC_BRANCH_FLAGS=%SYNC_BRANCH_FLAGS%Fresh "
 if %FLAG_SVN_AUTO_CLEANUP% NEQ 0 set "SYNC_BRANCH_FLAGS=%SYNC_BRANCH_FLAGS%AutoCleanup "
 if %FLAG_SVN_AUTO_REVERT% NEQ 0 set "SYNC_BRANCH_FLAGS=%SYNC_BRANCH_FLAGS%AutoRevert "
@@ -238,6 +238,7 @@ rem (workingset branch consistency/compatability check, for example, if reposito
 set "BRANCH_INFO_FILE=%BRANCH_ROOT_INFO_FILE%"
 set "BRANCH_CHANGESET_FILE=%BRANCH_ROOT_CHANGESET_FILE%"
 set "BRANCH_DIFF_FILE=%BRANCH_ROOT_DIFF_FILE%"
+set "BRANCH_EXTERNALS_FILE=%BRANCH_ROOT_EXTERNALS_FILE%"
 
 set SYNC_BRANCH_PATH=.
 
@@ -249,7 +250,10 @@ set SYNC_BRANCH_IS_ROOT=0
 rem Remove --ignore-externals in svn commands to root branch externals if -R was not set.
 rem This will leave nested externals in not synchronized state to the workingset but consistent
 rem with revisions of root branch externals.
-if %FLAG_SVN_EXTERNALS_RECURSIVE% EQU 0 set "FLAG_TEXT_SVN_IGNORE_EXTERNALS="
+if %FLAG_SVN_EXTERNALS_RECURSIVE% EQU 0 (
+  set FLAG_SVN_IGNORE_EXTERNALS=0
+  set "FLAG_TEXT_SVN_IGNORE_EXTERNALS="
+)
 
 echo.Synchronizing branch by workingset recursively...
 
@@ -303,12 +307,18 @@ if not exist "%BRANCH_INFO_FILE%" (
   exit /b 21
 )
 
+set "BRANCH_EXTERNALS_FILE=%BRANCH_WORKINGSET_CATALOG_DIR%/%SYNC_BRANCH_REDUCED_PATH%/$externals.lst"
+if not exist "%BRANCH_EXTERNALS_FILE%" (
+  echo.%?~nx0%: error: externals file required for branch synchronization is not found: BRANCH_PATH="%SYNC_BRANCH_UNREDUCED_PATH%" BRANCH_EXTERNALS_FILE="%BRANCH_EXTERNALS_FILE%".
+  exit /b 22
+)
+
 set "BRANCH_CHANGESET_FILE=%BRANCH_WORKINGSET_CATALOG_DIR%/%SYNC_BRANCH_REDUCED_PATH%/$changeset.lst"
 
 set "BRANCH_DIFF_FILE=%BRANCH_WORKINGSET_CATALOG_DIR%/%SYNC_BRANCH_REDUCED_PATH%/$diff.patch"
 if not exist "%BRANCH_DIFF_FILE%" (
   echo.%?~nx0%: error: difference file required for branch synchronization is not found: BRANCH_PATH="%SYNC_BRANCH_UNREDUCED_PATH%" BRANCH_DIFF_FILE="%BRANCH_DIFF_FILE%".
-  exit /b 22
+  exit /b 23
 )
 
 echo.Synchronizing branch: "%SYNC_BRANCH_REDUCED_PATH%"...
@@ -330,8 +340,8 @@ if "%BRANCH_WORKINGSET_DIR_URL%" == "" (
 ) >&2
 
 call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "Repository Root"
-set "BRANCH_WORKINGSET_REPOSITORY_ROOT=%RETURN_VALUE%"
-if "%BRANCH_WORKINGSET_REPOSITORY_ROOT%" == "" (
+set "BRANCH_WORKINGSET_REPO_ROOT=%RETURN_VALUE%"
+if "%BRANCH_WORKINGSET_REPO_ROOT%" == "" (
   echo.%?~nx0%: error: `Repository Root` property is not found in SVN workingset info file: BRANCH_PATH="%BRANCH_PATH%" BRANCH_INFO_FILE="%BRANCH_INFO_FILE%".
   exit /b 31
 ) >&2
@@ -348,7 +358,7 @@ rem call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "VerID"
 rem set "BRANCH_WORKINGSET_SVNVERSION_VALUE=%RETURN_VALUE%"
 rem if "%BRANCH_WORKINGSET_SVNVERSION_VALUE%" == "" set BRANCH_WORKINGSET_SVNVERSION_VALUE=0
 
-call set "BRANCH_WORKINGSET_REPO_REL_PATH=%%BRANCH_WORKINGSET_DIR_URL:*%BRANCH_WORKINGSET_REPOSITORY_ROOT%=%%"
+call set "BRANCH_WORKINGSET_REPO_REL_PATH=%%BRANCH_WORKINGSET_DIR_URL:*%BRANCH_WORKINGSET_REPO_ROOT%=%%"
 
 rem WORKAROUND: 
 rem   Fix for "invalid command" output.
@@ -356,18 +366,18 @@ if "%BRANCH_WORKINGSET_REPO_REL_PATH%" == "" set BRANCH_WORKINGSET_REPO_REL_PATH
 
 rem echo "BRANCH_WORKINGSET_REPO_REL_PATH=%BRANCH_WORKINGSET_REPO_REL_PATH%"
 rem echo "BRANCH_WORKINGSET_DIR_URL=%BRANCH_WORKINGSET_DIR_URL%"
-rem echo "BRANCH_WORKINGSET_REPOSITORY_ROOT=%BRANCH_WORKINGSET_REPOSITORY_ROOT%"
+rem echo "BRANCH_WORKINGSET_REPO_ROOT=%BRANCH_WORKINGSET_REPO_ROOT%"
 
 if "%BRANCH_WORKINGSET_REPO_REL_PATH%" == "/" goto BRANCH_WORKINGSET_ROOT_DIR_URL_VALID
 
 if not "%BRANCH_WORKINGSET_REPO_REL_PATH%" == "%BRANCH_WORKINGSET_DIR_URL%" ^
-if "%BRANCH_WORKINGSET_REPOSITORY_ROOT%%BRANCH_WORKINGSET_REPO_REL_PATH%" == "%BRANCH_WORKINGSET_DIR_URL%" (
+if "%BRANCH_WORKINGSET_REPO_ROOT%%BRANCH_WORKINGSET_REPO_REL_PATH%" == "%BRANCH_WORKINGSET_DIR_URL%" (
   if "%BRANCH_WORKINGSET_REPO_REL_PATH%" == "" goto BRANCH_WORKINGSET_ROOT_DIR_URL_VALID
   if "%BRANCH_WORKINGSET_REPO_REL_PATH:~0,1%" == "/" goto BRANCH_WORKINGSET_ROOT_DIR_URL_VALID
 )
 
 (
-  echo.%?~nx0%: error: Workingset Repository Root is not a prefix to the workingset branch URL: BRANCH_PATH="%BRANCH_PATH%" REPO_ROOT="%BRANCH_WORKINGSET_REPOSITORY_ROOT%" BRANCH_URL="%BRANCH_WORKINGSET_DIR_URL%".
+  echo.%?~nx0%: error: Workingset Repository Root is not a prefix to the workingset branch URL: BRANCH_PATH="%BRANCH_PATH%" REPO_ROOT="%BRANCH_WORKINGSET_REPO_ROOT%" BRANCH_URL="%BRANCH_WORKINGSET_DIR_URL%".
   exit /b 40
 ) >&2
 
@@ -415,13 +425,13 @@ if "%BRANCH_DIR_URL%" == "" (
 ) >&2
 
 call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE_TMP%%" "Repository Root"
-set "BRANCH_REPOSITORY_ROOT=%RETURN_VALUE%"
-if "%BRANCH_REPOSITORY_ROOT%" == "" (
+set "BRANCH_REPO_ROOT=%RETURN_VALUE%"
+if "%BRANCH_REPO_ROOT%" == "" (
   echo.%?~nx0%: error: `Repository Root` property is not found in temporary SVN info file requested from the branch: BRANCH_PATH="%BRANCH_PATH%".
   exit /b 44
 ) >&2
 
-call set "BRANCH_REPO_REL_PATH=%%BRANCH_DIR_URL:*%BRANCH_REPOSITORY_ROOT%=%%"
+call set "BRANCH_REPO_REL_PATH=%%BRANCH_DIR_URL:*%BRANCH_REPO_ROOT%=%%"
 
 rem WORKAROUND:
 rem   Fix for "invalid command" output.
@@ -429,18 +439,18 @@ if "%BRANCH_REPO_REL_PATH%" == "" set BRANCH_REPO_REL_PATH=/
 
 rem echo "BRANCH_REPO_REL_PATH=%BRANCH_REPO_REL_PATH%"
 rem echo "BRANCH_DIR_URL=%BRANCH_DIR_URL%"
-rem echo "BRANCH_REPOSITORY_ROOT=%BRANCH_REPOSITORY_ROOT%"
+rem echo "BRANCH_REPO_ROOT=%BRANCH_REPO_ROOT%"
 
 if "%BRANCH_REPO_REL_PATH%" == "/" goto BRANCH_ROOT_DIR_URL_VALID
 
 if not "%BRANCH_REPO_REL_PATH%" == "%BRANCH_DIR_URL%" ^
-if "%BRANCH_REPOSITORY_ROOT%%BRANCH_REPO_REL_PATH%" == "%BRANCH_DIR_URL%" (
+if "%BRANCH_REPO_ROOT%%BRANCH_REPO_REL_PATH%" == "%BRANCH_DIR_URL%" (
   if "%BRANCH_REPO_REL_PATH%" == "" goto BRANCH_ROOT_DIR_URL_VALID
   if "%BRANCH_REPO_REL_PATH:~0,1%" == "/" goto BRANCH_ROOT_DIR_URL_VALID
 )
 
 (
-  echo.%?~nx0%: error: `Repository Root` is not a prefix to the branch `URL`: BRANCH_PATH="%BRANCH_PATH%" REPO_ROOT="%BRANCH_REPOSITORY_ROOT%" BRANCH_URL="%BRANCH_DIR_URL%".
+  echo.%?~nx0%: error: `Repository Root` is not a prefix to the branch `URL`: BRANCH_PATH="%BRANCH_PATH%" REPO_ROOT="%BRANCH_REPO_ROOT%" BRANCH_URL="%BRANCH_DIR_URL%".
   exit /b 50
 ) >&2
 
@@ -478,19 +488,99 @@ if %FLAG_SVN_AUTO_CLEANUP% NEQ 0 (
 if %FLAG_SVN_AUTO_RELOCATE% NEQ 0 goto IGNORE_BRANCH_REPO_PATH_COMPARE
 
 rem compare workingset branch repo path with branch repo path
-if not "%BRANCH_REPOSITORY_ROOT%" == "%BRANCH_WORKINGSET_REPOSITORY_ROOT%" (
-  echo.%?~nx0%: error: Branch repository URL path is not equal to the workingset branch repository URL path: BRANCH_PATH="%BRANCH_PATH%" REPO_PATH="%BRANCH_REPOSITORY_ROOT%" REPO_WORKINGSET_PATH="%BRANCH_WORKINGSET_REPOSITORY_ROOT%"
+if not "%BRANCH_REPO_ROOT%" == "%BRANCH_WORKINGSET_REPO_ROOT%" (
+  echo.%?~nx0%: error: Branch repository URL path is not equal to the workingset branch repository URL path: BRANCH_PATH="%BRANCH_PATH%" REPO_PATH="%BRANCH_REPO_ROOT%" REPO_WORKINGSET_PATH="%BRANCH_WORKINGSET_REPO_ROOT%"
   exit /b 53
 ) >&2
 
 :IGNORE_BRANCH_REPO_PATH_COMPARE
 
+if %FLAG_SVN_IGNORE_EXTERNALS% NEQ 0 (
+  rem Add externals remove step, because:
+  rem   1. Update or switch w/ --ignore-externals flag won't remove externals what should be removed
+  rem      (externals what should be added will be added automatically in next turn by it's explicit processing).
+  rem   2. We must remove an external directory before the switch/update below because a switch/update can update the tree structure where the external subdirectory may
+  rem      become a part of the repository and so raise the "obstructing working copy" issue.
+  rem Algorithm:
+  rem   1. Request externals list for a particular revision from being updated directory and current externals list. Then
+  rem      compare them and find removed externals and physically remove them.
+  rem   2. Additionally remove parent directories (in reverse order from child to parent) if they were a part of an external path and there is no
+  rem      any files or directories in it.
+  rem   3. Stop with an error if being removed external contains changes but the auto revert option is not set.
+
+  rem from externals
+  pushd "%SYNC_BRANCH_PATH%" && (
+    svn pget svn:externals . -R --non-interactive > "%BRANCH_FROM_EXTERNALS_FILE_TMP%" || ( popd & exit /b 54 )
+    popd
+  )
+
+  rem convert externals into CSV list
+  call "%%?~dp0%%gen_externals_list.bat" "%%BRANCH_FROM_EXTERNALS_FILE_TMP%%" "%%BRANCH_REPO_ROOT%%" "%%BRANCH_DIR_URL%%" > "%BRANCH_FROM_EXTERNALS_LIST_FILE_TMP%"
+  if %ERRORLEVEL% NEQ 0 (
+    echo.%?~nx0%: error: invalid svn:externals path transformation: EXTERNAL_FILE="%BRANCH_FROM_EXTERNALS_FILE_TMP%" REPO_ROOT="%BRANCH_REPO_ROOT%" ^
+DIR_URL="%BRANCH_DIR_URL%".
+    exit /b 55
+  ) >&2
+
+  rem generate externals difference file
+  call "%%?~dp0%%gen_diff_svn_externals.bat" "%%BRANCH_EXTERNALS_FILE%%" "%%BRANCH_FROM_EXTERNALS_LIST_FILE_TMP%%" "%%BRANCH_EXTERNALS_DIFF_LIST_FILE_TMP%%"
+  if %ERRORLEVEL% GTR 0 (
+    echo.%?~nx0%: error: invalid svn:externals file lists: ERROR="%ERRORLEVEL%" PREV_EXTERNALS="%BRANCH_FROM_EXTERNALS_LIST_FILE_TMP%" NEXT_EXTERNALS="%BRANCH_EXTERNALS_FILE%".
+    exit /b 56
+  ) >&2
+
+  if %ERRORLEVEL% EQU 0 (
+    rem externals has differences, search for removed externals
+    for /F "usebackq eol=# tokens=1,2,3 delims=|" %%i in ("%BRANCH_EXTERNALS_DIFF_LIST_FILE_TMP%") do (
+      if "%%i" == "-" (
+        set "BRANCH_EXTERNAL_DIR_PATH_PREFIX_TO_REMOVE=%%j"
+        set "BRANCH_EXTERNAL_DIR_PATH_TO_REMOVE=%%k"
+        call :REMOVE_BRANCH_EXTERNAL_DIR_PATH || goto :EOF
+      )
+    )
+  )
+)
+
+goto REMOVE_BRANCH_EXTERNAL_DIR_PATH_END
+
+:REMOVE_BRANCH_EXTERNAL_DIR_PATH
+set "DIR_PATH=%BRANCH_EXTERNAL_DIR_PATH_PREFIX_TO_REMOVE%/%BRANCH_EXTERNAL_DIR_PATH_TO_REMOVE%"
+set "SYNC_BRANCH_PATH_TO_REMOVE=%SYNC_BRANCH_PATH%/%DIR_PATH%"
+
+rem create temporary branch difference file to compare with
+pushd "%SYNC_BRANCH_PATH_TO_REMOVE%" && (
+  svn diff . --non-interactive > "%BRANCH_DIFF_FILE_TMP%" || ( popd & exit /b 57 )
+  popd
+)
+
+rem get branch difference file size before update
+call "%%TOOLS_PATH%%/get_filesize.bat" "%%BRANCH_DIFF_FILE_TMP%%"
+
+if %ERRORLEVEL% NEQ 0 ^
+if %FLAG_SVN_AUTO_REVERT% EQU 0 (
+  rem being removed external directory has differences but the auto revert flag is not set
+  echo.%?~nx0%: error: Branch has differences, manual branch revert is required: BRANCH_PATH="%SYNC_BRANCH_PATH_TO_REMOVE%".
+  exit /b 58
+) >&2
+
+pushd "%SYNC_BRANCH_PATH%" && (
+  rem remove recursively all versioned files and directories in the external directory
+  call :SVN_REMOVE_DIR_BY_LIST || ( popd & goto :EOF )
+  rem remove parent path to the external directory
+  call :REMOVE_EMPTY_DIR_PATH || ( popd & goto :EOF )
+  popd
+)
+
+exit /b 0
+
+:REMOVE_BRANCH_EXTERNAL_DIR_PATH_END
+
 if %FLAG_SVN_AUTO_RELOCATE% NEQ 0 (
-  if not "%BRANCH_REPOSITORY_ROOT%" == "%BRANCH_WORKINGSET_REPOSITORY_ROOT%" (
-    rem auto switch to workingset URL 
+  if not "%BRANCH_REPO_ROOT%" == "%BRANCH_WORKINGSET_REPO_ROOT%" (
+    rem auto relocate to workingset URL 
     set SVN_DIR_RELOCATED=1
     pushd "%SYNC_BRANCH_PATH%" && (
-      call :CMD svn relocate "%%BRANCH_DIR_URL%%" "%%BRANCH_WORKINGSET_DIR_URL%%" . %%FLAG_TEXT_SVN_IGNORE_EXTERNALS%% --non-interactive || ( popd & exit /b 54 )
+      call :CMD svn relocate "%%BRANCH_DIR_URL%%" "%%BRANCH_WORKINGSET_DIR_URL%%" . %%FLAG_TEXT_SVN_IGNORE_EXTERNALS%% --non-interactive || ( popd & exit /b 59 )
       popd
     )
     echo.
@@ -499,10 +589,10 @@ if %FLAG_SVN_AUTO_RELOCATE% NEQ 0 (
 
 if %FLAG_SVN_AUTO_SWITCH% NEQ 0 (
   if not "%BRANCH_DIR_URL%" == "%BRANCH_WORKINGSET_DIR_URL%" (
-    rem auto switch to workingset URL 
+    rem auto switch to workingset URL w/o branch switch (in-tree relocation)
     set SVN_DIR_SWITCHED=1
     pushd "%SYNC_BRANCH_PATH%" && (
-      call :CMD svn switch "%%BRANCH_WORKINGSET_DIR_URL%%@%%BRANCH_WORKINGSET_INFO_CURRENT_REV%%" -r "%%BRANCH_WORKINGSET_INFO_CURRENT_REV%%" . --set-depth infinity %%FLAG_TEXT_SVN_IGNORE_EXTERNALS%% %%FLAG_TEXT_SVN_IGNORE_ANCESTRY%% --non-interactive || ( popd & exit /b 55 )
+      call :CMD svn switch "%%BRANCH_WORKINGSET_DIR_URL%%@%%BRANCH_WORKINGSET_INFO_CURRENT_REV%%" -r "%%BRANCH_WORKINGSET_INFO_CURRENT_REV%%" . --set-depth infinity %%FLAG_TEXT_SVN_IGNORE_EXTERNALS%% %%FLAG_TEXT_SVN_IGNORE_ANCESTRY%% --non-interactive || ( popd & exit /b 60 )
       popd
     )
     echo.
@@ -512,7 +602,7 @@ if %FLAG_SVN_AUTO_SWITCH% NEQ 0 (
 if %FLAG_SVN_AUTO_REVERT% EQU 0 (
   rem create temporary branch difference file to compare with
   pushd "%SYNC_BRANCH_PATH%" && (
-    svn diff . --non-interactive > "%BRANCH_DIFF_FILE_TMP%" || ( popd & exit /b 56 )
+    svn diff . --non-interactive > "%BRANCH_DIFF_FILE_TMP%" || ( popd & exit /b 61 )
     popd
   )
 
@@ -532,37 +622,26 @@ if %FLAG_SVN_FRESH_CHECKOUT% EQU 0 (
   if %FLAG_SVN_AUTO_REVERT% NEQ 0 (
     rem if %BRANCH_DIFF_FILESIZE% NEQ 0 (
       pushd "%SYNC_BRANCH_PATH%" && (
-        call :CMD svn revert . %%FLAG_SVN_EXTERNALS_PROPGET%% --depth infinity --non-interactive || ( popd & exit /b 57 )
+        call :CMD svn revert . %%FLAG_SVN_EXTERNALS_PROPGET%% --depth infinity --non-interactive || ( popd & exit /b 62 )
         popd
       )
       echo.
     rem )
   ) else if %BRANCH_DIFF_FILESIZE% NEQ 0 (
     echo.%?~nx0%: error: Branch has differences, manual branch revert is required: BRANCH_PATH="%BRANCH_PATH%".
-    exit /b 58
+    exit /b 63
   )
 )
-
-rem TODO:
-rem   Add PREPROCESS_EXTERNAL_REMOVE step, because:
-rem   1. Update w/ --ignore-externals flag won't remove externals marked to remove
-rem      (externals marked to add will be added automatically in turn by it's explicit processing).
-rem   2. We must remove an external directory before the update below because an update can update the tree structure where the external subdirectory may
-rem      become a part of the repository and so raise the "obstructing working copy" issue.
-rem Algorithm:
-rem   1. Request externals list from being updated directory and compare it with the list avout to be apply. Then
-rem      find removed externals and physically remove them.
-rem   2. Additionally remove parent directories if they were a part of an external path and there is no items under version control (or just empty directory).
 
 rem INFO:
 rem   Update changes with --set-depth infinity in case if previous checkout/update has been done w/o infinity depth.
 rem   If update is recursive (-R) then ignore externals update because they will be updated exclusively.
 if %SVN_DIR_SWITCHED% EQU 0 (
   pushd "%SYNC_BRANCH_PATH%" && (
-    call :CMD svn up . -r "%%BRANCH_WORKINGSET_INFO_CURRENT_REV%%" --set-depth infinity %%FLAG_TEXT_SVN_IGNORE_EXTERNALS%% --non-interactive || ( popd & exit /b 59 )
+    call :CMD svn up . -r "%%BRANCH_WORKINGSET_INFO_CURRENT_REV%%" --set-depth infinity %%FLAG_TEXT_SVN_IGNORE_EXTERNALS%% --non-interactive || ( popd & exit /b 64 )
     echo.
-    rem revert immediately to resolve potential tree conflicts
-    call :CMD svn revert . %%FLAG_SVN_EXTERNALS_PROPGET%% --depth infinity --non-interactive || ( popd & exit /b 60 )
+    rem rem revert immediately to resolve potential tree conflicts
+    rem call :CMD svn revert . %%FLAG_SVN_EXTERNALS_PROPGET%% --depth infinity --non-interactive || ( popd & exit /b 65 )
     popd
   )
   echo.
@@ -579,9 +658,9 @@ for /F "usebackq eol= tokens=1,* delims=|" %%i in ("%BRANCH_CHANGESET_FILE%") do
   set CHANGESET_REVISION=%%i
   set "CHANGESET_PATH=%%j"
   pushd "%SYNC_BRANCH_PATH%" && (
-    call :CMD svn up "%%CHANGESET_PATH%%@%%CHANGESET_REVISION%%" -r "%%CHANGESET_REVISION%%" --depth infinity %%FLAG_TEXT_SVN_IGNORE_EXTERNALS%% --non-interactive || ( popd & exit /b 61 )
-    rem revert immediately to resolve potential tree conflicts
-    call :CMD svn revert "%%CHANGESET_PATH" %%FLAG_SVN_EXTERNALS_PROPGET%% --depth infinity --non-interactive || ( popd & exit /b 62 )
+    call :CMD svn up "%%CHANGESET_PATH%%@%%CHANGESET_REVISION%%" -r "%%CHANGESET_REVISION%%" --depth infinity %%FLAG_TEXT_SVN_IGNORE_EXTERNALS%% --non-interactive || ( popd & exit /b 66 )
+    rem rem revert immediately to resolve potential tree conflicts
+    rem call :CMD svn revert "%%CHANGESET_PATH" %%FLAG_SVN_EXTERNALS_PROPGET%% --depth infinity --non-interactive || ( popd & exit /b 67 )
     popd
   )
   echo.
@@ -595,6 +674,16 @@ call "%%TOOLS_PATH%%/get_filesize.bat" "%%BRANCH_DIFF_FILE%%"
 set BRANCH_DIFF_FILESIZE=%ERRORLEVEL%
 
 if %BRANCH_DIFF_FILESIZE% NEQ 0 pushd "%SYNC_BRANCH_PATH%" && (
+  rem PREPROCESS_EXTERNAL_REMOVE step, because:
+  rem   1. We must postprocess all removed external items after the patch below because a patch can update a directory externals property list but does not
+  rem      physically remove directories associated with removed external items.
+  rem Algorithm:
+  rem   1. Request current externals list from being updated directory and compare it with externals list about to be apply. Then
+  rem      find removed externals and physically remove them.
+  rem   2. Additionally remove parent directories (in reverse order from child to parent) if they were a part of an external path and there is no
+  rem      any files or directories in it.
+  rem   3. Stop with an error if being removed external contains changes but the auto revert option is not set.
+
   rem CAUTION: Patch svn added files workaround:
   rem   SVN revert can leave files in working copy if they were added before into version control
   rem   (Undo Add command usually does leave files in working copy). So the next patch command
@@ -635,7 +724,7 @@ rem end of branch root processing
 if %SYNC_BRANCH_IS_ROOT% NEQ 0 exit /b 0
 
 rem CAUTION:
-rem   1. Because patch could change anything including svn properties like svn:externals, so we must to update those changes exclusively avoiding
+rem   1. Because patch could change anything including svn properties like svn:externals, so we must update those changes exclusively avoiding
 rem      redundant processing by the call like "svn up" here. Native svn update will update repository which already updated before the patch and may rollback
 rem      patched items, for example, by update to the head (the changeset exists to update items to a particular revision).
 rem   2. Exclusive externals update will leave those externals unsynchronized with parent repositories in the local WC database. So we must synchronize
@@ -851,8 +940,7 @@ set "BRANCH_BINARY_FILE_DIR=%~dp2"
 set "BRANCH_BINARY_FILE_DIR=%BRANCH_BINARY_FILE_DIR:~0,-1%"
 
 rem check is directory already added to the version control
-svn info "%BRANCH_BINARY_FILE_DIR%" >nul 2>nul
-if %ERRORLEVEL% EQU 0 exit /b 0
+svn info "%BRANCH_BINARY_FILE_DIR%" >nul 2>nul && exit /b 0
 
 rem echo BRANCH_FILE_PATH=%BRANCH_FILE_PATH%
 call "%%TOOLS_PATH%%/index_pathstr.bat" BRANCH_BINARY_FILE_SUBDIR_ /\ "%%BRANCH_FILE_PATH%%"
@@ -925,41 +1013,121 @@ call "%%TOOLS_PATH%%/xcopy_file.bat" "%%BRANCH_BINARY_FILE_DIR%%" "%%BRANCH_BINA
 exit /b 0
 
 :SVN_ADD_FILE
+rem safe checks
+if "%BRANCH_FILE_PATH%" == "" exit /b 0
+if "%BRANCH_FILE_PATH%" == "." exit /b 0
 rem add only unversionned files
-svn info "%BRANCH_FILE_PATH%" >nul 2>nul
-if %ERRORLEVEL% EQU 0 exit /b 0
+svn info "%BRANCH_FILE_PATH%" >nul 2>nul && exit /b 0
 call :CMD svn add "%%BRANCH_FILE_PATH%%" --depth empty --non-interactive || exit /b 111
 exit /b 0
 
 :SVN_ADD_FILE_DIR
+rem safe checks
+if "%DIR_PATH%" == "" exit /b 0
+if "%DIR_PATH%" == "." exit /b 0
 if not exist "%DIR_PATH%\" mkdir "%DIR_PATH%"
 rem add only unversionned directories
-svn info "%DIR_PATH%" >nul 2>nul
-if %ERRORLEVEL% EQU 0 exit /b 0
+svn info "%DIR_PATH%" >nul 2>nul && exit /b 0
 call :CMD svn add "%%DIR_PATH%%" --depth empty --non-interactive || exit /b 112
 exit /b 0
 
 :SVN_REMOVE_FILE
+rem safe checks
+if "%BRANCH_FILE_PATH%" == "" exit /b 0
+if "%BRANCH_FILE_PATH%" == "." exit /b 0
 if exist "%BRANCH_FILE_PATH%" ( call :REMOVE_VERSIONNED || goto :EOF )
 exit /b 0
 
+:SVN_REMOVE_DIR_BY_LIST
+rem set a current directory for "svn ls" command to reduce path lengths in output and from there the ".svn" directory search up to the root
+pushd "%DIR_PATH%" && (
+  call "%%TOOLS_PATH%%/scm/svn/svn_list.bat" -offline . --depth infinity --non-interactive > "%BRANCH_FILES_FILE_TMP%" 2>nul || ( popd & goto :EOF )
+
+  echo.Removing external directory: "%DIR_PATH%"...
+  for /F "usebackq eol=	 tokens=* delims=" %%i in (`sort /R "%BRANCH_FILES_FILE_TMP%"`) do (
+    echo.%%i
+    set "SVN_FILE_PATH=%%i"
+    call :REMOVE_SVN_FILE_PATH || ( popd & goto :EOF )
+  )
+  popd
+)
+exit /b 0
+
+:REMOVE_SVN_FILE_PATH
+rem safe checks
+if "%SVN_FILE_PATH%" == "" exit /b 0
+if "%SVN_FILE_PATH%" == "." exit /b 0
+if "%SVN_FILE_PATH:~-1%" == "/" (
+  rmdir /Q "%SVN_FILE_PATH:/=\%" 2>nul && echo."%SVN_FILE_PATH%"
+) else (
+  del /F /Q /A:-D "%SVN_FILE_PATH:/=\%" 2>nul && echo."%SVN_FILE_PATH%"
+)
+exit /b 0
+
 :REMOVE_VERSIONNED
+rem safe checks
+if "%BRANCH_FILE_PATH%" == "" exit /b 0
+if "%BRANCH_FILE_PATH%" == "." exit /b 0
 rem remove only versionned files
-svn info "%BRANCH_FILE_PATH%" >nul 2>nul
-if %ERRORLEVEL% NEQ 0 exit /b 0
+svn info "%BRANCH_FILE_PATH%" >nul 2>nul || exit /b 0
 call :CMD svn remove "%%BRANCH_FILE_PATH%%" --force --non-interactive || exit /b 113
 exit /b 0
 
 :REMOVE_UNVERSIONNED
+rem safe checks
+if "%BRANCH_FILE_PATH%" == "" exit /b 0
+if "%BRANCH_FILE_PATH%" == "." exit /b 0
 rem remove only unversionned files
-svn info "%BRANCH_FILE_PATH%" >nul 2>nul
-if %ERRORLEVEL% EQU 0 exit /b 0
+svn info "%BRANCH_FILE_PATH%" >nul 2>nul && exit /b 0
 if exist "%BRANCH_FILE_PATH%\" (
   call :CMD rmdir /Q "%%BRANCH_FILE_PATH:/=\%%" || exit /b 114
   exit /b 0
 )
 call :CMD del /F /Q /A:-D "%%BRANCH_FILE_PATH:/=\%%" || exit /b 115
 exit /b 0
+
+:REMOVE_EMPTY_DIR_PATH
+rem safe checks
+if "%DIR_PATH%" == "" exit /b 0
+if "%DIR_PATH%" == "." exit /b 0
+if "%DIR_PATH:~1,1%" == ":" exit /b 0
+rem test whole path on empty directory
+rem set "DIR_PATH=%DIR_PATH:/=\%"
+if exist "%DIR_PATH%\" (
+  dir /B "%DIR_PATH%\" >nul 2>nul && exit /b 0
+  call :REMOVE_EMPTY_DIR_PATH_IMPL || goto :EOF
+)
+exit /b 0
+
+:REMOVE_EMPTY_DIR_PATH_IMPL
+set "DIR_PATH_PREFIX="
+set DIR_PATH_OFFSET=1
+
+:REMOVE_EMPTY_DIR_PATH_IMPL_COMPONENT_LOOP
+set "DIR_PATH_COMPONENT="
+for /F "eol=	 tokens=%DIR_PATH_OFFSET% delims=/" %%i in ("%DIR_PATH%") do set "DIR_PATH_COMPONENT=%%i"
+if not "%DIR_PATH_COMPONENT%" == "" (
+  set "DIR_PATH_ARR[%DIR_PATH_OFFSET%]=%DIR_PATH_PREFIX%%DIR_PATH_COMPONENT%"
+  set "DIR_PATH_PREFIX=%DIR_PATH_PREFIX%%DIR_PATH_COMPONENT%/"
+  set /A DIR_PATH_OFFSET+=1
+  goto REMOVE_EMPTY_DIR_PATH_IMPL_COMPONENT_LOOP
+)
+
+set /A DIR_PATH_OFFSET-=1
+
+:REMOVE_EMPTY_DIR_PATH_IMPL_REMOVE_LOOP
+if %DIR_PATH_OFFSET% LEQ 0 exit /b 0
+call set "DIR_PATH_PREFIX=%%DIR_PATH_ARR[%DIR_PATH_OFFSET%]%%"
+rem test path component on empty directory
+if not "%DIR_PATH_PREFIX%" == "." ^
+if exist "%DIR_PATH_PREFIX:/=\%\" (
+  dir /B "%DIR_PATH_PREFIX:/=\%\" >nul 2>nul && exit /b 0
+  call :CMD rmdir /Q "%%DIR_PATH_PREFIX:/=\%%" || exit /b 116
+)
+
+set /A DIR_PATH_OFFSET-=1
+
+goto REMOVE_EMPTY_DIR_PATH_IMPL_REMOVE_LOOP
 
 :CMD
 echo.^>%*

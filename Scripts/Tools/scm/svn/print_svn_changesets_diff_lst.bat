@@ -12,7 +12,7 @@ rem   last - unchanged).
 rem Example of input CSV differences file:
 rem *|https://repo1/svn/proj1|111|110
 rem +|https://repo2/svn/proj2|222|
-rem -|https://repo3/svn/proj3||333
+rem -|https://repo3/svn/proj3|0|333
 rem  |https://repo4/svn/proj4|444|
 rem *|https://repo5/svn/proj5|200|300
 
