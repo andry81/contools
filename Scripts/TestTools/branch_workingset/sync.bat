@@ -10,7 +10,7 @@ rem  -ac - auto cleanup all branches before relocate/switch/revert/update to mai
 rem  -ar - auto revert any branch changes.
 rem  -as - auto switch to URL from workingset if previous is different (relative path change).
 rem  -fs - force switch from URL w/o common version control ancestry with the requested switch location (see error E195012 and --ignore-ancestry svn.exe flag)
-rem  -arloc - auto relocate to URL from workingset if previous is different (absolute path change, overrides flag -as).
+rem  -arloc - auto relocate to URL from workingset if previous is different (repository location change).
 
 setlocal
 
@@ -25,4 +25,4 @@ if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
 if "%~1" == "" exit /b 65532
 if "%~2" == "" exit /b 65531
 
-call "%%TOOLS_PATH%%/scm/svn/sync_branch_workingset.bat" %%3 %%4 %%5 %%6 %%7 %%8 %%9 "%%~1" "%%~2_root_info.txt" "%%~2_root_changeset.lst" "%%~2_root_diff.patch" "%%~2_workingset.lst" "%%~2_workingset"
+call "%%TOOLS_PATH%%/scm/svn/sync_branch_workingset.bat" %%3 %%4 %%5 %%6 %%7 %%8 %%9 "%%~1" "%%~2_root_info.txt" "%%~2_root_changeset.lst" "%%~2_root_diff.patch" "%%~2_root_externals.lst" "%%~2_workingset.lst" "%%~2_workingset"

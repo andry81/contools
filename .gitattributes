@@ -490,6 +490,7 @@ Scripts/Tools/scm/svn/extract_url_root.bat -text
 Scripts/Tools/scm/svn/extract_url_scheme.bat -text
 Scripts/Tools/scm/svn/gen_branch_workingset.bat -text
 Scripts/Tools/scm/svn/gen_branch_workingset_time.bat -text
+Scripts/Tools/scm/svn/gen_diff_svn_externals.bat -text
 Scripts/Tools/scm/svn/gen_diff_svn_workingsets.bat -text
 Scripts/Tools/scm/svn/gen_externals_list.bat -text
 Scripts/Tools/scm/svn/impl/svn_arg_parse-r.bat -text

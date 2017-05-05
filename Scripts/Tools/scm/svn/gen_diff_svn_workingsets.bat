@@ -34,46 +34,46 @@ setlocal ENABLEDELAYEDEXPANSION
 
 set "SVN_WORKINGSET_NEXT=%~1"
 set "SVN_WORKINGSET_PREV=%~2"
-set "SVN_WORKINGSET=%~3"
+set "SVN_WORKINGSET_DIFF=%~3"
 
-if not exist "%SVN_WORKINGSET_NEXT%" (
-  echo.%~nx0: error: svn next workingset does not exist: "%SVN_WORKINGSET_NEXT%"
+if not exist "!SVN_WORKINGSET_NEXT!" (
+  echo.%~nx0: error: svn next workingset file does not exist: "!SVN_WORKINGSET_NEXT!"
   exit /b 1
 ) >&2
 
-if not exist "%SVN_WORKINGSET_PREV%" (
-  echo.%~nx0: error: svn prev workingset does not exist: "%SVN_WORKINGSET_PREV%"
+if not exist "!SVN_WORKINGSET_PREV!" (
+  echo.%~nx0: error: svn prev workingset file does not exist: "!SVN_WORKINGSET_PREV!"
   exit /b 2
 ) >&2
 
 rem drop output difference file
-del /Q /A:-D "%SVN_WORKINGSET%"
-if exist "%SVN_WORKINGSET%" (
-  echo.%~nx0: error: svn workingsets differences file could not be recreated: "%SVN_WORKINGSET%"
+del /F /Q /A:-D "!SVN_WORKINGSET_DIFF!" 2>nul
+if exist "!SVN_WORKINGSET_DIFF!" (
+  echo.%~nx0: error: svn workingsets differences file could not be recreated: "!SVN_WORKINGSET_DIFF!"
   exit /b 3
 ) >&2
 
 rem load workingset lines into variables to speed up overall code interations
-set "LOAD_SVN_WORKINGSET=%SVN_WORKINGSET_NEXT%"
+set "LOAD_SVN_WORKINGSET=!SVN_WORKINGSET_NEXT!"
 set "SVN_WORKINGSET_LINE_VAR_PREFIX=SVN_WORKINGSET_NEXT_LINE_"
 set "SVN_WORKINGSET_NUM_LINES_VAR=SVN_WORKINGSET_NEXT_LINES"
 set LASTERROR=0
 call :LOAD_SVN_WORKINGSET
 
-if %LASTERROR% NEQ 0 (
-  echo.%~nx0: error: svn next workingset is broken: "%SVN_WORKINGSET_NEXT%"
-  exit /b %LASTERROR%
+if !LASTERROR! NEQ 0 (
+  echo.%~nx0: error: svn next workingset file is broken: "!SVN_WORKINGSET_NEXT!"
+  exit /b !LASTERROR!
 ) >&2
 
-set "LOAD_SVN_WORKINGSET=%SVN_WORKINGSET_PREV%"
+set "LOAD_SVN_WORKINGSET=!SVN_WORKINGSET_PREV!"
 set "SVN_WORKINGSET_LINE_VAR_PREFIX=SVN_WORKINGSET_PREV_LINE_"
 set "SVN_WORKINGSET_NUM_LINES_VAR=SVN_WORKINGSET_PREV_LINES"
 set LASTERROR=0
 call :LOAD_SVN_WORKINGSET
 
-if %LASTERROR% NEQ 0 (
-  echo.%~nx0: error: svn previous workingset is broken: "%SVN_WORKINGSET_PREV%"
-  exit /b %LASTERROR%
+if !LASTERROR! NEQ 0 (
+  echo.%~nx0: error: svn previous workingset file is broken: "!SVN_WORKINGSET_PREV!"
+  exit /b !LASTERROR!
 ) >&2
 
 set WORKINGSETS_HAS_CHANGES=0
@@ -96,21 +96,23 @@ set SVN_WORKINGSET_R_LINES_VAR=SVN_WORKINGSET_NEXT_LINES
 
 call :PROCESS_WORKINGSET_L
 
-if %WORKINGSETS_HAS_CHANGES% EQU 0 exit /b -1
+if !WORKINGSETS_HAS_CHANGES! EQU 0 exit /b -1
 
 exit /b 0
 
 :PROCESS_WORKINGSET_L
 set FOR_L_INDEX=1
 :PROCESS_WORKINGSET_L_FOR_LOOP
-call :PROCESS_LINE_WORKINGSET_L "%%FOR_L_INDEX%%" || goto :EOF
+call :PROCESS_LINE_WORKINGSET_L || goto :EOF
 set /A FOR_L_INDEX+=1
-if %FOR_L_INDEX% GTR !%SVN_WORKINGSET_L_LINES_VAR%! exit /b 0
+if !FOR_L_INDEX! GTR !%SVN_WORKINGSET_L_LINES_VAR%! exit /b 0
 goto PROCESS_WORKINGSET_L_FOR_LOOP
 
 :PROCESS_LINE_WORKINGSET_L
-rem set "SVN_WORKINGSET_L_LINE=!%SVN_WORKINGSET_L_LINE_VAR%%~1!"
-for /F "eol= tokens=1,2 delims=|" %%i in ("!%SVN_WORKINGSET_L_LINE_VAR%%~1!") do (
+set "L_REPO="
+set "L_REV="
+set "SVN_WORKINGSET_L_LINE=!%SVN_WORKINGSET_L_LINE_VAR%%FOR_L_INDEX%!"
+for /F "eol=# tokens=1,2 delims=|" %%i in ("!SVN_WORKINGSET_L_LINE!") do (
   set "L_REPO=%%i"
   set "L_REV=%%j"
 )
@@ -118,26 +120,26 @@ for /F "eol= tokens=1,2 delims=|" %%i in ("!%SVN_WORKINGSET_L_LINE_VAR%%~1!") do
 set WORKINGSET_REPO_FOUND=0
 set WORKINGSET_REV_CHANGED=0
 
-rem echo.%L_REPO%^|%L_REV%
+rem echo.!L_REPO!^|!L_REV!
 
 call :PROCESS_WORKINGSET_R
 
-if %SVN_WORKINGSET_SEARCH_T% EQU 0 (
-  if %WORKINGSET_REPO_FOUND% NEQ 0 (
-    if %WORKINGSET_REV_CHANGED% EQU 0 (
-      (echo. ^|%L_REPO%^|%L_REV%^| )>>"%SVN_WORKINGSET%"
+if !SVN_WORKINGSET_SEARCH_T! EQU 0 (
+  if !WORKINGSET_REPO_FOUND! NEQ 0 (
+    if !WORKINGSET_REV_CHANGED! EQU 0 (
+      (echo. ^|!L_REPO!^|!L_REV!^|0)>>"!SVN_WORKINGSET_DIFF!"
     ) else (
       set WORKINGSETS_HAS_CHANGES=1
-      (echo.^*^|%L_REPO%^|%L_REV%^|%R_REV%)>>"%SVN_WORKINGSET%"
+      (echo.^*^|!L_REPO!^|!L_REV!^|!R_REV!)>>"!SVN_WORKINGSET_DIFF!"
     )
-  ) else (
+  ) else if not "!L_REPO!" == "" (
     set WORKINGSETS_HAS_CHANGES=1
-    (echo.+^|%L_REPO%^|%L_REV%^| )>>"%SVN_WORKINGSET%"
+    (echo.+^|!L_REPO!^|!L_REV!^|0)>>"!SVN_WORKINGSET_DIFF!"
   )
-) else (
-  if %WORKINGSET_REPO_FOUND% EQU 0 (
+) else if not "!R_REPO!" == "" (
+  if !WORKINGSET_REPO_FOUND! EQU 0 (
     set WORKINGSETS_HAS_CHANGES=1
-    (echo.-^|%L_REPO%^| ^|%L_REV%)>>"%SVN_WORKINGSET%"
+    (echo.-^|!L_REPO!^|0^|!L_REV!)>>"!SVN_WORKINGSET_DIFF!"
   )
 )
 
@@ -148,19 +150,22 @@ set FOR_R_INDEX=1
 :PROCESS_WORKINGSET_R_FOR_LOOP
 call :PROCESS_LINE_WORKINGSET_R || goto :EOF
 set /A FOR_R_INDEX+=1
-if %FOR_R_INDEX% GTR !%SVN_WORKINGSET_R_LINES_VAR%! exit /b 0
+if !FOR_R_INDEX! GTR !%SVN_WORKINGSET_R_LINES_VAR%! exit /b 0
 goto PROCESS_WORKINGSET_R_FOR_LOOP
 
 :PROCESS_LINE_WORKINGSET_R
-rem set "SVN_WORKINGSET_R_LINE=!%SVN_WORKINGSET_R_LINE_VAR%%FOR_R_INDEX%!"
-for /F "eol= tokens=1,2 delims=|" %%i in ("!%SVN_WORKINGSET_R_LINE_VAR%%FOR_R_INDEX%!") do (
+set "R_REPO="
+set "R_REV="
+set "SVN_WORKINGSET_R_LINE=!%SVN_WORKINGSET_R_LINE_VAR%%FOR_R_INDEX%!"
+for /F "eol=# tokens=1,2 delims=|" %%i in ("!SVN_WORKINGSET_R_LINE!") do (
   set "R_REPO=%%i"
   set "R_REV=%%j"
 )
 
-if "%L_REPO%" == "%R_REPO%" (
+rem case sensitive compare!
+if "!L_REPO!" == "!R_REPO!" (
   set WORKINGSET_REPO_FOUND=1
-  if %L_REV% NEQ %R_REV% set WORKINGSET_REV_CHANGED=1
+  if !L_REV! NEQ !R_REV! set WORKINGSET_REV_CHANGED=1
   exit /b -1
 )
 
@@ -168,20 +173,21 @@ exit /b 0
 
 :LOAD_SVN_WORKINGSET
 set SVN_WORKINGSET_INDEX=0
-for /F "eol=# tokens=1,2 delims=|" %%i in (%LOAD_SVN_WORKINGSET%) do ( call :LOAD_LINE_SVN_WORKINGSET "%%i" "%%j" || goto :EOF )
-set "%SVN_WORKINGSET_NUM_LINES_VAR%=%SVN_WORKINGSET_INDEX%"
+for /F "eol=# tokens=1,2 delims=|" %%i in (!LOAD_SVN_WORKINGSET!) do (
+  set "REPO=%%i"
+  set "REV=%%j"
+  call :LOAD_LINE_SVN_WORKINGSET || goto :EOF
+)
+set "!SVN_WORKINGSET_NUM_LINES_VAR!=!SVN_WORKINGSET_INDEX!"
 exit /b 0
 
 :LOAD_LINE_SVN_WORKINGSET
-set "REPO=%~1"
-set "REV=%~2"
-
-if "%REPO%" == "" ( set "LASTERROR=1" && exit /b 1 )
-if "%REV%" == "" ( set "LASTERROR=2" && exit /b 1 )
-if %REV% LEQ 0 ( set "LASTERROR=3" && exit /b 1 )
+if "!REPO!" == "" ( set "LASTERROR=1" && exit /b 1 )
+if "!REV!" == "" ( set "LASTERROR=2" && exit /b 1 )
+if !REV! LSS 0 ( set "LASTERROR=3" && exit /b 1 )
 
 set /A SVN_WORKINGSET_INDEX+=1
 
-set "%SVN_WORKINGSET_LINE_VAR_PREFIX%%SVN_WORKINGSET_INDEX%=%REPO%|%REV%"
+set "%SVN_WORKINGSET_LINE_VAR_PREFIX%!SVN_WORKINGSET_INDEX!=!REPO!|!REV!"
 
 exit /b 0

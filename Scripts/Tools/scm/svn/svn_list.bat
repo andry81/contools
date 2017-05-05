@@ -99,7 +99,7 @@ if not "%SVN_BRANCH_REL_SUB_PATH%" == "" (
 
 if not "%SVN_BRANCH_REL_SUB_PATH%" == "" ^
 if /i not "%SVN_WCROOT_PATH%\%SVN_BRANCH_REL_SUB_PATH%" == "%CD%" (
-  echo.%?~nx0%: error: SVN WC root path must be absolute and current directory path must be from the SVN WC root path: SVN_WCROOT_PATH="%SVN_WCROOT_PATH%" CD="%CD%".
+  echo.%?~nx0%: error: SVN WC root path must be absolute and current directory path must be descendant to the SVN WC root path: SVN_WCROOT_PATH="%SVN_WCROOT_PATH%" CD="%CD%".
   exit /b 250
 ) >&2
 

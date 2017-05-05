@@ -53,7 +53,7 @@ rem    To traverse a branch not external directories recursively and to generate
 rem 3. Versioned directories should not begin by the #-character, because it is used to mark directories as externals, otherwise synchronization may throw errors.
 rem    Versioned files should not be the files $info.txt, $changeset.lst, $diff.patch, $diff_copy.lst, $diff_added.lst, $diff_removed.lst, $externals.lst, $files.lst, $status.txt,
 rem    because they are used to store svn.exe output information, otherwise the script may throw errors.
-rem 4. All collisions must be solved before the script execution, otherwise the result will be inconsistent.
+rem 4. All collisions must be resolved before the script execution, otherwise the result will be inconsistent.
 
 rem Drop last error level
 cd .
@@ -236,8 +236,7 @@ rem Is branch URI is a WC URL?
 set SVN_BRANCH_PATH_IS_WC_URL=0
 
 rem try request as local WC path
-if %SVN_BRANCH_URI_IS_LOCAL% NEQ 0 svn info "%SVN_BRANCH_PATH%" > "%BRANCH_ROOT_INFO_FILE_TMP%" 2>nul
-if %SVN_BRANCH_URI_IS_LOCAL% NEQ 0 if %ERRORLEVEL% EQU 0 set SVN_BRANCH_PATH_IS_WC_URL=1
+if %SVN_BRANCH_URI_IS_LOCAL% NEQ 0 ( svn info "%SVN_BRANCH_PATH%" > "%BRANCH_ROOT_INFO_FILE_TMP%" 2>nul && set "SVN_BRANCH_PATH_IS_WC_URL=1" )
 
 set "SVN_BRANCH_WCROOT_PATH="
 if %SVN_BRANCH_PATH_IS_WC_URL% NEQ 0 (
@@ -255,8 +254,7 @@ rem Is branch URI is a local repo URL?
 set SVN_BRANCH_PATH_IS_LOCAL_REPO_URL=0
 
 rem if not SVN WC path but a local path, then try to request file:/// prefixed path to detect local repo URL presence
-if %SVN_BRANCH_PATH_IS_WC_URL% EQU 0 if %SVN_BRANCH_URI_IS_LOCAL% NEQ 0 svn info "file:///%SVN_BRANCH_PATH%" >nul 2>nul
-if %SVN_BRANCH_PATH_IS_WC_URL% EQU 0 if %SVN_BRANCH_URI_IS_LOCAL% NEQ 0 if %ERRORLEVEL% EQU 0 set SVN_BRANCH_PATH_IS_LOCAL_REPO_URL=1
+if %SVN_BRANCH_PATH_IS_WC_URL% EQU 0 if %SVN_BRANCH_URI_IS_LOCAL% NEQ 0 ( svn info "file:///%SVN_BRANCH_PATH%" >nul 2>nul && set "SVN_BRANCH_PATH_IS_LOCAL_REPO_URL=1" )
 
 if %SVN_BRANCH_URI_IS_LOCAL% NEQ 0 (
   if %SVN_BRANCH_PATH_IS_WC_URL% NEQ 0 (
@@ -578,7 +576,7 @@ if %FLAG_SVN_LIST_FILES% NEQ 0 (
   type nul > "%BRANCH_ROOT_FILES_FILE%"
 
   if %SVN_BRANCH_PATH_IS_WC_URL% NEQ 0 (
-    rem set a current directory for "svn ls" command to reduce path lengths in output
+    rem set a current directory for "svn ls" command to reduce path lengths in output and from there the ".svn" directory search up to the root
     pushd "%SVN_BRANCH_PATH%" && (
       call "%%TOOLS_PATH%%/scm/svn/svn_list.bat" %%FLAG_TEXT_SVN_OFFLINE%% -wcroot "%%SVN_BRANCH_WCROOT_PATH%%" . --depth infinity --non-interactive > "%BRANCH_ROOT_FILES_FILE%" 2>nul
       popd
