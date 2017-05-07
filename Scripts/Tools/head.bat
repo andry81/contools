@@ -26,7 +26,7 @@ for /F "usebackq delims=" %%i in (`findstr /B /N /R /C:".*" 2^>nul`) do (
   set /A LINE_INDEX+=1
 )
 
-exit /b
+exit /b 0
 
 :IF_OR_PRINT
 if %* exit /b 0
