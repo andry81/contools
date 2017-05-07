@@ -426,6 +426,7 @@ Scripts/Tools/hashdeep/tigerdeep64.exe -text
 Scripts/Tools/hashdeep/whirlpooldeep.exe -text
 Scripts/Tools/hashdeep/whirlpooldeep64.exe -text
 Scripts/Tools/hashlib.sh -text
+Scripts/Tools/head.bat -text
 Scripts/Tools/if_.bat -text
 Scripts/Tools/iffexist.bat -text
 Scripts/Tools/index_pathstr.bat -text
