@@ -6,12 +6,12 @@ cd .
 rem Create local variable's stack
 setlocal
 
-call "%%~dp0init.bat"
+call "%%~dp0__init__.bat"
 
 echo Running %~nx0...
 title %~nx0 %*
 
-set /A NEST_LVL+=1
+set /A __NEST_LVL+=1
 
 setlocal EnableDelayedExpansion
 
@@ -30,8 +30,8 @@ for /L %%i in (1,1,1000) do (
 
 echo.
 
-set /A NEST_LVL-=1
-if %NEST_LVL%0 EQU 0 pause
+set /A __NEST_LVL-=1
+if %__NEST_LVL%0 EQU 0 pause
 
 exit /b 0
 
