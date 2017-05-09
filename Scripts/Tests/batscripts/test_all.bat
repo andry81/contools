@@ -7,18 +7,18 @@ call "%%~dp0__init__.bat"
 
 set /A __NEST_LVL+=1
 
-call "%%~dp0test_strlen.bat"
-call "%%~dp0test_strchr.bat"
-call "%%~dp0test_strrep.bat"
-call "%%~dp0test_stresc.bat"
-call "%%~dp0test_cstresc.bat"
-call "%%~dp0test_extract_version.bat"
-call "%%~dp0test_make_url_canonical.bat"
-call "%%~dp0test_make_url_absolute.bat"
-rem call "%%~dp0test_setvarsfromfile.bat"
+call "%%TESTS_ROOT%%/test_strlen.bat"
+call "%%TESTS_ROOT%%/test_strchr.bat"
+call "%%TESTS_ROOT%%/test_strrep.bat"
+call "%%TESTS_ROOT%%/test_stresc.bat"
+call "%%TESTS_ROOT%%/test_cstresc.bat"
+call "%%TESTS_ROOT%%/test_extract_version.bat"
+call "%%TESTS_ROOT%%/test_make_url_canonical.bat"
+call "%%TESTS_ROOT%%/test_make_url_absolute.bat"
+rem call "%%TESTS_ROOT%%/test_setvarsfromfile.bat"
 
-call "%%~dp0test_xml_sed.bat"
-call "%%~dp0test_xml__filter_xpath_list_by_xpath_list.bat"
+call "%%TESTS_ROOT%%/test_xml_sed.bat"
+call "%%TESTS_ROOT%%/test_xml__filter_xpath_list_by_xpath_list.bat"
 
 set /A __NEST_LVL-=1
 
