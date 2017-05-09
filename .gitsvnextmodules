@@ -8,7 +8,7 @@
 	type = dir
 [submodule "Scripts/Tools/scm/svn"]
 	path = Scripts/Tools/scm/svn
-	owner = Scripts/Tools
+	owner = Scripts
 	url = https://svn.code.sf.net/p/svncmd/scripts/trunk/Scripts
 	branch = /
 	fetch = :refs/remotes/git-svn
