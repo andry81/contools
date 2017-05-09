@@ -17,6 +17,8 @@ setlocal DISABLEDELAYEDEXPANSION
 
 set "NUM=%~1"
 if "%NUM%" == "" set NUM=0
+set "STR_PREFIX=%~2"
+set "STR_SUFFIX=%~3"
 
 set LINE_INDEX=0
 
@@ -36,5 +38,5 @@ set OFFSET=0
 set CHAR=!LINE_STR:~%OFFSET%,1!
 if not "!CHAR!" == ":" ( set /A OFFSET+=1 && goto OFFSET_LOOP )
 set /A OFFSET+=1
-echo.!LINE_STR:~%OFFSET%!
+echo.!STR_PREFIX!!LINE_STR:~%OFFSET%!!STR_SUFFIX!
 exit /b 1
