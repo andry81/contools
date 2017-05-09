@@ -18,25 +18,23 @@ cd .
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0..\.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
-call "%%TOOLS_PATH%%/get_datetime.bat"
+call "%%CONTOOLS_ROOT%%/get_datetime.bat"
 set "BEGIN_DATE=%RETURN_VALUE:~0,4%-%RETURN_VALUE:~4,2%-%RETURN_VALUE:~6,2%"
 set "BEGIN_TIME=%RETURN_VALUE:~8,2%-%RETURN_VALUE:~10,2%-%RETURN_VALUE:~12,2%,%RETURN_VALUE:~15,3%"
-call "%%TOOLS_PATH%%/timestamp.bat" "%%RETURN_VALUE%%"
+call "%%CONTOOLS_ROOT%%/timestamp.bat" "%%RETURN_VALUE%%"
 set "BEGIN_TIMESTAMP=%TIMESTAMP%"
 
 echo.%~nx0: start time: %BEGIN_DATE% %BEGIN_TIME% ^(%BEGIN_TIMESTAMP%^)
 
-call "%%~dp0gen_branch_workingset.bat" %*
+call "%%SVNCMD_TOOLS_ROOT%%/gen_branch_workingset.bat" %*
 set LASTERROR=%ERRORLEVEL%
 
-call "%%TOOLS_PATH%%/get_datetime.bat"
+call "%%CONTOOLS_ROOT%%/get_datetime.bat"
 set "END_DATE=%RETURN_VALUE:~0,4%-%RETURN_VALUE:~4,2%-%RETURN_VALUE:~6,2%"
 set "END_TIME=%RETURN_VALUE:~8,2%-%RETURN_VALUE:~10,2%-%RETURN_VALUE:~12,2%,%RETURN_VALUE:~15,3%"
-call "%%TOOLS_PATH%%/timestamp.bat" "%%RETURN_VALUE%%"
+call "%%CONTOOLS_ROOT%%/timestamp.bat" "%%RETURN_VALUE%%"
 set "END_TIMESTAMP=%TIMESTAMP%"
 
 echo.%~nx0: end time: %END_DATE% %END_TIME% ^(%END_TIMESTAMP%^)

@@ -41,11 +41,9 @@ if not exist "%DOWNSTREAM_SVN_CHANGESET%" (
 rem Drop last error level
 cd .
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
-call "%%TOOLS_PATH%%\scm\svn\gen_diff_svn_changeset_lst.bat" "%%UPSTREAM_SVN_CHANGESET%%" "%%DOWNSTREAM_SVN_CHANGESET%%" "%%DOWNSTREAM_SVN_CHANGESETS_DIFF%%"
+call "%%SVNCMD_TOOLS_ROOT%%/gen_diff_svn_changeset_lst.bat" "%%UPSTREAM_SVN_CHANGESET%%" "%%DOWNSTREAM_SVN_CHANGESET%%" "%%DOWNSTREAM_SVN_CHANGESETS_DIFF%%"
 set LASTERROR=%ERRORLEVEL%
 if %LASTERROR% LSS 0 (
   echo.%~nx0: info: upstream and downstream svn changesets has changes.
@@ -57,7 +55,7 @@ if %LASTERROR% LSS 0 (
   exit /b -1
 )
 
-call "%%TOOLS_PATH%%\scm\svn\print_svn_changesets_diff_lst.bat" "%%DOWNSTREAM_SVN_CHANGESETS_DIFF%%"
+call "%%SVNCMD_TOOLS_ROOT%%/print_svn_changesets_diff_lst.bat" "%%DOWNSTREAM_SVN_CHANGESETS_DIFF%%"
 set LASTERROR=%ERRORLEVEL%
 if %LASTERROR% NEQ 0 (
   echo.%~nx0: warning: build is stopped because of previous errors.>&2

@@ -48,9 +48,7 @@ if not exist "%SVN_CHANGESETS_DIFF%" (
 
 set "?1=^|"
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set REPO_MAXLEN=0
 call :LOAD_SVN_CHANGESETS_DIFF
@@ -138,13 +136,13 @@ if "%STATUS%" == "+" set /A NUM_ADDED+=1
 if "%STATUS%" == "-" set /A NUM_REMOVED+=1
 if "%STATUS%" == " " set /A NUM_UNCHANGED+=1
 
-call "%%TOOLS_PATH%%\strlen.bat" "" "%%REPO%%"
+call "%%CONTOOLS_ROOT%%/strlen.bat" "" "%%REPO%%"
 set REPO_LEN=%ERRORLEVEL%
 
-call "%%TOOLS_PATH%%\strlen.bat" "" "%%REV%%"
+call "%%CONTOOLS_ROOT%%/strlen.bat" "" "%%REV%%"
 set REV_LEN=%ERRORLEVEL%
 
-call "%%TOOLS_PATH%%\strlen.bat" "" "%%PREV%%"
+call "%%CONTOOLS_ROOT%%/strlen.bat" "" "%%PREV%%"
 set PREV_LEN=%ERRORLEVEL%
 
 call set "REPO_SPACES=%%REPO_MAXSPACES:~%REPO_LEN%%%"
@@ -171,7 +169,7 @@ set "REPO=%~2"
 set "REV=%~3"
 set "PREV=%~4"
 
-call "%%TOOLS_PATH%%\strlen.bat" "" "%%REPO%%"
+call "%%CONTOOLS_ROOT%%/strlen.bat" "" "%%REPO%%"
 set REPO_LEN=%ERRORLEVEL%
 if %REPO_LEN% GTR %REPO_MAXLEN% set REPO_MAXLEN=%REPO_LEN%
 

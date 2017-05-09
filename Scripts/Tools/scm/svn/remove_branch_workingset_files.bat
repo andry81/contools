@@ -14,10 +14,6 @@ cd .
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0..\.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
-
 set "ROOT_FILES_DIR_PATH=%~1"
 set "ROOT_FILES_NAME_PREFIX=%~2"
 set "WORKINGSET_CATALOG_DIR_PATH=%~3"

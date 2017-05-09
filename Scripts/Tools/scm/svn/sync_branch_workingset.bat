@@ -49,13 +49,10 @@ cd .
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0..\.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
-set "?~dp0=%~dp0"
 
 rem script flags
 set FLAG_SVN_EXTERNALS_RECURSIVE=0
@@ -152,7 +149,7 @@ set "BRANCH_ROOT_EXTERNALS_FILE=%~dpf5"
 set "BRANCH_WORKINGSET_FILE=%~dpf6"
 set "BRANCH_WORKINGSET_CATALOG_DIR=%~dpf7"
 
-call "%%TOOLS_PATH%%/get_datetime.bat"
+call "%%CONTOOLS_ROOT%%/get_datetime.bat"
 set "SYNC_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
 set "SYNC_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 
@@ -332,14 +329,14 @@ exit /b
 setlocal
 
 rem retrieve workingset URL and Repository Root properties
-call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "URL"
+call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "URL"
 set "BRANCH_WORKINGSET_DIR_URL=%RETURN_VALUE%"
 if "%BRANCH_WORKINGSET_DIR_URL%" == "" (
   echo.%?~nx0%: error: `URL` property is not found in SVN info file: BRANCH_PATH="%BRANCH_PATH%" BRANCH_INFO_FILE="%BRANCH_INFO_FILE%".
   exit /b 30
 ) >&2
 
-call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "Repository Root"
+call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "Repository Root"
 set "BRANCH_WORKINGSET_REPO_ROOT=%RETURN_VALUE%"
 if "%BRANCH_WORKINGSET_REPO_ROOT%" == "" (
   echo.%?~nx0%: error: `Repository Root` property is not found in SVN workingset info file: BRANCH_PATH="%BRANCH_PATH%" BRANCH_INFO_FILE="%BRANCH_INFO_FILE%".
@@ -347,14 +344,14 @@ if "%BRANCH_WORKINGSET_REPO_ROOT%" == "" (
 ) >&2
 
 rem retrieve workingset revisions and VerID properties
-call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "Revision"
+call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "Revision"
 set "BRANCH_WORKINGSET_INFO_CURRENT_REV=%RETURN_VALUE%"
 if "%BRANCH_WORKINGSET_INFO_CURRENT_REV%" == "" (
   echo.%?~nx0%: error: `Revision` property is not found in SVN workingset info file: BRANCH_PATH="%BRANCH_PATH%" BRANCH_INFO_FILE="%BRANCH_INFO_FILE%".
   exit /b 32
 ) >&2
 
-rem call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "VerID"
+rem call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%BRANCH_INFO_FILE%%" "VerID"
 rem set "BRANCH_WORKINGSET_SVNVERSION_VALUE=%RETURN_VALUE%"
 rem if "%BRANCH_WORKINGSET_SVNVERSION_VALUE%" == "" set BRANCH_WORKINGSET_SVNVERSION_VALUE=0
 
@@ -417,14 +414,14 @@ pushd "%SYNC_BRANCH_PATH%" && (
 )
 
 rem read branch info file
-call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE_TMP%%" "URL"
+call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%BRANCH_INFO_FILE_TMP%%" "URL"
 set "BRANCH_DIR_URL=%RETURN_VALUE%"
 if "%BRANCH_DIR_URL%" == "" (
   echo.%?~nx0%: error: `URL` property is not found in temporary SVN info file requested from the branch: BRANCH_PATH="%BRANCH_PATH%".
   exit /b 43
 ) >&2
 
-call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE_TMP%%" "Repository Root"
+call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%BRANCH_INFO_FILE_TMP%%" "Repository Root"
 set "BRANCH_REPO_ROOT=%RETURN_VALUE%"
 if "%BRANCH_REPO_ROOT%" == "" (
   echo.%?~nx0%: error: `Repository Root` property is not found in temporary SVN info file requested from the branch: BRANCH_PATH="%BRANCH_PATH%".
@@ -515,7 +512,7 @@ if %FLAG_SVN_IGNORE_EXTERNALS% NEQ 0 (
   )
 
   rem convert externals into CSV list
-  call "%%?~dp0%%gen_externals_list.bat" "%%BRANCH_FROM_EXTERNALS_FILE_TMP%%" "%%BRANCH_REPO_ROOT%%" "%%BRANCH_DIR_URL%%" > "%BRANCH_FROM_EXTERNALS_LIST_FILE_TMP%"
+  call "%%SVNCMD_TOOLS_ROOT%%/gen_externals_list.bat" "%%BRANCH_FROM_EXTERNALS_FILE_TMP%%" "%%BRANCH_REPO_ROOT%%" "%%BRANCH_DIR_URL%%" > "%BRANCH_FROM_EXTERNALS_LIST_FILE_TMP%"
   if %ERRORLEVEL% NEQ 0 (
     echo.%?~nx0%: error: invalid svn:externals path transformation: EXTERNAL_FILE="%BRANCH_FROM_EXTERNALS_FILE_TMP%" REPO_ROOT="%BRANCH_REPO_ROOT%" ^
 DIR_URL="%BRANCH_DIR_URL%".
@@ -523,7 +520,7 @@ DIR_URL="%BRANCH_DIR_URL%".
   ) >&2
 
   rem generate externals difference file
-  call "%%?~dp0%%gen_diff_svn_externals.bat" "%%BRANCH_EXTERNALS_FILE%%" "%%BRANCH_FROM_EXTERNALS_LIST_FILE_TMP%%" "%%BRANCH_EXTERNALS_DIFF_LIST_FILE_TMP%%"
+  call "%%SVNCMD_TOOLS_ROOT%%/gen_diff_svn_externals.bat" "%%BRANCH_EXTERNALS_FILE%%" "%%BRANCH_FROM_EXTERNALS_LIST_FILE_TMP%%" "%%BRANCH_EXTERNALS_DIFF_LIST_FILE_TMP%%"
   if %ERRORLEVEL% GTR 0 (
     echo.%?~nx0%: error: invalid svn:externals file lists: ERROR="%ERRORLEVEL%" PREV_EXTERNALS="%BRANCH_FROM_EXTERNALS_LIST_FILE_TMP%" NEXT_EXTERNALS="%BRANCH_EXTERNALS_FILE%".
     exit /b 56
@@ -554,7 +551,7 @@ pushd "%SYNC_BRANCH_PATH_TO_REMOVE%" && (
 )
 
 rem get branch difference file size before update
-call "%%TOOLS_PATH%%/get_filesize.bat" "%%BRANCH_DIFF_FILE_TMP%%"
+call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%BRANCH_DIFF_FILE_TMP%%"
 
 if %ERRORLEVEL% NEQ 0 ^
 if %FLAG_SVN_AUTO_REVERT% EQU 0 (
@@ -607,7 +604,7 @@ if %FLAG_SVN_AUTO_REVERT% EQU 0 (
   )
 
   rem get branch difference file size before update
-  call "%%TOOLS_PATH%%/get_filesize.bat" "%%BRANCH_DIFF_FILE_TMP%%"
+  call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%BRANCH_DIFF_FILE_TMP%%"
 )
 
 if %FLAG_SVN_AUTO_REVERT% EQU 0 (
@@ -670,7 +667,7 @@ exit /b 0
 :UPDATE_BY_CHANGESET_END
 
 rem get branch difference file size after update
-call "%%TOOLS_PATH%%/get_filesize.bat" "%%BRANCH_DIFF_FILE%%"
+call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%BRANCH_DIFF_FILE%%"
 set BRANCH_DIFF_FILESIZE=%ERRORLEVEL%
 
 if %BRANCH_DIFF_FILESIZE% NEQ 0 pushd "%SYNC_BRANCH_PATH%" && (
@@ -833,7 +830,7 @@ pushd "%SYNC_BRANCH_PARENT_PATH%" && (
 )
 
 rem read parent branch info file
-call "%%?~dp0%%extract_info_param.bat" "%%BRANCH_INFO_FILE_TMP%%" "Repository UUID"
+call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%BRANCH_INFO_FILE_TMP%%" "Repository UUID"
 set "PARENT_BRANCH_REPOSITORY_UUID=%RETURN_VALUE%"
 if "%PARENT_BRANCH_REPOSITORY_UUID%" == "" (
   echo.%?~nx0%: error: `Repository UUID` property is not found in temporary SVN info file requested from the branch: BRANCH_PATH="%BRANCH_PATH:\=/%/%SYNC_BRANCH_PARENT_PATH%".
@@ -843,14 +840,14 @@ if "%PARENT_BRANCH_REPOSITORY_UUID%" == "" (
 if "%BRANCH_REPO_REL_PATH%" == "." set "BRANCH_REPO_REL_PATH="
 
 set "REPOS_ID="
-for /F "usebackq eol= tokens=* delims=" %%i in (`call "%%TOOLS_PATH%%/sqlite/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" "select id from "REPOSITORY" where uuid='%%PARENT_BRANCH_REPOSITORY_UUID%%'"`) do set "REPOS_ID=%%i"
+for /F "usebackq eol= tokens=* delims=" %%i in (`call "%%SQLITE_TOOLS_ROOT%%/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" "select id from "REPOSITORY" where uuid='%%PARENT_BRANCH_REPOSITORY_UUID%%'"`) do set "REPOS_ID=%%i"
 if "%REPOS_ID%" == "" (
   echo.%?~nx0%: error: SVN database `REPOSITORY id` request has failed: "%BRANCH_PATH:\=/%/%SYNC_BRANCH_PARENT_PATH%/.svn/wc.db".
   exit /b 90
 )
 
 set "WC_ID="
-for /F "usebackq eol= tokens=* delims=" %%i in (`call "%%TOOLS_PATH%%/sqlite/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" "select id from "WCROOT" where local_abspath is null or local_abspath = ''"`) do set "WC_ID=%%i"
+for /F "usebackq eol= tokens=* delims=" %%i in (`call "%%SQLITE_TOOLS_ROOT%%/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" "select id from "WCROOT" where local_abspath is null or local_abspath = ''"`) do set "WC_ID=%%i"
 if "%WC_ID%" == "" (
   echo.%?~nx0%: error: SVN database `WCROOT id` request has failed: "%BRANCH_PATH:\=/%/%SYNC_BRANCH_PARENT_PATH%/.svn/wc.db".
   exit /b 91
@@ -860,14 +857,14 @@ if "%SYNC_BRANCH_EXTERNAL_URI_REV_PEG%" == "0" set "SYNC_BRANCH_EXTERNAL_URI_REV
 if "%SYNC_BRANCH_EXTERNAL_URI_REV_OPERATIVE%" == "0" set "SYNC_BRANCH_EXTERNAL_URI_REV_OPERATIVE=%SYNC_BRANCH_EXTERNAL_URI_REV_PEG%"
 
 set "PREV_WC_ID="
-for /F "usebackq eol= tokens=* delims=" %%i in (`call "%%TOOLS_PATH%%/sqlite/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" "select wc_id from "EXTERNALS" where wc_id = '%%WC_ID%%' and local_relpath = '%%SYNC_BRANCH_LOCAL_REL_PATH%%' and def_local_relpath = '%SYNC_BRANCH_LOCAL_DEF_PATH%' "`) do set "PREV_WC_ID=%%i"
+for /F "usebackq eol= tokens=* delims=" %%i in (`call "%%SQLITE_TOOLS_ROOT%%/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" "select wc_id from "EXTERNALS" where wc_id = '%%WC_ID%%' and local_relpath = '%%SYNC_BRANCH_LOCAL_REL_PATH%%' and def_local_relpath = '%SYNC_BRANCH_LOCAL_DEF_PATH%' "`) do set "PREV_WC_ID=%%i"
 
 rem Update/Insert records into WC EXTERNALS table to link external directory from the parent.
 if not "%PREV_WC_ID%" == "" (
-  call "%%TOOLS_PATH%%/sqlite/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" ^
+  call "%%SQLITE_TOOLS_ROOT%%/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" ^
     "update EXTERNALS set parent_relpath = '%%SYNC_BRANCH_PARENT_REL_PATH%%',repos_id = '%%REPOS_ID%%',presence = 'normal',kind = 'dir',def_repos_relpath = '%%BRANCH_REPO_REL_PATH%%',def_operational_revision = '%%SYNC_BRANCH_EXTERNAL_URI_REV_PEG%%',def_revision = '%%SYNC_BRANCH_EXTERNAL_URI_REV_OPERATIVE%%' where wc_id = '%%WC_ID%%' and local_relpath = '%%SYNC_BRANCH_LOCAL_REL_PATH%%' and def_local_relpath = '%%SYNC_BRANCH_LOCAL_DEF_PATH%%'" >nul
 ) else (
-  call "%%TOOLS_PATH%%/sqlite/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" ^
+  call "%%SQLITE_TOOLS_ROOT%%/sqlite.bat" -batch "%%SYNC_BRANCH_PARENT_PATH%%/.svn/wc.db" ".headers off" ^
     "insert into EXTERNALS (wc_id,local_relpath,parent_relpath,repos_id,presence,kind,def_local_relpath,def_repos_relpath,def_operational_revision,def_revision) values (%%WC_ID%%,'%%SYNC_BRANCH_LOCAL_REL_PATH%%','%%SYNC_BRANCH_PARENT_REL_PATH%%','%%REPOS_ID%%','normal','dir','%%SYNC_BRANCH_LOCAL_DEF_PATH%%','%%BRANCH_REPO_REL_PATH%%','%%SYNC_BRANCH_EXTERNAL_URI_REV_PEG%%','%%SYNC_BRANCH_EXTERNAL_URI_REV_OPERATIVE%%')"
 )
 
@@ -943,7 +940,7 @@ rem check is directory already added to the version control
 svn info "%BRANCH_BINARY_FILE_DIR%" >nul 2>nul && exit /b 0
 
 rem echo BRANCH_FILE_PATH=%BRANCH_FILE_PATH%
-call "%%TOOLS_PATH%%/index_pathstr.bat" BRANCH_BINARY_FILE_SUBDIR_ /\ "%%BRANCH_FILE_PATH%%"
+call "%%CONTOOLS_ROOT%%/index_pathstr.bat" BRANCH_BINARY_FILE_SUBDIR_ /\ "%%BRANCH_FILE_PATH%%"
 set BRANCH_BINARY_FILE_INDEX_SIZE=%RETURN_VALUE%
 if %BRANCH_BINARY_FILE_INDEX_SIZE% LSS 2 exit /b 0
 
@@ -961,7 +958,7 @@ exit /b 0
 
 :PREPROCESS_COPY_ADD_BINARY_FILE_LINE
 rem echo BRANCH_FILE_PATH_TO_ADD=%BRANCH_FILE_PATH_TO_ADD%
-call "%%TOOLS_PATH%%/index_pathstr.bat" BRANCH_BINARY_FILE_TO_ADD_SUBDIR_ /\ "%%BRANCH_FILE_PATH_TO_ADD%%"
+call "%%CONTOOLS_ROOT%%/index_pathstr.bat" BRANCH_BINARY_FILE_TO_ADD_SUBDIR_ /\ "%%BRANCH_FILE_PATH_TO_ADD%%"
 set BRANCH_BINARY_FILE_TO_ADD_INDEX_SIZE=%RETURN_VALUE%
 if %BRANCH_BINARY_FILE_TO_ADD_INDEX_SIZE% LSS 2 exit /b 0
 
@@ -1009,7 +1006,7 @@ set "BRANCH_BINARY_FILE_NAME=%~nx1"
 set "BRANCH_BINARY_FILE_DIR_COPY_TO=%~dp2"
 set "BRANCH_FILE_PATH_COPY_TO=%~dpnx2"
 
-call "%%TOOLS_PATH%%/xcopy_file.bat" "%%BRANCH_BINARY_FILE_DIR%%" "%%BRANCH_BINARY_FILE_NAME%%" "%%BRANCH_BINARY_FILE_DIR_COPY_TO%%" /NJS || exit /b 110
+call "%%CONTOOLS_ROOT%%/xcopy_file.bat" "%%BRANCH_BINARY_FILE_DIR%%" "%%BRANCH_BINARY_FILE_NAME%%" "%%BRANCH_BINARY_FILE_DIR_COPY_TO%%" /NJS || exit /b 110
 exit /b 0
 
 :SVN_ADD_FILE
@@ -1041,7 +1038,7 @@ exit /b 0
 :SVN_REMOVE_DIR_BY_LIST
 rem set a current directory for "svn ls" command to reduce path lengths in output and from there the ".svn" directory search up to the root
 pushd "%DIR_PATH%" && (
-  call "%%TOOLS_PATH%%/scm/svn/svn_list.bat" -offline . --depth infinity --non-interactive > "%BRANCH_FILES_FILE_TMP%" 2>nul || ( popd & goto :EOF )
+  call "%%SVNCMD_TOOLS_ROOT%%/svn_list.bat" -offline . --depth infinity --non-interactive > "%BRANCH_FILES_FILE_TMP%" 2>nul || ( popd & goto :EOF )
 
   echo.Removing external directory: "%DIR_PATH%"...
   for /F "usebackq eol=	 tokens=* delims=" %%i in (`sort /R "%BRANCH_FILES_FILE_TMP%"`) do (

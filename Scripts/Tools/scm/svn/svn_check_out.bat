@@ -16,12 +16,9 @@ setlocal
 echo.%~nx0 %*
 echo.
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0..\.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
-set "?~dp0=%~dp0"
 
 rem svn flags
 set "SVN_CMD_FLAG_ARGS="
@@ -102,7 +99,7 @@ goto :EOF
 :GET_URL_FILE_NAME
 set "SVN_URL_PATH_PREFIX=%~1"
 
-call "%%?~dp0%%make_url_canonical.bat" "%%SVN_URL_PATH_PREFIX%%"
+call "%%SVNCMD_TOOLS_ROOT%%/make_url_canonical.bat" "%%SVN_URL_PATH_PREFIX%%"
 set "SVN_URL_PATH_PREFIX=%RETURN_VALUE%"
 
 rem strip until empty
