@@ -2,6 +2,9 @@
 
 setlocal
 
+rem builtin defaults
+if "%TORTOISEPROC_MAX_CALLS%" == "" set TORTOISEPROC_MAX_CALLS=10
+
 rem script flags
 set FLAG_WAIT_EXIT=0
 
@@ -33,8 +36,13 @@ if "%PWD%" == "" goto NOPWD
 
 :NOPWD
 
+rem run only first TORTOISEPROC_MAX_CALLS
+set CALL_INDEX=0
+
 rem run COMMAND over selected files/directories in the PWD directory
 :CURDIR_LOOP
+if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 0
+
 set "FILENAME=%~1"
 
 if "%FILENAME%" == "" exit /b 0
@@ -44,6 +52,8 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
 ) else (
   call :CMD start /B "" TortoiseProc.exe %%COMMAND%% /path:"%%FILENAME%%"
 )
+
+set /A CALL_INDEX+=1
 
 shift
 
