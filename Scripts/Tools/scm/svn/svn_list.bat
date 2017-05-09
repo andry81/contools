@@ -13,12 +13,9 @@ cd .
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0..\.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
-set "?~dp0=%~dp0"
 
 rem script flags
 set FLAG_SVN_OFFLINE=0
@@ -137,7 +134,7 @@ exit /b
 
 rem parse -r argument value
 set "SQLITE_EXP_REVISION_RANGE_SUFFIX="
-if %ARG_SVN_REVISION_RANGE_IS_SET% NEQ 0 call "%%?~dp0%%impl/svn_arg_parse-r.bat" "%%ARG_SVN_REVISION_RANGE%%"
+if %ARG_SVN_REVISION_RANGE_IS_SET% NEQ 0 call "%%SVNCMD_TOOLS_ROOT%%/impl/svn_arg_parse-r.bat" "%%ARG_SVN_REVISION_RANGE%%"
 if not "%SQLITE_EXP_REVISION_RANGE%" == "" set "SQLITE_EXP_REVISION_RANGE_SUFFIX= and (%SQLITE_EXP_REVISION_RANGE%)"
 
 rem filter output only for the current directory path
@@ -150,7 +147,7 @@ if %ARG_SVN_WCROOT% NEQ 0 (
 )
 
 if %FLAG_SVN_OFFLINE% NEQ 0 (
-  call "%%TOOLS_PATH%%/sqlite/sqlite.bat" -batch ".svn/wc.db" ".headers off" "with new_nodes as ( select case when kind != 'dir' then local_relpath else local_relpath || '/' end as local_relpath_new from nodes_base where local_relpath != ''%%SQLITE_EXP_REVISION_RANGE_SUFFIX%% and presence != 'not-present') select %%SQLITE_EXP_SELECT_CMD_LINE%%order by local_relpath_new asc"
+  call "%%SQLITE_TOOLS_ROOT%%/sqlite.bat" -batch ".svn/wc.db" ".headers off" "with new_nodes as ( select case when kind != 'dir' then local_relpath else local_relpath || '/' end as local_relpath_new from nodes_base where local_relpath != ''%%SQLITE_EXP_REVISION_RANGE_SUFFIX%% and presence != 'not-present') select %%SQLITE_EXP_SELECT_CMD_LINE%%order by local_relpath_new asc"
 ) else (
   svn ls %SVN_CMD_FLAG_ARGS%
 )

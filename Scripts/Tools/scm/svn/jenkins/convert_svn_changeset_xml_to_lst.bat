@@ -25,9 +25,7 @@ if not exist "%XML_PATH%" (
 rem Drop last error level
 cd .
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0..\__init__.bat" || goto :EOF
 
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
@@ -38,6 +36,6 @@ call :XMLSTARLET ^
 exit /b 0
 
 :XMLSTARLET
-echo.^>^> "%TOOLS_PATH%\xml\xml.exe" %* ^> "%OUTPUT_DIR%\svn_changeset.lst"
-"%TOOLS_PATH%\xml\xml.exe" %* > "%OUTPUT_DIR%\svn_changeset.lst"
+echo.^>^> "%XML_TOOLS_ROOT%/xml.exe" %* ^> "%OUTPUT_DIR%\svn_changeset.lst"
+"%XML_TOOLS_ROOT%/xml.exe" %* > "%OUTPUT_DIR%\svn_changeset.lst"
 goto :EOF

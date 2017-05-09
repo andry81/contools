@@ -289,6 +289,7 @@ Scripts/Tools/ToolAdaptors/vbs/make_xp_shortcut_cmd_c.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut_cmd.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_sys_shortcut_cmd.bat -text
+Scripts/Tools/__init__.bat -text
 Scripts/Tools/abspath.bat -text
 Scripts/Tools/admin/ProductKey/PrintProductKeyFromFile.py -text
 Scripts/Tools/admin/ProductKey/PrintProductKeyFromFile.vbs -text
@@ -429,6 +430,7 @@ Scripts/Tools/hashlib.sh -text
 Scripts/Tools/head.bat -text
 Scripts/Tools/if_.bat -text
 Scripts/Tools/iffexist.bat -text
+Scripts/Tools/index_patch_file.bat -text
 Scripts/Tools/index_pathstr.bat -text
 Scripts/Tools/isnativecmd.bat -text
 Scripts/Tools/joinvars.bat -text
@@ -483,7 +485,7 @@ Scripts/Tools/regquery.bat -text
 Scripts/Tools/resetenv.bat -text
 Scripts/Tools/sar.pl -text
 Scripts/Tools/sarf.js -text
-Scripts/Tools/scm/index_patch_file.bat -text
+Scripts/Tools/scm/svn/__init__.bat -text
 Scripts/Tools/scm/svn/check_svn_up_change.bat -text
 Scripts/Tools/scm/svn/extract_info_param.bat -text
 Scripts/Tools/scm/svn/extract_last_changed_rev.bat -text

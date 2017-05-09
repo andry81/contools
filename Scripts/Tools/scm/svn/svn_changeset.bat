@@ -29,9 +29,7 @@ cd .
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0..\.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
 set "?~dp0=%~dp0"
@@ -173,4 +171,4 @@ if not "%SVN_BRANCH_REL_SUB_PATH%" == "" (
   set "SQLITE_EXP_SELECT_CMD_LINE=revision, substr(local_relpath_new, length('%SVN_BRANCH_REL_SUB_PATH%/')+1) as local_relpath_new_suffix from new_nodes where substr(local_relpath_new, 1, length('%SVN_BRANCH_REL_SUB_PATH%/')) == '%SVN_BRANCH_REL_SUB_PATH%/' collate nocase and local_relpath_new_suffix != '' "
 )
 
-call "%%TOOLS_PATH%%/sqlite/sqlite.bat" -batch ".svn/wc.db" ".headers off" ".mode list" ".separator |" ".nullvalue ." "with new_nodes as ( select revision, case when kind != 'dir' then local_relpath else local_relpath || '/' end as local_relpath_new from %%SQLITE_EXP_NODES_TABLE%% where local_relpath != ''%%SQLITE_EXP_REVISION_RANGE_SUFFIX%%) select %%SQLITE_EXP_SELECT_CMD_LINE%%order by local_relpath_new asc"
+call "%%SQLITE_TOOLS_ROOT%%/sqlite.bat" -batch ".svn/wc.db" ".headers off" ".mode list" ".separator |" ".nullvalue ." "with new_nodes as ( select revision, case when kind != 'dir' then local_relpath else local_relpath || '/' end as local_relpath_new from %%SQLITE_EXP_NODES_TABLE%% where local_relpath != ''%%SQLITE_EXP_REVISION_RANGE_SUFFIX%%) select %%SQLITE_EXP_SELECT_CMD_LINE%%order by local_relpath_new asc"

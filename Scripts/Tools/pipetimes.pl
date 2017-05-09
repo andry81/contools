@@ -21,8 +21,7 @@
 
 # Examples:
 # 1. #!/bin/sh
-#    {
-#    {
+#    function foo()
 #    {
 #      echo 1
 #      sleep 1
@@ -37,8 +36,22 @@
 #      echo 123456
 #      echo 12345 >&2
 #      echo 123456 >&2
-#    } 2>&1 >&6 | perl ./pipetimes.pl "b1" | tee "b" >&7 2>/dev/null
-#    } 6>&1 | perl ./pipetimes.pl "a1" | tee "a"
+#    }
+#
+#    # 2-phase redirection
+#    {
+#    {
+#      foo
+#    } 2>&1 >&6 | perl ./pipetimes.pl -a "$ErrIndexFilePath" | tee -a "$ErrFilePath" >&2
+#    } 6>&1 | perl ./pipetimes.pl -a "$OutIndexFilePath" | tee -a "$OutFilePath"
+#
+#    # 3-phase redirection
+#    {
+#    {
+#    {
+#      foo
+#    } 2>&1 >&6 | perl ./pipetimes.pl -a "$ErrIndexFilePath" | tee -a "$ErrFilePath" >&7 2>/dev/null
+#    } 6>&1 | perl ./pipetimes.pl -a "$OutIndexFilePath" | tee -a "$OutFilePath"
 #    } 7>&2
 
 use strict;

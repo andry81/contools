@@ -45,8 +45,9 @@ cd .
 
 setlocal
 
+call "%%~dp0__init__.bat" || goto :EOF
+
 set "?~nx0=%~nx0"
-set "?~dp0=%~dp0"
 
 rem script flags
 set FLAG_TEST_ABSOLUTE_TRANSFORM_PATH=0
@@ -175,7 +176,7 @@ if "%TRANSFORM_PATH:~0,1%" == "." (
     echo.%?~nx0%: error: REPO_URL should not be empty.
     exit /b 8
   ) >&2
-  call "%%?~dp0%%extract_url_scheme.bat" "%%REPO_URL%%"
+  call "%%SVNCMD_TOOLS_ROOT%%/extract_url_scheme.bat" "%%REPO_URL%%"
   call set "RETURN_VALUE=%%RETURN_VALUE%%://%%TRANSFORM_PATH:~2%%"
 ) else if "%TRANSFORM_PATH:~0,1%" == "/" (
   rem relative to repo url root
@@ -183,7 +184,7 @@ if "%TRANSFORM_PATH:~0,1%" == "." (
     echo.%?~nx0%: error: REPO_URL should not be empty.
     exit /b 8
   ) >&2
-  call "%%?~dp0%%extract_url_root.bat" "%%REPO_URL%%"
+  call "%%SVNCMD_TOOLS_ROOT%%/extract_url_root.bat" "%%REPO_URL%%"
   call set "RETURN_VALUE=%%RETURN_VALUE%%/%%TRANSFORM_PATH:~1%%"
 ) else (
   rem relative or prefix to base url
@@ -199,7 +200,7 @@ if "%TRANSFORM_PATH:~0,1%" == "." (
   )
 )
 
-call "%%?~dp0%%make_url_canonical.bat" "%%RETURN_VALUE%%"
+call "%%SVNCMD_TOOLS_ROOT%%/make_url_canonical.bat" "%%RETURN_VALUE%%"
 
 (
   endlocal

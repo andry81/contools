@@ -31,6 +31,8 @@ cd .
 
 setlocal
 
+call "%%~dp0__init__.bat" || goto :EOF
+
 rem for script self debugging
 rem set DEBUG=1
 set ?1=^^^>
@@ -60,7 +62,7 @@ set "URL_PATH_PREFIX=%URL_PATH%"
 set COMPONENT_INDEX=0
 set NUM_REDUCTIONS=0
 
-rem save :/// :// :/ // character sequence from trimming to :/ and /
+rem save :/// :// // character sequence from trimming to :/ and /
 set "URL_PATH_PREFIX=%URL_PATH_PREFIX:///=|||%"
 set "URL_PATH_PREFIX=%URL_PATH_PREFIX://=||%"
 if "%URL_PATH_PREFIX:~0,1%" == "/" set "URL_PATH_PREFIX=|%URL_PATH_PREFIX:~1%"
@@ -90,7 +92,7 @@ if %DEBUG%0 NEQ 0 echo "URL_PATH_SUFFIX=%URL_PATH_SUFFIX%" "%URL_PATH_SUFFIX:~0,
 
 if "%URL_PATH_PREFIX%" == "" (
   if %NUM_REDUCTIONS% NEQ 0 (
-    rem Make reduction again until would nothing to reduce
+    rem Make reduction again until will nothing to reduce
     set COMPONENT_INDEX=0
     set NUM_REDUCTIONS=0
     set "URL_PATH_PREFIX=%RETURN_VALUE%"
