@@ -130,6 +130,12 @@ Scripts/TestTools/branch_workingset/gen.bat -text
 Scripts/TestTools/branch_workingset/sync.bat -text
 Scripts/TestTools/genstrings.py -text
 Scripts/TestTools/genstrings.tcl -text
+Scripts/Tests/batscripts/__init__.bat -text
+Scripts/Tests/batscripts/_testdata/test_setvarsfromfile/test_1_empty.vars -text
+Scripts/Tests/batscripts/_testdata/test_setvarsfromfile/test_2_simple_set.vars -text
+Scripts/Tests/batscripts/_testdata/test_setvarsfromfile/test_3_math.vars -text
+Scripts/Tests/batscripts/_testdata/test_setvarsfromfile/test_4_from_file.vars -text
+Scripts/Tests/batscripts/_testdata/test_setvarsfromfile/test_5_dbl_eval.vars -text
 Scripts/Tests/batscripts/_testdata/test_xml__filter_xpath_list_by_xpath_list/01_empty/output.txt -text
 Scripts/Tests/batscripts/_testdata/test_xml__filter_xpath_list_by_xpath_list/01_empty/xpath_filter.txt -text
 Scripts/Tests/batscripts/_testdata/test_xml__filter_xpath_list_by_xpath_list/11_inexact/output.txt -text
@@ -156,7 +162,6 @@ Scripts/Tests/batscripts/_testdata/test_xml_sed/xpath_search_list/01_empty/input
 Scripts/Tests/batscripts/_testdata/test_xml_sed/xpath_search_list/01_empty/output.txt -text
 Scripts/Tests/batscripts/_testdata/test_xml_sed/xpath_search_list/02/input.txt -text
 Scripts/Tests/batscripts/_testdata/test_xml_sed/xpath_search_list/02/output.txt -text
-Scripts/Tests/batscripts/init.bat -text
 Scripts/Tests/batscripts/test_all.bat -text
 Scripts/Tests/batscripts/test_cstresc.bat -text
 Scripts/Tests/batscripts/test_envblock_size.bat -text
