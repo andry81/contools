@@ -4,6 +4,22 @@
 // Author:      Andrey Dibrov (andry at inbox dot ru)
 //----------------------------------------
 
+// CAUTION:
+//   This implementation still can not be precise for several reasons.
+//   For example, this has 2-phase redirection:
+//   1. {
+//      {
+//        foo
+//      } 2>&1 >&6 | pipetimes.exe -a "$ErrIndexFilePath" | tee -a "$ErrFilePath" >&2
+//      } 6>&1 | pipetimes.exe -a "$OutIndexFilePath" | tee -a "$OutFilePath"
+//   To handle different phases of redirection corretly:
+//   1. The utility must get all the streams at the same time which not gonna
+//      happen because of lags inside the shell output.
+//   2. Two processes of pipetimes.exe must process both streams together w/o
+//      schedule lags which not gonna happen too, because of not real time OS.
+//   As a result the $ErrIndexFilePath and $OutIndexFilePath will contain the
+//   time lag values.
+
 #define _CRT_SECURE_NO_WARNINGS
 //#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 
