@@ -38,10 +38,11 @@ http://www.boost.org/users/license.html)
 -------------------------------------------------------------------------------
 3. INSTALLATION
 -------------------------------------------------------------------------------
-Scripts doesn't required to be built and installed. Windows executable utilities
-can be built if necessary under Microsoft Visual Studio C++ 2015 Community
-Edition. The utilities does not require an installed Microsoft Visual C++ 2015
-Redistributables at runtime.
+run configure.bat
+
+Windows executable utilities can be built if necessary under Microsoft Visual
+Studio C++ 2015 Community Edition. The utilities does not require an installed
+Microsoft Visual C++ 2015 Redistributables at runtime.
 
 -------------------------------------------------------------------------------
 4. FILES

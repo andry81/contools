@@ -6,6 +6,14 @@
 	fetch = :refs/remotes/git-svn
 	remote = svn
 	type = dir
+[submodule "Scripts/Tools/scm/svn"]
+	path = Scripts/Tools/scm/svn
+	owner = Scripts/Tools
+	url = https://svn.code.sf.net/p/svncmd/scripts/trunk
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
 [submodule "Scripts/ToolsExternal"]
 	path = Scripts/ToolsExternal
 	owner = Scripts
