@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.03.04
+* 2017.05.09
 * ConsoleTools
 
 WARNING:
@@ -115,8 +115,8 @@ Script runs run_msysdvlpr.bat under UAC promotion.
 
 !!!
 
-BEWARE OF DIFFERENCES WHEN TYPE A BATCH FILE CODE PEACE IN A CONSOLE WINDOW AND
-RUN AN ACTUAL BATCH FILE. THERE IS DIFFERENT VARIABLE EXPANSION PASS STAGES!
+BEWARE OF DIFFERENCES WHEN TYPE A BATCH FILE CODE PEACED IN A CONSOLE WINDOW AND
+RAN AS AN ACTUAL BATCH FILE. THERE IS DIFFERENT VARIABLE EXPANSION PASS STAGES!
 
 !!!
 
@@ -154,15 +154,16 @@ RESULT WOULD BE DIFFERENT THAN YOU THINK OF.
 
 !!!
 
-To automatically drop created variables from the batch script you can use these
-instructions:
+To automatically drop created variables from the BATCH SCRIPT FILE you can use
+these instructions:
 
 setlocal
 endlocal
 
 !!!
 
-BEWARE OF THE ENDLOCAL INSTRUCTION WHICH CALLS AUTOMATICALLY WHEN SCRIPT EXISTS.
+BEWARE OF THE ENDLOCAL INSTRUCTION WHICH CALLS AUTOMATICALLY WHEN A SCRIPT
+EXISTS OR CALL SUBROUTINE ENDS.
 BEWARE OF THE SETLOCAL INSTRUCTION WHICH WORKS ONLY IN A SCRIPT.
 
 !!!
@@ -767,13 +768,16 @@ Assign new command line to the existing Windows shortcut file.
 -------------------------------------------------------------------------------
      pipetimes.pl
 -------------------------------------------------------------------------------
+CAUTION:
+  This implementation is obsolete, use pipetimes.exe instead as more
+  precise.
+
 Script indexes standard input stream by line print time, offset from begin
 of stream and size of line.
 
 Examples:
 1. #!/bin/sh
-   {
-   {
+   function foo()
    {
      echo 1
      sleep 1
@@ -788,8 +792,22 @@ Examples:
      echo 123456
      echo 12345 >&2
      echo 123456 >&2
-   } 2>&1 >&6 | perl ./pipetimes.pl "b1" | tee "b" >&7 2>/dev/null
-   } 6>&1 | perl ./pipetimes.pl "a1" | tee "a"
+   }
+
+   # 2-phase redirection
+   {
+   {
+     foo
+   } 2>&1 >&6 | perl ./pipetimes.pl -a "$ErrIndexFilePath" | tee -a "$ErrFilePath" >&2
+   } 6>&1 | perl ./pipetimes.pl -a "$OutIndexFilePath" | tee -a "$OutFilePath"
+
+   # 3-phase redirection
+   {
+   {
+   {
+     foo
+   } 2>&1 >&6 | perl ./pipetimes.pl -a "$ErrIndexFilePath" | tee -a "$ErrFilePath" >&7 2>/dev/null
+   } 6>&1 | perl ./pipetimes.pl -a "$OutIndexFilePath" | tee -a "$OutFilePath"
    } 7>&2
 
 -------------------------------------------------------------------------------
@@ -1007,6 +1025,22 @@ detailes).
 -------------------------------------------------------------------------------
      pipetimes.exe
 -------------------------------------------------------------------------------
+CAUTION:
+  This implementation still can not be precise for several reasons.
+  For example, this has 2-phase redirection:
+  1. {
+     {
+       foo
+     } 2>&1 >&6 | pipetimes.exe -a "$ErrIndexFilePath" | tee -a "$ErrFilePath" >&2
+     } 6>&1 | pipetimes.exe -a "$OutIndexFilePath" | tee -a "$OutFilePath"
+  To handle different phases of redirection corretly:
+  1. The utility must get all the streams at the same time which not gonna
+     happen because of lags inside the shell output.
+  2. Two processes of pipetimes.exe must process both streams together w/o
+     schedule lags which not gonna happen too, because of not real time OS.
+  As a result the $ErrIndexFilePath and $OutIndexFilePath will contain the
+  time lag values.
+
 Standard input intermediate indexing utility. Indexes standard input stream by
 steam input time, offset from begin of input stream and size of input stream
 portion. Have the same sematic as pipetimes.pl script, but more precisable (see
@@ -1014,7 +1048,7 @@ pipetimes_help.txt inside source directory for detailes).
 
 Examples:
 1. #!/bin/sh
-   {
+   function foo()
    {
      echo 1
      sleep 1
@@ -1029,9 +1063,23 @@ Examples:
      echo 123456
      echo 12345 >&2
      echo 123456 >&2
+   }
+
+   # 2-phase redirection
+   {
+   {
+     foo
    } 2>&1 >&6 | pipetimes.exe -a "$ErrIndexFilePath" | tee -a "$ErrFilePath" >&2
    } 6>&1 | pipetimes.exe -a "$OutIndexFilePath" | tee -a "$OutFilePath"
 
+   # 3-phase redirection
+   {
+   {
+   {
+     foo
+   } 2>&1 >&6 | pipetimes.exe -a "$ErrIndexFilePath" | tee -a "$ErrFilePath" >&7 2>/dev/null
+   } 6>&1 | pipetimes.exe -a "$OutIndexFilePath" | tee -a "$OutFilePath"
+   } 7>&2
 
 -------------------------------------------------------------------------------
 5. KNOWN ISSUES
