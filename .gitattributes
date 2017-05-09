@@ -126,10 +126,8 @@ Scripts/Config/env/vars_winxp.lst -text
 Scripts/Config/msys.vars -text
 Scripts/Config/msysdvlpr.vars -text
 Scripts/Config/tmpl/runas_admin.lnk.dat -text
-Scripts/TestTools/branch_workingset/gen.bat -text
-Scripts/TestTools/branch_workingset/sync.bat -text
-Scripts/TestTools/genstrings.py -text
-Scripts/TestTools/genstrings.tcl -text
+Scripts/TestScripts/genstrings.py -text
+Scripts/TestScripts/genstrings.tcl -text
 Scripts/Tests/batscripts/__init__.bat -text
 Scripts/Tests/batscripts/_testdata/test_setvarsfromfile/test_1_empty.vars -text
 Scripts/Tests/batscripts/_testdata/test_setvarsfromfile/test_2_simple_set.vars -text
