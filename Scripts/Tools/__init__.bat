@@ -1,6 +1,6 @@
 @echo off
 
-if "%CONTOOLS_ROOT%" == "" set "CONTOOLS_ROOT=%%~dp0"
+if "%CONTOOLS_ROOT%" == "" set "CONTOOLS_ROOT=%~dp0"
 set "CONTOOLS_ROOT=%CONTOOLS_ROOT:\=/%"
 if "%CONTOOLS_ROOT:~-1%" == "/" set "CONTOOLS_ROOT=%CONTOOLS_ROOT:~0,-1%"
 
