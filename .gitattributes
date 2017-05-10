@@ -489,6 +489,7 @@ Scripts/Tools/sarf.js -text
 Scripts/Tools/setvarfromstd.bat -text
 Scripts/Tools/setvarsfromfile.bat -text
 Scripts/Tools/sigcheck.exe -text
+Scripts/Tools/split_pathstr.bat -text
 Scripts/Tools/splitvars.bat -text
 Scripts/Tools/sqlite/sqldiff.exe -text
 Scripts/Tools/sqlite/sqlite.bat -text
