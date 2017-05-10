@@ -7,7 +7,7 @@ set "CONFIGURE_ROOT=%CONFIGURE_ROOT:~0,-1%"
 
 if exist "%CONFIGURE_ROOT%/Scripts/__init__.bat" exit /b 1
 
-rem generate default configure.user.bat
+rem generate __init__.bat in "Tools/scm/svn"
 (
   echo.@echo off
   echo.
