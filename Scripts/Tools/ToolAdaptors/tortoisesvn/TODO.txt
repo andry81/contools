@@ -1,5 +1,5 @@
 TortoiseProc script:
-  - call by list, collect all parent directories where exists a child directory ".svn\" and create path list file in format of UCS2 w/o BOM.
+  - call by list, collect all parent directories where exists a child directory ".svn\" and create path list file in format of Unix(LF) UCS2 w/o BOM (x:\dir1\dir2).
   - /command:repostatus /pathfile:"<pathfile>" /deletepathfile
   - /command:commit /pathfile:"<pathfile>" /deletepathfile
   - workaround repostatus not showing nested WC if they referenced in nested directories (can be workarounded through the entire directory tree replication by the "mklink /D" command)
