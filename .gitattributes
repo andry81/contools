@@ -249,6 +249,7 @@ Scripts/Tools/ToolAdaptors/start_nowait_cmd64.bat -text
 Scripts/Tools/ToolAdaptors/start_nowait_cmd6432.bat -text
 Scripts/Tools/ToolAdaptors/start_nowait_cmd6432_k.bat -text
 Scripts/Tools/ToolAdaptors/start_nowait_cmd64_k.bat -text
+Scripts/Tools/ToolAdaptors/tortoisesvn/TODO.txt -text
 Scripts/Tools/ToolAdaptors/tortoisesvn/TortoiseProc.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/cmd_as_admin.bat -text
