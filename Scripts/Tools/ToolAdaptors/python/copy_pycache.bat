@@ -1,0 +1,180 @@
+@echo off
+
+rem Author: Andrey Dibrov (andry at inbox dot ru)
+
+rem Description:
+rem   Script for __pycache__ (.pyc) files copy from source directory into
+rem   target one with preserve of original directory structure with or without
+rem   __pycache__ directory prefix and .pyc files name suffix.
+rem
+rem   This script is useful to prepare a copy of library .pyc files for the
+rem   python integration package, where all python files are in a single
+rem   directory and the site packages are in an archive file.
+rem
+rem Flags:
+rem   - -prefix_dirs: |-separated list of .pyc files prefix directories.
+rem       By default the "__pycache__" is used. Can has directory sub paths,
+rem       like "__pycache__/dummy" or "dummy/__pycache__".
+rem   - -suffix_names: |-separated list of .pyc files prefix directories.
+rem       By default is empty. For example: ".cpython-36".
+rem
+rem Examples:
+rem   1. mkdir "c:\Python36\Lib\site-packages.pycache_copy"
+rem      copy_pycache.bat "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
+rem   2. mkdir "c:\Python36\Lib\site-packages.pycache_copy"
+rem      copy_pycache.bat -prefix_dirs "__pycache__|__pycache__/37" -suffix_names ".cpython-37" "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
+rem   3. mkdir "c:\Python36\Lib\site-packages.pycache_copy"
+rem      copy_pycache.bat -prefix_dirs "" -suffix_names "" "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
+rem
+
+setlocal
+
+set "?~nx0=%~nx0"
+
+rem script flags
+set "FLAG_VALUE_PREFIX_DIRS=__pycache__"
+set "FLAG_VALUE_SUFFIX_NAMES=.cpython-36|.cpython-35|.cpython-34|.cpython-33|.cpython-32"
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if not "%FLAG%" == "" ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if not "%FLAG%" == "" (
+  if "%FLAG%" == "-prefix_dirs" (
+    shift
+    call set "FLAG_VALUE_PREFIX_DIRS=%%~1"
+    shift
+  ) else if "%FLAG%" == "-suffix_names" (
+    shift
+    call set "FLAG_VALUE_SUFFIX_NAMES=%%~1"
+    shift
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
+
+set "SOURCE_DIR=%~1"
+set "SOURCE_DIR_ABS=%~dpf1"
+set "TARGET_DIR=%~2"
+set "TARGET_DIR_ABS=%~dpf2"
+
+if "%SOURCE_DIR%" == "" goto NO_SOURCE_DIR
+if not exist "%SOURCE_DIR%\" goto NO_SOURCE_DIR
+
+goto NO_SOURCE_DIR_END
+:NO_SOURCE_DIR
+(
+  echo.%?~nx0%: error: source directory does not exist: "%SOURCE_DIR%".
+  exit /b 1
+) >&2
+:NO_SOURCE_DIR_END
+
+if "%TARGET_DIR%" == "" goto NO_TARGET_DIR
+if not exist "%TARGET_DIR%\" goto NO_TARGET_DIR
+
+goto NO_TARGET_DIR_END
+:NO_TARGET_DIR
+(
+  echo.%?~nx0%: error: target directory does not exist: "%TARGET_DIR%".
+  exit /b 2
+) >&2
+:NO_TARGET_DIR_END
+
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "%SOURCE_DIR%\*.pyc."`) do (
+  set FILE_PATH=%%i
+  call :COPY_FILE_PATH || goto :EOF
+)
+
+exit /b 0
+
+:COPY_FILE_PATH
+call set "FILE_PATH_FROM=%%FILE_PATH:%SOURCE_DIR_ABS%=%%"
+set "FILE_PATH_FROM=%FILE_PATH_FROM:\=/%"
+set "FILE_PATH_FROM=%FILE_PATH_FROM:~1%"
+
+call :SPLIT_PATHSTR "%%FILE_PATH_FROM%%"
+set "DIR_PATH_TO=%DIR_PATH%"
+set "FILE_PATH_TO=%FILE_PATH%"
+
+if "%DIR_PATH_TO%" == "" goto IGNORE_PREFIX_DIRS
+
+:PREFIX_DIRS
+set "NEXT_PREFIX_DIR=%FLAG_VALUE_PREFIX_DIRS%"
+:PREFIX_DIRS_LOOP
+set "PREFIX_DIR="
+for /F "eol=	 tokens=1,* delims=|" %%i in ("%NEXT_PREFIX_DIR%") do (
+  set PREFIX_DIR=%%i
+  set NEXT_PREFIX_DIR=%%j
+)
+if "%PREFIX_DIR%" == "" goto PREFIX_DIRS_END
+call :PREPROCESS_PREFIX_DIR && goto PREFIX_DIRS_END
+goto PREFIX_DIRS_LOOP
+:PREFIX_DIRS_END
+
+if not "%DIR_PATH_TO%" == "" set "DIR_PATH_TO=%DIR_PATH_TO:/=\%\"
+
+if "%FILE_PATH_TO%" == "" goto IGNORE_SUFFIX_NAMES
+
+:SUFFIX_NAMES
+set "NEXT_SUFFIX_NAME=%FLAG_VALUE_SUFFIX_NAMES%"
+:SUFFIX_NAMES_LOOP
+set "SUFFIX_NAME="
+for /F "eol=	 tokens=1,* delims=|" %%i in ("%NEXT_SUFFIX_NAME%") do (
+  set SUFFIX_NAME=%%i
+  set NEXT_SUFFIX_NAME=%%j
+)
+if "%SUFFIX_NAME%" == "" goto SUFFIX_NAMES_END
+call :PREPROCESS_SUFFIX_NAME && goto SUFFIX_NAMES_END
+goto SUFFIX_NAMES_LOOP
+:SUFFIX_NAMES_END
+
+:CREATE_DIR_PATH_TO
+if not exist "%TARGET_DIR_ABS%\%DIR_PATH_TO%" mkdir "%TARGET_DIR_ABS%\%DIR_PATH_TO%"
+echo "%SOURCE_DIR%\%FILE_PATH_FROM:/=\%" -^> "%TARGET_DIR%\%DIR_PATH_TO%%FILE_PATH_TO%"
+copy /B /Y "%SOURCE_DIR%\%FILE_PATH_FROM:/=\%" "%TARGET_DIR%\%DIR_PATH_TO%%FILE_PATH_TO%" >nul
+exit /b
+
+:PREPROCESS_SUFFIX_NAME
+call set "FILE_PATH_TO_PREFIX=%%FILE_PATH_TO:%SUFFIX_NAME%.pyc=%%"
+if "%FILE_PATH_TO_PREFIX%" == "" exit /b 1
+if not "%FILE_PATH_TO_PREFIX%%SUFFIX_NAME%.pyc" == "%FILE_PATH_TO%" exit /b 1
+set "FILE_PATH_TO=%FILE_PATH_TO_PREFIX%.pyc"
+exit /b 0
+
+:PREPROCESS_PREFIX_DIR
+call set "DIR_PATH_TO_PREFIX=%%DIR_PATH_TO:%PREFIX_DIR%=%%"
+if "%DIR_PATH_TO_PREFIX%" == "" ( set "DIR_PATH_TO=" & exit /b 0 )
+if not "%DIR_PATH_TO_PREFIX%%PREFIX_DIR%" == "%DIR_PATH_TO%" exit /b 1
+if not "%DIR_PATH_TO_PREFIX:~-1%" == "/" exit /b 1
+set "DIR_PATH_TO=%DIR_PATH_TO_PREFIX:~0,-1%"
+exit /b 0
+
+:SPLIT_PATHSTR
+set "DIR_PATH="
+set "FILE_PATH=%~1"
+set "NEXT_FILE_PATH=%FILE_PATH%"
+
+:SPLIT_PATHSTR_LOOP
+set "PREV_DIR="
+for /F "eol=	 tokens=1,* delims=/" %%i in ("%NEXT_FILE_PATH%") do (
+  set PREV_DIR_PATH=%%i
+  set NEXT_FILE_PATH=%%j
+)
+if "%NEXT_FILE_PATH%" == "" exit /b 0
+
+set "FILE_PATH=%NEXT_FILE_PATH%"
+
+if not "%DIR_PATH%" == "" (
+  set "DIR_PATH=%DIR_PATH%/%PREV_DIR_PATH%"
+) else (
+  set "DIR_PATH=%PREV_DIR_PATH%"
+)
+goto SPLIT_PATHSTR_LOOP
