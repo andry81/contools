@@ -109,7 +109,7 @@ if "%LINE_NUMBERS%" == "" goto FINDSTR_LINES_FILTER_END
 set LINE_NUMBER_INDEX=1
 :FINDSTR_LINES_FILTER_LOOP
 set "LINE_NUMBER="
-for /F "eol= tokens=%LINE_NUMBER_INDEX% delims=:" %%i in ("%LINE_NUMBERS%") do set "LINE_NUMBER=%%i"
+for /F "eol=	 tokens=%LINE_NUMBER_INDEX% delims=:" %%i in ("%LINE_NUMBERS%") do set "LINE_NUMBER=%%i"
 if "%LINE_NUMBER%" == "" goto FINDSTR_LINES_FILTER_END
 
 set FINDSTR_LINES_FILTER_CMD_LINE=!FINDSTR_LINES_FILTER_CMD_LINE! /C:"!LINE_NUMBER!:"
@@ -200,7 +200,7 @@ rem echo !CMD_LINE! >&2
     if %FLAG_PRINT_LINE_NUMBER_PREFIX% NEQ 0 (
       %CMD_LINE% 2>nul
     ) else ( 
-      for /F "usebackq eol= tokens=1,* delims=:" %%i in (`^(%CMD_LINE: | findstr = ^| findstr %^) 2^>nul`) do echo.%%j
+      for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`^(%CMD_LINE: | findstr = ^| findstr %^) 2^>nul`) do echo.%%j
     )
   ) else (
     %CMD_LINE% 2>nul

@@ -26,7 +26,7 @@ goto :EOF
 set DIR_INDEX=1
 :GET_BASE_DIR_NAME_LOOP
 set "DIR_NAME="
-for /F "eol= tokens=%DIR_INDEX% delims=\" %%i in ("%PATH_VALUE%") do set "DIR_NAME=%%i"
+for /F "eol=	 tokens=%DIR_INDEX% delims=\" %%i in ("%PATH_VALUE%") do set "DIR_NAME=%%i"
 if "%DIR_NAME%" == "" exit /b 0
 
 set "PREV_DIR_NAME=%LAST_DIR_NAME%"

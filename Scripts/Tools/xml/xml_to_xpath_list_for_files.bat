@@ -62,13 +62,13 @@ rem get code page value from first parameter
 set "LAST_CODE_PAGE="
 if "%CODE_PAGE%" == "" goto NOCODEPAGE
 
-for /F "usebackq eol= tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
+for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
 set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
 
 if not "%LAST_CODE_PAGE%" == "%CODE_PAGE%" chcp %CODE_PAGE% >nul
 
 :NOCODEPAGE
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S %CMD_VA_ARGS%`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S %CMD_VA_ARGS%`) do (
   echo.# ------------------------------------------------------------------------------
   echo # File: "%%i"
   echo.# ------------------------------------------------------------------------------

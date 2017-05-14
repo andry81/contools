@@ -60,44 +60,44 @@ set __VER_PATCH=
 set __VER_REVISION1=
 set __VER_REVISION2=
 
-for /F "eol= tokens=1,* delims=-" %%i in ("%VER_STR%") do (
+for /F "eol=	 tokens=1,* delims=-" %%i in ("%VER_STR%") do (
   set "__VER_MAJOR=%%i"
   set "__VER_REVISION2=%%j"
 )
 
-for /F "eol= tokens=1,* delims=." %%i in ("%__VER_MAJOR%") do (
+for /F "eol=	 tokens=1,* delims=." %%i in ("%__VER_MAJOR%") do (
   set "__VER_MAJOR=%%i"
   set "__VER_MINOR=%%j"
 )
 
-for /F "eol= tokens=1,* delims=." %%i in ("%__VER_MINOR%") do (
+for /F "eol=	 tokens=1,* delims=." %%i in ("%__VER_MINOR%") do (
   set "__VER_MINOR=%%i"
   set "__VER_PATCH=%%j"
 )
 
 if "%__VER_PATCH%" == "" (
-  for /F "eol= tokens=1,* delims=p" %%i in ("%__VER_MINOR%") do (
+  for /F "eol=	 tokens=1,* delims=p" %%i in ("%__VER_MINOR%") do (
     set "__VER_MINOR=%%i"
     set "__VER_PATCH=%%j"
   )
 )
 
 if "%__VER_PATCH%" == "" (
-  for /F "eol= tokens=1,* delims=_" %%i in ("%__VER_MINOR%") do (
+  for /F "eol=	 tokens=1,* delims=_" %%i in ("%__VER_MINOR%") do (
     set "__VER_MINOR=%%i"
     set "__VER_PATCH=%%j"
   )
 )
 
 if not "%__VER_PATCH%" == "" (
-  for /F "eol= tokens=1,* delims=." %%i in ("%__VER_PATCH%") do (
+  for /F "eol=	 tokens=1,* delims=." %%i in ("%__VER_PATCH%") do (
     set "__VER_PATCH=%%i"
     set "__VER_REVISION1=%%j"
   )
 )
 
 if not "%__VER_REVISION1%" == "" (
-  for /F "eol= tokens=1,* delims=." %%i in ("%__VER_REVISION1%") do (
+  for /F "eol=	 tokens=1,* delims=." %%i in ("%__VER_REVISION1%") do (
     set "__VER_REVISION1=%%i"
     if not "%%j" == "" set "__VER_REVISION2=%%j"
   )

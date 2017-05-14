@@ -29,7 +29,7 @@ set PATH_INDEX=1
 
 :PUBLISH_XCOPY_STAGE_PATH_LOOP
 set PUBLISH_STAGE_PATH=
-for /F "eol= tokens=%PATH_INDEX% delims=|" %%i in ("%PUBLISH_STAGE_PATH_LIST%") do set "PUBLISH_STAGE_PATH=%%i"
+for /F "eol=	 tokens=%PATH_INDEX% delims=|" %%i in ("%PUBLISH_STAGE_PATH_LIST%") do set "PUBLISH_STAGE_PATH=%%i"
 if "%PUBLISH_STAGE_PATH%" == "" goto PUBLISH_XCOPY_STAGE_PATH_LOOP_END
 
 call :PUBLISH_XCOPY "%%PUBLISH_STAGE_PATH%%" "%%FROM_BASE_PATH%%" "%%TO_APP_DIR_PATH%%" || exit /b 1

@@ -14,5 +14,5 @@ rem restore code page
 chcp %CURRENT_CODE_PAGE% 2>&1 >nul
 
 :GET_CURRENT_CODE_PAGE
-for /F "usebackq eol= tokens=2 delims=:" %%i in (`chcp 2^>nul`) do set CURRENT_CODE_PAGE=%%i
+for /F "usebackq eol=	 tokens=2 delims=:" %%i in (`chcp 2^>nul`) do set CURRENT_CODE_PAGE=%%i
 set CURRENT_CODE_PAGE=%CURRENT_CODE_PAGE: =%

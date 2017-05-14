@@ -21,7 +21,7 @@ shift
 
 if "%CODE_PAGE%" == "" goto NOCODEPAGE
 
-for /F "usebackq eol= tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
+for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
 set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
 
 if not "%LAST_CODE_PAGE%" == "%CODE_PAGE%" chcp %CODE_PAGE% >nul
@@ -76,7 +76,7 @@ exit /b 0
 :PROCESS_FILE_PATH
 set "FILE_PATH=%~dpf1"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%FILE_PATH%" /S /B /A:-D 2^>nul`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%FILE_PATH%" /S /B /A:-D 2^>nul`) do (
   set "ARCHIVE_FILE_PATH=%%i"
   call :PROCESS_ARCHIVE_FILE || goto :EOF
 )
@@ -107,7 +107,7 @@ exit /b %LASTERROR%
 set ARCHIVE_LIST_FILTER=0
 set ARCHIVE_LIST_EOF=0
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%TOOLS_PATH%/7zip/7za.exe" l "%ARCHIVE_FILE_PATH%"`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%TOOLS_PATH%/7zip/7za.exe" l "%ARCHIVE_FILE_PATH%"`) do (
   set "ARCHIVE_LIST_LINE=%%i"
   call :PROCESS_ARCHIVE_LIST_LINE || goto :EOF
   call :IS_ARCHIVE_LIST_EOF && goto PROCESS_ARCHIVE_FILE_IMPL_EXIT
@@ -155,7 +155,7 @@ if "%ARCHIVE_LIST_FILE_PATH%" == "" exit /b 0
 
 rem use attributes to determine directory path from file path
 set "ARCHIVE_LIST_LINE_ATTR="
-for /F "eol= tokens=3" %%i in ("%ARCHIVE_LIST_LINE%") do (
+for /F "eol=	 tokens=3" %%i in ("%ARCHIVE_LIST_LINE%") do (
   set "ARCHIVE_LIST_LINE_ATTR=%%i"
 )
 

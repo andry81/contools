@@ -17,7 +17,7 @@ set __DIR_INDEX__=1
 
 :LOOP
 set "__SUBDIR__="
-for /F "eol= tokens=%__DIR_INDEX__% delims=%__DELIMS__%" %%i in ("%__STRING__%") do set "__SUBDIR__=%%i"
+for /F "eol=	 tokens=%__DIR_INDEX__% delims=%__DELIMS__%" %%i in ("%__STRING__%") do set "__SUBDIR__=%%i"
 if "%__SUBDIR__%" == "" goto LOOP_END
 
 if not "%__SUBPATH__%" == "" (
