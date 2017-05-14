@@ -18,7 +18,7 @@ rem %2, %3, etc - Paths to text file with environment variables list.
 rem Examples:
 rem 1. call resetenv.bat "./env_vars.lst"
 rem 1. call resetenv.bat -p "./env_vars.lst"
-rem 2. call resetenv.bat "-p -e" "./env_vars.lst"
+rem 2. call resetenv.bat -p -e "./env_vars.lst"
 
 rem Example of variables text file:
 rem   See the file "vars_winxp.lst" as an example of the default Window XP
@@ -31,28 +31,35 @@ set "?~nx0=%~nx0"
 
 set ?LASTERROR=0
 
-rem standard flags
+rem script flags
 set ?FLAG_PRINT=0
 set ?FLAG_EXPAND=0
 set ?FLAG_RESET=0
 
 :FLAGS_LOOP
+
 rem flags always at first
 set "?FLAG=%~1"
 
+if not "%?FLAG%" == "" ^
+if not "%?FLAG:~0,1%" == "-" set "?FLAG="
+
 if not "%?FLAG%" == "" (
-  if "%?FLAG:~0,1%" == "-" (
+  if "%?FLAG%" == "-p" (
+    set ?FLAG_PRINT=1
+    shift
+  ) else if "%?FLAG%" == "-e" (
+    set ?FLAG_EXPAND=1
+    shift
+  ) else if "%?FLAG%" == "-r" (
+    set ?FLAG_RESET=1
     shift
   ) else (
-    set "?FLAG="
-  )
-)
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
 
-if not "%?FLAG%" == "" (
-  if "%?FLAG%" == "-p" set ?FLAG_PRINT=1
-  if "%?FLAG%" == "-e" set ?FLAG_EXPAND=1
-  if "%?FLAG%" == "-r" set ?FLAG_RESET=1
-
+  rem read until no flags
   goto FLAGS_LOOP
 )
 
@@ -146,7 +153,7 @@ if not "%?CLEAR_VAR_VALUE%" == "" (
 goto :EOF
 
 :RESET_LIST
-for /F "usebackq tokens=1,* delims==" %%i in (`type "%~1"`) do if /i "%?CLEAR_VAR_NAME%" == "%%i" exit /b 1
+for /F "usebackq eol=	 tokens=1,* delims==" %%i in (`type "%~dpf1"`) do if /i "%?CLEAR_VAR_NAME%" == "%%i" exit /b 1
 exit /b 0
 
 :CLEANUP_AND_EXIT
