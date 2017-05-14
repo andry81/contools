@@ -283,6 +283,9 @@ int main(int argc,const char* argv[])
   // same for the CRT layer
   setvbuf(stdin, NULL, _IONBF, 0);
 
+  // just in case: http://stackoverflow.com/questions/9371238/why-is-reading-lines-from-stdin-much-slower-in-c-than-python
+  std::ios_base::sync_with_stdio(false);
+
 #if USE_NATIVE_IMPLEMENTATION
   // implementation via Win32 API (preferred because more precise in time quality)
 
@@ -464,6 +467,8 @@ int main(int argc,const char* argv[])
 
   bool readTime = true;
   bool printTime = false;
+
+  std::ios_base::sync_with_stdio(false); // speedup: http://stackoverflow.com/questions/9371238/why-is-reading-lines-from-stdin-much-slower-in-c-than-python
 
   while(!isInputEof)
   {
