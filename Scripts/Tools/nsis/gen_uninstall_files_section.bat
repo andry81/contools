@@ -25,7 +25,7 @@ shift
 
 if "%CODE_PAGE%" == "" goto NOCODEPAGE
 
-for /F "usebackq eol= tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
+for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
 set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
 
 if not "%LAST_CODE_PAGE%" == "%CODE_PAGE%" chcp %CODE_PAGE% >nul
@@ -71,7 +71,7 @@ call :PROCESS_DIR_FILES || ( popd & goto :EOF )
 
 set DIR_INDEX=0
 pushd "%BASE_DIR_PATH%" && (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`dir . /S /B /A:D 2^>nul`) do (
+  for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir . /S /B /A:D 2^>nul`) do (
     set "DIR_PATH=%%i"
     call :PROCESS_DIR_FILES || ( popd & goto :EOF )
   )
@@ -82,7 +82,7 @@ set NUM_DIRS=%DIR_INDEX%
 
 set DIR_INDEX=0
 pushd "%BASE_DIR_PATH%" && (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`dir . /S /B /A:D 2^>nul`) do (
+  for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir . /S /B /A:D 2^>nul`) do (
     set "DIR_PATH=%%i"
     call :INDEX_DIR_PATH
   )
@@ -111,7 +111,7 @@ call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
 if not "%FILE_DIR_PATH%" == "" set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
 set FILE_INDEX=0
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /B /A:-D 2^>nul`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /B /A:-D 2^>nul`) do (
   if not "%%i" == "" ( call :PROCESS_FILE "%%i" || goto :EOF )
 )
 if %FILE_INDEX% NEQ 0 (

@@ -23,7 +23,7 @@ set "__PATCH_FILE_PATH__="
 set __PATCH_FILE_INDEX__=1
 set __PATCH_FILE_LAST_INDEX__=1
 set __PATCH_FILE_INDEX_OFFSET__=0
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%GNUWIN32_ROOT%/bin/sed.exe" -n "/^Index: /,/\(^@@ \|^GIT binary patch$\)/ { /\(^@@ \|^GIT binary patch$\)/b; p }" "%__PATCH_FILE__%" 2^>nul`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%GNUWIN32_ROOT%/bin/sed.exe" -n "/^Index: /,/\(^@@ \|^GIT binary patch$\)/ { /\(^@@ \|^GIT binary patch$\)/b; p }" "%__PATCH_FILE__%" 2^>nul`) do (
   set "__PATCH_FILE_LINE__=%%i"
   call :PROCESS_PATCH_FILE_LINE || goto :EOF
   set /A __PATCH_FILE_INDEX_OFFSET__+=1

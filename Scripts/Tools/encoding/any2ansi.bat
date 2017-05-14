@@ -53,7 +53,7 @@ if "%OUTPUT_CHARSET%" == "" call :GET_CURRENT_CODE_PAGE
 exit /b
 
 :GET_CURRENT_CODE_PAGE
-for /F "usebackq eol= tokens=2 delims=:" %%i in (`chcp 2^>nul`) do set CURRENT_CODE_PAGE=%%i
+for /F "usebackq eol=	 tokens=2 delims=:" %%i in (`chcp 2^>nul`) do set CURRENT_CODE_PAGE=%%i
 set CURRENT_CODE_PAGE=%CURRENT_CODE_PAGE: =%
 
 rem convert chcp codepage into iconv namespace

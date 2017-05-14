@@ -21,7 +21,7 @@ set FILE_INDEX=1
 
 :EXCLUDE_FILES_LOOP
 set "FILE="
-for /F "eol= tokens=%FILE_INDEX% delims=|" %%i in ("%XCOPY_EXCLUDE_FILES_LIST%") do set "FILE=%%i"
+for /F "eol=	 tokens=%FILE_INDEX% delims=|" %%i in ("%XCOPY_EXCLUDE_FILES_LIST%") do set "FILE=%%i"
 if "%FILE%" == "" goto EXIT
 
 set VALUE_FOUND_DO_EXIT=0
@@ -32,7 +32,7 @@ if %ROBOCOPY_EXIST% EQU 0 (
 )
 
 set VALUE_FOUND_DO_EXIT=1
-for /F "usebackq eol= tokens=* delims=" %%i in ("%FILE%") do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in ("%FILE%") do (
   set "VALUE=%%i"
   call :VALUE_FOUND
 )

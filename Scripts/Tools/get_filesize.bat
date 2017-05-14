@@ -18,6 +18,6 @@ set "FILE=%~1"
 
 if not exist "%FILE%" exit /b -1
 
-for /F "eol= tokens=* delims=" %%i in ("%FILE%") do exit /b %%~zi
+for /F "eol=	 tokens=* delims=" %%i in ("%FILE%") do exit /b %%~zi
 
 exit /b -1
