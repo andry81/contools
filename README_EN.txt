@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.05.09
+* 2017.05.20
 * ConsoleTools
 
 WARNING:
@@ -32,8 +32,8 @@ piping.
 -------------------------------------------------------------------------------
 2. LICENSE
 -------------------------------------------------------------------------------
-The Boost license (see included text file "license.txt" or
-http://www.boost.org/users/license.html)
+The MIT license (see included text file "license.txt" or
+https://en.wikipedia.org/wiki/MIT_License)
 
 -------------------------------------------------------------------------------
 3. INSTALLATION
@@ -1099,4 +1099,4 @@ Solution:
 -------------------------------------------------------------------------------
 6. AUTHOR EMAIL
 -------------------------------------------------------------------------------
-andry at inbox dot ru
+Andrey Dibrov (andry at inbox dot ru)
