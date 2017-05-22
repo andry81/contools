@@ -36,6 +36,7 @@ for /F "eol=	 tokens=1,* delims=%DELIMS%" %%i in ("%NEXT_FILE%") do (
 )
 rem echo SUBDIR=%SUBDIR%
 rem echo NEXT_FILE=%NEXT_FILE%
+if "%SUBDIR%" == "" goto EXIT
 if "%NEXT_FILE%" == "" goto EXIT
 
 set "FILE=%NEXT_FILE%"
@@ -51,6 +52,15 @@ set /A DIR_INDEX+=1
 goto LOOP
 
 :EXIT
+if "%DIR_PATH%" == "" call set "FILE_BUF=%%FILE:%DELIMS:~0,1%=%%"
+
+if "%DIR_PATH%" == "" ^
+if not "%FILE%" == "%FILE_BUF%" (
+  rem swap
+  set "DIR_PATH=%FILE%"
+  set "FILE="
+)
+
 (
   endlocal
   rem return local variables
