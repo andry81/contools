@@ -1,5 +1,8 @@
 /.git
+/.gitmodules
 /Output
+Scripts/.git
+Scripts/.gitmodules
 Scripts/Tools/.git
 Scripts/Tools/.gitmodules
 /Temp
