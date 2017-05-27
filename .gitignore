@@ -1,6 +1,7 @@
 /.git
 /Output
 Scripts/Tools/.git
+Scripts/Tools/.gitmodules
 /Temp
 Utilities/Sources/_common/help.txt
 Utilities/Sources/_common/help_inl.hpp
