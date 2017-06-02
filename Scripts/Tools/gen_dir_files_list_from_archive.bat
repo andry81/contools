@@ -2,9 +2,7 @@
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
@@ -85,7 +83,7 @@ goto :EOF
 
 :PROCESS_ARCHIVE_FILE
 
-call "%%TOOLS_PATH%%/uuidgen.bat"
+call "%%CONTOOLS_ROOT%%/uuidgen.bat"
 set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%TEMP%\%?~n0%.%RETURN_VALUE%"
 
 mkdir "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%"
@@ -107,7 +105,7 @@ exit /b %LASTERROR%
 set ARCHIVE_LIST_FILTER=0
 set ARCHIVE_LIST_EOF=0
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%TOOLS_PATH%/7zip/7za.exe" l "%ARCHIVE_FILE_PATH%"`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%CONTOOLS_ROOT%/7zip/7za.exe" l "%ARCHIVE_FILE_PATH%"`) do (
   set "ARCHIVE_LIST_LINE=%%i"
   call :PROCESS_ARCHIVE_LIST_LINE || goto :EOF
   call :IS_ARCHIVE_LIST_EOF && goto PROCESS_ARCHIVE_FILE_IMPL_EXIT

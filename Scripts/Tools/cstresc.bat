@@ -40,9 +40,7 @@ cd .
 rem Create local variable's stack
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "__STR=%~1"
 set __COUNTER1=0
@@ -67,7 +65,7 @@ call set "__CHAR=%%__STR:%__EMPTY_FIELD%%%"
 if "%__CHAR%^" == ""^" goto EXIT
 if "%__CHAR%" == "" goto EXIT
 if "%__CHAR%" == "%__EMPTY_FIELD%" goto EXIT
-  call "%%TOOLS_PATH%%\strchr.bat" "" "%%~3" "%%__CHAR%%"
+  call "%%CONTOOLS_ROOT%%/strchr.bat" "" "%%~3" "%%__CHAR%%"
   if "%ERRORLEVEL%" == "-1" (
     call set "%%~2=%%%~2%%%%__CHAR%%"
   ) else (

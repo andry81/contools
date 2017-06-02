@@ -56,9 +56,7 @@ if %ERRORLEVEL% NEQ 0 exit /b 1
 if "%~2" == "" ^
 if "%~3" == "-t" exit /b 0
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+rem call "%%~dp0__init__.bat" || goto :EOF
 
 if not "%__REG_VAR%" == "" call :QUERY_KEY_ESCAPE
 goto QUERY_KEY_ESCAPE_END
@@ -68,7 +66,7 @@ rem remove lash slash duplication
 set "__KEYVAR=%__REG_VAR%"
 if "%__KEYVAR:~-1%" == "\" set "__KEYVAR=%__REG_VAR:~0,-1%"
 
-rem call "%%TOOLS_PATH%%\cstresc.bat" "%%__KEYVAR%%" "__KEYVAR" "*"
+rem call "%%CONTOOLS_ROOT%%/cstresc.bat" "%%__KEYVAR%%" "__KEYVAR" "*"
 set "__KEYVAR=%__KEYVAR:\=\\%"
 set "__KEYVAR=%__KEYVAR:.=\.%"
 set "__KEYVAR=%__KEYVAR:^=\^%"

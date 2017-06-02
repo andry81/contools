@@ -21,9 +21,7 @@ set "XCOPY_FLAGS=%~4"
 rem Drop last error level
 cd .
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set PATH_INDEX=1
 
@@ -50,7 +48,7 @@ set "FROM_BASE_PATH=%~2"
 set "TO_APP_DIR_PATH=%~3"
 
 rem <XCOPY_SUFFIX_PATH> = <FROM_DIR_PATH> - <FROM_BASE_PATH>
-call "%%TOOLS_PATH%%/get_path_subtract.bat" "%%FROM_BASE_PATH%%" "%%FROM_DIR_PATH%%"
+call "%%CONTOOLS_ROOT%%/get_path_subtract.bat" "%%FROM_BASE_PATH%%" "%%FROM_DIR_PATH%%"
 set "XCOPY_SUFFIX_PATH=%RETURN_VALUE:\=/%"
 
 if not "%XCOPY_SUFFIX_PATH%" == "" (
@@ -68,5 +66,5 @@ if not "%XCOPY_SUFFIX_PATH%" == "" (
 goto :EOF
 
 :XCOPY_DIR
-call "%%TOOLS_PATH%%/xcopy_dir.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/xcopy_dir.bat" %%* || goto :EOF
 exit /b 0

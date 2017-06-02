@@ -9,9 +9,9 @@ if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${
 
 SOURCE_CONTOOLS_PATCHLIB_SH=1 # including guard
 
-source "${TOOLS_PATH:-.}/baselib.sh"
-source "${TOOLS_PATH:-.}/traplib.sh"
-source "${TOOLS_PATH:-.}/regexplib.sh"
+source "${CONTOOLS_ROOT:-.}/baselib.sh"
+source "${CONTOOLS_ROOT:-.}/traplib.sh"
+source "${CONTOOLS_ROOT:-.}/regexplib.sh"
 
 function PatchFileIterator()
 {

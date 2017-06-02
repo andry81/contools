@@ -16,9 +16,7 @@ set "EXPORT_VARS_FILE=%~1"
 rem Drop last error level
 cd .
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 call :WRITE_VAR_FILE PROJECT_NAME                   "%%EXPORT_VARS_FILE%%" || goto :EOF
 call :WRITE_VAR_FILE PROJECT_BRANCH_PATH            "%%EXPORT_VARS_FILE%%" || goto :EOF
@@ -74,5 +72,5 @@ call :WRITE_VAR_FILE F_ENABLE_STAGE_OUT_TO_ARCHIVE  "%%EXPORT_VARS_FILE%%" || go
 exit /b 0
 
 :WRITE_VAR_FILE
-call "%%TOOLS_PATH%%/build/write_var_to_file.bat" %%* || goto :EOF
+call "%%BUILD_TOOLS_ROOT%%/write_var_to_file.bat" %%* || goto :EOF
 exit /b 0

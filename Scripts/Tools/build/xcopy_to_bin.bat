@@ -28,9 +28,7 @@ if not exist "%~2" (
 rem Drop last error level
 cd .
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 ( call :XCOPY_FILE "%%FROM_PATH%%" "%%FROM_FILE%%" "%%TO_PATH%%" /Y /D || goto :EOF ) && ^
 if /i not "%TO_PATH%/%FROM_FILE%" == "%TO_PATH%/%TO_FILE%" (
@@ -44,13 +42,13 @@ if /i not "%TO_PATH%/%FROM_FILE%" == "%TO_PATH%/%TO_FILE%" (
 exit /b 0
 
 :XCOPY_FILE
-call "%%TOOLS_PATH%%/xcopy_file.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/xcopy_file.bat" %%* || goto :EOF
 exit /b 0
 
 :COPY
-call "%%TOOLS_PATH%%/copy.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/copy.bat" %%* || goto :EOF
 exit /b 0
 
 :DEL_FILE
-call "%%TOOLS_PATH%%/del_file.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/del_file.bat" %%* || goto :EOF
 exit /b 0

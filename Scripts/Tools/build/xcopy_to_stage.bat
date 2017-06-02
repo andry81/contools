@@ -34,9 +34,7 @@ if not exist "%FROM_STAGE_DIR_PATH%" (
 rem Drop last error level
 cd .
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 call :FILE_PATH "%%TO_STAGE_DIR_PATH%%"
 set "TO_STAGE_DIR_FILE_PATH=%FILE_PATH%"
@@ -64,7 +62,7 @@ if "%FROM_FILE%" == "" goto FROM_FILE_LOOP_END
 
 set /A FROM_FILE_INDEX+=1
 
-call "%%TOOLS_PATH%%/has_dir_files.bat" /S "%%FROM_STAGE_DIR_PATH%%/%%FROM_FILE%%" || goto FROM_FILE_LOOP
+call "%%CONTOOLS_ROOT%%/has_dir_files.bat" /S "%%FROM_STAGE_DIR_PATH%%/%%FROM_FILE%%" || goto FROM_FILE_LOOP
 
 if %MSG_PRINTED% EQU 0 (
   echo.Coping %MSG_TOKEN% files into %STAGE_NAME%...
@@ -73,7 +71,7 @@ if %MSG_PRINTED% EQU 0 (
 
 if not exist "%TO_STAGE_DIR_PATH%" mkdir "%TO_STAGE_DIR_PATH%"
 
-set "XCOPY_EXCLUDE_DIRS_LIST=%TOOLS_PATH:/=\%\excludes\xcopy_svn_files.lst"
+set "XCOPY_EXCLUDE_DIRS_LIST=%CONTOOLS_ROOT:/=\%\excludes\xcopy_svn_files.lst"
 if not "%XCOPY_EXCLUDE_DIRS_FILE%" == "" set "XCOPY_EXCLUDE_DIRS_LIST=%XCOPY_EXCLUDE_DIRS_LIST%|%XCOPY_EXCLUDE_DIRS_FILE%"
 set "XCOPY_EXCLUDE_FILES_LIST="
 if not "%XCOPY_EXCLUDE_FILES_FILE%" == "" set "XCOPY_EXCLUDE_FILES_LIST=%XCOPY_EXCLUDE_FILES_FILE%"
@@ -89,7 +87,7 @@ if %MSG_PRINTED% NEQ 0 echo.
 exit /b 0
 
 :XCOPY_FILE
-call "%%TOOLS_PATH%%/xcopy_file.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/xcopy_file.bat" %%* || goto :EOF
 exit /b 0
 
 :FILE_PATH

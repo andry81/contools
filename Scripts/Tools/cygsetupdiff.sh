@@ -18,7 +18,7 @@
 # Script ONLY for execution.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -eq 0) ]]; then
 
-source "${TOOLS_PATH:-.}/cygsetuplib.sh"
+source "${CONTOOLS_ROOT:-.}/cygsetuplib.sh"
 
 OverallBeginTime="$(date "+%s")"
 CalculateCygSetupIniPackagesDiff "$@"

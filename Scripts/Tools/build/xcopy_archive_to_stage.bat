@@ -32,9 +32,7 @@ set "XCOPY_FILE_FLAGS=%~9"
 rem Drop last error level
 cd .
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set LASTERROR=0
 
@@ -95,10 +93,10 @@ set "ARCHIVE_FILE_PATH=%ARCHIVE_FILE_FILE_PATH%"
 set "COPY_TO_STAGE_DIR_PATH=%COPY_TO_STAGE_DIR_FILE_PATH%"
 
 rem <ARCHIVE_DIR_PREFIX_PATH> = <COPY_FROM_STAGE_DIR_PATH> - <ARCHIVE_FROM_STAGE_DIR_PATH>
-call "%%TOOLS_PATH%%/get_path_subtract.bat" "%%ARCHIVE_FROM_STAGE_DIR_PATH%%" "%%COPY_FROM_STAGE_DIR_PATH%%"
+call "%%CONTOOLS_ROOT%%/get_path_subtract.bat" "%%ARCHIVE_FROM_STAGE_DIR_PATH%%" "%%COPY_FROM_STAGE_DIR_PATH%%"
 set "ARCHIVE_DIR_PREFIX_PATH=%RETURN_VALUE%"
 
-call "%%TOOLS_PATH%%/uuidgen.bat"
+call "%%CONTOOLS_ROOT%%/uuidgen.bat"
 set "XCOPY_ARCHIVE_EXCLUDE_FILES_FILE=%TEMP%\%?~n0%.%RETURN_VALUE%.txt"
 
 call :DEL_XCOPY_ARCHIVE_EXCLUDE_FILES_FILE || exit /b 10
@@ -124,7 +122,7 @@ goto CONVERT_ARCHIVE_FILE_LIST_TO_PATH_LIST
 :CONVERT_ARCHIVE_FILE_LIST_TO_PATH_LIST_END
 
 :ARCHIVE_STAGE
-call "%%TOOLS_PATH%%/has_dir_files.bat" /S %%ARCHIVE_STAGE_FILE_PATH_LIST%% || goto COPY_STAGE
+call "%%CONTOOLS_ROOT%%/has_dir_files.bat" /S %%ARCHIVE_STAGE_FILE_PATH_LIST%% || goto COPY_STAGE
 
 echo.Archiving %MSG_TOKEN% files into %STAGE_NAME%...
 
@@ -140,9 +138,9 @@ if "%TO_FILE%" == "" goto ARCHIVE_FILE_LIST_END
 set /A FROM_FILE_INDEX+=1
 
 if not "%ARCHIVE_DIR_PREFIX_PATH%" == "" (
-  call "%%TOOLS_PATH%%/build/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_PATH%%" "%%ARCHIVE_DIR_PREFIX_PATH%%/%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%" || ( set LASTERROR=11 & goto EXIT )
+  call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_PATH%%" "%%ARCHIVE_DIR_PREFIX_PATH%%/%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%" || ( set LASTERROR=11 & goto EXIT )
 ) else (
-  call "%%TOOLS_PATH%%/build/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_PATH%%" "%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%" || ( set LASTERROR=12 & goto EXIT )
+  call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_PATH%%" "%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%" || ( set LASTERROR=12 & goto EXIT )
 )
 
 goto ARCHIVE_FILE_LIST
@@ -152,14 +150,10 @@ goto ARCHIVE_FILE_LIST
 echo.
 
 :COPY_STAGE
-call "%%TOOLS_PATH%%/build/xcopy_to_stage.bat" "%%MSG_TOKEN%%" "%%STAGE_NAME%%" "%%COPY_FROM_STAGE_DIR_PATH%%" "%%COPY_TO_STAGE_DIR_PATH%%" "%%COPY_FILE_LIST%%" ^
+call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "%%MSG_TOKEN%%" "%%STAGE_NAME%%" "%%COPY_FROM_STAGE_DIR_PATH%%" "%%COPY_TO_STAGE_DIR_PATH%%" "%%COPY_FILE_LIST%%" ^
   "%%XCOPY_FILE_FLAGS%%" "" "%%XCOPY_ARCHIVE_EXCLUDE_FILES_FILE%%" || ( set LASTERROR=13 & goto EXIT )
 
 goto :EXIT
-
-:DEL_FILE
-call "%%TOOLS_PATH%%/del_file.bat" %%* || goto :EOF
-exit /b 0
 
 :FILE_PATH
 rem add /. to the end to suppress trailing slash misinterpretation
@@ -180,7 +174,7 @@ set "BASE_PATH=%~dp1"
 goto :EOF
 
 :DEL_XCOPY_ARCHIVE_EXCLUDE_FILES_FILE
-if exist "%XCOPY_ARCHIVE_EXCLUDE_FILES_FILE%" ( call :DEL_FILE "%%XCOPY_ARCHIVE_EXCLUDE_FILES_FILE%%" /F /Q /A:-D >nul || exit /b 1 )
+if exist "%XCOPY_ARCHIVE_EXCLUDE_FILES_FILE%" ( call "%%CONTOOLS_ROOT%%/del_file.bat" "%%XCOPY_ARCHIVE_EXCLUDE_FILES_FILE%%" /F /Q /A:-D >nul || exit /b 1 )
 exit /b 0
 
 :EXIT

@@ -7,8 +7,8 @@ if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${
 
 SOURCE_CONTOOLS_FUNCLIB_SH=1 # including guard
 
-source "${TOOLS_PATH:-.}/baselib.sh"
-source "${TOOLS_PATH:-.}/hashlib.sh"
+source "${CONTOOLS_ROOT:-.}/baselib.sh"
+source "${CONTOOLS_ROOT:-.}/hashlib.sh"
 
 function GetFunctionDeclaration()
 {

@@ -52,9 +52,7 @@ cd .
 rem Create local variable's stack
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 if "%~3" == "-a" (
   rem Built-in search functionality
@@ -98,7 +96,7 @@ if not "%__DO_TRIM%" == "" (
   call :TRIMVAR_ROUTINE "%%__VAR1%%
 )
 
-call "%%TOOLS_PATH%%\appendvar.bat" __VAR1 "%%~1" "\"
+call "%%CONTOOLS_ROOT%%/appendvar.bat" __VAR1 "%%~1" "\"
 if exist "%__VAR1%" (
   set "FOUND_PATH=%__VAR1%"
   goto :EOF

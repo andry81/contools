@@ -5,10 +5,10 @@
 # Script can be ONLY included by "source" command.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then
 
-source "${TOOLS_PATH:-.}/baselib.sh"
-source "${TOOLS_PATH:-.}/filelib.sh"
-source "${TOOLS_PATH:-.}/funclib.sh"
-source "${TOOLS_PATH:-.}/stringlib.sh"
+source "${CONTOOLS_ROOT:-.}/baselib.sh"
+source "${CONTOOLS_ROOT:-.}/filelib.sh"
+source "${CONTOOLS_ROOT:-.}/funclib.sh"
+source "${CONTOOLS_ROOT:-.}/stringlib.sh"
 
 function TestReturn()
 {
@@ -302,7 +302,7 @@ function RunTest()
 trap 'exit 254' INT
 trap '' PIPE
 
-source \"\${TOOLS_PATH:-.}/baselib.sh\"
+source \"\${CONTOOLS_ROOT:-.}/baselib.sh\"
 for src in $TestSourcesCmdLine; do
   source \"\$src\"
 done

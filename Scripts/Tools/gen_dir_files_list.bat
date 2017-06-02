@@ -2,9 +2,7 @@
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
 
@@ -63,9 +61,9 @@ if exist "%FILES_PATH%\" (
 exit /b
 
 :FILES_PATH_AS_DIR
-call "%%TOOLS_PATH%%/strlen.bat" /v FILES_PATH
+call "%%CONTOOLS_ROOT%%/strlen.bat" /v FILES_PATH
 set /A FILES_PATH_LEN=%ERRORLEVEL%+1
-dir /B /S "%FILES_PATH%\" | "%TOOLS_PATH%/gnuwin32/bin/sed.exe" "s/.\{%FILES_PATH_LEN%\}\(.*\)/\1\\/" | sort | "%TOOLS_PATH%/gnuwin32/bin/sed.exe" "s/\(.*\).$/\1/"
+dir /B /S "%FILES_PATH%\" | "%GNUWIN32_ROOT%/bin/sed.exe" "s/.\{%FILES_PATH_LEN%\}\(.*\)/\1\\/" | sort | "%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/"
 goto :EOF
 
 :FILES_PATH_AS_FILE

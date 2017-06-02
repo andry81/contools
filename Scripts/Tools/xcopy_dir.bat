@@ -9,7 +9,7 @@ rem   to copy a directory to a directory.
 
 rem CAUTION:
 rem   xcopy.exe has a file path limit up to 260 characters in a path. To bypass
-rem   that condition we have to use robocopy.exe instead
+rem   that limitation we have to use robocopy.exe instead
 rem   (Windows Vista and higher ONLY).
 rem
 rem   robocopy.exe will copy hidden and archive files by default.
@@ -34,10 +34,10 @@ rem switch locale into english compatible locale
 chcp 65001 >nul
 
 set "XCOPY_EXCLUDES_CMD="
-call "%%TOOLS_PATH%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_DIRS_LIST%%"
+call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_DIRS_LIST%%"
 if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%RETURN_VALUE%"
 
-call "%%TOOLS_PATH%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%"
+call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%"
 if %ERRORLEVEL% EQU 0 (
   if not "%XCOPY_EXCLUDES_CMD%" == "" (
     set "XCOPY_EXCLUDES_CMD=%XCOPY_EXCLUDES_CMD%+%RETURN_VALUE%"
@@ -65,7 +65,7 @@ for %%i in (%XCOPY_FLAGS%) do (
 )
 
 set "ROBOCOPY_EXCLUDE_DIRS_CMD="
-call "%%TOOLS_PATH%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_DIRS_LIST%%"
+call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_DIRS_LIST%%"
 if %ERRORLEVEL% EQU 0 for %%i in (%RETURN_VALUE%) do (
   set XCOPY_EXCLUDE_DIR=%%i
   call :SET_ROBOCOPY_EXCLUDE_DIRS_CMD %%XCOPY_EXCLUDE_DIR%%
@@ -81,7 +81,7 @@ exit /b 0
 :SET_ROBOCOPY_EXCLUDE_DIRS_CMD_END
 
 set "ROBOCOPY_EXCLUDE_FILES_CMD="
-call "%%TOOLS_PATH%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%"
+call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%"
 if %ERRORLEVEL% EQU 0 for %%i in (%RETURN_VALUE%) do (
   set XCOPY_EXCLUDE_FILE=%%i
   call :SET_ROBOCOPY_EXCLUDE_FILES_CMD %%XCOPY_EXCLUDE_FILE%%

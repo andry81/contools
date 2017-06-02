@@ -16,9 +16,7 @@ cd .
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
 
@@ -95,9 +93,9 @@ if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
 goto X64
 
 :NOTX64
-"%TOOLS_PATH%\hashdeep\hashdeep.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
+"%HASHDEEP_ROOT%/hashdeep.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
 
 :X64
-"%TOOLS_PATH%\hashdeep\hashdeep64.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
+"%HASHDEEP_ROOT%/hashdeep64.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
 
 goto :EOF

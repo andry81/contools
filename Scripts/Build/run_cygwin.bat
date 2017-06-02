@@ -29,19 +29,18 @@ cd .
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion
 
-rem Set TOOLS_PATH variable to point to directory with support tools.
-set "TOOLS_PATH=%~dp0..\Tools"
+call "%%~dp0__init__.bat" || goto :EOF
 
 rem make all paths canonical
-call "%%TOOLS_PATH%%\abspath.bat" "%%TOOLS_PATH%%"
-set "TOOLS_PATH=%PATH_VALUE%"
-set "TOOLS_PATH_NATIVE=%PATH_VALUE%"
+call "%%CONTOOLS_ROOT%%/abspath.bat" "%%CONTOOLS_ROOT%%"
+set "CONTOOLS_ROOT=%PATH_VALUE%"
+set "CONTOOLS_ROOT_NATIVE=%PATH_VALUE%"
 
-call "%%TOOLS_PATH_NATIVE%%\abspath.bat" "%%~dp0..\Config"
+call "%%CONTOOLS_ROOT_NATIVE%%\abspath.bat" "%%~dp0..\Config"
 set "CONFIG_PATH=%PATH_VALUE%"
 
 rem Update variables pointing temporary directories
-call "%%TOOLS_PATH_NATIVE%%\abspath.bat" "%%~dp0..\Temp"
+call "%%CONTOOLS_ROOT_NATIVE%%\abspath.bat" "%%~dp0..\Temp"
 set "TEMP=%PATH_VALUE%"
 set "TMP=%PATH_VALUE%"
 
@@ -49,7 +48,7 @@ rem Save all variables to stack again
 setlocal
 
 :CHECK_CMD
-call "%%TOOLS_PATH_NATIVE%%\isnativecmd.bat"
+call "%%CONTOOLS_ROOT_NATIVE%%\isnativecmd.bat"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Script doesn't support not native Command Interpreter.>&2
   exit /b 1
@@ -59,10 +58,10 @@ rem Check path to this script for invalid characters
 set "__STRING__=%~dp0"
 set __CHARS__= ^	-^"'`^?^*^&^|^<^>^(^)^^#%%!
 
-call "%%TOOLS_PATH_NATIVE%%\strchr.bat" /v
+call "%%CONTOOLS_ROOT_NATIVE%%\strchr.bat" /v
 if not %ERRORLEVEL% GEQ 0 goto CHECK_CYGWIN_VARS
 
-call "%%TOOLS_PATH_NATIVE%%\stresc.bat" /v __STRING__ STRING_ESCAPED __CHARS__ {EC} {#}
+call "%%CONTOOLS_ROOT_NATIVE%%\stresc.bat" /v __STRING__ STRING_ESCAPED __CHARS__ {EC} {#}
 call :cecho %%~nx0: {0C}error{#}: {0C}Path to the script has incorrect characters{#}: ^^^"%%STRING_ESCAPED%%^".>&2
 exit /b 2
 
@@ -73,7 +72,7 @@ if not exist "%CONFIG_PATH%\cygwin.vars" (
   exit /b 3
 )
 
-call "%%TOOLS_PATH_NATIVE%%\setvarsfromfile.bat" "%%CONFIG_PATH%%\cygwin.vars"
+call "%%CONTOOLS_ROOT_NATIVE%%\setvarsfromfile.bat" "%%CONFIG_PATH%%\cygwin.vars"
 rem Replace all "/" characters to "\" characters
 set "CYGWIN_PATH=%CYGWIN_PATH:/=\%"
 rem remove back slash
@@ -92,7 +91,7 @@ if not exist "%CYGWIN_PATH%\cygwin.bat" (
 )
 
 rem Check main cygwin dll version.
-call "%%TOOLS_PATH_NATIVE%%\cygver.bat" cygwin "%%CYGWIN_PATH%%"
+call "%%CONTOOLS_ROOT_NATIVE%%\cygver.bat" cygwin "%%CYGWIN_PATH%%"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Failed to run cygcheck utility to detect cygwin dll version.>&2
   exit /b 7
@@ -138,7 +137,7 @@ if "%CYGWIN_REGKEY_PATH:~-1%" == "\" set "CYGWIN_REGKEY_PATH=%CYGWIN_REGKEY_PATH
 if "%~1" == "-r" call :REMOUNT_CYGWIN
 
 rem For cygwin versions 1.6.x and older test if cygwin at least was installed.
-call "%%TOOLS_PATH_NATIVE%%\regquery.bat" "%%CYGWIN_REGKEY_PATH%%\/" "native"
+call "%%CONTOOLS_ROOT_NATIVE%%\regquery.bat" "%%CYGWIN_REGKEY_PATH%%\/" "native"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Cygwin was not installed properly or registry key not found.>&2
   exit /b 9
@@ -184,25 +183,25 @@ rem Convert all required variables before login into cygwin.
 rem Variable PATH will be converted itself automatically on the Cygwin login.
 
 rem Complete path converting
-call "%%TOOLS_PATH_NATIVE%%\setvarfromstd.bat" "%%CYGWIN_PATH%%\bin\cygpath.exe" -u "%%TEMP%%"
+call "%%CONTOOLS_ROOT_NATIVE%%\setvarfromstd.bat" "%%CYGWIN_PATH%%\bin\cygpath.exe" -u "%%TEMP%%"
 set "CYGDRIVE_TEMP=%STDOUT_VALUE%"
 
-call "%%TOOLS_PATH_NATIVE%%\setvarfromstd.bat" "%%CYGWIN_PATH%%\bin\cygpath.exe" -u "%%TMP%%"
+call "%%CONTOOLS_ROOT_NATIVE%%\setvarfromstd.bat" "%%CYGWIN_PATH%%\bin\cygpath.exe" -u "%%TMP%%"
 set "CYGDRIVE_TMP=%STDOUT_VALUE%"
 
-call "%%TOOLS_PATH_NATIVE%%\setvarfromstd.bat" "%%CYGWIN_PATH%%\bin\cygpath.exe" -u "%%TOOLS_PATH%%"
-set "CYGDRIVE_TOOLS_PATH=%STDOUT_VALUE%"
+call "%%CONTOOLS_ROOT_NATIVE%%\setvarfromstd.bat" "%%CYGWIN_PATH%%\bin\cygpath.exe" -u "%%CONTOOLS_ROOT%%"
+set "CYGDRIVE_CONTOOLS_ROOT=%STDOUT_VALUE%"
 
-rem Update TOOLS_PATH variable for the cygwin shell scripts
-set "TOOLS_PATH=%CYGDRIVE_TOOLS_PATH%"
+rem Update CONTOOLS_ROOT variable for the cygwin shell scripts
+set "CONTOOLS_ROOT=%CYGDRIVE_CONTOOLS_ROOT%"
 
 echo %~nx0: Unmounting backend directories...
 
 rem Unmount mount points that can potentially interfere with the backend
-"%CYGWIN_PATH%\bin\bash" "%CYGDRIVE_TOOLS_PATH%/unmountdir.sh" "/usr/local"
+"%CYGWIN_PATH%\bin\bash" "%CYGDRIVE_CONTOOLS_ROOT%/unmountdir.sh" "/usr/local"
 if %ERRORLEVEL% EQU 0 echo /usr/local
 
-"%CYGWIN_PATH%\bin\bash" "%CYGDRIVE_TOOLS_PATH%/unmountdir.sh" "/usr"
+"%CYGWIN_PATH%\bin\bash" "%CYGDRIVE_CONTOOLS_ROOT%/unmountdir.sh" "/usr"
 if %ERRORLEVEL% EQU 0 echo /usr
 
 echo.
@@ -211,7 +210,7 @@ echo %~nx0: Mounting local directories...
 
 if "%CYGDRIVE_TMP%" == "/tmp" goto TMP_MOUNTED
 
-"%CYGWIN_PATH%\bin\bash" "%CYGDRIVE_TOOLS_PATH%/mountdir.sh" "%TMP%" "/tmp"
+"%CYGWIN_PATH%\bin\bash" "%CYGDRIVE_CONTOOLS_ROOT%/mountdir.sh" "%TMP%" "/tmp"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Couldn't mount /tmp directory.>&2
   call :cecho %%~nx0: {0F}/tmp{#}: "{0F}%%TMP%%{#}">&2
@@ -227,10 +226,10 @@ rem "%CYGWIN_PATH%\bin\chmod" 1777 /tmp 2>/dev/null
 :TMP_MOUNTED
 echo "%TMP%" "/tmp"
 
-if not exist "%MINGW_PATH%" goto RESTORE_TOOLS_PATH
+if not exist "%MINGW_PATH%" goto RESTORE_CONTOOLS_ROOT
 
 rem In case if the Mingw binaries used under the Cygwin platform
-"%CYGWIN_PATH%\bin\bash" "%CYGDRIVE_TOOLS_PATH%/mountdir.sh" "%MINGW_PATH%" "/mingw"
+"%CYGWIN_PATH%\bin\bash" "%CYGDRIVE_CONTOOLS_ROOT%/mountdir.sh" "%MINGW_PATH%" "/mingw"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0F}MINGW_PATH{#}: "{0F}%%MINGW_PATH%%{#}">&2
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Couldn't mount /mingw directory.>&2
@@ -238,21 +237,21 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo "%MINGW_PATH%" "/mingw"
 
-:RESTORE_TOOLS_PATH
+:RESTORE_CONTOOLS_ROOT
 echo.
 
-rem Restore TOOLS_PATH variable
-set "TOOLS_PATH=%TOOLS_PATH_NATIVE%"
+rem Restore CONTOOLS_ROOT variable
+set "CONTOOLS_ROOT=%CONTOOLS_ROOT_NATIVE%"
 
 goto :CLEAN_AND_RESET_ENV_AND_CALL1
 exit /b 0
 
 :CLEAN_AND_RESET_ENV_AND_CALL1
 rem Read windows version
-call "%%TOOLS_PATH_NATIVE%%\winver.bat"
+call "%%CONTOOLS_ROOT_NATIVE%%\winver.bat"
 
 rem Reset environment
-call "%%TOOLS_PATH_NATIVE%%\setvarfromstd.bat" "%%TOOLS_PATH%%\splitvars.bat" "%%WINVER_VALUE%%" "|" "-s"
+call "%%CONTOOLS_ROOT_NATIVE%%\setvarfromstd.bat" "%%CONTOOLS_ROOT%%\splitvars.bat" "%%WINVER_VALUE%%" "|" "-s"
 if "%STDOUT_VALUE%" == "Windows2000" goto :CLEAN_AND_RESET_ENV_AND_CALL_WIN2K
 if "%STDOUT_VALUE%" == "WindowsXP" goto :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 if "%STDOUT_VALUE%" == "WindowsVista" goto :CLEAN_AND_RESET_ENV_AND_CALL_WINVISTA
@@ -266,11 +265,11 @@ goto :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 endlocal&& (
   set "CYGDRIVE_TEMP=%CYGDRIVE_TEMP%"
   set "CYGDRIVE_TMP=%CYGDRIVE_TMP%"
-  set "CYGDRIVE_TOOLS_PATH=%CYGDRIVE_TOOLS_PATH%"
+  set "CYGDRIVE_CONTOOLS_ROOT=%CYGDRIVE_CONTOOLS_ROOT%"
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_win2k.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_TOOLS_PATH%%"
+  call :RESET_ENV_AND_CALL vars_win2k.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_CONTOOLS_ROOT%%"
 )
 goto :EOF
 
@@ -278,11 +277,11 @@ goto :EOF
 endlocal&& (
   set "CYGDRIVE_TEMP=%CYGDRIVE_TEMP%"
   set "CYGDRIVE_TMP=%CYGDRIVE_TMP%"
-  set "CYGDRIVE_TOOLS_PATH=%CYGDRIVE_TOOLS_PATH%"
+  set "CYGDRIVE_CONTOOLS_ROOT=%CYGDRIVE_CONTOOLS_ROOT%"
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_winxp.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_TOOLS_PATH%%"
+  call :RESET_ENV_AND_CALL vars_winxp.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_CONTOOLS_ROOT%%"
 )
 goto :EOF
 
@@ -290,11 +289,11 @@ goto :EOF
 endlocal&& (
   set "CYGDRIVE_TEMP=%CYGDRIVE_TEMP%"
   set "CYGDRIVE_TMP=%CYGDRIVE_TMP%"
-  set "CYGDRIVE_TOOLS_PATH=%CYGDRIVE_TOOLS_PATH%"
+  set "CYGDRIVE_CONTOOLS_ROOT=%CYGDRIVE_CONTOOLS_ROOT%"
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_vista.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_TOOLS_PATH%%"
+  call :RESET_ENV_AND_CALL vars_vista.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_CONTOOLS_ROOT%%"
 )
 goto :EOF
 
@@ -302,11 +301,11 @@ goto :EOF
 endlocal&& (
   set "CYGDRIVE_TEMP=%CYGDRIVE_TEMP%"
   set "CYGDRIVE_TMP=%CYGDRIVE_TMP%"
-  set "CYGDRIVE_TOOLS_PATH=%CYGDRIVE_TOOLS_PATH%"
+  set "CYGDRIVE_CONTOOLS_ROOT=%CYGDRIVE_CONTOOLS_ROOT%"
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_win7.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_TOOLS_PATH%%"
+  call :RESET_ENV_AND_CALL vars_win7.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_CONTOOLS_ROOT%%"
 )
 goto :EOF
 
@@ -314,30 +313,30 @@ goto :EOF
 endlocal&& (
   set "CYGDRIVE_TEMP=%CYGDRIVE_TEMP%"
   set "CYGDRIVE_TMP=%CYGDRIVE_TMP%"
-  set "CYGDRIVE_TOOLS_PATH=%CYGDRIVE_TOOLS_PATH%"
+  set "CYGDRIVE_CONTOOLS_ROOT=%CYGDRIVE_CONTOOLS_ROOT%"
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_win8.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_TOOLS_PATH%%"
+  call :RESET_ENV_AND_CALL vars_win8.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%CYGWIN_PATH%%" "%%CYGDRIVE_TEMP%%" "%%CYGDRIVE_TMP%%" "%%CYGDRIVE_CONTOOLS_ROOT%%"
 )
 goto :EOF
 
 :RESET_ENV_AND_CALL
 rem Reset environment
 echo %~nx0: Resetting environment to defaults...
-call "%%TOOLS_PATH_NATIVE%%\resetenv.bat" -p -e "%%~3\env\%%~1"
+call "%%CONTOOLS_ROOT_NATIVE%%\resetenv.bat" -p -e "%%~3\env\%%~1"
 
 rem Return variables
 set "OLDPATH=%PATH%"
-set "TOOLS_PATH_NATIVE=%~2"
+set "CONTOOLS_ROOT_NATIVE=%~2"
 set "TEMP=%~5"
 set "TMP=%~6"
-set "TOOLS_PATH=%~7"
+set "CONTOOLS_ROOT=%~7"
 
 call :cecho %%~nx0: {0B}info{#}: "{0F}PATH=%%PATH%%{#}"
 call :cecho %%~nx0: {0B}info{#}: "{0F}TEMP=%%TEMP%%{#}"
 call :cecho %%~nx0: {0B}info{#}: "{0F}TMP=%%TMP%%{#}"
-call :cecho %%~nx0: {0B}info{#}: "{0F}TOOLS_PATH=%%TOOLS_PATH%%{#}"
+call :cecho %%~nx0: {0B}info{#}: "{0F}CONTOOLS_ROOT=%%CONTOOLS_ROOT%%{#}"
 echo.
 
 call :RUN_SHELL %%4
@@ -354,8 +353,8 @@ rem Environment will be restored automatically here
 goto :EOF
 
 :cecho
-if exist "%TOOLS_PATH_NATIVE%\cecho.exe" (
-  "%TOOLS_PATH_NATIVE%\cecho.exe" %*{#}{\n}
+if exist "%CONTOOLS_ROOT_NATIVE%\cecho.exe" (
+  "%CONTOOLS_ROOT_NATIVE%\cecho.exe" %*{#}{\n}
 ) else (
   echo.%*
 )

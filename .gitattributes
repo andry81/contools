@@ -1,6 +1,7 @@
 * text=auto !eol
 BuildTools/TargetProject.PostBuildStep.bat -text
 BuildTools/TargetProject.PreBuildStep.bat -text
+BuildTools/__init__.bat -text
 BuildTools/msys/bin/autogen.exe -text
 BuildTools/msys/bin/msys-1.0.dll -text
 BuildTools/msys/bin/msys-crypt-0.dll -text
@@ -107,6 +108,7 @@ BuildTools/msys/share/guile/ice-9/weak-vector.scm -text
 /Changes_EN.txt -text
 Projects/ConsoleTools.sln -text
 /README_EN.txt -text
+Scripts/Build/__init__.bat -text
 Scripts/Build/reg_cygwin.bat -text
 Scripts/Build/reg_msys.bat -text
 Scripts/Build/reg_msysdvlpr.bat -text
@@ -316,6 +318,7 @@ Scripts/Tools/admin/sfc_scan.bat -text
 Scripts/Tools/appendvar.bat -text
 Scripts/Tools/assert_msvc.bat -text
 Scripts/Tools/baselib.sh -text
+Scripts/Tools/build/__init__.bat -text
 Scripts/Tools/build/add_files_to_archive.bat -text
 Scripts/Tools/build/env_generators/base.bat -text
 Scripts/Tools/build/env_generators/cmake.bat -text
@@ -366,6 +369,7 @@ Scripts/Tools/dirpath.bat -text
 Scripts/Tools/dos2unix.bat -text
 Scripts/Tools/dospath.bat -text
 Scripts/Tools/dumpmountdirs.sh -text
+Scripts/Tools/encoding/__init__.bat -text
 Scripts/Tools/encoding/ansi2any.bat -text
 Scripts/Tools/encoding/any2ansi.bat -text
 Scripts/Tools/encoding/boms/efbbbf.bin -text
@@ -437,6 +441,7 @@ Scripts/Tools/index_patch_file.bat -text
 Scripts/Tools/index_pathstr.bat -text
 Scripts/Tools/isnativecmd.bat -text
 Scripts/Tools/joinvars.bat -text
+Scripts/Tools/locks/__init__.bat -text
 Scripts/Tools/locks/lock_dir_impl.bat -text
 Scripts/Tools/locks/lock_mutex.bat -text
 Scripts/Tools/locks/try_lock_mutex.bat -text
@@ -456,6 +461,7 @@ Scripts/Tools/mingw/m.ico -text
 Scripts/Tools/mingw/msys.ico -text
 Scripts/Tools/mountdir.sh -text
 Scripts/Tools/msysver.bat -text
+Scripts/Tools/nsis/__init__.bat -text
 Scripts/Tools/nsis/find_errors_nsis_log.bat -text
 Scripts/Tools/nsis/gen_files_pp_command_from_list.bat -text
 Scripts/Tools/nsis/gen_install_files_section.bat -text
@@ -533,6 +539,7 @@ Scripts/Tools/wtee.exe -text
 Scripts/Tools/xcopy/xcopy_convert_excludes.bat -text
 Scripts/Tools/xcopy_dir.bat -text
 Scripts/Tools/xcopy_file.bat -text
+Scripts/Tools/xml/__init__.bat -text
 Scripts/Tools/xml/filter_xpath_list_by_xpath_list.bat -text
 Scripts/Tools/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_exact_list.sed -text
 Scripts/Tools/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed -text

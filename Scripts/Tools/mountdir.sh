@@ -12,11 +12,11 @@
 
 if [[ -n "$BASH" ]]; then
 
-source "${TOOLS_PATH:-.}/baselib.sh"
-source "${TOOLS_PATH:-.}/traplib.sh"
-source "${TOOLS_PATH:-.}/filelib.sh"
-source "${TOOLS_PATH:-.}/stringlib.sh"
-source "${TOOLS_PATH:-.}/cygver.sh"
+source "${CONTOOLS_ROOT:-.}/baselib.sh"
+source "${CONTOOLS_ROOT:-.}/traplib.sh"
+source "${CONTOOLS_ROOT:-.}/filelib.sh"
+source "${CONTOOLS_ROOT:-.}/stringlib.sh"
+source "${CONTOOLS_ROOT:-.}/cygver.sh"
 
 function MountDir()
 {
@@ -102,7 +102,7 @@ function MountDir()
       if [[ "${WindowsPath//[ $'\t']/}" != "$WindowsPath" ]]; then
         local ComSpecInternal="$COMSPEC" # workaround for a "command not found" in the msys shell
         # msys automatically converts argument to the native path if it begins from '/' character
-        WindowsPath="`"$ComSpecInternal" '^/C' call "$TOOLS_PATH"'\printdospath.bat' "$WindowsPath"`"
+        WindowsPath="`"$ComSpecInternal" '^/C' call "$CONTOOLS_ROOT"'\printdospath.bat' "$WindowsPath"`"
         if [[ -n "$WindowsPath" ]]; then
           WindowsPath="${WindowsPath:1:${#WindowsPath}-2}" # remove quotes
           # check DOS path on exists because is important that the DOS path is existing BEFORE the mounting
@@ -213,7 +213,7 @@ mountdir.sh: info: \"$WindowsPath\"" >&2
       FstabFile=$("$MountTool" -m)
       if (( ${#FstabFile} )); then
         MountRecord=$("$MountTool" -m |\
-          /bin/perl.exe "$TOOLS_PATH/sar.pl" m '^([ \t]*[^\r\n]+[ \t]+)'"$MountPathEscaped"'([ \t]+[^\r\n]+?|[ \t]*)$' '\1'"$MountPathEscaped"'\2' ms;)
+          /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m '^([ \t]*[^\r\n]+[ \t]+)'"$MountPathEscaped"'([ \t]+[^\r\n]+?|[ \t]*)$' '\1'"$MountPathEscaped"'\2' ms;)
         LastError=$?
       else
         return 20
@@ -231,14 +231,14 @@ mountdir.sh: info: \"$WindowsPath\"" >&2
       if (( ${#FstabFile} )); then
         # Replace mount point in existed mount path.
         FstabFile=$(IFS=""; PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab' |\
-          /bin/perl.exe "$TOOLS_PATH/sar.pl" s '(.*?^[ \t]*)[^\r\n]+[ \t]+'"$MountPathEscaped"'(?:[ \t]+[^\r\n]+?|[ \t]*)$(.*?)' '\1'"$WindowsPathEscaped $MountPathEscaped${MountRecordSuffix:+ }$MountRecordSuffix"'\2' ms;\
+          /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s '(.*?^[ \t]*)[^\r\n]+[ \t]+'"$MountPathEscaped"'(?:[ \t]+[^\r\n]+?|[ \t]*)$(.*?)' '\1'"$WindowsPathEscaped $MountPathEscaped${MountRecordSuffix:+ }$MountRecordSuffix"'\2' ms;\
           LastError=$?; echo -n '.'; exit $LastError)
         LastError=$?
 
         if (( LastError )); then
           # Mount path is not replaced because not matched (not existed), then try to append to the end of list of printable string lines.
           FstabFile=$(IFS=""; PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab' |\
-            /bin/perl.exe "$TOOLS_PATH/sar.pl" s '(.*?[ \t]*[^\r\n]+(?:[ \t]+[^\r\n]+)?)\r?\n?([ \t\r\n]*)$' '\1'$'\n'"$WindowsPathEscaped $MountPathEscaped${MountRecordSuffix:+ }$MountRecordSuffix"$'\n''\2' s;\
+            /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s '(.*?[ \t]*[^\r\n]+(?:[ \t]+[^\r\n]+)?)\r?\n?([ \t\r\n]*)$' '\1'$'\n'"$WindowsPathEscaped $MountPathEscaped${MountRecordSuffix:+ }$MountRecordSuffix"$'\n''\2' s;\
             LastError=$?; echo -n '.'; exit $LastError)
           LastError=$?
         fi

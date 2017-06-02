@@ -7,19 +7,19 @@
 # Script can be ONLY included by "source" command.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then
 
-source "${TOOLS_PATH:-.}/baselib.sh"
-source "${TOOLS_PATH:-.}/funclib.sh"
-source "${TOOLS_PATH:-.}/traplib.sh"
-source "${TOOLS_PATH:-.}/synclib.sh"
-source "${TOOLS_PATH:-.}/hashlib.sh"
-source "${TOOLS_PATH:-.}/patchlib.sh"
-source "${TOOLS_PATH:-.}/stringlib.sh"
-source "${TOOLS_PATH:-.}/filelib.sh"
-source "${TOOLS_PATH:-.}/mountdir.sh"
-source "${TOOLS_PATH:-.}/unmountdir.sh"
-source "${TOOLS_PATH:-.}/buildlibcomponents.sh"
+source "${CONTOOLS_ROOT:-.}/baselib.sh"
+source "${CONTOOLS_ROOT:-.}/funclib.sh"
+source "${CONTOOLS_ROOT:-.}/traplib.sh"
+source "${CONTOOLS_ROOT:-.}/synclib.sh"
+source "${CONTOOLS_ROOT:-.}/hashlib.sh"
+source "${CONTOOLS_ROOT:-.}/patchlib.sh"
+source "${CONTOOLS_ROOT:-.}/stringlib.sh"
+source "${CONTOOLS_ROOT:-.}/filelib.sh"
+source "${CONTOOLS_ROOT:-.}/mountdir.sh"
+source "${CONTOOLS_ROOT:-.}/unmountdir.sh"
+source "${CONTOOLS_ROOT:-.}/buildlibcomponents.sh"
 if [[ "$OSTYPE" == "cygwin" ]]; then
-  source "${TOOLS_PATH:-.}/cygver.sh"
+  source "${CONTOOLS_ROOT:-.}/cygver.sh"
 fi
 
 function InitializeBuildSystem()
@@ -303,8 +303,8 @@ function EvalTargetStageIntBlock()
   SyncStdoutStderr # give a moment to initialize executables on stdout pipe before executables on stderr pipe
   (
     eval "$@"
-  ) 2>&1 >&5 | tee -a "$TargetStageLogErrFilePath" | "$TOOLS_PATH/tee2.sh" -6 >&8
-  ) 5>&1 | "$TOOLS_PATH/tee2.sh" -7 >&9
+  ) 2>&1 >&5 | tee -a "$TargetStageLogErrFilePath" | "$CONTOOLS_ROOT/tee2.sh" -6 >&8
+  ) 5>&1 | "$CONTOOLS_ROOT/tee2.sh" -7 >&9
   ) 6>&1 7>&1 | tee -a "$TargetStageFullLogFilePath" | tee -a "$CompileFullLogFileName" >/dev/null
   ) 8>&1 9>&2
 }
@@ -327,8 +327,8 @@ function EvalTargetStageBlock()
     LastError="$?"
     echo ""
     exit "$LastError"
-  ) 2>&1 >&5 | tee -a "$TargetStageLogErrFilePath" | "$TOOLS_PATH/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
-  ) 5>&1 | "$TOOLS_PATH/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
+  ) 2>&1 >&5 | tee -a "$TargetStageLogErrFilePath" | "$CONTOOLS_ROOT/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
+  ) 5>&1 | "$CONTOOLS_ROOT/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
   ) 6>&1 7>&1 | tee -a "$TargetStageFullLogFilePath" >/dev/null # redirect cloned stdout/stderr output to files
   ) 8>&1 9>&2 # redirect the stream descriptors 8 and 9 back to stdout and stderr
 
@@ -346,8 +346,8 @@ function EvalTargetIntBlock()
   SyncStdoutStderr # give a moment to initialize executables on stdout pipe before executables on stderr pipe
   (
     eval "$@"
-  ) 2>&5 | "$TOOLS_PATH/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
-  ) 5>&1 | "$TOOLS_PATH/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
+  ) 2>&5 | "$CONTOOLS_ROOT/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
+  ) 5>&1 | "$CONTOOLS_ROOT/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
   ) 6>&1 7>&1 | tee -a "$CompileFullLogFileName" | tee -a "$CompileLogStatsFileName" >/dev/null # redirect cloned stdout/stderr output to files
   ) 8>&1 9>&2 # redirect the stream descriptors 8 and 9 back to stdout and stderr
 }
@@ -361,8 +361,8 @@ function EvalTargetExitBlock()
   SyncStdoutStderr # give a moment to initialize executables on stdout pipe before executables on stderr pipe
   (
     eval "$@" || exit $?
-  ) 2>&5 | "$TOOLS_PATH/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
-  ) 5>&1 | "$TOOLS_PATH/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
+  ) 2>&5 | "$CONTOOLS_ROOT/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
+  ) 5>&1 | "$CONTOOLS_ROOT/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
   ) 6>&1 7>&1 | tee -a "$CompileLogStatsFileName" >/dev/null # redirect cloned stdout/stderr output to files
   ) 8>&1 9>&2 # redirect the stream descriptors 8 and 9 back to stdout and stderr
 }
@@ -380,8 +380,8 @@ function EvalCompileIntBlock()
   # them back to stdout and stderr. This is useful if you want copy all output
   # from stdout and stderr streams in one file without redirecting stderr to
   # stdout.
-  ) 2>&5 | "$TOOLS_PATH/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
-  ) 5>&1 | "$TOOLS_PATH/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
+  ) 2>&5 | "$CONTOOLS_ROOT/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
+  ) 5>&1 | "$CONTOOLS_ROOT/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
   ) 6>&1 7>&1 | tee -a "$CompileFullLogFileName" >/dev/null # redirect cloned stdout/stderr output to files
   ) 8>&1 9>&2 # redirect the stream descriptors 8 and 9 back to stdout and stderr
 }
@@ -400,8 +400,8 @@ function EvalCompileBlock()
   # them back to stdout and stderr. This is useful if you want copy all output
   # from stdout and stderr streams in one file without redirecting stderr to
   # stdout.
-  ) 2>&5 | "$TOOLS_PATH/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
-  ) 5>&1 | "$TOOLS_PATH/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
+  ) 2>&5 | "$CONTOOLS_ROOT/tee2.sh" -6 >&8 # temporary redirect stdout to the steam descriptor 8
+  ) 5>&1 | "$CONTOOLS_ROOT/tee2.sh" -7 >&9 # temporary redirect stdout (which is redirected stderr here) to the steam descriptor 9
   ) 6>&1 7>&1 | tee -a "$CompileFullLogFileName" >/dev/null # redirect cloned stdout/stderr output to files
   ) 8>&1 9>&2 # redirect the stream descriptors 8 and 9 back to stdout and stderr
 
@@ -649,14 +649,14 @@ function CleanupEnvVars()
   OLDPATH="`echo "$OLDPATH" | /bin/tr '[:upper:]' '[:lower:]'`"
   TEMP="`echo "$TEMP" | /bin/tr '[:upper:]' '[:lower:]'`"
   TMP="`echo "$TMP" | /bin/tr '[:upper:]' '[:lower:]'`"
-  TOOLS_PATH="`echo "$TOOLS_PATH" | /bin/tr '[:upper:]' '[:lower:]'`"
+  CONTOOLS_ROOT="`echo "$CONTOOLS_ROOT" | /bin/tr '[:upper:]' '[:lower:]'`"
 
   ConvertNativePathListToBackend "$PATH"
   PATH="$RETURN_VALUE"
   ConvertNativePathListToBackend "$OLDPATH"
   OLDPATH="$RETURN_VALUE"
-  ConvertNativePathListToBackend "$TOOLS_PATH"
-  TOOLS_PATH="$RETURN_VALUE"
+  ConvertNativePathListToBackend "$CONTOOLS_ROOT"
+  CONTOOLS_ROOT="$RETURN_VALUE"
 
   RemoveRelativePathsFromPathListVariable PATH
   RemoveRelativePathsFromPathListVariable OLDPATH
@@ -739,7 +739,7 @@ function MergeTargetStageLogs()
 {
   if [[ -n "$TargetStageName" ]]; then
     echo "Merging stage \"$TargetStageName\" logs..."
-    "$TOOLS_PATH/print_merged_logs.sh" \
+    "$CONTOOLS_ROOT/print_merged_logs.sh" \
       "$TargetStageLogOutFilePath" \
       "$TargetStageLogErrFilePath" \
       "$TargetStageLogOutIndexFilePath" \
@@ -768,7 +768,7 @@ function CollectLogStats()
 'xgcc: unrecognized option'
 
       local Warnings="`cat "$TargetFilePath" |\
-        /bin/perl.exe "$TOOLS_PATH/sar.pl" m "$MatchPattern1" '$main::i++' gmsx '$main::i=0' 'print "$main::i"'`"
+        /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m "$MatchPattern1" '$main::i++' gmsx '$main::i=0' 'print "$main::i"'`"
 
       RETURN_VALUE="${Warnings:-0}"
     ;;
@@ -778,7 +778,7 @@ function CollectLogStats()
 'error:|ERROR:|make: \*\*\*[[:space:]]+[^[:space:]]+[[:space:]]+Error[[:space:]]+'
 
       local Errors="`cat "$TargetFilePath" |\
-        /bin/perl.exe "$TOOLS_PATH/sar.pl" m "$MatchPattern1" '$main::i++' gmsx '$main::i=0' 'print "$main::i"'`"
+        /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m "$MatchPattern1" '$main::i++' gmsx '$main::i=0' 'print "$main::i"'`"
 
       RETURN_VALUE="${Errors:-0}"
     ;;
@@ -788,7 +788,7 @@ function CollectLogStats()
 '(\d+) of \d+ patches applied.'
 
       local Patches="`cat "$TargetFilePath" |\
-        /bin/perl.exe "$TOOLS_PATH/sar.pl" m "$MatchPattern1" '$main::i++' gmsx '$main::i=0' 'print "$main::i"'`"
+        /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m "$MatchPattern1" '$main::i++' gmsx '$main::i=0' 'print "$main::i"'`"
 
       RETURN_VALUE="${Patches:-0}"
     ;;

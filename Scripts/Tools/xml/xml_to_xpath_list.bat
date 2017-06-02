@@ -14,9 +14,7 @@ cd .
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
 set "?~dp0=%~dp0"
@@ -67,4 +65,4 @@ set XSLT_FILE[0,1]=xml_to_xpath_leaf_list_no_props.xslt
 set XSLT_FILE[1,0]=xml_to_xpath_node_list.xslt
 set XSLT_FILE[1,1]=xml_to_xpath_node_list_no_props.xslt
 
-call "%%TOOLS_PATH%%/xml/xml.exe" tr "%%TOOLS_PATH%%/xml/xslt/%%XSLT_FILE[%FLAG_LNODES%,%FLAG_NOPROPS%]%%" "%%XML_FILE%%"
+call "%%XML_TOOLS_ROOT%%/xml.exe" tr "%%XML_TOOLS_ROOT%%/xslt/%%XSLT_FILE[%FLAG_LNODES%,%FLAG_NOPROPS%]%%" "%%XML_FILE%%"

@@ -7,7 +7,7 @@ if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${
 
 SOURCE_CONTOOLS_HASHLIB_SH=1 # including guard
 
-source "${TOOLS_PATH:-.}/baselib.sh"
+source "${CONTOOLS_ROOT:-.}/baselib.sh"
 
 # table from bsd libkrnl
 _CRC32_TABLE_BSD=(

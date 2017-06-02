@@ -29,9 +29,9 @@ function MatchString()
     BASH_REMATCH=()
     local ArrayStr
     if (( ! DoUseFullMatchVariable )); then
-      ArrayStr="$(echo -n "$SearchString" | /bin/perl.exe "$TOOLS_PATH/sar.pl" m "$SearchPattern" 'print("'\'''\''"); for(my $i=1; $i<@sys::numVars; $i++) { my $str2=""; eval("\$str2=\$$i;"); $str2 =~ '"s/'/'\\\\''/g"'; print(" '\''$str2'\''"); } 0;' mx)"
+      ArrayStr="$(echo -n "$SearchString" | /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m "$SearchPattern" 'print("'\'''\''"); for(my $i=1; $i<@sys::numVars; $i++) { my $str2=""; eval("\$str2=\$$i;"); $str2 =~ '"s/'/'\\\\''/g"'; print(" '\''$str2'\''"); } 0;' mx)"
     else
-      ArrayStr="$(echo -n "$SearchString" | /bin/perl.exe "$TOOLS_PATH/sar.pl" m "$SearchPattern" 'my @str=$&; print("'\'''\''"); for(my $i=1; $i<@sys::numVars; $i++) { my $str2=""; eval("\$str2=\$$i;"); $str2 =~ '"s/'/'\\\\''/g"'; print(" '\''$str2'\''"); } $str=$&; $str =~ '"s/'/'\\\\''/g"'; print(" '\''$str'\''"); 0;' mx)"
+      ArrayStr="$(echo -n "$SearchString" | /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m "$SearchPattern" 'my @str=$&; print("'\'''\''"); for(my $i=1; $i<@sys::numVars; $i++) { my $str2=""; eval("\$str2=\$$i;"); $str2 =~ '"s/'/'\\\\''/g"'; print(" '\''$str2'\''"); } $str=$&; $str =~ '"s/'/'\\\\''/g"'; print(" '\''$str'\''"); 0;' mx)"
     fi
     LastError=$?
     eval "BASH_REMATCH=($ArrayStr)"

@@ -2,9 +2,7 @@
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
 
@@ -49,7 +47,7 @@ if not exist "%INPUT_FILE%" (
 
 if "%OUTPUT_CHARSET%" == "" call :GET_CURRENT_CODE_PAGE
 
-"%TOOLS_PATH%/gnuwin32/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
+"%GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
 exit /b
 
 :GET_CURRENT_CODE_PAGE

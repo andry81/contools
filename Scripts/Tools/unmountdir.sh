@@ -12,9 +12,9 @@
 
 if [[ -n "$BASH" ]]; then
 
-source "${TOOLS_PATH:-.}/baselib.sh"
-source "${TOOLS_PATH:-.}/traplib.sh"
-source "${TOOLS_PATH:-.}/stringlib.sh"
+source "${CONTOOLS_ROOT:-.}/baselib.sh"
+source "${CONTOOLS_ROOT:-.}/traplib.sh"
+source "${CONTOOLS_ROOT:-.}/stringlib.sh"
 
 function UnmountDir()
 {
@@ -79,7 +79,7 @@ function UnmountDir()
     MountPathEscaped="$RETURN_VALUE"
 
     FstabFile=$(IFS=""; local PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab' |\
-      /bin/perl.exe "$TOOLS_PATH/sar.pl" s '(.*?)^[ \t]*[^\r\n]+[ \t]+'"$MountPathEscaped"'(?:[ \t]+[^\r\n]+?|[ \t]*)$\r?\n?(.*?)' '\1\2' ms;\
+      /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s '(.*?)^[ \t]*[^\r\n]+[ \t]+'"$MountPathEscaped"'(?:[ \t]+[^\r\n]+?|[ \t]*)$\r?\n?(.*?)' '\1\2' ms;\
       LastError=$?; echo -n '.'; exit $LastError)
     LastError=$?
 

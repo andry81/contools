@@ -14,8 +14,8 @@
 
 if [[ -n "$BASH" ]]; then
 
-source "${TOOLS_PATH:-.}/stringlib.sh"
-source "${TOOLS_PATH:-.}/filelib.sh"
+source "${CONTOOLS_ROOT:-.}/stringlib.sh"
+source "${CONTOOLS_ROOT:-.}/filelib.sh"
 
 function PrintMergedLogs()
 {

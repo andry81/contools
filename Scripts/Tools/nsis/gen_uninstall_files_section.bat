@@ -8,9 +8,7 @@ rem  RMDir "$INSTDIR\universal_tract"
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
 
@@ -62,7 +60,7 @@ exit /b 0
 :PROCESS_DIR_PATH
 set "BASE_DIR_PATH=%~dpf1"
 
-call "%%TOOLS_PATH%%\strlen.bat" /v BASE_DIR_PATH
+call "%%CONTOOLS_ROOT%%/strlen.bat" /v BASE_DIR_PATH
 set /A BASE_DIR_PATH_LEN=%ERRORLEVEL%
 
 set DIR_INDEX=0

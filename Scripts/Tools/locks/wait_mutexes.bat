@@ -4,9 +4,7 @@ setlocal
 
 set "LOCK_NAMES=%~1"
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "LOCK_PATH=%TEMP%"
 set "UNLOCK_DIR=unlock0"
@@ -37,7 +35,7 @@ goto PREPARE_LOCK_WAITERS_IMPL
 set "PRE_LOCK_FILE=prelock_mutex0.%LOCK_NAME%"
 set "LOCK_DIR=lock_mutex0.%LOCK_NAME%"
 
-call "%%TOOLS_PATH%%/uuidgen.bat"
+call "%%CONTOOLS_ROOT%%/uuidgen.bat"
 
 set "WAITER_FILE=waiter.%RETURN_VALUE%"
 set "WAITER_FILE_%LOCK_WAITER_INDEX%="
@@ -108,7 +106,7 @@ call set "LOCK_NAME=%%LOCK_NAME_%LOCK_WAITER_INDEX%%%"
 call set "PRE_LOCK_FILE=%%PRE_LOCK_FILE_%LOCK_WAITER_INDEX%%%"
 call set "LOCK_DIR=%%LOCK_DIR_%LOCK_WAITER_INDEX%%%"
 
-call "%%TOOLS_PATH%%/uuidgen.bat"
+call "%%CONTOOLS_ROOT%%/uuidgen.bat"
 
 set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VALUE%"
 
