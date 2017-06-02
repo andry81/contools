@@ -5,6 +5,8 @@ setlocal
 rem Drop last error code
 cd .
 
+call "%%~dp0__init__.bat" || goto :EOF
+
 set "SOLUTION_DIR=%~1"
 set "PROJECT_DIR=%~2"
 set "PROJECT_NAME=%~3"
@@ -15,10 +17,6 @@ if "%UNICODE_ENABLED%" == "" set UNICODE_ENABLED=0
 set "BUILD_TOOLS_DIR=%SOLUTION_DIR%..\BuildTools"
 set "SOURCES_DIR=%PROJECT_DIR%..\Sources\%PROJECT_NAME%"
 set "CONSOLE_HELP_FILE=%SOURCES_DIR%\help"
-
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%SOLUTION_DIR%..\Scripts\Tools"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
 
 pushd "%SOURCES_DIR%" && (
   "%BUILD_TOOLS_DIR%\msys\bin\autogen.exe" -L "%SOURCES_DIR%" help.def
@@ -34,7 +32,7 @@ if not "%THLIBAUTOCFG_CMD_LINE_FLAGS%" == "" set "THLIBAUTOCFG_CMD_LINE=-%THLIBA
 
 if exist "%CONSOLE_HELP_FILE%.txt" (
   echo   "%CONSOLE_HELP_FILE%_inl.hpp"
-  call :CMD "%TOOLS_PATH%\thlibautocfg.exe" -txt2c %THLIBAUTOCFG_CMD_LINE%"%CONSOLE_HELP_FILE%.txt" "%CONSOLE_HELP_FILE%_inl.hpp"
+  call :CMD "%CONTOOLS_ROOT%/thlibautocfg.exe" -txt2c %THLIBAUTOCFG_CMD_LINE%"%CONSOLE_HELP_FILE%.txt" "%CONSOLE_HELP_FILE%_inl.hpp"
 )
 
 rem avoid output of this sequence: "error:"

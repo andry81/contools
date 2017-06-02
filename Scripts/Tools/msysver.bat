@@ -39,13 +39,11 @@ cd .
 rem Create local variable's stack
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?0=^"
 set "?2=|"
-call "%%TOOLS_PATH%%\setvarfromstd.bat" "%%~2\bin\uname.exe" -r
+call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" "%%~2\bin\uname.exe" -r
 for /F "tokens=1,* delims= " %%i in ("%STDOUT_VALUE%") do (
   set MSYS_VER_STR=0
   set "MSYS_VER_STR=%%i"

@@ -174,9 +174,9 @@ if %FLAG_F1_LINE_NUMBER_FILTER% NEQ 0 (
   set OUTPUT_HAS_NUMBER_PREFIX=1
 )
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%?~dp0%"
-rem set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "\" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+if "%CONTOOLS_ROOT%" == "" set "CONTOOLS_ROOT=%?~dp0%"
+rem set "CONTOOLS_ROOT=%CONTOOLS_ROOT:\=/%"
+if "%CONTOOLS_ROOT:~-1%" == "\" set "CONTOOLS_ROOT=%CONTOOLS_ROOT:~0,-1%"
 
 if %FLAG_FILE_FORMAT_PE% EQU 0 (
   set CMD_LINE=type "%FILE_PATH_PREFIX%%FILE_PATH%" ^| findstr !FINDSTR_FIRST_FILTER_CMD_LINE!
@@ -185,7 +185,7 @@ if %FLAG_FILE_FORMAT_PE% EQU 0 (
   reg add HKCU\Software\Sysinternals\Strings /v EulaAccepted /t REG_DWORD /d 0x00000001 /f >nul 2>nul
 
   rem @ for bug case workaround
-  set CMD_LINE=@"%TOOLS_PATH%\strings.exe" -q "%FILE_PATH_PREFIX%%FILE_PATH%" ^| findstr !FINDSTR_FIRST_FILTER_CMD_LINE!
+  set CMD_LINE=@"%CONTOOLS_ROOT%/strings.exe" -q "%FILE_PATH_PREFIX%%FILE_PATH%" ^| findstr !FINDSTR_FIRST_FILTER_CMD_LINE!
 )
 
 if %FLAG_F1_LINE_NUMBER_FILTER% NEQ 0 set CMD_LINE=!CMD_LINE! ^| findstr /N /R /C:".*"

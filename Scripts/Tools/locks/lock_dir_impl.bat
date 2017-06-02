@@ -11,11 +11,9 @@ set "UNLOCK_DIR=%~4"
 set "UNLOCK_FILE=%~5"
 set "WAITERS_DIR=%~6"
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
-call "%%TOOLS_PATH%%/uuidgen.bat"
+call "%%CONTOOLS_ROOT%%/uuidgen.bat"
 
 set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VALUE%"
 set "OLD_UNLOCK_DIR=%UNLOCK_DIR%.%RETURN_VALUE%"

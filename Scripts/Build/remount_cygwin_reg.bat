@@ -21,18 +21,17 @@ cd .
 rem Save all variables to stack
 setlocal
 
-rem Set TOOLS_PATH variable to point to directory with support tools.
-set "TOOLS_PATH=%~dp0..\Tools"
+call "%%~dp0__init__.bat" || goto :EOF
 
 rem make all paths canonical
-call "%%TOOLS_PATH%%\abspath.bat" "%%TOOLS_PATH%%"
-set "TOOLS_PATH=%PATH_VALUE%"
+call "%%CONTOOLS_ROOT%%/abspath.bat" "%%CONTOOLS_ROOT%%"
+set "CONTOOLS_ROOT=%PATH_VALUE%"
 
-call "%%TOOLS_PATH%%\abspath.bat" "%%~dp0..\Config"
+call "%%CONTOOLS_ROOT%%\abspath.bat" "%%~dp0..\Config"
 set "CONFIG_PATH=%PATH_VALUE%"
 
 rem Update variables pointing temporary directories
-call "%%TOOLS_PATH%%\abspath.bat" "%%~dp0..\Temp"
+call "%%CONTOOLS_ROOT%%\abspath.bat" "%%~dp0..\Temp"
 set "TEMP=%PATH_VALUE%"
 set "TMP=%PATH_VALUE%"
 
@@ -40,7 +39,7 @@ rem Save all variables to stack
 setlocal
 
 :CHECK_CMD
-call "%%TOOLS_PATH%%\isnativecmd.bat"
+call "%%CONTOOLS_ROOT%%\isnativecmd.bat"
 if %ERRORLEVEL% NEQ 0 (
   echo %~nx0: error: ^(%ERRORLEVEL%^) Script doesn't support not native Command Interpreter.>&2
   exit /b 1
@@ -53,7 +52,7 @@ if not exist "%CONFIG_PATH%\cygwin.vars" (
   exit /b 3
 )
 
-call "%%TOOLS_PATH%%\setvarsfromfile.bat" "%%CONFIG_PATH%%\cygwin.vars"
+call "%%CONTOOLS_ROOT%%\setvarsfromfile.bat" "%%CONFIG_PATH%%\cygwin.vars"
 rem Replace all "/" characters to "\" characters
 set "CYGWIN_PATH=%CYGWIN_PATH:/=\%"
 rem remove back slash
@@ -66,7 +65,7 @@ if not exist "%CYGWIN_PATH%\bin\cygwin?.dll" (
 )
 
 rem Run cygcheck to check main cygwin dll version.
-call "%%TOOLS_PATH%%\cygver.bat" cygwin "%%CYGWIN_PATH%%"
+call "%%CONTOOLS_ROOT%%\cygver.bat" cygwin "%%CYGWIN_PATH%%"
 if %ERRORLEVEL% NEQ 0 (
   echo %~nx0: error: ^(%ERRORLEVEL%^) Failed to run cygcheck utility to detect cygwin dll version.>&2
   exit /b 6
@@ -105,7 +104,7 @@ rem remove back slash
 if "%CYGWIN_REGKEY_PATH:~-1%" == "\" set "CYGWIN_REGKEY_PATH=%CYGWIN_REGKEY_PATH:~0,-1%"
 
 rem For cygwin versions 1.6.x and older test if cygwin at least was installed.
-call "%%TOOLS_PATH%%\regquery.bat" "%%CYGWIN_REGKEY_PATH%%\/" "native"
+call "%%CONTOOLS_ROOT%%\regquery.bat" "%%CYGWIN_REGKEY_PATH%%\/" "native"
 if %ERRORLEVEL% NEQ 0 (
   echo %~nx0: error: ^(%ERRORLEVEL%^) Cygwin was not installed properly or registry key not found.>&2
   exit /b 9
@@ -117,10 +116,10 @@ set "__CURRENT_CYGWIN_PATH=%REGQUERY_VALUE:/=\%"
 rem Drop last slash/back-slash character.
 if "%__CURRENT_CYGWIN_PATH:~-1%" == "\" set "__CURRENT_CYGWIN_PATH=%__CURRENT_CYGWIN_PATH:~0,-1%"
 
-call "%%TOOLS_PATH%%\strlen.bat" "" "%%__CURRENT_CYGWIN_PATH%%"
+call "%%CONTOOLS_ROOT%%\strlen.bat" "" "%%__CURRENT_CYGWIN_PATH%%"
 set __CURRENT_CYGWIN_PATH_LEN=%ERRORLEVEL%
 
-call "%%TOOLS_PATH%%\strlen.bat" "" "%%CYGWIN_REGKEY_PATH%%"
+call "%%CONTOOLS_ROOT%%\strlen.bat" "" "%%CYGWIN_REGKEY_PATH%%"
 set __CYGWIN_REGKEY_PATH_LEN=%ERRORLEVEL%
 set /A __CYGWIN_REGKEY_PATH_LEN+=1
 
@@ -129,7 +128,7 @@ set __REMOUNTED_PATHS=0
 
 echo Remounting Cygwin installation...
 rem Read each subkey of registry key and process it.
-for /F "usebackq eol= tokens=*" %%i in (`call "%%TOOLS_PATH%%\regenum.bat" "%%CYGWIN_REGKEY_PATH%%\"`) do (
+for /F "usebackq eol= tokens=*" %%i in (`call "%%CONTOOLS_ROOT%%\regenum.bat" "%%CYGWIN_REGKEY_PATH%%\"`) do (
   if not "%%i" == "" (
     call :PROCESS_CYGWIN_MOUNT_REGKEY "%%i"
   )
@@ -147,7 +146,7 @@ if "%__VALUE%" == "" goto :EOF
 if "%__VALUE%" == "~%__CYGWIN_REGKEY_PATH_LEN%" goto :EOF
 
 set /A __OVERALL_PATHS+=1
-call "%%TOOLS_PATH%%\regquery.bat" "%%CYGWIN_REGKEY_PATH%%\%%__VALUE%%" "native"
+call "%%CONTOOLS_ROOT%%\regquery.bat" "%%CYGWIN_REGKEY_PATH%%\%%__VALUE%%" "native"
 rem Ignore empty mounts.
 if %ERRORLEVEL% NEQ 0 goto :EOF
 

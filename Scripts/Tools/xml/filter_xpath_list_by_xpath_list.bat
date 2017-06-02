@@ -30,9 +30,7 @@ cd .
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
@@ -89,7 +87,7 @@ if not exist "%XPATH_LIST_FILE_FILTER%" (
   exit /b 5
 ) >&2
 
-call "%%TOOLS_PATH%%/get_datetime.bat"
+call "%%CONTOOLS_ROOT%%/get_datetime.bat"
 set "TEMP_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
 set "TEMP_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 
@@ -125,12 +123,12 @@ if %FLAG_EXACT% NEQ 0 (
 ) else (
   set "SED_FILTER_SUFFIX_CMD_FILE=convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
 )
-"%TOOLS_PATH%/gnuwin32/bin/sed.exe" -n %SED_FILTER_PREFIX_CMD_LINE% -f "%TOOLS_PATH%/xml/sed/%SED_FILTER_SUFFIX_CMD_FILE%" "%XPATH_LIST_FILE_FILTER%" > "%XPATH_LIST_FILE_FILTER_TEMP_FILE%" || goto :EOF
+"%GNUWIN32_ROOT%/gnuwin32/bin/sed.exe" -n %SED_FILTER_PREFIX_CMD_LINE% -f "%XML_TOOLS_ROOT%/sed/%SED_FILTER_SUFFIX_CMD_FILE%" "%XPATH_LIST_FILE_FILTER%" > "%XPATH_LIST_FILE_FILTER_TEMP_FILE%" || goto :EOF
 
 rem create search list, append "/" to end of each xpath for exact/subdir match
 set SED_SEARCH_PREFIX_CMD_LINE=-e "/^#/ !{ /[^\/]\[@/ { s/\([^\/]\)\[@/\1\/[@/; }; /\/\[@/ !{ /[^[[:space:]]]/ { /\/$/ !{ s/$/\//; } } } }"
-"%TOOLS_PATH%/gnuwin32/bin/sed.exe" -n %SED_SEARCH_PREFIX_CMD_LINE% -f "%TOOLS_PATH%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed" %SED_SEARCH_LAST_CMD_LINE% "%XPATH_LIST_FILE_IN%" > "%XPATH_LIST_FILE_IN_TEMP_FILE%" || goto :EOF
+"%GNUWIN32_ROOT%/gnuwin32/bin/sed.exe" -n %SED_SEARCH_PREFIX_CMD_LINE% -f "%XML_TOOLS_ROOT%/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed" %SED_SEARCH_LAST_CMD_LINE% "%XPATH_LIST_FILE_IN%" > "%XPATH_LIST_FILE_IN_TEMP_FILE%" || goto :EOF
 
 rem apply filter list to search list and remove flat list prefixes, convert empty lines to special comments to save them in output, remove "/" from end of each xpath
 set SED_CLEANUP_LAST_CMD_LINE=-e "/^#/ { s/^# :EOL$//; }; /^#/ !{ /./ { s/.*|//; } }; /\/\[@/ { s/\/\[@/[@/; }; /\/\[@/ !{ s/\/$//; }"
-"%TOOLS_PATH%/gnuwin32/bin/sed.exe" -e "/./ !{ s/^$/# :EOL/ }" "%XPATH_LIST_FILE_IN_TEMP_FILE%" | findstr /R /B /G:"%XPATH_LIST_FILE_FILTER_TEMP_FILE%" /C:"#" | "%TOOLS_PATH%/gnuwin32/bin/sed.exe" %SED_CLEANUP_LAST_CMD_LINE%
+"%GNUWIN32_ROOT%/gnuwin32/bin/sed.exe" -e "/./ !{ s/^$/# :EOL/ }" "%XPATH_LIST_FILE_IN_TEMP_FILE%" | findstr /R /B /G:"%XPATH_LIST_FILE_FILTER_TEMP_FILE%" /C:"#" | "%GNUWIN32_ROOT%/gnuwin32/bin/sed.exe" %SED_CLEANUP_LAST_CMD_LINE%

@@ -45,14 +45,12 @@ call set "PUBLISH_APP_DIR_VALUE=%%%PUBLISH_APP_DIR_VAR_PREFIX%PUBLISH_APP_DIR%%"
 
 if not "%PUBLISH_APP_DIR_VALUE%" == "" exit /b 0
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
-if "%PUBLISH_DATE%" == "" call "%%TOOLS_PATH%%/get_date_as_filename.bat"
+if "%PUBLISH_DATE%" == "" call "%%CONTOOLS_ROOT%%/get_date_as_filename.bat"
 if "%PUBLISH_DATE%" == "" set "PUBLISH_DATE=%RETURN_VALUE%"
 
-if "%PUBLISH_TIME%" == "" call "%%TOOLS_PATH%%/get_time_as_filename.bat"
+if "%PUBLISH_TIME%" == "" call "%%CONTOOLS_ROOT%%/get_time_as_filename.bat"
 if "%PUBLISH_TIME%" == "" set "PUBLISH_TIME=%RETURN_VALUE%"
 
 if "%PUBLISH_APP_DIR%" == "" goto GEN_PUBLISH_APP_DIR
@@ -76,7 +74,7 @@ set "APP_TARGET_DESC=%PROJECT_TYPE%"
 if "%APP_TARGET_NAME%" == "" goto IGNORE_APP_TARGET_NAME
 
 rem set APP_TARGET_NAME to upper case for more readability
-call "%%TOOLS_PATH%%/strupcase.bat" /v APP_TARGET_NAME
+call "%%CONTOOLS_ROOT%%/strupcase.bat" /v APP_TARGET_NAME
 set "APP_TARGET_NAME=%RETURN_VALUE%"
 set "APP_TARGET_DESC=%APP_TARGET_NAME%_%PROJECT_TYPE%"
 

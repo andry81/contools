@@ -7,7 +7,7 @@
 # Script can be ONLY included by "source" command.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then 
 
-source "${TOOLS_PATH:-.}/stringlib.sh"
+source "${CONTOOLS_ROOT:-.}/stringlib.sh"
 
 # Function gets perl module list file path.
 function GetPerlModuleListFilePath()
@@ -63,13 +63,13 @@ function CleanInstallPerlModule()
   fi
 
   echo "$PerlModuleListFileText" |\
-    /bin/perl.exe "$TOOLS_PATH/sar.pl" m "$MatchPattern" '' ms >/dev/null
+    /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m "$MatchPattern" '' ms >/dev/null
   if [[ $? -ne 0 ]]; then
     return 128
   fi
 
   echo "$PerlModuleListFileText" |\
-    /bin/perl.exe "$TOOLS_PATH/sar.pl" s "$SearchPattern1" "$ReplacePattern1" mse > "$PerlModuleListFilePath"
+    /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s "$SearchPattern1" "$ReplacePattern1" mse > "$PerlModuleListFilePath"
   if [[ $? -ne 0 ]]; then
     return 3
   fi
@@ -80,14 +80,14 @@ function CleanInstallPerlModule()
   # Remove repeated section if file not empty.
   while [[ -n "$PerlModuleListFileText" ]]; do
     echo "$PerlModuleListFileText" |\
-      /bin/perl.exe "$TOOLS_PATH/sar.pl" m "$MatchPattern" '' ms >/dev/null
+      /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m "$MatchPattern" '' ms >/dev/null
     if [[ $? -ne 0 ]]; then
       # No more repeated section.
       break
     fi
 
     echo "$PerlModuleListFileText" |\
-      /bin/perl.exe "$TOOLS_PATH/sar.pl" s "$SearchPattern1" "$ReplacePattern1" mse > "$PerlModuleListFilePath"
+      /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s "$SearchPattern1" "$ReplacePattern1" mse > "$PerlModuleListFilePath"
     if [[ $? -ne 0 ]]; then
       return 4
     fi

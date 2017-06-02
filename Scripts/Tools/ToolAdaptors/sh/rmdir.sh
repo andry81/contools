@@ -2,7 +2,7 @@
 
 if [[ -d "$2" ]]; then
   # load all libraries
-  source "$TOOLS_PATH/filelib.sh"
+  source "$CONTOOLS_ROOT/filelib.sh"
 
   if [[ -n "$RMDIR" ]]; then
     CleanupDir '' "$2" && eval '"$RMDIR"' $3 '"$2"'

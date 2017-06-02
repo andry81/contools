@@ -19,7 +19,7 @@ TestScriptFileName="${TestScriptFilePath##*[/]}"
 TestScriptBaseFileName="${TestScriptFileName%.*}"
 
 source "$TestScriptDirPath/testlib.sh"
-source "${TOOLS_PATH:-.}/funclib.sh"
+source "${CONTOOLS_ROOT:-.}/funclib.sh"
 
 TestModuleInit
 

@@ -27,9 +27,7 @@ cd .
 rem Create local variable's stack
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 rem Standard ANSI character table
 set __ANSI_TBL= !"#$%%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
@@ -48,7 +46,7 @@ if "%__WCHARCODE%" == "" goto EXIT
 
 rem Convert from hex code to decimal
 if not "%__WCHARCODE:~0,2%" == "" (
-  call "%%TOOLS_PATH%%\expandvarn.bat" __ACHAROFFSET "0x%%__WCHARCODE:~0,2%%"
+  call "%%CONTOOLS_ROOT%%/expandvarn.bat" __ACHAROFFSET "0x%%__WCHARCODE:~0,2%%"
 ) else (
   set __ACHAROFFSET=0
 )

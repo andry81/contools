@@ -30,9 +30,7 @@ if not exist "%HASH_LIST_FILE%" (
   exit /b 2
 ) >&2
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 rem use 64-bit application in 64-bit OS
 if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
@@ -41,9 +39,9 @@ if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
 goto X64
 
 :NOTX64
-"%TOOLS_PATH%\hashdeep\hashdeep.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
+"%HASHDEEP_ROOT%/hashdeep.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
 goto :EOF
 
 :X64
-"%TOOLS_PATH%\hashdeep\hashdeep64.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
+"%HASHDEEP_ROOT%/hashdeep64.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
 goto :EOF

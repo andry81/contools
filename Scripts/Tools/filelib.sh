@@ -9,10 +9,10 @@ if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${
 
 SOURCE_CONTOOLS_FILELIB_SH=1 # including guard
 
-source "${TOOLS_PATH:-.}/baselib.sh"
-source "${TOOLS_PATH:-.}/traplib.sh"
-source "${TOOLS_PATH:-.}/stringlib.sh"
-source "${TOOLS_PATH:-.}/regexplib.sh"
+source "${CONTOOLS_ROOT:-.}/baselib.sh"
+source "${CONTOOLS_ROOT:-.}/traplib.sh"
+source "${CONTOOLS_ROOT:-.}/stringlib.sh"
+source "${CONTOOLS_ROOT:-.}/regexplib.sh"
 
 function BufferedRead()
 {
@@ -1192,7 +1192,7 @@ function ReadFileDependents()
   case "$DumpbType" in
     1)
       EvalString="$(
-        "${TOOLS_PATH:-.}/dumpbin.exe" -dependents "$NativeFilePath" | \
+        "${CONTOOLS_ROOT:-.}/dumpbin.exe" -dependents "$NativeFilePath" | \
         InternalDumpbinRead | tr '[:upper:]' '[:lower:]' | \
         { MakeCommandArgumentsFromFile - && echo -n "$RETURN_VALUE"; }
       )"
@@ -1201,7 +1201,7 @@ function ReadFileDependents()
 
     2)
       EvalString="$(
-        "${TOOLS_PATH:-.}/objdump.exe" -p "$NativeFilePath" | \
+        "${CONTOOLS_ROOT:-.}/objdump.exe" -p "$NativeFilePath" | \
         InternalObjdumpRead | tr '[:upper:]' '[:lower:]' | \
         { MakeCommandArgumentsFromFile - && echo -n "$RETURN_VALUE"; }
       )"

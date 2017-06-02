@@ -27,9 +27,7 @@ set "ARCHIVE_DIR=%~dp3"
 rem Drop last error level
 cd .
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 pushd "%DIR%" || (
   echo.%~nx0: error: could not switch current directory: "%DIR%".
@@ -43,7 +41,7 @@ rem   Explicitly use temporary directory for 7zip. This is required in some case
 rem   archive file around being updated archive file.
 rem   For example: pushd c:\ && ( 7za.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
 
-call "%%TOOLS_PATH%%/uuidgen.bat"
+call "%%CONTOOLS_ROOT%%/uuidgen.bat"
 set "TEMP_DIR_PATH=%TEMP%\%~n0.%RETURN_VALUE%"
 
 mkdir "%TEMP_DIR_PATH%" || (
@@ -68,4 +66,4 @@ rem remove arguments trailing back slashes to avoid exe command line parse old b
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"
 if "%REL_PATH:~-1%" == "\" set "REL_PATH=%REL_PATH:~0,-1%"
 
-"%TOOLS_PATH%/7zip/7za.exe" a -r %_7ZIP_SWITCHES% "%ARCHIVE_PATH%" "%REL_PATH%" "-w%TEMP_DIR_PATH%"
+"%CONTOOLS_ROOT%/7zip/7za.exe" a -r %_7ZIP_SWITCHES% "%ARCHIVE_PATH%" "%REL_PATH%" "-w%TEMP_DIR_PATH%"

@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.05.20
+* 2017.06.02
 * ConsoleTools
 
 WARNING:
@@ -900,9 +900,9 @@ Bash script which executes function by name of bash script and name of
 function in that script. Cygwin/Mingw/Msys system required.
 
 Examples:
-1. execfunc.sh "$TOOLS_PATH/execbat.sh" "ExecWindowsBatch" "echo 10"
-2. source "$TOOLS_PATH/execfunc.sh"
-   ExecBashFunction "$TOOLS_PATH/execbat.sh" "ExecWindowsBatch" "echo 10"
+1. execfunc.sh "$CONTOOLS_ROOT/execbat.sh" "ExecWindowsBatch" "echo 10"
+2. source "$CONTOOLS_ROOT/execfunc.sh"
+   ExecBashFunction "$CONTOOLS_ROOT/execbat.sh" "ExecWindowsBatch" "echo 10"
 
 -------------------------------------------------------------------------------
      filelib.sh

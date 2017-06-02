@@ -33,13 +33,11 @@ set "PROJECT_STAGE_VAR_PATH=%~8"
 rem Drop last error level
 cd .
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 :PDB_STAGE
 if not exist "%STAGE_IN.PROJECT_STAGE_PDB_PATH%" goto PDB_STAGE_END
-call "%%TOOLS_PATH%%/build/xcopy_archive_to_stage.bat" "stage-in project debug information" "stage" ^
+call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "stage-in project debug information" "stage" ^
   "%%STAGE_IN.PROJECT_STAGE_PDB_PATH%%" "%%PROJECT_STAGE_PDB_PATH%%" ^
   "%%ARCHIVE_COPY_FROM_OFFSET%%" ^
   "%%PROJECT_STAGE_PDB_PATH%%/%%STAGE_IN.PROJECT_NAME%%_pdb_%%STAGE_IN.BUILD_SCM_BRANCH%%_%%STAGE_IN.PROJECT_TYPE%%_%%STAGE_IN.APP_TARGET_NAME%%_v%%STAGE_IN.PRODUCT_VERSION_FILE_SUFFIX%%.pdb.7z" ^
@@ -49,7 +47,7 @@ call "%%TOOLS_PATH%%/build/xcopy_archive_to_stage.bat" "stage-in project debug i
 
 :LIB_STAGE
 if not exist "%STAGE_IN.PROJECT_STAGE_LIB_PATH%" goto LIB_STAGE_END
-call "%%TOOLS_PATH%%/build/xcopy_archive_to_stage.bat" "stage-in project library" "stage" ^
+call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "stage-in project library" "stage" ^
   "%%STAGE_IN.PROJECT_STAGE_LIB_PATH%%" "%%PROJECT_STAGE_LIB_PATH%%" ^
   "%%ARCHIVE_COPY_FROM_OFFSET%%" ^
   "%%PROJECT_STAGE_LIB_PATH%%/%%STAGE_IN.PROJECT_NAME%%_lib_%%STAGE_IN.BUILD_SCM_BRANCH%%_%%STAGE_IN.PROJECT_TYPE%%_%%STAGE_IN.APP_TARGET_NAME%%_v%%STAGE_IN.PRODUCT_VERSION_FILE_SUFFIX%%.lib.7z" ^
@@ -59,14 +57,14 @@ call "%%TOOLS_PATH%%/build/xcopy_archive_to_stage.bat" "stage-in project library
 
 :GEN_STAGE
 if not exist "%STAGE_IN.PROJECT_STAGE_GEN_PATH%" goto GEN_STAGE_END
-call "%%TOOLS_PATH%%/build/xcopy_to_stage.bat" "stage-in project generated" "stage" ^
+call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "stage-in project generated" "stage" ^
   "%%STAGE_IN.PROJECT_STAGE_GEN_PATH%%" "%%PROJECT_STAGE_GEN_PATH%%/%%STAGE_IN.PROJECT_NAME%%" "*.*" "/S /Y /H" || exit /b 3
 
 :GEN_STAGE_END
 
 :VAR_STAGE
 if not exist "%STAGE_IN.PROJECT_STAGE_VAR_PATH%" goto VAR_STAGE_END
-call "%%TOOLS_PATH%%/build/xcopy_to_stage.bat" "stage-in project variables" "stage" ^
+call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "stage-in project variables" "stage" ^
   "%%STAGE_IN.PROJECT_STAGE_VAR_PATH%%" "%%PROJECT_STAGE_VAR_PATH%%/%%STAGE_IN.PROJECT_NAME%%" "*.*" "/S /Y /H" || exit /b 4
 
 :VAR_STAGE_END

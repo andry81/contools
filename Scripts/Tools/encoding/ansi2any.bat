@@ -2,9 +2,7 @@
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
 
@@ -50,7 +48,7 @@ if "%INPUT_CHARSET%" == "" call :GET_CURRENT_CODE_PAGE
 
 if %FLAG_USE_BOM% NEQ 0 call :OUTPUT_BOM
 
-"%TOOLS_PATH%/gnuwin32/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
+"%GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
 exit /b
 
 :GET_CURRENT_CODE_PAGE
@@ -74,4 +72,4 @@ if not "%OUTPUT_CHARSET:-32LE=%" == "%OUTPUT_CHARSET%" set "BOM_FILE_NAME=fffe.b
 if not "%OUTPUT_CHARSET:-32BE=%" == "%OUTPUT_CHARSET%" set "BOM_FILE_NAME=feff.bin" & goto COPY_BOM
 
 :COPY_BOM
-type "%TOOLS_PATH:/=\%\encoding\boms\%BOM_FILE_NAME%"
+type "%CONTOOLS_ROOT:/=\%\encoding\boms\%BOM_FILE_NAME%"

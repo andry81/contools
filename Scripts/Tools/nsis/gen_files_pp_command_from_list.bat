@@ -14,9 +14,7 @@ rem  !macroend
 
 setlocal
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0.."
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "?~nx0=%~nx0"
 
@@ -75,7 +73,7 @@ goto PROCESS_FILE_EXT_LIST_LOOP
 set FILE_INDEX=0
 set "LAST_FILE_PATH="
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%TOOLS_PATH%/gnuwin32/bin/sed.exe" "s/\(.*\)/\1\\/" "%FILE_PATH_LIST_FILE%" ^| sort ^| "%TOOLS_PATH%/gnuwin32/bin/sed.exe" "s/\(.*\).$/\1/" ^| findstr %FINDSTR_CMD_LINE%`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\)/\1\\/" "%FILE_PATH_LIST_FILE%" ^| sort ^| "%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/" ^| findstr %FINDSTR_CMD_LINE%`) do (
   set "FILE_PATH=%%i"
   call :PROCESS_FILE_PATH || goto :EOF
 )

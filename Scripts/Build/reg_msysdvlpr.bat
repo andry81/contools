@@ -22,19 +22,18 @@ cd .
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion
 
-rem Set TOOLS_PATH variable to point to directory with support tools.
-set "TOOLS_PATH=%~dp0..\Tools"
+call "%%~dp0__init__.bat" || goto :EOF
 
 rem make all paths canonical
-call "%%TOOLS_PATH%%\abspath.bat" "%%TOOLS_PATH%%"
-set "TOOLS_PATH=%PATH_VALUE%"
-set "TOOLS_PATH_NATIVE=%PATH_VALUE%"
+call "%%CONTOOLS_ROOT%%/abspath.bat" "%%CONTOOLS_ROOT%%"
+set "CONTOOLS_ROOT=%PATH_VALUE%"
+set "CONTOOLS_ROOT_NATIVE=%PATH_VALUE%"
 
-call "%%TOOLS_PATH_NATIVE%%\abspath.bat" "%%~dp0..\Config"
+call "%%CONTOOLS_ROOT_NATIVE%%\abspath.bat" "%%~dp0..\Config"
 set "CONFIG_PATH=%PATH_VALUE%"
 
 rem Update variables pointing temporary directories
-call "%%TOOLS_PATH_NATIVE%%\abspath.bat" "%%~dp0..\Temp"
+call "%%CONTOOLS_ROOT_NATIVE%%\abspath.bat" "%%~dp0..\Temp"
 set "TEMP=%PATH_VALUE%"
 set "TMP=%PATH_VALUE%"
 
@@ -42,7 +41,7 @@ rem Save all variables to stack again
 setlocal
 
 :CHECK_CMD
-call "%%TOOLS_PATH_NATIVE%%\isnativecmd.bat"
+call "%%CONTOOLS_ROOT_NATIVE%%\isnativecmd.bat"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Script doesn't support not native Command Interpreter.>&2
   exit /b 1
@@ -52,10 +51,10 @@ rem Check path to this script for invalid characters
 set "__STRING__=%~dp0"
 set __CHARS__= ^	-^"'`^?^*^&^|^<^>^(^)^^#%%!
 
-call "%%TOOLS_PATH_NATIVE%%\strchr.bat" /v
+call "%%CONTOOLS_ROOT_NATIVE%%\strchr.bat" /v
 if not %ERRORLEVEL% GEQ 0 goto CHECK_MSYS_VARS
 
-call "%%TOOLS_PATH_NATIVE%%\stresc.bat" /v __STRING__ STRING_ESCAPED __CHARS__ {EC} {#}
+call "%%CONTOOLS_ROOT_NATIVE%%\stresc.bat" /v __STRING__ STRING_ESCAPED __CHARS__ {EC} {#}
 call :cecho %%~nx0: {0C}error{#}: {0C}Path to the script has incorrect characters{#}: ^^^"%%STRING_ESCAPED%%^".>&2
 exit /b 2
 
@@ -66,7 +65,7 @@ if not exist "%CONFIG_PATH%\msysdvlpr.vars" (
   exit /b 3
 )
 
-call "%%TOOLS_PATH%%\setvarsfromfile.bat" "%%CONFIG_PATH%%\msysdvlpr.vars"
+call "%%CONTOOLS_ROOT%%\setvarsfromfile.bat" "%%CONFIG_PATH%%\msysdvlpr.vars"
 rem Replace all "/" characters to "\" characters
 set "MSYS_PATH=%MSYS_PATH:/=\%"
 rem remove back slash
@@ -92,7 +91,7 @@ if not exist "%MSYS_PATH%\msys.bat" (
 )
 
 rem Check main msys dll version.
-call "%%TOOLS_PATH%%\msysver.bat" msys "%%MSYS_PATH%%"
+call "%%CONTOOLS_ROOT%%\msysver.bat" msys "%%MSYS_PATH%%"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Failed to run uname utility to detect msys dll version.>&2
   exit /b 7
@@ -112,17 +111,17 @@ if not exist "%TEMP%" mkdir "%TEMP%"
 echo %~nx0: Unmounting backend directories...
 
 rem Unmount mount points that can potentially interfere with the backend
-"%MSYS_PATH%\bin\bash" "%TOOLS_PATH%/unmountdir.sh" "/usr/local"
+"%MSYS_PATH%\bin\bash" "%CONTOOLS_ROOT%/unmountdir.sh" "/usr/local"
 if %ERRORLEVEL% EQU 0 echo /usr/local
 
-"%MSYS_PATH%\bin\bash" "%TOOLS_PATH%/unmountdir.sh" "/usr"
+"%MSYS_PATH%\bin\bash" "%CONTOOLS_ROOT%/unmountdir.sh" "/usr"
 if %ERRORLEVEL% EQU 0 echo /usr
 
 echo.
 
 echo %~nx0: Mounting local directories...
 
-"%MSYS_PATH%\bin\bash" "%TOOLS_PATH%/mountdir.sh" "%TMP%" "/tmp"
+"%MSYS_PATH%\bin\bash" "%CONTOOLS_ROOT%/mountdir.sh" "%TMP%" "/tmp"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Couldn't mount /tmp directory.>&2
   call :cecho %%~nx0: {0F}/tmp{#}: "{0F}%%TMP%%{#}">&2
@@ -130,7 +129,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo "%TMP%" "/tmp"
 
-"%MSYS_PATH%\bin\bash" "%TOOLS_PATH%/mountdir.sh" "%MINGW_PATH%" "/mingw"
+"%MSYS_PATH%\bin\bash" "%CONTOOLS_ROOT%/mountdir.sh" "%MINGW_PATH%" "/mingw"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0F}MINGW_PATH{#}: "{0F}%%MINGW_PATH%%{#}">&2
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Couldn't mount /mingw directory.>&2
@@ -145,10 +144,10 @@ exit /b 0
 
 :CLEAN_AND_RESET_ENV_AND_CALL1
 rem Read windows version
-call "%%TOOLS_PATH_NATIVE%%\winver.bat"
+call "%%CONTOOLS_ROOT_NATIVE%%\winver.bat"
 
 rem Reset environment
-call "%%TOOLS_PATH_NATIVE%%\setvarfromstd.bat" "%%TOOLS_PATH%%\splitvars.bat" "%%WINVER_VALUE%%" "|" "-s"
+call "%%CONTOOLS_ROOT_NATIVE%%\setvarfromstd.bat" "%%CONTOOLS_ROOT%%\splitvars.bat" "%%WINVER_VALUE%%" "|" "-s"
 if "%STDOUT_VALUE%" == "Windows2000" goto :CLEAN_AND_RESET_ENV_AND_CALL_WIN2K
 if "%STDOUT_VALUE%" == "WindowsXP" goto :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 if "%STDOUT_VALUE%" == "WindowsVista" goto :CLEAN_AND_RESET_ENV_AND_CALL_WINVISTA
@@ -160,76 +159,76 @@ goto :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN2K
 endlocal&& (
-  set "TOOLS_PATH=%TOOLS_PATH%"
+  set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_win2k.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
+  call :RESET_ENV_AND_CALL vars_win2k.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 endlocal&& (
-  set "TOOLS_PATH=%TOOLS_PATH%"
+  set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_winxp.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
+  call :RESET_ENV_AND_CALL vars_winxp.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WINVISTA
 endlocal&& (
-  set "TOOLS_PATH=%TOOLS_PATH%"
+  set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_vista.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
+  call :RESET_ENV_AND_CALL vars_vista.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN7
 endlocal&& (
-  set "TOOLS_PATH=%TOOLS_PATH%"
+  set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_win7.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
+  call :RESET_ENV_AND_CALL vars_win7.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN8
 endlocal&& (
-  set "TOOLS_PATH=%TOOLS_PATH%"
+  set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
-  call :RESET_ENV_AND_CALL vars_win8.lst "%%TOOLS_PATH_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
+  call :RESET_ENV_AND_CALL vars_win8.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
 goto :EOF
 
 :RESET_ENV_AND_CALL
 rem Reset environment
 echo %~nx0: Resetting environment to defaults...
-call "%%TOOLS_PATH_NATIVE%%\resetenv.bat" -p -e "%%~3\env\%%~1"
+call "%%CONTOOLS_ROOT_NATIVE%%\resetenv.bat" -p -e "%%~3\env\%%~1"
 
 rem Return variables
 set "OLDPATH=%PATH%"
 set "PATH=%~4\local\bin;%~4\bin;%~5\bin;%PATH%"
-set "TOOLS_PATH_NATIVE=%~2"
+set "CONTOOLS_ROOT_NATIVE=%~2"
 set "TEMP=%TEMP%"
 set "TMP=%TMP%"
-set "TOOLS_PATH=%TOOLS_PATH%"
+set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
 
 call :cecho %%~nx0: {0B}info{#}: "{0F}PATH=%%PATH%%{#}"
 call :cecho %%~nx0: {0B}info{#}: "{0F}TEMP=%%TEMP%%{#}"
 call :cecho %%~nx0: {0B}info{#}: "{0F}TMP=%%TMP%%{#}"
-call :cecho %%~nx0: {0B}info{#}: "{0F}TOOLS_PATH=%%TOOLS_PATH%%{#}"
+call :cecho %%~nx0: {0B}info{#}: "{0F}CONTOOLS_ROOT=%%CONTOOLS_ROOT%%{#}"
 echo.
 
 call :RUN_SHELL
@@ -246,8 +245,8 @@ rem Environment will be restored automatically here
 goto :EOF
 
 :cecho
-if exist "%TOOLS_PATH_NATIVE%\cecho.exe" (
-  "%TOOLS_PATH_NATIVE%\cecho.exe" %*{#}{\n}
+if exist "%CONTOOLS_ROOT_NATIVE%\cecho.exe" (
+  "%CONTOOLS_ROOT_NATIVE%\cecho.exe" %*{#}{\n}
 ) else (
   echo.%*
 )

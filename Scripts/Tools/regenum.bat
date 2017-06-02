@@ -37,11 +37,9 @@ rem test if key is exist
 reg.exe query "%__REG_PATH%" 2>&1 >nul
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
-if "%TOOLS_PATH%" == "" set "TOOLS_PATH=%~dp0"
-set "TOOLS_PATH=%TOOLS_PATH:\=/%"
-if "%TOOLS_PATH:~-1%" == "/" set "TOOLS_PATH=%TOOLS_PATH:~0,-1%"
+rem call "%%~dp0__init__.bat" || goto :EOF
 
-rem call "%%TOOLS_PATH%%\cstresc.bat" "%%__REG_PATH%%" "__KEYPATH" "\.*^$[]"
+rem call "%%CONTOOLS_ROOT%%/cstresc.bat" "%%__REG_PATH%%" "__KEYPATH" "\.*^$[]"
 set "__KEYPATH=%__REG_PATH:\=\\%"
 set "__KEYPATH=%__KEYPATH:.=\.%"
 set "__KEYPATH=%__KEYPATH:^=\^%"

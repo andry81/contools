@@ -8,8 +8,8 @@
 # Script can be ONLY included by "source" command.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then
 
-source "${TOOLS_PATH:-.}/baselib.sh"
-source "${TOOLS_PATH:-.}/traplib.sh"
+source "${CONTOOLS_ROOT:-.}/baselib.sh"
+source "${CONTOOLS_ROOT:-.}/traplib.sh"
 
 function GetUtilityVersion()
 {
@@ -28,17 +28,17 @@ function GetUtilityVersion()
   case "$AppName" in
     "DejaGnu")
       AppCurVerStr="`"$AppFilePath" --version 2>/dev/null |
-        eval /bin/perl.exe "'$TOOLS_PATH/sar.pl'" $DejaGnuVersionPattern1`"
+        eval /bin/perl.exe "'$CONTOOLS_ROOT/sar.pl'" $DejaGnuVersionPattern1`"
     ;;
 
     *)
       AppCurVerStr="(`"$AppFilePath" --version 2>/dev/null |
-        eval /bin/perl.exe "'$TOOLS_PATH/sar.pl'" $CommonVersionPattern1`)"
+        eval /bin/perl.exe "'$CONTOOLS_ROOT/sar.pl'" $CommonVersionPattern1`)"
     ;;
   esac
 
   eval "RETURN_VALUE=(`echo "$AppCurVerStr" |
-    eval /bin/perl.exe "'$TOOLS_PATH/sar.pl'" $CommonVersionParsePattern1`)"
+    eval /bin/perl.exe "'$CONTOOLS_ROOT/sar.pl'" $CommonVersionParsePattern1`)"
 }
 
 function GetLibVersion()
@@ -481,7 +481,7 @@ function CheckScriptGccmrt()
 {
   echo -n "Checking \"gccmrt.sh\" script... "
 
-  local GccMrtPath="$TOOLS_PATH/gccmrt.sh"
+  local GccMrtPath="$CONTOOLS_ROOT/gccmrt.sh"
 
   if [[ -z "$GccMrtPath" || ! -f "$GccMrtPath" ]]; then
     echo "Error."

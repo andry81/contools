@@ -3,7 +3,7 @@
 # Script can be ONLY included by "source" command.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then
 
-source "${TOOLS_PATH:-.}/testlib.sh"
+source "${CONTOOLS_ROOT:-.}/testlib.sh"
 
 function TestUserModuleInit()
 {
@@ -18,7 +18,7 @@ function TestUserModuleInit()
   export CH_CODE_MIN=32
   export CH_CODE_MAX=127
 
-  TEST_SOURCES=("${TOOLS_PATH:-.}/hashlib.sh")
+  TEST_SOURCES=("${CONTOOLS_ROOT:-.}/hashlib.sh")
   TEST_FUNCTIONS=(GenerateStrings GenerateHashes GenerateHashMap ReadHashMap CheckHashCollisions)
 }
 
