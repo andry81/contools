@@ -1,2 +1,2 @@
 Common:
-  - rewrite setvarsfromfile.bat, tests
+  - rewrite setvarsfromfile.bat, tests.
