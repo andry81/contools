@@ -13,8 +13,6 @@ call "%%TESTS_ROOT%%/test_strrep.bat"
 call "%%TESTS_ROOT%%/test_stresc.bat"
 call "%%TESTS_ROOT%%/test_cstresc.bat"
 call "%%TESTS_ROOT%%/test_extract_version.bat"
-call "%%TESTS_ROOT%%/test_make_url_canonical.bat"
-call "%%TESTS_ROOT%%/test_make_url_absolute.bat"
 rem call "%%TESTS_ROOT%%/test_setvarsfromfile.bat"
 
 call "%%TESTS_ROOT%%/test_xml_sed.bat"
