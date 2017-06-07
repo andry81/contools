@@ -27,7 +27,7 @@ goto :EOF
 :SET
 %~d1
 pushd "%~dp1" && (
-  call echo.Current directory: "%%CD%%"
+  call echo.Current directory: "%%CD:\=/%%"
   call :CMD "%%~dp0make_shortcut.vbs" "%%SC_NAME%%" "%%WD%%" "%%%%COMSPEC%%%%" "%%CMD_LINE%%"
 )
 
