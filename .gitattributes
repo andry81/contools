@@ -252,8 +252,6 @@ Scripts/Tools/ToolAdaptors/sh/dos2unix.sh -text
 Scripts/Tools/ToolAdaptors/sh/mkdir.sh -text
 Scripts/Tools/ToolAdaptors/sh/rm.sh -text
 Scripts/Tools/ToolAdaptors/sh/rmdir.sh -text
-Scripts/Tools/ToolAdaptors/tortoisesvn/TODO.txt -text
-Scripts/Tools/ToolAdaptors/tortoisesvn/TortoiseProc.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/cmd_as_admin.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/cmd_as_user.bat -text
@@ -261,7 +259,6 @@ Scripts/Tools/ToolAdaptors/totalcmd/cmda.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/cmda.user.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_sorted_files.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/externals_edit.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/COPYING -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/README.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/icobundl.exe -text
@@ -277,6 +274,9 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/compare_sorted_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/loadvars.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/profile.vars -text
+Scripts/Tools/ToolAdaptors/totalcmd/tortoisesvn/TODO.txt -text
+Scripts/Tools/ToolAdaptors/totalcmd/tortoisesvn/TortoiseProc.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/tortoisesvn/externals_edit.bat -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_cmd_to_run_notepad_and_wait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_notepad_and_wait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/call.vbs -text
