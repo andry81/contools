@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.03.11
+* 2017.06.07
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -15,8 +15,14 @@
 3.1 Method #1 (Main). For selected files and directories together over SVN GUI.
 3.2 Method #2. For selected files and directores one after one over external editor.
 4. Open SVN Log for selected files and directories together.
-5. One pane comparison for 2 selected files.
-6. One pane comparison for 2 selected files with sorted content.
+5. Open TortoiseSVN commit dialogs for a directory separately for all nested versioned directories.
+5.1. Method #1. One windows for all nested directories with changes.
+5.2. Method #2. Window per each nested directory with changes.
+6. Open TortoiseSVN status dialog for a directory including all nested versioned directories.
+6.1. Method #1. One windows for all nested directories.
+6.2. Method #2. Window per each nested directory.
+7. One pane comparison for 2 selected files.
+8. One pane comparison for 2 selected files with sorted content.
 
 ------------------------------------------------------------------------------
 1. Open standalone notepad window for selected files.
@@ -133,7 +139,7 @@ cmda.bat
 ------------------------------------------------------------------------------
 (all windows together)
 
-TortoiseProc.bat
+tortoisesvn\TortoiseProc.bat
 /command:properties "%P" %S
 
 ------------------------------------------------------------------------------
@@ -154,18 +160,50 @@ externals_edit.bat
 ------------------------------------------------------------------------------
 (all windows together)
 
-TortoiseProc.bat
+tortoisesvn\TortoiseProc.bat
 /command:log "%P" %S
 
 ------------------------------------------------------------------------------
-5. One pane comparison for 2 selected files.
+5. Open TortoiseSVN commit dialogs for a directory separately for all nested versioned directories.
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+5.1. Method #1. One windows for all nested directories with changes.
+------------------------------------------------------------------------------
+tortoisesvn\TortoiseProcByNestedWC.bat
+-all-in-one /command:commit "%P" %S
+
+------------------------------------------------------------------------------
+5.2. Method #2. Window per each nested directory with changes.
+------------------------------------------------------------------------------
+tortoisesvn\TortoiseProcByNestedWC.bat
+-window-per-wcroot /command:commit "%P" %S
+
+------------------------------------------------------------------------------
+6. Open TortoiseSVN status dialog for a directory including all nested versioned directories.
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+6.1. Method #1. One windows for all nested directories.
+------------------------------------------------------------------------------
+tortoisesvn\TortoiseProcByNestedWC.bat
+-all-in-one /command:repostatus "%P" %S
+
+------------------------------------------------------------------------------
+6.2. Method #2. Window per each nested directory.
+------------------------------------------------------------------------------
+tortoisesvn\TortoiseProcByNestedWC.bat
+-window-per-wcroot /command:repostatus "%P" %S
+
+------------------------------------------------------------------------------
+7. One pane comparison for 2 selected files.
 ------------------------------------------------------------------------------
 
 cmd_noconsole.vbs
 compare_files.bat -wait "%P" %S
 
 ------------------------------------------------------------------------------
-6. One pane comparison for 2 selected files with sorted content.
+8. One pane comparison for 2 selected files with sorted content.
 ------------------------------------------------------------------------------
 
 cmd_noconsole.vbs

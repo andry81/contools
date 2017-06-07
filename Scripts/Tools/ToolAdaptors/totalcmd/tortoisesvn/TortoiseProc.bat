@@ -20,6 +20,9 @@ if not "%FLAG%" == "" (
   if "%FLAG%" == "-wait" (
     set FLAG_WAIT_EXIT=1
     shift
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
   )
 
   rem read until no flags
