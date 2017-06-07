@@ -26,7 +26,7 @@ call :SET
 goto :EOF
 
 :SET
-echo.Current directory: "%CD%"
+echo.Current directory: "%CD:\=/%"
 call :CMD "%%~dp0update_shortcut.vbs" "%%SC_NAME%%" "%%WD%%" "%%%%COMSPEC%%%%" "%%CMD_LINE%%"
 
 goto :EOF

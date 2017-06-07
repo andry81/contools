@@ -5,7 +5,7 @@ set "NSIS_LOG_FILE=%~1"
 set FIND_ERRORS=0
 set FIND_WARNINGS=0
 
-echo.Log file: "%CD%\%NSIS_LOG_FILE%"
+echo.Log file: "%CD:\=/%/%NSIS_LOG_FILE%"
 
 rem TODO:
 rem   * Fix not full Usage output, where prints only first text line:
