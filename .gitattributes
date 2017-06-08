@@ -370,7 +370,6 @@ Scripts/Tools/cygwin/etc/fstab -text
 Scripts/Tools/del_file.bat -text
 Scripts/Tools/del_file_pttn.bat -text
 Scripts/Tools/dirpath.bat -text
-Scripts/Tools/dos2unix.bat -text
 Scripts/Tools/dospath.bat -text
 Scripts/Tools/dumpmountdirs.sh -text
 Scripts/Tools/encoding/__init__.bat -text
@@ -379,6 +378,9 @@ Scripts/Tools/encoding/any2ansi.bat -text
 Scripts/Tools/encoding/boms/efbbbf.bin -text
 Scripts/Tools/encoding/boms/feff.bin -text svneol=unset#application/octet-stream
 Scripts/Tools/encoding/boms/fffe.bin -text svneol=unset#application/octet-stream
+Scripts/Tools/encoding/dos2unix.bat -text
+Scripts/Tools/encoding/makefile_dos2unix.bat -text
+Scripts/Tools/encoding/makefile_unix2dos.bat -text
 Scripts/Tools/envvarcmp.exe -text
 Scripts/Tools/errlvl.bat -text
 Scripts/Tools/excludes/7zip_svn_files.lst -text
@@ -419,6 +421,7 @@ Scripts/Tools/gnuwin32/bin/libiconv2.dll -text
 Scripts/Tools/gnuwin32/bin/libintl3.dll -text
 Scripts/Tools/gnuwin32/bin/regex2.dll -text
 Scripts/Tools/gnuwin32/bin/sed.exe -text
+Scripts/Tools/gnuwin32/bin/tr.exe -text
 Scripts/Tools/has_dir_files.bat -text
 Scripts/Tools/hashdeep/CHANGES.txt -text
 Scripts/Tools/hashdeep/COPYING.txt -text
@@ -529,7 +532,6 @@ Scripts/Tools/timediff.bat -text
 Scripts/Tools/timestamp.bat -text
 Scripts/Tools/touch.bat -text
 Scripts/Tools/traplib.sh -text
-Scripts/Tools/unix2dos.bat -text
 Scripts/Tools/unmountdir.sh -text
 Scripts/Tools/unset.bat -text
 Scripts/Tools/uuidgen.bat -text
