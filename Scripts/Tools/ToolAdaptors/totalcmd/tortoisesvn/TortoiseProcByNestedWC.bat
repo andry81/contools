@@ -28,6 +28,8 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
 )
 set LASTERROR=%ERRORLEVEL%
 
+:IGNORE_OUTTER_PROCESS
+
 :EXIT_MAIN
 rem cleanup temporary files
 rmdir /S /Q "%TEMP_FILE_OUTTER_DIR%"
@@ -37,7 +39,6 @@ rem   rem delete the external file in case if left behind
 rem   del /F /Q /A:-D "%TORTOISEPROC_PATHFILE_UCS16LE_TMP%"
 rem )
 
-:IGNORE_OUTTER_PROCESS
 exit /b %LASTERROR%
 
 :MAIN
@@ -104,21 +105,24 @@ if %FLAG_ALL_IN_ONE%%FLAG_WINDOW_PER_WCROOT% EQU 0 (
   )
 )
 
-if %FLAG_ALL_IN_ONE% EQU 0 goto IGNORE_OUTTER_INIT
-
 call "%%CONTOOLS_ROOT%%/get_datetime.bat"
 set "TEMP_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
 set "TEMP_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 
 set "TEMP_FILE_OUTTER_DIR=%TEMP%\%?~n0%.%TEMP_DATE%.%TEMP_TIME%"
-set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-crlf.lst"
-set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-cr.lst"
 
 rem create temporary files to store local context output
 if exist "%TEMP_FILE_OUTTER_DIR%\" (
   echo.%?~nx0%: error: temporary generated directory TEMP_FILE_OUTTER_DIR is already exist: "%TEMP_FILE_OUTTER_DIR%"
   exit /b 1
 ) >&2
+
+mkdir "%TEMP_FILE_OUTTER_DIR%"
+
+if %FLAG_ALL_IN_ONE% EQU 0 goto IGNORE_OUTTER_INIT
+
+set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-crlf.lst"
+set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-cr.lst"
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   rem use temporary file inside script temporary directory
@@ -127,8 +131,6 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
   rem use temporary file outside script temporary directory, delegate to TortoiseProc.exe it's deletion
   set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%TEMP%\%?~n0%.%TEMP_DATE%.%TEMP_TIME%.pathfile-ucs-16LE.lst"
 )
-
-mkdir "%TEMP_FILE_OUTTER_DIR%"
 
 rem create empty files
 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
@@ -139,11 +141,14 @@ if "%PWD%" == "" goto NOPWD
 ( %PWD:~0,2% && cd "%PWD%" ) || exit /b 1
 
 :NOPWD
-rem run only first TORTOISEPROC_MAX_CALLS
+rem count only success calls
 set CALL_INDEX=0
+rem task per subdir
+set OUTTER_TASK_INDEX=0
 
 rem run COMMAND over selected files/directories in the PWD directory
 :CURDIR_LOOP
+rem run only first TORTOISEPROC_MAX_CALLS
 if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% goto EXIT_CURDIR_LOOP
 
 set "FILENAME=%~1"
@@ -154,11 +159,15 @@ if not exist "%FILENAME%\" == "" goto NEXT_CURDIR
 
 if %FLAG_WINDOW_PER_WCROOT% EQU 0 goto IGNORE_INNER_INIT
 
-call "%%CONTOOLS_ROOT%%/get_datetime.bat"
-set "TEMP_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
-set "TEMP_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
+set INNER_TASK_INDEX=%OUTTER_TASK_INDEX%
 
-set "TEMP_FILE_INNER_DIR=%TEMP%\%?~n0%.%TEMP_DATE%.%TEMP_TIME%"
+set "FILENAME_DECORATED=%FILENAME:\=--%"
+set "FILENAME_DECORATED=%FILENAME_DECORATED:/=--%"
+set "FILENAME_DECORATED=%FILENAME_DECORATED::=--%"
+
+if "%INNER_TASK_INDEX:~1,1%" == "" set INNER_TASK_INDEX=0%INNER_TASK_INDEX%
+
+set "TEMP_FILE_INNER_DIR=%TEMP_FILE_OUTTER_DIR%\%INNER_TASK_INDEX%=%FILENAME_DECORATED%"
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TEMP_FILE_INNER_DIR%\pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%TEMP_FILE_INNER_DIR%\pathfile-ansi-cr.lst"
 
@@ -207,17 +216,11 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
   call :CMD start /B "" TortoiseProc.exe %%COMMAND%% /pathfile:"%%TORTOISEPROC_PATHFILE_UCS16LE_TMP%%" /deletepathfile
 )
 
-rem cleanup temporary files
-rmdir /S /Q "%TEMP_FILE_INNER_DIR%"
-
-rem if %FLAG_WAIT_EXIT% EQU 0 (
-rem   rem delete the external file in case if left behind
-rem   del /F /Q /A:-D "%TORTOISEPROC_PATHFILE_UCS16LE_TMP%"
-rem )
-
 :IGNORE_INNER_PROCESS
 
 :NEXT_CURDIR
+set /A OUTTER_TASK_INDEX+=1
+
 shift
 
 goto CURDIR_LOOP
