@@ -1,5 +1,8 @@
-TortoiseProc script:
-  - call by list, collect all parent directories where exists a child directory ".svn\" and create path list file in format of Unix(LF) UCS2 w/o BOM (x:\dir1\dir2).
-  - /command:repostatus /pathfile:"<pathfile>" /deletepathfile
-  - /command:commit /pathfile:"<pathfile>" /deletepathfile
-  - workaround repostatus not showing nested WC if they referenced in nested directories (can be workarounded through the entire directory tree replication by the "mklink /D" command)
+TortoiseProcByNestedWC script:
+  - /command:repostatus shows duplicated changes if pathfile list has parent paths and paths with externals to the same repository from parent path:
+      repo1/parent_path
+      repo1/parent_path/ext1
+    but, in this case this is correct duplication:
+      repo1/parent_path
+      repo2/parent_path/ext1
+  - /command:commit creates windows by selection, but instead should create by repository list (one window per directory list extracted from selection list groupped by the same repository)

@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.06.07
+* 2017.06.08
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -35,12 +35,12 @@
 
 For Notepad++:
 
-cmd_noconsole.vbs
+call_nowindow.vbs
 notepad_edit_files.bat -wait -npp -nosession "%P" %S
 
 For Windows Notepad:
 
-cmd_noconsole.vbs
+call_nowindow.vbs
 notepad_edit_files.bat "%P" %S
 
 ------------------------------------------------------------------------------
@@ -50,13 +50,13 @@ notepad_edit_files.bat "%P" %S
 
 For Notepad++:
 
-notepad_edit_files.bat -npp -nosession
-"%P" %S
+call_nowindow.vbs
+notepad_edit_files.bat -npp -nosession "%P" %S
 
 For Windows Notepad:
 
-notepad_edit_files.bat
-"%P" %S
+call_nowindow.vbs
+notepad_edit_files.bat "%P" %S
 
 ------------------------------------------------------------------------------
 2. Open Administator console window in current directory.
@@ -139,8 +139,8 @@ cmda.bat
 ------------------------------------------------------------------------------
 (all windows together)
 
-tortoisesvn\TortoiseProc.bat
-/command:properties "%P" %S
+call_nowindow.vbs
+tortoisesvn\TortoiseProc.bat /command:properties "%P" %S
 
 ------------------------------------------------------------------------------
 3.2 Method #2. For selected files and directores one after one over external editor.
@@ -160,8 +160,8 @@ externals_edit.bat
 ------------------------------------------------------------------------------
 (all windows together)
 
-tortoisesvn\TortoiseProc.bat
-/command:log "%P" %S
+call_nowindow.vbs
+tortoisesvn\TortoiseProc.bat /command:log "%P" %S
 
 ------------------------------------------------------------------------------
 5. Open TortoiseSVN commit dialogs for a directory separately for all nested versioned directories.
@@ -170,14 +170,14 @@ tortoisesvn\TortoiseProc.bat
 ------------------------------------------------------------------------------
 5.1. Method #1. One windows for all nested directories with changes.
 ------------------------------------------------------------------------------
-tortoisesvn\TortoiseProcByNestedWC.bat
--all-in-one /command:commit "%P" %S
+call_nowindow.vbs
+tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 5.2. Method #2. Window per each nested directory with changes.
 ------------------------------------------------------------------------------
-tortoisesvn\TortoiseProcByNestedWC.bat
--window-per-wcroot /command:commit "%P" %S
+call_nowindow.vbs
+tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 6. Open TortoiseSVN status dialog for a directory including all nested versioned directories.
@@ -186,25 +186,25 @@ tortoisesvn\TortoiseProcByNestedWC.bat
 ------------------------------------------------------------------------------
 6.1. Method #1. One windows for all nested directories.
 ------------------------------------------------------------------------------
-tortoisesvn\TortoiseProcByNestedWC.bat
--all-in-one /command:repostatus "%P" %S
+call_nowindow.vbs
+tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 6.2. Method #2. Window per each nested directory.
 ------------------------------------------------------------------------------
-tortoisesvn\TortoiseProcByNestedWC.bat
--window-per-wcroot /command:repostatus "%P" %S
+call_nowindow.vbs
+tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 7. One pane comparison for 2 selected files.
 ------------------------------------------------------------------------------
 
-cmd_noconsole.vbs
+call_nowindow.vbs
 compare_files.bat -wait "%P" %S
 
 ------------------------------------------------------------------------------
 8. One pane comparison for 2 selected files with sorted content.
 ------------------------------------------------------------------------------
 
-cmd_noconsole.vbs
+call_nowindow.vbs
 compare_sorted_files.bat -wait "%P" %S
