@@ -24,8 +24,8 @@ set "CONTOOLS_ROOT_COPY=%~dp0Tools"
 (
   echo.@echo off
   echo.
-  echo.set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
-  echo.set "CONTOOLS_ROOT_COPY=%CONTOOLS_ROOT_COPY%"
+  echo.set "CONTOOLS_ROOT_FROM=%CONTOOLS_ROOT%"
+  echo.set "CONTOOLS_ROOT_TO=%CONTOOLS_ROOT_COPY%"
 ) > "%~dp0configure.user.bat"
 
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
