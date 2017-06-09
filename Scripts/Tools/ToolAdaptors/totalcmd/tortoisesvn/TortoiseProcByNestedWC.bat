@@ -49,8 +49,8 @@ rem script flags
 set FLAG_WAIT_EXIT=0
 rem single window for all changes
 set FLAG_ALL_IN_ONE=0
-rem window per WC root
-set FLAG_WINDOW_PER_WCROOT=0
+rem window per WC directory
+set FLAG_WINDOW_PER_WCDIR=0
 
 :FLAGS_LOOP
 
@@ -66,11 +66,11 @@ if not "%FLAG%" == "" (
     shift
   ) else if "%FLAG%" == "-all-in-one" (
     set FLAG_ALL_IN_ONE=1
-    set FLAG_WINDOW_PER_WCROOT=0
+    set FLAG_WINDOW_PER_WCDIR=0
     shift
-  ) else if "%FLAG%" == "-window-per-wcroot" (
+  ) else if "%FLAG%" == "-window-per-wcdir" (
     set FLAG_ALL_IN_ONE=0
-    set FLAG_WINDOW_PER_WCROOT=1
+    set FLAG_WINDOW_PER_WCDIR=1
     shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
@@ -92,16 +92,16 @@ if "%COMMAND%" == "/command:repostatus" set COMMAND_REPOSTATUS=1
 if "%COMMAND%" == "/command:commit" set COMMAND_COMMIT=1
 
 rem window-per-wcroot by default in case of other commands
-if %FLAG_ALL_IN_ONE%%FLAG_WINDOW_PER_WCROOT% EQU 0 (
+if %FLAG_ALL_IN_ONE%%FLAG_WINDOW_PER_WCDIR% EQU 0 (
   if %COMMAND_REPOSTATUS% NEQ 0 (
     rem all-in-one by default in case of repostatus command
     set FLAG_ALL_IN_ONE=1
   ) else if %COMMAND_COMMIT% NEQ 0 (
     rem window-per-wcroot by default in case of commit command
-    set FLAG_WINDOW_PER_WCROOT=1
+    set FLAG_WINDOW_PER_WCDIR=1
   ) else (
     rem window-per-wcroot by default in case of other commands
-    set FLAG_WINDOW_PER_WCROOT=1
+    set FLAG_WINDOW_PER_WCDIR=1
   )
 )
 
@@ -149,21 +149,48 @@ set OUTTER_TASK_INDEX=0
 rem run COMMAND over selected files/directories in the PWD directory
 :CURDIR_LOOP
 rem run only first TORTOISEPROC_MAX_CALLS
-if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% goto EXIT_CURDIR_LOOP
+if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 0
 
 set "FILENAME=%~1"
-if "%FILENAME%" == "" goto EXIT_CURDIR_LOOP
+if "%FILENAME%" == "" exit /b 0
 
 rem ignore files selection
-if not exist "%FILENAME%\" == "" goto NEXT_CURDIR
+if not exist "%FILENAME%\" goto NEXT_CURDIR
 
-if %FLAG_WINDOW_PER_WCROOT% EQU 0 goto IGNORE_INNER_INIT
+rem reduce relative path to avoid . and .. characters
+call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILENAME%%"
+set "FILENAME=%RETURN_VALUE%"
+
+set "FILENAME_DECORATED=\%FILENAME%\"
+
+rem cut off suffix with .svn subdirectory
+if "%FILENAME_DECORATED:\.svn\=%" == "%FILENAME_DECORATED%" goto IGNORE_FILENAME_WCROOT_PATH_CUTOFF
+
+set "FILENAME_WCROOT_SUFFIX=%FILENAME_DECORATED:*.svn\=%"
+
+set "FILENAME_WCROOT_PREFIX=%FILENAME_DECORATED%"
+if "%FILENAME_WCROOT_SUFFIX%" == "" goto CUTOFF_WCROOT_PREFIX
+
+call set "FILENAME_WCROOT_PREFIX=%%FILENAME_DECORATED:\%FILENAME_WCROOT_SUFFIX%=%%"
+
+:CUTOFF_WCROOT_PREFIX
+rem remove bounds character and extract diretory path
+if "%FILENAME_DECORATED:~-1%" == "\" set "FILENAME_DECORATED=%FILENAME_DECORATED:~0,-1%"
+call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILENAME_DECORATED:~1%%" \ "" FILENAME
+
+rem should not be empty
+if "%FILENAME%" == "" set FILENAME=.
+
+:IGNORE_FILENAME_WCROOT_PATH_CUTOFF
+
+if %FLAG_WINDOW_PER_WCDIR% EQU 0 goto IGNORE_INNER_INIT
 
 set INNER_TASK_INDEX=%OUTTER_TASK_INDEX%
 
 set "FILENAME_DECORATED=%FILENAME:\=--%"
 set "FILENAME_DECORATED=%FILENAME_DECORATED:/=--%"
 set "FILENAME_DECORATED=%FILENAME_DECORATED::=--%"
+set "FILENAME_DECORATED=%FILENAME_DECORATED:.=%"
 
 if "%INNER_TASK_INDEX:~1,1%" == "" set INNER_TASK_INDEX=0%INNER_TASK_INDEX%
 
@@ -199,7 +226,7 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:D "%FILENAME%\*.s
 
 set /A CALL_INDEX+=1
 
-if %FLAG_WINDOW_PER_WCROOT% EQU 0 goto IGNORE_INNER_PROCESS
+if %FLAG_WINDOW_PER_WCDIR% EQU 0 goto IGNORE_INNER_PROCESS
 
 rem ignore empty lists
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
@@ -249,11 +276,12 @@ for /F "tokens=* delims=" %%i in ("%WCROOT_PATH%") do (echo.%%i) >> "%TORTOISEPR
 
 exit /b
 
+:GET_ABS_PATH
+set "ABS_PATH=%~dpf1"
+exit /b
+
 :GET_DIR_PARENT
 set "DIR_PARENT_PATH=%~dp1"
 rem remove last back slash in case if not the root directory of a drive
 if not "%DIR_PARENT_PATH:~-2,1%" == ":" set "DIR_PARENT_PATH=%DIR_PARENT_PATH:~0,-1%"
 exit /b
-
-:EXIT_CURDIR_LOOP
-exit /b 0

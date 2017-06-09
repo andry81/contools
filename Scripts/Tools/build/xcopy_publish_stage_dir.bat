@@ -48,7 +48,7 @@ set "FROM_BASE_PATH=%~2"
 set "TO_APP_DIR_PATH=%~3"
 
 rem <XCOPY_SUFFIX_PATH> = <FROM_DIR_PATH> - <FROM_BASE_PATH>
-call "%%CONTOOLS_ROOT%%/get_path_subtract.bat" "%%FROM_BASE_PATH%%" "%%FROM_DIR_PATH%%"
+call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%FROM_BASE_PATH%%" "%%FROM_DIR_PATH%%"
 set "XCOPY_SUFFIX_PATH=%RETURN_VALUE:\=/%"
 
 if not "%XCOPY_SUFFIX_PATH%" == "" (

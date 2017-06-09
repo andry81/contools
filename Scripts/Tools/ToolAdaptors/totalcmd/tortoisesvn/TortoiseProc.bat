@@ -2,6 +2,8 @@
 
 setlocal
 
+call "%%~dp0__init__.bat" || goto :EOF
+
 rem builtin defaults
 if "%TORTOISEPROC_MAX_CALLS%" == "" set TORTOISEPROC_MAX_CALLS=10
 
@@ -47,8 +49,33 @@ rem run COMMAND over selected files/directories in the PWD directory
 if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 0
 
 set "FILENAME=%~1"
-
 if "%FILENAME%" == "" exit /b 0
+
+rem reduce relative path to avoid . and .. characters
+call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILENAME%%"
+set "FILENAME=%RETURN_VALUE%"
+
+set "FILENAME_DECORATED=\%FILENAME%\"
+
+rem cut off suffix with .svn subdirectory
+if "%FILENAME_DECORATED:\.svn\=%" == "%FILENAME_DECORATED%" goto IGNORE_FILENAME_WCROOT_PATH_CUTOFF
+
+set "FILENAME_WCROOT_SUFFIX=%FILENAME_DECORATED:*.svn\=%"
+
+set "FILENAME_WCROOT_PREFIX=%FILENAME_DECORATED%"
+if "%FILENAME_WCROOT_SUFFIX%" == "" goto CUTOFF_WCROOT_PREFIX
+
+call set "FILENAME_WCROOT_PREFIX=%%FILENAME_DECORATED:\%FILENAME_WCROOT_SUFFIX%=%%"
+
+:CUTOFF_WCROOT_PREFIX
+rem remove bounds character and extract diretory path
+if "%FILENAME_DECORATED:~-1%" == "\" set "FILENAME_DECORATED=%FILENAME_DECORATED:~0,-1%"
+call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILENAME_DECORATED:~1%%" \ "" FILENAME
+
+rem should not be empty
+if "%FILENAME%" == "" set FILENAME=.
+
+:IGNORE_FILENAME_WCROOT_PATH_CUTOFF
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   call :CMD start /B /WAIT "" TortoiseProc.exe %%COMMAND%% /path:"%%FILENAME%%"
