@@ -3,6 +3,7 @@
 setlocal
 
 if exist "%~dp0configure.user.bat" ( call "%~dp0configure.user.bat" || goto :EOF )
+if not "%CONTOOLS_ROOT_FROM%" == "" set "CONTOOLS_ROOT=%CONTOOLS_ROOT_FROM%"
 
 if not "%CONTOOLS_ROOT%" == "" ^
 if exist "%CONTOOLS_ROOT%\" goto IGNORE_CONTOOLS_ROOT_INPUT
@@ -31,6 +32,10 @@ set "CONTOOLS_ROOT_COPY=%~dp0Tools"
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_datetime.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_filesize.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "reduce_relative_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "subtract_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "split_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "strlen.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/encoding" "%%CONTOOLS_ROOT_COPY%%/encoding" /E /Y /D || goto :EOF
 
 call :XCOPY_DIR "%%GNUWIN32_ROOT%%" "%%CONTOOLS_ROOT_COPY%%/gnuwin32" /E /Y /D || goto :EOF

@@ -413,7 +413,6 @@ Scripts/Tools/get_date_as_filename.bat -text
 Scripts/Tools/get_datetime.bat -text
 Scripts/Tools/get_filesize.bat -text
 Scripts/Tools/get_newest_file.bat -text
-Scripts/Tools/get_path_subtract.bat -text
 Scripts/Tools/get_time.bat -text
 Scripts/Tools/get_time_as_filename.bat -text
 Scripts/Tools/gnuwin32/bin/iconv.exe -text
@@ -495,6 +494,7 @@ Scripts/Tools/pstools/Eula.txt -text
 Scripts/Tools/pstools/Handle.exe -text
 Scripts/Tools/pstools/close_process_by_handle.bat -text
 Scripts/Tools/query_session_id.bat -text
+Scripts/Tools/reduce_relative_path.bat -text
 Scripts/Tools/regenum.bat -text
 Scripts/Tools/regexplib.sh -text
 Scripts/Tools/regquery.bat -text
@@ -524,6 +524,7 @@ Scripts/Tools/strrep.bat -text
 Scripts/Tools/strstr.bat -text
 Scripts/Tools/strtrim.bat -text
 Scripts/Tools/strupcase.bat -text
+Scripts/Tools/subtract_path.bat -text
 Scripts/Tools/synclib.sh -text
 Scripts/Tools/tee2.sh -text
 Scripts/Tools/testlib.sh -text
