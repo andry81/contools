@@ -59,7 +59,7 @@ rem otherwise handle.exe command line parser will fail because of trailing \" se
 if "%PROC_NAME:~-1%" == "\" set "PROC_NAME=%PROC_NAME%\"
 if "%OBJECT_NAME:~-1%" == "\" set "OBJECT_NAME=%OBJECT_NAME%\"
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`"handle.exe -p "%PROC_NAME%" "%OBJECT_NAME%" | findstr /R /C:"pid: .*type: ""`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`"handle.exe -p "%PROC_NAME%" "%OBJECT_NAME%" | findstr.exe /R /C:"pid: .*type: ""`) do (
   set "HANDLE_LINE=%%i"
   call :PROCESS_HANDLE_LINE
   if %FLAG_CLOSE_ALL% EQU 0 exit /b 0

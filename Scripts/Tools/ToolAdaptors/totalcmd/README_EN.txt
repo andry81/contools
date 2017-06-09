@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.06.08
+* 2017.06.09
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -15,12 +15,14 @@
 3.1 Method #1 (Main). For selected files and directories together over SVN GUI.
 3.2 Method #2. For selected files and directores one after one over external editor.
 4. Open SVN Log for selected files and directories together.
-5. Open TortoiseSVN commit dialogs for a directory separately for all nested versioned directories.
-5.1. Method #1. One windows for all nested directories with changes.
-5.2. Method #2. Window per each nested directory with changes.
-6. Open TortoiseSVN status dialog for a directory including all nested versioned directories.
-6.1. Method #1. One windows for all nested directories.
-6.2. Method #2. Window per each nested directory.
+5. Open TortoiseSVN status dialog for a set of WC directories.
+5.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes (always opens to show unversioned changes).
+5.2. Method #2. Window per unique repository root with or without versioned changes (always opens to show unversioned changes) in respective WC directory.
+5.3. Method #3. Window per WC directory with or without versioned changes (always opens to show unversioned changes).
+6. Open TortoiseSVN commit dialogs for a set of WC directories.
+6.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
+6.2. Method #2. One window for all WC directories with changes.
+6.3. Method #3. Window per each WC directory with changes.
 7. One pane comparison for 2 selected files.
 8. One pane comparison for 2 selected files with sorted content.
 
@@ -164,36 +166,48 @@ call_nowindow.vbs
 tortoisesvn\TortoiseProc.bat /command:log "%P" %S
 
 ------------------------------------------------------------------------------
-5. Open TortoiseSVN commit dialogs for a directory separately for all nested versioned directories.
+5. Open TortoiseSVN status dialog for a set of WC directories.
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-5.1. Method #1. One windows for all nested directories with changes.
+5.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes (always opens to show unversioned changes).
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
+-all-in-one tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
-5.2. Method #2. Window per each nested directory with changes.
+5.2. Method #2. Window per unique repository root with or without versioned changes (always opens to show unversioned changes) in respective WC directory.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
+-window-per-reporoot tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
-6. Open TortoiseSVN status dialog for a directory including all nested versioned directories.
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-6.1. Method #1. One windows for all nested directories.
+5.3. Method #3. Window per WC directory with or without versioned changes (always opens to show unversioned changes).
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
+-window-per-wcdir tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
-6.2. Method #2. Window per each nested directory.
+6. Open TortoiseSVN commit dialogs for a set of WC directories.
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+6.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
+-window-per-reporoot -show-if-has-versioned-changes tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
+
+------------------------------------------------------------------------------
+6.2. Method #2. One window for all WC directories with changes.
+------------------------------------------------------------------------------
+call_nowindow.vbs
+-all-in-one -show-if-has-versioned-changes tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
+
+------------------------------------------------------------------------------
+6.3. Method #3. Window per each WC directory with changes.
+------------------------------------------------------------------------------
+call_nowindow.vbs
+-window-per-wcdir -show-if-has-versioned-changes tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 7. One pane comparison for 2 selected files.

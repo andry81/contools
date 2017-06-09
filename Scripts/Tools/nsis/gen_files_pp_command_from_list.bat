@@ -73,7 +73,7 @@ goto PROCESS_FILE_EXT_LIST_LOOP
 set FILE_INDEX=0
 set "LAST_FILE_PATH="
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\)/\1\\/" "%FILE_PATH_LIST_FILE%" ^| sort ^| "%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/" ^| findstr %FINDSTR_CMD_LINE%`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\)/\1\\/" "%FILE_PATH_LIST_FILE%" ^| sort ^| "%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/" ^| findstr.exe %FINDSTR_CMD_LINE%`) do (
   set "FILE_PATH=%%i"
   call :PROCESS_FILE_PATH || goto :EOF
 )

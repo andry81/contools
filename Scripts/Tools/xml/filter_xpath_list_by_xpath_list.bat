@@ -131,4 +131,4 @@ set SED_SEARCH_PREFIX_CMD_LINE=-e "/^#/ !{ /[^\/]\[@/ { s/\([^\/]\)\[@/\1\/[@/; 
 
 rem apply filter list to search list and remove flat list prefixes, convert empty lines to special comments to save them in output, remove "/" from end of each xpath
 set SED_CLEANUP_LAST_CMD_LINE=-e "/^#/ { s/^# :EOL$//; }; /^#/ !{ /./ { s/.*|//; } }; /\/\[@/ { s/\/\[@/[@/; }; /\/\[@/ !{ s/\/$//; }"
-"%GNUWIN32_ROOT%/bin/sed.exe" -e "/./ !{ s/^$/# :EOL/ }" "%XPATH_LIST_FILE_IN_TEMP_FILE%" | findstr /R /B /G:"%XPATH_LIST_FILE_FILTER_TEMP_FILE%" /C:"#" | "%GNUWIN32_ROOT%/bin/sed.exe" %SED_CLEANUP_LAST_CMD_LINE%
+"%GNUWIN32_ROOT%/bin/sed.exe" -e "/./ !{ s/^$/# :EOL/ }" "%XPATH_LIST_FILE_IN_TEMP_FILE%" | findstr.exe /R /B /G:"%XPATH_LIST_FILE_FILTER_TEMP_FILE%" /C:"#" | "%GNUWIN32_ROOT%/bin/sed.exe" %SED_CLEANUP_LAST_CMD_LINE%
