@@ -5,4 +5,3 @@ TortoiseProcByNestedWC script:
     but, in this case this is correct duplication:
       repo1/parent_path
       repo2/parent_path/ext1
-  - /command:commit creates windows by selection, but instead should create by repository list (one window per directory list extracted from selection list groupped by the same repository)

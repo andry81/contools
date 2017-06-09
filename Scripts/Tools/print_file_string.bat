@@ -179,17 +179,17 @@ rem set "CONTOOLS_ROOT=%CONTOOLS_ROOT:\=/%"
 if "%CONTOOLS_ROOT:~-1%" == "\" set "CONTOOLS_ROOT=%CONTOOLS_ROOT:~0,-1%"
 
 if %FLAG_FILE_FORMAT_PE% EQU 0 (
-  set CMD_LINE=type "%FILE_PATH_PREFIX%%FILE_PATH%" ^| findstr !FINDSTR_FIRST_FILTER_CMD_LINE!
+  set CMD_LINE=type "%FILE_PATH_PREFIX%%FILE_PATH%" ^| findstr.exe !FINDSTR_FIRST_FILTER_CMD_LINE!
 ) else (
   rem add EULA acception into registry to avoid EULA acception GUI dialog
   reg add HKCU\Software\Sysinternals\Strings /v EulaAccepted /t REG_DWORD /d 0x00000001 /f >nul 2>nul
 
   rem @ for bug case workaround
-  set CMD_LINE=@"%CONTOOLS_ROOT%/strings.exe" -q "%FILE_PATH_PREFIX%%FILE_PATH%" ^| findstr !FINDSTR_FIRST_FILTER_CMD_LINE!
+  set CMD_LINE=@"%CONTOOLS_ROOT%/strings.exe" -q "%FILE_PATH_PREFIX%%FILE_PATH%" ^| findstr.exe !FINDSTR_FIRST_FILTER_CMD_LINE!
 )
 
-if %FLAG_F1_LINE_NUMBER_FILTER% NEQ 0 set CMD_LINE=!CMD_LINE! ^| findstr /N /R /C:".*"
-if not "!FINDSTR_LINES_FILTER_CMD_LINE!" == "" set CMD_LINE=!CMD_LINE! ^| findstr !FINDSTR_LINES_FILTER_CMD_LINE!
+if %FLAG_F1_LINE_NUMBER_FILTER% NEQ 0 set CMD_LINE=!CMD_LINE! ^| findstr.exe /N /R /C:".*"
+if not "!FINDSTR_LINES_FILTER_CMD_LINE!" == "" set CMD_LINE=!CMD_LINE! ^| findstr.exe !FINDSTR_LINES_FILTER_CMD_LINE!
 
 rem echo !CMD_LINE! >&2
 (
@@ -200,7 +200,7 @@ rem echo !CMD_LINE! >&2
     if %FLAG_PRINT_LINE_NUMBER_PREFIX% NEQ 0 (
       %CMD_LINE% 2>nul
     ) else ( 
-      for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`^(%CMD_LINE: | findstr = ^| findstr %^) 2^>nul`) do echo.%%j
+      for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`^(%CMD_LINE: | findstr.exe = ^| findstr.exe %^) 2^>nul`) do echo.%%j
     )
   ) else (
     %CMD_LINE% 2>nul

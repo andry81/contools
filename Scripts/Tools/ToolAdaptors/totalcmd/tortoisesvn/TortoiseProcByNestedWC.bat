@@ -7,14 +7,18 @@ call "%%~dp0__init__.bat" || goto :EOF
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
+rem builtin defaults
+if "%TORTOISEPROC_MAX_CALLS%" == "" set TORTOISEPROC_MAX_CALLS=10
+if "%TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS%" == "" set TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS=20
+
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
-if %FLAG_ALL_IN_ONE% EQU 0 goto IGNORE_OUTTER_PROCESS
+if %FLAG_ALL_IN_ONE% EQU 0 goto IGNORE_OUTTER_ALL_IN_ONE_PROCESS
 
 rem ignore empty lists
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
-if %ERRORLEVEL% EQU 0 goto IGNORE_OUTTER_PROCESS
+if %ERRORLEVEL% EQU 0 goto IGNORE_OUTTER_ALL_IN_ONE_PROCESS
 
 rem convert dos line returns to unix
 call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto EXIT_MAIN
@@ -28,7 +32,116 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
 )
 set LASTERROR=%ERRORLEVEL%
 
-:IGNORE_OUTTER_PROCESS
+:IGNORE_OUTTER_ALL_IN_ONE_PROCESS
+
+if %FLAG_WINDOW_PER_REPOROOT% EQU 0 goto IGNORE_OUTTER_WINDOW_PER_REPOROOT_PROCESS
+
+rem to preserve the order through the dir command call
+set REPOROOT_NEXT_INDEX=0
+
+rem to prefix task index by number with zeros to correct order in case of single dir command
+set REPOROOT_LAST_INDEX=%REPOROOT_INDEX%
+call "%%CONTOOLS_ROOT%%/strlen.bat" /v REPOROOT_LAST_INDEX
+set REPOROOT_LAST_INDEX_STR_LEN=%ERRORLEVEL%
+set /A REPOROOT_LAST_INDEX_STR_LEN_INDEX=REPOROOT_LAST_INDEX_STR_LEN-1
+
+for /F "usebackq eol=	 tokens=1,2 delims=|" %%i in ("%TORTOISEPROC_PATHFILE_WORKINGSET_TMP%") do (
+  set WCDIR_PATH=%%i
+  set REPOROOT=%%j
+  call :PREPROCESS_OUTTER_WINDOW_PER_REPOROOT
+)
+goto OUTTER_WINDOW_PER_REPOROOT_PREPROCESS_END
+
+:PREPROCESS_OUTTER_WINDOW_PER_REPOROOT
+rem for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH% %REPOROOT%") do (echo.%%i)
+set "REPOROOT_DECORATED=%REPOROOT:\=--%"
+set "REPOROOT_DECORATED=%REPOROOT_DECORATED:/=--%"
+set "REPOROOT_DECORATED=%REPOROOT_DECORATED::=--%"
+set "REPOROOT_DECORATED=%REPOROOT_DECORATED:.=%"
+
+set "REPOROOT_TASK_INDEX_DIR=%TEMP_FILE_OUTTER_DIR%\reporoots_index\%REPOROOT_DECORATED%"
+set "REPOROOT_TASK_INDEX_FILE=%REPOROOT_TASK_INDEX_DIR%\index.var"
+if not exist "%REPOROOT_TASK_INDEX_DIR%\" (
+  mkdir "%REPOROOT_TASK_INDEX_DIR%"
+  rem create index file
+  set REPOROOT_INDEX=%REPOROOT_NEXT_INDEX%
+  set /A REPOROOT_NEXT_INDEX+=1
+  (call echo.%%REPOROOT_INDEX%%) > "%REPOROOT_TASK_INDEX_FILE%"
+) else set /P REPOROOT_INDEX=< "%REPOROOT_TASK_INDEX_FILE%"
+
+set REPOROOT_INDEX_DECORATED=%REPOROOT_INDEX%
+for /L %%i in (1,1,%REPOROOT_LAST_INDEX_STR_LEN%) do (
+  call "%%CONTOOLS_ROOT%%/std/if_.bat" "%%REPOROOT_INDEX_DECORATED:~%REPOROOT_LAST_INDEX_STR_LEN_INDEX%,1%%" == "" && call set "REPOROOT_INDEX_DECORATED=0%%REPOROOT_INDEX_DECORATED%%"
+)
+
+set "REPOROOT_TASK_DIR_DECORATED=%REPOROOT_INDEX_DECORATED%=%REPOROOT_DECORATED%"
+set "REPOROOT_TASK_DIR=%TEMP_FILE_OUTTER_DIR%\reporoots\%REPOROOT_TASK_DIR_DECORATED%"
+set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf.lst"
+
+if not exist "%REPOROOT_TASK_DIR%\" (
+  mkdir "%REPOROOT_TASK_DIR%"
+  rem create empty files
+  type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
+)
+
+rem save to pathfile associated with repository root
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
+
+exit /b
+
+:OUTTER_WINDOW_PER_REPOROOT_PREPROCESS_END
+rem count only success calls
+set CALL_INDEX=0
+
+for /F "usebackq eol=	 tokens=1,2 delims==" %%i in (`@pushd "%TEMP_FILE_OUTTER_DIR%\reporoots" ^&^& ^( dir /B /A:D "*=*" 2^>nul ^& popd ^)`) do (
+  set REPOROOT_INDEX_DECORATED=%%i
+  set REPOROOT_DIR_DECORATED=%%j
+  call :PROCESS_OUTTER_WINDOW_PER_REPOROOT || goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_END
+)
+goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_END
+
+:PROCESS_OUTTER_WINDOW_PER_REPOROOT
+rem run only first TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS
+if %CALL_INDEX% GEQ %TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS% exit /b 1
+
+set REPOROOT_INDEX_DECORATED_DECORATED=0%REPOROOT_INDEX_DECORATED%
+set REPOROOT_INDEX=%REPOROOT_INDEX_DECORATED_DECORATED:*0=%
+set "REPOROOT_TASK_DIR_DECORATED=%REPOROOT_INDEX_DECORATED%=%REPOROOT_DIR_DECORATED%"
+set "REPOROOT_TASK_DIR=%TEMP_FILE_OUTTER_DIR%\reporoots\%REPOROOT_TASK_DIR_DECORATED%"
+set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf.lst"
+set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-cr.lst"
+
+if %FLAG_WAIT_EXIT% NEQ 0 (
+  rem use temporary file inside script temporary directory
+  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%REPOROOT_TASK_DIR%\pathfile-ucs-16LE.lst"
+) else (
+  rem use temporary file outside script temporary directory, delegate to TortoiseProc.exe it's deletion
+  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%TEMP%\%?~n0%.pathfile-ucs-16LE.%TEMP_DATE%.%TEMP_TIME%.%REPOROOT_TASK_DIR_DECORATED%.lst"
+)
+
+rem ignore empty lists
+call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
+if %ERRORLEVEL% EQU 0 exit /b 0
+
+rem convert dos line returns to unix
+call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_EXIT
+rem convert to UCS-16BE w/o bom
+call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" "" UCS-2LE "%%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%%" > "%TORTOISEPROC_PATHFILE_UCS16LE_TMP%" || goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_EXIT
+rem execute path file
+if %FLAG_WAIT_EXIT% NEQ 0 (
+  call :CMD start /B /WAIT "" TortoiseProc.exe %%COMMAND%% /pathfile:"%%TORTOISEPROC_PATHFILE_UCS16LE_TMP%%"
+) else (
+  call :CMD start /B "" TortoiseProc.exe %%COMMAND%% /pathfile:"%%TORTOISEPROC_PATHFILE_UCS16LE_TMP%%" /deletepathfile
+)
+
+:OUTTER_WINDOW_PER_REPOROOT_PROCESS_EXIT
+set /A CALL_INDEX+=1
+
+exit /b 0
+
+:OUTTER_WINDOW_PER_REPOROOT_PROCESS_END
+:IGNORE_OUTTER_WINDOW_PER_REPOROOT_PROCESS
+set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
 rem cleanup temporary files
@@ -42,15 +155,16 @@ rem )
 exit /b %LASTERROR%
 
 :MAIN
-rem builtin defaults
-if "%TORTOISEPROC_MAX_CALLS%" == "" set TORTOISEPROC_MAX_CALLS=10
-
 rem script flags
 set FLAG_WAIT_EXIT=0
 rem single window for all changes
 set FLAG_ALL_IN_ONE=0
 rem window per WC directory
 set FLAG_WINDOW_PER_WCDIR=0
+rem window per repository root
+set FLAG_WINDOW_PER_REPOROOT=0
+rem show if has versioned changes
+set FLAG_SHOW_IF_HAS_VERSIONED_CHANGES=0
 
 :FLAGS_LOOP
 
@@ -67,10 +181,20 @@ if not "%FLAG%" == "" (
   ) else if "%FLAG%" == "-all-in-one" (
     set FLAG_ALL_IN_ONE=1
     set FLAG_WINDOW_PER_WCDIR=0
+    set FLAG_WINDOW_PER_REPOROOT=0
     shift
   ) else if "%FLAG%" == "-window-per-wcdir" (
     set FLAG_ALL_IN_ONE=0
     set FLAG_WINDOW_PER_WCDIR=1
+    set FLAG_WINDOW_PER_REPOROOT=0
+    shift
+  ) else if "%FLAG%" == "-window-per-reporoot" (
+    set FLAG_ALL_IN_ONE=0
+    set FLAG_WINDOW_PER_WCDIR=0
+    set FLAG_WINDOW_PER_REPOROOT=1
+    shift
+  ) else if "%FLAG%" == "-show-if-has-versioned-changes" (
+    set FLAG_SHOW_IF_HAS_VERSIONED_CHANGES=1
     shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
@@ -91,16 +215,15 @@ set COMMAND_COMMIT=0
 if "%COMMAND%" == "/command:repostatus" set COMMAND_REPOSTATUS=1
 if "%COMMAND%" == "/command:commit" set COMMAND_COMMIT=1
 
-rem window-per-wcroot by default in case of other commands
-if %FLAG_ALL_IN_ONE%%FLAG_WINDOW_PER_WCDIR% EQU 0 (
+if %FLAG_ALL_IN_ONE%%FLAG_WINDOW_PER_WCDIR%%FLAG_WINDOW_PER_REPOROOT% EQU 0 (
   if %COMMAND_REPOSTATUS% NEQ 0 (
     rem all-in-one by default in case of repostatus command
     set FLAG_ALL_IN_ONE=1
   ) else if %COMMAND_COMMIT% NEQ 0 (
-    rem window-per-wcroot by default in case of commit command
-    set FLAG_WINDOW_PER_WCDIR=1
+    rem window-per-reporoot by default in case of commit command
+    set FLAG_WINDOW_PER_REPOROOT=1
   ) else (
-    rem window-per-wcroot by default in case of other commands
+    rem window-per-wcdir by default in case of other commands
     set FLAG_WINDOW_PER_WCDIR=1
   )
 )
@@ -119,21 +242,26 @@ if exist "%TEMP_FILE_OUTTER_DIR%\" (
 
 mkdir "%TEMP_FILE_OUTTER_DIR%"
 
-if %FLAG_ALL_IN_ONE% EQU 0 goto IGNORE_OUTTER_INIT
+if %FLAG_ALL_IN_ONE% EQU 0 ^
+if %FLAG_WINDOW_PER_REPOROOT% EQU 0 goto IGNORE_OUTTER_INIT
 
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-cr.lst"
+set "TORTOISEPROC_PATHFILE_WORKINGSET_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-workingset.lst"
+set "TORTOISEPROC_PATHFILE_INFO_TMP=%TEMP_FILE_OUTTER_DIR%\$info.txt"
+set "TASKS_NUM_VARFILE_TMP=%TEMP_FILE_OUTTER_DIR%\num_tasks.var"
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   rem use temporary file inside script temporary directory
   set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ucs-16LE.lst"
 ) else (
   rem use temporary file outside script temporary directory, delegate to TortoiseProc.exe it's deletion
-  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%TEMP%\%?~n0%.%TEMP_DATE%.%TEMP_TIME%.pathfile-ucs-16LE.lst"
+  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%TEMP%\%?~n0%.pathfile-ucs-16LE.%TEMP_DATE%.%TEMP_TIME%.lst"
 )
 
 rem create empty files
 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
+if %FLAG_WINDOW_PER_REPOROOT% NEQ 0 ( type nul > "%TORTOISEPROC_PATHFILE_WORKINGSET_TMP%" )
 
 :IGNORE_OUTTER_INIT
 
@@ -143,6 +271,8 @@ if "%PWD%" == "" goto NOPWD
 :NOPWD
 rem count only success calls
 set CALL_INDEX=0
+rem count unique repository roots
+set REPOROOT_INDEX=-1
 rem task per subdir
 set OUTTER_TASK_INDEX=0
 
@@ -151,77 +281,78 @@ rem run COMMAND over selected files/directories in the PWD directory
 rem run only first TORTOISEPROC_MAX_CALLS
 if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 0
 
-set "FILENAME=%~1"
-if "%FILENAME%" == "" exit /b 0
+set "FILEPATH=%~1"
+if "%FILEPATH%" == "" exit /b 0
 
 rem ignore files selection
-if not exist "%FILENAME%\" goto NEXT_CURDIR
+if not exist "%FILEPATH%\" goto NEXT_CURDIR
 
 rem reduce relative path to avoid . and .. characters
-call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILENAME%%"
-set "FILENAME=%RETURN_VALUE%"
+call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILEPATH%%"
+set "FILEPATH=%RETURN_VALUE%"
 
-set "FILENAME_DECORATED=\%FILENAME%\"
+set "FILEPATH_DECORATED=\%FILEPATH%\"
 
 rem cut off suffix with .svn subdirectory
-if "%FILENAME_DECORATED:\.svn\=%" == "%FILENAME_DECORATED%" goto IGNORE_FILENAME_WCROOT_PATH_CUTOFF
+if "%FILEPATH_DECORATED:\.svn\=%" == "%FILEPATH_DECORATED%" goto IGNORE_FILEPATH_WCDIR_PATH_CUTOFF
 
-set "FILENAME_WCROOT_SUFFIX=%FILENAME_DECORATED:*.svn\=%"
+set "FILEPATH_WCROOT_SUFFIX=%FILEPATH_DECORATED:*.svn\=%"
 
-set "FILENAME_WCROOT_PREFIX=%FILENAME_DECORATED%"
-if "%FILENAME_WCROOT_SUFFIX%" == "" goto CUTOFF_WCROOT_PREFIX
+set "FILEPATH_WCROOT_PREFIX=%FILEPATH_DECORATED%"
+if "%FILEPATH_WCROOT_SUFFIX%" == "" goto CUTOFF_WCROOT_PREFIX
 
-call set "FILENAME_WCROOT_PREFIX=%%FILENAME_DECORATED:\%FILENAME_WCROOT_SUFFIX%=%%"
+call set "FILEPATH_WCROOT_PREFIX=%%FILEPATH_DECORATED:\%FILEPATH_WCROOT_SUFFIX%=%%"
 
 :CUTOFF_WCROOT_PREFIX
 rem remove bounds character and extract diretory path
-if "%FILENAME_DECORATED:~-1%" == "\" set "FILENAME_DECORATED=%FILENAME_DECORATED:~0,-1%"
-call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILENAME_DECORATED:~1%%" \ "" FILENAME
+if "%FILEPATH_DECORATED:~-1%" == "\" set "FILEPATH_DECORATED=%FILEPATH_DECORATED:~0,-1%"
+call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILEPATH_DECORATED:~1%%" \ "" FILEPATH
 
 rem should not be empty
-if "%FILENAME%" == "" set FILENAME=.
+if "%FILEPATH%" == "" set FILEPATH=.
 
-:IGNORE_FILENAME_WCROOT_PATH_CUTOFF
+:IGNORE_FILEPATH_WCDIR_PATH_CUTOFF
 
 if %FLAG_WINDOW_PER_WCDIR% EQU 0 goto IGNORE_INNER_INIT
 
 set INNER_TASK_INDEX=%OUTTER_TASK_INDEX%
 
-set "FILENAME_DECORATED=%FILENAME:\=--%"
-set "FILENAME_DECORATED=%FILENAME_DECORATED:/=--%"
-set "FILENAME_DECORATED=%FILENAME_DECORATED::=--%"
-set "FILENAME_DECORATED=%FILENAME_DECORATED:.=%"
+set "FILEPATH_DECORATED=%FILEPATH:\=--%"
+set "FILEPATH_DECORATED=%FILEPATH_DECORATED:/=--%"
+set "FILEPATH_DECORATED=%FILEPATH_DECORATED::=--%"
+set "FILEPATH_DECORATED=%FILEPATH_DECORATED:.=%"
 
 if "%INNER_TASK_INDEX:~1,1%" == "" set INNER_TASK_INDEX=0%INNER_TASK_INDEX%
 
-set "TEMP_FILE_INNER_DIR=%TEMP_FILE_OUTTER_DIR%\%INNER_TASK_INDEX%=%FILENAME_DECORATED%"
-set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TEMP_FILE_INNER_DIR%\pathfile-ansi-crlf.lst"
-set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%TEMP_FILE_INNER_DIR%\pathfile-ansi-cr.lst"
+set "FILEPATH_TASK_DIR_DECORATED=%INNER_TASK_INDEX%=%FILEPATH_DECORATED%"
+set "FILEPATH_TASK_DIR=%TEMP_FILE_OUTTER_DIR%\wcdirs\%FILEPATH_TASK_DIR_DECORATED%"
+set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\pathfile-ansi-crlf.lst"
+set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%FILEPATH_TASK_DIR%\pathfile-ansi-cr.lst"
 
 rem create temporary files to store local context output
-if exist "%TEMP_FILE_INNER_DIR%\" (
-  echo.%?~nx0%: error: temporary generated directory TEMP_FILE_INNER_DIR is already exist: "%TEMP_FILE_INNER_DIR%"
+if exist "%FILEPATH_TASK_DIR%\" (
+  echo.%?~nx0%: error: temporary generated directory FILEPATH_TASK_DIR is already exist: "%FILEPATH_TASK_DIR%"
   exit /b 2
 ) >&2
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   rem use temporary file inside script temporary directory
-  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%TEMP_FILE_INNER_DIR%\pathfile-ucs-16LE.lst"
+  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%FILEPATH_TASK_DIR%\pathfile-ucs-16LE.lst"
 ) else (
   rem use temporary file outside script temporary directory, delegate to TortoiseProc.exe it's deletion
-  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%TEMP%\%?~n0%.%TEMP_DATE%.%TEMP_TIME%.pathfile-ucs-16LE.lst"
+  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%TEMP%\%?~n0%.pathfile-ucs-16LE.%TEMP_DATE%.%TEMP_TIME%.lst"
 )
 
-mkdir "%TEMP_FILE_INNER_DIR%"
+mkdir "%FILEPATH_TASK_DIR%"
 
 rem recreate empty files
 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
 :IGNORE_INNER_INIT
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:D "%FILENAME%\*.svn" 2^>nul`) do (
-  set DIR_PATH=%%i
-  call :PROCESS_DIR_PATH
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:D "%FILEPATH%\*.svn" 2^>nul`) do (
+  set WCDIR_PATH=%%i
+  call :PROCESS_WCDIR_PATH
 )
 
 set /A CALL_INDEX+=1
@@ -257,22 +388,43 @@ echo.^>%*
 (%*)
 exit /b
 
-:PROCESS_DIR_PATH
-call :GET_DIR_PARENT "%%DIR_PATH%%"
-set "WCROOT_PATH=%DIR_PARENT_PATH%"
+:PROCESS_WCDIR_PATH
+call :GET_WCDIR_PARENT "%%WCDIR_PATH%%"
+set "WCDIR_PATH=%WCDIR_PARENT_PATH%"
 
-if %COMMAND_COMMIT% EQU 0 goto IGNORE_STATUS_REQUEST
+if %FLAG_SHOW_IF_HAS_VERSIONED_CHANGES% EQU 0 goto IGNORE_STATUS_REQUEST
 
-call "%%SVNCMD_TOOLS_ROOT%%/svn_has_changes.bat" -stat-exclude-? "%%WCROOT_PATH%%" >nul 2>nul
+call "%%SVNCMD_TOOLS_ROOT%%/svn_has_changes.bat" -stat-exclude-? "%%WCDIR_PATH%%" >nul 2>nul
 rem call anyway if error happened
 if %ERRORLEVEL% EQU 0 ^
 if %RETURN_VALUE% EQU 0 exit /b 0
 
 :IGNORE_STATUS_REQUEST
 
-rem write to path file (special form of the echo command to ignore special characters in the WCROOT_PATH value)
-rem set "WCROOT_PATH=%WCROOT_PATH:\=/%"
-for /F "tokens=* delims=" %%i in ("%WCROOT_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
+rem write to path file (special form of the echo command to ignore special characters in the WCDIR_PATH value)
+rem set "WCDIR_PATH=%WCDIR_PATH:\=/%"
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
+
+if %FLAG_WINDOW_PER_REPOROOT% EQU 0 exit /b
+
+rem get file path svn info
+svn info "%WCDIR_PATH%" > "%TORTOISEPROC_PATHFILE_INFO_TMP%" 2>nul
+rem ignore on error
+if %ERRORLEVEL% NEQ 0 exit /b 0
+
+rem read repository Root
+call "%%CONTOOLS_ROOT%%/scm/svn/extract_info_param.bat" "%%TORTOISEPROC_PATHFILE_INFO_TMP%%" "Repository Root"
+rem ignore on error
+if %ERRORLEVEL% NEQ 0 exit /b 0
+
+set "REPOROOT=%RETURN_VALUE%"
+
+rem count unique repository roots
+type "%TORTOISEPROC_PATHFILE_WORKINGSET_TMP%" | findstr.exe /L "|%REPOROOT%|" >nul 2>nul
+if %ERRORLEVEL% NEQ 0 set /A REPOROOT_INDEX+=1
+
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do ^
+for /F "eol=	 tokens=* delims=" %%j in ("%REPOROOT%") do (echo.%%i^|%%j^|) >> "%TORTOISEPROC_PATHFILE_WORKINGSET_TMP%"
 
 exit /b
 
@@ -280,8 +432,8 @@ exit /b
 set "ABS_PATH=%~dpf1"
 exit /b
 
-:GET_DIR_PARENT
-set "DIR_PARENT_PATH=%~dp1"
+:GET_WCDIR_PARENT
+set "WCDIR_PARENT_PATH=%~dp1"
 rem remove last back slash in case if not the root directory of a drive
-if not "%DIR_PARENT_PATH:~-2,1%" == ":" set "DIR_PARENT_PATH=%DIR_PARENT_PATH:~0,-1%"
+if not "%WCDIR_PARENT_PATH:~-2,1%" == ":" set "WCDIR_PARENT_PATH=%WCDIR_PARENT_PATH:~0,-1%"
 exit /b

@@ -441,7 +441,6 @@ Scripts/Tools/hashdeep/whirlpooldeep.exe -text
 Scripts/Tools/hashdeep/whirlpooldeep64.exe -text
 Scripts/Tools/hashlib.sh -text
 Scripts/Tools/head.bat -text
-Scripts/Tools/if_.bat -text
 Scripts/Tools/iffexist.bat -text
 Scripts/Tools/index_patch_file.bat -text
 Scripts/Tools/index_pathstr.bat -text
@@ -512,6 +511,7 @@ Scripts/Tools/sqlite/sqlite3.exe -text
 Scripts/Tools/sqlite/sqlite3_analyzer.exe -text
 Scripts/Tools/std/append_list_from_string.bat -text
 Scripts/Tools/std/clear_list.bat -text
+Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
 Scripts/Tools/strchr.bat -text
 Scripts/Tools/stresc.bat -text

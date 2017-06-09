@@ -19,10 +19,10 @@ rem the drive must be the same before subtraction
 if /i not "%FROM_PATH:~0,1%" == "%TO_PATH:~0,1%" exit /b 1
 
 call "%%CONTOOLS_ROOT%%/strlen.bat" /v FROM_PATH
-set /A FROM_PATH_LEN=%ERRORLEVEL%
+set FROM_PATH_LEN=%ERRORLEVEL%
 
 call "%%CONTOOLS_ROOT%%/strlen.bat" /v TO_PATH
-set /A TO_PATH_LEN=%ERRORLEVEL%
+set TO_PATH_LEN=%ERRORLEVEL%
 
 set "PATH_SUBTRUCT="
 
