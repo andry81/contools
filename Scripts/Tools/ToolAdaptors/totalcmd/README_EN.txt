@@ -173,19 +173,19 @@ tortoisesvn\TortoiseProc.bat /command:log "%P" %S
 5.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes (always opens to show unversioned changes).
 ------------------------------------------------------------------------------
 call_nowindow.vbs
--all-in-one tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
+tortoisesvn\TortoiseProcByNestedWC.bat -all-in-one /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 5.2. Method #2. Window per unique repository root with or without versioned changes (always opens to show unversioned changes) in respective WC directory.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
--window-per-reporoot tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
+tortoisesvn\TortoiseProcByNestedWC.bat -window-per-reporoot /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 5.3. Method #3. Window per WC directory with or without versioned changes (always opens to show unversioned changes).
 ------------------------------------------------------------------------------
 call_nowindow.vbs
--window-per-wcdir tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
+tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcdir /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 6. Open TortoiseSVN commit dialogs for a set of WC directories.
@@ -195,19 +195,19 @@ call_nowindow.vbs
 6.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
--window-per-reporoot -show-if-has-versioned-changes tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
+tortoisesvn\TortoiseProcByNestedWC.bat -window-per-reporoot -show-if-has-versioned-changes /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 6.2. Method #2. One window for all WC directories with changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
--all-in-one -show-if-has-versioned-changes tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
+tortoisesvn\TortoiseProcByNestedWC.bat -all-in-one -show-if-has-versioned-changes /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 6.3. Method #3. Window per each WC directory with changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
--window-per-wcdir -show-if-has-versioned-changes tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
+tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcdir -show-if-has-versioned-changes /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 7. One pane comparison for 2 selected files.

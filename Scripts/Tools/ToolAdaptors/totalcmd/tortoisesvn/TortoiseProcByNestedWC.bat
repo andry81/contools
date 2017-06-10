@@ -57,7 +57,6 @@ rem for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH% %REPOROOT%") do (echo.
 set "REPOROOT_DECORATED=%REPOROOT:\=--%"
 set "REPOROOT_DECORATED=%REPOROOT_DECORATED:/=--%"
 set "REPOROOT_DECORATED=%REPOROOT_DECORATED::=--%"
-set "REPOROOT_DECORATED=%REPOROOT_DECORATED:.=%"
 
 set "REPOROOT_TASK_INDEX_DIR=%TEMP_FILE_OUTTER_DIR%\reporoots_index\%REPOROOT_DECORATED%"
 set "REPOROOT_TASK_INDEX_FILE=%REPOROOT_TASK_INDEX_DIR%\index.var"
@@ -90,6 +89,8 @@ for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTO
 exit /b
 
 :OUTTER_WINDOW_PER_REPOROOT_PREPROCESS_END
+if not exist "%TEMP_FILE_OUTTER_DIR%\reporoots" goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_END
+
 rem count only success calls
 set CALL_INDEX=0
 
@@ -320,7 +321,6 @@ set INNER_TASK_INDEX=%OUTTER_TASK_INDEX%
 set "FILEPATH_DECORATED=%FILEPATH:\=--%"
 set "FILEPATH_DECORATED=%FILEPATH_DECORATED:/=--%"
 set "FILEPATH_DECORATED=%FILEPATH_DECORATED::=--%"
-set "FILEPATH_DECORATED=%FILEPATH_DECORATED:.=%"
 
 if "%INNER_TASK_INDEX:~1,1%" == "" set INNER_TASK_INDEX=0%INNER_TASK_INDEX%
 
@@ -349,6 +349,12 @@ rem recreate empty files
 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
 :IGNORE_INNER_INIT
+
+rem add directory root as WC directory path if it is not a WC root path
+if not exist "%FILEPATH%\.svn\" (
+  set "WCDIR_PATH=%FILEPATH%\.svn"
+  call :PROCESS_WCDIR_PATH
+)
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:D "%FILEPATH%\*.svn" 2^>nul`) do (
   set WCDIR_PATH=%%i
@@ -392,6 +398,11 @@ exit /b
 call :GET_WCDIR_PARENT "%%WCDIR_PATH%%"
 set "WCDIR_PATH=%WCDIR_PARENT_PATH%"
 
+rem test path on version control presence and get file path svn info
+svn info "%WCDIR_PATH%" > "%TORTOISEPROC_PATHFILE_INFO_TMP%" 2>nul
+rem ignore on error
+if %ERRORLEVEL% NEQ 0 exit /b 0
+
 if %FLAG_SHOW_IF_HAS_VERSIONED_CHANGES% EQU 0 goto IGNORE_STATUS_REQUEST
 
 call "%%SVNCMD_TOOLS_ROOT%%/svn_has_changes.bat" -stat-exclude-? "%%WCDIR_PATH%%" >nul 2>nul
@@ -406,11 +417,6 @@ rem set "WCDIR_PATH=%WCDIR_PATH:\=/%"
 for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
 if %FLAG_WINDOW_PER_REPOROOT% EQU 0 exit /b
-
-rem get file path svn info
-svn info "%WCDIR_PATH%" > "%TORTOISEPROC_PATHFILE_INFO_TMP%" 2>nul
-rem ignore on error
-if %ERRORLEVEL% NEQ 0 exit /b 0
 
 rem read repository Root
 call "%%CONTOOLS_ROOT%%/scm/svn/extract_info_param.bat" "%%TORTOISEPROC_PATHFILE_INFO_TMP%%" "Repository Root"
