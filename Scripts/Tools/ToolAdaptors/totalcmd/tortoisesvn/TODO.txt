@@ -5,4 +5,3 @@ TortoiseProcByNestedWC script:
     but, in this case this is correct duplication:
       repo1/parent_path
       repo2/parent_path/ext1
-  - /command:commit may show windows with no active versioned changes but with disabled changes which are changes for different repositories.

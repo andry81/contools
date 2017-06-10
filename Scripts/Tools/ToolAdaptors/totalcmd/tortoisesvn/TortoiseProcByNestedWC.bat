@@ -146,7 +146,7 @@ set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
 rem cleanup temporary files
-rmdir /S /Q "%TEMP_FILE_OUTTER_DIR%"
+rem rmdir /S /Q "%TEMP_FILE_OUTTER_DIR%"
 
 rem if %FLAG_WAIT_EXIT% EQU 0 (
 rem   rem delete the external file in case if left behind
@@ -160,11 +160,13 @@ rem script flags
 set FLAG_WAIT_EXIT=0
 rem single window for all changes
 set FLAG_ALL_IN_ONE=0
-rem window per WC directory
+rem window per WC directory (directory in the command line argument)
 set FLAG_WINDOW_PER_WCDIR=0
-rem window per repository root
+rem window per WC root (WC root directories found by searching from directories in the command line arguments)
+set FLAG_WINDOW_PER_WCROOT=0
+rem window per repository root (WC root directories found by searching from directories in the command line arguments and groupped by unique repository roots)
 set FLAG_WINDOW_PER_REPOROOT=0
-rem show if has versioned changes
+rem show if has versioned changes (shows only those windows which will have version changes to show)
 set FLAG_SHOW_IF_HAS_VERSIONED_CHANGES=0
 
 :FLAGS_LOOP
@@ -182,16 +184,25 @@ if not "%FLAG%" == "" (
   ) else if "%FLAG%" == "-all-in-one" (
     set FLAG_ALL_IN_ONE=1
     set FLAG_WINDOW_PER_WCDIR=0
+    set FLAG_WINDOW_PER_WCROOT=0
     set FLAG_WINDOW_PER_REPOROOT=0
     shift
   ) else if "%FLAG%" == "-window-per-wcdir" (
     set FLAG_ALL_IN_ONE=0
     set FLAG_WINDOW_PER_WCDIR=1
+    set FLAG_WINDOW_PER_WCROOT=0
+    set FLAG_WINDOW_PER_REPOROOT=0
+    shift
+  ) else if "%FLAG%" == "-window-per-wcroot" (
+    set FLAG_ALL_IN_ONE=0
+    set FLAG_WINDOW_PER_WCDIR=0
+    set FLAG_WINDOW_PER_WCROOT=1
     set FLAG_WINDOW_PER_REPOROOT=0
     shift
   ) else if "%FLAG%" == "-window-per-reporoot" (
     set FLAG_ALL_IN_ONE=0
     set FLAG_WINDOW_PER_WCDIR=0
+    set FLAG_WINDOW_PER_WCROOT=0
     set FLAG_WINDOW_PER_REPOROOT=1
     shift
   ) else if "%FLAG%" == "-show-if-has-versioned-changes" (
@@ -295,7 +306,7 @@ set "FILEPATH=%RETURN_VALUE%"
 set "FILEPATH_DECORATED=\%FILEPATH%\"
 
 rem cut off suffix with .svn subdirectory
-if "%FILEPATH_DECORATED:\.svn\=%" == "%FILEPATH_DECORATED%" goto IGNORE_FILEPATH_WCDIR_PATH_CUTOFF
+if "%FILEPATH_DECORATED:\.svn\=%" == "%FILEPATH_DECORATED%" goto IGNORE_FILEPATH_WCROOT_PATH_CUTOFF
 
 set "FILEPATH_WCROOT_SUFFIX=%FILEPATH_DECORATED:*.svn\=%"
 
@@ -312,9 +323,9 @@ call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILEPATH_DECORATED:~1%%" \ "" FILE
 rem should not be empty
 if "%FILEPATH%" == "" set FILEPATH=.
 
-:IGNORE_FILEPATH_WCDIR_PATH_CUTOFF
+:IGNORE_FILEPATH_WCROOT_PATH_CUTOFF
 
-if %FLAG_WINDOW_PER_WCDIR% EQU 0 goto IGNORE_INNER_INIT
+if %FLAG_WINDOW_PER_WCDIR% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCDIR_INIT
 
 set INNER_TASK_INDEX=%OUTTER_TASK_INDEX%
 
@@ -348,26 +359,27 @@ mkdir "%FILEPATH_TASK_DIR%"
 rem recreate empty files
 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
-:IGNORE_INNER_INIT
+:IGNORE_INNER_WINDOW_PER_WCDIR_INIT
 
-rem add directory root as WC directory path if it is not a WC root path
+rem add directory as a fake WC root path if it is not a WC root path to process
+rem it's content in case if real WC root directory is above of the directory in the directories tree.
 if not exist "%FILEPATH%\.svn\" (
   set "WCDIR_PATH=%FILEPATH%\.svn"
-  call :PROCESS_WCDIR_PATH
+  call :PROCESS_WCDIR_PATH || exit /b 0
 )
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:D "%FILEPATH%\*.svn" 2^>nul`) do (
   set WCDIR_PATH=%%i
-  call :PROCESS_WCDIR_PATH
+  call :PROCESS_WCDIR_PATH || exit /b 0
 )
 
-set /A CALL_INDEX+=1
+if %FLAG_WINDOW_PER_WCROOT% EQU 0 set /A CALL_INDEX+=1
 
-if %FLAG_WINDOW_PER_WCDIR% EQU 0 goto IGNORE_INNER_PROCESS
+if %FLAG_WINDOW_PER_WCDIR% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCDIR_PROCESS
 
 rem ignore empty lists
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
-if %ERRORLEVEL% EQU 0 goto IGNORE_INNER_PROCESS
+if %ERRORLEVEL% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCDIR_PROCESS
 
 rem convert dos line returns to unix
 call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto NEXT_CURDIR
@@ -380,7 +392,7 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
   call :CMD start /B "" TortoiseProc.exe %%COMMAND%% /pathfile:"%%TORTOISEPROC_PATHFILE_UCS16LE_TMP%%" /deletepathfile
 )
 
-:IGNORE_INNER_PROCESS
+:IGNORE_INNER_WINDOW_PER_WCDIR_PROCESS
 
 :NEXT_CURDIR
 set /A OUTTER_TASK_INDEX+=1
@@ -394,7 +406,12 @@ echo.^>%*
 (%*)
 exit /b
 
+rem can process versioned and unversioned directories together
 :PROCESS_WCDIR_PATH
+rem run only first TORTOISEPROC_MAX_CALLS
+if %FLAG_WINDOW_PER_WCROOT% NEQ 0 ^
+if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 1
+
 call :GET_WCDIR_PARENT "%%WCDIR_PATH%%"
 set "WCDIR_PATH=%WCDIR_PARENT_PATH%"
 
@@ -412,11 +429,26 @@ if %RETURN_VALUE% EQU 0 exit /b 0
 
 :IGNORE_STATUS_REQUEST
 
+if %FLAG_WINDOW_PER_WCROOT% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCROOT_PROCESS
+
+rem execute path file
+if %FLAG_WAIT_EXIT% NEQ 0 (
+  call :CMD start /B /WAIT "" TortoiseProc.exe %%COMMAND%% /path:"%%WCDIR_PATH%%"
+) else (
+  call :CMD start /B "" TortoiseProc.exe %%COMMAND%% /path:"%%WCDIR_PATH%%"
+)
+
+set /A CALL_INDEX+=1
+
+exit /b 0
+
+:IGNORE_INNER_WINDOW_PER_WCROOT_PROCESS
+
 rem write to path file (special form of the echo command to ignore special characters in the WCDIR_PATH value)
 rem set "WCDIR_PATH=%WCDIR_PATH:\=/%"
 for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
-if %FLAG_WINDOW_PER_REPOROOT% EQU 0 exit /b
+if %FLAG_WINDOW_PER_REPOROOT% EQU 0 exit /b 0
 
 rem read repository Root
 call "%%CONTOOLS_ROOT%%/scm/svn/extract_info_param.bat" "%%TORTOISEPROC_PATHFILE_INFO_TMP%%" "Repository Root"
@@ -432,7 +464,7 @@ if %ERRORLEVEL% NEQ 0 set /A REPOROOT_INDEX+=1
 for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do ^
 for /F "eol=	 tokens=* delims=" %%j in ("%REPOROOT%") do (echo.%%i^|%%j^|) >> "%TORTOISEPROC_PATHFILE_WORKINGSET_TMP%"
 
-exit /b
+exit /b 0
 
 :GET_ABS_PATH
 set "ABS_PATH=%~dpf1"
