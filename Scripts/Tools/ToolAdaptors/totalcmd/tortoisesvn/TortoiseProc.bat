@@ -7,7 +7,7 @@ call "%%~dp0__init__.bat" || goto :EOF
 rem builtin defaults
 if "%TORTOISEPROC_MAX_CALLS%" == "" set TORTOISEPROC_MAX_CALLS=10
 
-rem script flags
+rem wait TrotoiseProc.exe to exit
 set FLAG_WAIT_EXIT=0
 
 :FLAGS_LOOP
