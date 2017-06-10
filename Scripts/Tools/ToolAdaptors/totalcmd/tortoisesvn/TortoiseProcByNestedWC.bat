@@ -146,7 +146,7 @@ set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
 rem cleanup temporary files
-rem rmdir /S /Q "%TEMP_FILE_OUTTER_DIR%"
+rmdir /S /Q "%TEMP_FILE_OUTTER_DIR%"
 
 rem if %FLAG_WAIT_EXIT% EQU 0 (
 rem   rem delete the external file in case if left behind
