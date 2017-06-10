@@ -156,7 +156,7 @@ rem )
 exit /b %LASTERROR%
 
 :MAIN
-rem script flags
+rem wait TrotoiseProc.exe to exit
 set FLAG_WAIT_EXIT=0
 rem single window for all changes
 set FLAG_ALL_IN_ONE=0
@@ -166,8 +166,12 @@ rem window per WC root (WC root directories found by searching from directories 
 set FLAG_WINDOW_PER_WCROOT=0
 rem window per repository root (WC root directories found by searching from directories in the command line arguments and groupped by unique repository roots)
 set FLAG_WINDOW_PER_REPOROOT=0
-rem show if has versioned changes (shows only those windows which will have version changes to show)
-set FLAG_SHOW_IF_HAS_VERSIONED_CHANGES=0
+rem Force use workingset paths with out versioned changes.
+rem Has meaning only for /command:commit and if -all-in-one flag is not set.
+set FLAG_FORCE_USE_WORKINGSET_PATHS_WITHOUT_VERSIONED_CHANGES=0
+
+rem internal flags
+set FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES=0
 
 :FLAGS_LOOP
 
@@ -205,8 +209,8 @@ if not "%FLAG%" == "" (
     set FLAG_WINDOW_PER_WCROOT=0
     set FLAG_WINDOW_PER_REPOROOT=1
     shift
-  ) else if "%FLAG%" == "-show-if-has-versioned-changes" (
-    set FLAG_SHOW_IF_HAS_VERSIONED_CHANGES=1
+  ) else if "%FLAG%" == "-force-use-workingset-paths-wo-versioned-changes" (
+    set FLAG_FORCE_USE_WORKINGSET_PATHS_WITHOUT_VERSIONED_CHANGES=1
     shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
@@ -240,11 +244,24 @@ if %FLAG_ALL_IN_ONE%%FLAG_WINDOW_PER_WCDIR%%FLAG_WINDOW_PER_REPOROOT% EQU 0 (
   )
 )
 
+rem exception cases
+if %COMMAND_COMMIT% NEQ 0 (
+  if %FLAG_ALL_IN_ONE% EQU 0 (
+    if %FLAG_FORCE_USE_WORKINGSET_PATHS_WITHOUT_VERSIONED_CHANGES% EQU 0 (
+      set FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES=1
+    )
+  )
+)
+
 call "%%CONTOOLS_ROOT%%/get_datetime.bat"
 set "TEMP_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
 set "TEMP_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 
 set "TEMP_FILE_OUTTER_DIR=%TEMP%\%?~n0%.%TEMP_DATE%.%TEMP_TIME%"
+
+rem special initialized
+if %FLAG_WINDOW_PER_WCDIR% EQU 0 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-crlf.lst"
+set "WORKINGSET_PATH_INFO_TMP=%TEMP_FILE_OUTTER_DIR%\$info.txt"
 
 rem create temporary files to store local context output
 if exist "%TEMP_FILE_OUTTER_DIR%\" (
@@ -254,13 +271,14 @@ if exist "%TEMP_FILE_OUTTER_DIR%\" (
 
 mkdir "%TEMP_FILE_OUTTER_DIR%"
 
+rem create empty files
+if %FLAG_WINDOW_PER_WCDIR% EQU 0 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
+
 if %FLAG_ALL_IN_ONE% EQU 0 ^
 if %FLAG_WINDOW_PER_REPOROOT% EQU 0 goto IGNORE_OUTTER_INIT
 
-set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-cr.lst"
 set "TORTOISEPROC_PATHFILE_WORKINGSET_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-workingset.lst"
-set "TORTOISEPROC_PATHFILE_INFO_TMP=%TEMP_FILE_OUTTER_DIR%\$info.txt"
 set "TASKS_NUM_VARFILE_TMP=%TEMP_FILE_OUTTER_DIR%\num_tasks.var"
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
@@ -272,7 +290,6 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
 )
 
 rem create empty files
-type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 if %FLAG_WINDOW_PER_REPOROOT% NEQ 0 ( type nul > "%TORTOISEPROC_PATHFILE_WORKINGSET_TMP%" )
 
 :IGNORE_OUTTER_INIT
@@ -416,11 +433,11 @@ call :GET_WCDIR_PARENT "%%WCDIR_PATH%%"
 set "WCDIR_PATH=%WCDIR_PARENT_PATH%"
 
 rem test path on version control presence and get file path svn info
-svn info "%WCDIR_PATH%" > "%TORTOISEPROC_PATHFILE_INFO_TMP%" 2>nul
+svn info "%WCDIR_PATH%" > "%WORKINGSET_PATH_INFO_TMP%" 2>nul
 rem ignore on error
 if %ERRORLEVEL% NEQ 0 exit /b 0
 
-if %FLAG_SHOW_IF_HAS_VERSIONED_CHANGES% EQU 0 goto IGNORE_STATUS_REQUEST
+if %FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES% EQU 0 goto IGNORE_STATUS_REQUEST
 
 call "%%SVNCMD_TOOLS_ROOT%%/svn_has_changes.bat" -stat-exclude-? "%%WCDIR_PATH%%" >nul 2>nul
 rem call anyway if error happened
@@ -428,6 +445,11 @@ if %ERRORLEVEL% EQU 0 ^
 if %RETURN_VALUE% EQU 0 exit /b 0
 
 :IGNORE_STATUS_REQUEST
+
+rem Write to path file (special form of the echo command to ignore special characters in the WCDIR_PATH value),
+rem even if file is not required (for debugging purposes).
+rem set "WCDIR_PATH=%WCDIR_PATH:\=/%"
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
 if %FLAG_WINDOW_PER_WCROOT% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCROOT_PROCESS
 
@@ -444,14 +466,10 @@ exit /b 0
 
 :IGNORE_INNER_WINDOW_PER_WCROOT_PROCESS
 
-rem write to path file (special form of the echo command to ignore special characters in the WCDIR_PATH value)
-rem set "WCDIR_PATH=%WCDIR_PATH:\=/%"
-for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
-
 if %FLAG_WINDOW_PER_REPOROOT% EQU 0 exit /b 0
 
 rem read repository Root
-call "%%CONTOOLS_ROOT%%/scm/svn/extract_info_param.bat" "%%TORTOISEPROC_PATHFILE_INFO_TMP%%" "Repository Root"
+call "%%CONTOOLS_ROOT%%/scm/svn/extract_info_param.bat" "%%WORKINGSET_PATH_INFO_TMP%%" "Repository Root"
 rem ignore on error
 if %ERRORLEVEL% NEQ 0 exit /b 0
 
