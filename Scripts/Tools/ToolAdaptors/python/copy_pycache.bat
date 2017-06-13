@@ -15,8 +15,8 @@ rem Flags:
 rem   - -prefix_dirs: |-separated list of .pyc files prefix directories.
 rem       By default the "__pycache__" is used. Can has directory sub paths,
 rem       like "__pycache__/dummy" or "dummy/__pycache__".
-rem   - -suffix_names: |-separated list of .pyc files prefix directories.
-rem       By default is empty. For example: ".cpython-36".
+rem   - -suffix_names: |-separated list of .pyc files suffix names.
+rem       By default is empty. Can be, for example: ".cpython-36".
 rem
 rem Examples:
 rem   1. mkdir "c:\Python36\Lib\site-packages.pycache_copy"
