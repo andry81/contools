@@ -204,6 +204,10 @@ Scripts/Tools/ToolAdaptors/bat/call_cmd64.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd6432.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd6432_k.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd64_k.bat -text
+Scripts/Tools/ToolAdaptors/bat/cmd_as_admin.bat -text
+Scripts/Tools/ToolAdaptors/bat/cmd_as_user.bat -text
+Scripts/Tools/ToolAdaptors/bat/cmda.bat -text
+Scripts/Tools/ToolAdaptors/bat/cmda.user.bat -text
 Scripts/Tools/ToolAdaptors/bat/start32.bat -text
 Scripts/Tools/ToolAdaptors/bat/start3264.bat -text
 Scripts/Tools/ToolAdaptors/bat/start3264_nowait.bat -text
@@ -254,10 +258,6 @@ Scripts/Tools/ToolAdaptors/sh/rm.sh -text
 Scripts/Tools/ToolAdaptors/sh/rmdir.sh -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/README_EN.txt -text
-Scripts/Tools/ToolAdaptors/totalcmd/cmd_as_admin.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/cmd_as_user.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/cmda.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/cmda.user.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_sorted_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/configure.bat -text
