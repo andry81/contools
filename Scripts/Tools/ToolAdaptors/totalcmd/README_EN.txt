@@ -177,6 +177,11 @@ tortoisesvn\TortoiseProc.bat /command:log "%P" %S
 call_nowindow.vbs
 tortoisesvn\TortoiseProcByNestedWC.bat -all-in-one /command:repostatus "%P" %S
 
+or
+
+call_nowindow.vbs
+tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
+
 ------------------------------------------------------------------------------
 5.2. Method #2. Window per unique repository root with or without versioned changes in respective WC directory.
 ------------------------------------------------------------------------------
@@ -204,6 +209,11 @@ tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:repostatus "%
 ------------------------------------------------------------------------------
 call_nowindow.vbs
 tortoisesvn\TortoiseProcByNestedWC.bat -window-per-reporoot /command:commit "%P" %S
+
+or
+
+call_nowindow.vbs
+tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 6.2. Method #2. One window for all WC directories with changes.
