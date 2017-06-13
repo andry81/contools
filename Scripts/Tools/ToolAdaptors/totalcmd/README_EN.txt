@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.06.10
+* 2017.06.13
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -201,7 +201,7 @@ call_nowindow.vbs
 tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
-6. Open TortoiseSVN commit dialogs for a set of WC directories.
+6. Open TortoiseSVN commit dialogs for a set of WC directories (opens only if has not empty versioned changes).
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
