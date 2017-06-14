@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.06.13
+* 2017.06.14
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -54,13 +54,13 @@ notepad_edit_files.bat "%P" %S
 
 For Notepad++:
 
-call_nowindow.vbs
-notepad_edit_files.bat -npp -nosession "%P" %S
+notepad_edit_files.bat
+-npp -nosession "%P" %S
 
 For Windows Notepad:
 
-call_nowindow.vbs
-notepad_edit_files.bat "%P" %S
+notepad_edit_files.bat
+"%P" %S
 
 ------------------------------------------------------------------------------
 2. Open Administator console window in current directory.
@@ -72,25 +72,30 @@ notepad_edit_files.bat "%P" %S
 (may be in some cases it won't work, for example, command "pip install pip --upgrade" in Python 3.5 in Windows 7 x86 responds as "access denided")
 (correction: may be the error is an error of Python, the internet advises to run command as: "python -m pip install --upgrade")
 
-In the Window x64 open 64-bit console window and type:
-  mklink /D "%SystemRoot%\Sysnative\cmd.exe" "%COMSPEC%"
+In the Windows x64 open 64-bit console window in the Administrative mode and type:
+  mklink /D "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
 
 This will create the directory link to 64-bit cmd.exe available from the 32-bit
 process.
 
-For 64-bit cmd.exe button under Windows x64:
+For 64-bit cmd.exe button under Windows x64 in the Administrative mode:
 
 cmd_sysnative_admin.lnk
 /K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
 
-For 32-bit cmd.exe button under Windows x64:
+For 32-bit cmd.exe button under Windows x64 in the Administrative mode:
 
 cmd_syswow64_admin.lnk
 /K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
 
-For cmd.exe button under Windows x32:
+For 64-bit cmd.exe button under Windows x64 in a user mode:
 
-cmd_admin.lnk
+cmd_sysnative.lnk
+/K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
+
+For 32-bit cmd.exe button under Windows x64 in a user mode:
+
+cmd_syswow64.lnk
 /K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
 
 ------------------------------------------------------------------------------
