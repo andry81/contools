@@ -1,12 +1,12 @@
 @echo off
 
 rem generate common environment
-set "PROJECT_NAME="
+set "__PROJECT_NAME="
 call :GEN_PROJECT_ENV %%*
 
 rem generate per project environment
 for %%i in (%PROJECTS_LIST%) do (
-  set "PROJECT_NAME=%%i"
+  set "__PROJECT_NAME=%%i"
   call :GEN_PROJECT_ENV
 )
 
@@ -19,8 +19,8 @@ rem drop internal variables
 exit /b
 
 :GEN_PROJECT_ENV
-if "%PROJECT_NAME%" == "" set "__PROJECT_VAR_PREFIX="
-if not "%PROJECT_NAME%" == "" set "__PROJECT_VAR_PREFIX=%PROJECT_NAME%."
+if "%__PROJECT_NAME%" == "" set "__PROJECT_VAR_PREFIX="
+if not "%__PROJECT_NAME%" == "" set "__PROJECT_VAR_PREFIX=%__PROJECT_NAME%."
 
 call set "__DEV_COMPILER=%%%__PROJECT_VAR_PREFIX%DEV_COMPILER%%"
 call set "__DEV_ADDRESS_MODEL=%%%__PROJECT_VAR_PREFIX%DEV_ADDRESS_MODEL%%"
@@ -30,6 +30,14 @@ if "%__DEV_ADDRESS_MODEL%" == "32" (
   call :SET_IF_EMPTY %__PROJECT_VAR_PREFIX%DEV_COMPILER_DIR "%%__DEV_COMPILER%%_x86"
 ) else (
   call :SET_IF_EMPTY %__PROJECT_VAR_PREFIX%DEV_COMPILER_DIR "%%__DEV_COMPILER%%_x%%__DEV_ADDRESS_MODEL%%"
+)
+
+rem drop temporary variables
+(
+  set "__PROJECT_NAME="
+  set "__DEV_COMPILER="
+  set "__DEV_ADDRESS_MODEL="
+  set "__PROJECT_VAR_PREFIX="
 )
 
 exit /b 0

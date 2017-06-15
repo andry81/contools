@@ -47,11 +47,9 @@ if not "%PUBLISH_APP_DIR_VALUE%" == "" exit /b 0
 
 call "%%~dp0__init__.bat" || goto :EOF
 
-if "%PUBLISH_DATE%" == "" call "%%CONTOOLS_ROOT%%/get_date_as_filename.bat"
-if "%PUBLISH_DATE%" == "" set "PUBLISH_DATE=%RETURN_VALUE%"
-
-if "%PUBLISH_TIME%" == "" call "%%CONTOOLS_ROOT%%/get_time_as_filename.bat"
-if "%PUBLISH_TIME%" == "" set "PUBLISH_TIME=%RETURN_VALUE%"
+call "%%CONTOOLS_ROOT%%/get_datetime.bat"
+if "%PUBLISH_DATE%" == "" set "PUBLISH_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
+if "%PUBLISH_TIME%" == "" set "PUBLISH_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 
 if "%PUBLISH_APP_DIR%" == "" goto GEN_PUBLISH_APP_DIR
 goto PUBLISH

@@ -29,7 +29,7 @@ rem ignore empty lists
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
 if %ERRORLEVEL% EQU 0 goto IGNORE_OUTTER_ALL_IN_ONE_PROCESS
 
-if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% NEQ 0 call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS
+if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% NEQ 0 ( call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS || goto EXIT_MAIN )
 
 rem convert dos line returns to unix
 call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto EXIT_MAIN
@@ -180,7 +180,7 @@ rem ignore empty lists
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
 if %ERRORLEVEL% EQU 0 exit /b 0
 
-if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% NEQ 0 call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS
+if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% NEQ 0 ( call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS || goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_EXIT )
 
 rem convert dos line returns to unix
 call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_EXIT
@@ -204,7 +204,7 @@ set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
 rem cleanup temporary files
-rmdir /S /Q "%TEMP_FILE_OUTTER_DIR%"
+rem rmdir /S /Q "%TEMP_FILE_OUTTER_DIR%"
 
 rem if %FLAG_WAIT_EXIT% EQU 0 (
 rem   rem delete the external file in case if left behind
@@ -380,7 +380,7 @@ rem task per subdir
 set OUTTER_TASK_INDEX=0
 
 rem run COMMAND over selected files/directories in the PWD directory
-:CURDIR_LOOP
+:LOOKUP_DIR_LOOP
 rem run only first TORTOISEPROC_MAX_CALLS
 if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 0
 
@@ -388,7 +388,7 @@ set "FILEPATH=%~1"
 if "%FILEPATH%" == "" exit /b 0
 
 rem ignore files selection
-if not exist "%FILEPATH%\" goto NEXT_CURDIR
+if not exist "%FILEPATH%\" goto NEXT_LOOKUP_DIR
 
 rem reduce relative path to avoid . and .. characters
 call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILEPATH%%"
@@ -490,12 +490,12 @@ rem ignore empty lists
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
 if %ERRORLEVEL% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCDIR_PROCESS
 
-if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% NEQ 0 call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS
+if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% NEQ 0 ( call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS || goto NEXT_LOOKUP_DIR )
 
 rem convert dos line returns to unix
-call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto NEXT_CURDIR
+call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto NEXT_LOOKUP_DIR
 rem convert to UCS-16BE w/o bom
-call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" "" UCS-2LE "%%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%%" > "%TORTOISEPROC_PATHFILE_UCS16LE_TMP%" || goto NEXT_CURDIR
+call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" "" UCS-2LE "%%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%%" > "%TORTOISEPROC_PATHFILE_UCS16LE_TMP%" || goto NEXT_LOOKUP_DIR
 rem execute path file
 if %FLAG_WAIT_EXIT% NEQ 0 (
   call :CMD start /B /WAIT "" TortoiseProc.exe %%COMMAND%% /pathfile:"%%TORTOISEPROC_PATHFILE_UCS16LE_TMP%%"
@@ -505,12 +505,12 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
 
 :IGNORE_INNER_WINDOW_PER_WCDIR_PROCESS
 
-:NEXT_CURDIR
+:NEXT_LOOKUP_DIR
 set /A OUTTER_TASK_INDEX+=1
 
 shift
 
-goto CURDIR_LOOP
+goto LOOKUP_DIR_LOOP
 
 :CMD
 echo.^>%*
@@ -617,9 +617,18 @@ if not "%WCDIR_PARENT_PATH:~-2,1%" == ":" set "WCDIR_PARENT_PATH=%WCDIR_PARENT_P
 exit /b
 
 :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS
+rem don't filter by empty externals list
+if not exist "%WORKINGSET_PATH_EXTERNALS_PATHS_TMP%" exit /b 0
+call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%WORKINGSET_PATH_EXTERNALS_PATHS_TMP%%"
+if %ERRORLEVEL% EQU 0 exit /b 0
+
 type "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%" | findstr.exe /I /V /X /G:"%WORKINGSET_PATH_EXTERNALS_PATHS_TMP%" > "%TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP%"
+
+rem ignore empty pathfiles
+call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP%%"
+if %ERRORLEVEL% EQU 0 exit /b 1
 
 rem set filtered as input
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP%"
 
-exit /b
+exit /b 0
