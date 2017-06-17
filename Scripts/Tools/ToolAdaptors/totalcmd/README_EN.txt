@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.06.14
+* 2017.06.18
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -85,7 +85,7 @@ cmd_sysnative_admin.lnk
 
 For 32-bit cmd.exe button under Windows x64 in the Administrative mode:
 
-cmd_syswow64_admin.lnk
+cmd_wow64_admin.lnk
 /K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
 
 For 64-bit cmd.exe button under Windows x64 in a user mode:
@@ -95,7 +95,7 @@ cmd_sysnative.lnk
 
 For 32-bit cmd.exe button under Windows x64 in a user mode:
 
-cmd_syswow64.lnk
+cmd_wow64.lnk
 /K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
 
 ------------------------------------------------------------------------------
