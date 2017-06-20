@@ -1,7 +1,12 @@
 TortoiseProcByNestedWC script:
-  - /command:repostatus shows duplicated changes if pathfile list has parent paths and paths with externals to the same repository from parent path:
+  - /command:repostatus (/command:commit) shows duplicated changes if pathfile list has parent paths and paths with externals to the same repository from parent path:
       repo1/parent_path
       repo1/parent_path/ext1
     but, in this case this is correct duplication:
       repo1/parent_path
       repo2/parent_path/ext1
+  - /command:commit may show changes in the same window for the same remote directory:
+      WCDIR1/parent_path/ext1
+      WCDIR2/parent_path/ext1
+    , where ext1 points to the same remote directory.
+    Add a flag to split (or do not split) such directories into different lists and does show them in separate windows to sequence collided commits.
