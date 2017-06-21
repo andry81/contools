@@ -1,10 +1,10 @@
 * README_EN.txt
-* 2017.06.02
+* 2017.06.21
 * ConsoleTools
 
 WARNING:
   THIS DOCUMENTATION IS OBSOLETE.
-  A new version of console utilities is UNDER CONSTRUCTION.
+  A new version of console utilities is always UNDER DEVELOPMENT.
   Use the SVN access to find out new scripts and features:
     https://svn.code.sf.net/p/contools/contools/trunk
 
