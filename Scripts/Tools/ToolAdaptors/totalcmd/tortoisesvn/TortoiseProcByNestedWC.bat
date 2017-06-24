@@ -220,9 +220,11 @@ rem single window for all changes
 set FLAG_ALL_IN_ONE=0
 rem window per WC directory (directory in the command line argument)
 set FLAG_WINDOW_PER_WCDIR=0
-rem window per WC root (WC root directories found by searching from directories in the command line arguments)
+rem window per WC root (WC root directories found by searching from directories in the command line arguments,
+rem including directories from command line arguments which might be not WC root directories)
 set FLAG_WINDOW_PER_WCROOT=0
-rem window per repository root (WC root directories found by searching from directories in the command line arguments and groupped by unique repository roots)
+rem window per repository root (WC root directories found by searching from directories in the command line
+rem arguments and groupped by unique repository roots)
 set FLAG_WINDOW_PER_REPOROOT=0
 rem Force use workingset paths with out versioned changes.
 rem Has meaning only for /command:commit and if -all-in-one flag is not set.
