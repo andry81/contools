@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.06.21
+* 2017.06.28
 * ConsoleTools
 
 WARNING:
@@ -134,7 +134,7 @@ Example for direct input into a console window:
    set "BBB=222\333"
    call set "DDD=%AAA%"
    echo "DDD=%DDD%"
-   rem output is: "DDD=C:\111\222\333"
+   rem output is: "DDD=C:\111\"
 
 Differences between these 2 examples are in how the `set "AAA=C:\111\%BBB%'
 would be expanded.
@@ -164,7 +164,7 @@ endlocal
 !!!
 
 BEWARE OF THE ENDLOCAL INSTRUCTION WHICH CALLS AUTOMATICALLY WHEN A SCRIPT
-EXISTS OR CALL SUBROUTINE ENDS.
+EXITS OR CALL SUBROUTINE ENDS.
 BEWARE OF THE SETLOCAL INSTRUCTION WHICH WORKS ONLY IN A SCRIPT.
 
 !!!
