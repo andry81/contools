@@ -6,7 +6,8 @@ rem remember current code page
 call :GET_CURRENT_CODE_PAGE
 
 rem set utf-8 code page for sqlite
-chcp 65001 2>&1 >nul
+rem chcp 65001 2>&1 >nul
+chcp 866 2>&1 >nul
 
 if 0%SVNCMD_TOOLS_DEBUG_VERBOCITY_LVL% GEQ 1 (echo.^>^>%0 %*) >&3
 
