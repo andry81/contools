@@ -20,11 +20,11 @@ rem       By default is empty. Can be, for example: ".cpython-36".
 rem
 rem Examples:
 rem   1. mkdir "c:\Python36\Lib\site-packages.pycache_copy"
-rem      copy_pycache.bat "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
+rem      call copy_pycache.bat "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
 rem   2. mkdir "c:\Python36\Lib\site-packages.pycache_copy"
-rem      copy_pycache.bat -prefix_dirs "__pycache__|__pycache__/37" -suffix_names ".cpython-37" "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
+rem      call copy_pycache.bat -prefix_dirs "__pycache__|__pycache__/37" -suffix_names ".cpython-37" "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
 rem   3. mkdir "c:\Python36\Lib\site-packages.pycache_copy"
-rem      copy_pycache.bat -prefix_dirs "" -suffix_names "" "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
+rem      call copy_pycache.bat -prefix_dirs "" -suffix_names "" "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
 rem
 
 setlocal
@@ -33,7 +33,8 @@ set "?~nx0=%~nx0"
 
 rem script flags
 set "FLAG_VALUE_PREFIX_DIRS=__pycache__"
-set "FLAG_VALUE_SUFFIX_NAMES=.cpython-36|.cpython-35|.cpython-34|.cpython-33|.cpython-32"
+rem default list of suffixes
+set "FLAG_VALUE_SUFFIX_NAMES=.cpython-39|.cpython-38|.cpython-37|.cpython-36|.cpython-35|.cpython-34|.cpython-33|.cpython-32|.cpython-31|.cpython-30"
 
 :FLAGS_LOOP
 
@@ -45,12 +46,12 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if not "%FLAG%" == "" (
   if "%FLAG%" == "-prefix_dirs" (
+    set "FLAG_VALUE_PREFIX_DIRS=%~2"
     shift
-    call set "FLAG_VALUE_PREFIX_DIRS=%%~1"
     shift
   ) else if "%FLAG%" == "-suffix_names" (
+    set "FLAG_VALUE_SUFFIX_NAMES=%~2"
     shift
-    call set "FLAG_VALUE_SUFFIX_NAMES=%%~1"
     shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
