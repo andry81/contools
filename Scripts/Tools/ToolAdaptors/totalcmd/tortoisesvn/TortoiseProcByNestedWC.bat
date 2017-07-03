@@ -91,8 +91,8 @@ set "REPOROOT_TASK_DIR=%TEMP_FILE_OUTTER_DIR%\reporoots\%REPOROOT_TASK_DIR_DECOR
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf-filtered.lst"
 rem set "WORKINGSET_PATH_STATUS_EXTERNALS_TMP=%REPOROOT_TASK_DIR%\status_externals.lst"
-set "WORKINGSET_PATH_EXTERNALS_TEXT_TMP=%REPOROOT_TASK_DIR%\$externals.txt"
-set "WORKINGSET_PATH_EXTERNALS_LIST_TMP=%REPOROOT_TASK_DIR%\externals.lst"
+set "WORKINGSET_PATH_INFO_TEXT_TMP=%REPOROOT_TASK_DIR%\$info.txt"
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%REPOROOT_TASK_DIR%\externals_db.lst"
 set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%REPOROOT_TASK_DIR%\external_paths.lst"
 
 if not exist "%REPOROOT_TASK_DIR%\" (
@@ -103,19 +103,33 @@ if not exist "%REPOROOT_TASK_DIR%\" (
 
 rem Save to pathfile associated with repository root
 rem (special form of the echo command to ignore special characters in the echo value).
-for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%\") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
 if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% EQU 0 goto IGNORE_OUTTER_SUPPRESS_DUPLICATE_CHANGE
 
-rem Dump externals list for each WC directory, always use relative paths.
-pushd "%WCDIR_PATH%" && (
-  svn pget svn:externals . -R --non-interactive > "%WORKINGSET_PATH_EXTERNALS_TEXT_TMP%"
-  popd
-)
-call "%%SVNCMD_TOOLS_ROOT%%/gen_externals_list_from_pget.bat" -no_uri_transform "%%WORKINGSET_PATH_EXTERNALS_TEXT_TMP%%" > "%WORKINGSET_PATH_EXTERNALS_LIST_TMP%"
+rem extract the directory WC root through the info file if WCDIR_PATH is not WC root
+set "WCROOT_PATH=%WCDIR_PATH%"
+if exist "%WCDIR_PATH%\.svn\" goto IGNORE_OUTTER_WCROOT_FROM_WCDIR
 
-for /F "usebackq eol=	 tokens=1,2 delims=|" %%i in ("%WORKINGSET_PATH_EXTERNALS_LIST_TMP%") do (
-  set "WORKINGSET_EXTERNAL_PATH=%%i/%%j"
+svn info "%WCDIR_PATH%" --non-interactive > "%WORKINGSET_PATH_INFO_TEXT_TMP%" || (
+  echo.%?~nx0%: error: not versioned directory: "%WCDIR_PATH%".
+  exit /b 255
+) >&2
+
+call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%WORKINGSET_PATH_INFO_TEXT_TMP%%" "Working Copy Root Path" || (
+  echo.%?~nx0%: error: "Working Copy Root Path" property is not found in info file from WC directory: "%WCDIR_PATH%".
+  exit /b 254
+) >&2
+
+set "WCROOT_PATH=%RETURN_VALUE%"
+
+:IGNORE_OUTTER_WCROOT_FROM_WCDIR
+
+rem append to the workingset externals from the WC root database ONLY
+call "%%SVNCMD_TOOLS_ROOT%%/svn_externals_list.bat" -l -offline -wcroot "%%WCROOT_PATH%%" "%%WCDIR_PATH%%" > "%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP%"
+
+for /F "usebackq eol=	 tokens=* delims=" %%i in ("%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP%") do (
+  set "WORKINGSET_EXTERNAL_PATH=%%i"
   call :PROCESS_OUTTER_WORKINGSET_PATH_EXTERNALS_LIST
 )
 
@@ -124,15 +138,12 @@ goto IGNORE_OUTTER_SUPPRESS_DUPLICATE_CHANGE
 :PROCESS_OUTTER_WORKINGSET_PATH_EXTERNALS_LIST
 rem 1. Make URL absolute
 rem 2. Convert forward/backward slashes (special form of the echo command to ignore special characters in the echo value).
-if not "%WORKINGSET_EXTERNAL_PATH:~1,1%" == ":" set "WORKINGSET_EXTERNAL_PATH=%WORKINGSET_EXTERNAL_PATH:./=%"
-if not "%WORKINGSET_EXTERNAL_PATH:~1,1%" == ":" set "WORKINGSET_EXTERNAL_PATH=%WCDIR_PATH:\=/%/%WORKINGSET_EXTERNAL_PATH%"
+set "WORKINGSET_EXTERNAL_PATH=%WCDIR_PATH:\=/%/%WORKINGSET_EXTERNAL_PATH%"
 for /F "eol=	 tokens=* delims=" %%i in ("%WORKINGSET_EXTERNAL_PATH:/=\\%") do (
   (echo.%%i) >> "%WORKINGSET_PATH_EXTERNALS_PATHS_TMP%"
 )
 
 exit /b 0
-
-rem call "%%CONTOOLS_ROOT%%/scm/svn/svn_has_changes.bat" -stat-exclude-? -stat-include-X -stat-exclude-versioned "%%WCDIR_PATH%%" >> "%WORKINGSET_PATH_STATUS_EXTERNALS_TMP%"
 
 :IGNORE_OUTTER_SUPPRESS_DUPLICATE_CHANGE
 
@@ -162,8 +173,7 @@ set "REPOROOT_TASK_DIR=%TEMP_FILE_OUTTER_DIR%\reporoots\%REPOROOT_TASK_DIR_DECOR
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf-filtered.lst"
 rem set "WORKINGSET_PATH_STATUS_EXTERNALS_TMP=%REPOROOT_TASK_DIR%\status_externals.lst"
-set "WORKINGSET_PATH_EXTERNALS_TEXT_TMP=%REPOROOT_TASK_DIR%\$externals.txt"
-set "WORKINGSET_PATH_EXTERNALS_LIST_TMP=%REPOROOT_TASK_DIR%\externals.lst"
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%REPOROOT_TASK_DIR%\externals_db.lst"
 set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%REPOROOT_TASK_DIR%\external_paths.lst"
 
 set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-cr.lst"
@@ -334,10 +344,9 @@ rem special initialized
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-crlf-filtered.lst"
 rem set "WORKINGSET_PATH_STATUS_EXTERNALS_TMP=%TEMP_FILE_OUTTER_DIR%\status_externals.lst"
-set "WORKINGSET_PATH_EXTERNALS_TEXT_TMP=%TEMP_FILE_OUTTER_DIR%\$externals.txt"
-set "WORKINGSET_PATH_EXTERNALS_LIST_TMP=%TEMP_FILE_OUTTER_DIR%\externals.lst"
+set "WORKINGSET_PATH_INFO_TEXT_TMP=%TEMP_FILE_OUTTER_DIR%\$info.txt"
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%TEMP_FILE_OUTTER_DIR%\externals_db.lst"
 set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%TEMP_FILE_OUTTER_DIR%\external_paths.lst"
-set "WORKINGSET_PATH_INFO_TMP=%TEMP_FILE_OUTTER_DIR%\$info.txt"
 
 rem create temporary files to store local context output
 if exist "%TEMP_FILE_OUTTER_DIR%\" (
@@ -445,8 +454,7 @@ set "FILEPATH_TASK_DIR=%TEMP_FILE_OUTTER_DIR%\wcdirs\%FILEPATH_TASK_DIR_DECORATE
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\pathfile-ansi-crlf-filtered.lst"
 rem set "WORKINGSET_PATH_STATUS_EXTERNALS_TMP=%FILEPATH_TASK_DIR%\status_externals.lst"
-set "WORKINGSET_PATH_EXTERNALS_TEXT_TMP=%FILEPATH_TASK_DIR%\$externals.txt"
-set "WORKINGSET_PATH_EXTERNALS_LIST_TMP=%FILEPATH_TASK_DIR%\externals.lst"
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%FILEPATH_TASK_DIR%\externals_db.lst"
 set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%FILEPATH_TASK_DIR%\external_paths.lst"
 
 set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%FILEPATH_TASK_DIR%\pathfile-ansi-cr.lst"
@@ -529,7 +537,7 @@ call :GET_WCDIR_PARENT "%%WCDIR_PATH%%"
 set "WCDIR_PATH=%WCDIR_PARENT_PATH%"
 
 rem test path on version control presence and get file path svn info
-svn info "%WCDIR_PATH%" > "%WORKINGSET_PATH_INFO_TMP%" 2>nul
+svn info "%WCDIR_PATH%" > "%WORKINGSET_PATH_INFO_TEXT_TMP%" 2>nul
 rem ignore on error
 if %ERRORLEVEL% NEQ 0 exit /b 0
 
@@ -545,7 +553,7 @@ if %RETURN_VALUE% EQU 0 exit /b 0
 rem Write to path file even if file is not required (for debugging purposes).
 rem set "WCDIR_PATH=%WCDIR_PATH:\=/%"
 rem (special form of the echo command to ignore special characters in the echo value).
-for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%\") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
 if %FLAG_WINDOW_PER_WCROOT% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCROOT_PROCESS
 
@@ -565,15 +573,29 @@ exit /b 0
 if %FLAG_WINDOW_PER_REPOROOT% NEQ 0 goto IGNORE_INNER_SUPPRESS_DUPLICATE_CHANGE
 if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% EQU 0 goto IGNORE_INNER_SUPPRESS_DUPLICATE_CHANGE
 
-rem Dump externals list for each WC directory, always use relative paths.
-pushd "%WCDIR_PATH%" && (
-  svn pget svn:externals . -R --non-interactive > "%WORKINGSET_PATH_EXTERNALS_TEXT_TMP%"
-  popd
-)
-call "%%SVNCMD_TOOLS_ROOT%%/gen_externals_list_from_pget.bat" -no_uri_transform "%%WORKINGSET_PATH_EXTERNALS_TEXT_TMP%%"  > "%WORKINGSET_PATH_EXTERNALS_LIST_TMP%"
+rem extract the directory WC root through the info file if WCDIR_PATH is not WC root
+set "WCROOT_PATH=%WCDIR_PATH%"
+if exist "%WCDIR_PATH%\.svn\" goto IGNORE_INNER_WCROOT_FROM_WCDIR
 
-for /F "usebackq eol=	 tokens=1,2 delims=|" %%i in ("%WORKINGSET_PATH_EXTERNALS_LIST_TMP%") do (
-  set "WORKINGSET_EXTERNAL_PATH=%%i/%%j"
+svn info "%WCDIR_PATH%" --non-interactive > "%WORKINGSET_PATH_INFO_TEXT_TMP%" || (
+  echo.%?~nx0%: error: not versioned directory: "%WCDIR_PATH%".
+  exit /b 245
+) >&2
+
+call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%WORKINGSET_PATH_INFO_TEXT_TMP%%" "Working Copy Root Path" || (
+  echo.%?~nx0%: error: "Working Copy Root Path" property is not found in info file from WC directory: "%WCDIR_PATH%".
+  exit /b 244
+) >&2
+
+set "WCROOT_PATH=%RETURN_VALUE%"
+
+:IGNORE_INNER_WCROOT_FROM_WCDIR
+
+rem append to the workingset externals from the WC root database ONLY
+call "%%SVNCMD_TOOLS_ROOT%%/svn_externals_list.bat" -l -offline -wcroot "%%WCROOT_PATH%%" "%%WCDIR_PATH%%" > "%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP%"
+
+for /F "usebackq eol=	 tokens=* delims=" %%i in ("%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP%") do (
+  set "WORKINGSET_EXTERNAL_PATH=%%i"
   call :PROCESS_INNER_WORKINGSET_PATH_EXTERNALS_LIST
 )
 
@@ -582,22 +604,19 @@ goto IGNORE_INNER_SUPPRESS_DUPLICATE_CHANGE
 :PROCESS_INNER_WORKINGSET_PATH_EXTERNALS_LIST
 rem 1. Make URL absolute
 rem 2. Convert forward/backward slashes (special form of the echo command to ignore special characters in the echo value).
-if not "%WORKINGSET_EXTERNAL_PATH:~1,1%" == ":" set "WORKINGSET_EXTERNAL_PATH=%WORKINGSET_EXTERNAL_PATH:./=%"
-if not "%WORKINGSET_EXTERNAL_PATH:~1,1%" == ":" set "WORKINGSET_EXTERNAL_PATH=%WCDIR_PATH:\=/%/%WORKINGSET_EXTERNAL_PATH%"
+set "WORKINGSET_EXTERNAL_PATH=%WCDIR_PATH:\=/%/%WORKINGSET_EXTERNAL_PATH%"
 for /F "eol=	 tokens=* delims=" %%i in ("%WORKINGSET_EXTERNAL_PATH:/=\\%") do (
   (echo.%%i) >> "%WORKINGSET_PATH_EXTERNALS_PATHS_TMP%"
 )
 
 exit /b 0
 
-rem call "%%CONTOOLS_ROOT%%/scm/svn/svn_has_changes.bat" -stat-exclude-? -stat-include-X -stat-exclude-versioned "%%WCDIR_PATH%%" >> "%WORKINGSET_PATH_STATUS_EXTERNALS_TMP%"
-
 :IGNORE_INNER_SUPPRESS_DUPLICATE_CHANGE
 
 if %FLAG_WINDOW_PER_REPOROOT% EQU 0 exit /b 0
 
 rem read repository Root
-call "%%CONTOOLS_ROOT%%/scm/svn/extract_info_param.bat" "%%WORKINGSET_PATH_INFO_TMP%%" "Repository Root"
+call "%%CONTOOLS_ROOT%%/scm/svn/extract_info_param.bat" "%%WORKINGSET_PATH_INFO_TEXT_TMP%%" "Repository Root"
 rem ignore on error
 if %ERRORLEVEL% NEQ 0 exit /b 0
 
@@ -607,7 +626,7 @@ rem count unique repository roots
 type "%TORTOISEPROC_PATHFILE_WORKINGSET_TMP%" | findstr.exe /L "|%REPOROOT%|" >nul 2>nul
 if %ERRORLEVEL% NEQ 0 set /A REPOROOT_INDEX+=1
 
-for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do ^
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%\") do ^
 for /F "eol=	 tokens=* delims=" %%j in ("%REPOROOT%") do (echo.%%i^|%%j^|) >> "%TORTOISEPROC_PATHFILE_WORKINGSET_TMP%"
 
 exit /b 0

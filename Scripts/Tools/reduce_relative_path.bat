@@ -4,8 +4,8 @@ rem Author: Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
 rem   Script converts relative path with . and .. occurrences to the absolute
-rem   path and tries subtruct current directory path from it.
-rem   If no . and .. occurrences found or could not subtruct then leave
+rem   path and tries subtract current directory path from it.
+rem   If no . and .. occurrences found or could not subtract then leave
 rem   relative path or intermediate absolute path as is.
 
 rem Command arguments:

@@ -523,6 +523,7 @@ Scripts/Tools/strstr.bat -text
 Scripts/Tools/strtrim.bat -text
 Scripts/Tools/strupcase.bat -text
 Scripts/Tools/subtract_path.bat -text
+Scripts/Tools/subtract_relative_path.bat -text
 Scripts/Tools/synclib.sh -text
 Scripts/Tools/tee2.sh -text
 Scripts/Tools/testlib.sh -text
