@@ -29,7 +29,7 @@ rem ignore empty lists
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
 if %ERRORLEVEL% EQU 0 goto IGNORE_OUTTER_ALL_IN_ONE_PROCESS
 
-if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% NEQ 0 ( call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS || goto EXIT_MAIN )
+if %FLAG_FORCE_USE_NOT_ORPHAN_EXTERNAL_PATHS% EQU 0 ( call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS || goto EXIT_MAIN )
 
 rem convert dos line returns to unix
 call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto EXIT_MAIN
@@ -92,11 +92,13 @@ set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf.
 set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf-filtered.lst"
 rem set "WORKINGSET_PATH_STATUS_EXTERNALS_TMP=%REPOROOT_TASK_DIR%\status_externals.lst"
 set "WORKINGSET_PATH_INFO_TEXT_TMP=%REPOROOT_TASK_DIR%\$info.txt"
-set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%REPOROOT_TASK_DIR%\externals_db.lst"
+set "WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP=%REPOROOT_TASK_DIR%\externals_db"
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP=%WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP%\{{REF}}.lst"
 set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%REPOROOT_TASK_DIR%\external_paths.lst"
 
 if not exist "%REPOROOT_TASK_DIR%\" (
   mkdir "%REPOROOT_TASK_DIR%"
+  mkdir "%WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP%"
   rem create empty files
   type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 )
@@ -105,7 +107,7 @@ rem Save to pathfile associated with repository root
 rem (special form of the echo command to ignore special characters in the echo value).
 for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%\") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
-if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% EQU 0 goto IGNORE_OUTTER_SUPPRESS_DUPLICATE_CHANGE
+if %FLAG_FORCE_USE_NOT_ORPHAN_EXTERNAL_PATHS% NEQ 0 goto IGNORE_OUTTER_SUPPRESS_DUPLICATE_CHANGE
 
 rem extract the directory WC root through the info file if WCDIR_PATH is not WC root
 set "WCROOT_PATH=%WCDIR_PATH%"
@@ -126,6 +128,13 @@ set "WCROOT_PATH=%RETURN_VALUE%"
 :IGNORE_OUTTER_WCROOT_FROM_WCDIR
 
 rem append to the workingset externals from the WC root database ONLY
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP%"
+
+set "WCDIR_PATH_DECORATED=%WCDIR_PATH::=--%"
+set "WCDIR_PATH_DECORATED=%WCDIR_PATH_DECORATED:\=--%"
+
+call set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP:{{REF}}=%WCDIR_PATH_DECORATED%%%"
+
 call "%%SVNCMD_TOOLS_ROOT%%/svn_externals_list.bat" -l -offline -wcroot "%%WCROOT_PATH%%" "%%WCDIR_PATH%%" > "%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP%"
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in ("%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP%") do (
@@ -173,7 +182,8 @@ set "REPOROOT_TASK_DIR=%TEMP_FILE_OUTTER_DIR%\reporoots\%REPOROOT_TASK_DIR_DECOR
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-crlf-filtered.lst"
 rem set "WORKINGSET_PATH_STATUS_EXTERNALS_TMP=%REPOROOT_TASK_DIR%\status_externals.lst"
-set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%REPOROOT_TASK_DIR%\externals_db.lst"
+set "WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP=%REPOROOT_TASK_DIR%\externals_db"
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP=%WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP%\{{REF}}.lst"
 set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%REPOROOT_TASK_DIR%\external_paths.lst"
 
 set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%REPOROOT_TASK_DIR%\pathfile-ansi-cr.lst"
@@ -190,7 +200,7 @@ rem ignore empty lists
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
 if %ERRORLEVEL% EQU 0 exit /b 0
 
-if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% NEQ 0 ( call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS || goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_EXIT )
+if %FLAG_FORCE_USE_NOT_ORPHAN_EXTERNAL_PATHS% EQU 0 ( call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS || goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_EXIT )
 
 rem convert dos line returns to unix
 call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto OUTTER_WINDOW_PER_REPOROOT_PROCESS_EXIT
@@ -214,7 +224,7 @@ set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
 rem cleanup temporary files
-rem rmdir /S /Q "%TEMP_FILE_OUTTER_DIR%"
+rmdir /S /Q "%TEMP_FILE_OUTTER_DIR%"
 
 rem if %FLAG_WAIT_EXIT% EQU 0 (
 rem   rem delete the external file in case if left behind
@@ -239,14 +249,11 @@ set FLAG_WINDOW_PER_REPOROOT=0
 rem Force use workingset paths with out versioned changes.
 rem Has meaning only for /command:commit and if -all-in-one flag is not set.
 set FLAG_FORCE_USE_WORKINGSET_PATHS_WITHOUT_VERSIONED_CHANGES=0
-rem Drop not orphan external paths.
+rem Force use not orphan external paths.
 rem Has meaning only for all-in-one/window-per-wcdir/window-per-reporoot only modes.
-rem CAUTION:
-rem   Currently uses `svn pget svn:externals` due to a bug in the `svn status` (shows "merged" paths instead of complete one)!
-rem   This will might NOT SHOW versioned changes in orphan externals (externals existed in the WC directories, but not registered in the parent WC database), because
-rem   instead of the parent WC database the script will use externals listed in properties, where orphaned records WILL BE PRESENT.
-rem   See details here: https://svn.haxx.se/users/archive-2017-06/0057.shtml ("svn status merges intersected external records into single row")
-set FLAG_DROP_NOT_ORPHAN_EXTERNALS=0
+rem By default externals registered in the wc.db EXTERNALS table will be removed from the pathsfile.
+rem The wc.db EXTERNALS table used as workaround for the `svn status` bug: https://svn.haxx.se/users/archive-2017-06/0057.shtml ("svn status merges intersected external records into single row")
+set FLAG_FORCE_USE_NOT_ORPHAN_EXTERNAL_PATHS=0
 
 rem internal flags
 set FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES=0
@@ -290,8 +297,8 @@ if not "%FLAG%" == "" (
   ) else if "%FLAG%" == "-force-use-workingset-paths-wo-versioned-changes" (
     set FLAG_FORCE_USE_WORKINGSET_PATHS_WITHOUT_VERSIONED_CHANGES=1
     shift
-  ) else if "%FLAG%" == "-drop-not-orphan-externals" (
-    set FLAG_DROP_NOT_ORPHAN_EXTERNALS=1
+  ) else if "%FLAG%" == "-force-use-not-orphan-external-paths" (
+    set FLAG_FORCE_USE_NOT_ORPHAN_EXTERNAL_PATHS=1
     shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
@@ -345,7 +352,8 @@ set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-cr
 set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%TEMP_FILE_OUTTER_DIR%\pathfile-ansi-crlf-filtered.lst"
 rem set "WORKINGSET_PATH_STATUS_EXTERNALS_TMP=%TEMP_FILE_OUTTER_DIR%\status_externals.lst"
 set "WORKINGSET_PATH_INFO_TEXT_TMP=%TEMP_FILE_OUTTER_DIR%\$info.txt"
-set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%TEMP_FILE_OUTTER_DIR%\externals_db.lst"
+set "WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP=%TEMP_FILE_OUTTER_DIR%\externals_db"
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP=%WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP%\{{REF}}.lst"
 set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%TEMP_FILE_OUTTER_DIR%\external_paths.lst"
 
 rem create temporary files to store local context output
@@ -355,6 +363,7 @@ if exist "%TEMP_FILE_OUTTER_DIR%\" (
 ) >&2
 
 mkdir "%TEMP_FILE_OUTTER_DIR%"
+mkdir "%WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP%"
 
 rem create empty files
 if %FLAG_WINDOW_PER_WCDIR% EQU 0 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
@@ -454,7 +463,8 @@ set "FILEPATH_TASK_DIR=%TEMP_FILE_OUTTER_DIR%\wcdirs\%FILEPATH_TASK_DIR_DECORATE
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\pathfile-ansi-crlf-filtered.lst"
 rem set "WORKINGSET_PATH_STATUS_EXTERNALS_TMP=%FILEPATH_TASK_DIR%\status_externals.lst"
-set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%FILEPATH_TASK_DIR%\externals_db.lst"
+set "WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP=%FILEPATH_TASK_DIR%\externals_db"
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP=%WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP%\{{REF}}.lst"
 set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%FILEPATH_TASK_DIR%\external_paths.lst"
 
 set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%FILEPATH_TASK_DIR%\pathfile-ansi-cr.lst"
@@ -474,6 +484,7 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
 )
 
 mkdir "%FILEPATH_TASK_DIR%"
+mkdir "%WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP%"
 
 rem recreate empty files
 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
@@ -500,7 +511,7 @@ rem ignore empty lists
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
 if %ERRORLEVEL% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCDIR_PROCESS
 
-if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% NEQ 0 ( call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS || goto NEXT_LOOKUP_DIR )
+if %FLAG_FORCE_USE_NOT_ORPHAN_EXTERNAL_PATHS% EQU 0 ( call :REMOVE_PATHFILE_NOT_ORPHAN_EXTERNALS || goto NEXT_LOOKUP_DIR )
 
 rem convert dos line returns to unix
 call "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%" > "%TORTOISEPROC_PATHFILE_ANSI_LF_TMP%" || goto NEXT_LOOKUP_DIR
@@ -571,7 +582,7 @@ exit /b 0
 :IGNORE_INNER_WINDOW_PER_WCROOT_PROCESS
 
 if %FLAG_WINDOW_PER_REPOROOT% NEQ 0 goto IGNORE_INNER_SUPPRESS_DUPLICATE_CHANGE
-if %FLAG_DROP_NOT_ORPHAN_EXTERNALS% EQU 0 goto IGNORE_INNER_SUPPRESS_DUPLICATE_CHANGE
+if %FLAG_FORCE_USE_NOT_ORPHAN_EXTERNAL_PATHS% NEQ 0 goto IGNORE_INNER_SUPPRESS_DUPLICATE_CHANGE
 
 rem extract the directory WC root through the info file if WCDIR_PATH is not WC root
 set "WCROOT_PATH=%WCDIR_PATH%"
@@ -592,6 +603,13 @@ set "WCROOT_PATH=%RETURN_VALUE%"
 :IGNORE_INNER_WCROOT_FROM_WCDIR
 
 rem append to the workingset externals from the WC root database ONLY
+set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP%"
+
+set "WCDIR_PATH_DECORATED=%WCDIR_PATH::=--%"
+set "WCDIR_PATH_DECORATED=%WCDIR_PATH_DECORATED:\=--%"
+
+call set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP:{{REF}}=%WCDIR_PATH_DECORATED%%%"
+
 call "%%SVNCMD_TOOLS_ROOT%%/svn_externals_list.bat" -l -offline -wcroot "%%WCROOT_PATH%%" "%%WCDIR_PATH%%" > "%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP%"
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in ("%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP%") do (
