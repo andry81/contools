@@ -87,27 +87,17 @@ if not exist "%XPATH_LIST_FILE_FILTER%" (
   exit /b 5
 ) >&2
 
-call "%%CONTOOLS_ROOT%%/get_datetime.bat"
-set "TEMP_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
-set "TEMP_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 
-set "TEMP_FILE_DIR=%TEMP%\%?~n0%.%TEMP_DATE%.%TEMP_TIME%"
-set "XPATH_LIST_FILE_IN_TEMP_FILE=%TEMP_FILE_DIR%\xpath_in.lst"
-set "XPATH_LIST_FILE_FILTER_TEMP_FILE=%TEMP_FILE_DIR%\xpath_filter.lst"
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
-rem create temporary files to store local context output
-if exist "%TEMP_FILE_DIR%" (
-  echo.%?~nx0%: error: temporary generated directory TEMP_FILE_DIR is already exist: "%TEMP_FILE_DIR%"
-  exit /b 6
-)
-
-mkdir "%TEMP_FILE_DIR%"
+set "XPATH_LIST_FILE_IN_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\xpath_in.lst"
+set "XPATH_LIST_FILE_FILTER_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\xpath_filter.lst"
 
 call :MAIN
 set LASTERROR=%ERRORLEVEL%
 
 rem cleanup temporary files
-rmdir /S /Q "%TEMP_FILE_DIR%"
+call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
 exit /b %LASTERROR%
 
