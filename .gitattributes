@@ -167,6 +167,9 @@ Scripts/Tests/batscripts/test_cstresc.bat -text
 Scripts/Tests/batscripts/test_envblock_size.bat -text
 Scripts/Tests/batscripts/test_extract_version.bat -text
 Scripts/Tests/batscripts/test_setvarsfromfile.bat -text
+Scripts/Tests/batscripts/test_std_allocate_temp_dir_nested.bat -text
+Scripts/Tests/batscripts/test_std_allocate_temp_dir_nested_with_task.bat -text
+Scripts/Tests/batscripts/test_std_allocate_temp_dir_nested_with_task_count.bat -text
 Scripts/Tests/batscripts/test_strchr.bat -text
 Scripts/Tests/batscripts/test_stresc.bat -text
 Scripts/Tests/batscripts/test_strlen.bat -text
@@ -505,8 +508,11 @@ Scripts/Tools/sqlite/sqldiff.exe -text
 Scripts/Tools/sqlite/sqlite.bat -text
 Scripts/Tools/sqlite/sqlite3.exe -text
 Scripts/Tools/sqlite/sqlite3_analyzer.exe -text
+Scripts/Tools/std/__init__.bat -text
+Scripts/Tools/std/allocate_temp_dir.bat -text
 Scripts/Tools/std/append_list_from_string.bat -text
 Scripts/Tools/std/clear_list.bat -text
+Scripts/Tools/std/free_temp_dir.bat -text
 Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
 Scripts/Tools/std/replace_sys_chars.bat -text
