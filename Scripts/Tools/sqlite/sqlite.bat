@@ -2,12 +2,8 @@
 
 setlocal
 
-rem remember current code page
-call :GET_CURRENT_CODE_PAGE
-
-rem set utf-8 code page for sqlite
-rem chcp 65001 2>&1 >nul
-chcp 866 2>&1 >nul
+rem get and set code page
+call "%%CONTOOLS_ROOT%%/std/chcp.bat" 866
 
 if 0%SVNCMD_TOOLS_DEBUG_VERBOCITY_LVL% GEQ 1 (echo.^>^>%0 %*) >&3
 
@@ -15,10 +11,12 @@ if 0%SVNCMD_TOOLS_DEBUG_VERBOCITY_LVL% GEQ 1 (echo.^>^>%0 %*) >&3
 set LASTERROR=%ERRORLEVEL%
 
 rem restore code page
-chcp %CURRENT_CODE_PAGE% 2>&1 >nul
+call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
-exit /b %LASTERROR%
-
-:GET_CURRENT_CODE_PAGE
-for /F "usebackq eol=	 tokens=2 delims=:" %%i in (`chcp 2^>nul`) do set CURRENT_CODE_PAGE=%%i
-set CURRENT_CODE_PAGE=%CURRENT_CODE_PAGE: =%
+(
+  endlocal
+  rem restore chcp variables
+  set "CURRENT_CP=%CURRENT_CP%"
+  set "LAST_CP=%LAST_CP%"
+  exit /b %LASTERROR%
+)

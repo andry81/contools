@@ -24,14 +24,9 @@ set "CODE_PAGE=%~1"
 
 shift
 
-if "%CODE_PAGE%" == "" goto NOCODEPAGE
+rem get and set code page
+call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CODE_PAGE%%
 
-for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
-set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
-
-if not "%LAST_CODE_PAGE%" == "%CODE_PAGE%" chcp %CODE_PAGE% >nul
-
-:NOCODEPAGE
 set "PREFIX_PATH_VAR=%~1"
 set "INSTDIR_SUBDIR=%~2"
 set "FILE_FILTER=%~3"
@@ -59,7 +54,8 @@ shift
 
 if exist "%~1" goto PROCESS_DIR_LOOP
 
-if not "%LAST_CODE_PAGE%" == "%CODE_PAGE%" chcp %LAST_CODE_PAGE% >nul
+rem restore code page
+call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 exit /b 0
 

@@ -17,14 +17,9 @@ set CODE_PAGE=%~1
 
 shift
 
-if "%CODE_PAGE%" == "" goto NOCODEPAGE
+rem get and set code page
+call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CODE_PAGE%%
 
-for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
-set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
-
-if not "%LAST_CODE_PAGE%" == "%CODE_PAGE%" chcp %CODE_PAGE% >nul
-
-:NOCODEPAGE
 set "FILE_FILTER=%~1"
 
 rem ignore specific patterns to avoid problems
@@ -67,7 +62,8 @@ goto ARCHIVE_FILE_FILTERS_LOOP
 rem double evaluate to % ~dpf1 to handle case with the *: "*" -> "X:\YYY\."
 call :PROCESS_FILE_PATH "%%FILE_PATH%%" || goto :EOF
 
-if not "%LAST_CODE_PAGE%" == "%CODE_PAGE%" chcp %LAST_CODE_PAGE% >nul
+rem restore code page
+call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 exit /b 0
 

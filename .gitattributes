@@ -511,12 +511,14 @@ Scripts/Tools/sqlite/sqlite3_analyzer.exe -text
 Scripts/Tools/std/__init__.bat -text
 Scripts/Tools/std/allocate_temp_dir.bat -text
 Scripts/Tools/std/append_list_from_string.bat -text
+Scripts/Tools/std/chcp.bat -text
 Scripts/Tools/std/clear_list.bat -text
 Scripts/Tools/std/free_temp_dir.bat -text
 Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
 Scripts/Tools/std/replace_sys_chars.bat -text
 Scripts/Tools/std/restore_sys_chars.bat -text
+Scripts/Tools/std/restorecp.bat -text
 Scripts/Tools/strchr.bat -text
 Scripts/Tools/stresc.bat -text
 Scripts/Tools/stringlib.sh -text
