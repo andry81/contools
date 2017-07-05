@@ -27,11 +27,8 @@ if not exist "%~2\" (
 
 if exist "%WINDIR%\system32\robocopy.exe" goto USE_ROBOCOPY
 
-for /F "usebackq tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
-set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
-
-rem switch locale into english compatible locale
-chcp 65001 >nul
+rem switch code page into english compatible locale
+call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
 
 set "XCOPY_EXCLUDES_CMD="
 call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_DIRS_LIST%%"
@@ -52,8 +49,8 @@ echo.D|xcopy "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 
 set LASTERROR=%ERRORLEVEL%
 
-rem restore locale
-if not "%LAST_CODE_PAGE%" == "65001" chcp %LAST_CODE_PAGE% >nul
+rem restore code page
+call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 exit /b %LASTERROR%
 

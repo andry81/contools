@@ -13,18 +13,15 @@ set "BINARY_DIR=%~2"
 set "TARGET_DIR=%~dp1"
 set "TARGET_FILE=%~f1"
 
-for /F "usebackq tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
-set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
-
 rem switch locale into english compatible locale
-chcp 65001 >nul
+call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
 
 call :XCOPY_FILE "%%TARGET_DIR%%" "%%TARGET_FILE%%" "%%BINARY_DIR%%" /Y /H /R
 
 set LASTERROR=%ERRORLEVEL%
 
-rem restore locale
-if not "%LAST_CODE_PAGE%" == "65001" chcp %LAST_CODE_PAGE% >nul
+rem restore code page
+call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 rem avoid output of this sequence: "error:"
 echo Last return code: %LASTERROR%

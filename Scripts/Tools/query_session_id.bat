@@ -12,10 +12,8 @@ set "SESSION_NAME=%~1"
 set "USER_NAME=%~2"
 set "STATE_NAME=%~3"
 
-for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
-set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
-
-if not "%LAST_CODE_PAGE%" == "65001" chcp 65001 >nul
+rem get and set code page
+call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
 
 set LINE_INDEX=0
 set SESSION_ID=0
@@ -26,7 +24,8 @@ set LASTERROR=%ERRORLEVEL%
 
 rem echo RETURN_VALUE=%RETURN_VALUE%
 
-if not "%LAST_CODE_PAGE%" == "65001" chcp %LAST_CODE_PAGE% >nul
+rem restore code page
+call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 (
   endlocal

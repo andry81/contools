@@ -27,14 +27,9 @@ set CODE_PAGE=%~1
 
 shift
 
-if "%CODE_PAGE%" == "" goto NOCODEPAGE
+rem get and set code page
+call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CODE_PAGE%%
 
-for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`chcp 2^>nul`) do set LAST_CODE_PAGE=%%j
-set LAST_CODE_PAGE=%LAST_CODE_PAGE: =%
-
-if not "%LAST_CODE_PAGE%" == "%CODE_PAGE%" chcp %CODE_PAGE% >nul
-
-:NOCODEPAGE
 set "TOKEN_VALUE=%~1"
 set "FILE_EXT_LIST=%~2"
 set "FILE_PATH_LIST_FILE=%~3"
@@ -99,7 +94,8 @@ if %FILE_INDEX% LSS %NUM_FILES% goto REPEAT_PP_COMMAND_LOOP
 if %NUM_FILES% GTR 0 echo.${SETUP_PP_COMMAND_EPILOG}
 echo.!macroend
 
-if not "%LAST_CODE_PAGE%" == "%CODE_PAGE%" chcp %LAST_CODE_PAGE% >nul
+rem restore code page
+call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 goto :EOF
 
