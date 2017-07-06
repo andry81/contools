@@ -1,4 +1,5 @@
 TortoiseProcByNestedWC script:
+  - do not remove wc dirs if they have changes only in children, remove only if there is no any changes at all
   - /command:commit may show changes in the same window for the same remote directory:
       WCDIR1/parent_path/ext1
       WCDIR2/parent_path/ext1
