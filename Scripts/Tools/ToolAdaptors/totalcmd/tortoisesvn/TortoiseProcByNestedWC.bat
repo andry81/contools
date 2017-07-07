@@ -683,22 +683,30 @@ rename "%TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP%.tmp" "%TORTOISEPROC_PATHF
 exit /b 0
 
 :FILTER_PATHFILE_BY_NOT_ORPHAN_EXTERNALS
+rem don't use empty pathfiles
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%%"
 if %ERRORLEVEL% EQU 0 exit /b 1
 
-rem don't filter by empty externals list
+rem apply the pathlist if empty externals list
 if not exist "%WORKINGSET_PATH_EXTERNALS_PATHS_TMP%" exit /b 0
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%WORKINGSET_PATH_EXTERNALS_PATHS_TMP%%"
 if %ERRORLEVEL% EQU 0 exit /b 0
 
 findstr.exe /I /X /G:"%WORKINGSET_PATH_EXTERNALS_PATHS_TMP%" "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%" > "%TORTOISEPROC_PATHFILE_NOT_ORTHAN_EXTERNALS_ANSI_CRLF_TMP%"
 
-rem continue if nothing has filtered
+rem apply the pathlist if the pathlist consist only of orthan externals not connected to each other
 call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_NOT_ORTHAN_EXTERNALS_ANSI_CRLF_TMP%%"
 if %ERRORLEVEL% EQU 0 exit /b 0
 
+rem get list of orthan externals
 findstr.exe /I /V /X /G:"%WORKINGSET_PATH_EXTERNALS_PATHS_TMP%" "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%" > "%TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP%"
 
+rem apply the pathlist if the pathlist consist only of not orthan externals not connected to each other.
+call "%%CONTOOLS_ROOT%%/get_filesize.bat" "%%TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP%%"
+if %ERRORLEVEL% EQU 0 exit /b 0
+
+rem restore not orphan external path (having versined changes) in the only orphan externals pathlist if all its not orphan parent paths were removed
+rem in the first filter because have had no versioned changes
 type "%TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP%" | "%GNUWIN32_ROOT%/bin/sed.exe" "s/\\/\\\\/g" > "%TORTOISEPROC_PATHFILE_FILTER_ANSI_CRLF_TMP%"
 
 findstr.exe /B /I /V /L /G:"%TORTOISEPROC_PATHFILE_FILTER_ANSI_CRLF_TMP%" "%TORTOISEPROC_PATHFILE_NOT_ORTHAN_EXTERNALS_ANSI_CRLF_TMP%" >> "%TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP%"
