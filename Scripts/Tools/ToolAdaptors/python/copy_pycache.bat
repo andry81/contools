@@ -32,9 +32,8 @@ setlocal
 set "?~nx0=%~nx0"
 
 rem script flags
-set "FLAG_VALUE_PREFIX_DIRS=__pycache__"
-rem default list of suffixes
-set "FLAG_VALUE_SUFFIX_NAMES=.cpython-39|.cpython-38|.cpython-37|.cpython-36|.cpython-35|.cpython-34|.cpython-33|.cpython-32|.cpython-31|.cpython-30"
+set "FLAG_VALUE_PREFIX_DIRS="
+set "FLAG_VALUE_SUFFIX_NAMES="
 
 :FLAGS_LOOP
 
@@ -61,6 +60,9 @@ if not "%FLAG%" == "" (
   rem read until no flags
   goto FLAGS_LOOP
 )
+
+if "%FLAG_VALUE_PREFIX_DIRS%" == "" set "FLAG_VALUE_PREFIX_DIRS=__pycache__"
+if "%FLAG_VALUE_SUFFIX_NAMES%" == "" set "FLAG_VALUE_SUFFIX_NAMES=.cpython-39|.cpython-38|.cpython-37|.cpython-36|.cpython-35|.cpython-34|.cpython-33|.cpython-32|.cpython-31|.cpython-30"
 
 set "SOURCE_DIR=%~1"
 set "SOURCE_DIR_ABS=%~dpf1"
@@ -105,7 +107,7 @@ call :SPLIT_PATHSTR "%%FILE_PATH_FROM%%"
 set "DIR_PATH_TO=%DIR_PATH%"
 set "FILE_PATH_TO=%FILE_PATH%"
 
-if "%DIR_PATH_TO%" == "" goto IGNORE_PREFIX_DIRS
+if "%DIR_PATH_TO%" == "" goto PREFIX_DIRS_END
 
 :PREFIX_DIRS
 set "NEXT_PREFIX_DIR=%FLAG_VALUE_PREFIX_DIRS%"
@@ -122,7 +124,7 @@ goto PREFIX_DIRS_LOOP
 
 if not "%DIR_PATH_TO%" == "" set "DIR_PATH_TO=%DIR_PATH_TO:/=\%\"
 
-if "%FILE_PATH_TO%" == "" goto IGNORE_SUFFIX_NAMES
+if "%FILE_PATH_TO%" == "" goto SUFFIX_NAMES_END
 
 :SUFFIX_NAMES
 set "NEXT_SUFFIX_NAME=%FLAG_VALUE_SUFFIX_NAMES%"
