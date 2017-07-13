@@ -3,8 +3,8 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   Script to restore !, %, and = characters in variables from respective
-rem   ?00, ?01 and ?02 placeholders.
+rem   Script to restore ?, !, %, and = characters in variables from respective
+rem   ?00, ?01, ?02 and ?03 placeholders.
 
 setlocal DISABLEDELAYEDEXPANSION
 
@@ -18,15 +18,16 @@ if "%STR%" == "" exit /b 0
 
 setlocal ENABLEDELAYEDEXPANSION
 
-set STR=!STR:?01=%%!
-set STR=!STR:?02==!
+set STR=!STR:?02=%%!
+set STR=!STR:?03==!
 
 (
   endlocal
   set "STR=%STR%"
 )
 
-set "STR=%STR:?00=!%"
+set "STR=%STR:?01=!%"
+set "STR=%STR:?00=?%"
 
 (
   endlocal
