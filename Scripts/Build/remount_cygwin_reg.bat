@@ -25,15 +25,15 @@ call "%%~dp0__init__.bat" || goto :EOF
 
 rem make all paths canonical
 call "%%CONTOOLS_ROOT%%/abspath.bat" "%%CONTOOLS_ROOT%%"
-set "CONTOOLS_ROOT=%PATH_VALUE%"
+set "CONTOOLS_ROOT=%RETURN_VALUE%"
 
 call "%%CONTOOLS_ROOT%%\abspath.bat" "%%~dp0..\Config"
-set "CONFIG_PATH=%PATH_VALUE%"
+set "CONFIG_PATH=%RETURN_VALUE%"
 
 rem Update variables pointing temporary directories
 call "%%CONTOOLS_ROOT%%\abspath.bat" "%%~dp0..\Temp"
-set "TEMP=%PATH_VALUE%"
-set "TMP=%PATH_VALUE%"
+set "TEMP=%RETURN_VALUE%"
+set "TMP=%RETURN_VALUE%"
 
 rem Save all variables to stack
 setlocal
