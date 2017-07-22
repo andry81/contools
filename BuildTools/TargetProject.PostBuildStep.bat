@@ -11,7 +11,7 @@ set "TARGET_PATH=%~1"
 set "BINARY_DIR=%~2"
 
 set "TARGET_DIR=%~dp1"
-set "TARGET_FILE=%~f1"
+set "TARGET_FILE=%~nx1"
 
 rem switch locale into english compatible locale
 call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001

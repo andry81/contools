@@ -1,0 +1,7 @@
+@echo off
+
+call "%%CONTOOLS_ROOT%%/stresc.bat" /v "" STRING_ESCAPED
+set ERRORLEVEL_RETURNED=%ERRORLEVEL%
+set STRING_EVALUATED=%STRING_ESCAPED%
+
+exit /b 0

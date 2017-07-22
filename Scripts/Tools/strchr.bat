@@ -141,7 +141,7 @@ for /L %%j in (%__FOR20_BEGIN_FROM%,1,%__FOR20_END_TO%) do (
   )
 
   rem Uniform comparison including quote character
-  if %~1 "!__CHAR1!^" == "!__CHAR2!^" exit /b 0
+  if %~4 "!__CHAR1!^" == "!__CHAR2!^" exit /b 0
 )
 
 set /A __FOR20_BEGIN_FROM+=%__FOR20_STEP%
