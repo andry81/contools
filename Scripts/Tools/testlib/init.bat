@@ -6,6 +6,11 @@ rem   script before the first call to the test.bat script.
 rem
 rem   The first argument must be the full path to the user test script file from
 rem   which this script calls.
+rem
+rem   The second argument (optional) can point to a directory with user handler
+rem   scripts. Can absolute or relative. If relative then relative to the
+rem   directory path from first argument.
+rem
 
 rem initialize testlib "module"
 call "%%~dp0__init__.bat" || goto :EOF
@@ -16,6 +21,17 @@ if %TESTLIB__NEST_LVL%0 EQU 0 (
   set TESTLIB__PASSED_TESTS=0
   set TESTLIB__OVERALL_TESTS=0
 )
+
+set "TEST_SCRIPT_FILE_PATH=%~1"
+if not "%TEST_SCRIPT_FILE_PATH%" == "" ^
+if "%TEST_SCRIPT_FILE_PATH:~1,1%" == ":" goto TEST_SCRIPT_FILE_PATH_OK
+
+(
+  echo.%~nx0: error: test script file path is empty or not absolute: "%TEST_SCRIPT_FILE_PATH%".
+  exit /b -255
+) >&2
+
+:TEST_SCRIPT_FILE_PATH_OK
 
 rem shortcuts to the user test script file name
 set "?~n0=%~n1"
@@ -39,6 +55,15 @@ set "TEST_SCRIPT_FILE_DIR=%TEST_SCRIPT_FILE_DIR:~0,-1%"
 set "TEST_SCRIPT_FILE_DIR=%TEST_SCRIPT_FILE_DIR:\=/%"
 
 set "TEST_SCRIPT_OUTPUT_DIR=%TEST_SCRIPT_FILE_DIR%/_output"
+
+set "TEST_SCRIPT_HANDLERS_DIR=%~2"
+
+if "%TEST_SCRIPT_HANDLERS_DIR%" == "" (
+  set "TEST_SCRIPT_HANDLERS_DIR=%TEST_SCRIPT_FILE_DIR%"
+) else if not ":" == "%TEST_SCRIPT_HANDLERS_DIR:~1,1%" (
+  rem relative to the script directory path
+  set "TEST_SCRIPT_HANDLERS_DIR=%TEST_SCRIPT_FILE_DIR%/%TEST_SCRIPT_HANDLERS_DIR:\=/%"
+)
 
 rem tests counter
 set TESTLIB__TEST_COUNT=0
