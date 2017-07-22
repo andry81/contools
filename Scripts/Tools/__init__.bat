@@ -1,5 +1,7 @@
 @echo off
 
+if %__CONTOOLS_INIT__%0 NEQ 0 exit /b 0
+
 if "%CONTOOLS_ROOT%" == "" set "CONTOOLS_ROOT=%~dp0"
 set "CONTOOLS_ROOT=%CONTOOLS_ROOT:\=/%"
 if "%CONTOOLS_ROOT:~-1%" == "/" set "CONTOOLS_ROOT=%CONTOOLS_ROOT:~0,-1%"
@@ -31,3 +33,5 @@ if "%HASHDEEP_ROOT:~-1%" == "/" set "HASHDEEP_ROOT=%HASHDEEP_ROOT:~0,-1%"
 if "%VARS_ROOT%" == "" set "VARS_ROOT=%CONTOOLS_ROOT%/vars"
 set "VARS_ROOT=%VARS_ROOT:\=/%"
 if "%VARS_ROOT:~-1%" == "/" set "VARS_ROOT=%VARS_ROOT:~0,-1%"
+
+set __CONTOOLS_INIT__=1

@@ -12,14 +12,10 @@ if 0%__CTRL_SETLOCAL% EQU 1 (
 )
 set __CTRL_SETLOCAL=1
 
-call "%%~dp0__init__.bat"
+call "%%~dp0__init__.bat" || goto :EOF
+call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || goto :EOF
 
-echo Running %~nx0...
-title %~nx0 %*
-
-set /A __NEST_LVL+=1
-
-set __COUNTER1=1
+set __TEST_COUNT_OUTTER=1
 
 set __STRING__=012345 78901^	-^"'`^?^*^&^|^<^>^(^)
 call :TEST_SEQ1 6 6 15 12 6 -1 14 -1 25
@@ -45,7 +41,8 @@ call :TEST_SEQ2 -1 -1 -1 -1
 goto EXIT
 
 :TEST_SEQ1
-set __COUNTER2=1
+rem reset tests counter
+set TESTLIB__TEST_COUNT=0
 
 set __CHARS__= ^	-^"'`^?^*^&^|^<^>^(^)
 call :TEST %%1
@@ -74,14 +71,15 @@ call :TEST %%8
 set "__CHARS__="
 call :TEST %%9
 
-set /A __COUNTER1+=1
+set /A __TEST_COUNT_OUTTER+=1
 
 echo.
 
 exit /b 0
 
 :TEST_SEQ2
-set __COUNTER2=1
+rem reset tests counter
+set TESTLIB__TEST_COUNT=0
 
 set "__CHARS__="
 call :TEST %%1
@@ -95,55 +93,21 @@ call :TEST %%3 /i
 set __CHARS__=!
 call :TEST %%4
 
-set /A __COUNTER1+=1
+set /A __TEST_COUNT_OUTTER+=1
 
 echo.
 
 exit /b 0
 
-:TEST
-set "STRING_OFFSET=%~1"
-call :CMD "%%CONTOOLS_ROOT%%/strchr.bat" /v "" "" %%2
-set LASTERRORLEVEL=%ERRORLEVEL%
-goto CMD_END
-
-:CMD
-echo.^>%~nx1 %2 %3 %4 %5
-(%*)
-exit /b
-:CMD_END
-
-if %LASTERRORLEVEL% GEQ 0 (
-  call set "FOUND_CHAR=%%__STRING__:~%LASTERRORLEVEL%,1%%"
-) else set "FOUND_CHAR="
-
-if "%FOUND_CHAR%^" == "~%LASTERRORLEVEL%,1^" set "FOUND_CHAR="
-if %STRING_OFFSET% EQU %LASTERRORLEVEL% (
-  set /A __PASSED_TESTS+=1
-  rem print string containing __STRING__ and __CHARS__ environment variable value which may hold batch control characters
-  "%CONTOOLS_ROOT%/printf.exe" "PASSED: %__COUNTER1%.%__COUNTER2%: (%STRING_OFFSET% == %LASTERRORLEVEL%) FOUND_CHAR=`${FOUND_CHAR}` STRING=`${__STRING__}` CHARS=`${__CHARS__}`"
-) else (
-  rem print string containing __STRING__ and __CHARS__ environment variable value which may hold batch control characters
-  "%CONTOOLS_ROOT%/printf.exe" "FAILED: %__COUNTER1%.%__COUNTER2%: (%STRING_OFFSET% == %LASTERRORLEVEL%) FOUND_CHAR=`${FOUND_CHAR}` STRING=`${__STRING__}` CHARS=`${__CHARS__}`"
-)
-
-set /A __OVERALL_TESTS+=1
-set /A __COUNTER2+=1
-
-goto :EOF
-
 :EXIT
-rem Drop internal variables but use some changed value(s) for the return
-(
-  endlocal
-  set __PASSED_TESTS=%__PASSED_TESTS%
-  set __OVERALL_TESTS=%__OVERALL_TESTS%
-  set __NEST_LVL=%__NEST_LVL%
-)
+if %LASTERROR% EQU 0 echo.
 
-set /A __NEST_LVL-=1
+rem WARNING: must be called without the call prefix!
+"%TESTLIB_ROOT%/exit.bat"
 
-if %__NEST_LVL%0 EQU 0 (
-  echo    %__PASSED_TESTS% of %__OVERALL_TESTS% tests is passed.
-  pause
-)
+rem no code can be executed here, just in case
+exit /b
+
+:TEST
+call "%%TESTLIB_ROOT%%/test.bat" %%*
+exit /b

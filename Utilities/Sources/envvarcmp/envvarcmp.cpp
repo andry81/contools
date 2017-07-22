@@ -111,7 +111,7 @@ namespace {
             last_offset = p + 5;
             const size_t v1_value_len = strlen(v1_value);
             for(size_t i = 0; i < v1_value_len; i++) {
-              parsed_str.append(hextbl[v1_value[i] - '0']);
+              parsed_str.append(hextbl[v1_value[i]]);
             }
             found = true;
           }

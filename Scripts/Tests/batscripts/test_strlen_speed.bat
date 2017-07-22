@@ -12,66 +12,36 @@ if 0%__CTRL_SETLOCAL% EQU 1 (
 )
 set __CTRL_SETLOCAL=1
 
-call "%%~dp0__init__.bat"
+call "%%~dp0__init__.bat" || goto :EOF
+call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || goto :EOF
 
-echo Running %~nx0...
-title %~nx0 %*
-
-set /A __NEST_LVL+=1
-
-setlocal EnableDelayedExpansion
-
-set __COUNTER1=1
 set __STRING__=a
-set __STRING_LEN__=1
+set STRING_LEN=1
 
 for /L %%i in (1,1,13) do (
   call :TEST
 )
 
-echo.
+if %LASTERROR% EQU 0 echo.
 
-goto EXIT
+rem WARNING: must be called without the call prefix!
+"%TESTLIB_ROOT%/exit.bat"
+
+rem no code can be executed here, just in case
+exit /b
 
 :TEST
-call :CMD "%%CONTOOLS_ROOT%%/strlen.bat" /v
-set LASTERRORLEVEL=%ERRORLEVEL%
-goto CMD_END
+call "%%TESTLIB_ROOT%%/test.bat" %%*
 
-:CMD
-echo.^>%~nx1 %2
-(%*)
-exit /b
-:CMD_END
-
-if %__STRING_LEN__% EQU %LASTERRORLEVEL% (
-  set /A __PASSED_TESTS+=1
-  rem print string containing __STRING__ and __CHARS__ environment variable value which may hold batch control characters
-  "%CONTOOLS_ROOT%/printf.exe" "PASSED: %__COUNTER1%: (%__STRING_LEN__% == %LASTERRORLEVEL%) STRING=`${__STRING__}`"
-) else (
-  "%CONTOOLS_ROOT%/printf.exe" "FAILED: %__COUNTER1%: (%__STRING_LEN__% == %LASTERRORLEVEL%) STRING=`${__STRING__}`"
-)
-
-set /A __OVERALL_TESTS+=1
-set /A __COUNTER1+=1
+setlocal EnableDelayedExpansion
 
 set __STRING__=!__STRING__!!__STRING__!
-set /A __STRING_LEN__*=2
+set /A STRING_LEN*=2
 
-goto :EOF
-
-:EXIT
-rem Drop internal variables but use some changed value(s) for the return
 (
   endlocal
-  set __PASSED_TESTS=%__PASSED_TESTS%
-  set __OVERALL_TESTS=%__OVERALL_TESTS%
-  set __NEST_LVL=%__NEST_LVL%
+  set "__STRING__=%__STRING__%"
+  set "STRING_LEN=%STRING_LEN%"
 )
 
-set /A __NEST_LVL-=1
-
-if %__NEST_LVL%0 EQU 0 (
-  echo    %__PASSED_TESTS% of %__OVERALL_TESTS% tests is passed.
-  pause
-)
+exit /b
