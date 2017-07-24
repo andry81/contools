@@ -15,8 +15,24 @@ rem    echo RETURN_VALUE=%RETURN_VALUE%
 rem Drop return value
 set "RETURN_VALUE="
 
-if "%~1" == "" exit /b -255
+setlocal
 
-set "RETURN_VALUE=%~dpf1"
+set "FROM_PATH=%~1"
+if not "%FROM_PATH%" == "" set "FROM_PATH=%FROM_PATH:/=\%"
+
+if not "%FROM_PATH%" == "" ^
+if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
+
+(
+  echo.%~nx0: error: path is invalid: "%FROM_PATH%".
+  exit /b -255
+) >&2
+
+:FROM_PATH_OK
+
+(
+  endlocal
+  set "RETURN_VALUE=%~dpf1"
+)
 
 exit /b 0

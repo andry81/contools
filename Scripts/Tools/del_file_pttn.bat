@@ -9,12 +9,22 @@ rem   Can remove a file by extended and separated patterns: dir+file+extention.
 setlocal
 
 set "FILE_DIR=%~1"
-set "FILE_DIR=%FILE_DIR:/=\%"
-if not "%FILE_DIR%" == "" if not "%FILE_DIR:~-1%" == "\" set "FILE_DIR=%FILE_DIR%\"
+if not "%FILE_DIR%" == "" set "FILE_DIR=%FILE_DIR:/=\%"
 
+if not "%FILE_DIR%" == "" ^
+if not "\" == "%FILE_DIR:~0,1%" goto FILE_DIR_OK
+
+(
+  echo.%~nx0: error: path is invalid: "%FILE_DIR%".
+  exit /b -255
+) >&2
+
+:FILE_DIR_OK
+
+if not "%FILE_DIR:~-1%" == "\" set "FILE_DIR=%FILE_DIR%\"
 if not exist "%FILE_DIR%" (
   echo.%~nx0: error: file directory does not exist: "%FILE_DIR%"
-  exit /b 127
+  exit /b -254
 ) >&2
 
 set "FILE_NAME_PTTN=%~2"

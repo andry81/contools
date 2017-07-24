@@ -20,13 +20,28 @@ rem    echo FOUND_PATH=%FOUND_PATH%
 rem Drop variable FOUND_PATH.
 set "FOUND_PATH="
 
-if "%~1" == "" exit /b 65
+setlocal
 
-rem Drop last error level.
-cd .
+set "FROM_PATH=%~1"
+if not "%FROM_PATH%" == "" set "FROM_PATH=%FROM_PATH:/=\%"
+
+if not "%FROM_PATH%" == "" ^
+if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
+
+(
+  echo.%~nx0: error: path is invalid: "%FROM_PATH%".
+  exit /b -255
+) >&2
+
+:FROM_PATH_OK
 
 if not "%~2" == "-i" (
-  if not exist "%~1" exit /b 1
+  if not exist "%FROM_PATH%" exit /b 1
 )
 
-set "FOUND_PATH=%~dp1"
+(
+  endlocal
+  set "FOUND_PATH=%~dp1"
+)
+
+exit /b 0
