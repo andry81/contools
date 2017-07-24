@@ -16,14 +16,40 @@ rem   robocopy.exe will copy hidden and archive files by default.
 
 setlocal
 
+set "FROM_PATH=%~1"
+set "TO_PATH=%~2"
+
+if not "%FROM_PATH%" == "" set "FROM_PATH=%FROM_PATH:/=\%"
+if not "%TO_PATH%" == "" set "TO_PATH=%TO_PATH:/=\%"
+
+if not "%FROM_PATH%" == "" ^
+if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
+
+(
+  echo.%~nx0: error: input directory is invalid: "%FROM_PATH%".
+  exit /b -255
+) >&2
+
+:FROM_PATH_OK
+
+if not "%TO_PATH%" == "" ^
+if not "\" == "%TO_PATH:~0,1%" goto TO_PATH_OK
+
+(
+  echo.%~nx0: error: output directory is invalid: "%TO_PATH%".
+  exit /b -254
+) >&2
+
+:TO_PATH_OK
+
+if not exist "%TO_PATH%\" (
+  echo.%~nx0: error: output directory does not exist: "%TO_PATH%\"
+  exit /b -253
+) >&2
+
 set "FROM_PATH=%~dpf1"
 set "TO_PATH=%~dpf2"
 set XCOPY_FLAGS=%3 %4 %5 %6 %7 %8 %9
-
-if not exist "%~2\" (
-  echo.%~nx0: error: output directory does not exist: "%~2\"
-  exit /b 127
-) >&2
 
 if exist "%WINDIR%\system32\robocopy.exe" goto USE_ROBOCOPY
 
@@ -43,9 +69,9 @@ if %ERRORLEVEL% EQU 0 (
   )
 )
 
-echo.^>xcopy "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
+echo.^>xcopy.exe "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 rem echo.D will only work if locale is in english !!!
-echo.D|xcopy "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
+echo.D|xcopy.exe "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 
 set LASTERROR=%ERRORLEVEL%
 
@@ -95,8 +121,8 @@ exit /b 0
 
 :SET_ROBOCOPY_EXCLUDE_FILES_CMD_END
 
-echo.^>robocopy "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /NP /TEE /NJH /NS /NC %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
-robocopy "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /NP /TEE /NJH /NS /NC %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
+echo.^>robocopy.exe "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /NP /TEE /NJH /NS /NC %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
+robocopy.exe "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /NP /TEE /NJH /NS /NC %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 

@@ -16,15 +16,42 @@ rem   robocopy.exe will copy hidden and archive files by default.
 
 setlocal
 
-set "FROM_PATH=%~dpf1"
-set "FROM_FILE=%~2"
-set "TO_PATH=%~dpf3"
-set XCOPY_FLAGS=%4 %5 %6 %7 %8 %9
+set "FROM_PATH=%~1"
+set "TO_PATH=%~3"
 
-if not exist "%~3\" (
-  echo.%~nx0: error: output directory does not exist: "%~3\"
-  exit /b 127
+if not "%FROM_PATH%" == "" set "FROM_PATH=%FROM_PATH:/=\%"
+if not "%TO_PATH%" == "" set "TO_PATH=%TO_PATH:/=\%"
+
+if not "%FROM_PATH%" == "" ^
+if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
+
+(
+  echo.%~nx0: error: input directory is invalid: "%FROM_PATH%".
+  exit /b -255
 ) >&2
+
+:FROM_PATH_OK
+
+if not "%TO_PATH%" == "" ^
+if not "\" == "%TO_PATH:~0,1%" goto TO_PATH_OK
+
+(
+  echo.%~nx0: error: output directory is invalid: "%TO_PATH%".
+  exit /b -254
+) >&2
+
+
+:TO_PATH_OK
+
+if not exist "%TO_PATH%\" (
+  echo.%~nx0: error: output directory does not exist: "%TO_PATH%\"
+  exit /b -253
+) >&2
+
+set "FROM_PATH_ABS=%~dpf1"
+set "FROM_FILE=%~2"
+set "TO_PATH_ABS=%~dpf3"
+set XCOPY_FLAGS=%4 %5 %6 %7 %8 %9
 
 if exist "%WINDIR%\system32\robocopy.exe" goto USE_ROBOCOPY
 
@@ -44,9 +71,9 @@ if %ERRORLEVEL% EQU 0 (
   )
 )
 
-echo.^>xcopy "%FROM_PATH%\%FROM_FILE%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
+echo.^>xcopy.exe "%FROM_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 rem echo.F will only work if locale is in english !!!
-echo.F|xcopy "%FROM_PATH%\%FROM_FILE%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
+echo.F|xcopy.exe "%FROM_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 
 set LASTERROR=%ERRORLEVEL%
 
@@ -96,11 +123,11 @@ exit /b 0
 
 :SET_ROBOCOPY_EXCLUDE_FILES_CMD_END
 
-if "%FROM_PATH:~-1%" == "\" set "FROM_PATH=%FROM_PATH%\"
-if "%TO_PATH:~-1%" == "\" set "TO_PATH=%TO_PATH%\"
+if "%FROM_PATH_ABS:~-1%" == "\" set "FROM_PATH_ABS=%FROM_PATH_ABS%\"
+if "%TO_PATH_ABS:~-1%" == "\" set "TO_PATH_ABS=%TO_PATH_ABS%\"
 
-echo.^>robocopy "%FROM_PATH%" "%TO_PATH%" "%FROM_FILE%" /R:0 /NP /TEE /NJH /NS /NC %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
-robocopy "%FROM_PATH%" "%TO_PATH%" "%FROM_FILE%" /R:0 /NP /TEE /NJH /NS /NC %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
+echo.^>robocopy.exe "%FROM_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /NP /TEE /NJH /NS /NC %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
+robocopy.exe "%FROM_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /NP /TEE /NJH /NS /NC %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
