@@ -9,7 +9,7 @@ rem   File hashes per line format: (depends on flag -c)
 rem     <size>,<Hash1>,<Hash2>,...,<HashN>,<path>
 
 rem Examples:
-rem 1. call gen_dir_hash_lst.bat -c "md5,sha1" -r . > dir_hash_list.lst
+rem 1. call gen_dir_hash_lst.bat -c "md5,sha256" -l -r . > dir_hash_list.lst
 
 rem Drop last error level
 cd .
@@ -93,9 +93,11 @@ if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
 goto X64
 
 :NOTX64
-"%HASHDEEP_ROOT%/hashdeep.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
+rem WORKAROUND: The last slash must backward otherwise "Unknown algorithm" error will be thrown.
+"%HASHDEEP_ROOT%\hashdeep.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
 
 :X64
-"%HASHDEEP_ROOT%/hashdeep64.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
+rem WORKAROUND: The last slash must backward otherwise "Unknown algorithm" error will be thrown.
+"%HASHDEEP_ROOT%\hashdeep64.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
 
 goto :EOF
