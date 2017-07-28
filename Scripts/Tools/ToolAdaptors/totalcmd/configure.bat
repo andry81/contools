@@ -54,6 +54,8 @@ call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%/impl" "svn_get_wc_db_user_ver.bat" "%%CO
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/sqlite" "%%CONTOOLS_ROOT_COPY%%/sqlite" /E /Y /D || goto :EOF
 
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /E /Y /D || goto :EOF
+
 pause
 
 exit /b

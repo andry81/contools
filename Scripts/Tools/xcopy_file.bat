@@ -17,27 +17,39 @@ rem   robocopy.exe will copy hidden and archive files by default.
 setlocal
 
 set "FROM_PATH=%~1"
+set "FROM_FILE=%~2"
 set "TO_PATH=%~3"
 
 if not "%FROM_PATH%" == "" set "FROM_PATH=%FROM_PATH:/=\%"
+if not "%FROM_FILE%" == "" set "FROM_FILE=%FROM_FILE:/=\%"
 if not "%TO_PATH%" == "" set "TO_PATH=%TO_PATH:/=\%"
 
 if not "%FROM_PATH%" == "" ^
 if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
 
 (
-  echo.%~nx0: error: input directory is invalid: "%FROM_PATH%".
+  echo.%~nx0: error: input directory is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
   exit /b -255
 ) >&2
 
 :FROM_PATH_OK
 
+if not "%FROM_FILE%" == "" ^
+if "%FROM_FILE%" == "%FROM_FILE:\=%" goto FROM_FILE_OK
+
+(
+  echo.%~nx0: error: input file name is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  exit /b -254
+) >&2
+
+:FROM_FILE_OK
+
 if not "%TO_PATH%" == "" ^
 if not "\" == "%TO_PATH:~0,1%" goto TO_PATH_OK
 
 (
-  echo.%~nx0: error: output directory is invalid: "%TO_PATH%".
-  exit /b -254
+  echo.%~nx0: error: output directory is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  exit /b -253
 ) >&2
 
 
@@ -45,11 +57,10 @@ if not "\" == "%TO_PATH:~0,1%" goto TO_PATH_OK
 
 if not exist "%TO_PATH%\" (
   echo.%~nx0: error: output directory does not exist: "%TO_PATH%\"
-  exit /b -253
+  exit /b -252
 ) >&2
 
 set "FROM_PATH_ABS=%~dpf1"
-set "FROM_FILE=%~2"
 set "TO_PATH_ABS=%~dpf3"
 set XCOPY_FLAGS=%4 %5 %6 %7 %8 %9
 
@@ -136,6 +147,8 @@ set "XCOPY_FLAG=%~1"
 set XCOPY_FLAG_PARSED=0
 if "%XCOPY_FLAG%" == "/Y" exit /b 1
 if "%XCOPY_FLAG%" == "/R" exit /b 1
+if "%XCOPY_FLAG%" == "/E" exit /b 1
+if "%XCOPY_FLAG%" == "/S" exit /b 1
 if "%XCOPY_FLAG%" == "/D" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/XO " & set XCOPY_FLAG_PARSED=1
 if "%XCOPY_FLAG%" == "/H" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/IA:AH " & set XCOPY_FLAG_PARSED=1
 if %XCOPY_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%%XCOPY_FLAG% "
