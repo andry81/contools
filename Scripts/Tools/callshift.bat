@@ -15,7 +15,7 @@ rem 1. call callshift.bat echo
 rem    echo PATH_VALUE=%PATH_VALUE%
 
 rem Drop last error level
-cd .
+type nul>nul
 
 setlocal
 

@@ -30,7 +30,7 @@ set "COPY_FILE_LIST=%~8"
 set "XCOPY_FILE_FLAGS=%~9"
 
 rem Drop last error level
-cd .
+type nul>nul
 
 call "%%~dp0__init__.bat" || goto :EOF
 

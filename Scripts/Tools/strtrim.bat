@@ -16,7 +16,7 @@ rem Create local variable's stack
 setlocal
 
 rem Drop last error level
-cd .
+type nul>nul
 
 for /f "tokens=* delims=	 " %%i in ("%~1") do set "__STRING__=%%i"
 

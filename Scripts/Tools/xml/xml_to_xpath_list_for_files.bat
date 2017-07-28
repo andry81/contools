@@ -12,7 +12,7 @@ rem Examples:
 rem 1. call xml_to_xpath_list_for_files.bat -lnodes 1251 *.xml *.xml.tmpl
 
 rem Drop last error level
-cd .
+type nul>nul
 
 setlocal
 

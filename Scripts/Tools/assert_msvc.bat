@@ -6,7 +6,7 @@ rem Description:
 rem   Script checks if it is running under Visual Studio environment.
 
 rem Drop last error level.
-cd .
+type nul>nul
 
 if "%VS_UNICODE_OUTPUT%" == "" (
   echo This is script must be called inside of Visual Studio Project ^(*.vcproj^) under command line of project/file event

@@ -10,7 +10,7 @@ rem  -noprops - do not print properties
 rem  -lnodes - print leaf ancestor XPATHs (leaf nodes) before a leaf
 
 rem Drop last error level
-cd .
+type nul>nul
 
 setlocal
 

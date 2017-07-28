@@ -19,7 +19,7 @@ if not "%CMD_LINE%" == "" (
 )
 
 rem Drom last error level
-cd .
+type nul>nul
 
 rem Save all variables to stack
 setlocal

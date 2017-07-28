@@ -18,6 +18,6 @@ set "PATH_VALUE="
 if "%~1" == "" exit /b 65
 
 rem Drop last error level
-cd .
+type nul>nul
 
 set "PATH_VALUE=%~s1"

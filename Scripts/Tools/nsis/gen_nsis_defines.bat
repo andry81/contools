@@ -13,7 +13,7 @@ if not exist "%SETUP_ROOT%\" (
 ) >&2
 
 rem drop last error level
-cd .
+type nul>nul
 
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="

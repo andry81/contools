@@ -17,7 +17,7 @@ rem 1. call regenum.bat "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft"
 rem 2. call regenum.bat "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\"
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal

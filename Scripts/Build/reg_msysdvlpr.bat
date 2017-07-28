@@ -17,7 +17,7 @@ goto :EOF
 :NOTX64
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion
@@ -236,7 +236,7 @@ goto :EOF
 
 :RUN_SHELL
 rem Drop last error level before the last call
-cd .
+type nul>nul
 
 echo.^
 cmd /K

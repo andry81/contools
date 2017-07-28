@@ -26,7 +26,7 @@ rem Drop variable FOUND_PATH.
 if "%~1" == "" exit /b 65
 
 rem Drop last error level.
-cd .
+type nul>nul
 
 if not "%~2" == "-i" (
   if not exist "%~1" (

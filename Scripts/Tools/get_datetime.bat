@@ -4,7 +4,7 @@ rem Description:
 rem   Independent to Windows locale date/time request.
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem drop return value
 set "RETURN_VALUE="

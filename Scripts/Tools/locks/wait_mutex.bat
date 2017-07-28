@@ -36,7 +36,7 @@ set PRE_LOCK_ACQUIRE=0
 
     rem Drop error level to 0 to avoid accidental exit by error from above commands.
     rem Error must be raised ONLY by the redirection command!
-    cd .
+    type nul>nul
 
   ) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%" && set PRE_LOCK_ACQUIRE=1
 ) 2>nul

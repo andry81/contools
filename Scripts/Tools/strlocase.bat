@@ -19,7 +19,7 @@ rem 1. call strlocase.bat "" "Hello world!"
 rem    echo ERRORLEVEL=%ERRORLEVEL%
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Drop return value
 set "RETURN_VALUE="

@@ -23,7 +23,7 @@ set "ARCHIVE_PATH=%~dpf3"
 set "_7ZIP_SWITCHES=%~4"
 
 rem Drop last error level
-cd .
+type nul>nul
 
 call "%%~dp0__init__.bat" || goto :EOF
 

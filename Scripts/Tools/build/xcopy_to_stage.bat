@@ -32,7 +32,7 @@ if not exist "%FROM_STAGE_DIR_PATH%" (
 ) >&2
 
 rem Drop last error level
-cd .
+type nul>nul
 
 call "%%~dp0__init__.bat" || goto :EOF
 

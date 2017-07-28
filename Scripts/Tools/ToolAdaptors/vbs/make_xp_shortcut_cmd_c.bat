@@ -7,7 +7,7 @@ rem Creating a shortcut in the "%SYSTEMROOT%" directory under Windows XP avoids
 rem parasite path prefixes in the output shortcut file.
 
 rem Drom last error level
-cd .
+type nul>nul
 
 rem Save all variables to stack
 setlocal

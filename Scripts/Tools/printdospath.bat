@@ -20,6 +20,6 @@ rem Drop output values before request
 if "%~1" == "" exit /b 65
 
 rem Drop last error level
-cd .
+type nul>nul
 
 echo "%~s1"

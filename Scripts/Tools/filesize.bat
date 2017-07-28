@@ -15,7 +15,7 @@ rem 1. call filesize.bat "C:\blabla\blabla.ext"
 if "%~1" == "" exit /b -1
 
 rem Drop last error level.
-cd .
+type nul>nul
 
 if not exist "%~1" exit /b -1
 

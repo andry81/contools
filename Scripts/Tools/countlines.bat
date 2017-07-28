@@ -16,7 +16,7 @@ set "STDOUT_LINES="
 if "%~1" == "" exit /b 65
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal
