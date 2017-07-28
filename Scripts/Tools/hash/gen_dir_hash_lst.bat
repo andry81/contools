@@ -12,7 +12,7 @@ rem Examples:
 rem 1. call gen_dir_hash_lst.bat -c "md5,sha256" -l -r . > dir_hash_list.lst
 
 rem Drop last error level
-cd .
+type nul>nul
 
 setlocal
 
@@ -86,18 +86,4 @@ if not "%~1" == "" (
   goto ARGSN_LOOP
 )
 
-rem use 64-bit application in 64-bit OS
-if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
-rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
-if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
-goto X64
-
-:NOTX64
-rem WORKAROUND: The last slash must backward otherwise "Unknown algorithm" error will be thrown.
-"%HASHDEEP_ROOT%\hashdeep.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
-
-:X64
-rem WORKAROUND: The last slash must backward otherwise "Unknown algorithm" error will be thrown.
-"%HASHDEEP_ROOT%\hashdeep64.exe" %HASHDEEP_CMD_FLAG_ARGS% %HASHDEEP_CMD_ARGS%
-
-goto :EOF
+call "%%CONTOOLS_ROOT%%/hash/hashdeep.bat" %%HASHDEEP_CMD_FLAG_ARGS%% %%HASHDEEP_CMD_ARGS%%

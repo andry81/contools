@@ -27,6 +27,8 @@ set "TORTOISEPROC_PATHFILE_NOT_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP=pathfile-ansi
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
+rem ==================== all-in-one process ====================
+
 if %FLAG_ALL_IN_ONE% EQU 0 goto IGNORE_OUTTER_ALL_IN_ONE_PROCESS
 
 if %FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES% NEQ 0 ( call :FILTER_PATHFILE_BY_VERSIONED_CHANGES || goto EXIT_MAIN )
@@ -47,6 +49,8 @@ set LASTERROR=%ERRORLEVEL%
 goto EXIT_MAIN
 
 :IGNORE_OUTTER_ALL_IN_ONE_PROCESS
+
+rem ==================== window-per-reporoot process ====================
 
 if %FLAG_WINDOW_PER_REPOROOT% EQU 0 goto IGNORE_OUTTER_WINDOW_PER_REPOROOT_PROCESS
 
@@ -69,10 +73,18 @@ goto OUTTER_WINDOW_PER_REPOROOT_PREPROCESS_END
 :PREPROCESS_OUTTER_WINDOW_PER_REPOROOT
 if "%WCDIR_PATH:~-1%" == "\" set "WCDIR_PATH=%WCDIR_PATH:~0,-1%"
 
-rem for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH% %REPOROOT%") do (echo.%%i)
-set "REPOROOT_DECORATED=%REPOROOT:\=--%"
-set "REPOROOT_DECORATED=%REPOROOT_DECORATED:/=--%"
-set "REPOROOT_DECORATED=%REPOROOT_DECORATED::=--%"
+rem make hash from a path
+if not exist "%SCRIPT_TEMP_CURRENT_DIR%\tmp\" mkdir "%SCRIPT_TEMP_CURRENT_DIR%\tmp"
+
+rem copy path to a file
+rem (special form of the echo command to ignore special characters in the echo value).
+for /F "eol=	 tokens=* delims=" %%i in ("%REPOROOT%") do (echo.%%i) > "%SCRIPT_TEMP_CURRENT_DIR%\tmp\reporoot_path.var"
+
+rem generate md5 hash from a file content
+call "%%CONTOOLS_ROOT%%/hash/gen_file_hash_cvs.bat" -c md5 -b -s "%%SCRIPT_TEMP_CURRENT_DIR%%\tmp\reporoot_path.var"
+
+set "REPOROOT_DECORATED="
+for /F "eol=	 tokens=2 delims=," %%i in ("%RETURN_VALUE%") do set "REPOROOT_DECORATED=%%i"
 
 set "REPOROOT_TASK_INDEX_DIR=%SCRIPT_TEMP_CURRENT_DIR%\reporoots_index\%REPOROOT_DECORATED%"
 set "REPOROOT_TASK_INDEX_FILE=%REPOROOT_TASK_INDEX_DIR%\index.var"
@@ -133,8 +145,18 @@ set "WCROOT_PATH=%RETURN_VALUE%"
 rem append to the workingset externals from the WC root database ONLY
 set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP%"
 
-set "WCDIR_PATH_DECORATED=%WCDIR_PATH::=--%"
-set "WCDIR_PATH_DECORATED=%WCDIR_PATH_DECORATED:\=--%"
+rem make hash from a path
+if not exist "%SCRIPT_TEMP_CURRENT_DIR%\tmp\" mkdir "%SCRIPT_TEMP_CURRENT_DIR%\tmp"
+
+rem copy path to a file
+rem (special form of the echo command to ignore special characters in the echo value).
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) > "%SCRIPT_TEMP_CURRENT_DIR%\tmp\wcdir_path.var"
+
+rem generate md5 hash from a file content
+call "%%CONTOOLS_ROOT%%/hash/gen_file_hash_cvs.bat" -c md5 -b -s "%%SCRIPT_TEMP_CURRENT_DIR%%\tmp\wcdir_path.var"
+
+set "WCDIR_PATH_DECORATED="
+for /F "eol=	 tokens=2 delims=," %%i in ("%RETURN_VALUE%") do set "WCDIR_PATH_DECORATED=%%i"
 
 call set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP:{{REF}}=%WCDIR_PATH_DECORATED%%%"
 
@@ -247,10 +269,13 @@ rem window per WC root (WC root directories found by searching from directories 
 rem including directories from command line arguments which might be not WC root directories)
 set FLAG_WINDOW_PER_WCROOT=0
 rem window per repository root (WC root directories found by searching from directories in the command line
-rem arguments and groupped by unique repository roots)
+rem arguments and groupped by unique repository roots). Won't include unversioned WC directories from the command line
+rem in the search logic, because unversioned directories does not have repository root (currently in the TODO list).
 set FLAG_WINDOW_PER_REPOROOT=0
 rem Force use workingset paths with out versioned changes.
 rem Has meaning only for /command:commit and if -all-in-one flag is not set.
+rem Has additional meaning when WC directories might contain unversioned items to show them in changesets along with items to be committed
+rem (useful if you may miss to add something to commit).
 set FLAG_FORCE_USE_WORKINGSET_PATHS_WITHOUT_VERSIONED_CHANGES=0
 rem Force use not orphan external paths.
 rem Has meaning only for all-in-one/window-per-wcdir/window-per-reporoot only modes.
@@ -260,6 +285,8 @@ set FLAG_FORCE_USE_NOT_ORPHAN_EXTERNAL_PATHS=0
 
 rem internal flags
 set FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES=0
+rem will be used only when the FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES is not set!
+set FLAG_INTERNAL_USE_UNVERSIONED_WORKINGSET_PATHS=0
 
 :FLAGS_LOOP
 
@@ -322,7 +349,7 @@ set COMMAND_COMMIT=0
 if "%COMMAND%" == "/command:repostatus" set COMMAND_REPOSTATUS=1
 if "%COMMAND%" == "/command:commit" set COMMAND_COMMIT=1
 
-if %FLAG_ALL_IN_ONE%%FLAG_WINDOW_PER_WCDIR%%FLAG_WINDOW_PER_REPOROOT% EQU 0 (
+if %FLAG_ALL_IN_ONE%%FLAG_WINDOW_PER_WCDIR%%FLAG_WINDOW_PER_WCROOT%%FLAG_WINDOW_PER_REPOROOT% EQU 0 (
   if %COMMAND_REPOSTATUS% NEQ 0 (
     rem all-in-one by default in case of repostatus command
     set FLAG_ALL_IN_ONE=1
@@ -342,6 +369,11 @@ if %COMMAND_COMMIT% NEQ 0 (
       set FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES=1
     )
   )
+)
+
+if %FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES% EQU 0 ^
+if %FLAG_WINDOW_PER_REPOROOT% EQU 0 (
+  set FLAG_INTERNAL_USE_UNVERSIONED_WORKINGSET_PATHS=1
 )
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
@@ -440,12 +472,24 @@ set "FILEPATH=%~dpf1"
 exit /b
 :ABS_FILEPATH_END
 
+rem ==================== window-per-wcdir init ====================
+
 if %FLAG_WINDOW_PER_WCDIR% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCDIR_INIT
 
 set INNER_TASK_INDEX=%OUTTER_TASK_INDEX%
 
-set "FILEPATH_DECORATED=%FILEPATH:\=--%"
-set "FILEPATH_DECORATED=%FILEPATH_DECORATED::=--%"
+rem make hash from a path
+if not exist "%SCRIPT_TEMP_CURRENT_DIR%\tmp\" mkdir "%SCRIPT_TEMP_CURRENT_DIR%\tmp"
+
+rem copy path to a file
+rem (special form of the echo command to ignore special characters in the echo value).
+for /F "eol=	 tokens=* delims=" %%i in ("%FILEPATH%") do (echo.%%i) > "%SCRIPT_TEMP_CURRENT_DIR%\tmp\wcdir_path.var"
+
+rem generate md5 hash from a file content
+call "%%CONTOOLS_ROOT%%/hash/gen_file_hash_cvs.bat" -c md5 -b -s "%%SCRIPT_TEMP_CURRENT_DIR%%\tmp\wcdir_path.var"
+
+set "FILEPATH_DECORATED="
+for /F "eol=	 tokens=2 delims=," %%i in ("%RETURN_VALUE%") do set "FILEPATH_DECORATED=%%i"
 
 if "%INNER_TASK_INDEX:~1,1%" == "" set INNER_TASK_INDEX=0%INNER_TASK_INDEX%
 
@@ -497,6 +541,8 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:D "%FILEPATH%\*.s
 
 if %FLAG_WINDOW_PER_WCROOT% EQU 0 set /A CALL_INDEX+=1
 
+rem ==================== window-per-wcdir process ====================
+
 if %FLAG_WINDOW_PER_WCDIR% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCDIR_PROCESS
 
 if %FLAG_INTERNAL_USE_ONLY_WORKINGSET_PATHS_WITH_VERSIONED_CHANGES% NEQ 0 ( call :FILTER_PATHFILE_BY_VERSIONED_CHANGES || goto NEXT_LOOKUP_DIR )
@@ -527,6 +573,8 @@ echo.^>%*
 (%*)
 exit /b
 
+rem ==================== process for all ====================
+
 rem can process versioned and unversioned directories together
 :PROCESS_WCDIR_PATH
 rem run only first TORTOISEPROC_MAX_CALLS
@@ -535,6 +583,9 @@ if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 1
 
 call :GET_WCDIR_PARENT "%%WCDIR_PATH%%"
 set "WCDIR_PATH=%WCDIR_PARENT_PATH%"
+
+rem ignore check in case of unversioned paths
+if %FLAG_INTERNAL_USE_UNVERSIONED_WORKINGSET_PATHS% NEQ 0 goto IGNORE_CHANGES_CHECK
 
 rem test path on version control presence and get file path svn info
 svn info "%WCDIR_PATH%" > "%WORKINGSET_PATH_INFO_TEXT_TMP%" 2>nul
@@ -558,6 +609,8 @@ rem set "WCDIR_PATH=%WCDIR_PATH:\=/%"
 rem (special form of the echo command to ignore special characters in the echo value).
 for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%\") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
+rem ==================== window-per-wcroot process ====================
+
 if %FLAG_WINDOW_PER_WCROOT% EQU 0 goto IGNORE_INNER_WINDOW_PER_WCROOT_PROCESS
 
 rem execute path file
@@ -580,7 +633,11 @@ rem extract the directory WC root through the info file if WCDIR_PATH is not WC 
 set "WCROOT_PATH=%WCDIR_PATH%"
 if exist "%WCDIR_PATH%\.svn\" goto IGNORE_INNER_WCROOT_FROM_WCDIR
 
-svn info "%WCDIR_PATH%" --non-interactive > "%WORKINGSET_PATH_INFO_TEXT_TMP%" || (
+svn info "%WCDIR_PATH%" --non-interactive > "%WORKINGSET_PATH_INFO_TEXT_TMP%"
+
+if %ERRORLEVEL% NEQ 0 (
+  rem leave unversioned paths as is
+  if %FLAG_INTERNAL_USE_UNVERSIONED_WORKINGSET_PATHS% NEQ 0 exit /b 0
   echo.%?~nx0%: error: not versioned directory: "%WCDIR_PATH%".
   exit /b 245
 ) >&2
@@ -597,8 +654,18 @@ set "WCROOT_PATH=%RETURN_VALUE%"
 rem append to the workingset externals from the WC root database ONLY
 set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP%"
 
-set "WCDIR_PATH_DECORATED=%WCDIR_PATH::=--%"
-set "WCDIR_PATH_DECORATED=%WCDIR_PATH_DECORATED:\=--%"
+rem make hash from a path
+if not exist "%SCRIPT_TEMP_CURRENT_DIR%\tmp\" mkdir "%SCRIPT_TEMP_CURRENT_DIR%\tmp"
+
+rem copy path to a file
+rem (special form of the echo command to ignore special characters in the echo value).
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) > "%SCRIPT_TEMP_CURRENT_DIR%\tmp\wcdir_path.var"
+
+rem generate md5 hash from a file content
+call "%%CONTOOLS_ROOT%%/hash/gen_file_hash_cvs.bat" -c md5 -b -s "%%SCRIPT_TEMP_CURRENT_DIR%%\tmp\wcdir_path.var"
+
+set "WCDIR_PATH_DECORATED="
+for /F "eol=	 tokens=2 delims=," %%i in ("%RETURN_VALUE%") do set "WCDIR_PATH_DECORATED=%%i"
 
 call set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP=%%WORKINGSET_PATH_DB_EXTERNALS_LIST_TMP:{{REF}}=%WCDIR_PATH_DECORATED%%%"
 
