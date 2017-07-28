@@ -3,7 +3,7 @@
 setlocal
 
 rem Drop last error code
-cd .
+type nul>nul
 
 call "%%~dp0__init__.bat" || goto :EOF
 

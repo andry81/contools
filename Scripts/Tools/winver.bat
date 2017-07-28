@@ -21,7 +21,7 @@ rem Drop WINVER_VALUE variable
 set "WINVER_VALUE="
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal

@@ -9,7 +9,7 @@ set "?~nx0=%~nx0"
 set "?~dp0=%~dp0"
 
 rem drop last error level
-cd .
+type nul>nul
 
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="
@@ -165,7 +165,7 @@ exit /b 0
 
 :CREATE_TEMP_TREE_OF_EMPTY_FILES
 rem drop last error level
-cd .
+type nul>nul
 
 set TEMP_FILE_PATH_IS_DIR_PATH=0
 if "%~1" == "D" set TEMP_FILE_PATH_IS_DIR_PATH=1

@@ -61,7 +61,7 @@ rem 1. call setvarsfromfile.bat blabla.vars
 if "%~1" == "" exit /b 65
 
 rem Drop last error level.
-cd .
+type nul>nul
 
 echo.loading "%~1"...
 

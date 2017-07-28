@@ -42,7 +42,7 @@ if not "%~3" == "-s" (
 )
 
 rem Drop last error level.
-cd .
+type nul>nul
 
 set "?0=^"
 set ?1="

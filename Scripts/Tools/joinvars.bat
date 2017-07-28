@@ -25,7 +25,7 @@ if "%~2" == "" exit /b 64
 if not exist "%~2" exit /b 63
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal

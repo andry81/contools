@@ -16,7 +16,7 @@ rem 2. set "AAA=C:\blabla\blabla\"
 rem    call appendvar.bat AAA "blabla\blabla" \
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal

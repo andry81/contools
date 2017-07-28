@@ -4,7 +4,7 @@ rem Script to create the Windows shortcut file to the "COMSPEC <cmdline>"
 rem in the current directory.
 
 rem Drom last error level
-cd .
+type nul>nul
 
 rem Save all variables to stack
 setlocal

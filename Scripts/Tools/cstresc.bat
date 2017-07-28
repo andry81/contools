@@ -35,7 +35,7 @@ set "%~2="
 if "%~1" == "" exit /b 0
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal

@@ -22,7 +22,7 @@ call "%%~dp0__init__.bat" || goto :EOF
 set "?~nx0=%~nx0"
 
 rem drop last error level
-cd .
+type nul>nul
 
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="

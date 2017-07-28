@@ -10,7 +10,7 @@ rem 1. call get_filesize.bat file
 rem    echo %ERRORLEVEL%
 
 rem Drop last error level
-cd .
+type nul>nul
 
 setlocal
 

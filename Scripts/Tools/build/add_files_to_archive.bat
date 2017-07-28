@@ -25,7 +25,7 @@ set "_7ZIP_SWITCHES=%~4"
 set "ARCHIVE_DIR=%~dp3"
 
 rem Drop last error level
-cd .
+type nul>nul
 
 call "%%~dp0__init__.bat" || goto :EOF
 

@@ -23,7 +23,7 @@ rem Drop variable FILE_ATTR.
 if "%~1" == "" exit /b 65
 
 rem Drop last error level.
-cd .
+type nul>nul
 
 if exist "%~1" (
   set "FILE_ATTR=%~a1"

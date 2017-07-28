@@ -15,7 +15,7 @@ rem Examples:
 rem 1. call xml_vbs_preformat_for_files.bat *.xml *.xml.tmpl
 
 rem Drop last error level
-cd .
+type nul>nul
 
 setlocal
 
