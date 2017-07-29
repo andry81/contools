@@ -1,7 +1,7 @@
 @echo off
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal

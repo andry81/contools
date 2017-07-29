@@ -1,7 +1,7 @@
 @echo off
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal
@@ -22,7 +22,7 @@ for /L %%i in (1,1,13) do (
   call :TEST
 )
 
-if %LASTERROR% EQU 0 echo.
+echo.
 
 rem WARNING: must be called without the call prefix!
 "%TESTLIB_ROOT%/exit.bat"

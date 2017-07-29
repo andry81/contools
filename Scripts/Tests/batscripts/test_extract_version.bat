@@ -1,7 +1,7 @@
 @echo off
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal
@@ -36,7 +36,7 @@ call :TEST "2009.0.0.1"   "2009k-1" -d
 call :TEST "1.2.3c.4.5"   "1.2.3c.4.5"
 call :TEST "1.2.3.4.5"    "1.2.3c.4.5" -d
 
-if %LASTERROR% EQU 0 echo.
+echo.
 
 rem WARNING: must be called without the call prefix!
 "%TESTLIB_ROOT%/exit.bat"

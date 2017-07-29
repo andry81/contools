@@ -1,7 +1,7 @@
 @echo off
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal
@@ -42,7 +42,7 @@ goto EXIT
 
 :TEST_SEQ1
 rem reset tests counter
-set TESTLIB__TEST_COUNT=0
+set TESTLIB__CURRENT_TESTS=0
 
 set __CHARS__= ^	-^"'`^?^*^&^|^<^>^(^)
 call :TEST %%1
@@ -79,7 +79,7 @@ exit /b 0
 
 :TEST_SEQ2
 rem reset tests counter
-set TESTLIB__TEST_COUNT=0
+set TESTLIB__CURRENT_TESTS=0
 
 set "__CHARS__="
 call :TEST %%1
@@ -100,7 +100,7 @@ echo.
 exit /b 0
 
 :EXIT
-if %LASTERROR% EQU 0 echo.
+echo.
 
 rem WARNING: must be called without the call prefix!
 "%TESTLIB_ROOT%/exit.bat"
