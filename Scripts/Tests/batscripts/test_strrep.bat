@@ -1,7 +1,7 @@
 @echo off
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal
@@ -39,7 +39,7 @@ set "__STRING__="
 set __CHARS__= ^|!/
 call :TEST 0 ""
 
-if %LASTERROR% EQU 0 echo.
+echo.
 
 rem WARNING: must be called without the call prefix!
 "%TESTLIB_ROOT%/exit.bat"

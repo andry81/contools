@@ -15,13 +15,9 @@ set __CTRL_SETLOCAL=1
 call "%%~dp0__init__.bat" || goto :EOF
 call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || goto :EOF
 
-call :TEST "_common/01_empty.txt"   "01_empty"
-call :TEST "_common/02_base.txt"    "11_inexact"
-call :TEST "_common/02_base.txt"    "12_exact"                  -exact
-call :TEST "_common/02_base.txt"    "21_inexact_w_props"
-call :TEST "_common/02_base.txt"    "22_exact_w_props"          -exact
-call :TEST "_common/02_base.txt"    "31_inexact_ignore_props"           -ignore-props
-call :TEST "_common/02_base.txt"    "32_exact_ignore_props"     -exact  -ignore-props
+call :TEST "01_nested"
+call :TEST "02_nested_with_task"
+call :TEST "03_nested_with_task_count"
 
 echo.
 

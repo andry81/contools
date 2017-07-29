@@ -1,7 +1,7 @@
 @echo off
 
 rem Drop last error level
-cd .
+type nul>nul
 
 rem Create local variable's stack
 setlocal
@@ -24,7 +24,7 @@ rem xpath_search_list/0X
 call :TEST "xpath_search_list/01_empty" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
 call :TEST "xpath_search_list/02" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
 
-if %LASTERROR% EQU 0 echo.
+echo.
 
 rem WARNING: must be called without the call prefix!
 "%TESTLIB_ROOT%/exit.bat"

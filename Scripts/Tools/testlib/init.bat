@@ -17,10 +17,14 @@ call "%%~dp0__init__.bat" || goto :EOF
 
 if "%TESTLIB__NEST_LVL%" == "" set TESTLIB__NEST_LVL=0
 
+if "%TESTLIB__TEST_DO_TEARDOWN%" == "" set TESTLIB__TEST_DO_TEARDOWN=0
+
 if %TESTLIB__NEST_LVL%0 EQU 0 (
-  set TESTLIB__PASSED_TESTS=0
+  set TESTLIB__OVERALL_PASSED_TESTS=0
   set TESTLIB__OVERALL_TESTS=0
 )
+set TESTLIB__CURRENT_PASSED_TESTS=0
+set TESTLIB__CURRENT_TESTS=0
 
 set "TEST_SCRIPT_FILE_PATH=%~1"
 if not "%TEST_SCRIPT_FILE_PATH%" == "" ^
@@ -64,9 +68,6 @@ if "%TEST_SCRIPT_HANDLERS_DIR%" == "" (
   rem relative to the script directory path
   set "TEST_SCRIPT_HANDLERS_DIR=%TEST_SCRIPT_FILE_DIR%/%TEST_SCRIPT_HANDLERS_DIR:\=/%"
 )
-
-rem tests counter
-set TESTLIB__TEST_COUNT=0
 
 echo Running %?~nx0%...
 title %?~nx0% %2 %3 %4 %5 %6 %7 %8 %9
