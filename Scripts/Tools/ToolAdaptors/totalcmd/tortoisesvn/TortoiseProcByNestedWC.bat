@@ -733,6 +733,22 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TORTOISEPROC_PATHFILE_ANSI_CR
 goto PROCESS_WCDIR_VERSIONED_CHANGES_END
 
 :PROCESS_WCDIR_VERSIONED_CHANGES
+rem remove orphan externals only if it has no versioned changes recursively
+if not exist "%TORTOISEPROC_PATHFILE_ORTHAN_EXTERNALS_ANSI_CRLF_TMP%" goto PROCESS_WCDIR_VERSIONED_CHANGES_NOT_ORPHAN
+
+findstr.exe /I /X /C:"%WCDIR_PATH:\=\\%" "%TORTOISEPROC_PATHFILE_ORTHAN_EXTERNALS_ANSI_CRLF_TMP%" > nul
+if %ERRORLEVEL% NEQ 0 goto PROCESS_WCDIR_VERSIONED_CHANGES_NOT_ORPHAN
+
+call "%%SVNCMD_TOOLS_ROOT%%/svn_has_changes.bat" -R -stat-exclude-? "%%WCDIR_PATH%%" >nul 2>nul
+rem call anyway if error happened
+if %ERRORLEVEL% EQU 0 ^
+if %RETURN_VALUE% EQU 0 exit /b 0
+
+rem (special form of the echo command to ignore special characters in the echo value).
+for /F "eol=	 tokens=* delims=" %%i in ("%WCDIR_PATH%") do (echo.%%i) >> "%TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP%"
+exit /b 0
+
+:PROCESS_WCDIR_VERSIONED_CHANGES_NOT_ORPHAN
 call "%%SVNCMD_TOOLS_ROOT%%/svn_has_changes.bat" -stat-exclude-? "%%WCDIR_PATH%%" >nul 2>nul
 rem call anyway if error happened
 if %ERRORLEVEL% EQU 0 ^
