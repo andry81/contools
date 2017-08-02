@@ -50,6 +50,10 @@ call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "svn_has_changes.bat" "%%CONTOOLS_ROOT_
 call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_info_param.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
 call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "gen_externals_list_from_pget.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
 call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "svn_externals_list.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "make_url_absolute.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "make_url_canonical.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_url_scheme.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_url_root.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
 call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%/impl" "svn_get_wc_db_user_ver.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn/impl" /Y /D /H || goto :EOF
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/sqlite" "%%CONTOOLS_ROOT_COPY%%/sqlite" /E /Y /D || goto :EOF
