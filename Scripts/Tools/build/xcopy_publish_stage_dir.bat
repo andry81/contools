@@ -8,58 +8,60 @@ rem   projects into one output directory.
 
 rem Examples:
 rem 1. call xcopy_publish_stage_dir.bat ^
-rem    "%%MYPROJECT1.STAGE_PATH%%/pdb/%%MYPROJECT1.APP_TARGET_NAME%%/%%MYPROJECT1.PROJECT_TYPE%%|%%MYPROJECT2.STAGE_PATH%%/pdb/%%MYPROJECT2.APP_TARGET_NAME%%/%%MYPROJECT2.PROJECT_TYPE%%" ^
-rem    "%%PROJECT_STAGE_BASE_PATH%%" "%%MYPROJECT.PUBLISH_APP_STAGE_PATH%%/%%MYPROJECT.PUBLISH_APP_DIR%%" "/S /Y" || exit /b 22
+rem    "%%MYPROJECT1.PROJECT_STAGE_POSTBUILD_ROOT%%/pdb/%%MYPROJECT1.APP_TARGET_NAME%%/%%MYPROJECT1.PROJECT_TYPE%%|%%MYPROJECT2.PROJECT_STAGE_POSTBUILD_ROOT%%/pdb/%%MYPROJECT2.APP_TARGET_NAME%%/%%MYPROJECT2.PROJECT_TYPE%%" ^
+rem    "%%PROJECT_STAGE_POSTBUILD_BASE_ROOT%%" "%%MYPROJECT.PUBLISH_APP_STAGE_ROOT%%/%%MYPROJECT.PUBLISH_APP_DIR%%" "/S /Y" || exit /b 22
 
 setlocal
 
-set "PUBLISH_STAGE_PATH_LIST=%~1"
-set "FROM_BASE_PATH=%~2"
-set "TO_APP_DIR_PATH=%~3"
+set "?~dp0=%~dp0"
+
+set "PUBLISH_STAGE_ROOT_LIST=%~1"
+set "FROM_BASE_ROOT=%~2"
+set "TO_APP_DIR_ROOT=%~3"
 set "XCOPY_FLAGS=%~4"
 
 rem Drop last error level
 type nul>nul
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || goto :EOF
 
 set PATH_INDEX=1
 
-:PUBLISH_XCOPY_STAGE_PATH_LOOP
-set PUBLISH_STAGE_PATH=
-for /F "eol=	 tokens=%PATH_INDEX% delims=|" %%i in ("%PUBLISH_STAGE_PATH_LIST%") do set "PUBLISH_STAGE_PATH=%%i"
-if "%PUBLISH_STAGE_PATH%" == "" goto PUBLISH_XCOPY_STAGE_PATH_LOOP_END
+:PUBLISH_XCOPY_STAGE_ROOT_LOOP
+set PUBLISH_STAGE_ROOT=
+for /F "eol=	 tokens=%PATH_INDEX% delims=|" %%i in ("%PUBLISH_STAGE_ROOT_LIST%") do set "PUBLISH_STAGE_ROOT=%%i"
+if "%PUBLISH_STAGE_ROOT%" == "" goto PUBLISH_XCOPY_STAGE_ROOT_LOOP_END
 
-call :PUBLISH_XCOPY "%%PUBLISH_STAGE_PATH%%" "%%FROM_BASE_PATH%%" "%%TO_APP_DIR_PATH%%" || exit /b 1
+call :PUBLISH_XCOPY "%%PUBLISH_STAGE_ROOT%%" "%%FROM_BASE_ROOT%%" "%%TO_APP_DIR_ROOT%%" || exit /b 1
 
 set /A PATH_INDEX+=1
 
-goto PUBLISH_XCOPY_STAGE_PATH_LOOP
+goto PUBLISH_XCOPY_STAGE_ROOT_LOOP
 
-:PUBLISH_XCOPY_STAGE_PATH_LOOP_END
+:PUBLISH_XCOPY_STAGE_ROOT_LOOP_END
 
 exit /b 0
 
 :PUBLISH_XCOPY
 setlocal
 
-set "FROM_DIR_PATH=%~1"
-set "FROM_BASE_PATH=%~2"
-set "TO_APP_DIR_PATH=%~3"
+set "FROM_DIR_ROOT=%~1"
+set "FROM_BASE_ROOT=%~2"
+set "TO_APP_DIR_ROOT=%~3"
 
-rem <XCOPY_SUFFIX_PATH> = <FROM_DIR_PATH> - <FROM_BASE_PATH>
-call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%FROM_BASE_PATH%%" "%%FROM_DIR_PATH%%"
+rem <XCOPY_SUFFIX_PATH> = <FROM_DIR_ROOT> - <FROM_BASE_ROOT>
+call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%FROM_BASE_ROOT%%" "%%FROM_DIR_ROOT%%"
 set "XCOPY_SUFFIX_PATH=%RETURN_VALUE:\=/%"
 
 if not "%XCOPY_SUFFIX_PATH%" == "" (
-  if exist "%FROM_DIR_PATH%" (
-    mkdir "%TO_APP_DIR_PATH%/%XCOPY_SUFFIX_PATH%"
-    call :XCOPY_DIR "%%FROM_DIR_PATH%%" "%%TO_APP_DIR_PATH%%/%%XCOPY_SUFFIX_PATH%%" %%XCOPY_FLAGS%% || exit /b 1
+  if exist "%FROM_DIR_ROOT%" (
+    mkdir "%TO_APP_DIR_ROOT%/%XCOPY_SUFFIX_PATH%"
+    call :XCOPY_DIR "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%/%%XCOPY_SUFFIX_PATH%%" %%XCOPY_FLAGS%% || exit /b 1
   )
 ) else (
-  if exist "%FROM_DIR_PATH%" (
-    mkdir "%TO_APP_DIR_PATH%"
-    call :XCOPY_DIR "%%FROM_DIR_PATH%%" "%%TO_APP_DIR_PATH%%" %%XCOPY_FLAGS%% || exit /b 2
+  if exist "%FROM_DIR_ROOT%" (
+    mkdir "%TO_APP_DIR_ROOT%"
+    call :XCOPY_DIR "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%" %%XCOPY_FLAGS%% || exit /b 2
   )
 )
 

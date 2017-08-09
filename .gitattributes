@@ -408,6 +408,7 @@ Scripts/Tools/cygwin/bin/sed.exe -text
 Scripts/Tools/cygwin/etc/fstab -text
 Scripts/Tools/del_file.bat -text
 Scripts/Tools/del_file_pttn.bat -text
+Scripts/Tools/diff/__init__.bat -text
 Scripts/Tools/diff/index_patch_file.bat -text
 Scripts/Tools/dirpath.bat -text
 Scripts/Tools/dospath.bat -text

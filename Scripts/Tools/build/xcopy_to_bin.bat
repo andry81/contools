@@ -11,12 +11,14 @@ rem   somehow locked on a moment of rename then the original file will be left
 rem   unrenamed in the output directory to manual rename later.
 
 rem Examples:
-rem 1. call xcopy_to_bin.bat "%%PROJECT_STAGE_BIN_PATH%%" "%%MYPROJECT.PROJECT_BIN_PATH%%/%%PUBLISH_APP_DIR%%" "myapp.exe" "myapp_v2.exe" || goto :EOF
+rem 1. call xcopy_to_bin.bat "%%UPSTREAM.PROJECT_STAGE_POSTBUILDBUILD_ROOT.BIN_DIR%%" "%%DOWNSTREAM.PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%/%%PUBLISH_APP_DIR%%" "myapp.exe" "myapp_v2.exe" || goto :EOF
 
 setlocal
 
-set "FROM_PATH=%~dpf1"
-set "TO_PATH=%~dpf2"
+set "?~dp0=%~dp0"
+
+set "FROM_ROOT=%~dpf1"
+set "TO_ROOT=%~dpf2"
 set "FROM_FILE=%~3"
 set "TO_FILE=%~4"
 
@@ -28,14 +30,14 @@ if not exist "%~2" (
 rem Drop last error level
 type nul>nul
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || goto :EOF
 
-( call :XCOPY_FILE "%%FROM_PATH%%" "%%FROM_FILE%%" "%%TO_PATH%%" /Y /D || goto :EOF ) && ^
-if /i not "%TO_PATH%/%FROM_FILE%" == "%TO_PATH%/%TO_FILE%" (
+( call :XCOPY_FILE "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || goto :EOF ) && ^
+if /i not "%TO_ROOT%/%FROM_FILE%" == "%TO_ROOT%/%TO_FILE%" (
   (
-    call :COPY "%%TO_PATH%%/%%FROM_FILE%%" "%%TO_PATH%%/%%TO_FILE%%" /B /Y || goto :EOF
+    call :COPY "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || goto :EOF
   ) && (
-    call :DEL_FILE "%%TO_PATH%%/%%FROM_FILE%%" /F /Q || goto :EOF
+    call :DEL_FILE "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || goto :EOF
   )
 )
 

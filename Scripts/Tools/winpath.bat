@@ -10,7 +10,7 @@ rem 1. call canonicalpath.bat "blabla/../.."
 rem    echo.PATH_VALUE=%PATH_VALUE%
 
 rem Drop output values before request
-set PATH_VALUE=
+set "PATH_VALUE="
 
 if "%~1" == "" exit /b 65
 

@@ -14,9 +14,6 @@ set "PATH_VALUE="
 
 if "%~1" == "" exit /b 65
 
-rem Drop last error level.
-type nul>nul
-
 set "PATH_VALUE=%~dpf1"
 set "PATH_VALUE=%PATH_VALUE:/=\%"
 
