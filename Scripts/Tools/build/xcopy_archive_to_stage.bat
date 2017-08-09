@@ -42,7 +42,7 @@ if not exist "%COPY_FROM_STAGE_ROOT%" (
   exit /b 1
 ) >&2
 
-if not "%ARCHIVE_COPY_FROM_OFFSET%" == "" (
+if defined ARCHIVE_COPY_FROM_OFFSET (
   set "ARCHIVE_FROM_STAGE_DIR_PATH=%COPY_FROM_STAGE_ROOT%/%ARCHIVE_COPY_FROM_OFFSET%"
 ) else (
   set "ARCHIVE_FROM_STAGE_DIR_PATH=%COPY_FROM_STAGE_ROOT%"
@@ -107,11 +107,11 @@ set FROM_FILE_INDEX=1
 set MSG_PRINTED=0
 
 :CONVERT_ARCHIVE_FILE_LIST_TO_PATH_LIST
-if "%ARCHIVE_FILE_LIST%" == "" set "ARCHIVE_FILE_LIST=*.*"
+if not defined ARCHIVE_FILE_LIST set "ARCHIVE_FILE_LIST=*.*"
 
 set "FROM_FILE="
 for /F "eol=# tokens=%FROM_FILE_INDEX% delims=:" %%i in ("%ARCHIVE_FILE_LIST%") do set "FROM_FILE=%%i"
-if "%FROM_FILE%" == "" goto CONVERT_ARCHIVE_FILE_LIST_TO_PATH_LIST_END
+if not defined FROM_FILE goto CONVERT_ARCHIVE_FILE_LIST_TO_PATH_LIST_END
 
 set /A FROM_FILE_INDEX+=1
 
@@ -134,11 +134,11 @@ set FROM_FILE_INDEX=1
 :ARCHIVE_FILE_LIST
 set "TO_FILE="
 for /F "eol=# tokens=%FROM_FILE_INDEX% delims=:" %%i in ("%ARCHIVE_FILE_LIST%") do set "TO_FILE=%%i"
-if "%TO_FILE%" == "" goto ARCHIVE_FILE_LIST_END
+if not defined TO_FILE goto ARCHIVE_FILE_LIST_END
 
 set /A FROM_FILE_INDEX+=1
 
-if not "%ARCHIVE_DIR_PREFIX_PATH%" == "" (
+if defined ARCHIVE_DIR_PREFIX_PATH (
   call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_PATH%%" "%%ARCHIVE_DIR_PREFIX_PATH%%/%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%" || ( set LASTERROR=11 & goto EXIT )
 ) else (
   call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_PATH%%" "%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%" || ( set LASTERROR=12 & goto EXIT )

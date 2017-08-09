@@ -10,10 +10,10 @@ set FLAG_WAIT_EXIT=0
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-wait" (
     set FLAG_WAIT_EXIT=1
     shift
@@ -31,7 +31,7 @@ shift
 set "FILES_LIST="
 set NUM_FILES=0
 
-if "%PWD%" == "" goto NOPWD
+if not defined PWD goto NOPWD
 ( %PWD:~0,2% && cd "%PWD%" ) || exit /b 1
 
 :NOPWD

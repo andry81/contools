@@ -18,7 +18,7 @@ set "PATH_VALUE=%~dpf1"
 set "PATH_VALUE=%PATH_VALUE:/=\%"
 
 rem remove trailing backslash
-if not "%PATH_VALUE%" == "" (
+if defined PATH_VALUE (
   if "%PATH_VALUE:~-1,1%" == "\" set "PATH_VALUE=%PATH_VALUE:~0,-1%"
 )
 

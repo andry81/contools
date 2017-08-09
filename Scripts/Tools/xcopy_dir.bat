@@ -19,10 +19,10 @@ setlocal
 set "FROM_PATH=%~1"
 set "TO_PATH=%~2"
 
-if not "%FROM_PATH%" == "" set "FROM_PATH=%FROM_PATH:/=\%"
-if not "%TO_PATH%" == "" set "TO_PATH=%TO_PATH:/=\%"
+if defined FROM_PATH set "FROM_PATH=%FROM_PATH:/=\%"
+if defined TO_PATH set "TO_PATH=%TO_PATH:/=\%"
 
-if not "%FROM_PATH%" == "" ^
+if defined FROM_PATH ^
 if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
 
 (
@@ -32,7 +32,7 @@ if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
 
 :FROM_PATH_OK
 
-if not "%TO_PATH%" == "" ^
+if defined TO_PATH ^
 if not "\" == "%TO_PATH:~0,1%" goto TO_PATH_OK
 
 (
@@ -62,7 +62,7 @@ if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%RETURN_VALUE%"
 
 call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%"
 if %ERRORLEVEL% EQU 0 (
-  if not "%XCOPY_EXCLUDES_CMD%" == "" (
+  if defined XCOPY_EXCLUDES_CMD (
     set "XCOPY_EXCLUDES_CMD=%XCOPY_EXCLUDES_CMD%+%RETURN_VALUE%"
   ) else (
     set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%RETURN_VALUE%"

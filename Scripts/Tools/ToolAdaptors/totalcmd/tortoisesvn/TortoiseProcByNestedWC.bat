@@ -17,8 +17,8 @@ set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
 rem builtin defaults
-if "%TORTOISEPROC_MAX_CALLS%" == "" set TORTOISEPROC_MAX_CALLS=10
-if "%TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS%" == "" set TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS=20
+if not defined TORTOISEPROC_MAX_CALLS set TORTOISEPROC_MAX_CALLS=10
+if not defined TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS set TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS=20
 set "TORTOISEPROC_PATHFILE_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_FILTERED_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf-filtered.lst"
 set "TORTOISEPROC_PATHFILE_FILTER_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf-filter.lst"
@@ -296,10 +296,10 @@ set FLAG_INTERNAL_USE_UNVERSIONED_WORKINGSET_PATHS=0
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-wait" (
     set FLAG_WAIT_EXIT=1
     shift
@@ -415,7 +415,7 @@ if %FLAG_WINDOW_PER_REPOROOT% NEQ 0 ( type nul > "%TORTOISEPROC_PATHFILE_WORKING
 
 :IGNORE_OUTTER_INIT
 
-if "%PWD%" == "" goto NOPWD
+if not defined PWD goto NOPWD
 ( %PWD:~0,2% && cd "%PWD%" ) || exit /b 1
 
 :NOPWD
@@ -432,7 +432,7 @@ rem run only first TORTOISEPROC_MAX_CALLS
 if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 0
 
 set "FILEPATH=%~1"
-if "%FILEPATH%" == "" exit /b 0
+if not defined FILEPATH exit /b 0
 
 rem ignore files selection
 if not exist "%FILEPATH%\" goto NEXT_LOOKUP_DIR
@@ -442,7 +442,7 @@ call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILEPATH%%"
 set "FILEPATH=%RETURN_VALUE%"
 
 rem should not be empty
-if "%FILEPATH%" == "" set FILEPATH=.
+if not defined FILEPATH set FILEPATH=.
 set "FILEPATH=%FILEPATH:/=\%"
 
 set "FILEPATH_DECORATED=\%FILEPATH%\"
@@ -453,7 +453,7 @@ if "%FILEPATH_DECORATED:\.svn\=%" == "%FILEPATH_DECORATED%" goto IGNORE_FILEPATH
 set "FILEPATH_WCROOT_SUFFIX=%FILEPATH_DECORATED:*.svn\=%"
 
 set "FILEPATH_WCROOT_PREFIX=%FILEPATH_DECORATED%"
-if "%FILEPATH_WCROOT_SUFFIX%" == "" goto CUTOFF_WCROOT_PREFIX
+if not defined FILEPATH_WCROOT_SUFFIX goto CUTOFF_WCROOT_PREFIX
 
 call set "FILEPATH_WCROOT_PREFIX=%%FILEPATH_DECORATED:\%FILEPATH_WCROOT_SUFFIX%=%%"
 
@@ -463,7 +463,7 @@ if "%FILEPATH_DECORATED:~-1%" == "\" set "FILEPATH_DECORATED=%FILEPATH_DECORATED
 call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILEPATH_DECORATED:~1%%" \ "" FILEPATH
 
 rem should not be empty
-if "%FILEPATH%" == "" set FILEPATH=.
+if not defined FILEPATH set FILEPATH=.
 
 :IGNORE_FILEPATH_WCROOT_PATH_CUTOFF
 

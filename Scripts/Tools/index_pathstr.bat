@@ -7,7 +7,7 @@ set "__VAR_NAME_PREFIX__=%~1"
 set "__DELIMS__=%~2"
 set "__STRING__=%~3"
 
-if "%__VAR_NAME_PREFIX__%" == "" (
+if not defined __VAR_NAME_PREFIX__ (
   echo.%~nx0: error: Variable name prefix is not set.
   exit /b 1
 ) >&2
@@ -18,9 +18,9 @@ set __DIR_INDEX__=1
 :LOOP
 set "__SUBDIR__="
 for /F "eol=	 tokens=%__DIR_INDEX__% delims=%__DELIMS__%" %%i in ("%__STRING__%") do set "__SUBDIR__=%%i"
-if "%__SUBDIR__%" == "" goto LOOP_END
+if not defined __SUBDIR__ goto LOOP_END
 
-if not "%__SUBPATH__%" == "" (
+if defined __SUBPATH__ (
   set "__SUBPATH__=%__SUBPATH__%/%__SUBDIR__%"
 ) else (
   set "__SUBPATH__=%__SUBDIR__%"

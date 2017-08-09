@@ -2,7 +2,7 @@
 
 setlocal
 
-if "%SETUP_ROOT%" == "" (
+if not defined SETUP_ROOT (
   echo.%~nx0: error: SETUP_ROOT is not set.
   exit /b 1
 ) >&2
@@ -68,7 +68,7 @@ call :DEFINE_NOCHECK BUILD_NUMBER "%%BUILD_NUMBER%%"
 call :DEFINE_NOCHECK BUILD_NUMBER_VERSION_SUFFIX "%%BUILD_NUMBER_VERSION_SUFFIX%%"
 echo.
 
-if "%APP_TARGETS_LIST%" == "" goto APP_TARGETS_LIST_END
+if not defined APP_TARGETS_LIST goto APP_TARGETS_LIST_END
 
 rem dump variables with <app_target_name> as part of name
 for /D %%i in (%APP_TARGETS_LIST%) do call :TARGET_APP_LIST_HANDLER "%%i"

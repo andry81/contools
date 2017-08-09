@@ -72,17 +72,17 @@ rem Exit with current error level.
 goto EXIT
 
 :PRINT_AND_PARSENEXT_ROUTINE
-if not "%__DO_EXPAND%" == "" (
+if defined __DO_EXPAND (
   set __VAR1=0
   call set "__VAR1=%__VAR1%"
 )
-if not "%__DO_TRIM%" == "" (
+if defined __DO_TRIM (
   call :TRIMVAR_ROUTINE "%%__VAR1%%
 )
 rem If variable was empty, then prints empty string.
 echo.%__VAR1%
 
-if not "%__VAR2%" == "" (
+if defined __VAR2 (
   rem Process next internal variable.
   for /F "tokens=1,* delims=%~1" %%i in ("%__VAR2%") do (
     set __VAR1=0

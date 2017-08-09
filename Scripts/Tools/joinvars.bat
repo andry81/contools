@@ -47,18 +47,18 @@ goto EXIT
 :JOIN_ROUTINE
 call set __SET1=%%?0%%%%%__SET_VAR%:~0,1%%
 
+if not defined __SET1 goto SET1_EMPTY
 if "%__SET1%^" == ""^" goto SET1_NOT_EMPTY
 if "%__SET1%" == "~0,1" goto SET1_EMPTY
-if "%__SET1%" == "" goto SET1_EMPTY
 
 goto :SET1_NOT_EMPTY
 
 :SET1_NOT_EMPTY
 set __SET2=^%__VAR1:~0,1%
 
+if not defined __SET2 exit /b 0
 if "%__SET2%^" == ""^" goto SET1
 if "%__SET2%" == "~0,1" exit /b 0
-if "%__SET2%" == "" exit /b 0
 
 :SET1
 rem call echo.1%%__SET_VAR%%=%%%__SET_VAR%%%%%__SPLIT_STR%%%__VAR1%
@@ -68,9 +68,9 @@ goto :EOF
 :SET1_EMPTY
 set __SET2=%__VAR1:~0,1%
 
+if not defined __SET2 exit /b 0
 if "%__SET2%^" == ""^" goto SET2
 if "%__SET2%" == "~0,1" exit /b 0
-if "%__SET2%" == "" exit /b 0
 
 :SET2
 rem call echo.2%%__SET_VAR%%=%__VAR1%

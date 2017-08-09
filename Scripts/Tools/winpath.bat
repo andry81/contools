@@ -15,6 +15,6 @@ set "PATH_VALUE="
 if "%~1" == "" exit /b 65
 
 set "PATH_VALUE=%~1"
-if not "%PATH_VALUE%" == "" set "PATH_VALUE=%PATH_VALUE:/=\%"
+if defined PATH_VALUE set "PATH_VALUE=%PATH_VALUE:/=\%"
 
 exit /b 0

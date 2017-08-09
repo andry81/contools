@@ -5,7 +5,7 @@ setlocal
 call "%%~dp0__init__.bat" || goto :EOF
 
 rem builtin defaults
-if "%TORTOISEPROC_MAX_CALLS%" == "" set TORTOISEPROC_MAX_CALLS=10
+if not defined TORTOISEPROC_MAX_CALLS set TORTOISEPROC_MAX_CALLS=10
 
 rem wait TrotoiseProc.exe to exit
 set FLAG_WAIT_EXIT=0
@@ -15,10 +15,10 @@ set FLAG_WAIT_EXIT=0
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-wait" (
     set FLAG_WAIT_EXIT=1
     shift
@@ -36,7 +36,7 @@ set "PWD=%~2"
 shift
 shift
 
-if "%PWD%" == "" goto NOPWD
+if not defined PWD goto NOPWD
 ( %PWD:~0,2% && cd "%PWD%" ) || exit /b 1
 
 :NOPWD
@@ -49,7 +49,7 @@ rem run COMMAND over selected files/directories in the PWD directory
 if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 0
 
 set "FILENAME=%~1"
-if "%FILENAME%" == "" exit /b 0
+if not defined FILENAME exit /b 0
 
 rem reduce relative path to avoid . and .. characters
 call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILENAME%%"
@@ -63,7 +63,7 @@ if "%FILENAME_DECORATED:\.svn\=%" == "%FILENAME_DECORATED%" goto IGNORE_FILENAME
 set "FILENAME_WCROOT_SUFFIX=%FILENAME_DECORATED:*.svn\=%"
 
 set "FILENAME_WCROOT_PREFIX=%FILENAME_DECORATED%"
-if "%FILENAME_WCROOT_SUFFIX%" == "" goto CUTOFF_WCROOT_PREFIX
+if not defined FILENAME_WCROOT_SUFFIX goto CUTOFF_WCROOT_PREFIX
 
 call set "FILENAME_WCROOT_PREFIX=%%FILENAME_DECORATED:\%FILENAME_WCROOT_SUFFIX%=%%"
 
@@ -73,7 +73,7 @@ if "%FILENAME_DECORATED:~-1%" == "\" set "FILENAME_DECORATED=%FILENAME_DECORATED
 call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILENAME_DECORATED:~1%%" \ "" FILENAME
 
 rem should not be empty
-if "%FILENAME%" == "" set FILENAME=.
+if not defined FILENAME set FILENAME=.
 
 :IGNORE_FILENAME_WCROOT_PATH_CUTOFF
 

@@ -28,10 +28,10 @@ set FLAG_LNODES=0
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-noprops" (
     set FLAG_NOPROPS=1
     shift
@@ -49,7 +49,7 @@ if not "%FLAG%" == "" (
 
 set "XML_FILE=%~1"
 
-if "%XML_FILE%" == "" (
+if not defined XML_FILE (
   echo.%?~nx0%: error: xml file is no set.
   exit /b 254
 ) >&2

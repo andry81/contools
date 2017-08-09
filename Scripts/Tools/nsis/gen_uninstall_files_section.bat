@@ -33,9 +33,9 @@ shift
 shift
 
 set "INSTDIR_SUBDIR_SUFFIX="
-if not "%INSTDIR_SUBDIR%" == "" set "INSTDIR_SUBDIR_SUFFIX=\%INSTDIR_SUBDIR%"
+if defined INSTDIR_SUBDIR set "INSTDIR_SUBDIR_SUFFIX=\%INSTDIR_SUBDIR%"
 set "FILE_FILTER_SUFFIX="
-if not "%FILE_FILTER%" == "" set "FILE_FILTER_SUFFIX=\%FILE_FILTER%"
+if defined FILE_FILTER set "FILE_FILTER_SUFFIX=\%FILE_FILTER%"
 
 :PROCESS_DIR_LOOP
 call :PROCESS_DIR_PATH "%%~1" || goto :EOF
@@ -44,7 +44,7 @@ shift
 
 if exist "%~1" goto PROCESS_DIR_LOOP
 
-if not "%INSTDIR_SUBDIR%" == "" (
+if defined INSTDIR_SUBDIR (
   echo.RMDir "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%"
 )
 
@@ -102,7 +102,7 @@ goto :EOF
 :PROCESS_DIR_FILES
 call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
 
-if not "%FILE_DIR_PATH%" == "" set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
+if defined FILE_DIR_PATH set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
 set FILE_INDEX=0
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /B /A:-D 2^>nul`) do (
@@ -120,15 +120,15 @@ goto :EOF
 call set "DIR_PATH=%%LINE_%LINE_INDEX%%%"
 call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
 
-if not "%FILE_DIR_PATH%" == "" set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
+if defined FILE_DIR_PATH set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
-if not "%FILE_DIR_PATH%" == "" ^
+if defined FILE_DIR_PATH ^
 if not exist "%DIR_PATH%\" (
   echo.%?~nx0%: error: found directory does not exist: "%DIR_PATH%"
   exit /b 2
 ) >&2
 
-if not "%FILE_DIR_PATH%" == "" (
+if defined FILE_DIR_PATH (
   echo.RMDir "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%\%FILE_DIR_PATH%"
 ) else (
   echo.RMDir "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%"
@@ -139,7 +139,7 @@ exit /b 0
 :PROCESS_FILE
 set "FILE_NAME=%~1"
 
-if not "%FILE_DIR_PATH%" == "" (
+if defined FILE_DIR_PATH (
   set "FILE_PATH=%FILE_DIR_PATH%\%FILE_NAME%"
 ) else (
   set "FILE_PATH=%FILE_NAME%"

@@ -40,10 +40,10 @@ set "FLAG_VALUE_SUFFIX_NAMES="
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-prefix_dirs" (
     set "FLAG_VALUE_PREFIX_DIRS=%~2"
     shift
@@ -61,15 +61,15 @@ if not "%FLAG%" == "" (
   goto FLAGS_LOOP
 )
 
-if "%FLAG_VALUE_PREFIX_DIRS%" == "" set "FLAG_VALUE_PREFIX_DIRS=__pycache__"
-if "%FLAG_VALUE_SUFFIX_NAMES%" == "" set "FLAG_VALUE_SUFFIX_NAMES=.cpython-39|.cpython-38|.cpython-37|.cpython-36|.cpython-35|.cpython-34|.cpython-33|.cpython-32|.cpython-31|.cpython-30"
+if not defined FLAG_VALUE_PREFIX_DIRS set "FLAG_VALUE_PREFIX_DIRS=__pycache__"
+if not defined FLAG_VALUE_SUFFIX_NAMES set "FLAG_VALUE_SUFFIX_NAMES=.cpython-39|.cpython-38|.cpython-37|.cpython-36|.cpython-35|.cpython-34|.cpython-33|.cpython-32|.cpython-31|.cpython-30"
 
 set "SOURCE_DIR=%~1"
 set "SOURCE_DIR_ABS=%~dpf1"
 set "TARGET_DIR=%~2"
 set "TARGET_DIR_ABS=%~dpf2"
 
-if "%SOURCE_DIR%" == "" goto NO_SOURCE_DIR
+if not defined SOURCE_DIR goto NO_SOURCE_DIR
 if not exist "%SOURCE_DIR%\" goto NO_SOURCE_DIR
 
 goto NO_SOURCE_DIR_END
@@ -80,7 +80,7 @@ goto NO_SOURCE_DIR_END
 ) >&2
 :NO_SOURCE_DIR_END
 
-if "%TARGET_DIR%" == "" goto NO_TARGET_DIR
+if not defined TARGET_DIR goto NO_TARGET_DIR
 if not exist "%TARGET_DIR%\" goto NO_TARGET_DIR
 
 goto NO_TARGET_DIR_END
@@ -107,7 +107,7 @@ call :SPLIT_PATHSTR "%%FILE_PATH_FROM%%"
 set "DIR_PATH_TO=%DIR_PATH%"
 set "FILE_PATH_TO=%FILE_PATH%"
 
-if "%DIR_PATH_TO%" == "" goto PREFIX_DIRS_END
+if not defined DIR_PATH_TO goto PREFIX_DIRS_END
 
 :PREFIX_DIRS
 set "NEXT_PREFIX_DIR=%FLAG_VALUE_PREFIX_DIRS%"
@@ -117,14 +117,14 @@ for /F "eol=	 tokens=1,* delims=|" %%i in ("%NEXT_PREFIX_DIR%") do (
   set PREFIX_DIR=%%i
   set NEXT_PREFIX_DIR=%%j
 )
-if "%PREFIX_DIR%" == "" goto PREFIX_DIRS_END
+if not defined PREFIX_DIR goto PREFIX_DIRS_END
 call :PREPROCESS_PREFIX_DIR && goto PREFIX_DIRS_END
 goto PREFIX_DIRS_LOOP
 :PREFIX_DIRS_END
 
-if not "%DIR_PATH_TO%" == "" set "DIR_PATH_TO=%DIR_PATH_TO:/=\%\"
+if defined DIR_PATH_TO set "DIR_PATH_TO=%DIR_PATH_TO:/=\%\"
 
-if "%FILE_PATH_TO%" == "" goto SUFFIX_NAMES_END
+if not defined FILE_PATH_TO goto SUFFIX_NAMES_END
 
 :SUFFIX_NAMES
 set "NEXT_SUFFIX_NAME=%FLAG_VALUE_SUFFIX_NAMES%"
@@ -134,7 +134,7 @@ for /F "eol=	 tokens=1,* delims=|" %%i in ("%NEXT_SUFFIX_NAME%") do (
   set SUFFIX_NAME=%%i
   set NEXT_SUFFIX_NAME=%%j
 )
-if "%SUFFIX_NAME%" == "" goto SUFFIX_NAMES_END
+if not defined SUFFIX_NAME goto SUFFIX_NAMES_END
 call :PREPROCESS_SUFFIX_NAME && goto SUFFIX_NAMES_END
 goto SUFFIX_NAMES_LOOP
 :SUFFIX_NAMES_END
@@ -147,14 +147,14 @@ exit /b
 
 :PREPROCESS_SUFFIX_NAME
 call set "FILE_PATH_TO_PREFIX=%%FILE_PATH_TO:%SUFFIX_NAME%.pyc=%%"
-if "%FILE_PATH_TO_PREFIX%" == "" exit /b 1
+if not defined FILE_PATH_TO_PREFIX exit /b 1
 if not "%FILE_PATH_TO_PREFIX%%SUFFIX_NAME%.pyc" == "%FILE_PATH_TO%" exit /b 1
 set "FILE_PATH_TO=%FILE_PATH_TO_PREFIX%.pyc"
 exit /b 0
 
 :PREPROCESS_PREFIX_DIR
 call set "DIR_PATH_TO_PREFIX=%%DIR_PATH_TO:%PREFIX_DIR%=%%"
-if "%DIR_PATH_TO_PREFIX%" == "" ( set "DIR_PATH_TO=" & exit /b 0 )
+if not defined DIR_PATH_TO_PREFIX ( set "DIR_PATH_TO=" & exit /b 0 )
 if not "%DIR_PATH_TO_PREFIX%%PREFIX_DIR%" == "%DIR_PATH_TO%" exit /b 1
 if not "%DIR_PATH_TO_PREFIX:~-1%" == "/" exit /b 1
 set "DIR_PATH_TO=%DIR_PATH_TO_PREFIX:~0,-1%"
@@ -171,11 +171,11 @@ for /F "eol=	 tokens=1,* delims=/" %%i in ("%NEXT_FILE_PATH%") do (
   set PREV_DIR_PATH=%%i
   set NEXT_FILE_PATH=%%j
 )
-if "%NEXT_FILE_PATH%" == "" exit /b 0
+if not defined NEXT_FILE_PATH exit /b 0
 
 set "FILE_PATH=%NEXT_FILE_PATH%"
 
-if not "%DIR_PATH%" == "" (
+if defined DIR_PATH (
   set "DIR_PATH=%DIR_PATH%/%PREV_DIR_PATH%"
 ) else (
   set "DIR_PATH=%PREV_DIR_PATH%"

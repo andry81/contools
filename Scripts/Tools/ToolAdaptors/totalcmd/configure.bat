@@ -3,21 +3,21 @@
 setlocal
 
 if exist "%~dp0configure.user.bat" ( call "%~dp0configure.user.bat" || goto :EOF )
-if not "%CONTOOLS_ROOT_FROM%" == "" set "CONTOOLS_ROOT=%CONTOOLS_ROOT_FROM%"
+if defined CONTOOLS_ROOT_FROM set "CONTOOLS_ROOT=%CONTOOLS_ROOT_FROM%"
 
-if not "%CONTOOLS_ROOT%" == "" ^
+if defined CONTOOLS_ROOT ^
 if exist "%CONTOOLS_ROOT%\" goto IGNORE_CONTOOLS_ROOT_INPUT
 
 set /P CONTOOLS_ROOT=Input the root path to the tools directory to copy: 
 
 :IGNORE_CONTOOLS_ROOT_INPUT
-if "%CONTOOLS_ROOT%" == "" goto CONTOOLS_ROOT_ERROR
+if not defined CONTOOLS_ROOT goto CONTOOLS_ROOT_ERROR
 if not exist "%CONTOOLS_ROOT%\__init__.bat" goto CONTOOLS_ROOT_ERROR
 
 rem initialize "module" tools
 call "%%CONTOOLS_ROOT%%/__init__.bat" || goto CONTOOLS_ROOT_ERROR
 
-if "%SVNCMD_TOOLS_ROOT%" == "" goto SVNCMD_TOOLS_ROOT_ERROR
+if not defined SVNCMD_TOOLS_ROOT goto SVNCMD_TOOLS_ROOT_ERROR
 if not exist "%SVNCMD_TOOLS_ROOT%\__init__.bat" goto SVNCMD_TOOLS_ROOT_ERROR
 
 set "CONTOOLS_ROOT_COPY=%~dp0Tools"

@@ -31,7 +31,7 @@ set __VAR_VALUE_IS_FLAG__=0
 set __VAR_VALUE_IS_USER_PARAM__=0
 for /F "eol=	 tokens=%__INDEX__% delims= " %%i in ("%__VARS__%") do set "__VAR__=%%i"
 
-if "%__VAR__%" == "" goto VARS_LOOP_END
+if not defined __VAR__ goto VARS_LOOP_END
 if "%__VAR__:~0,1%" == "-" goto VARS_LOOP_END
 
 if "%__VAR__:~0,1%" == "?" (
@@ -42,7 +42,7 @@ if "%__VAR__:~0,1%" == "?" (
 set "__VAR_VALUE__=%~1"
 set "__ARG=%__VAR_VALUE__%"
 
-if not "%__VAR_VALUE__%" == "" (
+if defined __VAR_VALUE__ (
   if "%__VAR_VALUE__:~0,1%" == "-" (
     set __VAR_VALUE_IS_FLAG__=1
     call :PROCESS_FLAG
@@ -52,7 +52,7 @@ if not "%__VAR_VALUE__%" == "" (
 call :PROCESS_USER_PARAM
 
 if %__VAR_OPTIONAL__% EQU 0 (
-  if "%__VAR_VALUE__%" == "" (
+  if not defined __VAR_VALUE__ (
     call :ERROR0
     endlocal
     set "__VARS__="
@@ -64,7 +64,7 @@ if %__VAR_OPTIONAL__% EQU 0 (
     set "__VARS__="
     set "__INDEX__="
     exit /b %__INDEX__%
-  ) else if not "%__USER_PARAM__%" == "" (
+  ) else if defined __USER_PARAM__ (
     call :ERROR0
     endlocal
     set "__VARS__="
@@ -76,9 +76,9 @@ if %__VAR_OPTIONAL__% EQU 0 (
 (
   endlocal
   rem reset variable after endlocal
-  if not "%__USER_PARAM__%" == "" (
+  if defined __USER_PARAM__ (
     set "%__USER_PARAM__%=%__USER_VALUE__%"
-  ) else if not "%__VAR_VALUE__%" == "" if %__VAR_VALUE_IS_FLAG__% EQU 0 (
+  ) else if defined __VAR_VALUE__ if %__VAR_VALUE_IS_FLAG__% EQU 0 (
     set "%__VAR__%=%__VAR_VALUE__%"
   )
   rem restore flags
@@ -100,13 +100,13 @@ endlocal
 
 set "__ARG=%~1"
 
-if "%__ARG%" == "" goto ARGS_LOOP_END
+if not defined __ARG goto ARGS_LOOP_END
 
 call :PROCESS_FLAG
 
 call :PROCESS_USER_PARAM
 
-if not "%__USER_PARAM__%" == "" (
+if defined __USER_PARAM__ (
   set "%__USER_PARAM__%=%__USER_VALUE__%"
 )
 
@@ -141,7 +141,7 @@ if "%__ARG:~0,1%" == "-" (
 )
 
 rem script flags
-if not "%__FLAG%" == "" (
+if defined __FLAG (
   if not "%__FLAG%" == "%__FLAG:-g =%" set FLAGS_REGEN=1
   if not "%__FLAG%" == "%__FLAG:-r =%" set FLAGS_REBUILD=1
 )

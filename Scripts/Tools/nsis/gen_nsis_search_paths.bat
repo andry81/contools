@@ -47,7 +47,7 @@ set "PATH=%PATH%;%VALUE%"
 goto :EOF
 
 :GEN_OUTPUT
-if not "%PREV_COMMAND%" == "" if not "%PREV_COMMAND%" == "%COMMAND%" echo.
+if defined PREV_COMMAND if not "%PREV_COMMAND%" == "%COMMAND%" echo.
 
 set "PREV_COMMAND=%COMMAND%"
 

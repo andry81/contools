@@ -39,7 +39,7 @@ goto EXIT
 for /F "usebackq tokens=*" %%i in (`cygpath.exe -u "%~1"`) do (
   if not "%%i" == "" set "CONVERSION_PATH=%%i"
 )
-if not "%CONVERSION_PATH%" == "" (
+if defined CONVERSION_PATH (
   call :EXEC "%%CONVERSION_PATH%%"
   set CONVERSION_PATH=
 ) else (
@@ -65,7 +65,7 @@ goto :EOF
 if exist "%~$PATH:1" (
   rem Environment variable OSTYPE=cygwin is not set if cmd runs under cygwin,
   rem so we need to check it out explicitly here
-  if "%OSTYPE%" == "" (
+  if not defined OSTYPE (
     if "%TERM%" == "cygwin" (
       if exist "%~dp$PATH:1cygwin1.dll" set OSTYPE=cygwin
     )

@@ -30,13 +30,13 @@ set "__VAR_SIZE_NAME=%~4"
 set "__STRING=%~5"
 set "__SEPARATOR=%~6"
 
-if "%__VAR_NAME%" == "" exit /b -1
+if not defined __VAR_NAME exit /b -1
 
-if "%__FROM_OFFSET%" == "" set __FROM_OFFSET=0
-if "%__SEPARATOR%" == "" set __SEPARATOR=:
+if not defined __FROM_OFFSET set __FROM_OFFSET=0
+if not defined __SEPARATOR set __SEPARATOR=:
 
 set __GOTO_LOOP=ALL_LOOP
-if "%__COPY_SIZE%" == "" set __COPY_SIZE=-1
+if not defined __COPY_SIZE set __COPY_SIZE=-1
 if %__COPY_SIZE% GEQ 0 set __GOTO_LOOP=RANGE_LOOP
 
 set /A __INDEX_INT_IN=1+__FROM_OFFSET
@@ -44,7 +44,7 @@ set __INDEX_INT_OUT=0
 set __INDEX_EXT=0
 
 call set "__LIST_OUT_SIZE=%%%__VAR_NAME%.SIZE%%"
-if not "%__LIST_OUT_SIZE%" == "" set /A __INDEX_EXT+=__LIST_OUT_SIZE
+if defined __LIST_OUT_SIZE set /A __INDEX_EXT+=__LIST_OUT_SIZE
 
 goto %__GOTO_LOOP%
 
@@ -54,7 +54,7 @@ if %__INDEX_INT_OUT% GEQ %__COPY_SIZE% goto LOOP_END
 :ALL_LOOP
 set "__VALUE="
 for /F "tokens=%__INDEX_INT_IN% delims=%__SEPARATOR%" %%i in ("%__STRING%") do set "__VALUE=%%i"
-if "%__VALUE%" == "" goto LOOP_END
+if not defined __VALUE goto LOOP_END
 
 set "%__VAR_NAME%[%__INDEX_EXT%]=%__VALUE%"
 
@@ -66,7 +66,7 @@ goto %__GOTO_LOOP%
 
 :LOOP_END
 
-if not "%__VAR_SIZE_NAME%" == "" set %__VAR_SIZE_NAME%=%__INDEX_INT_OUT%
+if defined __VAR_SIZE_NAME set %__VAR_SIZE_NAME%=%__INDEX_INT_OUT%
 set %__VAR_NAME%.SIZE=%__INDEX_EXT%
 
 rem drop temporary variables

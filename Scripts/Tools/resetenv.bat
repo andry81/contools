@@ -41,10 +41,10 @@ set ?FLAG_RESET=0
 rem flags always at first
 set "?FLAG=%~1"
 
-if not "%?FLAG%" == "" ^
+if defined ?FLAG ^
 if not "%?FLAG:~0,1%" == "-" set "?FLAG="
 
-if not "%?FLAG%" == "" (
+if defined ?FLAG (
   if "%?FLAG%" == "-p" (
     set ?FLAG_PRINT=1
     shift
@@ -129,7 +129,7 @@ goto :EOF
 
 :CLEAR_VAR
 set "?CLEAR_VAR_NAME=%~1"
-if "%?CLEAR_VAR_NAME%" == "" goto :EOF
+if not defined ?CLEAR_VAR_NAME goto :EOF
 if "%?CLEAR_VAR_NAME:~0,1%" == "?" goto :EOF
 
 call :CLEAR_VAR_LOOP %%?RESET_ENV_FILES%%
@@ -145,7 +145,7 @@ shift
 if exist "%~1" goto CLEAR_VAR_LOOP
 
 call set "?CLEAR_VAR_VALUE=%%%?CLEAR_VAR_NAME%%%"
-if not "%?CLEAR_VAR_VALUE%" == "" (
+if defined ?CLEAR_VAR_VALUE (
   set "%?CLEAR_VAR_NAME%="
   if %?FLAG_PRINT% NEQ 0 echo.-"%?CLEAR_VAR_NAME%"
 )

@@ -11,7 +11,7 @@ set "RETURN_VALUE="
 
 for /F "usebackq eol=	 tokens=1,2 delims==" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if "%%i" == "LocalDateTime" set "RETURN_VALUE=%%j"
 
-if not "%RETURN_VALUE%" == "" (
+if defined RETURN_VALUE (
   set "RETURN_VALUE=%RETURN_VALUE:~0,18%"
   exit /b 0
 )

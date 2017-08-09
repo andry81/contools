@@ -45,10 +45,10 @@ set FLAG_IGNORE_PROPS=0
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-exact" (
     set FLAG_EXACT=1
     shift
@@ -67,7 +67,7 @@ if not "%FLAG%" == "" (
 set "XPATH_LIST_FILE_IN=%~1"
 set "XPATH_LIST_FILE_FILTER=%~2"
 
-if "%XPATH_LIST_FILE_IN%" == "" (
+if not defined XPATH_LIST_FILE_IN (
   echo.%?~nx0%: error: input xpath file is no set.
   exit /b 2
 ) >&2
@@ -77,7 +77,7 @@ if not exist "%XPATH_LIST_FILE_IN%" (
   exit /b 3
 ) >&2
 
-if "%XPATH_LIST_FILE_FILTER%" == "" (
+if not defined XPATH_LIST_FILE_FILTER (
   echo.%?~nx0%: error: xpath filter file is no set.
   exit /b 4
 ) >&2

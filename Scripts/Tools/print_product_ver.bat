@@ -6,15 +6,15 @@ set "DIR_PATH=%~dpf1"
 set "FILE_PATH=%~2"
 
 set "FILE_PATH_PREFIX="
-if not "%DIR_PATH%" == "" set "FILE_PATH_PREFIX=%DIR_PATH%\"
+if defined DIR_PATH set "FILE_PATH_PREFIX=%DIR_PATH%\"
 
-if not "%FILE_PATH_PREFIX%" == "" ^
+if defined FILE_PATH_PREFIX ^
 if not exist "%FILE_PATH_PREFIX%" (
   echo.%~nx0: error: Directory path does not exist: "%FILE_PATH_PREFIX%"
   exit /b 1
 ) >&2
 
-if "%FILE_PATH%" == "" (
+if not defined FILE_PATH (
   echo.%~nx0: error: File path does not set.
   exit /b 2
 ) >&2

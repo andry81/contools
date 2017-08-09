@@ -38,7 +38,7 @@ set __COUNTER1=0
 
 :LOOP10
 call set "__SUBSTR=%%__STR:~%__COUNTER1%,%__STRLEN%%%"
-if not "%__SUBSTR%" == "" (
+if defined __SUBSTR (
   if %~3 not "%__SUBSTR%" == "%~2" (
     set /A __COUNTER1+=1
     goto LOOP10

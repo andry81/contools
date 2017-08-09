@@ -17,7 +17,7 @@ rem installation. To do it we reads registry for installation directory.
 rem Restart shell if x64 mode
 if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
 rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
-if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
+if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 "%SystemRoot%\Syswow64\cmd.exe" /C ^(%0 %*^)
 goto :EOF
 
@@ -98,7 +98,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 set CYGWIN_VER_1_7_X=0
-if not "%CYGWIN_VER_STR%" == "" (
+if defined CYGWIN_VER_STR (
   for /F "eol= tokens=1,2,* delims=." %%i in ("%CYGWIN_VER_STR%") do (
     rem If Cygwin version is 1.7 or higher, then no need to check registry installation,
     rem because the Cygwin with version 1.7 and higher implements mingw style of working.
@@ -124,7 +124,7 @@ if %CYGWIN_VER_1_7_X% EQU 1 (
 )
 
 rem Seems cygwin version is 1.6.x or older (or installation corrupted).
-if "%CYGWIN_REGKEY_PATH%" == "" (
+if not defined CYGWIN_REGKEY_PATH (
   call :cecho %%~nx0: {0C}error{#}: {0C}Variable CYGWIN_REGKEY_PATH doesn't set properly by "cygwin.vars" ^^^(required for cygwin version 1.6.x and older^^^).>&2
   exit /b 8
 )

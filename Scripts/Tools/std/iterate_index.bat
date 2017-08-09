@@ -24,7 +24,7 @@ set "__INDEX_VAR_NAME=%~2"
 
 set "?~nx0=%~nx0"
 
-if "%__SIZE%" == "" (
+if not defined __SIZE (
   echo.%?~nx0%: error: size is not set.
   exit /b 1
 ) >&2
@@ -60,7 +60,7 @@ set /A __PRED_INDEX0+=1
 
 :PRED_LIST_LOOP_END
 
-if "%__INDEX_VAR_NAME%" == "" set __INDEX_VAR_NAME=INDEX0
+if not defined __INDEX_VAR_NAME set __INDEX_VAR_NAME=INDEX0
 set %__INDEX_VAR_NAME%=0
 call set __INDEX0=%%%__INDEX_VAR_NAME%%%
 
@@ -110,7 +110,7 @@ for /F "usebackq eol=	 tokens=1,* delims==" %%i in (`set __PRED_LIST[ 2^>nul`) d
 
 (
   set "?~nx0="
-  if not "%__INDEX_VAR_NAME%" == "" set "%__INDEX_VAR_NAME%="
+  if defined __INDEX_VAR_NAME set "%__INDEX_VAR_NAME%="
   set "__SIZE="
   set "__INDEX_VAR_NAME="
   set "__PRED_INDEX0="

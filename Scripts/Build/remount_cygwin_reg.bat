@@ -9,7 +9,7 @@ rem "CYGWIN_PATH" and "CYGWIN_REGKEY_PATH" before.
 rem Restart shell if x64 mode
 if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
 rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
-if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
+if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 "%SystemRoot%\Syswow64\cmd.exe" /C ^(%0 %*^)
 goto :EOF
 
@@ -72,7 +72,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 set CYGWIN_VER_1_7_X=0
-if not "%CYGWIN_VER_STR%" == "" (
+if defined CYGWIN_VER_STR (
   for /F "eol= tokens=1,2,* delims=." %%i in ("%CYGWIN_VER_STR%") do (
     rem If Cygwin version is 1.7 or higher, then no need to check registry installation,
     rem because the Cygwin with version 1.7 and higher implements mingw style of working.
@@ -93,7 +93,7 @@ if %CYGWIN_VER_1_7_X% EQU 0 goto REMOUNT_CYGWIN_1_6_X
 
 :REMOUNT_CYGWIN_1_6_X
 rem Make remount in the Windows registry.
-if "%CYGWIN_REGKEY_PATH%" == "" (
+if not defined CYGWIN_REGKEY_PATH (
   echo %~nx0: error: Variable CYGWIN_REGKEY_PATH doesn't set properly by "cygwin.vars" ^(required for cygwin version 1.6.x and older^).>&2
   exit /b 8
 )
@@ -142,7 +142,7 @@ goto EXIT
 rem Ignore root path, because it is path to registry key.
 set "__VALUE=%~1"
 call set "__VALUE=%%__VALUE:~%__CYGWIN_REGKEY_PATH_LEN%%%"
-if "%__VALUE%" == "" goto :EOF
+if not defined __VALUE goto :EOF
 if "%__VALUE%" == "~%__CYGWIN_REGKEY_PATH_LEN%" goto :EOF
 
 set /A __OVERALL_PATHS+=1
@@ -163,7 +163,7 @@ rem Change only mounts which paths begins from root mount minus drive.
 if /i not "%__CURRENT_CYGWIN_PATH:~1%" == "%__VALUE2_1:~1%" goto :EOF
 
 set "__VALUE2_2_1=%__VALUE2_2:\=/%"
-if not "%__VALUE2_2%" == "" if not "%__VALUE2_2_1:~0,1%" == "/" goto :EOF
+if defined __VALUE2_2 if not "%__VALUE2_2_1:~0,1%" == "/" goto :EOF
 
 rem Write new value to registry.
 reg.exe add "%CYGWIN_REGKEY_PATH%\%__VALUE%" /v "native" /d "%CYGWIN_PATH%%__VALUE2_2%" /f >nul 2>&1

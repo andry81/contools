@@ -10,7 +10,7 @@ rem Mingw doesn't need to install, so we doesn't need to check it correctness.
 rem Restart shell if x64 mode
 if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
 rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
-if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
+if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 "%SystemRoot%\Syswow64\cmd.exe" /C ^(%0 %*^)
 goto :EOF
 

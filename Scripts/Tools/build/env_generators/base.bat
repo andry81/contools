@@ -19,8 +19,8 @@ rem drop internal variables
 exit /b
 
 :GEN_PROJECT_ENV
-if "%__PROJECT_NAME%" == "" set "__PROJECT_VAR_PREFIX="
-if not "%__PROJECT_NAME%" == "" set "__PROJECT_VAR_PREFIX=%__PROJECT_NAME%."
+if not defined __PROJECT_NAME set "__PROJECT_VAR_PREFIX="
+if defined __PROJECT_NAME set "__PROJECT_VAR_PREFIX=%__PROJECT_NAME%."
 
 call set "__BUILD_DEV_COMPILER=%%%__PROJECT_VAR_PREFIX%BUILD_DEV_COMPILER%%"
 call set "__BUILD_DEV_ADDRESS_MODEL=%%%__PROJECT_VAR_PREFIX%BUILD_DEV_ADDRESS_MODEL%%"
@@ -46,7 +46,7 @@ exit /b 0
 setlocal
 call set "__VALUE__=%%%~1%%"
 if not "%~1" == "" ^
-if "%__VALUE__%" == "" (
+if not defined __VALUE__ (
   endlocal
   if %F_ENABLE_PRINT_USER_CONFIGURE_VARS_SET%0 NEQ 0 echo.%~1=%2
   set "%~1=%~2"

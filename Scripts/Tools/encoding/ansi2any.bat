@@ -14,10 +14,10 @@ set FLAG_USE_BOM=0
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-bom" (
     set FLAG_USE_BOM=1
     shift
@@ -34,7 +34,7 @@ set "INPUT_CHARSET=%~1"
 set "OUTPUT_CHARSET=%~2"
 set "INPUT_FILE=%~3"
 
-if "%OUTPUT_CHARSET%" == "" (
+if not defined OUTPUT_CHARSET (
   echo.%?~nx0%: error: OUTPUT_CHARSET is not set.
   exit /b 1
 )
@@ -44,7 +44,7 @@ if not exist "%INPUT_FILE%" (
   exit /b 2
 ) >&2
 
-if "%INPUT_CHARSET%" == "" call :GET_CURRENT_CODE_PAGE
+if not defined INPUT_CHARSET call :GET_CURRENT_CODE_PAGE
 
 if %FLAG_USE_BOM% NEQ 0 call :OUTPUT_BOM
 

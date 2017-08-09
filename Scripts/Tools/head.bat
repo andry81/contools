@@ -16,7 +16,7 @@ rem   * Not so fast, prints ~2000 lines about 8 seconds on 3.2GHz AMD processor
 setlocal DISABLEDELAYEDEXPANSION
 
 set "NUM=%~1"
-if "%NUM%" == "" set NUM=0
+if not defined NUM set NUM=0
 set "STR_PREFIX=%~2"
 set "STR_SUFFIX=%~3"
 

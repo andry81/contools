@@ -19,10 +19,10 @@ set FLAG_CLOSE_ALL=0
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-all" (
     set FLAG_CLOSE_ALL=1
     shift
@@ -38,12 +38,12 @@ if not "%FLAG%" == "" (
 set "PROC_NAME=%~1"
 set "OBJECT_NAME=%~2"
 
-if "%PROC_NAME%" == "" (
+if not defined PROC_NAME (
   echo.%?~nx0%: error: PROC_NAME is not set.
   exit /b 1
 ) >&2
 
-if "%OBJECT_NAME%" == "" (
+if not defined OBJECT_NAME (
   echo.%?~nx0%: error: OBJECT_NAME is not set.
   exit /b 2
 ) >&2
@@ -74,7 +74,7 @@ set WORD_FOUND=0
 :PROCESS_HANDLE_LINE_LOOP
 set "WORD="
 for /F "eol=	 tokens=%WORD_INDEX% delims= " %%i in ("%HANDLE_LINE%") do set "WORD=%%i"
-if "%WORD%" == "" exit /b 0
+if not defined WORD exit /b 0
 
 if %WORD_INDEX% EQU 1 set "PROC_NAME=%WORD%"
 if %WORD_FOUND% NEQ 0 set "PROC_PID=%WORD%" & goto HANDLE_LINE_PROCESSED
@@ -85,7 +85,7 @@ set /A WORD_INDEX+=1
 goto PROCESS_HANDLE_LINE_LOOP
 
 :HANDLE_LINE_PROCESSED
-if "%PROC_NAME%" == "" exit /b 1
-if "%PROC_PID%" == "" exit /b 2
+if not defined PROC_NAME exit /b 1
+if not defined PROC_PID exit /b 2
 echo.  Killing %PROC_NAME% with pid %PROC_PID%...
 taskkill /PID %PROC_PID%

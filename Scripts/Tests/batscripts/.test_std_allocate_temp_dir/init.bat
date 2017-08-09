@@ -8,7 +8,7 @@ set "TEST_TEMP_DIR_NAME=%TEST_SCRIPT_FILE_NAME%.%TESTLIB__CURRENT_TESTS%.%RANDOM
 call "%%CONTOOLS_ROOT%%/abspath.bat" "%%TEST_TEMP_BASE_DIR%%\%%TEST_TEMP_DIR_NAME%%"
 set "TEST_TEMP_DIR=%RETURN_VALUE%"
 
-if "%TEST_TEMP_DIR%" == "" exit /b 127
+if not defined TEST_TEMP_DIR exit /b 127
 
 mkdir "%TEST_TEMP_DIR%"
 

@@ -8,7 +8,7 @@ rem   Script checks if it is running under Visual Studio environment.
 rem Drop last error level.
 type nul>nul
 
-if "%VS_UNICODE_OUTPUT%" == "" (
+if not defined VS_UNICODE_OUTPUT (
   echo This is script must be called inside of Visual Studio Project ^(*.vcproj^) under command line of project/file event
   exit /b 65534
 )

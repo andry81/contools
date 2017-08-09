@@ -13,11 +13,11 @@ rem 1. call clear_list.bat MyList
 
 set "__VAR_NAME=%~1"
 
-if "%__VAR_NAME%" == "" exit /b -1
+if not defined __VAR_NAME exit /b -1
 
 call set "__LIST_SIZE=%%%__VAR_NAME%.SIZE%%"
 
-if "%__LIST_SIZE%" == "" exit /b -2
+if not defined __LIST_SIZE exit /b -2
 
 set __INDEX_EXT=0
 

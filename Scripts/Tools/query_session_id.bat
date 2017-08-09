@@ -49,10 +49,10 @@ for /F "eol=	 tokens=1,* delims= " %%j in ("%QUERY_LINE:~1%") do set "SESSION=%%
 if "%SESSION_NAME%" == "*" goto SESSION_NAME_FOUND
 
 rem session can be empty if a user is not logged in, but the terminal has user logged in processes
-if "%SESSION_NAME%" == "" (
-  if "%SESSION%" == "" goto SESSION_NAME_FOUND
+if not defined SESSION_NAME (
+  if not defined SESSION goto SESSION_NAME_FOUND
   goto PROCESS_QUERY_END
-) else if "%SESSION%" == "" goto PROCESS_QUERY_END
+) else if not defined SESSION goto PROCESS_QUERY_END
 
 call set "SESSION_NAME_PARSED=%%SESSION:%SESSION_NAME%=%%"
 
@@ -65,7 +65,7 @@ rem spaces filter
 for /F "eol=	 tokens=1,* delims= " %%j in ("%USER%") do set "USER=%%j"
 for /F "eol=	 tokens=* delims= " %%j in ("%USER%") do set "USER=%%j"
 
-if "%USER_NAME%" == "" goto USER_NAME_FOUND
+if not defined USER_NAME goto USER_NAME_FOUND
 if /i "%USER%" == "%USER_NAME%" goto USER_NAME_FOUND
 goto PROCESS_QUERY_END
 
@@ -85,10 +85,10 @@ for /F "eol=	 tokens=* delims= " %%j in ("%SESSION_STATE%") do set "SESSION_STAT
 
 if "%STATE_NAME%" == "*" goto SESSION_STATE_FOUND
 
-if "%STATE_NAME%" == "" (
-  if "%SESSION_STATE%" == "" goto SESSION_STATE_FOUND
+if not defined STATE_NAME (
+  if not defined SESSION_STATE goto SESSION_STATE_FOUND
   goto PROCESS_QUERY_END
-) else if "%SESSION_STATE%" == "" goto PROCESS_QUERY_END
+) else if not defined SESSION_STATE goto PROCESS_QUERY_END
 
 if /i "%STATE_NAME%" == "%SESSION_STATE%" goto SESSION_STATE_FOUND
 goto PROCESS_QUERY_END

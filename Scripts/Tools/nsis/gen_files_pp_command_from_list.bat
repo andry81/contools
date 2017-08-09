@@ -34,11 +34,11 @@ set "TOKEN_VALUE=%~1"
 set "FILE_EXT_LIST=%~2"
 set "FILE_PATH_LIST_FILE=%~3"
 
-if "%TOKEN_VALUE%" == "" (
+if not defined TOKEN_VALUE (
   echo.%?~nx0%: error: token value is not set: "%TOKEN_VALUE%"
   exit /b 1
 ) >&2
-if "%FILE_EXT_LIST%" == "" (
+if not defined FILE_EXT_LIST (
   echo.%?~nx0%: error: file extensions list is not set: "%FILE_EXT_LIST%"
   exit /b 2
 ) >&2
@@ -55,7 +55,7 @@ set FILE_EXT_INDEX=1
 :PROCESS_FILE_EXT_LIST_LOOP
 set "FILE_EXT="
 for /F "eol=	 tokens=%FILE_EXT_INDEX% delims=|" %%i in ("%FILE_EXT_LIST%") do set "FILE_EXT=%%i"
-if "%FILE_EXT%" == "" goto :EOF
+if not defined FILE_EXT goto :EOF
 
 set FINDSTR_CMD_LINE=%FINDSTR_CMD_LINE% /C:"%FILE_EXT%"
 

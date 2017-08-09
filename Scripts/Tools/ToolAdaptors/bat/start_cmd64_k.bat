@@ -30,7 +30,7 @@ rem   "Jailed 32-Bit Processes on Windows x64" on the internet).
 
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
 rem in case of wrong PROCESSOR_ARCHITECTURE value
-if not "%PROCESSOR_ARCHITEW6432%" == "" goto WOW64
+if defined PROCESSOR_ARCHITEW6432 goto WOW64
 exit /b -256
 
 :X64

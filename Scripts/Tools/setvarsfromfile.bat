@@ -73,7 +73,7 @@ set ?1="
 set !?2!=!
 
 set __DO_EXPAND_ALL_VALUES=0
-if not "%__FLAGS%" == "" (
+if defined __FLAGS (
   if not "%__FLAGS%" == "%__FLAGS:e=%" set __DO_EXPAND_ALL_VALUES=1
 )
 
@@ -211,8 +211,8 @@ if %__SET_FLAG_DONT_EXPAND_NAME%0 EQU 0 (
 ) else (
   set "__SET1=%__VAR_PREFIX%%__EXP%"
 )
-if not "%__SET1%" == "" call set "__SET1=%%%__SET1%%%"
-if not "%__SET1%" == "" exit /b 0
+if defined __SET1 call set "__SET1=%%%__SET1%%%"
+if defined __SET1 exit /b 0
 
 if %__SET_FLAG_FROM_FILE%0 NEQ 0 goto SET_FROM_FILE
 
@@ -247,10 +247,10 @@ set __DO_EXPAND_VALUE=0
 if %__DO_EXPAND_ALL_VALUES%0 NEQ 0 set __DO_EXPAND_VALUE=1
 if %__SET_FLAG_DBL_EXPAND_VALUE%0 NEQ 0 set __DO_EXPAND_VALUE=1
 
-if %__DO_EXPAND_VALUE%0 NEQ 0 if %__SET_FLAG_REF%0 EQU 0 if not "%__ARGS__%" == "" call set "__ARGS__=%__ARGS__%"
-if not "%__ARGS__%" == "" set "__ARGS__=%__ARGS__:^^^^=^%"
-if not "%__ARGS__%" == "" set "__ARGS__=%__ARGS__:^^=^%"
-if %__DO_EXPAND_VALUE%0 NEQ 0 if %__SET_FLAG_REF%0 EQU 0 if not "%__ARGS__%" == "" set "__ARGS__=%__ARGS__:^=^^%"
+if %__DO_EXPAND_VALUE%0 NEQ 0 if %__SET_FLAG_REF%0 EQU 0 if defined __ARGS__ call set "__ARGS__=%__ARGS__%"
+if defined __ARGS__ set "__ARGS__=%__ARGS__:^^^^=^%"
+if defined __ARGS__ set "__ARGS__=%__ARGS__:^^=^%"
+if %__DO_EXPAND_VALUE%0 NEQ 0 if %__SET_FLAG_REF%0 EQU 0 if defined __ARGS__ set "__ARGS__=%__ARGS__:^=^^%"
 
 if %__SET_FLAG_DONT_EXPAND_NAME%0 EQU 0 (
   call set "__VAR_NAME=%__VAR_PREFIX%%__EXP%"
@@ -260,7 +260,7 @@ if %__SET_FLAG_DONT_EXPAND_NAME%0 EQU 0 (
 
 rem ignore set if variable's value is not exist as path or begins/ends by slash or having double slash inside (empty expanded variables in a value)
 if %__SET_FLAG_IF_EXIST%0 NEQ 0 (
-  if "%__ARGS__%" == "" exit /b 0
+  if not defined __ARGS__ exit /b 0
   set "__ARGS__=%__ARGS__:\=/%"
 )
 if %__SET_FLAG_IF_EXIST%0 NEQ 0 (
@@ -295,7 +295,7 @@ if %__SET_FLAG_DONT_EXPAND_NAME%0 EQU 0 (
 
 rem ignore set if variable's value does not exist as path or begins/ends by slash or having double slash inside (empty expanded variables in a value)
 if %__SET_FLAG_IF_EXIST%0 NEQ 0 (
-  if "%__ARGS__%" == "" exit /b 0
+  if not defined __ARGS__ exit /b 0
   set "__ARGS__=%__ARGS__:\=/%"
 )
 if %__SET_FLAG_IF_EXIST%0 NEQ 0 (
@@ -325,7 +325,7 @@ set __DO_EXPAND_VALUE=0
 if %__DO_EXPAND_ALL_VALUES%0 NEQ 0 set __DO_EXPAND_VALUE=1
 if %__SET_FLAG_DBL_EXPAND_VALUE%0 NEQ 0 set __DO_EXPAND_VALUE=1
 
-if %__DO_EXPAND_VALUE%0 NEQ 0 if %__SET_FLAG_REF%0 EQU 0 if not "%__STDIN_FILE%" == "" call set "__STDIN_FILE=%__STDIN_FILE%"
+if %__DO_EXPAND_VALUE%0 NEQ 0 if %__SET_FLAG_REF%0 EQU 0 if defined __STDIN_FILE call set "__STDIN_FILE=%__STDIN_FILE%"
 
 if %__SET_FLAG_DONT_EXPAND_NAME%0 EQU 0 (
   call set "__VAR_NAME=%__VAR_PREFIX%%__EXP%"
@@ -335,7 +335,7 @@ if %__SET_FLAG_DONT_EXPAND_NAME%0 EQU 0 (
 
 rem ignore set if variable's value does not exist as path or begins/ends by slash or having double slash inside (empty expanded variables in a value)
 if %__SET_FLAG_IF_EXIST%0 NEQ 0 (
-  if "%__STDIN_FILE%" == "" exit /b 0
+  if not defined __STDIN_FILE exit /b 0
   set "__STDIN_FILE=%__STDIN_FILE:\=/%"
 )
 if %__SET_FLAG_IF_EXIST%0 NEQ 0 (

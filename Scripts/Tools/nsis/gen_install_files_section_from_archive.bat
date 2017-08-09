@@ -48,13 +48,13 @@ shift
 shift
 
 set "FILES_PATH_PREFIX="
-if not "%PREFIX_PATH_VAR%" == "" set "FILES_PATH_PREFIX=%PREFIX_PATH_VAR%\"
+if defined PREFIX_PATH_VAR set "FILES_PATH_PREFIX=%PREFIX_PATH_VAR%\"
 set "INSTDIR_SUBDIR_SUFFIX="
-if not "%INSTDIR_SUBDIR%" == "" set "INSTDIR_SUBDIR_SUFFIX=\%INSTDIR_SUBDIR%"
+if defined INSTDIR_SUBDIR set "INSTDIR_SUBDIR_SUFFIX=\%INSTDIR_SUBDIR%"
 set "EXEDIR_SUBDIR_SUFFIX="
-if not "%EXEDIR_SUBDIR%" == "" set "EXEDIR_SUBDIR_SUFFIX=%EXEDIR_SUBDIR%\"
+if defined EXEDIR_SUBDIR set "EXEDIR_SUBDIR_SUFFIX=%EXEDIR_SUBDIR%\"
 set "FILE_FILTER_SUFFIX="
-if not "%FILE_FILTER%" == "" set "FILE_FILTER_SUFFIX=\%FILE_FILTER%"
+if defined FILE_FILTER set "FILE_FILTER_SUFFIX=\%FILE_FILTER%"
 
 echo.!define INCLUDE_FILE_DIR "%INCLUDE_FILE_DIR_PATH%"
 echo.
@@ -99,7 +99,7 @@ goto :EOF
 :PROCESS_DIR_FILES
 call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
 
-if not "%FILE_DIR_PATH%" == "" set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
+if defined FILE_DIR_PATH set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
 set FILE_INDEX=0
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /B /A:-D 2^>nul`) do (
@@ -112,14 +112,14 @@ goto :EOF
 set "FILE_NAME=%~1"
 
 if %FILE_INDEX% EQU 0 (
-  if not "%FILE_DIR_PATH%" == "" (
+  if defined FILE_DIR_PATH (
     echo.SetOutPath "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%\%FILE_DIR_PATH%"
   ) else (
     echo.SetOutPath "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%"
   )
 )
 
-if not "%FILE_DIR_PATH%" == "" (
+if defined FILE_DIR_PATH (
   set "FILE_PATH=%FILE_DIR_PATH%\%FILE_NAME%"
 ) else (
   set "FILE_PATH=%FILE_NAME%"

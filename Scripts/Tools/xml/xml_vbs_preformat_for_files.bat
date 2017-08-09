@@ -32,10 +32,10 @@ set "CMD_FLAG_ARGS="
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   set CMD_FLAG_ARGS=%CMD_FLAG_ARGS%%1 
 
   shift

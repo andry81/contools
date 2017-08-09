@@ -30,10 +30,7 @@ rem    strrep.bat "" "a\b\.c" "abba" a
 if "%~4" == "" exit /b 1
 
 rem Drop output variable
-(
-  set %~4=0
-  set %~4=
-)
+set "%~4="
 
 rem Drop last error level
 type nul>nul
@@ -59,8 +56,8 @@ set __COUNTER1=0
 :LOOP10
 set "__EMPTY_FIELD=~%__COUNTER1%,1"
 call set "__CHAR=%%%__STRING_VAR__%:%__EMPTY_FIELD%%%"
+if not defined __CHAR goto EXIT
 if "%__CHAR%^" == ""^" goto EXIT
-if "%__CHAR%" == "" goto EXIT
 if "%__CHAR%" == "%__EMPTY_FIELD%" goto EXIT
 
 set __COUNTER2=0
@@ -68,15 +65,15 @@ set __COUNTER2=0
 :LOOP20
 set "__EMPTY_FIELD1=~%__COUNTER2%,1"
 call set "__CHAR1=%%%__CHARS_VAR__%:%__EMPTY_FIELD1%%%"
+if not defined __CHAR1 goto LOOP30
 if "%__CHAR1%^" == ""^" goto EXIT2
-if "%__CHAR1%" == "" goto LOOP30
 if "%__CHAR1%" == "%__EMPTY_FIELD1%" goto LOOP30
 set /A __COUNTER2+=1
 
 set "__EMPTY_FIELD2=~%__COUNTER2%,1"
 call set "__CHAR2=%%%__CHARS_VAR__%:%__EMPTY_FIELD2%%%"
+if not defined __CHAR2 goto LOOP30
 if "%__CHAR2%^" == ""^" goto EXIT2
-if "%__CHAR2%" == "" goto LOOP30
 if "%__CHAR2%" == "%__EMPTY_FIELD2%" LOOP30
 set /A __COUNTER2+=1
 

@@ -2,7 +2,7 @@
 
 set "USER=%~1"
 
-if "%USER%" == "" call :GET_DEFAULT_ADMIN_NAME
+if not defined USER call :GET_DEFAULT_ADMIN_NAME
 
 runas /user:%USER% "\"%COMSPEC%\" /K %CD:~0,2%&call cd \"%CD%\"&title User: %USER%"
 

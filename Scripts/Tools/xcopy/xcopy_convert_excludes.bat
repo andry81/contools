@@ -12,7 +12,7 @@ set HAS_RETURN_VALUE=0
 
 set "XCOPY_EXCLUDE_FILES_LIST=%~1"
 
-if "%XCOPY_EXCLUDE_FILES_LIST%" == "" exit /b 1
+if not defined XCOPY_EXCLUDE_FILES_LIST exit /b 1
 
 set ROBOCOPY_EXIST=0
 if exist "%WINDIR%\system32\robocopy.exe" set ROBOCOPY_EXIST=1
@@ -22,7 +22,7 @@ set FILE_INDEX=1
 :EXCLUDE_FILES_LOOP
 set "FILE="
 for /F "eol=	 tokens=%FILE_INDEX% delims=|" %%i in ("%XCOPY_EXCLUDE_FILES_LIST%") do set "FILE=%%i"
-if "%FILE%" == "" goto EXIT
+if not defined FILE goto EXIT
 
 set VALUE_FOUND_DO_EXIT=0
 

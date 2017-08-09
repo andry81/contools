@@ -8,9 +8,9 @@ rem   The del wrapper script with echo and some conditions check before call.
 setlocal
 
 set "FROM_PATH=%~1"
-if not "%FROM_PATH%" == "" set "FROM_PATH=%FROM_PATH:/=\%"
+if defined FROM_PATH set "FROM_PATH=%FROM_PATH:/=\%"
 
-if not "%FROM_PATH%" == "" ^
+if defined FROM_PATH ^
 if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
 
 (

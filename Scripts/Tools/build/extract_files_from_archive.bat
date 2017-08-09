@@ -27,7 +27,7 @@ type nul>nul
 
 call "%%~dp0__init__.bat" || goto :EOF
 
-if "%REL_PATH%" == "" (
+if not defined REL_PATH (
   echo.%~nx0: error: Relative path is no set.
   exit /b 1
 ) >&2

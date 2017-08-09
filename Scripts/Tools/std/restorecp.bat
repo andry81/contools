@@ -1,6 +1,6 @@
 @echo off
 
-if "%LAST_CP%" == "" exit /b 0
+if not defined LAST_CP exit /b 0
 if "%CURRENT_CP%" == "%LAST_CP%" exit /b 0
 
 rem echo.chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2

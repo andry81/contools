@@ -6,7 +6,7 @@ rem Description:
 rem   Script detects native Windows cmd.exe.
 rem   Returns 0 if it is, and 1 - if not.
 
-if "%COMSPEC%" == "" exit /b 1
+if not defined COMSPEC exit /b 1
 
 call :CHECK "%%COMSPEC%%"
 exit /b

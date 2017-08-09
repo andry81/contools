@@ -25,7 +25,7 @@ set LOCK_WAITER_INDEX=1
 :PREPARE_LOCK_WAITERS_IMPL
 set "LOCK_NAME="
 for /F "eol=# tokens=%LOCK_WAITER_INDEX% delims=:" %%i in ("%LOCK_NAMES%") do set "LOCK_NAME=%%i"
-if "%LOCK_NAME%" == "" exit /b 0
+if not defined LOCK_NAME exit /b 0
 call :PREPARE_LOCK_WAITER
 set NUM_LOCK_WAITERS=%LOCK_WAITER_INDEX%
 set /A LOCK_WAITER_INDEX+=1
@@ -100,7 +100,7 @@ goto EXIT
 set "LOCK_WAITER_INDEX=%~1"
 call set "WAITER_FILE=%%WAITER_FILE_%LOCK_WAITER_INDEX%%%"
 
-if "%WAITER_FILE%" == "" exit /b 0
+if not defined WAITER_FILE exit /b 0
 
 call set "LOCK_NAME=%%LOCK_NAME_%LOCK_WAITER_INDEX%%%"
 call set "PRE_LOCK_FILE=%%PRE_LOCK_FILE_%LOCK_WAITER_INDEX%%%"

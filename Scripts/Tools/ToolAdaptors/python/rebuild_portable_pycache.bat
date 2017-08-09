@@ -35,10 +35,10 @@ set "FLAG_VALUE_EXCLUDE_DIRS="
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-exclude_dirs" (
     set "FLAG_VALUE_EXCLUDE_DIRS=%~2"
     shift
@@ -52,7 +52,7 @@ if not "%FLAG%" == "" (
   goto FLAGS_LOOP
 )
 
-if "%FLAG_VALUE_EXCLUDE_DIRS%" == "" set "FLAG_VALUE_EXCLUDE_DIRS=__pycache__"
+if not defined FLAG_VALUE_EXCLUDE_DIRS set "FLAG_VALUE_EXCLUDE_DIRS=__pycache__"
 
 set "PYTHON_DIR=%~dpf1"
 set "DESTDIR=%~2"
@@ -65,7 +65,7 @@ if not exist "%PYTHON_EXE%" (
   exit /b 255
 ) >&2
 
-if not "%DESTDIR%" == "" ^
+if defined DESTDIR ^
 if exist "%DESTDIR_ABS%\" goto DESTDIR_OK
 
 (
@@ -98,12 +98,12 @@ for /F "eol=	 tokens=1,* delims=|" %%i in ("%NEXT_EXCLUDE_DIR%") do (
   set EXCLUDE_DIR=%%i
   set NEXT_EXCLUDE_DIR=%%j
 )
-if "%EXCLUDE_DIR%" == "" goto EXCLUDE_DIRS_END
+if not defined EXCLUDE_DIR goto EXCLUDE_DIRS_END
 call :PREPROCESS_EXCLUDE_DIR && goto EXCLUDE_DIRS_END
 goto EXCLUDE_DIRS_LOOP
 :EXCLUDE_DIRS_END
 
-if "%FILE_PATH_FROM%" == "" exit /b 0
+if not defined FILE_PATH_FROM exit /b 0
 
 set "FILE_PATH_FROM=%FILE_PATH_FROM:/=\%"
 
@@ -119,7 +119,7 @@ exit /b
 
 :PREPROCESS_EXCLUDE_DIR
 call set "FILE_PATH_FROM_PREFIX=%%FILE_PATH_FROM:%EXCLUDE_DIR%=%%"
-if "%FILE_PATH_FROM_PREFIX%" == "" ( set "FILE_PATH_FROM=" & exit /b 0 )
+if not defined FILE_PATH_FROM_PREFIX ( set "FILE_PATH_FROM=" & exit /b 0 )
 if not "%FILE_PATH_FROM_PREFIX%%EXCLUDE_DIR%" == "%FILE_PATH_FROM%" exit /b 1
 if not "%FILE_PATH_FROM_PREFIX:~-1%" == "/" exit /b 1
 set "FILE_PATH_FROM="

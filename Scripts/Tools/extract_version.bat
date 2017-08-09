@@ -50,7 +50,7 @@ set "FLAGS=%~2"
 
 rem set flag -d variable
 set FLAG_NO_D=
-if not "%FLAGS%" == "" set "FLAG_NO_D=%FLAGS:d=%"
+if defined FLAGS set "FLAG_NO_D=%FLAGS:d=%"
 set FLAG_D=0
 if not "%FLAG_NO_D%" == "%FLAGS%" set FLAG_D=1
 
@@ -75,43 +75,43 @@ for /F "eol=	 tokens=1,* delims=." %%i in ("%__VER_MINOR%") do (
   set "__VER_PATCH=%%j"
 )
 
-if "%__VER_PATCH%" == "" (
+if not defined __VER_PATCH (
   for /F "eol=	 tokens=1,* delims=p" %%i in ("%__VER_MINOR%") do (
     set "__VER_MINOR=%%i"
     set "__VER_PATCH=%%j"
   )
 )
 
-if "%__VER_PATCH%" == "" (
+if not defined __VER_PATCH (
   for /F "eol=	 tokens=1,* delims=_" %%i in ("%__VER_MINOR%") do (
     set "__VER_MINOR=%%i"
     set "__VER_PATCH=%%j"
   )
 )
 
-if not "%__VER_PATCH%" == "" (
+if defined __VER_PATCH (
   for /F "eol=	 tokens=1,* delims=." %%i in ("%__VER_PATCH%") do (
     set "__VER_PATCH=%%i"
     set "__VER_REVISION1=%%j"
   )
 )
 
-if not "%__VER_REVISION1%" == "" (
+if defined __VER_REVISION1 (
   for /F "eol=	 tokens=1,* delims=." %%i in ("%__VER_REVISION1%") do (
     set "__VER_REVISION1=%%i"
     if not "%%j" == "" set "__VER_REVISION2=%%j"
   )
 ) else (
-  if not "%__VER_REVISION2%" == "" (
+  if defined __VER_REVISION2 (
     set "__VER_REVISION1=%__VER_REVISION2%"
     set "__VER_REVISION2="
   )
 )
 
-if "%__VER_MAJOR%" == "" set __VER_MAJOR=0
-if "%__VER_MINOR%" == "" set __VER_MINOR=0
-if "%__VER_PATCH%" == "" set __VER_PATCH=0
-if "%__VER_REVISION1%" == "" set __VER_REVISION1=0
+if not defined __VER_MAJOR set __VER_MAJOR=0
+if not defined __VER_MINOR set __VER_MINOR=0
+if not defined __VER_PATCH set __VER_PATCH=0
+if not defined __VER_REVISION1 set __VER_REVISION1=0
 
 if %FLAG_D%0 NEQ 0 call :FILTER_DIGITS "%__VER_MAJOR%" __VER_MAJOR
 if %FLAG_D%0 NEQ 0 call :FILTER_DIGITS "%__VER_MINOR%" __VER_MINOR
@@ -119,10 +119,10 @@ if %FLAG_D%0 NEQ 0 call :FILTER_DIGITS "%__VER_PATCH%" __VER_PATCH
 if %FLAG_D%0 NEQ 0 call :FILTER_DIGITS "%__VER_REVISION1%" __VER_REVISION1
 
 if %FLAG_D%0 NEQ 0 (
-  if not "%__VER_REVISION2%" == "" call :FILTER_DIGITS "%__VER_REVISION2%" __VER_REVISION2
+  if defined __VER_REVISION2 call :FILTER_DIGITS "%__VER_REVISION2%" __VER_REVISION2
 )
 
-if "%__VER_REVISION2%" == "" (
+if not defined __VER_REVISION2 (
   set "RETURN_VALUE=%__VER_MAJOR%.%__VER_MINOR%.%__VER_PATCH%.%__VER_REVISION1%"
 ) else (
   set "RETURN_VALUE=%__VER_MAJOR%.%__VER_MINOR%.%__VER_PATCH%.%__VER_REVISION1%.%__VER_REVISION2%"
@@ -142,28 +142,28 @@ set __OUT_VAR=%~2
 
 rem filter only digits from string
 set "__VER_STR_C_NO_D=%__VER_STR_C:0=%"
-if "%__VER_STR_C_NO_D%" == "" goto FILTER_DIGITS_END
+if not defined __VER_STR_C_NO_D goto FILTER_DIGITS_END
 set "__VER_STR_C_NO_D=%__VER_STR_C_NO_D:1=%"
-if "%__VER_STR_C_NO_D%" == "" goto FILTER_DIGITS_END
+if not defined __VER_STR_C_NO_D goto FILTER_DIGITS_END
 set "__VER_STR_C_NO_D=%__VER_STR_C_NO_D:2=%"
-if "%__VER_STR_C_NO_D%" == "" goto FILTER_DIGITS_END
+if not defined __VER_STR_C_NO_D goto FILTER_DIGITS_END
 set "__VER_STR_C_NO_D=%__VER_STR_C_NO_D:3=%"
-if "%__VER_STR_C_NO_D%" == "" goto FILTER_DIGITS_END
+if not defined __VER_STR_C_NO_D goto FILTER_DIGITS_END
 set "__VER_STR_C_NO_D=%__VER_STR_C_NO_D:4=%"
-if "%__VER_STR_C_NO_D%" == "" goto FILTER_DIGITS_END
+if not defined __VER_STR_C_NO_D goto FILTER_DIGITS_END
 set "__VER_STR_C_NO_D=%__VER_STR_C_NO_D:5=%"
-if "%__VER_STR_C_NO_D%" == "" goto FILTER_DIGITS_END
+if not defined __VER_STR_C_NO_D goto FILTER_DIGITS_END
 set "__VER_STR_C_NO_D=%__VER_STR_C_NO_D:6=%"
-if "%__VER_STR_C_NO_D%" == "" goto FILTER_DIGITS_END
+if not defined __VER_STR_C_NO_D goto FILTER_DIGITS_END
 set "__VER_STR_C_NO_D=%__VER_STR_C_NO_D:7=%"
-if "%__VER_STR_C_NO_D%" == "" goto FILTER_DIGITS_END
+if not defined __VER_STR_C_NO_D goto FILTER_DIGITS_END
 set "__VER_STR_C_NO_D=%__VER_STR_C_NO_D:8=%"
-if "%__VER_STR_C_NO_D%" == "" goto FILTER_DIGITS_END
+if not defined __VER_STR_C_NO_D goto FILTER_DIGITS_END
 set "__VER_STR_C_NO_D=%__VER_STR_C_NO_D:9=%"
 
 :FILTER_DIGITS_END
 
-if not "%__VER_STR_C_NO_D%" == "" call set "__VER_STR_C=%%__VER_STR_C:%__VER_STR_C_NO_D%=%%"
+if defined __VER_STR_C_NO_D call set "__VER_STR_C=%%__VER_STR_C:%__VER_STR_C_NO_D%=%%"
 
 set "%__OUT_VAR%=%__VER_STR_C%"
 

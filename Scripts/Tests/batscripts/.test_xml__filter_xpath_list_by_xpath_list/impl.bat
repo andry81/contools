@@ -1,6 +1,6 @@
 @echo off
 
-if not "%TEST_DATA_FILE_IN%" == "" (
+if defined TEST_DATA_FILE_IN (
   call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_IN%%"
 ) else (
   call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_REF_DIR%%\xpath_in.txt"
