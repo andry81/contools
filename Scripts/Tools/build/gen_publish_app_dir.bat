@@ -25,6 +25,8 @@ rem 1. call gen_publish_app_dir.bat MY_PROJECT. 2016_05_10 23_59_59 my_project c
 
 setlocal
 
+set "?~dp0=%~dp0"
+
 set "PUBLISH_APP_DIR_VAR_PREFIX=%~1"
 rem PUBLISH_DATE/PUBLISH_TIME should be in filename compatible form
 set "PUBLISH_DATE=%~2"
@@ -45,7 +47,7 @@ call set "PUBLISH_APP_DIR_VALUE=%%%PUBLISH_APP_DIR_VAR_PREFIX%PUBLISH_APP_DIR%%"
 
 if not "%PUBLISH_APP_DIR_VALUE%" == "" exit /b 0
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || goto :EOF
 
 call "%%CONTOOLS_ROOT%%/get_datetime.bat"
 if "%PUBLISH_DATE%" == "" set "PUBLISH_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
