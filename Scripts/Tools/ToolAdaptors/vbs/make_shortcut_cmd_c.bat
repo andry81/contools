@@ -13,7 +13,7 @@ set "SC_NAME=%~1"
 set "WD=%~2"
 set "CMD_LINE=%~3"
 
-if "%SC_NAME%" == "" (
+if not defined SC_NAME (
   echo %~nx0: error: Shortcut name is not defined
   exit /b 1
 ) >&2
@@ -23,7 +23,7 @@ goto :EOF
 
 :SET
 echo.Current directory: "%CD:\=/%"
-if "%CMD_LINE%" == "" (
+if not defined CMD_LINE (
   call :CMD "%%~dp0make_shortcut.vbs" "%%SC_NAME%%" "%%WD%%" "%%%%COMSPEC%%%%" "/C"
 ) else (
   call :CMD "%%~dp0make_shortcut.vbs" "%%SC_NAME%%" "%%WD%%" "%%%%COMSPEC%%%%" "/C %%CMD_LINE%%"

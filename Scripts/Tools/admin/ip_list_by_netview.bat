@@ -24,7 +24,7 @@ for /f "usebackq tokens=1,2,* delims= " %%i in (`net view /all`) do (
                 rem resolve NETBIOS name into ip through the ping
                 for /f "usebackq tokens=* delims=" %%i in (`ping -w 200 -n 1 "!host:~2!" 2^>nul`) do (
                     set line=%%i
-                    if not "!line!" == "" (
+                    if defined line (
                         if /i not "!line:pinging=!" == "!line!" echo.  !line!
                         if /i not "!line:reply=!" == "!line!" echo.  !line!
                     )

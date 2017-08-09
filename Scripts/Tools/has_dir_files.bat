@@ -11,7 +11,7 @@ set "__ARGS__="
 :LOOP
 set "PARAM=%~1"
 
-if "%PARAM%" == "" goto DIR
+if not defined PARAM goto DIR
 
 set "DIR="
 if not "/" == "%PARAM:~0,1%" set "DIR=%PARAM:/=\%"

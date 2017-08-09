@@ -48,8 +48,8 @@ if not "%~3" == "" goto LOOP20
 :LOOP10
 set "__EMPTY_FIELD=~%__COUNTER1%,1"
 call set "__CHAR=%%__STR:%__EMPTY_FIELD%%%"
+if not defined __CHAR goto EXIT
 if "%__CHAR%^" == ""^" goto EXIT
-if "%__CHAR%" == "" goto EXIT
 if "%__CHAR%" == "%__EMPTY_FIELD%" goto EXIT
   if not "%__CHAR%" == "\" (
     call set "%%~2=%%%~2%%%%__CHAR%%"
@@ -62,8 +62,8 @@ if "%__CHAR%" == "%__EMPTY_FIELD%" goto EXIT
 :LOOP20
 set "__EMPTY_FIELD=~%__COUNTER1%,1"
 call set "__CHAR=%%__STR:%__EMPTY_FIELD%%%"
+if not defined __CHAR goto EXIT
 if "%__CHAR%^" == ""^" goto EXIT
-if "%__CHAR%" == "" goto EXIT
 if "%__CHAR%" == "%__EMPTY_FIELD%" goto EXIT
   call "%%CONTOOLS_ROOT%%/strchr.bat" "" "%%~3" "%%__CHAR%%"
   if "%ERRORLEVEL%" == "-1" (

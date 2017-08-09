@@ -9,9 +9,9 @@ setlocal
 set "FILE_IN=%~dpf1"
 set "SRC_DIR=%~dpf2"
 
-if "%FILE_IN%" == "" exit /b 1
+if not defined FILE_IN exit /b 1
 if not exist "%FILE_IN%" exit /b 2
-if "%SRC_DIR%" == "" exit /b 3
+if not defined SRC_DIR exit /b 3
 if not exist "%SRC_DIR%\" exit /b 4
 
 set LINE_INDEX=0

@@ -10,11 +10,11 @@ setlocal DISABLEDELAYEDEXPANSION
 
 set "__VAR__=%~1"
 
-if "%__VAR__%" == "" exit /b 1
+if not defined __VAR__ exit /b 1
 
 rem ignore empty variables
 call set "STR=%%%__VAR__%%%"
-if "%STR%" == "" exit /b 0
+if not defined STR exit /b 0
 
 set ?01=!
 
@@ -30,13 +30,13 @@ set INDEX=1
 :EQUAL_CHAR_REPLACE_LOOP
 set "STR_TMP2="
 for /F "tokens=%INDEX% delims== eol=" %%i in ("/!STR!/") do set STR_TMP2=%%i
-if "!STR_TMP2!" == "" goto EQUAL_CHAR_REPLACE_LOOP_END
+if not defined STR_TMP2 goto EQUAL_CHAR_REPLACE_LOOP_END
 set "STR_TMP=!STR_TMP!!STR_TMP2!?03"
 set /A INDEX+=1
 goto EQUAL_CHAR_REPLACE_LOOP
 
 :EQUAL_CHAR_REPLACE_LOOP_END
-if not "!STR_TMP!" == "" set STR=!STR_TMP:~1,-4!
+if defined STR_TMP set STR=!STR_TMP:~1,-4!
 
 (
   endlocal

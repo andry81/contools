@@ -108,10 +108,10 @@ rem Safe and fast string check on empty value
 set "__EMPTY_FIELD=~0,1"
 set "__CHAR=!%__STRING_VAR__%:~0,1!"
 
+rem Check on empty value
+if not defined __CHAR exit /b 0
 rem Check on quote character first
 if not "!__CHAR!^" == ""^" (
-  rem Check on empty value
-  if "!__CHAR!" == "" exit /b 0
   rem Check on empty value (specific cmd bug case)
   if "!__CHAR!" == "!__EMPTY_FIELD!" exit /b 0
 )
@@ -125,12 +125,12 @@ for /L %%i in (%__FOR10_BEGIN_FROM%,1,%__FOR10_END_TO%) do (
   set "__EMPTY_FIELD=~%%i,1"
   set "__CHAR=!%__STRING_VAR__%:~%%i,1!"
 
+  rem Check on empty value
+  if not defined __CHAR ( set "__COUNTER1=%%i" && goto CHECK_ON_EXIT )
   rem Check on quote character first
   if not "!__CHAR!^" == ""^" (
-    rem Check on empty value
-    if "!__CHAR!" == "" set __COUNTER1=%%i&& goto CHECK_ON_EXIT
     rem Check on out of bounds (specific cmd bug case)
-    if "!__CHAR!" == "!__EMPTY_FIELD!" set __COUNTER1=%%i&& goto CHECK_ON_EXIT
+    if "!__CHAR!" == "!__EMPTY_FIELD!" ( set "__COUNTER1=%%i" && goto CHECK_ON_EXIT )
 
     if not "!__CHAR!" == "!?2!" (
       rem echo =^!__CHAR!= - %%i
@@ -158,7 +158,7 @@ for /L %%i in (%__FOR10_BEGIN_FROM%,1,%__FOR10_END_TO%) do (
         if "!__CHAR!" == ")" set __CHAR_TO_APPEND=%%?0%%%%?0%%%%?0%%%%?0%%%%?0%%%%?0%%%%?0%%%%?A%%
       )
       if "!__CHAR!" == "%%" set __CHAR_TO_APPEND=%%%%
-      if "!__CHAR_TO_APPEND!" == "" set "__CHAR_TO_APPEND=!__CHAR!"
+      if not defined __CHAR_TO_APPEND set "__CHAR_TO_APPEND=!__CHAR!"
     ) else (
       rem echo =!?2!= - %%i
       set __CHAR_TO_APPEND=%%?2%%
@@ -185,7 +185,7 @@ goto SUBLOOP10
 
 :APPEND
 set __DO_PREFIX=0
-if not "%__CHARS_VAR__%" == "" (
+if defined __CHARS_VAR__ (
   call "%%CONTOOLS_ROOT%%/strchr.bat" /v %%__CHARS_VAR__%% __CHAR
   if !ERRORLEVEL! GEQ 0 set __DO_PREFIX=1
 )

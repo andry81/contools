@@ -10,11 +10,11 @@ setlocal DISABLEDELAYEDEXPANSION
 
 set "__VAR__=%~1"
 
-if "%__VAR__%" == "" exit /b 1
+if not defined __VAR__ exit /b 1
 
 rem ignore empty variables
 call set "STR=%%%__VAR__%%%"
-if "%STR%" == "" exit /b 0
+if not defined STR exit /b 0
 
 setlocal ENABLEDELAYEDEXPANSION
 

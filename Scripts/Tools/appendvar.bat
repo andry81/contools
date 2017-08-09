@@ -40,10 +40,10 @@ set __FLAG_FORCE=0
 rem flags always at first
 set "__FLAG=%~1"
 
-if not "%__FLAG%" == "" ^
+if defined __FLAG ^
 if not "%__FLAG:~0,1%" == "-" set "__FLAG="
 
-if not "%__FLAG%" == "" (
+if defined __FLAG (
   if "%__FLAG%" == "-g" (
     set __FLAG_SET_GLOBAL_REGISTRY=1
     shift
@@ -72,26 +72,26 @@ if "%~1" == "" (
 
 set "__SEPARATOR="
 if not "%~3" == "" set "__SEPARATOR=%~3"
-if "%__SEPARATOR%" == "" set "__SEPARATOR=;"
+if not defined __SEPARATOR set "__SEPARATOR=;"
 set "__SEPARATOR=%__SEPARATOR:~0,1%"
 
 set "__NEW_VALUE=%~2"
 
 rem remove trailing separator character
-if not "%__NEW_VALUE%" == "" (
+if defined __NEW_VALUE (
   if "%__SEPARATOR%" == "%__NEW_VALUE:~-1%" (
     set "__NEW_VALUE=%__NEW_VALUE:~0,-1%"
   )
 )
 
 rem remove trailing "\" character
-if not "%__NEW_VALUE%" == "" (
+if defined __NEW_VALUE (
   if "\" == "%__NEW_VALUE:~-1%" (
     set "__NEW_VALUE=%__NEW_VALUE:~0,-1%"
   )
 )
 
-if "%__NEW_VALUE%" == "" (
+if not defined __NEW_VALUE (
   if "%~2" == "" exit /b 0
   rem the variable value is a separator character only
   exit /b 2
@@ -112,7 +112,7 @@ if %__FLAG_SET_GLOBAL_REGISTRY_ALL_USERS% NEQ 0 (
 
 for /F "usebackq eol=	 tokens=1,* delims==" %%i in (`wmic environment %__FLAG_SET_GLOBAL_REGISTRY_WMIC_WHERE_EXP% get VariableValue /VALUE 2^>NUL`) do if "%%i" == "VariableValue" set "__VAR_VALUE=%%j"
 
-if not "%__VAR_VALUE%" == "" (
+if defined __VAR_VALUE (
   if "%__SEPARATOR%" == "%__VAR_VALUE:~-1%" (
     set "__VAR_VALUE=%__VAR_VALUE:~0,-1%"
   )
@@ -120,7 +120,7 @@ if not "%__VAR_VALUE%" == "" (
 
 rem check on existance
 if %__FLAG_FORCE% NEQ 0 goto SET_GLOBAL_IMPL
-if "%__VAR_VALUE%" == "" goto SET_GLOBAL_IMPL
+if not defined __VAR_VALUE goto SET_GLOBAL_IMPL
 
 set "__VAR_VALUE_TMP=%__SEPARATOR%%__VAR_VALUE%%__SEPARATOR%"
 
@@ -129,7 +129,7 @@ call set "__VAR_VALUE_TMP_EXCLUDED=%%__VAR_VALUE_TMP:%__SEPARATOR%%__NEW_VALUE%%
 if /i not "%__VAR_VALUE_TMP_EXCLUDED%" == "%__VAR_VALUE_TMP%" goto SET_GLOBAL_END
 
 :SET_GLOBAL_IMPL
-if not "%__VAR_VALUE%" == "" (
+if defined __VAR_VALUE (
   wmic environment %__FLAG_SET_GLOBAL_REGISTRY_WMIC_WHERE_EXP% set VariableValue="%__VAR_VALUE%%__SEPARATOR%%__NEW_VALUE%"
 ) else (
   wmic environment %__FLAG_SET_GLOBAL_REGISTRY_WMIC_WHERE_EXP% set VariableValue="%__NEW_VALUE%"
@@ -141,7 +141,7 @@ if %__FLAG_SET_LOCAL% EQU 0 exit /b
 rem local setup
 call set "__VAR_VALUE=%%%~1%%"
 
-if not "%__VAR_VALUE%" == "" (
+if defined __VAR_VALUE (
   if "%__SEPARATOR%" == "%__VAR_VALUE:~-1%" (
     set "__VAR_VALUE=%__VAR_VALUE:~0,-1%"
   )
@@ -149,7 +149,7 @@ if not "%__VAR_VALUE%" == "" (
 
 rem check on existance
 if %__FLAG_FORCE% NEQ 0 goto SET_LOCAL_IMPL
-if "%__VAR_VALUE%" == "" goto SET_LOCAL_IMPL
+if not defined __VAR_VALUE goto SET_LOCAL_IMPL
 
 set "__VAR_VALUE_TMP=%__SEPARATOR%%__VAR_VALUE%%__SEPARATOR%"
 
@@ -158,7 +158,7 @@ call set "__VAR_VALUE_TMP_EXCLUDED=%%__VAR_VALUE_TMP:%__SEPARATOR%%__NEW_VALUE%%
 if /i not "%__VAR_VALUE_TMP_EXCLUDED%" == "%__VAR_VALUE_TMP%" goto SET_LOCAL_END
 
 :SET_LOCAL_IMPL
-if not "%__VAR_VALUE%" == "" (
+if defined __VAR_VALUE (
   endlocal
   set "%~1=%__VAR_VALUE%%__SEPARATOR%%__NEW_VALUE%"
 ) else (

@@ -76,7 +76,7 @@ if "%~5" == "-e" (
   set __DO_EXPAND=1
 )
 
-for /F "%__PARSING_KEYWORDS%" %%i in ("%~2") do (if not "%FOUND_PATH%" == "" goto :END_FOR10) && (
+for /F "%__PARSING_KEYWORDS%" %%i in ("%~2") do ( if defined FOUND_PATH goto :END_FOR10 ) && (
   set __VAR1=0
   set "__VAR1=%%i"
   set __VAR2=0
@@ -88,11 +88,11 @@ for /F "%__PARSING_KEYWORDS%" %%i in ("%~2") do (if not "%FOUND_PATH%" == "" got
 goto EXIT
 
 :CHECK_OR_PARSENEXT_ROUTINE
-if not "%__DO_EXPAND%" == "" (
+if defined __DO_EXPAND (
   set __VAR1=0
   call set "__VAR1=%__VAR1%"
 )
-if not "%__DO_TRIM%" == "" (
+if defined __DO_TRIM (
   call :TRIMVAR_ROUTINE "%%__VAR1%%
 )
 
@@ -102,7 +102,7 @@ if exist "%__VAR1%" (
   goto :EOF
 )
 
-if not "%__VAR2%" == "" (
+if defined __VAR2 (
   rem Process next internal variable.
   for /F "tokens=1,* delims=;" %%i in ("%__VAR2%") do (
     set __VAR1=0
@@ -132,5 +132,5 @@ rem Drop internal variables but use some changed value(s) for the return
   endlocal
   set "FOUND_PATH=%FOUND_PATH%"
 )
-if "%FOUND_PATH%" == "" exit /b 1
+if not defined FOUND_PATH exit /b 1
 exit /b 0

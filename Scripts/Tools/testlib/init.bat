@@ -15,9 +15,9 @@ rem
 rem initialize testlib "module"
 call "%%~dp0__init__.bat" || goto :EOF
 
-if "%TESTLIB__NEST_LVL%" == "" set TESTLIB__NEST_LVL=0
+if not defined TESTLIB__NEST_LVL set TESTLIB__NEST_LVL=0
 
-if "%TESTLIB__TEST_DO_TEARDOWN%" == "" set TESTLIB__TEST_DO_TEARDOWN=0
+if not defined TESTLIB__TEST_DO_TEARDOWN set TESTLIB__TEST_DO_TEARDOWN=0
 
 if %TESTLIB__NEST_LVL%0 EQU 0 (
   set TESTLIB__OVERALL_PASSED_TESTS=0
@@ -27,7 +27,7 @@ set TESTLIB__CURRENT_PASSED_TESTS=0
 set TESTLIB__CURRENT_TESTS=0
 
 set "TEST_SCRIPT_FILE_PATH=%~1"
-if not "%TEST_SCRIPT_FILE_PATH%" == "" ^
+if defined TEST_SCRIPT_FILE_PATH ^
 if "%TEST_SCRIPT_FILE_PATH:~1,1%" == ":" goto TEST_SCRIPT_FILE_PATH_OK
 
 (
@@ -62,7 +62,7 @@ set "TEST_SCRIPT_OUTPUT_DIR=%TEST_SCRIPT_FILE_DIR%/_output"
 
 set "TEST_SCRIPT_HANDLERS_DIR=%~2"
 
-if "%TEST_SCRIPT_HANDLERS_DIR%" == "" (
+if not defined TEST_SCRIPT_HANDLERS_DIR (
   set "TEST_SCRIPT_HANDLERS_DIR=%TEST_SCRIPT_FILE_DIR%"
 ) else if not ":" == "%TEST_SCRIPT_HANDLERS_DIR:~1,1%" (
   rem relative to the script directory path

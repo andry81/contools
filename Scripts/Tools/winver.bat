@@ -33,14 +33,14 @@ set "?2=|"
 
 rem Windows 2000
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" ver%%%%?2%%%% findstr.exe /I /R /C:"Windows[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*2000"
-if not "%STDOUT_VALUE%" == "" set WINVER_VALUE=Windows2000
-if not "%WINVER_VALUE%" == "" goto CHECK_PLATFORM
+if defined STDOUT_VALUE set WINVER_VALUE=Windows2000
+if defined WINVER_VALUE goto CHECK_PLATFORM
 
 rem Higher than Windows 2000
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" reg.exe query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v "ProductName" %%%%?2%%%% findstr.exe /I /R /C:"ProductName[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*REG_[A-Z][A-Z]*" 2>nul
 
 rem Truncate 2 fields before value
-if not "%STDOUT_VALUE%" == "" (
+if defined STDOUT_VALUE (
   set "STDOUT_VALUE=%STDOUT_VALUE:~11%"
 )
 
@@ -57,56 +57,56 @@ call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" echo "%%WINVER_VALUE_FULL%%"%%%%?2%%%
 if not "%STDOUT_VALUE:~1,-1%" == "~1,-1" (
   if not "%STDOUT_VALUE:~1,-1%" == "" set WINVER_VALUE=WindowsXP
 )
-if not "%WINVER_VALUE%" == "" goto CHECK_PLATFORM
+if defined WINVER_VALUE goto CHECK_PLATFORM
 
 rem Windows Vista
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" echo "%%WINVER_VALUE_FULL%%"%%%%?2%%%% findstr.exe /I /R /C:"[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*Vista[%%?0%%a-zA-Z0-9\\/]*"
 if not "%STDOUT_VALUE:~1,-1%" == "~1,-1" (
   if not "%STDOUT_VALUE:~1,-1%" == "" set WINVER_VALUE=WindowsVista
 )
-if not "%WINVER_VALUE%" == "" goto CHECK_PLATFORM
+if defined WINVER_VALUE goto CHECK_PLATFORM
 
 rem Windows 7
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" echo "%%WINVER_VALUE_FULL%%"%%%%?2%%%% findstr.exe /I /R /C:"Windows[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*7"
 if not "%STDOUT_VALUE:~1,-1%" == "~1,-1" (
   if not "%STDOUT_VALUE:~1,-1%" == "" set WINVER_VALUE=Windows7
 )
-if not "%WINVER_VALUE%" == "" goto CHECK_PLATFORM
+if defined WINVER_VALUE goto CHECK_PLATFORM
 
 rem Windows 8
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" echo "%%WINVER_VALUE_FULL%%"%%%%?2%%%% findstr.exe /I /R /C:"Windows[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*8"
 if not "%STDOUT_VALUE:~1,-1%" == "~1,-1" (
   if not "%STDOUT_VALUE:~1,-1%" == "" set WINVER_VALUE=Windows8
 )
-if not "%WINVER_VALUE%" == "" goto CHECK_PLATFORM
+if defined WINVER_VALUE goto CHECK_PLATFORM
 
 rem Windows Server 2003
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" echo "%%WINVER_VALUE_FULL%%"%%%%?2%%%% findstr.exe /I /R /C:"Server[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*2003"
 if not "%STDOUT_VALUE:~1,-1%" == "~1,-1" (
   if not "%STDOUT_VALUE:~1,-1%" == "" set WINVER_VALUE=WindowsSrv2003
 )
-if not "%WINVER_VALUE%" == "" goto CHECK_PLATFORM
+if defined WINVER_VALUE goto CHECK_PLATFORM
 
 rem Windows Server 2008 R2
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" echo "%%WINVER_VALUE_FULL%%"%%%%?2%%%% findstr.exe /I /R /C:"Server[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*2008[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*R2"
 if not "%STDOUT_VALUE:~1,-1%" == "~1,-1" (
   if not "%STDOUT_VALUE:~1,-1%" == "" set WINVER_VALUE=WindowsSrv2008R2
 )
-if not "%WINVER_VALUE%" == "" goto CHECK_PLATFORM
+if defined WINVER_VALUE goto CHECK_PLATFORM
 
 rem Windows Server 2008 R1
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" echo "%%WINVER_VALUE_FULL%%"%%%%?2%%%% findstr.exe /I /R /C:"Server[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*2008[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*R1"
 if not "%STDOUT_VALUE:~1,-1%" == "~1,-1" (
   if not "%STDOUT_VALUE:~1,-1%" == "" set WINVER_VALUE=WindowsSrv2008R1
 )
-if not "%WINVER_VALUE%" == "" goto CHECK_PLATFORM
+if defined WINVER_VALUE goto CHECK_PLATFORM
 
 rem Windows Server 2008
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" echo "%%WINVER_VALUE_FULL%%"%%%%?2%%%% findstr.exe /I /R /C:"Server[%%?0%%a-zA-Z0-9\\/][%%?0%%a-zA-Z0-9\\/]*2008"
 if not "%STDOUT_VALUE:~1,-1%" == "~1,-1" (
   if not "%STDOUT_VALUE:~1,-1%" == "" set WINVER_VALUE=WindowsSrv2008
 )
-if not "%WINVER_VALUE%" == "" goto CHECK_PLATFORM
+if defined WINVER_VALUE goto CHECK_PLATFORM
 
 set WINVER_VALUE=Windows
 
@@ -129,7 +129,7 @@ if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
 call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" ver
 
 rem Truncate 2 fields before value
-if not "%STDOUT_VALUE%" == "" (
+if defined STDOUT_VALUE (
   set "STDOUT_VALUE=%STDOUT_VALUE:~14%"
 )
 

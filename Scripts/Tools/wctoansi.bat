@@ -42,7 +42,7 @@ set __COUNTER=0
 rem Read next wide character code
 call set "__WCHARCODE=%%__WCSTRING:~%__COUNTER%,4%%"
 
-if "%__WCHARCODE%" == "" goto EXIT
+if not defined __WCHARCODE goto EXIT
 
 rem Convert from hex code to decimal
 if not "%__WCHARCODE:~0,2%" == "" (

@@ -39,7 +39,7 @@ if not "%~2" == "" (
   call set "__STRING__=%%%__STRING_VAR__%%%"
 )
 
-if "%__STRING__%" == "" exit /b 1
+if not defined __STRING__ exit /b 1
 
 for %%i in ("a=A" "b=B" "c=C" "d=D" "e=E" "f=F" "g=G" "h=H" "i=I" "j=J" "k=K" "l=L" "m=M" "n=N" "o=O" "p=P" "q=Q" "r=R" "s=S" "t=T" "u=U" "v=V" "w=W" "x=X" "y=Y" "z=Z") do ^
 call :IMPL %%i

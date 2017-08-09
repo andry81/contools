@@ -24,7 +24,7 @@ setlocal
 
 set "__REG_PATH=%~1"
 
-if "%__REG_PATH%" == "" exit /b 65
+if not defined __REG_PATH exit /b 65
 
 rem remove last slash, otherwise reg.exe will exit with error code
 set __REG_PATH_LAST_SLASH=0

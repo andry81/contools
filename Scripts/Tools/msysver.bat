@@ -49,10 +49,10 @@ for /F "tokens=1,* delims= " %%i in ("%STDOUT_VALUE%") do (
   set "MSYS_VER_STR=%%i"
 )
 
-if "%MSYS_VER_STR%" == "" set "MSYS_VER_STR=%STDOUT_VALUE%"
+if not defined MSYS_VER_STR set "MSYS_VER_STR=%STDOUT_VALUE%"
 
 rem Drop internal variables but use some changed value(s) for the return
-if "%MSYS_VER_STR%" == "" (
+if not defined MSYS_VER_STR (
   endlocal
   set "MSYS_VER_STR=%MSYS_VER_STR%"
   exit /b 1
@@ -84,7 +84,7 @@ for /F "tokens=1,* delims=." %%i in ("%__MSYS_VER_MINOR%") do (
   set "__MSYS_VER_PATCH=%%j"
 )
 
-if "%__MSYS_VER_PATCH%" == "" (
+if not defined __MSYS_VER_PATCH (
   for /F "tokens=1,* delims=p" %%i in ("%__MSYS_VER_MINOR%") do (
     set __MSYS_VER_MINOR=0
     set "__MSYS_VER_MINOR=%%i"
@@ -93,7 +93,7 @@ if "%__MSYS_VER_PATCH%" == "" (
   )
 )
 
-if "%__MSYS_VER_PATCH%" == "" (
+if not defined __MSYS_VER_PATCH (
   for /F "tokens=1,* delims=_" %%i in ("%__MSYS_VER_MINOR%") do (
     set __MSYS_VER_MINOR=0
     set "__MSYS_VER_MINOR=%%i"
@@ -102,7 +102,7 @@ if "%__MSYS_VER_PATCH%" == "" (
   )
 )
 
-if not "%__MSYS_VER_PATCH%" == "" (
+if defined __MSYS_VER_PATCH (
   for /F "tokens=1,* delims=." %%i in ("%__MSYS_VER_PATCH%") do (
     set __MSYS_VER_PATCH=0
     set "__MSYS_VER_PATCH=%%i"
@@ -111,8 +111,8 @@ if not "%__MSYS_VER_PATCH%" == "" (
   )
 )
 
-if "%__MSYS_VER_REVISION1%" == "" (
-  if not "%__MSYS_VER_REVISION2%" == "" (
+if not defined __MSYS_VER_REVISION1 (
+  if defined __MSYS_VER_REVISION2 (
     set __MSYS_VER_REVISION1=0
     set "__MSYS_VER_REVISION1=%__MSYS_VER_REVISION2%"
     set __MSYS_VER_REVISION2=0
@@ -122,27 +122,27 @@ if "%__MSYS_VER_REVISION1%" == "" (
 
 rem echo %__MSYS_VER_MAJOR%.%__MSYS_VER_MINOR%.%__MSYS_VER_PATCH%.%__MSYS_VER_REVISION1%
 
-if not "%__MSYS_VER_MAJOR%" == "" (
+if defined __MSYS_VER_MAJOR (
   set "MSYS_VER_STR=%__MSYS_VER_MAJOR%"
 ) else (
   set MSYS_VER_STR=0
 )
-if not "%__MSYS_VER_MINOR%" == "" (
+if defined __MSYS_VER_MINOR (
   set "MSYS_VER_STR=%MSYS_VER_STR%.%__MSYS_VER_MINOR%"
 ) else (
   set "MSYS_VER_STR=%MSYS_VER_STR%.0"
 )
-if not "%__MSYS_VER_PATCH%" == "" (
+if defined __MSYS_VER_PATCH (
   set "MSYS_VER_STR=%MSYS_VER_STR%.%__MSYS_VER_PATCH%"
 ) else (
   set "MSYS_VER_STR=%MSYS_VER_STR%.0"
 )
-if not "%__MSYS_VER_REVISION1%" == "" (
+if defined __MSYS_VER_REVISION1 (
   set "MSYS_VER_STR=%MSYS_VER_STR%.%__MSYS_VER_REVISION1%"
 ) else (
   set "MSYS_VER_STR=%MSYS_VER_STR%.0"
 )
-if not "%__MSYS_VER_REVISION2%" == "" (
+if defined __MSYS_VER_REVISION2 (
   set "MSYS_VER_STR=%MSYS_VER_STR%.%__MSYS_VER_REVISION2%"
 )
 

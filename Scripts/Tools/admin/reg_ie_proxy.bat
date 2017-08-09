@@ -3,7 +3,7 @@
 setlocal
 
 set /P USE_PROXY=Use proxy [Y/n] ^>
-if "%USE_PROXY%" == "" set USE_PROXY=1
+if not defined USE_PROXY set USE_PROXY=1
 if "%USE_PROXY%" == "y" set USE_PROXY=1
 if not "%USE_PROXY%" == "1" set USE_PROXY=0
 

@@ -32,10 +32,10 @@ set "HASHDEEP_CMD_ARGS="
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-c" (
     rem consume next argument into flags
     set HASHDEEP_CMD_FLAG_ARGS=%HASHDEEP_CMD_FLAG_ARGS%%FLAG% %2 
@@ -101,7 +101,7 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in (`@call "%%CONTOOLS_ROOT%%/hash/
 exit /b 0
 
 :PROCESS_LINE
-if "%HASHDEEP_LINE%" == "" exit /b 0
+if not defined HASHDEEP_LINE exit /b 0
 
 if "%HASHDEEP_LINE:~0,1%" == "%%" exit /b 0
 if "%HASHDEEP_LINE:~0,1%" == "#" exit /b 0

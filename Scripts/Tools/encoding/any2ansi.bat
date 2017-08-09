@@ -14,10 +14,10 @@ rem set FLAG_USE_BOM=0
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   rem if "%FLAG%" == "-bom" (
   rem   set FLAG_USE_BOM=1
   rem   shift
@@ -35,7 +35,7 @@ set "INPUT_CHARSET=%~1"
 set "OUTPUT_CHARSET=%~2"
 set "INPUT_FILE=%~3"
 
-if "%INPUT_CHARSET%" == "" (
+if not defined INPUT_CHARSET (
   echo.%?~nx0%: error: INPUT_CHARSET is not set.
   exit /b 1
 )
@@ -45,7 +45,7 @@ if not exist "%INPUT_FILE%" (
   exit /b 2
 ) >&2
 
-if "%OUTPUT_CHARSET%" == "" call :GET_CURRENT_CODE_PAGE
+if not defined OUTPUT_CHARSET call :GET_CURRENT_CODE_PAGE
 
 "%GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
 exit /b

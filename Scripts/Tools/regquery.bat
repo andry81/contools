@@ -37,7 +37,7 @@ setlocal
 set "__REG_PATH=%~1"
 set "__REG_VAR=%~2"
 
-if "%__REG_PATH%" == "" exit /b 65
+if not defined __REG_PATH exit /b 65
 
 rem remove last slash, otherwise reg.exe will exit with error code
 if "%__REG_PATH:~-1%" == "\" (
@@ -45,7 +45,7 @@ if "%__REG_PATH:~-1%" == "\" (
 )
 
 rem duplicate last slash, otherwise reg.exe will exit with error code
-if not "%__REG_VAR%" == "" if "%__REG_VAR:~-1%" == "\" (
+if defined __REG_VAR if "%__REG_VAR:~-1%" == "\" (
   set "__REG_VAR=%__REG_VAR%\"
 )
 
@@ -58,7 +58,7 @@ if "%~3" == "-t" exit /b 0
 
 rem call "%%~dp0__init__.bat" || goto :EOF
 
-if not "%__REG_VAR%" == "" call :QUERY_KEY_ESCAPE
+if defined __REG_VAR call :QUERY_KEY_ESCAPE
 goto QUERY_KEY_ESCAPE_END
 
 :QUERY_KEY_ESCAPE
@@ -89,7 +89,7 @@ for /F "usebackq tokens=* delims=" %%i in (`reg.exe query "%__REG_PATH%" /v "%__
 )
 
 rem count words in name of empty value (language independent parse)
-if "%__REG_VAR%" == "" call :EMPTY_KEYNAME_PARSE
+if not defined __REG_VAR call :EMPTY_KEYNAME_PARSE
 goto EMPTY_KEYNAME_PARSE_END
 
 :EMPTY_KEYNAME_PARSE
@@ -98,7 +98,7 @@ set "__KEYNAME_WORD="
 
 :EMPTY_KEYNAME_PARSE_LOOP
 for /F "tokens=%__KEYVAR_WORDS%" %%i in ("%STDOUT_VALUE%") do set "__KEYNAME_WORD=%%i"
-if "%__KEYNAME_WORD%" == "" exit /b 0
+if not defined __KEYNAME_WORD exit /b 0
 if not "%__KEYNAME_WORD:REG_=%" == "%__KEYNAME_WORD%" exit /b 0
 
 set /A __KEYVAR_WORDS+=1
@@ -112,7 +112,7 @@ for /F "tokens=%__KEYVAR_WORDS%,*" %%i in ("%STDOUT_VALUE%") do (
 )
 
 rem reg.exe in Windows 7 for default key value returns 0 if Default value was not set
-if "%__REG_VAR%" == "" if not "%REGQUERY_VALUE%" == "" if "%REGQUERY_VALUE:~0,1%" == "(" if "%REGQUERY_VALUE:~-1%" == ")" exit /b 1
+if not defined __REG_VAR if defined REGQUERY_VALUE if "%REGQUERY_VALUE:~0,1%" == "(" if "%REGQUERY_VALUE:~-1%" == ")" exit /b 1
 
 goto EXIT
 

@@ -36,13 +36,13 @@ shift
 shift
 
 set "FILES_PATH_PREFIX="
-if not "%PREFIX_PATH_VAR%" == "" set "FILES_PATH_PREFIX=${%PREFIX_PATH_VAR%}\"
+if defined PREFIX_PATH_VAR set "FILES_PATH_PREFIX=${%PREFIX_PATH_VAR%}\"
 set "INSTDIR_SUBDIR_SUFFIX="
-if not "%INSTDIR_SUBDIR%" == "" set "INSTDIR_SUBDIR_SUFFIX=\%INSTDIR_SUBDIR%"
+if defined INSTDIR_SUBDIR set "INSTDIR_SUBDIR_SUFFIX=\%INSTDIR_SUBDIR%"
 set "FILE_FILTER_SUFFIX="
-if not "%FILE_FILTER%" == "" set "FILE_FILTER_SUFFIX=\%FILE_FILTER%"
+if defined FILE_FILTER set "FILE_FILTER_SUFFIX=\%FILE_FILTER%"
 
-if not "%INSTDIR_SUBDIR%" == "" (
+if defined INSTDIR_SUBDIR (
   echo.CreateDirectory "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%"
   echo.
 )
@@ -77,7 +77,7 @@ if %BASE_DIR_PATH_LEN% GTR %PREFIX_PATH_LEN% (
 )
 
 if %PREFIX_PATH_LEN% GTR 0 (
-  if not "%BASE_DIR_SUFFIX%" == "" set "BASE_DIR_SUFFIX=%BASE_DIR_SUFFIX:~1%"
+  if defined BASE_DIR_SUFFIX set "BASE_DIR_SUFFIX=%BASE_DIR_SUFFIX:~1%"
 )
 
 set "DIR_PATH=%BASE_DIR_PATH%"
@@ -96,7 +96,7 @@ goto :EOF
 :PROCESS_DIR_FILES
 call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
 
-if not "%FILE_DIR_PATH%" == "" set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
+if defined FILE_DIR_PATH set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
 set FILE_INDEX=0
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /B /A:-D 2^>nul`) do (
@@ -110,13 +110,13 @@ echo.
 goto :EOF
 
 :CREATE_FILES_DIR
-if not "%FILE_DIR_PATH%" == "" ^
+if defined FILE_DIR_PATH ^
 if not exist "%DIR_PATH%\" (
   echo.%?~nx0%: error: found directory does not exist: "%DIR_PATH%"
   exit /b 2
 ) >&2
 
-if not "%FILE_DIR_PATH%" == "" (
+if defined FILE_DIR_PATH (
   echo.CreateDirectory "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%\%FILE_DIR_PATH%"
 ) else (
   echo.CreateDirectory "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%"
@@ -128,14 +128,14 @@ exit /b 0
 set "FILE_NAME=%~1"
 
 if %FILE_INDEX% EQU 0 (
-  if not "%FILE_DIR_PATH%" == "" (
+  if defined FILE_DIR_PATH (
     echo.SetOutPath "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%\%FILE_DIR_PATH%"
   ) else (
     echo.SetOutPath "$INSTDIR%INSTDIR_SUBDIR_SUFFIX%"
   )
 )
 
-if not "%FILE_DIR_PATH%" == "" (
+if defined FILE_DIR_PATH (
   set "FILE_PATH=%FILE_DIR_PATH%\%FILE_NAME%"
 ) else (
   set "FILE_PATH=%FILE_NAME%"
@@ -146,7 +146,7 @@ if not exist "%DIR_PATH%\%FILE_NAME%" (
   exit /b 1
 ) >&2
 
-if not "%BASE_DIR_SUFFIX%" == "" (
+if defined BASE_DIR_SUFFIX (
   echo.File "%FILES_PATH_PREFIX%%BASE_DIR_SUFFIX%\%FILE_PATH%"
 ) else (
   echo.File "%FILES_PATH_PREFIX%%FILE_PATH%"

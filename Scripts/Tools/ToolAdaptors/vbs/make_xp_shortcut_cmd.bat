@@ -16,7 +16,7 @@ set "SC_NAME=%~1"
 set "WD=%~2"
 set "CMD_LINE=%~3"
 
-if "%SC_NAME%" == "" (
+if not defined SC_NAME (
   echo %~nx0: error: Shurtcut name is not defined
   exit /b 1
 ) >&2

@@ -22,7 +22,7 @@ call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CODE_PAGE%%
 set "FILE_PATH_PTTN=%~1"
 
 rem ignore specific patterns to avoid problems
-if "%FILE_PATH_PTTN%" == "" (
+if not defined FILE_PATH_PTTN (
   echo.%?~nx0%: error: file or directory is not set.
   exit /b 1
 ) >&2

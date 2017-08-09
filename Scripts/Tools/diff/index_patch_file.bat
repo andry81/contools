@@ -8,7 +8,7 @@ call "%%~dp0__init__.bat" || goto :EOF
 set "__VAR_NAME_PREFIX__=%~1"
 set "__PATCH_FILE__=%~2"
 
-if "%__VAR_NAME_PREFIX__%" == "" (
+if not defined __VAR_NAME_PREFIX__ (
   echo.%~nx0: error: Variable name prefix is not set.
   exit /b 1
 ) >&2
@@ -48,7 +48,7 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%GNUWIN32_ROOT%/bin/sed.exe"
 exit /b 0
 
 :PROCESS_PATCH_FILE_LINE
-if "%__PATCH_FILE_LINE__%" == "" exit /b 0
+if not defined __PATCH_FILE_LINE__ exit /b 0
 if not "%__PATCH_FILE_LINE__:~0,7%" == "Index: " goto INDEX_END
 
 set __PATCH_FILE_INDEX_OFFSET__=0
@@ -59,7 +59,7 @@ set "__PATCH_FILE_PATH__=%__PATCH_FILE_PATH__:\=/%"
 set "__PATCH_FILE_INDEX_VAR__=%__VAR_NAME_PREFIX__%.index#%__PATCH_FILE_PATH__%"
 call set "__PATCH_FILE_INDEX_VALUE__=%%%__PATCH_FILE_INDEX_VAR__%%%"
 
-if not "%__PATCH_FILE_INDEX_VALUE__%" == "" (
+if defined __PATCH_FILE_INDEX_VALUE__ (
   call set "__PATCH_FILE_INDEX__=%__PATCH_FILE_INDEX_VALUE__%"
 ) else (
   set __PATCH_FILE_INDEX__=%__PATCH_FILE_LAST_INDEX__%

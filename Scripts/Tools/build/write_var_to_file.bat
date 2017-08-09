@@ -17,9 +17,9 @@ set "__VAR_NAME_IN=%~4"
 
 set "__FILE_OUT_DIR=%~dp2"
 
-if "%__VAR_NAME_IN%" == "" set "__VAR_NAME_IN=%__VAR_NAME_OUT%"
+if not defined __VAR_NAME_IN set "__VAR_NAME_IN=%__VAR_NAME_OUT%"
 
-if "%__VAR_VALUE%" == "" call set "__VAR_VALUE=%%%__VAR_NAME_IN%%%"
+if not defined __VAR_VALUE call set "__VAR_VALUE=%%%__VAR_NAME_IN%%%"
 
 echo.%__VAR_NAME_IN% -^> %__VAR_NAME_OUT%="%__VAR_VALUE%"
 

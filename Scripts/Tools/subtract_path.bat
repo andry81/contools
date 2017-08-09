@@ -38,7 +38,7 @@ if /i not "%TO_PATH_PREFIX%" == "%FROM_PATH%" exit /b 1
 call set "TO_PATH_SUFFIX=%%TO_PATH:~%FROM_PATH_LEN%%%"
 
 if %FROM_PATH_LEN% GTR 0 (
-  if not "%TO_PATH_SUFFIX%" == "" (
+  if defined TO_PATH_SUFFIX (
     if "%TO_PATH_SUFFIX:~0,1%" == "\" (
       set "TO_PATH_SUFFIX=%TO_PATH_SUFFIX:~1%"
     ) else set "TO_PATH_SUFFIX="
@@ -48,7 +48,7 @@ if %FROM_PATH_LEN% GTR 0 (
 (
   endlocal
   set "RETURN_VALUE=%TO_PATH_SUFFIX%"
-  if not "%TO_PATH_SUFFIX%" == "" exit /b 0
+  if defined TO_PATH_SUFFIX exit /b 0
   if %FROM_PATH_LEN% EQU %TO_PATH_LEN% exit /b 0
 )
 

@@ -31,10 +31,10 @@ set "HASHDEEP_CMD_ARGS="
 rem flags always at first
 set "FLAG=%~1"
 
-if not "%FLAG%" == "" ^
+if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if not "%FLAG%" == "" (
+if defined FLAG (
   if "%FLAG%" == "-c" (
     rem consume next argument into flags
     set HASHDEEP_CMD_FLAG_ARGS=%HASHDEEP_CMD_FLAG_ARGS%%FLAG% %2 

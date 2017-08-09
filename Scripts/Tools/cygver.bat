@@ -52,10 +52,10 @@ for /F "tokens=1,2,* delims= " %%i in ("%STDOUT_VALUE%") do (
   set "CYGWIN_VER_STR=%%j"
 )
 
-if "%CYGWIN_VER_STR%" == "" set "CYGWIN_VER_STR=%STDOUT_VALUE%"
+if not defined CYGWIN_VER_STR set "CYGWIN_VER_STR=%STDOUT_VALUE%"
 
 rem Drop internal variables but use some changed value(s) for the return
-if "%CYGWIN_VER_STR%" == "" ( endlocal && set "CYGWIN_VER_STR=%CYGWIN_VER_STR%" && exit /b 1 )
+if not defined CYGWIN_VER_STR ( endlocal && set "CYGWIN_VER_STR=%CYGWIN_VER_STR%" && exit /b 1 )
 
 for /F "tokens=1,* delims=-" %%i in ("%CYGWIN_VER_STR%") do (
   set __CYGWIN_VER_MAJOR=0
@@ -78,7 +78,7 @@ for /F "tokens=1,* delims=." %%i in ("%__CYGWIN_VER_MINOR%") do (
   set "__CYGWIN_VER_PATCH=%%j"
 )
 
-if "%__CYGWIN_VER_PATCH%" == "" (
+if not defined __CYGWIN_VER_PATCH (
   for /F "tokens=1,* delims=p" %%i in ("%__CYGWIN_VER_MINOR%") do (
     set __CYGWIN_VER_MINOR=0
     set "__CYGWIN_VER_MINOR=%%i"
@@ -87,7 +87,7 @@ if "%__CYGWIN_VER_PATCH%" == "" (
   )
 )
 
-if "%__CYGWIN_VER_PATCH%" == "" (
+if not defined __CYGWIN_VER_PATCH (
   for /F "tokens=1,* delims=_" %%i in ("%__CYGWIN_VER_MINOR%") do (
     set __CYGWIN_VER_MINOR=0
     set "__CYGWIN_VER_MINOR=%%i"
@@ -96,7 +96,7 @@ if "%__CYGWIN_VER_PATCH%" == "" (
   )
 )
 
-if not "%__CYGWIN_VER_PATCH%" == "" (
+if defined __CYGWIN_VER_PATCH (
   for /F "tokens=1,* delims=." %%i in ("%__CYGWIN_VER_PATCH%") do (
     set __CYGWIN_VER_PATCH=0
     set "__CYGWIN_VER_PATCH=%%i"
@@ -105,8 +105,8 @@ if not "%__CYGWIN_VER_PATCH%" == "" (
   )
 )
 
-if "%__CYGWIN_VER_REVISION1%" == "" (
-  if not "%__CYGWIN_VER_REVISION2%" == "" (
+if not defined __CYGWIN_VER_REVISION1 (
+  if defined __CYGWIN_VER_REVISION2 (
     set __CYGWIN_VER_REVISION1=0
     set "__CYGWIN_VER_REVISION1=%__CYGWIN_VER_REVISION2%"
     set __CYGWIN_VER_REVISION2=0
@@ -116,27 +116,27 @@ if "%__CYGWIN_VER_REVISION1%" == "" (
 
 rem echo %__CYGWIN_VER_MAJOR%.%__CYGWIN_VER_MINOR%.%__CYGWIN_VER_PATCH%.%__CYGWIN_VER_REVISION1%
 
-if not "%__CYGWIN_VER_MAJOR%" == "" (
+if defined __CYGWIN_VER_MAJOR (
   set "CYGWIN_VER_STR=%__CYGWIN_VER_MAJOR%"
 ) else (
   set CYGWIN_VER_STR=0
 )
-if not "%__CYGWIN_VER_MINOR%" == "" (
+if defined __CYGWIN_VER_MINOR (
   set "CYGWIN_VER_STR=%CYGWIN_VER_STR%.%__CYGWIN_VER_MINOR%"
 ) else (
   set "CYGWIN_VER_STR=%CYGWIN_VER_STR%.0"
 )
-if not "%__CYGWIN_VER_PATCH%" == "" (
+if defined __CYGWIN_VER_PATCH (
   set "CYGWIN_VER_STR=%CYGWIN_VER_STR%.%__CYGWIN_VER_PATCH%"
 ) else (
   set "CYGWIN_VER_STR=%CYGWIN_VER_STR%.0"
 )
-if not "%__CYGWIN_VER_REVISION1%" == "" (
+if defined __CYGWIN_VER_REVISION1 (
   set "CYGWIN_VER_STR=%CYGWIN_VER_STR%.%__CYGWIN_VER_REVISION1%"
 ) else (
   set "CYGWIN_VER_STR=%CYGWIN_VER_STR%.0"
 )
-if not "%__CYGWIN_VER_REVISION2%" == "" (
+if defined __CYGWIN_VER_REVISION2 (
   set "CYGWIN_VER_STR=%CYGWIN_VER_STR%.%__CYGWIN_VER_REVISION2%"
 )
 

@@ -15,7 +15,7 @@ call "%%~dp0__init__.bat" || goto :EOF
 rem use 64-bit application in 64-bit OS
 if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
 rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
-if not "%PROCESSOR_ARCHITEW6432%" == "" goto NOTX64
+if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 goto X64
 
 :NOTX64

@@ -39,7 +39,7 @@ if not exist "%DIR_PATH%\%DIR_NAME_PTTN%" exit /b 3
 set "DIR_NAME="
 for /F "usebackq tokens=* delims=" %%i in (`dir /A:D /B "%DIR_PATH%\%DIR_NAME_PTTN%"`) do set "DIR_NAME=%%i"
 
-if "%DIR_NAME%" == "" exit /b 4
+if not defined DIR_NAME exit /b 4
 
 call set "TEST_DATA_OUTPUT_FILE_NAME=%%TEST_DATA_OUTPUT_FILE_NAME_PTTN:{{INDEX}}=%DIR_INDEX%%%"
 

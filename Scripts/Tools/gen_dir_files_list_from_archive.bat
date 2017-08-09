@@ -23,7 +23,7 @@ call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CODE_PAGE%%
 set "FILE_FILTER=%~1"
 
 rem ignore specific patterns to avoid problems
-if "%FILE_FILTER%" == "" (
+if not defined FILE_FILTER (
   echo.%?~nx0%: error: file or directory is not set.
   exit /b 1
 ) >&2
@@ -131,7 +131,7 @@ if %ARCHIVE_LIST_EOF% NEQ 0 exit /b 0
 exit /b 1
 
 :PROCESS_ARCHIVE_LIST_LINE
-if "%ARCHIVE_LIST_LINE%" == "" exit /b 0
+if not defined ARCHIVE_LIST_LINE exit /b 0
 
 if %ARCHIVE_LIST_FILTER% NEQ 0 (
   if "%ARCHIVE_LIST_LINE:~0,25%" == "------------------- -----" (
@@ -145,7 +145,7 @@ if %ARCHIVE_LIST_FILTER% NEQ 0 (
 
 set "ARCHIVE_LIST_FILE_PATH=%ARCHIVE_LIST_LINE:~53%"
 
-if "%ARCHIVE_LIST_FILE_PATH%" == "" exit /b 0
+if not defined ARCHIVE_LIST_FILE_PATH exit /b 0
 
 rem use attributes to determine directory path from file path
 set "ARCHIVE_LIST_LINE_ATTR="
@@ -154,7 +154,7 @@ for /F "eol=	 tokens=3" %%i in ("%ARCHIVE_LIST_LINE%") do (
 )
 
 set "ARCHIVE_LIST_FILE_PATH_ATTR0="
-if not "%ARCHIVE_LIST_LINE_ATTR%" == "" (
+if defined ARCHIVE_LIST_LINE_ATTR (
   set "ARCHIVE_LIST_FILE_PATH_ATTR0=%ARCHIVE_LIST_LINE_ATTR:~0,1%"
 )
 
@@ -182,7 +182,7 @@ rem echo."%FILES_PATH_PREFIX%%INSTDIR_SUBDIR_SUFFIX%/%ARCHIVE_LIST_FILE_PATH:\=/
 if not exist "%TEMP_FILE_DIR%" ( mkdir "%TEMP_FILE_DIR%" || exit /b 1 )
 
 rem create empty file
-if not "%TEMP_FILE_PATH%" == "" (
+if defined TEMP_FILE_PATH (
   type nul > "%TEMP_FILE_PATH%"
 )
 

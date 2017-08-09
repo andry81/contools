@@ -17,7 +17,7 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /B "%TEST_TEMP_DIR%"`) do 
 )
 
 :EXIT
-if not "%TEST_TEMP_DIR_PATH_ITEM%" == "" exit /b 64
+if defined TEST_TEMP_DIR_PATH_ITEM exit /b 64
 
 rmdir "%TEST_TEMP_DIR%"
 

@@ -77,24 +77,24 @@ rem Safe and fast string check on empty values
 set "__EMPTY_FIELD1=~0,1"
 set "__CHAR1=!%__STRING_VAR__%:%__EMPTY_FIELD1%!"
 
+rem Check on empty value
+if not defined __CHAR1 ( set "__COUNTER1=-1" && goto EXIT )
 rem Check on quote character first
 if not "!__CHAR1!^" == ""^" (
-  rem Check on empty value
-  if "!__CHAR1!" == "" set __COUNTER1=-1&& goto EXIT
   rem Check on empty value (specific cmd bug case)
-  if "!__CHAR1!" == "!__EMPTY_FIELD1!" set __COUNTER1=-1&& goto EXIT
+  if "!__CHAR1!" == "!__EMPTY_FIELD1!" ( set "__COUNTER1=-1" && goto EXIT )
 )
 
 rem Safe and fast string check on empty values
 set "__EMPTY_FIELD2=~0,1"
 set "__CHAR2=!%__CHARS_VAR__%:%__EMPTY_FIELD2%!"
 
+rem Check on empty value
+if not defined __CHAR2 ( call :STRLEN && goto EXIT )
 rem Check on quote character first
 if not "!__CHAR2!^" == ""^" (
-  rem Check on empty value
-  if "!__CHAR2!" == "" call :STRLEN&& goto EXIT
   rem Check on empty value (specific cmd bug case)
-  if "!__CHAR2!" == "!__EMPTY_FIELD2!" call :STRLEN&& goto EXIT
+  if "!__CHAR2!" == "!__EMPTY_FIELD2!" ( call :STRLEN && goto EXIT )
 )
 
 :LOOP10
@@ -106,16 +106,16 @@ for /L %%i in (%__FOR10_BEGIN_FROM%,1,%__FOR10_END_TO%) do (
   set "__EMPTY_FIELD1=~%%i,1"
   set "__CHAR1=!%__STRING_VAR__%:~%%i,1!"
 
+  rem Check on empty value
+  if not defined __CHAR1 ( set "__COUNTER1=-1" && goto EXIT )
   rem Check on quote character first
   if not "!__CHAR1!^" == ""^" (
-    rem Check on empty value
-    if "!__CHAR1!" == "" set __COUNTER1=-1&& goto EXIT
     rem Check on out of bounds (specific cmd bug case)
-    if "!__CHAR1!" == "!__EMPTY_FIELD1!" set __COUNTER1=-1&& goto EXIT
+    if "!__CHAR1!" == "!__EMPTY_FIELD1!" ( set "__COUNTER1=-1" && goto EXIT )
   )
 
   call :LOOP20 %%4
-  if !ERRORLEVEL! EQU 0 set __COUNTER1=%%i&& goto EXIT
+  if !ERRORLEVEL! EQU 0 ( set "__COUNTER1=%%i" && goto EXIT )
 )
 
 set /A __FOR10_BEGIN_FROM+=%__FOR10_STEP%
@@ -132,10 +132,10 @@ for /L %%j in (%__FOR20_BEGIN_FROM%,1,%__FOR20_END_TO%) do (
   set "__EMPTY_FIELD2=~%%j,1"
   set "__CHAR2=!%__CHARS_VAR__%:~%%j,1!"
 
+  rem Check on empty value
+  if not defined __CHAR2 exit /b 1
   rem Check on quote character first
   if not "!__CHAR2!^" == ""^" (
-    rem Check on empty value
-    if "!__CHAR2!" == "" exit /b 1
     rem Check on out of bounds (specific cmd bug case)
     if "!__CHAR2!" == "!__EMPTY_FIELD2!" exit /b 1
   )
@@ -158,12 +158,12 @@ for /L %%i in (%__FOR10_BEGIN_FROM%,1,%__FOR10_END_TO%) do (
   set "__EMPTY_FIELD1=~%%i,1"
   set "__CHAR1=!%__STRING_VAR__%:~%%i,1!"
 
+  rem Check on empty value
+  if not defined __CHAR1 ( set "__COUNTER1=%%i" && goto :EOF )
   rem Check on quote character first
   if not "!__CHAR1!^" == ""^" (
-    rem Check on empty value
-    if "!__CHAR1!" == "" set __COUNTER1=%%i&& goto :EOF
     rem Check on out of bounds (specific cmd bug case)
-    if "!__CHAR1!" == "!__EMPTY_FIELD1!" set __COUNTER1=%%i&& goto :EOF
+    if "!__CHAR1!" == "!__EMPTY_FIELD1!" ( set "__COUNTER1=%%i" && goto :EOF )
   )
 )
 
