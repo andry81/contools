@@ -158,7 +158,8 @@ call :cecho %%~nx0: {0E}warning{#}: {0E}Unsupported Windows version.>&2
 goto :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN2K
-endlocal&& (
+(
+  endlocal
   set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"
@@ -169,7 +170,8 @@ endlocal&& (
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
-endlocal&& (
+(
+  endlocal
   set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"
@@ -180,7 +182,8 @@ endlocal&& (
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WINVISTA
-endlocal&& (
+(
+  endlocal
   set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"
@@ -191,7 +194,8 @@ endlocal&& (
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN7
-endlocal&& (
+(
+  endlocal
   set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"
@@ -202,7 +206,8 @@ endlocal&& (
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN8
-endlocal&& (
+(
+  endlocal
   set "CONTOOLS_ROOT=%CONTOOLS_ROOT%"
   set "MSYS_PATH=%MSYS_PATH%"
   set "MINGW_PATH=%MINGW_PATH%"

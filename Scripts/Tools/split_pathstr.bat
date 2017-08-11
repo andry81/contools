@@ -65,8 +65,8 @@ if not "%FILE%" == "%FILE_BUF%" (
   endlocal
   rem return local variables
   set RETURN_VALUE=%DIR_INDEX%
-  if defined DIR_PATH_VAR set "%DIR_PATH_VAR%=%DIR_PATH%"
-  if defined FILE_VAR set "%FILE_VAR%=%FILE%"
+  if not "%DIR_PATH_VAR%" == "" set "%DIR_PATH_VAR%=%DIR_PATH%"
+  if not "%FILE_VAR%" == "" set "%FILE_VAR%=%FILE%"
 )
 
 exit /b 0

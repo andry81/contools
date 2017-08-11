@@ -13,7 +13,7 @@ call :GET_BASE_DIR_NAME
 
 (
   endlocal
-  if defined PREV_DIR_NAME (
+  if not "%PREV_DIR_NAME%" == "" (
     set "RETURN_VALUE=%PREV_DIR_NAME%"
   ) else (
     set "RETURN_VALUE=%LAST_DIR_NAME%"

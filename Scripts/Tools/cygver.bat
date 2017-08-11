@@ -55,7 +55,11 @@ for /F "tokens=1,2,* delims= " %%i in ("%STDOUT_VALUE%") do (
 if not defined CYGWIN_VER_STR set "CYGWIN_VER_STR=%STDOUT_VALUE%"
 
 rem Drop internal variables but use some changed value(s) for the return
-if not defined CYGWIN_VER_STR ( endlocal && set "CYGWIN_VER_STR=%CYGWIN_VER_STR%" && exit /b 1 )
+if not defined CYGWIN_VER_STR (
+  endlocal
+  set "CYGWIN_VER_STR=%CYGWIN_VER_STR%"
+  exit /b 1
+)
 
 for /F "tokens=1,* delims=-" %%i in ("%CYGWIN_VER_STR%") do (
   set __CYGWIN_VER_MAJOR=0
