@@ -6,3 +6,9 @@ TortoiseProcByNestedWC script:
     Add a flag to split (or do not split) such directories into different lists and does show them in separate windows to sequence collided commits.
   - Not unversioned items does filter out now only in window-per-reporoot mode what may lead to miss notice records with unversioned/nested status.
     User may forget, for example, to add such items to the version control before a commit, so the mode should show these records to notice a user about unversioned records around.
+  - Add scripts (`SaveSvnProps`/`SaveSvnPropsByNestedWC`) to save all `svn:*` properties from selected directories to `.svn*` or `.svnprops/svn-*.txt` files in the directory where a property is taken.
+    If a particular property already has been saved into the file and has changes with the file's content, then the property must be saved into a temporary file and the
+    file comparison window must be open to merge the changes from a temporary file to the file being saved.
+  - Add scripts (`LoadSvnProps`/`LoadSvnPropsByNestedWC`) to load `svn:*` property for selected directories from `.svn*` or `.svnprops/svn-*.txt` files in the directory where a property must be given.
+    If a directory already has a particular property and the property has changes with the file's content being loaded, then the property must be saved into a temporary file and the
+    file comparison window must be open to merge the changes from a temporary file to the file being loaded.
