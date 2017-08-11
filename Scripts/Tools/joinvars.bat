@@ -19,6 +19,9 @@ if "%~1" == "" exit /b 65
 if "%~2" == "" exit /b 64
 if not exist "%~2" exit /b 63
 
+rem Drop return value
+set "%~1="
+
 rem Drop last error level
 type nul>nul
 
@@ -75,8 +78,9 @@ goto :EOF
 
 :EXIT
 rem Drop internal variables but use some changed value(s) for the return
-call set "__ARGS__=%%__SET_VAR%%=%%%__SET_VAR%%%"
-(
+setlocal ENABLEDELAYEDEXPANSION
+for /F tokens^=^*^ delims^=^ eol^= %%i in ("!%__SET_VAR%!") do (
   endlocal
-  set "%__ARGS__%"
+  endlocal
+  set "%__SET_VAR%=%%i"
 )
