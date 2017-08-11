@@ -147,8 +147,6 @@ set "XCOPY_FLAG=%~1"
 set XCOPY_FLAG_PARSED=0
 if "%XCOPY_FLAG%" == "/Y" exit /b 1
 if "%XCOPY_FLAG%" == "/R" exit /b 1
-if "%XCOPY_FLAG%" == "/E" exit /b 1
-if "%XCOPY_FLAG%" == "/S" exit /b 1
 if "%XCOPY_FLAG%" == "/D" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/XO " & set XCOPY_FLAG_PARSED=1
 if "%XCOPY_FLAG%" == "/H" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/IA:AH " & set XCOPY_FLAG_PARSED=1
 if %XCOPY_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%%XCOPY_FLAG% "
