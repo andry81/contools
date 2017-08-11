@@ -76,9 +76,9 @@ if %__VAR_OPTIONAL__% EQU 0 (
 (
   endlocal
   rem reset variable after endlocal
-  if defined __USER_PARAM__ (
+  if not "%__USER_PARAM__%" == "" (
     set "%__USER_PARAM__%=%__USER_VALUE__%"
-  ) else if defined __VAR_VALUE__ if %__VAR_VALUE_IS_FLAG__% EQU 0 (
+  ) else if not "%__VAR_VALUE__%" == "" if %__VAR_VALUE_IS_FLAG__% EQU 0 (
     set "%__VAR__%=%__VAR_VALUE__%"
   )
   rem restore flags
