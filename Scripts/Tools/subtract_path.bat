@@ -48,7 +48,7 @@ if %FROM_PATH_LEN% GTR 0 (
 (
   endlocal
   set "RETURN_VALUE=%TO_PATH_SUFFIX%"
-  if defined TO_PATH_SUFFIX exit /b 0
+  if defined RETURN_VALUE exit /b 0
   if %FROM_PATH_LEN% EQU %TO_PATH_LEN% exit /b 0
 )
 

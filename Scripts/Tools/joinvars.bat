@@ -11,11 +11,6 @@ rem Command arguments:
 rem %1 - Variable name, which will store concatenated strings.
 rem %2 - Path to string file.
 rem %3 - String join with.
-rem You should use special variables in the file to avoid problems with
-rem respective characters:
-rem   %?0% - expands to ^ (Useful when -e flag defined)
-rem   %?1% - expands to " (Should always be used instead)
-rem   !?2! - expands to ! (Should always be used inside "setlocal ENABLEDELAYEDEXPANSION")
 
 rem Examples:
 rem 1. call joinvars.bat PATH "pathlist.txt"
@@ -28,11 +23,9 @@ rem Drop last error level
 type nul>nul
 
 rem Create local variable's stack
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 set "?0=^"
-set ?1="
-set !?2!=!
 
 set "__SET_VAR=%~1"
 set "__SPLIT_STR=%~3"

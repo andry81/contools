@@ -252,7 +252,8 @@ call :cecho %%~nx0: {0E}warning{#}: {0E}Unsupported Windows version.>&2
 goto :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN2K
-endlocal&& (
+(
+  endlocal
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
@@ -261,7 +262,8 @@ endlocal&& (
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
-endlocal&& (
+(
+  endlocal
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
@@ -270,7 +272,8 @@ endlocal&& (
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WINVISTA
-endlocal&& (
+(
+  endlocal
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
@@ -279,7 +282,8 @@ endlocal&& (
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN7
-endlocal&& (
+(
+  endlocal
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
@@ -288,7 +292,8 @@ endlocal&& (
 goto :EOF
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN8
-endlocal&& (
+(
+  endlocal
   set "CYGWIN_PATH=%CYGWIN_PATH%"
   set "CONFIG_PATH=%CONFIG_PATH%"
 
