@@ -365,6 +365,8 @@ Scripts/Tools/build/__init__.bat -text
 Scripts/Tools/build/add_files_to_archive.bat -text
 Scripts/Tools/build/env_generators/base.bat -text
 Scripts/Tools/build/env_generators/cmake.bat -text
+Scripts/Tools/build/env_generators/cmake_cmd_line.bat -text
+Scripts/Tools/build/env_generators/makensis_cmd_line.bat -text
 Scripts/Tools/build/export_build_vars.bat -text
 Scripts/Tools/build/extract_files_from_archive.bat -text
 Scripts/Tools/build/gen_publish_app_dir.bat -text
