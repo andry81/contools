@@ -10,11 +10,10 @@ call "%%TESTS_ROOT%%/../../Tools/__init__.bat" || goto :EOF
 rem initialize testlib "module"
 call "%%CONTOOLS_ROOT%%/testlib/__init__.bat" || goto :EOF
 
-set "TEST_SRC_BASE_DIR=%~dp0"
-set "TEST_SRC_BASE_DIR=%TEST_SRC_BASE_DIR:~0,-1%"
+set "TEST_SRC_BASE_DIR=%TESTS_ROOT%"
 
-set "TEST_DATA_BASE_DIR=%TEST_SRC_BASE_DIR%\_testdata"
-set "TEST_TEMP_BASE_DIR=%TEST_SRC_BASE_DIR%\..\..\..\Temp"
+set "TEST_DATA_BASE_DIR=%TEST_SRC_BASE_DIR%/_testdata"
+set "TEST_TEMP_BASE_DIR=%TEST_SRC_BASE_DIR%/../../../Temp"
 
 call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%"
 set "TEST_DATA_BASE_DIR=%RETURN_VALUE%"
