@@ -337,7 +337,6 @@ Scripts/Tools/ToolAdaptors/vbs/make_xp_shortcut_cmd_c.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut_cmd.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_sys_shortcut_cmd.bat -text
-Scripts/Tools/__init__.bat -text
 Scripts/Tools/abspath.bat -text
 Scripts/Tools/admin/ProductKey/PrintProductKeyFromFile.py -text
 Scripts/Tools/admin/ProductKey/PrintProductKeyFromFile.vbs -text
