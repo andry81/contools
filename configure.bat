@@ -19,6 +19,7 @@ if exist "%CONFIGURE_ROOT%/svncmd.tag" goto CONFIGURE_SVNCMD
 
 :CONFIGURE_CONTOOLS
 rem generate __init__.bat in "%CONFIGURE_ROOT%/Scripts/Tools"
+echo "%CONFIGURE_ROOT%/Scripts/Tools/__init__.bat"
 (
   echo.@echo off
   echo.
@@ -48,6 +49,7 @@ rem generate __init__.bat in "%CONFIGURE_ROOT%/Scripts/Tools"
 ) > "%CONFIGURE_ROOT%/Scripts/Tools/__init__.bat"
 
 rem generate __init__.bat in "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn"
+echo "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
 (
   echo.@echo off
   echo.
@@ -58,6 +60,7 @@ goto CONFIGURE_SVNCMD_END
 
 :CONFIGURE_SVNCMD
 rem generate __init__.bat in "%CONFIGURE_ROOT%/Tools"
+echo."%CONFIGURE_ROOT%/Tools/__init__.bat"
 (
   echo.@echo off
   echo.
@@ -87,6 +90,7 @@ rem generate __init__.bat in "%CONFIGURE_ROOT%/Tools"
 ) > "%CONFIGURE_ROOT%/Tools/__init__.bat"
 
 rem generate __init__.bat in "%CONFIGURE_ROOT%/Scripts"
+echo "%CONFIGURE_ROOT%/Scripts/__init__.bat"
 (
   echo.@echo off
   echo.
@@ -96,7 +100,7 @@ rem generate __init__.bat in "%CONFIGURE_ROOT%/Scripts"
 :CONFIGURE_SVNCMD_END
 
 if exist "%CONFIGURE_ROOT%/svncmd.tag" goto DEPLOY_TOOLS_EXTERNAL
-exit /b 0
+goto END
 
 :DEPLOY_TOOLS_EXTERNAL
 rem initialize Tools "module"
@@ -104,7 +108,18 @@ call "%%CONFIGURE_ROOT%%/Tools/__init__.bat" || goto :EOF
 
 rem deploy Windows UCRT dependencies
 for %%i in (%WINDOWS_UCRT_X86_DEPLOY_DIR_LIST%) do (
-  call "%%CONTOOLS_ROOT%%/xcopy_dir.bat" "%%CONFIGURE_ROOT%%/ToolsExternal/deps/Windows Kits/10/Redist/ucrt/DLLs/x86" "%%CONFIGURE_ROOT%%/%%i" || goto :EOF
+  call :CMD "%%CONTOOLS_ROOT%%/xcopy_dir.bat" "%%CONFIGURE_ROOT%%/ToolsExternal/deps/Windows Kits/10/Redist/ucrt/DLLs/x86" "%%CONFIGURE_ROOT%%/%%i" || goto :EOF
 )
+
+exit /b 0
+
+:CMD
+echo.^>%*
+(%*)
+exit /b
+
+:END
+
+pause
 
 exit /b 0
