@@ -663,4 +663,5 @@ Utilities/Sources/thlibautocfg/thlibautocfg.cpp -text
 Utilities/Sources/thlibautocfg/version.def -text
 Utilities/Sources/thlibautocfg/version.tpl -text
 /configure.bat -text
+/contools.tag -text
 /license.txt -text
