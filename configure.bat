@@ -22,7 +22,7 @@ rem generate __init__.bat in "%CONFIGURE_ROOT%/Scripts/Tools"
 (
   echo.@echo off
   echo.
-  echo.if "%%CONTOOLS_ROOT%%" == "" set "CONTOOLS_ROOT=%CONFIGURE_ROOT%/Scripts/Tools"
+  echo.if "%%CONTOOLS_ROOT%%" == "" set "CONTOOLS_ROOT=%%~dp0"
   echo.set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:\=/%%"
   echo.if "%%CONTOOLS_ROOT:~-1%%" == "/" set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:~0,-1%%"
   echo.
@@ -61,7 +61,7 @@ rem generate __init__.bat in "%CONFIGURE_ROOT%/Tools"
 (
   echo.@echo off
   echo.
-  echo.if "%%CONTOOLS_ROOT%%" == "" set "CONTOOLS_ROOT=%CONFIGURE_ROOT%/Tools"
+  echo.if "%%CONTOOLS_ROOT%%" == "" set "CONTOOLS_ROOT=%%~dp0"
   echo.set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:\=/%%"
   echo.if "%%CONTOOLS_ROOT:~-1%%" == "/" set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:~0,-1%%"
   echo.
@@ -69,7 +69,7 @@ rem generate __init__.bat in "%CONFIGURE_ROOT%/Tools"
   echo.set "GNUWIN32_ROOT=%%GNUWIN32_ROOT:\=/%%"
   echo.if "%%GNUWIN32_ROOT:~-1%%" == "/" set "GNUWIN32_ROOT=%%GNUWIN32_ROOT:~0,-1%%"
   echo.
-  echo.if "%%SVNCMD_TOOLS_ROOT%%" == "" set "SVNCMD_TOOLS_ROOT=%CONFIGURE_ROOT%/Scripts"
+  echo.if "%%SVNCMD_TOOLS_ROOT%%" == "" set "SVNCMD_TOOLS_ROOT=%%CONTOOLS_ROOT%%/../Scripts"
   echo.set "SVNCMD_TOOLS_ROOT=%%SVNCMD_TOOLS_ROOT:\=/%%"
   echo.if "%%SVNCMD_TOOLS_ROOT:~-1%%" == "/" set "SVNCMD_TOOLS_ROOT=%%SVNCMD_TOOLS_ROOT:~0,-1%%"
   echo.
