@@ -2,6 +2,7 @@
 Scripts/Tests/batscripts/_output
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/*
 Scripts/Tools/ToolAdaptors/totalcmd/configure.user.bat
+Scripts/Tools/__init__.bat
 /Temp
 Utilities/Sources/_common/help.txt
 Utilities/Sources/_common/help_inl.hpp
