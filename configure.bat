@@ -23,29 +23,43 @@ echo "%CONFIGURE_ROOT%/Scripts/Tools/__init__.bat"
 (
   echo.@echo off
   echo.
-  echo.if "%%CONTOOLS_ROOT%%" == "" set "CONTOOLS_ROOT=%%~dp0"
+  echo.if %%__CONTOOLS_INIT__%%0 NEQ 0 exit /b 0
+  echo.
+  echo.if not defined CONTOOLS_ROOT set "CONTOOLS_ROOT=%%~dp0"
   echo.set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:\=/%%"
   echo.if "%%CONTOOLS_ROOT:~-1%%" == "/" set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:~0,-1%%"
   echo.
-  echo.if "%%GNUWIN32_ROOT%%" == "" set "GNUWIN32_ROOT=%%CONTOOLS_ROOT%%/gnuwin32"
+  echo.if not defined BUILD_TOOLS_ROOT set "BUILD_TOOLS_ROOT=%%CONTOOLS_ROOT%%/build"
+  echo.set "BUILD_TOOLS_ROOT=%%BUILD_TOOLS_ROOT:\=/%%"
+  echo.if "%%BUILD_TOOLS_ROOT:~-1%%" == "/" set "BUILD_TOOLS_ROOT=%%BUILD_TOOLS_ROOT:~0,-1%%"
+  echo.
+  echo.if not defined GNUWIN32_ROOT set "GNUWIN32_ROOT=%%CONTOOLS_ROOT%%/gnuwin32"
   echo.set "GNUWIN32_ROOT=%%GNUWIN32_ROOT:\=/%%"
   echo.if "%%GNUWIN32_ROOT:~-1%%" == "/" set "GNUWIN32_ROOT=%%GNUWIN32_ROOT:~0,-1%%"
   echo.
-  echo.if "%%SVNCMD_TOOLS_ROOT%%" == "" set "SVNCMD_TOOLS_ROOT=%%CONTOOLS_ROOT%%/scm/svn"
+  echo.if not defined SVNCMD_TOOLS_ROOT set "SVNCMD_TOOLS_ROOT=%%CONTOOLS_ROOT%%/scm/svn"
   echo.set "SVNCMD_TOOLS_ROOT=%%SVNCMD_TOOLS_ROOT:\=/%%"
   echo.if "%%SVNCMD_TOOLS_ROOT:~-1%%" == "/" set "SVNCMD_TOOLS_ROOT=%%SVNCMD_TOOLS_ROOT:~0,-1%%"
   echo.
-  echo.if "%%SQLITE_TOOLS_ROOT%%" == "" set "SQLITE_TOOLS_ROOT=%%CONTOOLS_ROOT%%/sqlite"
+  echo.if not defined SQLITE_TOOLS_ROOT set "SQLITE_TOOLS_ROOT=%%CONTOOLS_ROOT%%/sqlite"
   echo.set "SQLITE_TOOLS_ROOT=%%SQLITE_TOOLS_ROOT:\=/%%"
   echo.if "%%SQLITE_TOOLS_ROOT:~-1%%" == "/" set "SQLITE_TOOLS_ROOT=%%SQLITE_TOOLS_ROOT:~0,-1%%"
   echo.
-  echo.if "%%XML_TOOLS_ROOT%%" == "" set "XML_TOOLS_ROOT=%%CONTOOLS_ROOT%%/xml"
+  echo.if not defined XML_TOOLS_ROOT set "XML_TOOLS_ROOT=%%CONTOOLS_ROOT%%/xml"
   echo.set "XML_TOOLS_ROOT=%%XML_TOOLS_ROOT:\=/%%"
   echo.if "%%XML_TOOLS_ROOT:~-1%%" == "/" set "XML_TOOLS_ROOT=%%XML_TOOLS_ROOT:~0,-1%%"
   echo.
-  echo.if "%%VARS_ROOT%%" == "" set "VARS_ROOT=%%CONTOOLS_ROOT%%/vars"
+  echo.if not defined HASHDEEP_ROOT set "HASHDEEP_ROOT=%%CONTOOLS_ROOT%%/hash/hashdeep"
+  echo.set "HASHDEEP_ROOT=%%HASHDEEP_ROOT:\=/%%"
+  echo.if "%%HASHDEEP_ROOT:~-1%%" == "/" set "HASHDEEP_ROOT=%%HASHDEEP_ROOT:~0,-1%%"
+  echo.
+  echo.if not defined VARS_ROOT set "VARS_ROOT=%%CONTOOLS_ROOT%%/vars"
   echo.set "VARS_ROOT=%%VARS_ROOT:\=/%%"
   echo.if "%%VARS_ROOT:~-1%%" == "/" set "VARS_ROOT=%%VARS_ROOT:~0,-1%%"
+  echo.
+  echo.set __CONTOOLS_INIT__=1
+  echo.
+  echo.exit /b 0
 ) > "%CONFIGURE_ROOT%/Scripts/Tools/__init__.bat"
 
 rem generate __init__.bat in "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn"
@@ -64,29 +78,43 @@ echo."%CONFIGURE_ROOT%/Tools/__init__.bat"
 (
   echo.@echo off
   echo.
-  echo.if "%%CONTOOLS_ROOT%%" == "" set "CONTOOLS_ROOT=%%~dp0"
+  echo.if %%__CONTOOLS_INIT__%%0 NEQ 0 exit /b 0
+  echo.
+  echo.if not defined CONTOOLS_ROOT set "CONTOOLS_ROOT=%%~dp0"
   echo.set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:\=/%%"
   echo.if "%%CONTOOLS_ROOT:~-1%%" == "/" set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:~0,-1%%"
   echo.
-  echo.if "%%GNUWIN32_ROOT%%" == "" set "GNUWIN32_ROOT=%%CONTOOLS_ROOT%%/gnuwin32"
+  echo.if not defined BUILD_TOOLS_ROOT set "BUILD_TOOLS_ROOT=%%CONTOOLS_ROOT%%/build"
+  echo.set "BUILD_TOOLS_ROOT=%%BUILD_TOOLS_ROOT:\=/%%"
+  echo.if "%%BUILD_TOOLS_ROOT:~-1%%" == "/" set "BUILD_TOOLS_ROOT=%%BUILD_TOOLS_ROOT:~0,-1%%"
+  echo.
+  echo.if not defined GNUWIN32_ROOT set "GNUWIN32_ROOT=%%CONTOOLS_ROOT%%/gnuwin32"
   echo.set "GNUWIN32_ROOT=%%GNUWIN32_ROOT:\=/%%"
   echo.if "%%GNUWIN32_ROOT:~-1%%" == "/" set "GNUWIN32_ROOT=%%GNUWIN32_ROOT:~0,-1%%"
   echo.
-  echo.if "%%SVNCMD_TOOLS_ROOT%%" == "" set "SVNCMD_TOOLS_ROOT=%%CONTOOLS_ROOT%%/../Scripts"
+  echo.if not defined SVNCMD_TOOLS_ROOT set "SVNCMD_TOOLS_ROOT=%%CONTOOLS_ROOT%%/../Scripts"
   echo.set "SVNCMD_TOOLS_ROOT=%%SVNCMD_TOOLS_ROOT:\=/%%"
   echo.if "%%SVNCMD_TOOLS_ROOT:~-1%%" == "/" set "SVNCMD_TOOLS_ROOT=%%SVNCMD_TOOLS_ROOT:~0,-1%%"
   echo.
-  echo.if "%%SQLITE_TOOLS_ROOT%%" == "" set "SQLITE_TOOLS_ROOT=%%CONTOOLS_ROOT%%/sqlite"
+  echo.if not defined SQLITE_TOOLS_ROOT set "SQLITE_TOOLS_ROOT=%%CONTOOLS_ROOT%%/sqlite"
   echo.set "SQLITE_TOOLS_ROOT=%%SQLITE_TOOLS_ROOT:\=/%%"
   echo.if "%%SQLITE_TOOLS_ROOT:~-1%%" == "/" set "SQLITE_TOOLS_ROOT=%%SQLITE_TOOLS_ROOT:~0,-1%%"
   echo.
-  echo.if "%%XML_TOOLS_ROOT%%" == "" set "XML_TOOLS_ROOT=%%CONTOOLS_ROOT%%/xml"
+  echo.if not defined XML_TOOLS_ROOT set "XML_TOOLS_ROOT=%%CONTOOLS_ROOT%%/xml"
   echo.set "XML_TOOLS_ROOT=%%XML_TOOLS_ROOT:\=/%%"
   echo.if "%%XML_TOOLS_ROOT:~-1%%" == "/" set "XML_TOOLS_ROOT=%%XML_TOOLS_ROOT:~0,-1%%"
   echo.
-  echo.if "%%VARS_ROOT%%" == "" set "VARS_ROOT=%%CONTOOLS_ROOT%%/vars"
+  echo.if not defined HASHDEEP_ROOT set "HASHDEEP_ROOT=%%CONTOOLS_ROOT%%/hash/hashdeep"
+  echo.set "HASHDEEP_ROOT=%%HASHDEEP_ROOT:\=/%%"
+  echo.if "%%HASHDEEP_ROOT:~-1%%" == "/" set "HASHDEEP_ROOT=%%HASHDEEP_ROOT:~0,-1%%"
+  echo.
+  echo.if not defined VARS_ROOT set "VARS_ROOT=%%CONTOOLS_ROOT%%/vars"
   echo.set "VARS_ROOT=%%VARS_ROOT:\=/%%"
   echo.if "%%VARS_ROOT:~-1%%" == "/" set "VARS_ROOT=%%VARS_ROOT:~0,-1%%"
+  echo.
+  echo.set __CONTOOLS_INIT__=1
+  echo.
+  echo.exit /b 0
 ) > "%CONFIGURE_ROOT%/Tools/__init__.bat"
 
 rem generate __init__.bat in "%CONFIGURE_ROOT%/Scripts"
