@@ -127,7 +127,7 @@ echo "%CONFIGURE_ROOT%/Scripts/__init__.bat"
 
 :CONFIGURE_SVNCMD_END
 
-if exist "%CONFIGURE_ROOT%/svncmd.tag" goto DEPLOY_TOOLS_EXTERNAL
+if exist "%CONFIGURE_ROOT%/svncmd.tag" call :DEPLOY_TOOLS_EXTERNAL
 goto END
 
 :DEPLOY_TOOLS_EXTERNAL
