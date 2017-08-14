@@ -54,7 +54,7 @@ exit /b 0
 :PROCESS_DIR_PATH
 set "BASE_DIR_PATH=%~dpf1"
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%BASE_DIR_PATH%%FILE_FILTER_SUFFIX%" /S /B /A:-D 2^>nul`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%BASE_DIR_PATH%%FILE_FILTER_SUFFIX%" /A:-D /B /S /O:N 2^>nul`) do (
   set "ARCHIVE_FILE_PATH=%%i"
   call :PROCESS_ARCHIVE_FILE || goto :EOF
 )

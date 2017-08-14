@@ -59,7 +59,7 @@ exit /b
 :FILES_PATH_AS_DIR
 call "%%CONTOOLS_ROOT%%/strlen.bat" /v FILES_PATH
 set /A FILES_PATH_LEN=%ERRORLEVEL%+1
-dir /B /S "%FILES_PATH%\" | "%GNUWIN32_ROOT%/bin/sed.exe" "s/.\{%FILES_PATH_LEN%\}\(.*\)/\1\\/" | sort | "%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/"
+dir /A:-D /B /S /O:N "%FILES_PATH%\" | "%GNUWIN32_ROOT%/bin/sed.exe" "s/.\{%FILES_PATH_LEN%\}\(.*\)/\1\\/" | "%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/"
 goto :EOF
 
 :FILES_PATH_AS_FILE
