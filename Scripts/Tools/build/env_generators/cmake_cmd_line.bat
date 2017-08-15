@@ -9,12 +9,12 @@ setlocal DISABLEDELAYEDEXPANSION
 
 set "CONFIG_ROOT=%~1"
 
-if not "%CONFIG_ROOT%" == "" (
+if defined CONFIG_ROOT (
   if "\" == "%CONFIG_ROOT:~0,1%" exit /b 1
   if "\" == "%CONFIG_ROOT:~-1%" set "CONFIG_ROOT=%CONFIG_ROOT:~0,-1%"
 )
 
-if "%CONFIG_ROOT%" == "" exit /b 1
+if not defined CONFIG_ROOT exit /b 1
 
 set "?~nx0=%~nx0"
 
