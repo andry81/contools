@@ -31,6 +31,11 @@ if defined BUILD_USER_VARS_ROOT (
   if "\" == "%BUILD_USER_VARS_ROOT:~-1%" set "BUILD_USER_VARS_ROOT=%BUILD_USER_VARS_ROOT:~0,-1%"
 )
 
+if not defined PROJECT_NAME (
+  echo.%~nx0: error: PROJECT_NAME must be defined.
+  exit /b 3
+) >&2
+
 rem cleanup all STAGE_IN.PROJECT_* variables
 for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set "STAGE_IN.PROJECT_" 2^>nul`) do set "%%i="
 

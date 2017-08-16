@@ -76,7 +76,7 @@ echo.
 if not defined APP_TARGETS_LIST goto APP_TARGETS_LIST_END
 
 rem dump variables with <app_target_name> as part of name
-for /D %%i in (%APP_TARGETS_LIST%) do call :TARGET_APP_LIST_HANDLER "%%i"
+for %%i in (%APP_TARGETS_LIST%) do call :TARGET_APP_LIST_HANDLER %%%%i
 echo.
 goto APP_TARGETS_LIST_END
 

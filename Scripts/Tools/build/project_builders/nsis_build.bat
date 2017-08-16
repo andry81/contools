@@ -89,10 +89,10 @@ if %FLAGS_REBUILD%0 EQU 10 (
   )
 )
 
-if not exist "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" mkdir "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" mkdir "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" mkdir "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" mkdir "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%"
+if not exist "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%%"
+if not exist "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%%"
+if not exist "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%"
+if not exist "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%"
 
 echo.
 
@@ -108,6 +108,7 @@ if exist "%BUILD_SCRIPTS_ROOT%/read_product_ver.bat" (
 
 echo.Generating NSIS defines...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/nsis_defines.nsi"
+
 call "%%CONTOOLS_ROOT%%/nsis/gen_nsis_defines.bat" 1251 "%%BUILD_CONFIG_ROOT%%\nsis_defines.lst" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/nsis_defines.nsi"
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
@@ -116,19 +117,21 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo.Generating NSIS search paths...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/nsis_search_paths.nsi"
+
 call "%%CONTOOLS_ROOT%%/nsis/gen_nsis_search_paths.bat" "%%BUILD_CONFIG_ROOT%%\nsis_search_paths.lst" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/nsis_search_paths.nsi"
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
   exit /b 23
 )
 
-if %F_DISABLE_APP_DIR_INSTALL%0 EQU 0 (
+if %F_DISABLE_APP_DIR_INSTALL%0 NEQ 0 (
   type nul > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_install_file_list.lst"
   goto IGNORE_APP_DIR_INSTALL
 )
 
 echo.Generating install file list...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_install_file_list.lst"
+
 if %F_ENABLE_APP_DIR_INSTALL_FROM_ARCHIVE%0 NEQ 0 (
   call "%%CONTOOLS_ROOT%%/gen_dir_files_list_from_archive.bat" 1251 ^
     "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%/*.7z" "*.*" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_install_file_list.lst"
@@ -158,6 +161,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo.Generating uninstall instructions...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/uninstall.nsi"
+
 if %F_ENABLE_APP_DIR_INSTALL_FROM_ARCHIVE%0 NEQ 0 (
   call "%%CONTOOLS_ROOT%%/nsis/gen_uninstall_files_section_from_archive.bat" 1251 $INSTDIR "" "*.7z" ^
     "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/uninstall.nsi"
@@ -180,7 +184,7 @@ if exist "%BUILD_SCRIPTS_ROOT%/gen_uninstall_list.bat" (
 
 :IGNORE_APP_DIR_INSTALL
 
-if %F_DISABLE_APP_INTEGRATION_DIR_INSTALL%0 EQU 0 (
+if %F_DISABLE_APP_INTEGRATION_DIR_INSTALL%0 NEQ 0 (
   goto IGNORE_APP_INTEGRATION_DIR_INSTALL
 )
 
@@ -188,8 +192,15 @@ if not defined APP_INTEGRATION_ROOT goto IGNORE_GEN_INTEGRATION_FILE_LIST
 if not defined APP_INTEGRATION_DIR goto IGNORE_GEN_INTEGRATION_FILE_LIST
 
 echo.Generating integration install file list...
-call "%%CONTOOLS_ROOT%%/gen_dir_files_list.bat" 1251 ^
-  "%%APP_INTEGRATION_ROOT%%/%%APP_INTEGRATION_DIR%%" >> "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_install_file_list.lst"
+echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/install_integration.nsi"
+
+if %F_ENABLE_APP_INTEGRATION_DIR_INSTALL_FROM_ARCHIVE%0 NEQ 0 (
+  call "%%CONTOOLS_ROOT%%/gen_dir_files_list_from_archive.bat" 1251 ^
+    "%%APP_INTEGRATION_ROOT%%/%%APP_INTEGRATION_DIR%%" >> "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_install_file_list.lst"
+) else (
+  call "%%CONTOOLS_ROOT%%/gen_dir_files_list.bat" 1251 ^
+    "%%APP_INTEGRATION_ROOT%%/%%APP_INTEGRATION_DIR%%" >> "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_install_file_list.lst"
+)
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
   exit /b 40
@@ -197,8 +208,14 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo.Generating integration install instructions...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/install_integration.nsi"
-call "%%CONTOOLS_ROOT%%/nsis/gen_install_files_section.bat" 1251 APP_INTEGRATION_ROOT "" "" ^
-  "%%APP_INTEGRATION_ROOT%%/%%APP_INTEGRATION_DIR%%" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/install_integration.nsi"
+
+if %F_ENABLE_APP_INTEGRATION_DIR_INSTALL_FROM_ARCHIVE%0 NEQ 0 (
+  call "%%CONTOOLS_ROOT%%/nsis/gen_install_files_section_from_archive.bat" 1251 $EXEDIR "" "" "*.7z" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" ^
+    0 "%%APP_INTEGRATION_ROOT%%/%%APP_INTEGRATION_DIR%%" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/install_integration.nsi"
+) else (
+  call "%%CONTOOLS_ROOT%%/nsis/gen_install_files_section.bat" 1251 APP_INTEGRATION_ROOT "" "" ^
+    "%%APP_INTEGRATION_ROOT%%/%%APP_INTEGRATION_DIR%%" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/install_integration.nsi"
+)
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
   exit /b 41
@@ -206,8 +223,14 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo.Generating integration uninstall instructions...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/uninstall_integration.nsi"
-call "%%CONTOOLS_ROOT%%/nsis/gen_uninstall_files_section.bat" 1251 $INSTDIR "" "" ^
-  "%%APP_INTEGRATION_ROOT%%/%%APP_INTEGRATION_DIR%%" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/uninstall_integration.nsi"
+
+if %F_ENABLE_APP_INTEGRATION_DIR_INSTALL_FROM_ARCHIVE%0 NEQ 0 (
+  call "%%CONTOOLS_ROOT%%/nsis/gen_uninstall_files_section_from_archive.bat" 1251 $INSTDIR "" "*.7z" ^
+    "%%APP_INTEGRATION_ROOT%%/%%APP_INTEGRATION_DIR%%" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/uninstall_integration.nsi"
+) else (
+  call "%%CONTOOLS_ROOT%%/nsis/gen_uninstall_files_section.bat" 1251 $INSTDIR "" "" ^
+    "%%APP_INTEGRATION_ROOT%%/%%APP_INTEGRATION_DIR%%" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/uninstall_integration.nsi"
+)
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
   exit /b 42
@@ -227,6 +250,7 @@ if exist "%BUILD_SCRIPTS_ROOT%/gen_integration_uninstall_list.bat" (
 
 echo.Generating scripts file list...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_scripts_list_res.nsi"
+
 call "%%CONTOOLS_ROOT%%/nsis/gen_files_pp_command_from_list.bat" 1251 SCRIPT ".bat|.cmd" ^
   "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_install_file_list.lst" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_scripts_list_res.nsi"
 if %ERRORLEVEL% NEQ 0 (
@@ -236,6 +260,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo.Generating executables file list...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_exec_list_res.nsi"
+
 call "%%CONTOOLS_ROOT%%/nsis/gen_files_pp_command_from_list.bat" 1251 PROC ".exe" ^
   "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_install_file_list.lst" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/product_exec_list_res.nsi"
 if %ERRORLEVEL% NEQ 0 (
@@ -255,7 +280,8 @@ if exist "%BUILD_SCRIPTS_ROOT%\gen_scm_branch_workingset.bat" (
 
 echo.Building setup executable...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%/%APP_SETUP_FILE_NAME%.exe"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%" mkdir "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%"
+
+if not exist "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%"
 call :CMD "%%NSIS_ROOT%%/bin/makensis.exe" %%MAKENSIS_CMD_LINE.COMPILE%%
 set LASTERROR=%ERRORLEVEL%
 echo.Return code: %LASTERROR%
@@ -281,7 +307,7 @@ if %LASTERROR% NEQ 0 (
 
 rem copy makensis detailed log file into /gen directory
 echo.Copying setup log files...
-call :XCOPY_FILE . "%%MAKENSIS_LOG_FILE_NAME%%" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" /Y /D
+call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" . "%%MAKENSIS_LOG_FILE_NAME%%" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" /Y /D
 set LASTERROR=%ERRORLEVEL%
 
 echo.
@@ -311,7 +337,3 @@ echo.^>%*
 echo.
 (%*)
 exit /b
-
-:XCOPY_FILE
-call "%%CONTOOLS_ROOT%%/xcopy_file.bat" %%* || goto :EOF
-exit /b 0

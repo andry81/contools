@@ -55,18 +55,14 @@ set "XCOPY_SUFFIX_PATH=%RETURN_VALUE:\=/%"
 
 if defined XCOPY_SUFFIX_PATH (
   if exist "%FROM_DIR_ROOT%" (
-    mkdir "%TO_APP_DIR_ROOT%/%XCOPY_SUFFIX_PATH%"
-    call :XCOPY_DIR "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%/%%XCOPY_SUFFIX_PATH%%" %%XCOPY_FLAGS%% || exit /b 1
+    call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%TO_APP_DIR_ROOT%%/%%XCOPY_SUFFIX_PATH%%"
+    call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%/%%XCOPY_SUFFIX_PATH%%" %%XCOPY_FLAGS%% || exit /b 1
   )
 ) else (
   if exist "%FROM_DIR_ROOT%" (
-    mkdir "%TO_APP_DIR_ROOT%"
-    call :XCOPY_DIR "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%" %%XCOPY_FLAGS%% || exit /b 2
+    call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%TO_APP_DIR_ROOT%%"
+    call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%" %%XCOPY_FLAGS%% || exit /b 2
   )
 )
 
 goto :EOF
-
-:XCOPY_DIR
-call "%%CONTOOLS_ROOT%%/xcopy_dir.bat" %%* || goto :EOF
-exit /b 0
