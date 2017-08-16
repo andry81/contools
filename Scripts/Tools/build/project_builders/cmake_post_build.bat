@@ -1,7 +1,5 @@
 @echo off
 
-setlocal
-
 set "BUILD_CONFIG_ROOT=%~1"
 set "BUILD_SCRIPTS_ROOT=%~2"
 set "BUILD_USER_VARS_ROOT=%~3"
@@ -65,20 +63,22 @@ rmdir /S /Q "%PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%" > nul
 echo Deleting PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR: "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%"
 rmdir /S /Q "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" > nul
 
+echo.
+
 rem read product version
 if exist "%BUILD_SCRIPTS_ROOT%/read_product_ver.bat" (
   call "%%BUILD_SCRIPTS_ROOT%%/read_product_ver.bat" || exit /b 30
 )
 
-call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_from_stagein_all_dirs.bat" ^
-  "../.." ^
+echo.
+
+call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_from_stagein_all_dirs.bat" "../.." ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 31
 
-call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stageout_all_dirs.bat" ^
-  "stage" "../.." ^
+call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stageout_all_dirs.bat" "stage" "../.." ^
   "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%" "%%PROJECT_ROOT%%\_scripts\stage_bin_excludes.lst" ^
   "%%PROJECT_STAGE_BUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
   "%%PROJECT_STAGE_BUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
@@ -87,7 +87,7 @@ call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stageout_all_dirs.bat" ^
 
 rem saving data for next build step into stage directory
 echo.Exporting build variables into stage...
-if not exist "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" mkdir "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%"
+if not exist "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%"
 call "%%BUILD_TOOLS_ROOT%%/export_build_vars.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%\post_build.vars" || exit /b 33
 echo.
 

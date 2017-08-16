@@ -32,25 +32,13 @@ type nul>nul
 
 call "%%?~dp0%%__init__.bat" || goto :EOF
 
-( call :XCOPY_FILE "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || goto :EOF ) && ^
+( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || goto :EOF ) && ^
 if /i not "%TO_ROOT%/%FROM_FILE%" == "%TO_ROOT%/%TO_FILE%" (
   (
-    call :COPY "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || goto :EOF
+    call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || goto :EOF
   ) && (
-    call :DEL_FILE "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || goto :EOF
+    call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || goto :EOF
   )
 )
 
-exit /b 0
-
-:XCOPY_FILE
-call "%%CONTOOLS_ROOT%%/xcopy_file.bat" %%* || goto :EOF
-exit /b 0
-
-:COPY
-call "%%CONTOOLS_ROOT%%/copy.bat" %%* || goto :EOF
-exit /b 0
-
-:DEL_FILE
-call "%%CONTOOLS_ROOT%%/del_file.bat" %%* || goto :EOF
 exit /b 0

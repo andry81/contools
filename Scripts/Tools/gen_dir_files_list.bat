@@ -47,7 +47,10 @@ exit /b 0
 :PROCESS_DIR_PATH
 set "FILES_PATH=%~dpf1"
 
-if not exist "%FILES_PATH%" exit /b -1
+if not exist "%FILES_PATH%" (
+  echo.%?~nx0%: error: file or directory is not found: "%FILES_PATH%".
+  exit /b -1
+) >&2
 
 rem check on file path
 if exist "%FILES_PATH%\" (

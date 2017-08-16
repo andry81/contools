@@ -403,7 +403,6 @@ Scripts/Tools/cat2.sh -text
 Scripts/Tools/cecho.exe -text
 Scripts/Tools/cecho_x64.exe -text
 Scripts/Tools/clearcache.exe -text
-Scripts/Tools/copy.bat -text
 Scripts/Tools/countlines.bat -text
 Scripts/Tools/cstresc.bat -text
 Scripts/Tools/cygsetupdiff.sh -text
@@ -421,8 +420,6 @@ Scripts/Tools/cygwin/bin/diff.exe -text
 Scripts/Tools/cygwin/bin/patch.exe -text
 Scripts/Tools/cygwin/bin/sed.exe -text
 Scripts/Tools/cygwin/etc/fstab -text
-Scripts/Tools/del_file.bat -text
-Scripts/Tools/del_file_pttn.bat -text
 Scripts/Tools/diff/__init__.bat -text
 Scripts/Tools/diff/index_patch_file.bat -text
 Scripts/Tools/dirpath.bat -text
@@ -568,12 +565,18 @@ Scripts/Tools/std/allocate_temp_dir.bat -text
 Scripts/Tools/std/append_list_from_string.bat -text
 Scripts/Tools/std/chcp.bat -text
 Scripts/Tools/std/clear_list.bat -text
+Scripts/Tools/std/copy.bat -text
+Scripts/Tools/std/del_file.bat -text
+Scripts/Tools/std/del_file_pttn.bat -text
 Scripts/Tools/std/free_temp_dir.bat -text
 Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
+Scripts/Tools/std/mkdir.bat -text
 Scripts/Tools/std/replace_sys_chars.bat -text
 Scripts/Tools/std/restore_sys_chars.bat -text
 Scripts/Tools/std/restorecp.bat -text
+Scripts/Tools/std/xcopy_dir.bat -text
+Scripts/Tools/std/xcopy_file.bat -text
 Scripts/Tools/strchr.bat -text
 Scripts/Tools/stresc.bat -text
 Scripts/Tools/stringlib.sh -text
@@ -610,8 +613,6 @@ Scripts/Tools/winpath.bat -text
 Scripts/Tools/winver.bat -text
 Scripts/Tools/wtee.exe -text
 Scripts/Tools/xcopy/xcopy_convert_excludes.bat -text
-Scripts/Tools/xcopy_dir.bat -text
-Scripts/Tools/xcopy_file.bat -text
 Scripts/Tools/xml/__init__.bat -text
 Scripts/Tools/xml/filter_xpath_list_by_xpath_list.bat -text
 Scripts/Tools/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_exact_list.sed -text

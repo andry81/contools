@@ -70,14 +70,14 @@ if %MSG_PRINTED% EQU 0 (
   set MSG_PRINTED=1
 )
 
-if not exist "%TO_STAGE_DIR_ROOT%" mkdir "%TO_STAGE_DIR_ROOT%"
+if not exist "%TO_STAGE_DIR_ROOT%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%TO_STAGE_DIR_ROOT%%"
 
 set "XCOPY_EXCLUDE_DIRS_LIST=%CONTOOLS_ROOT:/=\%\excludes\xcopy_svn_files.lst"
 if defined XCOPY_EXCLUDE_DIRS_FILE set "XCOPY_EXCLUDE_DIRS_LIST=%XCOPY_EXCLUDE_DIRS_LIST%|%XCOPY_EXCLUDE_DIRS_FILE%"
 set "XCOPY_EXCLUDE_FILES_LIST="
 if defined XCOPY_EXCLUDE_FILES_FILE set "XCOPY_EXCLUDE_FILES_LIST=%XCOPY_EXCLUDE_FILES_FILE%"
 
-call :XCOPY_FILE "%%FROM_STAGE_DIR_ROOT%%" "%%FROM_FILE%%" "%%TO_STAGE_DIR_ROOT%%" %%XCOPY_FILE_FLAGS%% || exit /b 127
+call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_STAGE_DIR_ROOT%%" "%%FROM_FILE%%" "%%TO_STAGE_DIR_ROOT%%" %%XCOPY_FILE_FLAGS%% || exit /b 127
 
 goto FROM_FILE_LOOP
 
@@ -85,10 +85,6 @@ goto FROM_FILE_LOOP
 
 if %MSG_PRINTED% NEQ 0 echo.
 
-exit /b 0
-
-:XCOPY_FILE
-call "%%CONTOOLS_ROOT%%/xcopy_file.bat" %%* || goto :EOF
 exit /b 0
 
 :FILE_PATH

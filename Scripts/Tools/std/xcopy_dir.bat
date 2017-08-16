@@ -3,48 +3,95 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   The xcopy.exe/robocopy.exe seemless wrapper script with xcopy compatible
-rem   command line flags/excludes, echo and some conditions check before call
-rem   to copy a directory to a directory.
+rem   The `xcopy.exe`/`robocopy.exe` seemless wrapper script with xcopy
+rem   compatible command line flags/excludes, echo and some conditions check
+rem   before call to copy a directory to a directory.
 
 rem CAUTION:
-rem   xcopy.exe has a file path limit up to 260 characters in a path. To bypass
-rem   that limitation we have to use robocopy.exe instead
+rem   `xcopy.exe` has a file path limit up to 260 characters in a path. To
+rem   bypass that limitation we have to use `robocopy.exe` instead
 rem   (Windows Vista and higher ONLY).
 rem
-rem   robocopy.exe will copy hidden and archive files by default.
+rem   `robocopy.exe` will copy hidden and archive files by default.
 
 setlocal
 
 set "FROM_PATH=%~1"
 set "TO_PATH=%~2"
 
-if defined FROM_PATH set "FROM_PATH=%FROM_PATH:/=\%"
-if defined TO_PATH set "TO_PATH=%TO_PATH:/=\%"
-
-if defined FROM_PATH ^
-if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
-
-(
-  echo.%~nx0: error: input directory is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+if not defined FROM_PATH (
+  echo.%~nx0: error: input durectory path argument must be defined.
   exit /b -255
+) >&2
+
+if not defined TO_PATH (
+  echo.%~nx0: error: output durectory path argument must be defined.
+  exit /b -254
+) >&2
+
+set "FROM_PATH=%FROM_PATH:/=\%"
+set "TO_PATH=%TO_PATH:/=\%"
+
+rem check on missed components...
+
+rem ...forwarding `\` character
+if "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_ERROR
+
+rem ...double `\\` character
+if not "%FROM_PATH%" == "%FROM_PATH:\\=\%" goto FROM_PATH_ERROR
+
+rem ...trailing `\` character
+if "\" == "%FROM_PATH:~-1%" goto FROM_PATH_ERROR
+
+rem check on invalid characters in path
+if not "%FROM_PATH%" == "%FROM_PATH:**=%" goto FROM_PATH_ERROR
+if not "%FROM_PATH%" == "%FROM_PATH:?=%" goto FROM_PATH_ERROR
+
+goto FROM_PATH_OK
+
+:FROM_PATH_ERROR
+(
+  echo.%~nx0: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+  exit /b -253
 ) >&2
 
 :FROM_PATH_OK
 
-if defined TO_PATH ^
-if not "\" == "%TO_PATH:~0,1%" goto TO_PATH_OK
+rem check on missed components...
 
+rem ...forwarding `\` character
+if "\" == "%TO_PATH:~0,1%" goto TO_PATH_ERROR
+
+rem ...double `\\` character
+if not "%TO_PATH%" == "%TO_PATH:\\=\%" goto TO_PATH_ERROR
+
+rem ...trailing `\` character
+if "\" == "%TO_PATH:~-1%" goto TO_PATH_ERROR
+
+rem check on invalid characters in path
+if not "%TO_PATH%" == "%TO_PATH:**=%" goto TO_PATH_ERROR
+if not "%TO_PATH%" == "%TO_PATH:?=%" goto TO_PATH_ERROR
+
+if "\" == "%TO_PATH:~0,1%" goto TO_PATH_ERROR
+
+goto TO_PATH_OK
+
+:TO_PATH_ERROR
 (
-  echo.%~nx0: error: output directory is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
-  exit /b -254
+  echo.%~nx0: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+  exit /b -252
 ) >&2
 
 :TO_PATH_OK
 
+if not exist "%FROM_PATH%\" (
+  echo.%~nx0: error: input directory does not exist: "%FROM_PATH%\"
+  exit /b -251
+) >&2
+
 if not exist "%TO_PATH%\" (
   echo.%~nx0: error: output directory does not exist: "%TO_PATH%\"
-  exit /b -253
+  exit /b -250
 ) >&2
 
 set "FROM_PATH=%~dpf1"

@@ -3,16 +3,17 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   The xcopy.exe/robocopy.exe seemless wrapper script with xcopy compatible
-rem   command line flags/excludes, echo and some conditions check before call
-rem   to copy a file to a path.
+rem   The `xcopy.exe`/`robocopy.exe` seemless wrapper script with xcopy
+rem   compatible command line flags/excludes, echo and some conditions check
+rem   before call to copy a file or file pattern in a directory to another
+rem   directory.
 
 rem CAUTION:
-rem   xcopy.exe has a file path limit up to 260 characters in a path. To bypass
-rem   that limitation we have to use robocopy.exe instead
+rem   `xcopy.exe` has a file path limit up to 260 characters in a path. To
+rem   bypass that limitation we have to use `robocopy.exe` instead
 rem   (Windows Vista and higher ONLY).
 rem
-rem   robocopy.exe will copy hidden and archive files by default.
+rem   `robocopy.exe` will copy hidden and archive files by default.
 
 setlocal
 
@@ -20,44 +21,100 @@ set "FROM_PATH=%~1"
 set "FROM_FILE=%~2"
 set "TO_PATH=%~3"
 
-if defined FROM_PATH set "FROM_PATH=%FROM_PATH:/=\%"
-if defined FROM_FILE set "FROM_FILE=%FROM_FILE:/=\%"
-if defined TO_PATH set "TO_PATH=%TO_PATH:/=\%"
-
-if defined FROM_PATH ^
-if not "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_OK
-
-(
-  echo.%~nx0: error: input directory is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+if not defined FROM_PATH (
+  echo.%~nx0: error: input directory path argument must be defined.
   exit /b -255
+) >&2
+
+if not defined FROM_FILE (
+  echo.%~nx0: error: input files argument must be defined.
+  exit /b -254
+) >&2
+
+if not defined TO_PATH (
+  echo.%~nx0: error: output directory path argument must be defined.
+  exit /b -253
+) >&2
+
+set "FROM_PATH=%FROM_PATH:/=\%"
+set "FROM_FILE=%FROM_FILE:/=\%"
+set "TO_PATH=%TO_PATH:/=\%"
+
+rem check on missed components...
+
+rem ...forwarding `\` character
+if "\" == "%FROM_PATH:~0,1%" goto FROM_PATH_ERROR
+
+rem ...double `\\` character
+if not "%FROM_PATH%" == "%FROM_PATH:\\=\%" goto FROM_PATH_ERROR
+
+rem ...trailing `\` character
+if "\" == "%FROM_PATH:~-1%" goto FROM_PATH_ERROR
+
+rem check on invalid characters in path
+if not "%FROM_PATH%" == "%FROM_PATH:**=%" goto FROM_PATH_ERROR
+if not "%FROM_PATH%" == "%FROM_PATH:?=%" goto FROM_PATH_ERROR
+
+goto FROM_PATH_OK
+
+:FROM_PATH_ERROR
+(
+  echo.%~nx0: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  exit /b -252
 ) >&2
 
 :FROM_PATH_OK
 
-if defined FROM_FILE ^
-if "%FROM_FILE%" == "%FROM_FILE:\=%" goto FROM_FILE_OK
+rem check on missed components...
 
+rem check on invalid characters in file pattern
+if not "%FROM_FILE%" == "%FROM_FILE:\=%" goto FROM_FILE_ERROR
+
+goto FROM_FILE_OK
+
+:FROM_FILE_ERROR
 (
-  echo.%~nx0: error: input file name is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
-  exit /b -254
+  echo.%~nx0: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  exit /b -251
 ) >&2
 
 :FROM_FILE_OK
 
-if defined TO_PATH ^
-if not "\" == "%TO_PATH:~0,1%" goto TO_PATH_OK
+rem check on missed components...
 
+rem ...forwarding `\` character
+if "\" == "%TO_PATH:~0,1%" goto TO_PATH_ERROR
+
+rem ...double `\\` character
+if not "%TO_PATH%" == "%TO_PATH:\\=\%" goto TO_PATH_ERROR
+
+rem ...trailing `\` character
+if "\" == "%TO_PATH:~-1%" goto TO_PATH_ERROR
+
+rem check on invalid characters in path
+if not "%TO_PATH%" == "%TO_PATH:**=%" goto TO_PATH_ERROR
+if not "%TO_PATH%" == "%TO_PATH:?=%" goto TO_PATH_ERROR
+
+if "\" == "%TO_PATH:~0,1%" goto TO_PATH_ERROR
+
+goto TO_PATH_OK
+
+:TO_PATH_ERROR
 (
-  echo.%~nx0: error: output directory is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
-  exit /b -253
+  echo.%~nx0: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  exit /b -250
 ) >&2
-
 
 :TO_PATH_OK
 
+if not exist "%FROM_PATH%\" (
+  echo.%~nx0: error: input directory does not exist: "%FROM_PATH%\"
+  exit /b -249
+) >&2
+
 if not exist "%TO_PATH%\" (
   echo.%~nx0: error: output directory does not exist: "%TO_PATH%\"
-  exit /b -252
+  exit /b -248
 ) >&2
 
 set "FROM_PATH_ABS=%~dpf1"
