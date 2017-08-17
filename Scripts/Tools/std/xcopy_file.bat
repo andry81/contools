@@ -15,6 +15,8 @@ rem   (Windows Vista and higher ONLY).
 rem
 rem   `robocopy.exe` will copy hidden and archive files by default.
 
+echo.^>%~nx0 %*
+
 setlocal
 
 set "FROM_PATH=%~1"
@@ -139,7 +141,6 @@ if %ERRORLEVEL% EQU 0 (
   )
 )
 
-echo.^>xcopy.exe "%FROM_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 rem echo.F will only work if locale is in english !!!
 echo.F|xcopy.exe "%FROM_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 
@@ -194,7 +195,7 @@ exit /b 0
 if "%FROM_PATH_ABS:~-1%" == "\" set "FROM_PATH_ABS=%FROM_PATH_ABS%\"
 if "%TO_PATH_ABS:~-1%" == "\" set "TO_PATH_ABS=%TO_PATH_ABS%\"
 
-echo.^>robocopy.exe "%FROM_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /NP /TEE /NJH /NS /NC /XX %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
+echo.^>^>robocopy.exe "%FROM_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /NP /TEE /NJH /NS /NC /XX %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
 robocopy.exe "%FROM_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /NP /TEE /NJH /NS /NC /XX %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b

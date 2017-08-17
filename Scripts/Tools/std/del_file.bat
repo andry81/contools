@@ -6,6 +6,8 @@ rem Description:
 rem   The `del` wrapper script with echo and some conditions check before
 rem   call.
 
+echo.^>%~nx0 %*
+
 setlocal
 
 set "FROM_PATH=%~1"
@@ -52,5 +54,4 @@ if not exist "%FROM_PATH%" (
 
 set "FROM_PATH=%~dpf1"
 
-echo.^>del %2 %3 %4 %5 %6 %7 %8 %9 "%FROM_PATH%"
 del %2 %3 %4 %5 %6 %7 %8 %9 "%FROM_PATH%"

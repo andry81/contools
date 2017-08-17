@@ -6,6 +6,8 @@ rem Description:
 rem   The `copy` wrapper script with echo and some conditions check before
 rem   call.
 
+echo.^>%~nx0 %*
+
 setlocal
 
 set "FROM_PATH=%~1"
@@ -81,13 +83,7 @@ if not exist "%FROM_PATH%" (
   exit /b -251
 ) >&2
 
-if not exist "%TO_PATH%\" (
-  echo.%~nx0: error: output directory does not exist: "%TO_PATH%\"
-  exit /b -250
-) >&2
-
 set "FROM_PATH=%~dpf1"
 set "TO_PATH=%~dpf2"
 
-echo.^>copy %3 %4 %5 %6 %7 %8 %9 "%FROM_PATH%" "%TO_PATH%"
 copy %3 %4 %5 %6 %7 %8 %9 "%FROM_PATH%" "%TO_PATH%"
