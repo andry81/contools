@@ -7,6 +7,8 @@ rem   The `del` wrapper script with echo and some conditions check before
 rem   call. Can remove a file by extended and separated patterns:
 rem     dir+file+extention.
 
+echo.^>%~nx0 %*
+
 setlocal
 
 set "FILE_DIR=%~1"
@@ -64,8 +66,8 @@ goto :EOF
 call :GET_FILE_EXT "%%FILE_PATH%%"
 if defined FILE_EXT_PTTN if "%FILE_EXT_PTTN:~-1%" == "." if not "%FILE_EXT%" == "%FILE_EXT_PTTN:~0,-1%" goto :EOF
 
-echo.^>del %4 %5 %6 %7 %8 %9 "%FILE_PATH%"
 del %4 %5 %6 %7 %8 %9 "%FILE_PATH%"
+
 goto :EOF
 
 :GET_FILE_EXT
