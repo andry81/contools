@@ -383,6 +383,8 @@ Scripts/Tools/build/project_builders/nsis_publish.bat -text
 Scripts/Tools/build/project_builders/print_cmake_build_vars.bat -text
 Scripts/Tools/build/project_builders/print_nsis_build_vars.bat -text
 Scripts/Tools/build/project_builders/project_directory_build.bat -text
+Scripts/Tools/build/project_builders/project_directory_post_build.bat -text
+Scripts/Tools/build/project_builders/project_directory_pre_build.bat -text
 Scripts/Tools/build/project_builders/project_directory_pre_validate_vars.bat -text
 Scripts/Tools/build/project_tools/scm/svn/gen_svn_branch_workingset.bat -text
 Scripts/Tools/build/set_project_build_time.bat -text

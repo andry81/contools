@@ -34,8 +34,8 @@ if defined UPSTREAM.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR if exist "%UPSTREAM.PRO
   call "%%CONTOOLS_ROOT%%/setvarsfromfile.bat" "%%UPSTREAM.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%/post_build.vars" "" STAGE_IN. || exit /b 10
 )
 
-rem load build generated variables
-call "%%CONTOOLS_ROOT%%/setvarsfromfile.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%/build.vars" "" || exit /b 11
+rem rem load build generated variables
+rem call "%%CONTOOLS_ROOT%%/setvarsfromfile.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%/build.vars" "" || exit /b 11
 
 call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 12
 
@@ -65,9 +65,14 @@ rmdir /S /Q "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" > nul
 
 echo.
 
+rem read parent product version
+if exist "%BUILD_SCRIPTS_ROOT%/read_parent_product_ver.bat" (
+  call "%%BUILD_SCRIPTS_ROOT%%/read_parent_product_ver.bat" || exit /b 20
+)
+
 rem read product version
 if exist "%BUILD_SCRIPTS_ROOT%/read_product_ver.bat" (
-  call "%%BUILD_SCRIPTS_ROOT%%/read_product_ver.bat" || exit /b 30
+  call "%%BUILD_SCRIPTS_ROOT%%/read_product_ver.bat" || exit /b 21
 )
 
 echo.
@@ -82,19 +87,19 @@ call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_from_stagein_all_dirs.bat" "../.." ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" ^
-  "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 31
+  "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 30
 
 call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stageout_all_dirs.bat" "stage" "../.." ^
-  "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%" "%%PROJECT_ROOT%%\_scripts\stage_bin_excludes.lst" ^
+  "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%" "%%BUILD_CONFIG_ROOT%%\stage_bin_excludes.lst" ^
   "%%PROJECT_STAGE_BUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
   "%%PROJECT_STAGE_BUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
   "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" ^
-  "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 32
+  "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 31
 
 rem saving data for next build step into stage directory
 echo.Exporting build variables into stage...
 if not exist "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%"
-call "%%BUILD_TOOLS_ROOT%%/export_build_vars.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%\post_build.vars" || exit /b 33
+call "%%BUILD_TOOLS_ROOT%%/export_build_vars.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%\post_build.vars" || exit /b 32
 echo.
 
 if defined PROJECT_LOCK_TOKEN (
