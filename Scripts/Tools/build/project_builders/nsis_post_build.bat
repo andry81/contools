@@ -77,6 +77,12 @@ if exist "%BUILD_SCRIPTS_ROOT%/read_product_ver.bat" (
 
 echo.
 
+rem user post build
+if exist "%BUILD_SCRIPTS_ROOT%/post_build.user.bat" (
+  call "%%BUILD_SCRIPTS_ROOT%%/post_build.user.bat" || exit /b 22
+  echo.
+)
+
 call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_from_stagein_all_dirs.bat" "../.." ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
