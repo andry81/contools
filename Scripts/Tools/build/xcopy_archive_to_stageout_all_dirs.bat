@@ -9,8 +9,7 @@ rem   a project build pipeline) into a stage of calling project.
 rem   The copy performs file filtering and archiving by pattern.
 
 rem Examples:
-rem 1. call xcopy_archive_to_stageout_all_dirs.bat ^
-rem    "stage" "../.." ^
+rem 1. call xcopy_archive_to_stageout_all_dirs.bat "stage" "../.." ^
 rem    "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%" "%%PROJECT_ROOT%%\_scripts\stage_bin_excludes.lst" ^
 rem    "%%PROJECT_STAGE_BUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
 rem    "%%PROJECT_STAGE_BUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
