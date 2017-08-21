@@ -31,12 +31,27 @@ rem
 
 setlocal
 
+rem must be assigned not under 65000 codepage!
+if defined CURRENT_CP ^
+if "%CURRENT_CP%" == "65000" (
+  chcp 866 >nul
+)
+
+rem workaround for the plus sign control character under the unicode codepage
+set "?5=+"
+
+rem restore back
+if defined CURRENT_CP ^
+if "%CURRENT_CP%" == "65000" (
+  chcp 65000 >nul
+)
+
 set LASTERROR=0
 set INTERRORLEVEL=0
 set "TEST_DATA_REF_FILE="
 
-set /A TESTLIB__CURRENT_TESTS+=1
-set /A TESTLIB__OVERALL_TESTS+=1
+set /A TESTLIB__CURRENT_TESTS%?5%=1
+set /A TESTLIB__OVERALL_TESTS%?5%=1
 
 if %TESTLIB__TEST_SETUP%0 EQU 0 (
   set TESTLIB__TEST_DO_TEARDOWN=1
@@ -66,9 +81,10 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.impl%TEST_SCRIPT_FI
   ) && (
     if exist "%TEST_SCRIPT_HANDLERS_DIR%/impl%TEST_SCRIPT_FILE_EXT%" ( type nul>nul ) else type 2>nul
   ) && (
-    call "%%TEST_SCRIPT_HANDLERS_DIR%%/impl%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+    ( call "%%TEST_SCRIPT_HANDLERS_DIR%%/impl%%TEST_SCRIPT_FILE_EXT%%" ) || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
   )
 ) || (
+  echo xxx
   echo.%?~nx0%: error: test script implementation is not found: "%TEST_SCRIPT_FILE_NAME%".
   set "LASTERROR=-255"
 ) >&2
@@ -87,8 +103,8 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.exit%TEST_SCRIPT_FI
 
 :TEST_REPORT
 if %LASTERROR% EQU 0 (
-  set /A TESTLIB__CURRENT_PASSED_TESTS+=1
-  set /A TESTLIB__OVERALL_PASSED_TESTS+=1
+  set /A TESTLIB__CURRENT_PASSED_TESTS%?5%=1
+  set /A TESTLIB__OVERALL_PASSED_TESTS%?5%=1
 )
 
 rem call user report script
@@ -131,16 +147,57 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.setup%TEST_SCRIPT_F
 exit /b 0
 
 :TEST_END
+set "TESTLIB__EXEC_ON_ENDLOCAL="
+
+if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars" (
+  for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars") do (
+    set "__VAR_NAME=%%i"
+    call :SET_EXEC_ON_ENDLOCAL
+  )
+) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars" (
+  for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars") do (
+    set "__VAR_NAME=%%i"
+    call :SET_EXEC_ON_ENDLOCAL
+  )
+) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
+  if exist "%TEST_SCRIPT_HANDLERS_DIR%/return.vars" (
+    for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/return.vars") do (
+      set "__VAR_NAME=%%i"
+      call :SET_EXEC_ON_ENDLOCAL
+    )
+  )
+)
+
+goto EXIT
+
+:SET_EXEC_ON_ENDLOCAL
+if defined TESTLIB__EXEC_ON_ENDLOCAL (
+  setlocal ENABLEDELAYEDEXPANSION
+  for /F "eol=	 tokens=* delims=" %%i in ("!TESTLIB__EXEC_ON_ENDLOCAL!") do (
+    endlocal
+    call set TESTLIB__EXEC_ON_ENDLOCAL=%%i {{AND}} set "%%__VAR_NAME%%=%%%__VAR_NAME%%%"
+  )
+) else call set TESTLIB__EXEC_ON_ENDLOCAL=set "%%__VAR_NAME%%=%%%__VAR_NAME%%%"
+
+exit /b 0
+
+:EXIT
+set TESTLIB__EXEC_ON_ENDLOCAL=%TESTLIB__EXEC_ON_ENDLOCAL:{{AND}}=^&%
+
 rem Drop internal variables but use some changed value(s) for the return
 (
   endlocal
-  set LASTERROR=%LASTERROR%
-  set TESTLIB__OVERALL_PASSED_TESTS=%TESTLIB__OVERALL_PASSED_TESTS%
-  set TESTLIB__OVERALL_TESTS=%TESTLIB__OVERALL_TESTS%
-  set TESTLIB__CURRENT_PASSED_TESTS=%TESTLIB__CURRENT_PASSED_TESTS%
-  set TESTLIB__CURRENT_TESTS=%TESTLIB__CURRENT_TESTS%
-  set TESTLIB__TEST_SETUP=%TESTLIB__TEST_SETUP%
-  set TESTLIB__TEST_DO_TEARDOWN=%TESTLIB__TEST_DO_TEARDOWN%
+
+  set "LASTERROR=%LASTERROR%"
+  set "TESTLIB__OVERALL_PASSED_TESTS=%TESTLIB__OVERALL_PASSED_TESTS%"
+  set "TESTLIB__OVERALL_TESTS=%TESTLIB__OVERALL_TESTS%"
+  set "TESTLIB__CURRENT_PASSED_TESTS=%TESTLIB__CURRENT_PASSED_TESTS%"
+  set "TESTLIB__CURRENT_TESTS=%TESTLIB__CURRENT_TESTS%"
+  set "TESTLIB__TEST_SETUP=%TESTLIB__TEST_SETUP%"
+  set "TESTLIB__TEST_DO_TEARDOWN=%TESTLIB__TEST_DO_TEARDOWN%"
+
+  rem return user declared variables
+  %TESTLIB__EXEC_ON_ENDLOCAL%
 )
 
 exit /b %LASTERROR%
