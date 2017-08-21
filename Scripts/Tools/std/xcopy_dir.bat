@@ -22,12 +22,12 @@ set "FROM_PATH=%~1"
 set "TO_PATH=%~2"
 
 if not defined FROM_PATH (
-  echo.%~nx0: error: input durectory path argument must be defined.
+  echo.%~nx0: error: input directory path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined TO_PATH (
-  echo.%~nx0: error: output durectory path argument must be defined.
+  echo.%~nx0: error: output directory path argument must be defined.
   exit /b -254
 ) >&2
 
