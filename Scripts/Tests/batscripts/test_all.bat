@@ -14,7 +14,9 @@ call "%%TESTS_ROOT%%/test_cstresc.bat"
 call "%%TESTS_ROOT%%/test_extract_version.bat"
 rem call "%%TESTS_ROOT%%/test_setvarsfromfile.bat"
 
-call "%%TESTS_ROOT%%/test_std_allocate_temp_dir.bat"
+call "%%TESTS_ROOT%%/test_std__allocate_temp_dir.bat"
+call "%%TESTS_ROOT%%/test_std__chcp.bat"
+
 call "%%TESTS_ROOT%%/test_xml_sed.bat"
 call "%%TESTS_ROOT%%/test_xml__filter_xpath_list_by_xpath_list.bat"
 

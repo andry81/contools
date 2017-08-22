@@ -134,13 +134,13 @@ Scripts/Tests/batscripts/.test_cstresc/impl.bat -text
 Scripts/Tests/batscripts/.test_cstresc/init.bat -text
 Scripts/Tests/batscripts/.test_extract_version/impl.bat -text
 Scripts/Tests/batscripts/.test_extract_version/init.bat -text
+Scripts/Tests/batscripts/.test_std__allocate_temp_dir/exit.bat -text
+Scripts/Tests/batscripts/.test_std__allocate_temp_dir/impl.bat -text
+Scripts/Tests/batscripts/.test_std__allocate_temp_dir/init.bat -text
+Scripts/Tests/batscripts/.test_std__allocate_temp_dir/report.bat -text
 Scripts/Tests/batscripts/.test_std__chcp/impl.bat -text
 Scripts/Tests/batscripts/.test_std__chcp/init.bat -text
 Scripts/Tests/batscripts/.test_std__chcp/return.vars -text
-Scripts/Tests/batscripts/.test_std_allocate_temp_dir/exit.bat -text
-Scripts/Tests/batscripts/.test_std_allocate_temp_dir/impl.bat -text
-Scripts/Tests/batscripts/.test_std_allocate_temp_dir/init.bat -text
-Scripts/Tests/batscripts/.test_std_allocate_temp_dir/report.bat -text
 Scripts/Tests/batscripts/.test_strchr/impl.bat -text
 Scripts/Tests/batscripts/.test_strchr/init.bat -text
 Scripts/Tests/batscripts/.test_stresc/impl.bat -text
@@ -207,8 +207,8 @@ Scripts/Tests/batscripts/test_cstresc.bat -text
 Scripts/Tests/batscripts/test_envblock_size.bat -text
 Scripts/Tests/batscripts/test_extract_version.bat -text
 Scripts/Tests/batscripts/test_setvarsfromfile.bat -text
+Scripts/Tests/batscripts/test_std__allocate_temp_dir.bat -text
 Scripts/Tests/batscripts/test_std__chcp.bat -text
-Scripts/Tests/batscripts/test_std_allocate_temp_dir.bat -text
 Scripts/Tests/batscripts/test_strchr.bat -text
 Scripts/Tests/batscripts/test_stresc.bat -text
 Scripts/Tests/batscripts/test_strlen.bat -text
