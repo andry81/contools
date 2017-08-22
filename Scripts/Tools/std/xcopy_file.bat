@@ -29,7 +29,7 @@ if not defined FROM_PATH (
 ) >&2
 
 if not defined FROM_FILE (
-  echo.%~nx0: error: input files argument must be defined.
+  echo.%~nx0: error: input file argument must be defined.
   exit /b -254
 ) >&2
 
