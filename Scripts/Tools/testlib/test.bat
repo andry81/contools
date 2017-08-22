@@ -182,7 +182,7 @@ if defined TESTLIB__EXEC_ON_ENDLOCAL (
 exit /b 0
 
 :EXIT
-set TESTLIB__EXEC_ON_ENDLOCAL=%TESTLIB__EXEC_ON_ENDLOCAL:{{AND}}=^&%
+if defined TESTLIB__EXEC_ON_ENDLOCAL set TESTLIB__EXEC_ON_ENDLOCAL=%TESTLIB__EXEC_ON_ENDLOCAL:{{AND}}=^&%
 
 rem Drop internal variables but use some changed value(s) for the return
 (
