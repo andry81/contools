@@ -286,6 +286,7 @@ Scripts/Tools/ToolAdaptors/lnk/cmd_wow64.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/runas_admin.bat -text
+Scripts/Tools/ToolAdaptors/python/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/python/copy_pycache.bat -text
 Scripts/Tools/ToolAdaptors/python/rebuild_portable_pycache.bat -text
 Scripts/Tools/ToolAdaptors/sh/autoconf.sh -text
