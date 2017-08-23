@@ -18,6 +18,22 @@ rem   4. You have to trace and process all dependent packages which are not
 rem      a part of the `site-packages` directory on your own and call this
 rem      script on them separately but with different last path in a command.
 
+rem CAUTION:
+rem   1. Because all the .pyc files in the destination directory will be
+rem      rebuilded, then you have to make a copy of the destination directory
+rem      (in examples below this is the `site-packages` directory) on yourself
+rem      to avoid any changed in the original directory. To do so just do copy
+rem      the original directory and run the script on the copied one instead of
+rem      on the original.
+rem      This will leave the original directory .pyc files intact after the
+rem      rebuild which is might be important for debugging from installed
+rem      python.
+rem   2. Some modules still can has absolute paths in their .pyc files even
+rem      after the full recompilation.
+rem      For example, the PyInstaller will use them. But because, the
+rem      PyInstaller is not intended to be used as a portable module then it is
+rem      not might be so important.
+
 rem Examples:
 rem   1. call rebuild_portable_pycache.bat "c:\Python36" "c:\Python36\Lib\site-packages"
 rem   2. call rebuild_portable_pycache.bat -exclude_dirs "__pycache__|__pycache__/37" "c:\Python36" "c:\Python36\Lib\site-packages"
