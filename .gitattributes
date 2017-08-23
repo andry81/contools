@@ -274,7 +274,6 @@ Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432_k.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64_k.bat -text
-Scripts/Tools/ToolAdaptors/debug/outofmem.bat -text
 Scripts/Tools/ToolAdaptors/hta/Samples/run_notepad.hta -text
 Scripts/Tools/ToolAdaptors/hta/Samples/view_example.hta -text
 Scripts/Tools/ToolAdaptors/lnk/cmd.lnk -text
