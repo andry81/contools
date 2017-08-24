@@ -442,6 +442,7 @@ Scripts/Tools/encoding/makefile_dos2unix.bat -text
 Scripts/Tools/encoding/makefile_unix2dos.bat -text
 Scripts/Tools/envvarcmp.exe -text
 Scripts/Tools/errlvl.bat -text
+Scripts/Tools/excludes/7zip_msvc_debug_info_files.lst -text
 Scripts/Tools/excludes/7zip_svn_files.lst -text
 Scripts/Tools/excludes/xcopy_msvc_debug_info_files.lst -text
 Scripts/Tools/excludes/xcopy_svn_files.lst -text
