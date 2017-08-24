@@ -57,7 +57,7 @@ if %F_ENABLE_STAGE_OUT_TO_ARCHIVE%0 EQU 0 (
     "%%PROJECT_BIN_ROOT%%" "%%PROJECT_STAGE_BIN_ROOT%%" ^
     "" ^
     "%%PROJECT_STAGE_BIN_ROOT%%/%%PROJECT_NAME%%_bin_%%BUILD_SCM_BRANCH%%_%%PROJECT_TYPE%%_%%APP_TARGET_NAME%%_v%%PRODUCT_VERSION_FILE_SUFFIX%%.bin.7z" ^
-    "" "*.bin.7z" "/S /Y /H" || exit /b 2
+    "" "*.bin.7z" "/S /Y /H" "@%%CONTOOLS_ROOT:/=\%%\excludes\7zip_msvc_debug_info_files.lst" || exit /b 2
 )
 
 :BIN_STAGE_END

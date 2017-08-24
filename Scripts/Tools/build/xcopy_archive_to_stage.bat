@@ -12,7 +12,7 @@ rem 1. call xcopy_archive_to_stage.bat "stage-in project debug information" "sta
 rem    "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" ^
 rem    "%%ARCHIVE_COPY_FROM_OFFSET%%" ^
 rem    "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%/%%STAGE_IN.PROJECT_NAME%%_pdb_%%STAGE_IN.BUILD_SCM_BRANCH%%_%%STAGE_IN.PROJECT_TYPE%%_%%STAGE_IN.APP_TARGET_NAME%%_v%%STAGE_IN.PRODUCT_VERSION_FILE_SUFFIX%%.pdb.7z" ^
-rem    "*.pdb:*.ilk:*.map" "*.pdb.7z" "/S /Y /H" || goto :EOF
+rem    "*.pdb:*.ilk:*.map" "*.pdb.7z" "/S /Y /H" "@archive_exclude_file_list.lst|*.lib|*.exp" || goto :EOF
 
 setlocal
 
@@ -29,6 +29,8 @@ set "ARCHIVE_FILE_PATH=%~6"
 set "ARCHIVE_FILE_LIST=%~7"
 set "COPY_FILE_LIST=%~8"
 set "XCOPY_FILE_FLAGS=%~9"
+shift
+set "ARCHIVE_EXCLUDE_FILE_LIST=%~9"
 
 rem Drop last error level
 type nul>nul
@@ -125,6 +127,28 @@ goto CONVERT_ARCHIVE_FILE_LIST_TO_PATH_LIST
 
 :CONVERT_ARCHIVE_FILE_LIST_TO_PATH_LIST_END
 
+set "ARCHIVE_7ZIP_SWITCHES="
+set FROM_FILE_INDEX=1
+
+if not defined ARCHIVE_EXCLUDE_FILE_LIST goto CONVERT_ARCHIVE_EXCLUDE_FILE_LIST_TO_7ZIP_COMMAND_LINE_END
+
+:CONVERT_ARCHIVE_EXCLUDE_FILE_LIST_TO_7ZIP_COMMAND_LINE
+set "FROM_FILE="
+for /F "eol=# tokens=%FROM_FILE_INDEX% delims=|" %%i in ("%ARCHIVE_EXCLUDE_FILE_LIST%") do set "FROM_FILE=%%i"
+if not defined FROM_FILE goto CONVERT_ARCHIVE_EXCLUDE_FILE_LIST_TO_7ZIP_COMMAND_LINE_END
+
+set /A FROM_FILE_INDEX+=1
+
+if "%FROM_FILE:~0,1%" == "@" (
+  set ARCHIVE_7ZIP_SWITCHES=%ARCHIVE_7ZIP_SWITCHES% -xr@"%FROM_FILE:~1%"
+) else (
+  set ARCHIVE_7ZIP_SWITCHES=%ARCHIVE_7ZIP_SWITCHES% -xr!"%FROM_FILE%"
+)
+
+goto CONVERT_ARCHIVE_EXCLUDE_FILE_LIST_TO_7ZIP_COMMAND_LINE
+
+:CONVERT_ARCHIVE_EXCLUDE_FILE_LIST_TO_7ZIP_COMMAND_LINE_END
+
 :ARCHIVE_STAGE
 call "%%CONTOOLS_ROOT%%/has_dir_files.bat" /S %%ARCHIVE_STAGE_FILE_PATH_LIST%% || goto COPY_STAGE
 
@@ -142,9 +166,9 @@ if not defined TO_FILE goto ARCHIVE_FILE_LIST_END
 set /A FROM_FILE_INDEX+=1
 
 if defined ARCHIVE_DIR_PREFIX_PATH (
-  call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%ARCHIVE_DIR_PREFIX_PATH%%/%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%" || ( set LASTERROR=11 & goto EXIT )
+  call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%ARCHIVE_DIR_PREFIX_PATH%%/%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_SWITCHES%% || ( set LASTERROR=11 & goto EXIT )
 ) else (
-  call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%" || ( set LASTERROR=12 & goto EXIT )
+  call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_SWITCHES%% || ( set LASTERROR=12 & goto EXIT )
 )
 
 goto ARCHIVE_FILE_LIST
