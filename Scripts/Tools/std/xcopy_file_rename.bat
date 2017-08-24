@@ -127,7 +127,7 @@ goto TO_FILE_OK
   exit /b -247
 ) >&2
 
-:FROM_FILE_OK
+:TO_FILE_OK
 
 if not exist "%FROM_PATH%\" (
   echo.%~nx0: error: input directory does not exist: "%FROM_PATH%\"
@@ -145,8 +145,8 @@ set "TO_ROOT=%~dpf2"
 call "%%~dp0__init__.bat" || goto :EOF
 
 if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
-  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || goto :EOF ) && ^
-  if /i not "%FROM_FILE%" == "%TO_FILE%" (
+  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || goto :EOF ) && if /i not ^
+      "%FROM_FILE%" == "%TO_FILE%" (
     (
       call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || goto :EOF
     ) && (
