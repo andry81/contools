@@ -1,26 +1,26 @@
 * README_EN.txt
-* 2017.06.28
+* 2017.08.25
 * ConsoleTools
 
 WARNING:
   THIS DOCUMENTATION IS OBSOLETE.
-  A new version of console utilities is always UNDER DEVELOPMENT.
-  Use the SVN access to find out new scripts and features:
-    https://svn.code.sf.net/p/contools/contools/trunk
+  A new version of console utilities is always UNDER DEVELOPMENT,
+  see the DESCRIPTION section.
 
 1. DESCRIPTION
 2. LICENSE
-3. INSTALLATION
-4. FILES
-4.1. Backend registration scripts
-4.2. Windows Batch scripts
-4.3. Windows Scripting Host scripts
-4.4. Perl scripts
-4.5. Bash shell scripts
-4.6. Windows executable utilities
-5. KNOWN ISSUES
-5.1. Error message `reg_cygwin.bat: error: (1) Failed to run cygcheck utility to detect cygwin dll version.'
-6. AUTHOR EMAIL
+3. REPOSITORIES
+4. INSTALLATION
+5. FILES
+5.1. Backend registration scripts
+5.2. Windows Batch scripts
+5.3. Windows Scripting Host scripts
+5.4. Perl scripts
+5.5. Bash shell scripts
+5.6. Windows executable utilities
+6. KNOWN ISSUES
+6.1. Error message `reg_cygwin.bat: error: (1) Failed to run cygcheck utility to detect cygwin dll version.'
+7. AUTHOR EMAIL
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -29,6 +29,12 @@ Scripts for WindowsNT interpreter cmd.exe and other interpreters to support
 various operations and procedures with environment variables, text files and
 piping.
 
+The latest version is here: sf.net/p/contools
+
+WARNING:
+  Use the SVN access to find out new functionality and bug fixes:
+    https://svn.code.sf.net/p/contools/contools/trunk
+
 -------------------------------------------------------------------------------
 2. LICENSE
 -------------------------------------------------------------------------------
@@ -36,7 +42,17 @@ The MIT license (see included text file "license.txt" or
 https://en.wikipedia.org/wiki/MIT_License)
 
 -------------------------------------------------------------------------------
-3. INSTALLATION
+3. REPOSITORIES
+-------------------------------------------------------------------------------
+Primary:
+  * https://svn.code.sf.net/p/contools/contools/trunk
+First mirror:
+  * https://github.com/andry81/contools.git
+Second mirror:
+  * https://bitbucket.org/andry81/contools.git
+
+-------------------------------------------------------------------------------
+4. INSTALLATION
 -------------------------------------------------------------------------------
 run configure.bat
 
@@ -45,11 +61,11 @@ Studio C++ 2015 Community Edition. The utilities does not require an installed
 Microsoft Visual C++ 2015 Redistributables at runtime.
 
 -------------------------------------------------------------------------------
-4. FILES
+5. FILES
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-4.1. Backend registration scripts
+5.1. Backend registration scripts
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -111,7 +127,7 @@ Msys parameters reads from "msysdvlpr.vars".
 Script runs run_msysdvlpr.bat under UAC promotion.
 
 -------------------------------------------------------------------------------
-4.2. Windows Batch scripts
+5.2. Windows Batch scripts
 -------------------------------------------------------------------------------
 
 !!!
@@ -731,7 +747,7 @@ Creating a shortcut in the "%SYSTEMROOT%" directory under Windows XP avoids
 parasite path prefixes in the output shortcut file.
 
 -------------------------------------------------------------------------------
-4.3. Windows Scripting Host scripts
+5.3. Windows Scripting Host scripts
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -763,7 +779,7 @@ directory.
 Assign new command line to the existing Windows shortcut file.
 
 -------------------------------------------------------------------------------
-4.4. Perl scripts
+5.4. Perl scripts
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -825,7 +841,7 @@ predefined text with regexp variables (\0, \1, ..., \254, \255) and prints
 result dependent on options.
 
 -------------------------------------------------------------------------------
-4.5. Bash shell scripts
+5.5. Bash shell scripts
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -1006,7 +1022,7 @@ Examples:
    UnmountDir /mingw
 
 -------------------------------------------------------------------------------
-4.6. Windows executable utilities
+5.6. Windows executable utilities
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -1083,11 +1099,11 @@ Examples:
    } 7>&2
 
 -------------------------------------------------------------------------------
-5. KNOWN ISSUES
+6. KNOWN ISSUES
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-5.1. Error message `reg_cygwin.bat: error: (1) Failed to run cygcheck utility to detect cygwin dll version.'
+6.1. Error message `reg_cygwin.bat: error: (1) Failed to run cygcheck utility to detect cygwin dll version.'
 -------------------------------------------------------------------------------
 Solution:
  1. Reintall cygwin referenced by the path from CYGWIN_PATH variable in the
@@ -1097,6 +1113,6 @@ Solution:
     (x86) HKEY_LOCAL_MACHINE\SOFTWARE\Cygnus Solutions\Cygwin\mounts v2\/
 
 -------------------------------------------------------------------------------
-6. AUTHOR EMAIL
+7. AUTHOR EMAIL
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)
