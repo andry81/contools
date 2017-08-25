@@ -18,16 +18,18 @@ echo.^>%~nx0 %*
 
 setlocal
 
+set "?~n0=%~nx0"
+
 set "FROM_PATH=%~1"
 set "TO_PATH=%~2"
 
 if not defined FROM_PATH (
-  echo.%~nx0: error: input directory path argument must be defined.
+  echo.%?~n0%: error: input directory path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined TO_PATH (
-  echo.%~nx0: error: output directory path argument must be defined.
+  echo.%?~n0%: error: output directory path argument must be defined.
   exit /b -254
 ) >&2
 
@@ -53,7 +55,7 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%~nx0: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+  echo.%?~n0%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
   exit /b -253
 ) >&2
 
@@ -80,21 +82,23 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%~nx0: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+  echo.%?~n0%: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
   exit /b -252
 ) >&2
 
 :TO_PATH_OK
 
 if not exist "%FROM_PATH%\" (
-  echo.%~nx0: error: input directory does not exist: "%FROM_PATH%\"
+  echo.%?~n0%: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -251
 ) >&2
 
 if not exist "%TO_PATH%\" (
-  echo.%~nx0: error: output directory does not exist: "%TO_PATH%\"
+  echo.%?~n0%: error: output directory does not exist: "%TO_PATH%\"
   exit /b -250
 ) >&2
+
+call "%%~dp0__init__.bat" || goto :EOF
 
 set "FROM_PATH=%~dpf1"
 set "TO_PATH=%~dpf2"
@@ -106,22 +110,29 @@ rem switch code page into english compatible locale
 call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
 
 set "XCOPY_EXCLUDES_CMD="
-call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_DIRS_LIST%%"
-if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%RETURN_VALUE%"
+set "XCOPY_EXCLUDES_LIST_TMP="
 
-call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%"
-if %ERRORLEVEL% EQU 0 (
-  if defined XCOPY_EXCLUDES_CMD (
-    set "XCOPY_EXCLUDES_CMD=%XCOPY_EXCLUDES_CMD%+%RETURN_VALUE%"
-  ) else (
-    set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%RETURN_VALUE%"
-  )
-)
+if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_XCOPY_EXCLUDES
+
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
+set "XCOPY_EXCLUDES_LIST_TMP=%SCRIPT_TEMP_CURRENT_DIR%\$xcopy_excludes.lst"
+
+call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_xcopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" "%%XCOPY_EXCLUDES_LIST_TMP%%" || (
+  echo.%?~n0%: error: xcopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
+  exit /b -247
+) >&2
+if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%"
+
+:IGNORE_XCOPY_EXCLUDES
 
 rem echo.D will only work if locale is in english !!!
 echo.D|xcopy.exe "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
-
 set LASTERROR=%ERRORLEVEL%
+
+if defined XCOPY_EXCLUDES_LIST_TMP (
+  rem cleanup temporary files
+  call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
+)
 
 rem restore code page
 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
@@ -135,42 +146,20 @@ for %%i in (%XCOPY_FLAGS%) do (
   call :XCOPY_FLAGS_CONVERT %%XCOPY_FLAG%%
 )
 
-set "ROBOCOPY_EXCLUDE_DIRS_CMD="
-call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_DIRS_LIST%%"
-if %ERRORLEVEL% EQU 0 for %%i in (%RETURN_VALUE%) do (
-  set XCOPY_EXCLUDE_DIR=%%i
-  call :SET_ROBOCOPY_EXCLUDE_DIRS_CMD %%XCOPY_EXCLUDE_DIR%%
-)
+set "ROBOCOPY_EXCLUDES_CMD="
 
-goto SET_ROBOCOPY_EXCLUDE_DIRS_CMD_END
+if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_ROBOCOPY_EXCLUDES
 
-:SET_ROBOCOPY_EXCLUDE_DIRS_CMD
-set "XCOPY_EXCLUDE_DIR=%~1"
-set ROBOCOPY_EXCLUDE_DIRS_CMD=%ROBOCOPY_EXCLUDE_DIRS_CMD%/XD "%XCOPY_EXCLUDE_DIR%" 
-exit /b 0
+call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_robocopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" || (
+  echo.%?~n0%: error: robocopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
+  exit /b -246
+) >&2
+if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
 
-:SET_ROBOCOPY_EXCLUDE_DIRS_CMD_END
+:IGNORE_ROBOCOPY_EXCLUDES
 
-set "ROBOCOPY_EXCLUDE_FILES_CMD="
-call "%%CONTOOLS_ROOT%%/xcopy/xcopy_convert_excludes.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%"
-if %ERRORLEVEL% EQU 0 for %%i in (%RETURN_VALUE%) do (
-  set XCOPY_EXCLUDE_FILE=%%i
-  call :SET_ROBOCOPY_EXCLUDE_FILES_CMD %%XCOPY_EXCLUDE_FILE%%
-)
-
-goto SET_ROBOCOPY_EXCLUDE_FILES_CMD_END
-
-:SET_ROBOCOPY_EXCLUDE_FILES_CMD
-set "XCOPY_EXCLUDE_FILE=%~1"
-rem post process files
-if "%XCOPY_EXCLUDE_FILE:~0,1%" == "." set "XCOPY_EXCLUDE_FILE=*%XCOPY_EXCLUDE_FILE%"
-set ROBOCOPY_EXCLUDE_FILES_CMD=%ROBOCOPY_EXCLUDE_FILES_CMD%/XF "%XCOPY_EXCLUDE_FILE%" 
-exit /b 0
-
-:SET_ROBOCOPY_EXCLUDE_FILES_CMD_END
-
-echo.^>^>robocopy.exe "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /NP /TEE /NJH /NS /NC /XX %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
-robocopy.exe "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /NP /TEE /NJH /NS /NC /XX %ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDE_DIRS_CMD% %ROBOCOPY_EXCLUDE_FILES_CMD%
+echo.^>^>robocopy.exe "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /NP /TEE /NJH /NS /NC /XX %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%
+robocopy.exe "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /NP /TEE /NJH /NS /NC /XX %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
