@@ -11,7 +11,7 @@ rem Examples:
 rem 1. call xcopy_to_stage.bat "project binaries w/o debug information" "%%STAGE_NAME%%" ^
 rem    "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%" "*.*" "/E /Y /H" ^
 rem    "%%PROJECT_BIN_ROOT_XCOPY_EXCLUDE_DIRS_FILE%%" ^
-rem    xcopy_msvc_debug_info_files.lst || exit /b 1
+rem    "@xcopy_msvc_debug_info_files.lst" || exit /b 1
 
 setlocal
 
@@ -24,8 +24,8 @@ set "FROM_STAGE_DIR_ROOT=%~3"
 set "TO_STAGE_DIR_ROOT=%~4"
 set "FROM_FILE_LIST=%~5"
 set "XCOPY_FILE_FLAGS=%~6"
-set "XCOPY_EXCLUDE_DIRS_FILE=%~7"
-set "XCOPY_EXCLUDE_FILES_FILE=%~8"
+set "XCOPY_EXCLUDE_FILES_LIST=%~7"
+set "XCOPY_EXCLUDE_DIRS_LIST=%~8"
 
 if not exist "%FROM_STAGE_DIR_ROOT%" (
   echo.%?~nx0%: error: FROM_STAGE_DIR_ROOT path does not exist: "%FROM_STAGE_DIR_ROOT%"
@@ -71,11 +71,6 @@ if %MSG_PRINTED% EQU 0 (
 )
 
 if not exist "%TO_STAGE_DIR_ROOT%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%TO_STAGE_DIR_ROOT%%"
-
-set "XCOPY_EXCLUDE_DIRS_LIST=%CONTOOLS_ROOT:/=\%\excludes\xcopy_svn_files.lst"
-if defined XCOPY_EXCLUDE_DIRS_FILE set "XCOPY_EXCLUDE_DIRS_LIST=%XCOPY_EXCLUDE_DIRS_LIST%|%XCOPY_EXCLUDE_DIRS_FILE%"
-set "XCOPY_EXCLUDE_FILES_LIST="
-if defined XCOPY_EXCLUDE_FILES_FILE set "XCOPY_EXCLUDE_FILES_LIST=%XCOPY_EXCLUDE_FILES_FILE%"
 
 call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_STAGE_DIR_ROOT%%" "%%FROM_FILE%%" "%%TO_STAGE_DIR_ROOT%%" %%XCOPY_FILE_FLAGS%% || exit /b 127
 

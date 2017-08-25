@@ -139,10 +139,10 @@ if not exist "%TO_PATH%\" (
   exit /b -245
 ) >&2
 
+call "%%~dp0__init__.bat" || goto :EOF
+
 set "FROM_ROOT=%~dpf1"
 set "TO_ROOT=%~dpf2"
-
-call "%%~dp0__init__.bat" || goto :EOF
 
 if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
   ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || goto :EOF ) && if /i not ^

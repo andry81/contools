@@ -10,11 +10,12 @@ rem   The copy performs file filtering and archiving by pattern.
 
 rem Examples:
 rem 1. call xcopy_archive_to_stageout_all_dirs.bat "stage" "../.." ^
-rem    "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%" "%%PROJECT_ROOT%%\_scripts\stage_bin_excludes.lst" ^
+rem    "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%" ^
 rem    "%%PROJECT_STAGE_BUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
 rem    "%%PROJECT_STAGE_BUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
 rem    "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" ^
-rem    "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 32
+rem    "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" ^
+rem    "@%%PROJECT_ROOT%%\_scripts\stage_bin_excludes.lst" || exit /b 32
 
 setlocal
 
@@ -27,17 +28,17 @@ shift
 
 set "PROJECT_BIN_ROOT=%~1"
 set "PROJECT_STAGE_BIN_ROOT=%~2"
-set "PROJECT_BIN_ROOT_XCOPY_EXCLUDE_DIRS_FILE=%~3"
-set "PROJECT_PDB_ROOT=%~4"
-set "PROJECT_STAGE_PDB_ROOT=%~5"
-set "PROJECT_LIB_ROOT=%~6"
-set "PROJECT_STAGE_LIB_ROOT=%~7"
-set "PROJECT_GEN_ROOT=%~8"
-set "PROJECT_STAGE_GEN_ROOT=%~9"
+set "PROJECT_PDB_ROOT=%~3"
+set "PROJECT_STAGE_PDB_ROOT=%~4"
+set "PROJECT_LIB_ROOT=%~5"
+set "PROJECT_STAGE_LIB_ROOT=%~6"
+set "PROJECT_GEN_ROOT=%~7"
+set "PROJECT_STAGE_GEN_ROOT=%~8"
 shift
 shift
-set "PROJECT_VAR_ROOT=%~8"
-set "PROJECT_STAGE_VAR_ROOT=%~9"
+set "PROJECT_VAR_ROOT=%~7"
+set "PROJECT_STAGE_VAR_ROOT=%~8"
+set "PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST=%~9"
 
 rem Drop last error level
 type nul>nul
@@ -47,17 +48,24 @@ call "%%?~dp0%%__init__.bat" || goto :EOF
 :BIN_STAGE
 if not exist "%PROJECT_BIN_ROOT%" goto BIN_STAGE_END
 
+if defined PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST set "PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST=%PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST%|"
+
+if %F_ENABLE_STAGE_OUT_TO_ARCHIVE%0 EQU 0 (
+  set "PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST=%PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST%@%CONTOOLS_ROOT:/=\%\excludes\xcopy_msvc_debug_info_files.lst"
+) else (
+  set "PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST=%PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST%@%CONTOOLS_ROOT:/=\%\excludes\7zip_msvc_debug_info_files.lst"
+)
+
 if %F_ENABLE_STAGE_OUT_TO_ARCHIVE%0 EQU 0 (
   call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "project binaries w/o debug information" "%%STAGE_NAME%%" ^
     "%%PROJECT_BIN_ROOT%%" "%%PROJECT_STAGE_BIN_ROOT%%" "*.*" "/E /Y /H" ^
-    "%%PROJECT_BIN_ROOT_XCOPY_EXCLUDE_DIRS_FILE%%" ^
-    "%%CONTOOLS_ROOT:/=\%%\excludes\xcopy_msvc_debug_info_files.lst" || exit /b 1
+    "%%PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST%%" || exit /b 1
 ) else (
   call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "project binaries" "%%STAGE_NAME%%" ^
     "%%PROJECT_BIN_ROOT%%" "%%PROJECT_STAGE_BIN_ROOT%%" ^
     "" ^
     "%%PROJECT_STAGE_BIN_ROOT%%/%%PROJECT_NAME%%_bin_%%BUILD_SCM_BRANCH%%_%%PROJECT_TYPE%%_%%APP_TARGET_NAME%%_v%%PRODUCT_VERSION_FILE_SUFFIX%%.bin.7z" ^
-    "" "*.bin.7z" "/S /Y /H" "@%%CONTOOLS_ROOT:/=\%%\excludes\7zip_msvc_debug_info_files.lst" || exit /b 2
+    "" "*.bin.7z" "/S /Y /H" "%%PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST%%" || exit /b 2
 )
 
 :BIN_STAGE_END
