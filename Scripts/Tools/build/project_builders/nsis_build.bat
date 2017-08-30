@@ -47,15 +47,17 @@ if not defined BUILD_NEST_LVL set BUILD_NEST_LVL=1
 call "%%BUILD_TOOLS_ROOT%%/set_project_build_time.bat"
 call "%%BUILD_TOOLS_ROOT%%/env_generators\makensis_cmd_line.bat" "%%BUILD_CONFIG_ROOT%%" || exit /b 10
 
-call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 11
+if exist "%BUILD_SCRIPTS_ROOT%/pre_validate_vars.bat" (
+  call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 13
+) else call "%%~dp0nsis_pre_validate_vars.bat" %%3 %%4 %%5 %%6 %%7 %%8 %%9 || exit /b 13
 
-if %F_DISABLE_PRE_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/pre_build.bat" || exit /b 12 )
+if %F_DISABLE_PRE_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/pre_build.bat" || exit /b 14 )
 
 title build %PROJECT_NAME% %BUILD_SCM_BRANCH% %PROJECT_TYPE% %APP_TARGET_NAME% %TARGET_NAME%
 
 echo.Build started: %PROJECT_BUILD_DATE% - %PROJECT_BUILD_TIME%
 
-call "%%BUILD_SCRIPTS_ROOT%%/post_validate_vars.bat" || exit /b 13
+call "%%BUILD_SCRIPTS_ROOT%%/post_validate_vars.bat" || exit /b 15
 
 if defined PROJECT_LOCK_TOKEN (
   rem call "%%CONTOOLS_ROOT%%/locks/lock_mutex.bat" %PROJECT_LOCK_TOKEN%_build
@@ -89,21 +91,21 @@ if %FLAGS_REBUILD%0 EQU 10 (
   )
 )
 
-if not exist "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%"
+if not exist "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%%" || exit /b 20 )
+if not exist "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%%" || exit /b 21 )
+if not exist "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" || exit /b 22 )
+if not exist "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" || exit /b 23 )
 
 echo.
 
 rem read parent product version
 if exist "%BUILD_SCRIPTS_ROOT%/read_parent_product_ver.bat" (
-  call "%%BUILD_SCRIPTS_ROOT%%/read_parent_product_ver.bat" || exit /b 20
+  call "%%BUILD_SCRIPTS_ROOT%%/read_parent_product_ver.bat" || exit /b 30
 )
 
 rem read product version
 if exist "%BUILD_SCRIPTS_ROOT%/read_product_ver.bat" (
-  call "%%BUILD_SCRIPTS_ROOT%%/read_product_ver.bat" || exit /b 21
+  call "%%BUILD_SCRIPTS_ROOT%%/read_product_ver.bat" || exit /b 31
 )
 
 echo.Generating NSIS defines...
@@ -112,7 +114,7 @@ echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/nsis_defines.nsi"
 call "%%CONTOOLS_ROOT%%/nsis/gen_nsis_defines.bat" 1251 "%%BUILD_CONFIG_ROOT%%\nsis_defines.lst" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/nsis_defines.nsi"
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
-  exit /b 22
+  exit /b 32
 )
 
 echo.Generating NSIS search paths...
@@ -121,7 +123,7 @@ echo.  "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/nsis_search_paths.nsi"
 call "%%CONTOOLS_ROOT%%/nsis/gen_nsis_search_paths.bat" "%%BUILD_CONFIG_ROOT%%\nsis_search_paths.lst" > "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/nsis_search_paths.nsi"
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
-  exit /b 23
+  exit /b 33
 )
 
 if %F_DISABLE_APP_DIR_INSTALL%0 NEQ 0 (
@@ -141,7 +143,7 @@ if %F_ENABLE_APP_DIR_INSTALL_FROM_ARCHIVE%0 NEQ 0 (
 )
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
-  exit /b 30
+  exit /b 34
 )
 
 echo.Generating install instructions...
@@ -156,7 +158,7 @@ if %F_ENABLE_APP_DIR_INSTALL_FROM_ARCHIVE%0 NEQ 0 (
 )
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
-  exit /b 31
+  exit /b 35
 )
 
 echo.Generating uninstall instructions...
@@ -171,15 +173,15 @@ if %F_ENABLE_APP_DIR_INSTALL_FROM_ARCHIVE%0 NEQ 0 (
 )
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
-  exit /b 32
+  exit /b 36
 )
 
 if exist "%BUILD_SCRIPTS_ROOT%/gen_install_list.bat" (
-  call "%%BUILD_SCRIPTS_ROOT%%/gen_install_list.bat" || exit /b 33
+  call "%%BUILD_SCRIPTS_ROOT%%/gen_install_list.bat" || exit /b 37
 )
 
 if exist "%BUILD_SCRIPTS_ROOT%/gen_uninstall_list.bat" (
-  call "%%BUILD_SCRIPTS_ROOT%%/gen_uninstall_list.bat" || exit /b 34
+  call "%%BUILD_SCRIPTS_ROOT%%/gen_uninstall_list.bat" || exit /b 38
 )
 
 :IGNORE_APP_DIR_INSTALL
