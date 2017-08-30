@@ -620,6 +620,9 @@ Scripts/Tools/which.bat -text
 Scripts/Tools/winpath.bat -text
 Scripts/Tools/winver.bat -text
 Scripts/Tools/wtee.exe -text
+Scripts/Tools/xcopy/__init__.bat -text
+Scripts/Tools/xcopy/convert_excludes_to_7zip.bat -text
+Scripts/Tools/xcopy/convert_excludes_to_robocopy.bat -text
 Scripts/Tools/xcopy/convert_excludes_to_xcopy.bat -text
 Scripts/Tools/xml/__init__.bat -text
 Scripts/Tools/xml/filter_xpath_list_by_xpath_list.bat -text
