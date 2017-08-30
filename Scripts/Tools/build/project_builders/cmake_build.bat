@@ -39,7 +39,9 @@ call "%%BUILD_TOOLS_ROOT%%/env_generators\base.bat" || exit /b 10
 call "%%BUILD_TOOLS_ROOT%%/env_generators\cmake.bat" || exit /b 11
 call "%%BUILD_TOOLS_ROOT%%/env_generators\cmake_cmd_line.bat" "%%BUILD_CONFIG_ROOT%%" || exit /b 12
 
-call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 13
+if exist "%BUILD_SCRIPTS_ROOT%/pre_validate_vars.bat" (
+  call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 13
+) else call "%%~dp0cmake_pre_validate_vars.bat" %%3 %%4 %%5 %%6 %%7 %%8 %%9 || exit /b 13
 
 if %F_DISABLE_PRE_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/pre_build.bat" || exit /b 14 )
 
@@ -81,10 +83,10 @@ if %FLAGS_REBUILD%0 EQU 10 (
   )
 )
 
-if not exist "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%"
+if not exist "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%%" || exit /b 20 )
+if not exist "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%%" || exit /b 21 )
+if not exist "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" || exit /b 22 )
+if not exist "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" || exit /b 23 )
 
 if defined PROJECT_CMAKE_BUILD_ROOT (
   if not exist "%PROJECT_CMAKE_BUILD_ROOT%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_CMAKE_BUILD_ROOT%%"
@@ -95,7 +97,7 @@ if defined PROJECT_CMAKE_INSTALL_ROOT (
 
 echo.
 
-pushd "%PROJECT_CMAKE_BUILD_ROOT%" || exit /b 20
+pushd "%PROJECT_CMAKE_BUILD_ROOT%" || exit /b 30
 
 rem cmake configure
 call :CMD cmake "%%PROJECT_CMAKE_LIST_ROOT%%" %%CMAKE_CMD_LINE.CONFIGURE%%
@@ -111,7 +113,7 @@ if %FLAGS_REGEN%0 NEQ 0 exit /b 0
 rem SCM branch workingset
 if %F_DISABLE_GEN_BRANCH_INFO%0 EQU 0 ^
 if exist "%BUILD_SCRIPTS_ROOT%\gen_scm_branch_workingset.bat" (
-  call "%%BUILD_SCRIPTS_ROOT%%/gen_scm_branch_workingset.bat" || goto :EOF
+  call "%%BUILD_SCRIPTS_ROOT%%/gen_scm_branch_workingset.bat" || exit /b 31
 )
 
 rem cmake make

@@ -31,7 +31,9 @@ if defined BUILD_USER_VARS_ROOT (
 
 call "%%BUILD_TOOLS_ROOT%%/set_project_build_time.bat"
 
-call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 10
+if exist "%BUILD_SCRIPTS_ROOT%/pre_validate_vars.bat" (
+  call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 10
+) else call "%%~dp0project_directory_pre_validate_vars.bat" %%3 %%4 %%5 %%6 %%7 %%8 %%9 || exit /b 10
 
 if %F_DISABLE_PRE_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/pre_build.bat" || exit /b 11 )
 
@@ -73,10 +75,10 @@ if %FLAGS_REBUILD%0 EQU 10 (
   )
 )
 
-if not exist "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%"
-if not exist "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%"
+if not exist "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%%" || exit /b 20 )
+if not exist "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%%" || exit /b 21 )
+if not exist "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" || exit /b 22 )
+if not exist "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" || exit /b 23 )
 
 echo.
 

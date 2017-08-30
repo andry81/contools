@@ -29,6 +29,11 @@ if defined BUILD_USER_VARS_ROOT (
   if "\" == "%BUILD_USER_VARS_ROOT:~-1%" set "BUILD_USER_VARS_ROOT=%BUILD_USER_VARS_ROOT:~0,-1%"
 )
 
+title postbuild %PROJECT_NAME% %BUILD_SCM_BRANCH% %PROJECT_TYPE% %APP_TARGET_NAME% %TARGET_NAME%
+
+echo.%~nx0: %PROJECT_NAME%: Executing post build step...
+
+if %STAGE_IN.HAS_UPSTREAM%0 NEQ 0 ^
 if defined UPSTREAM.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR if exist "%UPSTREAM.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%/post_build.vars" (
   rem load staged out project build variables as stage in
   call "%%CONTOOLS_ROOT%%/setvarsfromfile.bat" "%%UPSTREAM.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%/post_build.vars" "" STAGE_IN. || exit /b 10
@@ -37,14 +42,18 @@ if defined UPSTREAM.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR if exist "%UPSTREAM.PRO
 rem load build generated variables
 call "%%CONTOOLS_ROOT%%/setvarsfromfile.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%/build.vars" "" || exit /b 11
 
-call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 12
+if exist "%BUILD_SCRIPTS_ROOT%/pre_validate_vars.bat" (
+  call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 12
+) else call "%%~dp0cmake_pre_validate_vars.bat" %%3 %%4 %%5 %%6 %%7 %%8 %%9 || exit /b 12
+
+if exist "%BUILD_CONFIG_ROOT%/setup.post.vars" (
+  rem load system post variables
+  call "%%CONTOOLS_ROOT%%/setvarsfromfile.bat" "%%BUILD_CONFIG_ROOT%%/setup.post.vars" || exit /b 13
+)
 
 rem load user post variables
-call "%%CONTOOLS_ROOT%%/setvarsfromfile.bat" "%%BUILD_USER_VARS_ROOT%%/setup.user.post.vars" || exit /b 13
+call "%%CONTOOLS_ROOT%%/setvarsfromfile.bat" "%%BUILD_USER_VARS_ROOT%%/setup.user.post.vars" || exit /b 14
 
-title postbuild %PROJECT_NAME% %BUILD_SCM_BRANCH% %PROJECT_TYPE% %APP_TARGET_NAME% %TARGET_NAME%
-
-echo.%~nx0: %PROJECT_NAME%: Executing post build step...
 echo.
 
 if defined PROJECT_LOCK_TOKEN (
@@ -65,9 +74,14 @@ rmdir /S /Q "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" > nul
 
 echo.
 
+rem read parent product version
+if exist "%BUILD_SCRIPTS_ROOT%/read_parent_product_ver.bat" (
+  call "%%BUILD_SCRIPTS_ROOT%%/read_parent_product_ver.bat" || exit /b 20
+)
+
 rem read product version
 if exist "%BUILD_SCRIPTS_ROOT%/read_product_ver.bat" (
-  call "%%BUILD_SCRIPTS_ROOT%%/read_product_ver.bat" || exit /b 30
+  call "%%BUILD_SCRIPTS_ROOT%%/read_product_ver.bat" || exit /b 21
 )
 
 echo.
@@ -82,7 +96,7 @@ call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_from_stagein_all_dirs.bat" "../.." ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" ^
-  "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 31
+  "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 30
 
 set "STAGE_BIN_EXCLUDES_FILE_LIST="
 set "STAGE_BIN_EXCLUDES_FILE=%BUILD_CONFIG_ROOT%\stage_bin_excludes.lst"
@@ -94,11 +108,11 @@ call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stageout_all_dirs.bat" "stage" "../.
   "%%PROJECT_STAGE_BUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
   "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" ^
   "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" ^
-  "%%STAGE_BIN_EXCLUDES_FILE_LIST%%" || exit /b 32
+  "%%STAGE_BIN_EXCLUDES_FILE_LIST%%" || exit /b 31
 
 rem saving data for next build step into stage directory
 echo.Exporting build variables into stage...
-if not exist "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%"
+if not exist "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 32 )
 call "%%BUILD_TOOLS_ROOT%%/export_build_vars.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%\post_build.vars" || exit /b 33
 echo.
 
