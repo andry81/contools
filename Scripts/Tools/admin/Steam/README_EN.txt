@@ -25,7 +25,12 @@ Steam.vbs [mode]
   `AppID`
 
 WARNING:
-  The Working Directory must point the Steam installation root.
+  * The Working Directory must point the Steam installation root.
+
+CAUTION:
+  * The script does not solve the `No steam logon` issue. If you want to play
+    offline and game kicks you after ~1 min of a game play with that message,
+    then YOU HAVE TO LOGIN and do `Go Offline` from the Steam main window!
 
 -------------------------------------------------------------------------------
 3. AUTHOR
