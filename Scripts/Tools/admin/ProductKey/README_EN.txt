@@ -1,10 +1,11 @@
 * README_EN.txt
-* 2016.11.12
+* 2017.09.02
 * DigitalProductId decoder
 
 1. DESCRIPTION
 2. USAGE
 2.1. Execution from Windows System Recovery Console boot option
+3. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -29,3 +30,8 @@ commands:
 
 Where, <WindowsDrive> - Drive letter where being recovered Windows has been
                         installed.
+
+-------------------------------------------------------------------------------
+3. AUTHOR
+-------------------------------------------------------------------------------
+Andrey Dibrov (andry at inbox dot ru)

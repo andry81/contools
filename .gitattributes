@@ -353,6 +353,8 @@ Scripts/Tools/admin/ProductKey/WinReg.py -text
 Scripts/Tools/admin/RunDll/ExportImportWindowsCreds.bat -text
 Scripts/Tools/admin/RunDll/SafelyRemoveHotPlugDevice.bat -text
 Scripts/Tools/admin/RunDll/UserControl.bat -text
+Scripts/Tools/admin/Steam/README_EN.txt -text
+Scripts/Tools/admin/Steam/steam.vbs -text
 Scripts/Tools/admin/cleanup_acl.bat -text
 Scripts/Tools/admin/ip_list_by_arp.bat -text
 Scripts/Tools/admin/ip_list_by_netview.bat -text
