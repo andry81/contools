@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.08.25
+* 2017.10.28
 * ConsoleTools
 
 WARNING:
@@ -20,7 +20,7 @@ WARNING:
 5.6. Windows executable utilities
 6. KNOWN ISSUES
 6.1. Error message `reg_cygwin.bat: error: (1) Failed to run cygcheck utility to detect cygwin dll version.'
-7. AUTHOR EMAIL
+7. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -132,8 +132,8 @@ Script runs run_msysdvlpr.bat under UAC promotion.
 
 !!!
 
-BEWARE OF DIFFERENCES WHEN TYPE A BATCH FILE CODE PEACED IN A CONSOLE WINDOW AND
-RAN AS AN ACTUAL BATCH FILE. THERE IS DIFFERENT VARIABLE EXPANSION PASS STAGES!
+BEWARE OF DIFFERENCES WHEN TYPE A BATCH FILE CODE IN A CONSOLE WINDOW AND
+RUN AS AN ACTUAL BATCH FILE. THERE IS DIFFERENT VARIABLE EXPANSION PASS STAGES!
 
 !!!
 
@@ -1113,6 +1113,6 @@ Solution:
     (x86) HKEY_LOCAL_MACHINE\SOFTWARE\Cygnus Solutions\Cygwin\mounts v2\/
 
 -------------------------------------------------------------------------------
-7. AUTHOR EMAIL
+7. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)
