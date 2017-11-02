@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.06.23
+* 2017.11.02
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -29,7 +29,12 @@
 7.3. Method #3. Window per command line WC directory with changes.
 7.4. Method #4. Window per WC root directory with changes.
 8. One pane comparison for 2 selected files.
+8.1. Method #1. By path list from ANSI text file.
+8.2. Method #2. By path list from command line.
 9. One pane comparison for 2 selected files with sorted content.
+9.1. Method #1. By path list from ANSI text file.
+9.2. Method #2. By path list from command line.
+10. AUTHOR
 
 ------------------------------------------------------------------------------
 1. Open standalone notepad window for selected files.
@@ -265,6 +270,17 @@ tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:commit "%P" %
 8. One pane comparison for 2 selected files.
 ------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------
+8.1. Method #1. By path list from ANSI text file.
+------------------------------------------------------------------------------
+
+call_nowindow.vbs
+compare_files_by_list.bat -wait "%P" %L
+
+------------------------------------------------------------------------------
+8.2. Method #2. By path list from command line.
+------------------------------------------------------------------------------
+
 call_nowindow.vbs
 compare_files.bat -wait "%P" %S
 
@@ -272,5 +288,21 @@ compare_files.bat -wait "%P" %S
 9. One pane comparison for 2 selected files with sorted content.
 ------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------
+9.1. Method #1. By path list from ANSI text file.
+------------------------------------------------------------------------------
+
+call_nowindow.vbs
+compare_sorted_files_by_list.bat -wait "%P" %L
+
+------------------------------------------------------------------------------
+9.2. Method #2. By path list from command line.
+------------------------------------------------------------------------------
+
 call_nowindow.vbs
 compare_sorted_files.bat -wait "%P" %S
+
+------------------------------------------------------------------------------
+10. AUTHOR
+------------------------------------------------------------------------------
+Andrey Dibrov (andry at inbox dot ru)
