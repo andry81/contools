@@ -302,7 +302,9 @@ Scripts/Tools/ToolAdaptors/sh/rmdir.sh -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_files.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/compare_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_sorted_files.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/compare_sorted_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/configure.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/COPYING -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/README.txt -text
