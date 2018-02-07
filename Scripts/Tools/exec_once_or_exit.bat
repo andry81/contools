@@ -28,12 +28,20 @@ exit /b -1024
 rem call IMPL2 to recover exit code from commands like "exit /b"
 call :IMPL2 %%* 9> "%TEMP%\lock.%~1\lock0.%LOCK_DIR_NAME_SUFFIX%.txt"
 set LASTERROR=%ERRORLEVEL%
-rmdir /S /Q "%TEMP%\lock.%~1"
+rmdir /S /Q "%TEMP%\lock.%~1" >nul 2>&1
 exit /b %LASTERROR%
 
 :IMPL2
-if "%~n2" == "bat" call %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9 && goto :EOF
-if not "%~n2" == "bat" (
+if "%~n2" == "bat" (
+  call %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9
+  goto :EOF
+) else if "%~n2" == "cmd" (
+  call %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9
+  goto :EOF
+)
+
+(
   %2 %3 %4 %5 %6 %7 %8 %9
 )
+
 goto :EOF
