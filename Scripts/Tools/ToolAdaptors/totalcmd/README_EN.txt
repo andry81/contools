@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.11.02
+* 2018.07.19
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -34,7 +34,9 @@
 9. One pane comparison for 2 selected files with sorted content.
 9.1. Method #1. By path list from ANSI text file.
 9.2. Method #2. By path list from command line.
-10. AUTHOR
+10. SVN/GIT files batch rename
+10.1. Method #1. Rename files by selection list.
+11. AUTHOR
 
 ------------------------------------------------------------------------------
 1. Open standalone notepad window for selected files.
@@ -177,7 +179,7 @@ cmda.bat
 (all windows together)
 
 call_nowindow.vbs
-tortoisesvn\TortoiseProc.bat /command:properties "%P" %S
+scm\tortoisesvn\TortoiseProc.bat /command:properties "%P" %S
 
 ------------------------------------------------------------------------------
 4.2 Method #2. For selected files and directores one after one over external editor.
@@ -198,7 +200,7 @@ externals_edit.bat
 (all windows together)
 
 call_nowindow.vbs
-tortoisesvn\TortoiseProc.bat /command:log "%P" %S
+scm\tortoisesvn\TortoiseProc.bat /command:log "%P" %S
 
 ------------------------------------------------------------------------------
 6. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes).
@@ -208,30 +210,30 @@ tortoisesvn\TortoiseProc.bat /command:log "%P" %S
 6.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat -all-in-one /command:repostatus "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat -all-in-one /command:repostatus "%P" %S
 
 or
 
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 6.2. Method #2. Window per unique repository root with or without versioned changes in respective WC directory.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat -window-per-reporoot /command:repostatus "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-reporoot /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 6.3. Method #3. Window per command line WC directory with or without versioned changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcdir /command:repostatus "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcdir /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 6.4. Method #4. Window per WC root directory with or without versioned changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:repostatus "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 7. Open TortoiseSVN commit dialogs for a set of WC directories (opens only if has not empty versioned changes).
@@ -241,30 +243,30 @@ tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:repostatus "%
 7.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat -window-per-reporoot /command:commit "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-reporoot /command:commit "%P" %S
 
 or
 
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 7.2. Method #2. One window for all WC directories with changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat -all-in-one /command:commit "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat -all-in-one /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 7.3. Method #3. Window per command line WC directory with changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcdir /command:commit "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcdir /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 7.4. Method #4. Window per WC root directory with changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
-tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:commit "%P" %S
+scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 8. One pane comparison for 2 selected files.
@@ -303,6 +305,24 @@ call_nowindow.vbs
 compare_sorted_files.bat -wait "%P" %S
 
 ------------------------------------------------------------------------------
-10. AUTHOR
+10. SVN/GIT files batch rename
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+10.1. Method #1. Rename files by selection list.
+------------------------------------------------------------------------------
+
+For SVN:
+
+call.vbs
+scm\svn\svn_rename_files_by_list.bat "%P" %L
+
+For GIT:
+
+call.vbs
+scm\git\git_rename_files_by_list.bat "%P" %L
+
+------------------------------------------------------------------------------
+11. AUTHOR
 ------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

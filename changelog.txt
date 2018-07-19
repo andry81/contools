@@ -1,0 +1,5 @@
+2018.07.19:
+* new: changelog for per changeset commit logs
+* new: totalcmd/scm/svn/svn_rename_files_by_list.bat and totalcmd/scm/git/git_rename_files_by_list.bat scripts + icons for toolbar
+* refactor: totalcmd scripts 
+* minor fixup and cleanup
