@@ -1,5 +1,6 @@
 2018.07.19:
 * fixed: typo
+* fixed: better version control detection in totalcmd/scm/svn/svn_rename_by_list.bat script
 * new: changelog for per changeset commit logs
 * new: totalcmd/scm/svn/svn_rename_by_list.bat and totalcmd/scm/git/git_rename_by_list.bat scripts + icons for toolbar
 * new: svn/git ignore files
