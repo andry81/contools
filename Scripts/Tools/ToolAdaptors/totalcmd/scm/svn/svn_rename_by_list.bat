@@ -107,24 +107,13 @@ if "%TO_FILE_PATH:~-1%" == "\" if "%FROM_FILE_PATH:~-1%" == "\" (
 )
 
 rem check if file is under SVN version contorl
-set "SVN_STATUS_OUT="
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`svn status "%FROM_FILE_PATH%" --depth files --non-interactive 2^>nul`) do (
-  set "SVN_STATUS_OUT=%%i"
-  goto FOR_BREAK
+svn info "%FROM_FILE_PATH%" --non-interactive >nul 2>nul
+if %ERRORLEVEL% EQU 0 (
+  call :SVN_RENAME_FILE "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+) else (
+  rem rename through the shell
+  call :SHELL_RENAME_FILE "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 )
-
-:FOR_BREAK
-
-if not defined SVN_STATUS_OUT goto SVN_RENAME
-if "%SVN_STATUS_OUT:~0,1%" == "?" goto SHELL_RENAME
-
-:SVN_RENAME
-call :SVN_RENAME_FILE "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
-goto SHELL_RENAME_END
-
-:SHELL_RENAME
-call :SHELL_RENAME_FILE "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
-goto SHELL_RENAME_END
 
 :SHELL_RENAME_END
 
