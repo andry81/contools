@@ -1,7 +1,8 @@
 2018.07.19:
 * fixed: typo
 * new: changelog for per changeset commit logs
-* new: totalcmd/scm/svn/svn_rename_files_by_list.bat and totalcmd/scm/git/git_rename_files_by_list.bat scripts + icons for toolbar
+* new: totalcmd/scm/svn/svn_rename_by_list.bat and totalcmd/scm/git/git_rename_by_list.bat scripts + icons for toolbar
 * new: svn/git ignore files
+* changed: totalcmd/scm/svn/svn_rename_by_list.bat and totalcmd/scm/git/git_rename_by_list.bat scripts adopted to rename both files and directories
 * refactor: totalcmd scripts 
 * minor fixup and cleanup
