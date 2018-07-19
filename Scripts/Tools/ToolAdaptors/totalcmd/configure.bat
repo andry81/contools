@@ -20,7 +20,9 @@ call "%%CONTOOLS_ROOT%%/__init__.bat" || goto CONTOOLS_ROOT_ERROR
 if not defined SVNCMD_TOOLS_ROOT goto SVNCMD_TOOLS_ROOT_ERROR
 if not exist "%SVNCMD_TOOLS_ROOT%\__init__.bat" goto SVNCMD_TOOLS_ROOT_ERROR
 
-set "CONTOOLS_ROOT_COPY=%~dp0Tools"
+set "CONTOOLS_ROOT_COPY=%~dp0"
+set "CONTOOLS_ROOT_COPY=%CONTOOLS_ROOT_COPY:\=/%"
+if "%CONTOOLS_ROOT_COPY:~-1%" == "/" set "CONTOOLS_ROOT_COPY=%CONTOOLS_ROOT_COPY:~0,-1%"
 
 (
   echo.@echo off
@@ -65,21 +67,21 @@ pause
 exit /b
 
 :XCOPY_FILE
-if not exist "%CONTOOLS_ROOT%\xcopy_file.bat" (
-  echo.%~nx0: error: xcopy_file.bat is not found: "%CONTOOLS_ROOT%\xcopy_file.bat".
+if not exist "%CONTOOLS_ROOT%/std/xcopy_file.bat" (
+  echo.%~nx0: error: xcopy_file.bat is not found: "%CONTOOLS_ROOT%/std/xcopy_file.bat".
   exit /b 1
 ) >&2
 if not exist "%~3" mkdir "%~3"
-call "%%CONTOOLS_ROOT%%\xcopy_file.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%* || goto :EOF
 exit /b 0
 
 :XCOPY_DIR
-if not exist "%CONTOOLS_ROOT%\xcopy_dir.bat" (
-  echo.%~nx0: error: xcopy_dir.bat is not found: "%CONTOOLS_ROOT%\xcopy_dir.bat".
+if not exist "%CONTOOLS_ROOT%/std/xcopy_dir.bat" (
+  echo.%~nx0: error: xcopy_dir.bat is not found: "%CONTOOLS_ROOT%/std/xcopy_dir.bat".
   exit /b 1
 ) >&2
 if not exist "%~2" mkdir "%~2"
-call "%%CONTOOLS_ROOT%%\xcopy_dir.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || goto :EOF
 exit /b 0
 
 :CONTOOLS_ROOT_ERROR

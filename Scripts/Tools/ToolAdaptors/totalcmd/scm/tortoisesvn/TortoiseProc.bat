@@ -2,7 +2,11 @@
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+set "?~dp0=%~dp0"
+set "?~n0=%~n0"
+set "?~nx0=%~nx0"
+
+call "%%?~dp0%%__init__.bat" || goto :EOF
 
 rem builtin defaults
 if not defined TORTOISEPROC_MAX_CALLS set TORTOISEPROC_MAX_CALLS=10

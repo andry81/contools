@@ -2,6 +2,12 @@
 
 setlocal
 
+set "?~dp0=%~dp0"
+set "?~n0=%~n0"
+set "?~nx0=%~nx0"
+
+call "%%?~dp0%%__init__.bat" || goto :EOF
+
 rem script flags
 set FLAG_WAIT_EXIT=0
 
@@ -17,13 +23,16 @@ if defined FLAG (
   if "%FLAG%" == "-wait" (
     set FLAG_WAIT_EXIT=1
     shift
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
   )
-
+  
   rem read until no flags
   goto FLAGS_LOOP
 )
 
-call "%%~dp0loadvars.bat" "%%~dp0profile.vars"
+call "%%?~dp0%%loadvars.bat" "%%?~dp0%%profile.vars"
 
 set "PWD=%~1"
 shift
