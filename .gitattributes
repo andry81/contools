@@ -229,6 +229,7 @@ Scripts/Tests/traplib/test3.sh -text
 Scripts/Tests/traplib/test4.sh -text
 Scripts/Tests/traplib/test5.sh -text
 Scripts/Tests/traplib/testlib.sh -text
+Scripts/Tools/.svnignore -text
 Scripts/Tools/7zip/7-zip.chm -text
 Scripts/Tools/7zip/7z.exe -text
 Scripts/Tools/7zip/7za.dll -text
