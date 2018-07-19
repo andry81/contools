@@ -65,11 +65,8 @@ type nul > "%RENAME_TO_LIST_FILE_TMP%"
 
 rem read selected file paths from file
 for /F "usebackq eol=	 delims=" %%i in ("%~1") do (
-  rem must be files, not sub directories
-  if not exist "%%i\" (
-    (echo.%%i) >> "%RENAME_FROM_LIST_FILE_TMP%"
-    (echo.%%i) >> "%RENAME_TO_LIST_FILE_TMP%"
-  )
+  (echo.%%i) >> "%RENAME_FROM_LIST_FILE_TMP%"
+  (echo.%%i) >> "%RENAME_TO_LIST_FILE_TMP%"
 )
 
 call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%RENAME_TO_LIST_FILE_TMP%%"
@@ -104,6 +101,11 @@ if not exist "%FROM_FILE_PATH%" (
   exit /b 4
 ) >&2
 
+if "%TO_FILE_PATH:~-1%" == "\" if "%FROM_FILE_PATH:~-1%" == "\" (
+  set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
+  set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
+)
+
 rem check if file is under SVN version contorl
 set "SVN_STATUS_OUT="
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`svn status "%FROM_FILE_PATH%" --depth files --non-interactive 2^>nul`) do (
@@ -134,7 +136,7 @@ set "TO_FILE_DIR=%~dp2"
 if /i "%FROM_FILE_DIR%" == "%TO_FILE_DIR%" (
   call :CMD svn rename "%%~1" "%%~nx2"
 ) else (
-  echo.%?~n0%: error: file directory path must stay the same: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
+  echo.%?~n0%: error: parent directory path must stay the same: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
   exit /b -254
 ) >&2
 
@@ -146,7 +148,7 @@ set "TO_FILE_DIR=%~dp2"
 if /i "%FROM_FILE_DIR%" == "%TO_FILE_DIR%" (
   call :CMD rename "%%~1" "%%~nx2"
 ) else (
-  echo.%?~n0%: error: file directory path must stay the same: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
+  echo.%?~n0%: error: parent directory path must stay the same: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
   exit /b -254
 ) >&2
 
