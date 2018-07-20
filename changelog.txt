@@ -1,3 +1,6 @@
+2018.07.20:
+* fixed: minor error output cleanup
+
 2018.07.19:
 * fixed: typo
 * fixed: better version control detection in totalcmd/scm/svn/svn_rename_by_list.bat script

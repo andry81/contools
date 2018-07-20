@@ -107,7 +107,7 @@ if "%TO_FILE_PATH:~-1%" == "\" if "%FROM_FILE_PATH:~-1%" == "\" (
 )
 
 rem check if file is under GIT version contorl
-git ls-files --error-unmatch "%FROM_FILE_PATH%"
+git ls-files --error-unmatch "%FROM_FILE_PATH%" >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
   call :GIT_RENAME_FILE "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 ) else (
