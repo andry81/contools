@@ -101,45 +101,40 @@ if not exist "%FROM_FILE_PATH%" (
   exit /b 4
 ) >&2
 
-if "%TO_FILE_PATH:~-1%" == "\" if "%FROM_FILE_PATH:~-1%" == "\" (
-  set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
-  set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
-)
+if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
+if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
 rem check if file is under GIT version contorl
 git ls-files --error-unmatch "%FROM_FILE_PATH%" >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
-  call :GIT_RENAME_FILE "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+  call :RENAME_FILE SVN "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 ) else (
   rem rename through the shell
-  call :SHELL_RENAME_FILE "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+  call :RENAME_FILE SHELL "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 )
-
-:SHELL_RENAME_END
 
 exit /b
 
-:GIT_RENAME_FILE
+:RENAME_FILE
+set "MODE=%~1"
+shift
 set "FROM_FILE_DIR=%~dp1"
 set "TO_FILE_DIR=%~dp2"
-if /i "%FROM_FILE_DIR%" == "%TO_FILE_DIR%" (
-  call :CMD git mv "%%~1" "%%~nx2"
-) else (
+
+if /i not "%FROM_FILE_DIR%" == "%TO_FILE_DIR%" (
   echo.%?~n0%: error: parent directory path must stay the same: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
   exit /b -254
 ) >&2
+
+goto %MODE%_RENAME_FILE
+
+:SVN_RENAME_FILE
+call :CMD git mv "%%~1" "%%~2"
 
 exit /b
 
 :SHELL_RENAME_FILE
-set "FROM_FILE_DIR=%~dp1"
-set "TO_FILE_DIR=%~dp2"
-if /i "%FROM_FILE_DIR%" == "%TO_FILE_DIR%" (
-  call :CMD rename "%%~1" "%%~nx2"
-) else (
-  echo.%?~n0%: error: parent directory path must stay the same: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
-  exit /b -254
-) >&2
+call :CMD rename "%%~1" "%%~nx2"
 
 exit /b
 
