@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.07.19
+* 2018.07.22
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -36,7 +36,9 @@
 9.2. Method #2. By path list from command line.
 10. SVN/GIT files batch rename
 10.1. Method #1. Rename files by selection list.
-11. AUTHOR
+11. SVN/GIT files batch move
+11.1. Method #1. Move files by selection list.
+12. AUTHOR
 
 ------------------------------------------------------------------------------
 1. Open standalone notepad window for selected files.
@@ -323,6 +325,24 @@ call.vbs
 scm\git\git_rename_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-11. AUTHOR
+11. SVN/GIT files batch move
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+11.1. Method #1. Move files by selection list.
+------------------------------------------------------------------------------
+
+For SVN:
+
+call.vbs
+scm\svn\svn_move_files_by_list.bat "%P" %L
+
+For GIT:
+
+call.vbs
+scm\git\git_move_files_by_list.bat "%P" %L
+
+------------------------------------------------------------------------------
+12. AUTHOR
 ------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)
