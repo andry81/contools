@@ -6,6 +6,8 @@ set "?~dp0=%~dp0"
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
+title %?~nx0%: %CD%
+
 call "%%?~dp0%%__init__.bat" || goto :EOF
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
@@ -51,6 +53,8 @@ shift
 
 if not defined PWD goto NOPWD
 ( %PWD:~0,2% && cd "%PWD%" ) || exit /b 1
+
+title %?~nx0%: %CD%
 
 :NOPWD
 
@@ -110,14 +114,25 @@ if %ERRORLEVEL% EQU 0 (
 if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
 if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
+call :PARENT_DIR FROM_FILE_DIR "%%FROM_FILE_PATH%%"
+
 rem check if file is under GIT version contorl
-git ls-files --error-unmatch "%FROM_FILE_PATH%" >nul 2>nul
-if %ERRORLEVEL% EQU 0 (
-  call :MOVE_FILE GIT "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
-) else (
+
+rem WORKAROUND:
+rem  Git ignores absolute path as an command argument and anyway searches current working directory for the repository.
+rem  Use `pushd` to set the current directory to parent directory of being processed item.
+rem
+
+call :CMD pushd "%%FROM_FILE_DIR%%" && (
+  call :CMD git ls-files --error-unmatch "%%FROM_FILE_PATH%%" >nul 2>nul && (
+    call :MOVE_FILE GIT "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+  )
+) || (
   rem move through the shell
   call :MOVE_FILE SHELL "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 )
+
+call :CMD popd
 
 exit /b
 
@@ -211,3 +226,7 @@ exit /b
 :CMD
 echo.^>%*
 (%*)
+
+:PARENT_DIR
+set "%~1=%~dp2"
+exit /b 0
