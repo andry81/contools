@@ -78,11 +78,11 @@ call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst
 setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
 (
-    for /f "usebackq eol=# tokens=* delims=" %%i in ("%RENAME_TO_LIST_FILE_TMP%") do (
-        set /p "FROM_FILE_PATH="
-        set "TO_FILE_PATH=%%i"
-        call :PROCESS_RENAME
-    )
+  for /f "usebackq eol=# tokens=* delims=" %%i in ("%RENAME_TO_LIST_FILE_TMP%") do (
+    set /p "FROM_FILE_PATH="
+    set "TO_FILE_PATH=%%i"
+    call :PROCESS_RENAME
+  )
 ) < "%RENAME_FROM_LIST_FILE_TMP%"
 
 endlocal
