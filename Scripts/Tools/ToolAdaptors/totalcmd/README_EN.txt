@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.07.22
+* 2018.07.24
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -38,7 +38,10 @@
 10.1. Method #1. Rename files by selection list.
 11. SVN/GIT files batch move
 11.1. Method #1. Move files by selection list.
-12. AUTHOR
+12. Create batch directories
+12.1. Method #1. Create directories in current directory by list.
+12.2. Method #2. Create directories in selected directories by list.
+13. AUTHOR
 
 ------------------------------------------------------------------------------
 1. Open standalone notepad window for selected files.
@@ -343,6 +346,24 @@ call.vbs
 scm\git\git_move_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-12. AUTHOR
+12. Create batch directories
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+12.1. Method #1. Create directories in current directory by list.
+------------------------------------------------------------------------------
+
+call.vbs
+create_dirs_by_list.bat "%P"
+
+------------------------------------------------------------------------------
+12.2. Method #2. Create directories in selected directories by list.
+------------------------------------------------------------------------------
+
+call.vbs
+create_dirs_by_list.bat "%P" %L
+
+------------------------------------------------------------------------------
+13. AUTHOR
 ------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

@@ -309,6 +309,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/compare_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_sorted_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_sorted_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/configure.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/create_dirs_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/COPYING -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/README.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/icobundl.exe -text
@@ -321,12 +322,18 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/compare-files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare-sorted-files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare_sorted_files.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/create_dirs.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/create_dirs.png -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/create_dirs_in_dirs.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/create_dirs_in_dirs.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/git_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/git_move_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/git_rename_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/git_rename_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/icon_move_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/icon_rename_files.png -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/separator_svn.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/separator_svn.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/svn_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/svn_move_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/svn_rename_files.ico -text
