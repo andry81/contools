@@ -1,3 +1,7 @@
+2018.07.24:
+* new: totalcmd/create_dirs_by_list.bat scripts + icons
+* new: svn group buttons separator-title icon
+
 2018.07.23:
 * fixed: totalcmd/scm/git: git commands does ignore absolute path in a command argument and searches the current directory for a repository
 * minor totalcmd scripts improvement
