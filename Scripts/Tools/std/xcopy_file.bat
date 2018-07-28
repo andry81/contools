@@ -148,7 +148,7 @@ if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%
 
 :IGNORE_XCOPY_EXCLUDES
 
-rem echo.F will only work if locale is NOT in english !!!
+rem echo.F will ONLY work if locale is compatible with english !!!
 echo.F|xcopy.exe "%FROM_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 set LASTERROR=%ERRORLEVEL%
 
