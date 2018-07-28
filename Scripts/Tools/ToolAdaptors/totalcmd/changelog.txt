@@ -1,6 +1,6 @@
 2018.07.28
-* new: Scripts/Tools/ToolAdaptors/totalcmd: standalone changelog (all previous history partially compied from the root changelog)
-* changed: Scripts/Tools/ToolAdaptors/totalcmd: minor icons edit
+* new: standalone changelog (all previous history partially compied from the root changelog)
+* changed: minor icons edit
 
 2018.07.24:
 * new: totalcmd/create_dirs_by_list.bat scripts + icons
@@ -13,7 +13,6 @@
 2018.07.23:
 * fixed: totalcmd/scm/svn/svn_rename_by_list.bat, totalcmd/scm/git/git_rename_by_list.bat scripts
 * new: totalcmd/scm/svn/svn_move_by_list.bat, totalcmd/scm/git/git_move_by_list.bat scripts + icons
-* new: get_shared_path.bat script
 * minor refactor and cleanup
 
 2018.07.20:
@@ -22,7 +21,6 @@
 2018.07.19:
 * fixed: typo
 * fixed: better version control detection in totalcmd/scm/svn/svn_rename_by_list.bat script
-* new: changelog for per changeset commit logs
 * new: totalcmd/scm/svn/svn_rename_by_list.bat and totalcmd/scm/git/git_rename_by_list.bat scripts + icons for toolbar
 * new: svn/git ignore files
 * changed: totalcmd/scm/svn/svn_rename_by_list.bat and totalcmd/scm/git/git_rename_by_list.bat scripts adopted to rename both files and directories
