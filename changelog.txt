@@ -1,4 +1,7 @@
-2018.07.28
+2018.07.28:
+* fixed: typo
+
+2018.07.28:
 * new: Scripts/Tools/ToolAdaptors/totalcmd: standalone changelog (all previous history partially compied from the root changelog)
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: minor icons edit
 
