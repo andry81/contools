@@ -68,7 +68,7 @@ type nul > "%MOVE_FROM_LIST_FILE_TMP%"
 type nul > "%MOVE_TO_LIST_FILE_TMP%"
 
 rem read selected file paths from file
-for /F "usebackq eol=	 delims=" %%i in ("%~1") do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
   (echo.%%i) >> "%MOVE_FROM_LIST_FILE_TMP%"
   (echo.%%i) >> "%MOVE_TO_LIST_FILE_TMP%"
 )
@@ -114,7 +114,7 @@ if %ERRORLEVEL% EQU 0 (
 if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
 if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
-rem check if file is under SVN version contorl
+rem check if file is under SVN version control
 svn info "%FROM_FILE_PATH%" --non-interactive >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
   call :MOVE_FILE SVN "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"

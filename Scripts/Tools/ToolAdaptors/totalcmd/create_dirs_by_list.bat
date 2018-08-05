@@ -69,13 +69,13 @@ type nul > "%CREATE_DIRS_LIST_FILE_TMP%"
 
 if not "%~1" == "" (
   rem read selected file paths from file
-  for /F "usebackq eol=	 delims=" %%i in ("%~1") do (
+  for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
     (echo.%%i) >> "%CREATE_DIRS_IN_LIST_FILE_TMP%"
   )
 ) else (
   rem use working directory path as base directory path
   setlocal ENABLEDELAYEDEXPANSION
-  for /F "eol=	 delims=" %%i in ("!CD!") do (
+  for /F "eol=	 tokens=* delims=" %%i in ("!CD!") do (
     endlocal
     (echo.%%i) >> "%CREATE_DIRS_IN_LIST_FILE_TMP%"
   )

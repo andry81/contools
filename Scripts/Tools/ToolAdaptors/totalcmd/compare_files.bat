@@ -8,6 +8,8 @@ set "?~nx0=%~nx0"
 
 call "%%?~dp0%%__init__.bat" || goto :EOF
 
+call "%%?~dp0%%loadvars.bat" "%%?~dp0%%profile.vars" || goto :EOF
+
 rem script flags
 set FLAG_WAIT_EXIT=0
 
@@ -31,8 +33,6 @@ if defined FLAG (
   rem read until no flags
   goto FLAGS_LOOP
 )
-
-call "%%?~dp0%%loadvars.bat" "%%?~dp0%%profile.vars"
 
 set "PWD=%~1"
 shift
