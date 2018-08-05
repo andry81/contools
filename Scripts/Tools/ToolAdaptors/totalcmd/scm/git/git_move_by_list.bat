@@ -68,7 +68,7 @@ type nul > "%MOVE_FROM_LIST_FILE_TMP%"
 type nul > "%MOVE_TO_LIST_FILE_TMP%"
 
 rem read selected file paths from file
-for /F "usebackq eol=	 delims=" %%i in ("%~1") do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
   (echo.%%i) >> "%MOVE_FROM_LIST_FILE_TMP%"
   (echo.%%i) >> "%MOVE_TO_LIST_FILE_TMP%"
 )
@@ -116,7 +116,7 @@ if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
 call :PARENT_DIR FROM_FILE_DIR "%%FROM_FILE_PATH%%"
 
-rem check if file is under GIT version contorl
+rem check if file is under GIT version control
 
 rem WORKAROUND:
 rem  Git ignores absolute path as an command argument and anyway searches current working directory for the repository.

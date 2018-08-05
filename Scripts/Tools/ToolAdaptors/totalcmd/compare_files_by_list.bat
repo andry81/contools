@@ -8,6 +8,8 @@ set "?~nx0=%~nx0"
 
 call "%%?~dp0%%__init__.bat" || goto :EOF
 
+call "%%?~dp0%%loadvars.bat" "%%?~dp0%%profile.vars" || goto :EOF
+
 rem script flags
 set FLAG_WAIT_EXIT=0
 
@@ -27,12 +29,10 @@ if defined FLAG (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   )
-  
+
   rem read until no flags
   goto FLAGS_LOOP
 )
-
-call "%%?~dp0%%loadvars.bat" "%%?~dp0%%profile.vars"
 
 set "PWD=%~1"
 shift
@@ -46,7 +46,7 @@ if not defined PWD goto NOPWD
 :NOPWD
 
 rem read selected file paths from file
-for /F "usebackq eol=	 delims=" %%i in ("%~1") do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
   set FILE_PATH=%%i
   call :PROCESS_FILE_PATH || goto PROCESS_COMPARE
 )
