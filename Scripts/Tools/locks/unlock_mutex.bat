@@ -6,15 +6,13 @@ set "LOCK_NAME=%~1"
 
 call "%%~dp0__init__.bat" || goto :EOF
 
-call "%%CONTOOLS_ROOT%%/uuidgen.bat"
-
 set "LOCK_PATH=%TEMP%"
 set "PRE_LOCK_FILE=prelock_mutex0.%LOCK_NAME%"
 set "LOCK_DIR=lock_mutex0.%LOCK_NAME%"
 set "UNLOCK_DIR=unlock0"
 set "UNLOCK_FILE=unlock0"
 
-set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VALUE%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
 
 :PRE_LOCK_LOOP
 rem prelock via redirection to file
@@ -45,7 +43,7 @@ if %PRE_LOCK_ACQUIRE% NEQ 0 (
   exit /b 0
 )
 
-rem pathping localhost -n -q 1 -p 20 >nul 2>&1
+rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto PRE_LOCK_LOOP
 

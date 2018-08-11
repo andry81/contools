@@ -8,15 +8,17 @@ call "%%~dp0__init__.bat" || goto :EOF
 
 call "%%CONTOOLS_ROOT%%/uuidgen.bat"
 
+set "RAND=%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
+
 set "LOCK_PATH=%TEMP%"
 set "PRE_LOCK_FILE=prelock_mutex0.%LOCK_NAME%"
 set "LOCK_DIR=lock_mutex0.%LOCK_NAME%"
 set "UNLOCK_DIR=unlock0"
 set "UNLOCK_FILE=unlock0"
 set "WAITERS_DIR=waiters"
-set "WAITER_FILE=waiter.%RETURN_VAlUE%"
+set "WAITER_FILE=waiter.%RAND%"
 
-set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VAlUE%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RAND%"
 
 :PRE_LOCK_LOOP
 rem prelock via redirection to file
@@ -43,7 +45,7 @@ set PRE_LOCK_ACQUIRE=0
 
 rem could not prelock operations over the lock directory - somebody is already proccessing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% EQU 0 (
-  rem pathping localhost -n -q 1 -p 20 >nul 2>&1
+  rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
   goto PRE_LOCK_LOOP
 )
@@ -54,7 +56,7 @@ call :CLEANUP_PRELOCK
 :WAIT_LOOP
 if not exist "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%\%WAITER_FILE%" goto EXIT
 
-pathping localhost -n -q 1 -p 20 >nul 2>&1
+call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto WAIT_LOOP
 

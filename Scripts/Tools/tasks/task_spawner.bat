@@ -36,7 +36,7 @@ exit /b 0
 
 :REPEAT_DECREMENT_WAIT
 
-rem improvised sleep of 500 msec wait
-pathping localhost -n -q 1 -p 500 >nul
+rem improvised sleep of 20 msec wait
+call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto REPEAT_DECREMENT_LOOP

@@ -25,6 +25,8 @@ if "%~3" == "" (
   exit /b -1
 ) >&2
 
+call "%%~dp0__init__.bat" || goto :EOF
+
 set SPAWNED_TASKS=0
 
 set RND=%RANDOM%.%RANDOM%
@@ -59,8 +61,8 @@ if %RUNNING_TASKS_COUNTER% LSS %MAX_WAIT_TASKS% goto SPAWN_TASK
 
 :REPEAT_READ_WAIT
 
-rem improvised sleep of 500 msec wait
-pathping localhost -n -q 1 -p 500 >nul
+rem improvised sleep of 20 msec wait
+call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto REPEAT_READ_LOOP
 
@@ -104,8 +106,8 @@ goto REPEAT_READ_LOOP
 
 :REPEAT_INCREMENT_WAIT
 
-rem improvised sleep of 500 msec wait
-pathping localhost -n -q 1 -p 500 >nul
+rem improvised sleep of 20 msec wait
+call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto REPEAT_INCREMENT_LOOP
 
@@ -143,7 +145,7 @@ exit /b 0
 
 :REPEAT_WAIT_EXIT
 
-rem improvised sleep of 500 msec wait
-pathping localhost -n -q 1 -p 500 >nul
+rem improvised sleep of 20 msec wait
+call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto WAIT_EXIT_LOOP

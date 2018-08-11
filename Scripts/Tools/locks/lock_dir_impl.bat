@@ -13,16 +13,16 @@ set "WAITERS_DIR=%~6"
 
 call "%%~dp0__init__.bat" || goto :EOF
 
-call "%%CONTOOLS_ROOT%%/uuidgen.bat"
+set "RAND=%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
 
-set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VALUE%"
-set "OLD_UNLOCK_DIR=%UNLOCK_DIR%.%RETURN_VALUE%"
-set "OLD_WAITERS_DIR=%WAITERS_DIR%.%RETURN_VALUE%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RAND%"
+set "OLD_UNLOCK_DIR=%UNLOCK_DIR%.%RAND%"
+set "OLD_WAITERS_DIR=%WAITERS_DIR%.%RAND%"
 
 :WAIT_LOOP
 if exist "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%\%UNLOCK_FILE%" goto EXIT
 
-pathping localhost -n -q 1 -p 20 >nul 2>&1
+call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto WAIT_LOOP
 
@@ -74,7 +74,7 @@ if %PRE_LOCK_ACQUIRE% NEQ 0 (
   exit /b 0
 )
 
-rem pathping localhost -n -q 1 -p 20 >nul 2>&1
+rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto EXIT_PRE_LOCK_LOOP
 
@@ -89,6 +89,6 @@ rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>&1 && rmdir /S /Q "%LOCK
 if not exist "%LOCK_PATH%\%LOCK_DIR%" exit /b 0
 
 rem we should not exit until the lock directory would not be cleanuped
-rem pathping localhost -n -q 1 -p 20 >nul 2>&1
+rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto RELEASE_AND_CLEANUP_LOCK_LOOP
