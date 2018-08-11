@@ -1,3 +1,8 @@
+2018.08.11:
+* new: sleep.bat script
+* changed: replaced direct usage of the pathping.exe utility by the sleep.bat script
+* changed: speed up locks and tasks scripts by replacing uuid.exe usage by %RANDOM%
+
 2018.08.05:
 * new: Scripts/Tools/ToolAdaptors/totalcmd: notepad_edit_files_by_list.bat script (modificated version of notepad_edit_files.bat) to bypass command interpreter's 8190 characters limit of command line length
 * refactor: Scripts/Tools/ToolAdaptors/totalcmd: minor refactor

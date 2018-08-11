@@ -35,13 +35,13 @@ goto PREPARE_LOCK_WAITERS_IMPL
 set "PRE_LOCK_FILE=prelock_mutex0.%LOCK_NAME%"
 set "LOCK_DIR=lock_mutex0.%LOCK_NAME%"
 
-call "%%CONTOOLS_ROOT%%/uuidgen.bat"
+set "RAND=%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
 
-set "WAITER_FILE=waiter.%RETURN_VALUE%"
+set "WAITER_FILE=waiter.%RAND%"
 set "WAITER_FILE_%LOCK_WAITER_INDEX%="
 
 rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
-set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VALUE%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RAND%"
 
 :PRE_LOCK_LOOP0
 rem prelock via redirection to file
@@ -76,7 +76,7 @@ set PRE_LOCK_ACQUIRE=0
 rem could not prelock operations over the lock directory - somebody is already proccessing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% NEQ 0 exit /b 0
 
-rem pathping localhost -n -q 1 -p 20 >nul 2>&1
+rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto PRE_LOCK_LOOP0
 
@@ -86,7 +86,7 @@ call :CLEANUP_PRELOCK
 :WAIT_LOOP
 call :LOCK_WAITING && exit /b 0
 
-pathping localhost -n -q 1 -p 20 >nul 2>&1
+call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto WAIT_LOOP
 
@@ -106,9 +106,7 @@ call set "LOCK_NAME=%%LOCK_NAME_%LOCK_WAITER_INDEX%%%"
 call set "PRE_LOCK_FILE=%%PRE_LOCK_FILE_%LOCK_WAITER_INDEX%%%"
 call set "LOCK_DIR=%%LOCK_DIR_%LOCK_WAITER_INDEX%%%"
 
-call "%%CONTOOLS_ROOT%%/uuidgen.bat"
-
-set "OLD_LOCK_DIR=%LOCK_DIR%.%RETURN_VALUE%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
 
 rem prelock via redirection to file
 (
