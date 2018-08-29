@@ -417,7 +417,7 @@ if %FLAG_WINDOW_PER_REPOROOT% NEQ 0 ( type nul > "%TORTOISEPROC_PATHFILE_WORKING
 :IGNORE_OUTTER_INIT
 
 if not defined PWD goto NOPWD
-( %PWD:~0,2% && cd "%PWD%" ) || exit /b 1
+cd /d "%PWD%" || exit /b 1
 
 :NOPWD
 rem count only success calls

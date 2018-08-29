@@ -1,3 +1,9 @@
+2018.08.29:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: svn/git move scripts redesigned to avoid creation a subdirectory with file name as name
+
+2018.08.28:
+* refactor: minor improvement
+
 2018.08.11:
 * new: sleep.bat script
 * changed: replaced direct usage of the pathping.exe utility by the sleep.bat script

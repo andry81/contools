@@ -41,7 +41,7 @@ set "FILES_LIST="
 set NUM_FILES=0
 
 if not defined PWD goto NOPWD
-( %PWD:~0,2% && cd "%PWD%" ) || exit /b 1
+cd /d "%PWD%" || exit /b 1
 
 :NOPWD
 

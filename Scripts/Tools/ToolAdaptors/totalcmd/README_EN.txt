@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.07.24
+* 2018.08.28
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -116,22 +116,22 @@ process.
 For 64-bit cmd.exe button under Windows x64 in the Administrative mode:
 
 cmd_sysnative_admin.lnk
-/K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
+/K set "PWD=%P"&call cd /d "%%PWD%%"
 
 For 32-bit cmd.exe button under Windows x64 in the Administrative mode:
 
 cmd_wow64_admin.lnk
-/K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
+/K set "PWD=%P"&call cd /d "%%PWD%%"
 
 For 64-bit cmd.exe button under Windows x64 in a user mode:
 
 cmd_sysnative.lnk
-/K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
+/K set "PWD=%P"&call cd /d "%%PWD%%"
 
 For 32-bit cmd.exe button under Windows x64 in a user mode:
 
 cmd_wow64.lnk
-/K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
+/K set "PWD=%P"&call cd /d "%%PWD%%"
 
 ------------------------------------------------------------------------------
 3.2. Method #2. On left mouse button. Total Commander bitness dependent.
@@ -142,14 +142,14 @@ Total Commander bitness)
 (correction: may be the error is an error of Python, the internet advises to run command as: "python -m pip install --upgrade")
 
 cmd_admin.lnk
-/K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
+/K set "PWD=%P"&call cd /d "%%PWD%%"
 
 ------------------------------------------------------------------------------
 3.3. Method #2. On right mouse button -> As Administrator.
 ------------------------------------------------------------------------------
 
 cmd.exe
-/K set "PWD=%P"&call %%PWD:~0,2%%&call cd "%%PWD%%"
+/K set "PWD=%P"&call cd /d "%%PWD%%"
 
 ------------------------------------------------------------------------------
 3.4. Method #3. On left mouse button.
@@ -158,7 +158,7 @@ cmd.exe
 (in not english version of Windows instead of the "Administrator" you have to use a localized name)
 
 runas
-/user:Administrator "cmd.exe /K set \"PWD=%P\\"&call %%PWD:~0,2%%&call cd \"%%PWD%%\"&title User: ^<Administrator^>"
+/user:Administrator "cmd.exe /K set \"PWD=%P\\"&call cd /d \"%%PWD%%\"&title User: ^<Administrator^>"
 
 or
 
