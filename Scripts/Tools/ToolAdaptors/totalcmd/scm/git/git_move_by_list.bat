@@ -52,7 +52,7 @@ set "PWD=%~1"
 shift
 
 if not defined PWD goto NOPWD
-( %PWD:~0,2% && cd "%PWD%" ) || exit /b 1
+cd /d "%PWD%" || exit /b 1
 
 title %?~nx0%: %CD%
 
@@ -70,8 +70,26 @@ type nul > "%MOVE_TO_LIST_FILE_TMP%"
 rem read selected file paths from file
 for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
   (echo.%%i) >> "%MOVE_FROM_LIST_FILE_TMP%"
+  set "FILE_PATH=%%i"
+  call :FILL_TO_LIST_FILE_TMP
+)
+
+goto FILL_TO_LIST_FILE_TMP_END
+
+:FILL_TO_LIST_FILE_TMP
+
+rem always remove trailing slash character
+if "%FILE_PATH:~-1%" == "\" set "FILE_PATH=%FILE_PATH:~0,-1%"
+
+call :GET_FILE_PATH_COMPONENTS PARENT_DIR FILE_NAME "%%FILE_PATH%%"
+
+for /F "eol=	 tokens=* delims=" %%i in ("%PARENT_DIR%|%FILE_NAME%") do (
   (echo.%%i) >> "%MOVE_TO_LIST_FILE_TMP%"
 )
+
+exit /b 0
+
+:FILL_TO_LIST_FILE_TMP_END
 
 call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%MOVE_TO_LIST_FILE_TMP%%"
 
@@ -93,6 +111,19 @@ exit /b 0
 if not defined FROM_FILE_PATH exit /b 1
 if not defined TO_FILE_PATH exit /b 2
 
+rem always remove trailing slash character
+if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
+if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
+
+rem extract destination path components
+for /F "eol=	 tokens=1,* delims=|" %%i in ("%TO_FILE_PATH%") do (
+  set "TO_FILE_DIR=%%i"
+  set "TO_FILE_NAME=%%j"
+)
+
+rem concatenate
+set "TO_FILE_PATH=%TO_FILE_PATH:|=%"
+
 if /i "%FROM_FILE_PATH%" == "%TO_FILE_PATH%" exit /b 0
 
 if not exist "%FROM_FILE_PATH%" (
@@ -111,10 +142,15 @@ if %ERRORLEVEL% EQU 0 (
 
 :IGNORE_TO_FILE_PATH_CHECK
 
-if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
-if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
+rem check if destination name is changed and print warning
+call :GET_FILE_PATH_COMPONENTS FROM_FILE_DIR FROM_FILE_NAME "%%FROM_FILE_PATH%%"
 
-call :PARENT_DIR FROM_FILE_DIR "%%FROM_FILE_PATH%%"
+if not "%FROM_FILE_NAME%" == "%TO_FILE_NAME%" (
+  echo.%?~n0%: warning: move does not imply rename, destination file name should not change ^(rename ignored^): FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
+)
+
+if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
+if "%TO_FILE_DIR:~-1%" == "\" set "TO_FILE_DIR=%TO_FILE_DIR:~0,-1%"
 
 rem check if file is under GIT version control
 
@@ -125,12 +161,16 @@ rem
 
 call :CMD pushd "%%FROM_FILE_DIR%%" && (
   call :CMD git ls-files --error-unmatch "%%FROM_FILE_PATH%%" >nul 2>nul && (
-    call :MOVE_FILE GIT "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+    call :MOVE_FILE GIT
+    rem to avoid trigger the shell copy block on not zero return code from above command
+    goto MOVE_END
+  ) || (
+    rem move through the shell
+    call :MOVE_FILE SHELL
   )
-) || (
-  rem move through the shell
-  call :MOVE_FILE SHELL "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 )
+
+:MOVE_END
 
 call :CMD popd
 
@@ -138,95 +178,67 @@ exit /b
 
 :MOVE_FILE
 set "MODE=%~1"
-shift
-set "FROM_FILE_DIR=%~dp1"
-set "TO_FILE_DIR=%~dp2"
 
-call "%%CONTOOLS_ROOT%%/get_shared_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+call "%%CONTOOLS_ROOT%%/get_shared_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_DIR%%"
 if %ERRORLEVEL% NEQ 0 (
-  echo.%?~n0%: error: source file path and destination file path must share a common root path: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
+  echo.%?~n0%: error: source file path and destination file directory must share a common root path: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_DIR="%TO_FILE_DIR%".
   exit /b -253
 ) >&2
 
 set "SHARED_ROOT=%RETURN_VALUE%"
 
-call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%SHARED_ROOT%%" "%%TO_FILE_PATH%%"
+call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%SHARED_ROOT%%" "%%TO_FILE_DIR%%"
 if %ERRORLEVEL% NEQ 0 (
-  echo.%?~n0%: error: shared path root is not a prefix to TO_FILE_PATH path: SHARED_ROOT="%SHARED_ROOT%" TO_FILE_PATH="%TO_FILE_PATH%".
+  echo.%?~n0%: error: shared path root is not a prefix to TO_FILE_DIR path: SHARED_ROOT="%SHARED_ROOT%" TO_FILE_DIR="%TO_FILE_DIR%".
   exit /b -252
 ) >&2
 
-set "TO_FILE_PATH_SUFFIX=%RETURN_VALUE%"
+set "TO_FILE_DIR_SUFFIX=%RETURN_VALUE%"
 
 goto %MODE%_MOVE_FILE
 
 :GIT_MOVE_FILE
-if not defined TO_FILE_PATH_SUFFIX goto GIT_MOVE_FILE_CMD
-
-rem rem add to version control
-rem call "%%CONTOOLS_ROOT%%/index_pathstr.bat" TO_FILE_PATH_SUFFIX \ "%%TO_FILE_PATH_SUFFIX%%"
-rem set TO_FILE_PATH_SUFFIX_ARR_SIZE=%RETURN_VALUE%
-rem 
-rem if %TO_FILE_PATH_SUFFIX_ARR_SIZE% EQU 0 goto GIT_MOVE_FILE_CMD
-rem 
-rem set TO_FILE_PATH_SUFFIX_INDEX=1
-rem 
-rem call :CMD pushd "%%SHARED_ROOT%%" || goto GIT_MOVE_FILE_CMD
-rem 
-rem call :CMD mkdir "%%TO_FILE_PATH_SUFFIX%%"
-rem 
-rem :GIT_ADD_LOOP
-rem call set "TO_FILE_PATH_SUFFIX_STR=%%TO_FILE_PATH_SUFFIX%TO_FILE_PATH_SUFFIX_INDEX%%%"
-rem 
-rem call :CMD git add "%%TO_FILE_PATH_SUFFIX_STR%%"
-rem 
-rem set /A TO_FILE_PATH_SUFFIX_INDEX+=1
-rem 
-rem if %TO_FILE_PATH_SUFFIX_INDEX% GTR %TO_FILE_PATH_SUFFIX_ARR_SIZE% goto GIT_ADD_LOOP_END
-rem 
-rem goto GIT_ADD_LOOP
-rem 
-rem :GIT_ADD_LOOP_END
-rem 
-rem call :CMD popd
-rem 
-rem :GIT_MOVE_FILE_CMD
+if not defined TO_FILE_DIR_SUFFIX goto GIT_MOVE_FILE_CMD
 
 call :CMD pushd "%%SHARED_ROOT%%" && (
-  call :CMD mkdir "%%TO_FILE_PATH_SUFFIX%%"
+  call :CMD mkdir "%%TO_FILE_DIR_SUFFIX%%"
   call :CMD popd
 )
 
 :GIT_MOVE_FILE_CMD
-rem workaround to move directory/file into parent path directory
-if not defined TO_FILE_PATH_SUFFIX set "TO_FILE_PATH_SUFFIX=."
-if "%TO_FILE_PATH_SUFFIX:~-1%" == "\" set "TO_FILE_PATH_SUFFIX=%TO_FILE_PATH_SUFFIX%."
+set "TO_FILE_PATH=%SHARED_ROOT%\%TO_FILE_DIR_SUFFIX%"
 
-call :CMD git mv "%%~1" "%%SHARED_ROOT%%\%%TO_FILE_PATH_SUFFIX%%"
+rem always remove trailing slash character
+if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
+
+call :CMD git mv "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 
 exit /b
 
 :SHELL_MOVE_FILE
-if not defined TO_FILE_PATH_SUFFIX goto SHELL_MOVE_FILE_CMD
+if not defined TO_FILE_DIR_SUFFIX goto SHELL_MOVE_FILE_CMD
 
 call :CMD pushd "%%SHARED_ROOT%%" && (
-  call :CMD mkdir "%%TO_FILE_PATH_SUFFIX%%"
+  call :CMD mkdir "%%TO_FILE_DIR_SUFFIX%%"
   call :CMD popd
 )
 
 :SHELL_MOVE_FILE_CMD
-rem workaround to move directory/file into parent path directory
-if not defined TO_FILE_PATH_SUFFIX set "TO_FILE_PATH_SUFFIX=."
-if "%TO_FILE_PATH_SUFFIX:~-1%" == "\" set "TO_FILE_PATH_SUFFIX=%TO_FILE_PATH_SUFFIX%."
+set "TO_FILE_PATH=%SHARED_ROOT%\%TO_FILE_DIR_SUFFIX%"
 
-call :CMD move "%%~1" "%%SHARED_ROOT%%\%%TO_FILE_PATH_SUFFIX%%"
+rem always remove trailing slash character
+if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
+
+call :CMD move "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 
 exit /b
 
 :CMD
 echo.^>%*
 (%*)
+exit /b
 
-:PARENT_DIR
-set "%~1=%~dp2"
+:GET_FILE_PATH_COMPONENTS
+set "%~1=%~dp3"
+set "%~2=%~nx3"
 exit /b 0
