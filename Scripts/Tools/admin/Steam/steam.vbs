@@ -12,7 +12,7 @@ End Function
 Function WriteBinaryFile(strText, strPath)
     Dim oFSO: Set oFSO = CreateObject("Scripting.FileSystemObject")
 
-    ' below lines pupose: checks that write access is possible!
+    ' below lines purpose: checks that write access is possible!
     Dim oTxtStream: Set oTxtStream = oFSO.createTextFile(strPath)
     On Error Resume Next
     If Err.number <> 0 Then MsgBox(Err.message) : Exit Function

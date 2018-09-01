@@ -1,3 +1,9 @@
+2018.09.01:
+* fixed: Tools\admin\Telemetry: `disable_telemetry_junk_win7.bat` script workarounded over `Access Denided` errors around `takeown` and `icacls` system utilities.
+* fixed: TargetProject.PostBuildStep.bat build script
+* new: retakeowner utility to take ownershipe where the system `takeown` and `icacls` fails with access denided error.
+* minor cleanup
+
 2018.08.29:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: svn/git move scripts redesigned to avoid creation a subdirectory with file name as name
 

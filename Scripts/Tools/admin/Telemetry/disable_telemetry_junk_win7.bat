@@ -43,6 +43,19 @@ goto :EOF
 
 :UPDATE_PERMISSIONS
 echo.^>%FILE%
+if exist "%~dp0retakeowner.exe" goto RETAKEOWNER_WORKAROUND
+
+rem CAUTION: Obsolete implementation, `takeown` and `icacls` does not work anymore on TrustedInstaller protected files!
+echo.%~nx0: warning: system takeown utility may fail to take ownership on TrustedInstaller protected files beginning from Windows 7. Copy `retakeowner.exe` utility into directory with the script to bypass this issue.
 takeown /S localhost /U "%USERNAME%" /F "%FILE%"
+
+goto RETAKEOWNER_WORKAROUND_END
+
+:RETAKEOWNER_WORKAROUND
+"%~dp0retakeowner.exe" "%FILE%" "%USERNAME%"
+echo.%~nx0: retakeowner last error code: %ERRORLEVEL%
+
+:RETAKEOWNER_WORKAROUND_END
+
 icacls "%FILE%" /remove:g "NT SERVICE\TrustedInstaller"
 icacls "%FILE%" /deny *S-1-1-0:(WO,GE)

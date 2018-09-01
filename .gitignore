@@ -27,6 +27,9 @@ Utilities/Sources/printargs/version.hpp
 Utilities/Sources/printf/help.txt
 Utilities/Sources/printf/help_inl.hpp
 Utilities/Sources/printf/version.hpp
+Utilities/Sources/retakeowner/help.txt
+Utilities/Sources/retakeowner/help_inl.hpp
+Utilities/Sources/retakeowner/version.hpp
 Utilities/Sources/thlibautocfg/help.txt
 Utilities/Sources/thlibautocfg/help_inl.hpp
 Utilities/Sources/thlibautocfg/version.hpp
