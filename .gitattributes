@@ -679,6 +679,7 @@ Utilities/Binaries/envvarcmp.exe -text
 Utilities/Binaries/pipetimes.exe -text
 Utilities/Binaries/printargs.exe -text
 Utilities/Binaries/printf.exe -text
+Utilities/Binaries/retakeowner.exe -text
 Utilities/Binaries/thlibautocfg.exe -text
 Utilities/Projects/TargetProject.PreBuildStep.CommandLine.var -text
 Utilities/Projects/callf.vcxproj -text
@@ -687,6 +688,7 @@ Utilities/Projects/envvarcmp.vcxproj -text
 Utilities/Projects/pipetimes.vcxproj -text
 Utilities/Projects/printargs.vcxproj -text
 Utilities/Projects/printf.vcxproj -text
+Utilities/Projects/retakeowner.vcxproj -text
 Utilities/Projects/thlibautocfg.vcxproj -text
 Utilities/Sources/_common/common.hpp -text
 Utilities/Sources/_common/printf.hpp -text
@@ -716,6 +718,11 @@ Utilities/Sources/printf/help.tpl -text
 Utilities/Sources/printf/printf.cpp -text
 Utilities/Sources/printf/version.def -text
 Utilities/Sources/printf/version.tpl -text
+Utilities/Sources/retakeowner/help.def -text
+Utilities/Sources/retakeowner/help.tpl -text
+Utilities/Sources/retakeowner/retakeowner.cpp -text
+Utilities/Sources/retakeowner/version.def -text
+Utilities/Sources/retakeowner/version.tpl -text
 Utilities/Sources/thlibautocfg/help.def -text
 Utilities/Sources/thlibautocfg/help.tpl -text
 Utilities/Sources/thlibautocfg/thlibautocfg.cpp -text

@@ -29,6 +29,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "callf", "..\Utilities\Proje
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "clearcache", "..\Utilities\Projects\clearcache.vcxproj", "{DE71ED8C-9F4E-47AC-8E1D-E0053E42F575}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "retakeowner", "..\Utilities\Projects\retakeowner.vcxproj", "{E17B910A-9CF1-4739-B4F0-D10034CA11FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -61,6 +63,10 @@ Global
 		{B9C215D3-6B7B-4A49-ACD7-4F8DFA69F337}.Release|Win32.Build.0 = Release|Win32
 		{DE71ED8C-9F4E-47AC-8E1D-E0053E42F575}.Debug|Win32.ActiveCfg = Debug|Win32
 		{DE71ED8C-9F4E-47AC-8E1D-E0053E42F575}.Release|Win32.ActiveCfg = Release|Win32
+		{E17B910A-9CF1-4739-B4F0-D10034CA11FE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E17B910A-9CF1-4739-B4F0-D10034CA11FE}.Debug|Win32.Build.0 = Debug|Win32
+		{E17B910A-9CF1-4739-B4F0-D10034CA11FE}.Release|Win32.ActiveCfg = Release|Win32
+		{E17B910A-9CF1-4739-B4F0-D10034CA11FE}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{3BF4DB3A-DD04-4457-A474-D9A534D59B81} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{B9C215D3-6B7B-4A49-ACD7-4F8DFA69F337} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{DE71ED8C-9F4E-47AC-8E1D-E0053E42F575} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
+		{E17B910A-9CF1-4739-B4F0-D10034CA11FE} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
