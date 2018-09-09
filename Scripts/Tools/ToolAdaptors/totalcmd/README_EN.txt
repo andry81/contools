@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.08.28
+* 2018.09.09
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -67,15 +67,25 @@ notepad_edit_files.bat "%P" %S
 ------------------------------------------------------------------------------
 (Console window appears on a moment (flickering))
 
-For Notepad++:
+For Notepad++, ANSI only files (limited by command line length):
 
-notepad_edit_files.bat
--npp -nosession -multiInst "%P" %S
+call_nowindow.vbs
+notepad_edit_files.bat -npp -nosession -multiInst "%P" %S
+
+For Notepad++, ANSI only files (not limited by command line length):
+
+call_nowindow.vbs
+notepad_edit_files_by_list.bat -npp -nosession -multiInst "%P" %L
+
+For Notepad++, any files (not limited by command line length, but slower):
+
+call_nowindow.vbs
+notepad_edit_files_by_list.bat -npp -paths_to_u16cp -nosession -multiInst "%P" %WL
 
 For Windows Notepad:
 
-notepad_edit_files.bat
-"%P" %S
+call_nowindow.vbs
+notepad_edit_files.bat "%P" %S
 
 ------------------------------------------------------------------------------
 2. Open selected files in existing Notepad++ window.
@@ -86,16 +96,28 @@ notepad_edit_files.bat
 ------------------------------------------------------------------------------
 (Console window is hidden (no flickering))
 
+ANSI only files (limited by command line length):
+
 call_nowindow.vbs
 notepad_edit_files.bat -wait -npp -nosession "%P" %S
+
+ANSI only files (not limited by command line length):
+
+call_nowindow.vbs
+notepad_edit_files_by_list.bat -wait -npp -nosession "%P" %L
+
+Any files (not limited by command line length, but slower):
+
+call_nowindow.vbs
+notepad_edit_files_by_list.bat -wait -npp -paths_to_u16cp -nosession "%P" %WL
 
 ------------------------------------------------------------------------------
 2.2. Method #2. On left mouse button.
 ------------------------------------------------------------------------------
 (Console window appears on a moment (flickering))
 
-notepad_edit_files.bat
--npp -nosession "%P" %S
+call_nowindow.vbs
+notepad_edit_files.bat -npp -nosession "%P" %S
 
 ------------------------------------------------------------------------------
 3. Open Administator console window in current directory.

@@ -1,3 +1,6 @@
+2018.09.09:
+* changed: improved notepad_edit_files_by_list.bat script to open different language files
+
 2018.08.29:
 * fixed: svn/git move scripts redesigned to avoid creation a subdirectory with file name as name
 
