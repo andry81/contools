@@ -1,3 +1,7 @@
+2018.09.09:
+* new: convert_hextbl_utf16le_to_u16cp.bat script to convert utf-16 LE in a hex table into unicode code points
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: improved notepad_edit_files_by_list.bat script to open different language files
+
 2018.09.01:
 * fixed: Tools\admin\Telemetry: `disable_telemetry_junk_win7.bat` script workarounded over `Access Denided` errors around `takeown` and `icacls` system utilities.
 * fixed: TargetProject.PostBuildStep.bat build script

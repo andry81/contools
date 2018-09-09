@@ -27,6 +27,7 @@ exit /b %LASTERROR%
 rem script flags
 set FLAG_WAIT_EXIT=0
 set FLAG_NOTEPADPLUSPLUS=0
+set FLAG_COVERT_PATHS_TO_UNICODE_CODE_POINTS=0
 set "BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -42,6 +43,8 @@ if defined FLAG (
     set FLAG_WAIT_EXIT=1
   ) else if "%FLAG%" == "-npp" (
     set FLAG_NOTEPADPLUSPLUS=1
+  ) else if "%FLAG%" == "-paths_to_u16cp" (
+    set FLAG_COVERT_PATHS_TO_UNICODE_CODE_POINTS=1
   ) else (
     set BARE_FLAGS=%BARE_FLAGS% %1
   )
@@ -60,23 +63,48 @@ cd /d "%PWD%" || exit /b 1
 
 :NOPWD
 
-if "%~1" == "" exit /b 0
+set "LIST_FILE_PATH=%~1"
+
+if not defined LIST_FILE_PATH exit /b 0
+
+set "LIST_FILE_PATH=%LIST_FILE_PATH:\=/%"
 
 if %FLAG_NOTEPADPLUSPLUS% EQU 0 goto USE_BASIC_NOTEPAD
 
 set "EDIT_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.xml"
+set "EDIT_FROM_LIST_FILE_HEX_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.hex.xml"
+set "EDIT_FROM_LIST_FILE_U16CP_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.u16cp.xml"
+
+set "EDIT_FROM_LIST_FILE_HEX_TMP=%EDIT_FROM_LIST_FILE_HEX_TMP:\=/%"
 
 rem recreate empty lists
 type nul > "%EDIT_FROM_LIST_FILE_TMP%"
 
+set "TRANSLATED_LIST_FILE_PATH=%LIST_FILE_PATH%"
+
+if %FLAG_COVERT_PATHS_TO_UNICODE_CODE_POINTS% EQU 0 goto IGNORE_CONVERT_TO_U16CP
+
+set "TRANSLATED_LIST_FILE_PATH=%EDIT_FROM_LIST_FILE_U16CP_TMP%"
+
+call :CMD certutil -encodehex "%%LIST_FILE_PATH%%" "%%EDIT_FROM_LIST_FILE_HEX_TMP%%"
+
+call :CMD "%%CONTOOLS_ROOT%%/encoding/convert_hextbl_utf16le_to_u16cp.bat" "%%EDIT_FROM_LIST_FILE_HEX_TMP%%" "%%EDIT_FROM_LIST_FILE_U16CP_TMP%%"
+
+:IGNORE_CONVERT_TO_U16CP
+
+rem call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CHCP%%
+
 rem create Notepad++ only session file
 (
+  rem rem make UTF-8-BOM xml to enable open non english character files
+  rem type "%CONTOOLS_ROOT%/encoding/boms\efbbbf.bin"
+  rem echo.^<?xml version="1.0" encoding="utf-8"?^>
   echo.^<NotepadPlus^>
   echo.    ^<Session^>
   echo.        ^<mainView^>
 
   rem read selected file paths from file
-  for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
+  for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TRANSLATED_LIST_FILE_PATH%") do (
     rem ignore a sub directory open, files in a sub directory must be selected explicitly in a panel!
     if not exist "%%i\" (
       echo.            ^<File filename="%%i"/^>
@@ -86,8 +114,9 @@ rem create Notepad++ only session file
   echo.        ^</mainView^>
   echo.    ^</Session^>
   echo.^</NotepadPlus^>
-
 ) >> "%EDIT_FROM_LIST_FILE_TMP%"
+
+rem call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   call :CMD start /B /WAIT "" "%%EDITOR%%"%%BARE_FLAGS%% -openSession "%%EDIT_FROM_LIST_FILE_TMP%%"
@@ -100,7 +129,7 @@ exit /b 0
 :USE_BASIC_NOTEPAD
 
 rem CAUTION: no limit to open files!
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in ("%LIST_FILE_PATH%") do (
   set "FILE_TO_EDIT=%%i"
   call :OPEN_BASIC_EDITOR
 )
