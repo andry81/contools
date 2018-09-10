@@ -1,3 +1,7 @@
+2018.09.10:
+* changed: configure.bat script update
+* changed: convert_hextbl_utf16le_to_u16cp.bat script speedup
+
 2018.09.09:
 * changed: improved notepad_edit_files_by_list.bat script to open different language files
 
