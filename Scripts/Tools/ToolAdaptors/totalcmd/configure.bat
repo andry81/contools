@@ -2,6 +2,8 @@
 
 setlocal
 
+call "%%?~dp0%%__init__.bat" || goto :EOF
+
 if exist "%~dp0configure.user.bat" ( call "%~dp0configure.user.bat" || goto :EOF )
 if defined CONTOOLS_ROOT_FROM set "CONTOOLS_ROOT=%CONTOOLS_ROOT_FROM%"
 
@@ -63,6 +65,15 @@ call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%/impl" "svn_get_wc_db_user_ver.bat" "%%CO
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/sqlite" "%%CONTOOLS_ROOT_COPY%%/sqlite" /E /Y /D || goto :EOF
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /E /Y /D || goto :EOF
+
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "create_dirs_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "loadvars.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
 
 pause
 

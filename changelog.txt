@@ -1,3 +1,7 @@
+2018.09.10:
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat script update
+* changed: convert_hextbl_utf16le_to_u16cp.bat script speedup
+
 2018.09.09:
 * new: convert_hextbl_utf16le_to_u16cp.bat script to convert utf-16 LE in a hex table into unicode code points
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: improved notepad_edit_files_by_list.bat script to open different language files
