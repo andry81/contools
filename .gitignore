@@ -7,9 +7,9 @@ Scripts/Tools/__init__.bat
 Utilities/Sources/_common/help.txt
 Utilities/Sources/_common/help_inl.hpp
 Utilities/Sources/_common/version.hpp
-Utilities/Sources/_gui/wxSaveFileDialog/help.txt
-Utilities/Sources/_gui/wxSaveFileDialog/help_inl.hpp
-Utilities/Sources/_gui/wxSaveFileDialog/version.hpp
+Utilities/Sources/_gui/wxFileDialog/help.txt
+Utilities/Sources/_gui/wxFileDialog/help_inl.hpp
+Utilities/Sources/_gui/wxFileDialog/version.hpp
 Utilities/Sources/callf/help.txt
 Utilities/Sources/callf/help_inl.hpp
 Utilities/Sources/callf/version.hpp

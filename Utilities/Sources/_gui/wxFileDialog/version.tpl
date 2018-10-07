@@ -1,6 +1,6 @@
 [+ AutoGen5 template hpp=%s.hpp +]
-#ifndef __GUI_WX_SAVE_FILE_DIALOG_VERSION_HPP__
-#define __GUI_WX_SAVE_FILE_DIALOG_VERSION_HPP__
+#ifndef __GUI_WX_FILE_DIALOG_VERSION_HPP__
+#define __GUI_WX_FILE_DIALOG_VERSION_HPP__
 
 #define APP_VERSION_MAJOR    [+ AppMajorVer +]
 #define APP_VERSION_MINOR    [+ AppMinorVer +]
