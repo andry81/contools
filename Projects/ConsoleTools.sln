@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Header Files", "Header File
 		..\Utilities\Sources\_common\printf.hpp = ..\Utilities\Sources\_common\printf.hpp
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxSaveFileDialog", "..\Utilities\Projects\gui\wxSaveFileDialog.vcxproj", "{01A1ACEA-7261-43C6-B6B0-5C36A6674EE0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxFileDialog", "..\Utilities\Projects\gui\wxFileDialog.vcxproj", "{01A1ACEA-7261-43C6-B6B0-5C36A6674EE0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thlibautocfg", "..\Utilities\Projects\thlibautocfg.vcxproj", "{6163FDF1-845E-4C24-8A88-B99DC955CA2D}"
 EndProject
@@ -37,7 +37,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "retakeowner", "..\Utilities
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GUI", "GUI", "{B3B938A1-1763-4CB6-A295-23AF4A3A136F}"
 	ProjectSection(SolutionItems) = preProject
-		..\Utilities\Sources\_common\gui\wxSaveFileDialog.hpp = ..\Utilities\Sources\_common\gui\wxSaveFileDialog.hpp
+		..\Utilities\Sources\_common\gui\wxFileDialog.hpp = ..\Utilities\Sources\_common\gui\wxFileDialog.hpp
 	EndProjectSection
 EndProject
 Global

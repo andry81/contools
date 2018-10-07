@@ -58,7 +58,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../Sources/_gui/wxSaveFileDialog;../../Sources/_common/gui;../../Sources/_common;$(SolutionDir)../_3dparty/gui/wxWidgets/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Sources/_gui/wxFileDialog;../../Sources/_common/gui;../../Sources/_common;$(SolutionDir)../_3dparty/gui/wxWidgets/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;wxUSE_UNICODE;wxUSE_FILEDLG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -83,7 +83,7 @@
       <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "_gui" "$(ProjectName)"</Command>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../Sources/_gui/wxSaveFileDialog;../../Sources/_common/gui;../../Sources/_common;$(SolutionDir)../_3dparty/gui/wxWidgets/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Sources/_gui/wxFileDialog;../../Sources/_common/gui;../../Sources/_common;$(SolutionDir)../_3dparty/gui/wxWidgets/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;wxUSE_UNICODE;wxUSE_FILEDLG;wxNO_NET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -91,7 +91,7 @@
       <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wxmsw31u_core.lib;UxTheme.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw31u_core.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
@@ -106,17 +106,17 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Sources\_gui\wxSaveFileDialog\wxSaveFileDialog.cpp" />
+    <ClCompile Include="..\..\Sources\_gui\wxFileDialog\wxFileDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Sources\_gui\wxSaveFileDialog\help_inl.hpp" />
-    <ClInclude Include="..\..\Sources\_gui\wxSaveFileDialog\version.hpp" />
+    <ClInclude Include="..\..\Sources\_gui\wxFileDialog\help_inl.hpp" />
+    <ClInclude Include="..\..\Sources\_gui\wxFileDialog\version.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Sources\_gui\wxSaveFileDialog\help.def" />
-    <None Include="..\..\Sources\_gui\wxSaveFileDialog\help.tpl" />
-    <None Include="..\..\Sources\_gui\wxSaveFileDialog\version.def" />
-    <None Include="..\..\Sources\_gui\wxSaveFileDialog\version.tpl" />
+    <None Include="..\..\Sources\_gui\wxFileDialog\help.def" />
+    <None Include="..\..\Sources\_gui\wxFileDialog\help.tpl" />
+    <None Include="..\..\Sources\_gui\wxFileDialog\version.def" />
+    <None Include="..\..\Sources\_gui\wxFileDialog\version.tpl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

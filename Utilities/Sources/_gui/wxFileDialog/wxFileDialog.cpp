@@ -5,10 +5,11 @@
 #include <wx/app.h> 
 #include <wx/filedlg.h>
 #include <wx/string.h>
+#include <wx/arrstr.h>
 
 #include "common.hpp"
 
-#include "wxSaveFileDialog.hpp"
+#include "wxFileDialog.hpp"
 
 #ifndef _UNICODE
 #error Non unicode is not supported.
@@ -50,9 +51,13 @@ int wmain(int argc, wchar_t * argv[])
 
         //<Flags>
         int flags = 0;
-        bool hasFlags = false;
+        bool hadFlag_o = true; // Open file by default
+        bool hadFlag_s = false;
         bool hadFlag_p = false;
         bool hadFlag_n = false;
+        bool hadFlag_e = false;
+        bool hadFlag_m = false;
+        bool hadFlag_w = false;
 
         if(argc >= 2 && argv[1]) {
             if(!wcscmp(argv[1], L"/?")) {
@@ -77,12 +82,35 @@ int wmain(int argc, wchar_t * argv[])
 
         if (argc >= 5 && argv[4]) {
             if (argv[4][0] == '-') {
-                hasFlags = true;
-                if (wcschr(argv[4], L'p')) {
-                    hadFlag_p = true;
-                }
-                else if (wcschr(argv[4], L'n')) {
-                    hadFlag_n = true;
+                wchar_t * flagChar = &argv[4][0];
+                while (*flagChar) {
+                    if (*flagChar == L'o') {
+                        // the last position has priority
+                        hadFlag_s = false;
+                        hadFlag_o = true;
+                    }
+                    else if (*flagChar == L's') {
+                        // the last position has priority
+                        hadFlag_o = false;
+                        hadFlag_s = true;
+                    }
+                    else if (*flagChar == L'p') {
+                        hadFlag_p = true;
+                    }
+                    else if (*flagChar == L'n') {
+                        hadFlag_n = true;
+                    }
+                    else if (*flagChar == L'e') {
+                        hadFlag_e = true;
+                    }
+                    else if (*flagChar == L'm') {
+                        hadFlag_m = true;
+                    }
+                    else if (*flagChar == L'w') {
+                        hadFlag_w = true;
+                    }
+
+                    ++flagChar;
                 }
             }
         }
@@ -102,10 +130,19 @@ int wmain(int argc, wchar_t * argv[])
 
         wxString selected_path;
 
-        wxFileDialog * open_dialog = new wxFileDialog(NULL, title, start_folder, wxEmptyString, file_types, wxFD_SAVE);
+        wxFileDialog * open_dialog = new wxFileDialog(NULL, title, start_folder, wxEmptyString, file_types,
+            (hadFlag_o ? wxFD_OPEN : wxFD_SAVE) |
+            (hadFlag_p ? wxFD_OVERWRITE_PROMPT : 0) |
+            (hadFlag_n ? wxFD_NO_FOLLOW : 0) |
+            (hadFlag_e ? wxFD_FILE_MUST_EXIST : 0) |
+            (hadFlag_m ? wxFD_MULTIPLE : 0) |
+            (hadFlag_w ? wxFD_PREVIEW : 0));
         if (open_dialog->ShowModal() == wxID_OK) {
-            selected_path = open_dialog->GetPath();
-            puts(selected_path.c_str());
+            wxArrayString selected_paths;
+            open_dialog->GetPaths(selected_paths);
+            for (size_t i = 0; i < selected_paths.size(); i++) {
+                puts(selected_paths[i].c_str());
+            }
             ret = 0;
         }
         else {
