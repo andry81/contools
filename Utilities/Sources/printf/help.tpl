@@ -5,7 +5,7 @@ printf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build
 
 Usage: printf.exe [/?] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
   Description:
-    - /?:
+    /?:
       This help.
 
     <FormatString> placeholders:

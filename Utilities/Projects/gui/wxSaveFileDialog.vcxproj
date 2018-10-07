@@ -11,21 +11,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{636E0F9A-7A52-4C2F-8031-8A35D5DC417F}</ProjectGuid>
+    <ProjectGuid>{01A1ACEA-7261-43c6-B6B0-5C36A6674EE0}</ProjectGuid>
     <RootNamespace>ConsoleTools</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -53,12 +54,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "" "$(ProjectName)"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "_gui" "$(ProjectName)"</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../Sources/pipetimes;../Sources/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../Sources/_gui/wxSaveFileDialog;../../Sources/_common/gui;../../Sources/_common;$(SolutionDir)../_3dparty/gui/wxWidgets/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;wxUSE_UNICODE;wxUSE_FILEDLG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -66,12 +67,12 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalDependencies>wxmsw31ud_core.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\_3dparty\gui\wxWidgets\lib\vc_lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\Binaries\"</Command>
@@ -79,21 +80,24 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "" "$(ProjectName)"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "_gui" "$(ProjectName)"</Command>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>../Sources/pipetimes;../Sources/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../Sources/_gui/wxSaveFileDialog;../../Sources/_common/gui;../../Sources/_common;$(SolutionDir)../_3dparty/gui/wxWidgets/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;wxUSE_UNICODE;wxUSE_FILEDLG;wxNO_NET_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw31u_core.lib;UxTheme.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\_3dparty\gui\wxWidgets\lib\vc_lib</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
@@ -102,17 +106,17 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Sources\pipetimes\pipetimes.cpp" />
+    <ClCompile Include="..\..\Sources\_gui\wxSaveFileDialog\wxSaveFileDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Sources\pipetimes\help_inl.hpp" />
-    <ClInclude Include="..\Sources\pipetimes\version.hpp" />
+    <ClInclude Include="..\..\Sources\_gui\wxSaveFileDialog\help_inl.hpp" />
+    <ClInclude Include="..\..\Sources\_gui\wxSaveFileDialog\version.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Sources\pipetimes\help.def" />
-    <None Include="..\Sources\pipetimes\help.tpl" />
-    <None Include="..\Sources\pipetimes\version.def" />
-    <None Include="..\Sources\pipetimes\version.tpl" />
+    <None Include="..\..\Sources\_gui\wxSaveFileDialog\help.def" />
+    <None Include="..\..\Sources\_gui\wxSaveFileDialog\help.tpl" />
+    <None Include="..\..\Sources\_gui\wxSaveFileDialog\version.def" />
+    <None Include="..\..\Sources\_gui\wxSaveFileDialog\version.tpl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

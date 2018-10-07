@@ -1,9 +1,9 @@
 * README_EN.txt
-* 2017.10.28
+* 2018.10.07
 * ConsoleTools
 
 WARNING:
-  THIS DOCUMENTATION IS OBSOLETE.
+  THIS DOCUMENTATION IS PARTIALLY OBSOLETE AND INCOMPLETE.
   A new version of console utilities is always UNDER DEVELOPMENT,
   see the DESCRIPTION section.
 
@@ -59,6 +59,12 @@ run configure.bat
 Windows executable utilities can be built if necessary under Microsoft Visual
 Studio C++ 2015 Community Edition. The utilities does not require an installed
 Microsoft Visual C++ 2015 Redistributables at runtime.
+
+To build GUI utilities is required the wxWidgets library at least of version
+3.1.x.
+
+You have to download and copy the library sources manually into the
+`/_3dparty/gui/wxWidgets` subdirectory.
 
 -------------------------------------------------------------------------------
 5. FILES
@@ -154,6 +160,7 @@ Example for direct input into a console window:
 
 Differences between these 2 examples are in how the `set "AAA=C:\111\%BBB%'
 would be expanded.
+
 In actual batch script it will always be expanded. In a windows console it would
 only be expanded IF THE `BBB' VARIABLE HAS BEEN SET BEFORE (NOT EMPTY),
 OTHERWISE IT WILL BE LEFT AS IS.
@@ -180,8 +187,9 @@ endlocal
 !!!
 
 BEWARE OF THE ENDLOCAL INSTRUCTION WHICH CALLS AUTOMATICALLY WHEN A SCRIPT
-EXITS OR CALL SUBROUTINE ENDS.
-BEWARE OF THE SETLOCAL INSTRUCTION WHICH WORKS ONLY IN A SCRIPT.
+EXITS OR HAS CALLED SUBROUTINE ENDS.
+
+BEWARE OF THE `SETLOCAL` INSTRUCTION WHICH WORKS ONLY IN A SCRIPT.
 
 !!!
 

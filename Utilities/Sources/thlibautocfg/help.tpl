@@ -4,9 +4,9 @@ Thrust library auto configuration utility, version [+ AppMajorVer +].[+ AppMinor
 
 Usage: [+ AppName +].exe [/?] <Mode> [<Flags>] <ConfigFile> <OutputFile>
   Description:
-    - /?:
+    /?:
       This help.
-    -<Mode>: -<cfg2c | txt2c>
+    <Mode>: -<cfg2c | txt2c>
       cfg2c - Generate header file from configuration file to c/c++
               translation unit.
       txt2c - Generate text file to quoted and commented c-file.
@@ -16,9 +16,9 @@ Usage: [+ AppName +].exe [/?] <Mode> [<Flags>] <ConfigFile> <OutputFile>
       a - As previous, but additionally comments '%' by '%'
           (for use in printf-like function).
       u - adds 'L' prefix into each text line.
-    -<ConfigFile>:
+    <ConfigFile>:
       Path to the configuration file, which would reads.
-    -<OutputFile>:
+    <OutputFile>:
       Path to the output file, which would be processed from the <ConfigFile>.
 
   Return codes (Basically positive values - errors, negative - warnings):
