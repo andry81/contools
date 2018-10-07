@@ -1,3 +1,10 @@
+2018.10.07:
+* fixed: multiple minor build issues
+* new: Utilities/*/gui/wxSaveFileDialog project (wxWidgets library must be installed separately into `_3dparty` subdirectory, see the `INSTALLATION` section in the `README_EN.txt` file for details)
+* added: wxWidgets setup.h for the msvc build to build as much as possible a minimal sized binary linked with the wxWidgets library
+* changed: git/svn ingores
+* changed: rebuilded all utilities
+
 2018.09.10:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat script update
 * changed: convert_hextbl_utf16le_to_u16cp.bat script speedup

@@ -4,7 +4,7 @@ retakeowner.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], 
 
 Usage: retakeowner.exe [/?] <File>|<Directory> <User>|<Group>
   Description:
-    - /?:
+    /?:
       This help.
 
     <File>|<Directory> - Path to existing file or directory.

@@ -1,0 +1,7 @@
+autogen definitions version;
+
+AppName = "printf";
+AppMajorVer = 1;
+AppMinorVer = 0;
+AppRevision = 1;
+AppBuildNum = 1;

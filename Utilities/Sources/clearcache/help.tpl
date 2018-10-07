@@ -4,10 +4,10 @@ clearcache.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], b
 
 Usage: clearcache.exe [/?] <DriveRoot1> [<DriveRoot2> ... [<DriveRootN>]]
   Description:
-    - /?:
+    /?:
       This help.
 
-    <DriveRoot> - the root of a drive:
+    <DriveRoot> - the root of a drive.
 
   Return codes (Positive values - errors, negative - warnings):
    -2   - help output

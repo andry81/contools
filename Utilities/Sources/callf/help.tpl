@@ -5,7 +5,7 @@ callf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build 
 
 Usage: callf.exe [/?] <ApplicationNameFormatString> [<CommandLineFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
   Description:
-    - /?:
+    /?:
       This help.
 
     <ApplicationNameFormatString>, <CommandLineFormatString> placeholders:
