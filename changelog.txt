@@ -1,3 +1,6 @@
+2018.10.23:
+* new: Scripts/Tools/trapliblite.sh: lightweight trap stack implementation
+
 2018.10.07:
 * new: open dialog together with the save dialog functionality
 * refactor: wxSaveFileDialog renamed into wxFileDialog

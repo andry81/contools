@@ -645,6 +645,7 @@ Scripts/Tools/timediff.bat -text
 Scripts/Tools/timestamp.bat -text
 Scripts/Tools/touch.bat -text
 Scripts/Tools/traplib.sh -text
+Scripts/Tools/trapliblite.sh -text
 Scripts/Tools/unmountdir.sh -text
 Scripts/Tools/unset.bat -text
 Scripts/Tools/uuidgen.bat -text
