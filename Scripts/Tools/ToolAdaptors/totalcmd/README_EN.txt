@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.09.09
+* 2018.11.07
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -34,9 +34,9 @@
 9. One pane comparison for 2 selected files with sorted content.
 9.1. Method #1. By path list from ANSI text file.
 9.2. Method #2. By path list from command line.
-10. SVN/GIT files batch rename
+10. Shell/SVN/GIT files batch rename
 10.1. Method #1. Rename files by selection list.
-11. SVN/GIT files batch move
+11. Shell/SVN/GIT files batch move
 11.1. Method #1. Move files by selection list.
 12. Create batch directories
 12.1. Method #1. Create directories in current directory by list.
@@ -332,12 +332,17 @@ call_nowindow.vbs
 compare_sorted_files.bat -wait "%P" %S
 
 ------------------------------------------------------------------------------
-10. SVN/GIT files batch rename
+10. Shell/SVN/GIT files batch rename
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
 10.1. Method #1. Rename files by selection list.
 ------------------------------------------------------------------------------
+
+For Shell:
+
+call.vbs
+scm\shell\shell_rename_files_by_list.bat "%P" %L
 
 For SVN:
 
@@ -350,12 +355,17 @@ call.vbs
 scm\git\git_rename_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-11. SVN/GIT files batch move
+11. Shell/SVN/GIT files batch move
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
 11.1. Method #1. Move files by selection list.
 ------------------------------------------------------------------------------
+
+For Shell:
+
+call.vbs
+scm\shell\shell_move_files_by_list.bat "%P" %L
 
 For SVN:
 

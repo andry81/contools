@@ -1,3 +1,6 @@
+2018.11.07:
+* new: shell only rename/move to speed up pure shell tasks
+
 2018.09.10:
 * changed: configure.bat script update
 * changed: convert_hextbl_utf16le_to_u16cp.bat script speedup

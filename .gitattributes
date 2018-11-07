@@ -336,6 +336,10 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/icon_move_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/icon_rename_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/separator_svn.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/separator_svn.png -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/shell_move_files.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/shell_move_files.png -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/shell_rename_files.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/shell_rename_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/svn_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/svn_move_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/svn_rename_files.ico -text
@@ -347,6 +351,9 @@ Scripts/Tools/ToolAdaptors/totalcmd/profile.vars -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/git_move_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/git_rename_by_list.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/scm/shell/__init__.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/scm/shell/shell_move_by_list.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/scm/shell/shell_rename_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_externals_edit.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_move_by_list.bat -text
