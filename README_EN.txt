@@ -29,7 +29,7 @@ Scripts for WindowsNT interpreter cmd.exe and other interpreters to support
 various operations and procedures with environment variables, text files and
 piping.
 
-The latest version is here: sf.net/p/contools
+The latest version is here: https://sf.net/p/contools
 
 WARNING:
   Use the SVN access to find out new functionality and bug fixes.
