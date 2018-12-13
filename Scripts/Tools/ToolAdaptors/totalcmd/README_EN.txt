@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.11.07
+* 2018.12.13
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open standalone notepad window for selected files.
@@ -35,12 +35,16 @@
 9.1. Method #1. By path list from ANSI text file.
 9.2. Method #2. By path list from command line.
 10. Shell/SVN/GIT files batch rename
-10.1. Method #1. Rename files by selection list.
+10.1. Method #1. Rename files by selection list from ANSI text file.
+10.2. Method #2. Rename files by selection list from UNICODE text file.
 11. Shell/SVN/GIT files batch move
-11.1. Method #1. Move files by selection list.
+11.1. Method #1. Move files by selection list from ANSI text file.
+11.2. Method #2. Move files by selection list from UNICODE text file.
 12. Create batch directories
-12.1. Method #1. Create directories in current directory by list.
-12.2. Method #2. Create directories in selected directories by list.
+12.1. Method #1. Create directories in current directory by list from ANSI text file.
+12.2. Method #2. Create directories in selected directories by list from ANSI text file.
+12.3. Method #3. Create directories in current directory by list from UNICODE text file.
+12.4. Method #4. Create directories in selected directories by list from UNICODE text file.
 13. AUTHOR
 
 ------------------------------------------------------------------------------
@@ -336,7 +340,7 @@ compare_sorted_files.bat -wait "%P" %S
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-10.1. Method #1. Rename files by selection list.
+10.1. Method #1. Rename files by selection list from ANSI text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -355,11 +359,30 @@ call.vbs
 scm\git\git_rename_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
+10.2. Method #2. Rename files by selection list from UNICODE text file.
+------------------------------------------------------------------------------
+
+For Shell:
+
+call.vbs
+scm\shell\shell_rename_files_by_list.bat -from_utf16 "%P" %WL
+
+For SVN:
+
+call.vbs
+scm\svn\svn_rename_files_by_list.bat -from_utf16 "%P" %WL
+
+For GIT:
+
+call.vbs
+scm\git\git_rename_files_by_list.bat -from_utf16 "%P" %WL
+
+------------------------------------------------------------------------------
 11. Shell/SVN/GIT files batch move
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-11.1. Method #1. Move files by selection list.
+11.1. Method #1. Move files by selection list from ANSI text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -378,22 +401,55 @@ call.vbs
 scm\git\git_move_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
+11.2. Method #2. Move files by selection list from UNICODE text file.
+------------------------------------------------------------------------------
+
+For Shell:
+
+call.vbs
+scm\shell\shell_move_files_by_list.bat -from_utf16 "%P" %WL
+
+For SVN:
+
+call.vbs
+scm\svn\svn_move_files_by_list.bat -from_utf16 "%P" %WL
+
+For GIT:
+
+call.vbs
+scm\git\git_move_files_by_list.bat -from_utf16 "%P" %WL
+
+------------------------------------------------------------------------------
 12. Create batch directories
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-12.1. Method #1. Create directories in current directory by list.
+12.1. Method #1. Create directories in current directory by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat "%P"
 
 ------------------------------------------------------------------------------
-12.2. Method #2. Create directories in selected directories by list.
+12.2. Method #2. Create directories in selected directories by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat "%P" %L
+
+------------------------------------------------------------------------------
+12.3. Method #3. Create directories in current directory by list from UNICODE text file.
+------------------------------------------------------------------------------
+
+call.vbs
+create_dirs_by_list.bat -from_utf16 "%P"
+
+------------------------------------------------------------------------------
+12.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+------------------------------------------------------------------------------
+
+call.vbs
+create_dirs_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
 13. AUTHOR

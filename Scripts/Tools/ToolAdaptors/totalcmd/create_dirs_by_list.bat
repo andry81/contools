@@ -25,7 +25,7 @@ exit /b %LASTERROR%
 
 :MAIN
 rem script flags
-rem set FLAG_WAIT_EXIT=0
+set FLAG_CONVERT_FROM_UTF16=0
 
 :FLAGS_LOOP
 
@@ -35,18 +35,18 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-rem if defined FLAG (
-rem   if "%FLAG%" == "-wait" (
-rem     set FLAG_WAIT_EXIT=1
-rem     shift
-rem   ) else (
-rem     echo.%?~nx0%: error: invalid flag: %FLAG%
-rem     exit /b -255
-rem   )
-rem 
-rem   rem read until no flags
-rem   goto FLAGS_LOOP
-rem )
+if defined FLAG (
+  if "%FLAG%" == "-from_utf16" (
+    set FLAG_CONVERT_FROM_UTF16=1
+    shift
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  )
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
 
 set "PWD=%~1"
 shift
@@ -63,16 +63,38 @@ if not defined PWD exit /b 1
 set "CREATE_DIRS_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_dirs_in_dirs_list.txt"
 set "CREATE_DIRS_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_dirs_list.txt"
 
-rem recreate empty lists
-type nul > "%CREATE_DIRS_IN_LIST_FILE_TMP%"
-type nul > "%CREATE_DIRS_LIST_FILE_TMP%"
+set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.txt"
+
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
+  rem to fix `echo.F` and `for /f`
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+)
+
+rem CAUTION:
+rem   xcopy does not support file paths longer than ~260 characters!
+rem
 
 if not "%~1" == "" (
-  rem read selected file paths from file
-  for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
-    (echo.%%i) >> "%CREATE_DIRS_IN_LIST_FILE_TMP%"
+  if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
+    rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
+    rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
+    rem
+    call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%INPUT_LIST_FILE_UTF8_TMP%"
+  ) else (
+    set "INPUT_LIST_FILE_UTF8_TMP=%~1"
   )
+)
+
+rem recreate empty lists
+type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%CREATE_DIRS_LIST_FILE_TMP%"
+
+if not "%~1" == "" (
+  rem recreate files
+  echo.F|xcopy "%INPUT_LIST_FILE_UTF8_TMP%" "%CREATE_DIRS_IN_LIST_FILE_TMP%" /H /K /Y
 ) else (
+  rem recreate empty lists
+  type nul > "%CREATE_DIRS_IN_LIST_FILE_TMP%"
+
   rem use working directory path as base directory path
   setlocal ENABLEDELAYEDEXPANSION
   for /F "eol=	 tokens=* delims=" %%i in ("!CD!") do (
@@ -96,6 +118,7 @@ call :CMD pushd "%%CREATE_DIRS_IN_DIR_PATH%%" || (
   exit /b 2
 )
 
+set LINE_INDEX=0
 for /f "usebackq eol=# tokens=* delims=" %%j in ("%CREATE_DIRS_LIST_FILE_TMP%") do (
   set "CREATE_DIR_PATH=%%j"
   call :PROCESS_CREATE_DIRS
@@ -106,8 +129,18 @@ call :CMD popd
 exit /b 0
 
 :PROCESS_CREATE_DIRS
+set /A LINE_INDEX+=1
+
 if not defined CREATE_DIR_PATH exit /b 1
 
+if %FLAG_CONVERT_FROM_UTF16% EQU 0 goto IGNORE_CONVERT_FROM_UTF16
+
+rem trick to remove BOM in the first line
+if %LINE_INDEX% EQU 1 set "CREATE_DIR_PATH=%CREATE_DIR_PATH:~1%"
+
+if not defined CREATE_DIR_PATH exit /b 1
+
+:IGNORE_CONVERT_FROM_UTF16
 if exist "%CREATE_DIR_PATH%\" exit /b 0
 
 call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%CD%%" "%%CREATE_DIR_PATH%%"

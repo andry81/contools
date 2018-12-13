@@ -25,7 +25,7 @@ exit /b %LASTERROR%
 
 :MAIN
 rem script flags
-rem set FLAG_WAIT_EXIT=0
+set FLAG_CONVERT_FROM_UTF16=0
 
 :FLAGS_LOOP
 
@@ -35,18 +35,18 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-rem if defined FLAG (
-rem   if "%FLAG%" == "-wait" (
-rem     set FLAG_WAIT_EXIT=1
-rem     shift
-rem   ) else (
-rem     echo.%?~nx0%: error: invalid flag: %FLAG%
-rem     exit /b -255
-rem   )
-rem 
-rem   rem read until no flags
-rem   goto FLAGS_LOOP
-rem )
+if defined FLAG (
+  if "%FLAG%" == "-from_utf16" (
+    set FLAG_CONVERT_FROM_UTF16=1
+    shift
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  )
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
 
 set "PWD=%~1"
 shift
@@ -63,14 +63,23 @@ if "%~1" == "" exit /b 0
 set "RENAME_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_from_file_list.txt"
 set "RENAME_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_to_file_list.txt"
 
-rem recreate empty lists
-type nul > "%RENAME_FROM_LIST_FILE_TMP%"
-type nul > "%RENAME_TO_LIST_FILE_TMP%"
+rem CAUTION:
+rem   xcopy does not support file paths longer than ~260 characters!
+rem
 
-rem read selected file paths from file
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
-  (echo.%%i) >> "%RENAME_FROM_LIST_FILE_TMP%"
-  (echo.%%i) >> "%RENAME_TO_LIST_FILE_TMP%"
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
+  rem to fix `echo.F` and `for /f`
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+
+  rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
+  rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
+  rem
+  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%RENAME_FROM_LIST_FILE_TMP%"
+  echo.F|xcopy "%RENAME_FROM_LIST_FILE_TMP%" "%RENAME_TO_LIST_FILE_TMP%" /H /K /Y
+) else (
+  rem recreate files
+  echo.F|xcopy "%~1" "%RENAME_FROM_LIST_FILE_TMP%" /H /K /Y
+  echo.F|xcopy "%~1" "%RENAME_TO_LIST_FILE_TMP%" /H /K /Y
 )
 
 call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%RENAME_TO_LIST_FILE_TMP%%"

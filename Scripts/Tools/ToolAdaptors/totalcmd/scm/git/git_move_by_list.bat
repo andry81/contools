@@ -25,7 +25,7 @@ exit /b %LASTERROR%
 
 :MAIN
 rem script flags
-rem set FLAG_WAIT_EXIT=0
+set FLAG_CONVERT_FROM_UTF16=0
 
 :FLAGS_LOOP
 
@@ -35,18 +35,18 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-rem if defined FLAG (
-rem   if "%FLAG%" == "-wait" (
-rem     set FLAG_WAIT_EXIT=1
-rem     shift
-rem   ) else (
-rem     echo.%?~nx0%: error: invalid flag: %FLAG%
-rem     exit /b -255
-rem   )
-rem 
-rem   rem read until no flags
-rem   goto FLAGS_LOOP
-rem )
+if defined FLAG (
+  if "%FLAG%" == "-from_utf16" (
+    set FLAG_CONVERT_FROM_UTF16=1
+    shift
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  )
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
 
 set "PWD=%~1"
 shift
@@ -63,13 +63,32 @@ if "%~1" == "" exit /b 0
 set "MOVE_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\move_from_file_list.txt"
 set "MOVE_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\move_to_file_list.txt"
 
+set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.txt"
+
+rem CAUTION:
+rem   xcopy does not support file paths longer than ~260 characters!
+rem
+
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
+  rem to fix `echo.F` and `for /f`
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+
+  rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
+  rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
+  rem
+  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%INPUT_LIST_FILE_UTF8_TMP%"
+) else (
+  set "INPUT_LIST_FILE_UTF8_TMP=%~1"
+)
+
+rem recreate files
+echo.F|xcopy "%INPUT_LIST_FILE_UTF8_TMP%" "%MOVE_FROM_LIST_FILE_TMP%" /H /K /Y
+
 rem recreate empty lists
-type nul > "%MOVE_FROM_LIST_FILE_TMP%"
 type nul > "%MOVE_TO_LIST_FILE_TMP%"
 
 rem read selected file paths from file
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%~1") do (
-  (echo.%%i) >> "%MOVE_FROM_LIST_FILE_TMP%"
+for /F "usebackq eol=	 tokens=* delims=" %%i in ("%INPUT_LIST_FILE_UTF8_TMP%") do (
   set "FILE_PATH=%%i"
   call :FILL_TO_LIST_FILE_TMP
 )
