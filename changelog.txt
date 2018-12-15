@@ -1,3 +1,7 @@
+2018.12.15:
+* fixed: Utilities: envvarcmp invalid return code on equal variables w/o anything to print
+* changed: Utilities: enable breakpoints break in the Debug
+
 2018.12.13:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: unicode file paths/names usage in scm/shell rename/remove scripts
 

@@ -327,5 +327,5 @@ int main(int argc,const char* argv[])
     if (!greater_or_equal_str.empty()) puts(greater_or_equal_str.c_str());
   }
 
-  return res < 0 ? -1 : 1;
+  return !res ? 0 : res < 0 ? -1 : 1;
 }
