@@ -301,6 +301,7 @@ Scripts/Tools/ToolAdaptors/sh/dos2unix.sh -text
 Scripts/Tools/ToolAdaptors/sh/mkdir.sh -text
 Scripts/Tools/ToolAdaptors/sh/rm.sh -text
 Scripts/Tools/ToolAdaptors/sh/rmdir.sh -text
+Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/.svnignore -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/README_EN.txt -text
@@ -691,6 +692,7 @@ Utilities/Binaries/printargs.exe -text
 Utilities/Binaries/printf.exe -text
 Utilities/Binaries/retakeowner.exe -text
 Utilities/Binaries/thlibautocfg.exe -text
+Utilities/Binaries/touch.exe -text
 Utilities/Binaries/wxFileDialog.exe -text
 Utilities/Projects/TargetProject.PreBuildStep.CommandLine.var -text
 Utilities/Projects/callf.vcxproj -text

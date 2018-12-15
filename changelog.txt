@@ -1,4 +1,8 @@
 2018.12.15:
+* new: Utilities: touch utility w/o sources (taken from Steve Miller's `Win32 Console Toolbox`, see for details: https://stevemiller.net/apps/)
+* new: Scripts/Tools/ToolAdaptors: file timestamp copy script `copy_timestamp_by_pttn.bat` to copy timestamps from one file to another by file path pattern
+
+2018.12.15:
 * fixed: safe `title` call
 
 2018.12.15:
