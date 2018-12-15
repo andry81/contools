@@ -29,7 +29,12 @@ if defined BUILD_USER_VARS_ROOT (
   if "\" == "%BUILD_USER_VARS_ROOT:~-1%" set "BUILD_USER_VARS_ROOT=%BUILD_USER_VARS_ROOT:~0,-1%"
 )
 
-title prebuild %PROJECT_NAME% %BUILD_SCM_BRANCH% %PROJECT_TYPE% %APP_TARGET_NAME% %TARGET_NAME%
+rem safe title call
+setlocal DISABLEDELAYEDEXPANSION
+for /F "eol=	 tokens=* delims=" %%i in ("prebuild %PROJECT_NAME% %BUILD_SCM_BRANCH% %PROJECT_TYPE% %APP_TARGET_NAME% %TARGET_NAME%") do (
+  endlocal
+  title %%i
+)
 
 echo.%~nx0: %PROJECT_NAME%: Executing pre build step...
 

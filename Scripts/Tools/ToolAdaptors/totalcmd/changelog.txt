@@ -1,3 +1,6 @@
+2018.12.15:
+* fixed: safe `title` call
+
 2018.12.13:
 * fixed: unicode file paths/names usage in scm/shell rename/remove scripts
 

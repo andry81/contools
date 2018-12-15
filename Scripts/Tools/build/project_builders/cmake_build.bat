@@ -45,7 +45,12 @@ if exist "%BUILD_SCRIPTS_ROOT%/pre_validate_vars.bat" (
 
 if %F_DISABLE_PRE_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/pre_build.bat" || exit /b 14 )
 
-title build %PROJECT_NAME% %BUILD_SCM_BRANCH% %PROJECT_TYPE% %APP_TARGET_NAME% %TARGET_NAME%
+rem safe title call
+setlocal DISABLEDELAYEDEXPANSION
+for /F "eol=	 tokens=* delims=" %%i in ("build %PROJECT_NAME% %BUILD_SCM_BRANCH% %PROJECT_TYPE% %APP_TARGET_NAME% %TARGET_NAME%") do (
+  endlocal
+  title %%i
+)
 
 echo.Build started: %PROJECT_BUILD_DATE% - %PROJECT_BUILD_TIME%
 

@@ -70,7 +70,13 @@ if not defined TEST_SCRIPT_HANDLERS_DIR (
 )
 
 echo Running %?~nx0%...
-title %?~nx0% %2 %3 %4 %5 %6 %7 %8 %9
+
+rem safe title call
+setlocal DISABLEDELAYEDEXPANSION
+for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0% %2 %3 %4 %5 %6 %7 %8 %9") do (
+  endlocal
+  title %%i
+)
 
 set /A TESTLIB__NEST_LVL+=1
 

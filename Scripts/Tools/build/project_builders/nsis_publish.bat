@@ -40,7 +40,12 @@ if defined BUILD_USER_VARS_ROOT (
   if "\" == "%BUILD_USER_VARS_ROOT:~-1%" set "BUILD_USER_VARS_ROOT=%BUILD_USER_VARS_ROOT:~0,-1%"
 )
 
-title publish %PROJECT_NAMESPACE%/%PROJECT_NAME% %BUILD_SCM_BRANCH%
+rem safe title call
+setlocal DISABLEDELAYEDEXPANSION
+for /F "eol=	 tokens=* delims=" %%i in ("publish %PROJECT_NAMESPACE%/%PROJECT_NAME% %BUILD_SCM_BRANCH%") do (
+  endlocal
+  title %%i
+)
 
 if exist "%BUILD_SCRIPTS_ROOT%/pre_validate_vars.bat" (
   call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 10

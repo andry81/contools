@@ -6,8 +6,6 @@ set "?~dp0=%~dp0"
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
-title %?~nx0%: %CD%
-
 call "%%?~dp0%%__init__.bat" || goto :EOF
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
@@ -54,7 +52,12 @@ shift
 if not defined PWD goto NOPWD
 cd /d "%PWD%" || exit /b 1
 
-title %?~nx0%: %CD%
+rem safe title call
+setlocal ENABLEDELAYEDEXPANSION
+for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: !CD!") do (
+  endlocal
+  title %%i
+)
 
 :NOPWD
 

@@ -97,7 +97,12 @@ if %ERRORLEVEL% NEQ 0 (
   exit /b 7
 )
 
-title Msys v%MSYS_VER_STR% - %MSYS_PATH%
+rem safe title call
+setlocal DISABLEDELAYEDEXPANSION
+for /F "eol=	 tokens=* delims=" %%i in ("Msys v%MSYS_VER_STR% - %MSYS_PATH%") do (
+  endlocal
+  title %%i
+)
 
 call :cecho %%~nx0: {0B}info{#}: {0B}Msys dll version{#}: {0F}%%MSYS_VER_STR%%{#}.
 

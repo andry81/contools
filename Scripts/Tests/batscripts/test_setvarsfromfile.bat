@@ -15,7 +15,13 @@ set __CTRL_SETLOCAL=1
 call "%%~dp0__init__.bat"
 
 echo Running %~nx0...
-title %~nx0 %*
+
+rem safe title call
+setlocal DISABLEDELAYEDEXPANSION
+for /F "eol=	 tokens=* delims=" %%i in ("%~nx0 %*") do (
+  endlocal
+  title %%i
+)
 
 set /A __NEST_LVL+=1
 
