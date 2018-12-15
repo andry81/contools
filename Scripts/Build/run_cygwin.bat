@@ -113,7 +113,12 @@ if defined CYGWIN_VER_STR (
   exit /b 8
 )
 
-title Cygwin v%CYGWIN_VER_STR% - %CYGWIN_PATH%
+rem safe title call
+setlocal DISABLEDELAYEDEXPANSION
+for /F "eol=	 tokens=* delims=" %%i in ("Cygwin v%CYGWIN_VER_STR% - %CYGWIN_PATH%") do (
+  endlocal
+  title %%i
+)
 
 call :cecho %%~nx0: {0B}info{#}: {0B}Cygwin dll version{#}: {0F}%%CYGWIN_VER_STR%%{#}.
 
