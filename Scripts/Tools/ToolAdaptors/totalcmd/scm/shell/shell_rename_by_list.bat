@@ -121,18 +121,29 @@ if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
 if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
 rem rename through the shell
-set "FROM_FILE_DIR=%~dp1"
-set "TO_FILE_DIR=%~dp2"
+call :PARENT_DIR FROM_FILE_DIR "%%FROM_FILE_PATH%%"
+call :PARENT_DIR TO_FILE_DIR "%%TO_FILE_PATH%%"
 
 if /i not "%FROM_FILE_DIR%" == "%TO_FILE_DIR%" (
   echo.%?~n0%: error: parent directory path must stay the same: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
   exit /b -254
 ) >&2
 
-call :CMD rename "%%~1" "%%~nx2"
+call :FILE_NAME TO_FILE_NAME "%%TO_FILE_PATH%%"
+
+call :CMD rename "%%~1" "%%TO_FILE_NAME%%"
 
 exit /b
 
 :CMD
 echo.^>%*
 (%*)
+exit /b
+
+:PARENT_DIR
+set "%~1=%~dp2"
+exit /b 0
+
+:FILE_NAME
+set "%~1=%~nx2"
+exit /b 0
