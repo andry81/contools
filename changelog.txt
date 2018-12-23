@@ -1,3 +1,6 @@
+2018.12.23:
+* new: Scripts/Tools/admin: WMI/fix_reactivated_in_namespace_eventviewer_error_Event_ID_10.vbs script to fix `Event ID 10` error in the event viewer
+
 2018.12.21:
 * fixed: Scripts/Tools/ToolAdaptors: file directories shell rename
 
