@@ -348,6 +348,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/svn_rename_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/loadvars.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files_by_list.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/notepad_new_session.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/profile.vars -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/git_move_by_list.bat -text

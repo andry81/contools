@@ -1,3 +1,6 @@
+2018.12.24:
+* new: Scripts/Tools/ToolAdaptors/totalcmd: added `notepad_new_session.bat` script to open a new session of notepad independently to current selection
+
 2018.12.23:
 * new: Scripts/Tools/admin: WMI/fix_reactivated_in_namespace_eventviewer_error_Event_ID_10.vbs script to fix `Event ID 10` error in the event viewer
 
