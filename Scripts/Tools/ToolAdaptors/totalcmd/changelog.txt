@@ -1,4 +1,7 @@
 2018.12.24:
+* refactor: `EDITOR` variable replaced by `NPP_EDITOR`, added BASIC_TEXT_EDITOR variable to use classic windows notepad over notepad++
+
+2018.12.24:
 * new: added `notepad_new_session.bat` script to open a new session of notepad independently to current selection
 
 2018.12.21:

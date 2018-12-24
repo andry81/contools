@@ -1,3 +1,10 @@
+2018.12.25:
+* fixed: Scripts/Tools/ToolAdaptors/lnk: `*_sysnative_*.lnk` shortcuts replaced by `*_system64_*.lnk` shortcuts to fix problems over `sysnative` directory usage in particular cases (see `Open Administator console window in current directory` in the readme file)
+* changed: Scripts/Tools/ToolAdaptors/lnk: updated all other shortcuts to remove references to drive `C:\`
+
+2018.12.24:
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: `EDITOR` variable replaced by `NPP_EDITOR`, added BASIC_TEXT_EDITOR variable to use classic windows notepad over notepad++
+
 2018.12.24:
 * new: Scripts/Tools/ToolAdaptors/totalcmd: added `notepad_new_session.bat` script to open a new session of notepad independently to current selection
 
