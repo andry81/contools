@@ -281,9 +281,9 @@ Scripts/Tools/ToolAdaptors/hta/Samples/view_example.hta -text
 Scripts/Tools/ToolAdaptors/lnk/cmd.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_minimized.lnk -text
-Scripts/Tools/ToolAdaptors/lnk/cmd_sysnative.lnk -text
-Scripts/Tools/ToolAdaptors/lnk/cmd_sysnative_admin.lnk -text
-Scripts/Tools/ToolAdaptors/lnk/cmd_sysnative_minimized.lnk -text
+Scripts/Tools/ToolAdaptors/lnk/cmd_system64.lnk -text
+Scripts/Tools/ToolAdaptors/lnk/cmd_system64_admin.lnk -text
+Scripts/Tools/ToolAdaptors/lnk/cmd_system64_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_minimized.lnk -text

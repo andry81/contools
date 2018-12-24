@@ -30,7 +30,7 @@ call :SET "%%SYSTEMROOT%%\system32\"
 goto :EOF
 
 :SET
-pushd "%~dp1" && (
+pushd "%SYSTEMROOT%\system32\" && (
   call echo.Current directory: "%%CD:\=/%%"
   call :CMD "%%~dp0update_shortcut.vbs" "%%SC_NAME%%" "%%WD%%" "%%CMD%%" "%%ARGS%%"
   popd
