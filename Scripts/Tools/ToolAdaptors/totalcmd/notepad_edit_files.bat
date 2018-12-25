@@ -69,18 +69,18 @@ if %NUM_FILES% EQU 0 exit /b 0
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   if %FLAG_NOTEPADPLUSPLUS% NEQ 0 (
-    call :CMD start /B /WAIT "" "%%EDITOR%%"%%BARE_FLAGS%% %%FILES_LIST%%
+    call :CMD start /B /WAIT "" "%%NPP_EDITOR%%"%%BARE_FLAGS%% %%FILES_LIST%%
   ) else (
     for %%i in (%FILES_LIST%) do (
-      call :CMD start /B /WAIT "" "%%EDITOR%%"%%BARE_FLAGS%% %%i
+      call :CMD start /B /WAIT "" "%%BASIC_TEXT_EDITOR%%"%%BARE_FLAGS%% %%i
     )
   )
 ) else (
   if %FLAG_NOTEPADPLUSPLUS% NEQ 0 (
-    call :CMD start /B "" "%%EDITOR%%"%%BARE_FLAGS%% %%FILES_LIST%%
+    call :CMD start /B "" "%%NPP_EDITOR%%"%%BARE_FLAGS%% %%FILES_LIST%%
   ) else (
     for %%i in (%FILES_LIST%) do (
-      call :CMD start /B "" "%%EDITOR%%"%%BARE_FLAGS%% %%i
+      call :CMD start /B "" "%%BASIC_TEXT_EDITOR%%"%%BARE_FLAGS%% %%i
     )
   )
 )
