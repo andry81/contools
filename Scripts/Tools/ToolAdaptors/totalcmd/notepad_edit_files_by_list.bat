@@ -119,9 +119,9 @@ rem create Notepad++ only session file
 rem call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%EDITOR%%"%%BARE_FLAGS%% -openSession "%%EDIT_FROM_LIST_FILE_TMP%%"
+  call :CMD start /B /WAIT "" "%%NPP_EDITOR%%"%%BARE_FLAGS%% -openSession "%%EDIT_FROM_LIST_FILE_TMP%%"
 ) else (
-  call :CMD start /B "" "%%EDITOR%%"%%BARE_FLAGS%% -openSession "%%EDIT_FROM_LIST_FILE_TMP%%"
+  call :CMD start /B "" "%%NPP_EDITOR%%"%%BARE_FLAGS%% -openSession "%%EDIT_FROM_LIST_FILE_TMP%%"
 )
 
 exit /b 0
@@ -143,9 +143,9 @@ rem ignore a sub directory open, files in a sub directory must be selected expli
 if exist "%FILE_TO_EDIT%\" goto ENDLOCAL_END_EXIT
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%EDITOR%%"%%BARE_FLAGS%% "%%FILE_TO_EDIT%%"
+  call :CMD start /B /WAIT "" "%%BASIC_TEXT_EDITOR%%"%%BARE_FLAGS%% "%%FILE_TO_EDIT%%"
 ) else (
-  call :CMD start /B "" "%%EDITOR%%"%%BARE_FLAGS%% "%%FILE_TO_EDIT%%"
+  call :CMD start /B "" "%%BASIC_TEXT_EDITOR%%"%%BARE_FLAGS%% "%%FILE_TO_EDIT%%"
 )
 
 exit /b 0
