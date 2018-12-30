@@ -478,6 +478,7 @@ Scripts/Tools/encoding/boms/efbbbf.bin -text
 Scripts/Tools/encoding/boms/feff.bin -text svneol=unset#application/octet-stream
 Scripts/Tools/encoding/boms/fffe.bin -text svneol=unset#application/octet-stream
 Scripts/Tools/encoding/convert_hextbl_utf16le_to_u16cp.bat -text
+Scripts/Tools/encoding/convert_utf16le_to_utf8.bat -text
 Scripts/Tools/encoding/dos2unix.bat -text
 Scripts/Tools/encoding/makefile_dos2unix.bat -text
 Scripts/Tools/encoding/makefile_unix2dos.bat -text

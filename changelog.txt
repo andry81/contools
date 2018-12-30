@@ -1,3 +1,6 @@
+2018.12.31:
+* new: Scripts/Tools/encoding: convert_utf16le_to_utf8.bat script
+
 2018.12.25:
 * fixed: Scripts/Tools/ToolAdaptors/lnk: `*_sysnative_*.lnk` shortcuts replaced by `*_system64_*.lnk` shortcuts to fix problems over `sysnative` directory usage in particular cases (see `Open Administator console window in current directory` in the readme file)
 * changed: Scripts/Tools/ToolAdaptors/lnk: updated all other shortcuts to remove references to drive `C:\`
