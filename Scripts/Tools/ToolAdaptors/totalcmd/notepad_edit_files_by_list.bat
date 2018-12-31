@@ -28,6 +28,7 @@ rem script flags
 set FLAG_WAIT_EXIT=0
 set FLAG_NOTEPADPLUSPLUS=0
 set FLAG_COVERT_PATHS_TO_UNICODE_CODE_POINTS=0
+set FLAG_COVERT_PATHS_TO_UTF8=0
 set "BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -45,6 +46,8 @@ if defined FLAG (
     set FLAG_NOTEPADPLUSPLUS=1
   ) else if "%FLAG%" == "-paths_to_u16cp" (
     set FLAG_COVERT_PATHS_TO_UNICODE_CODE_POINTS=1
+  ) else if "%FLAG%" == "-paths_to_utf8" (
+    set FLAG_COVERT_PATHS_TO_UTF8=1
   ) else (
     set BARE_FLAGS=%BARE_FLAGS% %1
   )
@@ -72,8 +75,9 @@ set "LIST_FILE_PATH=%LIST_FILE_PATH:\=/%"
 if %FLAG_NOTEPADPLUSPLUS% EQU 0 goto USE_BASIC_NOTEPAD
 
 set "EDIT_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.xml"
-set "EDIT_FROM_LIST_FILE_HEX_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.hex.xml"
-set "EDIT_FROM_LIST_FILE_U16CP_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.u16cp.xml"
+set "EDIT_FROM_LIST_FILE_HEX_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.hex.bin"
+set "EDIT_FROM_LIST_FILE_U16CP_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.u16cp.txt"
+set "EDIT_FROM_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.utf8.txt"
 
 set "EDIT_FROM_LIST_FILE_HEX_TMP=%EDIT_FROM_LIST_FILE_HEX_TMP:\=/%"
 
@@ -88,9 +92,17 @@ set "TRANSLATED_LIST_FILE_PATH=%EDIT_FROM_LIST_FILE_U16CP_TMP%"
 
 call :CMD certutil -encodehex "%%LIST_FILE_PATH%%" "%%EDIT_FROM_LIST_FILE_HEX_TMP%%"
 
-call :CMD "%%CONTOOLS_ROOT%%/encoding/convert_hextbl_utf16le_to_u16cp.bat" "%%EDIT_FROM_LIST_FILE_HEX_TMP%%" "%%EDIT_FROM_LIST_FILE_U16CP_TMP%%"
+call :CMD "%%CONTOOLS_ROOT%%/encoding/convert_hextbl_utf16le_to_u16cp.bat" "%%EDIT_FROM_LIST_FILE_HEX_TMP%%" "%%TRANSLATED_LIST_FILE_PATH%%"
 
 :IGNORE_CONVERT_TO_U16CP
+
+if %FLAG_COVERT_PATHS_TO_UTF8% EQU 0 goto IGNORE_CONVERT_TO_UTF8
+
+set "TRANSLATED_LIST_FILE_PATH=%EDIT_FROM_LIST_FILE_UTF8_TMP%"
+
+call :CMD "%%CONTOOLS_ROOT%%/encoding/convert_utf16le_to_utf8.bat" "%%LIST_FILE_PATH%%" "%%TRANSLATED_LIST_FILE_PATH%%"
+
+:IGNORE_CONVERT_TO_UTF8
 
 rem call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CHCP%%
 
@@ -106,9 +118,7 @@ rem create Notepad++ only session file
   rem read selected file paths from file
   for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TRANSLATED_LIST_FILE_PATH%") do (
     rem ignore a sub directory open, files in a sub directory must be selected explicitly in a panel!
-    if not exist "%%i\" (
-      echo.            ^<File filename="%%i"/^>
-    )
+    if not exist "%%i\" echo.            ^<File filename="%%i" /^>
   )
 
   echo.        ^</mainView^>
