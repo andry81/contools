@@ -45,7 +45,7 @@ rem   Last slash character in the path is required otherwise the command
 rem   "if not exist" will fail under Windows 7 x64 in the x32 cmd shell!
 if not exist "%SystemRoot%\Sysnative\" (
   if exist "mklink.exe" (
-    mklink.exe /D "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
+    mklink /D "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
     "%SystemRoot%\Sysnative\cmd.exe" /C %*
     exit /b
   ) else if exist "linkd.exe" (

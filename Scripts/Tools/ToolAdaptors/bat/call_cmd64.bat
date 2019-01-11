@@ -30,7 +30,7 @@ if "%~1" == "" exit /b -1
 
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
 rem in case of wrong PROCESSOR_ARCHITECTURE value
-if defined PROCESSOR_ARCHITEW6432 goto :WOW64
+if defined PROCESSOR_ARCHITEW6432 goto WOW64
 exit /b -256
 
 :X64
@@ -44,7 +44,7 @@ rem   Last slash character in the path is required otherwise the command
 rem   "if not exist" will fail under Windows 7 x64 in the x32 cmd shell!
 if not exist "%SystemRoot%\Sysnative\" (
   if exist "mklink.exe" (
-    mklink.exe /D "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
+    mklink /D "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
     "%SystemRoot%\Sysnative\cmd.exe" /C %*
   ) else if exist "linkd.exe" (
     linkd.exe "%SystemRoot%\Sysnative" "%SystemRoot%\System32"
