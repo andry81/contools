@@ -6,6 +6,44 @@ rem
 
 setlocal
 
+rem scripts must run in administrator mode
+net session >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+  echo.%~nx0: error: run script in administrator mode!
+  exit /b -255
+) >&2
+
+rem Under WOW64 (32-bit process in 64-bit Windows) restart script in 64-bit mode
+if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
+if not defined PROCESSOR_ARCHITEW6432 goto X32
+
+rem restart in x64
+if exist "%SystemRoot%\Sysnative\" (
+  "%SystemRoot%\Sysnative\cmd.exe" /C %0 %*
+  exit /b
+)
+
+(
+  echo.%~nx0: error: run script in 64-bit console ONLY (in administrative mode)!
+  exit /b -254
+) >&2
+
+:X64
+rem WORKAROUND:
+rem   Under pure Windows x64 create system64 directory to bypass sysnative directory permissions
+
+if exist "%SystemRoot%\System64\" goto IGNORE_SYSTEM64_CREATE
+
+echo.^>mklink /D "%SystemRoot%\System64" "%SystemRoot%\System32"
+mklink /D "%SystemRoot%\System64" "%SystemRoot%\System32"
+if %ERRORLEVEL% NEQ 0 (
+  echo.%~nx0: error: run `mklink.exe /D "%SystemRoot%\System64" "%SystemRoot%\System32"` manually or restart system!
+  exit /b -253
+) >&2
+
+:X32
+:IGNORE_SYSTEM64_CREATE
+
 set "COMPATTELRUNNER_LOG_DIR=%ProgramData%\Microsoft\Diagnosis\ETLLogs\AutoLogger"
 
 echo Stopping and disabling CompatTelRunner.exe services..

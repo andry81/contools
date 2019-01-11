@@ -1,3 +1,7 @@
+2019.01.11:
+* fixed: Scripts/Tools/ToolAdaptors/bat: mklink run error
+* fixed: Scripts/Tools/admin: Telemetry/disable_telemetry_junk_win7.bat script execution on fresh installed Windows
+
 2018.12.31:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: minor notepad_edit_files_by_list.bat improvement
 
