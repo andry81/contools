@@ -1,4 +1,10 @@
 2019.01.11:
+* new: Scripts/Tools/ToolAdaptors/totalcmd: console group menu icon, compare icons
+* added: Scripts/Tools/ToolAdaptors/totalcmd: dev images
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: rename/move icons
+* removed: Scripts/Tools/ToolAdaptors/totalcmd: unnecessary png images
+
+2019.01.11:
 * fixed: Scripts/Tools/ToolAdaptors/bat: mklink run error
 * fixed: Scripts/Tools/admin: Telemetry/disable_telemetry_junk_win7.bat script execution on fresh installed Windows
 
