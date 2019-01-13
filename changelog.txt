@@ -1,3 +1,6 @@
+2019.01.13:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: ffmpeg/ffmpeg_concat_copy_by_list.bat parentheses in file names
+
 2019.01.11:
 * new: Scripts/Tools/ToolAdaptors/totalcmd: console group menu icon, compare icons
 * added: Scripts/Tools/ToolAdaptors/totalcmd: dev images
