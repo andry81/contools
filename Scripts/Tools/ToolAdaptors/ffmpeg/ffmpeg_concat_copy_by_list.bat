@@ -45,7 +45,9 @@ if not exist "%FILE_PATH%" (
   exit /b 252
 ) >&2
 
-(echo.file '%FILE_PATH:\=/%')>> tmp_list.txt
+for /f "eol=	 tokens=* delims=" %%i in ("%FILE_PATH:\=/%") do (
+  echo.file '%%i'
+) >> tmp_list.txt
 
 exit /b
 
