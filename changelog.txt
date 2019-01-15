@@ -1,3 +1,7 @@
+2019.01.15:
+* new: Scripts/Tools/ToolAdaptors/totalcmd: ffmpeg_convert_by_list.bat script for ffmpeg_concat_copy_by_list.bat integration
+* minor refactor
+
 2019.01.13:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: ffmpeg/ffmpeg_concat_copy_by_list.bat parentheses in file names
 

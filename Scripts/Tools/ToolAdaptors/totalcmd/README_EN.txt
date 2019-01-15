@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2018.12.24
+* 2019.01.15
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open a notepad window independently to selected files.
@@ -47,7 +47,8 @@
 13.2. Method #2. Create directories in selected directories by list from ANSI text file.
 13.3. Method #3. Create directories in current directory by list from UNICODE text file.
 13.4. Method #4. Create directories in selected directories by list from UNICODE text file.
-14. AUTHOR
+14. Concatenate video files
+15. AUTHOR
 
 ------------------------------------------------------------------------------
 1. Open a notepad window independently to selected files.
@@ -476,6 +477,13 @@ call.vbs
 create_dirs_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-14. AUTHOR
+14. Concatenate video files
+------------------------------------------------------------------------------
+
+call.vbs
+converters\ffmpeg\ffmpeg_convert_by_list.bat -wait -pause_on_exit %L "%T"
+
+------------------------------------------------------------------------------
+15. AUTHOR
 ------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

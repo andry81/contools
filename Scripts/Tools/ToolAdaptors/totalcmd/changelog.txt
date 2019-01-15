@@ -1,3 +1,6 @@
+2019.01.15:
+* new: ffmpeg_convert_by_list.bat script for ffmpeg_concat_copy_by_list.bat integration
+
 2019.01.11:
 * new: console group menu icon, compare icons
 * added: dev images
