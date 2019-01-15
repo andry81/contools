@@ -74,7 +74,6 @@ call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "create_dirs_by_list.
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "loadvars.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_new_session.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
 
 pause
 

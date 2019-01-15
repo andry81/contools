@@ -32,7 +32,8 @@ namespace {
 	typedef std::vector<const char *> const_char_ptr_vector_t;
 	typedef std::vector<std::string> string_vector_t;
 
-	const char * _extract_variable(const char * last_offset, const char * parse_str, std::string & parsed_str, char * in_str_value) {
+	const char * _extract_variable(const char * last_offset, const char * parse_str, std::string & parsed_str, char * in_str_value)
+	{
 		const char * return_offset = 0;
 
 		const char * p_in_str_var = 0;

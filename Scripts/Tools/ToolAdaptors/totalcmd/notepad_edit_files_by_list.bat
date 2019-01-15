@@ -8,8 +8,6 @@ set "?~nx0=%~nx0"
 
 call "%%?~dp0%%__init__.bat" || goto :EOF
 
-call "%%?~dp0%%loadvars.bat" "%%?~dp0%%profile.vars" || goto :EOF
-
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
 call :MAIN %%*
@@ -110,7 +108,7 @@ rem create Notepad++ only session file
 (
   rem rem make UTF-8-BOM xml to enable open non english character files
   rem type "%CONTOOLS_ROOT%/encoding/boms\efbbbf.bin"
-  rem echo.^<?xml version="1.0" encoding="utf-8"?^>
+  echo.^<?xml version="1.0" encoding="utf-8"?^>
   echo.^<NotepadPlus^>
   echo.    ^<Session^>
   echo.        ^<mainView^>
