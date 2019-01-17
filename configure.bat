@@ -70,6 +70,8 @@ echo "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
   echo.call "%%%%~dp0..\..\__init__.bat" ^|^| goto :EOF
 ) > "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
 
+call :DEPLOY_UTILS
+
 goto CONFIGURE_SVNCMD_END
 
 :CONFIGURE_SVNCMD
@@ -132,19 +134,32 @@ goto END
 
 :DEPLOY_TOOLS_EXTERNAL
 rem initialize Tools "module"
-call "%%CONFIGURE_ROOT%%/Tools/__init__.bat" || goto :EOF
+call "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
 
 rem deploy Windows UCRT dependencies
 for %%i in (%WINDOWS_UCRT_X86_DEPLOY_DIR_LIST%) do (
-  call :CMD "%%CONTOOLS_ROOT%%/xcopy_dir.bat" "%%CONFIGURE_ROOT%%/ToolsExternal/deps/Windows Kits/10/Redist/ucrt/DLLs/x86" "%%CONFIGURE_ROOT%%/%%i" || goto :EOF
+  call :XCOPY_DIR "%%CONFIGURE_ROOT%%/ToolsExternal/deps/Windows Kits/10/Redist/ucrt/DLLs/x86" "%%CONFIGURE_ROOT%%/%%i" || goto :EOF
 )
 
 exit /b 0
 
-:CMD
-echo.^>%*
-(%*)
-exit /b
+:DEPLOY_UTILS
+rem initialize Tools "module"
+call "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
+
+rem copy utilities into Tools
+call :XCOPY_DIR "%%CONFIGURE_ROOT%%/Utilities/Binaries" "%%CONFIGURE_ROOT%%/Scripts/Tools" /E /Y /D || goto :EOF
+
+exit /b 0
+
+:XCOPY_DIR
+if not exist "%CONTOOLS_ROOT%/std/xcopy_dir.bat" (
+  echo.%~nx0: error: xcopy_dir.bat is not found: "%CONTOOLS_ROOT%/std/xcopy_dir.bat".
+  exit /b 1
+) >&2
+if not exist "%~2" mkdir "%~2"
+call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || goto :EOF
+exit /b 0
 
 :END
 
