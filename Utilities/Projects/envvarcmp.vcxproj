@@ -57,7 +57,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../Sources/envvarcmp;../Sources/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/envvarcmp;../src/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -74,7 +74,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\Binaries\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,7 +82,7 @@
       <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "" "$(ProjectName)"</Command>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>../Sources/envvarcmp;../Sources/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/envvarcmp;../src/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -98,21 +98,21 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\Binaries\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Sources\envvarcmp\envvarcmp.cpp" />
+    <ClCompile Include="..\src\envvarcmp\envvarcmp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Sources\envvarcmp\help_inl.hpp" />
-    <ClInclude Include="..\Sources\envvarcmp\version.hpp" />
+    <ClInclude Include="..\src\envvarcmp\help_inl.hpp" />
+    <ClInclude Include="..\src\envvarcmp\version.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Sources\envvarcmp\help.def" />
-    <None Include="..\Sources\envvarcmp\help.tpl" />
-    <None Include="..\Sources\envvarcmp\version.def" />
-    <None Include="..\Sources\envvarcmp\version.tpl" />
+    <None Include="..\src\envvarcmp\help.def" />
+    <None Include="..\src\envvarcmp\help.tpl" />
+    <None Include="..\src\envvarcmp\version.def" />
+    <None Include="..\src\envvarcmp\version.tpl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

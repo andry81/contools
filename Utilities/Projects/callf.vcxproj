@@ -57,7 +57,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../Sources/callf;../Sources/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/callf;../src/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -74,7 +74,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\Binaries\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,7 +82,7 @@
       <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "" "$(ProjectName)"</Command>
     </PreBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>../Sources/callf;../Sources/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/callf;../src/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -98,21 +98,21 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\Binaries\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Sources\callf\callf.cpp" />
+    <ClCompile Include="..\src\callf\callf.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Sources\callf\help_inl.hpp" />
-    <ClInclude Include="..\Sources\callf\version.hpp" />
+    <ClInclude Include="..\src\callf\help_inl.hpp" />
+    <ClInclude Include="..\src\callf\version.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Sources\callf\help.def" />
-    <None Include="..\Sources\callf\help.tpl" />
-    <None Include="..\Sources\callf\version.def" />
-    <None Include="..\Sources\callf\version.tpl" />
+    <None Include="..\src\callf\help.def" />
+    <None Include="..\src\callf\help.tpl" />
+    <None Include="..\src\callf\version.def" />
+    <None Include="..\src\callf\version.tpl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

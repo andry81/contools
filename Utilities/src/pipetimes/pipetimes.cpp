@@ -48,6 +48,47 @@
 #error Unicode is not supported.
 #endif
 
+template <int v>
+struct int_identity
+{
+    static constexpr const int value = v;
+};
+
+enum SafeStaticCastType
+{
+    SafeStaticCastType_CheckSizeof              = 1,
+    SafeStaticCastType_CheckAlignof             = 2,
+    SafeStaticCastType_CheckSizeofAndAlignof    = 3
+};
+
+struct tag_check_sizeof : int_identity<SafeStaticCastType_CheckSizeof> {};
+struct tag_check_alignof : int_identity<SafeStaticCastType_CheckAlignof> {};
+struct tag_check_sizeof_and_alignof : int_identity<SafeStaticCastType_CheckSizeofAndAlignof> {};
+
+// static_cast(s) with sizeof and alignment test on at least the same size
+
+template <typename T, typename U>
+inline T static_cast_extra(const U & v, int_identity<SafeStaticCastType_CheckSizeofAndAlignof> = int_identity<SafeStaticCastType_CheckSizeofAndAlignof>{})
+{
+    static_assert(sizeof(T) >= sizeof(v), "size of T must fit the size of U");
+    static_assert(alignof(T) >= alignof(U), "alignment of T must fit the alignment of U");
+    return static_cast<T>(v);
+}
+
+template <typename T, typename U>
+inline T static_cast_extra(const U & v, int_identity<SafeStaticCastType_CheckSizeof>)
+{
+    static_assert(sizeof(T) >= sizeof(v), "size of T must fit the size of U");
+    return static_cast<T>(v);
+}
+
+template <typename T, typename U>
+inline T static_cast_extra(const U & v, int_identity<SafeStaticCastType_CheckAlignof>)
+{
+    static_assert(alignof(T) >= alignof(U), "alignment of T must fit the alignment of U");
+    return static_cast<T>(v);
+}
+
 HANDLE g_stdin_handle = 0;
 HANDLE g_stdout_handle = 0;
 const std::streamsize g_stream_reserve_size = 65536;
@@ -426,12 +467,12 @@ int main(int argc,const char* argv[])
       if(pipe_file_handle.handle && !_fstat64(_fileno(pipe_file_handle.handle), &pipe_file_stat))
       {
         fprintf(index_file_handle.handle, "%X %X %X %X %I64X\n",
-          begin_time_msec, end_time_msec, input_stream_offset_index, num_read_chars, pipe_file_stat.st_mtime);
+          begin_time_msec, end_time_msec, size_t(static_cast_extra<uint64_t>(input_stream_offset_index)), num_read_chars, pipe_file_stat.st_mtime); // CAUTION: input_stream_offset_index truncation to 32-bit
       }
       else
       {
         fprintf(index_file_handle.handle, "%X %X %X %X\n",
-          begin_time_msec, end_time_msec, input_stream_offset_index, num_read_chars);
+          begin_time_msec, end_time_msec, size_t(static_cast_extra<uint64_t>(input_stream_offset_index)), num_read_chars); // CAUTION: input_stream_offset_index truncation to 32-bit
       }
       //fflush(index_file_handle.handle);
 

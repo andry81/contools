@@ -1,4 +1,8 @@
 2019.01.20:
+* fixed: pipetimes truncation warnings
+* refactor: Binaries/Sources directories rename into bin/src
+
+2019.01.20:
 * changed: minor readme and old changelog update
 
 2019.01.17:
