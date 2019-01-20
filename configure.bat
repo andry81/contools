@@ -2,6 +2,9 @@
 
 setlocal
 
+if not defined NEST_LVL set NEST_LVL=0
+set /A NEST_LVL+=1
+
 set "CONFIGURE_ROOT=%~dp0"
 set "CONFIGURE_ROOT=%CONFIGURE_ROOT:~0,-1%"
 set "CONFIGURE_ROOT=%CONFIGURE_ROOT:\=/%"
@@ -70,7 +73,8 @@ echo "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
   echo.call "%%%%~dp0..\..\__init__.bat" ^|^| goto :EOF
 ) > "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
 
-call :DEPLOY_UTILS
+call :DEPLOY_UTILS || goto EXIT
+call :DEPLOY_3DPARTY || goto EXIT
 
 goto CONFIGURE_SVNCMD_END
 
@@ -130,11 +134,11 @@ echo "%CONFIGURE_ROOT%/Scripts/__init__.bat"
 :CONFIGURE_SVNCMD_END
 
 if exist "%CONFIGURE_ROOT%/svncmd.tag" call :DEPLOY_TOOLS_EXTERNAL
-goto END
+goto EXIT
 
 :DEPLOY_TOOLS_EXTERNAL
 rem initialize Tools "module"
-call "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
+call :CMD "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
 
 rem deploy Windows UCRT dependencies
 for %%i in (%WINDOWS_UCRT_X86_DEPLOY_DIR_LIST%) do (
@@ -145,10 +149,22 @@ exit /b 0
 
 :DEPLOY_UTILS
 rem initialize Tools "module"
-call "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
+call :CMD "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
 
 rem copy utilities into Tools
 call :XCOPY_DIR "%%CONFIGURE_ROOT%%/Utilities/bin" "%%CONFIGURE_ROOT%%/Scripts/Tools" /E /Y /D || goto :EOF
+
+exit /b 0
+
+:DEPLOY_3DPARTY
+rem initialize Tools "module"
+call :CMD "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
+
+rem search recursively for a `_scripts/configure_src.bat` script inside the `_3dparty` directory and call it
+for /f "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "configure_src.bat"`) do (
+  echo."%%i"
+  call :CMD "%%i"
+)
 
 exit /b 0
 
@@ -161,8 +177,15 @@ if not exist "%~2" mkdir "%~2"
 call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || goto :EOF
 exit /b 0
 
-:END
+:CMD
+echo.^>%*
+(%*)
+exit /b
 
-pause
+:EXIT
+
+set /A NEST_LVL-=1
+
+if %NEST_LVL% EQU 0 pause
 
 exit /b 0

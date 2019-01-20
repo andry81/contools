@@ -105,8 +105,9 @@ BuildTools/msys/share/guile/ice-9/test.scm -text
 BuildTools/msys/share/guile/ice-9/threads.scm -text
 BuildTools/msys/share/guile/ice-9/time.scm -text
 BuildTools/msys/share/guile/ice-9/weak-vector.scm -text
-/Changes_EN.txt -text
+/Changes_EN.old.txt -text
 Projects/ConsoleTools.sln -text
+/README_EN.old.txt -text
 /README_EN.txt -text
 Scripts/Build/__init__.bat -text
 Scripts/Build/reg_cygwin.bat -text
@@ -796,11 +797,8 @@ _3dparty/utility/tacklelib/cmake/FindEnvironment.cmake -text
 _3dparty/utility/tacklelib/cmake/ForwardVariables.cmake -text
 _3dparty/utility/tacklelib/examples/utility/log/p7logger/p7_logger_example1.cpp -text
 _3dparty/utility/tacklelib/include/tacklelib/.svnignore -text
-_3dparty/utility/tacklelib/include/tacklelib/debug.hpp -text
 _3dparty/utility/tacklelib/include/tacklelib/debug.hpp.in -text
-_3dparty/utility/tacklelib/include/tacklelib/optimization.hpp -text
 _3dparty/utility/tacklelib/include/tacklelib/optimization.hpp.in -text
-_3dparty/utility/tacklelib/include/tacklelib/setup.hpp -text
 _3dparty/utility/tacklelib/include/tacklelib/setup.hpp.in -text
 _3dparty/utility/tacklelib/include/tacklelib/tackle/aligned_storage/aligned_storage_base.hpp -text
 _3dparty/utility/tacklelib/include/tacklelib/tackle/aligned_storage/aligned_storage_from.hpp -text
@@ -844,11 +842,8 @@ _3dparty/utility/tacklelib/include/tacklelib/utility/utility.hpp -text
 _3dparty/utility/tacklelib/license.txt -text
 _3dparty/utility/tacklelib/src/.svnignore -text
 _3dparty/utility/tacklelib/src/common.hpp -text
-_3dparty/utility/tacklelib/src/debug.hpp -text
 _3dparty/utility/tacklelib/src/debug.hpp.in -text
-_3dparty/utility/tacklelib/src/optimization.hpp -text
 _3dparty/utility/tacklelib/src/optimization.hpp.in -text
-_3dparty/utility/tacklelib/src/setup.hpp -text
 _3dparty/utility/tacklelib/src/setup.hpp.in -text
 _3dparty/utility/tacklelib/src/tackle/aligned_storage/aligned_storage_by.hpp -text
 _3dparty/utility/tacklelib/src/tackle/aligned_storage/max_aligned_storage.hpp -text
