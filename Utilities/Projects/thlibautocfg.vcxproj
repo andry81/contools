@@ -57,7 +57,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../Sources/thlibautocfg;../Sources/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/thlibautocfg;../src/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -78,7 +78,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\Binaries\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -87,7 +87,7 @@
     </PreBuildEvent>
     <ClCompile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../Sources/thlibautocfg;../Sources/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/thlibautocfg;../src/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeader />
@@ -108,21 +108,21 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\Binaries\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Sources\thlibautocfg\thlibautocfg.cpp" />
+    <ClCompile Include="..\src\thlibautocfg\thlibautocfg.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Sources\thlibautocfg\help_inl.hpp" />
-    <ClInclude Include="..\Sources\thlibautocfg\version.hpp" />
+    <ClInclude Include="..\src\thlibautocfg\help_inl.hpp" />
+    <ClInclude Include="..\src\thlibautocfg\version.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Sources\thlibautocfg\help.def" />
-    <None Include="..\Sources\thlibautocfg\help.tpl" />
-    <None Include="..\Sources\thlibautocfg\version.def" />
-    <None Include="..\Sources\thlibautocfg\version.tpl" />
+    <None Include="..\src\thlibautocfg\help.def" />
+    <None Include="..\src\thlibautocfg\help.tpl" />
+    <None Include="..\src\thlibautocfg\version.def" />
+    <None Include="..\src\thlibautocfg\version.tpl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

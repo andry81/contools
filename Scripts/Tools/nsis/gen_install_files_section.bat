@@ -2,11 +2,11 @@
 
 rem FILE OUTPUT EXAMPLE #1:
 rem  SetOutPath "$INSTDIR\app\exec"
-rem  File "${%PREFIX_PATH_VAR%}\app\exec\CrossFlow.xml"
+rem  File "${%PREFIX_PATH_VAR%}\app\exec\MyProject.xml"
 rem  File "${%PREFIX_PATH_VAR%}\app\exec\default.xml"
 rem FILE OUTPUT EXAMPLE #2:
 rem  SetOutPath "$INSTDIR\app\exec"
-rem  File "${%PREFIX_PATH_VAR%}\<subpath>\app\exec\CrossFlow.xml"
+rem  File "${%PREFIX_PATH_VAR%}\<subpath>\app\exec\MyProject.xml"
 rem  File "${%PREFIX_PATH_VAR%}\<subpath>\app\exec\default.xml"
 
 setlocal

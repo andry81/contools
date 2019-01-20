@@ -148,7 +148,7 @@ rem initialize Tools "module"
 call "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
 
 rem copy utilities into Tools
-call :XCOPY_DIR "%%CONFIGURE_ROOT%%/Utilities/Binaries" "%%CONFIGURE_ROOT%%/Scripts/Tools" /E /Y /D || goto :EOF
+call :XCOPY_DIR "%%CONFIGURE_ROOT%%/Utilities/bin" "%%CONFIGURE_ROOT%%/Scripts/Tools" /E /Y /D || goto :EOF
 
 exit /b 0
 

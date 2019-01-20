@@ -13,8 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Common", "_Common", "{F126
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Header Files", "Header Files", "{2909C0F5-E8D4-4975-A49C-2B246EE0DE17}"
 	ProjectSection(SolutionItems) = preProject
-		..\Utilities\Sources\_common\common.hpp = ..\Utilities\Sources\_common\common.hpp
-		..\Utilities\Sources\_common\printf.hpp = ..\Utilities\Sources\_common\printf.hpp
+		..\Utilities\src\_common\common.hpp = ..\Utilities\src\_common\common.hpp
+		..\Utilities\src\_common\printf.hpp = ..\Utilities\src\_common\printf.hpp
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxFileDialog", "..\Utilities\Projects\gui\wxFileDialog.vcxproj", "{01A1ACEA-7261-43C6-B6B0-5C36A6674EE0}"
@@ -37,7 +37,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "retakeowner", "..\Utilities
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GUI", "GUI", "{B3B938A1-1763-4CB6-A295-23AF4A3A136F}"
 	ProjectSection(SolutionItems) = preProject
-		..\Utilities\Sources\_common\gui\wxFileDialog.hpp = ..\Utilities\Sources\_common\gui\wxFileDialog.hpp
+		..\Utilities\src\_common\gui\wxFileDialog.hpp = ..\Utilities\src\_common\gui\wxFileDialog.hpp
 	EndProjectSection
 EndProject
 Global
