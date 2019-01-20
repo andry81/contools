@@ -1,4 +1,9 @@
 2019.01.20:
+* fixed: 3dparty: tacklelib merge
+* fixed: configure execution
+* new: readme, old renamed
+
+2019.01.20:
 * new: 3dparty: tacklelib generic puspose library for C++11 and cmake v3 build system
 * new: tacklelib--cmake generic puspose cmake scripts for cmake v3 build system
 

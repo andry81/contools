@@ -17,17 +17,17 @@ if not defined CONFIGURE_ROOT (
 
 echo."%CONFIGURE_ROOT%/include/tacklelib/setup.hpp.in" -^> "%CONFIGURE_ROOT%/include/tacklelib/setup.hpp"
 (
-  type "%CONFIGURE_ROOT:/=\%\tacklelib\setup.hpp.in"
+  type "%CONFIGURE_ROOT:/=\%\include\tacklelib\setup.hpp.in"
 ) > "%CONFIGURE_ROOT%/include/tacklelib/setup.hpp"
 
 echo."%CONFIGURE_ROOT%/include/tacklelib/debug.hpp.in" -^> "%CONFIGURE_ROOT%/include/tacklelib/debug.hpp"
 (
-  type "%CONFIGURE_ROOT:/=\%\tacklelib\debug.hpp.in"
+  type "%CONFIGURE_ROOT:/=\%\include\tacklelib\debug.hpp.in"
 ) > "%CONFIGURE_ROOT%/include/tacklelib/debug.hpp"
 
 echo."%CONFIGURE_ROOT%/include/tacklelib/optimization.hpp.in" -^> "%CONFIGURE_ROOT%/include/tacklelib/optimization.hpp"
 (
-  type "%CONFIGURE_ROOT:/=\%\tacklelib\optimization.hpp.in"
+  type "%CONFIGURE_ROOT:/=\%\include\tacklelib\optimization.hpp.in"
 ) > "%CONFIGURE_ROOT%/include/tacklelib/optimization.hpp"
 
 echo."%CONFIGURE_ROOT%/src/setup.hpp.in" -^> "%CONFIGURE_ROOT%/src/setup.hpp"
