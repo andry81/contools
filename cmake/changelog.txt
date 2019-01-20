@@ -1,0 +1,81 @@
+2019.01.17:
+* fixed: missed to retain some scripts
+
+2018.12.07:
+* changed: the include/link inheritance type is added to `link_qt_components` function
+
+2018.12.05:
+* refactor: `Common.cmake` and other basic modules moved into `tacklelib` repository to support calls in the root `CMakeLists.txt` file in the tacklelib sources
+
+2018.11.30:
+* fixed: set_target_property function
+
+2018.11.30:
+* fixed: install under linux into inner directory
+* changed: add_target_static_lib_properties function merged into add_target_link_properties function
+
+2018.11.13:
+* fixed: variables discovery ignores environment variables in case of cached one
+
+2018.10.30:
+* fixed: invalid path exclusion in case of paths begins by the "/~" in exclude_paths_from_path_list function
+* changed: disable optimization in debug by default
+
+2018.10.29:
+* fixed: missed to remove from the global list the imported not global targets which are visible only from directory target
+* new: set_target_property function with include/exclude patterns/filters to set a single property but for set of targets from a particular directory with or without recursion
+
+2018.10.26:
+* fixed: accidental invalid usage issue of add_target_compile_definitions function, added explicit check with FATAL_ERROR
+
+2018.10.22:
+* fixed: ARGV and ARGV0..N variables shift in case of overriden system functions like find_package/add_subdirectory/etc (macro contexts), fixed by replacing overriden functions from macros to functions and custom propogating variable changes to parent scope
+* new: ForwardVariables.cmake module to forward changed variables to parent scope
+* refactor: variable discovery
+
+2018.10.16:
+* new: uniform way to set FOLDER property on a target via set_target_folder function
+* changed: add_target_subdirectory_from_dir_var merged into add_target_subdirectory
+* changed: extended exclude_file_paths_from_path_list and exclude_paths_from_path_list functions by optional exclude_list output
+* refactor: replaced variable expansion by `IN LISTS` in all foreach instructions
+
+2018.10.15:
+* new: set_target_folder_by_pattern function to set target folders by package source directory pattern together with target pattern
+* new: added to builtin find_package function a custom first parameter for package source directory variable name (with back compatability to original syntaxes)
+* new: added to find_qt_component function a custom first parameter for package source directory variable name (with back compatability to original syntaxes)
+
+2018.10.12:
+* fixed: alias (read only) targets change attempt
+* cmake minor improvement and cleanup
+
+2018.10.09:
+* minor refactor
+
+2018.10.08:
+* new: targets extension module
+* new: set_target_folder_from_dir function to set target folder for a target from target source directory
+
+2018.08.30:
+* new: Qwt library module
+
+2018.08.14:
+* new: FindWindowsSDK.cmake script to explicitly detect WindowsSDK headers/libraries
+
+2018.08.14:
+* new: executable/library basic initialization to add default preprocessor definition, compiler and linker keys
+
+2018.08.09:
+* refactor: cmake build scripts
+
+2018.07.15:
+* fixed: Common.cmake configure_environment script
+* new: add_target_subdirectory to ignore add already added subdirectories
+* new: ExternalProjectEx.cmake script
+
+2018.06.17:
+* fixed: escaping was not supported from a file configured by the configure_file cmake command
+
+2018.05.07:
+* new: cmake environment discovery support for builtin variables
+* new: CMAKE_CONFIG_TYPES coverts now into builtin CMAKE_CONFIGURATION_TYPES variable and vice versa (if empty)
+* new: standalone changelog file added
