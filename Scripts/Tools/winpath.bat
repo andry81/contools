@@ -6,7 +6,7 @@ rem Description:
 rem   Converts input file/directory path to the windows form.
 
 rem Examples:
-rem 1. call canonicalpath.bat "blabla/../.."
+rem 1. call winpath.bat "blabla/../.."
 rem    echo.PATH_VALUE=%PATH_VALUE%
 
 rem Drop output values before request

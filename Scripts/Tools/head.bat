@@ -11,7 +11,7 @@ rem   * Does not consume empty lines.
 rem
 rem Issues:
 rem   * findstr truncates lines longer than 8180 characters ("FINDSTR: Line NNN is too long" message)
-rem   * Not so fast, prints ~2000 lines about 8 seconds on 3.2GHz AMD processor
+rem   * Is not so fast, prints ~2000 lines about 8 seconds on 3.2GHz AMD processor
 
 setlocal DISABLEDELAYEDEXPANSION
 
