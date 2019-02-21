@@ -8,15 +8,15 @@ rem   Script to spawn tasks in parallel but not greater than maximum.
 setlocal
 
 set MAX_SPAWN_TASKS=%~1
-set MAX_WAIT_TASKS=%~2
+set MAX_BUSY_TASKS=%~2
 
 if not defined MAX_SPAWN_TASKS (
   echo.%~nx0: error: max spawn tasks is not defined.
   exit /b 1
 ) >&2
 
-if not defined MAX_WAIT_TASKS (
-  echo.%~nx0: error: max wait tasks is not defined.
+if not defined MAX_BUSY_TASKS (
+  echo.%~nx0: error: max busy tasks is not defined.
   exit /b 2
 ) >&2
 
@@ -57,7 +57,7 @@ if %LOCK_FILE0_ACQUIRE% EQU 0 (
 :REPEAT_SPAWN_LOOP
 
 rem can run more tasks?
-if %RUNNING_TASKS_COUNTER% LSS %MAX_WAIT_TASKS% goto SPAWN_TASK
+if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 
 :REPEAT_READ_WAIT
 
@@ -99,7 +99,7 @@ if %LOCK_FILE0_ACQUIRE% EQU 0 (
 if %SPAWNED_TASKS% GEQ %MAX_SPAWN_TASKS% goto MAX_SPAWN_REACHED
 
 rem can run more tasks?
-if %RUNNING_TASKS_COUNTER% LSS %MAX_WAIT_TASKS% goto SPAWN_TASK
+if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 
 rem don't wait
 goto REPEAT_READ_LOOP

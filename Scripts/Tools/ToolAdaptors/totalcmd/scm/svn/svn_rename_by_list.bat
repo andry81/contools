@@ -89,6 +89,7 @@ call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst
 
 setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
+rem trick with simultaneous iteration over 2 list in the same time
 (
   for /f "usebackq eol=# tokens=* delims=" %%i in ("%RENAME_TO_LIST_FILE_TMP%") do (
     set /p "FROM_FILE_PATH="
