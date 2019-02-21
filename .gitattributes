@@ -629,6 +629,7 @@ Scripts/Tools/regquery.bat -text
 Scripts/Tools/resetenv.bat -text
 Scripts/Tools/sar.pl -text
 Scripts/Tools/sarf.js -text
+Scripts/Tools/set_vars_from_locked_file_pair.bat -text
 Scripts/Tools/setvarfromstd.bat -text
 Scripts/Tools/setvarsfromfile.bat -text
 Scripts/Tools/split_pathstr.bat -text
