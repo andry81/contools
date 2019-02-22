@@ -30,19 +30,21 @@ function set_vars_from_locked_file_pair()
   function LocalMain()
   {
     # open file for direct reading by the `read` in the same shell process
-    exec 7<> "$2"
-    exec 8<> "$3"
+    exec 7< "$2"
+    exec 8< "$3"
 
     # cleanup on return
-    trap "exec 8>&-; exec 7>&-; trap - RETURN" RETURN
+    trap "rm -f \"$1\" 2> /dev/null; exec 8>&-; exec 7>&-; trap - RETURN" RETURN
 
     local __VarName
     local __VarValue
 
-    # exclusive acquire of the lock file
+    # shared acquire of the lock file
     while :; do
       # lock via redirection to file
       {
+        flock -s 9
+
         # simultaneous iteration over 2 lists in the same time
         while read -r -u 7 __VarName; do
           read -r -u 8 __VarValue
@@ -55,12 +57,12 @@ function set_vars_from_locked_file_pair()
 
         break
 
-        # return with code from the LocalRead
-      } 9> "$1" # has exclusive lock been acquired?
+        # return with previous code
+      } 9> "$1" 2> /dev/null # has exclusive lock been acquired?
 
       # busy wait
       sleep 0.02
-    done 2> /dev/null
+    done
   }
 
   LocalMain "${1//\\//}" "${2//\\//}" "${3//\\//}" "${4:-0}"
