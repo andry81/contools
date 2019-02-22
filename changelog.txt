@@ -1,3 +1,6 @@
+2019.02.22:
+* fixed: Scripts/Tools: `set_vars_from_locked_file_pair.bat` variables setup after the lock release instead of under the lock
+
 2019.02.21:
 * new: Scripts/Tools: `set_vars_from_locked_file_pair.bat` script to set variables from 2 files after a file lock acquire. Useful where a variable list sets outside in a child process and must be returned back into a parent windows batch script process.
 
