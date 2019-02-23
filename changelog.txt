@@ -1,3 +1,6 @@
+2019.02.23:
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme minor update
+
 2019.02.22:
 * fixed: Scripts/Tools: `set_vars_from_locked_file_pair.sh` file redirection has no exclusion effect in the linux, must be accompanied together with the flock usage
 

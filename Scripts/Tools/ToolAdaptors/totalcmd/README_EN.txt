@@ -1,53 +1,66 @@
 * README_EN.txt
-* 2019.01.15
+* 2019.02.23
 * Toolbar buttons configuration for the Total Commander.
 
 1. Open a notepad window independently to selected files.
+
 2. Open standalone notepad window for selected files.
 2.1. Method #1. On left mouse button.
 2.2. Method #2. On left mouse button.
+
 3. Open selected files in existing Notepad++ window.
 3.1. Method #1. On left mouse button.
 3.2. Method #2. On left mouse button.
-4. Open a notepad window independently to selected files.
+
 4. Open Administator console window in current directory.
 4.1. Method #1. On left mouse button. Total Commander bitness independent.
 4.2. Method #2. On left mouse button. Total Commander bitness dependent.
 4.3. Method #3. On right mouse button -> As Administrator.
 4.4. Method #4. On left mouse button.
 4.5. Method #5. Call command cmda.bat and Administrator password after.
+
 5. Edit SVN externals (SVN properties).
 5.1 Method #1 (Main). For selected files and directories together over SVN GUI.
 5.2 Method #2. For selected files and directores one after one over external editor.
+
 6. Open SVN Log for selected files and directories together.
+
 7. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes).
 7.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes.
 7.2. Method #2. Window per unique repository root with or without versioned changes in respective WC directory.
 7.3. Method #3. Window per command line WC directory with or without versioned changes.
 7.4. Method #4. Window per WC root directory with or without versioned changes.
+
 8. Open TortoiseSVN commit dialogs for a set of WC directories.
 8.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
 8.2. Method #2. One window for all WC directories with changes.
 8.3. Method #3. Window per command line WC directory with changes.
 8.4. Method #4. Window per WC root directory with changes.
+
 9. One pane comparison for 2 selected files.
 9.1. Method #1. By path list from ANSI text file.
 9.2. Method #2. By path list from command line.
+
 10. One pane comparison for 2 selected files with sorted content.
 10.1. Method #1. By path list from ANSI text file.
 10.2. Method #2. By path list from command line.
+
 11. Shell/SVN/GIT files batch rename
 11.1. Method #1. Rename files by selection list from ANSI text file.
 11.2. Method #2. Rename files by selection list from UNICODE text file.
+
 12. Shell/SVN/GIT files batch move
 12.1. Method #1. Move files by selection list from ANSI text file.
 12.2. Method #2. Move files by selection list from UNICODE text file.
+
 13. Create batch directories
 13.1. Method #1. Create directories in current directory by list from ANSI text file.
 13.2. Method #2. Create directories in selected directories by list from ANSI text file.
 13.3. Method #3. Create directories in current directory by list from UNICODE text file.
 13.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+
 14. Concatenate video files
+
 15. AUTHOR
 
 ------------------------------------------------------------------------------
@@ -57,7 +70,7 @@
 For Notepad++:
 
 call_nowindow.vbs
-notepad_edit_files.bat -wait -npp -multiInst "%P"
+notepad_edit_files.bat -wait -npp -multiInst -nosession "%P"
 
 For Windows Notepad:
 
