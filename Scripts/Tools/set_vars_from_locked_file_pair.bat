@@ -48,7 +48,7 @@ rem exclusive acquire of the lock file
   ) 9> "%~1" && (del /F /Q /A:-D "%~1" & goto EXIT)
 ) 2>nul
 
-rem Busy wait: with external call significally reduces CPU consumption while in a waiting state
+rem Busy wait: with external call significantly reduces CPU consumption while in a waiting state
 pathping localhost -n -q 1 -p 20 >nul 2>&1
 goto REPEAT_LOCK_LOOP
 
