@@ -52,7 +52,7 @@ function set_vars_from_locked_file_pair()
           __VarName="${__VarName//[$'\r\n']}"
           __VarValue="${__VarValue//[$'\r\n']}"
           declare -gx $__VarName="$__VarValue"
-          (( $4 )) && echo "$__VarName=\`$__VarValue\`"
+          (( ${4:-0} )) && echo "$__VarName=\`$__VarValue\`"
         done
 
         break

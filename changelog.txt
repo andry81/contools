@@ -1,3 +1,9 @@
+2019.03.14:
+* changed: Scripts/Tools/ToolAdaptors/sh: bash_entry reworked, make it usable from the source command
+* added: Scripts/Tools/ToolAdaptors/sh: bash_entry: ScriptBaseInit function to init base variables after script execution
+* added: Scripts/Tools/ToolAdaptors/sh: bash_entry: return_local function to return local variables (as not exported)
+* fixed: Scripts/Tools: minor fix in set_vars_from_locked_file_pair.sh script
+
 2019.02.23:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: readme minor update
 
