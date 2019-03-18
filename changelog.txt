@@ -1,3 +1,6 @@
+2019.03.18:
+* fixed: Scripts/Tools: minor fix in `stringlib.sh`
+
 2019.03.14:
 * changed: Scripts/Tools/ToolAdaptors/sh: bash_entry reworked, make it usable from the source command
 * added: Scripts/Tools/ToolAdaptors/sh: bash_entry: ScriptBaseInit function to init base variables after script execution
