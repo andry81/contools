@@ -348,9 +348,9 @@ function MakeCommandLineEx()
   Args=("$@")
 
   local CommandLine=""
-  local AlwaysQuoting=1
+  local AlwaysQuoting=0
 
-  [[ "${EscapeFlags//a/}" != "$EscapeFlags" ]] && AlwaysQuoting=0
+  [[ "${EscapeFlags//a/}" != "$EscapeFlags" ]] && AlwaysQuoting=1
 
   local arg
   local i=0
