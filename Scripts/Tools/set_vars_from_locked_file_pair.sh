@@ -51,7 +51,8 @@ function set_vars_from_locked_file_pair()
           # drop line returns
           __VarName="${__VarName//[$'\r\n']}"
           __VarValue="${__VarValue//[$'\r\n']}"
-          declare -gx $__VarName="$__VarValue"
+          # instead of `declare -gx` because `-g` is introduced only in `bash-4.2-alpha`
+          export $__VarName="$__VarValue"
           (( ${4:-0} )) && echo "$__VarName=\`$__VarValue\`"
         done
 

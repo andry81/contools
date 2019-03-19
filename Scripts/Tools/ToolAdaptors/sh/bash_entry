@@ -33,10 +33,24 @@ function ScriptBaseInit()
   return_local ScriptFileName "${ScriptFileName}"
 }
 
+# WORKAROUND:
+#   The `declare -g` has been introduced in the `bash-4.2-alpha`, so to make
+#   a global variable in an older version we have to replace the
+#   `declare -g` by a sequence of calls to `unset` and `eval`.
+#
+#   The `return_local` has used for both issues:
+#   1. To return a local variable.
+#   2. To replace the `declare -g`.
+#
 function return_local()
 {
   unset $1 # must be local
   eval "$1=\"\$2\""
+}
+
+function set_return()
+{
+  return ${1:-0};
 }
 
 function GetNativeParentDir()
@@ -76,11 +90,11 @@ function GetAbsolutePathFromDirPath()
     DirPath="$RETURN_VALUE"
   fi
 
-  if [[ -n "$DirPath" && -x "/bin/readlink.exe" ]]; then
+  if [[ -n "$DirPath" && -x "/bin/readlink" ]]; then
     if [[ "${RelativePath:0:1}" != '/' ]]; then
-      RETURN_VALUE="`/bin/readlink.exe -m "$DirPath${RelativePath:+/}$RelativePath"`"
+      RETURN_VALUE="`/bin/readlink -m "$DirPath${RelativePath:+/}$RelativePath"`"
     else
-      RETURN_VALUE="`/bin/readlink.exe -m "$RelativePath"`"
+      RETURN_VALUE="`/bin/readlink -m "$RelativePath"`"
     fi
   fi
 
@@ -148,7 +162,7 @@ function ConvertBackendPathToNative()
         RETURN_VALUE="${RETURN_VALUE//\\//}"
       fi
 
-      return 2
+      return 0
     ;;
   esac
 
