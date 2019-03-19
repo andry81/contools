@@ -1,3 +1,7 @@
+2019.03.20:
+* fixed: Scripts/Tools: fix in the `set_vars_from_locked_file_pair.sh` for the back compatibility with a bash version lower than `bash-4.2-alpha`
+* fixed: Scripts/Tools/ToolAdaptors/sh: fix in the `bash_entry` to run in the Cygwin 1.5.x and Linux
+
 2019.03.18:
 * fixed: Scripts/Tools: minor fix in `stringlib.sh`
 
