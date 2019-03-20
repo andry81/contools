@@ -427,10 +427,11 @@ Scripts/Tools/admin/RunDll/SafelyRemoveHotPlugDevice.bat -text
 Scripts/Tools/admin/RunDll/UserControl.bat -text
 Scripts/Tools/admin/Steam/README_EN.txt -text
 Scripts/Tools/admin/Steam/steam.vbs -text
-Scripts/Tools/admin/Telemetry/disable_telemetry_junk_win7.bat -text
-Scripts/Tools/admin/Telemetry/disable_telemetry_junk_win7_2.bat -text
-Scripts/Tools/admin/Telemetry/disable_telemetry_junk_win7_3.bat -text
-Scripts/Tools/admin/Telemetry/disable_telemetry_junk_win7_4.bat -text
+Scripts/Tools/admin/Telemetry/01_disable_telemetry_junk_win7.bat -text
+Scripts/Tools/admin/Telemetry/02_disable_telemetry_junk_win7.bat -text
+Scripts/Tools/admin/Telemetry/03_disable_telemetry_junk_win7.bat -text
+Scripts/Tools/admin/Telemetry/04_disable_telemetry_junk_win7.bat -text
+Scripts/Tools/admin/Telemetry/crash_updates.txt -text
 Scripts/Tools/admin/WMI/fix_reactivated_in_namespace_eventviewer_error_Event_ID_10.vbs -text
 Scripts/Tools/admin/cleanup_acl.bat -text
 Scripts/Tools/admin/ip_list_by_arp.bat -text

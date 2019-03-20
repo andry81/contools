@@ -1,5 +1,8 @@
 2019.03.20:
-* fixed: Scripts/Tools/admin/Telemetry: more junk disabler scripts
+* new: Scripts/Tools/admin/Telemetry: windows 7 updates crashing the boot
+
+2019.03.20:
+* new: Scripts/Tools/admin/Telemetry: more windows 7 junk disabler scripts
 
 2019.03.20:
 * fixed: Scripts/Tools: fix in the `set_vars_from_locked_file_pair.sh` for the back compatibility with a bash version lower than `bash-4.2-alpha`
