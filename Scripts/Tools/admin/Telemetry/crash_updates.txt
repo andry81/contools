@@ -1,0 +1,22 @@
+List of updates which could crash on reboot.
+Based on this article:
+
+https://evgesha.net/stop-c0000145-application-error-0xc000000d/
+
+KB3022345
+KB3045999
+KB3060716
+KB3068708
+KB3071756
+KB3080149
+
+upd 14.07.2016:
+
+KB3101746
+KB3121212
+KB3126587
+KB3126593
+KB3140410
+KB3146706
+KB3147071
+KB3153171
