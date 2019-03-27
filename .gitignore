@@ -39,9 +39,3 @@ Utilities/src/thlibautocfg/help_inl.hpp
 Utilities/src/thlibautocfg/version.hpp
 Utilities/src/version.hpp
 /_3dparty
-_3dparty/utility/tacklelib/include/tacklelib/debug.hpp
-_3dparty/utility/tacklelib/include/tacklelib/optimization.hpp
-_3dparty/utility/tacklelib/include/tacklelib/setup.hpp
-_3dparty/utility/tacklelib/src/debug.hpp
-_3dparty/utility/tacklelib/src/optimization.hpp
-_3dparty/utility/tacklelib/src/setup.hpp
