@@ -1,3 +1,6 @@
+2019.04.05:
+* new: Scripts/Tools/admin: `test_connect.bat` script to test remote ports on open (PowerShell)
+
 2019.03.27:
 * changed: catalog structure cleanup
 
