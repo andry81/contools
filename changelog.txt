@@ -1,4 +1,4 @@
-2019.04.05:
+2019.04.14:
 * new: Scripts/Tools/admin: `comspec_as_svc.bat` script to run cmd.exe interactively in the Local System Account (Seesion 0 process)
 
 2019.04.05:
