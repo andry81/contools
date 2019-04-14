@@ -1,4 +1,7 @@
 2019.04.05:
+* new: Scripts/Tools/admin: `comspec_as_svc.bat` script to run cmd.exe interactively in the Local System Account (Seesion 0 process)
+
+2019.04.05:
 * new: Scripts/Tools/admin: `test_connect.bat` script to test remote ports on open (PowerShell)
 
 2019.03.27:
