@@ -1,3 +1,6 @@
+2019.04.22:
+* new: Scripts/Tools/admin/VM: `compact_vdi.bat` script to call the VirtualBox compact command on all `*.vdi` files in a directory
+
 2019.04.14:
 * new: Scripts/Tools/admin: `comspec_as_svc.bat` script to run cmd.exe interactively in the Local System Account (Seesion 0 process)
 
