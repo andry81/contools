@@ -3,9 +3,6 @@
 rem Description:
 rem   Main entry point script for tests on batch files.
 rem
-rem   The first argument must be user test script file name from which this
-rem   script calls.
-rem
 rem   The user script must contain the test handlers in separated scripts in
 rem   this file structure format:
 rem     /<user_test_script>.bat
@@ -84,7 +81,6 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.impl%TEST_SCRIPT_FI
     ( call "%%TEST_SCRIPT_HANDLERS_DIR%%/impl%%TEST_SCRIPT_FILE_EXT%%" ) || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
   )
 ) || (
-  echo xxx
   echo.%?~nx0%: error: test script implementation is not found: "%TEST_SCRIPT_FILE_NAME%".
   set "LASTERROR=-255"
 ) >&2
