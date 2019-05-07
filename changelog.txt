@@ -1,3 +1,9 @@
+2019.05.07:
+* fixed: `configure.bat` script call
+* fixed: Scripts/Tests/batscripts: utilities usage from scripts
+* new: Utilities: `Utilities/bin` as an external directory
+* new: svn ignore properties
+
 2019.04.22:
 * new: Scripts/Tools/admin/VM: `compact_vdi.bat` script to call the VirtualBox compact command on all `*.vdi` files in a directory
 

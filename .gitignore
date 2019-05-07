@@ -4,6 +4,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/Tools/*
 Scripts/Tools/ToolAdaptors/totalcmd/configure.user.bat
 Scripts/Tools/__init__.bat
 /Temp
+Utilities/Projects/*.user
 Utilities/src/_common/help.txt
 Utilities/src/_common/help_inl.hpp
 Utilities/src/_common/version.hpp
