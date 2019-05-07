@@ -32,6 +32,10 @@ echo "%CONFIGURE_ROOT%/Scripts/Tools/__init__.bat"
   echo.set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:\=/%%"
   echo.if "%%CONTOOLS_ROOT:~-1%%" == "/" set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:~0,-1%%"
   echo.
+  echo.if not defined UTILITIES_ROOT set "UTILITIES_ROOT=%%CONTOOLS_ROOT%%/../../Utilities"
+  echo.set "UTILITIES_ROOT=%%UTILITIES_ROOT:\=/%%"
+  echo.if "%%UTILITIES_ROOT:~-1%%" == "/" set "UTILITIES_ROOT=%%UTILITIES_ROOT:~0,-1%%"
+  echo.
   echo.if not defined BUILD_TOOLS_ROOT set "BUILD_TOOLS_ROOT=%%CONTOOLS_ROOT%%/build"
   echo.set "BUILD_TOOLS_ROOT=%%BUILD_TOOLS_ROOT:\=/%%"
   echo.if "%%BUILD_TOOLS_ROOT:~-1%%" == "/" set "BUILD_TOOLS_ROOT=%%BUILD_TOOLS_ROOT:~0,-1%%"
@@ -73,7 +77,6 @@ echo "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
   echo.call "%%%%~dp0..\..\__init__.bat" ^|^| goto :EOF
 ) > "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
 
-call :DEPLOY_UTILS || goto EXIT
 call :DEPLOY_3DPARTY || goto EXIT
 
 goto CONFIGURE_SVNCMD_END
@@ -89,6 +92,10 @@ echo."%CONFIGURE_ROOT%/Tools/__init__.bat"
   echo.if not defined CONTOOLS_ROOT set "CONTOOLS_ROOT=%%~dp0"
   echo.set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:\=/%%"
   echo.if "%%CONTOOLS_ROOT:~-1%%" == "/" set "CONTOOLS_ROOT=%%CONTOOLS_ROOT:~0,-1%%"
+  echo.
+  echo.if not defined UTILITIES_ROOT set "UTILITIES_ROOT=%%CONTOOLS_ROOT%%/../Utilities"
+  echo.set "UTILITIES_ROOT=%%UTILITIES_ROOT:\=/%%"
+  echo.if "%%UTILITIES_ROOT:~-1%%" == "/" set "UTILITIES_ROOT=%%UTILITIES_ROOT:~0,-1%%"
   echo.
   echo.if not defined BUILD_TOOLS_ROOT set "BUILD_TOOLS_ROOT=%%CONTOOLS_ROOT%%/build"
   echo.set "BUILD_TOOLS_ROOT=%%BUILD_TOOLS_ROOT:\=/%%"
@@ -147,21 +154,20 @@ for %%i in (%WINDOWS_UCRT_X86_DEPLOY_DIR_LIST%) do (
 
 exit /b 0
 
-:DEPLOY_UTILS
-rem initialize Tools "module"
-call :CMD "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
-
-rem copy utilities into Tools
-call :XCOPY_DIR "%%CONFIGURE_ROOT%%/Utilities/bin" "%%CONFIGURE_ROOT%%/Scripts/Tools" /E /Y /D || goto :EOF
-
-exit /b 0
-
 :DEPLOY_3DPARTY
 rem initialize Tools "module"
 call :CMD "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
 
-rem search recursively for a `_scripts/configure_src.bat` script inside the `_3dparty` directory and call it
-for /f "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "configure_src.bat"`) do (
+rem search recursively for a `*configure_src.bat` script inside the `_3dparty` directory and call it
+echo.Searching for "%CONFIGURE_ROOT%/_3dparty/*configure_src.bat"...
+for /f "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "%CONFIGURE_ROOT%/_3dparty\*configure_src.bat" 2^>nul`) do (
+  echo."%%i"
+  call :CMD "%%i"
+)
+
+rem search recursively for a `*generate_src.bat` script inside the `_3dparty` directory and call it
+echo.Searching for "%CONFIGURE_ROOT%/_3dparty/*generate_src.bat"...
+for /f "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "%CONFIGURE_ROOT%/_3dparty\*generate_src.bat"`) do (
   echo."%%i"
   call :CMD "%%i"
 )

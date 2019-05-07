@@ -745,6 +745,7 @@ Utilities/bin/touch.exe -text
 Utilities/bin/uuidgen.exe -text
 Utilities/bin/wtee.exe -text
 Utilities/bin/wxFileDialog.exe -text
+Utilities/changelog.txt -text
 Utilities/src/_common/common.hpp -text
 Utilities/src/_common/gui/wxFileDialog.hpp -text
 Utilities/src/_common/printf.hpp -text
