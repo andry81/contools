@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2017.09.02
+* 2019.05.11
 * DigitalProductId decoder
 
 1. DESCRIPTION
@@ -30,6 +30,9 @@ commands:
 
 Where, <WindowsDrive> - Drive letter where being recovered Windows has been
                         installed.
+
+Example:
+  PrintProductKeyFromReg.vbs "HKLM\Software\Microsoft\Windows NT\CurrentVersion"
 
 -------------------------------------------------------------------------------
 3. AUTHOR
