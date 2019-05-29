@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.01.20
+* 2019.05.29
 * ConsoleTools
 
 CAUTION:
@@ -20,7 +20,8 @@ Scripts for WindowsNT interpreter cmd.exe and other interpreters to support
 various operations and procedures with environment variables, text files and
 piping.
 
-The latest version is here: https://sf.net/p/contools
+The latest version is here:
+  https://sf.net/p/contools/contools/HEAD/tree/trunk
 
 WARNING:
   Use the SVN access to find out new functionality and bug fixes.
@@ -45,7 +46,45 @@ Second mirror:
 -------------------------------------------------------------------------------
 4. PREREQUISITES
 -------------------------------------------------------------------------------
-1. C++11 compiler: MSVC 2015 update 3 or GCC v5.4
+
+Currently tested these set of OS platforms, compilers, IDE's and interpreters
+to run from:
+
+1. OS platforms.
+
+* Windows 7 (`.bat` only, minimal version for the cmake 3.14)
+* Cygwin 1.7.x (`.sh` only)
+
+2. C++11 compilers.
+
+* (primary) Microsoft Visual C++ 2015 Update 3
+* (secondary) GCC 5.4+
+* (experimental) Clang 3.8+
+
+3. IDE's.
+
+* Microsoft Visual Studio 2015 Update 3
+* Microsoft Visual Studio 2017
+* QtCreator 4.6+
+
+4. Interpreters:
+
+* bash shell 3.2.48+ (to run unix shell scripts)
+* cmake 3.14+ :
+  https://cmake.org/download/
+
+Noticeable cmake changes from the version 3.14:
+
+https://cmake.org/cmake/help/v3.14/release/3.14.html#deprecated-and-removed-features
+
+* The FindQt module is no longer used by the find_package() command as a find
+  module. This allows the Qt Project upstream to optionally provide its own
+  QtConfig.cmake package configuration file and have applications use it via
+  find_package(Qt) rather than find_package(Qt CONFIG). See policy CMP0084.
+
+* Support for running CMake on Windows XP and Windows Vista has been dropped.
+  The precompiled Windows binaries provided on cmake.org now require Windows 7
+  or higher.
 
 -------------------------------------------------------------------------------
 5. INSTALLATION

@@ -1,3 +1,6 @@
+2019.05.29:
+* changed: minor readme update
+
 2019.05.11:
 * changed: Scripts/Tools/admin/ProductKey: minor readme update
 
