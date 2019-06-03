@@ -18,9 +18,9 @@ rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired b
 rmdir /S /Q "%TEMP%\lock.%~1" >nul 2>&1
 
 mkdir "%TEMP%\lock.%~1" && (
-  rem IMPL to use "goto :EOF" in next command instead of "exit /b %ERRORLEVEL%" under "block" command - "( )"
+  rem IMPL to use "exit /b" in next command instead of "exit /b %ERRORLEVEL%" under "block" command - "( )"
   call :IMPL %%*
-  goto :EOF
+  exit /b
 )
 exit /b -1024
 
@@ -34,14 +34,14 @@ exit /b %LASTERROR%
 :IMPL2
 if "%~n2" == "bat" (
   call %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9
-  goto :EOF
+  exit /b
 ) else if "%~n2" == "cmd" (
   call %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9
-  goto :EOF
+  exit /b
 )
 
 (
   %2 %3 %4 %5 %6 %7 %8 %9
 )
 
-goto :EOF
+exit /b

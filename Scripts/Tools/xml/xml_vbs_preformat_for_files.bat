@@ -19,7 +19,7 @@ type nul>nul
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "?~nx0=%~nx0"
 set "?~dp0=%~dp0"

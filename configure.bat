@@ -74,7 +74,7 @@ echo "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
 (
   echo.@echo off
   echo.
-  echo.call "%%%%~dp0..\..\__init__.bat" ^|^| goto :EOF
+  echo.call "%%%%~dp0..\..\__init__.bat" ^|^| exit /b
 ) > "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
 
 call :DEPLOY_3DPARTY || goto EXIT
@@ -135,7 +135,7 @@ echo "%CONFIGURE_ROOT%/Scripts/__init__.bat"
 (
   echo.@echo off
   echo.
-  echo.call "%%%%~dp0..\Tools\__init__.bat" ^|^| goto :EOF
+  echo.call "%%%%~dp0..\Tools\__init__.bat" ^|^| exit /b
 ) > "%CONFIGURE_ROOT%/Scripts/__init__.bat"
 
 :CONFIGURE_SVNCMD_END
@@ -145,18 +145,18 @@ goto EXIT
 
 :DEPLOY_TOOLS_EXTERNAL
 rem initialize Tools "module"
-call :CMD "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
+call :CMD "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || exit /b
 
 rem deploy Windows UCRT dependencies
 for %%i in (%WINDOWS_UCRT_X86_DEPLOY_DIR_LIST%) do (
-  call :XCOPY_DIR "%%CONFIGURE_ROOT%%/ToolsExternal/deps/Windows Kits/10/Redist/ucrt/DLLs/x86" "%%CONFIGURE_ROOT%%/%%i" || goto :EOF
+  call :XCOPY_DIR "%%CONFIGURE_ROOT%%/ToolsExternal/deps/Windows Kits/10/Redist/ucrt/DLLs/x86" "%%CONFIGURE_ROOT%%/%%i" || exit /b
 )
 
 exit /b 0
 
 :DEPLOY_3DPARTY
 rem initialize Tools "module"
-call :CMD "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || goto :EOF
+call :CMD "%%CONFIGURE_ROOT%%/Scripts/Tools/__init__.bat" || exit /b
 
 rem search recursively for a `*configure_src.bat` script inside the `_3dparty` directory and call it
 echo.Searching for "%CONFIGURE_ROOT%/_3dparty/*configure_src.bat"...
@@ -180,7 +180,7 @@ if not exist "%CONTOOLS_ROOT%/std/xcopy_dir.bat" (
   exit /b 1
 ) >&2
 if not exist "%~2" mkdir "%~2"
-call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || exit /b
 exit /b 0
 
 :CMD

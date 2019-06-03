@@ -7,7 +7,7 @@ rem   Script to set project build time.
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/get_datetime.bat"
 (

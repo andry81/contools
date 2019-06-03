@@ -51,4 +51,4 @@ if not defined __VALUE__ (
   if %F_ENABLE_PRINT_USER_CONFIGURE_VARS_SET%0 NEQ 0 echo.%~1=%2
   set "%~1=%~2"
 )
-goto :EOF
+exit /b

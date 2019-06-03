@@ -13,7 +13,7 @@ rem   directory path from first argument.
 rem
 
 rem initialize testlib "module"
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 if not defined TESTLIB__NEST_LVL set TESTLIB__NEST_LVL=0
 

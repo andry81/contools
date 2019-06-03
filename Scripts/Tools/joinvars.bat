@@ -59,7 +59,7 @@ if "%__SET2%" == "~0,1" exit /b 0
 :SET1
 rem call echo.1%%__SET_VAR%%=%%%__SET_VAR%%%%%__SPLIT_STR%%%__VAR1%
 call set %%__SET_VAR%%=%%%__SET_VAR%%%%%__SPLIT_STR%%%__VAR1%
-goto :EOF
+exit /b
 
 :SET1_EMPTY
 set __SET2=%__VAR1:~0,1%
@@ -71,10 +71,10 @@ if "%__SET2%" == "~0,1" exit /b 0
 :SET2
 rem call echo.2%%__SET_VAR%%=%__VAR1%
 call set %%__SET_VAR%%=%__VAR1%
-goto :EOF
+exit /b
 
 rem Exit with current error level.
-goto :EOF
+exit /b
 
 :EXIT
 rem Drop internal variables but use some changed value(s) for the return

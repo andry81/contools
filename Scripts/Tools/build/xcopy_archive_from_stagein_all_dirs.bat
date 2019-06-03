@@ -13,7 +13,7 @@ rem 1. call xcopy_archive_to_stagein_all_dirs.bat "../.." ^
 rem    "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
 rem    "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
 rem    "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" ^
-rem    "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || goto :EOF
+rem    "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b
 
 setlocal
 
@@ -34,7 +34,7 @@ set "PROJECT_STAGE_VAR_ROOT=%~8"
 rem Drop last error level
 type nul>nul
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 :PDB_STAGE
 if not exist "%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%" goto PDB_STAGE_END

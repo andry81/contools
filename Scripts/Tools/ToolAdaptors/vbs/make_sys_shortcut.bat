@@ -23,7 +23,7 @@ if not defined SC_NAME (
 ) >&2
 
 call :SET "%%SYSTEMROOT%%\system32\"
-goto :EOF
+exit /b
 
 :SET
 pushd "%SYSTEMROOT%\system32\" && (
@@ -32,7 +32,7 @@ pushd "%SYSTEMROOT%\system32\" && (
   popd
 )
 
-goto :EOF
+exit /b
 
 :CMD
 echo.^>%*

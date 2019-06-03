@@ -25,7 +25,7 @@ if "%~3" == "" (
   exit /b -1
 ) >&2
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set SPAWNED_TASKS=0
 

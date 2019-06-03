@@ -40,7 +40,7 @@ rem Workaround:
 rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.
 start "" /B /WAIT "%SystemRoot%\System32\cmd.exe" /C %*
 rem Exit with current error level.
-goto :EOF
+exit /b
 
 :NOTX64
 rem Workaround:

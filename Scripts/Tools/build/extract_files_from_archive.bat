@@ -25,7 +25,7 @@ set "_7ZIP_SWITCHES=%~4"
 rem Drop last error level
 type nul>nul
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 if not defined REL_PATH (
   echo.%~nx0: error: Relative path is no set.
@@ -80,7 +80,7 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:-D "%ARCHIVE_PATH
   set "ARCHIVE_FILE=%%i"
   call :EXTRACT_FROM_FILE
 )
-goto :EOF
+exit /b
 
 :EXTRACT_FROM_FILE
 "%CONTOOLS_ROOT%/7zip/7za.exe" x %_7ZIP_SWITCHES% "%ARCHIVE_FILE%" "%REL_PATH%" "-w%TEMP_DIR_PATH%"

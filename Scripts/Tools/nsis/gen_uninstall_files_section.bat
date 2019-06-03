@@ -8,7 +8,7 @@ rem  RMDir "$INSTDIR\universal_tract"
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "?~nx0=%~nx0"
 
@@ -38,7 +38,7 @@ set "FILE_FILTER_SUFFIX="
 if defined FILE_FILTER set "FILE_FILTER_SUFFIX=\%FILE_FILTER%"
 
 :PROCESS_DIR_LOOP
-call :PROCESS_DIR_PATH "%%~1" || goto :EOF
+call :PROCESS_DIR_PATH "%%~1" || exit /b
 
 shift 
 
@@ -61,13 +61,13 @@ set /A BASE_DIR_PATH_LEN=%ERRORLEVEL%
 
 set DIR_INDEX=0
 set "DIR_PATH=%BASE_DIR_PATH%"
-call :PROCESS_DIR_FILES || ( popd & goto :EOF )
+call :PROCESS_DIR_FILES || ( popd & exit /b )
 
 set DIR_INDEX=0
 pushd "%BASE_DIR_PATH%" && (
   for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir . /A:D /B /S /O:N 2^>nul`) do (
     set "DIR_PATH=%%i"
-    call :PROCESS_DIR_FILES || ( popd & goto :EOF )
+    call :PROCESS_DIR_FILES || ( popd & exit /b )
   )
   popd
 )
@@ -86,18 +86,18 @@ pushd "%BASE_DIR_PATH%" && (
 set /A NUM_DIRS_LAST=NUM_DIRS-1
 for /L %%i in (%NUM_DIRS_LAST%,-1,0) do (
   set LINE_INDEX=%%i
-  call :PROCESS_LINE_DIR || goto :EOF
+  call :PROCESS_LINE_DIR || exit /b
 )
 if %NUM_DIRS% NEQ 0 (
   echo.
 )
 
-goto :EOF
+exit /b
 
 :INDEX_DIR_PATH
 set "LINE_%DIR_INDEX%=%DIR_PATH%"
 set /A DIR_INDEX+=1
-goto :EOF
+exit /b
 
 :PROCESS_DIR_FILES
 call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
@@ -106,7 +106,7 @@ if defined FILE_DIR_PATH set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
 set FILE_INDEX=0
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /A:-D /B /O:N 2^>nul`) do (
-  if not "%%i" == "" ( call :PROCESS_FILE "%%i" || goto :EOF )
+  if not "%%i" == "" ( call :PROCESS_FILE "%%i" || exit /b )
 )
 if %FILE_INDEX% NEQ 0 (
   echo.
@@ -114,7 +114,7 @@ if %FILE_INDEX% NEQ 0 (
 
 set /A DIR_INDEX+=1
 
-goto :EOF
+exit /b
 
 :PROCESS_LINE_DIR
 call set "DIR_PATH=%%LINE_%LINE_INDEX%%%"

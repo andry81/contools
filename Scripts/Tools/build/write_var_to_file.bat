@@ -6,7 +6,7 @@ rem Description:
 rem   Script to set project build time.
 
 rem Examples:
-rem 1. call write_var_to_file.bat PROJECT_NAME c:\_b\MyProject\build\vars\post_build.vars "" STAGE_OUT.PROJECT_NAME || goto :EOF
+rem 1. call write_var_to_file.bat PROJECT_NAME c:\_b\MyProject\build\vars\post_build.vars "" STAGE_OUT.PROJECT_NAME || exit /b
 
 setlocal
 
@@ -30,4 +30,4 @@ if not exist "%__FILE_OUT_DIR%" (
 
 echo."%__VAR_NAME_OUT%=%__VAR_VALUE%">> "%__FILE_OUT%"
 
-goto :EOF
+exit /b

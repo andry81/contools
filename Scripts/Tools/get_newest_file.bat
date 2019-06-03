@@ -21,4 +21,4 @@ exit /b 0
 
 :GET_DIR
 set "FILE_DIR=%~dp1"
-goto :EOF
+exit /b

@@ -47,7 +47,7 @@ call set "PUBLISH_APP_DIR_VALUE=%%%PUBLISH_APP_DIR_VAR_PREFIX%PUBLISH_APP_DIR%%"
 
 if defined PUBLISH_APP_DIR_VALUE exit /b 0
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/get_datetime.bat"
 if not defined PUBLISH_DATE set "PUBLISH_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
@@ -86,4 +86,4 @@ set "PUBLISH_APP_DIR=%PROJECT_NAME%_%BUILD_SCM_BRANCH%_%PRODUCT_VERSION_FILE_SUF
   set "%PUBLISH_APP_DIR_VAR_PREFIX%PUBLISH_APP_DIR=%PUBLISH_APP_DIR%"
 )
 
-goto :EOF
+exit /b

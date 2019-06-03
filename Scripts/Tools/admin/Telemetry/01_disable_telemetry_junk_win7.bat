@@ -77,7 +77,7 @@ for /F "usebackq eol=; tokens=* delims=" %%i in (`dir "%WINDIR%\CompatTelRunner.
 )
 echo.
 
-goto :EOF
+exit /b
 
 :UPDATE_PERMISSIONS
 echo.^>%FILE%

@@ -2,7 +2,7 @@
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
@@ -60,7 +60,7 @@ goto ARCHIVE_FILE_FILTERS_LOOP
 :ARCHIVE_FILE_FILTERS_END
 
 rem double evaluate to % ~dpf1 to handle case with the *: "*" -> "X:\YYY\."
-call :PROCESS_FILE_PATH "%%FILE_PATH%%" || goto :EOF
+call :PROCESS_FILE_PATH "%%FILE_PATH%%" || exit /b
 
 rem restore code page
 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
@@ -72,10 +72,10 @@ set "FILE_PATH=%~dpf1"
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%FILE_PATH%" /A:-D /B /S /O:N 2^>nul`) do (
   set "ARCHIVE_FILE_PATH=%%i"
-  call :PROCESS_ARCHIVE_FILE || goto :EOF
+  call :PROCESS_ARCHIVE_FILE || exit /b
 )
 
-goto :EOF
+exit /b
 
 :PROCESS_ARCHIVE_FILE
 
@@ -103,23 +103,23 @@ set ARCHIVE_LIST_EOF=0
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%CONTOOLS_ROOT%/7zip/7za.exe" l "%ARCHIVE_FILE_PATH%"`) do (
   set "ARCHIVE_LIST_LINE=%%i"
-  call :PROCESS_ARCHIVE_LIST_LINE || goto :EOF
+  call :PROCESS_ARCHIVE_LIST_LINE || exit /b
   call :IS_ARCHIVE_LIST_EOF && goto PROCESS_ARCHIVE_FILE_IMPL_EXIT
 )
 
 :PROCESS_ARCHIVE_FILE_IMPL_EXIT
-if %ERRORLEVEL% NEQ 0 goto :EOF
+if %ERRORLEVEL% NEQ 0 exit /b
 
 set "ARCHIVE_FILE_FILTER_PATH_ARGS="
 call :PROCESS_ARCHIVE_FILE_FILTER %ARCHIVE_FILE_FILTERS_ARGS%
 
-call "%%?~dp0%%gen_dir_files_list.bat" "%%CODE_PAGE%%" %%ARCHIVE_FILE_FILTER_PATH_ARGS%% || goto :EOF
+call "%%?~dp0%%gen_dir_files_list.bat" "%%CODE_PAGE%%" %%ARCHIVE_FILE_FILTER_PATH_ARGS%% || exit /b
 
-goto :EOF
+exit /b
 
 :PROCESS_ARCHIVE_FILE_FILTER
 :PROCESS_ARCHIVE_FILE_FILTER_LOOP
-if "%~1" == "" goto :EOF
+if "%~1" == "" exit /b
 set ARCHIVE_FILE_FILTER_PATH_ARGS=%ARCHIVE_FILE_FILTER_PATH_ARGS% "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%\%~1"
 
 shift
@@ -159,7 +159,7 @@ if defined ARCHIVE_LIST_LINE_ATTR (
 )
 
 rem create empty files tree in temporary directory to retrieve later a sorted file paths list by `dir` command
-call :CREATE_TEMP_TREE_OF_EMPTY_FILES "%%ARCHIVE_LIST_FILE_PATH_ATTR0%%" "%%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%%\%%ARCHIVE_LIST_FILE_PATH%%" || goto :EOF
+call :CREATE_TEMP_TREE_OF_EMPTY_FILES "%%ARCHIVE_LIST_FILE_PATH_ATTR0%%" "%%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%%\%%ARCHIVE_LIST_FILE_PATH%%" || exit /b
 
 exit /b 0
 
@@ -186,4 +186,4 @@ if defined TEMP_FILE_PATH (
   type nul > "%TEMP_FILE_PATH%"
 )
 
-goto :EOF
+exit /b

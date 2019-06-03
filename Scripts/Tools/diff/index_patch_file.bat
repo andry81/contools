@@ -3,7 +3,7 @@
 rem Drop return value
 set RETURN_VALUE=0
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "__VAR_NAME_PREFIX__=%~1"
 set "__PATCH_FILE__=%~2"
@@ -25,7 +25,7 @@ set __PATCH_FILE_LAST_INDEX__=1
 set __PATCH_FILE_INDEX_OFFSET__=0
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%GNUWIN32_ROOT%/bin/sed.exe" -n "/^Index: /,/\(^@@ \|^GIT binary patch$\)/ { /\(^@@ \|^GIT binary patch$\)/b; p }" "%__PATCH_FILE__%" 2^>nul`) do (
   set "__PATCH_FILE_LINE__=%%i"
-  call :PROCESS_PATCH_FILE_LINE || goto :EOF
+  call :PROCESS_PATCH_FILE_LINE || exit /b
   set /A __PATCH_FILE_INDEX_OFFSET__+=1
 )
 

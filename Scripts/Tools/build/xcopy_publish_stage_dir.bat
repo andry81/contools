@@ -23,7 +23,7 @@ set "XCOPY_FLAGS=%~4"
 rem Drop last error level
 type nul>nul
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 set PATH_INDEX=1
 
@@ -65,4 +65,4 @@ if defined XCOPY_SUFFIX_PATH (
   )
 )
 
-goto :EOF
+exit /b

@@ -4,7 +4,7 @@ setlocal
 
 set "LOCK_NAME=%~1"
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "LOCK_PATH=%TEMP%"
 set "PRE_LOCK_FILE=prelock_mutex0.%LOCK_NAME%"
@@ -53,4 +53,4 @@ exit /b %LASTERROR%
 
 :CLEANUP_PRELOCK
 del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>&1
-goto :EOF
+exit /b

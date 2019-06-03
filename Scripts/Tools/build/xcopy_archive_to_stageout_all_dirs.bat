@@ -43,7 +43,7 @@ set "PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST=%~9"
 rem Drop last error level
 type nul>nul
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 :BIN_STAGE
 if not exist "%PROJECT_BIN_ROOT%" goto BIN_STAGE_END

@@ -136,14 +136,14 @@ exit /b 0
 
 :DEFINE_BY_VAR_NAME
 call :DEFINE "%%__VAR_NAME%%" "%%%__VAR_NAME%%%"
-goto :EOF
+exit /b
 
 :DEFINE
 rem define ONLY if not empty
 if not "%~2" == "" echo.!define %~1 "%~2"
-goto :EOF
+exit /b
 
 :DEFINE_NOCHECK
 rem always define even if not empty
 echo.!define %~1 "%~2"
-goto :EOF
+exit /b

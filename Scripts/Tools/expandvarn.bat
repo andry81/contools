@@ -6,12 +6,12 @@ rem Description:
 rem   Script expands variable %2 with numeric expression, store result in
 rem   variable %1 and returns with previous error level.
 
-if "%~1" == "" goto :EOF
+if "%~1" == "" exit /b
 
 rem Drop output variable
 set "%~1="
 
-if "%~2" == "" goto :EOF
+if "%~2" == "" exit /b
 
 (
   rem Expand string %2.

@@ -36,7 +36,7 @@ exit /b -256
 :X64
 call %*
 rem Exit with current error level.
-goto :EOF
+exit /b
 
 :WOW64
 rem Workaround:

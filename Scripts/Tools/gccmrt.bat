@@ -27,7 +27,7 @@ goto usage
 copy "%__GCC_LIB_DIR%\libmsvcr%__GCC_MSVCRT_VER%.a" "%__GCC_LIB_DIR%\libmsvcrt.a" > nul 2>&1
 copy "%__GCC_LIB_DIR%\libmsvcr%__GCC_MSVCRT_VER%d.a" "%__GCC_LIB_DIR%\libmsvcrtd.a" > nul 2>&1
 echo %~n0: set GCC to link executables by default with libmsvc%__GCC_MSVCRT_VER%*.a dynamic libraries.
-goto :EOF
+exit /b
 
 :usage
 echo %~n0: configure the Microsoft runtime library to use for compilation
@@ -38,8 +38,8 @@ echo   60 - Link with MSVCRT.DLL (like Visual Studio '98 aka VC6)
 echo   70 - Link with MSVCR70.DLL (like Visual Studio .NET aka VC70)
 echo   71 - Link with MSVCR71.DLL (like Visual Studio .NET 2003 aka VC71)
 echo   80 - Link with MSVCR80.DLL (like Visual Studio .NET 2005 aka VC80)
-goto :EOF
+exit /b
 
 :errorpath
 echo %~n0: Internal error while trying to find Mingw libraries directory.
-goto :EOF
+exit /b

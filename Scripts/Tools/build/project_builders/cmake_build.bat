@@ -122,12 +122,12 @@ if exist "%BUILD_SCRIPTS_ROOT%\gen_scm_branch_workingset.bat" (
 )
 
 rem cmake make
-call :CMD cmake %%CMAKE_CMD_LINE.MAKE%% || goto :EOF
+call :CMD cmake %%CMAKE_CMD_LINE.MAKE%% || exit /b
 
 if not defined CMAKE_CMD_LINE.INSTALL goto IGNORE_CMAKE_INSTALL
 
 rem cmake install
-call :CMD cmake %%CMAKE_CMD_LINE.INSTALL%% || goto :EOF
+call :CMD cmake %%CMAKE_CMD_LINE.INSTALL%% || exit /b
 
 :IGNORE_CMAKE_INSTALL
 
@@ -142,7 +142,7 @@ if defined PROJECT_LOCK_TOKEN (
   rem call "%%CONTOOLS_ROOT%%/locks/unlock_mutex.bat" %PROJECT_LOCK_TOKEN%_build
 )
 
-if %F_DISABLE_POST_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/post_build.bat" || goto :EOF )
+if %F_DISABLE_POST_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/post_build.bat" || exit /b )
 
 exit /b 0
 

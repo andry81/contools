@@ -5,7 +5,7 @@ setlocal
 set "HASHES_FILE=%~df1"
 
 for /F "usebackq eol=# tokens=1,2,3,* delims=," %%i in ("%HASHES_FILE%") do call :PROCESS_HASH_LINE "%%i" "%%j" "%%k" "%%l"
-goto :EOF
+exit /b
 
 :PROCESS_HASH_LINE
 set "FILE_SIZE=%~1"

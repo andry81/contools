@@ -8,7 +8,7 @@ if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
 rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
 if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 "%SystemRoot%\Syswow64\cmd.exe" /C ^(%0 %*^)
-goto :EOF
+exit /b
 
 :NOTX64
 
@@ -60,12 +60,12 @@ if %ERRORLEVEL% NEQ 0 goto PAUSE_AND_EXIT
 
 set UAC_READY=1
 call "%%~dp0runas_admin.lnk" ^("%%~dp0run_msys.bat" %%*^)
-goto :EOF
+exit /b
 
 :UAC_READY
 :NO_UAC
 call "%%~dp0run_msys.bat" %%*
-goto :EOF
+exit /b
 
 :PAUSE_AND_EXIT
 pause

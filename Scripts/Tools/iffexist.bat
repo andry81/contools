@@ -52,7 +52,7 @@ type nul>nul
 rem Create local variable's stack
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 if "%~3" == "-a" (
   rem Built-in search functionality
@@ -99,7 +99,7 @@ if defined __DO_TRIM (
 call "%%CONTOOLS_ROOT%%/appendvar.bat" __VAR1 "%%~1" "\"
 if exist "%__VAR1%" (
   set "FOUND_PATH=%__VAR1%"
-  goto :EOF
+  exit /b
 )
 
 if defined __VAR2 (
@@ -114,7 +114,7 @@ if defined __VAR2 (
 )
 
 rem Exit with current error level.
-goto :EOF
+exit /b
 
 :TRIMVAR_ROUTINE
 rem Set variable with spaces trim.
@@ -124,7 +124,7 @@ if not "%~1" == "" (
 ) else (
   set __VAR1=
 )
-goto :EOF
+exit /b
 
 :EXIT
 rem Drop internal variables but use some changed value(s) for the return

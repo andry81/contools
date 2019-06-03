@@ -35,7 +35,7 @@ if not exist "%FROM_STAGE_DIR_ROOT%" (
 rem Drop last error level
 type nul>nul
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 call :FILE_PATH "%%TO_STAGE_DIR_ROOT%%"
 set "TO_STAGE_DIR_FILE_PATH=%FILE_PATH%"
@@ -85,17 +85,17 @@ exit /b 0
 :FILE_PATH
 rem add /. to the end to suppress trailing slash misinterpretation
 call :FILE_PATH_IMPL "%%~1/."
-goto :EOF
+exit /b
 
 :FILE_PATH_IMPL
 set "FILE_PATH=%~dpf1"
-goto :EOF
+exit /b
 
 :BASE_PATH
 rem add /. to the end to suppress trailing slash misinterpretation
 call :BASE_PATH_IMPL "%%~1/."
-goto :EOF
+exit /b
 
 :BASE_PATH_IMPL
 set "BASE_PATH=%~dp1"
-goto :EOF
+exit /b

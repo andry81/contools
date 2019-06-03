@@ -98,7 +98,7 @@ if not exist "%TO_PATH%\" (
   exit /b -250
 ) >&2
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "FROM_PATH=%~dpf1"
 set "TO_PATH=%~dpf2"

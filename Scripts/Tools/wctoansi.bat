@@ -27,7 +27,7 @@ type nul>nul
 rem Create local variable's stack
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 rem Standard ANSI character table
 set __ANSI_TBL= !"#$%%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~

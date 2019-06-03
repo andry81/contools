@@ -17,7 +17,7 @@ rem   ${EndInstallFromArchive}
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "?~nx0=%~nx0"
 
@@ -61,7 +61,7 @@ echo.
 echo.${BeginInstallFromArchive}
 
 :PROCESS_DIR_LOOP
-call :PROCESS_DIR_PATH "%~1" || goto :EOF
+call :PROCESS_DIR_PATH "%~1" || exit /b
 
 shift 
 
@@ -84,17 +84,17 @@ call "%%CONTOOLS_ROOT%%/strlen.bat" /v BASE_DIR_PATH
 set /A BASE_DIR_PATH_LEN=%ERRORLEVEL%
 
 set "DIR_PATH=%BASE_DIR_PATH%"
-call :PROCESS_DIR_FILES || ( popd & goto :EOF )
+call :PROCESS_DIR_FILES || ( popd & exit /b )
 
 pushd "%BASE_DIR_PATH%" && (
   for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir . /A:D /B /S /O:N 2^>nul`) do (
     set "DIR_PATH=%%i"
-    call :PROCESS_DIR_FILES || ( popd & goto :EOF )
+    call :PROCESS_DIR_FILES || ( popd & exit /b )
   )
   popd
 )
 
-goto :EOF
+exit /b
 
 :PROCESS_DIR_FILES
 call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
@@ -103,10 +103,10 @@ if defined FILE_DIR_PATH set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
 set FILE_INDEX=0
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /A:-D /B /O:N 2^>nul`) do (
-  if not "%%i" == "" ( call :PROCESS_FILE "%%i" || goto :EOF )
+  if not "%%i" == "" ( call :PROCESS_FILE "%%i" || exit /b )
 )
 
-goto :EOF
+exit /b
 
 :PROCESS_FILE
 set "FILE_NAME=%~1"

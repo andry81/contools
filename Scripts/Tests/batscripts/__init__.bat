@@ -5,10 +5,10 @@ set "TESTS_ROOT=%TESTS_ROOT:~0,-1%"
 set "TESTS_ROOT=%TESTS_ROOT:\=/%"
 
 rem initialize Tools "module"
-call "%%TESTS_ROOT%%/../../Tools/__init__.bat" || goto :EOF
+call "%%TESTS_ROOT%%/../../Tools/__init__.bat" || exit /b
 
 rem initialize testlib "module"
-call "%%CONTOOLS_ROOT%%/testlib/__init__.bat" || goto :EOF
+call "%%CONTOOLS_ROOT%%/testlib/__init__.bat" || exit /b
 
 set "TEST_SRC_BASE_DIR=%TESTS_ROOT%"
 

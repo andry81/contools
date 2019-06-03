@@ -11,7 +11,7 @@ call "%%~dp0reg_ie_proxy.bat"
 call :CMD netsh winhttp reset proxy
 call :CMD netsh winhttp import proxy source=ie
 
-goto :EOF
+exit /b
 
 :CMD
 echo.^>%*

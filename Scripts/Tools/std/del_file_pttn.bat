@@ -60,16 +60,16 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /B /A:-D /S "%FILE_DIR%%FI
   set "FILE_PATH=%%i"
   call :DEL_FILE %%*
 )
-goto :EOF
+exit /b
 
 :DEL_FILE
 call :GET_FILE_EXT "%%FILE_PATH%%"
-if defined FILE_EXT_PTTN if "%FILE_EXT_PTTN:~-1%" == "." if not "%FILE_EXT%" == "%FILE_EXT_PTTN:~0,-1%" goto :EOF
+if defined FILE_EXT_PTTN if "%FILE_EXT_PTTN:~-1%" == "." if not "%FILE_EXT%" == "%FILE_EXT_PTTN:~0,-1%" exit /b
 
 del %4 %5 %6 %7 %8 %9 "%FILE_PATH%"
 
-goto :EOF
+exit /b
 
 :GET_FILE_EXT
 set "FILE_EXT=%~x1"
-goto :EOF
+exit /b

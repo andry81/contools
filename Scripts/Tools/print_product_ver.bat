@@ -24,7 +24,7 @@ if not exist "%FILE_PATH_PREFIX%%FILE_PATH%" (
   exit /b 3
 ) >&2
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 rem add EULA acception into registry to avoid EULA acception GUI dialog in the build process
 reg add HKCU\Software\Sysinternals\SigCheck /v EulaAccepted /t REG_DWORD /d 0x00000001 /f >nul 2>nul

@@ -44,4 +44,4 @@ echo.%LINESTR%
 :PARSE_LINE_EXIT
 set /A LINE_INDEX+=1
 
-goto :EOF
+exit /b

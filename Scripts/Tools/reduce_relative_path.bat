@@ -26,7 +26,7 @@ type nul>nul
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "REL_PATH=%~1"
 if "%REL_PATH:.=%" == "%REL_PATH%" exit /b 0

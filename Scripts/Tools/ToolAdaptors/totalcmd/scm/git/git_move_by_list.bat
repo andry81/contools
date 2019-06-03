@@ -6,7 +6,7 @@ set "?~dp0=%~dp0"
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
@@ -147,6 +147,7 @@ for /F "eol=	 tokens=1,* delims=|" %%i in ("%TO_FILE_PATH%") do (
 rem concatenate
 set "TO_FILE_PATH=%TO_FILE_PATH:|=%"
 
+rem file is not moved
 if /i "%FROM_FILE_PATH%" == "%TO_FILE_PATH%" exit /b 0
 
 if not exist "%FROM_FILE_PATH%" (
@@ -159,7 +160,7 @@ if not exist "%FROM_FILE_PATH%\" goto IGNORE_TO_FILE_PATH_CHECK
 
 call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 if %ERRORLEVEL% EQU 0 (
-  echo.%?~n0%: error: TO_FILE_PATH file path must not contain FROM_FILE_PATH file path: FROM_FILE_PATH="%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
+  echo.%?~n0%: error: TO_FILE_PATH directory path must not contain FROM_FILE_PATH directory path: FROM_FILE_PATH="%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
   exit /b 5
 ) >&2
 
@@ -170,6 +171,7 @@ call :GET_FILE_PATH_COMPONENTS FROM_FILE_DIR FROM_FILE_NAME "%%FROM_FILE_PATH%%"
 
 if not "%FROM_FILE_NAME%" == "%TO_FILE_NAME%" (
   echo.%?~n0%: warning: move does not imply rename, destination file name should not change ^(rename ignored^): FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
+  exit /b 0
 )
 
 if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"

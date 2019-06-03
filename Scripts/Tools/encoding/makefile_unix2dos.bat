@@ -49,19 +49,19 @@ if defined CONVERSION_PATH (
 )
 set /A __OVERALL_COUNTER+=1
 
-goto :EOF
+exit /b
 
 :PROCESS_MINGW
 call :EXEC "%%~1"
 set /A __OVERALL_COUNTER+=1
 
-goto :EOF
+exit /b
 
 :EXEC
 unix2dos.exe -D %*
 if %ERRORLEVEL% EQU 0 set /A __CONVERTED_COUNTER+=1
 
-goto :EOF
+exit /b
 
 :STAGE1
 if exist "%~$PATH:1" (

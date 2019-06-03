@@ -96,7 +96,7 @@ call :CMD "%%PYTHON_EXE%%" -m compileall -f -d "" "%%DESTDIR_ABS%%" -r 0
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:D /B /S "%DESTDIR_ABS%"`) do (
   set FILE_PATH=%%i
-  call :REBUILD_FILE_PATH || goto :EOF
+  call :REBUILD_FILE_PATH || exit /b
 )
 
 exit /b 0

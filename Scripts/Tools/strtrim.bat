@@ -27,7 +27,7 @@ call :TRIM_RIGHT "%%__STRING__%%
   set "%~2=%__STRING__%"
 )
 
-goto :EOF
+exit /b
 
 :TRIM_RIGHT
 set "__STRING__=%~1"

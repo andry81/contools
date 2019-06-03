@@ -11,7 +11,7 @@ rem    set "BUILD_CMD_VARS=MYPROJECT.PROJECT_TYPE ?MYPROJECT.TARGET_NAME ?MYPROJ
 rem    set BUILD_CMD_LINE=%*
 rem    ...
 rem    rem somethere in another script in pipeline
-rem    call parse_cmd_build_params.bat "%%BUILD_CMD_VARS%%" %%BUILD_CMD_LINE%% || goto :EOF
+rem    call parse_cmd_build_params.bat "%%BUILD_CMD_VARS%%" %%BUILD_CMD_LINE%% || exit /b
 rem    ...
 rem    rem usage example, 2 and 3 parameters are optional
 rem    call build_x86.bat release target123
@@ -131,7 +131,7 @@ exit /b 0
 :ERROR0
 echo.%~nx0: error: %__VAR__% is not set.>&2
 
-goto :EOF
+exit /b
 
 :PROCESS_FLAG
 set "__FLAG="
@@ -146,7 +146,7 @@ if defined __FLAG (
   if not "%__FLAG%" == "%__FLAG:-r =%" set FLAGS_REBUILD=1
 )
 
-goto :EOF
+exit /b
 
 :PROCESS_USER_PARAM
 
@@ -164,4 +164,4 @@ if "%__ARG%" == "%__USER_PARAM__%" (
   set "__USER_VALUE__="
 )
 
-goto :EOF
+exit /b

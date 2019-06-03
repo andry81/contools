@@ -47,9 +47,9 @@ exit /b 0
 set "DIR=%DIR:/=\%"
 if "\" == "%DIR:~-1%" exit /b 0
 call :SET_DIR_FROM_BASE_IMPL "%%DIR%%"
-goto :EOF
+exit /b
 
 :SET_DIR_FROM_BASE_IMPL
 set "DIR=%~dp1"
 set "DIR=%DIR:~0,-1%"
-goto :EOF
+exit /b

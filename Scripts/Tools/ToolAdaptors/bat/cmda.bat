@@ -6,7 +6,7 @@ if not defined USER call :GET_DEFAULT_ADMIN_NAME
 
 runas /user:%USER% "\"%COMSPEC%\" /K call cd /d \"%CD%\"&title User: %USER%"
 
-goto :EOF
+exit /b
 
 :GET_DEFAULT_ADMIN_NAME
 setlocal
