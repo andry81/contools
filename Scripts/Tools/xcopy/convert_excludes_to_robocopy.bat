@@ -24,8 +24,8 @@ set "ROBOCOPY_EXCLUDE_DIRS_LIST=%~2"
 
 if not defined ROBOCOPY_EXCLUDE_FILES_LIST if not defined ROBOCOPY_EXCLUDE_DIRS_LIST exit /b 1
 
-if defined ROBOCOPY_EXCLUDE_FILES_LIST ( call :PROCESS_EXCLUDES_LIST "%%ROBOCOPY_EXCLUDE_FILES_LIST%%" XF || goto :EOF )
-if defined ROBOCOPY_EXCLUDE_DIRS_LIST ( call :PROCESS_EXCLUDES_LIST "%%ROBOCOPY_EXCLUDE_DIRS_LIST%%" XD || goto :EOF )
+if defined ROBOCOPY_EXCLUDE_FILES_LIST ( call :PROCESS_EXCLUDES_LIST "%%ROBOCOPY_EXCLUDE_FILES_LIST%%" XF || exit /b )
+if defined ROBOCOPY_EXCLUDE_DIRS_LIST ( call :PROCESS_EXCLUDES_LIST "%%ROBOCOPY_EXCLUDE_DIRS_LIST%%" XD || exit /b )
 
 (
   endlocal
@@ -59,7 +59,7 @@ goto ROBOCOPY_EXCLUDES_LIST_LOOP
 :PROCESS_EXCLUDES_LIST_FILE
 for /F "usebackq eol=	 tokens=* delims=" %%i in ("%FILE%") do (
   set "FILE=%%i"
-  call :PROCESS_WILDCARD || goto :EOF
+  call :PROCESS_WILDCARD || exit /b
 )
 exit /b 0
 

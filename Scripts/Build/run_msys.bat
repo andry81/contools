@@ -12,7 +12,7 @@ if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
 rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
 if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 "%SystemRoot%\Syswow64\cmd.exe" /C ^(%0 %*^)
-goto :EOF
+exit /b
 
 :NOTX64
 
@@ -22,7 +22,7 @@ type nul>nul
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 rem make all paths canonical
 call "%%CONTOOLS_ROOT%%/abspath.bat" "%%CONTOOLS_ROOT%%"
@@ -172,7 +172,7 @@ goto :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 
   call :RESET_ENV_AND_CALL vars_win2k.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
-goto :EOF
+exit /b
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 (
@@ -184,7 +184,7 @@ goto :EOF
 
   call :RESET_ENV_AND_CALL vars_winxp.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
-goto :EOF
+exit /b
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WINVISTA
 (
@@ -196,7 +196,7 @@ goto :EOF
 
   call :RESET_ENV_AND_CALL vars_vista.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
-goto :EOF
+exit /b
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN7
 (
@@ -208,7 +208,7 @@ goto :EOF
 
   call :RESET_ENV_AND_CALL vars_win7.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
-goto :EOF
+exit /b
 
 :CLEAN_AND_RESET_ENV_AND_CALL_WIN8
 (
@@ -220,7 +220,7 @@ goto :EOF
 
   call :RESET_ENV_AND_CALL vars_win8.lst "%%CONTOOLS_ROOT_NATIVE%%" "%%CONFIG_PATH%%" "%%MSYS_PATH%%" "%%MINGW_PATH%%"
 )
-goto :EOF
+exit /b
 
 :RESET_ENV_AND_CALL
 rem Reset environment
@@ -241,7 +241,7 @@ call :cecho %%~nx0: {0B}info{#}: "{0F}CONTOOLS_ROOT=%%CONTOOLS_ROOT%%{#}"
 echo.
 
 call :RUN_SHELL %%4
-goto :EOF
+exit /b
 
 :RUN_SHELL
 rem Drop last error level before the last call
@@ -251,7 +251,7 @@ echo.^
 call "%%~1\msys.bat" --norxvt MINGW32
 
 rem Environment will be restored automatically here
-goto :EOF
+exit /b
 
 :cecho
 if exist "%CONTOOLS_ROOT_NATIVE%\cecho.exe" (
@@ -259,4 +259,4 @@ if exist "%CONTOOLS_ROOT_NATIVE%\cecho.exe" (
 ) else (
   echo.%*
 )
-goto :EOF
+exit /b

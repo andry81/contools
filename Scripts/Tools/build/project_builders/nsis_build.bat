@@ -335,7 +335,7 @@ if defined PROJECT_LOCK_TOKEN (
   rem call "%%CONTOOLS_ROOT%%/locks/unlock_mutex.bat" %PROJECT_LOCK_TOKEN%_build
 )
 
-if %F_DISABLE_POST_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/post_build.bat" || goto :EOF )
+if %F_DISABLE_POST_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/post_build.bat" || exit /b )
 
 exit /b 0
 

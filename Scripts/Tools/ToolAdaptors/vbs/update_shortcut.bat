@@ -24,13 +24,13 @@ if not exist "%SC_NAME%" (
 ) >&2
 
 call :SET
-goto :EOF
+exit /b
 
 :SET
 echo.Current directory: "%CD:\=/%"
 call :CMD "%%~dp0update_shortcut.vbs" "%%SC_NAME%%" "%%WD%%" "%%CMD%%" "%%ARGS%%"
 
-goto :EOF
+exit /b
 
 :CMD
 echo.^>%*

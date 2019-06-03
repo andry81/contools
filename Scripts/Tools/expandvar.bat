@@ -14,12 +14,12 @@ rem    set "CCC=blabla\blabla"
 rem    call expandvar.bat DDD "%%%AAA%%%"
 rem    echo "DDD=%DDD%"
 
-if "%~1" == "" goto :EOF
+if "%~1" == "" exit /b
 
 rem Drop output variable
 set "%~1="
 
-if "%~2" == "" goto :EOF
+if "%~2" == "" exit /b
 
 (
   rem Expand string %2.

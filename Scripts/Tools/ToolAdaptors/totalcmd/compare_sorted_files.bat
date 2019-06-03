@@ -6,7 +6,7 @@ set "?~dp0=%~dp0"
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 rem script flags
 set FLAG_WAIT_EXIT=0

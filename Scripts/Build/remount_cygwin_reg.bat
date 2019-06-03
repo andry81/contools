@@ -11,7 +11,7 @@ if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
 rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
 if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 "%SystemRoot%\Syswow64\cmd.exe" /C ^(%0 %*^)
-goto :EOF
+exit /b
 
 :NOTX64
 
@@ -21,7 +21,7 @@ type nul>nul
 rem Save all variables to stack
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 rem make all paths canonical
 call "%%CONTOOLS_ROOT%%/abspath.bat" "%%CONTOOLS_ROOT%%"
@@ -142,13 +142,13 @@ goto EXIT
 rem Ignore root path, because it is path to registry key.
 set "__VALUE=%~1"
 call set "__VALUE=%%__VALUE:~%__CYGWIN_REGKEY_PATH_LEN%%%"
-if not defined __VALUE goto :EOF
-if "%__VALUE%" == "~%__CYGWIN_REGKEY_PATH_LEN%" goto :EOF
+if not defined __VALUE exit /b
+if "%__VALUE%" == "~%__CYGWIN_REGKEY_PATH_LEN%" exit /b
 
 set /A __OVERALL_PATHS+=1
 call "%%CONTOOLS_ROOT%%\regquery.bat" "%%CYGWIN_REGKEY_PATH%%\%%__VALUE%%" "native"
 rem Ignore empty mounts.
-if %ERRORLEVEL% NEQ 0 goto :EOF
+if %ERRORLEVEL% NEQ 0 exit /b
 
 call set "__VALUE2_1=%%REGQUERY_VALUE:~0,%__CURRENT_CYGWIN_PATH_LEN%%%"
 call set "__VALUE2_2=%%REGQUERY_VALUE:~%__CURRENT_CYGWIN_PATH_LEN%%%"
@@ -157,26 +157,26 @@ rem Replace all "/" characters to "\" characters
 set "__VALUE2_1=%__VALUE2_1:/=\%"
 
 rem Ignore already correct mounts.
-if /i "%CYGWIN_PATH%" == "%__VALUE2_1%" goto :EOF
+if /i "%CYGWIN_PATH%" == "%__VALUE2_1%" exit /b
 
 rem Change only mounts which paths begins from root mount minus drive.
-if /i not "%__CURRENT_CYGWIN_PATH:~1%" == "%__VALUE2_1:~1%" goto :EOF
+if /i not "%__CURRENT_CYGWIN_PATH:~1%" == "%__VALUE2_1:~1%" exit /b
 
 set "__VALUE2_2_1=%__VALUE2_2:\=/%"
-if defined __VALUE2_2 if not "%__VALUE2_2_1:~0,1%" == "/" goto :EOF
+if defined __VALUE2_2 if not "%__VALUE2_2_1:~0,1%" == "/" exit /b
 
 rem Write new value to registry.
 reg.exe add "%CYGWIN_REGKEY_PATH%\%__VALUE%" /v "native" /d "%CYGWIN_PATH%%__VALUE2_2%" /f >nul 2>&1
 echo %__VALUE% -^> "%CYGWIN_PATH%%__VALUE2_2%"
 set /A __REMOUNTED_PATHS+=1
 
-goto :EOF
+exit /b
 
 :REMOUNT_CYGWIN_1_7_X
 rem Make remount in the local /etc/fstab file.
 echo %~nx0: warning: /etc/fstab should be manually remounted.>&2
 
-goto :EOF
+exit /b
 
 :EXIT
 exit /b 0

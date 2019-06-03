@@ -41,12 +41,12 @@ set TESTLIB__TEST_TEARDOWN=1
 
 rem call user teardown script
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.teardown%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.teardown%%TEST_SCRIPT_FILE_EXT%%" || goto :EOF
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.teardown%%TEST_SCRIPT_FILE_EXT%%" || exit /b
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/teardown%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/teardown%%TEST_SCRIPT_FILE_EXT%%" || goto :EOF
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/teardown%%TEST_SCRIPT_FILE_EXT%%" || exit /b
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/teardown%TEST_SCRIPT_FILE_EXT%" (
-    call "%%TEST_SCRIPT_HANDLERS_DIR%%/teardown%%TEST_SCRIPT_FILE_EXT%%" || goto :EOF
+    call "%%TEST_SCRIPT_HANDLERS_DIR%%/teardown%%TEST_SCRIPT_FILE_EXT%%" || exit /b
   )
 )
 

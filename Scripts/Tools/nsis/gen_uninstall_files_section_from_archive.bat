@@ -8,7 +8,7 @@ rem  RMDir "$INSTDIR\universal_tract"
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
@@ -40,7 +40,7 @@ set "FILE_FILTER_SUFFIX="
 if defined FILE_FILTER set "FILE_FILTER_SUFFIX=\%FILE_FILTER%"
 
 :PROCESS_DIR_LOOP
-call :PROCESS_DIR_PATH "%%~1" || goto :EOF
+call :PROCESS_DIR_PATH "%%~1" || exit /b
 
 shift 
 
@@ -56,10 +56,10 @@ set "BASE_DIR_PATH=%~dpf1"
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir "%BASE_DIR_PATH%%FILE_FILTER_SUFFIX%" /A:-D /B /S /O:N 2^>nul`) do (
   set "ARCHIVE_FILE_PATH=%%i"
-  call :PROCESS_ARCHIVE_FILE || goto :EOF
+  call :PROCESS_ARCHIVE_FILE || exit /b
 )
 
-goto :EOF
+exit /b
 
 :PROCESS_ARCHIVE_FILE
 
@@ -87,16 +87,16 @@ set ARCHIVE_LIST_EOF=0
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%CONTOOLS_ROOT%/7zip/7za.exe" l "%ARCHIVE_FILE_PATH%"`) do (
   set "ARCHIVE_LIST_LINE=%%i"
-  call :PROCESS_ARCHIVE_LIST_LINE || goto :EOF
+  call :PROCESS_ARCHIVE_LIST_LINE || exit /b
   call :IS_ARCHIVE_LIST_EOF && goto PROCESS_ARCHIVE_FILE_IMPL_EXIT
 )
 
 :PROCESS_ARCHIVE_FILE_IMPL_EXIT
 if %ERRORLEVEL% EQU 0 (
-  call "%%?~dp0%%gen_uninstall_files_section.bat" "%%CODE_PAGE%%" "%%FILES_PATH_PREFIX%%" "%%INSTDIR_SUBDIR%%" "" "%%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%%" || goto :EOF
+  call "%%?~dp0%%gen_uninstall_files_section.bat" "%%CODE_PAGE%%" "%%FILES_PATH_PREFIX%%" "%%INSTDIR_SUBDIR%%" "" "%%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%%" || exit /b
 )
 
-goto :EOF
+exit /b
 
 :IS_ARCHIVE_LIST_EOF
 if %ARCHIVE_LIST_EOF% NEQ 0 exit /b 0
@@ -131,7 +131,7 @@ if defined ARCHIVE_LIST_LINE_ATTR (
 )
 
 rem create empty files tree in temporary directory to retrieve later a sorted file paths list by `dir` command
-call :CREATE_TEMP_TREE_OF_EMPTY_FILES "%%ARCHIVE_LIST_FILE_PATH_ATTR0%%" "%%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%%\%%ARCHIVE_LIST_FILE_PATH%%" || goto :EOF
+call :CREATE_TEMP_TREE_OF_EMPTY_FILES "%%ARCHIVE_LIST_FILE_PATH_ATTR0%%" "%%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%%\%%ARCHIVE_LIST_FILE_PATH%%" || exit /b
 
 exit /b 0
 
@@ -158,4 +158,4 @@ if defined TEMP_FILE_PATH (
   type nul > "%TEMP_FILE_PATH%"
 )
 
-goto :EOF
+exit /b

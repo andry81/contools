@@ -11,7 +11,7 @@ set "UNLOCK_DIR=%~4"
 set "UNLOCK_FILE=%~5"
 set "WAITERS_DIR=%~6"
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "RAND=%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
 

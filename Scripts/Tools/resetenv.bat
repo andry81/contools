@@ -104,41 +104,41 @@ shift
 
 if exist "%~1" goto RESET_VARS
 
-goto :EOF
+exit /b
 
 :RESET_VARS_IMPL
 for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do call :RESET_VAR "%%i" "%%j"
-goto :EOF
+exit /b
 
 :RESET_VAR
-if "%~1" == "" goto :EOF
-if "%~2" == "" goto :EOF
+if "%~1" == "" exit /b
+if "%~2" == "" exit /b
 if %?FLAG_EXPAND% NEQ 0 (
   call set "%%~1=%~2"
 ) else (
   set "%~1=%~2"
 )
 if %?FLAG_PRINT% NEQ 0 echo.^*"%~1"
-goto :EOF
+exit /b
 
 rem Clear variables
 :CLEAR_VARS
 
 for /F "usebackq eol=# tokens=1,* delims==" %%i in (`set 2^>nul`) do call :CLEAR_VAR "%%i"
-goto :EOF
+exit /b
 
 :CLEAR_VAR
 set "?CLEAR_VAR_NAME=%~1"
-if not defined ?CLEAR_VAR_NAME goto :EOF
-if "%?CLEAR_VAR_NAME:~0,1%" == "?" goto :EOF
+if not defined ?CLEAR_VAR_NAME exit /b
+if "%?CLEAR_VAR_NAME:~0,1%" == "?" exit /b
 
 call :CLEAR_VAR_LOOP %%?RESET_ENV_FILES%%
-goto :EOF
+exit /b
 
 :CLEAR_VAR_LOOP
 
 call :RESET_LIST "%%~1"
-if %ERRORLEVEL% NEQ 0 goto :EOF
+if %ERRORLEVEL% NEQ 0 exit /b
 
 shift
 
@@ -150,7 +150,7 @@ if defined ?CLEAR_VAR_VALUE (
   if %?FLAG_PRINT% NEQ 0 echo.-"%?CLEAR_VAR_NAME%"
 )
 
-goto :EOF
+exit /b
 
 :RESET_LIST
 for /F "usebackq eol=	 tokens=1,* delims==" %%i in (`type "%~dpf1"`) do if /i "%?CLEAR_VAR_NAME%" == "%%i" exit /b 1

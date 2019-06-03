@@ -15,7 +15,7 @@ if not exist "%SEARCH_PATH_LIST_FILE%" (
 set "PREV_COMMAND="
 
 rem generate nsis_search_paths.nsi
-for /F "eol=# usebackq tokens=1,2 delims=|" %%i in ("%SEARCH_PATH_LIST_FILE%") do ( call :PROCESS_LINE "%%i" "%%j" || goto :EOF )
+for /F "eol=# usebackq tokens=1,2 delims=|" %%i in ("%SEARCH_PATH_LIST_FILE%") do ( call :PROCESS_LINE "%%i" "%%j" || exit /b )
 (
   endlocal
   rem return updated PATH variable
@@ -44,7 +44,7 @@ set "VALUE=%VALUE%"
 rem update PATH
 set "PATH=%PATH%;%VALUE%"
 
-goto :EOF
+exit /b
 
 :GEN_OUTPUT
 if defined PREV_COMMAND if not "%PREV_COMMAND%" == "%COMMAND%" echo.
@@ -53,12 +53,12 @@ set "PREV_COMMAND=%COMMAND%"
 
 if "%COMMAND%" == "includedir" (
   echo.!add%COMMAND% "%VALUE%"
-  goto :EOF
+  exit /b
 )
 if "%COMMAND%" == "plugindir" (
   echo.!add%COMMAND% "%VALUE%"
-  goto :EOF
+  exit /b
 )
 
 echo.!%COMMAND% "%VALUE%"
-goto :EOF
+exit /b

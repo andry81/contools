@@ -93,7 +93,7 @@ goto NO_TARGET_DIR_END
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "%SOURCE_DIR%\*.pyc."`) do (
   set FILE_PATH=%%i
-  call :COPY_FILE_PATH || goto :EOF
+  call :COPY_FILE_PATH || exit /b
 )
 
 exit /b 0

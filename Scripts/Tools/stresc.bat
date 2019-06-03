@@ -56,7 +56,7 @@ type nul>nul
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "__PREFIX_STR=%~5"
 set "__SUFFIX_STR=%~6"
@@ -196,7 +196,7 @@ if !__DO_PREFIX!0 NEQ 00 (
   set "%~1=!%~1!!__CHAR_TO_APPEND!"
 )
 
-goto :EOF
+exit /b
 
 :CHECK_ON_EXIT
 if not %__COUNTER1% GTR 0 goto EXIT

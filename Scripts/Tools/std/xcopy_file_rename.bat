@@ -11,7 +11,7 @@ rem   somehow locked on a moment of rename then the original file will be left
 rem   unrenamed in the output directory to manual rename later.
 
 rem Examples:
-rem 1. call xcopy_file_rename.bat "%%FROM_PATH%%" "%%TO_PATH%%" "%%FROM_FILE%%" "%%TO_FILE%%" || goto :EOF
+rem 1. call xcopy_file_rename.bat "%%FROM_PATH%%" "%%TO_PATH%%" "%%FROM_FILE%%" "%%TO_FILE%%" || exit /b
 
 echo.^>%~nx0 %*
 
@@ -139,25 +139,25 @@ if not exist "%TO_PATH%\" (
   exit /b -245
 ) >&2
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "FROM_ROOT=%~dpf1"
 set "TO_ROOT=%~dpf2"
 
 if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
-  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || goto :EOF ) && if /i not ^
+  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^
       "%FROM_FILE%" == "%TO_FILE%" (
     (
-      call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || goto :EOF
+      call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
     ) && (
-      call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || goto :EOF
+      call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || exit /b
     )
   )
 ) else if /i not "%FROM_FILE%" == "%TO_FILE%" (
   (
-    call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || goto :EOF
+    call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
   ) && (
-    call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || goto :EOF
+    call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || exit /b
   )
 )
 

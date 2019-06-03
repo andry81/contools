@@ -5,7 +5,7 @@ setlocal
 rem Drop last error code
 type nul>nul
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "SOLUTION_DIR=%~1"
 set "PROJECT_DIR=%~2"

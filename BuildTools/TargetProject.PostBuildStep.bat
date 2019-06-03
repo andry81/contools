@@ -5,7 +5,7 @@ setlocal
 rem Drop last error code
 type nul>nul
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "TARGET_PATH=%~1"
 set "BINARY_DIR=%~2"
@@ -33,5 +33,5 @@ echo Last return code: %LASTERROR%
 exit /b %LASTERROR%
 
 :XCOPY_FILE
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%* || exit /b
 exit /b 0

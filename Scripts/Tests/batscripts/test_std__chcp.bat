@@ -12,8 +12,8 @@ if 0%__CTRL_SETLOCAL% EQU 1 (
 )
 set __CTRL_SETLOCAL=1
 
-call "%%~dp0__init__.bat" || goto :EOF
-call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
+call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
 
 call :TEST chcp 65000 866 "866|"
 call :TEST chcp 65001 65000 "65000|866|"

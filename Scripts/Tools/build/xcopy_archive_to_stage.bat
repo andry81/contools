@@ -13,7 +13,7 @@ rem    "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_BUIL
 rem    "%%ARCHIVE_COPY_FROM_OFFSET%%" ^
 rem    "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%/%%STAGE_IN.PROJECT_NAME%%_pdb_%%STAGE_IN.BUILD_SCM_BRANCH%%_%%STAGE_IN.PROJECT_TYPE%%_%%STAGE_IN.APP_TARGET_NAME%%_v%%STAGE_IN.PRODUCT_VERSION_FILE_SUFFIX%%.pdb.7z" ^
 rem    "*.pdb:*.ilk:*.map" "*.pdb.7z" "/S /Y /H" ^
-rem    "@archive_exclude_file_list.lst|*.lib|*.exp" || goto :EOF
+rem    "@archive_exclude_file_list.lst|*.lib|*.exp" || exit /b
 
 setlocal
 
@@ -38,7 +38,7 @@ set "ARCHIVE_EXCLUDE_DIRS_LIST=%~9"
 rem Drop last error level
 type nul>nul
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 set LASTERROR=0
 
@@ -180,25 +180,25 @@ goto :EXIT
 
 :ABS_PATH
 set "ABS_PATH=%~dpf1"
-goto :EOF
+exit /b
 
 :FILE_PATH
 rem add /. to the end to suppress trailing slash misinterpretation
 call :FILE_PATH_IMPL "%%~1/."
-goto :EOF
+exit /b
 
 :FILE_PATH_IMPL
 set "FILE_PATH=%~dpf1"
-goto :EOF
+exit /b
 
 :PARENT_PATH
 rem add /. to the end to suppress trailing slash misinterpretation
 call :PARENT_PATH_IMPL "%%~1/."
-goto :EOF
+exit /b
 
 :PARENT_PATH_IMPL
 set "PARENT_PATH=%~dp1"
-goto :EOF
+exit /b
 
 :EXIT
 call :DEL_XCOPY_ARCHIVE_EXCLUDES_FILE

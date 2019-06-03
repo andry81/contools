@@ -12,8 +12,8 @@ if 0%__CTRL_SETLOCAL% EQU 1 (
 )
 set __CTRL_SETLOCAL=1
 
-call "%%~dp0__init__.bat" || goto :EOF
-call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
+call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
 
 call :TEST "01_nested"
 call :TEST "02_nested_with_task"

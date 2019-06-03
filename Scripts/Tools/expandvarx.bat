@@ -9,8 +9,8 @@ rem   returns with previous error level.
 rem Drop EXPANDED_VALUE
 set "EXPANDED_VALUE="
 
-if "%~1" == "" goto :EOF
-if "%~2" == "" goto :EOF
+if "%~1" == "" exit /b
+if "%~2" == "" exit /b
 
 (
   rem Expand string %*.

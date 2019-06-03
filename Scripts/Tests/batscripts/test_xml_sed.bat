@@ -12,8 +12,8 @@ if 0%__CTRL_SETLOCAL% EQU 1 (
 )
 set __CTRL_SETLOCAL=1
 
-call "%%~dp0__init__.bat" || goto :EOF
-call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
+call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
 
 rem xpath_filter_list/0X
 call :TEST "xpath_filter_list/01_empty" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"

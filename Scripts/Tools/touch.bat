@@ -5,7 +5,7 @@ rem
 
 setlocal
 
-if not exist "%~1" type nul >> "%~1" & goto :EOF
+if not exist "%~1" type nul >> "%~1" & exit /b
 
 set _ATTRIBUTES=%~a1
 if "%~a1" == "%_ATTRIBUTES:r=%" (copy "%~1"+,, > nul) else attrib -r "%~1" & copy "%~1"+,, > nul & attrib +r "%~1"

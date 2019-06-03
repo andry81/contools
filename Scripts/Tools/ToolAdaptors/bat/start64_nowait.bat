@@ -38,7 +38,7 @@ if "%~1" == "" exit /b -1
 
 start "" /B %*
 rem Exit with current error level.
-goto :EOF
+exit /b
 
 :WOW64
 rem Workaround:

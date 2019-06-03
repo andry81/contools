@@ -3,7 +3,7 @@
 set RETURN_VALUE=-1
 
 call :MAIN %%* 2>nul
-goto :EOF
+exit /b
 
 :MAIN
 setlocal

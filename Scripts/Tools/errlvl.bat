@@ -10,5 +10,5 @@ rem Examples:
 rem 1. call errlvl.bat 10
 rem    echo ERRORLEVEL=%ERRORLEVEL%
 
-if "%~1" == "" goto :EOF
+if "%~1" == "" exit /b
 exit /b %~1

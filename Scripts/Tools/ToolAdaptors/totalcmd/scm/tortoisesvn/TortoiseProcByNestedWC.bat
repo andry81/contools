@@ -15,7 +15,7 @@ set "?~dp0=%~dp0"
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 rem builtin defaults
 if not defined TORTOISEPROC_MAX_CALLS set TORTOISEPROC_MAX_CALLS=10

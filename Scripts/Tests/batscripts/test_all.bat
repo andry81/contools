@@ -3,8 +3,8 @@
 rem Create local variable's stack
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
-call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
+call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
 
 call "%%TESTS_ROOT%%/test_strlen.bat"
 call "%%TESTS_ROOT%%/test_strchr.bat"

@@ -94,7 +94,7 @@ if defined __VAR2 (
 )
 
 rem Exit with current error level.
-goto :EOF
+exit /b
 
 :TRIMVAR_ROUTINE
 rem Set variable with spaces trim.
@@ -104,7 +104,7 @@ if not "%~1" == "" (
 ) else (
   set __VAR1=
 )
-goto :EOF
+exit /b
 
 :EXIT
 

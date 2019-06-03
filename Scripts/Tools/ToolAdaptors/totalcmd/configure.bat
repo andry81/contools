@@ -2,9 +2,9 @@
 
 setlocal
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
-if exist "%~dp0configure.user.bat" ( call "%~dp0configure.user.bat" || goto :EOF )
+if exist "%~dp0configure.user.bat" ( call "%~dp0configure.user.bat" || exit /b )
 if defined CONTOOLS_ROOT_FROM set "CONTOOLS_ROOT=%CONTOOLS_ROOT_FROM%"
 
 if defined CONTOOLS_ROOT ^
@@ -33,47 +33,47 @@ if "%CONTOOLS_ROOT_COPY:~-1%" == "/" set "CONTOOLS_ROOT_COPY=%CONTOOLS_ROOT_COPY
   echo.set "CONTOOLS_ROOT_TO=%CONTOOLS_ROOT_COPY%"
 ) > "%~dp0configure.user.bat"
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
 
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/std" "%%CONTOOLS_ROOT_COPY%%/std" /E /Y /D || goto :EOF
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/std" "%%CONTOOLS_ROOT_COPY%%/std" /E /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_datetime.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_filesize.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_shared_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "reduce_relative_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "subtract_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "subtract_relative_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "index_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "split_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "strlen.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_datetime.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_filesize.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_shared_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "reduce_relative_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "subtract_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "subtract_relative_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "index_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "split_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "strlen.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
 
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/encoding" "%%CONTOOLS_ROOT_COPY%%/encoding" /E /Y /D || goto :EOF
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/encoding" "%%CONTOOLS_ROOT_COPY%%/encoding" /E /Y /D || exit /b
 
-call :XCOPY_DIR "%%GNUWIN32_ROOT%%" "%%CONTOOLS_ROOT_COPY%%/gnuwin32" /E /Y /D || goto :EOF
+call :XCOPY_DIR "%%GNUWIN32_ROOT%%" "%%CONTOOLS_ROOT_COPY%%/gnuwin32" /E /Y /D || exit /b
 
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "svn_has_changes.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_info_param.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "gen_externals_list_from_pget.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "svn_externals_list.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "make_url_absolute.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "make_url_canonical.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_url_scheme.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_url_root.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%/impl" "svn_get_wc_db_user_ver.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn/impl" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "svn_has_changes.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_info_param.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "gen_externals_list_from_pget.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "svn_externals_list.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "make_url_absolute.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "make_url_canonical.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_url_scheme.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_url_root.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%/impl" "svn_get_wc_db_user_ver.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn/impl" /Y /D /H || exit /b
 
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/sqlite" "%%CONTOOLS_ROOT_COPY%%/sqlite" /E /Y /D || goto :EOF
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/sqlite" "%%CONTOOLS_ROOT_COPY%%/sqlite" /E /Y /D || exit /b
 
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /E /Y /D || goto :EOF
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /E /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "create_dirs_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "loadvars.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || goto :EOF
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "create_dirs_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "loadvars.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 
 pause
 
@@ -85,7 +85,7 @@ if not exist "%CONTOOLS_ROOT%/std/xcopy_file.bat" (
   exit /b 1
 ) >&2
 if not exist "%~3" mkdir "%~3"
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%* || exit /b
 exit /b 0
 
 :XCOPY_DIR
@@ -94,7 +94,7 @@ if not exist "%CONTOOLS_ROOT%/std/xcopy_dir.bat" (
   exit /b 1
 ) >&2
 if not exist "%~2" mkdir "%~2"
-call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || goto :EOF
+call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || exit /b
 exit /b 0
 
 :CONTOOLS_ROOT_ERROR

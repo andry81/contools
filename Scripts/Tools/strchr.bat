@@ -159,11 +159,11 @@ for /L %%i in (%__FOR10_BEGIN_FROM%,1,%__FOR10_END_TO%) do (
   set "__CHAR1=!%__STRING_VAR__%:~%%i,1!"
 
   rem Check on empty value
-  if not defined __CHAR1 ( set "__COUNTER1=%%i" && goto :EOF )
+  if not defined __CHAR1 ( set "__COUNTER1=%%i" && exit /b )
   rem Check on quote character first
   if not "!__CHAR1!^" == ""^" (
     rem Check on out of bounds (specific cmd bug case)
-    if "!__CHAR1!" == "!__EMPTY_FIELD1!" ( set "__COUNTER1=%%i" && goto :EOF )
+    if "!__CHAR1!" == "!__EMPTY_FIELD1!" ( set "__COUNTER1=%%i" && exit /b )
   )
 )
 

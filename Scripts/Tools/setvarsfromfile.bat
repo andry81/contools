@@ -80,7 +80,7 @@ if defined __FLAGS (
 for /F "usebackq eol=# tokens=1,* delims=<" %%i in ("%~1") do (
   set __EXP=%%i
   set __STDIN_FILE=%%j
-  call :SET_ROUTINE || goto :EOF
+  call :SET_ROUTINE || exit /b
 )
 
 rem Drop internal variables.
@@ -108,7 +108,7 @@ set "__STDIN_FILE="
 set "__ARGS__="
 
 rem Exit with current error level.
-goto :EOF
+exit /b
 
 :SET_ROUTINE
 rem echo.%__EXP%^<%__STDIN_FILE%
@@ -141,14 +141,14 @@ goto SET_EXP
 
 :SET_QUOTED
 call :SET_QUOTED_IMPL %%__EXP%%
-goto :EOF
+exit /b
 
 :SET_QUOTED_IMPL
 rem echo 3. __EXP=%__EXP% ^| %*
 set __SET_FLAG_IS_QUOTED=1
 for /F "eol=	 tokens=1,* delims==" %%i in ("%~1") do (
   set __EXP=%%i
-  call :SET_EXP_IMPL "%%j" || goto :EOF
+  call :SET_EXP_IMPL "%%j" || exit /b
 )
 exit /b 0
 
@@ -173,7 +173,7 @@ if %__SET_FLAG_IS_QUOTED%0 NEQ 0 (
 ) else (
   call :SET_WITH_FLAG_IMPL %%__EXP%% %*
 )
-goto :EOF
+exit /b
 
 :SET_WITH_FLAG_IMPL
 if not %__SET1% == /E/ if not %__SET1% == /H/ if not %__SET1% == /R/ if not %__SET1% == /X/ if not %__SET1% == /V/ set __SET_FLAGS=%__SET_FLAGS%%1 
@@ -195,15 +195,15 @@ set __SET_FLAG_IS_QUOTED=1
 set "__EXP=%~2"
 rem echo.-^> %__EXP%^|%3 %4 %5 %6 %7 %8 %9
 call :SET_ROUTINE_IMPL %%3 %%4 %%5 %%6 %%7 %%8 %%9
-goto :EOF
+exit /b
 
 :SET_IF_EMPTY
 rem echo 1. __EXP=%__EXP% ^| %*
 for /F "usebackq eol=	 tokens=1,* delims== " %%i in ('%__EXP%') do (
   set __EXP=%%i
-  call :SET_IF_EMPTY_IMPL %%j %* || goto :EOF
+  call :SET_IF_EMPTY_IMPL %%j %* || exit /b
 )
-goto :EOF
+exit /b
 
 :SET_IF_EMPTY_IMPL
 if %__SET_FLAG_DONT_EXPAND_NAME%0 EQU 0 (
@@ -225,17 +225,17 @@ goto SET_EXP_UNQUOTED
 :SET_EXP_QUOTED
 for /F "eol=	 tokens=1,* delims==" %%i in ("%__EXP%") do (
   set __EXP=%%i
-  call :SET_EXP_IMPL %%j %* || goto :EOF
+  call :SET_EXP_IMPL %%j %* || exit /b
 )
-goto :EOF
+exit /b
 
 :SET_EXP_UNQUOTED
 rem echo 2. __EXP=%__EXP% ^| %*
 for /F "usebackq eol=	 tokens=1,* delims== " %%i in ('%__EXP% ') do (
   set __EXP=%%i
-  call :SET_EXP_IMPL %%j %* || goto :EOF
+  call :SET_EXP_IMPL %%j %* || exit /b
 )
-goto :EOF
+exit /b
 
 :SET_EXP_IMPL
 if %__SET_FLAG_IS_QUOTED%0 NEQ 0 goto SET_EXP_IMPL_QUOTED
@@ -274,7 +274,7 @@ rem echo.%__SET_FLAGS%"%__VAR_NAME%=%__ARGS__%" %__SET_FLAG_IF_EMPTY:1=/E% %__SE
 rem echo.
 rem exit /b 0
 set %__SET_FLAGS%"%__VAR_NAME%=%__ARGS__%"
-goto :EOF
+exit /b
 
 :SET_EXP_IMPL_UNQUOTED
 set __ARGS__=%*
@@ -309,15 +309,15 @@ rem echo.%__SET_FLAGS%%__VAR_NAME%=%__ARGS__% __DO_EXPAND_VALUE=%__DO_EXPAND_VAL
 rem echo.
 rem exit /b 0
 set %__SET_FLAGS%%__VAR_NAME%=%__ARGS__%
-goto :EOF
+exit /b
 
 :SET_FROM_FILE
 rem echo.--^> %__EXP%^|%*^|%__STDIN_FILE%
 for /F "eol=	 tokens=1,* delims==" %%i in ("%__EXP%") do (
   set __EXP=%%i
-  call :SET_FROM_FILE_IMPL %%__STDIN_FILE%% || goto :EOF
+  call :SET_FROM_FILE_IMPL %%__STDIN_FILE%% || exit /b
 )
-goto :EOF
+exit /b
 
 :SET_FROM_FILE_IMPL
 set "__STDIN_FILE=%~1"
@@ -349,4 +349,4 @@ rem echo.%__SET_FLAGS%%__VAR_NAME%=^<"%__STDIN_FILE%" %__SET_FLAG_IF_EMPTY:1=/E%
 rem echo.
 rem exit /b 0
 set %__SET_FLAGS%%__VAR_NAME%=<"%__STDIN_FILE%"
-goto :EOF
+exit /b

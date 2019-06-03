@@ -48,7 +48,7 @@ goto SWITCHES_LOOP
 rem Drop last error level
 type nul>nul
 
-call "%%?~dp0%%__init__.bat" || goto :EOF
+call "%%?~dp0%%__init__.bat" || exit /b
 
 pushd "%DIR%" || (
   echo.%?~nx0%: error: could not switch current directory: "%DIR%".

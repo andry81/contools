@@ -39,7 +39,7 @@ set RETURN_VALUE=
 if "%~1" == "" exit /b 65
 
 call :MAIN %%*
-goto :EOF
+exit /b
 
 :MAIN
 rem Create local variable's stack
@@ -167,4 +167,4 @@ if defined __VER_STR_C_NO_D call set "__VER_STR_C=%%__VER_STR_C:%__VER_STR_C_NO_
 
 set "%__OUT_VAR%=%__VER_STR_C%"
 
-goto :EOF
+exit /b

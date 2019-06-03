@@ -20,7 +20,7 @@ call :GET_BASE_DIR_NAME
   )
 )
 
-goto :EOF
+exit /b
 
 :GET_BASE_DIR_NAME
 set DIR_INDEX=1

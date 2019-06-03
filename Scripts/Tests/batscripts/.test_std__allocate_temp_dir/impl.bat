@@ -22,7 +22,7 @@ set DIR_INDEX=0
 for /F "usebackq tokens=1,* delims=|" %%i in ("%TEST_DATA_DIR_LIST_FILE%") do (
   set "DIR_PATH=%%i"
   set "DIR_NAME_PTTN=%%j"
-  call :PROCESS_DIR || ( popd & goto :EOF )
+  call :PROCESS_DIR || ( popd & exit /b )
 )
 
 popd

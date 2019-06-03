@@ -10,7 +10,7 @@ type nul>nul
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "FROM_PATH=%~1"
 set "TO_PATH=%~2"

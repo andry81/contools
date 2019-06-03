@@ -2,7 +2,7 @@
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "?~nx0=%~nx0"
 
@@ -32,7 +32,7 @@ if "%FILE_PATH_PTTN:~0,1%" == "\" (
 ) >&2
 
 rem double evaluate to % ~dpf1 to handle case with the *: "*" -> "X:\YYY\."
-call :PROCESS_DIR_PATH "%%~dpf1" || goto :EOF
+call :PROCESS_DIR_PATH "%%~dpf1" || exit /b
 
 :PROCESS_DIR_LOOP_CONTINUE
 shift
@@ -63,7 +63,7 @@ exit /b
 call "%%CONTOOLS_ROOT%%/strlen.bat" /v FILES_PATH
 set /A FILES_PATH_LEN=%ERRORLEVEL%+1
 dir /B /S /O:N "%FILES_PATH%\" | "%GNUWIN32_ROOT%/bin/sed.exe" "s/.\{%FILES_PATH_LEN%\}\(.*\)/\1\\/" | "%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/"
-goto :EOF
+exit /b
 
 :FILES_PATH_AS_FILE
 echo.%~nx1

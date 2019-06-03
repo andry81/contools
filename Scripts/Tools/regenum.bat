@@ -37,7 +37,7 @@ rem test if key is exist
 reg.exe query "%__REG_PATH%" 2>&1 >nul
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
-rem call "%%~dp0__init__.bat" || goto :EOF
+rem call "%%~dp0__init__.bat" || exit /b
 
 rem call "%%CONTOOLS_ROOT%%/cstresc.bat" "%%__REG_PATH%%" "__KEYPATH" "\.*^$[]"
 set "__KEYPATH=%__REG_PATH:\=\\%"

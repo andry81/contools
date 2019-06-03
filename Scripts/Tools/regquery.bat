@@ -56,7 +56,7 @@ if %ERRORLEVEL% NEQ 0 exit /b 1
 if "%~2" == "" ^
 if "%~3" == "-t" exit /b 0
 
-rem call "%%~dp0__init__.bat" || goto :EOF
+rem call "%%~dp0__init__.bat" || exit /b
 
 if defined __REG_VAR call :QUERY_KEY_ESCAPE
 goto QUERY_KEY_ESCAPE_END

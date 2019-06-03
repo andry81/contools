@@ -14,7 +14,7 @@ rem  !macroend
 
 setlocal
 
-call "%%~dp0__init__.bat" || goto :EOF
+call "%%~dp0__init__.bat" || exit /b
 
 set "?~nx0=%~nx0"
 
@@ -55,7 +55,7 @@ set FILE_EXT_INDEX=1
 :PROCESS_FILE_EXT_LIST_LOOP
 set "FILE_EXT="
 for /F "eol=	 tokens=%FILE_EXT_INDEX% delims=|" %%i in ("%FILE_EXT_LIST%") do set "FILE_EXT=%%i"
-if not defined FILE_EXT goto :EOF
+if not defined FILE_EXT exit /b
 
 set FINDSTR_CMD_LINE=%FINDSTR_CMD_LINE% /C:"%FILE_EXT%"
 
@@ -70,7 +70,7 @@ set "LAST_FILE_PATH="
 
 for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\)/\1\\/" "%FILE_PATH_LIST_FILE%" ^| sort ^| "%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/" ^| findstr.exe %FINDSTR_CMD_LINE%`) do (
   set "FILE_PATH=%%i"
-  call :PROCESS_FILE_PATH || goto :EOF
+  call :PROCESS_FILE_PATH || exit /b
 )
 
 set NUM_FILES=%FILE_INDEX%
@@ -97,11 +97,11 @@ echo.!macroend
 rem restore code page
 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
-goto :EOF
+exit /b
 
 :PROCESS_FILE_PATH
 rem ignore duplications
-if "%LAST_FILE_PATH%" == "%FILE_PATH%" goto :EOF
+if "%LAST_FILE_PATH%" == "%FILE_PATH%" exit /b
 
 echo.!define PRODUCT_%TOKEN_VALUE%%FILE_INDEX%_NAME "%FILE_PATH%"
 
