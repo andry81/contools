@@ -1,5 +1,5 @@
 2019.06.03:
-* refactor: global scripts refactor to replace `goto :EOF` by `exit /b` as a faster command
+* refactor: global scripts refactor to replace `goto :EOF` by `exit /b` as a might be faster command
 
 2019.05.29:
 * changed: minor readme update
