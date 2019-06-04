@@ -147,6 +147,7 @@ for /F "eol=	 tokens=1,* delims=|" %%i in ("%TO_FILE_PATH%") do (
 rem concatenate
 set "TO_FILE_PATH=%TO_FILE_PATH:|=%"
 
+rem file is not moved
 if /i "%FROM_FILE_PATH%" == "%TO_FILE_PATH%" exit /b 0
 
 if not exist "%FROM_FILE_PATH%" (
@@ -170,6 +171,7 @@ call :GET_FILE_PATH_COMPONENTS FROM_FILE_DIR FROM_FILE_NAME "%%FROM_FILE_PATH%%"
 
 if not "%FROM_FILE_NAME%" == "%TO_FILE_NAME%" (
   echo.%?~n0%: warning: move does not imply rename, destination file name should not change ^(rename ignored^): FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
+  exit /b 6
 )
 
 if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"

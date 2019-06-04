@@ -63,8 +63,8 @@ for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: !CD!") do (
 
 if "%~1" == "" exit /b 0
 
-set "MOVE_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\move_from_file_list.txt"
-set "MOVE_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\move_to_file_list.txt"
+set "COPY_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\copy_from_file_list.txt"
+set "COPY_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\copy_to_file_list.txt"
 
 set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.txt"
 
@@ -85,10 +85,10 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 )
 
 rem recreate files
-echo.F|xcopy "%INPUT_LIST_FILE_UTF8_TMP%" "%MOVE_FROM_LIST_FILE_TMP%" /H /K /Y
+echo.F|xcopy "%INPUT_LIST_FILE_UTF8_TMP%" "%COPY_FROM_LIST_FILE_TMP%" /H /K /Y
 
 rem recreate empty lists
-type nul > "%MOVE_TO_LIST_FILE_TMP%"
+type nul > "%COPY_TO_LIST_FILE_TMP%"
 
 rem read selected file paths from file
 for /F "usebackq eol=	 tokens=* delims=" %%i in ("%INPUT_LIST_FILE_UTF8_TMP%") do (
@@ -106,31 +106,31 @@ if "%FILE_PATH:~-1%" == "\" set "FILE_PATH=%FILE_PATH:~0,-1%"
 call :GET_FILE_PATH_COMPONENTS PARENT_DIR FILE_NAME "%%FILE_PATH%%"
 
 for /F "eol=	 tokens=* delims=" %%i in ("%PARENT_DIR%|%FILE_NAME%") do (
-  (echo.%%i) >> "%MOVE_TO_LIST_FILE_TMP%"
+  (echo.%%i) >> "%COPY_TO_LIST_FILE_TMP%"
 )
 
 exit /b 0
 
 :FILL_TO_LIST_FILE_TMP_END
 
-call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%MOVE_TO_LIST_FILE_TMP%%"
+call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%COPY_TO_LIST_FILE_TMP%%"
 
 setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
 rem trick with simultaneous iteration over 2 list in the same time
 (
-  for /f "usebackq eol=# tokens=* delims=" %%i in ("%MOVE_TO_LIST_FILE_TMP%") do (
+  for /f "usebackq eol=# tokens=* delims=" %%i in ("%COPY_TO_LIST_FILE_TMP%") do (
     set /p "FROM_FILE_PATH="
     set "TO_FILE_PATH=%%i"
-    call :PROCESS_MOVE
+    call :PROCESS_COPY
   )
-) < "%MOVE_FROM_LIST_FILE_TMP%"
+) < "%COPY_FROM_LIST_FILE_TMP%"
 
 endlocal
 
 exit /b 0
 
-:PROCESS_MOVE
+:PROCESS_COPY
 if not defined FROM_FILE_PATH exit /b 1
 if not defined TO_FILE_PATH exit /b 2
 
@@ -147,7 +147,7 @@ for /F "eol=	 tokens=1,* delims=|" %%i in ("%TO_FILE_PATH%") do (
 rem concatenate
 set "TO_FILE_PATH=%TO_FILE_PATH:|=%"
 
-rem file is not moved
+rem file being copied to itself
 if /i "%FROM_FILE_PATH%" == "%TO_FILE_PATH%" exit /b 0
 
 if not exist "%FROM_FILE_PATH%" (
@@ -160,7 +160,7 @@ if not exist "%FROM_FILE_PATH%\" goto IGNORE_TO_FILE_PATH_CHECK
 
 call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 if %ERRORLEVEL% EQU 0 (
-  echo.%?~n0%: error: TO_FILE_PATH directory path must not contain FROM_FILE_PATH directory path: FROM_FILE_PATH="%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
+  echo.%?~n0%: error: TO_FILE_PATH file path must not contain FROM_FILE_PATH file path: FROM_FILE_PATH="%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
   exit /b 5
 ) >&2
 
@@ -169,39 +169,21 @@ if %ERRORLEVEL% EQU 0 (
 rem check if destination name is changed and print warning
 call :GET_FILE_PATH_COMPONENTS FROM_FILE_DIR FROM_FILE_NAME "%%FROM_FILE_PATH%%"
 
-if not "%FROM_FILE_NAME%" == "%TO_FILE_NAME%" (
-  echo.%?~n0%: warning: move does not imply rename, destination file name should not change ^(rename ignored^): FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
-  exit /b 6
-)
-
 if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
 if "%TO_FILE_DIR:~-1%" == "\" set "TO_FILE_DIR=%TO_FILE_DIR:~0,-1%"
 
-rem check if file is under GIT version control
-
-rem WORKAROUND:
-rem  Git ignores absolute path as an command argument and anyway searches current working directory for the repository.
-rem  Use `pushd` to set the current directory to parent directory of being processed item.
-rem
-
-call :CMD pushd "%%FROM_FILE_DIR%%" && (
-  call :CMD git ls-files --error-unmatch "%%FROM_FILE_PATH%%" >nul 2>nul && (
-    call :MOVE_FILE GIT
-    rem to avoid trigger the shell copy block on not zero return code from above command
-    goto MOVE_END
-  ) || (
-    rem move through the shell
-    call :MOVE_FILE SHELL
-  )
+rem check if file is under SVN version control
+svn info "%FROM_FILE_PATH%" --non-interactive >nul 2>nul
+if %ERRORLEVEL% EQU 0 (
+  call :COPY_FILE SVN
+) else (
+  rem copy through the shell
+  call :COPY_FILE SHELL
 )
-
-:MOVE_END
-
-call :CMD popd
 
 exit /b
 
-:MOVE_FILE
+:COPY_FILE
 set "MODE=%~1"
 
 call "%%CONTOOLS_ROOT%%/get_shared_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_DIR%%"
@@ -220,41 +202,65 @@ if %ERRORLEVEL% NEQ 0 (
 
 set "TO_FILE_DIR_SUFFIX=%RETURN_VALUE%"
 
-goto %MODE%_MOVE_FILE
+goto %MODE%_COPY_FILE
 
-:GIT_MOVE_FILE
-if not defined TO_FILE_DIR_SUFFIX goto GIT_MOVE_FILE_CMD
+:SVN_COPY_FILE
+if not defined TO_FILE_DIR_SUFFIX goto SVN_COPY_FILE_CMD
 
-call :CMD pushd "%%SHARED_ROOT%%" && (
-  call :CMD mkdir "%%TO_FILE_DIR_SUFFIX%%"
-  call :CMD popd
-)
+call "%%CONTOOLS_ROOT%%/index_pathstr.bat" TO_FILE_DIR_SUFFIX \ "%%TO_FILE_DIR_SUFFIX%%"
+set TO_FILE_DIR_SUFFIX_ARR_SIZE=%RETURN_VALUE%
 
-:GIT_MOVE_FILE_CMD
+:IGNORE_TO_FILE_DIR_SUFFIX_INDEX
+
+rem add to version control
+if %TO_FILE_DIR_SUFFIX_ARR_SIZE% EQU 0 goto SVN_COPY_FILE_CMD
+
+set TO_FILE_DIR_SUFFIX_INDEX=1
+
+call :CMD pushd "%%SHARED_ROOT%%" || goto SVN_COPY_FILE_CMD
+
+call :CMD mkdir "%%TO_FILE_DIR_SUFFIX%%"
+
+:SVN_ADD_LOOP
+call set "TO_FILE_DIR_SUFFIX_STR=%%TO_FILE_DIR_SUFFIX%TO_FILE_DIR_SUFFIX_INDEX%%%"
+
+call :CMD svn add --depth immediates --non-interactive "%%TO_FILE_DIR_SUFFIX_STR%%"
+
+set /A TO_FILE_DIR_SUFFIX_INDEX+=1
+
+if %TO_FILE_DIR_SUFFIX_INDEX% GTR %TO_FILE_DIR_SUFFIX_ARR_SIZE% goto SVN_ADD_LOOP_END
+
+goto SVN_ADD_LOOP
+
+:SVN_ADD_LOOP_END
+
+call :CMD popd
+
+:SVN_COPY_FILE_CMD
 set "TO_FILE_PATH=%SHARED_ROOT%\%TO_FILE_DIR_SUFFIX%"
 
 rem always remove trailing slash character
 if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
-call :CMD git mv "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+call :CMD svn copy "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%\%%TO_FILE_NAME%%"
 
 exit /b
 
-:SHELL_MOVE_FILE
-if not defined TO_FILE_DIR_SUFFIX goto SHELL_MOVE_FILE_CMD
+:SHELL_COPY_FILE
+if not defined TO_FILE_DIR_SUFFIX goto SHELL_COPY_FILE_CMD
 
 call :CMD pushd "%%SHARED_ROOT%%" && (
   call :CMD mkdir "%%TO_FILE_DIR_SUFFIX%%"
   call :CMD popd
 )
 
-:SHELL_MOVE_FILE_CMD
+:SHELL_COPY_FILE_CMD
 set "TO_FILE_PATH=%SHARED_ROOT%\%TO_FILE_DIR_SUFFIX%"
 
 rem always remove trailing slash character
 if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
-call :CMD move "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+call :CMD copy /B /Y "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%\%%TO_FILE_NAME%%"
 
 exit /b
 
