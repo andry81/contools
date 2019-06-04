@@ -1,3 +1,7 @@
+2019.06.04:
+* new: Scripts/Tools/ToolAdaptors/totalcmd/scm: svn/svn_copy_by_list.bat, git/git_copy_by_list.bat scripts + icons
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+
 2019.06.03:
 * refactor: global scripts refactor to replace `goto :EOF` by `exit /b` as a might be faster command
 

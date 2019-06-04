@@ -1,3 +1,7 @@
+2019.06.04:
+* new: totalcmd/scm: svn/svn_copy_by_list.bat, git/git_copy_by_list.bat scripts + icons
+* changed: readme update
+
 2019.02.23:
 * changed: readme minor update
 
