@@ -107,6 +107,7 @@ BuildTools/msys/share/guile/ice-9/time.scm -text
 BuildTools/msys/share/guile/ice-9/weak-vector.scm -text
 /Changes_EN.old.txt -text
 Projects/ConsoleTools.sln -text
+/README_EN.deps.txt -text
 /README_EN.old.txt -text
 /README_EN.txt -text
 Scripts/Build/__init__.bat -text
@@ -399,6 +400,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_new_session.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/profile.vars -text
+Scripts/Tools/ToolAdaptors/totalcmd/save_file_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/git_copy_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/git_move_by_list.bat -text

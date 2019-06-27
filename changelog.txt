@@ -1,7 +1,18 @@
 2019.06.27:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: minor fixes
+* fixed: minor fixes
+* new: Scripts/Tools/ToolAdaptors/totalcmd: save file selection lists through the `save_file_list.bat` script + icons
+* new: Scripts/Tools/ToolAdaptors/totalcmd: load file selection lists through the `Find Files` dialog search templates feature icons
+* new: `README_EN.deps.txt` file for dependencies description
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme file update
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: missed changes in configure.bat
+* changed: main readme updated
+
+2019.06.27:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: minor text alignment in images/compare_files_in_sorted_list.ico
 * new: Scripts/Tools/ToolAdaptors/totalcmd: create_empty_files_by_list.bat script + icons
 * new: Scripts/Tools/ToolAdaptors/totalcmd: icons for lists save/load feature
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme file update
 
 2019.06.27:
 * refactor: minor changes

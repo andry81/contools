@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.05.29
+* 2019.06.27
 * ConsoleTools
 
 CAUTION:
@@ -10,8 +10,9 @@ CAUTION:
 2. LICENSE
 3. REPOSITORIES
 4. PREREQUISITES
-5. INSTALLATION
-6. AUTHOR
+5. DEPENDENCIES
+6. INSTALLATION
+7. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -87,7 +88,14 @@ https://cmake.org/cmake/help/v3.14/release/3.14.html#deprecated-and-removed-feat
   or higher.
 
 -------------------------------------------------------------------------------
-5. INSTALLATION
+5. DEPENDENCIES
+-------------------------------------------------------------------------------
+
+Read the `README_EN.deps.txt` file for the common dependencies for the Windows
+and the Linux platforms.
+
+-------------------------------------------------------------------------------
+6. INSTALLATION
 -------------------------------------------------------------------------------
 run configure.bat
 
@@ -103,6 +111,6 @@ You have to download and copy the library sources manually into:
 * wxWidgets:  `/_3dparty/gui/wxWidgets`
 
 -------------------------------------------------------------------------------
-6. AUTHOR
+7. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

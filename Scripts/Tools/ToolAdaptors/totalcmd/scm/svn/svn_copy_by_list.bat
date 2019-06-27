@@ -40,7 +40,7 @@ if defined FLAG (
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
-  )
+  ) >&2
 
   rem read until no flags
   goto FLAGS_LOOP

@@ -37,7 +37,7 @@ set "INPUT_FILE=%~3"
 if not defined OUTPUT_CHARSET (
   echo.%?~nx0%: error: OUTPUT_CHARSET is not set.
   exit /b 1
-)
+) >&2
 
 if not exist "%INPUT_FILE%" (
   echo.%?~nx0%: error: INPUT_FILE does not exist: INPUT_FILE="%INPUT_FILE%".
