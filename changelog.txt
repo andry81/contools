@@ -1,3 +1,6 @@
+2019.06.28:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: icons minor alignment
+
 2019.06.27:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: minor fixes
 * fixed: minor fixes
