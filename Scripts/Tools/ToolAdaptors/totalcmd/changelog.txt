@@ -1,5 +1,10 @@
+2019.06.27:
+* fixed: minor text alignment in images/compare_files_in_sorted_list.ico
+* new: create_empty_files_by_list.bat script + icons
+* new: icons for lists save/load feature
+
 2019.06.04:
-* new: totalcmd/scm: svn/svn_copy_by_list.bat, git/git_copy_by_list.bat scripts + icons
+* new: scm/svn/svn_copy_by_list.bat, scm/git/git_copy_by_list.bat scripts + icons
 * changed: readme update
 
 2019.02.23:
