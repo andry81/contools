@@ -1,3 +1,6 @@
+2019.06.28:
+* fixed: icons minor alignment
+
 2019.06.27:
 * fixed: minor fixes
 * new: save file selection lists through the `save_file_list.bat` script + icons
