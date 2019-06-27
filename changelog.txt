@@ -1,4 +1,9 @@
 2019.06.27:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: minor text alignment in images/compare_files_in_sorted_list.ico
+* new: Scripts/Tools/ToolAdaptors/totalcmd: create_empty_files_by_list.bat script + icons
+* new: Scripts/Tools/ToolAdaptors/totalcmd: icons for lists save/load feature
+
+2019.06.27:
 * refactor: minor changes
 
 2019.06.20:
