@@ -40,7 +40,7 @@ if defined FLAG (
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
-  )
+  ) >&2
 
   rem read until no flags
   goto FLAGS_LOOP
@@ -119,7 +119,7 @@ exit /b 0
 call :CMD pushd "%%CREATE_DIRS_IN_DIR_PATH%%" || (
   echo.%?~n0%: error: CREATE_DIRS_IN_DIR_PATH does not exist to create subdirectories in it: CREATE_DIRS_IN_DIR_PATH="%CREATE_DIRS_IN_DIR_PATH%".
   exit /b 2
-)
+) >&2
 
 set LINE_INDEX=0
 for /f "usebackq eol=# tokens=* delims=" %%j in ("%CREATE_DIRS_LIST_FILE_TMP%") do (

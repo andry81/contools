@@ -1,7 +1,15 @@
 2019.06.27:
+* fixed: minor fixes
+* new: save file selection lists through the `save_file_list.bat` script + icons
+* new: load file selection lists through the `Find Files` dialog search templates feature icons
+* changed: readme file update
+* changed: missed changes in configure.bat
+
+2019.06.27:
 * fixed: minor text alignment in images/compare_files_in_sorted_list.ico
 * new: create_empty_files_by_list.bat script + icons
 * new: icons for lists save/load feature
+* changed: readme file update
 
 2019.06.04:
 * new: scm/svn/svn_copy_by_list.bat, scm/git/git_copy_by_list.bat scripts + icons

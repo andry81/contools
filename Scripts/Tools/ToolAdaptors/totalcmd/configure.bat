@@ -71,9 +71,13 @@ call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_files_by_lis
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "create_dirs_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "create_empty_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "loadvars.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_new_session.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "save_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "load_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 
 pause
 

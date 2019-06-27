@@ -2,79 +2,97 @@
 * 2019.06.27
 * Toolbar buttons configuration for the Total Commander.
 
-1. Open a notepad window independently to selected files.
+1. Configuration storage files.
 
-2. Open standalone notepad window for selected files.
-2.1. Method #1. On left mouse button.
-2.2. Method #2. On left mouse button.
+2. Open a notepad window independently to selected files.
 
-3. Open selected files in existing Notepad++ window.
+3. Open standalone notepad window for selected files.
 3.1. Method #1. On left mouse button.
 3.2. Method #2. On left mouse button.
 
-4. Open Administator console window in current directory.
-4.1. Method #1. On left mouse button. Total Commander bitness independent.
-4.2. Method #2. On left mouse button. Total Commander bitness dependent.
-4.3. Method #3. On right mouse button -> As Administrator.
-4.4. Method #4. On left mouse button.
-4.5. Method #5. Call command cmda.bat and Administrator password after.
+4. Open selected files in existing Notepad++ window.
+4.1. Method #1. On left mouse button.
+4.2. Method #2. On left mouse button.
 
-5. Edit SVN externals (SVN properties).
-5.1 Method #1 (Main). For selected files and directories together over SVN GUI.
-5.2 Method #2. For selected files and directores one after one over external editor.
+5. Open Administator console window in current directory.
+5.1. Method #1. On left mouse button. Total Commander bitness independent.
+5.2. Method #2. On left mouse button. Total Commander bitness dependent.
+5.3. Method #3. On right mouse button -> As Administrator.
+5.4. Method #4. On left mouse button.
+5.5. Method #5. Call command cmda.bat and Administrator password after.
 
-6. Open SVN Log for selected files and directories together.
+6. Edit SVN externals (SVN properties).
+6.1 Method #1 (Main). For selected files and directories together over SVN GUI.
+6.2 Method #2. For selected files and directores one after one over external editor.
 
-7. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes).
-7.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes.
-7.2. Method #2. Window per unique repository root with or without versioned changes in respective WC directory.
-7.3. Method #3. Window per command line WC directory with or without versioned changes.
-7.4. Method #4. Window per WC root directory with or without versioned changes.
+7. Open SVN Log for selected files and directories together.
 
-8. Open TortoiseSVN commit dialogs for a set of WC directories.
-8.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
-8.2. Method #2. One window for all WC directories with changes.
-8.3. Method #3. Window per command line WC directory with changes.
-8.4. Method #4. Window per WC root directory with changes.
+8. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes).
+8.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes.
+8.2. Method #2. Window per unique repository root with or without versioned changes in respective WC directory.
+8.3. Method #3. Window per command line WC directory with or without versioned changes.
+8.4. Method #4. Window per WC root directory with or without versioned changes.
 
-9. One pane comparison for 2 selected files.
-9.1. Method #1. By path list from ANSI text file.
-9.2. Method #2. By path list from command line.
+9. Open TortoiseSVN commit dialogs for a set of WC directories.
+9.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
+9.2. Method #2. One window for all WC directories with changes.
+9.3. Method #3. Window per command line WC directory with changes.
+9.4. Method #4. Window per WC root directory with changes.
 
-10. One pane comparison for 2 selected files with sorted content.
+10. One pane comparison for 2 selected files.
 10.1. Method #1. By path list from ANSI text file.
 10.2. Method #2. By path list from command line.
 
-11. Shell/SVN/GIT files batch move
-11.1. Method #1. Move files by selection list from ANSI text file.
-11.2. Method #2. Move files by selection list from UNICODE text file.
+11. One pane comparison for 2 selected files with sorted content.
+11.1. Method #1. By path list from ANSI text file.
+11.2. Method #2. By path list from command line.
 
-12. Shell/SVN/GIT files batch rename
-12.1. Method #1. Rename files by selection list from ANSI text file.
-12.2. Method #2. Rename files by selection list from UNICODE text file.
+12. Shell/SVN/GIT files batch move
+12.1. Method #1. Move files by selection list from ANSI text file.
+12.2. Method #2. Move files by selection list from UNICODE text file.
 
-13. Shell/SVN/GIT files batch copy
-13.1. Method #1. Copy files by selection list from ANSI text file.
-13.2. Method #2. Copy files by selection list from UNICODE text file.
+13. Shell/SVN/GIT files batch rename
+13.1. Method #1. Rename files by selection list from ANSI text file.
+13.2. Method #2. Rename files by selection list from UNICODE text file.
 
-14. Create batch directories
-14.1. Method #1. Create directories in current directory by list from ANSI text file.
-14.2. Method #2. Create directories in selected directories by list from ANSI text file.
-14.3. Method #3. Create directories in current directory by list from UNICODE text file.
-14.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+14. Shell/SVN/GIT files batch copy
+14.1. Method #1. Copy files by selection list from ANSI text file.
+14.2. Method #2. Copy files by selection list from UNICODE text file.
 
-15. Create batch empty files
+15. Create batch directories
 15.1. Method #1. Create directories in current directory by list from ANSI text file.
 15.2. Method #2. Create directories in selected directories by list from ANSI text file.
 15.3. Method #3. Create directories in current directory by list from UNICODE text file.
 15.4. Method #4. Create directories in selected directories by list from UNICODE text file.
 
+16. Create batch empty files
+16.1. Method #1. Create directories in current directory by list from ANSI text file.
+16.2. Method #2. Create directories in selected directories by list from ANSI text file.
+16.3. Method #3. Create directories in current directory by list from UNICODE text file.
+16.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+
 17. Concatenate video files
 
-18. AUTHOR
+18. Save/Load file selection list to/from a saveload slot
+18.1. Save file selection list to a saveslot
+18.2. Load file selection list from a saveslot
+
+19. AUTHOR
 
 ------------------------------------------------------------------------------
-1. Open a notepad window independently to selected files.
+1. Configuration storage files.
+------------------------------------------------------------------------------
+
+All scripts below would work only if all configuration files would store
+correct configuration variables. These configurations files are:
+
+* `profile.vars`
+
+The distribution contains only an example of configuration variables, all the
+rest you should figure out on your own.
+
+------------------------------------------------------------------------------
+2. Open a notepad window independently to selected files.
 ------------------------------------------------------------------------------
 
 For Notepad++:
@@ -88,11 +106,11 @@ call_nowindow.vbs
 notepad_edit_files.bat "%P"
 
 ------------------------------------------------------------------------------
-2. Open standalone notepad window for selected files.
+3. Open standalone notepad window for selected files.
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-2.1. Method #1 On left mouse button.
+3.1. Method #1 On left mouse button.
 ------------------------------------------------------------------------------
 (Console window is hidden (no flickering))
 
@@ -107,7 +125,7 @@ call_nowindow.vbs
 notepad_edit_files.bat "%P" %S
 
 ------------------------------------------------------------------------------
-2.2. Method #2. On left mouse button.
+3.2. Method #2. On left mouse button.
 ------------------------------------------------------------------------------
 (Console window appears on a moment (flickering))
 
@@ -132,11 +150,11 @@ call_nowindow.vbs
 notepad_edit_files.bat "%P" %S
 
 ------------------------------------------------------------------------------
-3. Open selected files in existing Notepad++ window.
+4. Open selected files in existing Notepad++ window.
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-3.1. Method #1. On left mouse button.
+4.1. Method #1. On left mouse button.
 ------------------------------------------------------------------------------
 (Console window is hidden (no flickering))
 
@@ -156,7 +174,7 @@ call_nowindow.vbs
 notepad_edit_files_by_list.bat -wait -npp -paths_to_u16cp -nosession "%P" %WL
 
 ------------------------------------------------------------------------------
-3.2. Method #2. On left mouse button.
+4.2. Method #2. On left mouse button.
 ------------------------------------------------------------------------------
 (Console window appears on a moment (flickering))
 
@@ -164,7 +182,7 @@ call_nowindow.vbs
 notepad_edit_files.bat -npp -nosession "%P" %S
 
 ------------------------------------------------------------------------------
-4. Open Administator console window in current directory.
+5. Open Administator console window in current directory.
 ------------------------------------------------------------------------------
 CAUTION:
 1. Windows can create virtualized `sysnative` directory itself after install or after update rollup with reduced privilege rights, where, for example,
@@ -177,7 +195,7 @@ For above reasons we should create another directory may be additionally to the 
 2. No specific privilege rights restriction by the system and cmd.exe executable from there can be run under administrator user w/o any additional manipulations.
 
 ------------------------------------------------------------------------------
-4.1. Method #1. On left mouse button. Total Commander bitness independent.
+5.1. Method #1. On left mouse button. Total Commander bitness independent.
 ------------------------------------------------------------------------------
 (may be in some cases it won't work, for example, command "pip install pip --upgrade" in Python 3.5 in Windows 7 x86 responds as "access denided")
 (correction: may be the error is an error of Python, the internet advises to run command as: "python -m pip install --upgrade")
@@ -208,7 +226,7 @@ cmd_wow64.lnk
 /K set "PWD=%P"&call cd /d "%%PWD%%"
 
 ------------------------------------------------------------------------------
-4.2. Method #2. On left mouse button. Total Commander bitness dependent.
+5.2. Method #2. On left mouse button. Total Commander bitness dependent.
 ------------------------------------------------------------------------------
 (In Window x64 will open cmd.exe which bitness will be dependent on
 Total Commander bitness)
@@ -219,14 +237,14 @@ cmd_admin.lnk
 /K set "PWD=%P"&call cd /d "%%PWD%%"
 
 ------------------------------------------------------------------------------
-4.3. Method #2. On right mouse button -> As Administrator.
+5.3. Method #2. On right mouse button -> As Administrator.
 ------------------------------------------------------------------------------
 
 cmd.exe
 /K set "PWD=%P"&call cd /d "%%PWD%%"
 
 ------------------------------------------------------------------------------
-4.4. Method #3. On left mouse button.
+5.4. Method #3. On left mouse button.
 ------------------------------------------------------------------------------
 (may be in some cases it won't work, for example, command "netsh winhttp reset proxy" in Windows 7 x86 responds as "access denided")
 (in not english version of Windows instead of the "Administrator" you have to use a localized name)
@@ -240,7 +258,7 @@ cmd_as_user.bat
 Administrator "%P"
 
 ------------------------------------------------------------------------------
-4.5. Method #4. Call command cmda.bat and Administrator password after.
+5.5. Method #4. Call command cmda.bat and Administrator password after.
 ------------------------------------------------------------------------------
 (cmda.user.bat by default cantains a localized group name of Administrators which uses to take first Administrator name for the console
 if cmda.bat didn't have that name at first argument)
@@ -249,11 +267,11 @@ cmda.bat
 "<Administrator name>"
 
 ------------------------------------------------------------------------------
-5. Edit SVN externals (SVN properties).
+6. Edit SVN externals (SVN properties).
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-5.1 Method #1 (Main). For selected files and directories together over SVN GUI.
+6.1 Method #1 (Main). For selected files and directories together over SVN GUI.
 ------------------------------------------------------------------------------
 (all windows together)
 
@@ -261,7 +279,7 @@ call_nowindow.vbs
 scm\tortoisesvn\TortoiseProc.bat /command:properties "%P" %S
 
 ------------------------------------------------------------------------------
-5.2 Method #2. For selected files and directores one after one over external editor.
+6.2 Method #2. For selected files and directores one after one over external editor.
 ------------------------------------------------------------------------------
 (one notepad window at a time)
 
@@ -274,7 +292,7 @@ externals_edit.bat
 %S
 
 ------------------------------------------------------------------------------
-6. Open SVN Log for selected files and directories together.
+7. Open SVN Log for selected files and directories together.
 ------------------------------------------------------------------------------
 (all windows together)
 
@@ -282,11 +300,11 @@ call_nowindow.vbs
 scm\tortoisesvn\TortoiseProc.bat /command:log "%P" %S
 
 ------------------------------------------------------------------------------
-7. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes).
+8. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes).
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-7.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes.
+8.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat -all-in-one /command:repostatus "%P" %S
@@ -297,29 +315,29 @@ call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
-7.2. Method #2. Window per unique repository root with or without versioned changes in respective WC directory.
+8.2. Method #2. Window per unique repository root with or without versioned changes in respective WC directory.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-reporoot /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
-7.3. Method #3. Window per command line WC directory with or without versioned changes.
+8.3. Method #3. Window per command line WC directory with or without versioned changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcdir /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
-7.4. Method #4. Window per WC root directory with or without versioned changes.
+8.4. Method #4. Window per WC root directory with or without versioned changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
-8. Open TortoiseSVN commit dialogs for a set of WC directories (opens only if has not empty versioned changes).
+9. Open TortoiseSVN commit dialogs for a set of WC directories (opens only if has not empty versioned changes).
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-8.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
+9.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-reporoot /command:commit "%P" %S
@@ -330,43 +348,25 @@ call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
-8.2. Method #2. One window for all WC directories with changes.
+9.2. Method #2. One window for all WC directories with changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat -all-in-one /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
-8.3. Method #3. Window per command line WC directory with changes.
+9.3. Method #3. Window per command line WC directory with changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcdir /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
-8.4. Method #4. Window per WC root directory with changes.
+9.4. Method #4. Window per WC root directory with changes.
 ------------------------------------------------------------------------------
 call_nowindow.vbs
 scm\tortoisesvn\TortoiseProcByNestedWC.bat -window-per-wcroot /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
-9. One pane comparison for 2 selected files.
-------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------
-9.1. Method #1. By path list from ANSI text file.
-------------------------------------------------------------------------------
-
-call_nowindow.vbs
-compare_files_by_list.bat -wait "%P" %L
-
-------------------------------------------------------------------------------
-9.2. Method #2. By path list from command line.
-------------------------------------------------------------------------------
-
-call_nowindow.vbs
-compare_files.bat -wait "%P" %S
-
-------------------------------------------------------------------------------
-10. One pane comparison for 2 selected files with sorted content.
+10. One pane comparison for 2 selected files.
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
@@ -374,21 +374,39 @@ compare_files.bat -wait "%P" %S
 ------------------------------------------------------------------------------
 
 call_nowindow.vbs
-compare_sorted_files_by_list.bat -wait "%P" %L
+compare_files_by_list.bat -wait "%P" %L
 
 ------------------------------------------------------------------------------
 10.2. Method #2. By path list from command line.
 ------------------------------------------------------------------------------
 
 call_nowindow.vbs
+compare_files.bat -wait "%P" %S
+
+------------------------------------------------------------------------------
+11. One pane comparison for 2 selected files with sorted content.
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+11.1. Method #1. By path list from ANSI text file.
+------------------------------------------------------------------------------
+
+call_nowindow.vbs
+compare_sorted_files_by_list.bat -wait "%P" %L
+
+------------------------------------------------------------------------------
+11.2. Method #2. By path list from command line.
+------------------------------------------------------------------------------
+
+call_nowindow.vbs
 compare_sorted_files.bat -wait "%P" %S
 
 ------------------------------------------------------------------------------
-11. Shell/SVN/GIT files batch move
+12. Shell/SVN/GIT files batch move
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-11.1. Method #1. Move files by selection list from ANSI text file.
+12.1. Method #1. Move files by selection list from ANSI text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -407,7 +425,7 @@ call.vbs
 scm\git\git_move_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-11.2. Method #2. Move files by selection list from UNICODE text file.
+12.2. Method #2. Move files by selection list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -426,11 +444,11 @@ call.vbs
 scm\git\git_move_files_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-12. Shell/SVN/GIT files batch rename
+13. Shell/SVN/GIT files batch rename
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-12.1. Method #1. Rename files by selection list from ANSI text file.
+13.1. Method #1. Rename files by selection list from ANSI text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -449,7 +467,7 @@ call.vbs
 scm\git\git_rename_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-12.2. Method #2. Rename files by selection list from UNICODE text file.
+13.2. Method #2. Rename files by selection list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -468,11 +486,11 @@ call.vbs
 scm\git\git_rename_files_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-13. Shell/SVN/GIT files batch copy
+14. Shell/SVN/GIT files batch copy
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-13.1. Method #1. Copy files by selection list from ANSI text file.
+14.1. Method #1. Copy files by selection list from ANSI text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -491,7 +509,7 @@ call.vbs
 scm\git\git_copy_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-13.2. Method #2. Copy files by selection list from UNICODE text file.
+14.2. Method #2. Copy files by selection list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -510,77 +528,151 @@ call.vbs
 scm\git\git_copy_files_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-14. Create batch directories
+15. Create batch directories
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-14.1. Method #1. Create directories in current directory by list from ANSI text file.
+15.1. Method #1. Create directories in current directory by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat "%P"
 
 ------------------------------------------------------------------------------
-14.2. Method #2. Create directories in selected directories by list from ANSI text file.
+15.2. Method #2. Create directories in selected directories by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-14.3. Method #3. Create directories in current directory by list from UNICODE text file.
+15.3. Method #3. Create directories in current directory by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat -from_utf16 "%P"
 
 ------------------------------------------------------------------------------
-14.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+15.4. Method #4. Create directories in selected directories by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-15. Create batch empty files
+16. Create batch empty files
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-15.1. Method #1. Create empty files in current directory by list from ANSI text file.
+16.1. Method #1. Create empty files in current directory by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_empty_files_by_list.bat "%P"
 
 ------------------------------------------------------------------------------
-15.2. Method #2. Create empty files in selected directories by list from ANSI text file.
+16.2. Method #2. Create empty files in selected directories by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_empty_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-15.3. Method #3. Create empty files in current directory by list from UNICODE text file.
+16.3. Method #3. Create empty files in current directory by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_empty_files_by_list.bat -from_utf16 "%P"
 
 ------------------------------------------------------------------------------
-15.4. Method #4. Create empty files in selected directories by list from UNICODE text file.
+16.4. Method #4. Create empty files in selected directories by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_empty_files_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-16. Concatenate video files
+17. Concatenate video files
 ------------------------------------------------------------------------------
 
 call.vbs
 converters\ffmpeg\ffmpeg_convert_by_list.bat -wait -pause_on_exit %L "%T"
 
 ------------------------------------------------------------------------------
-17. AUTHOR
+18. Save/Load file selection list to/from a saveload slot
+------------------------------------------------------------------------------
+
+To be able to save and load file paths selection list in the Total Commander
+for minimal steps or mouse clicks you have to make some preparations before the
+usage.
+
+------------------------------------------------------------------------------
+18.1. Save file selection list to a saveslot
+------------------------------------------------------------------------------
+
+At first, you have to set all required variables in the `profile.vars`:
+
+* SAVELOAD_ROOT
+* SAVELOAD_FILE_LISTS_DIR
+
+After that you can create the buttons:
+
+For ANSI file paths:
+
+call.vbs
+save_file_list.bat -timeout_to_close_sec <timeout_to_close_sec> -to_file_name "<file_name>" "%P" %L
+
+For UNICODE file paths:
+
+call.vbs
+save_file_list.bat -timeout_to_close_sec <timeout_to_close_sec> -to_file_name "<file_name>" -in_utf16 "%P" %WL
+
+Where:
+  * `<file_name>` - file name with extension relative to the current
+    directory `%P` there the file paths list would be saved.
+  * `<timeout_to_close_sec>` - timeout in seconds before close a console
+    window.
+
+The files name must be by the same path as in the
+`saveload_search_in_slot_<INDEX_STR>_SearchIn` variables in below section.
+
+------------------------------------------------------------------------------
+18.2. Load file selection list from a saveslot
+------------------------------------------------------------------------------
+
+At first, you have to create search template in your main configuration file of
+the Total Commander in the section `[searches]`:
+
+```
+saveload_search_in_slot_<INDEX_STR>_SearchFor=*.*
+saveload_search_in_slot_<INDEX_STR>_SearchIn=@c:\Program Files\TotalCmd\.saveload\file_lists\<INDEX_STR>.lst
+saveload_search_in_slot_<INDEX_STR>_SearchText=
+saveload_search_in_slot_<INDEX_STR>_SearchFlags=0|103002010021|||||||||0000|||
+```
+
+Where the `<INDEX_STR>` can be any index string (for example, from `00` up to
+`99`) and the path `c:\Program Files\TotalCmd\.saveload\file_lists` is an
+arbitraty directory there all lists would be saved to and loaded from. You can
+create multiple arbitrary empty files in that directory using another command
+described here in the section `Create batch empty files`.
+
+NOTE:
+  The prefix string `saveload_search_in_slot_<INDEX_STR>` is a search template
+  name in the `Find Files` dialog in the Total Commander. So instead of adding
+  the string in the `[searches]` section, you may create all respective
+  templates through the same dialog from the `Load/Save` tab using the same
+  values from the example above.
+
+After that you can create any arbitrary number of buttons, but I recommend to
+you to create 5 or 10 buttons, not more:
+
+LOADSEARCH saveload_search_in_slot_<INDEX_STR>
+
+Then you can click on the button to open the respective `Find Files` dialog.
+Next click to the find button would show the last saved file paths list which
+you can feed to the Total Commander last active panel.
+
+------------------------------------------------------------------------------
+19. AUTHOR
 ------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

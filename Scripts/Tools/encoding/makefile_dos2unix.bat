@@ -19,7 +19,7 @@ call :STAGE1 dos2unix.exe
 if %ERRORLEVEL% NEQ 0 (
   echo %~nx0: error: "dos2unix.exe" not found to be run for conversion!
   exit /b 1
-)
+) >&2
 
 echo Converting all shell and make files in the DOS format to the UNIX format...
 set __CONVERTED_COUNTER=0
