@@ -110,7 +110,7 @@ if %__FLAG_SET_GLOBAL_REGISTRY_ALL_USERS% NEQ 0 (
   set __FLAG_SET_GLOBAL_REGISTRY_WMIC_WHERE_EXP=where "Name='Path' and UserName!='<SYSTEM>'"
 )
 
-for /F "usebackq eol=	 tokens=1,* delims==" %%i in (`wmic environment %__FLAG_SET_GLOBAL_REGISTRY_WMIC_WHERE_EXP% get VariableValue /VALUE 2^>NUL`) do if "%%i" == "VariableValue" set "__VAR_VALUE=%%j"
+for /F "usebackq eol=	 tokens=1,* delims==" %%i in (`wmic environment %__FLAG_SET_GLOBAL_REGISTRY_WMIC_WHERE_EXP% get VariableValue /VALUE 2^>nul`) do if "%%i" == "VariableValue" set "__VAR_VALUE=%%j"
 
 if defined __VAR_VALUE (
   if "%__SEPARATOR%" == "%__VAR_VALUE:~-1%" (
