@@ -1,4 +1,7 @@
 2019.06.28:
+* new: Scripts/Tools/ToolAdaptors/ffmpeg: ffmpeg_cut.bat and ffmpeg_cut_dur.bat to cut a video file
+
+2019.06.28:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: icons minor alignment
 
 2019.06.27:
