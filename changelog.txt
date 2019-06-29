@@ -1,3 +1,12 @@
+2019.06.29:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: instant exit on error w/o pause (save_file_list.bat)
+* new: Scripts/Tools/ToolAdaptors/totalcmd: copy_file_to_files_by_list.bat script to copy single file to multiple files by a list
+* new: Scripts/Tools/ToolAdaptors/totalcmd: save/load/by/shell_copy_file_to_files_by_list a list icons
+* removed: Scripts/Tools/ToolAdaptors/totalcmd: `-in_utf16` flag in save_file_list.bat as not required
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: changed `xcopy` to `copy` usage in case of single file to file copy
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: minor refactor
+
 2019.06.28:
 * new: Scripts/Tools/ToolAdaptors/ffmpeg: ffmpeg_cut.bat and ffmpeg_cut_dur.bat to cut a video file
 

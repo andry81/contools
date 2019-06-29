@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.06.27
+* 2019.06.29
 * Toolbar buttons configuration for the Total Commander.
 
 1. Configuration storage files.
@@ -59,25 +59,29 @@
 14.1. Method #1. Copy files by selection list from ANSI text file.
 14.2. Method #2. Copy files by selection list from UNICODE text file.
 
-15. Create batch directories
-15.1. Method #1. Create directories in current directory by list from ANSI text file.
-15.2. Method #2. Create directories in selected directories by list from ANSI text file.
-15.3. Method #3. Create directories in current directory by list from UNICODE text file.
-15.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+15. Shell file to files copy by list
+15.1. Method #1. Shell file to files copy by ANSI list
+15.2. Method #2. Shell file to files copy by UNICODE list
 
-16. Create batch empty files
+16. Create batch directories
 16.1. Method #1. Create directories in current directory by list from ANSI text file.
 16.2. Method #2. Create directories in selected directories by list from ANSI text file.
 16.3. Method #3. Create directories in current directory by list from UNICODE text file.
 16.4. Method #4. Create directories in selected directories by list from UNICODE text file.
 
-17. Concatenate video files
+17. Create batch empty files
+17.1. Method #1. Create directories in current directory by list from ANSI text file.
+17.2. Method #2. Create directories in selected directories by list from ANSI text file.
+17.3. Method #3. Create directories in current directory by list from UNICODE text file.
+17.4. Method #4. Create directories in selected directories by list from UNICODE text file.
 
-18. Save/Load file selection list to/from a saveload slot
-18.1. Save file selection list to a saveslot
-18.2. Load file selection list from a saveslot
+18. Concatenate video files
 
-19. AUTHOR
+19. Save/Load file selection list to/from a saveload slot
+19.1. Save file selection list to a saveslot
+19.2. Load file selection list from a saveslot
+
+20. AUTHOR
 
 ------------------------------------------------------------------------------
 1. Configuration storage files.
@@ -528,78 +532,96 @@ call.vbs
 scm\git\git_copy_files_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-15. Create batch directories
+15. Shell file to files copy by list
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-15.1. Method #1. Create directories in current directory by list from ANSI text file.
+15.1. Method #1. Shell file to files copy by ANSI list
+------------------------------------------------------------------------------
+
+call.vbs
+copy_file_to_files_by_list.bat -from_file %P%N "<file_paths_list_file>"
+
+------------------------------------------------------------------------------
+15.2. Method #2. Shell file to files copy by UNICODE list
+------------------------------------------------------------------------------
+
+call.vbs
+copy_file_to_files_by_list.bat -from_utf16 -from_file %P%N "<file_paths_list_file>"
+
+------------------------------------------------------------------------------
+16. Create batch directories
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+16.1. Method #1. Create directories in current directory by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat "%P"
 
 ------------------------------------------------------------------------------
-15.2. Method #2. Create directories in selected directories by list from ANSI text file.
+16.2. Method #2. Create directories in selected directories by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-15.3. Method #3. Create directories in current directory by list from UNICODE text file.
+16.3. Method #3. Create directories in current directory by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat -from_utf16 "%P"
 
 ------------------------------------------------------------------------------
-15.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+16.4. Method #4. Create directories in selected directories by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-16. Create batch empty files
+17. Create batch empty files
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-16.1. Method #1. Create empty files in current directory by list from ANSI text file.
+17.1. Method #1. Create empty files in current directory by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_empty_files_by_list.bat "%P"
 
 ------------------------------------------------------------------------------
-16.2. Method #2. Create empty files in selected directories by list from ANSI text file.
+17.2. Method #2. Create empty files in selected directories by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_empty_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-16.3. Method #3. Create empty files in current directory by list from UNICODE text file.
+17.3. Method #3. Create empty files in current directory by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_empty_files_by_list.bat -from_utf16 "%P"
 
 ------------------------------------------------------------------------------
-16.4. Method #4. Create empty files in selected directories by list from UNICODE text file.
+17.4. Method #4. Create empty files in selected directories by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_empty_files_by_list.bat -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-17. Concatenate video files
+18. Concatenate video files
 ------------------------------------------------------------------------------
 
 call.vbs
 converters\ffmpeg\ffmpeg_convert_by_list.bat -wait -pause_on_exit %L "%T"
 
 ------------------------------------------------------------------------------
-18. Save/Load file selection list to/from a saveload slot
+19. Save/Load file selection list to/from a saveload slot
 ------------------------------------------------------------------------------
 
 To be able to save and load file paths selection list in the Total Commander
@@ -607,7 +629,7 @@ for minimal steps or mouse clicks you have to make some preparations before the
 usage.
 
 ------------------------------------------------------------------------------
-18.1. Save file selection list to a saveslot
+19.1. Save file selection list to a saveslot
 ------------------------------------------------------------------------------
 
 At first, you have to set all required variables in the `profile.vars`:
@@ -625,7 +647,7 @@ save_file_list.bat -timeout_to_close_sec <timeout_to_close_sec> -to_file_name "<
 For UNICODE file paths:
 
 call.vbs
-save_file_list.bat -timeout_to_close_sec <timeout_to_close_sec> -to_file_name "<file_name>" -in_utf16 "%P" %WL
+save_file_list.bat -timeout_to_close_sec <timeout_to_close_sec> -to_file_name "<file_name>" "%P" %WL
 
 Where:
   * `<file_name>` - file name with extension relative to the current
@@ -637,7 +659,7 @@ The files name must be by the same path as in the
 `saveload_search_in_slot_<INDEX_STR>_SearchIn` variables in below section.
 
 ------------------------------------------------------------------------------
-18.2. Load file selection list from a saveslot
+19.2. Load file selection list from a saveslot
 ------------------------------------------------------------------------------
 
 At first, you have to create search template in your main configuration file of
@@ -673,6 +695,6 @@ Next click to the find button would show the last saved file paths list which
 you can feed to the Total Commander last active panel.
 
 ------------------------------------------------------------------------------
-19. AUTHOR
+20. AUTHOR
 ------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

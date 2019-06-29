@@ -69,13 +69,9 @@ set "CREATE_DIRS_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_dirs_list.txt"
 set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.txt"
 
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
-  rem to fix `echo.F` and `for /f`
+  rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
 )
-
-rem CAUTION:
-rem   xcopy does not support file paths longer than ~260 characters!
-rem
 
 if not "%~1" == "" (
   if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
@@ -93,7 +89,7 @@ type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%CREATE_DIRS_LIST_FILE_TM
 
 if not "%~1" == "" (
   rem recreate files
-  echo.F|xcopy "%INPUT_LIST_FILE_UTF8_TMP%" "%CREATE_DIRS_IN_LIST_FILE_TMP%" /H /K /Y
+  copy "%INPUT_LIST_FILE_UTF8_TMP%" "%CREATE_DIRS_IN_LIST_FILE_TMP%" /B /Y > nul
 ) else (
   rem recreate empty lists
   type nul > "%CREATE_DIRS_IN_LIST_FILE_TMP%"

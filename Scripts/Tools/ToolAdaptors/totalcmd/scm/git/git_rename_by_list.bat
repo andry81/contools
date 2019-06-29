@@ -66,23 +66,19 @@ if "%~1" == "" exit /b 0
 set "RENAME_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_from_file_list.txt"
 set "RENAME_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_to_file_list.txt"
 
-rem CAUTION:
-rem   xcopy does not support file paths longer than ~260 characters!
-rem
-
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
-  rem to fix `echo.F` and `for /f`
+  rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
 
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
   call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%RENAME_FROM_LIST_FILE_TMP%"
-  echo.F|xcopy "%RENAME_FROM_LIST_FILE_TMP%" "%RENAME_TO_LIST_FILE_TMP%" /H /K /Y
+  copy "%RENAME_FROM_LIST_FILE_TMP%" "%RENAME_TO_LIST_FILE_TMP%" /B /Y > nul
 ) else (
   rem recreate files
-  echo.F|xcopy "%~1" "%RENAME_FROM_LIST_FILE_TMP%" /H /K /Y
-  echo.F|xcopy "%~1" "%RENAME_TO_LIST_FILE_TMP%" /H /K /Y
+  copy "%~1" "%RENAME_FROM_LIST_FILE_TMP%" /B /Y > nul
+  copy "%~1" "%RENAME_TO_LIST_FILE_TMP%" /B /Y > nul
 )
 
 call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%RENAME_TO_LIST_FILE_TMP%%"

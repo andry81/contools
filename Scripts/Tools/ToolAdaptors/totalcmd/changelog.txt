@@ -1,3 +1,12 @@
+2019.06.29:
+* fixed: instant exit on error w/o pause (save_file_list.bat)
+* new: copy_file_to_files_by_list.bat script to copy single file to multiple files by a list
+* new: save/load/by/shell_copy_file_to_files_by_list a list icons
+* removed: `-in_utf16` flag in save_file_list.bat as not required
+* changed: changed `xcopy` to `copy` usage in case of single file to file copy
+* changed: readme update
+* refactor: minor refactor
+
 2019.06.28:
 * fixed: icons minor alignment
 

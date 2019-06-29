@@ -68,12 +68,8 @@ set "COPY_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\copy_to_file_list.txt"
 
 set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.txt"
 
-rem CAUTION:
-rem   xcopy does not support file paths longer than ~260 characters!
-rem
-
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
-  rem to fix `echo.F` and `for /f`
+  rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
 
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
@@ -85,7 +81,7 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 )
 
 rem recreate files
-echo.F|xcopy "%INPUT_LIST_FILE_UTF8_TMP%" "%COPY_FROM_LIST_FILE_TMP%" /H /K /Y
+copy "%INPUT_LIST_FILE_UTF8_TMP%" "%COPY_FROM_LIST_FILE_TMP%" /B /Y > nul
 
 rem recreate empty lists
 type nul > "%COPY_TO_LIST_FILE_TMP%"
