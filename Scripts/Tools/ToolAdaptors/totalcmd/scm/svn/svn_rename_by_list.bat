@@ -63,8 +63,8 @@ for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: !CD!") do (
 
 if "%~1" == "" exit /b 0
 
-set "RENAME_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_from_file_list.txt"
-set "RENAME_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_to_file_list.txt"
+set "RENAME_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_from_file_list.lst"
+set "RENAME_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_to_file_list.lst"
 
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
@@ -74,12 +74,11 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
   call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%RENAME_FROM_LIST_FILE_TMP%"
-  copy "%RENAME_FROM_LIST_FILE_TMP%" "%RENAME_TO_LIST_FILE_TMP%" /B /Y > nul
 ) else (
-  rem recreate files
-  copy "%~1" "%RENAME_FROM_LIST_FILE_TMP%" /B /Y > nul
-  copy "%~1" "%RENAME_TO_LIST_FILE_TMP%" /B /Y > nul
+  set "RENAME_FROM_LIST_FILE_TMP=%~1"
 )
+
+copy "%RENAME_FROM_LIST_FILE_TMP%" "%RENAME_TO_LIST_FILE_TMP%" /B /Y > nul
 
 call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%RENAME_TO_LIST_FILE_TMP%%"
 
@@ -88,7 +87,7 @@ setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 rem trick with simultaneous iteration over 2 list in the same time
 (
   for /f "usebackq eol=# tokens=* delims=" %%i in ("%RENAME_TO_LIST_FILE_TMP%") do (
-    set /p "FROM_FILE_PATH="
+    set /P "FROM_FILE_PATH="
     set "TO_FILE_PATH=%%i"
     call :PROCESS_RENAME
   )

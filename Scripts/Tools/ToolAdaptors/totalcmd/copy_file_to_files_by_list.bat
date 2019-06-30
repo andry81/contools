@@ -60,9 +60,7 @@ if exist "%FLAG_FILE_TO_COPY%\" (
   exit /b 3
 ) >&2
 
-set "COPY_TO_FILES_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\copy_to_files_in_list.txt"
-
-set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.txt"
+set "COPY_TO_FILES_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
 
 if %FLAG_PATHS_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
@@ -71,13 +69,10 @@ if %FLAG_PATHS_FROM_UTF16% NEQ 0 (
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
-  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%INPUT_LIST_FILE_UTF8_TMP%"
+  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%COPY_TO_FILES_IN_LIST_FILE_TMP%"
 ) else (
-  set "INPUT_LIST_FILE_UTF8_TMP=%~1"
+  set "COPY_TO_FILES_IN_LIST_FILE_TMP=%~1"
 )
-
-rem recreate files
-copy "%INPUT_LIST_FILE_UTF8_TMP%" "%COPY_TO_FILES_IN_LIST_FILE_TMP%" /B /Y > nul
 
 rem read selected file paths from file
 for /F "usebackq eol=	 tokens=* delims=" %%i in ("%COPY_TO_FILES_IN_LIST_FILE_TMP%") do (

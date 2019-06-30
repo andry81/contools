@@ -18,7 +18,6 @@ set "?~nx0=%~nx0"
 call "%%?~dp0%%__init__.bat" || exit /b
 
 rem builtin defaults
-if not defined TORTOISEPROC_MAX_CALLS set TORTOISEPROC_MAX_CALLS=10
 if not defined TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS set TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS=20
 set "TORTOISEPROC_PATHFILE_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_FILTERED_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf-filtered.lst"
@@ -429,9 +428,6 @@ set OUTTER_TASK_INDEX=0
 
 rem run COMMAND over selected files/directories in the PWD directory
 :LOOKUP_DIR_LOOP
-rem run only first TORTOISEPROC_MAX_CALLS
-if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 0
-
 set "FILEPATH=%~1"
 if not defined FILEPATH exit /b 0
 
@@ -583,10 +579,6 @@ rem ==================== process for all ====================
 
 rem can process versioned and unversioned directories together
 :PROCESS_WCDIR_PATH
-rem run only first TORTOISEPROC_MAX_CALLS
-if %FLAG_WINDOW_PER_WCROOT% NEQ 0 ^
-if %CALL_INDEX% GEQ %TORTOISEPROC_MAX_CALLS% exit /b 1
-
 call :GET_WCDIR_PARENT "%%WCDIR_PATH%%"
 set "WCDIR_PATH=%WCDIR_PARENT_PATH%"
 
