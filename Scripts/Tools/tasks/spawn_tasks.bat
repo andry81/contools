@@ -7,8 +7,14 @@ rem   Script to spawn tasks in parallel but not greater than maximum.
 
 setlocal
 
-set MAX_SPAWN_TASKS=%~1
-set MAX_BUSY_TASKS=%~2
+rem overall tasks to spawn
+set "MAX_SPAWN_TASKS=%~1"
+
+rem max permitted tasks to run together
+set "MAX_BUSY_TASKS=%~2"
+
+rem max tasks to lock spwn new tasks, may be left empty to not lock
+set "MAX_BUSY_TASKS_TO_LOCK_SPAWN=%~3"
 
 if not defined MAX_SPAWN_TASKS (
   echo.%~nx0: error: max spawn tasks is not defined.
@@ -20,14 +26,17 @@ if not defined MAX_BUSY_TASKS (
   exit /b 2
 ) >&2
 
-if "%~3" == "" (
+if "%~4" == "" (
   echo.%~nx0: error: command line is empty.
   exit /b -1
 ) >&2
 
 call "%%~dp0__init__.bat" || exit /b
 
-set SPAWNED_TASKS=0
+set SPAWN_TASK_INDEX=0
+set RUNNING_TASKS_COUNTER=0
+set PREV_RUNNING_TASKS_COUNTER=0
+set IS_TASK_SPAWN_LOCKED=0
 
 set RND=%RANDOM%.%RANDOM%
 set "RUNNING_TASKS_COUNTER_FILE=%TEMP%\spawn_tasks.counter.%RND%.var"
@@ -40,7 +49,7 @@ set LOCK_FILE0_ACQUIRE=0
 (
   (
     rem if lock is acquired, then we are in...
-    set /p RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
+    set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
     if not defined RUNNING_TASKS_COUNTER set RUNNING_TASKS_COUNTER=0
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
@@ -57,7 +66,15 @@ if %LOCK_FILE0_ACQUIRE% EQU 0 (
 :REPEAT_SPAWN_LOOP
 
 rem can run more tasks?
-if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
+if not defined MAX_BUSY_TASKS_TO_LOCK_SPAWN (
+  if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
+) else if %IS_TASK_SPAWN_LOCKED% EQU 0 (
+  if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
+  set IS_TASK_SPAWN_LOCKED=1
+) else if %MAX_BUSY_TASKS_TO_LOCK_SPAWN% GEQ %RUNNING_TASKS_COUNTER% (
+  set IS_TASK_SPAWN_LOCKED=0
+  if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
+)
 
 :REPEAT_READ_WAIT
 
@@ -68,9 +85,11 @@ goto REPEAT_READ_LOOP
 
 :SPAWN_TASK
 rem the task spawner CAN decrement the counter to the negative value, this is not critical here
-start /B "" "%COMSPEC%" /c call "%~dp0task_spawner.bat" %3 %4 %5 %6 %7 %8 %9
+start /B "" "%COMSPEC%" /c call "%~dp0task_spawner.bat" %4 %5 %6 %7 %8 %9
 
-set /a SPAWNED_TASKS+=1
+set /A SPAWN_TASK_INDEX+=1
+
+set PREV_RUNNING_TASKS_COUNTER=%RUNNING_TASKS_COUNTER%
 
 :REPEAT_INCREMENT_LOOP
 
@@ -80,9 +99,9 @@ set LOCK_FILE0_ACQUIRE=0
   (
     rem if lock is acquired, then we are in...
     rem reread the counter
-    set /p RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
+    set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
     if not defined RUNNING_TASKS_COUNTER set RUNNING_TASKS_COUNTER=0
-    set /a RUNNING_TASKS_COUNTER+=1
+    set /A RUNNING_TASKS_COUNTER+=1
     (call echo.%%RUNNING_TASKS_COUNTER%%) > "%RUNNING_TASKS_COUNTER_FILE%"
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
@@ -96,10 +115,18 @@ if %LOCK_FILE0_ACQUIRE% EQU 0 (
   goto REPEAT_INCREMENT_WAIT
 )
 
-if %SPAWNED_TASKS% GEQ %MAX_SPAWN_TASKS% goto MAX_SPAWN_REACHED
+if %SPAWN_TASK_INDEX% GEQ %MAX_SPAWN_TASKS% goto MAX_SPAWN_REACHED
 
 rem can run more tasks?
-if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
+if not defined MAX_BUSY_TASKS_TO_LOCK_SPAWN (
+  if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
+) else if %IS_TASK_SPAWN_LOCKED% EQU 0 (
+  if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
+  set IS_TASK_SPAWN_LOCKED=1
+) else if %MAX_BUSY_TASKS_TO_LOCK_SPAWN% GEQ %RUNNING_TASKS_COUNTER% (
+  set IS_TASK_SPAWN_LOCKED=0
+  if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
+)
 
 rem don't wait
 goto REPEAT_READ_LOOP
@@ -121,7 +148,7 @@ set LOCK_FILE0_ACQUIRE=0
 (
   (
     rem if lock is acquired, then we are in...
-    set /p RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
+    set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
     if not defined RUNNING_TASKS_COUNTER set RUNNING_TASKS_COUNTER=0
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.

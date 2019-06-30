@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.06.29
+* 2019.06.30
 * Toolbar buttons configuration for the Total Commander.
 
 1. Configuration storage files.
@@ -22,8 +22,10 @@
 5.5. Method #5. Call command cmda.bat and Administrator password after.
 
 6. Edit SVN externals (SVN properties).
-6.1 Method #1 (Main). For selected files and directories together over SVN GUI.
-6.2 Method #2. For selected files and directores one after one over external editor.
+6.1. Method #1. By path list from ANSI text file over SVN GUI.
+6.2. Method #2. By path list from UNICODE text file over SVN GUI.
+6.3. Method #3. By path list from command line over SVN GUI.
+6.4. Method #4. By path list from command line one by one over external editor.
 
 7. Open SVN Log for selected files and directories together.
 
@@ -275,7 +277,23 @@ cmda.bat
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-6.1 Method #1 (Main). For selected files and directories together over SVN GUI.
+6.1. Method #1. By path list from ANSI text file over SVN GUI.
+------------------------------------------------------------------------------
+(all windows together)
+
+call_nowindow.vbs
+scm\tortoisesvn\TortoiseProcByList.bat /command:properties "%P" %L
+
+------------------------------------------------------------------------------
+6.2. Method #2. By path list from UNICODE text file over SVN GUI.
+------------------------------------------------------------------------------
+(all windows together)
+
+call_nowindow.vbs
+scm\tortoisesvn\TortoiseProcByList.bat -from_utf16 /command:properties "%P" %WL
+
+------------------------------------------------------------------------------
+6.3. Method #3. By path list from command line over SVN GUI.
 ------------------------------------------------------------------------------
 (all windows together)
 
@@ -283,7 +301,7 @@ call_nowindow.vbs
 scm\tortoisesvn\TortoiseProc.bat /command:properties "%P" %S
 
 ------------------------------------------------------------------------------
-6.2 Method #2. For selected files and directores one after one over external editor.
+6.4. Method #4. By path list from command line one by one over external editor.
 ------------------------------------------------------------------------------
 (one notepad window at a time)
 

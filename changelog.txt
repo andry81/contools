@@ -1,3 +1,13 @@
+2019.06.30:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: TortoiseProc.bat: script does not process all records if quantity was greater than TORTOISEPROC_MAX_CALLS
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: TortoiseProcByNestedWC.bat: script does not process all records if quantity was greater than TORTOISEPROC_MAX_CALLS
+* removed: Scripts/Tools/ToolAdaptors/totalcmd: TortoiseProcByNestedWC.bat: removed usage of the TORTOISEPROC_MAX_CALLS variable because a user may want to choose which one repository must be committed at first between all records instead of the TORTOISEPROC_MAX_CALLS records
+* new: Scripts/Tools/tasks: added ability to lock run of new tasks until left 0 or defined number of running tasks to run next tasks up to the TORTOISEPROC_MAX_CALLS quantity
+* new: Scripts/Tools/ToolAdaptors/totalcmd: TortoiseProc.bat: wait until close all opened records to process next TORTOISEPROC_MAX_CALLS records
+* new: Scripts/Tools/ToolAdaptors/totalcmd: TortoiseProcByList.bat script to process records from a list file
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: scripts refactor
+
 2019.06.29:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: instant exit on error w/o pause (save_file_list.bat)
 * new: Scripts/Tools/ToolAdaptors/totalcmd: copy_file_to_files_by_list.bat script to copy single file to multiple files by a list
