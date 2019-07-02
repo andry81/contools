@@ -1,3 +1,6 @@
+2019.07.02:
+* changed: Scripts/Tools/admin/Telemetry: add interation with the user to ask for quiet uninstall (now is not by default, because Event Viewer can contain errors after unsuccessful uninstall and user might not to known that)
+
 2019.06.30:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: TortoiseProc.bat: script does not process all records if quantity was greater than TORTOISEPROC_MAX_CALLS
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: TortoiseProcByNestedWC.bat: script does not process all records if quantity was greater than TORTOISEPROC_MAX_CALLS
