@@ -1,4 +1,7 @@
 2019.07.03:
+* changed: Scripts/Tools/admin/Telemetry: minor change
+
+2019.07.03:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: `configure.bat` script mutiple fixes
 * new: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat: `configure.bat` can configure now into outter directory instead of inner one as is by default (if no input parameters)
 * new: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat: `configure.bat` now tries to create `%SYSTEMROOT%\System64` automatically if not done yet (`System64` must be visible from any bitness mode, when the `Sysnative` is visible only in the 32-bit mode)
