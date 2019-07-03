@@ -1,0 +1,26 @@
+[Buttonbar]
+Buttoncount=4
+button1=c:\Total Commander Scripts\images\cmd64_admin.ico
+cmd1=cmd_system64_admin.lnk
+param1=/K set "PWD=%P"&call cd /d "%%PWD%%"&title %%COMSPEC%%
+path1=c:\Total Commander Scripts\
+iconic1=0
+menu1=cmd 64-bit as admin
+button2=c:\Total Commander Scripts\images\cmd32_admin.ico
+cmd2=cmd_wow64_admin.lnk
+param2=/K set "PWD=%P"&call cd /d "%%PWD%%"&title %%COMSPEC%%
+path2=c:\Total Commander Scripts\
+iconic2=0
+menu2=cmd 32-bit as admin
+button3=c:\Total Commander Scripts\images\cmd64.ico
+cmd3=cmd_system64.lnk
+param3=/K set "PWD=%P"&call cd /d "%%PWD%%"&title %%COMSPEC%%
+path3=c:\Total Commander Scripts\
+iconic3=0
+menu3=cmd 64-bit
+button4=c:\Total Commander Scripts\images\cmd32.ico
+cmd4=cmd_wow64.lnk
+param4=/K set "PWD=%P"&call cd /d "%%PWD%%"&title %%COMSPEC%%
+path4=c:\Total Commander Scripts\
+iconic4=0
+menu4=cmd 32-bit
