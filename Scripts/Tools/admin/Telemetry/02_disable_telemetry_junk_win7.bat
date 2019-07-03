@@ -11,7 +11,11 @@ set "CMD_QUIET="
 set /P "IS_QUIET=Quiet uninstall? [y/N] "
 if "%IS_QUIET%" == "y" set "CMD_QUIET=/quiet"
 
+echo Uninstalling KB3068708
 wusa.exe /uninstall /kb:3068708 %CMD_QUIET% /norestart
+echo Uninstalling KB3022345
 wusa.exe /uninstall /kb:3022345 %CMD_QUIET% /norestart
+echo Uninstalling KB3075249
 wusa.exe /uninstall /kb:3075249 %CMD_QUIET% /norestart
+echo Uninstalling KB3080149
 wusa.exe /uninstall /kb:3080149 %CMD_QUIET% /norestart
