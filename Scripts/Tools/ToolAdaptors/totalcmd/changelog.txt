@@ -1,3 +1,13 @@
+2019.07.03:
+* fixed: `configure.bat` script mutiple fixes
+* new: configure.bat: `configure.bat` can configure now into outter directory instead of inner one as is by default (if no input parameters)
+* new: configure.bat: `configure.bat` now tries to create `%SYSTEMROOT%\System64` automatically if not done yet (`System64` must be visible from any bitness mode, when the `Sysnative` is visible only in the 32-bit mode)
+* new: Total Commander button bars examples for all scripts
+* removed: removed generation (and usage) the `configure.user.bat` script from the `configure.bat` script as not needed anymore
+* changed: `configure.bat` does configure the `CONTOOLS_ROOT` variable from the input parameter instead of an user input
+* changed: readme update
+* refactor: minor refactor
+
 2019.06.30:
 * fixed: TortoiseProc.bat: script does not process all records if quantity was greater than TORTOISEPROC_MAX_CALLS
 * new: TortoiseProc.bat: wait until close all opened records to process next TORTOISEPROC_MAX_CALLS records

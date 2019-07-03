@@ -291,6 +291,7 @@ Scripts/Tools/ToolAdaptors/lnk/cmd_system64_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_minimized.lnk -text
+Scripts/Tools/ToolAdaptors/lnk/mklink_system64.bat -text
 Scripts/Tools/ToolAdaptors/lnk/runas_admin.bat -text
 Scripts/Tools/ToolAdaptors/python/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/python/copy_pycache.bat -text
@@ -307,6 +308,18 @@ Scripts/Tools/ToolAdaptors/sh/rm.sh -text
 Scripts/Tools/ToolAdaptors/sh/rmdir.sh -text
 Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/.svnignore -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/_menu.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/cmd.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/compare.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/copy.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/copy_file_to_files_by_list.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/create.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/load.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/move.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/notepad++.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/rename.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/save.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/svn.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/__init__.bat -text

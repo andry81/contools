@@ -1,3 +1,14 @@
+2019.07.03:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: `configure.bat` script mutiple fixes
+* new: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat: `configure.bat` can configure now into outter directory instead of inner one as is by default (if no input parameters)
+* new: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat: `configure.bat` now tries to create `%SYSTEMROOT%\System64` automatically if not done yet (`System64` must be visible from any bitness mode, when the `Sysnative` is visible only in the 32-bit mode)
+* new: Scripts/Tools/ToolAdaptors/totalcmd: Total Commander button bars examples for all scripts
+* new: Scripts/Tools/ToolAdaptors/totalcmd/lnk: `mklink_system64.bat` script to create more reliable `%SYSTEMROOT%\System64` directory instead of usage the `%SYSTEMROOT%\Sysnative`, which is accessible only in the 32-bit mode
+* removed: Scripts/Tools/ToolAdaptors/totalcmd: removed generation (and usage) the `configure.user.bat` script from the `configure.bat` script as not needed anymore
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: `configure.bat` does configure the `CONTOOLS_ROOT` variable from the input parameter instead of an user input
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: minor refactor
+
 2019.07.02:
 * changed: Scripts/Tools/admin/Telemetry: add interation with the user to ask for quiet uninstall (now is not by default, because Event Viewer can contain errors after unsuccessful uninstall and user might not to known that)
 

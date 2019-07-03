@@ -23,7 +23,7 @@ exit /b %LASTERROR%
 
 :MAIN
 rem builtin defaults
-if not defined TORTOISEPROC_MAX_CALLS set TORTOISEPROC_MAX_CALLS=10
+if not defined TORTOISEPROC_MAX_SPAWN_CALLS set TORTOISEPROC_MAX_SPAWN_CALLS=10
 
 rem script flags
 set FLAG_PATHS_FROM_UTF16=0
@@ -77,7 +77,7 @@ if %FLAG_PATHS_FROM_UTF16% NEQ 0 (
 rem build filtered paths list
 set "PROPS_PATH_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\props_path_list.lst"
 
-rem calculate maximum busy tasks to wait after, open only TORTOISEPROC_MAX_CALLS windows at the same time
+rem calculate maximum busy tasks to wait after, open only TORTOISEPROC_MAX_SPAWN_CALLS windows at the same time
 set MAX_SPAWN_TASKS=0
 
 rem create empty file
@@ -133,7 +133,7 @@ set /A MAX_SPAWN_TASKS+=1
 exit /b
 
 :PROCESS_TASKS
-call :SPAWN_TASKS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_CALLS%%" 0 call "%%TOTALCMD_ROOT%%/scm/tortoisesvn/TortoiseProc_read_path_from_stdin.bat"
+call :SPAWN_TASKS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%TOTALCMD_ROOT%%/scm/tortoisesvn/TortoiseProc_read_path_from_stdin.bat"
 exit /b
 
 :SPAWN_TASKS
