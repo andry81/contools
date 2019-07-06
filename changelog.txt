@@ -1,4 +1,9 @@
 2019.07.06:
+* new: Scripts/Tools/admin: added `description` and `repositories` sections in respective text files to be able to find new versions
+* new: svn ignores
+* removed: Scripts/Tools/admin: WSUS moved to the KnownIssues
+
+2019.07.06:
 * new: Scripts/Tools/admin/KnownIssues: `admin_windows7_crash_updates.txt` file to list updates which might crash the system after reboot
 * new: Scripts/Tools/admin/KnownIssues: `admin_windows7_known_issues.txt` file to list known issues and solutions for them
 * new: Scripts/Tools/admin/Telemetry: `admin_windows7_telemetry_precaution.txt` file to describe steps to remove or block telemetry injection in the Windows7

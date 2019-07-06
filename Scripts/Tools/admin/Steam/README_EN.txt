@@ -1,10 +1,11 @@
 * README_EN.txt
-* 2017.09.02
+* 2019.07.06
 * Steam scripts
 
 1. DESCRIPTION
-2. USAGE
-3. AUTHOR
+2. REPOSITORIES
+3. USAGE
+4. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -16,7 +17,15 @@ Set of scritps to maintain Steam execution on the Windows.
   Can start Steam in offline mode w/o login.
 
 -------------------------------------------------------------------------------
-2. USAGE
+2. REPOSITORIES
+-------------------------------------------------------------------------------
+
+Primary:
+  * https://sf.net/p/contools/contools/HEAD/tree/trunk/Scripts/Tools/admin/Steam
+  * https://svn.code.sf.net/p/contools/contools/trunk/Scripts/Tools/admin/Steam
+
+-------------------------------------------------------------------------------
+3. USAGE
 -------------------------------------------------------------------------------
 Steam.vbs [mode]
 , where `mode` can be:
@@ -33,6 +42,6 @@ CAUTION:
     then YOU HAVE TO LOGIN and do `Go Offline` from the Steam main window!
 
 -------------------------------------------------------------------------------
-3. AUTHOR
+4. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)
