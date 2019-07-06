@@ -19,7 +19,7 @@ if not defined PROCESSOR_ARCHITEW6432 goto X32
 
 rem restart in x64
 if exist "%SystemRoot%\Sysnative\" (
-  "%SystemRoot%\Sysnative\cmd.exe" /C %0 %*
+  call :CMD "%%SystemRoot%%\Sysnative\cmd.exe" /C %%0 %%*
   exit /b
 )
 
@@ -34,8 +34,7 @@ rem   Under pure Windows x64 create system64 directory to bypass sysnative direc
 
 if exist "%SystemRoot%\System64\" goto IGNORE_SYSTEM64_CREATE
 
-echo.^>mklink /D "%SystemRoot%\System64" "%SystemRoot%\System32"
-mklink /D "%SystemRoot%\System64" "%SystemRoot%\System32"
+call :CMD mklink /D "%%SystemRoot%%\System64" "%%SystemRoot%%\System32"
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: run `mklink.exe /D "%SystemRoot%\System64" "%SystemRoot%\System32"` manually or restart system!
   exit /b -253
@@ -47,15 +46,15 @@ if %ERRORLEVEL% NEQ 0 (
 set "COMPATTELRUNNER_LOG_DIR=%ProgramData%\Microsoft\Diagnosis\ETLLogs\AutoLogger"
 
 echo Stopping and disabling CompatTelRunner.exe services..
-sc stop DiagTrack
-sc config DiagTrack start= disabled
-sc stop dmwappushservice
-sc config dmwappushservice start= disabled
+call :CMD sc stop DiagTrack
+call :CMD sc config DiagTrack start= disabled
+call :CMD sc stop dmwappushservice
+call :CMD sc config dmwappushservice start= disabled
 echo.
 
 echo Stopping and disabling NvTelemetryContainer.exe services..
-sc stop NvTelemetryContainer
-sc config NvTelemetryContainer start= disabled
+call :CMD sc stop NvTelemetryContainer
+call :CMD sc config NvTelemetryContainer start= disabled
 echo.
 
 echo Updating CompatTelRunner.exe files..
@@ -66,8 +65,8 @@ echo.> "%COMPATTELRUNNER_LOG_DIR%\AutoLogger-Diagtrack-Listener.etl"
 echo.
 
 echo Updating CompatTelRunner.exe registry..
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe" /v Debugger /t REG_SZ /d "systray.exe" /f
+call :CMD reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+call :CMD reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe" /v Debugger /t REG_SZ /d "systray.exe" /f
 echo.
 
 echo Updating CompatTelRunner.exe permissions...
@@ -85,15 +84,23 @@ if exist "%~dp0retakeowner.exe" goto RETAKEOWNER_WORKAROUND
 
 rem CAUTION: Obsolete implementation, `takeown` and `icacls` does not work anymore on TrustedInstaller protected files!
 echo.%~nx0: warning: system takeown utility may fail to take ownership on TrustedInstaller protected files beginning from Windows 7. Copy `retakeowner.exe` utility into directory with the script to bypass this issue.
-takeown /S localhost /U "%USERNAME%" /F "%FILE%"
+call :CMD takeown /S localhost /U "%%USERNAME%%" /F "%%FILE%%"
 
 goto RETAKEOWNER_WORKAROUND_END
 
 :RETAKEOWNER_WORKAROUND
-"%~dp0retakeowner.exe" "%FILE%" "%USERNAME%"
+call :CMD "%%~dp0retakeowner.exe" "%%FILE%%" "%%USERNAME%%"
 echo.%~nx0: retakeowner last error code: %ERRORLEVEL%
 
 :RETAKEOWNER_WORKAROUND_END
 
-icacls "%FILE%" /remove:g "NT SERVICE\TrustedInstaller"
-icacls "%FILE%" /deny *S-1-1-0:(WO,GE)
+call :CMD icacls "%%FILE%%" /remove:g "NT SERVICE\TrustedInstaller"
+call :CMD icacls "%%FILE%%" /deny *S-1-1-0:(WO,GE)
+
+echo.
+
+exit /b
+
+:CMD
+echo.^>%*
+%*
