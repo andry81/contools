@@ -1,3 +1,8 @@
+2019.07.06:
+* new: Scripts/Tools/admin/KnownIssues: `admin_windows7_crash_updates.txt` file to list updates which might crash the system after reboot
+* new: Scripts/Tools/admin/KnownIssues: `admin_windows7_known_issues.txt` file to list known issues and solutions for them
+* new: Scripts/Tools/admin/Telemetry: `admin_windows7_telemetry_precaution.txt` file to describe steps to remove or block telemetry injection in the Windows7
+
 2019.07.03:
 * changed: Scripts/Tools/admin/Telemetry: minor change
 
