@@ -1,4 +1,7 @@
 2019.07.06:
+* changed: Scripts/Tools/admin/Telemetry: added commands self print into stdout, lines separator
+
+2019.07.06:
 * new: Scripts/Tools/admin: added `description` and `repositories` sections in respective text files to be able to find new versions
 * new: svn ignores
 * removed: Scripts/Tools/admin: WSUS moved to the KnownIssues
