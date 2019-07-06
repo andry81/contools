@@ -4,6 +4,7 @@ Scripts/Tools/*.exe
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/*
 Scripts/Tools/ToolAdaptors/totalcmd/configure.user.bat
 Scripts/Tools/__init__.bat
+Scripts/Tools/admin/ProductKey/__pycache__
 /Temp
 Utilities/Projects/*.user
 Utilities/src/_common/help.txt

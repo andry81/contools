@@ -477,7 +477,6 @@ Scripts/Tools/admin/Telemetry/04_disable_telemetry_junk_win7.bat -text
 Scripts/Tools/admin/Telemetry/admin_windows7_telemetry_precaution.txt -text
 Scripts/Tools/admin/VM/compact_vdi.bat -text
 Scripts/Tools/admin/WMI/fix_reactivated_in_namespace_eventviewer_error_Event_ID_10.vbs -text
-Scripts/Tools/admin/WSUS/ProbableIssues.txt -text
 Scripts/Tools/admin/cleanup_acl.bat -text
 Scripts/Tools/admin/comspec_as_svc.bat -text
 Scripts/Tools/admin/ip_list_by_arp.bat -text

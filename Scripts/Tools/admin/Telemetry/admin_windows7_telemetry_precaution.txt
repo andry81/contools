@@ -2,12 +2,28 @@
 * 2019.07.06
 * admin/Telemetry
 
-1. AFTER INSTALL
-2. UPDATING
-3. APPLICATIONS
+1. DESCRIPTION
+2. REPOSITORIES
+3. AFTER INSTALL
+4. UPDATING
+5. APPLICATIONS
+6. AUTHOR
 
 -------------------------------------------------------------------------------
-1. AFTER INSTALL
+1. DESCRIPTION
+-------------------------------------------------------------------------------
+This is a readme file from the `sf.net/p/contools` project.
+
+-------------------------------------------------------------------------------
+2. REPOSITORIES
+-------------------------------------------------------------------------------
+
+Primary:
+  * https://sf.net/p/contools/contools/HEAD/tree/trunk/Scripts/Tools/admin/Telemetry
+  * https://svn.code.sf.net/p/contools/contools/trunk/Scripts/Tools/admin/Telemetry
+
+-------------------------------------------------------------------------------
+3. AFTER INSTALL
 -------------------------------------------------------------------------------
 
 1. Disable Windows Update service to auto check/download/install 
@@ -72,7 +88,7 @@
    telemetry junk updates.
 
 -------------------------------------------------------------------------------
-2. UPDATING
+4. UPDATING
 -------------------------------------------------------------------------------
 
 1. Avoid install updates listed here:
@@ -84,8 +100,13 @@
 * `*_disable_telemetry_junk_win7.bat`
 
 -------------------------------------------------------------------------------
-3. APPLICATIONS
+5. APPLICATIONS
 -------------------------------------------------------------------------------
 
 1. Install messengers or not trusted applications with network access in a
   separate virtual machine ONLY (for example, in the VirtualBox).
+
+-------------------------------------------------------------------------------
+6. AUTHOR
+-------------------------------------------------------------------------------
+Andrey Dibrov (andry at inbox dot ru)
