@@ -1,0 +1,40 @@
+* admin_windows7_known_issues.txt
+* 2019.07.06
+* admin/KnownIssues
+
+1. Can not run any application in an administrative mode (promoted UAC mode) or
+    `Run as administrator` ends with the error message:
+   `The service cannot be started, either because it is disabled or because it has no enabled devices associated with it`
+2. Windows Activation reports a problem: Error Code 0xC004E003
+
+-------------------------------------------------------------------------------
+1. Can not run any application in an administrative mode (promoted UAC mode) or
+    `Run as administrator` ends with the error message:
+   `The service cannot be started, either because it is disabled or because it has no enabled devices associated with it`
+-------------------------------------------------------------------------------
+
+Solution #1:
+
+Reboot in the Safe Mode and turn on `Appinfo` service:
+
+`sc config Appinfo start= auto`
+
+Solution #2:
+
+The `consent.exe` executable in the `%SYSTEMROOT%\System32` have has not enough
+file permissions to start.
+
+Reboot in the Safe Mode and change the file permissions:
+
+1. Take the file ownership to an administator user.
+2. Remove permissions which might interfere with the access, for example, the
+  `All` user should not be there.
+3. Restore ownership to the TrustedInstaller: `NT SERVICE\TrustedInstaller`.
+
+-------------------------------------------------------------------------------
+2. Windows Activation reports a problem: Error Code 0xC004E003
+-------------------------------------------------------------------------------
+
+Solution #1:
+
+Run Windows Update at least once to update Windows Update itself.
