@@ -128,8 +128,48 @@ call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk" "*.*" "%%TOTALCMD_ROOT%%" 
 
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/vbs" "call*.vbs" "%%TOTALCMD_ROOT%%" /S /Y /D || exit /b
 
+call :CMD fc "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd\profile.vars" "%%TOTALCMD_ROOT%%\profile.vars" > nul
+if %ERRORLEVEL% EQU 0 goto IGNORE_PROFILE_WRITE
+
+set PROFILE_VARS_INDEX_TO=3
+set PROFILE_VARS_INDEX_FROM=%PROFILE_VARS_INDEX_TO%
+:PROFILE_ROTATE_LOOP
+set /A PROFILE_VARS_INDEX_FROM-=1
+set /A PROFILE_VARS_INDEX_BEFORE=%PROFILE_VARS_INDEX_FROM%-1
+
+if %PROFILE_VARS_INDEX_FROM% LSS 1 goto CONTINUE_PROFILE_WRITE
+
+if %PROFILE_VARS_INDEX_FROM% GTR 1 (
+  if %PROFILE_VARS_INDEX_BEFORE% GTR 1 (
+    set "PROFILE_VARS_FILE_NAME_BEFORE=profile.old.%PROFILE_VARS_INDEX_BEFORE%.vars"
+  ) else (
+    set "PROFILE_VARS_FILE_NAME_BEFORE=profile.old.vars"
+  )
+  set "PROFILE_VARS_FILE_NAME_FROM=profile.old.%PROFILE_VARS_INDEX_FROM%.vars"
+) else (
+  set "PROFILE_VARS_FILE_NAME_BEFORE=profile.vars"
+  set "PROFILE_VARS_FILE_NAME_FROM=profile.old.vars"
+)
+
+if exist "%TOTALCMD_ROOT%/%PROFILE_VARS_FILE_NAME_BEFORE%" (
+  if exist "%TOTALCMD_ROOT%/%PROFILE_VARS_FILE_NAME_FROM%" (
+    if exist "%TOTALCMD_ROOT%/profile.old.%PROFILE_VARS_INDEX_TO%.vars" (
+      call :CMD del /F /Q /A:-D "%%TOTALCMD_ROOT%%\profile.old.%%PROFILE_VARS_INDEX_TO%%.vars"
+    )
+    call :CMD rename "%%TOTALCMD_ROOT%%\%%PROFILE_VARS_FILE_NAME_FROM%%" "profile.old.%%PROFILE_VARS_INDEX_TO%%.vars" || exit /b
+  )
+)
+
+set "PROFILE_VARS_INDEX_TO=%PROFILE_VARS_INDEX_FROM%"
+
+goto PROFILE_ROTATE_LOOP
+
+:CONTINUE_PROFILE_WRITE
+call :CMD rename "%%TOTALCMD_ROOT%%\profile.vars" "profile.old.vars" || exit /b
+
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "profile.vars" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 
+:IGNORE_PROFILE_WRITE
 if not exist "%SYSTEMROOT%\System64\" (
   call :CMD "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/mklink_system64.bat"
   if exist "%SYSTEMROOT%\System64\" (
