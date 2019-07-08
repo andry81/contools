@@ -1,3 +1,6 @@
+2019.07.08:
+* changed: back merge from tacklelib project
+
 2019.07.06:
 * changed: Scripts/Tools/admin/Telemetry: added commands self print into stdout, lines separator
 

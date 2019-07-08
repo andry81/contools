@@ -223,10 +223,14 @@ function GetFilePath()
 function GetAbsolutePathFromDirPath()
 {
   # drop return value
-  RETURN_VALUE="$1"
+  RETURN_VALUE=""
 
   local DirPath="$1"
   local RelativePath="$2"
+
+  # drop line returns
+  DirPath="${DirPath//[$'\r\n']}" 
+  RelativePath="${RelativePath//[$'\r\n']}" 
 
   # WORKAROUND:
   #   Because some versions of readlink can not handle windows native absolute
@@ -238,15 +242,19 @@ function GetAbsolutePathFromDirPath()
     DirPath="$RETURN_VALUE"
   fi
 
-  if [[ -n "$DirPath" && -x "/bin/readlink.exe" ]]; then
-    if [[ "${RelativePath:0:1}" != '/' ]]; then
-      RETURN_VALUE="`/bin/readlink.exe -m "$DirPath${RelativePath:+/}$RelativePath"`"
+  if [[ -n "$DirPath" ]]; then
+    if [[ -x "/bin/readlink" ]]; then
+      if [[ "${RelativePath:0:1}" != '/' ]]; then
+        RETURN_VALUE=$(/bin/readlink -m "$DirPath${RelativePath:+/}$RelativePath")
+      else
+        RETURN_VALUE=$(/bin/readlink -m "$RelativePath")
+      fi
     else
-      RETURN_VALUE="`/bin/readlink.exe -m "$RelativePath"`"
+      return 1
     fi
+  else
+    return 2
   fi
-
-  return 0
 }
 
 function ConvertBackendPathToNative()
@@ -257,6 +265,7 @@ function ConvertBackendPathToNative()
   # drop return value
   RETURN_VALUE="$1"
 
+  local LastError=0
   local PathToConvert="$1"
   local Flags="$2"
 
@@ -265,15 +274,24 @@ function ConvertBackendPathToNative()
   if [[ "${Flags/i/}" != "$Flags" ]]; then
     # w/ user mount points bypassing
     ExctractPathIgnoringUserMountPoints -w "$PathToConvert"
-    return $?
+    LastError=$?
+  fi
+
+  if [[ "${Flags/s/}" != "$Flags" ]]; then
+    # convert backslashes to slashes
+    RETURN_VALUE="${RETURN_VALUE//\\//}"
+  fi
+
+  if [[ "${Flags/i/}" != "$Flags" ]]; then
+    return $LastError
   fi
 
   [[ -n "$PathToConvert" ]] || return 1
 
-  GetAbsolutePathFromDirPath "$PathToConvert"
+  GetAbsolutePathFromDirPath "$PathToConvert" || return 2
 
   case "$OSTYPE" in
-    "msys" | "mingw")
+    msys* | mingw*)
       while true; do
         # in msys2 and higher we must use /bin/cygpath.exe to convert the path
         if [[ "$OSTYPE" == "msys" && -f "/bin/cygpath.exe" ]]; then
@@ -290,19 +308,30 @@ function ConvertBackendPathToNative()
       done
     ;;
 
-    "cygwin")
+    cygwin*)
       ConvertedPath="`/bin/cygpath.exe -w "$RETURN_VALUE"`"
     ;;
-    
+
     *)
-      return 2
+      if [[ "${Flags/s/}" != "$Flags" ]]; then
+        # convert backslashes to slashes
+        RETURN_VALUE="${RETURN_VALUE//\\//}"
+      fi
+
+      return 0
     ;;
   esac
 
   # remove last slash
   ConvertedPath="${ConvertedPath%[/\\]}"
-  # convert all slashes to backward slashes
-  RETURN_VALUE="${ConvertedPath//\//\\}"
+
+  if [[ "${Flags/s/}" != "$Flags" ]]; then
+    # convert backslashes to slashes
+    RETURN_VALUE="${ConvertedPath//\\//}"
+  else
+    # convert all slashes to backward slashes
+    RETURN_VALUE="${ConvertedPath//\//\\}"
+  fi
 
   return 0
 }
@@ -330,13 +359,13 @@ function ConvertNativePathToBackend()
   fi
   if (( PathToConvertLen >= 3 )); then
     PathSuffix="${PathToConvert:2}"
+    PathSuffix="${PathSuffix%/}"
   fi
-  PathSuffix="${PathSuffix%/}"
 
   # Convert path drive prefix too.
   if [[ "${PathPrefixes[0]}" != '/' && "${PathPrefixes[0]}" != '.' && "${PathPrefixes[1]}" == ':' ]]; then
     case "$OSTYPE" in
-      "cygwin") PathToConvert="/cygdrive/${PathPrefixes[0]}$PathSuffix" ;;
+      cygwin*) PathToConvert="/cygdrive/${PathPrefixes[0]}$PathSuffix" ;;
       *)
         PathToConvert="/${PathPrefixes[0]}$PathSuffix"
         # add slash to the end of path in case of drive only path
@@ -385,7 +414,7 @@ function ConvertNativePathListToBackend()
     # Convert path drive prefix too.
     if [[ "${PathPrefixes[0]}" != '/' && "${PathPrefixes[0]}" != '.' && "${PathPrefixes[1]}" == ':' ]]; then
       case "$OSTYPE" in
-        "cygwin") RETURN_VALUE="$RETURN_VALUE${RETURN_VALUE:+:}/cygdrive/${PathPrefixes[0]}${PathSuffix}" ;;
+        cygwin*) RETURN_VALUE="$RETURN_VALUE${RETURN_VALUE:+:}/cygdrive/${PathPrefixes[0]}${PathSuffix}" ;;
         *) RETURN_VALUE="$RETURN_VALUE${RETURN_VALUE:+:}/${PathPrefixes[0]}${PathSuffix}" ;;
       esac
     else
@@ -437,7 +466,7 @@ function CanonicalNativePath()
 # builtin mounts
 function ExctractPathIgnoringUserMountPoints()
 {
-  # Split the path into 2 paths by exracting builtin paths from the beginning of
+  # Splits the path into 2 paths by exracting builtin paths from the beginning of
   # the path in this order:
   # "/usr/bin" => "/usr/lib" => "/usr" => "/lib" => "/<drive>/" => "/"
   # That is because, the Cygwin backend has the redirection of
@@ -532,7 +561,7 @@ function ExctractPathIgnoringUserMountPoints()
 
   # bypassing mounting points
   case "$OSTYPE" in
-    "msys" | "mingw")
+    msys* | mingw*)
       while true; do
         # in msys2 and higher we must use /bin/cygpath.exe to convert the path
         if [[ "$OSTYPE" == "msys" && -f "/bin/cygpath.exe" ]]; then
@@ -549,13 +578,13 @@ function ExctractPathIgnoringUserMountPoints()
       done
       ;;
 
-    "cygwin")
+    cygwin*)
       ConvertedPath="`/bin/cygpath.exe -w "$PathPrefix"`"
       ;;
-    
+
     *)
       RETURN_VALUE="${PathPrefix%/}${PathSuffix:+/}$PathSuffix"
-      return 2
+      return 0
       ;;
   esac
 
@@ -563,7 +592,7 @@ function ExctractPathIgnoringUserMountPoints()
   ConvertedPath="${ConvertedPath%[/\\]}"
   # convert to declared path type with replacemant of all backward slashes
   if (( DoConvertToBackendTypePath )); then
-    ConvertNativePathToBackend "${ConvertedPath//\//\\}"
+    ConvertNativePathToBackend "${ConvertedPath//\//\\}" || return 3
     RETURN_VALUE="$RETURN_VALUE${PathSuffix:+/}$PathSuffix"
   else
     RETURN_VALUE="${ConvertedPath//\\//}${PathSuffix:+/}$PathSuffix"
