@@ -1,3 +1,6 @@
+2019.07.08:
+* fixed: configure.bat: `profile.vars` overwrite w/o backup, rotation implemented
+
 2019.07.03:
 * fixed: `configure.bat` script mutiple fixes
 * new: configure.bat: `configure.bat` can configure now into outter directory instead of inner one as is by default (if no input parameters)

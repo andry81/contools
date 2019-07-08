@@ -1,4 +1,7 @@
 2019.07.08:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat: `profile.vars` overwrite w/o backup, rotation implemented
+
+2019.07.08:
 * changed: back merge from tacklelib project
 
 2019.07.06:
