@@ -727,7 +727,7 @@ the Total Commander in the section `[searches]`:
 saveload_search_in_slot_<INDEX_STR>_SearchFor=*.*
 saveload_search_in_slot_<INDEX_STR>_SearchIn=@c:\Total Commander Scripts\.saveload\file_lists\<INDEX_STR>.lst
 saveload_search_in_slot_<INDEX_STR>_SearchText=
-saveload_search_in_slot_<INDEX_STR>_SearchFlags=0|103002010021|||||||||0000|||
+saveload_search_in_slot_<INDEX_STR>_SearchFlags=0|103002010021|||||||||0000|0||
 ```
 
 Where the `<INDEX_STR>` can be any index string (for example, from `00` up to
