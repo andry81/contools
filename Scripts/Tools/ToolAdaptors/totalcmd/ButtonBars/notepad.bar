@@ -1,0 +1,27 @@
+[Buttonbar]
+Buttoncount=5
+button1=c:\Total Commander Scripts\images\notepad_new.ico
+cmd1=call_nowindow.vbs
+param1=notepad_new_session.bat -wait -npp -multiInst -nosession
+path1=c:\Total Commander Scripts\
+iconic1=0
+menu1=Notepad++ new
+button2=c:\Total Commander Scripts\images\notepad_new_to_save.ico
+cmd2=call_nowindow.vbs
+param2=notepad_new_session.bat -wait -npp -multiInst -nosession "%P"
+path2=c:\Total Commander Scripts\
+iconic2=0
+menu2=Notepad++ new to save
+iconic3=0
+button4=C:\Program Files\Notepad++\notepad++.exe
+cmd4=call.vbs
+param4=notepad_edit_files_by_list.bat -wait -npp -paths_to_u16cp -nosession -multiInst "%P" %WL
+path4=c:\Total Commander Scripts\
+iconic4=0
+menu4=Notepad++ edit
+button5=C:\Program Files\Notepad++\notepad++.exe,11
+cmd5=call.vbs
+param5=notepad_edit_files_by_list.bat -wait -npp -paths_to_u16cp "%P" %WL
+path5=c:\Total Commander Scripts\
+iconic5=0
+menu5=Notepad++ append

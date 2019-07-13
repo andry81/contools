@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.07.03
+* 2019.07.13
 * Toolbar buttons configuration for the Total Commander.
 
 1. CONFIGURE
@@ -10,7 +10,9 @@
 
 3. DESCRIPTION ON SCRIPTS USAGE
 
-3.1 OPEN A NOTEPAD WINDOW INDEPENDENTLY TO SELECTED FILES
+3.1. Open a notepad window independently to selected files
+3.1.1. Method #1. Open a new notepad window to save edit file to current working directory.
+3.1.2. Method #2. Open a new notepad window to save edit file to current panel directory.
 
 3.2. Open standalone notepad window for selected files
 3.2.1. Method #1. On left mouse button.
@@ -137,26 +139,58 @@ rest you should figure out on your own.
 3. DESCRIPTION ON SCRIPTS USAGE
 ------------------------------------------------------------------------------
 
+All scripts can be called with the console window and without the console
+window.
+
+To create a console window use the `call.vbs` or `call_nowait.vbs` script.
+
+To hide a console window use the `call_nowindow.vbs` or
+`call_nowindow_nowait.vbs` script.
+
+CAUTION:
+  If a `call_nowindow*.vbs` script is used, then you must not use the
+  `-pause_on_exit` flag for down layer script otherwise the parent script
+  process would pause on exit and because the console window is not visible
+  you can not interact with it and you won't be able to close it!
+
 ------------------------------------------------------------------------------
-3.1. Open a notepad window independently to selected files.
+3.1. Open a notepad window independently to selected files
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+3.1.1. Method #1. Open a new notepad window to save edit file to current working directory.
 ------------------------------------------------------------------------------
 
 For Notepad++:
 
 call_nowindow.vbs
-notepad_edit_files.bat -wait -npp -multiInst -nosession "%P"
+notepad_new_session.bat -wait -npp -multiInst -nosession
 
 For Windows Notepad:
 
 call_nowindow.vbs
-notepad_edit_files.bat "%P"
+notepad_new_session.bat
+
+------------------------------------------------------------------------------
+3.1.2. Method #2. Open a new notepad window to save edit file to current panel directory.
+------------------------------------------------------------------------------
+
+For Notepad++:
+
+call_nowindow.vbs
+notepad_new_session.bat -wait -npp -multiInst -nosession "%P"
+
+For Windows Notepad:
+
+call_nowindow.vbs
+notepad_new_session.bat "%P"
 
 ------------------------------------------------------------------------------
 3.2. Open standalone notepad window for selected files.
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
-3.2.1. Method #1 On left mouse button.
+3.2.1. Method #1. On left mouse button.
 ------------------------------------------------------------------------------
 (Console window is hidden (no flickering))
 
@@ -558,17 +592,17 @@ scm\git\git_rename_files_by_list.bat -from_utf16 "%P" %WL
 For Shell:
 
 call.vbs
-scm\shell\shell_copy_files_by_list.bat "%P" %L
+scm\shell\shell_copy_files_by_list.bat -pause_on_exit "%P" %L
 
 For SVN:
 
 call.vbs
-scm\svn\svn_copy_files_by_list.bat "%P" %L
+scm\svn\svn_copy_files_by_list.bat -pause_on_exit "%P" %L
 
 For GIT:
 
 call.vbs
-scm\git\git_copy_files_by_list.bat "%P" %L
+scm\git\git_copy_files_by_list.bat -pause_on_exit "%P" %L
 
 ------------------------------------------------------------------------------
 3.13.2. Method #2. Copy files by selection list from UNICODE text file.
@@ -577,17 +611,17 @@ scm\git\git_copy_files_by_list.bat "%P" %L
 For Shell:
 
 call.vbs
-scm\shell\shell_copy_files_by_list.bat -from_utf16 "%P" %WL
+scm\shell\shell_copy_files_by_list.bat -pause_on_exit -from_utf16 "%P" %WL
 
 For SVN:
 
 call.vbs
-scm\svn\svn_copy_files_by_list.bat -from_utf16 "%P" %WL
+scm\svn\svn_copy_files_by_list.bat -pause_on_exit -from_utf16 "%P" %WL
 
 For GIT:
 
 call.vbs
-scm\git\git_copy_files_by_list.bat -from_utf16 "%P" %WL
+scm\git\git_copy_files_by_list.bat -pause_on_exit -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
 3.14. Shell file to files copy by list
@@ -598,14 +632,14 @@ scm\git\git_copy_files_by_list.bat -from_utf16 "%P" %WL
 ------------------------------------------------------------------------------
 
 call.vbs
-copy_file_to_files_by_list.bat -from_file %P%N "<file_paths_list_file>"
+copy_file_to_files_by_list.bat -pause_on_exit -from_file %P%N "<file_paths_list_file>"
 
 ------------------------------------------------------------------------------
 3.14.2. Method #2. Shell file to files copy by UNICODE list
 ------------------------------------------------------------------------------
 
 call.vbs
-copy_file_to_files_by_list.bat -from_utf16 -from_file %P%N "<file_paths_list_file>"
+copy_file_to_files_by_list.bat -pause_on_exit -from_utf16 -from_file %P%N "<file_paths_list_file>"
 
 ------------------------------------------------------------------------------
 3.15. Create batch directories
@@ -616,28 +650,28 @@ copy_file_to_files_by_list.bat -from_utf16 -from_file %P%N "<file_paths_list_fil
 ------------------------------------------------------------------------------
 
 call.vbs
-create_dirs_by_list.bat "%P"
+create_dirs_by_list.bat -pause_on_exit "%P"
 
 ------------------------------------------------------------------------------
 3.15.2. Method #2. Create directories in selected directories by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
-create_dirs_by_list.bat "%P" %L
+create_dirs_by_list.bat -pause_on_exit "%P" %L
 
 ------------------------------------------------------------------------------
 3.15.3. Method #3. Create directories in current directory by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
-create_dirs_by_list.bat -from_utf16 "%P"
+create_dirs_by_list.bat -pause_on_exit -from_utf16 "%P"
 
 ------------------------------------------------------------------------------
 3.15.4. Method #4. Create directories in selected directories by list from UNICODE text file.
 ------------------------------------------------------------------------------
 
 call.vbs
-create_dirs_by_list.bat -from_utf16 "%P" %WL
+create_dirs_by_list.bat -pause_on_exit -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
 3.16. Create batch empty files

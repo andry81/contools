@@ -1,3 +1,10 @@
+2019.07.13:
+* fixed: accidental pause on exit in multiple scripts, attach the pause to the `-pause_on_exit` to explicitly pause on exit (must be removed in case of call to `call_nowindow*.vbs`)
+* new: notepad icons
+* changed: split the notepad new into the new and the new to save, where the new item can be used inside an opened archive (`%P` is not used)
+* changed: readme update
+* refactor: minor refactor
+
 2019.07.10:
 * fixed: the file list selection feature (load) has been traverse a directory from the selection list recursively when must not
 
