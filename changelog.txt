@@ -1,3 +1,10 @@
+2019.07.13:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: accidental pause on exit in multiple scripts, attach the pause to the `-pause_on_exit` to explicitly pause on exit (must be removed in case of call to `call_nowindow*.vbs`)
+* new: Scripts/Tools/ToolAdaptors/totalcmd: notepad icons
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: split the notepad new into the new and the new to save, where the new item can be used inside an opened archive (`%P` is not used)
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: minor refactor
+
 2019.07.10:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: the file list selection feature (load) has been traverse a directory from the selection list recursively when must not
 
@@ -6,6 +13,9 @@
 
 2019.07.08:
 * changed: back merge from tacklelib project
+
+2019.07.06:
+* changed: Scripts/Tools/admin/Telemetry: 04_disable_telemetry_junk_win7.bat: more details
 
 2019.07.06:
 * changed: Scripts/Tools/admin/Telemetry: added commands self print into stdout, lines separator

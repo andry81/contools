@@ -1,5 +1,5 @@
 [Buttonbar]
-Buttoncount=10
+Buttoncount=9
 button1=c:\Total Commander Scripts\images\save_list.ico
 cmd1=call.vbs
 param1=save_file_list.bat -timeout_to_close_sec 10 -to_file_name "01.lst" "c:\Total Commander Scripts\.saveload\file_lists" %WL

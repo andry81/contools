@@ -1,5 +1,5 @@
 [Buttonbar]
-Buttoncount=10
+Buttoncount=9
 button1=c:\Total Commander Scripts\images\load_list.ico
 cmd1=LOADSEARCH saveload_search_in_slot_01
 param1=
