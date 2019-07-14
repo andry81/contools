@@ -365,6 +365,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/menu_create_dirs_and_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_rename_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_load.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/menu_svn.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_edit.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_new.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_new_to_save.ico -text
