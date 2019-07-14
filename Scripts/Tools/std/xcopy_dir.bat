@@ -108,6 +108,7 @@ if exist "%WINDIR%\system32\robocopy.exe" goto USE_ROBOCOPY
 
 rem switch code page into english compatible locale
 call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+set RESTORE_LOCALE=1
 
 set "XCOPY_EXCLUDES_CMD="
 set "XCOPY_EXCLUDES_LIST_TMP="
@@ -134,8 +135,8 @@ if defined XCOPY_EXCLUDES_LIST_TMP (
   call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 )
 
-rem restore code page
-call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 exit /b %LASTERROR%
 

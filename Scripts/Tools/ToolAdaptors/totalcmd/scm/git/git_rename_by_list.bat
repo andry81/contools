@@ -8,15 +8,19 @@ set "?~nx0=%~nx0"
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
-
 rem script flags
 set PAUSE_ON_EXIT=0
+set RESTORE_LOCALE=0
+
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
@@ -41,11 +45,12 @@ if defined FLAG (
     set PAUSE_ON_EXIT=1
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
-    shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
+
+  shift
 
   rem read until no flags
   goto FLAGS_LOOP
@@ -74,6 +79,7 @@ set "RENAME_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_to_file_list.lst"
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+  set RESTORE_LOCALE=1
 
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
@@ -87,8 +93,6 @@ copy "%RENAME_FROM_LIST_FILE_TMP%" "%RENAME_TO_LIST_FILE_TMP%" /B /Y > nul
 
 call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%RENAME_TO_LIST_FILE_TMP%%"
 
-setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
-
 rem trick with simultaneous iteration over 2 list in the same time
 (
   for /f "usebackq eol=# tokens=* delims=" %%i in ("%RENAME_TO_LIST_FILE_TMP%") do (
@@ -98,9 +102,7 @@ rem trick with simultaneous iteration over 2 list in the same time
   )
 ) < "%RENAME_FROM_LIST_FILE_TMP%"
 
-endlocal
-
-exit /b 0
+exit /b
 
 :PROCESS_RENAME
 if not defined FROM_FILE_PATH exit /b 1
@@ -138,10 +140,11 @@ call :CMD pushd "%%FROM_FILE_DIR%%" && (
   rem rename through the shell
   call :RENAME_FILE SHELL "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 )
+set LASTERROR=%ERRORLEVEL%
 
 call :CMD popd
 
-exit /b
+exit /b %LASTERROR%
 
 :RENAME_FILE
 set "MODE=%~1"

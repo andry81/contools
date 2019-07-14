@@ -8,10 +8,10 @@ set "?~nx0=%~nx0"
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
-
 rem script flags
 set PAUSE_ON_EXIT=0
+
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
@@ -43,6 +43,8 @@ if defined FLAG (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
+
+  shift
 
   rem read until no flags
   goto FLAGS_LOOP

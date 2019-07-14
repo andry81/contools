@@ -63,6 +63,11 @@ if defined CONFIGURE_TO_DIR (
 
 rem pre calls to configure in an outter directory
 if defined CONFIGURE_TO_DIR (
+  if exist "%CONFIGURE_TO_DIR%/ButtonBars\" (
+    echo.%~nx0: error: ButtonBars directory is already exist, you have to backup and remove it manually: "%CONFIGURE_TO_DIR%/ButtonBars"
+    exit /b 10
+  ) >&2
+
   call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/Tools" "%%CONTOOLS_ROOT_COPY%%" /E /Y /D || exit /b
   call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/converters" "%%CONFIGURE_TO_DIR%%/converters" /S /Y /D || exit /b
   call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/scm" "%%CONFIGURE_TO_DIR%%/scm" /S /Y /D || exit /b
@@ -124,7 +129,7 @@ call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "copy_file_to_files_b
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/ToolAdaptors/ffmpeg" "%%TOTALCMD_ROOT%%/converters/ffmpeg" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk" "*.*" "%%TOTALCMD_ROOT%%" /S /Y /D || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk" "cmd*.*" "%%TOTALCMD_ROOT%%" /S /Y /D || exit /b
 
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/vbs" "call*.vbs" "%%TOTALCMD_ROOT%%" /S /Y /D || exit /b
 

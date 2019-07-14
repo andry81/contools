@@ -8,15 +8,19 @@ set "?~nx0=%~nx0"
 
 call "%%?~dp0%%__init__.bat" || goto :EOF
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
-
 rem script flags
 set PAUSE_ON_EXIT=0
+set RESTORE_LOCALE=0
+
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
@@ -26,7 +30,7 @@ exit /b %LASTERROR%
 
 :MAIN
 rem script flags
-set FLAG_PATHS_FROM_UTF16=0
+set FLAG_CONVERT_FROM_UTF16=0
 
 :FLAGS_LOOP
 
@@ -43,7 +47,7 @@ if defined FLAG (
     set "FLAG_FILE_TO_COPY=%~2"
     shift
   ) else if "%FLAG%" == "-from_utf16" (
-    set FLAG_PATHS_FROM_UTF16=1
+    set FLAG_CONVERT_FROM_UTF16=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -67,9 +71,10 @@ if exist "%FLAG_FILE_TO_COPY%\" (
 
 set "COPY_TO_FILES_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
 
-if %FLAG_PATHS_FROM_UTF16% NEQ 0 (
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+  set RESTORE_LOCALE=1
 
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
@@ -84,8 +89,6 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in ("%COPY_TO_FILES_IN_LIST_FILE_TM
   set TO_FILE_PATH=%%i
   call :PROCESS_FILE_PATH
 )
-
-if %FLAG_PATHS_FROM_UTF16% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 exit /b
 

@@ -2,13 +2,13 @@
 Buttoncount=3
 button1=c:\Total Commander Scripts\images\compare_files_in_list.ico
 cmd1=call_nowindow.vbs
-param1=compare_files_by_list.bat -wait "%P" %L
+param1=compare_files_by_list.bat -wait -from_utf16 "%P" %WL
 path1=c:\Total Commander Scripts\
 iconic1=0
 menu1=compare 2 files in one panel
 button2=c:\Total Commander Scripts\images\compare_files_in_sorted_list.ico
 cmd2=call_nowindow.vbs
-param2=compare_sorted_files_by_list.bat -wait "%P" %L
+param2=compare_sorted_files_by_list.bat -wait -from_utf16 "%P" %WL
 path2=c:\Total Commander Scripts\
 iconic2=0
 menu2=compare 2 sorted files in one panel

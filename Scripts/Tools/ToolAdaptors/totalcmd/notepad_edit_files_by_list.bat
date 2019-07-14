@@ -8,10 +8,10 @@ set "?~nx0=%~nx0"
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
-
 rem script flags
 set PAUSE_ON_EXIT=0
+
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
@@ -108,6 +108,7 @@ call :CMD "%%CONTOOLS_ROOT%%/encoding/convert_utf16le_to_utf8.bat" "%%LIST_FILE_
 :IGNORE_CONVERT_TO_UTF8
 
 rem call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CHCP%%
+rem set RESTORE_LOCALE=1
 
 rem create Notepad++ only session file
 (
@@ -129,7 +130,8 @@ rem create Notepad++ only session file
   echo.^</NotepadPlus^>
 ) >> "%EDIT_FROM_LIST_FILE_TMP%"
 
-rem call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+rem restore locale
+rem if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   call :CMD start /B /WAIT "" "%%NPP_EDITOR%%"%%BARE_FLAGS%% -openSession "%%EDIT_FROM_LIST_FILE_TMP%%"
