@@ -1,4 +1,8 @@
 2019.07.14:
+* fixed: ButtonBars/_menu.bar: missed svn menu bar usage
+* new: svn menu icon
+
+2019.07.14:
 * fixed: flags parse bug in scripts in the previous change
 * fixed: multiple fixes for locale restore on a script exit
 * fixed: `configure.bat` backup and copy logic is improved

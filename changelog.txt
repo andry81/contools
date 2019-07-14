@@ -1,4 +1,8 @@
 2019.07.14:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars/_menu.bar: missed svn menu bar usage
+* new: Scripts/Tools/ToolAdaptors/totalcmd: svn menu icon
+
+2019.07.14:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: flags parse bug in scripts in the previous change
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: multiple fixes for locale restore on a script exit
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: `configure.bat` backup and copy logic is improved
