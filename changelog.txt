@@ -1,3 +1,13 @@
+2019.07.14:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: flags parse bug in scripts in the previous change
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: multiple fixes for locale restore on a script exit
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: `configure.bat` backup and copy logic is improved
+* new: Scripts/Tools/ToolAdaptors/totalcmd: `compare_files*.bat` and `compare_sorted_files*.bat` now can compare unicode file paths
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: `compare_sorted_files*.bat` scripts now use temporary directory instead of a directory with files being compared
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+* refactor: Scripts/Tools: minor refactor
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: `compare_files*.bat` and `compare_sorted_files*.bat` refactored to use a common base code and so error codes
+
 2019.07.13:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: accidental pause on exit in multiple scripts, attach the pause to the `-pause_on_exit` to explicitly pause on exit (must be removed in case of call to `call_nowindow*.vbs`)
 * new: Scripts/Tools/ToolAdaptors/totalcmd: notepad icons

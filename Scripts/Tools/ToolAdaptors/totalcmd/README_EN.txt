@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.07.13
+* 2019.07.14
 * Toolbar buttons configuration for the Total Commander.
 
 1. CONFIGURE
@@ -37,7 +37,7 @@
 
 3.6. Open SVN Log for selected files and directories together
 
-3.7. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes).
+3.7. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes)
 3.7.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes.
 3.7.2. Method #2. Window per unique repository root with or without versioned changes in respective WC directory.
 3.7.3. Method #3. Window per command line WC directory with or without versioned changes.
@@ -51,11 +51,13 @@
 
 3.9. One pane comparison for 2 selected files
 3.9.1. Method #1. By path list from ANSI text file.
-3.9.2. Method #2. By path list from command line.
+3.9.2. Method #2. By path list from UNICODE text file.
+3.9.3. Method #3. By path list from command line.
 
 3.10. One pane comparison for 2 selected files with sorted content
 3.10.1. Method #1. By path list from ANSI text file.
-3.10.2. Method #2. By path list from command line.
+3.10.2. Method #2. By path list from UNICODE text file.
+3.10.3. Method #3. By path list from command line.
 
 3.11. Shell/SVN/GIT files batch move
 3.11.1. Method #1. Move files by selection list from ANSI text file.
@@ -396,7 +398,7 @@ call_nowindow.vbs
 scm\tortoisesvn\TortoiseProc.bat /command:log "%P" %S
 
 ------------------------------------------------------------------------------
-3.7. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes).
+3.7. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes)
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
@@ -473,14 +475,21 @@ call_nowindow.vbs
 compare_files_by_list.bat -wait "%P" %L
 
 ------------------------------------------------------------------------------
-3.9.2. Method #2. By path list from command line.
+3.9.2. Method #2. By path list from UNICODE text file.
+------------------------------------------------------------------------------
+
+call_nowindow.vbs
+compare_files_by_list.bat -wait "%P" %WL
+
+------------------------------------------------------------------------------
+3.9.3. Method #3. By path list from command line.
 ------------------------------------------------------------------------------
 
 call_nowindow.vbs
 compare_files.bat -wait "%P" %S
 
 ------------------------------------------------------------------------------
-3.10. One pane comparison for 2 selected files with sorted content.
+3.10. One pane comparison for 2 selected files with sorted content
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
@@ -491,7 +500,14 @@ call_nowindow.vbs
 compare_sorted_files_by_list.bat -wait "%P" %L
 
 ------------------------------------------------------------------------------
-3.10.2. Method #2. By path list from command line.
+3.10.2. Method #2. By path list from UNICODE text file.
+------------------------------------------------------------------------------
+
+call_nowindow.vbs
+compare_sorted_files_by_list.bat -wait "%P" %WL
+
+------------------------------------------------------------------------------
+3.10.3. Method #3. By path list from command line.
 ------------------------------------------------------------------------------
 
 call_nowindow.vbs
@@ -500,6 +516,11 @@ compare_sorted_files.bat -wait "%P" %S
 ------------------------------------------------------------------------------
 3.11. Shell/SVN/GIT files batch move
 ------------------------------------------------------------------------------
+
+CAUTION:
+  All version control (svn/git) scripts would use the shell logic if a version
+  control logic is not applicable. For example, if selected files or
+  directories is not under version control.
 
 ------------------------------------------------------------------------------
 3.11.1. Method #1. Move files by selection list from ANSI text file.
@@ -543,6 +564,11 @@ scm\git\git_move_files_by_list.bat -from_utf16 "%P" %WL
 3.12. Shell/SVN/GIT files batch rename
 ------------------------------------------------------------------------------
 
+CAUTION:
+  All version control (svn/git) scripts would use the shell logic if a version
+  control logic is not applicable. For example, if selected files or
+  directories is not under version control.
+
 ------------------------------------------------------------------------------
 3.12.1. Method #1. Rename files by selection list from ANSI text file.
 ------------------------------------------------------------------------------
@@ -584,6 +610,11 @@ scm\git\git_rename_files_by_list.bat -from_utf16 "%P" %WL
 ------------------------------------------------------------------------------
 3.13. Shell/SVN/GIT files batch copy
 ------------------------------------------------------------------------------
+
+CAUTION:
+  All version control (svn/git) scripts would use the shell logic if a version
+  control logic is not applicable. For example, if selected files or
+  directories is not under version control.
 
 ------------------------------------------------------------------------------
 3.13.1. Method #1. Copy files by selection list from ANSI text file.

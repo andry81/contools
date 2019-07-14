@@ -35,33 +35,37 @@ if defined FLAG (
 set "PWD=%~1"
 shift
 
-set "FILES_LIST="
-set NUM_FILES=0
-
 if not defined PWD goto NOPWD
 cd /d "%PWD%" || exit /b 1
 
 :NOPWD
 
+set "FILES_LIST="
+set NUM_FILES=0
+
 rem read selected file names into variable
 :CURDIR_FILTER_LOOP
 if "%~1" == "" goto CURDIR_FILTER_LOOP_END
 rem must be files, not sub directories
-if exist "%~1\" exit /b 2
-set FILES_LIST=%FILES_LIST% %1
+if exist "%~1\" exit /b 4
+
+if %NUM_FILES% EQU 0 (
+  set FILES_LIST=%1
+) else if %NUM_FILES% EQU 1 (
+  set FILES_LIST=%FILES_LIST% %1
+)
 
 set /A NUM_FILES+=1
 
 rem only 2 first files from the list are accepted
-if %NUM_FILES% GEQ 2 goto CURDIR_FILTER_LOOP_END
+if %NUM_FILES% GTR 2 exit /b 2
 
 shift
 
 goto CURDIR_FILTER_LOOP
 
 :CURDIR_FILTER_LOOP_END
-
-if %NUM_FILES% EQU 0 exit /b 0
+if %NUM_FILES% NEQ 2 exit /b 2
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   call :CMD start /B /WAIT "" "%%COMPARE_TOOL%%" /wait %%FILES_LIST%%
@@ -69,7 +73,7 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
   call :CMD start /B "" "%%COMPARE_TOOL%%" /nowait %%FILES_LIST%%
 )
 
-exit /b 0
+exit /b
 
 :CMD
 echo.^>%*

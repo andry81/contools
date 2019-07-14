@@ -8,15 +8,19 @@ set "?~nx0=%~nx0"
 
 call "%%?~dp0%%__init__.bat" || goto :EOF
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
-
 rem script flags
 set PAUSE_ON_EXIT=0
+set RESTORE_LOCALE=0
+
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
@@ -41,11 +45,12 @@ if defined FLAG (
     set PAUSE_ON_EXIT=1
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
-    shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
+
+  shift
 
   rem read until no flags
   goto FLAGS_LOOP
@@ -76,6 +81,7 @@ set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.ls
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+  set RESTORE_LOCALE=1
 )
 
 if not "%~1" == "" (
@@ -127,10 +133,11 @@ for /f "usebackq eol=# tokens=* delims=" %%j in ("%CREATE_FILES_LIST_FILE_TMP%")
   set "CREATE_FILE_PATH=%%j"
   call :PROCESS_CREATE_FILES
 )
+set LASTERROR=%ERRORLEVEL%
 
 call :CMD popd
 
-exit /b 0
+exit /b %LASTERROR%
 
 :PROCESS_CREATE_FILES
 set /A LINE_INDEX+=1
