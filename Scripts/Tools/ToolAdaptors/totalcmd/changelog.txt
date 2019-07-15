@@ -1,4 +1,7 @@
 2019.07.15:
+* refactor: icons rename
+
+2019.07.15:
 * changed: ButtonBars: switched `svn.bar` from `TortoiseProc.bat` (ansi only) script to `TortoiseProcByList.bat` (w/ unicode) script usage
 
 2019.07.14:

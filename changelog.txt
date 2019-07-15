@@ -1,4 +1,7 @@
 2019.07.15:
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: icons rename
+
+2019.07.15:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars: switched `svn.bar` from `TortoiseProc.bat` (ansi only) script to `TortoiseProcByList.bat` (w/ unicode) script usage
 
 2019.07.14:
