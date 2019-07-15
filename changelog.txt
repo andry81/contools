@@ -1,4 +1,9 @@
 2019.07.15:
+* new: Scripts/Tools/ToolAdaptors/totalcmd: saveload lists edit
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: minor button bars refactor
+
+2019.07.15:
 * refactor: Scripts/Tools/ToolAdaptors/totalcmd: icons rename
 
 2019.07.15:

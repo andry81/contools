@@ -314,6 +314,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/compare.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/copy.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/copy_file_to_files_by_list.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/create.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/edit_saveload_file_list.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/load.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/move.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/notepad.bar -text
@@ -335,6 +336,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/converters/ffmpeg/ffmpeg_convert_by_list.bat
 Scripts/Tools/ToolAdaptors/totalcmd/copy_file_to_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/create_dirs_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/create_empty_files_by_list.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/edit_file_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/COPYING -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/README.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/icobundl.exe -text
@@ -353,6 +355,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/create_dirs.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/create_dirs_in_dirs.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/create_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/create_files_in_dirs.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/edit_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/ffmpeg_concat_by_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/git_copy_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/git_move_files.ico -text
@@ -361,6 +364,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/load_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_compare_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_copy_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_create_dirs_and_files.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/menu_edit_saveload_file_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_load_file_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_notepad.ico -text
