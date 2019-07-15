@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.07.14
+* 2019.07.15
 * Toolbar buttons configuration for the Total Commander.
 
 1. CONFIGURE
@@ -90,8 +90,9 @@
 3.17. Concatenate video files
 
 3.18. Save/Load file selection list to/from a saveload slot
-3.18.1. Save file selection list to a saveslot
-3.18.2. Load file selection list from a saveslot
+3.18.1. Save file selection list to a saveload slot
+3.18.2. Load file selection list from a saveload slot
+3.18.3. Edit a saveload slot list
 
 4. AUTHOR
 
@@ -752,37 +753,25 @@ for minimal steps or mouse clicks you have to make some preparations before the
 usage.
 
 ------------------------------------------------------------------------------
-3.18.1. Save file selection list to a saveslot
+3.18.1. Save file selection list to a saveload slot
 ------------------------------------------------------------------------------
 
-At first, you have to set all required variables in the `profile.vars`:
-
-* SAVELOAD_ROOT
-* SAVELOAD_FILE_LISTS_DIR
-
-After that you can create the buttons:
-
-For ANSI file paths:
-
 call.vbs
-save_file_list.bat -timeout_to_close_sec <timeout_to_close_sec> -to_file_name "<file_name>" "%P" %L
-
-For UNICODE file paths:
-
-call.vbs
-save_file_list.bat -timeout_to_close_sec <timeout_to_close_sec> -to_file_name "<file_name>" "%P" %WL
+save_file_list.bat [-pause_on_exit] [-pause_on_error] [-pause_timeout_sec <pause_timeout_sec>] -to_file_name "<file_name>" "%P" %WL
 
 Where:
+  * `-pause_on_exit` - always pause on exit.
+  * `-pause_on_error` - pause on exit only if an error.
   * `<file_name>` - file name with extension relative to the current
     directory `%P` there the file paths list would be saved.
-  * `<timeout_to_close_sec>` - timeout in seconds before close a console
-    window.
+  * `<pause_timeout_sec>` - timeout in seconds while in a pause (if enabled)
+    before close a console window.
 
 The files name must be by the same path as in the
 `saveload_search_in_slot_<INDEX_STR>_SearchIn` variables in below section.
 
 ------------------------------------------------------------------------------
-3.18.2. Load file selection list from a saveslot
+3.18.2. Load file selection list from a saveload slot
 ------------------------------------------------------------------------------
 
 At first, you have to create search template in your main configuration file of
@@ -816,6 +805,20 @@ LOADSEARCH saveload_search_in_slot_<INDEX_STR>
 Then you can click on the button to open the respective `Find Files` dialog.
 Next click to the find button would show the last saved file paths list which
 you can feed to the Total Commander last active panel.
+
+------------------------------------------------------------------------------
+3.18.3. Edit a saveload slot list
+------------------------------------------------------------------------------
+
+call.vbs
+save_file_list.bat [-pause_on_exit] [-pause_on_error] [-pause_timeout_sec <pause_timeout_sec>] "<list_file_path>"
+
+Where:
+  * `-pause_on_exit` - always pause on exit.
+  * `-pause_on_error` - pause on exit only if an error.
+  * `<list_file_path>` - a list file path there the file paths is stored.
+  * `<pause_timeout_sec>` - timeout in seconds while in a pause (if enabled)
+    before close a console window.
 
 ------------------------------------------------------------------------------
 4. AUTHOR

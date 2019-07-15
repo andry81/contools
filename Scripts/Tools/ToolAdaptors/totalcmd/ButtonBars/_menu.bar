@@ -1,5 +1,5 @@
 [Buttonbar]
-Buttoncount=18
+Buttoncount=19
 button1=c:\Total Commander Scripts\images\cmd6432_group.ico
 cmd1=C:\Total Commander Scripts\ButtonBars\cmd.bar
 iconic1=1
@@ -42,7 +42,7 @@ button15=C:\Total Commander Scripts\images\ffmpeg_concat_by_list.ico
 cmd15=call.vbs
 param15=converters\ffmpeg\ffmpeg_convert_by_list.bat -wait -pause_on_exit %L "%T"
 path15=c:\Total Commander Scripts\
-menu15=ffmpeg concat by list
+menu15=ffmpeg concat by selection list
 button16=
 button17=C:\Total Commander Scripts\images\menu_save_file_list.ico
 cmd17=C:\Total Commander Scripts\ButtonBars\save.bar
@@ -52,3 +52,7 @@ button18=C:\Total Commander Scripts\images\menu_load_file_list.ico
 cmd18=C:\Total Commander Scripts\ButtonBars\load.bar
 iconic18=1
 menu18=Load selected file list from...
+button19=C:\Total Commander Scripts\images\menu_edit_saveload_file_list.ico
+cmd19=C:\Total Commander Scripts\ButtonBars\edit_saveload_file_list.bar
+iconic19=1
+menu19=Edit saveload file list...

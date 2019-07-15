@@ -83,7 +83,7 @@ if %FLAG_WAIT_EXIT% NEQ 0 (
   )
 )
 
-exit /b 0
+exit /b
 
 :CMD
 echo.^>%*

@@ -125,6 +125,7 @@ call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files_b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_new_session.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "save_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "load_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "edit_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "copy_file_to_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/ToolAdaptors/ffmpeg" "%%TOTALCMD_ROOT%%/converters/ffmpeg" /S /Y /D || exit /b
