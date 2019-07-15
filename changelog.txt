@@ -1,3 +1,6 @@
+2019.07.15:
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars: switched `svn.bar` from `TortoiseProc.bat` (ansi only) script to `TortoiseProcByList.bat` (w/ unicode) script usage
+
 2019.07.14:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars/_menu.bar: missed svn menu bar usage
 * new: Scripts/Tools/ToolAdaptors/totalcmd: svn menu icon
