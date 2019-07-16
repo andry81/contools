@@ -1,4 +1,8 @@
 2019.07.16:
+* new: Scripts/Tools/ToolAdaptors/totalcmd: `-chcp` flags for scripts which does consume the input by the command line to enable read the unicode strings (not from a file list)
+* new: Scripts/Tools/ToolAdaptors/totalcmd: `-pause_on_exit` flags for scripts which does consume the input by the command line (not from a file list)
+
+2019.07.16:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: missed changes
 
 2019.07.15:

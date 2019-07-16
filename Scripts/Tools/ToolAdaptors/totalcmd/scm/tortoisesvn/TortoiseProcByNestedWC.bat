@@ -25,6 +25,12 @@ set "TORTOISEPROC_PATHFILE_FILTER_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf-filter.l
 set "TORTOISEPROC_PATHFILE_NOT_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf-not-orphan-externals.lst"
 set "TORTOISEPROC_PATHFILE_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf-orphan-externals.lst"
 
+rem script flags
+set PAUSE_ON_EXIT=0
+set RESTORE_LOCALE=0
+
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
+
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
@@ -251,6 +257,9 @@ exit /b 0
 set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
@@ -259,9 +268,14 @@ rem   rem delete the external file in case if left behind
 rem   del /F /Q /A:-D "%TORTOISEPROC_PATHFILE_UCS16LE_TMP%"
 rem )
 
+if %PAUSE_ON_EXIT% NEQ 0 pause
+
 exit /b %LASTERROR%
 
 :MAIN
+rem script flags
+set "FLAG_CHCP="
+
 rem wait TrotoiseProc.exe to exit
 set FLAG_WAIT_EXIT=0
 rem single window for all changes
@@ -300,43 +314,43 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-wait" (
-    set FLAG_WAIT_EXIT=1
+  if "%FLAG%" == "-pause_on_exit" (
+    set PAUSE_ON_EXIT=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
     shift
+  ) else if "%FLAG%" == "-wait" (
+    set FLAG_WAIT_EXIT=1
   ) else if "%FLAG%" == "-all-in-one" (
     set FLAG_ALL_IN_ONE=1
     set FLAG_WINDOW_PER_WCDIR=0
     set FLAG_WINDOW_PER_WCROOT=0
     set FLAG_WINDOW_PER_REPOROOT=0
-    shift
   ) else if "%FLAG%" == "-window-per-wcdir" (
     set FLAG_ALL_IN_ONE=0
     set FLAG_WINDOW_PER_WCDIR=1
     set FLAG_WINDOW_PER_WCROOT=0
     set FLAG_WINDOW_PER_REPOROOT=0
-    shift
   ) else if "%FLAG%" == "-window-per-wcroot" (
     set FLAG_ALL_IN_ONE=0
     set FLAG_WINDOW_PER_WCDIR=0
     set FLAG_WINDOW_PER_WCROOT=1
     set FLAG_WINDOW_PER_REPOROOT=0
-    shift
   ) else if "%FLAG%" == "-window-per-reporoot" (
     set FLAG_ALL_IN_ONE=0
     set FLAG_WINDOW_PER_WCDIR=0
     set FLAG_WINDOW_PER_WCROOT=0
     set FLAG_WINDOW_PER_REPOROOT=1
-    shift
   ) else if "%FLAG%" == "-force-use-workingset-paths-wo-versioned-changes" (
     set FLAG_FORCE_USE_WORKINGSET_PATHS_WITHOUT_VERSIONED_CHANGES=1
-    shift
   ) else if "%FLAG%" == "-force-use-not-orphan-external-paths" (
     set FLAG_FORCE_USE_NOT_ORPHAN_EXTERNAL_PATHS=1
-    shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
+
+  shift
 
   rem read until no flags
   goto FLAGS_LOOP
@@ -379,8 +393,6 @@ if %FLAG_WINDOW_PER_REPOROOT% EQU 0 (
   set FLAG_INTERNAL_USE_UNVERSIONED_WORKINGSET_PATHS=1
 )
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
-
 rem special initialized
 set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%TORTOISEPROC_PATHFILE_NAME_ANSI_CRLF_TMP%"
 set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%TORTOISEPROC_PATHFILE_FILTERED_NAME_ANSI_CRLF_TMP%"
@@ -391,6 +403,11 @@ set "WORKINGSET_PATH_INFO_TEXT_TMP=%SCRIPT_TEMP_CURRENT_DIR%\$info.txt"
 set "WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\externals_db"
 set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP=%WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP%\{{REF}}.lst"
 set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%SCRIPT_TEMP_CURRENT_DIR%\external_paths.lst"
+
+if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%FLAG_CHCP%"
+  set RESTORE_LOCALE=1
+)
 
 rem create empty files
 if %FLAG_WINDOW_PER_WCDIR% EQU 0 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
