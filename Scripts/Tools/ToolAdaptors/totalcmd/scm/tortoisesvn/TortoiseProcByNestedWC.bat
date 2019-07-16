@@ -27,6 +27,8 @@ set "TORTOISEPROC_PATHFILE_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP=pathfile-ansi-crl
 
 rem script flags
 set FLAG_PAUSE_ON_EXIT=0
+set FLAG_PAUSE_ON_ERROR=0
+set FLAG_PAUSE_TIMEOUT_SEC=0
 set RESTORE_LOCALE=0
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
@@ -268,14 +270,21 @@ rem   rem delete the external file in case if left behind
 rem   del /F /Q /A:-D "%TORTOISEPROC_PATHFILE_UCS16LE_TMP%"
 rem )
 
-if %FLAG_PAUSE_ON_EXIT% NEQ 0 pause
+if %FLAG_PAUSE_ON_EXIT% NEQ 0 (
+  if %FLAG_PAUSE_TIMEOUT_SEC% NEQ 0 (
+    timeout /T %FLAG_PAUSE_TIMEOUT_SEC%
+  ) else pause
+) else if %LASTERROR% NEQ 0 if %FLAG_PAUSE_ON_ERROR% NEQ 0 (
+  if %FLAG_PAUSE_TIMEOUT_SEC% NEQ 0 (
+    timeout /T %FLAG_PAUSE_TIMEOUT_SEC%
+  ) else pause
+)
 
 exit /b %LASTERROR%
 
 :MAIN
 rem script flags
 set "FLAG_CHCP="
-
 rem wait TrotoiseProc.exe to exit
 set FLAG_WAIT_EXIT=0
 rem single window for all changes
@@ -316,7 +325,12 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-pause_on_exit" (
     set FLAG_PAUSE_ON_EXIT=1
-  ) else if "%FLAG%" == "-chcp" (
+  ) if "%FLAG%" == "-pause_on_error" (
+    set FLAG_PAUSE_ON_ERROR=1
+  ) else if "%FLAG%" == "-pause_timeout_sec" (
+    set "FLAG_PAUSE_TIMEOUT_SEC=%~2"
+    shift
+  ) else else if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
   ) else if "%FLAG%" == "-wait" (

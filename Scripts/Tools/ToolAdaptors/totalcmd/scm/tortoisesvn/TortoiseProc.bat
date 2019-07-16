@@ -10,6 +10,8 @@ call "%%?~dp0%%__init__.bat" || exit /b
 
 rem script flags
 set FLAG_PAUSE_ON_EXIT=0
+set FLAG_PAUSE_ON_ERROR=0
+set FLAG_PAUSE_TIMEOUT_SEC=0
 set RESTORE_LOCALE=0
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
@@ -24,7 +26,15 @@ if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
-if %FLAG_PAUSE_ON_EXIT% NEQ 0 pause
+if %FLAG_PAUSE_ON_EXIT% NEQ 0 (
+  if %FLAG_PAUSE_TIMEOUT_SEC% NEQ 0 (
+    timeout /T %FLAG_PAUSE_TIMEOUT_SEC%
+  ) else pause
+) else if %LASTERROR% NEQ 0 if %FLAG_PAUSE_ON_ERROR% NEQ 0 (
+  if %FLAG_PAUSE_TIMEOUT_SEC% NEQ 0 (
+    timeout /T %FLAG_PAUSE_TIMEOUT_SEC%
+  ) else pause
+)
 
 exit /b %LASTERROR%
 
@@ -46,6 +56,11 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-pause_on_exit" (
     set FLAG_PAUSE_ON_EXIT=1
+  ) else if "%FLAG%" == "-pause_on_error" (
+    set FLAG_PAUSE_ON_ERROR=1
+  ) else if "%FLAG%" == "-pause_timeout_sec" (
+    set "FLAG_PAUSE_TIMEOUT_SEC=%~2"
+    shift
   ) else if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift

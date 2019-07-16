@@ -1,4 +1,9 @@
 2019.07.16:
+* new: `-pause_on_error` and `-pause_timeout_sec` command line flags to rest of scripts
+* changed: switched the `svn.bar` to use `-chcp 65001` flag over the `TortoiseProcByNestedWC.bat` script calls
+* changed: switched the `svn.bar` to use `call.vbs` script and `-pause_on_error` flag currently as a more reliable
+
+2019.07.16:
 * refactor: minor refactor
 
 2019.07.16:
