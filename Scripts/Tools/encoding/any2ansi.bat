@@ -2,12 +2,28 @@
 
 setlocal
 
-call "%%~dp0__init__.bat" || exit /b
-
 set "?~nx0=%~nx0"
 
+call "%%~dp0__init__.bat" || exit /b
+
 rem script flags
-rem set FLAG_USE_BOM=0
+set FLAG_PAUSE_ON_EXIT=0
+set RESTORE_LOCALE=0
+
+call :MAIN %%*
+set LASTERROR=%ERRORLEVEL%
+
+:EXIT_MAIN
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+
+if %FLAG_PAUSE_ON_EXIT% NEQ 0 pause
+
+exit /b %LASTERROR%
+
+:MAIN
+rem script flags
+set "FLAG_CHCP="
 
 :FLAGS_LOOP
 
@@ -18,14 +34,17 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  rem if "%FLAG%" == "-bom" (
-  rem   set FLAG_USE_BOM=1
-  rem   shift
-  rem ) else
-  (
+  if "%FLAG%" == "-pause_on_exit" (
+    set FLAG_PAUSE_ON_EXIT=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
+  ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
+
+  shift
 
   rem read until no flags
   goto FLAGS_LOOP
@@ -45,14 +64,22 @@ if not exist "%INPUT_FILE%" (
   exit /b 2
 ) >&2
 
-if not defined OUTPUT_CHARSET call :GET_CURRENT_CODE_PAGE
+if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%FLAG_CHCP%"
+  set RESTORE_LOCALE=1
+  if not defined OUTPUT_CHARSET set "OUTPUT_CHARSET=CP%FLAG_CHCP%"
+) else if not defined OUTPUT_CHARSET call :GET_CURRENT_CODE_PAGE
 
-"%GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
+rem workaround for `conversion from CP65001 unsupported`
+if "%OUTPUT_CHARSET%" == "CP65001" (
+  "%GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t UTF-8 "%INPUT_FILE%"
+) else (
+  "%GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
+)
 exit /b
 
 :GET_CURRENT_CODE_PAGE
 for /F "usebackq eol=	 tokens=2 delims=:" %%i in (`chcp 2^>nul`) do set CURRENT_CODE_PAGE=%%i
 rem convert chcp codepage into iconv namespace
 set OUTPUT_CHARSET=CP%CURRENT_CODE_PAGE: =%
-
 exit /b 0
