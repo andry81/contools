@@ -1,6 +1,9 @@
 2019.07.16:
-* new: `-chcp` flags for scripts which does consume the input by the command line to enable read the unicode strings (not from a file list)
-* new: `-pause_on_exit` flags for scripts which does consume the input by the command line (not from a file list)
+* refactor: flags global rename
+
+2019.07.16:
+* new: `-chcp` flag for scripts which does consume the input by the command line to enable read the unicode strings (not from a file list)
+* new: `-pause_on_exit` flag for scripts which does consume the input by the command line (not from a file list)
 
 2019.07.16:
 * changed: missed changes
