@@ -10,6 +10,7 @@ call "%%?~dp0%%__init__.bat" || exit /b
 
 rem script flags
 set PAUSE_ON_EXIT=0
+set RESTORE_LOCALE=0
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
@@ -17,6 +18,9 @@ call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
@@ -26,6 +30,7 @@ exit /b %LASTERROR%
 
 :MAIN
 rem script flags
+set "FLAG_CHCP="
 set FLAG_WAIT_EXIT=0
 
 :FLAGS_LOOP
@@ -39,6 +44,9 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-pause_on_exit" (
     set PAUSE_ON_EXIT=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else if "%FLAG%" == "-wait" (
     set FLAG_WAIT_EXIT=1
   ) else (
@@ -70,6 +78,11 @@ set "FILE_IN_1=%~1"
 set "FILE_IN_2=%~2"
 set "FILE_OUT_1=%SCRIPT_TEMP_CURRENT_DIR%\%~n1.~%RANDOM_VALUE1%%~x1"
 set "FILE_OUT_2=%SCRIPT_TEMP_CURRENT_DIR%\%~n2.~%RANDOM_VALUE2%%~x2"
+
+if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%FLAG_CHCP%"
+  set RESTORE_LOCALE=1
+)
 
 rem read selected file names into variable
 :CURDIR_FILTER_LOOP

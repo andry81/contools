@@ -10,6 +10,7 @@ call "%%?~dp0%%__init__.bat" || exit /b
 
 rem script flags
 set PAUSE_ON_EXIT=0
+set RESTORE_LOCALE=0
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
@@ -17,6 +18,9 @@ call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
@@ -25,6 +29,9 @@ if %PAUSE_ON_EXIT% NEQ 0 pause
 exit /b %LASTERROR%
 
 :MAIN
+rem script flags
+set "FLAG_CHCP="
+
 rem builtin defaults
 if not defined TORTOISEPROC_MAX_SPAWN_CALLS set TORTOISEPROC_MAX_SPAWN_CALLS=10
 
@@ -39,6 +46,9 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-pause_on_exit" (
     set PAUSE_ON_EXIT=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -65,6 +75,11 @@ set "PROPS_PATH_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\props_path_list.lst"
 
 rem calculate maximum busy tasks to wait after, open only TORTOISEPROC_MAX_SPAWN_CALLS windows at the same time
 set MAX_SPAWN_TASKS=0
+
+if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%FLAG_CHCP%"
+  set RESTORE_LOCALE=1
+)
 
 rem create empty file
 type nul > "%PROPS_PATH_LIST_FILE_TMP%"

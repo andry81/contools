@@ -9,6 +9,28 @@ set "?~nx0=%~nx0"
 call "%%?~dp0%%__init__.bat" || exit /b
 
 rem script flags
+set PAUSE_ON_EXIT=0
+set RESTORE_LOCALE=0
+
+rem call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
+
+call :MAIN %%*
+set LASTERROR=%ERRORLEVEL%
+
+:EXIT_MAIN
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+
+rem cleanup temporary files
+rem call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
+
+if %PAUSE_ON_EXIT% NEQ 0 pause
+
+exit /b %LASTERROR%
+
+:MAIN
+rem script flags
+set "FLAG_CHCP="
 set FLAG_WAIT_EXIT=0
 set FLAG_NOTEPADPLUSPLUS=0
 set "BARE_FLAGS="
@@ -22,7 +44,12 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-wait" (
+  if "%FLAG%" == "-pause_on_exit" (
+    set PAUSE_ON_EXIT=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
+  ) else if "%FLAG%" == "-wait" (
     set FLAG_WAIT_EXIT=1
   ) else if "%FLAG%" == "-npp" (
     set FLAG_NOTEPADPLUSPLUS=1
@@ -46,6 +73,11 @@ cd /d "%PWD%" || exit /b 1
 
 set "FILES_LIST="
 set NUM_FILES=0
+
+if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%FLAG_CHCP%"
+  set RESTORE_LOCALE=1
+)
 
 rem read selected file names into variable
 :CURDIR_FILTER_LOOP
