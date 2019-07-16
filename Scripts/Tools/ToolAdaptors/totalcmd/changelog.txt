@@ -1,3 +1,6 @@
+2019.07.16:
+* changed: missed changes
+
 2019.07.15:
 * new: saveload lists edit
 * changed: readme update

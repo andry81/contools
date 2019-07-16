@@ -347,6 +347,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/cmd32_admin.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/cmd64.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/cmd6432_group.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/cmd64_admin.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/compare_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare_files_black.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare_files_in_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare_files_in_sorted_list.ico -text
