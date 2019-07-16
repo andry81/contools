@@ -9,7 +9,7 @@ set "?~nx0=%~nx0"
 call "%%?~dp0%%__init__.bat" || exit /b
 
 rem script flags
-set PAUSE_ON_EXIT=0
+set FLAG_PAUSE_ON_EXIT=0
 set RESTORE_LOCALE=0
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
@@ -24,7 +24,7 @@ if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
-if %PAUSE_ON_EXIT% NEQ 0 pause
+if %FLAG_PAUSE_ON_EXIT% NEQ 0 pause
 
 exit /b %LASTERROR%
 
@@ -42,7 +42,7 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
   if "%FLAG%" == "-pause_on_exit" (
-    set PAUSE_ON_EXIT=1
+    set FLAG_PAUSE_ON_EXIT=1
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
   ) else (

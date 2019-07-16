@@ -26,7 +26,7 @@ set "TORTOISEPROC_PATHFILE_NOT_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP=pathfile-ansi
 set "TORTOISEPROC_PATHFILE_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf-orphan-externals.lst"
 
 rem script flags
-set PAUSE_ON_EXIT=0
+set FLAG_PAUSE_ON_EXIT=0
 set RESTORE_LOCALE=0
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
@@ -268,7 +268,7 @@ rem   rem delete the external file in case if left behind
 rem   del /F /Q /A:-D "%TORTOISEPROC_PATHFILE_UCS16LE_TMP%"
 rem )
 
-if %PAUSE_ON_EXIT% NEQ 0 pause
+if %FLAG_PAUSE_ON_EXIT% NEQ 0 pause
 
 exit /b %LASTERROR%
 
@@ -315,7 +315,7 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
   if "%FLAG%" == "-pause_on_exit" (
-    set PAUSE_ON_EXIT=1
+    set FLAG_PAUSE_ON_EXIT=1
   ) else if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
