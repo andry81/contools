@@ -345,7 +345,6 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/by_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/cmd32.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/cmd32_admin.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/cmd64.ico -text
-Scripts/Tools/ToolAdaptors/totalcmd/images/cmd6432_group.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/cmd64_admin.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/compare_files_black.ico -text
@@ -362,6 +361,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/git_copy_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/git_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/git_rename_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/load_list.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/menu_cmd6432.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_compare_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_copy_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_create_dirs_and_files.ico -text

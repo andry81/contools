@@ -1,4 +1,7 @@
 2019.07.16:
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: minor refactor
+
+2019.07.16:
 * refactor: Scripts/Tools/ToolAdaptors/totalcmd: flags global rename
 
 2019.07.16:
