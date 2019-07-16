@@ -1,6 +1,6 @@
 [Buttonbar]
 Buttoncount=19
-button1=c:\Total Commander Scripts\images\cmd6432_group.ico
+button1=c:\Total Commander Scripts\images\menu_cmd6432.ico
 cmd1=C:\Total Commander Scripts\ButtonBars\cmd.bar
 iconic1=1
 menu1=cmd 64-bit/32-bit as user/admin

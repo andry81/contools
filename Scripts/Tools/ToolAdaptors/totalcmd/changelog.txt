@@ -1,4 +1,7 @@
 2019.07.16:
+* refactor: minor refactor
+
+2019.07.16:
 * refactor: flags global rename
 
 2019.07.16:
