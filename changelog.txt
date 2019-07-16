@@ -1,3 +1,6 @@
+2019.07.17:
+* new: Scripts/Tools/ToolAdaptors/totalcmd: svn icons
+
 2019.07.16:
 * fixed: Scripts/Tools: workaround for error message `conversion from CP65001 unsupported` from the iconv utility (`ansi2any.bat` and `any2ansi.bat` scripts)
 * new: Scripts/Tools/ToolAdaptors/totalcmd: `-pause_on_error` and `-pause_timeout_sec` command line flags to rest of scripts

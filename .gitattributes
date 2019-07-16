@@ -381,6 +381,12 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/shell_copy_file_to_files_by_list.ico 
 Scripts/Tools/ToolAdaptors/totalcmd/images/shell_copy_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/shell_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/shell_rename_files.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/svn/svn_commit.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/svn/svn_log.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/svn/svn_project_monitor.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/svn/svn_props.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/svn/svn_repo_browser.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/svn/svn_repo_status.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/svn_copy_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/svn_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/svn_rename_files.ico -text
