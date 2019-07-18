@@ -140,12 +140,12 @@ if exist "%WCDIR_PATH%\.svn\" goto IGNORE_OUTTER_WCROOT_FROM_WCDIR
 
 svn info "%WCDIR_PATH%" --non-interactive > "%WORKINGSET_PATH_INFO_TEXT_TMP%" || (
   echo.%?~nx0%: error: not versioned directory: "%WCDIR_PATH%".
-  exit /b 255
+  exit /b 254
 ) >&2
 
 call "%%SVNCMD_TOOLS_ROOT%%/extract_info_param.bat" "%%WORKINGSET_PATH_INFO_TEXT_TMP%%" "Working Copy Root Path" || (
   echo.%?~nx0%: error: "Working Copy Root Path" property is not found in info file from WC directory: "%WCDIR_PATH%".
-  exit /b 254
+  exit /b 253
 ) >&2
 
 set "WCROOT_PATH=%RETURN_VALUE%"
@@ -459,50 +459,50 @@ set OUTTER_TASK_INDEX=0
 
 rem run COMMAND over selected files/directories in the PWD directory
 :LOOKUP_DIR_LOOP
-set "FILEPATH=%~1"
-if not defined FILEPATH exit /b 0
+set "FILE_PATH=%~1"
+if not defined FILE_PATH exit /b 0
 
 rem ignore files selection
-if not exist "%FILEPATH%\" goto NEXT_LOOKUP_DIR
+if not exist "%FILE_PATH%\" goto NEXT_LOOKUP_DIR
 
 rem reduce relative path to avoid . and .. characters
-call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILEPATH%%"
-set "FILEPATH=%RETURN_VALUE%"
+call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILE_PATH%%"
+set "FILE_PATH=%RETURN_VALUE%"
 
 rem should not be empty
-if not defined FILEPATH set FILEPATH=.
-set "FILEPATH=%FILEPATH:/=\%"
+if not defined FILE_PATH set FILE_PATH=.
+set "FILE_PATH=%FILE_PATH:/=\%"
 
-set "FILEPATH_DECORATED=\%FILEPATH%\"
+set "FILE_PATH_DECORATED=\%FILE_PATH%\"
 
 rem cut off suffix with .svn subdirectory
-if "%FILEPATH_DECORATED:\.svn\=%" == "%FILEPATH_DECORATED%" goto IGNORE_FILEPATH_WCROOT_PATH_CUTOFF
+if "%FILE_PATH_DECORATED:\.svn\=%" == "%FILE_PATH_DECORATED%" goto IGNORE_FILE_PATH_WCROOT_PATH_CUTOFF
 
-set "FILEPATH_WCROOT_SUFFIX=%FILEPATH_DECORATED:*.svn\=%"
+set "FILE_PATH_WCROOT_SUFFIX=%FILE_PATH_DECORATED:*.svn\=%"
 
-set "FILEPATH_WCROOT_PREFIX=%FILEPATH_DECORATED%"
-if not defined FILEPATH_WCROOT_SUFFIX goto CUTOFF_WCROOT_PREFIX
+set "FILE_PATH_WCROOT_PREFIX=%FILE_PATH_DECORATED%"
+if not defined FILE_PATH_WCROOT_SUFFIX goto CUTOFF_WCROOT_PREFIX
 
-call set "FILEPATH_WCROOT_PREFIX=%%FILEPATH_DECORATED:\%FILEPATH_WCROOT_SUFFIX%=%%"
+call set "FILE_PATH_WCROOT_PREFIX=%%FILE_PATH_DECORATED:\%FILE_PATH_WCROOT_SUFFIX%=%%"
 
 :CUTOFF_WCROOT_PREFIX
 rem remove bounds character and extract diretory path
-if "%FILEPATH_DECORATED:~-1%" == "\" set "FILEPATH_DECORATED=%FILEPATH_DECORATED:~0,-1%"
-call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILEPATH_DECORATED:~1%%" \ "" FILEPATH
+if "%FILE_PATH_DECORATED:~-1%" == "\" set "FILE_PATH_DECORATED=%FILE_PATH_DECORATED:~0,-1%"
+call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILE_PATH_DECORATED:~1%%" \ "" FILE_PATH
 
 rem should not be empty
-if not defined FILEPATH set FILEPATH=.
+if not defined FILE_PATH set FILE_PATH=.
 
-:IGNORE_FILEPATH_WCROOT_PATH_CUTOFF
+:IGNORE_FILE_PATH_WCROOT_PATH_CUTOFF
 
 rem filename must be always absolute
-call :ABS_FILEPATH "%%FILEPATH%%"
-goto ABS_FILEPATH_END
+call :ABS_FILE_PATH "%%FILE_PATH%%"
+goto ABS_FILE_PATH_END
 
-:ABS_FILEPATH
-set "FILEPATH=%~dpf1"
+:ABS_FILE_PATH
+set "FILE_PATH=%~dpf1"
 exit /b
-:ABS_FILEPATH_END
+:ABS_FILE_PATH_END
 
 rem ==================== window-per-wcdir init ====================
 
@@ -515,45 +515,45 @@ if not exist "%SCRIPT_TEMP_CURRENT_DIR%\tmp\" mkdir "%SCRIPT_TEMP_CURRENT_DIR%\t
 
 rem copy path to a file
 rem (special form of the echo command to ignore special characters in the echo value).
-for /F "eol=	 tokens=* delims=" %%i in ("%FILEPATH%") do (echo.%%i) > "%SCRIPT_TEMP_CURRENT_DIR%\tmp\wcdir_path.var"
+for /F "eol=	 tokens=* delims=" %%i in ("%FILE_PATH%") do (echo.%%i) > "%SCRIPT_TEMP_CURRENT_DIR%\tmp\wcdir_path.var"
 
 rem generate md5 hash from a file content
 call "%%CONTOOLS_ROOT%%/hash/gen_file_hash_cvs.bat" -c md5 -b -s "%%SCRIPT_TEMP_CURRENT_DIR%%\tmp\wcdir_path.var"
 
-set "FILEPATH_DECORATED="
-for /F "eol=	 tokens=2 delims=," %%i in ("%RETURN_VALUE%") do set "FILEPATH_DECORATED=%%i"
+set "FILE_PATH_DECORATED="
+for /F "eol=	 tokens=2 delims=," %%i in ("%RETURN_VALUE%") do set "FILE_PATH_DECORATED=%%i"
 
 if "%INNER_TASK_INDEX:~1,1%" == "" set INNER_TASK_INDEX=0%INNER_TASK_INDEX%
 
-set "FILEPATH_TASK_DIR_DECORATED=%INNER_TASK_INDEX%=%FILEPATH_DECORATED%"
-set "FILEPATH_TASK_DIR=%SCRIPT_TEMP_CURRENT_DIR%\wcdirs\%FILEPATH_TASK_DIR_DECORATED%"
-set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_NAME_ANSI_CRLF_TMP%"
-set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_FILTERED_NAME_ANSI_CRLF_TMP%"
-set "TORTOISEPROC_PATHFILE_FILTER_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_FILTER_NAME_ANSI_CRLF_TMP%"
-set "TORTOISEPROC_PATHFILE_NOT_ORTHAN_EXTERNALS_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_NOT_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP%"
-set "TORTOISEPROC_PATHFILE_ORTHAN_EXTERNALS_ANSI_CRLF_TMP=%FILEPATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP%"
-set "WORKINGSET_PATH_INFO_TEXT_TMP=%FILEPATH_TASK_DIR%\$info.txt"
-set "WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP=%FILEPATH_TASK_DIR%\externals_db"
+set "FILE_PATH_TASK_DIR_DECORATED=%INNER_TASK_INDEX%=%FILE_PATH_DECORATED%"
+set "FILE_PATH_TASK_DIR=%SCRIPT_TEMP_CURRENT_DIR%\wcdirs\%FILE_PATH_TASK_DIR_DECORATED%"
+set "TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP=%FILE_PATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_NAME_ANSI_CRLF_TMP%"
+set "TORTOISEPROC_PATHFILE_FILTERED_ANSI_CRLF_TMP=%FILE_PATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_FILTERED_NAME_ANSI_CRLF_TMP%"
+set "TORTOISEPROC_PATHFILE_FILTER_ANSI_CRLF_TMP=%FILE_PATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_FILTER_NAME_ANSI_CRLF_TMP%"
+set "TORTOISEPROC_PATHFILE_NOT_ORTHAN_EXTERNALS_ANSI_CRLF_TMP=%FILE_PATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_NOT_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP%"
+set "TORTOISEPROC_PATHFILE_ORTHAN_EXTERNALS_ANSI_CRLF_TMP=%FILE_PATH_TASK_DIR%\%TORTOISEPROC_PATHFILE_ORPHAN_EXTERNALS_NAME_ANSI_CRLF_TMP%"
+set "WORKINGSET_PATH_INFO_TEXT_TMP=%FILE_PATH_TASK_DIR%\$info.txt"
+set "WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP=%FILE_PATH_TASK_DIR%\externals_db"
 set "WORKINGSET_PATH_DB_EXTERNALS_LIST_TMPL_TMP=%WORKINGSET_PATH_DB_EXTERNALS_DIR_TMP%\{{REF}}.lst"
-set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%FILEPATH_TASK_DIR%\external_paths.lst"
+set "WORKINGSET_PATH_EXTERNALS_PATHS_TMP=%FILE_PATH_TASK_DIR%\external_paths.lst"
 
-set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%FILEPATH_TASK_DIR%\pathfile-ansi-cr.lst"
+set "TORTOISEPROC_PATHFILE_ANSI_LF_TMP=%FILE_PATH_TASK_DIR%\pathfile-ansi-cr.lst"
 
 rem create temporary files to store local context output
-if exist "%FILEPATH_TASK_DIR%\" (
-  echo.%?~nx0%: error: temporary generated directory FILEPATH_TASK_DIR is already exist: "%FILEPATH_TASK_DIR%"
+if exist "%FILE_PATH_TASK_DIR%\" (
+  echo.%?~nx0%: error: temporary generated directory FILE_PATH_TASK_DIR is already exist: "%FILE_PATH_TASK_DIR%"
   exit /b 2
 ) >&2
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   rem use temporary file inside script temporary directory
-  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%FILEPATH_TASK_DIR%\pathfile-ucs-16LE.lst"
+  set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%FILE_PATH_TASK_DIR%\pathfile-ucs-16LE.lst"
 ) else (
   rem use temporary file outside script temporary directory, delegate to TortoiseProc.exe it's deletion
   set "TORTOISEPROC_PATHFILE_UCS16LE_TMP=%TEMP%\%?~n0%.pathfile-ucs-16LE.%SCRIPT_TEMP_ROOT_DATE%.%SCRIPT_TEMP_ROOT_TIME%.lst"
 )
 
-mkdir "%FILEPATH_TASK_DIR%"
+mkdir "%FILE_PATH_TASK_DIR%"
 
 rem recreate empty files
 type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
@@ -562,12 +562,12 @@ type nul > "%TORTOISEPROC_PATHFILE_ANSI_CRLF_TMP%"
 
 rem add directory as a fake WC root path if it is not a WC root path to process
 rem it's content in case if real WC root directory is above of the directory in the directories tree.
-if not exist "%FILEPATH%\.svn\" (
-  set "WCDIR_PATH=%FILEPATH%\.svn"
+if not exist "%FILE_PATH%\.svn\" (
+  set "WCDIR_PATH=%FILE_PATH%\.svn"
   call :PROCESS_WCDIR_PATH || exit /b 0
 )
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:D "%FILEPATH%\*.svn" 2^>nul`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:D "%FILE_PATH%\*.svn" 2^>nul`) do (
   set WCDIR_PATH=%%i
   call :PROCESS_WCDIR_PATH || exit /b 0
 )
@@ -617,9 +617,12 @@ rem ignore check in case of unversioned paths
 if %FLAG_INTERNAL_USE_UNVERSIONED_WORKINGSET_PATHS% NEQ 0 goto IGNORE_CHANGES_CHECK
 
 rem test path on version control presence and get file path svn info
-svn info "%WCDIR_PATH%" > "%WORKINGSET_PATH_INFO_TEXT_TMP%" 2>nul
+svn info "%WCDIR_PATH%" --non-interactive > "%WORKINGSET_PATH_INFO_TEXT_TMP%" 2>nul
 rem ignore on error
-if %ERRORLEVEL% NEQ 0 exit /b 0
+if %ERRORLEVEL% NEQ 0 (
+  echo.%?~nx0%: warning: not versioned directory: "%WCDIR_PATH%".
+  exit /b 0
+)
 
 rem filter WC directory by changes existance just before call to TortoiseProc.exe and after orphan externals filter!
 if %FLAG_WINDOW_PER_WCROOT% EQU 0 goto IGNORE_CHANGES_CHECK

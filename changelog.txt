@@ -1,4 +1,9 @@
 2019.07.18:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: `TortoiseProcByNestedWC.bat` script missed warnings/errors output
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: `TortoiseProcByNestedWC.bat` call return wait flag
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: `TortoiseProcByNestedWC.bat` script minor refactor
+
+2019.07.18:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: `TortoiseProcByNestedWC.bat` flags parse
 
 2019.07.17:
