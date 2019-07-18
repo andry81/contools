@@ -1,3 +1,8 @@
+2019.07.18:
+* fixed: `TortoiseProcByNestedWC.bat` script missed warnings/errors output
+* changed: `TortoiseProcByNestedWC.bat` call return wait flag
+* refactor: `TortoiseProcByNestedWC.bat` script minor refactor
+
 2019.07.17:
 * new: svn icons
 

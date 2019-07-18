@@ -114,7 +114,12 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in ("%INPUT_LIST_FILE_TMP%") do (
   call :PROCESS_FILE_PATH
 )
 
-goto PROCESS_TASKS
+if %MAX_SPAWN_TASKS% GTR 0 goto PROCESS_TASKS
+
+(
+  echo.%?~nx0%: error: nothing left to process.
+  exit /b 254
+) >&2
 
 :PROCESS_FILE_PATH
 rem run COMMAND over selected files/directories in the PWD directory
@@ -146,16 +151,17 @@ if not defined FILE_PATH set FILE_PATH=.
 
 :IGNORE_FILE_PATH_WCROOT_PATH_CUTOFF
 
+if "%FILE_PATH:~-1%" == "\" set "FILE_PATH=%FILE_PATH:~0,-1%"
+
+svn info "%FILE_PATH%" --non-interactive >nul 2>nul || (
+  echo.%?~nx0%: error: not versioned directory: "%FILE_PATH%".
+  exit /b 254
+) >&2
+
 rem safe echo call
-setlocal ENABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("!FILE_PATH!") do (
-  endlocal
-  (echo.%%i) >> "%PROPS_PATH_LIST_FILE_TMP%"
-)
-
+for /F "eol=	 tokens=* delims=" %%i in ("%FILE_PATH%") do (echo.%%i) >> "%PROPS_PATH_LIST_FILE_TMP%"
 set /A MAX_SPAWN_TASKS+=1
-
-exit /b
+exit /b 0
 
 :PROCESS_TASKS
 call :SPAWN_TASKS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%TOTALCMD_ROOT%%/scm/tortoisesvn/TortoiseProc_read_path_from_stdin.bat"
