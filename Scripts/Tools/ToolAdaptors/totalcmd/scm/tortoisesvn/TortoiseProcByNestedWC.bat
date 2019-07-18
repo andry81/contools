@@ -325,12 +325,12 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-pause_on_exit" (
     set FLAG_PAUSE_ON_EXIT=1
-  ) if "%FLAG%" == "-pause_on_error" (
+  ) else if "%FLAG%" == "-pause_on_error" (
     set FLAG_PAUSE_ON_ERROR=1
   ) else if "%FLAG%" == "-pause_timeout_sec" (
     set "FLAG_PAUSE_TIMEOUT_SEC=%~2"
     shift
-  ) else else if "%FLAG%" == "-chcp" (
+  ) else if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
   ) else if "%FLAG%" == "-wait" (

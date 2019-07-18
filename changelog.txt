@@ -1,3 +1,6 @@
+2019.07.18:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: `TortoiseProcByNestedWC.bat` flags parse
+
 2019.07.17:
 * new: Scripts/Tools/ToolAdaptors/totalcmd: svn icons
 
