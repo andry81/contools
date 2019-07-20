@@ -59,7 +59,7 @@ copy /Y "%~dp0..\Config\tmpl\runas_admin.lnk.dat" "%~dp0runas_admin.lnk">nul
 if %ERRORLEVEL% NEQ 0 goto PAUSE_AND_EXIT
 
 set UAC_READY=1
-call "%%~dp0runas_admin.lnk" ^("%%~dp0run_msys.bat" %%*^)
+call "%%~dp0runas_admin.lnk" /c ^("%%~dp0run_msys.bat" %%*^)
 exit /b
 
 :UAC_READY
