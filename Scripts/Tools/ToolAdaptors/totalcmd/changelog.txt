@@ -1,4 +1,8 @@
 2019.07.21:
+* new: added WinMerge as a second comparison tool and added flags in respective scripts to switch onto it
+* changed: added bare flags to pass to a backend comparison tool
+
+2019.07.21:
 * refactor: scm/tortoisesvn: scripts rename to the snake case
 
 2019.07.18:

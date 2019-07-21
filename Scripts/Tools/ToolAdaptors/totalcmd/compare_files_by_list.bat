@@ -42,6 +42,9 @@ exit /b %LASTERROR%
 rem script flags
 set FLAG_WAIT_EXIT=0
 set FLAG_CONVERT_FROM_UTF16=0
+set FLAG_ARAXIS=0
+set FLAG_WINMERGE=0
+set "BARE_FLAGS="
 
 :FLAGS_LOOP
 
@@ -63,10 +66,13 @@ if defined FLAG (
     set FLAG_WAIT_EXIT=1
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-araxis" (
+    set FLAG_ARAXIS=1
+  ) else if "%FLAG%" == "-winmerge" (
+    set FLAG_WINMERGE=1
   ) else (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
-    exit /b -255
-  ) >&2
+    set BARE_FLAGS=%BARE_FLAGS% %1
+  )
 
   shift
 
@@ -130,17 +136,46 @@ if %NUM_FILES% EQU 0 (
 
 set /A NUM_FILES+=1
 
-rem only 2 first files from the list are accepted
+rem only 2 first files from the list is accepted
 if %NUM_FILES% GTR 2 exit /b 2
 
 exit /b 0
 
 :PROCESS_COMPARE
 
+if %FLAG_ARAXIS% NEQ 0 (
+  if not defined ARAXIS_CONSOLE_COMPARE_TOOL goto NOT_CONFIGURED
+  goto ARAXIS_CONSOLE_COMPARE_TOOL
+)
+
+if %FLAG_WINMERGE% NEQ 0 (
+  if not defined WINMERGE_COMPARE_TOOL goto NOT_CONFIGURED
+  goto WINMERGE_COMPARE_TOOL
+)
+
+if defined ARAXIS_CONSOLE_COMPARE_TOOL goto ARAXIS_CONSOLE_COMPARE_TOOL
+if defined WINMERGE_COMPARE_TOOL goto WINMERGE_COMPARE_TOOL
+
+:NOT_CONFIGURED
+(
+  echo.%?~nx0%: error: the comparison tool is not configured properly.
+  exit /b 255
+) >&2
+
+:ARAXIS_CONSOLE_COMPARE_TOOL
 if %FLAG_WAIT_EXIT% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%COMPARE_TOOL%%" /wait %%FILES_LIST%%
+  call :CMD start /B /WAIT "" "%%ARAXIS_CONSOLE_COMPARE_TOOL%%"%%BARE_FLAGS%% /wait %%FILES_LIST%%
 ) else (
-  call :CMD start /B "" "%%COMPARE_TOOL%%" /nowait %%FILES_LIST%%
+  call :CMD start /B "" "%%ARAXIS_CONSOLE_COMPARE_TOOL%%"%%BARE_FLAGS%% /nowait %%FILES_LIST%%
+)
+
+exit /b
+
+:WINMERGE_COMPARE_TOOL
+if %FLAG_WAIT_EXIT% NEQ 0 (
+  call :CMD start /B /WAIT "" "%%WINMERGE_COMPARE_TOOL%%"%%BARE_FLAGS%% %%FILES_LIST%%
+) else (
+  call :CMD start /B "" "%%WINMERGE_COMPARE_TOOL%%"%%BARE_FLAGS%% %%FILES_LIST%%
 )
 
 exit /b
