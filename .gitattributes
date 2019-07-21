@@ -451,11 +451,11 @@ Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_externals_edit.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_move_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_rename_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/TODO.txt -text
-Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/TortoiseProc.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/TortoiseProcByList.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/TortoiseProcByNestedWC.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/TortoiseProc_read_path_from_stdin.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/__init__.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/tortoiseproc.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/tortoiseproc_by_list.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/tortoiseproc_by_nested_wc.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/tortoiseproc_read_path_from_stdin.bat -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_cmd_to_run_notepad_and_wait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_notepad_and_wait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/call.vbs -text
