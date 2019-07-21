@@ -1,4 +1,4 @@
-TortoiseProcByNestedWC script:
+tortoiseproc_by_nested_wc script:
   - /command:commit may show changes in the same window for the same remote directory:
       WCDIR1/parent_path/ext1
       WCDIR2/parent_path/ext1

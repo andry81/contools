@@ -1,3 +1,6 @@
+2019.07.21:
+* refactor: Scripts/Tools/ToolAdaptors/scm/tortoisesvn: scripts rename to the snake case
+
 2019.07.20:
 * fixed: Scripts/Tools/ToolAdaptors/lnk: `cmd.lnk`, `cmd_admin.lnk`, `cmd_minimized.lnk` could not run directly from the Windows Explorer (Windows 7) because the inner `%COMSPEC%` target command string was not surrounded by the quotes (specific COM component behaviour).
 * changed: Scripts/Config/tmpl: replaced `runas_admin.lnk.dat` by the `cmd_admin.lnk` because it does not having differences anymore

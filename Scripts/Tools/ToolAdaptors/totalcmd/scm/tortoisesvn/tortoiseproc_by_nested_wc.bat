@@ -4,9 +4,9 @@ rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Script to recursively find the SVN WC root directories from a set of local
 rem directories and call
-rem `tortoiseproc.exe /command:repostatus /pathfile:"<path-to-file-with-list-of-items-to-lookup-from>"`
+rem `TortoiseProc.exe /command:repostatus /pathfile:"<path-to-file-with-list-of-items-to-lookup-from>"`
 rem or
-rem `tortoiseproc.exe /command:commit /pathfile:"<path-to-file-with-list-of-items-to-lookup-from>"`
+rem `TortoiseProc.exe /command:commit /pathfile:"<path-to-file-with-list-of-items-to-lookup-from>"`
 rem on them.
 
 setlocal
