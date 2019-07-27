@@ -78,11 +78,7 @@ if not defined PWD goto NOPWD
 cd /d "%PWD%" || exit /b 1
 
 rem safe title call
-setlocal ENABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: !CD!") do (
-  endlocal
-  title %%i
-)
+for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOPWD
 

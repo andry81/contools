@@ -1,7 +1,1 @@
-Issues:
-* Scripts/Tools/ToolAdaptors: totalcmdscm/shell/shell_rename_by_list.bat (and others related to rename) does not accept not english characters in files names/paths.
-* Scripts/Tools/ToolAdaptors: ffmpeg/ffmpeg_concat_copy_by_list.bat does not accept not english characters in files names/paths.
-* Scripts/Tools/ToolAdaptors: timestamp/copy_timestamp_by_pttn.bat does not accept not english characters in files names/paths.
-
-Common:
-  - rewrite setvarsfromfile.bat, tests.
+- rewrite setvarsfromfile.bat, tests.
