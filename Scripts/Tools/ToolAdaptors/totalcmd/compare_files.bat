@@ -101,7 +101,7 @@ rem read selected file names into variable
 :CURDIR_FILTER_LOOP
 if "%~1" == "" goto CURDIR_FILTER_LOOP_END
 rem must be files, not sub directories
-if exist "%~1\" exit /b 4
+rem if exist "%~1\" exit /b 4
 
 if %NUM_FILES% EQU 0 (
   set FILES_LIST=%1
