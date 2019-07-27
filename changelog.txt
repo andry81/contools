@@ -1,4 +1,7 @@
 2019.07.27:
+* changed: Scripts/Tools/ToolAdaptors: save/load icons minor edit
+
+2019.07.27:
 * new: Scripts/Tools/ToolAdaptors: notepad icons
 
 2019.07.27:
