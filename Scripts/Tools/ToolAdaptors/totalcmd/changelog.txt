@@ -1,4 +1,7 @@
 2019.07.27:
+* changed: save/load icons minor edit
+
+2019.07.27:
 * new: notepad icons
 
 2019.07.27:
