@@ -1,4 +1,7 @@
 2019.07.27:
+* changed: icons minor edit
+
+2019.07.27:
 * changed: move/rename/copy menu icons minor edit
 
 2019.07.27:
