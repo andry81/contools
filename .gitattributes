@@ -375,8 +375,11 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/menu_rename_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_file_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_load.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_svn.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_edit.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_new.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_new_to_save.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/notepadpp_append.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/notepadpp_edit.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/save_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/separator_svn.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/shell_copy_file_to_files_by_list.ico -text

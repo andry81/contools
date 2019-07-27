@@ -1,5 +1,8 @@
 2019.07.27:
-* changed: removed the check on a directory from the `compare_files.bat` and `compare_files_by_list.bat` scripts to enable compare directories (depends on a comparison tool)
+* new: notepad icons
+
+2019.07.27:
+* changed: removed the check on a directory existence from the `compare_files.bat` and `compare_files_by_list.bat` scripts to enable compare directories (depends on a comparison tool)
 
 2019.07.27:
 * refactor: fix in shortcut names, PWD renamed to CWD (Current Working Directory, not related to Print Current Directory, but may translate as Previous Working Directory)
