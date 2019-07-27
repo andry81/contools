@@ -1,4 +1,7 @@
 2019.07.27:
+* changed: Scripts/Tools/ToolAdaptors: TODO file update
+
+2019.07.27:
 * new: Scripts/Tools/ToolAdaptors: Issues file
 * changed: Scripts/Tools/ToolAdaptors: TODO file update
 * changed: TODO file update
