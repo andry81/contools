@@ -126,7 +126,7 @@ goto PROCESS_COMPARE
 :PROCESS_FILE_PATH
 if not defined FILE_PATH exit /b 3
 rem must be files, not sub directories
-if exist "%FILE_PATH%\" exit /b 4
+rem if exist "%FILE_PATH%\" exit /b 4
 
 if %NUM_FILES% EQU 0 (
   set FILES_LIST="%FILE_PATH%"
