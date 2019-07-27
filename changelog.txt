@@ -1,4 +1,7 @@
 2019.07.27:
+* refactor: Scripts/Tools/ToolAdaptors: fix in shortcut names, PWD renamed to CWD (Current Working Directory, not related to Print Current Directory, but may translate as Previous Working Directory)
+
+2019.07.27:
 * changed: Scripts/Tools/ToolAdaptors: TODO file update
 
 2019.07.27:

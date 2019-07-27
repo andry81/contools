@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.07.21
+* 2019.07.27
 * Toolbar buttons configuration for the Total Commander.
 
 1. CONFIGURE
@@ -291,22 +291,22 @@ This will create the directory link to 64-bit cmd.exe available from any bitness
 For 64-bit cmd.exe button under any mode in the Administrative mode:
 
 cmd_system64_admin.lnk
-/K set "PWD=%P"&call cd /d "%%PWD%%"
+/K set "CWD=%P"&call cd /d "%%CWD%%"
 
 For 32-bit cmd.exe button under any mode in the Administrative mode:
 
 cmd_wow64_admin.lnk
-/K set "PWD=%P"&call cd /d "%%PWD%%"
+/K set "CWD=%P"&call cd /d "%%CWD%%"
 
 For 64-bit cmd.exe button under any mode in a user mode:
 
 cmd_system64.lnk
-/K set "PWD=%P"&call cd /d "%%PWD%%"
+/K set "CWD=%P"&call cd /d "%%CWD%%"
 
 For 32-bit cmd.exe button under any mode in a user mode:
 
 cmd_wow64.lnk
-/K set "PWD=%P"&call cd /d "%%PWD%%"
+/K set "CWD=%P"&call cd /d "%%CWD%%"
 
 ------------------------------------------------------------------------------
 3.4.2. Method #2. On left mouse button. Total Commander bitness dependent.
@@ -317,14 +317,14 @@ Total Commander bitness)
 (correction: may be the error is an error of Python, the internet advises to run command as: "python -m pip install --upgrade")
 
 cmd_admin.lnk
-/K set "PWD=%P"&call cd /d "%%PWD%%"
+/K set "CWD=%P"&call cd /d "%%CWD%%"
 
 ------------------------------------------------------------------------------
 3.4.3. Method #2. On right mouse button -> As Administrator.
 ------------------------------------------------------------------------------
 
 cmd.exe
-/K set "PWD=%P"&call cd /d "%%PWD%%"
+/K set "CWD=%P"&call cd /d "%%CWD%%"
 
 ------------------------------------------------------------------------------
 3.4.4. Method #3. On left mouse button.
@@ -333,7 +333,7 @@ cmd.exe
 (in not english version of Windows instead of the "Administrator" you have to use a localized name)
 
 runas
-/user:Administrator "cmd.exe /K set \"PWD=%P\\"&call cd /d \"%%PWD%%\"&title User: ^<Administrator^>"
+/user:Administrator "cmd.exe /K set \"CWD=%P\\"&call cd /d \"%%CWD%%\"&title User: ^<Administrator^>"
 
 or
 
