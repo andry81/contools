@@ -68,16 +68,16 @@ if defined FLAG (
   goto FLAGS_LOOP
 )
 
-set "PWD=%~1"
+set "CWD=%~1"
 shift
 
-if not defined PWD goto NOPWD
-cd /d "%PWD%" || exit /b 1
+if not defined CWD goto NOCWD
+cd /d "%CWD%" || exit /b 1
 
 rem safe title call
 for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
-:NOPWD
+:NOCWD
 
 if "%~1" == "" exit /b 0
 

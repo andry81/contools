@@ -36,13 +36,13 @@ if defined FLAG (
   goto FLAGS_LOOP
 )
 
-set "PWD=%~1"
+set "CWD=%~1"
 shift
 
-if not defined PWD goto NOPWD
-cd /d "%PWD%" || exit /b 1
+if not defined CWD goto NOCWD
+cd /d "%CWD%" || exit /b 1
 
-:NOPWD
+:NOCWD
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   if %FLAG_NOTEPADPLUSPLUS% NEQ 0 (

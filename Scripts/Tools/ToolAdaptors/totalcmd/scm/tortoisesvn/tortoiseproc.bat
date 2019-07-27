@@ -76,14 +76,14 @@ if defined FLAG (
 )
 
 set "COMMAND=%~1"
-set "PWD=%~2"
+set "CWD=%~2"
 shift
 shift
 
-if not defined PWD goto NOPWD
-cd /d "%PWD%" || exit /b 1
+if not defined CWD goto NOCWD
+cd /d "%CWD%" || exit /b 1
 
-:NOPWD
+:NOCWD
 
 rem build filtered paths list
 set "PROPS_PATH_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\props_path_list.lst"
@@ -99,7 +99,7 @@ if defined FLAG_CHCP (
 rem create empty file
 type nul > "%PROPS_PATH_LIST_FILE_TMP%"
 
-rem run COMMAND over selected files/directories in the PWD directory
+rem run COMMAND over selected files/directories in the CWD directory
 :FILE_PATH_LOOP
 set "FILE_PATH=%~1"
 if not defined FILE_PATH goto PROCESS_TASKS

@@ -71,18 +71,18 @@ if defined FLAG (
   goto FLAGS_LOOP
 )
 
-set "PWD=%~1"
+set "CWD=%~1"
 shift
 
-if not defined PWD goto NOPWD
-cd /d "%PWD%" || exit /b 1
+if not defined CWD goto NOCWD
+cd /d "%CWD%" || exit /b 1
 
 rem safe title call
 for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
-:NOPWD
+:NOCWD
 
-if not defined PWD exit /b 1
+if not defined CWD exit /b 1
 
 set "CREATE_FILES_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_files_in_dirs_list.lst"
 set "CREATE_FILES_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_files_list.lst"

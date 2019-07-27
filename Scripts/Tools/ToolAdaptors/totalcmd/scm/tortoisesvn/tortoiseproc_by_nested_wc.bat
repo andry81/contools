@@ -371,7 +371,7 @@ if defined FLAG (
 )
 
 set "COMMAND=%~1"
-set "PWD=%~2"
+set "CWD=%~2"
 shift
 shift
 
@@ -446,10 +446,10 @@ if %FLAG_WINDOW_PER_REPOROOT% NEQ 0 ( type nul > "%TORTOISEPROC_PATHFILE_WORKING
 
 :IGNORE_OUTTER_INIT
 
-if not defined PWD goto NOPWD
-cd /d "%PWD%" || exit /b 1
+if not defined CWD goto NOCWD
+cd /d "%CWD%" || exit /b 1
 
-:NOPWD
+:NOCWD
 rem count only success calls
 set CALL_INDEX=0
 rem count unique repository roots
@@ -457,7 +457,7 @@ set REPOROOT_INDEX=-1
 rem task per subdir
 set OUTTER_TASK_INDEX=0
 
-rem run COMMAND over selected files/directories in the PWD directory
+rem run COMMAND over selected files/directories in the CWD directory
 :LOOKUP_DIR_LOOP
 set "FILE_PATH=%~1"
 if not defined FILE_PATH exit /b 0

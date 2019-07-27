@@ -75,14 +75,14 @@ if defined FLAG (
 )
 
 set "COMMAND=%~1"
-set "PWD=%~2"
+set "CWD=%~2"
 shift
 shift
 
-if not defined PWD goto NOPWD
-cd /d "%PWD%" || exit /b 1
+if not defined CWD goto NOCWD
+cd /d "%CWD%" || exit /b 1
 
-:NOPWD
+:NOCWD
 
 set "INPUT_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
 
@@ -122,7 +122,7 @@ if %MAX_SPAWN_TASKS% GTR 0 goto PROCESS_TASKS
 ) >&2
 
 :PROCESS_FILE_PATH
-rem run COMMAND over selected files/directories in the PWD directory
+rem run COMMAND over selected files/directories in the CWD directory
 if not defined FILE_PATH exit /b 1
 
 rem reduce relative path to avoid . and .. characters

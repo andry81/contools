@@ -76,13 +76,13 @@ if defined FLAG (
   goto FLAGS_LOOP
 )
 
-set "PWD=%~1"
+set "CWD=%~1"
 shift
 
-if not defined PWD goto NOPWD
-cd /d "%PWD%" || exit /b 1
+if not defined CWD goto NOCWD
+cd /d "%CWD%" || exit /b 1
 
-:NOPWD
+:NOCWD
 
 set "LIST_FILE_PATH=%~1"
 
