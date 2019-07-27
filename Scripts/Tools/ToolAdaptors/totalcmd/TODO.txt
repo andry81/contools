@@ -1,0 +1,49 @@
+- Add scripts (`svn_save_props_by_list`/`svn_save_props_by_nested_wc`) to
+  save `svn:*` properties for selected files and directories to
+  `<selected_dir>/.<svn_prop_name>` per a directory, to
+  `<selected_dir>/.svnprops/<file_etx_name>/<svn_prop_name>.txt` per a file
+  in a directory and to `.svnprops/<file_etx_name>/<svn_prop_name>.txt` per
+  selected file.
+  If related files representing being saved properties has already existed
+  before and there is changes with existing properties content, then a
+  property must be saved into a temporary file and the file comparison window
+  must be opened to merge the changes from the temporary file with the being
+  saved file. After merge into temporary files those of them which has been
+  changed must be writen back into the properties, otherwise left the
+  properties unchanged.
+
+- Add scripts (`svn_load_props_by_list`/`svn_load_props_by_nested_wc`) to
+  load `svn:*` properties for selected files and directories from
+  `<selected_dir>/.<svn_prop_name>` per a directory, from
+  `<selected_dir>/.svnprops/<file_etx_name>/<svn_prop_name>.txt` per a file
+  in a directory and from `.svnprops/<file_etx_name>/<svn_prop_name>.txt` per
+  selected file.
+  If related files representing being loaded properties has already existed
+  before and there is changes with existing properties content, then a
+  property must be saved into a temporary file and the file comparison window
+  must be opened to merge the changes from the temporary file with the being
+  loaded file. After the merge into all temporary files must be writen back
+  into the properties if they are changed, otherwise leave the properties not
+  changed. After merge into temporary files those of them which has been
+  changed must be writen back into the properties, otherwise left the
+  properties unchanged.
+
+- Add scripts (`svn_sync_props_by_list`/`svn_sync_props_by_nested_wc`) to
+  save/load `svn:*` properties for selected files and directories to/from
+  `<selected_dir>/.<svn_prop_name>` per a directory, to/from
+  `<selected_dir>/.svnprops/<file_etx_name>/<svn_prop_name>.txt` per a file
+  in a directory and to/from `.svnprops/<file_etx_name>/<svn_prop_name>.txt`
+  per selected file.
+  If related files representing being saved/loaded properties has already
+  existed before and there is changes with existing properties content, then
+  a property must be saved into a temporary file and the file comparison
+  window must be opened to merge the changes from the temporary file with the
+  being saved/loaded file. After merge into temporary files those of them
+  which has been changed must be writen back into the properties, otherwise
+  left the properties unchanged.
+
+Note:
+  A merge into being saved/loaded property files and into temporary files
+  must be handeled by an external comparison/merging utility. To do it a
+  temporary directory with property files must be constructed for both
+  sides of a comparison/merge.

@@ -78,11 +78,7 @@ if not defined PWD goto NOPWD
 cd /d "%PWD%" || exit /b 1
 
 rem safe title call
-setlocal ENABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: !CD!") do (
-  endlocal
-  title %%i
-)
+for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOPWD
 
@@ -121,11 +117,7 @@ if not "%~1" == "" (
   type nul > "%CREATE_DIRS_IN_LIST_FILE_TMP%"
 
   rem use working directory path as base directory path
-  setlocal ENABLEDELAYEDEXPANSION
-  for /F "eol=	 tokens=* delims=" %%i in ("!CD!") do (
-    endlocal
-    (echo.%%i) >> "%CREATE_DIRS_IN_LIST_FILE_TMP%"
-  )
+  for /F "eol=	 tokens=* delims=" %%i in ("%CD%") do (echo.%%i) >> "%CREATE_DIRS_IN_LIST_FILE_TMP%"
 )
 
 call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%CREATE_DIRS_LIST_FILE_TMP%%"

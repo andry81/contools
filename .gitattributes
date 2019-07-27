@@ -321,7 +321,9 @@ Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/notepad.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/rename.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/save.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/svn.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/Issues.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
+Scripts/Tools/ToolAdaptors/totalcmd/TODO.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/changelog.txt -text
@@ -450,7 +452,6 @@ Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_copy_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_externals_edit.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_move_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_rename_by_list.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/TODO.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/tortoiseproc.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/tortoisesvn/tortoiseproc_by_list.bat -text

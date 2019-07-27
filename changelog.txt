@@ -1,3 +1,11 @@
+2019.07.27:
+* new: Scripts/Tools/ToolAdaptors: Issues file
+* changed: Scripts/Tools/ToolAdaptors: TODO file update
+* changed: TODO file update
+
+2019.07.21:
+* changed: Scripts/Tools/ToolAdaptors: minor safe call optimizations
+
 2019.07.21:
 * new: Scripts/Tools/ToolAdaptors: added WinMerge as a second comparison tool and added flags in respective scripts to switch onto it
 * changed: Scripts/Tools/ToolAdaptors: added bare flags to pass to a backend comparison tool
