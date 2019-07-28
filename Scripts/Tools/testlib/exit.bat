@@ -1,11 +1,12 @@
 @echo off
 
 rem Description:
-rem   The tests exit script. Must be called one time in user test script after
-rem   the last call to the test.bat script.
+rem   The tests exit script. Must be called one time in a user test script
+rem   after the last call to the `test.bat` script.
 
-rem WARNING:
-rem   The script must be called without the call prefix!
+rem CAUTION:
+rem   The script must be called without the `call` prefix!
+rem
 
 set LASTERROR=0
 
