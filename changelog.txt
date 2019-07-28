@@ -1,3 +1,6 @@
+2019.07.28:
+* changed: Scripts/Tools/ToolAdaptors: TODO file update
+
 2019.07.27:
 * changed: Scripts/Tools/ToolAdaptors: icons minor edit
 

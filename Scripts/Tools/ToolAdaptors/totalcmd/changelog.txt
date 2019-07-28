@@ -1,3 +1,6 @@
+2019.07.28:
+* changed: TODO file update
+
 2019.07.27:
 * changed: icons minor edit
 
