@@ -1,10 +1,10 @@
 @echo off
 
 rem Description:
-rem   Main entry point script for tests on batch files.
+rem   Main entry point script for a user test script.
 rem
-rem   The user script must contain the test handlers in separated scripts in
-rem   this file structure format:
+rem   A user script must contain the handlers in separate scripts in this file
+rem   structure format:
 rem     /<user_test_script>.bat
 rem     /<user_test_script>.init.bat or /.<user_test_script>/init.bat
 rem     /<user_test_script>.impl.bat or /.<user_test_script>/impl.bat
@@ -14,27 +14,27 @@ rem     /<user_test_script>.teardown.bat or /.<user_test_script>/teardown.bat
 rem     /<user_test_script>.exit.bat or /.<user_test_script>/exit.bat
 rem
 rem , where:
-rem     <user_test_script>.bat - a test user script
+rem     <user_test_script>.bat - a test user script.
 rem     *init.bat - initialization handler for a test, required to process
-rem                 command line arguments
+rem                 command line arguments.
 rem     *impl.bat - implementation handler for a test, does not have command
-rem                 line arguments
-rem     *report.bat - report handler for a test, to print user test result
-rem     *setup.bat - a test first time setup handler
-rem     *teardown.bat - a test last time teardown handler
+rem                 line arguments.
+rem     *report.bat - report handler for a test, to print user test result.
+rem     *setup.bat - a test first time setup handler.
+rem     *teardown.bat - a test last time teardown handler.
 rem     *exit.bat - exit handler for a test, useful if required to copy test
-rem                 data out of temporary test script output directory
+rem                 data out of a test script temporary output directory.
 rem
 
 setlocal
 
-rem must be assigned not under 65000 codepage!
+rem must be assigned not to 65000 codepage!
 if defined CURRENT_CP ^
 if "%CURRENT_CP%" == "65000" (
   chcp 866 >nul
 )
 
-rem workaround for the plus sign control character under the unicode codepage
+rem workaround for the plus sign control character under a unicode codepage
 set "?5=+"
 
 rem restore back

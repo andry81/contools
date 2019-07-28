@@ -1,4 +1,7 @@
 2019.07.28:
+* refactor: minor changes, comments cleanup
+
+2019.07.28:
 * changed: Scripts/Tools/ToolAdaptors: TODO file update
 
 2019.07.27:

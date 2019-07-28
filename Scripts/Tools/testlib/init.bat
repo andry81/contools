@@ -1,15 +1,15 @@
 @echo off
 
 rem Description:
-rem   The tests initialization script. Must be called one time in user test
-rem   script before the first call to the test.bat script.
+rem   The tests initialization script. Must be called one time in a user test
+rem   script before the first call to the `test.bat` script.
 rem
-rem   The first argument must be the full path to the user test script file from
-rem   which this script calls.
+rem   The first argument must be the full path to the user test script file
+rem   from which this script calls.
 rem
 rem   The second argument (optional) can point to a directory with user handler
-rem   scripts. Can absolute or relative. If relative then relative to the
-rem   directory path from first argument.
+rem   scripts. Can be absolute or relative. If is a relative then relative to
+rem   the directory path from the first argument.
 rem
 
 rem initialize testlib "module"
