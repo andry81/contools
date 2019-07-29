@@ -18,7 +18,7 @@ set "?~nx0=%~nx0"
 call "%%?~dp0%%__init__.bat" || exit /b
 
 rem builtin defaults
-if not defined TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS set TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS=20
+if not defined TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS set TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS=10
 set "TORTOISEPROC_PATHFILE_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf.lst"
 set "TORTOISEPROC_PATHFILE_FILTERED_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf-filtered.lst"
 set "TORTOISEPROC_PATHFILE_FILTER_NAME_ANSI_CRLF_TMP=pathfile-ansi-crlf-filter.lst"

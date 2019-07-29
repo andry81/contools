@@ -1,3 +1,11 @@
+2019.07.29:
+* new: scm/svn: initial implementation of the `svn_edit_props_by_list.bat` script
+* changed: minor changes
+
+2019.07.28:
+* changed: `profile.vars` renamed into `profile.vars.in` template file to generate the user file on configuration with check on version change
+* changed: `configure.bat` now checks the version of the `profile.vars` versus version `profile.vars.in` before copy-with-backup and warns the user to merge the user file manually in case of different versions with the template one
+
 2019.07.28:
 * changed: TODO file update
 

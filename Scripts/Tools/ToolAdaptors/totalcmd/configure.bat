@@ -2,6 +2,42 @@
 
 setlocal
 
+set "?~dp0=%~dp0"
+set "?~n0=%~n0"
+set "?~nx0=%~nx0"
+
+call :MAIN %%*
+set LASTERROR=%ERRORLEVEL%
+
+:EXIT_MAIN
+exit /b %LASTERROR%
+
+:MAIN
+rem script flags
+set FLAG_IGNORE_BUTTONBARS=0
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-ignore_buttonbars" (
+    set FLAG_IGNORE_BUTTONBARS=1
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
+
+  shift
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
+
 rem there to configure
 set "CONFIGURE_TO_DIR=%~1"
 rem where take the Tools directory
@@ -13,12 +49,12 @@ set "CONFIGURE_TO_DIR=%CONFIGURE_TO_DIR:\=/%"
 if "%CONFIGURE_TO_DIR:~-1%" == "/" set "CONFIGURE_TO_DIR=%CONFIGURE_TO_DIR:~0,-1%"
 
 if not exist "%CONFIGURE_TO_DIR%\" (
-  echo.%~nx0: error: CONFIGURE_TO_DIR is not a directory: "%CONFIGURE_TO_DIR%"
+  echo.%?~nx0%: error: CONFIGURE_TO_DIR is not a directory: "%CONFIGURE_TO_DIR%"
   exit /b 1
 ) >&2
 
 :IGNORE_CONFIGURE_TO_DIR
-set "CONFIGURE_FROM_DIR=%~dp0"
+set "CONFIGURE_FROM_DIR=%?~dp0%"
 set "CONFIGURE_FROM_DIR=%CONFIGURE_FROM_DIR:\=/%"
 if "%CONFIGURE_FROM_DIR:~-1%" == "/" set "CONFIGURE_FROM_DIR=%CONFIGURE_FROM_DIR:~0,-1%"
 
@@ -28,7 +64,7 @@ set "CONTOOLS_FROM_DIR=%CONTOOLS_FROM_DIR:\=/%"
 if "%CONTOOLS_FROM_DIR:~-1%" == "/" set "CONTOOLS_FROM_DIR=%CONTOOLS_FROM_DIR:~0,-1%"
 
 if not exist "%CONTOOLS_FROM_DIR%\" (
-  echo.%~nx0: error: CONTOOLS_FROM_DIR is not a directory: "%CONTOOLS_FROM_DIR%"
+  echo.%?~nx0%: error: CONTOOLS_FROM_DIR is not a directory: "%CONTOOLS_FROM_DIR%"
   exit /b 2
 ) >&2
 
@@ -38,9 +74,8 @@ set "CONTOOLS_ROOT=%CONTOOLS_FROM_DIR%"
 goto IGNORE_INNER_CONTOOLS_ROOT
 
 :IGNORE_CONTOOLS_FROM_DIR
-call :CANONICAL_PATH "%%~dp0..\.."
+call :CANONICAL_PATH "%%?~dp0%%..\.."
 set "CONTOOLS_ROOT=%RETURN_VALUE%"
-
 
 :IGNORE_INNER_CONTOOLS_ROOT
 
@@ -63,17 +98,21 @@ if defined CONFIGURE_TO_DIR (
 
 rem pre calls to configure in an outter directory
 if defined CONFIGURE_TO_DIR (
-  if exist "%CONFIGURE_TO_DIR%/ButtonBars\" (
-    echo.%~nx0: error: ButtonBars directory is already exist, you have to backup and remove it manually: "%CONFIGURE_TO_DIR%/ButtonBars"
+  if %FLAG_IGNORE_BUTTONBARS% EQU 0 if exist "%CONFIGURE_TO_DIR%/ButtonBars\" (
+    echo.%?~nx0%: error: ButtonBars directory is already exist, you have to backup and remove it manually: "%CONFIGURE_TO_DIR%/ButtonBars"
     exit /b 10
   ) >&2
 
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/Tools" "%%CONTOOLS_ROOT_COPY%%" /E /Y /D || exit /b
+  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
+  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/_config" "%%CONFIGURE_TO_DIR%%/_config" /E /Y /D || exit /b
+  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/Tools" "%%CONFIGURE_TO_DIR%%/Tools" /E /Y /D || exit /b
   call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/converters" "%%CONFIGURE_TO_DIR%%/converters" /S /Y /D || exit /b
   call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/scm" "%%CONFIGURE_TO_DIR%%/scm" /S /Y /D || exit /b
   call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/images" "%%CONFIGURE_TO_DIR%%/images" /S /Y /D || exit /b
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/ButtonBars" "%%CONFIGURE_TO_DIR%%/ButtonBars" /S /Y /D || exit /b
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
+  rem copy only if does not exist before
+  if not exist "%CONFIGURE_TO_DIR%/ButtonBars\" (
+    call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/ButtonBars" "%%CONFIGURE_TO_DIR%%/ButtonBars" /S /Y /D || exit /b
+  )
 
   call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "__init__.bat" "%%CONFIGURE_TO_DIR%%" /Y /D /H || exit /b
 )
@@ -113,28 +152,36 @@ call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /S /Y /D 
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/tasks" "%%CONTOOLS_ROOT_COPY%%/tasks" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "compare_sorted_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "create_dirs_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "create_empty_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "loadvars.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_edit_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "notepad_new_session.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "save_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "load_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "edit_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "copy_file_to_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_sorted_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_sorted_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_dirs_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "loadvars.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_new_session.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "save_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "load_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "edit_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "copy_file_to_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/ToolAdaptors/ffmpeg" "%%TOTALCMD_ROOT%%/converters/ffmpeg" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk" "cmd*.*" "%%TOTALCMD_ROOT%%" /S /Y /D || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk" "cmd*.*" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/vbs" "call*.vbs" "%%TOTALCMD_ROOT%%" /S /Y /D || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/vbs" "call*.vbs" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
 
-call :CMD fc "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd\profile.vars" "%%TOTALCMD_ROOT%%\profile.vars" > nul
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "profile.vars.in" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+
+if not exist "%TOTALCMD_ROOT%\profile.vars" goto COPY_PROFILE
+
+call :CMD "%%CONTOOLS_ROOT_COPY%%/check_config_version.bat" 1 ^
+  "%%TOTALCMD_ROOT%%\profile.vars.in" "%%TOTALCMD_ROOT%%\profile.vars" || exit /b
+
+if /i "%%CONFIGURE_FROM_DIR%%\profile.vars" == "%%TOTALCMD_ROOT%%\profile.vars" goto IGNORE_PROFILE_WRITE
+call :CMD fc "%%CONFIGURE_FROM_DIR%%\profile.vars" "%%TOTALCMD_ROOT%%\profile.vars" > nul
 if %ERRORLEVEL% EQU 0 goto IGNORE_PROFILE_WRITE
 
 set PROFILE_VARS_INDEX_TO=3
@@ -173,7 +220,8 @@ goto PROFILE_ROTATE_LOOP
 :CONTINUE_PROFILE_WRITE
 call :CMD rename "%%TOTALCMD_ROOT%%\profile.vars" "profile.old.vars" || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/totalcmd" "profile.vars" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+:COPY_PROFILE
+call :COPY_FILE "%%TOTALCMD_ROOT%%\profile.vars.in" "%%TOTALCMD_ROOT%%\profile.vars" || exit /b
 
 :IGNORE_PROFILE_WRITE
 if not exist "%SYSTEMROOT%\System64\" (
@@ -181,7 +229,7 @@ if not exist "%SYSTEMROOT%\System64\" (
   if exist "%SYSTEMROOT%\System64\" (
     echo."%SYSTEMROOT%\System64" -^> "%SYSTEMROOT%\System32"
   ) else (
-    echo.%~nx0: error: could not create directory link: "%SYSTEMROOT%\System64" -^> "%SYSTEMROOT%\System32"
+    echo.%?~nx0%: error: could not create directory link: "%SYSTEMROOT%\System64" -^> "%SYSTEMROOT%\System32"
     exit /b 255
   ) >&2
 )
@@ -192,7 +240,7 @@ exit /b
 
 :XCOPY_FILE
 if not exist "%CONTOOLS_ROOT%/std/xcopy_file.bat" (
-  echo.%~nx0: error: xcopy_file.bat is not found: "%CONTOOLS_ROOT%/std/xcopy_file.bat".
+  echo.%?~nx0%: error: xcopy_file.bat is not found: "%CONTOOLS_ROOT%/std/xcopy_file.bat".
   exit /b 5
 ) >&2
 if not exist "%~3" mkdir "%~3"
@@ -201,11 +249,16 @@ exit /b 0
 
 :XCOPY_DIR
 if not exist "%CONTOOLS_ROOT%/std/xcopy_dir.bat" (
-  echo.%~nx0: error: xcopy_dir.bat is not found: "%CONTOOLS_ROOT%/std/xcopy_dir.bat".
+  echo.%?~nx0%: error: xcopy_dir.bat is not found: "%CONTOOLS_ROOT%/std/xcopy_dir.bat".
   exit /b 6
 ) >&2
 if not exist "%~2" mkdir "%~2"
 call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || exit /b
+exit /b 0
+
+:COPY_FILE
+echo."%~1" -^> "%~2"
+copy "%~1" "%~2" /B /Y || exit /b
 exit /b 0
 
 :CMD
@@ -220,14 +273,14 @@ exit /b 0
 
 :CONTOOLS_ROOT_ERROR
 (
-  echo.%~nx0: error: CONTOOLS_ROOT path is invalid or does not have the required set of utilities: "%CONTOOLS_ROOT%".
-  echo.%~nx0: info: execute the configure.bat from the contools WC root to update modules.
+  echo.%?~nx0%: error: CONTOOLS_ROOT path is invalid or does not have the required set of utilities: "%CONTOOLS_ROOT%".
+  echo.%?~nx0%: info: execute the configure.bat from the contools WC root to update modules.
   exit /b 10
 ) >&2
 
 :SVNCMD_TOOLS_ROOT_ERROR
 (
-  echo.%~nx0: error: SVNCMD_TOOLS_ROOT path is invalid or does not have the required set of utilities: "%SVNCMD_TOOLS_ROOT%".
-  echo.%~nx0: info: execute the configure.bat from the contools WC root to update modules.
+  echo.%?~nx0%: error: SVNCMD_TOOLS_ROOT path is invalid or does not have the required set of utilities: "%SVNCMD_TOOLS_ROOT%".
+  echo.%?~nx0%: info: execute the configure.bat from the contools WC root to update modules.
   exit /b 20
 ) >&2

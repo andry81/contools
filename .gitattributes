@@ -325,7 +325,10 @@ Scripts/Tools/ToolAdaptors/totalcmd/Issues.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/TODO.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/README_EN.txt -text
+Scripts/Tools/ToolAdaptors/totalcmd/Tools/check_config_version.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/__init__.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/_config/svn_props_to_edit.lst.in -text
+Scripts/Tools/ToolAdaptors/totalcmd/_config/svn_props_to_sync.lst.in -text
 Scripts/Tools/ToolAdaptors/totalcmd/changelog.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_files_by_list.bat -text
@@ -440,7 +443,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/loadvars.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_new_session.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/profile.vars -text
+Scripts/Tools/ToolAdaptors/totalcmd/profile.vars.in -text
 Scripts/Tools/ToolAdaptors/totalcmd/save_file_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/git_copy_by_list.bat -text
@@ -452,6 +455,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/scm/shell/shell_move_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/shell/shell_rename_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_copy_by_list.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_edit_props_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_externals_edit.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_move_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/svn/svn_rename_by_list.bat -text
