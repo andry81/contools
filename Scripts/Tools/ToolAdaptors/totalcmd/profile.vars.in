@@ -1,3 +1,7 @@
+#%% version: 1
+
+"CONFIG_DIR=%TOTALCMD_ROOT%\_config"
+
 "NPP_EDITOR=C:\Program Files\Notepad++\notepad++.exe"
 BASIC_TEXT_EDITOR=notepad.exe
 
@@ -7,9 +11,12 @@ BASIC_TEXT_EDITOR=notepad.exe
 
 SVN_EDITOR="%NPP_EDITOR%" -multiInst -nosession
 
-# maximum number of TortoiseProc spawn calls
-TORTOISEPROC_MAX_SPAWN_CALLS=10
-# maximum number of TortoiseProc calls with -window-per-reporoot flag
-TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS=20
-
 "FFMPEG_TOOL_EXE=c:\Tools\ffmpeg.org\ffmpeg\ffmpeg.exe"
+
+# maximum number of `TortoiseProc` spawn calls
+TORTOISEPROC_MAX_SPAWN_CALLS=10
+# maximum number of `TortoiseProc` calls with `-window-per-reporoot` flag
+TORTOISEPROC_WINDOW_PER_REPOROOT_MAX_CALLS=10
+
+# maximum number of `notepad_edit_files*.bat` calls with `-window_per_prop_class` flag
+NOTEPAD_WINDOW_PER_PROP_CLASS_MAX_CALLS=10

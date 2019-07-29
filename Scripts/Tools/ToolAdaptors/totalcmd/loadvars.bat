@@ -11,7 +11,7 @@ if exist "%~1\" (
 ) >&2
 
 for /F "usebackq eol=# tokens=* delims=" %%i in ("%~1") do (
-  set %%i
+  call set %%i
 )
 
 exit /b 0
