@@ -1,4 +1,9 @@
 2019.08.17:
+* new: Scripts/Tools: `cmdoplib.py` and `list_urls_in_files.py` scripts to extract urls from files
+* changed: Scripts/Tools: backmerge from tacklelib project (`set_vars_from_locked_file_pair.*`)
+* changed: Scripts/Tools/admin/ProductKey: missed changes
+
+2019.08.17:
 * new: Scripts/Tools/ToolAdaptors/fla: old flash tool for show differences between 2 flash files from the Perforce environment (Action Script 9.0)
 
 2019.07.29:
