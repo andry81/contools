@@ -1,0 +1,8 @@
+* CHANGES_EN.txt
+* 2013.08.11
+* diff_fla
+
+For more details, see README_EN.txt.
+
+review #1 - 2013.08.11 (diff_fla_rv1.zip)
+ - Initial release.
