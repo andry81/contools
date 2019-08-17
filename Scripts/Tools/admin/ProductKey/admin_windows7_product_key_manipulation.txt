@@ -1,0 +1,51 @@
+* admin_windows7_product_key_manipulation.txt
+* 2019.07.06
+* admin/ProductKey
+
+1. DESCRIPTION
+2. REPOSITORIES
+3. UNINSTALL PRODUCT KEY IN THE WINDOWS
+4. EXTRACT PRODUCT KEY FROM REGISTRY OR RUNNING IMAGE
+5. CHANGE PRODUCT KEY IN THE IMAGE BEFORE INSTALL
+
+-------------------------------------------------------------------------------
+1. DESCRIPTION
+-------------------------------------------------------------------------------
+This is a readme file from the `sf.net/p/contools` project.
+
+-------------------------------------------------------------------------------
+2. REPOSITORIES
+-------------------------------------------------------------------------------
+
+Primary:
+  * https://sf.net/p/contools/contools/HEAD/tree/trunk/Scripts/Tools/admin/ProductKey
+  * https://svn.code.sf.net/p/contools/contools/trunk/Scripts/Tools/admin/ProductKey
+
+-------------------------------------------------------------------------------
+3. UNINSTALL PRODUCT KEY IN THE WINDOWS
+-------------------------------------------------------------------------------
+
+To unintall product keys (based on: https://stackoverflow.com/questions/7759642/reset-windows-activation-remove-license-key ):
+
+1.) Open a command prompt as an Administrator.
+2.) Enter `slmgr /upk` and wait for this to complete. This will uninstall the
+    current product key from Windows and put it into an unlicensed state.
+3.) Enter `slmgr /cpky` and wait for this to complete. This will remove the
+    product key from the registry if it's still there.
+4.) Enter `slmgr /rearm` and wait for this to complete. This is to reset the
+    Windows activation timers so the new users will be prompted to activate
+    Windows when they put in the key.
+
+-------------------------------------------------------------------------------
+4. EXTRACT PRODUCT KEY FROM REGISTRY OR RUNNING IMAGE
+-------------------------------------------------------------------------------
+
+Read the `README_EN.txt` from `admin/ProductKey` directory for the details.
+
+-------------------------------------------------------------------------------
+5. CHANGE PRODUCT KEY IN THE IMAGE BEFORE INSTALL
+-------------------------------------------------------------------------------
+
+Change them in the script file:
+
+`sources\$OEM$\$$\SETUP\SCRIPTS\SetupComplete.cmd`

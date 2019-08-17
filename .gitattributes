@@ -494,6 +494,7 @@ Scripts/Tools/admin/ProductKey/ProductKey.py -text
 Scripts/Tools/admin/ProductKey/ProductKey.vbs -text
 Scripts/Tools/admin/ProductKey/README_EN.txt -text
 Scripts/Tools/admin/ProductKey/WinReg.py -text
+Scripts/Tools/admin/ProductKey/admin_windows7_product_key_manipulation.txt -text
 Scripts/Tools/admin/RunDll/ExportImportWindowsCreds.bat -text
 Scripts/Tools/admin/RunDll/SafelyRemoveHotPlugDevice.bat -text
 Scripts/Tools/admin/RunDll/UserControl.bat -text
@@ -560,6 +561,7 @@ Scripts/Tools/callargs.bat -text
 Scripts/Tools/callshift.bat -text
 Scripts/Tools/canonicalpath.bat -text
 Scripts/Tools/cat2.sh -text
+Scripts/Tools/cmdoplib.py -text
 Scripts/Tools/countlines.bat -text
 Scripts/Tools/cstresc.bat -text
 Scripts/Tools/cygsetupdiff.sh -text
@@ -658,6 +660,7 @@ Scripts/Tools/iffexist.bat -text
 Scripts/Tools/index_pathstr.bat -text
 Scripts/Tools/isnativecmd.bat -text
 Scripts/Tools/joinvars.bat -text
+Scripts/Tools/list_urls_in_files.py -text
 Scripts/Tools/locks/__init__.bat -text
 Scripts/Tools/locks/lock_dir_impl.bat -text
 Scripts/Tools/locks/lock_mutex.bat -text

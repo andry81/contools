@@ -68,7 +68,7 @@ rem trick with simultaneous iteration over 2 lists in the same time
   )
 ) < "%~2"
 
-exit /b
+exit /b 0
 
 :SET_WITH_PRINT
 rem trick with simultaneous iteration over 2 lists in the same time
@@ -76,6 +76,8 @@ rem trick with simultaneous iteration over 2 lists in the same time
   for /f "usebackq eol=# tokens=* delims=" %%i in ("%~1") do (
     set /p "%%i="
     rem to filter out wrong matches of a variable from the `set "%%i"`
-    for /f "usebackq eol=# tokens=1,* delims==" %%j in (`set "%%i"`) do if "%%j" == "%%i" echo.%%i=%%k
+    for /f "usebackq eol=# tokens=1,* delims==" %%j in (`set "%%i"`) do if /i "%%j" == "%%i" echo.%%i=%%k
   )
 ) < "%~2"
+
+exit /b 0

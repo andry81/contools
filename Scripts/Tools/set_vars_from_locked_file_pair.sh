@@ -34,6 +34,11 @@ function set_vars_from_locked_file_pair()
     exec 8< "$3"
 
     # cleanup on return
+    #
+    # CAUTION:
+    #   `trap - RETURN` is required here, otherwise the return trap would be called again in a parent scope function,
+    #   in case if there was no trap command!
+    #
     trap "rm -f \"$1\" 2> /dev/null; exec 8>&-; exec 7>&-; trap - RETURN" RETURN
 
     local __VarName
