@@ -280,6 +280,12 @@ Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64_k.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_cut.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_cut_dur.bat -text
+Scripts/Tools/ToolAdaptors/fla/diff_fla/CHANGES_EN.txt -text
+Scripts/Tools/ToolAdaptors/fla/diff_fla/FlaToXML.jsfl -text
+Scripts/Tools/ToolAdaptors/fla/diff_fla/README_EN.txt -text
+Scripts/Tools/ToolAdaptors/fla/diff_fla/diff_perforce.bat -text
+Scripts/Tools/ToolAdaptors/fla/diff_fla/diff_perforce.py -text
+Scripts/Tools/ToolAdaptors/fla/diff_fla/license.txt -text
 Scripts/Tools/ToolAdaptors/hta/Samples/run_notepad.hta -text
 Scripts/Tools/ToolAdaptors/hta/Samples/view_example.hta -text
 Scripts/Tools/ToolAdaptors/lnk/cmd.lnk -text
