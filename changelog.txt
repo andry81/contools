@@ -1,6 +1,10 @@
 2019.08.17:
+* fixed: Scripts/Tools: decode errors in the `list_urls_in_files.py` script
+* fixed: Scripts/Tools: warning message `cmdoplib.py:10: DeprecationWarning: invalid escape sequence \(` in case of import the `cmdoplib.py` module through the `importlib` module
+
+2019.08.17:
+* fixed: Scripts/Tools: traceback message in the `list_urls_in_files.py` script
 * new: Scripts/Tools: `cmdoplib.py` and `list_urls_in_files.py` scripts to extract urls from files
-* changed: Scripts/Tools: backmerge from tacklelib project (`set_vars_from_locked_file_pair.*`)
 * changed: Scripts/Tools/admin/ProductKey: missed changes
 
 2019.08.17:

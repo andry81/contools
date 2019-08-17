@@ -1,4 +1,4 @@
-import os, sys, re, inspect
+import os, sys, re, inspect, io
 
 SOURCE_FILE = os.path.abspath(inspect.getsourcefile(lambda:0)).replace('\\','/')
 SOURCE_DIR = os.path.dirname(SOURCE_FILE)
@@ -21,11 +21,24 @@ def parse_dir(dir_path):
 
     for file_name in files:
       file_path = os.path.join(dirpath, file_name).replace('\\','/')
-      with open(file_path) as file:
+      with open(file_path, 'rb') as file: # CAUTION: binary mode is required to correctly decode string into `utf-8` below
+        file_content = file.read()
+
         is_file_path_printed = False
         unique_file_urls = []
 
-        for line in file:
+        # CAUTION:
+        #   Do decode with explicitly stated encoding to avoid the error:
+        #   `UnicodeDecodeError: 'charmap' codec can't decode byte ... in position ...: character maps to <undefined>`
+        #   (see details: https://stackoverflow.com/questions/27453879/unicode-decode-error-how-to-skip-invalid-characters/27454001#27454001 )
+        #
+        file_content_decoded = file_content.decode('utf-8', errors='ignore')
+
+        # To iterate over lines instead chars.
+        # (see details: https://stackoverflow.com/questions/3054604/iterate-over-the-lines-of-a-string/3054898#3054898 )
+        file_strings = io.StringIO(file_content_decoded)
+
+        for line in file_strings:
           urls = cmdoplib.extract_urls(line)
           for url in urls:
             if not is_file_path_printed:
