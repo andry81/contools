@@ -82,8 +82,6 @@ for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
-if not defined CWD exit /b 1
-
 set "CREATE_FILES_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_files_in_dirs_list.lst"
 set "CREATE_FILES_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_files_list.lst"
 

@@ -1,3 +1,8 @@
+2019.08.18:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: create files/directories by list in case of empty current directory path
+* new: Scripts/Tools: `import_module` function in `cmdoplib.py` module to import python modules directly file by file
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: minor ButtonBars changes
+
 2019.08.17:
 * fixed: Scripts/Tools: decode errors in the `list_urls_in_files.py` script
 * fixed: Scripts/Tools: warning message `cmdoplib.py:10: DeprecationWarning: invalid escape sequence \(` in case of import the `cmdoplib.py` module through the `importlib` module

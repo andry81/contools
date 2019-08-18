@@ -1,6 +1,11 @@
 # pure python module for commands w/o extension modules usage (xonsh, cmdix and others)
 
-import os, sys, re
+import os, sys, re, importlib.util
+
+def import_module(dir_path, module_name):
+  import_spec = importlib.util.spec_from_file_location(module_name, os.path.join(dir_path, module_name).replace('\\', '/'))
+  import_module = importlib.util.module_from_spec(import_spec)
+  import_spec.loader.exec_module(import_module)
 
 # error print
 def print_err(*args, **kwargs):
