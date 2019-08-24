@@ -562,6 +562,9 @@ Scripts/Tools/callshift.bat -text
 Scripts/Tools/canonicalpath.bat -text
 Scripts/Tools/cat2.sh -text
 Scripts/Tools/cmdoplib.py -text
+Scripts/Tools/cmdoplib.std.xsh -text
+Scripts/Tools/cmdoplib.yaml.py -text
+Scripts/Tools/cmdoplib.yaml.xsh -text
 Scripts/Tools/countlines.bat -text
 Scripts/Tools/cstresc.bat -text
 Scripts/Tools/cygsetupdiff.sh -text

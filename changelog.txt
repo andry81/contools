@@ -1,3 +1,8 @@
+2019.08.25:
+* fixed: Scripts/Tools: temporary fix to the `import_module` function to workaround load module file names with period characters in the middle
+* new: Scripts/Tools: `cmdoplib.yaml.py` module to expand variable references in the YAML configuration dictionaries
+* new: Scripts/Tools: `cmdoplib.std.xsh`, `cmdoplib.yaml.xsh` xonsh scripts to support calls from xonsh environment
+
 2019.08.18:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: create files/directories by list in case of empty current directory path
 * new: Scripts/Tools: `import_module` function in `cmdoplib.py` module to import python modules directly file by file
