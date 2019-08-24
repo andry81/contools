@@ -1,6 +1,8 @@
-# pure python module for commands w/o extension modules usage (xonsh, cmdix and others)
+# xonsh python module for commands with extension modules usage: cmdoplib, xonsh
 
-import os, sys, re, imp#importlib
+import os, sys, xonsh, imp#importlib
+
+### local import ###
 
 def import_module(dir_path, module_name, ref_module_name = None):
   ### CAUTION: direct implementation, can not load modules directly from any arbitrary directory
@@ -18,19 +20,24 @@ def import_module(dir_path, module_name, ref_module_name = None):
   module_file, module_file_name, module_desc = imp.find_module(os.path.splitext(module_name)[0], [os.path.dirname(module_file_path)])
   globals()[module_name if ref_module_name is None else ref_module_name] = imp.load_module(module_file_path, module_file, module_file_name, module_desc)
 
-# error print
-def print_err(*args, **kwargs):
-  print(*args, file=sys.stderr, **kwargs)
+import_module($CONTOOLS_ROOT, 'cmdoplib.py')
 
-def extract_urls(str):
-  urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', str.lower())
-  urls_arr = []
-  for url in urls:
-    lastChar = url[-1] # get the last character
-    # if the last character is not (^ - not) an alphabet, or a number,
-    # or a '/' (some websites may have that. you can add your own ones), then enter IF condition
-    if (bool(re.match(r'[^a-zA-Z0-9/]', lastChar))): 
-      urls_arr.append(url[:-1]) # stripping last character, no matter what
-    else:
-      urls_arr.append(url) # else, simply append to new list
-  return urls_arr
+### functions ###
+
+def source_module(dir_path, module_name):
+  #source dir_path/module_name
+  evalx('source r"{0}"'.format(os.path.join(dir_path, module_name).replace('\\', '/')))
+
+# call from pipe
+def pcall(args):
+  args.pop(0)(*args)
+
+# call from pipe w/o capture: https://xon.sh/tutorial.html#uncapturable-aliases
+@xonsh.tools.uncapturable
+def pcall_nocap(args):
+  args.pop(0)(*args)
+
+# /dev/null (Linux) or nul (Windows) replacement
+def pnull(args, stdin=None):
+  for line in stdin:
+    pass
