@@ -561,10 +561,6 @@ Scripts/Tools/callargs.bat -text
 Scripts/Tools/callshift.bat -text
 Scripts/Tools/canonicalpath.bat -text
 Scripts/Tools/cat2.sh -text
-Scripts/Tools/cmdoplib.py -text
-Scripts/Tools/cmdoplib.std.xsh -text
-Scripts/Tools/cmdoplib.yaml.py -text
-Scripts/Tools/cmdoplib.yaml.xsh -text
 Scripts/Tools/countlines.bat -text
 Scripts/Tools/cstresc.bat -text
 Scripts/Tools/cygsetupdiff.sh -text
@@ -663,7 +659,6 @@ Scripts/Tools/iffexist.bat -text
 Scripts/Tools/index_pathstr.bat -text
 Scripts/Tools/isnativecmd.bat -text
 Scripts/Tools/joinvars.bat -text
-Scripts/Tools/list_urls_in_files.py -text
 Scripts/Tools/locks/__init__.bat -text
 Scripts/Tools/locks/lock_dir_impl.bat -text
 Scripts/Tools/locks/lock_mutex.bat -text
