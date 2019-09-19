@@ -1,3 +1,13 @@
+2019.09.19:
+* removed: Scripts/Tools: python scripts moved to tacklelib project
+
+2019.09.01:
+* fixed: Scripts/Tools: warning message `DeprecationWarning: the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses`, adopted `importlib` to import modules with periods in a file name
+* fixed: minor fixes
+* new: Scripts/Tools: cmdoplib.yaml.py: variables stack push/pop support, to drop/restore variables in different contexts (for example, between loads)
+* new: Scripts/Tools: cmdoplib.yaml.xsh: `yaml_push_global_vars`, `yaml_pop_global_vars` functions
+* refactor: Scripts/Tools: `cmdoplib.py` renamed into `cmdoplib.std.py`
+
 2019.08.25:
 * fixed: Scripts/Tools: temporary fix to the `import_module` function to workaround load module file names with period characters in the middle
 * new: Scripts/Tools: `cmdoplib.yaml.py` module to expand variable references in the YAML configuration dictionaries
