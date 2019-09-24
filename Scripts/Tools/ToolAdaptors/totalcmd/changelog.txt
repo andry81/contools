@@ -1,3 +1,8 @@
+2019.09.24:
+* new: `create_empty_files_by_path_list.bat` script and `create_files_by_list.bar` command bar to create empty files by saveload path list
+* new: icon `create_files_by_list.ico` for the `create_empty_files_by_path_list.bat` script
+* refactor: minor refactor
+
 2019.08.18:
 * fixed: create files/directories by list in case of empty current directory path
 * changed: minor ButtonBars changes
