@@ -82,7 +82,11 @@ for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
-set "CREATE_FILES_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_files_in_dirs_list.lst"
+set "LIST_FILE_PATH=%~1"
+
+rem if not defined LIST_FILE_PATH exit /b 0
+
+set "CREATE_FILES_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_files_in_dir_list.lst"
 set "CREATE_FILES_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_files_list.lst"
 
 set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
@@ -93,25 +97,25 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   set RESTORE_LOCALE=1
 )
 
-if not "%~1" == "" (
+if defined LIST_FILE_PATH (
   if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
     rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
     rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
     rem
-    call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%INPUT_LIST_FILE_UTF8_TMP%"
+    call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%LIST_FILE_PATH%%" > "%INPUT_LIST_FILE_UTF8_TMP%"
   ) else (
-    set "INPUT_LIST_FILE_UTF8_TMP=%~1"
+    set "INPUT_LIST_FILE_UTF8_TMP=%LIST_FILE_PATH%"
   )
 )
 
-rem recreate empty lists
+rem create empty list
 type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%CREATE_FILES_LIST_FILE_TMP%"
 
-if not "%~1" == "" (
+if defined LIST_FILE_PATH (
   rem recreate files
   copy "%INPUT_LIST_FILE_UTF8_TMP%" "%CREATE_FILES_IN_LIST_FILE_TMP%" /B /Y > nul
 ) else (
-  rem recreate empty lists
+  rem recreate empty list
   type nul > "%CREATE_FILES_IN_LIST_FILE_TMP%"
 
   rem use working directory path as base directory path

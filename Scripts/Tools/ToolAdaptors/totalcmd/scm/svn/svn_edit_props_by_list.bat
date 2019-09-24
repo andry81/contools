@@ -96,7 +96,9 @@ for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
-if "%~1" == "" exit /b 0
+set "LIST_FILE_PATH=%~1"
+
+if not defined LIST_FILE_PATH exit /b 0
 
 rem properties saved into files to compare with
 set "PROPS_INOUT_FILES_DIR=%SCRIPT_TEMP_CURRENT_DIR%\inout"
@@ -159,12 +161,12 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
-  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%INPUT_LIST_FILE_TMP%"
+  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%LIST_FILE_PATH%%" > "%INPUT_LIST_FILE_TMP%"
 ) else (
-  set "INPUT_LIST_FILE_TMP=%~1"
+  set "INPUT_LIST_FILE_TMP=%LIST_FILE_PATH%"
 )
 
-rem recreate empty lists
+rem recreate empty list
 type nul > "%EDIT_LIST_FILE_TMP%"
 
 rem read selected file paths from file
@@ -284,6 +286,7 @@ fc "%PROP_VALUE_FILE%" "%PROP_VALUE_FILE%.orig" > nul
 if %ERRORLEVEL% EQU 0 exit /b 0
 
 call :CMD svn pset "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" -F "%%PROP_VALUE_FILE%%" --non-interactive
+pause
 exit /b
 
 :CMD

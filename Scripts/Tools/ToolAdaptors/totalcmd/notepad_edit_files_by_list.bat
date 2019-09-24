@@ -99,7 +99,7 @@ set "EDIT_FROM_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_from_file_list.
 
 set "EDIT_FROM_LIST_FILE_HEX_TMP=%EDIT_FROM_LIST_FILE_HEX_TMP:\=/%"
 
-rem recreate empty lists
+rem recreate empty list
 type nul > "%EDIT_FROM_LIST_FILE_TMP%"
 
 set "TRANSLATED_LIST_FILE_PATH=%LIST_FILE_PATH%"

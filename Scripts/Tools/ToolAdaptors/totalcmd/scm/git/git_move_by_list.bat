@@ -82,7 +82,9 @@ for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
-if "%~1" == "" exit /b 0
+set "LIST_FILE_PATH=%~1"
+
+if not defined LIST_FILE_PATH exit /b 0
 
 set "MOVE_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
 set "MOVE_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\move_to_file_list.lst"
@@ -95,12 +97,12 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
-  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%~1" > "%MOVE_FROM_LIST_FILE_TMP%"
+  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16 UTF-8 "%%LIST_FILE_PATH%%" > "%MOVE_FROM_LIST_FILE_TMP%"
 ) else (
-  set "MOVE_FROM_LIST_FILE_TMP=%~1"
+  set "MOVE_FROM_LIST_FILE_TMP=%LIST_FILE_PATH%"
 )
 
-rem recreate empty lists
+rem recreate empty list
 type nul > "%MOVE_TO_LIST_FILE_TMP%"
 
 rem read selected file paths from file
