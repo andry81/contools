@@ -1,3 +1,6 @@
+2019.10.08:
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: TODO update
+
 2019.09.24:
 * new: Scripts/Tools/ToolAdaptors/totalcmd: `create_empty_files_by_path_list.bat` script and `create_files_by_list.bar` command bar to create empty files by saveload path list
 * new: Scripts/Tools/ToolAdaptors/totalcmd: icon `create_files_by_list.ico` for the `create_empty_files_by_path_list.bat` script

@@ -1,3 +1,6 @@
+2019.10.08:
+* changed: TODO update
+
 2019.09.24:
 * new: `create_empty_files_by_path_list.bat` script and `create_files_by_list.bar` command bar to create empty files by saveload path list
 * new: icon `create_files_by_list.ico` for the `create_empty_files_by_path_list.bat` script

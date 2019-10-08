@@ -67,3 +67,9 @@ Note:
     <file_name> - name of a file in a selection directory path.
   Scripts would open a Notepad to edit all related property files together or
   one by one.
+
+- Add scripts (`svn_copy_by_svn_ctrl_list.bat`/`git_copy_by_ctrl_list.bat`) to
+  copy directories and files by inner svn/git control list may be including
+  files which are not under control list (how is under question).
+  Useful to copy version control files into intermediate storage or into
+  archive to later extract and merge them into another svn/git repository.
