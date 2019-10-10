@@ -73,3 +73,9 @@ Note:
   files which are not under control list (how is under question).
   Useful to copy version control files into intermediate storage or into
   archive to later extract and merge them into another svn/git repository.
+  Additionally, add ability to generate/synchronize/edit .svnignore files by
+  using previous scripts like `svn_*_props_by_list`/`svn_*_props_by_nested_wc`.
+
+- Add scripts (`svn_add_files_by_list.bat`) to add files to the SVN
+  using builtin files for the ignore filter like `.svnignore` both from the
+  working copy root directory and from the working copy relative directory.
