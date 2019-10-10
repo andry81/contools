@@ -1,3 +1,6 @@
+2019.10.10:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd/scm/git: `git_rename_by_list.bat` fix for missed or incorrect renames
+
 2019.10.08:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: TODO update
 

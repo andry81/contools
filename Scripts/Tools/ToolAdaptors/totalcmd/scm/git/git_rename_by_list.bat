@@ -139,21 +139,29 @@ call :PARENT_DIR FROM_FILE_DIR "%%FROM_FILE_PATH%%"
 rem check if file is under GIT version control
 
 rem WORKAROUND:
-rem  Git ignores absolute path as an command argument and anyway searches current working directory for the repository.
+rem  Git checks if the current path is inside the same .git directories tree.
 rem  Use `pushd` to set the current directory to parent directory of being processed item.
 rem
 
-call :CMD pushd "%%FROM_FILE_DIR%%" && (
-  call :CMD git ls-files --error-unmatch "%%FROM_FILE_PATH%%" >nul 2>nul && (
-    call :RENAME_FILE GIT "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
-  )
-) || (
+set PUSHD=0
+call :CMD pushd "%%FROM_FILE_DIR%%"
+if %ERRORLEVEL% EQU 0 (
+  set PUSHD=1
+) else goto EXIT_PROCESS_RENAME
+
+rem check if file is under GIT version control
+git ls-files --error-unmatch "%FROM_FILE_PATH%" >nul 2>nul
+if %ERRORLEVEL% EQU 0 (
+  call :RENAME_FILE GIT "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+) else (
   rem rename through the shell
   call :RENAME_FILE SHELL "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 )
+
+:EXIT_PROCESS_RENAME
 set LASTERROR=%ERRORLEVEL%
 
-call :CMD popd
+if %PUSHD% NEQ 0 call :CMD popd
 
 exit /b %LASTERROR%
 
