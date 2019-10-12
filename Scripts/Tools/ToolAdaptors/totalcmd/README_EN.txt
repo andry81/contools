@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.07.27
+* 2019.10.12
 * Toolbar buttons configuration for the Total Commander.
 
 1. CONFIGURE
@@ -31,7 +31,7 @@
 
 3.5. Edit SVN externals (SVN properties)
 3.5.1. Method #1. By path list from ANSI text file over SVN GUI.
-3.5.2. Method #2. By path list from UNICODE text file over SVN GUI.
+3.5.2. Method #2. By path list from UNICODE (UTF-16) text file over SVN GUI.
 3.5.3. Method #3. By path list from command line over SVN GUI.
 3.5.4. Method #4. By path list from command line one by one over external editor.
 
@@ -51,48 +51,52 @@
 
 3.9. One pane comparison for 2 selected files
 3.9.1. Method #1. By path list from ANSI text file.
-3.9.2. Method #2. By path list from UNICODE text file.
+3.9.2. Method #2. By path list from UNICODE (UTF-16) text file.
 3.9.3. Method #3. By path list from command line.
 
 3.10. One pane comparison for 2 selected files with sorted content
 3.10.1. Method #1. By path list from ANSI text file.
-3.10.2. Method #2. By path list from UNICODE text file.
+3.10.2. Method #2. By path list from UNICODE (UTF-16) text file.
 3.10.3. Method #3. By path list from command line.
 
 3.11. Shell/SVN/GIT files batch move
 3.11.1. Method #1. Move files by selection list from ANSI text file.
-3.11.2. Method #2. Move files by selection list from UNICODE text file.
+3.11.2. Method #2. Move files by selection list from UNICODE (UTF-16) text file.
 
 3.12. Shell/SVN/GIT files batch rename
 3.12.1. Method #1. Rename files by selection list from ANSI text file.
-3.12.2. Method #2. Rename files by selection list from UNICODE text file.
+3.12.2. Method #2. Rename files by selection list from UNICODE (UTF-16) text file.
 
 3.13. Shell/SVN/GIT files batch copy
 3.13.1. Method #1. Copy files by selection list from ANSI text file.
-3.13.2. Method #2. Copy files by selection list from UNICODE text file.
+3.13.2. Method #2. Copy files by selection list from UNICODE (UTF-16) text file.
 
 3.14. Shell file to files copy by list
 3.14.1. Method #1. Shell file to files copy by ANSI list
-3.14.2. Method #2. Shell file to files copy by UNICODE list
+3.14.2. Method #2. Shell file to files copy by UNICODE (UTF-16) list
 
-3.15. Create batch directories
+3.15. Create batch directories from directories
 3.15.1. Method #1. Create directories in current directory by list from ANSI text file.
 3.15.2. Method #2. Create directories in selected directories by list from ANSI text file.
-3.15.3. Method #3. Create directories in current directory by list from UNICODE text file.
-3.15.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+3.15.3. Method #3. Create directories in current directory by list from UNICODE (UTF-16) text file.
+3.15.4. Method #4. Create directories in selected directories by list from UNICODE (UTF-16) text file.
 
-3.16. Create batch empty files
-3.16.1. Method #1. Create directories in current directory by list from ANSI text file.
-3.16.2. Method #2. Create directories in selected directories by list from ANSI text file.
-3.16.3. Method #3. Create directories in current directory by list from UNICODE text file.
-3.16.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+3.16. Create batch empty files from directories
+3.16.1. Method #1. Create empty files in current directory by list from ANSI text file.
+3.16.2. Method #2. Create empty files in selected directories by list from ANSI text file.
+3.16.3. Method #3. Create empty files in current directory by list from UNICODE (UTF-16) text file.
+3.16.4. Method #4. Create empty files in selected directories by list from UNICODE (UTF-16) text file.
 
-3.17. Concatenate video files
+3.17. Create batch empty files by paths
+3.17.1. Method #1. Create empty files by path list from ANSI text file.
+3.17.2. Method #3. Create empty files by path list from UNICODE (UTF-16) text file.
 
-3.18. Save/Load file selection list to/from a saveload slot
-3.18.1. Save file selection list to a saveload slot
-3.18.2. Load file selection list from a saveload slot
-3.18.3. Edit a saveload slot list
+3.18. Concatenate video files
+
+3.19. Save/Load file selection list to/from a saveload slot
+3.19.1. Save file selection list to a saveload slot
+3.19.2. Load file selection list from a saveload slot
+3.19.3. Edit a saveload slot list
 
 4. AUTHOR
 
@@ -362,7 +366,7 @@ call_nowindow.vbs
 scm\tortoisesvn\tortoiseproc_by_list.bat /command:properties "%P" %L
 
 ------------------------------------------------------------------------------
-3.5.2. Method #2. By path list from UNICODE text file over SVN GUI.
+3.5.2. Method #2. By path list from UNICODE (UTF-16) text file over SVN GUI.
 ------------------------------------------------------------------------------
 (all windows together)
 
@@ -476,7 +480,7 @@ call_nowindow.vbs
 compare_files_by_list.bat -wait "%P" %L
 
 ------------------------------------------------------------------------------
-3.9.2. Method #2. By path list from UNICODE text file.
+3.9.2. Method #2. By path list from UNICODE (UTF-16) text file.
 ------------------------------------------------------------------------------
 
 call_nowindow.vbs
@@ -501,7 +505,7 @@ call_nowindow.vbs
 compare_sorted_files_by_list.bat -wait "%P" %L
 
 ------------------------------------------------------------------------------
-3.10.2. Method #2. By path list from UNICODE text file.
+3.10.2. Method #2. By path list from UNICODE (UTF-16) text file.
 ------------------------------------------------------------------------------
 
 call_nowindow.vbs
@@ -543,7 +547,7 @@ call.vbs
 scm\git\git_move_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-3.11.2. Method #2. Move files by selection list from UNICODE text file.
+3.11.2. Method #2. Move files by selection list from UNICODE (UTF-16) text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -590,7 +594,7 @@ call.vbs
 scm\git\git_rename_files_by_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-3.12.2. Method #2. Rename files by selection list from UNICODE text file.
+3.12.2. Method #2. Rename files by selection list from UNICODE (UTF-16) text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -637,7 +641,7 @@ call.vbs
 scm\git\git_copy_files_by_list.bat -pause_on_exit "%P" %L
 
 ------------------------------------------------------------------------------
-3.13.2. Method #2. Copy files by selection list from UNICODE text file.
+3.13.2. Method #2. Copy files by selection list from UNICODE (UTF-16) text file.
 ------------------------------------------------------------------------------
 
 For Shell:
@@ -667,14 +671,14 @@ call.vbs
 copy_file_to_files_by_list.bat -pause_on_exit -from_file %P%N "<file_paths_list_file>"
 
 ------------------------------------------------------------------------------
-3.14.2. Method #2. Shell file to files copy by UNICODE list
+3.14.2. Method #2. Shell file to files copy by UNICODE (UTF-16) list
 ------------------------------------------------------------------------------
 
 call.vbs
 copy_file_to_files_by_list.bat -pause_on_exit -from_utf16 -from_file %P%N "<file_paths_list_file>"
 
 ------------------------------------------------------------------------------
-3.15. Create batch directories
+3.15. Create batch directories from directories
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
@@ -692,21 +696,21 @@ call.vbs
 create_dirs_by_list.bat -pause_on_exit "%P" %L
 
 ------------------------------------------------------------------------------
-3.15.3. Method #3. Create directories in current directory by list from UNICODE text file.
+3.15.3. Method #3. Create directories in current directory by list from UNICODE (UTF-16) text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat -pause_on_exit -from_utf16 "%P"
 
 ------------------------------------------------------------------------------
-3.15.4. Method #4. Create directories in selected directories by list from UNICODE text file.
+3.15.4. Method #4. Create directories in selected directories by list from UNICODE (UTF-16) text file.
 ------------------------------------------------------------------------------
 
 call.vbs
 create_dirs_by_list.bat -pause_on_exit -from_utf16 "%P" %WL
 
 ------------------------------------------------------------------------------
-3.16. Create batch empty files
+3.16. Create batch empty files from directories
 ------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------
@@ -714,38 +718,56 @@ create_dirs_by_list.bat -pause_on_exit -from_utf16 "%P" %WL
 ------------------------------------------------------------------------------
 
 call.vbs
-create_empty_files_by_list.bat "%P"
+create_empty_files_by_dirs_list.bat "%P"
 
 ------------------------------------------------------------------------------
 3.16.2. Method #2. Create empty files in selected directories by list from ANSI text file.
 ------------------------------------------------------------------------------
 
 call.vbs
-create_empty_files_by_list.bat "%P" %L
+create_empty_files_by_dirs_list.bat "%P" %L
 
 ------------------------------------------------------------------------------
-3.16.3. Method #3. Create empty files in current directory by list from UNICODE text file.
-------------------------------------------------------------------------------
-
-call.vbs
-create_empty_files_by_list.bat -from_utf16 "%P"
-
-------------------------------------------------------------------------------
-3.16.4. Method #4. Create empty files in selected directories by list from UNICODE text file.
+3.16.3. Method #3. Create empty files in current directory by list from UNICODE (UTF-16) text file.
 ------------------------------------------------------------------------------
 
 call.vbs
-create_empty_files_by_list.bat -from_utf16 "%P" %WL
+create_empty_files_by_disr_list.bat -from_utf16 "%P"
 
 ------------------------------------------------------------------------------
-3.17. Concatenate video files
+3.16.4. Method #4. Create empty files in selected directories by list from UNICODE (UTF-16) text file.
+------------------------------------------------------------------------------
+
+call.vbs
+create_empty_files_by_dirs_list.bat -from_utf16 "%P" %WL
+
+------------------------------------------------------------------------------
+3.17. Create batch empty files by paths
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+3.17.1. Method #1. Create empty files by path list from ANSI text file.
+------------------------------------------------------------------------------
+
+call.vbs
+create_empty_files_by_dirs_list.bat -pause_on_exit "%P" <path_to_path_list_with_ansi_strings>
+
+------------------------------------------------------------------------------
+3.17.2. Method #3. Create empty files by path list from UNICODE (UTF-16) text file.
+------------------------------------------------------------------------------
+
+call.vbs
+create_empty_files_by_dirs_list.bat -pause_on_exit -from_utf16 "%P" <path_to_path_list_with_utf16_strings>
+
+------------------------------------------------------------------------------
+3.18. Concatenate video files
 ------------------------------------------------------------------------------
 
 call.vbs
 converters\ffmpeg\ffmpeg_convert_by_list.bat -wait -pause_on_exit %L "%T"
 
 ------------------------------------------------------------------------------
-3.18. Save/Load file selection list to/from a saveload slot
+3.19. Save/Load file selection list to/from a saveload slot
 ------------------------------------------------------------------------------
 
 To be able to save and load file paths selection list in the Total Commander
@@ -753,7 +775,7 @@ for minimal steps or mouse clicks you have to make some preparations before the
 usage.
 
 ------------------------------------------------------------------------------
-3.18.1. Save file selection list to a saveload slot
+3.19.1. Save file selection list to a saveload slot
 ------------------------------------------------------------------------------
 
 call.vbs
@@ -771,7 +793,7 @@ The files name must be by the same path as in the
 `saveload_search_in_slot_<INDEX_STR>_SearchIn` variables in below section.
 
 ------------------------------------------------------------------------------
-3.18.2. Load file selection list from a saveload slot
+3.19.2. Load file selection list from a saveload slot
 ------------------------------------------------------------------------------
 
 At first, you have to create search template in your main configuration file of
@@ -807,7 +829,7 @@ Next click to the find button would show the last saved file paths list which
 you can feed to the Total Commander last active panel.
 
 ------------------------------------------------------------------------------
-3.18.3. Edit a saveload slot list
+3.19.3. Edit a saveload slot list
 ------------------------------------------------------------------------------
 
 call.vbs
