@@ -1,4 +1,9 @@
 2019.10.12:
+* fixed: configure.bat run errors
+* changed: `COMMANDER_SCRIPTS_ROOT` variable usage to reference all scripts in the *.bar files from the ButtonBars directory
+* changed: *.bar files switched to use the `COMMANDER_SCRIPTS_ROOT` environment variable
+
+2019.10.12:
 * fixed: missed `create_empty_files_by_path_list.bat` script
 * changed: readme update
 

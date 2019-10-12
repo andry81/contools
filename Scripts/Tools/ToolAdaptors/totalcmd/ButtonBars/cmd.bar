@@ -1,26 +1,26 @@
 [Buttonbar]
 Buttoncount=4
-button1=c:\Total Commander Scripts\images\cmd64_admin.ico
+button1=%COMMANDER_SCRIPTS_ROOT%\images\cmd64_admin.ico
 cmd1=cmd_system64_admin.lnk
 param1=/K set "CWD=%P"&call cd /d "%%CWD%%"&title %%COMSPEC%%
-path1=c:\Total Commander Scripts\
+path1=%COMMANDER_SCRIPTS_ROOT%\
 iconic1=0
 menu1=cmd 64-bit as admin
-button2=c:\Total Commander Scripts\images\cmd32_admin.ico
+button2=%COMMANDER_SCRIPTS_ROOT%\images\cmd32_admin.ico
 cmd2=cmd_wow64_admin.lnk
 param2=/K set "CWD=%P"&call cd /d "%%CWD%%"&title %%COMSPEC%%
-path2=c:\Total Commander Scripts\
+path2=%COMMANDER_SCRIPTS_ROOT%\
 iconic2=0
 menu2=cmd 32-bit as admin
-button3=c:\Total Commander Scripts\images\cmd64.ico
+button3=%COMMANDER_SCRIPTS_ROOT%\images\cmd64.ico
 cmd3=cmd_system64.lnk
 param3=/K set "CWD=%P"&call cd /d "%%CWD%%"&title %%COMSPEC%%
-path3=c:\Total Commander Scripts\
+path3=%COMMANDER_SCRIPTS_ROOT%\
 iconic3=0
 menu3=cmd 64-bit
-button4=c:\Total Commander Scripts\images\cmd32.ico
+button4=%COMMANDER_SCRIPTS_ROOT%\images\cmd32.ico
 cmd4=cmd_wow64.lnk
 param4=/K set "CWD=%P"&call cd /d "%%CWD%%"&title %%COMSPEC%%
-path4=c:\Total Commander Scripts\
+path4=%COMMANDER_SCRIPTS_ROOT%\
 iconic4=0
 menu4=cmd 32-bit

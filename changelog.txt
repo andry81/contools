@@ -1,4 +1,9 @@
 2019.10.12:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat run errors
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: `COMMANDER_SCRIPTS_ROOT` variable usage to reference all scripts in the *.bar files from the ButtonBars directory
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: *.bar files switched to use the `COMMANDER_SCRIPTS_ROOT` environment variable
+
+2019.10.12:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: missed `create_empty_files_by_path_list.bat` script
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
 
