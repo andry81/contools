@@ -348,6 +348,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/converters/ffmpeg/ffmpeg_convert_by_list.bat
 Scripts/Tools/ToolAdaptors/totalcmd/copy_file_to_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/create_dirs_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/create_empty_files_by_dir_list.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/create_empty_files_by_path_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/edit_file_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/COPYING -text
 Scripts/Tools/ToolAdaptors/totalcmd/icobundle/README.txt -text
