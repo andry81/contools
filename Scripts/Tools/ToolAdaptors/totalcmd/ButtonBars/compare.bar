@@ -1,18 +1,18 @@
 [Buttonbar]
 Buttoncount=3
-button1=c:\Total Commander Scripts\images\compare_files_in_list.ico
+button1=%COMMANDER_SCRIPTS_ROOT%\images\compare_files_in_list.ico
 cmd1=call_nowindow.vbs
 param1=compare_files_by_list.bat -wait -from_utf16 "%P" %WL
-path1=c:\Total Commander Scripts\
+path1=%COMMANDER_SCRIPTS_ROOT%\
 iconic1=0
 menu1=compare 2 files/directories in one panel
-button2=c:\Total Commander Scripts\images\compare_files_in_sorted_list.ico
+button2=%COMMANDER_SCRIPTS_ROOT%\images\compare_files_in_sorted_list.ico
 cmd2=call_nowindow.vbs
 param2=compare_sorted_files_by_list.bat -wait -from_utf16 "%P" %WL
-path2=c:\Total Commander Scripts\
+path2=%COMMANDER_SCRIPTS_ROOT%\
 iconic2=0
 menu2=compare 2 sorted files in one panel
-button3=c:\Total Commander Scripts\images\compare_files.ico
+button3=%COMMANDER_SCRIPTS_ROOT%\images\compare_files.ico
 cmd3=cm_IntCompareFilesByContent
 iconic3=0
 menu3=internal compare 2 files

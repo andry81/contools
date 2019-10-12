@@ -14,7 +14,7 @@ exit /b %LASTERROR%
 
 :MAIN
 rem script flags
-set FLAG_IGNORE_BUTTONBARS=0
+rem set FLAG_IGNORE_BUTTONBARS=0
 
 :FLAGS_LOOP
 
@@ -25,9 +25,10 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-ignore_buttonbars" (
-    set FLAG_IGNORE_BUTTONBARS=1
-  ) else (
+  rem if "%FLAG%" == "-ignore_buttonbars" (
+  rem   set FLAG_IGNORE_BUTTONBARS=1
+  rem ) else
+  (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -98,10 +99,13 @@ if defined CONFIGURE_TO_DIR (
 
 rem pre calls to configure in an outter directory
 if defined CONFIGURE_TO_DIR (
-  if %FLAG_IGNORE_BUTTONBARS% EQU 0 if exist "%CONFIGURE_TO_DIR%/ButtonBars\" (
-    echo.%?~nx0%: error: ButtonBars directory is already exist, you have to backup and remove it manually: "%CONFIGURE_TO_DIR%/ButtonBars"
-    exit /b 10
-  ) >&2
+  rem if %FLAG_IGNORE_BUTTONBARS% EQU 0 if exist "%CONFIGURE_TO_DIR%/ButtonBars\" (
+  rem   echo.%?~nx0%: error: ButtonBars directory is already exist, you have to backup and remove it manually: "%CONFIGURE_TO_DIR%/ButtonBars"
+  rem   exit /b 10
+  rem ) >&2
+
+  rem install the variable at first
+  call :CMD "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @setx /M COMMANDER_SCRIPTS_ROOT "%%CONFIGURE_TO_DIR:/=\%%"
 
   call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
   call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/_config" "%%CONFIGURE_TO_DIR%%/_config" /E /Y /D || exit /b
@@ -181,7 +185,7 @@ call :CMD "%%CONTOOLS_ROOT_COPY%%/check_config_version.bat" 1 ^
   "%%TOTALCMD_ROOT%%\profile.vars.in" "%%TOTALCMD_ROOT%%\profile.vars" || exit /b
 
 if /i "%%CONFIGURE_FROM_DIR%%\profile.vars" == "%%TOTALCMD_ROOT%%\profile.vars" goto IGNORE_PROFILE_WRITE
-call :CMD fc "%%CONFIGURE_FROM_DIR%%\profile.vars" "%%TOTALCMD_ROOT%%\profile.vars" > nul
+call :CMD fc "%%CONFIGURE_FROM_DIR%%\profile.vars.in" "%%TOTALCMD_ROOT%%\profile.vars" > nul
 if %ERRORLEVEL% EQU 0 goto IGNORE_PROFILE_WRITE
 
 set PROFILE_VARS_INDEX_TO=3
