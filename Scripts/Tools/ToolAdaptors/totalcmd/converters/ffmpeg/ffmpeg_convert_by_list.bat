@@ -78,7 +78,7 @@ set "TARGET_PATH=%TARGET_PATH:\=/%"
 
 rem select file
 set "CONVERT_TO_FILE_PATH="
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%CONTOOLS_ROOT%/wxSaveFileDialog.exe" "MP4 Video files (*.mp4)|*.mp4|All files|*.*" "%TARGET_PATH%" "Convert to a file"`) do (
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%CONTOOLS_ROOT%/wxFileDialog.exe" "MP4 Video files (*.mp4)|*.mp4|All files|*.*" "%TARGET_PATH%" "Convert to a file" -sp`) do (
   set "CONVERT_TO_FILE_PATH=%%i"
 )
 if %ERRORLEVEL% NEQ 0 exit /b 0

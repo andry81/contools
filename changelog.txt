@@ -1,4 +1,7 @@
 2019.10.14:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd/converters/ffmpeg: `ffmpeg_convert_by_list.bat` misuse
+
+2019.10.14:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: configure: missed to copy `wxFileDialog.exe` utility
 
 2019.10.14:
