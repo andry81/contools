@@ -2,7 +2,8 @@
 
 "CONFIG_DIR=%TOTALCMD_ROOT%\_config"
 
-"NPP_EDITOR=C:\Program Files\Notepad++\notepad++.exe"
+# 32-bit Notepad++ with better plugins manager
+"NPP_EDITOR=C:\Program Files (x86)\Notepad++\notepad++.exe"
 BASIC_TEXT_EDITOR=notepad.exe
 
 "ARAXIS_COMPARE_TOOL=C:\Program Files\Araxis Merge\Compare.exe"

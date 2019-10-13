@@ -1,4 +1,8 @@
 2019.10.14:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars %-character usage
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: profile minor change
+
+2019.10.14:
 * changed: configure: made the _3dparty directory an optional
 
 2019.10.12:

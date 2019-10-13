@@ -1,3 +1,7 @@
+2019.10.14:
+* fixed: ButtonBars %-character usage
+* changed: profile minor change
+
 2019.10.12:
 * fixed: configure.bat run errors
 * changed: `COMMANDER_SCRIPTS_ROOT` variable usage to reference all scripts in the *.bar files from the ButtonBars directory
