@@ -134,6 +134,7 @@ call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "subtract_relative_path.bat" "%%CONTOOLS_RO
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "index_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "split_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "strlen.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/../../Utilities/bin" "wxFileDialog.exe" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/encoding" "%%CONTOOLS_ROOT_COPY%%/encoding" /S /Y /D || exit /b
 
