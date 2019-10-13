@@ -1,4 +1,7 @@
 2019.10.14:
+* fixed: configure: missed to copy `wxFileDialog.exe` utility
+
+2019.10.14:
 * changed: profile minor change
 
 2019.10.14:
