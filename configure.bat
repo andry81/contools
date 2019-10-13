@@ -77,7 +77,7 @@ echo "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
   echo.call "%%%%~dp0..\..\__init__.bat" ^|^| exit /b
 ) > "%CONFIGURE_ROOT%/Scripts/Tools/scm/svn/__init__.bat"
 
-call :DEPLOY_3DPARTY || goto EXIT
+if exist "%CONFIGURE_ROOT%/_3dparty\" call :DEPLOY_3DPARTY || goto EXIT
 
 goto CONFIGURE_SVNCMD_END
 
