@@ -1,4 +1,7 @@
 2019.10.14:
+* changed: profile minor change
+
+2019.10.14:
 * fixed: ButtonBars %-character usage
 * changed: profile minor change
 
