@@ -1,4 +1,7 @@
 2019.10.17:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars: incomplete `COMMANDER_SCRIPTS_ROOT` variable usage changes
+
+2019.10.17:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: always quote command arguments because of a case where were no printable characters in an argument but was an environment variable expansion with not printable character in a value
 
 2019.10.14:
