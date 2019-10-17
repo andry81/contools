@@ -1,3 +1,6 @@
+2019.10.17:
+* fixed: ButtonBars: incomplete `COMMANDER_SCRIPTS_ROOT` variable usage changes
+
 2019.10.14:
 * fixed: converters/ffmpeg: `ffmpeg_convert_by_list.bat` misuse
 
