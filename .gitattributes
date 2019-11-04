@@ -327,6 +327,9 @@ Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/move.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/notepad.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/rename.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/save.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/save_file_names.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/save_file_paths.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/select.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/svn.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/Issues.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
@@ -385,7 +388,10 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/menu_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_notepad.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_rename_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_file_list.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_file_names.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_file_paths.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_load.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/menu_select_by_file_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_svn.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_edit.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_new.ico -text
@@ -393,6 +399,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_new_to_save.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepadpp_append.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepadpp_edit.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/save_list.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/select_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/separator_svn.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/shell_copy_file_to_files_by_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/shell_copy_files.ico -text

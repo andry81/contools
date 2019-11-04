@@ -85,15 +85,15 @@ if not exist "%CONFIGURE_TO_DIR%/tacklebar\" (
 )
 
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
+
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/_config" "%%CONFIGURE_TO_DIR%%/tacklebar/_config" /E /Y /D || exit /b
+
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/ButtonBars" "%%CONFIGURE_TO_DIR%%/tacklebar/ButtonBars" /S /Y /D || exit /b
+
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/Tools" "%%CONFIGURE_TO_DIR%%/tacklebar/Tools" /E /Y /D || exit /b
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/converters" "%%CONFIGURE_TO_DIR%%/tacklebar/converters" /S /Y /D || exit /b
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/scm" "%%CONFIGURE_TO_DIR%%/tacklebar/scm" /S /Y /D || exit /b
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/images" "%%CONFIGURE_TO_DIR%%/tacklebar/images" /S /Y /D || exit /b
-rem copy only if does not exist before
-if not exist "%CONFIGURE_TO_DIR%/tacklebar/ButtonBars\" (
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/ButtonBars" "%%CONFIGURE_TO_DIR%%/tacklebar/ButtonBars" /S /Y /D || exit /b
-)
 
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "__init__.bat" "%%CONFIGURE_TO_DIR%%/tacklebar" /Y /D /H || exit /b
 
