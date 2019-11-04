@@ -41,40 +41,24 @@ if defined FLAG (
 
 rem there to configure
 set "CONFIGURE_TO_DIR=%~1"
-rem where take the Tools directory
-set "CONTOOLS_FROM_DIR=%~2"
 
-if not defined CONFIGURE_TO_DIR goto IGNORE_CONFIGURE_TO_DIR
+if not defined CONFIGURE_TO_DIR (
+  echo.%?~nx0%: error: CONFIGURE_TO_DIR must be defined
+  exit /b 1
+) >&2
 
 set "CONFIGURE_TO_DIR=%CONFIGURE_TO_DIR:\=/%"
 if "%CONFIGURE_TO_DIR:~-1%" == "/" set "CONFIGURE_TO_DIR=%CONFIGURE_TO_DIR:~0,-1%"
 
 if not exist "%CONFIGURE_TO_DIR%\" (
   echo.%?~nx0%: error: CONFIGURE_TO_DIR is not a directory: "%CONFIGURE_TO_DIR%"
-  exit /b 1
+  exit /b 2
 ) >&2
 
-:IGNORE_CONFIGURE_TO_DIR
 set "CONFIGURE_FROM_DIR=%?~dp0%"
 set "CONFIGURE_FROM_DIR=%CONFIGURE_FROM_DIR:\=/%"
 if "%CONFIGURE_FROM_DIR:~-1%" == "/" set "CONFIGURE_FROM_DIR=%CONFIGURE_FROM_DIR:~0,-1%"
 
-if not defined CONTOOLS_FROM_DIR goto IGNORE_CONTOOLS_FROM_DIR
-
-set "CONTOOLS_FROM_DIR=%CONTOOLS_FROM_DIR:\=/%"
-if "%CONTOOLS_FROM_DIR:~-1%" == "/" set "CONTOOLS_FROM_DIR=%CONTOOLS_FROM_DIR:~0,-1%"
-
-if not exist "%CONTOOLS_FROM_DIR%\" (
-  echo.%?~nx0%: error: CONTOOLS_FROM_DIR is not a directory: "%CONTOOLS_FROM_DIR%"
-  exit /b 2
-) >&2
-
-rem relocate CONTOOLS_ROOT
-set "CONTOOLS_ROOT=%CONTOOLS_FROM_DIR%"
-
-goto IGNORE_INNER_CONTOOLS_ROOT
-
-:IGNORE_CONTOOLS_FROM_DIR
 call :CANONICAL_PATH "%%?~dp0%%..\.."
 set "CONTOOLS_ROOT=%RETURN_VALUE%"
 
@@ -89,37 +73,30 @@ call "%%CONTOOLS_ROOT%%/__init__.bat" || goto CONTOOLS_ROOT_ERROR
 if not defined SVNCMD_TOOLS_ROOT goto SVNCMD_TOOLS_ROOT_ERROR
 if not exist "%SVNCMD_TOOLS_ROOT%\__init__.bat" goto SVNCMD_TOOLS_ROOT_ERROR
 
-if defined CONFIGURE_TO_DIR (
-  set "TOTALCMD_ROOT=%CONFIGURE_TO_DIR%"
-  set "CONTOOLS_ROOT_COPY=%CONFIGURE_TO_DIR%/Tools"
-) else (
-  set "TOTALCMD_ROOT=%CONFIGURE_FROM_DIR%"
-  set "CONTOOLS_ROOT_COPY=%CONFIGURE_FROM_DIR%/Tools"
+set "COMMANDER_SCRIPTS_ROOT=%CONFIGURE_TO_DIR%"
+set "CONTOOLS_ROOT_COPY=%CONFIGURE_TO_DIR%/tacklebar/Tools"
+
+rem installing..
+
+call :CMD "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @setx /M COMMANDER_SCRIPTS_ROOT "%%COMMANDER_SCRIPTS_ROOT:/=\%%"
+
+if not exist "%CONFIGURE_TO_DIR%/tacklebar\" (
+  call :CMD mkdir "%%CONFIGURE_TO_DIR%%/tacklebar"
 )
 
-rem pre calls to configure in an outter directory
-if defined CONFIGURE_TO_DIR (
-  rem if %FLAG_IGNORE_BUTTONBARS% EQU 0 if exist "%CONFIGURE_TO_DIR%/ButtonBars\" (
-  rem   echo.%?~nx0%: error: ButtonBars directory is already exist, you have to backup and remove it manually: "%CONFIGURE_TO_DIR%/ButtonBars"
-  rem   exit /b 10
-  rem ) >&2
-
-  rem install the variable at first
-  call :CMD "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @setx /M COMMANDER_SCRIPTS_ROOT "%%CONFIGURE_TO_DIR:/=\%%"
-
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/_config" "%%CONFIGURE_TO_DIR%%/_config" /E /Y /D || exit /b
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/Tools" "%%CONFIGURE_TO_DIR%%/Tools" /E /Y /D || exit /b
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/converters" "%%CONFIGURE_TO_DIR%%/converters" /S /Y /D || exit /b
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/scm" "%%CONFIGURE_TO_DIR%%/scm" /S /Y /D || exit /b
-  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/images" "%%CONFIGURE_TO_DIR%%/images" /S /Y /D || exit /b
-  rem copy only if does not exist before
-  if not exist "%CONFIGURE_TO_DIR%/ButtonBars\" (
-    call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/ButtonBars" "%%CONFIGURE_TO_DIR%%/ButtonBars" /S /Y /D || exit /b
-  )
-
-  call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "__init__.bat" "%%CONFIGURE_TO_DIR%%" /Y /D /H || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/_config" "%%CONFIGURE_TO_DIR%%/tacklebar/_config" /E /Y /D || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/Tools" "%%CONFIGURE_TO_DIR%%/tacklebar/Tools" /E /Y /D || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/converters" "%%CONFIGURE_TO_DIR%%/tacklebar/converters" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/scm" "%%CONFIGURE_TO_DIR%%/tacklebar/scm" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/images" "%%CONFIGURE_TO_DIR%%/tacklebar/images" /S /Y /D || exit /b
+rem copy only if does not exist before
+if not exist "%CONFIGURE_TO_DIR%/tacklebar/ButtonBars\" (
+  call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/ButtonBars" "%%CONFIGURE_TO_DIR%%/tacklebar/ButtonBars" /S /Y /D || exit /b
 )
+
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "__init__.bat" "%%CONFIGURE_TO_DIR%%/tacklebar" /Y /D /H || exit /b
+
 
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
 
@@ -157,36 +134,37 @@ call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /S /Y /D 
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/tasks" "%%CONTOOLS_ROOT_COPY%%/tasks" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_sorted_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_sorted_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_dirs_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "loadvars.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_new_session.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "save_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "load_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "edit_file_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "copy_file_to_files_by_list.bat" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_sorted_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_sorted_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_dirs_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_by_dir_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_by_path_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "loadvars.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_new_session.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "save_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "load_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "edit_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "copy_file_to_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/ToolAdaptors/ffmpeg" "%%TOTALCMD_ROOT%%/converters/ffmpeg" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/ToolAdaptors/ffmpeg" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/converters/ffmpeg" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk" "cmd*.*" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk" "cmd*.*" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/vbs" "call*.vbs" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/vbs" "call*.vbs" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "profile.vars.in" "%%TOTALCMD_ROOT%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "profile.vars.in" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 
-if not exist "%TOTALCMD_ROOT%\profile.vars" goto COPY_PROFILE
+if not exist "%COMMANDER_SCRIPTS_ROOT%/tacklebar\profile.vars" goto COPY_PROFILE
 
 call :CMD "%%CONTOOLS_ROOT_COPY%%/check_config_version.bat" 1 ^
-  "%%TOTALCMD_ROOT%%\profile.vars.in" "%%TOTALCMD_ROOT%%\profile.vars" || exit /b
+  "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars.in" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars" || exit /b
 
-if /i "%%CONFIGURE_FROM_DIR%%\profile.vars" == "%%TOTALCMD_ROOT%%\profile.vars" goto IGNORE_PROFILE_WRITE
-call :CMD fc "%%CONFIGURE_FROM_DIR%%\profile.vars.in" "%%TOTALCMD_ROOT%%\profile.vars" > nul
+if /i "%%CONFIGURE_FROM_DIR%%\profile.vars" == "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars" goto IGNORE_PROFILE_WRITE
+call :CMD fc "%%CONFIGURE_FROM_DIR%%\profile.vars.in" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars" > nul
 if %ERRORLEVEL% EQU 0 goto IGNORE_PROFILE_WRITE
 
 set PROFILE_VARS_INDEX_TO=3
@@ -209,12 +187,12 @@ if %PROFILE_VARS_INDEX_FROM% GTR 1 (
   set "PROFILE_VARS_FILE_NAME_FROM=profile.old.vars"
 )
 
-if exist "%TOTALCMD_ROOT%/%PROFILE_VARS_FILE_NAME_BEFORE%" (
-  if exist "%TOTALCMD_ROOT%/%PROFILE_VARS_FILE_NAME_FROM%" (
-    if exist "%TOTALCMD_ROOT%/profile.old.%PROFILE_VARS_INDEX_TO%.vars" (
-      call :CMD del /F /Q /A:-D "%%TOTALCMD_ROOT%%\profile.old.%%PROFILE_VARS_INDEX_TO%%.vars"
+if exist "%COMMANDER_SCRIPTS_ROOT%/tacklebar/%PROFILE_VARS_FILE_NAME_BEFORE%" (
+  if exist "%COMMANDER_SCRIPTS_ROOT%/tacklebar/%PROFILE_VARS_FILE_NAME_FROM%" (
+    if exist "%COMMANDER_SCRIPTS_ROOT%/tacklebar/profile.old.%PROFILE_VARS_INDEX_TO%.vars" (
+      call :CMD del /F /Q /A:-D "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.old.%%PROFILE_VARS_INDEX_TO%%.vars"
     )
-    call :CMD rename "%%TOTALCMD_ROOT%%\%%PROFILE_VARS_FILE_NAME_FROM%%" "profile.old.%%PROFILE_VARS_INDEX_TO%%.vars" || exit /b
+    call :CMD rename "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\%%PROFILE_VARS_FILE_NAME_FROM%%" "profile.old.%%PROFILE_VARS_INDEX_TO%%.vars" || exit /b
   )
 )
 
@@ -223,10 +201,10 @@ set "PROFILE_VARS_INDEX_TO=%PROFILE_VARS_INDEX_FROM%"
 goto PROFILE_ROTATE_LOOP
 
 :CONTINUE_PROFILE_WRITE
-call :CMD rename "%%TOTALCMD_ROOT%%\profile.vars" "profile.old.vars" || exit /b
+call :CMD rename "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars" "profile.old.vars" || exit /b
 
 :COPY_PROFILE
-call :COPY_FILE "%%TOTALCMD_ROOT%%\profile.vars.in" "%%TOTALCMD_ROOT%%\profile.vars" || exit /b
+call :COPY_FILE "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars.in" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars" || exit /b
 
 :IGNORE_PROFILE_WRITE
 if not exist "%SYSTEMROOT%\System64\" (

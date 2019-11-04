@@ -1,13 +1,9 @@
 * README_EN.txt
-* 2019.10.12
+* 2019.11.04
 * Toolbar buttons configuration for the Total Commander.
 
-1. CONFIGURE
-1.1 Configure into outter directory
-1.2 Configure into inner directory
-
+1. INSTALLATION
 2. CONFIGURATION STORAGE FILES
-
 3. DESCRIPTION ON SCRIPTS USAGE
 
 3.1. Open a notepad window independently to selected files
@@ -101,34 +97,18 @@
 4. AUTHOR
 
 ------------------------------------------------------------------------------
-1. CONFIGURE
+1. INSTALLATION
 ------------------------------------------------------------------------------
 
-To configure into an outter directory do run the `configure.bat` with at least
-first parameter - path to the outter directory.
-
-To configure into an inner directory do run the `configure.bat` without
-parameters.
+To install into a directory do run the `_install.bat` with the first argument -
+path to the installation root. The `COMMANDER_SCRIPTS_ROOT` environment
+variable would be created to store the installation path and the `tacklelib`
+subdirectory would contain all the script files and configuration files.
 
 CAUTION:
   To use saveload feature to load file selection list from file path lists you
   must execute the steps introduced in the
   `Load file selection list from a saveslot` section of this file!
-
-------------------------------------------------------------------------------
-1.1 Configure into outter directory
-------------------------------------------------------------------------------
-
-The `configure.bat` script will copy all scripts and dependencies into outter
-directory.
-
-------------------------------------------------------------------------------
-1.2 Configure into inner directory
-------------------------------------------------------------------------------
-
-The `configure.bat` script will copy dependencies into inner directories.
-The `contools` project `Scripts/Tools` subdirectory must already exist or been
-copied as is because the script would copy files and subdirectories from it.
 
 ------------------------------------------------------------------------------
 2. CONFIGURATION STORAGE FILES
