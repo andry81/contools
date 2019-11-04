@@ -1,4 +1,9 @@
 2019.11.04:
+* new: Scripts/Tools/ToolAdaptors/totalcmd: save selection bar button now shows 2 submenu items: `Save absolute file paths...` and `Save file names...` + icons
+* new: Scripts/Tools/ToolAdaptors/totalcmd: selection by list bar button + icons
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+
+2019.11.04:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: `create_empty_files_by_dir_list.bat` and `create_empty_files_by_path_list.bat` is missed to install
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: `configure.bat` renamed into `_install.bat`
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: `_install.bat` simplification, now the first parameter is always required to define the directory there to install

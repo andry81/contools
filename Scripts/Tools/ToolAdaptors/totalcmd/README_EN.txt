@@ -91,8 +91,9 @@
 
 3.19. Save/Load file selection list to/from a saveload slot
 3.19.1. Save file selection list to a saveload slot
-3.19.2. Load file selection list from a saveload slot
-3.19.3. Edit a saveload slot list
+3.19.2. Edit a saveload slot list
+3.19.3. Load file selection list from a saveload slot
+3.19.4. Select files by list from a saveload slot
 
 4. AUTHOR
 
@@ -773,7 +774,21 @@ The files name must be by the same path as in the
 `saveload_search_in_slot_<INDEX_STR>_SearchIn` variables in below section.
 
 ------------------------------------------------------------------------------
-3.19.2. Load file selection list from a saveload slot
+3.19.2. Edit a saveload slot list
+------------------------------------------------------------------------------
+
+call.vbs
+save_file_list.bat [-pause_on_exit] [-pause_on_error] [-pause_timeout_sec <pause_timeout_sec>] "<list_file_path>"
+
+Where:
+  * `-pause_on_exit` - always pause on exit.
+  * `-pause_on_error` - pause on exit only if an error.
+  * `<list_file_path>` - a list file path there the file paths is stored.
+  * `<pause_timeout_sec>` - timeout in seconds while in a pause (if enabled)
+    before close a console window.
+
+------------------------------------------------------------------------------
+3.19.3. Load file selection list from a saveload slot
 ------------------------------------------------------------------------------
 
 At first, you have to create search template in your main configuration file of
@@ -809,18 +824,13 @@ Next click to the find button would show the last saved file paths list which
 you can feed to the Total Commander last active panel.
 
 ------------------------------------------------------------------------------
-3.19.3. Edit a saveload slot list
+3.19.4. Select files by list from a saveload slot
 ------------------------------------------------------------------------------
 
-call.vbs
-save_file_list.bat [-pause_on_exit] [-pause_on_error] [-pause_timeout_sec <pause_timeout_sec>] "<list_file_path>"
+LOADSELECTION "<path_to_file_list>"
 
-Where:
-  * `-pause_on_exit` - always pause on exit.
-  * `-pause_on_error` - pause on exit only if an error.
-  * `<list_file_path>` - a list file path there the file paths is stored.
-  * `<pause_timeout_sec>` - timeout in seconds while in a pause (if enabled)
-    before close a console window.
+NOTE:
+  Command implemented in the version starting from 9.50 beta 3.
 
 ------------------------------------------------------------------------------
 4. AUTHOR
