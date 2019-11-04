@@ -336,12 +336,12 @@ Scripts/Tools/ToolAdaptors/totalcmd/Tools/check_config_version.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/_config/svn_props_to_edit.lst.in -text
 Scripts/Tools/ToolAdaptors/totalcmd/_config/svn_props_to_sync.lst.in -text
+Scripts/Tools/ToolAdaptors/totalcmd/_install.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/changelog.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_sorted_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_sorted_files_by_list.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/configure.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/converters/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/converters/ffmpeg/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/converters/ffmpeg/ffmpeg_convert_by_list.bat -text

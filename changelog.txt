@@ -1,3 +1,10 @@
+2019.11.04:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: `create_empty_files_by_dir_list.bat` and `create_empty_files_by_path_list.bat` is missed to install
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: `configure.bat` renamed into `_install.bat`
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: `_install.bat` simplification, now the first parameter is always required to define the directory there to install
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: install: scripts, button bars and configuration files moved into `tacklebar` subdirectory to avoid mix or overwrite standalone files in the same root directory
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+
 2019.10.17:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars: incomplete `COMMANDER_SCRIPTS_ROOT` variable usage changes
 

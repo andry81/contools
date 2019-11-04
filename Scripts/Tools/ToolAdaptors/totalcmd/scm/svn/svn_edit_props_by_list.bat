@@ -108,11 +108,11 @@ set "EDIT_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_file_list.lst"
 set "CHANGESET_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\changeset_file_list.lst"
 
 if %FLAG_EDIT_FILTER_BY_PROP_CLASS% NEQ 0 goto USE_USER_PROPS_FILTER
-set "PROPS_FILTER_FILE=%CONFIG_DIR%\svn_props_to_edit.lst.in"
+set "PROPS_FILTER_FILE=%COMMANDER_CONFIG_DIR%\svn_props_to_edit.lst.in"
 goto LOAD_PROPS_FILTER
 
 :USE_USER_PROPS_FILTER
-call :CMD copy /B /Y "%%CONFIG_DIR%%\svn_props_to_edit.lst.in" "%%SCRIPT_TEMP_CURRENT_DIR%%\svn_props_to_edit.lst" || exit /b 10
+call :CMD copy /B /Y "%%COMMANDER_CONFIG_DIR%%\svn_props_to_edit.lst.in" "%%SCRIPT_TEMP_CURRENT_DIR%%\svn_props_to_edit.lst" || exit /b 10
 set "PROPS_FILTER_FILE=%SCRIPT_TEMP_CURRENT_DIR%\svn_props_to_edit.lst"
 rem goto LOAD_PROPS_FILTER
 

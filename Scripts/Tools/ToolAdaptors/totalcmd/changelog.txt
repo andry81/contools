@@ -1,3 +1,10 @@
+2019.11.04:
+* fixed: `create_empty_files_by_dir_list.bat` and `create_empty_files_by_path_list.bat` is missed to install
+* changed: `configure.bat` renamed into `_install.bat`
+* changed: `_install.bat` simplification, now the first parameter is always required to define the directory there to install
+* changed: install: scripts, button bars and configuration files moved into `tacklebar` subdirectory to avoid mix or overwrite standalone files in the same root directory
+* changed: readme update
+
 2019.10.17:
 * fixed: ButtonBars: incomplete `COMMANDER_SCRIPTS_ROOT` variable usage changes
 

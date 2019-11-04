@@ -1,6 +1,6 @@
 #%% version: 1
 
-"CONFIG_DIR=%TOTALCMD_ROOT%\_config"
+"COMMANDER_CONFIG_DIR=%COMMANDER_SCRIPTS_ROOT%/_config"
 
 # 32-bit Notepad++ with better plugins manager
 "NPP_EDITOR=C:\Program Files (x86)\Notepad++\notepad++.exe"
