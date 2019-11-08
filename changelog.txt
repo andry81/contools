@@ -1,4 +1,8 @@
 2019.11.08:
+* new: Scripts/Tools/ToolAdaptors/totalcmd: notepad icons
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: icons refactor
+
+2019.11.08:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: LOADSELECTION command does not work with quotes
 
 2019.11.08:
