@@ -102,7 +102,7 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 
 copy "%RENAME_FROM_LIST_FILE_TMP%" "%RENAME_TO_LIST_FILE_TMP%" /B /Y > nul
 
-call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%RENAME_TO_LIST_FILE_TMP%%"
+call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%RENAME_TO_LIST_FILE_TMP%%"
 
 rem trick with simultaneous iteration over 2 list in the same time
 (

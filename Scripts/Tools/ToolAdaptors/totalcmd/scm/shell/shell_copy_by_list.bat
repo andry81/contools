@@ -128,7 +128,7 @@ exit /b 0
 
 :FILL_TO_LIST_FILE_TMP_END
 
-call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%COPY_TO_LIST_FILE_TMP%%"
+call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%COPY_TO_LIST_FILE_TMP%%"
 
 rem trick with simultaneous iteration over 2 list in the same time
 (
@@ -186,36 +186,7 @@ if "%TO_FILE_DIR:~-1%" == "\" set "TO_FILE_DIR=%TO_FILE_DIR:~0,-1%"
 rem copy through the shell
 rem :COPY_FILE SHELL
 
-call "%%CONTOOLS_ROOT%%/get_shared_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_DIR%%"
-if %ERRORLEVEL% NEQ 0 (
-  echo.%?~n0%: error: source file path and destination file directory must share a common root path: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_DIR="%TO_FILE_DIR%".
-  exit /b -253
-) >&2
-
-set "SHARED_ROOT=%RETURN_VALUE%"
-
-call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%SHARED_ROOT%%" "%%TO_FILE_DIR%%"
-if %ERRORLEVEL% NEQ 0 (
-  echo.%?~n0%: error: shared path root is not a prefix to TO_FILE_DIR path: SHARED_ROOT="%SHARED_ROOT%" TO_FILE_DIR="%TO_FILE_DIR%".
-  exit /b -252
-) >&2
-
-set "TO_FILE_DIR_SUFFIX=%RETURN_VALUE%"
-
-if not defined TO_FILE_DIR_SUFFIX goto SHELL_COPY_FILE_CMD
-
-call :CMD pushd "%%SHARED_ROOT%%" && (
-  call :CMD mkdir "%%TO_FILE_DIR_SUFFIX%%"
-  call :CMD popd
-)
-
-:SHELL_COPY_FILE_CMD
-set "TO_FILE_PATH=%SHARED_ROOT%\%TO_FILE_DIR_SUFFIX%"
-
-rem always remove trailing slash character
-if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
-
-call :CMD copy /B /Y "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%\%%TO_FILE_NAME%%" || exit /b
+call :CMD copy /B /Y "%%FROM_FILE_PATH%%" "%%TO_FILE_DIR%%\%%TO_FILE_NAME%%" || exit /b
 
 exit /b
 

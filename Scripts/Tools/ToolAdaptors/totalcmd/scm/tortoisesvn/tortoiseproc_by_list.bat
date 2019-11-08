@@ -164,7 +164,7 @@ set /A MAX_SPAWN_TASKS+=1
 exit /b 0
 
 :PROCESS_TASKS
-call :SPAWN_TASKS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%TOTALCMD_ROOT%%/scm/tortoisesvn/tortoiseproc_read_path_from_stdin.bat"
+call :SPAWN_TASKS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/scm/tortoisesvn/tortoiseproc_read_path_from_stdin.bat"
 exit /b
 
 :SPAWN_TASKS
