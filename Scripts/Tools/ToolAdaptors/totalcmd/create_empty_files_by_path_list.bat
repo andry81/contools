@@ -108,7 +108,7 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 rem recreate files
 copy "%INPUT_LIST_FILE_UTF8_TMP%" "%CREATE_FILES_IN_LIST_FILE_TMP%" /B /Y > nul
 
-call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%CREATE_FILES_IN_LIST_FILE_TMP%%"
+call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%CREATE_FILES_IN_LIST_FILE_TMP%%"
 
 set LINE_INDEX=0
 for /f "usebackq eol=# tokens=* delims=" %%i in ("%CREATE_FILES_IN_LIST_FILE_TMP%") do (

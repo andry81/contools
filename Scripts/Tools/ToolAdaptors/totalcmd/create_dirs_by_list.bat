@@ -122,7 +122,7 @@ if defined LIST_FILE_PATH (
   for /F "eol=	 tokens=* delims=" %%i in ("%CD%") do (echo.%%i) >> "%CREATE_DIRS_IN_LIST_FILE_TMP%"
 )
 
-call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%CREATE_DIRS_LIST_FILE_TMP%%"
+call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%CREATE_DIRS_LIST_FILE_TMP%%"
 
 for /f "usebackq eol=# tokens=* delims=" %%i in ("%CREATE_DIRS_IN_LIST_FILE_TMP%") do (
   set "CREATE_DIRS_IN_DIR_PATH=%%i"

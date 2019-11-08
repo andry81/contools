@@ -117,7 +117,7 @@ set "PROPS_FILTER_FILE=%SCRIPT_TEMP_CURRENT_DIR%\svn_props_to_edit.lst"
 rem goto LOAD_PROPS_FILTER
 
 rem start to edit
-call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%PROPS_FILTER_FILE%%"
+call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%PROPS_FILTER_FILE%%"
 
 :LOAD_PROPS_FILTER
 set PROPS_FILTER_DIR_INDEX=0
@@ -185,7 +185,7 @@ if %NUM_PATHS_TO_EDIT% EQU 0 (
 ) >&2
 
 rem start to edit
-call "%%TOTALCMD_ROOT%%/notepad_edit_files_by_list.bat"%%BARE_FLAGS%% -wait -nosession -multiInst "" "%%EDIT_LIST_FILE_TMP%%"
+call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files_by_list.bat"%%BARE_FLAGS%% -wait -nosession -multiInst "" "%%EDIT_LIST_FILE_TMP%%"
 echo.
 
 rem read edited property paths from list file

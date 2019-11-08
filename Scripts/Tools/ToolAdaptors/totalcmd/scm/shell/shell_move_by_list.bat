@@ -125,7 +125,7 @@ exit /b 0
 
 :FILL_TO_LIST_FILE_TMP_END
 
-call "%%TOTALCMD_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%MOVE_TO_LIST_FILE_TMP%%"
+call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%MOVE_TO_LIST_FILE_TMP%%"
 
 rem trick with simultaneous iteration over 2 list in the same time
 (
