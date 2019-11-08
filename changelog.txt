@@ -1,4 +1,7 @@
 2019.11.08:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: LOADSELECTION command does not work with quotes
+
+2019.11.08:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: missed to replace `%TOTALCMD_ROOT%` by `%COMMANDER_SCRIPTS_ROOT%/tacklebar`
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: scm/shell: removed check on common root path in the `shell_copy_by_list.bat` script
 
