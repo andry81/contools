@@ -1,4 +1,8 @@
 2019.11.08:
+* new: notepad icons
+* refactor: icons refactor
+
+2019.11.08:
 * fixed: LOADSELECTION command does not work with quotes
 
 2019.11.08:

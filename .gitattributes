@@ -386,6 +386,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/menu_edit_saveload_file_list.ico -tex
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_load_file_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_move_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_notepad.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/menu_notepad.old.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_rename_files.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_file_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_file_names.ico -text
@@ -394,10 +395,14 @@ Scripts/Tools/ToolAdaptors/totalcmd/images/menu_save_load.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_select_by_file_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/menu_svn.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_edit.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_edit.old.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_new.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_new_to_save.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/notepad_new_to_save.old.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepadpp_append.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/notepadpp_append.old.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/notepadpp_edit.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images/notepadpp_edit.old.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/save_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/select_list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images/separator_svn.ico -text
@@ -454,6 +459,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/images_dev/ffmpeg.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images_dev/icon_move_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images_dev/icon_rename_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images_dev/list.ico -text
+Scripts/Tools/ToolAdaptors/totalcmd/images_dev/notepad_new.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images_dev/separator_svn.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/loadvars.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files.bat -text
