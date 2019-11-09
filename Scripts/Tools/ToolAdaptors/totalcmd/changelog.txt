@@ -1,3 +1,6 @@
+2019.11.09:
+* fixed: scm/shell: `shell_rename_by_list.bat` typo
+
 2019.11.08:
 * new: notepad icons
 * refactor: icons refactor

@@ -139,7 +139,7 @@ call :PARENT_DIR FROM_FILE_DIR "%%FROM_FILE_PATH%%"
 call :PARENT_DIR TO_FILE_DIR "%%TO_FILE_PATH%%"
 
 if /i not "%FROM_FILE_DIR%" == "%TO_FILE_DIR%" (
-  echo.%?~n0%: error: parent directory path must stay the same: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
+  echo.%?~n0%: error: parent directory path must stay the same: FROM_FILE_PATH="%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
   exit /b -254
 ) >&2
 
