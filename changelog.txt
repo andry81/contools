@@ -1,3 +1,6 @@
+2019.11.09:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: scm/shell: `shell_rename_by_list.bat` typo
+
 2019.11.08:
 * new: Scripts/Tools/ToolAdaptors/totalcmd: notepad icons
 * refactor: Scripts/Tools/ToolAdaptors/totalcmd: icons refactor
