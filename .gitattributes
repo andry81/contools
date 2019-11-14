@@ -531,6 +531,7 @@ Scripts/Tools/admin/reg_ie_proxy.bat -text
 Scripts/Tools/admin/reset_auth.bat -text
 Scripts/Tools/admin/reset_dns_winsock.bat -text
 Scripts/Tools/admin/reset_winhttp.bat -text
+Scripts/Tools/admin/scan_broken_reg_keys.py -text
 Scripts/Tools/admin/sfc_scan.bat -text
 Scripts/Tools/admin/test_connect.bat -text
 Scripts/Tools/appendvar.bat -text
