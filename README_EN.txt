@@ -38,12 +38,14 @@ https://en.wikipedia.org/wiki/MIT_License)
 3. REPOSITORIES
 -------------------------------------------------------------------------------
 Primary:
-  * https://svn.code.sf.net/p/contools/contools/trunk
-    https://sf.net/p/contools/contools/HEAD/tree/trunk/
+  * https://sf.net/p/contools/contools/HEAD/tree/trunk/
+    https://svn.code.sf.net/p/contools/contools/trunk
 First mirror:
-  * https://github.com/andry81/contools.git
+  * https://github.com/andry81/contools/tree/trunk
+    https://github.com/andry81/contools.git
 Second mirror:
-  * https://bitbucket.org/andry81/contools.git
+  * https://bitbucket.org/andry81/contools/src/trunk
+    https://bitbucket.org/andry81/contools.git
 
 -------------------------------------------------------------------------------
 4. PREREQUISITES
