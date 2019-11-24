@@ -1,6 +1,9 @@
 2019.11.24:
 * changed: readme update
 
+2019.11.24:
+* changed: readme update
+
 2019.11.14:
 * new: Scripts/Tools/admin: `scan_broken_reg_keys.py` python script to search for broken Windows registry keys
 
