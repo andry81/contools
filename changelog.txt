@@ -1,4 +1,7 @@
 2019.11.24:
+* changed: description changed in the readme file
+
+2019.11.24:
 * changed: readme update
 
 2019.11.24:
