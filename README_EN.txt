@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.06.27
+* 2019.11.24
 * ConsoleTools
 
 CAUTION:
@@ -39,6 +39,7 @@ https://en.wikipedia.org/wiki/MIT_License)
 -------------------------------------------------------------------------------
 Primary:
   * https://svn.code.sf.net/p/contools/contools/trunk
+    https://sf.net/p/contools/contools/HEAD/tree/trunk/
 First mirror:
   * https://github.com/andry81/contools.git
 Second mirror:
