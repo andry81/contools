@@ -17,9 +17,10 @@ CAUTION:
 -------------------------------------------------------------------------------
 1. DESCRIPTION
 -------------------------------------------------------------------------------
-Scripts for WindowsNT interpreter cmd.exe and other interpreters to support
-various operations and procedures with environment variables, text files and
-piping.
+A wide range of scripts for Windows NT interpreter (cmd.exe) and other
+interpreters such as bash shell (.sh), visual basic (.vbs), jscript (.js),
+python (.py), perl (.pl) and so on. Plus some set of standalone console
+utilities aside other utilities from cygwin, msys and mingw.
 
 The latest version is here:
   https://sf.net/p/contools/contools/HEAD/tree/trunk
