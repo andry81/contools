@@ -1,3 +1,6 @@
+2019.12.06:
+* new: Scripts/Tools/ToolAdaptors/ffmpeg: ffmpeg_copy.bat to fix a video file errors on copy
+
 2019.11.24:
 * changed: description changed in the readme file
 
