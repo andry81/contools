@@ -1,3 +1,6 @@
+2019.12.10:
+* new: Scripts/Tools/admin/MicrosoftOffice: enable/disable scripts for the Microsoft Office 2013 (15.0) services
+
 2019.12.06:
 * new: Scripts/Tools/ToolAdaptors/ffmpeg: ffmpeg_copy.bat to fix a video file errors on copy
 

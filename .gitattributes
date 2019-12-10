@@ -502,6 +502,8 @@ Scripts/Tools/abspath.bat -text
 Scripts/Tools/admin/BrokenKBUninstall/fix_win7_cannot_start_executables.bat -text
 Scripts/Tools/admin/KnownIssues/admin_windows7_crash_updates.txt -text
 Scripts/Tools/admin/KnownIssues/admin_windows7_known_issues.txt -text
+Scripts/Tools/admin/MicrosoftOffice/disable_msoffice_2013_15_svc.bat -text
+Scripts/Tools/admin/MicrosoftOffice/enable_msoffice_2013_15_svc.bat -text
 Scripts/Tools/admin/ProductKey/PrintProductKeyFromFile.py -text
 Scripts/Tools/admin/ProductKey/PrintProductKeyFromFile.vbs -text
 Scripts/Tools/admin/ProductKey/PrintProductKeyFromReg.py -text
