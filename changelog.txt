@@ -1,3 +1,6 @@
+2019.12.31:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: missed profile change
+
 2019.12.10:
 * new: Scripts/Tools/admin/MicrosoftOffice: enable/disable scripts for the Microsoft Office 2013 (15.0) services
 

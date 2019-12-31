@@ -1,3 +1,6 @@
+2019.12.31:
+* fixed: missed profile change
+
 2019.11.09:
 * fixed: scm/shell: `shell_rename_by_list.bat` typo
 
