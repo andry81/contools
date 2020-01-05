@@ -1,3 +1,7 @@
+2020.01.05:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: scm/svn: removed excessive pause commands
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars: svn: svn_edit_props_by_list: pause on exit instead pause on error
+
 2019.12.31:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: missed profile change
 
