@@ -180,7 +180,6 @@ for /F "usebackq eol=	 tokens=* delims=" %%i in ("%INPUT_LIST_FILE_TMP%") do (
 
 if %NUM_PATHS_TO_EDIT% EQU 0 (
   echo.%?~nx0%: warning: no properties is left to process, nothing to edit.
-  pause
   exit /b 12
 ) >&2
 
@@ -286,7 +285,6 @@ fc "%PROP_VALUE_FILE%" "%PROP_VALUE_FILE%.orig" > nul
 if %ERRORLEVEL% EQU 0 exit /b 0
 
 call :CMD svn pset "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" -F "%%PROP_VALUE_FILE%%" --non-interactive
-pause
 exit /b
 
 :CMD

@@ -1,3 +1,7 @@
+2020.01.05:
+* fixed: scm/svn: removed excessive pause commands
+* changed: ButtonBars: svn: svn_edit_props_by_list: pause on exit instead pause on error
+
 2019.12.31:
 * fixed: missed profile change
 
