@@ -259,7 +259,7 @@ function tkl_get_source_file_path()
 
 function tkl_make_source_file_components()
 {
-  tkl_get_source_file_path "$@" || return $?
+  tkl_get_source_file_path || return $?
 
   tkl_export BASH_SOURCE_FILE "$RETURN_VALUE"
   tkl_export BASH_SOURCE_DIR "${RETURN_VALUE%[/]*}"
