@@ -1,4 +1,7 @@
 2020.01.11:
+* new: Scripts/Tools/admin/VMware: enable/disable scripts for the VMware services
+
+2020.01.11:
 * new: Scripts/Tools: `load_config.bat` script to load (with copy from a template file if an input file is not found) light weight vars files
 
 2020.01.11:
