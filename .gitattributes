@@ -678,6 +678,7 @@ Scripts/Tools/iffexist.bat -text
 Scripts/Tools/index_pathstr.bat -text
 Scripts/Tools/isnativecmd.bat -text
 Scripts/Tools/joinvars.bat -text
+Scripts/Tools/load_config.bat -text
 Scripts/Tools/locks/__init__.bat -text
 Scripts/Tools/locks/lock_dir_impl.bat -text
 Scripts/Tools/locks/lock_mutex.bat -text
