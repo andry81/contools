@@ -1,3 +1,9 @@
+2020.01.22:
+* new: `create_dirs_by_path_list.bat` script to create directories by paths in a list
+* changed: ButtonBars: create: added `create directories by save load list...`
+* refactor: `create_*` scripts file name refactor
+* refactor: images: `create_*` icons file name refactor
+
 2020.01.21:
 * new: scm/svn: svn_edit_props_by_list: added `-create_prop_if_empty` flag to edit properties from the list and if not existed then create it
 * changed: ButtonBars: svn: added `svn edit selected properties by Notepad++` item
