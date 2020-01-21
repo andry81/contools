@@ -1,4 +1,10 @@
 2020.01.22:
+* new: Scripts/Tools/ToolAdaptors/totalcmd: `create_dirs_by_path_list.bat` script to create directories by paths in a list
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars: create: added `create directories by save load list...`
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: `create_*` scripts file name refactor
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: images: `create_*` icons file name refactor
+
+2020.01.22:
 * new: Scripts/Tools/admin/Photoshop: enable/disable scripts for the Photoshop services
 
 2020.01.21:
