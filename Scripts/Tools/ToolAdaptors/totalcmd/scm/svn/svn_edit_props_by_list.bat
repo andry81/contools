@@ -49,6 +49,8 @@ rem open an edit window per property class (`svn:ignore`, `svn.externals` and so
 set FLAG_WINDOW_PER_PROP_CLASS=0
 rem open an edit property classes filter window before open an edit properties window(s)
 set FLAG_EDIT_FILTER_BY_PROP_CLASS=0
+rem edit all properties selected by property classes filter window
+set FLAG_CREATE_PROP_IF_EMPTY=0
 set "BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -75,6 +77,8 @@ if defined FLAG (
     set FLAG_WINDOW_PER_PROP_CLASS=1
   ) else if "%FLAG%" == "-edit_filter_by_prop_class" (
     set FLAG_EDIT_FILTER_BY_PROP_CLASS=1
+  ) else if "%FLAG%" == "-create_prop_if_empty" (
+    set FLAG_CREATE_PROP_IF_EMPTY=1
   ) else (
     set BARE_FLAGS=%BARE_FLAGS% %1
   )
@@ -107,14 +111,19 @@ set "INPUT_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
 set "EDIT_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_file_list.lst"
 set "CHANGESET_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\changeset_file_list.lst"
 
+if %FLAG_CREATE_PROP_IF_EMPTY% NEQ 0 (
+  set "PROPS_FILTER_FILE_IN=%COMMANDER_CONFIG_DIR%\svn_props_to_edit_all.lst.in"
+) else (
+  set "PROPS_FILTER_FILE_IN=%COMMANDER_CONFIG_DIR%\svn_props_to_edit.lst.in"
+)
+
 if %FLAG_EDIT_FILTER_BY_PROP_CLASS% NEQ 0 goto USE_USER_PROPS_FILTER
-set "PROPS_FILTER_FILE=%COMMANDER_CONFIG_DIR%\svn_props_to_edit.lst.in"
+set "PROPS_FILTER_FILE=%PROPS_FILTER_FILE_IN%"
 goto LOAD_PROPS_FILTER
 
 :USE_USER_PROPS_FILTER
-call :CMD copy /B /Y "%%COMMANDER_CONFIG_DIR%%\svn_props_to_edit.lst.in" "%%SCRIPT_TEMP_CURRENT_DIR%%\svn_props_to_edit.lst" || exit /b 10
 set "PROPS_FILTER_FILE=%SCRIPT_TEMP_CURRENT_DIR%\svn_props_to_edit.lst"
-rem goto LOAD_PROPS_FILTER
+call :CMD copy /B /Y "%%PROPS_FILTER_FILE_IN%%" "%%PROPS_FILTER_FILE%%" || exit /b 10
 
 rem start to edit
 call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%PROPS_FILTER_FILE%%"
@@ -233,7 +242,12 @@ set "PROP_NAME_DECORATED=%PROP_NAME::=--%"
   type nul > nul
   if %PROPS_FILTER_PATH_INDEX% EQU 0 ( call :CMD mkdir "%%PROPS_INOUT_PATH_DIR%%" )
 ) && (
-  svn pget "%PROP_NAME%" "%FILE_PATH%" --non-interactive 2>nul >"%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%"
+  if %FLAG_CREATE_PROP_IF_EMPTY% EQU 0 (
+    svn pget "%PROP_NAME%" "%FILE_PATH%" --non-interactive 2>nul >"%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%"
+  ) else (
+    svn pget "%PROP_NAME%" "%FILE_PATH%" --non-interactive 2>nul >"%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%"
+    type nul > nul
+  )
 ) && (
   copy "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%" "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%.orig" /B /Y 2>&1 >nul
   for /F "eol=	 tokens=* delims=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
@@ -266,7 +280,12 @@ set "PROP_NAME_DECORATED=%PROP_NAME::=--%"
   type nul > nul
   if %PROPS_FILTER_PATH_INDEX% EQU 0 ( call :CMD mkdir "%%PROPS_INOUT_PATH_DIR%%" )
 ) && (
-  svn pget "%PROP_NAME%" "%FILE_PATH%" --non-interactive 2>nul >"%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%"
+  if %FLAG_CREATE_PROP_IF_EMPTY% EQU 0 (
+    svn pget "%PROP_NAME%" "%FILE_PATH%" --non-interactive 2>nul >"%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%"
+  ) else (
+    svn pget "%PROP_NAME%" "%FILE_PATH%" --non-interactive 2>nul >"%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%"
+    type nul > nul
+  )
 ) && (
   copy "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%" "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%.orig" /B /Y 2>&1 >nul
   for /F "eol=	 tokens=* delims=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
