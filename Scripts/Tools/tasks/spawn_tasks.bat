@@ -7,14 +7,14 @@ rem   Script to spawn tasks in parallel but not greater than maximum.
 
 setlocal
 
-rem overall tasks to spawn
+rem overall tasks to spawn, exit when reached
 set "MAX_SPAWN_TASKS=%~1"
 
-rem max permitted tasks to run together
+rem max permitted tasks to run together, otherwise wait
 set "MAX_BUSY_TASKS=%~2"
 
-rem max tasks to lock spwn new tasks, may be left empty to not lock
-set "MAX_BUSY_TASKS_TO_LOCK_SPAWN=%~3"
+rem min busy tasks to unlock spawn new tasks, may be left empty to not lock to spawn
+set "MIN_BUSY_TASKS_TO_UNLOCK_SPAWN=%~3"
 
 if not defined MAX_SPAWN_TASKS (
   echo.%~nx0: error: max spawn tasks is not defined.
@@ -66,12 +66,12 @@ if %LOCK_FILE0_ACQUIRE% EQU 0 (
 :REPEAT_SPAWN_LOOP
 
 rem can run more tasks?
-if not defined MAX_BUSY_TASKS_TO_LOCK_SPAWN (
+if not defined MIN_BUSY_TASKS_TO_UNLOCK_SPAWN (
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 ) else if %IS_TASK_SPAWN_LOCKED% EQU 0 (
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
   set IS_TASK_SPAWN_LOCKED=1
-) else if %MAX_BUSY_TASKS_TO_LOCK_SPAWN% GEQ %RUNNING_TASKS_COUNTER% (
+) else if %MIN_BUSY_TASKS_TO_UNLOCK_SPAWN% GEQ %RUNNING_TASKS_COUNTER% (
   set IS_TASK_SPAWN_LOCKED=0
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 )
@@ -118,12 +118,12 @@ if %LOCK_FILE0_ACQUIRE% EQU 0 (
 if %SPAWN_TASK_INDEX% GEQ %MAX_SPAWN_TASKS% goto MAX_SPAWN_REACHED
 
 rem can run more tasks?
-if not defined MAX_BUSY_TASKS_TO_LOCK_SPAWN (
+if not defined MIN_BUSY_TASKS_TO_UNLOCK_SPAWN (
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 ) else if %IS_TASK_SPAWN_LOCKED% EQU 0 (
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
   set IS_TASK_SPAWN_LOCKED=1
-) else if %MAX_BUSY_TASKS_TO_LOCK_SPAWN% GEQ %RUNNING_TASKS_COUNTER% (
+) else if %MIN_BUSY_TASKS_TO_UNLOCK_SPAWN% GEQ %RUNNING_TASKS_COUNTER% (
   set IS_TASK_SPAWN_LOCKED=0
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 )
