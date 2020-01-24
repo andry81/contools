@@ -6,6 +6,9 @@
 "NPP_EDITOR=C:\Program Files (x86)\Notepad++\notepad++.exe"
 BASIC_TEXT_EDITOR=notepad.exe
 
+# maximum number of compare tool spawn calls
+COMPARE_TOOL_MAX_SPAWN_CALLS=10
+
 "ARAXIS_COMPARE_TOOL=C:\Program Files\Araxis Merge\Compare.exe"
 "ARAXIS_CONSOLE_COMPARE_TOOL=C:\Program Files\Araxis Merge\ConsoleCompare.exe"
 "WINMERGE_COMPARE_TOOL=c:\Program Files\WinMerge\WinMergeU.exe"

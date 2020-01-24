@@ -132,6 +132,7 @@ call :XCOPY_DIR "%%CONTOOLS_ROOT%%/sqlite" "%%CONTOOLS_ROOT_COPY%%/sqlite" /S /Y
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /S /Y /D || exit /b
 
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/locks" "%%CONTOOLS_ROOT_COPY%%/locks" /S /Y /D || exit /b
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/tasks" "%%CONTOOLS_ROOT_COPY%%/tasks" /S /Y /D || exit /b
 
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
