@@ -1,3 +1,10 @@
+2020.01.24:
+* new: `compare_paths.bat` script to compare paths in a command line, `compare_paths_from_list.bat` script to compare paths in a single list file and `compare_paths_by_list.bat` script to compare paths in multiple list files
+* new: ButtonBars: compare: added `compare current directories of 2 panels` and `compare selected paths to saveload list...` items
+* changed: ButtonBars: compare: `compare selected paths from current panel (odd-to-even)` and `compare selected paths from current panel (odd-to-even, sort file lines)` items
+* refactor: compare function completely rewrited to support single panel compare (single list compare) and 2 panel compare (multiple lists compare)
+* refactor: Tools: minor cleanup
+
 2020.01.22:
 * new: `create_dirs_by_path_list.bat` script to create directories by paths in a list
 * changed: ButtonBars: create: added `create directories by save load list...`
