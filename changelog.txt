@@ -1,3 +1,6 @@
+2020.01.25:
+* new: Scripts/Tools/admin/VisualStudio: Visual Studio 2017 layout create/run scripts
+
 2020.01.24:
 * new: Scripts/Tools/locks: `read_file_to_var.bat`, `write_file_from_var.bat`, `incr_var_file.bat` and `decr_var_file.bat` scripts to exclusively read/write a file to/from a variable and increment/decrement integral value in a file
 * new: Scripts/Tools/ToolAdaptors/totalcmd: `compare_paths.bat` script to compare paths in a command line, `compare_paths_from_list.bat` script to compare paths in a single list file and `compare_paths_by_list.bat` script to compare paths in multiple list files
