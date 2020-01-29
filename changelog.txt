@@ -1,3 +1,6 @@
+2020.01.29:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: missed change
+
 2020.01.25:
 * new: Scripts/Tools/admin/VisualStudio: Visual Studio 2017 layout create/run scripts
 
