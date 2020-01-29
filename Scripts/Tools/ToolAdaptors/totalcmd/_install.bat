@@ -101,6 +101,7 @@ call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "__init__.bat" "%%CONFIGURE_TO_DIR%%/t
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/std" "%%CONTOOLS_ROOT_COPY%%/std" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/xcopy" "%%CONTOOLS_ROOT_COPY%%/xcopy" /S /Y /D || exit /b
 
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_datetime.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_filesize.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
