@@ -1,3 +1,6 @@
+2020.02.03:
+* fixed: scm/svn: svn_edit_props_by_list: missed to remove property if blank or contains only white spaces
+
 2020.01.24:
 * new: `compare_paths.bat` script to compare paths in a command line, `compare_paths_from_list.bat` script to compare paths in a single list file and `compare_paths_by_list.bat` script to compare paths in multiple list files
 * new: ButtonBars: compare: added `compare current directories of 2 panels` and `compare selected paths to saveload list...` items

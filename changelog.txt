@@ -1,3 +1,7 @@
+2020.02.03:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: scm/svn: svn_edit_props_by_list: missed to remove property if blank or contains only white spaces
+* refactor: Scripts/Tools: minor cleanup
+
 2020.01.29:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: missed change
 
