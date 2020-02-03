@@ -300,6 +300,14 @@ if %PROPS_FILTER_PATH_INDEX% LSS %PROPS_FILTER_DIR_INDEX% goto EDIT_DIR_PATH_LOO
 exit /b 0
 
 :UPDATE_PROPS
+rem at first check if property file is blank or contains only white spaces and delete the property
+type nul > nul
+for /f "usebackq eol=	 tokens=* delims=" %%i in ("%PROP_VALUE_FILE%") do goto PROP_IS_NOT_EMPTY
+
+call :CMD svn pdel "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" --non-interactive
+exit /b
+
+:PROP_IS_NOT_EMPTY
 fc "%PROP_VALUE_FILE%" "%PROP_VALUE_FILE%.orig" > nul
 if %ERRORLEVEL% EQU 0 exit /b 0
 
