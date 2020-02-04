@@ -170,7 +170,7 @@ exit /b 0
 if not defined FILE_TO_EDIT exit /b 0
 
 rem ignore a sub directory open, files in a sub directory must be selected explicitly in a panel!
-if exist "%FILE_TO_EDIT%\" goto ENDLOCAL_END_EXIT
+if exist "%FILE_TO_EDIT%\" exit /b
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
   call :CMD start /B /WAIT "" "%%BASIC_TEXT_EDITOR%%"%%BARE_FLAGS%% "%%FILE_TO_EDIT%%"

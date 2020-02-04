@@ -12,7 +12,9 @@ rem script flags
 set FLAG_PAUSE_ON_EXIT=0
 set FLAG_PAUSE_ON_ERROR=0
 set FLAG_PAUSE_TIMEOUT_SEC=0
+set FLAG_FROM_URL=0
 set RESTORE_LOCALE=0
+set "BARE_FLAGS="
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 
@@ -64,15 +66,23 @@ if defined FLAG (
   ) else if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
+  ) else if "%FLAG%" == "-from_url" (
+    set FLAG_FROM_URL=1
   ) else (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
-    exit /b -255
-  ) >&2
+    set BARE_FLAGS=%BARE_FLAGS% %1
+  )
 
   shift
 
   rem read until no flags
   goto FLAGS_LOOP
+)
+
+if %FLAG_FROM_URL% EQU 0 (
+  if defined BARE_FLAGS (
+    echo.%?~nx0%: error: invalid flags: %BARE_FLAGS%
+    exit /b -255
+  ) >&2
 )
 
 set "COMMAND=%~1"
@@ -86,7 +96,8 @@ cd /d "%CWD%" || exit /b 1
 :NOCWD
 
 rem build filtered paths list
-set "PROPS_PATH_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\props_path_list.lst"
+set "LOCAL_PATH_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\local_path_list.lst"
+set "URL_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\url_path_list.lst"
 
 rem calculate maximum busy tasks to wait after, open only TORTOISEPROC_MAX_SPAWN_CALLS windows at the same time
 set MAX_SPAWN_TASKS=0
@@ -97,7 +108,7 @@ if defined FLAG_CHCP (
 )
 
 rem create empty file
-type nul > "%PROPS_PATH_LIST_FILE_TMP%"
+type nul > "%LOCAL_PATH_LIST_FILE_TMP%"
 
 rem run COMMAND over selected files/directories in the CWD directory
 :FILE_PATH_LOOP
@@ -138,7 +149,7 @@ svn info "%FILE_PATH%" --non-interactive >nul 2>nul || (
 ) >&2
 
 rem safe echo call
-for /F "eol=	 tokens=* delims=" %%i in ("%FILE_PATH%") do (echo.%%i) >> "%PROPS_PATH_LIST_FILE_TMP%"
+for /F "eol=	 tokens=* delims=" %%i in ("%FILE_PATH%") do (echo.%%i) >> "%LOCAL_PATH_LIST_FILE_TMP%"
 set /A MAX_SPAWN_TASKS+=1
 
 shift
@@ -153,11 +164,37 @@ if %MAX_SPAWN_TASKS% GTR 0 goto PROCESS_TASKS
   exit /b 254
 ) >&2
 
+if %FLAG_FROM_URL% EQU 0 goto SPAWN_FROM_LOCAL
+
+rem create empty file
+type nul > "%URL_LIST_FILE_TMP%"
+
+rem read urls
+for /F "usebackq eol=	 tokens=* delims=" %%i in ("%LOCAL_PATH_LIST_FILE_TMP%") do (
+  svn info "%%i" --show-item url
+) >> "%URL_LIST_FILE_TMP%"
+
+rem start to edit
+call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat"%%BARE_FLAGS%% -wait -nosession -multiInst "" "%%URL_LIST_FILE_TMP%%" || exit /b
+echo.
+
+call :SPAWN_TASKS_FROM_URLS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/scm/tortoisesvn/tortoiseproc_read_path_from_stdin.bat"
+exit /b 0
+
+:SPAWN_FROM_LOCAL
 call :SPAWN_TASKS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/scm/tortoisesvn/tortoiseproc_read_path_from_stdin.bat"
+exit /b
+
+:SPAWN_TASKS_FROM_URLS
+echo.^>%*
+(
+  %*
+) < "%URL_LIST_FILE_TMP%"
 exit /b
 
 :SPAWN_TASKS
 echo.^>%*
 (
   %*
-) < "%PROPS_PATH_LIST_FILE_TMP%"
+) < "%LOCAL_PATH_LIST_FILE_TMP%"
+exit /b
