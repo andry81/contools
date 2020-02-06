@@ -1,3 +1,6 @@
+2020.02.06:
+* changed: todo list cleanup
+
 2020.02.04:
 * fixed: `notepad_edit_files_by_list.bat` minor fixup
 * new: scm/tortoisesvn: `-from_url` flag in the `tortoiseproc*.bat` scripts to extract url from a working copy and open the tortoise process by a remote url instead by a local path
