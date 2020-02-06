@@ -160,7 +160,7 @@ exit /b 0
 
 :PROCESS_LOAD_PROPS_FILTER_END
 
-mkdir "%PROPS_INOUT_FILES_DIR%" || exit /b 11
+mkdir "%PROPS_INOUT_FILES_DIR%\tmp" || exit /b 11
 
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
@@ -301,14 +301,18 @@ exit /b 0
 
 :UPDATE_PROPS
 rem at first check if property file is blank or contains only white spaces and delete the property
-type nul > nul
-for /f "usebackq eol=	 tokens=* delims=" %%i in ("%PROP_VALUE_FILE%") do goto PROP_IS_NOT_EMPTY
+findstr /R /V /C:"^$" "%PROP_VALUE_FILE%" > "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%"
+for /F %%i in ("%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%") do set "PROP_VALUE_FILE_SIZE=%%~zi"
+if %PROP_VALUE_FILE_SIZE% GTR 0 goto PROP_IS_NOT_EMPTY
 
 call :CMD svn pdel "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" --non-interactive
 exit /b
 
 :PROP_IS_NOT_EMPTY
-fc "%PROP_VALUE_FILE%" "%PROP_VALUE_FILE%.orig" > nul
+findstr /R /V /C:"^$" "%PROP_VALUE_FILE%.orig" > "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%.orig"
+
+rem compare ignoring empty lines
+fc "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%" "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%.orig" > nul
 if %ERRORLEVEL% EQU 0 exit /b 0
 
 call :CMD svn pset "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" -F "%%PROP_VALUE_FILE%%" --non-interactive

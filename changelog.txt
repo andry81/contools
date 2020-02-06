@@ -1,4 +1,7 @@
 2020.02.06:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: scm/svn: svn_edit_props_by_list: ignore line returns
+
+2020.02.06:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: todo list cleanup
 
 2020.02.04:
