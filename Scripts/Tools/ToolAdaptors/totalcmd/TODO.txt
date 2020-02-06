@@ -24,9 +24,7 @@
   before and there is changes with existing properties content, then a
   property must be saved into a temporary file and the file comparison window
   must be opened to merge the changes from the temporary file with the being
-  loaded file. After the merge into all temporary files must be writen back
-  into the properties if they are changed, otherwise leave the properties not
-  changed. After merge into temporary files those of them which has been
+  loaded file. After merge into temporary files those of them which has been
   changed must be writen back into the properties, otherwise left the
   properties unchanged.
 
