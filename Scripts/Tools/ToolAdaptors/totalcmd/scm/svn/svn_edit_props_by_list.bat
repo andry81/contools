@@ -301,7 +301,7 @@ exit /b 0
 
 :UPDATE_PROPS
 rem at first check if property file is blank or contains only white spaces and delete the property
-findstr /R /V /C:"^$" "%PROP_VALUE_FILE%" > "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%"
+call :PRINT_WO_LAST_EMPTY_LINES "%%PROP_VALUE_FILE%%" > "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%"
 for /F %%i in ("%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%") do set "PROP_VALUE_FILE_SIZE=%%~zi"
 if %PROP_VALUE_FILE_SIZE% GTR 0 goto PROP_IS_NOT_EMPTY
 
@@ -309,7 +309,7 @@ call :CMD svn pdel "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" --non-interactive
 exit /b
 
 :PROP_IS_NOT_EMPTY
-findstr /R /V /C:"^$" "%PROP_VALUE_FILE%.orig" > "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%.orig"
+call :PRINT_WO_LAST_EMPTY_LINES "%%PROP_VALUE_FILE%%.orig" > "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%.orig"
 
 rem compare ignoring empty lines
 fc "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%" "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%.orig" > nul
@@ -317,6 +317,39 @@ if %ERRORLEVEL% EQU 0 exit /b 0
 
 call :CMD svn pset "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" -F "%%PROP_VALUE_FILE%%" --non-interactive
 exit /b
+
+:PRINT_WO_LAST_EMPTY_LINES
+setlocal DISABLEDELAYEDEXPANSION
+
+set "FILE=%~1"
+
+set NUM_RETURN_LINES=0
+for /F "usebackq delims=" %%i in (`findstr.exe /B /N /R /C:".*" "%FILE%" 2^>nul`) do (
+  set LINE_STR=%%i
+  call :PRINT_LINES
+)
+
+exit /b 0
+
+:PRINT_LINES
+setlocal ENABLEDELAYEDEXPANSION
+set OFFSET=0
+:OFFSET_LOOP
+set CHAR=!LINE_STR:~%OFFSET%,1!
+if not "!CHAR!" == ":" ( set /A OFFSET+=1 && goto OFFSET_LOOP )
+set /A OFFSET+=1
+set "LINE_STR=!STR_PREFIX!!LINE_STR:~%OFFSET%!!STR_SUFFIX!"
+if defined LINE_STR (
+  if %NUM_RETURN_LINES% GTR 0 for /L %%i in (1,1,%NUM_RETURN_LINES%) do echo.
+  set NUM_RETURN_LINES=0
+  echo.!LINE_STR!
+) else set /A NUM_RETURN_LINES+=1
+
+(
+  endlocal
+  set "NUM_RETURN_LINES=%NUM_RETURN_LINES%"
+  exit /b
+)
 
 :CMD
 echo.^>%*

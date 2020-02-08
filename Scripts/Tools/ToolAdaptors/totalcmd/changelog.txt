@@ -1,3 +1,6 @@
+2020.02.08:
+* fixed: scm/svn: svn_edit_props_by_list: ignore only the last empty lines
+
 2020.02.06:
 * fixed: scm/svn: svn_edit_props_by_list: ignore line returns
 
