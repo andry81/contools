@@ -1,4 +1,9 @@
 2020.02.08:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: missed install script update
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: some missed files
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: removed `.saveload` directory creation from the install script
+
+2020.02.08:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: scm/svn: svn_edit_props_by_list: ignore only the last empty lines
 
 2020.02.06:

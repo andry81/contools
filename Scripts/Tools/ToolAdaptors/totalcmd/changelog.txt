@@ -1,4 +1,9 @@
 2020.02.08:
+* fixed: missed install script update
+* fixed: some missed files
+* changed: removed `.saveload` directory creation from the install script
+
+2020.02.08:
 * fixed: scm/svn: svn_edit_props_by_list: ignore only the last empty lines
 
 2020.02.06:

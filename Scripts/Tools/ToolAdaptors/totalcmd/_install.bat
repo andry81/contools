@@ -84,7 +84,7 @@ if not exist "%CONFIGURE_TO_DIR%/tacklebar\" (
   call :CMD mkdir "%%CONFIGURE_TO_DIR%%/tacklebar"
 )
 
-call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
+rem call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
 
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/_config" "%%CONFIGURE_TO_DIR%%/tacklebar/_config" /E /Y /D || exit /b
 
@@ -136,21 +136,21 @@ call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /S /Y /D 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/locks" "%%CONTOOLS_ROOT_COPY%%/locks" /S /Y /D || exit /b
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/tasks" "%%CONTOOLS_ROOT_COPY%%/tasks" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_sorted_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_sorted_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_dirs_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_by_dir_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_path.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_path_by_lists.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths_from_stdin.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "copy_file_to_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_dirs_by_path_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_dirs_in_dirs_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_by_path_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_in_dirs_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "edit_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "loadvars.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_new_session.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "save_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "load_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "edit_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "copy_file_to_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/ToolAdaptors/ffmpeg" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/converters/ffmpeg" /S /Y /D || exit /b
 
