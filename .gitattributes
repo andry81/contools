@@ -278,6 +278,7 @@ Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432_k.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64_k.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat -text
+Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_copy.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_cut.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_cut_dur.bat -text
 Scripts/Tools/ToolAdaptors/fla/diff_fla/CHANGES_EN.txt -text
@@ -344,6 +345,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/_config/svn_props_to_sync.lst.in -text
 Scripts/Tools/ToolAdaptors/totalcmd/_install.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/changelog.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_paths.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/compare_paths_by_lists.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_paths_from_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/compare_paths_from_stdin.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/converters/__init__.bat -text
