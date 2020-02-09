@@ -1,2 +1,7 @@
+2020.02.09:
+* fixed: wxwidgets build fixup
+* new: wxFileDialog: added support a directory selection
+* changed: wxFileDialog: rebuilded versus wxwidgets 3.1.3
+
 2019.05.07:
 * new: changelog file

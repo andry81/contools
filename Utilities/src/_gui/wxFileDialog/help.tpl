@@ -26,13 +26,19 @@ Usage: wxFileDialog.exe [/?] <FileTypes> <StartFolder> <Title> [<Options>]
           flag is only implemented in wxMSW and the non-dereferenced link path
           is always returned, even without this flag, under Unix and so using
           it there doesn't do anything.
-      e - Open file only: the user may only select files that actually exist.
+      e - Select file only: the user may only select files that actually exist.
           Notice that under OS X the file dialog with open flag always behaves
           as if this style was specified, because it is impossible to choose a
           file that doesn't exist from a standard OS X file dialog.
+          Select directory only: the dialog will allow the user to choose only
+          an existing folder. When this style is not given, a
+          "Create new directory" button is added to the dialog (on Windows) or
+          some other way is provided to the user to type the name of a new
+          folder.
       m - Open file only: allows selecting multiple files.
       w - Show the preview of the selected files (currently only supported by
           wxGTK).
+      d - Open or create a directory dialog instead of a file dialog.
 
   Return codes (Positive values - errors, negative - warnings):
    -1   - selection canceled

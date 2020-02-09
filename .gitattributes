@@ -907,6 +907,7 @@ Utilities/src/thlibautocfg/thlibautocfg.cpp -text
 Utilities/src/thlibautocfg/version.def -text
 Utilities/src/thlibautocfg/version.tpl -text
 _3dparty/gui/wxWidgets/include/wx/msw/setup.h -text
+_3dparty/gui/wxWidgets/include/wx/setup.h -text
 /changelog.txt -text
 /configure.bat -text
 /contools.tag -text
