@@ -4,6 +4,7 @@
 #include <wx/init.h>
 #include <wx/app.h> 
 #include <wx/filedlg.h>
+#include <wx/dirdlg.h>
 #include <wx/string.h>
 #include <wx/arrstr.h>
 
@@ -58,6 +59,7 @@ int wmain(int argc, wchar_t * argv[])
         bool hadFlag_e = false;
         bool hadFlag_m = false;
         bool hadFlag_w = false;
+        bool hadFlag_d = false;
 
         if(argc >= 2 && argv[1]) {
             if(!wcscmp(argv[1], L"/?")) {
@@ -109,6 +111,9 @@ int wmain(int argc, wchar_t * argv[])
                     else if (*flagChar == L'w') {
                         hadFlag_w = true;
                     }
+                    else if (*flagChar == L'd') {
+                        hadFlag_d = true;
+                    }
 
                     ++flagChar;
                 }
@@ -130,23 +135,38 @@ int wmain(int argc, wchar_t * argv[])
 
         wxString selected_path;
 
-        wxFileDialog * open_dialog = new wxFileDialog(NULL, title, start_folder, wxEmptyString, file_types,
-            (hadFlag_o ? wxFD_OPEN : wxFD_SAVE) |
-            (hadFlag_p ? wxFD_OVERWRITE_PROMPT : 0) |
-            (hadFlag_n ? wxFD_NO_FOLLOW : 0) |
-            (hadFlag_e ? wxFD_FILE_MUST_EXIST : 0) |
-            (hadFlag_m ? wxFD_MULTIPLE : 0) |
-            (hadFlag_w ? wxFD_PREVIEW : 0));
-        if (open_dialog->ShowModal() == wxID_OK) {
-            wxArrayString selected_paths;
-            open_dialog->GetPaths(selected_paths);
-            for (size_t i = 0; i < selected_paths.size(); i++) {
-                puts(selected_paths[i].c_str());
+        if (!hadFlag_d) {
+            wxFileDialog * file_dialog = new wxFileDialog(NULL, title, start_folder, wxEmptyString, file_types,
+                (hadFlag_o ? wxFD_OPEN : wxFD_SAVE) |
+                (hadFlag_p ? wxFD_OVERWRITE_PROMPT : 0) |
+                (hadFlag_n ? wxFD_NO_FOLLOW : 0) |
+                (hadFlag_e ? wxFD_FILE_MUST_EXIST : 0) |
+                (hadFlag_m ? wxFD_MULTIPLE : 0) |
+                (hadFlag_w ? wxFD_PREVIEW : 0));
+            if (file_dialog->ShowModal() == wxID_OK) {
+                wxArrayString selected_paths;
+                file_dialog->GetPaths(selected_paths);
+                for (size_t i = 0; i < selected_paths.size(); i++) {
+                    puts(selected_paths[i].c_str());
+                }
+                ret = 0;
             }
-            ret = 0;
+            else {
+                ret = -1;
+            }
         }
         else {
-            ret = -1;
+            wxDirDialog * dir_dialog = new wxDirDialog(NULL, title, start_folder,
+                wxDD_DEFAULT_STYLE |
+                (hadFlag_e ? wxDD_DIR_MUST_EXIST : 0));
+            if (dir_dialog->ShowModal() == wxID_OK) {
+                const wxString selected_path = dir_dialog->GetPath();
+                puts(selected_path.c_str());
+                ret = 0;
+            }
+            else {
+                ret = -1;
+            }
         }
     }
 

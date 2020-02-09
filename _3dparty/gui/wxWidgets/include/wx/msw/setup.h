@@ -872,9 +872,9 @@
 #define wxUSE_ANIMATIONCTRL 0   // wxAnimationCtrl
 #define wxUSE_BANNERWINDOW  0   // wxBannerWindow
 #define wxUSE_BUTTON        1   // wxButton
-#define wxUSE_BMPBUTTON     0   // wxBitmapButton
+#define wxUSE_BMPBUTTON     1   // wxBitmapButton
 #define wxUSE_CALENDARCTRL  0   // wxCalendarCtrl
-#define wxUSE_CHECKBOX      0   // wxCheckBox
+#define wxUSE_CHECKBOX      1   // wxCheckBox
 #define wxUSE_CHECKLISTBOX  0   // wxCheckListBox (requires wxUSE_OWNER_DRAWN)
 #define wxUSE_CHOICE        1   // wxChoice
 #define wxUSE_COLLPANE      0   // wxCollapsiblePane
@@ -1632,7 +1632,7 @@
 // Default is 1, set it to 0 only if you don't use wxImage neither
 //
 // Recommended setting: 1 (without it conversion to/from wxImage won't work)
-#define wxUSE_WXDIB 0
+#define wxUSE_WXDIB 1
 
 // Set to 0 to disable PostScript print/preview architecture code under Windows
 // (just use Windows printing).

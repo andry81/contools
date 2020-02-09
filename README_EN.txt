@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2019.11.24
+* 2020.02.09
 * ConsoleTools
 
 CAUTION:
@@ -108,11 +108,13 @@ Studio C++ 2015 Community Edition. The utilities does not require an installed
 Microsoft Visual C++ 2015 Redistributables at runtime.
 
 To build GUI utilities is required the wxWidgets library at least of version
-3.1.x.
+3.1.3.
 
 You have to download and copy the library sources manually into:
 
 * wxWidgets:  `/_3dparty/gui/wxWidgets`
+
+Then build wxwidgets before build the utilities.
 
 -------------------------------------------------------------------------------
 7. AUTHOR
