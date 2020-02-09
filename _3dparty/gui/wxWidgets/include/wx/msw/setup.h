@@ -392,18 +392,6 @@
 // wxWidgets.
 #define wxUSE_STD_STRING_CONV_IN_WXSTRING wxUSE_STL
 
-// VC++ 4.2 and above allows <iostream> and <iostream.h> but you can't mix
-// them. Set this option to 1 to use <iostream.h>, 0 to use <iostream>.
-//
-// Note that newer compilers (including VC++ 7.1 and later) don't support
-// wxUSE_IOSTREAMH == 1 and so <iostream> will be used anyhow.
-//
-// Default is 0.
-//
-// Recommended setting: 0, only set to 1 if you use a really old compiler
-#define wxUSE_IOSTREAMH     0
-
-
 // ----------------------------------------------------------------------------
 // non GUI features selection
 // ----------------------------------------------------------------------------
@@ -610,6 +598,22 @@
 // Set to 1 to compile wxZlibInput/OutputStream classes. Also required by
 // wxUSE_LIBPNG
 #define wxUSE_ZLIB          0
+
+// Set to 1 if liblzma is available to enable wxLZMA{Input,Output}Stream
+// classes.
+//
+// Notice that if you enable this build option when not using configure or
+// CMake, you need to ensure that liblzma headers and libraries are available
+// (i.e. by building the library yourself or downloading its binaries) and can
+// be found, either by copying them to one of the locations searched by the
+// compiler/linker by default (e.g. any of the directories in the INCLUDE or
+// LIB environment variables, respectively, when using MSVC) or modify the
+// make- or project files to add references to these directories.
+//
+// Default is 0 under MSW, auto-detected by configure.
+//
+// Recommended setting: 1 if you need LZMA compression.
+#define wxUSE_LIBLZMA       0
 
 // If enabled, the code written by Apple will be used to write, in a portable
 // way, float on the disk. See extended.c for the license which is different
@@ -1696,6 +1700,13 @@
 //
 // Recommended setting: 0, nobody uses .INI files any more
 #define wxUSE_INICONF 0
+
+// Set to 1 if you need to include <winsock2.h> over <winsock.h>
+//
+// Default is 0.
+//
+// Recommended setting: 0, set to 1 automatically if wxUSE_IPV6 is 1.
+#define wxUSE_WINSOCK2 0
 
 // ----------------------------------------------------------------------------
 // Generic versions of native controls

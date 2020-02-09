@@ -1,3 +1,6 @@
+2020.02.09:
+* changed: 3dparty: wxwidgets setup header updated to the 3.1.3 version
+
 2020.02.08:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: missed install script update
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: some missed files
