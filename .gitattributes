@@ -1,4 +1,5 @@
 * text=auto !eol
+/.svnignore -text
 BuildTools/TargetProject.PostBuildStep.bat -text
 BuildTools/TargetProject.PreBuildStep.bat -text
 BuildTools/__init__.bat -text
@@ -231,7 +232,6 @@ Scripts/Tests/traplib/test3.sh -text
 Scripts/Tests/traplib/test4.sh -text
 Scripts/Tests/traplib/test5.sh -text
 Scripts/Tests/traplib/testlib.sh -text
-Scripts/Tools/.svnignore -text
 Scripts/Tools/7zip/7-zip.chm -text
 Scripts/Tools/7zip/7z.exe -text
 Scripts/Tools/7zip/7za.dll -text
@@ -314,7 +314,6 @@ Scripts/Tools/ToolAdaptors/sh/mkdir.sh -text
 Scripts/Tools/ToolAdaptors/sh/rm.sh -text
 Scripts/Tools/ToolAdaptors/sh/rmdir.sh -text
 Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat -text
-Scripts/Tools/ToolAdaptors/totalcmd/.svnignore -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/_menu.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/cmd.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/compare.bar -text
@@ -834,6 +833,7 @@ Scripts/Tools/xml/xslt/xml_to_xpath_leaf_list.xslt -text
 Scripts/Tools/xml/xslt/xml_to_xpath_leaf_list_no_props.xslt -text
 Scripts/Tools/xml/xslt/xml_to_xpath_node_list.xslt -text
 Scripts/Tools/xml/xslt/xml_to_xpath_node_list_no_props.xslt -text
+Scripts/__init__.bat -text
 /TODO.txt -text
 Utilities/Projects/TargetProject.PreBuildStep.CommandLine.var -text
 Utilities/Projects/callf.vcxproj -text
@@ -906,8 +906,6 @@ Utilities/src/thlibautocfg/help.tpl -text
 Utilities/src/thlibautocfg/thlibautocfg.cpp -text
 Utilities/src/thlibautocfg/version.def -text
 Utilities/src/thlibautocfg/version.tpl -text
-_3dparty/gui/wxWidgets/include/wx/msw/setup.h -text
-_3dparty/gui/wxWidgets/include/wx/setup.h -text
 /changelog.txt -text
 /configure.bat -text
 /contools.tag -text

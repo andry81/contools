@@ -6,11 +6,3 @@
 	fetch = :refs/remotes/git-svn
 	remote = svn
 	type = dir
-[submodule "_3dparty/utility/tacklelib"]
-	path = _3dparty/utility/tacklelib
-	owner = _3dparty
-	url = /p/tacklelib/tacklelib/trunk
-	branch = /
-	fetch = :refs/remotes/git-svn
-	remote = svn
-	type = dir

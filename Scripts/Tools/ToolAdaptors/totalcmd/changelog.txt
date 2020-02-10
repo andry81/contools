@@ -1,3 +1,8 @@
+2020.02.10:
+* changed: ButtonBars: minor fixup
+* changed: todo list update
+* changed: readme update
+
 2020.02.08:
 * fixed: missed install script update
 * fixed: some missed files
