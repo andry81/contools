@@ -906,7 +906,11 @@ Utilities/src/thlibautocfg/help.tpl -text
 Utilities/src/thlibautocfg/thlibautocfg.cpp -text
 Utilities/src/thlibautocfg/version.def -text
 Utilities/src/thlibautocfg/version.tpl -text
+/__init__.bat -text
+/__init__.sh -text
 /changelog.txt -text
 /configure.bat -text
 /contools.tag -text
 /license.txt -text
+/preconfigure.bat -text
+/preconfigure.sh -text

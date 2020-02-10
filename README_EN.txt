@@ -11,9 +11,8 @@
 7. PROJECT CONFIGURATION VARIABLES
 8. PRECONFIGURE
 9. CONFIGURE
-9.1. Manual copy step
-9.2. Generation step(s)
-9.3. Configuration step
+9.1. Generation step(s)
+9.2. Configuration step
 10. BUILD
 10.1. From scripts
 10.2. From `Visual Studio`
@@ -366,8 +365,16 @@ NOTE:
   Windows platform (`.bat` file extension) and for the Linux like platform
   (`.sh` file extension).
 
+To run bash shell scripts (`.sh` file extension) you should copy the
+`Scripts/Tools/ToolAdaptors/sh/bash_entry` into the `/bin` directory of your
+platform.
+
+CAUTION:
+  For the Linux like platform do read the `README_EN.linux_x86_64.txt` file
+  to properly set permissions on the file.
+
 To be able to configure and build the sources you must run the
-/`preconfigure.*` script at least once.
+`preconfigure.*` script at least once.
 
 -------------------------------------------------------------------------------
 8. CONFIGURE
@@ -384,18 +391,7 @@ Studio C++ 2015 Community Edition. The utilities does not require an installed
 Microsoft Visual C++ 2015 Redistributables at runtime.
 
 -------------------------------------------------------------------------------
-8.1. Manual copy step
--------------------------------------------------------------------------------
-
-To run bash shell scripts (`.sh` file extension) you should copy the
-`/_scripts/tools/bash_entry` into the `/bin` directory of your platform.
-
-CAUTION:
-  For the Linux like platform do read the `README_EN.linux_x86_64.txt` file
-  to properly set permissions on the file.
-
--------------------------------------------------------------------------------
-8.2. Generation step(s)
+8.1. Generation step(s)
 -------------------------------------------------------------------------------
 
 To generate the source files which are not included in a version control system
@@ -474,7 +470,7 @@ First mirror:
   * https://github.com/andry81/tacklelib--3dparty.git
 
 -------------------------------------------------------------------------------
-8.3. Configuration step
+8.2. Configuration step
 -------------------------------------------------------------------------------
 
 To make a final configuration call to:
