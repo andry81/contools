@@ -1,4 +1,8 @@
 2020.02.10:
+* fixed: Scripts/Tools/ToolAdaptors: sh: bash_entry: always convert backend paths to native with forward slashes for `BASH_SOURCE_*` variables
+* new: preconfigure scripts
+
+2020.02.10:
 * new: [initiated] partial preparations to switch to build by the cmake
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars: minor fixup
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: todo list update

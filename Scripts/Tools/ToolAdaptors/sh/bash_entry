@@ -254,7 +254,7 @@ function tkl_get_source_file_path()
     local ScriptFilePath="${0//\\//}"
   fi
 
-  tkl_get_abs_path_from_dir "$ScriptFilePath"
+  tkl_get_abs_path_from_dir "$ScriptFilePath" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s
 }
 
 function tkl_make_source_file_components()
