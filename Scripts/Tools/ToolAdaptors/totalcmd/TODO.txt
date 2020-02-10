@@ -77,3 +77,11 @@ Note:
 - Add scripts (`svn_add_files_by_list.bat`) to add files to the SVN
   using builtin files for the ignore filter like `.svnignore` both from the
   working copy root directory and from the working copy relative directory.
+
+- All scripts should be able to merge changes in `.svnignore` files in externals
+  to the parent and vice versa (accumulate changes while moving to the root
+  and spread changes while moving to a leaf).
+
+- All scripts should detect files and directories in the ignore properties
+  which already under version control and explicitly report that to the user
+  before synchronization or a commit.

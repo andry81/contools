@@ -1,11 +1,11 @@
 * README_EN.txt
-* 2017.08.24
-* ToolAdaptors/python
+* 2020.10.02
+* contools/python
 
 1. DESCRIPTION
 2. SCRIPTS
 3. USAGE
-4. AUTHOR EMAIL
+4. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -40,6 +40,6 @@ You can copy it into the site-packages archive of the python portable
 distribution - `python35.zip`.
 
 -------------------------------------------------------------------------------
-4. AUTHOR EMAIL
+4. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

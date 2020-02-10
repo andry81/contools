@@ -1,3 +1,13 @@
+2020.02.10:
+* new: [initiated] partial preparations to switch to build by the cmake
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars: minor fixup
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: todo list update
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: readme update
+* changed: removed _3dparty because moved into `contools--3dparty` project
+* changed: svn/git ignores synchronization
+* changed: readme update
+* refactor: global refactor
+
 2020.02.09:
 * fixed: utilities: wxwidgets build fixup
 * new: utilities: wxFileDialog: added support a directory selection

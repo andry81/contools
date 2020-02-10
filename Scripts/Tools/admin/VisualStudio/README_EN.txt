@@ -1,6 +1,6 @@
 * README_EN.txt
-* 2020.01.25
-* contools
+* 2020.02.10
+* contools/admin
 
 1. DESCRIPTION
 3. REPOSITORIES
@@ -8,7 +8,7 @@
 5. CONFIGURE
 6. KNOWN ISSUES
 6.1. The setup does not go to update the layout
-7. AUTHOR EMAIL
+7. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -57,6 +57,6 @@ the correct one.
 You have to explicitly pass the '--update' key parameter to initiate an update.
 
 -------------------------------------------------------------------------------
-7. AUTHOR EMAIL
+7. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

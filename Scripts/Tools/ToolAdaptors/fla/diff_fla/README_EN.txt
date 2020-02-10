@@ -12,7 +12,7 @@
 7. KNOWN ISSUES
 7.1. Click on the Perforce "Diff ..." item from the context menu doesn't invoke
      the Adove Flash CS3
-8. AUTHOR EMAIL
+8. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -91,7 +91,7 @@ You have several choices:
 3. Restart the Perforce GUI
 
 -------------------------------------------------------------------------------
-8. AUTHOR EMAIL
+8. AUTHOR
 -------------------------------------------------------------------------------
 timrobinson007 at gmail dot com
 andry at inbox dot ru
