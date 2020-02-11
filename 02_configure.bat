@@ -2,11 +2,10 @@
 
 setlocal
 
-if not defined NEST_LVL set NEST_LVL=0
+call "%%~dp0__init__.bat" || exit /b
+
 set /A NEST_LVL+=1
 
-set "CONFIGURE_ROOT=%~dp0"
-set "CONFIGURE_ROOT=%CONFIGURE_ROOT:~0,-1%"
 set "CONFIGURE_ROOT=%CONFIGURE_ROOT:\=/%"
 
 set "WINDOWS_UCRT_X86_DEPLOY_DIR_LIST=ToolsExternal/python/python-win32/3.6.1"
