@@ -312,10 +312,10 @@ exit /b
 call :PRINT_WO_LAST_EMPTY_LINES "%%PROP_VALUE_FILE%%.orig" > "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%.orig"
 
 rem compare ignoring empty lines
-fc "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%" "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%.orig" > nul
+fc "%PROP_VALUE_FILE%" "%PROP_VALUE_FILE%.orig" > nul
 if %ERRORLEVEL% EQU 0 exit /b 0
 
-call :CMD svn pset "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" -F "%%PROP_VALUE_FILE%%" --non-interactive
+call :CMD svn pset "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" -F "%%PROPS_INOUT_FILES_DIR%%\tmp\.%%PROP_NAME_DECORATED%%" --non-interactive
 exit /b
 
 :PRINT_WO_LAST_EMPTY_LINES
