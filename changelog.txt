@@ -1,4 +1,7 @@
 2020.02.11:
+* fixed: Scripts/Tools/ToolAdaptors: scm/svn: svn_edit_props_by_list: ignore only the last empty lines but overwrite the property without last empty lines if changed
+
+2020.02.11:
 * refactor: root scripts rename
 
 2020.02.11:
