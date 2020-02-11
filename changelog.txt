@@ -1,3 +1,6 @@
+2020.02.11:
+* changed: svn ignores
+
 2020.02.10:
 * fixed: Scripts/Tools/ToolAdaptors: sh: bash_entry: always convert backend paths to native with forward slashes for `BASH_SOURCE_*` variables
 * new: preconfigure scripts
