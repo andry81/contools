@@ -42,3 +42,5 @@ Utilities/src/thlibautocfg/help_inl.hpp
 Utilities/src/thlibautocfg/version.hpp
 Utilities/src/version.hpp
 /_3dparty
+/_scripts
+/cmake
