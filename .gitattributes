@@ -1,5 +1,8 @@
 * text=auto !eol
 /.svnignore -text
+/01_preconfigure.bat -text
+/01_preconfigure.sh -text
+/02_configure.bat -text
 BuildTools/TargetProject.PostBuildStep.bat -text
 BuildTools/TargetProject.PreBuildStep.bat -text
 BuildTools/__init__.bat -text
@@ -909,8 +912,5 @@ Utilities/src/thlibautocfg/version.tpl -text
 /__init__.bat -text
 /__init__.sh -text
 /changelog.txt -text
-/configure.bat -text
 /contools.tag -text
 /license.txt -text
-/preconfigure.bat -text
-/preconfigure.sh -text

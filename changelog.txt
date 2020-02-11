@@ -1,4 +1,7 @@
 2020.02.11:
+* refactor: root scripts rename
+
+2020.02.11:
 * changed: svn ignores
 
 2020.02.10:

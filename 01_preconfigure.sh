@@ -24,7 +24,7 @@ function Pause()
 
 case "$OSTYPE" in
   mingw* | msys* | cygwin*)
-    Call "${COMSPEC//\\//}" /c "${BASH_SOURCE_DIR}/preconfigure.bat" $@
+    Call "${COMSPEC//\\//}" /c "${BASH_SOURCE_DIR}/01_preconfigure.bat" $@
     exit $?
     ;;
   *)
