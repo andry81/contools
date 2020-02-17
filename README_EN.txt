@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.02.10
+* 2020.02.17
 * contools
 
 1. DESCRIPTION
@@ -123,17 +123,21 @@ CAUTION:
 Read the `README_EN.deps.txt` file for the common dependencies for the Windows
 and the Linux platforms.
 
+NOTE:
+  To run bash shell scripts (`.sh` file extension) you should copy the
+  `_scripts/tools/bash_entry` into the `/bin` directory of your platform.
+
 To prepare local third party library sources you can:
 
-  1. Download the local third party project:
-     https://sf.net/p/tacklelib/3dparty
+  1. Download the local third party project: `contools--3dparty`:
+     https://sf.net/p/contools/3dparty
   2. Read the instructions in the project readme to checkout and build
      third party libraries.
   3. Link the checkouted library sources as a directory using the `mklink`
      command:
      `mklink /D _3dparty <path-to-project-root>/_src`
      or
-     Run the `preconfigure.*` script to make all links together
+     Run the `01_preconfigure.*` script to make all links together
      (see the `PRECONFIGURE` section).
 
 -------------------------------------------------------------------------------
@@ -255,9 +259,13 @@ To prepare local third party library sources you can:
  |    #
  |    # Utilities built by the project.
  |
- +- `preconfigure.bat`
+ +- `01_preconfigure.*`
  |   #
  |   # Scrtip to make a local preconfigure.
+ |
+ +- `02_configure.*`
+ |   #
+ |   # Scrtip to make a local configure.
  |
  +- `CMakeLists.txt`
      #
@@ -384,7 +392,7 @@ NOTE:
   For the additional details related particularly to the Linux do read the
   `README_EN.linux_x86_64.txt` file.
 
-run configure.bat
+run `02_configure.*`
 
 Windows executable utilities can be built if necessary under Microsoft Visual
 Studio C++ 2015 Community Edition. The utilities does not require an installed

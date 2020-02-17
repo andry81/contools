@@ -11,9 +11,9 @@ if %UAC_MODE%0 EQU 0 (
   exit /b
 )
 
-echo.1. Download `https://sf.net/p/contools/3dparty`.
+echo.1. Download the local third party project: `contools--3dparty`: `https://sf.net/p/contools/3dparty`.
 echo.2. Read the instructions from the readme file in the downloaded project to checkout third party sources.
-echo 3. Press any key to continue and select the `_src` subdirectory in the project as a third party catalog.
+echo 3. Press any key to continue and select the `_src` subdirectory in the `contools--3dparty` project as a third party catalog.
 
 pause
 
@@ -29,10 +29,10 @@ if not exist "%_3DPARTY_ROOT%" (
   exit /b 255
 ) >&2
 
-call :CREATE_DIR_LINK "%%~dp0_3dparty" "%%_3DPARTY_ROOT%%"
+call :CREATE_DIR_LINK "%%CONFIGURE_ROOT%%\_3dparty" "%%_3DPARTY_ROOT%%"
 
-call :CREATE_DIR_LINK "%%~dp0_scripts" "%%~dp0_3dparty\utility\tacklelib\tacklelib\_scripts"
-call :CREATE_DIR_LINK "%%~dp0cmake" "%%~dp0_3dparty\utility\tacklelib\tacklelib\cmake"
+call :CREATE_DIR_LINK "%%CONFIGURE_ROOT%%\_scripts" "%%CONFIGURE_ROOT%%\_3dparty\utility\tacklelib\tacklelib\_scripts"
+call :CREATE_DIR_LINK "%%CONFIGURE_ROOT%%\cmake" "%%CONFIGURE_ROOT%%\_3dparty\utility\tacklelib\tacklelib\cmake"
 
 pause
 

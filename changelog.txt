@@ -1,4 +1,8 @@
 2020.02.17:
+* changed: readme file
+* refactor: minor refactor
+
+2020.02.17:
 * fixed: Scripts/Tools/ToolAdaptors: sh: bash_entry: incomplete convert backend paths to native with forward slashes for `BASH_SOURCE_*` variables
 
 2020.02.11:
