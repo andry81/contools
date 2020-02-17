@@ -280,7 +280,7 @@ function tkl_include()
   local _84CB4B34_include_file_path
   for _84CB4B34_include_file_path in "$@"; do
     if tkl_is_abs_path "$_84CB4B34_include_file_path"; then
-      if tkl_get_abs_path_from_dir "$_84CB4B34_include_file_path"; then
+      if tkl_get_abs_path_from_dir "$_84CB4B34_include_file_path" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s; then
         tkl_include_local_impl "$RETURN_VALUE"
       fi
     else
@@ -298,7 +298,7 @@ function tkl_include()
         esac
         for _84CB4B34_path_prefix in $BASH_SOURCE_PATH; do
           if [[ "${_84CB4B34_include_file_path:0:1}" == "/" || "${_84CB4B34_include_file_path:0:1}" == "\\" ]]; then
-            if tkl_get_abs_path_from_dir "${_84CB4B34_path_prefix}${_84CB4B34_include_file_path}"; then
+            if tkl_get_abs_path_from_dir "${_84CB4B34_path_prefix}${_84CB4B34_include_file_path}" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s; then
               if [[ -f "$RETURN_VALUE" ]]; then
                 _84CB4B34_included=1
                 tkl_include_local_impl "$RETURN_VALUE"
@@ -306,7 +306,7 @@ function tkl_include()
               fi
             fi
           else
-            if tkl_get_abs_path_from_dir "${_84CB4B34_path_prefix}/${_84CB4B34_include_file_path}"; then
+            if tkl_get_abs_path_from_dir "${_84CB4B34_path_prefix}/${_84CB4B34_include_file_path}" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s; then
               if [[ -f "$RETURN_VALUE" ]]; then
                 _84CB4B34_included=1
                 tkl_include_local_impl "$RETURN_VALUE"
@@ -318,7 +318,7 @@ function tkl_include()
       fi
 
       if (( ! _84CB4B34_included )); then
-        if tkl_get_abs_path_from_dir "$BASH_SOURCE_DIR" "$_84CB4B34_include_file_path"; then
+        if tkl_get_abs_path_from_dir "$BASH_SOURCE_DIR" "$_84CB4B34_include_file_path" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s; then
           tkl_include_local_impl "$RETURN_VALUE"
         fi
       fi
