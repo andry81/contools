@@ -130,7 +130,7 @@ NOTE:
 To prepare local third party library sources you can:
 
   1. Download the local third party project: `contools--3dparty`:
-     https://sf.net/p/contools/3dparty
+     `https://sf.net/p/contools/3dparty`.
   2. Read the instructions in the project readme to checkout and build
      third party libraries.
   3. Link the checkouted library sources as a directory using the `mklink`
