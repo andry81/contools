@@ -1,3 +1,7 @@
+2020.02.21:
+* fixed: `compare_paths_from_stdin.bat` script last backslash characters bug workaround
+* fixed: install script invalid files copy
+
 2020.02.11:
 * fixed: scm/svn: svn_edit_props_by_list: ignore only the last empty lines but overwrite the property without last empty lines if changed
 

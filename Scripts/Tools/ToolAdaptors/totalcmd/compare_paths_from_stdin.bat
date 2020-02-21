@@ -10,6 +10,11 @@ if not defined LASTERROR set LASTERROR=0
 set /P "FILE_PATH_0="
 set /P "FILE_PATH_1="
 
+rem BUG WORKAROUND:
+rem   The last backslash duplication is required to avoid the last quote character escaping in case of executable call (not a script call)
+if "%FILE_PATH_0:~-1%" == "\" if not "%FILE_PATH_0:~-2,1%" == "\" set "FILE_PATH_0=%FILE_PATH_0%\"
+if "%FILE_PATH_1:~-1%" == "\" if not "%FILE_PATH_1:~-2,1%" == "\" set "FILE_PATH_1=%FILE_PATH_1%\"
+
 if %FLAG_ARAXIS% NEQ 0 goto ARAXIS_CONSOLE_COMPARE_TOOL
 if %FLAG_WINMERGE% NEQ 0 goto WINMERGE_COMPARE_TOOL
 
