@@ -136,8 +136,8 @@ call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /S /Y /D 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/locks" "%%CONTOOLS_ROOT_COPY%%/locks" /S /Y /D || exit /b
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/tasks" "%%CONTOOLS_ROOT_COPY%%/tasks" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_path.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_path_by_lists.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths_by_lists.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths_from_stdin.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "copy_file_to_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
