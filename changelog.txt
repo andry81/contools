@@ -1,3 +1,6 @@
+2020.02.25:
+* changed: Scripts/Tools: `load_config.bat` improved to load compatible to the unix shell configuration `key=value` pairs: `key="value"` instead of `"key=value"` or `key=(value0 ... valueN)` for a list of values
+
 2020.02.21:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: `compare_paths_from_stdin.bat` script last backslash characters bug workaround
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: install script invalid files copy
