@@ -257,13 +257,18 @@ function tkl_get_source_file_path()
   tkl_get_abs_path_from_dir "$ScriptFilePath" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s
 }
 
+function tkl_make_source_file_components_from_file_path()
+{
+  tkl_export BASH_SOURCE_FILE "$1"
+  tkl_export BASH_SOURCE_DIR "${1%[/]*}"
+  tkl_export BASH_SOURCE_FILE_NAME "${1##*[/]}"
+}
+
 function tkl_make_source_file_components()
 {
   tkl_get_source_file_path || return $?
 
-  tkl_export BASH_SOURCE_FILE "$RETURN_VALUE"
-  tkl_export BASH_SOURCE_DIR "${RETURN_VALUE%[/]*}"
-  tkl_export BASH_SOURCE_FILE_NAME "${RETURN_VALUE##*[/]}"
+  tkl_make_source_file_components_from_file_path "$RETURN_VALUE"
 }
 
 # Alternative inclusion command additionally to the `source` command.
@@ -281,7 +286,7 @@ function tkl_include()
   for _84CB4B34_include_file_path in "$@"; do
     if tkl_is_abs_path "$_84CB4B34_include_file_path"; then
       if tkl_get_abs_path_from_dir "$_84CB4B34_include_file_path" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s; then
-        tkl_include_local_impl "$RETURN_VALUE"
+        tkl_include_local_impl
       fi
     else
       local _84CB4B34_included=0
@@ -301,7 +306,7 @@ function tkl_include()
             if tkl_get_abs_path_from_dir "${_84CB4B34_path_prefix}${_84CB4B34_include_file_path}" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s; then
               if [[ -f "$RETURN_VALUE" ]]; then
                 _84CB4B34_included=1
-                tkl_include_local_impl "$RETURN_VALUE"
+                tkl_include_local_impl
                 break
               fi
             fi
@@ -309,7 +314,7 @@ function tkl_include()
             if tkl_get_abs_path_from_dir "${_84CB4B34_path_prefix}/${_84CB4B34_include_file_path}" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s; then
               if [[ -f "$RETURN_VALUE" ]]; then
                 _84CB4B34_included=1
-                tkl_include_local_impl "$RETURN_VALUE"
+                tkl_include_local_impl
                 break
               fi
             fi
@@ -319,13 +324,16 @@ function tkl_include()
 
       if (( ! _84CB4B34_included )); then
         if tkl_get_abs_path_from_dir "$BASH_SOURCE_DIR" "$_84CB4B34_include_file_path" && tkl_convert_backend_path_to_native "$RETURN_VALUE" -s; then
-          tkl_include_local_impl "$RETURN_VALUE"
+          tkl_include_local_impl
         fi
       fi
     fi
   done
 }
 
+# CAUTION:
+#   The function MUST NOT have has any arguments, otherwise arguments WILL PASS inside the `source` statement!
+#
 function tkl_include_local_impl()
 {
   # CAUTION:
@@ -334,9 +342,11 @@ function tkl_include_local_impl()
 
   #echo "tkl_include_local_impl: ${BASH_SOURCE_FILE} -> $1"
 
-  tkl_pushset_var_to_stack global BASH_SOURCE_FILE "${1}"
-  tkl_pushset_var_to_stack global BASH_SOURCE_DIR "${1%[/]*}"
-  tkl_pushset_var_to_stack global BASH_SOURCE_FILE_NAME "${1##*[/]}"
+  local RETURN_VALUE="$RETURN_VALUE"
+
+  tkl_pushset_var_to_stack global BASH_SOURCE_FILE "$RETURN_VALUE"
+  tkl_pushset_var_to_stack global BASH_SOURCE_DIR "${RETURN_VALUE%[/]*}"
+  tkl_pushset_var_to_stack global BASH_SOURCE_FILE_NAME "${RETURN_VALUE##*[/]}"
 
   #echo " -> BASH_SOURCE_FILE=${BASH_SOURCE_FILE}"
   #echo " -> BASH_SOURCE_DIR=${BASH_SOURCE_DIR}"
