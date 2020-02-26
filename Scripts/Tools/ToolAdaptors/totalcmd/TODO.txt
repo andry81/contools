@@ -85,3 +85,6 @@ Note:
 - All scripts should detect files and directories in the ignore properties
   which already under version control and explicitly report that to the user
   before synchronization or a commit.
+
+- Support recursion for properties edit in a Working Copy in nested
+  directories.

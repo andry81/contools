@@ -1,3 +1,6 @@
+2020.02.27:
+* changed: todo list update
+
 2020.02.21:
 * fixed: `compare_paths_from_stdin.bat` script last backslash characters bug workaround
 * fixed: install script invalid files copy
