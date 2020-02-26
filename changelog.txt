@@ -1,3 +1,8 @@
+2020.02.26:
+* fixed: Scripts/Tools/ToolAdaptors/sh: bash_entry: accidental `$1` argument pass into `source` statement
+* new: Scripts/Tools/ToolAdaptors/sh: bash_entry: `tkl_make_source_file_components_from_file_path` function to manually update source file components from any file path
+* new: Scripts/Tools: `load_config.bat` script port into `load_config.sh` script
+
 2020.02.25:
 * changed: Scripts/Tools: `load_config.bat` improved to load compatible to the unix shell configuration `key=value` pairs: `key="value"` instead of `"key=value"` or `key=(value0 ... valueN)` for a list of values
 

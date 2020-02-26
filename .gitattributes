@@ -700,6 +700,7 @@ Scripts/Tools/index_pathstr.bat -text
 Scripts/Tools/isnativecmd.bat -text
 Scripts/Tools/joinvars.bat -text
 Scripts/Tools/load_config.bat -text
+Scripts/Tools/load_config.sh -text
 Scripts/Tools/locks/__init__.bat -text
 Scripts/Tools/locks/decr_var_file.bat -text
 Scripts/Tools/locks/incr_var_file.bat -text
