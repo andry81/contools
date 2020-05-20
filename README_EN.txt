@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.02.17
+* 2020.03.03
 * contools
 
 1. DESCRIPTION
@@ -55,6 +55,18 @@ First mirror:
 Second mirror:
   * https://bitbucket.org/andry81/contools/src/trunk
     https://bitbucket.org/andry81/contools.git
+
+The `tacklelib` library repositories:
+
+Primary:
+  * https://sf.net/p/tacklelib/tacklelib/HEAD/tree/trunk
+  * https://svn.code.sf.net/p/tacklelib/tacklelib/trunk
+First mirror:
+  * https://github.com/andry81/tacklelib/tree/trunk
+  * https://github.com/andry81/tacklelib.git
+Second mirror:
+  * https://bitbucket.org/andry81/tacklelib/src/trunk
+  * https://bitbucket.org/andry81/tacklelib.git
 
 -------------------------------------------------------------------------------
 4. PREREQUISITES
@@ -124,8 +136,9 @@ Read the `README_EN.deps.txt` file for the common dependencies for the Windows
 and the Linux platforms.
 
 NOTE:
-  To run bash shell scripts (`.sh` file extension) you should copy the
-  `_scripts/tools/bash_entry` into the `/bin` directory of your platform.
+  To run bash shell scripts (`.sh` file extension) you should copy from the
+  `tacklelib` library the `/bash/tacklelib/bash_entry` module into the `/bin`
+  directory of your platform.
 
 To prepare local third party library sources you can:
 
@@ -379,7 +392,7 @@ platform.
 
 CAUTION:
   For the Linux like platform do read the `README_EN.linux_x86_64.txt` file
-  to properly set permissions on the file.
+  from the `tacklelib` library to properly set permissions on the file.
 
 To be able to configure and build the sources you must run the
 `preconfigure.*` script at least once.

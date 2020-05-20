@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script ONLY for execution.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -eq 0) ]]; then 
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -eq 0) ]]; then
 
 source "/bin/bash_entry" || exit $?
 tkl_include "__init__.sh" || exit $?
@@ -18,8 +18,7 @@ function Call()
 function Pause()
 {
   local key
-  read -n1 -r -p "Press any key to continue..." key
-  echo
+  read -n1 -r -p "Press any key to continue..."$'\n' key
 }
 
 case "$OSTYPE" in
