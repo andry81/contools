@@ -1,4 +1,7 @@
 2020.05.20:
+* changed: todo list update
+
+2020.05.20:
 * changed: minor install script change
 
 2020.02.27:

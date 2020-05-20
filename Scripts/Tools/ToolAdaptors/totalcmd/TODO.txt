@@ -88,3 +88,8 @@ Note:
 
 - Support recursion for properties edit in a Working Copy in nested
   directories.
+
+- Add scripts (`notepad_edit_svn_nested_wc_path_list` or/and
+  `notepad_edit_svn_nested_wc_reporoot_list`)
+  to collect for nested wc directories and remote reporoot urls and open them
+  in the editer as a list.
