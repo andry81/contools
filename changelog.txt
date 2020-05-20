@@ -1,3 +1,11 @@
+2020.05.20:
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: minor install script change
+
+2020.03.03:
+* changed: Scripts/Tools: `trapliblite.sh` file is removed because now is fully migrated into the `tacklelib` library
+* changed: Scripts/Tools/ToolAdaptors/sh: `bash_entry` file is removed because now is fully migrated into the `tacklelib` library
+* changed: readme update
+
 2020.02.27:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: todo list update
 

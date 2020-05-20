@@ -259,13 +259,13 @@ exit /b 0
 :CONTOOLS_ROOT_ERROR
 (
   echo.%?~nx0%: error: CONTOOLS_ROOT path is invalid or does not have the required set of utilities: "%CONTOOLS_ROOT%".
-  echo.%?~nx0%: info: execute the configure.bat from the contools WC root to update modules.
+  echo.%?~nx0%: info: execute the `*_configure.bat` from the contools WC root to update modules.
   exit /b 10
 ) >&2
 
 :SVNCMD_TOOLS_ROOT_ERROR
 (
   echo.%?~nx0%: error: SVNCMD_TOOLS_ROOT path is invalid or does not have the required set of utilities: "%SVNCMD_TOOLS_ROOT%".
-  echo.%?~nx0%: info: execute the configure.bat from the contools WC root to update modules.
+  echo.%?~nx0%: info: execute the `*_configure.bat` from the contools WC root to update modules.
   exit /b 20
 ) >&2

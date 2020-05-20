@@ -309,7 +309,6 @@ Scripts/Tools/ToolAdaptors/python/rebuild_portable_pycache.bat -text
 Scripts/Tools/ToolAdaptors/sh/autoconf.sh -text
 Scripts/Tools/ToolAdaptors/sh/autogen.sh -text
 Scripts/Tools/ToolAdaptors/sh/automake.sh -text
-Scripts/Tools/ToolAdaptors/sh/bash_entry -text
 Scripts/Tools/ToolAdaptors/sh/cat.sh -text
 Scripts/Tools/ToolAdaptors/sh/cp.sh -text
 Scripts/Tools/ToolAdaptors/sh/dos2unix.sh -text
@@ -810,7 +809,6 @@ Scripts/Tools/timediff.bat -text
 Scripts/Tools/timestamp.bat -text
 Scripts/Tools/touch.bat -text
 Scripts/Tools/traplib.sh -text
-Scripts/Tools/trapliblite.sh -text
 Scripts/Tools/unmountdir.sh -text
 Scripts/Tools/unset.bat -text
 Scripts/Tools/uuidgen.bat -text
