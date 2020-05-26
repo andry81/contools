@@ -1,3 +1,6 @@
+2020.05.26:
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: scm/shell: shell_copy_by_list.bat: derectory paths copy as directories
+
 2020.05.20:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: todo list update
 

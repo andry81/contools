@@ -167,7 +167,9 @@ if not exist "%FROM_FILE_PATH%" (
 ) >&2
 
 rem check recursion only if FROM_FILE_PATH is a directory
+set FROM_FILE_PATH_AS_DIR=0
 if not exist "%FROM_FILE_PATH%\" goto IGNORE_TO_FILE_PATH_CHECK
+set FROM_FILE_PATH_AS_DIR=1
 
 call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 if %ERRORLEVEL% EQU 0 (
@@ -186,9 +188,37 @@ if "%TO_FILE_DIR:~-1%" == "\" set "TO_FILE_DIR=%TO_FILE_DIR:~0,-1%"
 rem copy through the shell
 rem :COPY_FILE SHELL
 
-call :CMD copy /B /Y "%%FROM_FILE_PATH%%" "%%TO_FILE_DIR%%\%%TO_FILE_NAME%%" || exit /b
+if %FROM_FILE_PATH_AS_DIR%0 EQU 0 (
+  if "%FROM_FILE_DIR:~-1%" == "\" set "FROM_FILE_DIR=%FROM_FILE_DIR:~0,-1%"
+  call :XCOPY_FILE "%%FROM_FILE_DIR%%" "%%FROM_FILE_NAME%%" "%%TO_FILE_DIR%%" /Y /D /H || exit /b
+) else (
+  call :XCOPY_DIR "%%FROM_FILE_PATH%%" "%%TO_FILE_DIR%%\%%TO_FILE_NAME%%" /E /Y /D || exit /b
+)
 
 exit /b
+
+:XCOPY_FILE
+if not exist "%CONTOOLS_ROOT%/std/xcopy_file.bat" (
+  echo.%?~nx0%: error: xcopy_file.bat is not found: "%CONTOOLS_ROOT%/std/xcopy_file.bat".
+  exit /b 5
+) >&2
+if not exist "%~3" mkdir "%~3"
+call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%* || exit /b
+exit /b 0
+
+:XCOPY_DIR
+if not exist "%CONTOOLS_ROOT%/std/xcopy_dir.bat" (
+  echo.%?~nx0%: error: xcopy_dir.bat is not found: "%CONTOOLS_ROOT%/std/xcopy_dir.bat".
+  exit /b 6
+) >&2
+if not exist "%~2" mkdir "%~2"
+call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || exit /b
+exit /b 0
+
+:COPY_FILE
+echo."%~1" -^> "%~2"
+copy "%~1" "%~2" /B /Y || exit /b
+exit /b 0
 
 :CMD
 echo.^>%*
