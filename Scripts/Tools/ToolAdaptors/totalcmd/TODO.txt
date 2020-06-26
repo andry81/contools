@@ -93,3 +93,6 @@ Note:
   `notepad_edit_svn_nested_wc_reporoot_list`)
   to collect for nested wc directories and remote reporoot urls and open them
   in the editer as a list.
+
+- Add xml compare/merge support through the convertion by an external utility
+  to an yaml format file and back.
