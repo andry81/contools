@@ -36,6 +36,7 @@ for /F "usebackq eol=# tokens=* delims=" %%i in ("%__CONFIG_DIR%\%__CONFIG_FILE%
 rem drop local variables
 (
   set "__VAR="
+  set "__PLATFORM="
   set "__VALUE="
   set "__CONFIG_DIR="
   set "__CONFIG_FILE="
@@ -44,6 +45,26 @@ rem drop local variables
 exit /b 0
 
 :PARSE
+for /F "eol=	 tokens=1,* delims=:" %%i in ("%__VAR%") do (
+  set "__VAR=%%i"
+  set "__PLATFORM=%%j"
+)
+
+if defined __PLATFORM ^
+if not "%__PLATFORM%" == "BAT" ^
+if not "%__PLATFORM%" == "WIN" ^
+if not "%__PLATFORM%" == "OSWIN" exit /b 0
+
+for /F "eol=# tokens=1,* delims=	 " %%i in ("%__VAR%") do (
+  set "__ATTR=%%i"
+  set "__VAR=%%j"
+)
+
+if not defined __VAR (
+  set "__VAR=%__ATTR%"
+  set "__ATTR="
+)
+
 if not defined __VALUE (
   set "%__VAR%="
   exit /b 0
