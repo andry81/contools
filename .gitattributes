@@ -658,7 +658,6 @@ Scripts/Tools/gen_dir_files_list.bat -text
 Scripts/Tools/gen_dir_files_list_from_archive.bat -text
 Scripts/Tools/gen_product_ver.bat -text
 Scripts/Tools/get_base_dir_name.bat -text
-Scripts/Tools/get_datetime.bat -text
 Scripts/Tools/get_filesize.bat -text
 Scripts/Tools/get_newest_file.bat -text
 Scripts/Tools/get_shared_path.bat -text
@@ -698,8 +697,6 @@ Scripts/Tools/iffexist.bat -text
 Scripts/Tools/index_pathstr.bat -text
 Scripts/Tools/isnativecmd.bat -text
 Scripts/Tools/joinvars.bat -text
-Scripts/Tools/load_config.bat -text
-Scripts/Tools/load_config.sh -text
 Scripts/Tools/locks/__init__.bat -text
 Scripts/Tools/locks/decr_var_file.bat -text
 Scripts/Tools/locks/incr_var_file.bat -text
@@ -773,8 +770,10 @@ Scripts/Tools/std/copy.bat -text
 Scripts/Tools/std/del_file.bat -text
 Scripts/Tools/std/del_file_pttn.bat -text
 Scripts/Tools/std/free_temp_dir.bat -text
+Scripts/Tools/std/get_wmic_local_datetime.bat -text
 Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
+Scripts/Tools/std/load_config.bat -text
 Scripts/Tools/std/mkdir.bat -text
 Scripts/Tools/std/replace_sys_chars.bat -text
 Scripts/Tools/std/restore_sys_chars.bat -text
