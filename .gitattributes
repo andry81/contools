@@ -810,6 +810,7 @@ Scripts/Tools/touch.bat -text
 Scripts/Tools/traplib.sh -text
 Scripts/Tools/unmountdir.sh -text
 Scripts/Tools/unset.bat -text
+Scripts/Tools/unxutils/tee.exe -text
 Scripts/Tools/uuidgen.bat -text
 Scripts/Tools/vars/iconv.default_ansi_locale.var -text
 Scripts/Tools/wctoansi.bat -text
