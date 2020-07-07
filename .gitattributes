@@ -244,6 +244,7 @@ Scripts/Tools/7zip/history.txt -text
 Scripts/Tools/7zip/license.txt -text
 Scripts/Tools/7zip/readme.txt -text
 Scripts/Tools/PrintUserSessionId.cmd -text
+Scripts/Tools/ToolAdaptors/__init__.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd32.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd3264.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd3264_k.bat -text
@@ -280,6 +281,12 @@ Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432_k.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64_k.bat -text
+Scripts/Tools/ToolAdaptors/download/__init__.bat -text
+Scripts/Tools/ToolAdaptors/download/config.vars -text
+Scripts/Tools/ToolAdaptors/download/download_this_to_html.bat -text
+Scripts/Tools/ToolAdaptors/download/download_this_to_pdf.bat -text
+Scripts/Tools/ToolAdaptors/download/download_url_to_html.bat -text
+Scripts/Tools/ToolAdaptors/download/download_url_to_pdf.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_copy.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_cut.bat -text

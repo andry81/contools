@@ -1,4 +1,8 @@
 2020.07.07:
+* new: Scripts/Tools: `wkhtmltopdf` utility converter
+* new: Scripts/Tools/ToolAdapters: download scripts to download web files and html pages as is or html files as pdf files
+
+2020.07.07:
 * fixed: Scripts/Tools: the `wtee.exe` utility (now is deprecated) has an issue over a console progress bar (`\r` (character return) is not handled properly and so the output is messed), the gnuwin32 tee utility has another issue over `Cwrite error: No such file or directroy` error message when the pipe/output handle does close by the system. To workaround those issues the UnxUtils tee utility implementation does used instead of these are because works as expected in both cases. More details: https://stackoverflow.com/questions/796476/displaying-windows-command-prompt-output-and-redirecting-it-to-a-file/62771772#62771772
 * new: Scripts/Tools: the `tee` utility implementation from the UnxUtils project: http://unxutils.sourceforge.net
 
