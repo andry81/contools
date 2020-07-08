@@ -145,7 +145,6 @@ call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_dirs_in_dirs_from_list.bat" "%
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_by_path_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_in_dirs_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "edit_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "loadvars.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_new_session.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b

@@ -50,6 +50,10 @@ for /F "eol=	 tokens=1,* delims=:" %%i in ("%__VAR%") do (
   set "__PLATFORM=%%j"
 )
 
+rem trim surrounded spaces
+for %%i in (%__VAR%) do set __VAR=%%i
+for %%i in (%__PLATFORM%) do set __PLATFORM=%%i
+
 if defined __PLATFORM ^
 if not "%__PLATFORM%" == "BAT" ^
 if not "%__PLATFORM%" == "WIN" ^
@@ -72,12 +76,18 @@ if not defined __VALUE (
 
 setlocal ENABLEDELAYEDEXPANSION
 
-if ^" == ^%__VALUE:~0,1% (
-  for /F "eol=	 tokens=* delims=" %%i in ("!__VALUE:~1,-1!") do (
-    endlocal
-    set %__VAR%=%%i
-  )
-) else for /F "eol=	 tokens=* delims=" %%i in ("!__VALUE!") do (
+if ^/ == ^%__VALUE:~1,1%/ goto DONT_REMOVE_QUOTES
+if not ^" == ^%__VALUE:~0,1% goto DONT_REMOVE_QUOTES
+if not ^" == ^%__VALUE:~-1% goto DONT_REMOVE_QUOTES
+
+for /F "eol=	 tokens=* delims=" %%i in ("!__VALUE:~1,-1!") do (
+  endlocal
+  set %__VAR%=%%i
+)
+exit /b
+
+:DONT_REMOVE_QUOTES
+for /F "eol=	 tokens=* delims=" %%i in ("!__VALUE!") do (
   endlocal
   set %__VAR%=%%i
 )

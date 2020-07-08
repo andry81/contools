@@ -512,6 +512,8 @@ Scripts/Tools/ToolAdaptors/vbs/make_sys_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/update_sys_shortcut.bat -text
+Scripts/Tools/__init__.bat -text
+Scripts/Tools/__init__.sh -text
 Scripts/Tools/abspath.bat -text
 Scripts/Tools/admin/BrokenKBUninstall/fix_win7_cannot_start_executables.bat -text
 Scripts/Tools/admin/KnownIssues/admin_windows7_crash_updates.txt -text
@@ -546,12 +548,12 @@ Scripts/Tools/admin/VisualStudio/README_EN.txt -text
 Scripts/Tools/admin/VisualStudio/__init__.bat -text
 Scripts/Tools/admin/VisualStudio/config.vars.in -text
 Scripts/Tools/admin/VisualStudio/configure.bat -text
-Scripts/Tools/admin/VisualStudio/tools/load_config.bat -text
 Scripts/Tools/admin/VisualStudio/vs2017_Community_create_layout.bat -text
 Scripts/Tools/admin/VisualStudio/vs2017_Community_run.bat -text
 Scripts/Tools/admin/VisualStudio/vs2017_Professional_create_layout.bat -text
 Scripts/Tools/admin/VisualStudio/vs2017_Professional_run.bat -text
 Scripts/Tools/admin/WMI/fix_reactivated_in_namespace_eventviewer_error_Event_ID_10.vbs -text
+Scripts/Tools/admin/__init__.bat -text
 Scripts/Tools/admin/cleanup_acl.bat -text
 Scripts/Tools/admin/comspec_as_svc.bat -text
 Scripts/Tools/admin/ip_list_by_arp.bat -text
@@ -842,7 +844,8 @@ Scripts/Tools/xml/xslt/xml_to_xpath_leaf_list.xslt -text
 Scripts/Tools/xml/xslt/xml_to_xpath_leaf_list_no_props.xslt -text
 Scripts/Tools/xml/xslt/xml_to_xpath_node_list.xslt -text
 Scripts/Tools/xml/xslt/xml_to_xpath_node_list_no_props.xslt -text
-Scripts/__init__.bat -text
+Scripts/__init__/__init__.bat -text
+Scripts/__init__/__init__.sh -text
 /TODO.txt -text
 Utilities/Projects/TargetProject.PreBuildStep.CommandLine.var -text
 Utilities/Projects/callf.vcxproj -text
@@ -915,8 +918,8 @@ Utilities/src/thlibautocfg/help.tpl -text
 Utilities/src/thlibautocfg/thlibautocfg.cpp -text
 Utilities/src/thlibautocfg/version.def -text
 Utilities/src/thlibautocfg/version.tpl -text
-/__init__.bat -text
-/__init__.sh -text
+__init__/__init__.bat -text
+__init__/__init__.sh -text
 /changelog.txt -text
 /contools.tag -text
 /license.txt -text

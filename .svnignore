@@ -1,8 +1,8 @@
 _3dparty
+_out
 Output
 Temp
 
-Scripts/Tools/__init__.bat
 Scripts/Tools/*.exe
 
 Scripts/Tools/ToolAdaptors/totalcmd/*.vars
