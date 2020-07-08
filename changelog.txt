@@ -1,3 +1,9 @@
+2020.07.08:
+* fixed: Scripts/Tools/std: load_config.bat: case where `<var>="..." ...` parsed incorrectly removing the first quote character and the last not a quote character
+* changed: __init__.bat: improved an init script search logic to automatically load from the __init__ subdirectory
+* changed: Scripts/Tools/ToolAdaptors/totalcmd: replaced usage of the `loadvar.bat` script by usage of the `load_config.bat` script (more reliable)
+* refactor: code cleanup
+
 2020.07.07:
 * new: Scripts/Tools: `wkhtmltopdf` utility converter
 * new: Scripts/Tools/ToolAdapters: download scripts to download web files and html pages as is or html files as pdf files

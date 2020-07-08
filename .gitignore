@@ -3,7 +3,6 @@ Scripts/Tests/batscripts/_output
 Scripts/Tools/*.exe
 Scripts/Tools/ToolAdaptors/totalcmd/*.vars
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/*
-Scripts/Tools/__init__.bat
 Scripts/Tools/admin/ProductKey/__pycache__
 Scripts/Tools/admin/VisualStudio/*.vars
 /Temp
