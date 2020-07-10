@@ -754,6 +754,9 @@ Scripts/Tools/printfile.bat -text
 Scripts/Tools/pstools/Eula.txt -text
 Scripts/Tools/pstools/Handle.exe -text
 Scripts/Tools/pstools/close_process_by_handle.bat -text
+Scripts/Tools/pyxvcs/__init__.bat -text
+Scripts/Tools/pyxvcs/cmdop.py.bat -text
+Scripts/Tools/pyxvcs/configure.py.bat -text
 Scripts/Tools/query_session_id.bat -text
 Scripts/Tools/reduce_relative_path.bat -text
 Scripts/Tools/regenum.bat -text
