@@ -1,4 +1,7 @@
 2020.07.10:
+* new: Scripts/Tools: pyxvcs scripts moved from the pyxvcs project
+
+2020.07.10:
 * new: Scripts/Tools/admin/WindowsServices: GoogleUpdate enable/disable scripts
 * refactor: Scripts/Tools/admin: moved all Windows services scripts into WindowsServices directory
 
