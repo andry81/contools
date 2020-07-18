@@ -15,6 +15,14 @@ set __CTRL_SETLOCAL=1
 call "%%~dp0__init__.bat" || exit /b
 call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
 
+set "STRING_TO_TRIM="
+set "STRING_REFERENCE="
+call :TEST
+
+set "STRING_TO_TRIM= 	 		  	 "
+set "STRING_REFERENCE="
+call :TEST
+
 setlocal DISABLEDELAYEDEXPANSION
 set STRING_TO_TRIM= 	 	 	 1 ! 2 ^| 3 ^& 4 ^^ 5 = 6 , 7 ; 8 * 9 # 0 %% 1 / 2 \ 3 ? 4 ^> 5 ^< 6 " 7 	 	 	 
 set STRING_REFERENCE=1 ! 2 ^| 3 ^& 4 ^^ 5 = 6 , 7 ; 8 * 9 # 0 %% 1 / 2 \ 3 ? 4 ^> 5 ^< 6 " 7
