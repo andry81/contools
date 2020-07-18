@@ -147,6 +147,8 @@ Scripts/Tests/batscripts/.test_std__allocate_temp_dir/report.bat -text
 Scripts/Tests/batscripts/.test_std__chcp/impl.bat -text
 Scripts/Tests/batscripts/.test_std__chcp/init.bat -text
 Scripts/Tests/batscripts/.test_std__chcp/return.vars -text
+Scripts/Tests/batscripts/.test_std__trim_var/impl.bat -text
+Scripts/Tests/batscripts/.test_std__trim_var/init.bat -text
 Scripts/Tests/batscripts/.test_strchr/impl.bat -text
 Scripts/Tests/batscripts/.test_strchr/init.bat -text
 Scripts/Tests/batscripts/.test_stresc/impl.bat -text
@@ -215,6 +217,7 @@ Scripts/Tests/batscripts/test_extract_version.bat -text
 Scripts/Tests/batscripts/test_setvarsfromfile.bat -text
 Scripts/Tests/batscripts/test_std__allocate_temp_dir.bat -text
 Scripts/Tests/batscripts/test_std__chcp.bat -text
+Scripts/Tests/batscripts/test_std__trim_var.bat -text
 Scripts/Tests/batscripts/test_strchr.bat -text
 Scripts/Tests/batscripts/test_stresc.bat -text
 Scripts/Tests/batscripts/test_strlen.bat -text
@@ -783,6 +786,7 @@ Scripts/Tools/std/clear_list.bat -text
 Scripts/Tools/std/copy.bat -text
 Scripts/Tools/std/del_file.bat -text
 Scripts/Tools/std/del_file_pttn.bat -text
+Scripts/Tools/std/echo_var.bat -text
 Scripts/Tools/std/free_temp_dir.bat -text
 Scripts/Tools/std/get_wmic_local_datetime.bat -text
 Scripts/Tools/std/if_.bat -text
@@ -793,6 +797,7 @@ Scripts/Tools/std/replace_sys_chars.bat -text
 Scripts/Tools/std/restore_sys_chars.bat -text
 Scripts/Tools/std/restorecp.bat -text
 Scripts/Tools/std/sleep.bat -text
+Scripts/Tools/std/trim_var.bat -text
 Scripts/Tools/std/xcopy_dir.bat -text
 Scripts/Tools/std/xcopy_file.bat -text
 Scripts/Tools/std/xcopy_file_rename.bat -text
@@ -815,6 +820,7 @@ Scripts/Tools/tasks/task_spawner.bat -text
 Scripts/Tools/tee2.sh -text
 Scripts/Tools/testlib.sh -text
 Scripts/Tools/testlib/__init__.bat -text
+Scripts/Tools/testlib/endlocal.bat -text
 Scripts/Tools/testlib/exit.bat -text
 Scripts/Tools/testlib/init.bat -text
 Scripts/Tools/testlib/test.bat -text
