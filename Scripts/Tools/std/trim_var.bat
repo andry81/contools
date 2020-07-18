@@ -1,5 +1,10 @@
 @echo off
 
+rem drop the output variable value
+if not "%~2" == "" if not "%~1" == "%~2" set "%~2="
+
+if not defined %~1 exit /b 0
+
 setlocal DISABLEDELAYEDEXPANSION
 
 rem Load and replace a value quote characters by the \x01 character.

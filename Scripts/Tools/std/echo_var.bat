@@ -1,5 +1,10 @@
 @echo off
 
+if not defined %~1 (
+  echo.%~2%~3
+  exit /b 0
+)
+
 setlocal DISABLEDELAYEDEXPANSION
 
 rem Load and replace a value quote characters by the \x01 character.
