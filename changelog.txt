@@ -1,3 +1,12 @@
+2020.07.18:
+* fixed: Scripts/Tests/batscripts: execution fixes
+* new: Scripts/Tools/std: `trim_var.bat` and `echo_var.bat` scripts including handle of system characters like `!`, `%`, `"`, "^" and so on
+* new: Scripts/Tests/batscripts: `trim_var.bat` script tests
+* new: Scripts/Tools/testlib: `endlocal.bat` script to use from a test script in case if the `setlocal` command call is a part of a test case
+
+2020.07.11:
+* changed: Scripts/Tools/std: load_config.bat: made load a config file from a different output directory
+
 2020.07.10:
 * new: Scripts/Tools: pyxvcs scripts moved from the pyxvcs project
 
