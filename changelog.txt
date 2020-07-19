@@ -1,3 +1,7 @@
+2020.07.20:
+* new: Scripts/Tools/std: load_config.bat: integrated a variable name and value trim as builtin trim (from the `trim_var.bat` script) to suppress surrounding white spaces in the `<var> = <value>` expression
+* new: Scripts/Tools/std: load_config.bat: splitted the directory parameter into the input and the output directories
+
 2020.07.19:
 * changed: Scripts/Tools/ToolAdapters/download: minor refactor
 
