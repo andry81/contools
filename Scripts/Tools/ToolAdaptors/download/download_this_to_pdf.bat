@@ -2,7 +2,7 @@
 
 setlocal
 
-call "%%~dp0__init__.bat" || exit /b
+call "%%~dp0__init0__.bat" || exit /b
 
 if %IMPL_MODE%0 NEQ 0 goto IMPL
 
@@ -75,4 +75,4 @@ if defined FLAG (
 set "FROM_PAGE=%~1"
 set "TO_PAGE=%~2"
 
-call "%%CONTOOLS_ROOT%%\ToolAdapters\download\download_url_to_pdf.bat"%%BARE_FLAGS%% "domain/url-{PAGENUM}" "%%FROM_PAGE%%" "%%TO_PAGE%%" "file #{PAGENUM}.pdf"
+call "%%DOWNLOAD_TOOLS_ROOT%%\download_url_to_pdf.bat"%%BARE_FLAGS%% "domain/url-{PAGENUM}" "%%FROM_PAGE%%" "%%TO_PAGE%%" "file #{PAGENUM}.pdf"

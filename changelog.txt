@@ -1,4 +1,7 @@
 2020.07.19:
+* changed: Scripts/Tools/ToolAdapters/download: minor refactor
+
+2020.07.19:
 * fixed: Scripts/Tests/batscripts: trim_var.bat: fix in case of empty value
 * new: Scripts/Tests/batscripts: test_std__trim_var.bat: tests on empty value and whitespace only characters value
 

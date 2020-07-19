@@ -284,6 +284,7 @@ Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432_k.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64_k.bat -text
+Scripts/Tools/ToolAdaptors/download/__init0__.bat -text
 Scripts/Tools/ToolAdaptors/download/__init__.bat -text
 Scripts/Tools/ToolAdaptors/download/config.vars -text
 Scripts/Tools/ToolAdaptors/download/download_this_to_html.bat -text
