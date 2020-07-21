@@ -1,4 +1,8 @@
 2020.07.21:
+* changed: Scripts/Tools/std: load_config.bat: optimized, replaced temporary variables drop by a local `setlocal`/`endlocal`+ `for /F` commands tandem usage
+* refactor: Scripts/Tools/std: trim_var.bat: minor refactor
+
+2020.07.21:
 * changed: Scripts/Tools/std: trim_var.bat: optimized, removed redundant `setlocal ENABLEDELAYEDEXPANSION` section
 
 2020.07.20:

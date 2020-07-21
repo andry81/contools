@@ -1,5 +1,7 @@
 @echo off
 
+setlocal DISABLEDELAYEDEXPANSION
+
 set "__CONFIG_IN_DIR=%~1"
 set "__CONFIG_OUT_DIR=%~2"
 set "__CONFIG_FILE=%~3"
@@ -42,39 +44,85 @@ if not exist "%__CONFIG_OUT_DIR%/%__CONFIG_FILE%" (
   exit /b 20
 ) >&2
 
-for /F "usebackq eol=# tokens=* delims=" %%i in ("%__CONFIG_OUT_DIR%/%__CONFIG_FILE%") do for /F "eol=	 tokens=1,* delims==" %%j in ("%%i") do (
-  set __VAR=%%j
-  set __VALUE=%%k
-  call :PARSE
-)
-
-rem drop local variables
-(
-  set "__VAR="
-  set "__PLATFORM="
-  set "__VALUE="
-  set "__CONFIG_IN_DIR="
-  set "__CONFIG_OUT_DIR="
-  set "__CONFIG_FILE="
+for /F "usebackq eol=# tokens=* delims=" %%i in ("%__CONFIG_OUT_DIR%/%__CONFIG_FILE%") do (
+  endlocal
+  setlocal DISABLEDELAYEDEXPANSION
+  for /F "eol=# tokens=1,* delims==" %%j in ("%%i") do (
+    set "__VAR=%%j"
+    set "__VALUE=%%k"
+    call :PARSE_EXPR && (
+      setlocal ENABLEDELAYEDEXPANSION
+      for /F "tokens=1,* delims==" %%i in ("!__VAR!=!__VALUE!") do (
+        endlocal
+        endlocal
+        set "%%i=%%j"
+      )
+      type nul>nul
+    ) || endlocal
+  )
 )
 
 exit /b 0
 
-:PARSE
+:PARSE_EXPR
+if not defined __VAR exit /b 1
+
+rem CAUTION:
+rem Inplace trim of surrounded white spaces ONLY from left and right sequences as a whole for performance reasons.
+rem
+
+:TRIM_VAR_NAME
+:TRIM_VAR_NAME_LEFT_LOOP
+if not defined __VAR exit /b 1
+if not ^%__VAR:~0,1%/ == ^ / if not ^%__VAR:~0,1%/ == ^	/ goto TRIM_VAR_NAME_RIGHT_LOOP
+set "__VAR=%__VAR:~1%"
+goto TRIM_VAR_NAME_LEFT_LOOP
+
+:TRIM_VAR_NAME_RIGHT_LOOP
+if not ^%__VAR:~-1%/ == ^ / if not ^%__VAR:~-1%/ == ^	/ goto TRIM_VAR_NAME_RIGHT_LOOP_END
+set "__VAR=%__VAR:~0,-1%"
+if not defined __VAR exit /b 1
+goto TRIM_VAR_NAME_RIGHT_LOOP
+
+:TRIM_VAR_NAME_RIGHT_LOOP_END
+
+if not defined __VALUE exit /b 0
+
+rem Replace a value quote characters by the \x01 character.
+set "__VALUE=%__VALUE:"=%"
+
+:TRIM_VAR_VALUE
+setlocal DISABLEDELAYEDEXPANSION
+
+:TRIM_VAR_VALUE_LEFT_LOOP
+if not defined __VALUE exit /b 0
+if not ^%__VALUE:~0,1%/ == ^ / if not ^%__VALUE:~0,1%/ == ^	/ goto TRIM_VAR_VALUE_RIGHT_LOOP
+set "__VALUE=%__VALUE:~1%"
+goto TRIM_VAR_VALUE_LEFT_LOOP
+
+:TRIM_VAR_VALUE_RIGHT_LOOP
+if not ^%__VALUE:~-1%/ == ^ / if not ^%__VALUE:~-1%/ == ^	/ goto TRIM_VAR_VALUE_RIGHT_LOOP_END
+set "__VALUE=%__VALUE:~0,-1%"
+if not defined __VALUE exit /b 0
+goto TRIM_VAR_VALUE_RIGHT_LOOP
+
+:TRIM_VAR_VALUE_RIGHT_LOOP_END
+(
+  endlocal
+  set "__VALUE=%__VALUE%"
+)
+
 for /F "eol=	 tokens=1,* delims=:" %%i in ("%__VAR%") do (
   set "__VAR=%%i"
   set "__PLATFORM=%%j"
 )
 
-rem trim surrounded white spaces
-call :TRIM_VAR __VAR
-call :TRIM_VAR __PLATFORM
-call :TRIM_VAR __VALUE
+if not defined __VAR exit /b 1
 
 if defined __PLATFORM ^
 if not "%__PLATFORM%" == "BAT" ^
 if not "%__PLATFORM%" == "WIN" ^
-if not "%__PLATFORM%" == "OSWIN" exit /b 0
+if not "%__PLATFORM%" == "OSWIN" exit /b 1
 
 for /F "eol=# tokens=1,* delims=	 " %%i in ("%__VAR%") do (
   set "__ATTR=%%i"
@@ -86,93 +134,35 @@ if not defined __VAR (
   set "__ATTR="
 )
 
-if not defined __VALUE (
-  set "%__VAR%="
+if not defined __VAR exit /b 1
+
+if ^/ == ^%__VALUE:~1,1%/ goto PREPARSE_VALUE
+if not ^/ == ^%__VALUE:~0,1%/ goto PREPARSE_VALUE
+if not ^/ == ^%__VALUE:~-1%/ goto PREPARSE_VALUE
+
+:REMOVE_QUOTES
+for /F "tokens=* delims=" %%i in ("%__VALUE:~1,-1%") do set "__VALUE=%%i"
+
+if not defined __VALUE exit /b 0
+
+goto PARSE_VALUE
+
+:PREPARSE_VALUE
+set __HAS_VALUE=0
+for /F "eol=# tokens=* delims=" %%i in ("%__VALUE%") do set "__HAS_VALUE=1"
+
+if %__HAS_VALUE% EQU 0 (
+  set "__VALUE="
   exit /b 0
 )
 
-if ^/ == ^%__VALUE:~1,1%/ goto DONT_REMOVE_QUOTES
-if not ^"/ == ^%__VALUE:~0,1%/ goto DONT_REMOVE_QUOTES
-if not ^"/ == ^%__VALUE:~-1%/ goto DONT_REMOVE_QUOTES
-
-setlocal ENABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("!__VALUE:~1,-1!") do (
-  endlocal
-  set %__VAR%=%%i
-)
-exit /b
-
-:DONT_REMOVE_QUOTES
-setlocal ENABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("!__VALUE!") do (
-  endlocal
-  set %__VAR%=%%i
-)
-exit /b
-
-:TRIM_VAR
-rem drop the output variable value
-if not "%~2" == "" if not "%~1" == "%~2" set "%~2="
-
-if not defined %~1 exit /b 0
-
-setlocal DISABLEDELAYEDEXPANSION
-
-rem Load and replace a value quote characters by the \x01 character.
-call set "RETURN_VALUE=%%%~1:"=%%"
-
-rem Encode value to remove exclamation characters.
-set "RETURN_VALUE=%RETURN_VALUE:?=?00%"
-set "RETURN_VALUE=%RETURN_VALUE:!=?01%"
-
-if not defined RETURN_VALUE exit /b 0
-
-rem safe to enable
-setlocal ENABLEDELAYEDEXPANSION
-
-:TRIM_LEFT_LOOP
-if not "!RETURN_VALUE:~0,1!" == " " if not "!RETURN_VALUE:~0,1!" == "	" goto TRIM_LEFT_LOOP_END
-set "RETURN_VALUE=!RETURN_VALUE:~1!"
-goto TRIM_LEFT_LOOP
-
-:TRIM_LEFT_LOOP_END
-if not defined RETURN_VALUE exit /b 0
-
-:TRIM_RIGHT_LOOP
-if not "!RETURN_VALUE:~-1!" == " " if not "!RETURN_VALUE:~-1!" == "	" goto TRIM_END
-set "RETURN_VALUE=!RETURN_VALUE:~0,-1!"
-goto TRIM_RIGHT_LOOP
-
-:TRIM_END
-if not defined RETURN_VALUE exit /b 0
-
-rem restore value
-(
-  endlocal
-  set "RETURN_VALUE=%RETURN_VALUE:?01=!%"
-)
-
-rem restore value
-set "RETURN_VALUE=%RETURN_VALUE:?00=?%"
-
+:PARSE_VALUE
 rem recode quote and exclamation characters
 set "__ESC__=^"
 set __QUOT__=^"
 set "__EXCL__=!"
-set "RETURN_VALUE=%RETURN_VALUE:!=!__EXCL__!%"
-set "RETURN_VALUE=%RETURN_VALUE:^=!__ESC__!%"
-set "RETURN_VALUE=%RETURN_VALUE:=!__QUOT__!%"
-
-rem safe set
-setlocal ENABLEDELAYEDEXPANSION
-for /F "tokens=* delims=" %%i in ("!RETURN_VALUE!") do for /F "tokens=* delims=" %%j in ("%%i") do (
-  endlocal
-  endlocal
-  if not "%~2" == "" (
-    set "%~2=%%j"
-  ) else (
-    set "%~1=%%j"
-  )
-)
+set "__VALUE=%__VALUE:!=!__EXCL__!%"
+set "__VALUE=%__VALUE:^=!__ESC__!%"
+set "__VALUE=%__VALUE:=!__QUOT__!%"
 
 exit /b 0
