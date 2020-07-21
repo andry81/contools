@@ -14,13 +14,12 @@ call set "RETURN_VALUE=%%%~1:"=%%"
 if not defined RETURN_VALUE exit /b 0
 if not ^%RETURN_VALUE:~0,1%/ == ^ / if not ^%RETURN_VALUE:~0,1%/ == ^	/ goto TRIM_RIGHT_LOOP
 set "RETURN_VALUE=%RETURN_VALUE:~1%"
-if not defined RETURN_VALUE exit /b 0
 goto TRIM_LEFT_LOOP
 
 :TRIM_RIGHT_LOOP
-if not defined RETURN_VALUE exit /b 0
 if not ^%RETURN_VALUE:~-1%/ == ^ / if not ^%RETURN_VALUE:~-1%/ == ^	/ goto TRIM_RIGHT_LOOP_END
 set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+if not defined RETURN_VALUE exit /b 0
 goto TRIM_RIGHT_LOOP
 
 :TRIM_RIGHT_LOOP_END
