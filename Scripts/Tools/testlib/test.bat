@@ -47,12 +47,15 @@ set LASTERROR=0
 set INTERRORLEVEL=0
 set "TEST_DATA_REF_FILE="
 
+call "%%TESTLIB_ROOT%%/load_locals.bat"
+
 set /A TESTLIB__CURRENT_TESTS%?5%=1
 set /A TESTLIB__OVERALL_TESTS%?5%=1
 
 if %TESTLIB__TEST_SETUP%0 EQU 0 (
   set TESTLIB__TEST_DO_TEARDOWN=1
   call :TEST_SETUP || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT ) )
+  set TESTLIB__TEST_SETUP=0
 )
 
 rem call user initialization script
@@ -146,23 +149,26 @@ exit /b 0
 set "TESTLIB__EXEC_ON_ENDLOCAL="
 
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars" (
-  for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars") do (
-    set "__VAR_NAME=%%i"
+  call "%%TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.return.vars"
+  for /F "usebackq eol=# tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars") do (
+    set "__?RETURN_VAR_NAME=%%i"
     call :SET_EXEC_ON_ENDLOCAL
   )
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars" (
-  for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars") do (
-    set "__VAR_NAME=%%i"
+  call "%%TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/return.vars"
+  for /F "usebackq eol=# tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars") do (
+    set "__?RETURN_VAR_NAME=%%i"
     call :SET_EXEC_ON_ENDLOCAL
   )
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/return.vars" (
-    for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/return.vars") do (
-      set "__VAR_NAME=%%i"
+    call "%%TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/return.vars"
+    for /F "usebackq eol=# tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/return.vars") do (
+      set "__?RETURN_VAR_NAME=%%i"
       call :SET_EXEC_ON_ENDLOCAL
     )
-  )
-)
+  ) else call "%%TESTLIB_ROOT%%/save_locals.bat"
+) else call "%%TESTLIB_ROOT%%/save_locals.bat"
 
 goto EXIT
 
@@ -171,9 +177,9 @@ if defined TESTLIB__EXEC_ON_ENDLOCAL (
   setlocal ENABLEDELAYEDEXPANSION
   for /F "eol=	 tokens=* delims=" %%i in ("!TESTLIB__EXEC_ON_ENDLOCAL!") do (
     endlocal
-    call set TESTLIB__EXEC_ON_ENDLOCAL=%%i {{AND}} set "%%__VAR_NAME%%=%%%__VAR_NAME%%%"
+    call set TESTLIB__EXEC_ON_ENDLOCAL=%%i {{AND}} set "%%__?RETURN_VAR_NAME%%=%%%__?RETURN_VAR_NAME%%%"
   )
-) else call set TESTLIB__EXEC_ON_ENDLOCAL=set "%%__VAR_NAME%%=%%%__VAR_NAME%%%"
+) else call set TESTLIB__EXEC_ON_ENDLOCAL=set "%%__?RETURN_VAR_NAME%%=%%%__?RETURN_VAR_NAME%%%"
 
 exit /b 0
 
@@ -189,7 +195,6 @@ rem Drop internal variables but use some changed value(s) for the return
   set "TESTLIB__OVERALL_TESTS=%TESTLIB__OVERALL_TESTS%"
   set "TESTLIB__CURRENT_PASSED_TESTS=%TESTLIB__CURRENT_PASSED_TESTS%"
   set "TESTLIB__CURRENT_TESTS=%TESTLIB__CURRENT_TESTS%"
-  set "TESTLIB__TEST_SETUP=%TESTLIB__TEST_SETUP%"
   set "TESTLIB__TEST_DO_TEARDOWN=%TESTLIB__TEST_DO_TEARDOWN%"
 
   rem return user declared variables

@@ -15,16 +15,20 @@ rem
 rem initialize testlib "module"
 call "%%~dp0__init__.bat" || exit /b
 
-if not defined TESTLIB__NEST_LVL set TESTLIB__NEST_LVL=0
-
-if not defined TESTLIB__TEST_DO_TEARDOWN set TESTLIB__TEST_DO_TEARDOWN=0
-
-if %TESTLIB__NEST_LVL%0 EQU 0 (
-  set TESTLIB__OVERALL_PASSED_TESTS=0
-  set TESTLIB__OVERALL_TESTS=0
+rem must be assigned not to 65000 codepage!
+if defined CURRENT_CP ^
+if "%CURRENT_CP%" == "65000" (
+  chcp 866 >nul
 )
-set TESTLIB__CURRENT_PASSED_TESTS=0
-set TESTLIB__CURRENT_TESTS=0
+
+rem workaround for the plus sign control character under a unicode codepage
+set "?5=+"
+
+rem restore back
+if defined CURRENT_CP ^
+if "%CURRENT_CP%" == "65000" (
+  chcp 65000 >nul
+)
 
 set "TEST_SCRIPT_FILE_PATH=%~1"
 if defined TEST_SCRIPT_FILE_PATH ^
@@ -46,19 +50,21 @@ set "?~dp0=%~dp1"
 set "?~d0=%~d1"
 
 rem make builtin canonical user script path variables
-set "TEST_SCRIPT_FILE_PATH=%?~dpf0%"
-set "TEST_SCRIPT_FILE_PATH=%TEST_SCRIPT_FILE_PATH:\=/%"
+call :CANONICAL_PATH TEST_SCRIPT_FILE_PATH "%%?~dpf0%%"
 
 set "TEST_SCRIPT_FILE_NAME=%?~n0%"
 set "TEST_SCRIPT_FILE_EXT=%?~x0%"
 
 set "TEST_SCRIPT_FILE=%?~nx0%"
 
-set "TEST_SCRIPT_FILE_DIR=%?~dp0%"
-set "TEST_SCRIPT_FILE_DIR=%TEST_SCRIPT_FILE_DIR:~0,-1%"
-set "TEST_SCRIPT_FILE_DIR=%TEST_SCRIPT_FILE_DIR:\=/%"
+call :CANONICAL_PATH TEST_SCRIPT_FILE_DIR "%%?~dp0%%"
 
 set "TEST_SCRIPT_OUTPUT_DIR=%TEST_SCRIPT_FILE_DIR%/_output"
+set "TEST_SCRIPT_LOCAL_TEMP_DIR=%TEST_SCRIPT_FILE_DIR%/_output/_temp"
+set "TEST_SCRIPT_RETURN_VARS_DIR=%TEST_SCRIPT_LOCAL_TEMP_DIR%/test_return_vars"
+set "TEST_SCRIPT_RETURN_VARS_FILE_PATH=%TEST_SCRIPT_RETURN_VARS_DIR%/vars.txt"
+set "TEST_SCRIPT_RETURN_VALUES_FILE_PATH=%TEST_SCRIPT_RETURN_VARS_DIR%/names.txt"
+set "TEST_SCRIPT_RETURN_LOCK_FILE_PATH=%TEST_SCRIPT_RETURN_VARS_DIR%/.lock"
 
 set "TEST_SCRIPT_HANDLERS_DIR=%~2"
 
@@ -66,8 +72,33 @@ if not defined TEST_SCRIPT_HANDLERS_DIR (
   set "TEST_SCRIPT_HANDLERS_DIR=%TEST_SCRIPT_FILE_DIR%"
 ) else if not ":" == "%TEST_SCRIPT_HANDLERS_DIR:~1,1%" (
   rem relative to the script directory path
-  set "TEST_SCRIPT_HANDLERS_DIR=%TEST_SCRIPT_FILE_DIR%/%TEST_SCRIPT_HANDLERS_DIR:\=/%"
+  call :CANONICAL_PATH TEST_SCRIPT_HANDLERS_DIR "%%TEST_SCRIPT_FILE_DIR%%/%%TEST_SCRIPT_HANDLERS_DIR%%"
 )
+
+if not defined TESTLIB__NEST_LVL set TESTLIB__NEST_LVL=0
+if not defined TESTLIB__TEST_DO_TEARDOWN set TESTLIB__TEST_DO_TEARDOWN=0
+
+if %TESTLIB__NEST_LVL%0 EQU 0 (
+  if exist "%TEST_SCRIPT_RETURN_VARS_DIR%\" rmdir /S /Q "%TEST_SCRIPT_RETURN_VARS_DIR%"
+  if not exist "%TEST_SCRIPT_OUTPUT_DIR%\" mkdir "%TEST_SCRIPT_OUTPUT_DIR%"
+  if not exist "%TEST_SCRIPT_LOCAL_TEMP_DIR%\" mkdir "%TEST_SCRIPT_LOCAL_TEMP_DIR%"
+  if not exist "%TEST_SCRIPT_RETURN_VARS_DIR%\" mkdir "%TEST_SCRIPT_RETURN_VARS_DIR%"
+  set TESTLIB__OVERALL_PASSED_TESTS=0
+  set TESTLIB__OVERALL_TESTS=0
+) else call "%%TESTLIB_ROOT%%/load_locals.bat"
+
+set TESTLIB__CURRENT_PASSED_TESTS=0
+set TESTLIB__CURRENT_TESTS=0
+
+set /A TESTLIB__NEST_LVL%?5%=1
+
+call "%%TESTLIB_ROOT%%/save_locals.bat"
+
+rem return code from user test script
+set LASTERROR=0
+
+rem return code from user test script implementation
+set INTERRORLEVEL=0
 
 echo Running %?~nx0%...
 
@@ -78,10 +109,15 @@ for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0% %2 %3 %4 %5 %6 %7 %8 %9") do (
   title %%i
 )
 
-set /A TESTLIB__NEST_LVL+=1
+exit /b 0
 
-rem return code from user test script
-set LASTERROR=0
-
-rem return code from user test script implementation
-set INTERRORLEVEL=0
+:CANONICAL_PATH
+setlocal DISABLEDELAYEDEXPANSION
+set "RETURN_VALUE=%~dpf2"
+set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+if "%RETURN_VALUE:~-1%" == "/" set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+(
+  endlocal
+  set "%~1=%RETURN_VALUE%"
+)
+exit /b 0
