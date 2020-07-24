@@ -27,7 +27,7 @@ setlocal DISABLEDELAYEDEXPANSION
 set STRING_TO_TRIM= 	 	 	 1 ! 2 ^| 3 ^& 4 ^^ 5 = 6 , 7 ; 8 * 9 # 0 %% 1 / 2 \ 3 ? 4 ^> 5 ^< 6 " 7 	 	 	 
 set STRING_REFERENCE=1 ! 2 ^| 3 ^& 4 ^^ 5 = 6 , 7 ; 8 * 9 # 0 %% 1 / 2 \ 3 ? 4 ^> 5 ^< 6 " 7
 call :TEST
-call "%%TESTLIB_ROOT%%/endlocal.bat"
+endlocal
 
 echo.
 

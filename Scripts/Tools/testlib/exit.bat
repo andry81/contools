@@ -5,27 +5,22 @@ rem   The tests exit script. Must be called one time in a user test script
 rem   after the last call to the `test.bat` script.
 
 rem CAUTION:
-rem   The script must be called without the `call` prefix!
+rem   This script must be called without the `call` prefix!
 rem
 
-set LASTERROR=0
+call "%%TESTLIB_ROOT%%/load_locals.bat"
 
-:TEST_TEARDOWN
-if %TESTLIB__TEST_DO_TEARDOWN%0 NEQ 0 (
-  set "TESTLIB__TEST_DO_TEARDOWN="
-  call :TEST_TEARDOWN || ( call set "LASTERROR=%%ERRORLEVEL%%" )
-)
+if %TESTLIB__TEST_DO_TEARDOWN%0 NEQ 0 call :TEST_TEARDOWN
+set TESTLIB__TEST_TEARDOWN=0
 
-rem Drop internal variables but use some changed value(s) for the return
-(
-  endlocal
-  set "LASTERROR=%LASTERROR%"
-  set "TESTLIB__OVERALL_PASSED_TESTS=%TESTLIB__OVERALL_PASSED_TESTS%"
-  set "TESTLIB__OVERALL_TESTS=%TESTLIB__OVERALL_TESTS%"
-  set "TESTLIB__NEST_LVL=%TESTLIB__NEST_LVL%"
-)
+rem negative return code to indicate no error in the teardown
+if %TESTLIB__CURRENT_PASSED_TESTS% LSS %TESTLIB__CURRENT_TESTS% (
+  set /A LASTERROR=TESTLIB__CURRENT_PASSED_TESTS-TESTLIB__CURRENT_TESTS
+) else set LASTERROR=0
 
 set /A TESTLIB__NEST_LVL-=1
+
+call "%%TESTLIB_ROOT%%/save_locals.bat"
 
 if %TESTLIB__NEST_LVL%0 EQU 0 (
   echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% tests is passed.
@@ -33,9 +28,10 @@ if %TESTLIB__NEST_LVL%0 EQU 0 (
   pause
 )
 
-exit /b
+exit /b %LASTERROR%
 
 :TEST_TEARDOWN
+set "TESTLIB__TEST_DO_TEARDOWN="
 if %TESTLIB__TEST_SETUP%0 EQU 0 exit /b -1
 set "TESTLIB__TEST_SETUP="
 set TESTLIB__TEST_TEARDOWN=1
@@ -51,8 +47,4 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.teardown%TEST_SCRIP
   )
 )
 
-rem negative return code to indicate no error in the teardown
-if %LASTERROR% EQU 0 ^
-if %TESTLIB__CURRENT_PASSED_TESTS% LSS %TESTLIB__CURRENT_TESTS% set /A LASTERROR=TESTLIB__CURRENT_PASSED_TESTS-TESTLIB__CURRENT_TESTS
-
-exit /b %LASTERROR%
+exit /b 0

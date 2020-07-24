@@ -1,5 +1,9 @@
 @echo off
 
+if /i "%TEST_BATSCRIPTS_INIT0_DIR%" == "%~dp0" exit /b 0
+
+set "TEST_BATSCRIPTS_INIT0_DIR=%~dp0"
+
 call :CANONICAL_PATH TESTS_ROOT "%%~dp0"
 
 rem initialize Tools "module"
@@ -15,6 +19,12 @@ call :CANONICAL_PATH TEST_TEMP_BASE_DIR "%%TEST_SRC_BASE_DIR%%/../../../Temp"
 exit /b 0
 
 :CANONICAL_PATH
-set "%~1=%~dpf2"
-call set "%%~1=%%%~1:\=/%%"
+setlocal DISABLEDELAYEDEXPANSION
+set "RETURN_VALUE=%~dpf2"
+set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+if "%RETURN_VALUE:~-1%" == "/" set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+(
+  endlocal
+  set "%~1=%RETURN_VALUE%"
+)
 exit /b 0

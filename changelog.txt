@@ -1,3 +1,15 @@
+2020.07.24:
+* fixed: Scripts/Tools/testlib: endlocal can not be called from a nested script, replaced `endlocal.bat` script by `save_locals.bat`/`load_locals.bat` scripts to directly save/load variables into/from temporary external files
+* fixed: Scripts/Tools/std: load_config.bat: multiple bug fix
+* new: Scripts/Tools/std: load_config.bat: variables substitution and character escaping support
+* new: Scripts/Tests/batscripts: `load_config.bat` script tests
+* changed: Scripts/Tools: moved `set_vars_from_locked_file_pair.bat` into std subdirectory
+* changed: Scripts/Tools/testlib: implementation reworked
+* refactor: Scripts/Tools/std: load_config.bat: internal variable rename from `__*` to `__?*` to avoid intersection with double underscored variables
+* refactor: Scripts/Tools/testlib: implementation refactor
+* refactor: Scripts/Tools/ToolAdapters/totalcmd: local `CANONICAL_PATH` subroutine refactor
+* refactor: local `CANONICAL_PATH` subroutine refactor
+
 2020.07.21:
 * changed: Scripts/Tools/std: load_config.bat: optimized, replaced temporary variables drop by a local `setlocal`/`endlocal`+ `for /F` commands tandem usage
 * refactor: Scripts/Tools/std: trim_var.bat: minor refactor

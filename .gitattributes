@@ -147,6 +147,9 @@ Scripts/Tests/batscripts/.test_std__allocate_temp_dir/report.bat -text
 Scripts/Tests/batscripts/.test_std__chcp/impl.bat -text
 Scripts/Tests/batscripts/.test_std__chcp/init.bat -text
 Scripts/Tests/batscripts/.test_std__chcp/return.vars -text
+Scripts/Tests/batscripts/.test_std__load_config/exit.bat -text
+Scripts/Tests/batscripts/.test_std__load_config/impl.bat -text
+Scripts/Tests/batscripts/.test_std__load_config/init.bat -text
 Scripts/Tests/batscripts/.test_std__trim_var/impl.bat -text
 Scripts/Tests/batscripts/.test_std__trim_var/init.bat -text
 Scripts/Tests/batscripts/.test_strchr/impl.bat -text
@@ -184,6 +187,12 @@ Scripts/Tests/batscripts/_testdata/test_std__allocate_temp_dir/03_nested_with_ta
 Scripts/Tests/batscripts/_testdata/test_std__allocate_temp_dir/03_nested_with_task_count/dir.lst -text
 Scripts/Tests/batscripts/_testdata/test_std__allocate_temp_dir/03_nested_with_task_count/free.bat -text
 Scripts/Tests/batscripts/_testdata/test_std__allocate_temp_dir/03_nested_with_task_count/output0.txt -text
+Scripts/Tests/batscripts/_testdata/test_std__load_config/test_1_empty.vars -text
+Scripts/Tests/batscripts/_testdata/test_std__load_config/test_2_conditional.vars -text
+Scripts/Tests/batscripts/_testdata/test_std__load_config/test_3_substitution.vars -text
+Scripts/Tests/batscripts/_testdata/test_std__load_config/test_4_escape.vars -text
+Scripts/Tests/batscripts/_testdata/test_std__load_config/test_5_commentary.vars -text
+Scripts/Tests/batscripts/_testdata/test_std__load_config/test_6_specific.vars -text
 Scripts/Tests/batscripts/_testdata/test_xml__filter_xpath_list_by_xpath_list/01_empty/output.txt -text
 Scripts/Tests/batscripts/_testdata/test_xml__filter_xpath_list_by_xpath_list/01_empty/xpath_filter.txt -text
 Scripts/Tests/batscripts/_testdata/test_xml__filter_xpath_list_by_xpath_list/11_inexact/output.txt -text
@@ -217,6 +226,7 @@ Scripts/Tests/batscripts/test_extract_version.bat -text
 Scripts/Tests/batscripts/test_setvarsfromfile.bat -text
 Scripts/Tests/batscripts/test_std__allocate_temp_dir.bat -text
 Scripts/Tests/batscripts/test_std__chcp.bat -text
+Scripts/Tests/batscripts/test_std__load_config.bat -text
 Scripts/Tests/batscripts/test_std__trim_var.bat -text
 Scripts/Tests/batscripts/test_strchr.bat -text
 Scripts/Tests/batscripts/test_stresc.bat -text
@@ -769,7 +779,6 @@ Scripts/Tools/regquery.bat -text
 Scripts/Tools/resetenv.bat -text
 Scripts/Tools/sar.pl -text
 Scripts/Tools/sarf.js -text
-Scripts/Tools/set_vars_from_locked_file_pair.bat -text
 Scripts/Tools/set_vars_from_locked_file_pair.sh -text
 Scripts/Tools/setvarfromstd.bat -text
 Scripts/Tools/setvarsfromfile.bat -text
@@ -797,6 +806,7 @@ Scripts/Tools/std/mkdir.bat -text
 Scripts/Tools/std/replace_sys_chars.bat -text
 Scripts/Tools/std/restore_sys_chars.bat -text
 Scripts/Tools/std/restorecp.bat -text
+Scripts/Tools/std/set_vars_from_locked_file_pair.bat -text
 Scripts/Tools/std/sleep.bat -text
 Scripts/Tools/std/trim_var.bat -text
 Scripts/Tools/std/xcopy_dir.bat -text
@@ -821,9 +831,10 @@ Scripts/Tools/tasks/task_spawner.bat -text
 Scripts/Tools/tee2.sh -text
 Scripts/Tools/testlib.sh -text
 Scripts/Tools/testlib/__init__.bat -text
-Scripts/Tools/testlib/endlocal.bat -text
 Scripts/Tools/testlib/exit.bat -text
 Scripts/Tools/testlib/init.bat -text
+Scripts/Tools/testlib/load_locals.bat -text
+Scripts/Tools/testlib/save_locals.bat -text
 Scripts/Tools/testlib/test.bat -text
 Scripts/Tools/timediff.bat -text
 Scripts/Tools/timestamp.bat -text

@@ -22,6 +22,12 @@ call :CANONICAL_PATH VARS_ROOT          "%%CONTOOLS_ROOT%%/vars"
 exit /b 0
 
 :CANONICAL_PATH
-set "%~1=%~dpf2"
-call set "%%~1=%%%~1:\=/%%"
+setlocal DISABLEDELAYEDEXPANSION
+set "RETURN_VALUE=%~dpf2"
+set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+if "%RETURN_VALUE:~-1%" == "/" set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+(
+  endlocal
+  set "%~1=%RETURN_VALUE%"
+)
 exit /b 0
