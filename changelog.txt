@@ -1,3 +1,10 @@
+2020.07.29:
+* new: Scripts/Tools/ToolAdapters/totalcmd: scm: support comments over file path lines to ignore copy/move per file path
+
+2020.07.28:
+* new: Scripts/Tools/ToolAdapters/totalcmd: optional destination path show as a comment line in the files copy/move list
+* changed: Scripts/Tools/ToolAdapters/totalcmd: cleanup
+
 2020.07.28:
 * fixed: Scripts/Tools/ToolAdapters/totalcmd: scripts install and execution fixup
 * refactor: Scripts/Tools/ToolAdapters/totalcmd: __init__.bat: minor refactor

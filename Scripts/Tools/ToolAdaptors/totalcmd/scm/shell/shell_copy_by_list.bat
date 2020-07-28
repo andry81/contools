@@ -83,6 +83,7 @@ for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 :NOCWD
 
 set "LIST_FILE_PATH=%~1"
+set "OPTIONAL_DEST_DIR=%~2"
 
 if not defined LIST_FILE_PATH exit /b 0
 
@@ -104,6 +105,8 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 
 rem recreate empty list
 type nul > "%COPY_TO_LIST_FILE_TMP%"
+
+if defined OPTIONAL_DEST_DIR (echo.# dest: "%OPTIONAL_DEST_DIR%") >> "%COPY_TO_LIST_FILE_TMP%"
 
 rem read selected file paths from file
 for /F "usebackq eol=	 tokens=* delims=" %%i in ("%COPY_FROM_LIST_FILE_TMP%") do (
@@ -132,10 +135,14 @@ call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -n
 
 rem trick with simultaneous iteration over 2 list in the same time
 (
-  for /f "usebackq eol=# tokens=* delims=" %%i in ("%COPY_TO_LIST_FILE_TMP%") do (
-    set /P "FROM_FILE_PATH="
-    set "TO_FILE_PATH=%%i"
-    call :PROCESS_COPY
+  for /f "usebackq tokens=* delims= eol=" %%i in ("%COPY_TO_LIST_FILE_TMP%") do (
+    set IS_LINE_EMPTY=1
+    for /F "eol=# tokens=1,* delims=|" %%k in ("%%i") do set "IS_LINE_EMPTY="
+    if not "%%k" == "" if not "%%l" == "" set /P "FROM_FILE_PATH="
+    if not defined IS_LINE_EMPTY (
+      set "TO_FILE_PATH=%%i"
+      call :PROCESS_COPY
+    )
   )
 ) < "%COPY_FROM_LIST_FILE_TMP%"
 
