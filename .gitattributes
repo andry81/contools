@@ -490,7 +490,6 @@ Scripts/Tools/ToolAdaptors/totalcmd/images_dev/icon_rename_files.png -text
 Scripts/Tools/ToolAdaptors/totalcmd/images_dev/list.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images_dev/notepad_new.ico -text
 Scripts/Tools/ToolAdaptors/totalcmd/images_dev/separator_svn.png -text
-Scripts/Tools/ToolAdaptors/totalcmd/loadvars.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_new_session.bat -text
@@ -780,7 +779,6 @@ Scripts/Tools/regquery.bat -text
 Scripts/Tools/resetenv.bat -text
 Scripts/Tools/sar.pl -text
 Scripts/Tools/sarf.js -text
-Scripts/Tools/set_vars_from_locked_file_pair.sh -text
 Scripts/Tools/setvarfromstd.bat -text
 Scripts/Tools/setvarsfromfile.bat -text
 Scripts/Tools/split_pathstr.bat -text

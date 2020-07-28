@@ -1,3 +1,10 @@
+2020.07.29:
+* new: scm: support comments over file path lines to ignore copy/move per file path
+
+2020.07.28:
+* new: optional destination path show as a comment line in the files copy/move list
+* changed: cleanup
+
 2020.07.28:
 * fixed: scripts install and execution fixup
 * refactor: __init__.bat: minor refactor
