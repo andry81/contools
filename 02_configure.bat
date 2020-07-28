@@ -59,7 +59,7 @@ for /f "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "%CONFIGURE_RO
 
 rem search recursively for a `*generate_src.bat` script inside the `_3dparty` directory and call it
 echo.Searching for "%CONFIGURE_ROOT%/_3dparty/*generate_src.bat"...
-for /f "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "%CONFIGURE_ROOT%/_3dparty\*generate_src.bat"`) do (
+for /f "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "%CONFIGURE_ROOT%/_3dparty\*generate_src.bat" 2^>nul`) do (
   echo."%%i"
   call :CMD "%%i"
 )
