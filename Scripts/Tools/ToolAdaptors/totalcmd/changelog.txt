@@ -1,3 +1,8 @@
+2020.07.28:
+* fixed: scripts install and execution fixup
+* refactor: __init__.bat: minor refactor
+* refactor: _install.bat: directories hierarchy refactor
+
 2020.07.24:
 * refactor: local `CANONICAL_PATH` subroutine refactor
 

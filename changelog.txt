@@ -1,3 +1,9 @@
+2020.07.28:
+* fixed: Scripts/Tools/ToolAdapters/totalcmd: scripts install and execution fixup
+* refactor: Scripts/Tools/ToolAdapters/totalcmd: __init__.bat: minor refactor
+* refactor: Scripts/Tools/ToolAdapters/totalcmd: _install.bat: directories hierarchy refactor
+* refactor: __init__.bat: minor refactor
+
 2020.07.24:
 * fixed: Scripts/Tools/testlib: endlocal can not be called from a nested script, replaced `endlocal.bat` script by `save_locals.bat`/`load_locals.bat` scripts to directly save/load variables into/from temporary external files
 * fixed: Scripts/Tools/std: load_config.bat: multiple bug fix

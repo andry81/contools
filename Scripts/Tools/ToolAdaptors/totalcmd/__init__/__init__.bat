@@ -3,7 +3,7 @@
 set LASTERRORLEVEL=0
 
 rem init script search logic
-for %%i in ("%~dp0.." "%~dp0..\..") do (
+for %%i in ("%~dp0..\..") do (
   for %%j in ("__init__.bat" "__init__\__init__.bat") do (
     call :INCLUDE %%i %%j && (
       setlocal ENABLEDELAYEDEXPANSION & for %%i in (!LASTERRORLEVEL!) do (

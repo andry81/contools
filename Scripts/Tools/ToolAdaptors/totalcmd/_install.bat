@@ -2,6 +2,10 @@
 
 setlocal
 
+set TACKLEBAR_SCRIPTS_INSTALL=1
+
+call "%%~dp0__init__.bat" || exit /b
+
 set "?~dp0=%~dp0"
 set "?~n0=%~n0"
 set "?~nx0=%~nx0"
@@ -47,31 +51,18 @@ if not defined CONFIGURE_TO_DIR (
   exit /b 1
 ) >&2
 
-set "CONFIGURE_TO_DIR=%CONFIGURE_TO_DIR:\=/%"
-if "%CONFIGURE_TO_DIR:~-1%" == "/" set "CONFIGURE_TO_DIR=%CONFIGURE_TO_DIR:~0,-1%"
+call :CANONICAL_PATH CONFIGURE_TO_DIR "%%CONFIGURE_TO_DIR%%"
 
 if not exist "%CONFIGURE_TO_DIR%\" (
   echo.%?~nx0%: error: CONFIGURE_TO_DIR is not a directory: "%CONFIGURE_TO_DIR%"
   exit /b 2
 ) >&2
 
-set "CONFIGURE_FROM_DIR=%?~dp0%"
-set "CONFIGURE_FROM_DIR=%CONFIGURE_FROM_DIR:\=/%"
-if "%CONFIGURE_FROM_DIR:~-1%" == "/" set "CONFIGURE_FROM_DIR=%CONFIGURE_FROM_DIR:~0,-1%"
+call :CANONICAL_PATH CONFIGURE_FROM_DIR "%%?~dp0%%"
 
-call :CANONICAL_PATH "%%?~dp0%%..\.."
-set "CONTOOLS_ROOT=%RETURN_VALUE%"
-
-:IGNORE_INNER_CONTOOLS_ROOT
-
+if not defined CONFIGURE_ROOT goto CONTOOLS_ROOT_ERROR
 if not defined CONTOOLS_ROOT goto CONTOOLS_ROOT_ERROR
-if not exist "%CONTOOLS_ROOT%\__init__.bat" goto CONTOOLS_ROOT_ERROR
-
-rem initialize "module" tools
-call "%%CONTOOLS_ROOT%%/__init__.bat" || goto CONTOOLS_ROOT_ERROR
-
 if not defined SVNCMD_TOOLS_ROOT goto SVNCMD_TOOLS_ROOT_ERROR
-if not exist "%SVNCMD_TOOLS_ROOT%\__init__.bat" goto SVNCMD_TOOLS_ROOT_ERROR
 
 set "COMMANDER_SCRIPTS_ROOT=%CONFIGURE_TO_DIR%"
 set "CONTOOLS_ROOT_COPY=%CONFIGURE_TO_DIR%/tacklebar/Tools"
@@ -84,71 +75,74 @@ if not exist "%CONFIGURE_TO_DIR%/tacklebar\" (
   call :CMD mkdir "%%CONFIGURE_TO_DIR%%/tacklebar"
 )
 
+rem basic initialization
+call :XCOPY_DIR "%%CONFIGURE_ROOT%%/__init__"       "%%CONFIGURE_TO_DIR%%/tacklebar/__init__" /E /Y /D || exit /b
+
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "__init__.bat" "%%CONFIGURE_TO_DIR%%/tacklebar" /Y /D /H || exit /b
+
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "__init__.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+
 rem call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
 
-call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/_config" "%%CONFIGURE_TO_DIR%%/tacklebar/_config" /E /Y /D || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/_config"    "%%CONFIGURE_TO_DIR%%/tacklebar/_config" /E /Y /D || exit /b
 
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/ButtonBars" "%%CONFIGURE_TO_DIR%%/tacklebar/ButtonBars" /S /Y /D || exit /b
 
-call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/Tools" "%%CONFIGURE_TO_DIR%%/tacklebar/Tools" /E /Y /D || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/Tools"      "%%CONFIGURE_TO_DIR%%/tacklebar/Tools" /E /Y /D || exit /b
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/converters" "%%CONFIGURE_TO_DIR%%/tacklebar/converters" /S /Y /D || exit /b
-call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/scm" "%%CONFIGURE_TO_DIR%%/tacklebar/scm" /S /Y /D || exit /b
-call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/images" "%%CONFIGURE_TO_DIR%%/tacklebar/images" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/scm"        "%%CONFIGURE_TO_DIR%%/tacklebar/scm" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/images"     "%%CONFIGURE_TO_DIR%%/tacklebar/images" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "__init__.bat" "%%CONFIGURE_TO_DIR%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/std"             "%%CONTOOLS_ROOT_COPY%%/std" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/xcopy"           "%%CONTOOLS_ROOT_COPY%%/xcopy" /S /Y /D || exit /b
 
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "get_filesize.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "get_shared_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "reduce_relative_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "subtract_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "subtract_relative_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "index_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "split_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "strlen.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_FILE "%%UTILITY_ROOT%%"                 "wxFileDialog.exe" "%%CONFIGURE_TO_DIR%%/tacklebar/Utilities/bin" /Y /D /H || exit /b
 
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/std" "%%CONTOOLS_ROOT_COPY%%/std" /S /Y /D || exit /b
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/xcopy" "%%CONTOOLS_ROOT_COPY%%/xcopy" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/encoding"        "%%CONTOOLS_ROOT_COPY%%/encoding" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_filesize.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "get_shared_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "reduce_relative_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "subtract_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "subtract_relative_path.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "index_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "split_pathstr.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%" "strlen.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONTOOLS_ROOT%%/../../Utilities/bin" "wxFileDialog.exe" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
+call :XCOPY_DIR "%%GNUWIN32_ROOT%%"                 "%%CONTOOLS_ROOT_COPY%%/gnuwin32" /E /Y /D || exit /b
 
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/encoding" "%%CONTOOLS_ROOT_COPY%%/encoding" /S /Y /D || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%"            "__init__.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%"            "svn_has_changes.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%"            "extract_info_param.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%"            "gen_externals_list_from_pget.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%"            "svn_externals_list.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%"            "make_url_absolute.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%"            "make_url_canonical.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%"            "extract_url_scheme.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%"            "extract_url_root.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
+call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%/impl"       "svn_get_wc_db_user_ver.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn/impl" /Y /D /H || exit /b
 
-call :XCOPY_DIR "%%GNUWIN32_ROOT%%" "%%CONTOOLS_ROOT_COPY%%/gnuwin32" /E /Y /D || exit /b
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/sqlite"          "%%CONTOOLS_ROOT_COPY%%/sqlite" /S /Y /D || exit /b
 
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "__init__.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "svn_has_changes.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_info_param.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "gen_externals_list_from_pget.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "svn_externals_list.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "make_url_absolute.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "make_url_canonical.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_url_scheme.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%" "extract_url_root.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn" /Y /D /H || exit /b
-call :XCOPY_FILE "%%SVNCMD_TOOLS_ROOT%%/impl" "svn_get_wc_db_user_ver.bat" "%%CONTOOLS_ROOT_COPY%%/scm/svn/impl" /Y /D /H || exit /b
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash"            "%%CONTOOLS_ROOT_COPY%%/hash" /S /Y /D || exit /b
 
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/sqlite" "%%CONTOOLS_ROOT_COPY%%/sqlite" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/locks"           "%%CONTOOLS_ROOT_COPY%%/locks" /S /Y /D || exit /b
+call :XCOPY_DIR "%%CONTOOLS_ROOT%%/tasks"           "%%CONTOOLS_ROOT_COPY%%/tasks" /S /Y /D || exit /b
 
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/hash" "%%CONTOOLS_ROOT_COPY%%/hash" /S /Y /D || exit /b
-
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/locks" "%%CONTOOLS_ROOT_COPY%%/locks" /S /Y /D || exit /b
-call :XCOPY_DIR "%%CONTOOLS_ROOT%%/tasks" "%%CONTOOLS_ROOT_COPY%%/tasks" /S /Y /D || exit /b
-
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths_by_lists.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "compare_paths_from_stdin.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "copy_file_to_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_dirs_by_path_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_dirs_in_dirs_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_by_path_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "create_empty_files_in_dirs_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "edit_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_edit_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "notepad_new_session.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "save_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "compare_paths.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "compare_paths_by_lists.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "compare_paths_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "compare_paths_from_stdin.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "copy_file_to_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "create_dirs_by_path_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "create_dirs_in_dirs_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "create_empty_files_by_path_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "create_empty_files_in_dirs_from_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "edit_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "notepad_edit_files.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "notepad_edit_files_by_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "notepad_new_session.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "save_file_list.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 
 call :XCOPY_DIR "%%CONTOOLS_ROOT%%/ToolAdaptors/ffmpeg" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/converters/ffmpeg" /S /Y /D || exit /b
 
@@ -156,7 +150,7 @@ call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk" "cmd*.*" "%%COMMANDER_SCRI
 
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%/ToolAdaptors/vbs" "call*.vbs" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 
-call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%" "profile.vars.in" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
+call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "profile.vars.in" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" /Y /D /H || exit /b
 
 if not exist "%COMMANDER_SCRIPTS_ROOT%/tacklebar\profile.vars" goto COPY_PROFILE
 

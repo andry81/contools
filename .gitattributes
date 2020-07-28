@@ -361,6 +361,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/TODO.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/check_config_version.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/__init__.bat -text
+Scripts/Tools/ToolAdaptors/totalcmd/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/_config/svn_props_to_edit.lst.in -text
 Scripts/Tools/ToolAdaptors/totalcmd/_config/svn_props_to_edit_all.lst.in -text
 Scripts/Tools/ToolAdaptors/totalcmd/_config/svn_props_to_sync.lst.in -text
