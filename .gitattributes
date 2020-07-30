@@ -342,11 +342,11 @@ Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/cmd.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/compare.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/compare_paths_by_path_lists.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/copy.bar -text
-Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/copy_file_to_files_by_list.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/create.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/create_dirs_by_path_list.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/create_empty_files_by_path_list.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/edit_saveload_file_list.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/git_copy_paths_by_list.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/load.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/move.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/notepad.bar -text
@@ -355,7 +355,10 @@ Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/save.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/save_file_names.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/save_file_paths.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/select.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/shell_copy_file_to_files_by_list.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/shell_copy_paths_by_list.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/svn.bar -text
+Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/svn_copy_paths_by_list.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/Issues.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/TODO.txt -text

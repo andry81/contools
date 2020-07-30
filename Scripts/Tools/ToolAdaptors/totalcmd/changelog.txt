@@ -1,3 +1,7 @@
+2020.07.30:
+* fixed: scm: invalid copy/move
+* new: scm: copy paths by edited saveload list
+
 2020.07.29:
 * new: scm: support comments over file path lines to ignore copy/move per file path
 

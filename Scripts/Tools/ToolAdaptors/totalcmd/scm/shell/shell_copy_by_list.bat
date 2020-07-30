@@ -138,8 +138,10 @@ rem trick with simultaneous iteration over 2 list in the same time
   for /f "usebackq tokens=* delims= eol=" %%i in ("%COPY_TO_LIST_FILE_TMP%") do (
     set IS_LINE_EMPTY=1
     for /F "eol=# tokens=1,* delims=|" %%k in ("%%i") do set "IS_LINE_EMPTY="
-    if not "%%k" == "" if not "%%l" == "" set /P "FROM_FILE_PATH="
-    if not defined IS_LINE_EMPTY (
+    if defined IS_LINE_EMPTY (
+      for /F "eol=# tokens=1,* delims=|" %%k in ("%%i") do if not "%%k" == "" if not "%%l" == "" set /P "FROM_FILE_PATH="
+    ) else (
+      set /P "FROM_FILE_PATH="
       set "TO_FILE_PATH=%%i"
       call :PROCESS_COPY
     )
