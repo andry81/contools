@@ -17,7 +17,7 @@ echo 3. Press any key to continue and select the `_src` subdirectory in the `con
 
 pause
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%UTILITY_ROOT%\wxFileDialog.exe" "" "%CONFIGURE_ROOT%" "Select the third party catalog to link with..." -de`) do set "_3DPARTY_ROOT=%%i"
+for /F "usebackq eol=	 tokens=* delims=" %%i in (`@"%UTILITY_ROOT%\wxFileDialog.exe" "" "%PROJECT_ROOT%" "Select the third party catalog to link with..." -de`) do set "_3DPARTY_ROOT=%%i"
 
 if not exist "%_3DPARTY_ROOT%" (
   if not defined _3DPARTY_ROOT (
@@ -29,10 +29,10 @@ if not exist "%_3DPARTY_ROOT%" (
   exit /b 255
 ) >&2
 
-call :CREATE_DIR_LINK "%%CONFIGURE_ROOT%%\_3dparty" "%%_3DPARTY_ROOT%%"
+call :CREATE_DIR_LINK "%%PROJECT_ROOT%%\_3dparty" "%%_3DPARTY_ROOT%%"
 
-call :CREATE_DIR_LINK "%%CONFIGURE_ROOT%%\_scripts" "%%CONFIGURE_ROOT%%\_3dparty\utility\tacklelib\tacklelib\_scripts"
-call :CREATE_DIR_LINK "%%CONFIGURE_ROOT%%\cmake" "%%CONFIGURE_ROOT%%\_3dparty\utility\tacklelib\tacklelib\cmake"
+call :CREATE_DIR_LINK "%%PROJECT_ROOT%%\_scripts" "%%PROJECT_ROOT%%\_3dparty\utility\tacklelib\tacklelib\_scripts"
+call :CREATE_DIR_LINK "%%PROJECT_ROOT%%\cmake" "%%PROJECT_ROOT%%\_3dparty\utility\tacklelib\tacklelib\cmake"
 
 pause
 

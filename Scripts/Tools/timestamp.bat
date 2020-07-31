@@ -3,17 +3,27 @@
 setlocal
 
 set BEGIN_TIME=%~1
-set HOURS=%BEGIN_TIME:~8,2%
-set MINS=%BEGIN_TIME:~10,2%
-set SECS=%BEGIN_TIME:~12,2%
-set MSECS=%BEGIN_TIME:~15,3%
-if %HOURS:~0,1% EQU 0 set HOURS=%HOURS:~1,1%
-if %MINS:~0,1% EQU 0 set MINS=%MINS:~1,1%
-if %SECS:~0,1% EQU 0 set SECS=%SECS:~1,1%
-if %MSECS:~0,1% EQU 0 set MSECS=%MSECS:~1,2%
-if %MSECS:~0,1% EQU 0 set MSECS=%MSECS:~1,1%
+set HOURS=%BEGIN_TIME:~0,2%
+set MINS=%BEGIN_TIME:~3,2%
+set SECS=%BEGIN_TIME:~6,2%
+set MSECS=%BEGIN_TIME:~9,2%
 
-set /A TIMESTAMP=(%HOURS%*60*60*1000)+(%MINS%*60*1000)+(%SECS%*1000)+%MSECS%
+if defined HOURS (
+  if 0 EQU %HOURS:~0,1%0 set "HOURS=%HOURS:~1,1%"
+) else set HOURS=0
+if defined MINS (
+  if 0 EQU %MINS:~0,1%0 set "MINS=%MINS:~1,1%"
+) else set MINS=0
+if defined SECS (
+  if 0 EQU %SECS:~0,1%0 set "SECS=%SECS:~1,1%"
+) else set SECS=0
+if defined MSECS (
+  if 0 EQU %MSECS:~0,1%0 set "MSECS=%MSECS:~1%"
+  if 0 EQU %MSECS:~1,1%0 set "MSECS=%MSECS:~1%"
+) else set MSECS=0
+if not defined MSECS set MSECS=0
+
+set /A TIMESTAMP=(%HOURS%*60*60*1000)+(%MINS%*60*1000)+(%SECS%*1000)+%MSECS%*10
 
 (
   endlocal
