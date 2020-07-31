@@ -1,5 +1,5 @@
 /Output
-Scripts/Tests/batscripts/_output
+Scripts/Tests/unit/batscripts/_output
 Scripts/Tools/*.exe
 Scripts/Tools/ToolAdaptors/totalcmd/*.vars
 Scripts/Tools/ToolAdaptors/totalcmd/Tools/*

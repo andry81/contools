@@ -10,12 +10,12 @@ source "/bin/bash_entry" || exit $?
 [[ -z "$NEST_LVL" ]] && NEST_LVL=0
 
 tkl_normalize_path "$BASH_SOURCE_DIR/.." -a && \
-CONFIGURE_ROOT="$RETURN_VALUE"
+PROJECT_ROOT="$RETURN_VALUE"
 
 [[ -z "$LOCAL_CONFIG_DIR_NAME" ]] && LOCAL_CONFIG_DIR_NAME=config
 
-[[ -z "$CONTOOLS_ROOT" ]] && CONTOOLS_ROOT="$CONFIGURE_ROOT/Scripts/Tools"
-[[ -z "$UTILITIES_ROOT" ]] && UTILITIES_ROOT="$CONFIGURE_ROOT/Utilities"
+[[ -z "$CONTOOLS_ROOT" ]] && CONTOOLS_ROOT="$PROJECT_ROOT/Scripts/Tools"
+[[ -z "$UTILITIES_ROOT" ]] && UTILITIES_ROOT="$PROJECT_ROOT/Utilities"
 [[ -z "$UTILITY_ROOT" ]] && UTILITY_ROOT="$UTILITIES_ROOT/bin"
 [[ -z "$BUILD_TOOLS_ROOT" ]] && BUILD_TOOLS_ROOT="$CONTOOLS_ROOT/build"
 [[ -z "$GNUWIN32_ROOT" ]] && GNUWIN32_ROOT="$CONTOOLS_ROOT/gnuwin32"

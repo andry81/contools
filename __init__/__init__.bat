@@ -6,9 +6,9 @@ set "CONTOOLS_ROOT_INIT0_DIR=%~dp0"
 
 if not defined NEST_LVL set NEST_LVL=0
 
-if not defined CONFIGURE_ROOT     call :CANONICAL_PATH CONFIGURE_ROOT     "%%~dp0.."
-if not defined CONTOOLS_ROOT      call :CANONICAL_PATH CONTOOLS_ROOT      "%%CONFIGURE_ROOT%%/Scripts/Tools"
-if not defined UTILITIES_ROOT     call :CANONICAL_PATH UTILITIES_ROOT     "%%CONFIGURE_ROOT%%/Utilities"
+if not defined PROJECT_ROOT       call :CANONICAL_PATH PROJECT_ROOT       "%%~dp0.."
+if not defined CONTOOLS_ROOT      call :CANONICAL_PATH CONTOOLS_ROOT      "%%PROJECT_ROOT%%/Scripts/Tools"
+if not defined UTILITIES_ROOT     call :CANONICAL_PATH UTILITIES_ROOT     "%%PROJECT_ROOT%%/Utilities"
 if not defined UTILITY_ROOT       call :CANONICAL_PATH UTILITY_ROOT       "%%UTILITIES_ROOT%%/bin"
 if not defined BUILD_TOOLS_ROOT   call :CANONICAL_PATH BUILD_TOOLS_ROOT   "%%CONTOOLS_ROOT%%/build"
 if not defined GNUWIN32_ROOT      call :CANONICAL_PATH GNUWIN32_ROOT      "%%CONTOOLS_ROOT%%/gnuwin32"

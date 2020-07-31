@@ -23,7 +23,7 @@ function Pause()
 
 case "$OSTYPE" in
   mingw* | msys* | cygwin*)
-    Call "${COMSPEC//\\//}" /c "$CONFIGURE_ROOT/01_preconfigure.bat" $@
+    Call "${COMSPEC//\\//}" /c "$PROJECT_ROOT/01_preconfigure.bat" $@
     exit $?
     ;;
   *)
@@ -33,7 +33,7 @@ case "$OSTYPE" in
 
     Pause
 
-    _3DPARTY_ROOT=$("$UTILITY_ROOT/wxFileDialog" "" "$CONFIGURE_ROOT" "Select the third party catalog to link with..." -de)
+    _3DPARTY_ROOT=$("$UTILITY_ROOT/wxFileDialog" "" "$PROJECT_ROOT" "Select the third party catalog to link with..." -de)
 
     if [[ ! -d "$_3DPARTY_ROOT" ]]; then
       if [[ -z "$_3DPARTY_ROOT" ]]; then
@@ -44,10 +44,10 @@ case "$OSTYPE" in
       exit 255
     fi
 
-    Call ln -s "$CONFIGURE_ROOT/_3dparty" "$_3DPARTY_ROOT"
+    Call ln -s "$PROJECT_ROOT/_3dparty" "$_3DPARTY_ROOT"
 
-    Call ln -s "$CONFIGURE_ROOT/_3dparty/utility/tacklelib/tacklelib/_scripts" "$CONFIGURE_ROOT/_scripts"
-    Call ln -s "$CONFIGURE_ROOT/_3dparty/utility/tacklelib/tacklelib/cmake" "$CONFIGURE_ROOT/cmake"
+    Call ln -s "$PROJECT_ROOT/_3dparty/utility/tacklelib/tacklelib/_scripts" "$PROJECT_ROOT/_scripts"
+    Call ln -s "$PROJECT_ROOT/_3dparty/utility/tacklelib/tacklelib/cmake" "$PROJECT_ROOT/cmake"
     ;;
 esac
 

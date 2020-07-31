@@ -60,7 +60,7 @@ if not exist "%CONFIGURE_TO_DIR%\" (
 
 call :CANONICAL_PATH CONFIGURE_FROM_DIR "%%?~dp0%%"
 
-if not defined CONFIGURE_ROOT goto CONTOOLS_ROOT_ERROR
+if not defined PROJECT_ROOT goto PROJECT_ROOT_ERROR
 if not defined CONTOOLS_ROOT goto CONTOOLS_ROOT_ERROR
 if not defined SVNCMD_TOOLS_ROOT goto SVNCMD_TOOLS_ROOT_ERROR
 
@@ -76,7 +76,7 @@ if not exist "%CONFIGURE_TO_DIR%/tacklebar\" (
 )
 
 rem basic initialization
-call :XCOPY_DIR "%%CONFIGURE_ROOT%%/__init__"       "%%CONFIGURE_TO_DIR%%/tacklebar/__init__" /E /Y /D || exit /b
+call :XCOPY_DIR "%%PROJECT_ROOT%%/__init__"         "%%CONFIGURE_TO_DIR%%/tacklebar/__init__" /E /Y /D || exit /b
 
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "__init__.bat" "%%CONFIGURE_TO_DIR%%/tacklebar" /Y /D /H || exit /b
 
@@ -254,16 +254,23 @@ if "%RETURN_VALUE:~-1%" == "/" set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
 )
 exit /b 0
 
+:PROJECT_ROOT_ERROR
+(
+  echo.%?~nx0%: error: PROJECT_ROOT path is invalid or does not have the required set of utilities: "%PROJECT_ROOT%".
+  echo.%?~nx0%: info: execute the `*_configure.bat` from the contools WC root to update modules.
+  exit /b 10
+) >&2
+
 :CONTOOLS_ROOT_ERROR
 (
   echo.%?~nx0%: error: CONTOOLS_ROOT path is invalid or does not have the required set of utilities: "%CONTOOLS_ROOT%".
   echo.%?~nx0%: info: execute the `*_configure.bat` from the contools WC root to update modules.
-  exit /b 10
+  exit /b 20
 ) >&2
 
 :SVNCMD_TOOLS_ROOT_ERROR
 (
   echo.%?~nx0%: error: SVNCMD_TOOLS_ROOT path is invalid or does not have the required set of utilities: "%SVNCMD_TOOLS_ROOT%".
   echo.%?~nx0%: info: execute the `*_configure.bat` from the contools WC root to update modules.
-  exit /b 20
+  exit /b 30
 ) >&2
