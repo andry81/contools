@@ -1,4 +1,7 @@
 2020.07.31:
+* new: Scripts/Tests/batscripts: more `load_config.bat` script tests
+
+2020.07.31:
 * new: Scripts/Tests/batscripts: `load_config.bat` bench test added
 * changed: Scripts/Tests: split into unit tests and bench tests
 * changed: Scripts/Tools: `timestamp.bat` and `timediff.bat` scripts retargeted to work with the %TIME% value
