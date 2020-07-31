@@ -177,9 +177,14 @@ set "REFERENCE_4_VALUE_p3=%%%%"
 set REFERENCE_4_VALUE_q1=^"
 set REFERENCE_4_VALUE_q2=^"
 set REFERENCE_4_VALUE_q3=^"
+
+set REFERENCE_4_VALUE_r1=$/{TEST_4_VALUE_01}
+set REFERENCE_4_VALUE_r2=$/{TEST_4_VALUE_02}
+set REFERENCE_4_VALUE_r3=$/{TEST_4_VALUE_03}
+
 call :TEST test_4_escape.vars TEST_4_VALUE_ REFERENCE_4_VALUE_  11 12 13  21 22 23  31 32 33  41 42 43  51 52 53  61 62 63  71 72 73  81 82 83  91 92 93 ^
   a1 a2 a3  b1 b2 b3  c1 c2 c3  d1 d2 d3  e1 e2 e3  f1 f2 f3  g1 g2 g3  h1 h2 h3  i1 i2 i3  j1 j2 j3  k1 k2 k3  l1 l2 l3  m1 m2 m3  n1 n2 n3 ^
-  o1 o2 o3  p1 p2 p3  q1 q2 q3
+  o1 o2 o3  p1 p2 p3  q1 q2 q3  r1 r2 r3
 endlocal
 
 setlocal
