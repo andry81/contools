@@ -23,6 +23,9 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-enable_reencode" (
     set ENABLE_REENCODE=1
+  ) else if "%FLAG%" == "-crf" (
+    set BARE_FLAGS=%BARE_FLAGS% %1 %2
+    shift
   ) else (
     set BARE_FLAGS=%BARE_FLAGS% %1
   )
@@ -57,8 +60,8 @@ if not exist "%FILE_IN%" (
 ) >&2
 
 if %ENABLE_REENCODE% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%"%%BARE_FLAGS%% -i "%%FILE_IN%%" -ss "%%TIME_START%%" -to "%%TIME_END%%" "%%FILE_OUT%%"
-) else call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%"%%BARE_FLAGS%% -i "%%FILE_IN%%" -c copy -ss "%%TIME_START%%" -to "%%TIME_END%%" "%%FILE_OUT%%"
+  call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -i "%%FILE_IN%%" -ss "%%TIME_START%%" -to "%%TIME_END%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
+) else call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -i "%%FILE_IN%%" -c copy -ss "%%TIME_START%%" -to "%%TIME_END%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
 exit /b
 
 :CMD
