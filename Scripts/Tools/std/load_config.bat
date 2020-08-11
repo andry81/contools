@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 
 setlocal DISABLEDELAYEDEXPANSION
 
@@ -95,6 +95,7 @@ if not defined __?VALUE exit /b 0
 rem Replace a value quote characters by the \x01 character.
 
 :TRIM_VAR_VALUE
+set "__?VAR=%__?VAR:"=%"
 set "__?VALUE=%__?VALUE:"=%"
 
 :TRIM_VAR_VALUE_LEFT_LOOP
@@ -110,6 +111,12 @@ if not defined __?VALUE exit /b 0
 goto TRIM_VAR_VALUE_RIGHT_LOOP
 
 :TRIM_VAR_VALUE_RIGHT_LOOP_END
+rem check for old style expression quotes
+if "%__?VAR:~0,1%" == "" if "%__?VALUE:~-1%" == "" (
+  set "__?VAR=%__?VAR:~1%"
+  set "__?VALUE=%__?VALUE:~0,-1%"
+)
+
 for /F "eol=	 tokens=1,* delims=:" %%i in ("%__?VAR%") do (
   set "__?VAR=%%i"
   set "__?PLATFORM=%%j"
