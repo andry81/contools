@@ -59,7 +59,7 @@ set LAST_ERROR=%ERRORLEVEL%
 exit /b %LAST_ERROR%
 
 :RECODE
-call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%"%%BARE_FLAGS%% -err_detect ignore_err -i "%%FILE_IN%%" -c copy "%%FILE_OUT%%"
+call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -err_detect ignore_err -i "%%FILE_IN%%" -c copy%%BARE_FLAGS%% "%%FILE_OUT%%"
 
 exit /b
 

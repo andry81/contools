@@ -88,7 +88,7 @@ for /f "eol=	 tokens=* delims=" %%i in ("%FILE_PATH:\=/%") do (
 exit /b
 
 :ENCODE
-call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%"%%BARE_FLAGS%% -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -bsf:a aac_adtstoasc "%%FILE_OUT%%"
+call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
 
 exit /b
 

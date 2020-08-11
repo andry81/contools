@@ -1,4 +1,8 @@
 2020.08.11:
+* fixed: Scripts/Tools/ToolAdapters/ffmpeg: moved bare flags to the end because ffmpeg utility flags depends on the input
+* new: Scripts/Tools/ToolAdapters/ffmpeg: ffmpeg_cut.bat, ffmpeg_cut_dur.bat: support `-crf` flag together with the `-enable_reencode` to cut with arbitrary quality
+
+2020.08.11:
 * fixed: Scripts/Tools/std: load_config.bat: old tyle expression quotes trim
 * fixed: Scripts/Tools/ToolAdapters/totalcmd/Tools: check_config_version.bat: fix in case of a quote character in the version line
 
