@@ -1,3 +1,6 @@
+2020.08.15:
+* fixed: Scripts/Tools/std: load_config.bat: accidental UTF-8 with BOM encoding usage
+
 2020.08.11:
 * fixed: Scripts/Tools/ToolAdapters/ffmpeg: moved bare flags to the end because ffmpeg utility flags depends on the input
 * new: Scripts/Tools/ToolAdapters/ffmpeg: ffmpeg_cut.bat, ffmpeg_cut_dur.bat: support `-crf` flag together with the `-enable_reencode` to cut with arbitrary quality
