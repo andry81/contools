@@ -1,3 +1,8 @@
+2020.08.17:
+* new: Scripts/Tools/std: load_config.bat: faster and less accurate implementation as default (`-full_parse` flag to use slower full implementation)
+* new: Scripts/Tests/unit/batscripts: tests for new `load_config.bat` implementation
+* new: Scripts/Tests/batch/batscripts: tests for new `load_config.bat` implementation
+
 2020.08.15:
 * fixed: Scripts/Tools/std: load_config.bat: accidental UTF-8 with BOM encoding usage
 
