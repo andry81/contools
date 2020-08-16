@@ -139,7 +139,8 @@ Scripts/TestScripts/genstrings.tcl -text
 Scripts/Tests/bench/batscripts/__init__.bat -text
 Scripts/Tests/bench/batscripts/__init__/__init__.bat -text
 Scripts/Tests/bench/batscripts/_testdata/test_load_config/config.system.vars -text
-Scripts/Tests/bench/batscripts/test_load_config.bat -text
+Scripts/Tests/bench/batscripts/test_load_config_fast.bat -text
+Scripts/Tests/bench/batscripts/test_load_config_full.bat -text
 Scripts/Tests/unit/batscripts/.test_cstresc/impl.bat -text
 Scripts/Tests/unit/batscripts/.test_cstresc/init.bat -text
 Scripts/Tests/unit/batscripts/.test_extract_version/impl.bat -text
@@ -151,9 +152,12 @@ Scripts/Tests/unit/batscripts/.test_std__allocate_temp_dir/report.bat -text
 Scripts/Tests/unit/batscripts/.test_std__chcp/impl.bat -text
 Scripts/Tests/unit/batscripts/.test_std__chcp/init.bat -text
 Scripts/Tests/unit/batscripts/.test_std__chcp/return.vars -text
-Scripts/Tests/unit/batscripts/.test_std__load_config/exit.bat -text
-Scripts/Tests/unit/batscripts/.test_std__load_config/impl.bat -text
-Scripts/Tests/unit/batscripts/.test_std__load_config/init.bat -text
+Scripts/Tests/unit/batscripts/.test_std__load_config_fast/exit.bat -text
+Scripts/Tests/unit/batscripts/.test_std__load_config_fast/impl.bat -text
+Scripts/Tests/unit/batscripts/.test_std__load_config_fast/init.bat -text
+Scripts/Tests/unit/batscripts/.test_std__load_config_full/exit.bat -text
+Scripts/Tests/unit/batscripts/.test_std__load_config_full/impl.bat -text
+Scripts/Tests/unit/batscripts/.test_std__load_config_full/init.bat -text
 Scripts/Tests/unit/batscripts/.test_std__trim_var/impl.bat -text
 Scripts/Tests/unit/batscripts/.test_std__trim_var/init.bat -text
 Scripts/Tests/unit/batscripts/.test_strchr/impl.bat -text
@@ -231,7 +235,8 @@ Scripts/Tests/unit/batscripts/test_extract_version.bat -text
 Scripts/Tests/unit/batscripts/test_setvarsfromfile.bat -text
 Scripts/Tests/unit/batscripts/test_std__allocate_temp_dir.bat -text
 Scripts/Tests/unit/batscripts/test_std__chcp.bat -text
-Scripts/Tests/unit/batscripts/test_std__load_config.bat -text
+Scripts/Tests/unit/batscripts/test_std__load_config_fast.bat -text
+Scripts/Tests/unit/batscripts/test_std__load_config_full.bat -text
 Scripts/Tests/unit/batscripts/test_std__trim_var.bat -text
 Scripts/Tests/unit/batscripts/test_strchr.bat -text
 Scripts/Tests/unit/batscripts/test_stresc.bat -text
