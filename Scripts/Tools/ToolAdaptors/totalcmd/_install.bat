@@ -154,7 +154,7 @@ call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "profile.vars.in" "%%COMMAND
 
 if not exist "%COMMANDER_SCRIPTS_ROOT%/tacklebar\profile.vars" goto COPY_PROFILE
 
-call :CMD "%%CONTOOLS_ROOT_COPY%%/check_config_version.bat" 1 ^
+call :CMD "%%CONTOOLS_ROOT%%/cmake/check_config_version.bat" -optional_system_file_instance ^
   "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars.in" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars" || exit /b
 
 if /i "%%CONFIGURE_FROM_DIR%%\profile.vars" == "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar\profile.vars" goto IGNORE_PROFILE_WRITE

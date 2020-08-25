@@ -1,3 +1,6 @@
+2020.08.22:
+* changed: Tools: replaced specific `check_config_version.bat` script by common `check_config_version.bat` script from cmake subdirectory
+
 2020.08.11:
 * fixed: Tools: check_config_version.bat: fix in case of a quote character in the version line
 
