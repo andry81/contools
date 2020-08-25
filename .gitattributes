@@ -372,7 +372,6 @@ Scripts/Tools/ToolAdaptors/totalcmd/ButtonBars/svn_copy_paths_by_list.bar -text
 Scripts/Tools/ToolAdaptors/totalcmd/Issues.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/totalcmd/TODO.txt -text
-Scripts/Tools/ToolAdaptors/totalcmd/Tools/check_config_version.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/_config/svn_props_to_edit.lst.in -text
@@ -638,6 +637,13 @@ Scripts/Tools/callargs.bat -text
 Scripts/Tools/callshift.bat -text
 Scripts/Tools/canonicalpath.bat -text
 Scripts/Tools/cat2.sh -text
+Scripts/Tools/cmake/__init__.bat -text
+Scripts/Tools/cmake/check_build_type.bat -text
+Scripts/Tools/cmake/check_config_version.bat -text
+Scripts/Tools/cmake/get_GENERATOR_IS_MULTI_CONFIG.bat -text
+Scripts/Tools/cmake/make_output_directories.bat -text
+Scripts/Tools/cmake/set_vars_from_files.bat -text
+Scripts/Tools/cmake/update_build_type.bat -text
 Scripts/Tools/countlines.bat -text
 Scripts/Tools/cstresc.bat -text
 Scripts/Tools/cygsetupdiff.sh -text
