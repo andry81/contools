@@ -1,0 +1,10 @@
+[Buttonbar]
+Buttoncount=2
+button1=%COMMANDER_SCRIPTS_ROOT%\tacklebar\images\menu_read_file_paths_by_path_list.ico
+cmd1=%COMMANDER_SCRIPTS_ROOT%\tacklebar\ButtonBars\read_file_paths_by_path_list.bar
+iconic1=1
+menu1=Read absolute file paths by path list...
+button2=%COMMANDER_SCRIPTS_ROOT%\tacklebar\images\menu_read_file_names_by_path_list.ico
+cmd2=%COMMANDER_SCRIPTS_ROOT%\tacklebar\ButtonBars\read_file_names_by_path_list.bar
+iconic2=1
+menu2=Read file names by path list...

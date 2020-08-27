@@ -1,3 +1,7 @@
+2020.08.27:
+* new: Scripts/Tools/ToolAdapters/totalcmd: read file selection lists through the `read_file_list.bat` script (not recursively for directories) + icons
+* changed: Scripts/Tools/ToolAdapters/totalcmd: save_file_list.bat: minor improvement
+
 2020.08.26:
 * new: Scripts/Tools: moved 3dparty cmake scripts into separate directory
 
