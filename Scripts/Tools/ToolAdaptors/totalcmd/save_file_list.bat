@@ -69,14 +69,25 @@ if not defined CWD goto NOCWD
 cd /d "%CWD%" || exit /b 1
 
 :NOCWD
-
 set "LIST_FILE_PATH=%~1"
 
 if not defined LIST_FILE_PATH exit /b 0
 
-set "LIST_FILE_PATH=%LIST_FILE_PATH:/=\%"
+call :CANONICAL_PATH LIST_FILE_PATH "%%LIST_FILE_PATH%%"
+call :CANONICAL_PATH FLAG_FILE_NAME_TO_SAVE "%%FLAG_FILE_NAME_TO_SAVE%%"
 
-echo."%LIST_FILE_PATH%" -^> "%CD:\=/%/%FLAG_FILE_NAME_TO_SAVE%"
-copy "%LIST_FILE_PATH%" "%FLAG_FILE_NAME_TO_SAVE%" /B /Y
+echo."%LIST_FILE_PATH%" -^> "%FLAG_FILE_NAME_TO_SAVE%"
+copy "%LIST_FILE_PATH:/=\%" "%FLAG_FILE_NAME_TO_SAVE:/=\%" /B /Y
 
+exit /b 0
+
+:CANONICAL_PATH
+setlocal DISABLEDELAYEDEXPANSION
+set "RETURN_VALUE=%~dpf2"
+set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+if "%RETURN_VALUE:~-1%" == "/" set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+(
+  endlocal
+  set "%~1=%RETURN_VALUE%"
+)
 exit /b 0

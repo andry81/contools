@@ -1,0 +1,6 @@
+[Buttonbar]
+Buttoncount=1
+button1=%COMMANDER_SCRIPTS_ROOT%\tacklebar\images\menu_read_file_names_by_path_list.ico
+cmd1=%COMMANDER_SCRIPTS_ROOT%\tacklebar\ButtonBars\read_file_names_by_path_list_wo_recur.bar
+iconic1=1
+menu1=Read file names by path list (without recursion)...

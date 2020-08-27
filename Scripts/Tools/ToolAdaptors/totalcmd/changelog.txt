@@ -1,3 +1,7 @@
+2020.08.27:
+* new: read file selection lists through the `read_file_list.bat` script (not recursively for directories) + icons
+* changed: save_file_list.bat: minor improvement
+
 2020.08.22:
 * changed: Tools: replaced specific `check_config_version.bat` script by common `check_config_version.bat` script from cmake subdirectory
 
