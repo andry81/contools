@@ -515,6 +515,7 @@ Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_edit_files_by_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/notepad_new_session.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/profile.vars.in -text
+Scripts/Tools/ToolAdaptors/totalcmd/read_file_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/save_file_list.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/__init__.bat -text
 Scripts/Tools/ToolAdaptors/totalcmd/scm/git/git_copy_by_list.bat -text
