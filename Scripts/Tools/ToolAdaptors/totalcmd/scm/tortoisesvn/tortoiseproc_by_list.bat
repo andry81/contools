@@ -46,6 +46,7 @@ if not defined TORTOISEPROC_MAX_SPAWN_CALLS set TORTOISEPROC_MAX_SPAWN_CALLS=10
 
 rem script flags
 set FLAG_CONVERT_FROM_UTF16=0
+set "FLAG_CHCP="
 
 :FLAGS_LOOP
 
@@ -65,6 +66,9 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else if "%FLAG%" == "-from_url" (
     set FLAG_FROM_URL=1
   ) else (
@@ -100,7 +104,12 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
   set RESTORE_LOCALE=1
+) else if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+  set RESTORE_LOCALE=1
+)
 
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
@@ -120,7 +129,7 @@ rem create empty file
 type nul > "%LOCAL_PATH_LIST_FILE_TMP%"
 
 rem read selected file paths from file
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%INPUT_LIST_FILE_TMP%") do (
+for /F "usebackq tokens=* delims= eol=" %%i in ("%INPUT_LIST_FILE_TMP%") do (
   set "FILE_PATH=%%i"
   call :PROCESS_FILE_PATH
 )
@@ -170,7 +179,7 @@ svn info "%FILE_PATH%" --non-interactive >nul 2>nul || (
 ) >&2
 
 rem safe echo call
-for /F "eol=	 tokens=* delims=" %%i in ("%FILE_PATH%") do (echo.%%i) >> "%LOCAL_PATH_LIST_FILE_TMP%"
+for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH%") do (echo.%%i) >> "%LOCAL_PATH_LIST_FILE_TMP%"
 set /A MAX_SPAWN_TASKS+=1
 exit /b 0
 
@@ -181,7 +190,7 @@ rem create empty file
 type nul > "%URL_LIST_FILE_TMP%"
 
 rem read urls
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%LOCAL_PATH_LIST_FILE_TMP%") do (
+for /F "usebackq tokens=* delims= eol=" %%i in ("%LOCAL_PATH_LIST_FILE_TMP%") do (
   svn info "%%i" --show-item url
 ) >> "%URL_LIST_FILE_TMP%"
 

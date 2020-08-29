@@ -40,6 +40,7 @@ exit /b %LASTERROR%
 :MAIN
 rem script flags
 set FLAG_CONVERT_FROM_UTF16=0
+set "FLAG_CHCP="
 set "FLAG_FILE_NAME_TO_SAVE=default.lst"
 set FLAG_SAVE_FILE_NAMES_ONLY=0
 
@@ -61,6 +62,9 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else if "%FLAG%" == "-to_file_name" (
     set "FLAG_FILE_NAME_TO_SAVE=%~2"
     shift
@@ -99,7 +103,12 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
   set RESTORE_LOCALE=1
+) else if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+  set RESTORE_LOCALE=1
+)
 
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
@@ -109,7 +118,7 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 )
 
 rem read selected file paths from file
-for /F "usebackq tokens=* delims= eol=" %%i in ("%READ_FROM_LIST_FILE_TMP%") do (
+for /F "usebackq tokens=* delims= eol=" %%i in ("%READ_FROM_LIST_FILE_TMP%") do (
   set "FILE_PATH=%%i"
   call :READ_LIST_FILE
 )
@@ -124,29 +133,29 @@ call :CANONICAL_PATH FILE_PATH "%%FILE_PATH%%"
 if %FLAG_SAVE_FILE_NAMES_ONLY% NEQ 0 goto SAVE_FILE_NAMES_ONLY
 
 if not exist "%FILE_PATH%\" (
-  for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH:/=\%") do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
+  for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH:/=\%") do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
   exit /b 0
 )
 
 rem read directory file without recursion
-for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH:/=\%") do ^
-for /F "usebackq tokens=* delims= eol=" %%j in (`@dir "%%i" /A:-D /B ^| sort`) do (echo.%%i\%%j) >> "%FLAG_FILE_NAME_TO_SAVE%"
+for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH:/=\%") do ^
+for /F "usebackq tokens=* delims= eol=" %%j in (`@dir "%%i" /A:-D /B /O:N`) do (echo.%%i\%%j) >> "%FLAG_FILE_NAME_TO_SAVE%"
 
-exit /b 0
+exit /b
 
 :SAVE_FILE_NAMES_ONLY
 
 call :FILE_NAME FILE_NAME "%%FILE_PATH%%"
 
 if not exist "%FILE_PATH%\" (
-  for /F "tokens=* delims= eol=" %%i in ("%FILE_NAME%") do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
+  for /F "tokens=* delims= eol=" %%i in ("%FILE_NAME%") do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
   exit /b 0
 )
 
 rem read directory file without recursion
-for /F "usebackq tokens=* delims= eol=" %%i in (`@dir "%FILE_PATH:/=\%" /A:-D /B /O:N`) do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
+for /F "usebackq tokens=* delims= eol=" %%i in (`@dir "%FILE_PATH:/=\%" /A:-D /B /O:N`) do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
 
-exit /b 0
+exit /b
 
 :CANONICAL_PATH
 setlocal DISABLEDELAYEDEXPANSION

@@ -1,3 +1,15 @@
+2020.08.29:
+* fixed: Scripts/Tools/ToolAdapters/totalcmd: mess with mix between utf-8 and utf-16 text lists, explicitly state the text encoding in access to saveload lists
+* fixed: Scripts/Tools/ToolAdapters/totalcmd: avoid any quote characters in scripts for shell/svn/git move/rename/copy
+* fixed: Scripts/Tools/ToolAdapters/totalcmd/ButtonBars: single `%T` parameter must be used together with quotes
+* fixed: other minor bug fixes
+* new: Scripts/Tools/ToolAdapters/totalcmd: scripts for shell/svn/git move/rename/copy now can use saveload lists additionally to the selection lists
+* changed: Scripts/Tools/ToolAdapters/totalcmd: `eol=	` replaced by `eol=` in for loops
+* changed: Scripts/Tools/ToolAdapters/totalcmd: moved `eol=` instructions in for loops at the end of parameter string
+* changed: Scripts/Tools/ToolAdapters/totalcmd: readme update
+* changed: Scripts/Tools/ToolAdapters/totalcmd: TODO update
+* refactor: Scripts/Tools/ToolAdapters/totalcmd: global refactor of ButtonBars files
+
 2020.08.27:
 * new: Scripts/Tools/ToolAdapters/totalcmd: read file selection lists through the `read_file_list.bat` script (not recursively for directories) + icons
 * changed: Scripts/Tools/ToolAdapters/totalcmd: save_file_list.bat: minor improvement

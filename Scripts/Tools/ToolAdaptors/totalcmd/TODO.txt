@@ -96,3 +96,6 @@ Note:
 
 - Add xml compare/merge support through the convertion by an external utility
   to an yaml format file and back.
+
+- Fix copy scripts for copy together with rename (`*_copy_by_list.bat`).
+  Currently renaming does ignore.

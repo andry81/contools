@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.02.10
+* 2020.08.29
 * Toolbar buttons configuration for the Total Commander.
 
 1. INSTALLATION
@@ -83,11 +83,12 @@
 
 3.21. Concatenate video files
 
-3.22. Save/Edit/Load/Select path list to/in/from/by a saveload slot
-3.22.1. Save file selection list to a saveload slot
-3.22.2. Edit a saveload slot list
-3.22.3. Load file selection list from a saveload slot
-3.22.4. Select files by list from a saveload slot
+3.22. Read/Save/Edit/Load/Select path list to/in/from/by a saveload slot
+3.22.1. Read file selection list to a saveload slot
+3.22.2. Save file selection list to a saveload slot
+3.22.3. Edit a saveload slot list
+3.22.4. Load file selection list from a saveload slot
+3.22.5. Select files by list from a saveload slot
 
 4. AUTHOR
 
@@ -181,7 +182,7 @@ For Notepad++, ANSI only files (not limited by command line length):
 call.vbs
 notepad_edit_files_by_list.bat -npp -nosession -multiInst "%P" %L
 
-For Notepad++, any files (not limited by command line length, but slower):
+For Notepad++, any files (utf-16le, not limited by command line length, but slower):
 
 call.vbs
 notepad_edit_files_by_list.bat -npp -paths_to_u16cp -nosession -multiInst "%P" %WL
@@ -205,7 +206,7 @@ ANSI only files (not limited by command line length):
 call.vbs
 notepad_edit_files_by_list.bat -wait -npp "%P" %L
 
-Any files (not limited by command line length, but slower):
+Any files (utf-16le, not limited by command line length, but slower):
 
 call.vbs
 notepad_edit_files_by_list.bat -wait -npp -paths_to_u16cp "%P" %WL
@@ -303,12 +304,17 @@ cmda.bat
 3.5.1. Method #1. By path list over SVN GUI.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_list.bat -pause_on_error -from_utf16 /command:properties "%P" %WL
 
-for ANSI path list:
+For UTF-8 path list:
+
+call.vbs
+scm\tortoisesvn\tortoiseproc_by_list.bat -pause_on_error -chcp 65001 /command:properties "%P" "<utf-8-wo-bom-path-list-file>"
+
+For ANSI path list:
 
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_list.bat -pause_on_error /command:properties "%P" %L
@@ -324,19 +330,29 @@ scm\tortoisesvn\tortoiseproc.bat -pause_on_error /command:properties "%P" %S
 3.5.3. Method #3. By path list over notepad with tabs only for existing externals.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
 scm\svn\svn_edit_props_by_list.bat -pause_on_exit -wait -npp -from_utf16 -edit_filter_by_prop_class -window_per_prop_class "%P" %WL
+
+For UTF-8 path list:
+
+call.vbs
+scm\svn\svn_edit_props_by_list.bat -pause_on_exit -wait -npp -chcp 65001 -edit_filter_by_prop_class -window_per_prop_class "%P" "<utf-8-wo-bom-path-list-file>"
 
 ------------------------------------------------------------------------------
 3.5.4. Method #4. By path list over notepad with tabs for selected by user properties including not yet existed.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
 scm\svn\svn_edit_props_by_list.bat -pause_on_exit -wait -npp -from_utf16 -edit_filter_by_prop_class -create_prop_if_empty -window_per_prop_class "%P" %WL
+
+For UTF-8 path list:
+
+call.vbs
+scm\svn\svn_edit_props_by_list.bat -pause_on_exit -wait -npp -chcp 65001 -edit_filter_by_prop_class -create_prop_if_empty -window_per_prop_class "%P" "<utf-8-wo-bom-path-list-file>"
 
 ------------------------------------------------------------------------------
 3.6. Open SVN Log for selected files and directories together
@@ -346,19 +362,29 @@ scm\svn\svn_edit_props_by_list.bat -pause_on_exit -wait -npp -from_utf16 -edit_f
 3.6.1. Method #1. By path list over SVN GUI fom wokring copies.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_list.bat -pause_on_error -from_utf16 /command:log "%P" %WL
+
+For UTF-8 path list:
+
+call.vbs
+scm\tortoisesvn\tortoiseproc_by_list.bat -pause_on_error -chcp 65001 /command:log "%P" "<utf-8-wo-bom-path-list-file>"
 
 ------------------------------------------------------------------------------
 3.6.2. Method #2. By path list over SVN GUI from remmote urls.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_list.bat -pause_on_error -from_utf16 -from_url -npp /command:log "%P" %WL
+
+For UTF-8 path list:
+
+call.vbs
+scm\tortoisesvn\tortoiseproc_by_list.bat -pause_on_error -chcp 65001 -from_url -npp /command:log "%P" "<utf-8-wo-bom-path-list-file>"
 
 ------------------------------------------------------------------------------
 3.7. Open TortoiseSVN status dialog for a set of WC directories (always opens to show unversioned changes)
@@ -367,6 +393,7 @@ scm\tortoisesvn\tortoiseproc_by_list.bat -pause_on_error -from_utf16 -from_url -
 ------------------------------------------------------------------------------
 3.7.1. Method #1. (By default if no -window-per-*/-all-in-one flags) One window for all WC directories with or without versioned changes.
 ------------------------------------------------------------------------------
+
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait -all-in-one /command:repostatus "%P" %S
 
@@ -378,18 +405,21 @@ scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait 
 ------------------------------------------------------------------------------
 3.7.2. Method #2. Window per unique repository root with or without versioned changes in respective WC directory.
 ------------------------------------------------------------------------------
+
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait -window-per-reporoot /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 3.7.3. Method #3. Window per command line WC directory with or without versioned changes.
 ------------------------------------------------------------------------------
+
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait -window-per-wcdir /command:repostatus "%P" %S
 
 ------------------------------------------------------------------------------
 3.7.4. Method #4. Window per WC root directory with or without versioned changes.
 ------------------------------------------------------------------------------
+
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait -window-per-wcroot /command:repostatus "%P" %S
 
@@ -400,6 +430,7 @@ scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait 
 ------------------------------------------------------------------------------
 3.8.1. Method #1. (By default if no -window-per-*/-all-in-one flags) Window per unique repository root with changes in respective WC directory.
 ------------------------------------------------------------------------------
+
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait -window-per-reporoot /command:commit "%P" %S
 
@@ -411,18 +442,21 @@ scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait 
 ------------------------------------------------------------------------------
 3.8.2. Method #2. One window for all WC directories with changes.
 ------------------------------------------------------------------------------
+
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait -all-in-one /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 3.8.3. Method #3. Window per command line WC directory with changes.
 ------------------------------------------------------------------------------
+
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait -window-per-wcdir /command:commit "%P" %S
 
 ------------------------------------------------------------------------------
 3.8.4. Method #4. Window per WC root directory with changes.
 ------------------------------------------------------------------------------
+
 call.vbs
 scm\tortoisesvn\tortoiseproc_by_nested_wc.bat -pause_on_error -chcp 65001 -wait -window-per-wcroot /command:commit "%P" %S
 
@@ -438,7 +472,7 @@ compare_paths.bat -pause_on_exit -chcp 65001 "%X%P" %X%T
 ------------------------------------------------------------------------------
 
 call.vbs
-compare_paths_by_lists.bat -pause_on_exit -from_utf16 "%P" "<file_paths_list_file>" %WL
+compare_paths_by_list.bat -pause_on_exit -from_utf16 "%P" "<file_paths_list_file>" %WL
 
 ------------------------------------------------------------------------------
 3.11. Compare selected paths from current panel (odd-vs-even)
@@ -448,10 +482,15 @@ compare_paths_by_lists.bat -pause_on_exit -from_utf16 "%P" "<file_paths_list_fil
 3.11.1. Method #1. By path list.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
 compare_paths_from_list.bat -pause_on_exit -from_utf16 "%P" %WL
+
+For UTF-8 path list:
+
+call.vbs
+compare_paths_from_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
@@ -473,10 +512,15 @@ compare_paths.bat -pause_on_exit -chcp 65001 "<path-0>" "<path-1>" ...
 3.12.1. Method #1. By path list.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
 compare_paths_from_list.bat -pause_on_exit -from_utf16 -sort_file_lines "%P" %WL
+
+For UTF-8 path list:
+
+call.vbs
+compare_paths_from_list.bat -pause_on_exit -chcp 65001 -sort_file_lines "%P" "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
@@ -503,7 +547,7 @@ CAUTION:
 3.13.1. Method #1. Move files by path list.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 For Shell:
 
@@ -519,6 +563,23 @@ For GIT:
 
 call.vbs
 scm\git\git_move_by_list.bat -pause_on_exit -from_utf16 "%P" %WL
+
+For UTF-8 path list:
+
+For Shell:
+
+call.vbs
+scm\shell\shell_move_by_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
+
+For SVN:
+
+call.vbs
+scm\svn\svn_move_by_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
+
+For GIT:
+
+call.vbs
+scm\git\git_move_by_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
@@ -550,7 +611,7 @@ CAUTION:
 3.14.1. Method #1. Rename files by path list.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 For Shell:
 
@@ -566,6 +627,23 @@ For GIT:
 
 call.vbs
 scm\git\git_rename_by_list.bat -pause_on_exit -from_utf16 "%P" %WL
+
+For UTF-8 path list:
+
+For Shell:
+
+call.vbs
+scm\shell\shell_rename_by_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
+
+For SVN:
+
+call.vbs
+scm\svn\svn_rename_by_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
+
+For GIT:
+
+call.vbs
+scm\git\git_rename_by_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
@@ -597,7 +675,7 @@ CAUTION:
 3.15.1. Method #1. Copy files by path list.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 For Shell:
 
@@ -613,6 +691,23 @@ For GIT:
 
 call.vbs
 scm\git\git_copy_by_list.bat -pause_on_exit -from_utf16 "%P" %WL
+
+For UTF-8 path list:
+
+For Shell:
+
+call.vbs
+scm\shell\shell_copy_by_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
+
+For SVN:
+
+call.vbs
+scm\svn\svn_copy_by_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
+
+For GIT:
+
+call.vbs
+scm\git\git_copy_by_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
@@ -639,15 +734,20 @@ scm\git\git_copy_by_list.bat -pause_on_exit "%P" %L
 3.16.1. Method #1. Shell file to files copy by path list
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
-copy_file_to_files_by_list.bat -pause_on_exit -from_utf16 -from_file %P%N "<file_paths_list_file>"
+copy_file_to_files_by_list.bat -pause_on_exit -from_utf16 -from_file %P%N "<utf-16-path-list-file>"
+
+For UTF-8 path list:
+
+call.vbs
+copy_file_to_files_by_list.bat -pause_on_exit -chcp 65001 -from_file %P%N "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
 call.vbs
-copy_file_to_files_by_list.bat -pause_on_exit -from_file %P%N "<file_paths_list_file>"
+copy_file_to_files_by_list.bat -pause_on_exit -from_file %P%N "<ansi-path-list-file>"
 
 ------------------------------------------------------------------------------
 3.17. Batch create directories in directories
@@ -657,12 +757,12 @@ copy_file_to_files_by_list.bat -pause_on_exit -from_file %P%N "<file_paths_list_
 3.17.1. Method #1. Create directories in current directory
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-8:
 
 call.vbs
-create_dirs_in_dirs_from_list.bat -pause_on_exit -from_utf16 "%P"
+create_dirs_in_dirs_from_list.bat -pause_on_exit -chcp 65001 "%P"
 
-For ANSI path list:
+For ANSI:
 
 call.vbs
 create_dirs_in_dirs_from_list.bat -pause_on_exit "%P"
@@ -671,9 +771,13 @@ create_dirs_in_dirs_from_list.bat -pause_on_exit "%P"
 3.17.2. Method #2. Create directories in selected directories
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 create_dirs_in_dirs_from_list.bat -pause_on_exit -from_utf16 "%P" %WL
+
+For UTF-8 path list:
+
+create_dirs_in_dirs_from_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
@@ -688,12 +792,12 @@ create_dirs_in_dirs_from_list.bat -pause_on_exit "%P" %L
 3.18.1. Method #1. Create empty files in current directory
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-8:
 
 call.vbs
-create_empty_files_in_dirs_from_list.bat -pause_on_exit -from_utf16 "%P"
+create_empty_files_in_dirs_from_list.bat -pause_on_exit -chcp 65001 "%P"
 
-For ANSI path list:
+For ANSI:
 
 call.vbs
 create_empty_files_in_dirs_from_list.bat "%P"
@@ -702,10 +806,15 @@ create_empty_files_in_dirs_from_list.bat "%P"
 3.18.2. Method #2. Create empty files in selected directories
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
 create_empty_files_in_dirs_from_list.bat -pause_on_exit -from_utf16 "%P" %WL
+
+For UTF-8 path list:
+
+call.vbs
+create_empty_files_in_dirs_from_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
@@ -720,15 +829,20 @@ create_empty_files_in_dirs_from_list.bat -pause_on_exit "%P" %L
 3.19.1. Method #1. Create directories by path list.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
-create_dirs_by_path_list.bat -pause_on_exit -from_utf16 "%P" "<path_to_path_list_with_utf16_strings>"
+create_dirs_by_path_list.bat -pause_on_exit -from_utf16 "%P" "<utf-16-path-list-file>"
+
+For UTF-8 path list:
+
+call.vbs
+create_dirs_by_path_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
 call.vbs
-create_dirs_by_path_list.bat -pause_on_exit "%P" "<path_to_path_list_with_ansi_strings>"
+create_dirs_by_path_list.bat -pause_on_exit "%P" "<ansi-path-list-file>"
 
 ------------------------------------------------------------------------------
 3.20. Batch create empty files by path list
@@ -738,15 +852,20 @@ create_dirs_by_path_list.bat -pause_on_exit "%P" "<path_to_path_list_with_ansi_s
 3.20.1. Method #1. Create empty files by path list.
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
-create_empty_files_by_path_list.bat -pause_on_exit -from_utf16 "%P" "<path_to_path_list_with_ansi_strings>"
+create_empty_files_by_path_list.bat -pause_on_exit -from_utf16 "%P" "<utf-16-path-list-file>"
+
+For UTF-8 path list:
+
+call.vbs
+create_empty_files_by_path_list.bat -pause_on_exit -chcp 65001 "%P" "<utf-8-wo-bom-path-list-file>"
 
 For ANSI path list:
 
 call.vbs
-create_empty_files_by_path_list.bat -pause_on_exit "%P" <path_to_path_list_with_ansi_strings>
+create_empty_files_by_path_list.bat -pause_on_exit "%P" "<ansi-path-list-file>"
 
 ------------------------------------------------------------------------------
 3.21. Concatenate video files
@@ -764,11 +883,23 @@ for minimal steps or mouse clicks you have to make some preparations before the
 usage.
 
 ------------------------------------------------------------------------------
-3.22.1. Save file selection list to a saveload slot
+3.22.1. Read file selection list to a saveload slot
 ------------------------------------------------------------------------------
 
+For UTF-16 path list:
+
 call.vbs
-save_file_list.bat [-pause_on_exit | -pause_on_error | -pause_timeout_sec <pause_timeout_sec>] -to_file_name "<list_file_name>" "<list_file_dir_path>" %WL
+read_file_list.bat [-pause_on_exit | -pause_on_error | -pause_timeout_sec <pause_timeout_sec>] -from_utf16 -to_file_name "<list_file_name>" "<list_file_dir_path>" "<utf-16-path-list-file>"
+
+For UTF-8 path list:
+
+call.vbs
+read_file_list.bat [-pause_on_exit | -pause_on_error | -pause_timeout_sec <pause_timeout_sec>] -chcp 65001 -to_file_name "<list_file_name>" "<list_file_dir_path>" "<utf-8-wo-bom-path-list-file>"
+
+For ANSI path list:
+
+call.vbs
+read_file_list.bat [-pause_on_exit | -pause_on_error | -pause_timeout_sec <pause_timeout_sec>] -to_file_name "<list_file_name>" "<list_file_dir_path>" "<ansi-path-list-file>"
 
 Where:
   * `-pause_on_exit`    - always pause on exit.
@@ -778,17 +909,55 @@ Where:
   * `<list_file_path>`  - a list file directory path there the file paths would
                           be saved.
 
-The files name must be by the same path as in the
-`saveload_search_in_slot_<INDEX_STR>_SearchIn` variables in below section.
+Note:
+  The file name must be by the same path as in the
+  `saveload_search_in_utf8_slot_<INDEX_STR>_SearchIn` variables in below
+  section.
+
+The difference with the `save_file_list.bat` script is that the script steps
+into each directory (not recursively) to read the list of files from it.
 
 ------------------------------------------------------------------------------
-3.22.2. Edit a saveload slot list
+3.22.2. Save file selection list to a saveload slot
 ------------------------------------------------------------------------------
 
-For UNICODE (UTF-16) path list:
+For UTF-16 path list:
 
 call.vbs
-edit_file_list.bat [-pause_on_exit | -pause_on_error | -pause_timeout_sec <pause_timeout_sec>] -wait -npp -multiInst -nosession "<path_to_file_list>"
+save_file_list.bat [-pause_on_exit | -pause_on_error | -pause_timeout_sec <pause_timeout_sec>] -from_utf16 -to_file_name "<list_file_name>" "<list_file_dir_path>" "<utf-16-path-list-file>"
+
+For UTF-8 path list:
+
+call.vbs
+save_file_list.bat [-pause_on_exit | -pause_on_error | -pause_timeout_sec <pause_timeout_sec>] -chcp 65001 -to_file_name "<list_file_name>" "<list_file_dir_path>" "<utf-8-wo-bom-path-list-file>"
+
+For ANSI path list:
+
+call.vbs
+save_file_list.bat [-pause_on_exit | -pause_on_error | -pause_timeout_sec <pause_timeout_sec>] -to_file_name "<list_file_name>" "<list_file_dir_path>" "<ansi-path-list-file>"
+
+Where:
+  * `-pause_on_exit`    - always pause on exit.
+  * `-pause_on_error`   - pause on exit only if an error.
+  * `<pause_timeout_sec>` - timeout in seconds while in a pause (if enabled)
+  * `<list_file_name>`  - a list file name there the file paths would be saved.
+  * `<list_file_path>`  - a list file directory path there the file paths would
+                          be saved.
+
+Note:
+  The file name must be by the same path as in the
+  `saveload_search_in_utf8_slot_<INDEX_STR>_SearchIn` variables in below
+  section.
+
+The `save_file_list.bat` script just saves the list of paths to a slot file as
+is w/o step in into each directory.
+
+------------------------------------------------------------------------------
+3.22.3. Edit a saveload slot list
+------------------------------------------------------------------------------
+
+call.vbs
+edit_file_list.bat [-pause_on_exit | -pause_on_error | -pause_timeout_sec <pause_timeout_sec>] -wait -npp -multiInst -nosession "<path-list-file>"
 
 Where:
   * `-pause_on_exit`    - always pause on exit.
@@ -798,46 +967,59 @@ Where:
   * `<path_to_file_list>` - a path to list file there the file paths is stored.
 
 ------------------------------------------------------------------------------
-3.22.3. Load file selection list from a saveload slot
+3.22.4. Load file selection list from a saveload slot
 ------------------------------------------------------------------------------
 
 At first, you have to create search template in your main configuration file of
 the Total Commander in the section `[searches]`:
 
 ```
-saveload_search_in_slot_<INDEX_STR>_SearchFor=*.*
-saveload_search_in_slot_<INDEX_STR>_SearchIn=@c:\Total Commander Scripts\.saveload\file_lists\<INDEX_STR>.lst
-saveload_search_in_slot_<INDEX_STR>_SearchText=
-saveload_search_in_slot_<INDEX_STR>_SearchFlags=0|103002010021|||||||||0000|0||
+saveload_search_in_utf8_slot_<INDEX_STR>_SearchFor=*.*
+saveload_search_in_utf8_slot_<INDEX_STR>_SearchIn=@c:\Total Commander Scripts\.saveload\file_lists\<INDEX_STR>.utf-8.lst
+saveload_search_in_utf8_slot_<INDEX_STR>_SearchText=
+saveload_search_in_utf8_slot_<INDEX_STR>_SearchFlags=0|103002010021|||||||||0000|0||
 ```
 
-Where the `<INDEX_STR>` can be any index string (for example, from `00` up to
-`99`) and the path `c:\Total Commander Scripts\.saveload\file_lists` is an
+AND
+
+```
+saveload_search_in_utf16le_slot_<INDEX_STR>_SearchFor=*.*
+saveload_search_in_utf16le_slot_<INDEX_STR>_SearchIn=@c:\Total Commander Scripts\.saveload\file_lists\<INDEX_STR>.utf-16le.lst
+saveload_search_in_utf16le_slot_<INDEX_STR>_SearchText=
+saveload_search_in_utf16le_slot_<INDEX_STR>_SearchFlags=0|103002010021|||||||||0000|0||
+```
+
+Where the `<INDEX_STR>` must be index string from `01` up to `09` and the path
+`c:\Total Commander Scripts\.saveload\file_lists` is an
 arbitraty directory there all lists would be saved to and loaded from. You can
 create multiple arbitrary empty files in that directory using another command
 described here in the section `Create batch empty files`.
 
 NOTE:
-  The prefix string `saveload_search_in_slot_<INDEX_STR>` is a search template
-  name in the `Find Files` dialog in the Total Commander. So instead of adding
-  the string in the `[searches]` section, you may create all respective
-  templates through the same dialog from the `Load/Save` tab using the same
-  values from the example above.
+  The prefix string `saveload_search_in_*_slot_<INDEX_STR>` is a search
+  template name in the `Find Files` dialog in the Total Commander. So instead
+  of adding the string in the `[searches]` section, you may create all
+  respective templates through the same dialog from the `Load/Save` tab using
+  the same values from the example above.
 
 After that you can create any arbitrary number of buttons, but I recommend to
 you to create 5 or 10 buttons, not more:
 
-LOADSEARCH saveload_search_in_slot_<INDEX_STR>
+`LOADSEARCH saveload_search_in_utf8_slot_<INDEX_STR>`
+
+AND
+
+`LOADSEARCH saveload_search_in_utf16le_slot_<INDEX_STR>`
 
 Then you can click on the button to open the respective `Find Files` dialog.
 Next click to the find button would show the last saved file paths list which
 you can feed to the Total Commander last active panel.
 
 ------------------------------------------------------------------------------
-3.22.4. Select files by list from a saveload slot
+3.22.5. Select files by list from a saveload slot
 ------------------------------------------------------------------------------
 
-LOADSELECTION "<path_to_file_list>"
+LOADSELECTION "<path-list-file>"
 
 NOTE:
   Command implemented in the version starting from 9.50 beta 3.

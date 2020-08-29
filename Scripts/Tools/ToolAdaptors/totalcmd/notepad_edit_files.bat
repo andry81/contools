@@ -90,7 +90,7 @@ set "FILES_LIST="
 set NUM_FILES=0
 
 if defined FLAG_CHCP (
-  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%FLAG_CHCP%"
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
   set RESTORE_LOCALE=1
 )
 

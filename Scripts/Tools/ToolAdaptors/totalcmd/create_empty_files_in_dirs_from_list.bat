@@ -41,6 +41,7 @@ exit /b %LASTERROR%
 :MAIN
 rem script flags
 set FLAG_CONVERT_FROM_UTF16=0
+set "FLAG_CHCP="
 
 :FLAGS_LOOP
 
@@ -60,6 +61,9 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -78,7 +82,7 @@ if not defined CWD goto NOCWD
 cd /d "%CWD%" || exit /b 1
 
 rem safe title call
-for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
+for /F "tokens=* delims= eol=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
@@ -95,6 +99,9 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
   set RESTORE_LOCALE=1
+) else if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+  set RESTORE_LOCALE=1
 )
 
 if defined LIST_FILE_PATH (
@@ -109,22 +116,23 @@ if defined LIST_FILE_PATH (
 )
 
 rem create empty list
-type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%CREATE_FILES_LIST_FILE_TMP%"
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
+  type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%CREATE_FILES_LIST_FILE_TMP%"
+) else if "%FLAG_CHCP%" == "65001" (
+  type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%CREATE_FILES_LIST_FILE_TMP%"
+) else type nul > "%CREATE_FILES_LIST_FILE_TMP%"
 
 if defined LIST_FILE_PATH (
   rem recreate files
   copy "%INPUT_LIST_FILE_UTF8_TMP%" "%CREATE_FILES_IN_LIST_FILE_TMP%" /B /Y > nul
 ) else (
-  rem recreate empty list
-  type nul > "%CREATE_FILES_IN_LIST_FILE_TMP%"
-
   rem use working directory path as base directory path
-  for /F "eol=	 tokens=* delims=" %%i in ("%CD%") do (echo.%%i) >> "%CREATE_FILES_IN_LIST_FILE_TMP%"
+  for /F "tokens=* delims= eol=" %%i in ("%CD%") do (echo.%%i) > "%CREATE_FILES_IN_LIST_FILE_TMP%"
 )
 
 call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%CREATE_FILES_LIST_FILE_TMP%%"
 
-for /f "usebackq eol=# tokens=* delims=" %%i in ("%CREATE_FILES_IN_LIST_FILE_TMP%") do (
+for /f "usebackq tokens=* delims= eol=#" %%i in ("%CREATE_FILES_IN_LIST_FILE_TMP%") do (
   set "CREATE_FILES_IN_DIR_PATH=%%i"
   call :PROCESS_CREATE_FILES_IN_DIR
 )
@@ -138,7 +146,7 @@ call :CMD pushd "%%CREATE_FILES_IN_DIR_PATH%%" || (
 ) >&2
 
 set LINE_INDEX=0
-for /f "usebackq eol=# tokens=* delims=" %%j in ("%CREATE_FILES_LIST_FILE_TMP%") do (
+for /f "usebackq tokens=* delims= eol=#" %%j in ("%CREATE_FILES_LIST_FILE_TMP%") do (
   set "CREATE_FILE_PATH=%%j"
   call :PROCESS_CREATE_FILES
 )
