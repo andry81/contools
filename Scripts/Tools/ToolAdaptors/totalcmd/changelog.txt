@@ -1,3 +1,14 @@
+2020.08.29:
+* fixed: mess with mix between utf-8 and utf-16 text lists, explicitly state the text encoding in access to saveload lists
+* fixed: avoid any quote characters in scripts for shell/svn/git move/rename/copy
+* fixed: ButtonBars: single `%T` parameter must be used together with quotes
+* new: scripts for shell/svn/git move/rename/copy now can use saveload lists additionally to the selection lists
+* changed: `eol=	` replaced by `eol=` in for loops
+* changed: moved `eol=` instructions in for loops at the end of parameter string
+* changed: readme update
+* changed: TODO update
+* refactor: global refactor of ButtonBars files
+
 2020.08.27:
 * new: read file selection lists through the `read_file_list.bat` script (not recursively for directories) + icons
 * changed: save_file_list.bat: minor improvement

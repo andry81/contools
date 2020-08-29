@@ -41,6 +41,7 @@ exit /b %LASTERROR%
 :MAIN
 rem script flags
 set FLAG_CONVERT_FROM_UTF16=0
+set "FLAG_CHCP="
 
 :FLAGS_LOOP
 
@@ -63,6 +64,9 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -90,7 +94,12 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
   set RESTORE_LOCALE=1
+) else if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+  set RESTORE_LOCALE=1
+)
 
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
@@ -100,7 +109,7 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 )
 
 rem read selected file paths from file
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%COPY_TO_FILES_IN_LIST_FILE_TMP%") do (
+for /F "usebackq tokens=* delims= eol=" %%i in ("%COPY_TO_FILES_IN_LIST_FILE_TMP%") do (
   set TO_FILE_PATH=%%i
   call :PROCESS_FILE_PATH
 )

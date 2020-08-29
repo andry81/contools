@@ -68,7 +68,7 @@ if not exist "%INPUT_FILE%" (
 ) >&2
 
 if defined FLAG_CHCP (
-  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%FLAG_CHCP%"
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
   set RESTORE_LOCALE=1
   if not defined INPUT_CHARSET set "INPUT_CHARSET=CP%FLAG_CHCP%"
 ) else if not defined INPUT_CHARSET call :GET_CURRENT_CODE_PAGE

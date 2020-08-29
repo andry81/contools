@@ -41,6 +41,7 @@ exit /b %LASTERROR%
 :MAIN
 rem script flags
 set FLAG_CONVERT_FROM_UTF16=0
+set "FLAG_CHCP="
 
 :FLAGS_LOOP
 
@@ -60,6 +61,9 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -78,7 +82,7 @@ if not defined CWD goto NOCWD
 cd /d "%CWD%" || exit /b 1
 
 rem safe title call
-for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
+for /F "tokens=* delims= eol=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
@@ -93,6 +97,9 @@ set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.ls
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+  set RESTORE_LOCALE=1
+) else if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
   set RESTORE_LOCALE=1
 )
 
@@ -111,7 +118,7 @@ copy "%INPUT_LIST_FILE_UTF8_TMP%" "%CREATE_DIRS_IN_LIST_FILE_TMP%" /B /Y > nul
 call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%CREATE_DIRS_IN_LIST_FILE_TMP%%"
 
 set LINE_INDEX=0
-for /f "usebackq eol=# tokens=* delims=" %%i in ("%CREATE_DIRS_IN_LIST_FILE_TMP%") do (
+for /f "usebackq tokens=* delims= eol=#" %%i in ("%CREATE_DIRS_IN_LIST_FILE_TMP%") do (
   set "CREATE_DIR_PATH=%%i"
   call :PROCESS_CREATE_DIRS
 )

@@ -69,6 +69,7 @@ exit /b %LASTERROR%
 :MAIN
 rem script flags
 set FLAG_CONVERT_FROM_UTF16=0
+set "FLAG_CHCP="
 set FLAG_ARAXIS=0
 set FLAG_WINMERGE=0
 set "BARE_FLAGS="
@@ -91,6 +92,9 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else if "%FLAG%" == "-sort_file_lines" (
     set FLAG_SORT_FILE_LINES=1
   ) else if "%FLAG%" == "-araxis" (
@@ -143,6 +147,9 @@ type nul > "%COMPARE_OUTPUT_LIST_FILE_TMP%"
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+  set RESTORE_LOCALE=1
+) else if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
   set RESTORE_LOCALE=1
 )
 
@@ -222,7 +229,7 @@ rem append to lists an End Of List character
 
 rem trick with simultaneous iteration over 2 list in the same time
 (
-  for /f "usebackq eol=# tokens=* delims=" %%i in ("%COMPARE_FROM_LIST_FILE_1%") do (
+  for /f "usebackq tokens=* delims= eol=#" %%i in ("%COMPARE_FROM_LIST_FILE_1%") do (
     set /P "FILE_PATH_0="
     set "FILE_PATH_1=%%i"
     call :PROCESS_PATHS "%%FILE_PATH_0%%" "%%FILE_PATH_1%%" || goto PROCESS_LISTS_END
@@ -286,8 +293,8 @@ if not exist "%FILE_PATH_1%\" (
 
 :SORT_FILE_LINES_END
 rem safe echo call
-for /F "eol=	 tokens=* delims=" %%i in ("%FILE_PATH_0%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
-for /F "eol=	 tokens=* delims=" %%i in ("%FILE_PATH_1%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
+for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH_0%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
+for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH_1%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
 set /A PATHS_PAIR_INDEX+=1
 
 exit /b 0

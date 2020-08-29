@@ -45,6 +45,7 @@ exit /b %LASTERROR%
 rem script flags
 set FLAG_WAIT_EXIT=0
 set FLAG_CONVERT_FROM_UTF16=0
+set "FLAG_CHCP="
 rem open an edit window per property class (`svn:ignore`, `svn.externals` and so on)
 set FLAG_WINDOW_PER_PROP_CLASS=0
 rem open an edit property classes filter window before open an edit properties window(s)
@@ -73,6 +74,9 @@ if defined FLAG (
     set FLAG_WAIT_EXIT=1
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else if "%FLAG%" == "-window_per_prop_class" (
     set FLAG_WINDOW_PER_PROP_CLASS=1
   ) else if "%FLAG%" == "-edit_filter_by_prop_class" (
@@ -96,7 +100,7 @@ if not defined CWD goto NOCWD
 cd /d "%CWD%" || exit /b 1
 
 rem safe title call
-for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
+for /F "tokens=* delims= eol=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
@@ -131,7 +135,7 @@ call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -n
 :LOAD_PROPS_FILTER
 set PROPS_FILTER_DIR_INDEX=0
 set PROPS_FILTER_FILE_INDEX=0
-for /F "usebackq eol=# tokens=1,2 delims=|" %%i in ("%PROPS_FILTER_FILE%") do (
+for /F "usebackq tokens=1,2 delims=| eol=#" %%i in ("%PROPS_FILTER_FILE%") do (
   set "FILTER_PROP_CLASS=%%i"
   set "FILTER_PROP_NAME=%%j"
   call :PROCESS_LOAD_PROPS_FILTER
@@ -166,7 +170,12 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
   set RESTORE_LOCALE=1
+) else if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+  set RESTORE_LOCALE=1
+)
 
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
@@ -181,7 +190,7 @@ type nul > "%EDIT_LIST_FILE_TMP%"
 rem read selected file paths from file
 set PATH_INDEX=0
 set NUM_PATHS_TO_EDIT=0
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%INPUT_LIST_FILE_TMP%") do (
+for /F "usebackq tokens=* delims= eol=" %%i in ("%INPUT_LIST_FILE_TMP%") do (
   set "FILE_PATH=%%i"
   call :EDIT_FILE_PATH
   set /A PATH_INDEX+=1
@@ -197,7 +206,7 @@ call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files_by_list.bat"%%BARE
 echo.
 
 rem read edited property paths from list file
-for /F "usebackq eol=	 tokens=1,2,* delims=|" %%i in ("%CHANGESET_LIST_FILE_TMP%") do (
+for /F "usebackq tokens=1,2,* delims=| eol=" %%i in ("%CHANGESET_LIST_FILE_TMP%") do (
   if %NUM_PATHS_TO_EDIT% EQU 0 echo.Writing properties...
   set "PROP_NAME=%%i"
   set "PROP_VALUE_FILE=%%j"
@@ -250,8 +259,8 @@ set "PROP_NAME_DECORATED=%PROP_NAME::=--%"
   )
 ) && (
   copy "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%" "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%.orig" /B /Y 2>&1 >nul
-  for /F "eol=	 tokens=* delims=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
-  for /F "eol=	 tokens=* delims=" %%i in ("%PROP_NAME%|%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%|%FILE_PATH%") do (echo.%%i) >> "%CHANGESET_LIST_FILE_TMP%"
+  for /F "tokens=* delims= eol=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
+  for /F "tokens=* delims= eol=" %%i in ("%PROP_NAME%|%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%|%FILE_PATH%") do (echo.%%i) >> "%CHANGESET_LIST_FILE_TMP%"
   set /A NUM_PATHS_TO_EDIT+=1
 )
 
@@ -288,8 +297,8 @@ set "PROP_NAME_DECORATED=%PROP_NAME::=--%"
   )
 ) && (
   copy "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%" "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%.orig" /B /Y 2>&1 >nul
-  for /F "eol=	 tokens=* delims=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
-  for /F "eol=	 tokens=* delims=" %%i in ("%PROP_NAME%|%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%|%FILE_PATH%") do (echo.%%i) >> "%CHANGESET_LIST_FILE_TMP%"
+  for /F "tokens=* delims= eol=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
+  for /F "tokens=* delims= eol=" %%i in ("%PROP_NAME%|%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%|%FILE_PATH%") do (echo.%%i) >> "%CHANGESET_LIST_FILE_TMP%"
   set /A NUM_PATHS_TO_EDIT+=1
 )
 

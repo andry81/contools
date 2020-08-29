@@ -135,7 +135,7 @@ rem create Notepad++ only session file
   echo.        ^<mainView^>
 
   rem read selected file paths from file
-  for /F "usebackq eol=	 tokens=* delims=" %%i in ("%TRANSLATED_LIST_FILE_PATH%") do (
+  for /F "usebackq tokens=* delims= eol=" %%i in ("%TRANSLATED_LIST_FILE_PATH%") do (
     rem ignore a sub directory open, files in a sub directory must be selected explicitly in a panel!
     if not exist "%%i\" echo.            ^<File filename="%%i" /^>
   )
@@ -159,7 +159,7 @@ exit /b 0
 :USE_BASIC_NOTEPAD
 
 rem CAUTION: no limit to open files!
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%LIST_FILE_PATH%") do (
+for /F "usebackq tokens=* delims= eol=" %%i in ("%LIST_FILE_PATH%") do (
   set "FILE_TO_EDIT=%%i"
   call :OPEN_BASIC_EDITOR
 )

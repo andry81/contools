@@ -58,6 +58,7 @@ exit /b %LASTERROR%
 :MAIN
 rem script flags
 set FLAG_CONVERT_FROM_UTF16=0
+set "FLAG_CHCP="
 set FLAG_ARAXIS=0
 set FLAG_WINMERGE=0
 set "BARE_FLAGS="
@@ -80,6 +81,9 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else if "%FLAG%" == "-sort_file_lines" (
     set FLAG_SORT_FILE_LINES=1
   ) else if "%FLAG%" == "-araxis" (
@@ -134,7 +138,12 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
   set RESTORE_LOCALE=1
+) else if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+  set RESTORE_LOCALE=1
+)
 
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
@@ -154,7 +163,7 @@ rem append to lists an End Of List character
 (echo..) >> "%COMPARE_FROM_LIST_FILE%"
 
 rem read selected file paths from list
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%COMPARE_FROM_LIST_FILE%") do (
+for /F "usebackq tokens=* delims= eol=" %%i in ("%COMPARE_FROM_LIST_FILE%") do (
   set "FILE_PATH=%%i"
   call :PROCESS_PATH "%%FILE_PATH%%" || goto PROCESS_PATH_END
 )
@@ -213,8 +222,8 @@ set /A NUM_PATHS_REMAINDER=NUM_PATHS%%2
 
 if %NUM_PATHS_REMAINDER% EQU 0 (
   rem safe echo call
-  for /F "eol=	 tokens=* delims=" %%i in ("%PREV_FILE_PATH%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
-  for /F "eol=	 tokens=* delims=" %%i in ("%FILE_PATH%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
+  for /F "tokens=* delims= eol=" %%i in ("%PREV_FILE_PATH%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
+  for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
   set /A PATHS_PAIR_INDEX+=1
 )
 

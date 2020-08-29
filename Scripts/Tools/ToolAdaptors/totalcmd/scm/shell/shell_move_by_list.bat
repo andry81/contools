@@ -38,6 +38,7 @@ exit /b %LASTERROR%
 :MAIN
 rem script flags
 set FLAG_CONVERT_FROM_UTF16=0
+set "FLAG_CHCP="
 
 :FLAGS_LOOP
 
@@ -57,6 +58,9 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-from_utf16" (
     set FLAG_CONVERT_FROM_UTF16=1
+  ) else if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -75,7 +79,7 @@ if not defined CWD goto NOCWD
 cd /d "%CWD%" || exit /b 1
 
 rem safe title call
-for /F "eol=	 tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
+for /F "tokens=* delims= eol=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
@@ -91,7 +95,12 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
   set RESTORE_LOCALE=1
+) else if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+  set RESTORE_LOCALE=1
+)
 
+if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem Recreate files and recode files w/o BOM applience (do use UTF-16 instead of UCS-2LE/BE for that!)
   rem See for details: https://stackoverflow.com/questions/11571665/using-iconv-to-convert-from-utf-16be-to-utf-8-without-bom/11571759#11571759
   rem
@@ -103,10 +112,10 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 rem recreate empty list
 type nul > "%MOVE_TO_LIST_FILE_TMP%"
 
-if defined OPTIONAL_DEST_DIR (echo.# dest: "%OPTIONAL_DEST_DIR%") >> "%MOVE_FROM_LIST_FILE_TMP%"
+if defined OPTIONAL_DEST_DIR (echo.# dest: "%OPTIONAL_DEST_DIR%") >> "%MOVE_TO_LIST_FILE_TMP%"
 
 rem read selected file paths from file
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%MOVE_FROM_LIST_FILE_TMP%") do (
+for /F "usebackq tokens=* delims= eol=#" %%i in ("%MOVE_FROM_LIST_FILE_TMP%") do (
   set "FILE_PATH=%%i"
   call :FILL_TO_LIST_FILE_TMP
 )
@@ -115,12 +124,15 @@ goto FILL_TO_LIST_FILE_TMP_END
 
 :FILL_TO_LIST_FILE_TMP
 
+rem avoid any quote characters
+set "FILE_PATH=%FILE_PATH:"=%"
+
 rem always remove trailing slash character
 if "%FILE_PATH:~-1%" == "\" set "FILE_PATH=%FILE_PATH:~0,-1%"
 
 call :GET_FILE_PATH_COMPONENTS PARENT_DIR FILE_NAME "%%FILE_PATH%%"
 
-for /F "eol=	 tokens=* delims=" %%i in ("%PARENT_DIR%|%FILE_NAME%") do (
+for /F "tokens=* delims= eol=" %%i in ("%PARENT_DIR%|%FILE_NAME%") do (
   (echo.%%i) >> "%MOVE_TO_LIST_FILE_TMP%"
 )
 
@@ -132,11 +144,11 @@ call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -n
 
 rem trick with simultaneous iteration over 2 list in the same time
 (
-  for /f "usebackq eol=# tokens=* delims=" %%i in ("%MOVE_TO_LIST_FILE_TMP%") do (
+  for /f "usebackq tokens=* delims= eol=#" %%i in ("%MOVE_TO_LIST_FILE_TMP%") do (
     set IS_LINE_EMPTY=1
-    for /F "eol=# tokens=1,* delims=|" %%k in ("%%i") do set "IS_LINE_EMPTY="
+    for /F "tokens=1,* delims=| eol=#" %%k in ("%%i") do set "IS_LINE_EMPTY="
     if defined IS_LINE_EMPTY (
-      for /F "eol=# tokens=1,* delims=|" %%k in ("%%i") do if not "%%k" == "" if not "%%l" == "" set /P "FROM_FILE_PATH="
+      for /F "tokens=1,* delims=| eol=#" %%k in ("%%i") do if not "%%k" == "" if not "%%l" == "" set /P "FROM_FILE_PATH="
     ) else (
       set /P "FROM_FILE_PATH="
       set "TO_FILE_PATH=%%i"
@@ -156,7 +168,7 @@ if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
 if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
 rem extract destination path components
-for /F "eol=	 tokens=1,* delims=|" %%i in ("%TO_FILE_PATH%") do (
+for /F "tokens=1,* delims=| eol=" %%i in ("%TO_FILE_PATH%") do (
   set "TO_FILE_DIR=%%i"
   set "TO_FILE_NAME=%%j"
 )
