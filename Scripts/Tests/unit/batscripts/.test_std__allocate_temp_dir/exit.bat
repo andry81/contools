@@ -11,7 +11,7 @@ del /F /Q "%TEST_TEMP_DIR%\output*.txt" 2>nul
 
 rem cleanup empty temporary directory
 set "TEST_TEMP_DIR_PATH_ITEM="
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /B "%TEST_TEMP_DIR%"`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir /B "%TEST_TEMP_DIR%"`) do (
   set "TEST_TEMP_DIR_PATH_ITEM=%%i"
   goto EXIT
 )

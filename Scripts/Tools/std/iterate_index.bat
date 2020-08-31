@@ -106,7 +106,7 @@ goto INDEX_LOOP
 
 :EXIT
 rem cleanup predicate list
-for /F "usebackq eol=	 tokens=1,* delims==" %%i in (`set __PRED_LIST[ 2^>nul`) do set "%%i="
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`set __PRED_LIST[ 2^>nul`) do set "%%i="
 
 (
   set "?~nx0="

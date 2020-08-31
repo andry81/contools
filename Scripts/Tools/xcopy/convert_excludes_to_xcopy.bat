@@ -43,7 +43,7 @@ set INDEX=1
 
 :XCOPY_EXCLUDES_LIST_LOOP
 set "FILE="
-for /F "eol=	 tokens=%INDEX% delims=|" %%i in ("%XCOPY_EXCLUDES_LIST%") do set "FILE=%%i"
+for /F "eol= tokens=%INDEX% delims=|" %%i in ("%XCOPY_EXCLUDES_LIST%") do set "FILE=%%i"
 if not defined FILE exit /b 0
 
 if "%FILE:~0,1%" == "@" (
@@ -58,7 +58,7 @@ set /A INDEX+=1
 goto XCOPY_EXCLUDES_LIST_LOOP
 
 :PROCESS_EXCLUDES_LIST_FILE
-for /F "usebackq eol=	 tokens=* delims=" %%i in ("%FILE%") do (
+for /F "usebackq eol= tokens=* delims=" %%i in ("%FILE%") do (
   set "FILE=%%i"
   call :PROCESS_WILDCARD || exit /b
 )
@@ -67,5 +67,5 @@ exit /b 0
 :PROCESS_WILDCARD
 rem convert `*suffix.ext` into `suffix.ext`
 if "%FILE:~0,1%" == "*" set "FILE=%FILE:~1%"
-for /F "eol=	 tokens=* delims=" %%i in ("%FILE%") do (echo.%%i) >> "%XCOPY_EXCLUDES_LIST_FILE%"
+for /F "eol= tokens=* delims=" %%i in ("%FILE%") do (echo.%%i) >> "%XCOPY_EXCLUDES_LIST_FILE%"
 exit /b 0

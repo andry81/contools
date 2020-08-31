@@ -52,14 +52,14 @@ call :CMD "%%PROJECT_ROOT%%/Scripts/Tools/__init__.bat" || exit /b
 
 rem search recursively for a `*configure_src.bat` script inside the `_3dparty` directory and call it
 echo.Searching for "%PROJECT_ROOT%/_3dparty/*configure_src.bat"...
-for /f "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "%PROJECT_ROOT%/_3dparty\*configure_src.bat" 2^>nul`) do (
+for /f "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S "%PROJECT_ROOT%/_3dparty\*configure_src.bat" 2^>nul`) do (
   echo."%%i"
   call :CMD "%%i"
 )
 
 rem search recursively for a `*generate_src.bat` script inside the `_3dparty` directory and call it
 echo.Searching for "%PROJECT_ROOT%/_3dparty/*generate_src.bat"...
-for /f "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S "%PROJECT_ROOT%/_3dparty\*generate_src.bat" 2^>nul`) do (
+for /f "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S "%PROJECT_ROOT%/_3dparty\*generate_src.bat" 2^>nul`) do (
   echo."%%i"
   call :CMD "%%i"
 )

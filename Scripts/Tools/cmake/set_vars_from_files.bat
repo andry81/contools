@@ -85,11 +85,11 @@ if not defined __FLAGS__ goto FLAGS_LOOP_END
 rem safe set call
 setlocal ENABLEDELAYEDEXPANSION
 if defined __SET_VARS_FROM_FILES_FLAGS__ (
-  for /F "eol=	 tokens=1,* delims=|" %%i in ("!__SET_VARS_FROM_FILES_FLAGS__!|!__FLAGS__!") do (
+  for /F "eol= tokens=1,* delims=|" %%i in ("!__SET_VARS_FROM_FILES_FLAGS__!|!__FLAGS__!") do (
     endlocal
     set __SET_VARS_FROM_FILES_FLAGS__=%%i "%%j"
   )
-) else for /F "eol=	 tokens=* delims=" %%i in ("!__FLAGS__!") do (
+) else for /F "eol= tokens=* delims=" %%i in ("!__FLAGS__!") do (
   endlocal
   set __SET_VARS_FROM_FILES_FLAGS__="%%i"
 )
@@ -102,7 +102,7 @@ goto FLAGS_LOOP
 
 if defined __SET_VARS_FROM_FILES_FLAGS__ (
   setlocal ENABLEDELAYEDEXPANSION
-  for /F "eol=	 tokens=* delims=" %%i in ("!__SET_VARS_FROM_FILES_FLAGS__:%%=%%%%!") do (
+  for /F "eol= tokens=* delims=" %%i in ("!__SET_VARS_FROM_FILES_FLAGS__:%%=%%%%!") do (
     endlocal
     set "__SET_VARS_FROM_FILES_FLAGS__=%%i"
   )
@@ -110,7 +110,7 @@ if defined __SET_VARS_FROM_FILES_FLAGS__ (
 
 rem safe set call
 setlocal ENABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("!__SET_VARS_FROM_FILES_FLAGS__!") do (
+for /F "eol= tokens=* delims=" %%i in ("!__SET_VARS_FROM_FILES_FLAGS__!") do (
   endlocal
   set "__SET_VARS_FROM_FILES_FLAGS__=%%i"
 )

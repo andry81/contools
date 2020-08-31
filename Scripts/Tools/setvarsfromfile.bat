@@ -146,7 +146,7 @@ exit /b
 :SET_QUOTED_IMPL
 rem echo 3. __EXP=%__EXP% ^| %*
 set __SET_FLAG_IS_QUOTED=1
-for /F "eol=	 tokens=1,* delims==" %%i in ("%~1") do (
+for /F "eol= tokens=1,* delims==" %%i in ("%~1") do (
   set __EXP=%%i
   call :SET_EXP_IMPL "%%j" || exit /b
 )
@@ -199,7 +199,7 @@ exit /b
 
 :SET_IF_EMPTY
 rem echo 1. __EXP=%__EXP% ^| %*
-for /F "usebackq eol=	 tokens=1,* delims== " %%i in ('%__EXP%') do (
+for /F "usebackq eol= tokens=1,* delims== " %%i in ('%__EXP%') do (
   set __EXP=%%i
   call :SET_IF_EMPTY_IMPL %%j %* || exit /b
 )
@@ -223,7 +223,7 @@ if %__SET_FLAG_IS_QUOTED%0 NEQ 0 goto SET_EXP_QUOTED
 goto SET_EXP_UNQUOTED
 
 :SET_EXP_QUOTED
-for /F "eol=	 tokens=1,* delims==" %%i in ("%__EXP%") do (
+for /F "eol= tokens=1,* delims==" %%i in ("%__EXP%") do (
   set __EXP=%%i
   call :SET_EXP_IMPL %%j %* || exit /b
 )
@@ -231,7 +231,7 @@ exit /b
 
 :SET_EXP_UNQUOTED
 rem echo 2. __EXP=%__EXP% ^| %*
-for /F "usebackq eol=	 tokens=1,* delims== " %%i in ('%__EXP% ') do (
+for /F "usebackq eol= tokens=1,* delims== " %%i in ('%__EXP% ') do (
   set __EXP=%%i
   call :SET_EXP_IMPL %%j %* || exit /b
 )
@@ -313,7 +313,7 @@ exit /b
 
 :SET_FROM_FILE
 rem echo.--^> %__EXP%^|%*^|%__STDIN_FILE%
-for /F "eol=	 tokens=1,* delims==" %%i in ("%__EXP%") do (
+for /F "eol= tokens=1,* delims==" %%i in ("%__EXP%") do (
   set __EXP=%%i
   call :SET_FROM_FILE_IMPL %%__STDIN_FILE%% || exit /b
 )

@@ -41,7 +41,7 @@ set INDEX=1
 
 :ARCHIVE_EXCLUDES_LIST_LOOP
 set "FILE="
-for /F "eol=	 tokens=%INDEX% delims=|" %%i in ("%ARCHIVE_EXCLUDES_LIST%") do set "FILE=%%i"
+for /F "eol= tokens=%INDEX% delims=|" %%i in ("%ARCHIVE_EXCLUDES_LIST%") do set "FILE=%%i"
 if not defined FILE exit /b 0
 
 if "%FILE:~0,1%" == "@" (
@@ -55,7 +55,7 @@ set /A INDEX+=1
 goto ARCHIVE_EXCLUDES_LIST_LOOP
 
 :PROCESS_WILDCARD
-for /F "eol=	 tokens=* delims=" %%i in ("%FILE%") do (
+for /F "eol= tokens=* delims=" %%i in ("%FILE%") do (
   set RETURN_VALUE=%RETURN_VALUE% -xr!"%%i"
 )
 exit /b 0

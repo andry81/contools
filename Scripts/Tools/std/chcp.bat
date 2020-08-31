@@ -30,7 +30,7 @@ goto UPDATECP
 :INIT
 set "LAST_CP="
 set "CURRENT_CP=%CODE_PAGE%"
-for /F "usebackq eol=	 tokens=1,* delims=:" %%i in (`chcp.com 2^>nul`) do set "LAST_CP=%%j"
+for /F "usebackq eol= tokens=1,* delims=:" %%i in (`chcp.com 2^>nul`) do set "LAST_CP=%%j"
 if defined LAST_CP set "LAST_CP=%LAST_CP: =%"
 if defined LAST_CP set "CP_HISTORY_LIST=%LAST_CP%|"
 

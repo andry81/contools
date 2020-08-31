@@ -4,27 +4,27 @@ if not defined SCRIPT_TEMP_NEST_LVL set SCRIPT_TEMP_NEST_LVL=0
 
 if %SCRIPT_TEMP_NEST_LVL% EQU 0 goto NEST_LVL_0
 
-for /F "eol=	 tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_CURRENT_TASK_NAME_LIST%") do (
+for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_CURRENT_TASK_NAME_LIST%") do (
   set "SCRIPT_TEMP_CURRENT_TASK_NAME=%%i"
   set "SCRIPT_TEMP_CURRENT_TASK_NAME_LIST=%%j"
 )
-for /F "eol=	 tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_CURRENT_DIR_LIST%") do (
+for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_CURRENT_DIR_LIST%") do (
   set "SCRIPT_TEMP_CURRENT_DIR=%%i"
   set "SCRIPT_TEMP_CURRENT_DIR_LIST=%%j"
 )
-for /F "eol=	 tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_BASE_DIR_LIST%") do (
+for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_BASE_DIR_LIST%") do (
   set "SCRIPT_TEMP_BASE_DIR=%%i"
   set "SCRIPT_TEMP_BASE_DIR_LIST=%%j"
 )
-for /F "eol=	 tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR_LIST%") do (
+for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR_LIST%") do (
   set "SCRIPT_TEMP_PARENT_PATH_DIR=%%i"
   set "SCRIPT_TEMP_PARENT_PATH_DIR_LIST=%%j"
 )
-for /F "eol=	 tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_DIR_NAME_PREFIX_LIST%") do (
+for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_DIR_NAME_PREFIX_LIST%") do (
   set "SCRIPT_TEMP_DIR_NAME_PREFIX=%%i"
   set "SCRIPT_TEMP_DIR_NAME_PREFIX_LIST=%%j"
 )
-for /F "eol=	 tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_TASK_COUNT_LIST%") do (
+for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_TASK_COUNT_LIST%") do (
   set "SCRIPT_TEMP_TASK_COUNT=%%i"
   set "SCRIPT_TEMP_TASK_COUNT_LIST=%%j"
 )
@@ -52,7 +52,7 @@ if "%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX:~1,1%" == "" set "SCRIPT_TEMP_TASK_COUNT
 rem echo =%SCRIPT_TEMP_BASE_DIR%=%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_NAME_PREFIX%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%=
 
 rem remove parent directory
-for /F "eol=	 tokens=1,* delims=\" %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_NAME_PREFIX%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%") do (
+for /F "eol= tokens=1,* delims=\" %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_NAME_PREFIX%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%") do (
   rmdir /S /Q "%SCRIPT_TEMP_BASE_DIR%\%%i"
 )
 

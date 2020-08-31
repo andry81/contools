@@ -29,7 +29,7 @@ set PATH_INDEX=1
 
 :PUBLISH_XCOPY_STAGE_ROOT_LOOP
 set PUBLISH_STAGE_ROOT=
-for /F "eol=	 tokens=%PATH_INDEX% delims=|" %%i in ("%PUBLISH_STAGE_ROOT_LIST%") do set "PUBLISH_STAGE_ROOT=%%i"
+for /F "eol= tokens=%PATH_INDEX% delims=|" %%i in ("%PUBLISH_STAGE_ROOT_LIST%") do set "PUBLISH_STAGE_ROOT=%%i"
 if not defined PUBLISH_STAGE_ROOT goto PUBLISH_XCOPY_STAGE_ROOT_LOOP_END
 
 call :PUBLISH_XCOPY "%%PUBLISH_STAGE_ROOT%%" "%%FROM_BASE_ROOT%%" "%%TO_APP_DIR_ROOT%%" || exit /b 1

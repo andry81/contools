@@ -175,7 +175,7 @@ goto EXIT
 :SET_EXEC_ON_ENDLOCAL
 if defined TESTLIB__EXEC_ON_ENDLOCAL (
   setlocal ENABLEDELAYEDEXPANSION
-  for /F "eol=	 tokens=* delims=" %%i in ("!TESTLIB__EXEC_ON_ENDLOCAL!") do (
+  for /F "eol= tokens=* delims=" %%i in ("!TESTLIB__EXEC_ON_ENDLOCAL!") do (
     endlocal
     call set TESTLIB__EXEC_ON_ENDLOCAL=%%i {{AND}} set "%%__?RETURN_VAR_NAME%%=%%%__?RETURN_VAR_NAME%%%"
   )
