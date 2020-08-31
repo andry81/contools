@@ -1,3 +1,7 @@
+2020.08.31:
+* new: Scripts/Tools/ToolAdapters/notepadplusplus: notepad++ python scripts for PythonScript plugin
+* new: Scripts/Tools/std: allocate_temp_dir.bat: `SCRIPT_TEMP_DIR_NAME` variable to reuse last generated temporary directory name
+
 2020.08.29:
 * fixed: Scripts/Tools/ToolAdapters/totalcmd: mess with mix between utf-8 and utf-16 text lists, explicitly state the text encoding in access to saveload lists
 * fixed: Scripts/Tools/ToolAdapters/totalcmd: avoid any quote characters in scripts for shell/svn/git move/rename/copy
