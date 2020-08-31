@@ -100,7 +100,7 @@ if not defined CWD goto NOCWD
 cd /d "%CWD%" || exit /b 1
 
 rem safe title call
-for /F "tokens=* delims= eol=" %%i in ("%?~nx0%: %CD%") do title %%i
+for /F "eol= tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
@@ -190,7 +190,7 @@ type nul > "%EDIT_LIST_FILE_TMP%"
 rem read selected file paths from file
 set PATH_INDEX=0
 set NUM_PATHS_TO_EDIT=0
-for /F "usebackq tokens=* delims= eol=" %%i in ("%INPUT_LIST_FILE_TMP%") do (
+for /F "usebackq eol= tokens=* delims=" %%i in ("%INPUT_LIST_FILE_TMP%") do (
   set "FILE_PATH=%%i"
   call :EDIT_FILE_PATH
   set /A PATH_INDEX+=1
@@ -206,7 +206,7 @@ call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files_by_list.bat"%%BARE
 echo.
 
 rem read edited property paths from list file
-for /F "usebackq tokens=1,2,* delims=| eol=" %%i in ("%CHANGESET_LIST_FILE_TMP%") do (
+for /F "usebackq eol= tokens=1,2,* delims=|" %%i in ("%CHANGESET_LIST_FILE_TMP%") do (
   if %NUM_PATHS_TO_EDIT% EQU 0 echo.Writing properties...
   set "PROP_NAME=%%i"
   set "PROP_VALUE_FILE=%%j"
@@ -259,8 +259,8 @@ set "PROP_NAME_DECORATED=%PROP_NAME::=--%"
   )
 ) && (
   copy "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%" "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%.orig" /B /Y 2>&1 >nul
-  for /F "tokens=* delims= eol=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
-  for /F "tokens=* delims= eol=" %%i in ("%PROP_NAME%|%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%|%FILE_PATH%") do (echo.%%i) >> "%CHANGESET_LIST_FILE_TMP%"
+  for /F "eol= tokens=* delims=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
+  for /F "eol= tokens=* delims=" %%i in ("%PROP_NAME%|%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%|%FILE_PATH%") do (echo.%%i) >> "%CHANGESET_LIST_FILE_TMP%"
   set /A NUM_PATHS_TO_EDIT+=1
 )
 
@@ -297,8 +297,8 @@ set "PROP_NAME_DECORATED=%PROP_NAME::=--%"
   )
 ) && (
   copy "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%" "%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%.orig" /B /Y 2>&1 >nul
-  for /F "tokens=* delims= eol=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
-  for /F "tokens=* delims= eol=" %%i in ("%PROP_NAME%|%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%|%FILE_PATH%") do (echo.%%i) >> "%CHANGESET_LIST_FILE_TMP%"
+  for /F "eol= tokens=* delims=" %%i in ("%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%") do (echo.%%i) >> "%EDIT_LIST_FILE_TMP%"
+  for /F "eol= tokens=* delims=" %%i in ("%PROP_NAME%|%PROPS_INOUT_PATH_DIR%\.%PROP_NAME_DECORATED%|%FILE_PATH%") do (echo.%%i) >> "%CHANGESET_LIST_FILE_TMP%"
   set /A NUM_PATHS_TO_EDIT+=1
 )
 

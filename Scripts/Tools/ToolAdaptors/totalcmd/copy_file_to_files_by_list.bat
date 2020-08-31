@@ -109,7 +109,7 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 )
 
 rem read selected file paths from file
-for /F "usebackq tokens=* delims= eol=" %%i in ("%COPY_TO_FILES_IN_LIST_FILE_TMP%") do (
+for /F "usebackq eol= tokens=* delims=" %%i in ("%COPY_TO_FILES_IN_LIST_FILE_TMP%") do (
   set TO_FILE_PATH=%%i
   call :PROCESS_FILE_PATH
 )
