@@ -55,7 +55,7 @@ if not exist "%FILE_DIR%" (
 
 if defined FILE_EXT_PTTN if not "%FILE_EXT_PTTN:~0,1%" == "." set "FILE_EXT_PTTN=.%FILE_EXT_PTTN%"
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /B /A:-D /S "%FILE_DIR%%FILE_NAME_PTTN%%FILE_EXT_PTTN%" 2^>nul`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir /B /A:-D /S "%FILE_DIR%%FILE_NAME_PTTN%%FILE_EXT_PTTN%" 2^>nul`) do (
   set "FILE_PATH=%%i"
   call :DEL_FILE %%*
 )

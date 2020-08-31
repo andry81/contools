@@ -94,7 +94,7 @@ if exist "%DESTDIR_ABS%\" goto DESTDIR_OK
 rem process the root explicitly
 call :CMD "%%PYTHON_EXE%%" -m compileall -f -d "" "%%DESTDIR_ABS%%" -r 0
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:D /B /S "%DESTDIR_ABS%"`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:D /B /S "%DESTDIR_ABS%"`) do (
   set FILE_PATH=%%i
   call :REBUILD_FILE_PATH || exit /b
 )
@@ -110,7 +110,7 @@ set "FILE_PATH_FROM=%FILE_PATH_FROM:~1%"
 set "NEXT_EXCLUDE_DIR=%FLAG_VALUE_EXCLUDE_DIRS%"
 :EXCLUDE_DIRS_LOOP
 set "EXCLUDE_DIR="
-for /F "eol=	 tokens=1,* delims=|" %%i in ("%NEXT_EXCLUDE_DIR%") do (
+for /F "eol= tokens=1,* delims=|" %%i in ("%NEXT_EXCLUDE_DIR%") do (
   set EXCLUDE_DIR=%%i
   set NEXT_EXCLUDE_DIR=%%j
 )

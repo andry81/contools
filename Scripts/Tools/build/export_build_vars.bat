@@ -77,11 +77,11 @@ call :WRITE_VAR_FILE PRODUCT_VERSION                "%%EXPORT_VARS_FILE%%" || ex
 call :WRITE_VAR_FILE PRODUCT_VERSION_FILE_SUFFIX    "%%EXPORT_VARS_FILE%%" || exit /b
 call :WRITE_VAR_FILE BUILD_NUMBER                   "%%EXPORT_VARS_FILE%%" || exit /b
 
-for /F "usebackq eol=	 tokens=1,* delims==" %%i in (`@set "F_DISABLE_" 2^>nul`) do (
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set "F_DISABLE_" 2^>nul`) do (
   call :WRITE_VAR_FILE "%%i" "%%EXPORT_VARS_FILE%%" || exit /b
 )
 
-for /F "usebackq eol=	 tokens=1,* delims==" %%i in (`@set "F_ENABLE_" 2^>nul`) do (
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set "F_ENABLE_" 2^>nul`) do (
   call :WRITE_VAR_FILE "%%i" "%%EXPORT_VARS_FILE%%" || exit /b
 )
 

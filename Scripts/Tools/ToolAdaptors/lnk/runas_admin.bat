@@ -19,7 +19,7 @@ if %UAC_READY%0 EQU 10 goto UAC_READY
 if %NO_UAC%0 EQU 10 goto NO_UAC
 
 rem Check windows version and promote UAC if higher than Windows XP
-for /F "usebackq eol=	 tokens=*" %%i in (`ver`) do (
+for /F "usebackq eol= tokens=*" %%i in (`ver`) do (
   if not "%%i" == "" (
     set "STDOUT_VALUE=%%i"
     goto PARSE_WINVER
@@ -30,22 +30,22 @@ rem If can't detect windows version then always try to promote UAC
 goto PROMOTE_UAC
 
 :PARSE_WINVER
-for /F "eol=	 tokens=1,* delims=[" %%i in ("%STDOUT_VALUE%") do (
+for /F "eol= tokens=1,* delims=[" %%i in ("%STDOUT_VALUE%") do (
   set STDOUT_VALUE=0
   set "STDOUT_VALUE=%%j"
 )
 
-for /F "eol=	 tokens=1,* delims= " %%i in ("%STDOUT_VALUE%") do (
+for /F "eol= tokens=1,* delims= " %%i in ("%STDOUT_VALUE%") do (
   set STDOUT_VALUE=0
   set "STDOUT_VALUE=%%j"
 )
 
-for /F "eol=	 tokens=1,* delims=]" %%i in ("%STDOUT_VALUE%") do (
+for /F "eol= tokens=1,* delims=]" %%i in ("%STDOUT_VALUE%") do (
   set STDOUT_VALUE=0
   set "STDOUT_VALUE=%%i"
 )
 
-for /F "eol=	 tokens=1,* delims=." %%i in ("%STDOUT_VALUE%") do (
+for /F "eol= tokens=1,* delims=." %%i in ("%STDOUT_VALUE%") do (
   if %%i0 GTR 50 goto PROMOTE_UAC
 )
 

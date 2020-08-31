@@ -31,7 +31,7 @@ if defined BUILD_USER_VARS_ROOT (
 
 rem safe title call
 setlocal DISABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("postbuild %PROJECT_NAME% %BUILD_SCM_BRANCH% %PROJECT_TYPE% %APP_TARGET_NAME% %TARGET_NAME%") do (
+for /F "eol= tokens=* delims=" %%i in ("postbuild %PROJECT_NAME% %BUILD_SCM_BRANCH% %PROJECT_TYPE% %APP_TARGET_NAME% %TARGET_NAME%") do (
   endlocal
   title %%i
 )

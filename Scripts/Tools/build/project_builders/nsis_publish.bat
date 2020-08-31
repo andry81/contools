@@ -42,7 +42,7 @@ if defined BUILD_USER_VARS_ROOT (
 
 rem safe title call
 setlocal DISABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("publish %PROJECT_NAMESPACE%/%PROJECT_NAME% %BUILD_SCM_BRANCH%") do (
+for /F "eol= tokens=* delims=" %%i in ("publish %PROJECT_NAMESPACE%/%PROJECT_NAME% %BUILD_SCM_BRANCH%") do (
   endlocal
   title %%i
 )

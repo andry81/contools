@@ -140,7 +140,7 @@ if "%__?VAR:~0,1%" == "" if "%__?VALUE:~-1%" == "" (
   set "__?VALUE=%__?VALUE:~0,-1%"
 )
 
-for /F "eol=	 tokens=1,* delims=:" %%i in ("%__?VAR%") do (
+for /F "eol= tokens=1,* delims=:" %%i in ("%__?VAR%") do (
   set "__?VAR=%%i"
   set "__?PLATFORM=%%j"
 )
@@ -282,7 +282,7 @@ if "%__?VAR:~0,1%" == "" if "%__?VALUE:~-1%" == "" (
   set "__?VALUE=%__?VALUE:~0,-1%"
 )
 
-for /F "eol=	 tokens=1,* delims=:" %%i in ("%__?VAR%") do (
+for /F "eol= tokens=1,* delims=:" %%i in ("%__?VAR%") do (
   set "__?VAR=%%i"
   set "__?PLATFORM=%%j"
 )

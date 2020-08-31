@@ -29,7 +29,7 @@ set "__VAR__="
 set __VAR_OPTIONAL__=0
 set __VAR_VALUE_IS_FLAG__=0
 set __VAR_VALUE_IS_USER_PARAM__=0
-for /F "eol=	 tokens=%__INDEX__% delims= " %%i in ("%__VARS__%") do set "__VAR__=%%i"
+for /F "eol= tokens=%__INDEX__% delims= " %%i in ("%__VARS__%") do set "__VAR__=%%i"
 
 if not defined __VAR__ goto VARS_LOOP_END
 if "%__VAR__:~0,1%" == "-" goto VARS_LOOP_END
@@ -153,7 +153,7 @@ exit /b
 rem process for user parameters
 set "__USER_PARAM__="
 set "__USER_VALUE__="
-for /F "eol=	 tokens=1,* delims==" %%i in ("%__ARG%") do (
+for /F "eol= tokens=1,* delims==" %%i in ("%__ARG%") do (
   set "__USER_PARAM__=%%i"
   set "__USER_VALUE__=%%j"
 )

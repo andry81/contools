@@ -99,7 +99,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 rem safe title call
 setlocal DISABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("Msys v%MSYS_VER_STR% - %MSYS_PATH%") do (
+for /F "eol= tokens=* delims=" %%i in ("Msys v%MSYS_VER_STR% - %MSYS_PATH%") do (
   endlocal
   title %%i
 )

@@ -8,7 +8,7 @@ if not defined CURRENT_CP exit /b -255
 set "LAST_CP=%CURRENT_CP%"
 
 set "CURRENT_CP="
-for /F "eol=	 tokens=1,* delims=|" %%i in ("%CP_HISTORY_LIST%") do (
+for /F "eol= tokens=1,* delims=|" %%i in ("%CP_HISTORY_LIST%") do (
   set "CURRENT_CP=%%i"
   set "CP_HISTORY_LIST=%%j"
 )

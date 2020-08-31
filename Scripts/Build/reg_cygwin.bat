@@ -115,7 +115,7 @@ if defined CYGWIN_VER_STR (
 
 rem safe title call
 setlocal DISABLEDELAYEDEXPANSION
-for /F "eol=	 tokens=* delims=" %%i in ("Cygwin v%CYGWIN_VER_STR% - %CYGWIN_PATH%") do (
+for /F "eol= tokens=* delims=" %%i in ("Cygwin v%CYGWIN_VER_STR% - %CYGWIN_PATH%") do (
   endlocal
   title %%i
 )

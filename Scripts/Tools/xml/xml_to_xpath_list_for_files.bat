@@ -59,7 +59,7 @@ goto PROCESS_FILES_LOOP
 rem get and set code page
 call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CODE_PAGE%%
 
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /A:-D /B /S %CMD_VA_ARGS%`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S %CMD_VA_ARGS%`) do (
   echo.# ------------------------------------------------------------------------------
   echo # File: "%%i"
   echo.# ------------------------------------------------------------------------------

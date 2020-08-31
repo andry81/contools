@@ -76,7 +76,7 @@ if exist "%ARCHIVE_PATH%\" (
 exit /b 0
 
 :EXTRACT_FROM_DIR
-for /F "usebackq eol=	 tokens=* delims=" %%i in (`dir /S /B /A:-D "%ARCHIVE_PATH%\*.7z"`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir /S /B /A:-D "%ARCHIVE_PATH%\*.7z"`) do (
   set "ARCHIVE_FILE=%%i"
   call :EXTRACT_FROM_FILE
 )
