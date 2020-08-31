@@ -1,4 +1,7 @@
 2020.08.31:
+* fixed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: restore first active tab at the end of each tab manipulation script
+
+2020.08.31:
 * new: Scripts/Tools/ToolAdapters/notepadplusplus: notepad++ python scripts for PythonScript plugin
 * new: Scripts/Tools/std: allocate_temp_dir.bat: `SCRIPT_TEMP_DIR_NAME` variable to reuse last generated temporary directory name
 
