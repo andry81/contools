@@ -1,4 +1,7 @@
 2020.08.31:
+* fixed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: reverse activation order before restore last active tab to retain selection order reverse to activation order
+
+2020.08.31:
 * changed: `eol=	` replaced by `eol=` in the rest for loops
 
 2020.08.31:
