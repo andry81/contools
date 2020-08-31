@@ -82,7 +82,7 @@ if not defined CWD goto NOCWD
 cd /d "%CWD%" || exit /b 1
 
 rem safe title call
-for /F "tokens=* delims= eol=" %%i in ("%?~nx0%: %CD%") do title %%i
+for /F "eol= tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 

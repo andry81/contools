@@ -82,7 +82,7 @@ if not defined CWD goto NOCWD
 cd /d "%CWD%" || exit /b 1
 
 rem safe title call
-for /F "tokens=* delims= eol=" %%i in ("%?~nx0%: %CD%") do title %%i
+for /F "eol= tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
@@ -135,7 +135,7 @@ if "%FILE_PATH:~-1%" == "\" set "FILE_PATH=%FILE_PATH:~0,-1%"
 
 call :GET_FILE_PATH_COMPONENTS PARENT_DIR FILE_NAME "%%FILE_PATH%%"
 
-for /F "tokens=* delims= eol=" %%i in ("%PARENT_DIR%|%FILE_NAME%") do (
+for /F "eol= tokens=* delims=" %%i in ("%PARENT_DIR%|%FILE_NAME%") do (
   (echo.%%i) >> "%MOVE_TO_LIST_FILE_TMP%"
 )
 
@@ -171,7 +171,7 @@ if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
 if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
 rem extract destination path components
-for /F "tokens=1,* delims=| eol=" %%i in ("%TO_FILE_PATH%") do (
+for /F "eol= tokens=1,* delims=|" %%i in ("%TO_FILE_PATH%") do (
   set "TO_FILE_DIR=%%i"
   set "TO_FILE_NAME=%%j"
 )

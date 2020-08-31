@@ -118,7 +118,7 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
 )
 
 rem read selected file paths from file
-for /F "usebackq tokens=* delims= eol=" %%i in ("%READ_FROM_LIST_FILE_TMP%") do (
+for /F "usebackq eol= tokens=* delims=" %%i in ("%READ_FROM_LIST_FILE_TMP%") do (
   set "FILE_PATH=%%i"
   call :READ_LIST_FILE
 )
@@ -133,13 +133,13 @@ call :CANONICAL_PATH FILE_PATH "%%FILE_PATH%%"
 if %FLAG_SAVE_FILE_NAMES_ONLY% NEQ 0 goto SAVE_FILE_NAMES_ONLY
 
 if not exist "%FILE_PATH%\" (
-  for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH:/=\%") do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
+  for /F "eol= tokens=* delims=" %%i in ("%FILE_PATH:/=\%") do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
   exit /b 0
 )
 
 rem read directory file without recursion
-for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH:/=\%") do ^
-for /F "usebackq tokens=* delims= eol=" %%j in (`@dir "%%i" /A:-D /B /O:N`) do (echo.%%i\%%j) >> "%FLAG_FILE_NAME_TO_SAVE%"
+for /F "eol= tokens=* delims=" %%i in ("%FILE_PATH:/=\%") do ^
+for /F "usebackq eol= tokens=* delims=" %%j in (`@dir "%%i" /A:-D /B /O:N`) do (echo.%%i\%%j) >> "%FLAG_FILE_NAME_TO_SAVE%"
 
 exit /b
 
@@ -148,12 +148,12 @@ exit /b
 call :FILE_NAME FILE_NAME "%%FILE_PATH%%"
 
 if not exist "%FILE_PATH%\" (
-  for /F "tokens=* delims= eol=" %%i in ("%FILE_NAME%") do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
+  for /F "eol= tokens=* delims=" %%i in ("%FILE_NAME%") do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
   exit /b 0
 )
 
 rem read directory file without recursion
-for /F "usebackq tokens=* delims= eol=" %%i in (`@dir "%FILE_PATH:/=\%" /A:-D /B /O:N`) do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%FILE_PATH:/=\%" /A:-D /B /O:N`) do (echo.%%i) >> "%FLAG_FILE_NAME_TO_SAVE%"
 
 exit /b
 

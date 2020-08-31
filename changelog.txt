@@ -1,4 +1,7 @@
 2020.08.31:
+* changed: moved `eol=` instructions in for loops back to the begin of the parameter string because `delims=` parameter is sensitive to the space characters and accepts space characters ONLY at the end of the parameter string
+
+2020.08.31:
 * fixed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: restore first active tab at the end of each tab manipulation script
 
 2020.08.31:

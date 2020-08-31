@@ -82,7 +82,7 @@ if not defined CWD goto NOCWD
 cd /d "%CWD%" || exit /b 1
 
 rem safe title call
-for /F "tokens=* delims= eol=" %%i in ("%?~nx0%: %CD%") do title %%i
+for /F "eol= tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 
 :NOCWD
 
@@ -127,7 +127,7 @@ if defined LIST_FILE_PATH (
   copy "%INPUT_LIST_FILE_UTF8_TMP%" "%CREATE_FILES_IN_LIST_FILE_TMP%" /B /Y > nul
 ) else (
   rem use working directory path as base directory path
-  for /F "tokens=* delims= eol=" %%i in ("%CD%") do (echo.%%i) > "%CREATE_FILES_IN_LIST_FILE_TMP%"
+  for /F "eol= tokens=* delims=" %%i in ("%CD%") do (echo.%%i) > "%CREATE_FILES_IN_LIST_FILE_TMP%"
 )
 
 call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%CREATE_FILES_LIST_FILE_TMP%%"

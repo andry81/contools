@@ -293,8 +293,8 @@ if not exist "%FILE_PATH_1%\" (
 
 :SORT_FILE_LINES_END
 rem safe echo call
-for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH_0%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
-for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH_1%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
+for /F "eol= tokens=* delims=" %%i in ("%FILE_PATH_0%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
+for /F "eol= tokens=* delims=" %%i in ("%FILE_PATH_1%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
 set /A PATHS_PAIR_INDEX+=1
 
 exit /b 0

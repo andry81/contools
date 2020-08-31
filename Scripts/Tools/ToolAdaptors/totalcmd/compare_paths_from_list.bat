@@ -163,7 +163,7 @@ rem append to lists an End Of List character
 (echo..) >> "%COMPARE_FROM_LIST_FILE%"
 
 rem read selected file paths from list
-for /F "usebackq tokens=* delims= eol=" %%i in ("%COMPARE_FROM_LIST_FILE%") do (
+for /F "usebackq eol= tokens=* delims=" %%i in ("%COMPARE_FROM_LIST_FILE%") do (
   set "FILE_PATH=%%i"
   call :PROCESS_PATH "%%FILE_PATH%%" || goto PROCESS_PATH_END
 )
@@ -222,8 +222,8 @@ set /A NUM_PATHS_REMAINDER=NUM_PATHS%%2
 
 if %NUM_PATHS_REMAINDER% EQU 0 (
   rem safe echo call
-  for /F "tokens=* delims= eol=" %%i in ("%PREV_FILE_PATH%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
-  for /F "tokens=* delims= eol=" %%i in ("%FILE_PATH%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
+  for /F "eol= tokens=* delims=" %%i in ("%PREV_FILE_PATH%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
+  for /F "eol= tokens=* delims=" %%i in ("%FILE_PATH%") do (echo.%%i) >> "%COMPARE_OUTPUT_LIST_FILE_TMP%"
   set /A PATHS_PAIR_INDEX+=1
 )
 
