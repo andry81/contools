@@ -112,25 +112,35 @@ rem properties saved into files to compare with
 set "PROPS_INOUT_FILES_DIR=%SCRIPT_TEMP_CURRENT_DIR%\inout"
 
 set "INPUT_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
-set "EDIT_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\edit_file_list.lst"
+
+set "EDIT_LIST_FILE_NAME_TMP=edit_file_list.lst"
+set "EDIT_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%EDIT_LIST_FILE_NAME_TMP%"
+
 set "CHANGESET_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\changeset_file_list.lst"
 
 if %FLAG_CREATE_PROP_IF_EMPTY% NEQ 0 (
-  set "PROPS_FILTER_FILE_IN=%COMMANDER_CONFIG_DIR%\svn_props_to_edit_all.lst.in"
-) else (
-  set "PROPS_FILTER_FILE_IN=%COMMANDER_CONFIG_DIR%\svn_props_to_edit.lst.in"
-)
+  set "PROPS_FILTER_FILE_NAME_IN=svn_props_to_edit_all.lst.in"
+) else set "PROPS_FILTER_FILE_NAME_IN=svn_props_to_edit.lst.in"
+set "PROPS_FILTER_FILE_IN=%COMMANDER_SCRIPTS_CONFIG_DIR%\%PROPS_FILTER_FILE_NAME_IN%"
 
 if %FLAG_EDIT_FILTER_BY_PROP_CLASS% NEQ 0 goto USE_USER_PROPS_FILTER
+set "PROPS_FILTER_FILE_NAME=%PROPS_FILTER_FILE_NAME_IN%"
 set "PROPS_FILTER_FILE=%PROPS_FILTER_FILE_IN%"
 goto LOAD_PROPS_FILTER
 
 :USE_USER_PROPS_FILTER
-set "PROPS_FILTER_FILE=%SCRIPT_TEMP_CURRENT_DIR%\svn_props_to_edit.lst"
-call :CMD copy /B /Y "%%PROPS_FILTER_FILE_IN%%" "%%PROPS_FILTER_FILE%%" || exit /b 10
+set "PROPS_FILTER_FILE_NAME=svn_props_to_edit.lst"
+set "PROPS_FILTER_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%PROPS_FILTER_FILE_NAME%"
+call :COPY_FILE "%%PROPS_FILTER_FILE_IN%%" "%%PROPS_FILTER_FILE%%" || exit /b 10
 
-rem start to edit
-call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%PROPS_FILTER_FILE%%"
+rem props class edit
+mkdir "%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%/%SCRIPT_TEMP_DIR_NAME%"
+
+call :COPY_FILE "%%PROPS_FILTER_FILE%%" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%PROPS_FILTER_FILE_NAME%%"
+
+call "%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%PROPS_FILTER_FILE_NAME%%"
+
+call :COPY_FILE "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%PROPS_FILTER_FILE_NAME%%" "%%PROPS_FILTER_FILE%%"
 
 :LOAD_PROPS_FILTER
 set PROPS_FILTER_DIR_INDEX=0
@@ -201,8 +211,15 @@ if %NUM_PATHS_TO_EDIT% EQU 0 (
   exit /b 12
 ) >&2
 
-rem start to edit
-call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files_by_list.bat"%%BARE_FLAGS%% -wait -nosession -multiInst "" "%%EDIT_LIST_FILE_TMP%%"
+rem props values edit
+if not exist "%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%/%SCRIPT_TEMP_DIR_NAME%\" mkdir "%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%/%SCRIPT_TEMP_DIR_NAME%"
+
+call :COPY_FILE "%%EDIT_LIST_FILE_TMP%%" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%EDIT_LIST_FILE_NAME_TMP%%"
+
+call "%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/notepad_edit_files_by_list.bat"%%BARE_FLAGS%% -wait -nosession -multiInst "" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%EDIT_LIST_FILE_NAME_TMP%%"
+
+call :COPY_FILE "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%EDIT_LIST_FILE_NAME_TMP%%" "%%EDIT_LIST_FILE_TMP%%"
+
 echo.
 
 rem read edited property paths from list file
@@ -314,8 +331,9 @@ call :PRINT_WO_LAST_EMPTY_LINES "%%PROP_VALUE_FILE%%" > "%PROPS_INOUT_FILES_DIR%
 for /F %%i in ("%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%") do set "PROP_VALUE_FILE_SIZE=%%~zi"
 if %PROP_VALUE_FILE_SIZE% GTR 0 goto PROP_IS_NOT_EMPTY
 
-call :CMD svn pdel "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" --non-interactive
-exit /b
+call :CMD svn pdel "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" --non-interactive || exit /b
+
+exit /b 0
 
 :PROP_IS_NOT_EMPTY
 call :PRINT_WO_LAST_EMPTY_LINES "%%PROP_VALUE_FILE%%.orig" > "%PROPS_INOUT_FILES_DIR%\tmp\.%PROP_NAME_DECORATED%.orig"
@@ -324,8 +342,9 @@ rem compare ignoring empty lines
 fc "%PROP_VALUE_FILE%" "%PROP_VALUE_FILE%.orig" > nul
 if %ERRORLEVEL% EQU 0 exit /b 0
 
-call :CMD svn pset "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" -F "%%PROPS_INOUT_FILES_DIR%%\tmp\.%%PROP_NAME_DECORATED%%" --non-interactive
-exit /b
+call :CMD svn pset "%%PROP_NAME%%" "%%PROP_FILE_PATH%%" -F "%%PROPS_INOUT_FILES_DIR%%\tmp\.%%PROP_NAME_DECORATED%%" --non-interactive || exit /b
+
+exit /b 0
 
 :PRINT_WO_LAST_EMPTY_LINES
 setlocal DISABLEDELAYEDEXPANSION
@@ -359,6 +378,11 @@ if defined LINE_STR (
   set "NUM_RETURN_LINES=%NUM_RETURN_LINES%"
   exit /b
 )
+
+:COPY_FILE
+echo."%~1" -^> "%~2"
+copy "%~f1" "%~f2" /B /Y || exit /b
+exit /b 0
 
 :CMD
 echo.^>%*

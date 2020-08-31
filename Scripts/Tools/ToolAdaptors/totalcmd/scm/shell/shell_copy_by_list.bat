@@ -92,7 +92,9 @@ set "OPTIONAL_DEST_DIR=%~2"
 if not defined LIST_FILE_PATH exit /b 0
 
 set "COPY_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
-set "COPY_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\copy_to_file_list.lst"
+
+set "COPY_TO_LIST_FILE_NAME_TMP=copy_to_file_list.lst"
+set "COPY_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%COPY_TO_LIST_FILE_NAME_TMP%"
 
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
@@ -143,7 +145,13 @@ exit /b 0
 
 :FILL_TO_LIST_FILE_TMP_END
 
-call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%COPY_TO_LIST_FILE_TMP%%"
+mkdir "%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%/%SCRIPT_TEMP_DIR_NAME%"
+
+call :COPY_FILE "%%COPY_TO_LIST_FILE_TMP%%" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%COPY_TO_LIST_FILE_NAME_TMP%%"
+
+call "%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%COPY_TO_LIST_FILE_NAME_TMP%%"
+
+call :COPY_FILE "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%COPY_TO_LIST_FILE_NAME_TMP%%" "%%COPY_TO_LIST_FILE_TMP%%"
 
 rem trick with simultaneous iteration over 2 list in the same time
 (
@@ -206,9 +214,6 @@ call :GET_FILE_PATH_COMPONENTS FROM_FILE_DIR FROM_FILE_NAME "%%FROM_FILE_PATH%%"
 if "%FROM_FILE_PATH:~-1%" == "\" set "FROM_FILE_PATH=%FROM_FILE_PATH:~0,-1%"
 if "%TO_FILE_DIR:~-1%" == "\" set "TO_FILE_DIR=%TO_FILE_DIR:~0,-1%"
 
-rem copy through the shell
-rem :COPY_FILE SHELL
-
 if %FROM_FILE_PATH_AS_DIR%0 EQU 0 (
   if "%FROM_FILE_DIR:~-1%" == "\" set "FROM_FILE_DIR=%FROM_FILE_DIR:~0,-1%"
   call :XCOPY_FILE "%%FROM_FILE_DIR%%" "%%FROM_FILE_NAME%%" "%%TO_FILE_DIR%%" /Y /D /H || exit /b
@@ -216,7 +221,7 @@ if %FROM_FILE_PATH_AS_DIR%0 EQU 0 (
   call :XCOPY_DIR "%%FROM_FILE_PATH%%" "%%TO_FILE_DIR%%\%%TO_FILE_NAME%%" /E /Y /D || exit /b
 )
 
-exit /b
+exit /b 0
 
 :XCOPY_FILE
 if not exist "%CONTOOLS_ROOT%/std/xcopy_file.bat" (
@@ -224,7 +229,9 @@ if not exist "%CONTOOLS_ROOT%/std/xcopy_file.bat" (
   exit /b 5
 ) >&2
 if not exist "%~3" mkdir "%~3"
+
 call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%* || exit /b
+
 exit /b 0
 
 :XCOPY_DIR
@@ -233,12 +240,14 @@ if not exist "%CONTOOLS_ROOT%/std/xcopy_dir.bat" (
   exit /b 6
 ) >&2
 if not exist "%~2" mkdir "%~2"
+
 call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%* || exit /b
+
 exit /b 0
 
 :COPY_FILE
 echo."%~1" -^> "%~2"
-copy "%~1" "%~2" /B /Y || exit /b
+copy "%~f1" "%~f2" /B /Y || exit /b
 exit /b 0
 
 :CMD

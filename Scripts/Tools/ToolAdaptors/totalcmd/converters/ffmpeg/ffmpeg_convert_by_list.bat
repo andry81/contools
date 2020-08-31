@@ -88,9 +88,9 @@ if not defined CONVERT_TO_FILE_PATH (
 ) >&2
 
 if %FLAG_WAIT_EXIT% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%COMSPEC%%" /C @"%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/converters/ffmpeg/ffmpeg_concat_copy_by_list.bat"%%BARE_FLAGS%% "%%LIST_FILE_PATH%%" "%%CONVERT_TO_FILE_PATH%%"
+  call :CMD start /B /WAIT "" "%%COMSPEC%%" /C @"%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/converters/ffmpeg/ffmpeg_concat_copy_by_list.bat"%%BARE_FLAGS%% "%%LIST_FILE_PATH%%" "%%CONVERT_TO_FILE_PATH%%"
 ) else (
-  call :CMD start /B "" "%%COMSPEC%%" /C @"%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/converters/ffmpeg/ffmpeg_concat_copy_by_list.bat"%%BARE_FLAGS%% "%%LIST_FILE_PATH%%" "%%CONVERT_TO_FILE_PATH%%"
+  call :CMD start /B "" "%%COMSPEC%%" /C @"%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/converters/ffmpeg/ffmpeg_concat_copy_by_list.bat"%%BARE_FLAGS%% "%%LIST_FILE_PATH%%" "%%CONVERT_TO_FILE_PATH%%"
 )
 
 exit /b

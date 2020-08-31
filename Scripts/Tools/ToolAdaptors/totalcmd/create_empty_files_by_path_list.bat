@@ -90,7 +90,8 @@ set "LIST_FILE_PATH=%~1"
 
 if not defined LIST_FILE_PATH exit /b 0
 
-set "CREATE_FILES_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\create_files_in_path_list.lst"
+set "CREATE_FILES_IN_LIST_FILE_NAME_TMP=create_files_in_path_list.lst"
+set "CREATE_FILES_IN_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%CREATE_FILES_IN_LIST_FILE_NAME_TMP%"
 
 set "INPUT_LIST_FILE_UTF8_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
 
@@ -112,10 +113,13 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   set "INPUT_LIST_FILE_UTF8_TMP=%LIST_FILE_PATH%"
 )
 
-rem recreate files
-copy "%INPUT_LIST_FILE_UTF8_TMP%" "%CREATE_FILES_IN_LIST_FILE_TMP%" /B /Y > nul
+mkdir "%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%/%SCRIPT_TEMP_DIR_NAME%"
 
-call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%CREATE_FILES_IN_LIST_FILE_TMP%%"
+call :COPY_FILE "%%INPUT_LIST_FILE_UTF8_TMP%%" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%CREATE_FILES_IN_LIST_FILE_NAME_TMP%%"
+
+call "%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%CREATE_FILES_IN_LIST_FILE_NAME_TMP%%"
+
+call :COPY_FILE "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%CREATE_FILES_IN_LIST_FILE_NAME_TMP%%" "%%CREATE_FILES_IN_LIST_FILE_TMP%%"
 
 set LINE_INDEX=0
 for /f "usebackq tokens=* delims= eol=#" %%i in ("%CREATE_FILES_IN_LIST_FILE_TMP%") do (
@@ -138,6 +142,11 @@ if exist "%CREATE_FILE_PATH%" (
 call :CREATE_FILE
 
 exit /b
+
+:COPY_FILE
+echo."%~1" -^> "%~2"
+copy "%~f1" "%~f2" /B /Y || exit /b
+exit /b 0
 
 :CMD
 echo.^>%*

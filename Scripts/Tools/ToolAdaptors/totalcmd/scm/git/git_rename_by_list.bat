@@ -89,7 +89,9 @@ for /F "eol= tokens=* delims=" %%i in ("%?~nx0%: %CD%") do title %%i
 if "%~1" == "" exit /b 0
 
 set "RENAME_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_from_file_list.lst"
-set "RENAME_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\rename_to_file_list.lst"
+
+set "RENAME_TO_LIST_FILE_NAME_TMP=rename_to_file_list.lst"
+set "RENAME_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%RENAME_TO_LIST_FILE_NAME_TMP%"
 
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
@@ -109,9 +111,13 @@ if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   set "RENAME_FROM_LIST_FILE_TMP=%~1"
 )
 
-copy "%RENAME_FROM_LIST_FILE_TMP%" "%RENAME_TO_LIST_FILE_TMP%" /B /Y > nul
+mkdir "%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%/%SCRIPT_TEMP_DIR_NAME%"
 
-call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%RENAME_TO_LIST_FILE_TMP%%"
+call :COPY_FILE "%%RENAME_FROM_LIST_FILE_TMP%%" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%RENAME_TO_LIST_FILE_NAME_TMP%%"
+
+call "%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%RENAME_TO_LIST_FILE_NAME_TMP%%"
+
+call :COPY_FILE "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%RENAME_TO_LIST_FILE_NAME_TMP%%" "%%RENAME_TO_LIST_FILE_TMP%%"
 
 rem trick with simultaneous iteration over 2 list in the same time
 (
@@ -192,14 +198,19 @@ if /i not "%FROM_FILE_DIR%" == "%TO_FILE_DIR%" (
 goto %MODE%_RENAME_FILE
 
 :GIT_RENAME_FILE
-call :CMD git mv "%%~1" "%%~2"
+call :CMD git mv "%%~1" "%%~2" || exit /b
 
-exit /b
+exit /b 0
 
 :SHELL_RENAME_FILE
-call :CMD rename "%%~1" "%%~nx2"
+call :CMD rename "%%~1" "%%~nx2" || exit /b
 
-exit /b
+exit /b 0
+
+:COPY_FILE
+echo."%~1" -^> "%~2"
+copy "%~f1" "%~f2" /B /Y || exit /b
+exit /b 0
 
 :CMD
 echo.^>%*
