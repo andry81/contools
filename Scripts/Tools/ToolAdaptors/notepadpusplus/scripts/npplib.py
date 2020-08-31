@@ -11,8 +11,6 @@ def clear_readonly_flag_from_all_tabs():
 def set_readonly_flag_to_all_tabs():
   print('set_readonly_flag_to_all_tabs:')
   for f in notepad.getFiles():
-    print(notepad.getMenuHandle(MENUCOMMAND.EDIT_SETREADONLY))
-    print(notepad.getMenuHandle(MENUCOMMAND.EDIT_CLEARREADONLY))
     notepad.activateFile(f[0])
     notepad.menuCommand(MENUCOMMAND.EDIT_SETREADONLY)
     print("  - {}".format(f))
