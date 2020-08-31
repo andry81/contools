@@ -20,4 +20,4 @@ setattr(npplib, 'notepad', notepad)
 setattr(npplib, 'MENUCOMMAND', MENUCOMMAND)
 
 # execute
-npplib.set_readonly_flag_to_all_tabs()
+npplib.toggle_readonly_flag_for_all_tabs()

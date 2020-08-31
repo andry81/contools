@@ -1,15 +1,7 @@
 from __future__ import print_function
 
-def clear_readonly_flag_from_all_tabs():
-  print('clear_readonly_flag_from_all_tabs:')
-  for f in notepad.getFiles():
-    notepad.activateFile(f[0])
-    notepad.menuCommand(MENUCOMMAND.EDIT_CLEARREADONLY)
-    print(" - {}".format(f))
-  print()
-
-def set_readonly_flag_to_all_tabs():
-  print('set_readonly_flag_to_all_tabs:')
+def toggle_readonly_flag_for_all_tabs():
+  print('toggle_readonly_flag_for_all_tabs:')
   for f in notepad.getFiles():
     notepad.activateFile(f[0])
     notepad.menuCommand(MENUCOMMAND.EDIT_SETREADONLY)
@@ -20,7 +12,7 @@ def clear_readonly_flag_from_all_files():
   print('clear_readonly_flag_from_all_files:')
   for f in notepad.getFiles():
     notepad.activateFile(f[0])
-    notepad.menuCommand(MENUCOMMAND.EDIT_SETREADONLY)
+    notepad.menuCommand(MENUCOMMAND.EDIT_CLEARREADONLY)
     print("  - {}".format(f))
   print()
 
