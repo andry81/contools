@@ -71,9 +71,9 @@ rem installing..
 
 call :CMD "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @setx /M COMMANDER_SCRIPTS_ROOT "%%COMMANDER_SCRIPTS_ROOT:/=\%%"
 
-if not exist "%CONFIGURE_TO_DIR%/tacklebar\" (
-  call :CMD mkdir "%%CONFIGURE_TO_DIR%%/tacklebar"
-)
+if not exist "%CONFIGURE_TO_DIR%/tacklebar\" call :CMD mkdir "%%CONFIGURE_TO_DIR%%/tacklebar"
+if not exist "%CONFIGURE_TO_DIR%/.saveload\file_lists\" call :CMD mkdir "%%CONFIGURE_TO_DIR%%/.saveload/file_lists"
+if not exist "%CONFIGURE_TO_DIR%/.saveload\last_edited\" call :CMD mkdir "%%CONFIGURE_TO_DIR%%/.saveload/last_edited"
 
 rem basic initialization
 call :XCOPY_DIR "%%PROJECT_ROOT%%/__init__"         "%%CONFIGURE_TO_DIR%%/tacklebar/__init__" /E /Y /D || exit /b
@@ -81,8 +81,6 @@ call :XCOPY_DIR "%%PROJECT_ROOT%%/__init__"         "%%CONFIGURE_TO_DIR%%/tackle
 call :XCOPY_FILE "%%CONFIGURE_FROM_DIR%%"           "__init__.bat" "%%CONFIGURE_TO_DIR%%/tacklebar" /Y /D /H || exit /b
 
 call :XCOPY_FILE "%%CONTOOLS_ROOT%%"                "__init__.bat" "%%CONTOOLS_ROOT_COPY%%" /Y /D /H || exit /b
-
-rem call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/.saveload" "%%CONFIGURE_TO_DIR%%/.saveload" /E /Y /D || exit /b
 
 call :XCOPY_DIR "%%CONFIGURE_FROM_DIR%%/_config"    "%%CONFIGURE_TO_DIR%%/tacklebar/_config" /E /Y /D || exit /b
 
@@ -235,7 +233,7 @@ exit /b 0
 
 :COPY_FILE
 echo."%~1" -^> "%~2"
-copy "%~1" "%~2" /B /Y || exit /b
+copy "%~f1" "%~f2" /B /Y || exit /b
 exit /b 0
 
 :CMD

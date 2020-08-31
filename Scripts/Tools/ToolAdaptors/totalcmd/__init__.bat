@@ -20,9 +20,11 @@ if %TACKLEBAR_SCRIPTS_INSTALL%0 EQU 0 (
 
 call "%%~dp0__init__\__init__.bat" || exit /b
 
+call :CANONICAL_PATH  COMMANDER_SCRIPTS_TACKLEBAR_ROOT  "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar"
+
 rem load configuration file if installed
-if exist "%COMMANDER_SCRIPTS_ROOT%/tacklebar\" ^
-if exist "%COMMANDER_SCRIPTS_ROOT%/tacklebar\profile.vars" (
+if exist "%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%\" ^
+if exist "%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%\profile.vars" (
   call "%%CONTOOLS_ROOT%%/std/load_config.bat" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar" "profile.vars" || exit /b
 )
 

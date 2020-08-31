@@ -1,3 +1,10 @@
+2020.08.31:
+* fixed: _install.bat: missed to create default .saveload directory
+* fixed: ButtonBars: minor bugfix
+* new: profile.vars: direct variables to .saveload subdirectories and tacklebar subdirectory
+* new: all scripts with the `notepad_edit_files*.bat` script call uses `.saveload/last_edited` subdirectory to save user input in case of a script unexpected exit and user input lost
+* changed: ButtonBars: menu items rearrange
+
 2020.08.29:
 * fixed: mess with mix between utf-8 and utf-16 text lists, explicitly state the text encoding in access to saveload lists
 * fixed: avoid any quote characters in scripts for shell/svn/git move/rename/copy

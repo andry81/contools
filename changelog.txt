@@ -1,4 +1,13 @@
 2020.08.31:
+* fixed: Scripts/Tools/ToolAdapters/totalcmd: _install.bat: missed to create default .saveload directory
+* fixed: Scripts/Tools/ToolAdapters/totalcmd: ButtonBars: minor bugfix
+* fixed: Scripts/Tools/std: temp directory allocation/free scripts bugfix
+* new: Scripts/Tools/ToolAdapters/totalcmd: profile.vars: direct variables to .saveload subdirectories and tacklebar subdirectory
+* new: Scripts/Tools/ToolAdapters/totalcmd: all scripts with the `notepad_edit_files*.bat` script call uses `.saveload/last_edited` subdirectory to save user input in case of a script unexpected exit and user input lost
+* changed: Scripts/Tools/ToolAdapters/totalcmd: ButtonBars: menu items rearrange
+* refactor: Scripts/Tools/std: temp directory allocation/free scripts refactor
+
+2020.08.31:
 * fixed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: reverse activation order before restore last active tab to retain selection order reverse to activation order
 
 2020.08.31:

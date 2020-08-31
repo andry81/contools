@@ -92,7 +92,9 @@ set "OPTIONAL_DEST_DIR=%~2"
 if not defined LIST_FILE_PATH exit /b 0
 
 set "MOVE_FROM_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_list_utf_8.lst"
-set "MOVE_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\move_to_file_list.lst"
+
+set "MOVE_TO_LIST_FILE_NAME_TMP=move_to_file_list.lst"
+set "MOVE_TO_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%MOVE_TO_LIST_FILE_NAME_TMP%"
 
 if %FLAG_CONVERT_FROM_UTF16% NEQ 0 (
   rem to convert from unicode
@@ -143,7 +145,13 @@ exit /b 0
 
 :FILL_TO_LIST_FILE_TMP_END
 
-call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%MOVE_TO_LIST_FILE_TMP%%"
+mkdir "%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%/%SCRIPT_TEMP_DIR_NAME%"
+
+call :COPY_FILE "%%MOVE_TO_LIST_FILE_TMP%%" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%MOVE_TO_LIST_FILE_NAME_TMP%%"
+
+call "%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/notepad_edit_files.bat" -wait -npp -nosession -multiInst -notabbar "" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%MOVE_TO_LIST_FILE_NAME_TMP%%"
+
+call :COPY_FILE "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%MOVE_TO_LIST_FILE_NAME_TMP%%" "%%MOVE_TO_LIST_FILE_TMP%%"
 
 rem trick with simultaneous iteration over 2 list in the same time
 (
@@ -279,9 +287,9 @@ set "TO_FILE_PATH=%SHARED_ROOT%\%TO_FILE_DIR_SUFFIX%"
 rem always remove trailing slash character
 if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
-call :CMD svn move "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+call :CMD svn move "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%" || exit /b
 
-exit /b
+exit /b 0
 
 :SHELL_MOVE_FILE
 if not defined TO_FILE_DIR_SUFFIX goto SHELL_MOVE_FILE_CMD
@@ -297,9 +305,14 @@ set "TO_FILE_PATH=%SHARED_ROOT%\%TO_FILE_DIR_SUFFIX%"
 rem always remove trailing slash character
 if "%TO_FILE_PATH:~-1%" == "\" set "TO_FILE_PATH=%TO_FILE_PATH:~0,-1%"
 
-call :CMD move "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+call :CMD move "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%" || exit /b
 
-exit /b
+exit /b 0
+
+:COPY_FILE
+echo."%~1" -^> "%~2"
+copy "%~f1" "%~f2" /B /Y || exit /b
+exit /b 0
 
 :CMD
 echo.^>%*

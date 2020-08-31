@@ -97,7 +97,9 @@ cd /d "%CWD%" || exit /b 1
 
 rem build filtered paths list
 set "LOCAL_PATH_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\local_path_list.lst"
-set "URL_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\url_path_list.lst"
+
+set "URL_LIST_FILE_NAME_TMP=url_path_list.lst"
+set "URL_LIST_FILE_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%URL_LIST_FILE_NAME_TMP%"
 
 rem calculate maximum busy tasks to wait after, open only TORTOISEPROC_MAX_SPAWN_CALLS windows at the same time
 set MAX_SPAWN_TASKS=0
@@ -174,16 +176,28 @@ for /F "usebackq eol= tokens=* delims=" %%i in ("%LOCAL_PATH_LIST_FILE_TMP%") d
   svn info "%%i" --show-item url
 ) >> "%URL_LIST_FILE_TMP%"
 
-rem start to edit
-call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/notepad_edit_files.bat"%%BARE_FLAGS%% -wait -nosession -multiInst "" "%%URL_LIST_FILE_TMP%%" || exit /b
+rem url list edit
+mkdir "%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%/%SCRIPT_TEMP_DIR_NAME%"
+
+call :COPY_FILE "%%URL_LIST_FILE_TMP%%" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%URL_LIST_FILE_NAME_TMP%%"
+
+call "%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/notepad_edit_files.bat"%%BARE_FLAGS%% -wait -nosession -multiInst "" "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%URL_LIST_FILE_NAME_TMP%%" || exit /b
+
+call :COPY_FILE "%%COMMANDER_SCRIPTS_SAVELOAD_LAST_EDITED_DIR%%/%%SCRIPT_TEMP_DIR_NAME%%/%%URL_LIST_FILE_NAME_TMP%%" "%%URL_LIST_FILE_TMP%%"
+
 echo.
 
-call :SPAWN_TASKS_FROM_URLS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/scm/tortoisesvn/tortoiseproc_read_path_from_stdin.bat"
+call :SPAWN_TASKS_FROM_URLS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/scm/tortoisesvn/tortoiseproc_read_path_from_stdin.bat"
 exit /b 0
 
 :SPAWN_FROM_LOCAL
-call :SPAWN_TASKS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%COMMANDER_SCRIPTS_ROOT%%/tacklebar/scm/tortoisesvn/tortoiseproc_read_path_from_stdin.bat"
+call :SPAWN_TASKS "%%CONTOOLS_ROOT%%/tasks/spawn_tasks.bat" "%%MAX_SPAWN_TASKS%%" "%%TORTOISEPROC_MAX_SPAWN_CALLS%%" 0 call "%%COMMANDER_SCRIPTS_TACKLEBAR_ROOT%%/scm/tortoisesvn/tortoiseproc_read_path_from_stdin.bat"
 exit /b
+
+:COPY_FILE
+echo."%~1" -^> "%~2"
+copy "%~f1" "%~f2" /B /Y || exit /b
+exit /b 0
 
 :SPAWN_TASKS_FROM_URLS
 echo.^>%*
