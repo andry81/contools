@@ -99,3 +99,11 @@ Note:
 
 - Fix copy scripts for copy together with rename (`*_copy_by_list.bat`).
   Currently renaming does ignore.
+
+- Git filter-branch alorithms to:
+  * rewrite commits with wrong user names/emails
+  May be with an external dialog with edit fields before a script execution to
+  select:
+  * specific commits or range of commits
+  * specific users/emails or range of users/emails
+  * etc
