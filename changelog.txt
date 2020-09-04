@@ -1,3 +1,6 @@
+2020.09.04:
+* changed: Scripts/Tools/ToolAdapters/totalcmd: TODO update
+
 2020.08.31:
 * fixed: Scripts/Tools/ToolAdapters/totalcmd: _install.bat: missed to create default .saveload directory
 * fixed: Scripts/Tools/ToolAdapters/totalcmd: ButtonBars: minor bugfix
