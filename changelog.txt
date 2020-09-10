@@ -1,3 +1,6 @@
+2020.09.10:
+* new: Scripts/Tools/encoding: `prepend_bom_to_utf_file.bat` script to prepend BOM sequences to UTF text files
+
 2020.09.04:
 * changed: Scripts/Tools/ToolAdapters/totalcmd: TODO update
 

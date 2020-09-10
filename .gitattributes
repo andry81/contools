@@ -706,6 +706,7 @@ Scripts/Tools/encoding/convert_utf16le_to_utf8.bat -text
 Scripts/Tools/encoding/dos2unix.bat -text
 Scripts/Tools/encoding/makefile_dos2unix.bat -text
 Scripts/Tools/encoding/makefile_unix2dos.bat -text
+Scripts/Tools/encoding/prepend_bom_to_utf_file.bat -text
 Scripts/Tools/errlvl.bat -text
 Scripts/Tools/excludes/7zip_msvc_debug_info_files.lst -text
 Scripts/Tools/excludes/7zip_svn_files.lst -text
