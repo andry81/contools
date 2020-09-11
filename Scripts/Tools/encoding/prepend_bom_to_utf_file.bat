@@ -71,7 +71,7 @@ if not exist "%INPUT_FILE_PATH%" (
 set "BOM_FILE_PATH=%CONTOOLS_ROOT%/encoding/boms/%BOM_FILE_TOKEN%.bin"
 
 if not exist "%BOM_FILE_PATH%" (
-  echo.%~nx0%: error: BOM_FILE_TOKEN token file does not exist: "%BOM_FILE_TOKEN%".
+  echo.%~nx0%: error: BOM_FILE_TOKEN token file does not exist: "%BOM_FILE_PATH%".
   exit /b 2
 ) >&2
 
@@ -112,8 +112,6 @@ set "INPUT_FILE_BOM_STR=%INPUT_FILE_BOM_STR:"=%"
 
 rem trim BOM sequence by file size
 if defined INPUT_FILE_BOM_STR call set "INPUT_FILE_BOM_STR=%%INPUT_FILE_BOM_STR:~0,%BOM_FILE_SIZE%%%"
-
-echo "INPUT_FILE_BOM_STR=%INPUT_FILE_BOM_STR%"
 
 if not defined INPUT_FILE_BOM_STR goto IGNORE_BOM_CHECK
 
