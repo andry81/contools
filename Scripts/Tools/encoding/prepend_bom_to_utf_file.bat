@@ -119,6 +119,11 @@ for /F "eol= tokens=* delims=" %%i in ("%INPUT_FILE_BOM_STR%") do (echo.|set /P
 fc "%INPUT_FILE_BOM_PREFIX_TMP%" "%BOM_FILE_PATH%" > nul
 if %ERRORLEVEL% NEQ 0 goto IGNORE_BOM_CHECK
 
+if %RESTORE_LOCALE% GTR 1 (
+  call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+  set /A RESTORE_LOCALE-=1
+)
+
 if /i not "%INPUT_FILE_PATH%" == "%OUTPUT_FILE_PATH%" (
   call :COPY_FILE "%%INPUT_FILE_PATH%%" "%%OUTPUT_FILE_PATH%%" >nul 2>nul || (
     echo.%~nx0%: error: could not copy to the output file: "%OUTPUT_FILE_PATH%".
