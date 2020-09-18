@@ -20,10 +20,10 @@ rem   available otherwise the script won't work properly.
 setlocal
 
 rem drop last error
-type nul>nul
+type nul >nul
 
 if not defined CONTOOLS_ROOT (
-  echo.%~nx0: error: CONTOOLS_ROOT variable is defined
+  echo.%~nx0: error: CONTOOLS_ROOT variable is not defined
   exit /b 1
 ) >&2
 
