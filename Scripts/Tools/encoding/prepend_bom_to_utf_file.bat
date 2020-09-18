@@ -128,7 +128,7 @@ if /i not "%INPUT_FILE_PATH%" == "%OUTPUT_FILE_PATH%" (
   call :COPY_FILE "%%INPUT_FILE_PATH%%" "%%OUTPUT_FILE_PATH%%" >nul 2>nul || (
     echo.%~nx0%: error: could not copy to the output file: "%OUTPUT_FILE_PATH%".
     exit /b 10
-  )
+  ) >&2
 )
 
 exit /b 0
@@ -145,12 +145,12 @@ if %RESTORE_LOCALE% GTR 1 (
 call :COPY_TWO_BIN_FILES "%%BOM_FILE_PATH%%" "%%INPUT_FILE_PATH%%" "%%INTERMEDIATE_FILE_TMP%%" >nul 2>nul || (
   echo.%~nx0%: error: could not copy to the intermediate file: "%INTERMEDIATE_FILE_TMP%".
   exit /b 20
-)
+) >&2
 
 call :COPY_FILE "%%INTERMEDIATE_FILE_TMP%%" "%%OUTPUT_FILE_PATH%%" >nul 2>nul || (
   echo.%~nx0%: error: could not copy to the output file: "%OUTPUT_FILE_PATH%".
   exit /b 21
-)
+) >&2
 
 exit /b
 
@@ -159,12 +159,12 @@ exit /b
 call :COPY_TWO_TEXT_FILES "%%BOM_FILE_PATH%%" "%%INPUT_FILE_PATH%%" "%%INTERMEDIATE_FILE_TMP%%" >nul 2>nul || (
   echo.%~nx0%: error: could not copy to the intermediate file: "%INTERMEDIATE_FILE_TMP%".
   exit /b 30
-)
+) >&2
 
 call :COPY_FILE "%%INTERMEDIATE_FILE_TMP%%" "%%OUTPUT_FILE_PATH%%" >nul 2>nul || (
   echo.%~nx0%: error: could not copy to the output file: "%OUTPUT_FILE_PATH%".
   exit /b 31
-)
+) >&2
 
 exit /b
 
