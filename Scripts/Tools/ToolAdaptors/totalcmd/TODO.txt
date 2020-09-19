@@ -107,3 +107,8 @@ Note:
   * specific commits or range of commits
   * specific users/emails or range of users/emails
   * etc
+
+- Add new svn/git copy/move scripts to copy from one Working Copy (WC) to
+  another through the shell copy plus svn/git add operation by a locally
+  (not remotely and including local changes before a commit) requested list of
+  versioned files/directories.
