@@ -1,3 +1,7 @@
+2020.09.19:
+* changed: Scripts/Tools/ToolAdapters/totalcmd: ButtonBars: minor changes
+* changed: Scripts/Tools/ToolAdapters/totalcmd: readme update
+
 2020.09.18:
 * fixed: Scripts/Tools/ToolAdaptors/lnk: mklink_system64.bat: minor fix
 
