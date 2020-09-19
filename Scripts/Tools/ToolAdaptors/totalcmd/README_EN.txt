@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.08.29
+* 2020.09.19
 * Toolbar buttons configuration for the Total Commander.
 
 1. INSTALLATION
@@ -96,15 +96,23 @@
 1. INSTALLATION
 ------------------------------------------------------------------------------
 
-To install into a directory do run the `_install.bat` with the first argument -
-path to the installation root. The `COMMANDER_SCRIPTS_ROOT` environment
-variable would be created to store the installation path and the `tacklelib`
-subdirectory would contain all the script files and configuration files.
+1. To install into a directory do run the `_install.bat` with the first
+   argument - path to the installation root. The `COMMANDER_SCRIPTS_ROOT`
+   environment variable would be created to store the installation path and the
+   `tacklelib` subdirectory would contain all the script files and
+   configuration files.
 
-CAUTION:
-  To use saveload feature to load file selection list from file path lists you
-  must execute the steps introduced in the
-  `Load file selection list from a saveslot` section of this file!
+2. To use saveload feature to load file selection list from file path lists you
+   must execute steps introduced in the
+   `Load file selection list from a saveload slot` section of this file!
+
+3. Edit the `profile.vars` file for correct values.
+
+   CAUTION:
+      In case if the installation already has been called for a destination
+      directory, then the old `profile.vars` would be renamed on next
+      installation in the same directory. After the installation you have to
+      manually merge values from the old file to the new one.
 
 ------------------------------------------------------------------------------
 2. CONFIGURATION STORAGE FILES
