@@ -1,4 +1,7 @@
 2020.09.19:
+* changed: Scripts/Tools/ToolAdapters/totalcmd: TODO update
+
+2020.09.19:
 * changed: Scripts/Tools/ToolAdapters/totalcmd: ButtonBars: minor changes
 * changed: Scripts/Tools/ToolAdapters/totalcmd: readme update
 
