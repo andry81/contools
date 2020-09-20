@@ -24,16 +24,17 @@ setlocal
 call "%%~dp0__init__.bat" || exit /b
 
 rem make all paths canonical
-call "%%CONTOOLS_ROOT%%/abspath.bat" "%%CONTOOLS_ROOT%%"
-set "CONTOOLS_ROOT=%RETURN_VALUE%"
+call :CANONICAL_PATH CONTOOLS_ROOT "%%CONTOOLS_ROOT%%"
+set "CONTOOLS_ROOT=%CONTOOLS_ROOT:/=\%"
+set "CONTOOLS_ROOT_NATIVE=%CONTOOLS_ROOT%"
 
-call "%%CONTOOLS_ROOT%%\abspath.bat" "%%~dp0..\Config"
-set "CONFIG_PATH=%RETURN_VALUE%"
+call :CANONICAL_PATH CONFIG_PATH "%%~dp0..\Config"
+set "CONFIG_PATH=%CONFIG_PATH:/=\%"
 
 rem Update variables pointing temporary directories
-call "%%CONTOOLS_ROOT%%\abspath.bat" "%%~dp0..\Temp"
-set "TEMP=%RETURN_VALUE%"
-set "TMP=%RETURN_VALUE%"
+call :CANONICAL_PATH TEMP "%%~dp0..\Temp"
+set "TEMP=%TEMP:/=\%"
+set "TMP=%TEMP%"
 
 rem Save all variables to stack
 setlocal
@@ -116,10 +117,10 @@ set "__CURRENT_CYGWIN_PATH=%REGQUERY_VALUE:/=\%"
 rem Drop last slash/back-slash character.
 if "%__CURRENT_CYGWIN_PATH:~-1%" == "\" set "__CURRENT_CYGWIN_PATH=%__CURRENT_CYGWIN_PATH:~0,-1%"
 
-call "%%CONTOOLS_ROOT%%\strlen.bat" "" "%%__CURRENT_CYGWIN_PATH%%"
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" "" "%%__CURRENT_CYGWIN_PATH%%"
 set __CURRENT_CYGWIN_PATH_LEN=%ERRORLEVEL%
 
-call "%%CONTOOLS_ROOT%%\strlen.bat" "" "%%CYGWIN_REGKEY_PATH%%"
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" "" "%%CYGWIN_REGKEY_PATH%%"
 set __CYGWIN_REGKEY_PATH_LEN=%ERRORLEVEL%
 set /A __CYGWIN_REGKEY_PATH_LEN+=1
 
@@ -177,6 +178,17 @@ rem Make remount in the local /etc/fstab file.
 echo %~nx0: warning: /etc/fstab should be manually remounted.>&2
 
 exit /b
+
+:CANONICAL_PATH
+setlocal DISABLEDELAYEDEXPANSION
+set "RETURN_VALUE=%~dpf2"
+set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+if "%RETURN_VALUE:~-1%" == "/" set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+(
+  endlocal
+  set "%~1=%RETURN_VALUE%"
+)
+exit /b 0
 
 :EXIT
 exit /b 0

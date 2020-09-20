@@ -32,17 +32,17 @@ setlocal DisableDelayedExpansion
 call "%%~dp0__init__.bat" || exit /b
 
 rem make all paths canonical
-call "%%CONTOOLS_ROOT%%/abspath.bat" "%%CONTOOLS_ROOT%%"
-set "CONTOOLS_ROOT=%RETURN_VALUE%"
-set "CONTOOLS_ROOT_NATIVE=%RETURN_VALUE%"
+call :CANONICAL_PATH CONTOOLS_ROOT "%%CONTOOLS_ROOT%%"
+set "CONTOOLS_ROOT=%CONTOOLS_ROOT:/=\%"
+set "CONTOOLS_ROOT_NATIVE=%CONTOOLS_ROOT%"
 
-call "%%CONTOOLS_ROOT_NATIVE%%\abspath.bat" "%%~dp0..\Config"
-set "CONFIG_PATH=%RETURN_VALUE%"
+call :CANONICAL_PATH CONFIG_PATH "%%~dp0..\Config"
+set "CONFIG_PATH=%CONFIG_PATH:/=\%"
 
 rem Update variables pointing temporary directories
-call "%%CONTOOLS_ROOT_NATIVE%%\abspath.bat" "%%~dp0..\Temp"
-set "TEMP=%RETURN_VALUE%"
-set "TMP=%RETURN_VALUE%"
+call :CANONICAL_PATH TEMP "%%~dp0..\Temp"
+set "TEMP=%TEMP:/=\%"
+set "TMP=%TEMP%"
 
 rem Save all variables to stack again
 setlocal
@@ -369,3 +369,14 @@ if exist "%CONTOOLS_ROOT_NATIVE%\cecho.exe" (
   echo.%*
 )
 exit /b
+
+:CANONICAL_PATH
+setlocal DISABLEDELAYEDEXPANSION
+set "RETURN_VALUE=%~dpf2"
+set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+if "%RETURN_VALUE:~-1%" == "/" set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+(
+  endlocal
+  set "%~1=%RETURN_VALUE%"
+)
+exit /b 0

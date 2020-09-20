@@ -12,21 +12,20 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "FROM_PATH=%~1"
-set "TO_PATH=%~2"
+set "FROM_PATH=%~dpf1"
+set "TO_PATH=%~dpf2"
 
-rem convert all back slashes
-set "FROM_PATH=%FROM_PATH:\=/%"
-set "TO_PATH=%TO_PATH:\=/%"
+rem the drive must be the same before subtraction
+if /i not "%FROM_PATH:~0,1%" == "%TO_PATH:~0,1%" exit /b 1
 
 rem drop last slash character
-if "%FROM_PATH:~-1%" == "/" set "FROM_PATH=%FROM_PATH:~0,-1%"
-if "%TO_PATH:~-1%" == "/" set "TO_PATH=%TO_PATH:~0,-1%"
+if "%FROM_PATH:~-1%" == "\" set "FROM_PATH=%FROM_PATH:~0,-1%"
+if "%TO_PATH:~-1%" == "\" set "TO_PATH=%TO_PATH:~0,-1%"
 
-call "%%CONTOOLS_ROOT%%/strlen.bat" /v FROM_PATH
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v FROM_PATH
 set FROM_PATH_LEN=%ERRORLEVEL%
 
-call "%%CONTOOLS_ROOT%%/strlen.bat" /v TO_PATH
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v TO_PATH
 set TO_PATH_LEN=%ERRORLEVEL%
 
 if %TO_PATH_LEN% LSS %FROM_PATH_LEN% exit /b 1
@@ -40,7 +39,7 @@ call set "TO_PATH_SUFFIX=%%TO_PATH:~%FROM_PATH_LEN%%%"
 
 if %FROM_PATH_LEN% GTR 0 (
   if defined TO_PATH_SUFFIX (
-    if "%TO_PATH_SUFFIX:~0,1%" == "/" (
+    if "%TO_PATH_SUFFIX:~0,1%" == "\" (
       set "TO_PATH_SUFFIX=%TO_PATH_SUFFIX:~1%"
     ) else set "TO_PATH_SUFFIX="
   )

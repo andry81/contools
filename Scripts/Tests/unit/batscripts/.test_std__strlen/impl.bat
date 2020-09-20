@@ -2,7 +2,7 @@
 
 setlocal
 
-call "%%CONTOOLS_ROOT%%/strlen.bat" /v
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v
 set ERRORLEVEL_RETURNED=%ERRORLEVEL%
 
 if %TESTLIB__OVERALL_TESTS% GTR %TESTLIB__CURRENT_TESTS% (

@@ -18,11 +18,21 @@ goto TEST_DATA_CMD_LINE_LOOP
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%" "" "%%TEST_TEMP_BASE_DIR%%"
 
-set "TEST_TEMP_DIR_NAME=%TEST_SCRIPT_FILE_NAME%.%SCRIPT_TEMP_ROOT_DATE%.%SCRIPT_TEMP_ROOT_TIME%"
+set "TEST_TEMP_DIR_NAME=%SCRIPT_TEMP_DIR_NAME%"
 set "TEST_TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
 rem initialize setup parameters
-call "%%CONTOOLS_ROOT%%/abspath.bat" "%%TEST_TEMP_DIR_PATH%%\output.txt"
-set "TEST_DATA_OUT_FILE=%RETURN_VALUE%"
+call :CANONICAL_PATH TEST_DATA_OUT_FILE "%%TEST_TEMP_DIR_PATH%%\output.txt"
 
+exit /b 0
+
+:CANONICAL_PATH
+setlocal DISABLEDELAYEDEXPANSION
+set "RETURN_VALUE=%~dpf2"
+set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+if "%RETURN_VALUE:~-1%" == "/" set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+(
+  endlocal
+  set "%~1=%RETURN_VALUE%"
+)
 exit /b 0

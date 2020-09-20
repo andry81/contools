@@ -56,7 +56,7 @@ exit /b 0
 :PROCESS_DIR_PATH
 set "BASE_DIR_PATH=%~dpf1"
 
-call "%%CONTOOLS_ROOT%%/strlen.bat" /v BASE_DIR_PATH
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v BASE_DIR_PATH
 set /A BASE_DIR_PATH_LEN=%ERRORLEVEL%
 
 set DIR_INDEX=0

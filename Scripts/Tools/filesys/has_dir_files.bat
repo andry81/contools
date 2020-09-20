@@ -24,7 +24,7 @@ if not "/" == "%PARAM:~0,1%" (
   if not exist "%DIR%" (
     echo.%_nx0%: error: Directory does not exist: "%DIR%">&2
     exit /b -1
-  )
+  ) >&2
 ) else (
   rem space at the end
   set "FLAGS=%FLAGS%%PARAM% "
@@ -37,9 +37,7 @@ goto LOOP
 
 :DIR
 dir /A:-D /B %__ARGS__% >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-  exit /b 1
-)
+if %ERRORLEVEL% NEQ 0 exit /b 1
 
 exit /b 0
 

@@ -33,6 +33,8 @@ call "%%TEST_DATA_FREE_SCRIPT_FILE%%"
 exit /b 0
 
 :PROCESS_DIR
+call set "TEST_DATA_OUTPUT_FILE_NAME=%%TEST_DATA_OUTPUT_FILE_NAME_PTTN:{{INDEX}}=%DIR_INDEX%%%"
+
 if not exist "%DIR_PATH%\" exit /b 2
 if not exist "%DIR_PATH%\%DIR_NAME_PTTN%" exit /b 3
 
@@ -40,8 +42,6 @@ set "DIR_NAME="
 for /F "usebackq tokens=* delims=" %%i in (`dir /A:D /B "%DIR_PATH%\%DIR_NAME_PTTN%"`) do set "DIR_NAME=%%i"
 
 if not defined DIR_NAME exit /b 4
-
-call set "TEST_DATA_OUTPUT_FILE_NAME=%%TEST_DATA_OUTPUT_FILE_NAME_PTTN:{{INDEX}}=%DIR_INDEX%%%"
 
 call "%%CONTOOLS_ROOT%%/gen_dir_files_list.bat" 65001 "%DIR_PATH%\%DIR_NAME%" > "%TEST_DATA_OUTPUT_FILE_NAME%"
 

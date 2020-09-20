@@ -195,7 +195,7 @@ if not exist "%FROM_FILE_PATH%" (
 rem check recursion only if FROM_FILE_PATH is a directory
 if not exist "%FROM_FILE_PATH%\" goto IGNORE_TO_FILE_PATH_CHECK
 
-call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
+call "%%CONTOOLS_ROOT%%/filesys/subtract_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_PATH%%"
 if %ERRORLEVEL% EQU 0 (
   echo.%?~n0%: error: TO_FILE_PATH file path must not contain FROM_FILE_PATH file path: FROM_FILE_PATH="%FROM_FILE_PATH%" TO_FILE_PATH="%TO_FILE_PATH%".
   exit /b 5
@@ -217,7 +217,7 @@ if "%TO_FILE_DIR:~-1%" == "\" set "TO_FILE_DIR=%TO_FILE_DIR:~0,-1%"
 rem move through the shell
 rem :MOVE_FILE SHELL
 
-call "%%CONTOOLS_ROOT%%/get_shared_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_DIR%%"
+call "%%CONTOOLS_ROOT%%/filesys/get_shared_path.bat" "%%FROM_FILE_PATH%%" "%%TO_FILE_DIR%%"
 if %ERRORLEVEL% NEQ 0 (
   echo.%?~n0%: error: source file path and destination file directory must share a common root path: FROM_FILE_PATH=%FROM_FILE_PATH%" TO_FILE_DIR="%TO_FILE_DIR%".
   exit /b -253

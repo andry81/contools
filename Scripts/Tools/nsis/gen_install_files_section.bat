@@ -64,10 +64,10 @@ set "BASE_DIR_PATH=%~dpf1"
 
 rem <BASE_DIR_SUFFIX> = <BASE_DIR_PATH> - <PREFIX_PATH>
 
-call "%%CONTOOLS_ROOT%%/strlen.bat" /v BASE_DIR_PATH
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v BASE_DIR_PATH
 set /A BASE_DIR_PATH_LEN=%ERRORLEVEL%
 
-call "%%CONTOOLS_ROOT%%/strlen.bat" /v %%PREFIX_PATH_VAR%%
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v %%PREFIX_PATH_VAR%%
 set /A PREFIX_PATH_LEN=%ERRORLEVEL%
 
 set "BASE_DIR_SUFFIX="

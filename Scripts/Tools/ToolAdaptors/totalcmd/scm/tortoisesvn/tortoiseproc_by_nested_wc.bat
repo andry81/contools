@@ -68,7 +68,7 @@ set REPOROOT_NEXT_INDEX=0
 
 rem to prefix task index by number with zeros to correct order in case of single dir command
 set REPOROOT_LAST_INDEX=%REPOROOT_INDEX%
-call "%%CONTOOLS_ROOT%%/strlen.bat" /v REPOROOT_LAST_INDEX
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v REPOROOT_LAST_INDEX
 set REPOROOT_LAST_INDEX_STR_LEN=%ERRORLEVEL%
 set /A REPOROOT_LAST_INDEX_STR_LEN_INDEX=REPOROOT_LAST_INDEX_STR_LEN-1
 
@@ -466,7 +466,7 @@ rem ignore files selection
 if not exist "%FILE_PATH%\" goto NEXT_LOOKUP_DIR
 
 rem reduce relative path to avoid . and .. characters
-call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILE_PATH%%"
+call "%%CONTOOLS_ROOT%%/filesys/reduce_relative_path.bat" "%%FILE_PATH%%"
 set "FILE_PATH=%RETURN_VALUE%"
 
 rem should not be empty
@@ -488,7 +488,7 @@ call set "FILE_PATH_WCROOT_PREFIX=%%FILE_PATH_DECORATED:\%FILE_PATH_WCROOT_SUFFI
 :CUTOFF_WCROOT_PREFIX
 rem remove bounds character and extract diretory path
 if "%FILE_PATH_DECORATED:~-1%" == "\" set "FILE_PATH_DECORATED=%FILE_PATH_DECORATED:~0,-1%"
-call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILE_PATH_DECORATED:~1%%" \ "" FILE_PATH
+call "%%CONTOOLS_ROOT%%/filesys/split_pathstr.bat" "%%FILE_PATH_DECORATED:~1%%" \ "" FILE_PATH
 
 rem should not be empty
 if not defined FILE_PATH set FILE_PATH=.

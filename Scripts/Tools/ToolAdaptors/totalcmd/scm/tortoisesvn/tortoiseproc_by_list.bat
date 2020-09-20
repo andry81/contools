@@ -148,7 +148,7 @@ rem run COMMAND over selected files/directories in the CWD directory
 if not defined FILE_PATH exit /b 1
 
 rem reduce relative path to avoid . and .. characters
-call "%%CONTOOLS_ROOT%%/reduce_relative_path.bat" "%%FILE_PATH%%"
+call "%%CONTOOLS_ROOT%%/filesys/reduce_relative_path.bat" "%%FILE_PATH%%"
 set "FILE_PATH=%RETURN_VALUE%"
 
 set "FILE_PATH_DECORATED=\%FILE_PATH%\"
@@ -166,7 +166,7 @@ call set "FILE_PATH_WCROOT_PREFIX=%%FILE_PATH_DECORATED:\%FILE_PATH_WCROOT_SUFFI
 :CUTOFF_WCROOT_PREFIX
 rem remove bounds character and extract diretory path
 if "%FILE_PATH_DECORATED:~-1%" == "\" set "FILE_PATH_DECORATED=%FILE_PATH_DECORATED:~0,-1%"
-call "%%CONTOOLS_ROOT%%/split_pathstr.bat" "%%FILE_PATH_DECORATED:~1%%" \ "" FILE_PATH
+call "%%CONTOOLS_ROOT%%/filesys/split_pathstr.bat" "%%FILE_PATH_DECORATED:~1%%" \ "" FILE_PATH
 
 rem should not be empty
 if not defined FILE_PATH set FILE_PATH=.

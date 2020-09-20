@@ -26,7 +26,7 @@ mkdir "%TEMP_EXTRACT_DIR_PATH%" || (
 
 call "%%BUILD_TOOLS_ROOT%%/extract_files_from_archive.bat" "%%TEMP_EXTRACT_DIR_PATH%%" "%%FILE_PATH%%" "%%ARCHIVE_PATH%%" -y >nul || ( set LASTERROR=3 & goto EXIT )
 
-call "%%CONTOOLS_ROOT%%/get_newest_file.bat" "%%TEMP_EXTRACT_DIR_PATH%%\%%FILE_PATH%%"
+call "%%CONTOOLS_ROOT%%/filesys/get_newest_file.bat" "%%TEMP_EXTRACT_DIR_PATH%%\%%FILE_PATH%%"
 
 "%CONTOOLS_ROOT%/strings.exe" "%FOUND_PATH%" | findstr.exe "%STRING_PREFIX%"
 

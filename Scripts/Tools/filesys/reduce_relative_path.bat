@@ -33,7 +33,7 @@ if "%REL_PATH:.=%" == "%REL_PATH%" exit /b 0
 
 call :ABS_PATH "%%REL_PATH%%"
 
-call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%CD%%" "%%ABS_PATH%%"
+call "%%CONTOOLS_ROOT%%/filesys/subtract_path.bat" "%%CD%%" "%%ABS_PATH%%"
 
 rem use absolute path on error
 if %ERRORLEVEL% NEQ 0 set "RETURN_VALUE=%ABS_PATH%"

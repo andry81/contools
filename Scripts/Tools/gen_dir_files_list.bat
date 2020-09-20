@@ -60,7 +60,7 @@ if exist "%FILES_PATH%\" (
 exit /b
 
 :FILES_PATH_AS_DIR
-call "%%CONTOOLS_ROOT%%/strlen.bat" /v FILES_PATH
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v FILES_PATH
 set /A FILES_PATH_LEN=%ERRORLEVEL%+1
 dir /B /S /O:N "%FILES_PATH%\" | "%GNUWIN32_ROOT%/bin/sed.exe" "s/.\{%FILES_PATH_LEN%\}\(.*\)/\1\\/" | "%GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/"
 exit /b

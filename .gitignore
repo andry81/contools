@@ -1,8 +1,8 @@
 /Output
+Scripts/Tests/bench/batscripts/_output
 Scripts/Tests/unit/batscripts/_output
 Scripts/Tools/*.exe
 Scripts/Tools/ToolAdaptors/totalcmd/*.vars
-Scripts/Tools/ToolAdaptors/totalcmd/Tools/*
 Scripts/Tools/admin/ProductKey/__pycache__
 Scripts/Tools/admin/VisualStudio/*.vars
 /Temp

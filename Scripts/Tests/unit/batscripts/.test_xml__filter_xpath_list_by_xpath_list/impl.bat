@@ -27,7 +27,7 @@ rem builtin commands
 if not exist "%TEST_DATA_OUT_FILE%" ( set "LASTERROR=21" & goto EXIT )
 if not exist "%TEST_DATA_REF_FILE%" ( set "LASTERROR=22" & goto EXIT )
 
-fc "%TEST_DATA_OUT_FILE%" "%TEST_DATA_REF_FILE%" > nul
+fc "%TEST_DATA_OUT_FILE:/=\%" "%TEST_DATA_REF_FILE%" > nul
 if %ERRORLEVEL% NEQ 0 set LASTERROR=23
 
 :EXIT
