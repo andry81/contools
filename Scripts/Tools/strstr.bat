@@ -29,7 +29,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/strlen.bat" "%%~2"
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" "%%~2"
 set __STRLEN=%ERRORLEVEL%
 if %__STRLEN% EQU 0 exit /b -1
 

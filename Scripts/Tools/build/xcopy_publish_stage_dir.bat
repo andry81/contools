@@ -50,7 +50,7 @@ set "FROM_BASE_ROOT=%~2"
 set "TO_APP_DIR_ROOT=%~3"
 
 rem <XCOPY_SUFFIX_PATH> = <FROM_DIR_ROOT> - <FROM_BASE_ROOT>
-call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%FROM_BASE_ROOT%%" "%%FROM_DIR_ROOT%%"
+call "%%CONTOOLS_ROOT%%/filesys/subtract_path.bat" "%%FROM_BASE_ROOT%%" "%%FROM_DIR_ROOT%%"
 set "XCOPY_SUFFIX_PATH=%RETURN_VALUE:\=/%"
 
 if defined XCOPY_SUFFIX_PATH (

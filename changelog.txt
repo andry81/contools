@@ -1,3 +1,11 @@
+2020.09.21:
+* fixed: Scripts/Tests: tests fixup
+* fixed: other minor fixup
+* changed: init scripts minor changes
+* changed: Scripts/Tests: removed obsoleted or not actual scripts
+* changed: Scripts/Tools: scripts related to file system has moved to the `filesys` subdirectory
+* refactor: Scripts/Tests: moved bench tests from unit category
+
 2020.09.20:
 * changed: Scripts/Tools: removed usage of the `get_filesize.bat` script, removed script
 

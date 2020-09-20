@@ -182,7 +182,7 @@ if exist "%CREATE_FILE_PATH%\" (
   exit /b 3
 ) >&2
 
-call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%CD%%" "%%CREATE_FILE_PATH%%"
+call "%%CONTOOLS_ROOT%%/filesys/subtract_path.bat" "%%CD%%" "%%CREATE_FILE_PATH%%"
 if %ERRORLEVEL% NEQ 0 (
   echo.%?~n0%: error: CREATE_FILE_PATH must point inside of selected directory: CREATE_FILE_PATH="%CREATE_FILE_PATH%" CD="%CD%".
   exit /b 4

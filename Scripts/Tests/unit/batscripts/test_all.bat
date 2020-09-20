@@ -6,19 +6,19 @@ setlocal
 call "%%~dp0__init__.bat" || exit /b
 call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
 
-call "%%TESTS_ROOT%%/test_strlen.bat"
+call "%%TESTS_ROOT%%/test_std__strlen.bat"
+call "%%TESTS_ROOT%%/test_std__allocate_temp_dir.bat"
+call "%%TESTS_ROOT%%/test_std__chcp.bat"
+call "%%TESTS_ROOT%%/test_std__trim_var.bat"
+call "%%TESTS_ROOT%%/test_std__load_config_full.bat"
+call "%%TESTS_ROOT%%/test_std__load_config_fast.bat"
+
 call "%%TESTS_ROOT%%/test_strchr.bat"
 call "%%TESTS_ROOT%%/test_strrep.bat"
 call "%%TESTS_ROOT%%/test_stresc.bat"
 call "%%TESTS_ROOT%%/test_cstresc.bat"
 call "%%TESTS_ROOT%%/test_extract_version.bat"
 rem call "%%TESTS_ROOT%%/test_setvarsfromfile.bat"
-
-call "%%TESTS_ROOT%%/test_std__allocate_temp_dir.bat"
-call "%%TESTS_ROOT%%/test_std__chcp.bat"
-call "%%TESTS_ROOT%%/test_std__trim_var.bat"
-call "%%TESTS_ROOT%%/test_std__load_config_full.bat"
-call "%%TESTS_ROOT%%/test_std__load_config_fast.bat"
 
 call "%%TESTS_ROOT%%/test_xml_sed.bat"
 call "%%TESTS_ROOT%%/test_xml__filter_xpath_list_by_xpath_list.bat"

@@ -39,14 +39,14 @@ if not defined PROJECT_NAME (
 rem cleanup all STAGE_IN.PROJECT_* variables
 for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set "STAGE_IN.PROJECT_" 2^>nul`) do set "%%i="
 
-call "%%CONTOOLS_ROOT%%/canonicalpath.bat" "%%PROJECT_ROOT%%"
-set "PROJECT_ROOT=%PATH_VALUE%"
+call :CANONICAL_PATH PROJECT_ROOT "%%PROJECT_ROOT%%"
+set "PROJECT_ROOT=%PROJECT_ROOT:/=\%"
 
-call "%%CONTOOLS_ROOT%%/canonicalpath.bat" "%%APP_ROOT%%"
-set "APP_ROOT=%PATH_VALUE%"
+call :CANONICAL_PATH APP_ROOT "%%APP_ROOT%%"
+set "APP_ROOT=%APP_ROOT:/=\%"
 
-call "%%CONTOOLS_ROOT%%/canonicalpath.bat" "%%APP_INTEGRATION_ROOT%%"
-set "APP_INTEGRATION_ROOT=%PATH_VALUE%"
+call :CANONICAL_PATH APP_INTEGRATION_ROOT "%%APP_INTEGRATION_ROOT%%"
+set "APP_INTEGRATION_ROOT=%APP_INTEGRATION_ROOT:/=\%"
 
 if not defined PROJECT_ROOT goto :NO_PROJECT_ROOT
 if not exist "%PROJECT_ROOT%" goto :NO_PROJECT_ROOT
@@ -67,4 +67,15 @@ exit /b 11
 
 :APP_TARGET_NAME_END
 
+exit /b 0
+
+:CANONICAL_PATH
+setlocal DISABLEDELAYEDEXPANSION
+set "RETURN_VALUE=%~dpf2"
+set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+if "%RETURN_VALUE:~-1%" == "/" set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+(
+  endlocal
+  set "%~1=%RETURN_VALUE%"
+)
 exit /b 0

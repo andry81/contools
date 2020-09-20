@@ -178,7 +178,7 @@ if not defined CREATE_DIR_PATH exit /b 1
 :IGNORE_CONVERT_FROM_UTF16
 if exist "%CREATE_DIR_PATH%\" exit /b 0
 
-call "%%CONTOOLS_ROOT%%/subtract_path.bat" "%%CD%%" "%%CREATE_DIR_PATH%%"
+call "%%CONTOOLS_ROOT%%/filesys/subtract_path.bat" "%%CD%%" "%%CREATE_DIR_PATH%%"
 if %ERRORLEVEL% NEQ 0 (
   echo.%?~n0%: error: CREATE_DIR_PATH must point inside of selected directory: CREATE_DIR_PATH="%CREATE_DIR_PATH%" CD="%CD%".
   exit /b 3
