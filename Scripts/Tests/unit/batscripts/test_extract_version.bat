@@ -13,7 +13,7 @@ if 0%__CTRL_SETLOCAL% EQU 1 (
 set __CTRL_SETLOCAL=1
 
 call "%%~dp0__init__.bat" || exit /b
-call "%%TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
+call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
 
 call :TEST "1.7.5.1"      "1.7.5-1"
 call :TEST "1.7.5.1"      "1.7.5-1" -d
@@ -39,11 +39,11 @@ call :TEST "1.2.3.4.5"    "1.2.3c.4.5" -d
 echo.
 
 rem WARNING: must be called without the call prefix!
-"%TESTLIB_ROOT%/exit.bat"
+"%CONTOOLS_TESTLIB_ROOT%/exit.bat"
 
 rem no code can be executed here, just in case
 exit /b
 
 :TEST
-call "%%TESTLIB_ROOT%%/test.bat" %%*
+call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b

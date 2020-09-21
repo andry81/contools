@@ -47,7 +47,7 @@ set LASTERROR=0
 set INTERRORLEVEL=0
 set "TEST_DATA_REF_FILE="
 
-call "%%TESTLIB_ROOT%%/load_locals.bat"
+call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat"
 
 set /A TESTLIB__CURRENT_TESTS%?5%=1
 set /A TESTLIB__OVERALL_TESTS%?5%=1
@@ -149,26 +149,26 @@ exit /b 0
 set "TESTLIB__EXEC_ON_ENDLOCAL="
 
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars" (
-  call "%%TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.return.vars"
+  call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.return.vars"
   for /F "usebackq eol=# tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars") do (
     set "__?RETURN_VAR_NAME=%%i"
     call :SET_EXEC_ON_ENDLOCAL
   )
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars" (
-  call "%%TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/return.vars"
+  call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/return.vars"
   for /F "usebackq eol=# tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars") do (
     set "__?RETURN_VAR_NAME=%%i"
     call :SET_EXEC_ON_ENDLOCAL
   )
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/return.vars" (
-    call "%%TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/return.vars"
+    call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/return.vars"
     for /F "usebackq eol=# tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/return.vars") do (
       set "__?RETURN_VAR_NAME=%%i"
       call :SET_EXEC_ON_ENDLOCAL
     )
-  ) else call "%%TESTLIB_ROOT%%/save_locals.bat"
-) else call "%%TESTLIB_ROOT%%/save_locals.bat"
+  ) else call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
+) else call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
 
 goto EXIT
 

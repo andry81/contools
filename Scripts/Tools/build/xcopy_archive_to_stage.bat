@@ -156,9 +156,9 @@ if not defined TO_FILE goto ARCHIVE_FILE_LIST_END
 set /A FROM_FILE_INDEX+=1
 
 if defined ARCHIVE_DIR_PREFIX_PATH (
-  call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%ARCHIVE_DIR_PREFIX_PATH%%/%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_EXCLUDES_CMD%% || ( set LASTERROR=11 & goto EXIT )
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%ARCHIVE_DIR_PREFIX_PATH%%/%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_EXCLUDES_CMD%% || ( set LASTERROR=11 & goto EXIT )
 ) else (
-  call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_EXCLUDES_CMD%% || ( set LASTERROR=11 & goto EXIT )
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_EXCLUDES_CMD%% || ( set LASTERROR=11 & goto EXIT )
 )
 
 goto ARCHIVE_FILE_LIST
@@ -169,10 +169,10 @@ echo.
 
 :COPY_STAGE
 if exist "%XCOPY_ARCHIVE_EXCLUDES_FILE%" (
-  call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "%%MSG_TOKEN%%" "%%STAGE_NAME%%" "%%COPY_FROM_STAGE_ROOT%%" "%%COPY_TO_STAGE_ROOT%%" "%%COPY_FILE_LIST%%" ^
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "%%MSG_TOKEN%%" "%%STAGE_NAME%%" "%%COPY_FROM_STAGE_ROOT%%" "%%COPY_TO_STAGE_ROOT%%" "%%COPY_FILE_LIST%%" ^
     "%%XCOPY_FILE_FLAGS%%" "@%%XCOPY_ARCHIVE_EXCLUDES_FILE%%" || ( set LASTERROR=12 & goto EXIT )
 ) else (
-  call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "%%MSG_TOKEN%%" "%%STAGE_NAME%%" "%%COPY_FROM_STAGE_ROOT%%" "%%COPY_TO_STAGE_ROOT%%" "%%COPY_FILE_LIST%%" ^
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "%%MSG_TOKEN%%" "%%STAGE_NAME%%" "%%COPY_FROM_STAGE_ROOT%%" "%%COPY_TO_STAGE_ROOT%%" "%%COPY_FILE_LIST%%" ^
     "%%XCOPY_FILE_FLAGS%%" || ( set LASTERROR=12 & goto EXIT )
 )
 

@@ -21,7 +21,7 @@ set "TEST_DATA_REF_FILE=%TEST_DATA_REF_DIR_ROOT%\output.txt"
 
 rem builtin commands
 (
-  call "%%XML_TOOLS_ROOT%%/filter_xpath_list_by_xpath_list.bat" %%TEST_DATA_CMD_LINE%% "%%TEST_DATA_IN_FILE%%" "%%TEST_DATA_FILTER_FILE%%"
+  call "%%CONTOOLS_XML_TOOLS_ROOT%%/filter_xpath_list_by_xpath_list.bat" %%TEST_DATA_CMD_LINE%% "%%TEST_DATA_IN_FILE%%" "%%TEST_DATA_FILTER_FILE%%"
 ) > "%TEST_DATA_OUT_FILE%" || ( call set "INTERRORLEVEL=%%ERRORLEVEL%%" & set "LASTERROR=20" & goto EXIT )
 
 if not exist "%TEST_DATA_OUT_FILE%" ( set "LASTERROR=21" & goto EXIT )

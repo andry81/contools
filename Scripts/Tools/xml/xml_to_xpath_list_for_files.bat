@@ -63,7 +63,7 @@ for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S %CMD_VA_ARGS%`
   echo.# ------------------------------------------------------------------------------
   echo # File: "%%i"
   echo.# ------------------------------------------------------------------------------
-  call "%%XML_TOOLS_ROOT%%/xml_to_xpath_list.bat" %%CMD_FLAG_ARGS%% "%%i"
+  call "%%CONTOOLS_XML_TOOLS_ROOT%%/xml_to_xpath_list.bat" %%CMD_FLAG_ARGS%% "%%i"
   echo.
 )
 

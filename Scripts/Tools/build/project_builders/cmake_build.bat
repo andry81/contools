@@ -34,10 +34,10 @@ if defined BUILD_USER_VARS_ROOT (
 if defined BUILD_NEST_LVL set /A BUILD_NEST_LVL+=1
 if not defined BUILD_NEST_LVL set BUILD_NEST_LVL=1
 
-call "%%BUILD_TOOLS_ROOT%%/set_project_build_time.bat"
-call "%%BUILD_TOOLS_ROOT%%/env_generators\base.bat" || exit /b 10
-call "%%BUILD_TOOLS_ROOT%%/env_generators\cmake.bat" || exit /b 11
-call "%%BUILD_TOOLS_ROOT%%/env_generators\cmake_cmd_line.bat" "%%BUILD_CONFIG_ROOT%%" || exit /b 12
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/set_project_build_time.bat"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/env_generators\base.bat" || exit /b 10
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/env_generators\cmake.bat" || exit /b 11
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/env_generators\cmake_cmd_line.bat" "%%BUILD_CONFIG_ROOT%%" || exit /b 12
 
 if exist "%BUILD_SCRIPTS_ROOT%/pre_validate_vars.bat" (
   call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 13

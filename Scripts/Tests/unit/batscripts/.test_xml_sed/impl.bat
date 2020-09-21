@@ -8,7 +8,7 @@ set "TEST_DATA_REF_FILE=%TEST_DATA_REF_DIR_ROOT%\output.txt"
 
 rem builtin commands
 (
-  "%GNUWIN32_ROOT%/bin/sed.exe" %TEST_DATA_SED_CMD_LINE% "%TEST_DATA_IN_FILE%"
+  "%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" %TEST_DATA_SED_CMD_LINE% "%TEST_DATA_IN_FILE%"
 ) > "%TEST_DATA_OUT_FILE%" || ( call set "INTERRORLEVEL=%%ERRORLEVEL%%" & set "LASTERROR=20" & goto EXIT )
 
 if not exist "%TEST_DATA_OUT_FILE%" ( set "LASTERROR=21" & goto EXIT )

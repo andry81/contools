@@ -8,7 +8,7 @@ rem CAUTION:
 rem   This script must be called without the `call` prefix!
 rem
 
-call "%%TESTLIB_ROOT%%/load_locals.bat"
+call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat"
 
 if %TESTLIB__TEST_DO_TEARDOWN%0 NEQ 0 call :TEST_TEARDOWN
 set TESTLIB__TEST_TEARDOWN=0
@@ -20,7 +20,7 @@ if %TESTLIB__CURRENT_PASSED_TESTS% LSS %TESTLIB__CURRENT_TESTS% (
 
 set /A TESTLIB__NEST_LVL-=1
 
-call "%%TESTLIB_ROOT%%/save_locals.bat"
+call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
 
 if %TESTLIB__NEST_LVL%0 EQU 0 (
   echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% tests is passed.

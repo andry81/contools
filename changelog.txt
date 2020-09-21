@@ -1,4 +1,8 @@
 2020.09.21:
+* fixed: missed change
+* changed: project environment variables refactor
+
+2020.09.21:
 * fixed: Scripts/Tests: tests fixup
 * fixed: other minor fixup
 * changed: init scripts minor changes

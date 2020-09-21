@@ -65,5 +65,5 @@ if %NUM_CMD_VA_ARGS% EQU 0 (
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S %CMD_VA_ARGS%`) do (
   echo.%%i
-  call "%%XML_TOOLS_ROOT%%/vbs/xml_preformat.vbs" %%CMD_FLAG_ARGS%% "%%i" "%%i"
+  call "%%CONTOOLS_XML_TOOLS_ROOT%%/vbs/xml_preformat.vbs" %%CMD_FLAG_ARGS%% "%%i" "%%i"
 )

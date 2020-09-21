@@ -38,7 +38,7 @@ call "%%?~dp0%%__init__.bat" || exit /b
 
 :PDB_STAGE
 if not exist "%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%" goto PDB_STAGE_END
-call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "stage-in project debug information" "stage" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "stage-in project debug information" "stage" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_PDB_ROOT%%" ^
   "%%ARCHIVE_COPY_FROM_OFFSET%%" ^
   "%%PROJECT_STAGE_PDB_ROOT%%/%%STAGE_IN.PROJECT_NAME%%_pdb_%%STAGE_IN.BUILD_SCM_BRANCH%%_%%STAGE_IN.PROJECT_TYPE%%_%%STAGE_IN.APP_TARGET_NAME%%_v%%STAGE_IN.PRODUCT_VERSION_FILE_SUFFIX%%.pdb.7z" ^
@@ -48,7 +48,7 @@ call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "stage-in project debug i
 
 :LIB_STAGE
 if not exist "%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%" goto LIB_STAGE_END
-call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "stage-in project library" "stage" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "stage-in project library" "stage" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_LIB_ROOT%%" ^
   "%%ARCHIVE_COPY_FROM_OFFSET%%" ^
   "%%PROJECT_STAGE_LIB_ROOT%%/%%STAGE_IN.PROJECT_NAME%%_lib_%%STAGE_IN.BUILD_SCM_BRANCH%%_%%STAGE_IN.PROJECT_TYPE%%_%%STAGE_IN.APP_TARGET_NAME%%_v%%STAGE_IN.PRODUCT_VERSION_FILE_SUFFIX%%.lib.7z" ^
@@ -58,14 +58,14 @@ call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "stage-in project library
 
 :GEN_STAGE
 if not exist "%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%" goto GEN_STAGE_END
-call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "stage-in project generated" "stage" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "stage-in project generated" "stage" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" "%%PROJECT_STAGE_GEN_ROOT%%/%%STAGE_IN.PROJECT_NAME%%" "*.*" "/S /Y /H" || exit /b 3
 
 :GEN_STAGE_END
 
 :VAR_STAGE
 if not exist "%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" goto VAR_STAGE_END
-call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "stage-in project variables" "stage" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "stage-in project variables" "stage" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" "%%PROJECT_STAGE_VAR_ROOT%%/%%STAGE_IN.PROJECT_NAME%%" "*.*" "/S /Y /H" || exit /b 4
 
 :VAR_STAGE_END
