@@ -17,7 +17,7 @@ echo 3. Press any key to continue and select the `_src` subdirectory in the `con
 
 pause
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_UTILITY_ROOT%\wxFileDialog.exe" "" "%CONTOOLS_PROJECT_ROOT%" "Select the third party catalog to link with..." -de`) do set "CONTOOLS_3DPARTY_ROOT=%%i"
+for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_UTILITIES_BIN_ROOT%\wxFileDialog.exe" "" "%CONTOOLS_PROJECT_ROOT%" "Select the third party catalog to link with..." -de`) do set "CONTOOLS_3DPARTY_ROOT=%%i"
 
 if not exist "%CONTOOLS_3DPARTY_ROOT%" (
   if not defined CONTOOLS_3DPARTY_ROOT (

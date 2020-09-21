@@ -14,7 +14,7 @@ CONTOOLS_PROJECT_ROOT="$RETURN_VALUE"
 
 [[ -z "$CONTOOLS_ROOT" ]] &&                tkl_export CONTOOLS_ROOT                "$CONTOOLS_PROJECT_ROOT/Scripts/Tools"
 [[ -z "$CONTOOLS_UTILITIES_ROOT" ]] &&      tkl_export CONTOOLS_UTILITIES_ROOT      "$CONTOOLS_PROJECT_ROOT/Utilities"
-[[ -z "$CONTOOLS_UTILITY_ROOT" ]] &&        tkl_export CONTOOLS_UTILITY_ROOT        "$CONTOOLS_UTILITIES_ROOT/bin"
+[[ -z "$CONTOOLS_UTILITIES_BIN_ROOT" ]] &&  tkl_export CONTOOLS_UTILITIES_BIN_ROOT  "$CONTOOLS_UTILITIES_ROOT/bin"
 [[ -z "$CONTOOLS_BUILD_TOOLS_ROOT" ]] &&    tkl_export CONTOOLS_BUILD_TOOLS_ROOT    "$CONTOOLS_ROOT/build"
 [[ -z "$CONTOOLS_GNUWIN32_ROOT" ]] &&       tkl_export CONTOOLS_GNUWIN32_ROOT       "$CONTOOLS_ROOT/gnuwin32"
 [[ -z "$SVNCMD_TOOLS_ROOT" ]] &&            tkl_export SVNCMD_TOOLS_ROOT            "$CONTOOLS_ROOT/scm/svn"
