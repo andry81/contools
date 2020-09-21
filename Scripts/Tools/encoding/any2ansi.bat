@@ -72,9 +72,9 @@ if defined FLAG_CHCP (
 
 rem workaround for `conversion from CP65001 unsupported`
 if "%OUTPUT_CHARSET%" == "CP65001" (
-  "%GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t UTF-8 "%INPUT_FILE%"
+  "%CONTOOLS_GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t UTF-8 "%INPUT_FILE%"
 ) else (
-  "%GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
+  "%CONTOOLS_GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
 )
 exit /b
 

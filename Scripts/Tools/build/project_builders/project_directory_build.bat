@@ -29,7 +29,7 @@ if defined BUILD_USER_VARS_ROOT (
   if "\" == "%BUILD_USER_VARS_ROOT:~-1%" set "BUILD_USER_VARS_ROOT=%BUILD_USER_VARS_ROOT:~0,-1%"
 )
 
-call "%%BUILD_TOOLS_ROOT%%/set_project_build_time.bat"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/set_project_build_time.bat"
 
 if exist "%BUILD_SCRIPTS_ROOT%/pre_validate_vars.bat" (
   call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 10

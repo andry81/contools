@@ -49,7 +49,7 @@ call "%%SVNCMD_TOOLS_ROOT%%/gen_branch_workingset_time.bat" -offline -relfpaths 
   "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn/svn_project_branch_all_status.txt" || ( call "%%CONTOOLS_ROOT%%/std/if_.bat" %%ERRORLEVEL%% GTR 0 && exit /b 2 )
 
 echo.Archiving project branch workingset...
-call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn" "svn_project_branch*" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn/svn_project_branch_workingset.7z" -sdel || exit /b 14
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn" "svn_project_branch*" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn/svn_project_branch_workingset.7z" -sdel || exit /b 14
 echo.
 
 if not defined SOLUTION_BRANCH_ROOT goto IGNORE_SOLUTION_BRANCH
@@ -69,7 +69,7 @@ call "%%SVNCMD_TOOLS_ROOT%%/gen_branch_workingset_time.bat" -offline -relfpaths 
   "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn/svn_solution_branch_all_status.txt" || ( call "%%CONTOOLS_ROOT%%/std/if_.bat" %%ERRORLEVEL%% GTR 0 && exit /b 3 )
 
 echo.Archiving solution branch workingset...
-call "%%BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn" "svn_solution_branch*" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn/svn_solution_branch_workingset.7z" -sdel || exit /b 16
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn" "svn_solution_branch*" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn/svn_solution_branch_workingset.7z" -sdel || exit /b 16
 echo.
 
 :IGNORE_SOLUTION_BRANCH

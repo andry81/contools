@@ -891,6 +891,7 @@ Scripts/Tools/vars/iconv.default_ansi_locale.var -text
 Scripts/Tools/wctoansi.bat -text
 Scripts/Tools/which.bat -text
 Scripts/Tools/winver.bat -text
+Scripts/Tools/wkhtmltopdf/bin/wkhtmltopdf.exe -text
 Scripts/Tools/xcopy/__init__.bat -text
 Scripts/Tools/xcopy/convert_excludes_to_7zip.bat -text
 Scripts/Tools/xcopy/convert_excludes_to_robocopy.bat -text

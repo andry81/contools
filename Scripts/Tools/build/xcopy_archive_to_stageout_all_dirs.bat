@@ -57,11 +57,11 @@ if %F_ENABLE_STAGE_OUT_TO_ARCHIVE%0 EQU 0 (
 )
 
 if %F_ENABLE_STAGE_OUT_TO_ARCHIVE%0 EQU 0 (
-  call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "project binaries w/o debug information" "%%STAGE_NAME%%" ^
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "project binaries w/o debug information" "%%STAGE_NAME%%" ^
     "%%PROJECT_BIN_ROOT%%" "%%PROJECT_STAGE_BIN_ROOT%%" "*.*" "/E /Y /H" ^
     "%%PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST%%" || exit /b 1
 ) else (
-  call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "project binaries" "%%STAGE_NAME%%" ^
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "project binaries" "%%STAGE_NAME%%" ^
     "%%PROJECT_BIN_ROOT%%" "%%PROJECT_STAGE_BIN_ROOT%%" ^
     "" ^
     "%%PROJECT_STAGE_BIN_ROOT%%/%%PROJECT_NAME%%_bin_%%BUILD_SCM_BRANCH%%_%%PROJECT_TYPE%%_%%APP_TARGET_NAME%%_v%%PRODUCT_VERSION_FILE_SUFFIX%%.bin.7z" ^
@@ -72,21 +72,21 @@ if %F_ENABLE_STAGE_OUT_TO_ARCHIVE%0 EQU 0 (
 
 :PDB_STAGE
 if not exist "%PROJECT_BIN_ROOT%" goto PDB_STAGE_END
-call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "project debug information" "%%STAGE_NAME%%" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "project debug information" "%%STAGE_NAME%%" ^
   "%%PROJECT_BIN_ROOT%%" "%%PROJECT_STAGE_PDB_ROOT%%" ^
   "%%ARCHIVE_COPY_FROM_OFFSET%%" ^
   "%%PROJECT_STAGE_PDB_ROOT%%/%%PROJECT_NAME%%_pdb_%%BUILD_SCM_BRANCH%%_%%PROJECT_TYPE%%_%%APP_TARGET_NAME%%_v%%PRODUCT_VERSION_FILE_SUFFIX%%.pdb.7z" ^
   "*.pdb:*.ilk:*.map" "*.pdb.7z" "/S /Y /H" || exit /b 3
 
 if not exist "%PROJECT_PDB_ROOT%" goto PDB_STAGE_END
-call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "project debug information" "%%STAGE_NAME%%" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "project debug information" "%%STAGE_NAME%%" ^
   "%%PROJECT_PDB_ROOT%%" "%%PROJECT_STAGE_PDB_ROOT%%" "*.*" "/S /Y /H" || exit /b 4
 
 :PDB_STAGE_END
 
 :LIB_STAGE
 if not exist "%PROJECT_LIB_ROOT%" goto LIB_STAGE_END
-call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "project library" "%%STAGE_NAME%%" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "project library" "%%STAGE_NAME%%" ^
   "%%PROJECT_LIB_ROOT%%" "%%PROJECT_STAGE_LIB_ROOT%%" ^
   "%%ARCHIVE_COPY_FROM_OFFSET%%" ^
   "%%PROJECT_STAGE_LIB_ROOT%%/%%PROJECT_NAME%%_lib_%%BUILD_SCM_BRANCH%%_%%PROJECT_TYPE%%_%%APP_TARGET_NAME%%_v%%PRODUCT_VERSION_FILE_SUFFIX%%.lib.7z" ^
@@ -96,14 +96,14 @@ call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stage.bat" "project library" "%%STAG
 
 :GEN_STAGE
 if not exist "%PROJECT_GEN_ROOT%" goto GEN_STAGE_END
-call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "project generated" "%%STAGE_NAME%%" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "project generated" "%%STAGE_NAME%%" ^
   "%%PROJECT_GEN_ROOT%%" "%%PROJECT_STAGE_GEN_ROOT%%" "*.*" "/S /Y /H" || exit /b 6
 
 :GEN_STAGE_END
 
 :VAR_STAGE
 if not exist "%PROJECT_VAR_ROOT%" goto VAR_STAGE_END
-call "%%BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "project variables" "%%STAGE_NAME%%" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "project variables" "%%STAGE_NAME%%" ^
   "%%PROJECT_VAR_ROOT%%" "%%PROJECT_STAGE_VAR_ROOT%%" "*.*" "/S /Y /H" || exit /b 7
 
 :VAR_STAGE_END

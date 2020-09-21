@@ -88,5 +88,5 @@ for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set "F_ENABLE_" 2^>nul`) d
 exit /b 0
 
 :WRITE_VAR_FILE
-call "%%BUILD_TOOLS_ROOT%%/write_var_to_file.bat" %%* || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/write_var_to_file.bat" %%* || exit /b
 exit /b 0

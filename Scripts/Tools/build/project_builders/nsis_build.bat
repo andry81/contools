@@ -44,8 +44,8 @@ if not defined MAKENSIS_LOG_FILE_NAME (
 if defined BUILD_NEST_LVL set /A BUILD_NEST_LVL+=1
 if not defined BUILD_NEST_LVL set BUILD_NEST_LVL=1
 
-call "%%BUILD_TOOLS_ROOT%%/set_project_build_time.bat"
-call "%%BUILD_TOOLS_ROOT%%/env_generators\makensis_cmd_line.bat" "%%BUILD_CONFIG_ROOT%%" || exit /b 10
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/set_project_build_time.bat"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/env_generators\makensis_cmd_line.bat" "%%BUILD_CONFIG_ROOT%%" || exit /b 10
 
 if exist "%BUILD_SCRIPTS_ROOT%/pre_validate_vars.bat" (
   call "%%BUILD_SCRIPTS_ROOT%%/pre_validate_vars.bat" || exit /b 13

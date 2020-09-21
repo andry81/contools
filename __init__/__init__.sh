@@ -10,21 +10,19 @@ source "/bin/bash_entry" || exit $?
 [[ -z "$NEST_LVL" ]] && NEST_LVL=0
 
 tkl_normalize_path "$BASH_SOURCE_DIR/.." -a && \
-PROJECT_ROOT="$RETURN_VALUE"
+CONTOOLS_PROJECT_ROOT="$RETURN_VALUE"
 
-[[ -z "$LOCAL_CONFIG_DIR_NAME" ]] && LOCAL_CONFIG_DIR_NAME=config
-
-[[ -z "$CONTOOLS_ROOT" ]] && CONTOOLS_ROOT="$PROJECT_ROOT/Scripts/Tools"
-[[ -z "$UTILITIES_ROOT" ]] && UTILITIES_ROOT="$PROJECT_ROOT/Utilities"
-[[ -z "$UTILITY_ROOT" ]] && UTILITY_ROOT="$UTILITIES_ROOT/bin"
-[[ -z "$BUILD_TOOLS_ROOT" ]] && BUILD_TOOLS_ROOT="$CONTOOLS_ROOT/build"
-[[ -z "$GNUWIN32_ROOT" ]] && GNUWIN32_ROOT="$CONTOOLS_ROOT/gnuwin32"
-[[ -z "$SVNCMD_TOOLS_ROOT" ]] && SVNCMD_TOOLS_ROOT="$CONTOOLS_ROOT/scm/svn"
-[[ -z "$SQLITE_TOOLS_ROOT" ]] && SQLITE_TOOLS_ROOT="$CONTOOLS_ROOT/sqlite"
-[[ -z "$TESTLIB_ROOT" ]] && TESTLIB_ROOT="$CONTOOLS_ROOT/testlib"
-[[ -z "$XML_TOOLS_ROOT" ]] && XML_TOOLS_ROOT="$CONTOOLS_ROOT/xml"
-[[ -z "$HASHDEEP_ROOT" ]] && HASHDEEP_ROOT="$CONTOOLS_ROOT/hash/hashdeep"
-[[ -z "$VARS_ROOT" ]] && VARS_ROOT="$CONTOOLS_ROOT/vars"
+[[ -z "$CONTOOLS_ROOT" ]] &&                tkl_export CONTOOLS_ROOT                "$CONTOOLS_PROJECT_ROOT/Scripts/Tools"
+[[ -z "$CONTOOLS_UTILITIES_ROOT" ]] &&      tkl_export CONTOOLS_UTILITIES_ROOT      "$CONTOOLS_PROJECT_ROOT/Utilities"
+[[ -z "$CONTOOLS_UTILITY_ROOT" ]] &&        tkl_export CONTOOLS_UTILITY_ROOT        "$CONTOOLS_UTILITIES_ROOT/bin"
+[[ -z "$CONTOOLS_BUILD_TOOLS_ROOT" ]] &&    tkl_export CONTOOLS_BUILD_TOOLS_ROOT    "$CONTOOLS_ROOT/build"
+[[ -z "$CONTOOLS_GNUWIN32_ROOT" ]] &&       tkl_export CONTOOLS_GNUWIN32_ROOT       "$CONTOOLS_ROOT/gnuwin32"
+[[ -z "$SVNCMD_TOOLS_ROOT" ]] &&            tkl_export SVNCMD_TOOLS_ROOT            "$CONTOOLS_ROOT/scm/svn"
+[[ -z "$CONTOOLS_SQLITE_TOOLS_ROOT" ]] &&   tkl_export CONTOOLS_SQLITE_TOOLS_ROOT   "$CONTOOLS_ROOT/sqlite"
+[[ -z "$CONTOOLS_TESTLIB_ROOT" ]] &&        tkl_export CONTOOLS_TESTLIB_ROOT        "$CONTOOLS_ROOT/testlib"
+[[ -z "$CONTOOLS_XML_TOOLS_ROOT" ]] &&      tkl_export CONTOOLS_XML_TOOLS_ROOT      "$CONTOOLS_ROOT/xml"
+[[ -z "$CONTOOLS_HASHDEEP_ROOT" ]] &&       tkl_export CONTOOLS_HASHDEEP_ROOT       "$CONTOOLS_ROOT/hash/hashdeep"
+[[ -z "$CONTOOLS_VARS_ROOT" ]] &&           tkl_export CONTOOLS_VARS_ROOT           "$CONTOOLS_ROOT/vars"
 
 return 0
 

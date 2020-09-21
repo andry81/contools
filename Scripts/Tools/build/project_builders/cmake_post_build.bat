@@ -97,7 +97,7 @@ if exist "%BUILD_SCRIPTS_ROOT%/post_build.user.bat" (
   echo.
 )
 
-call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_from_stagein_all_dirs.bat" "../.." ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_archive_from_stagein_all_dirs.bat" "../.." ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
   "%%STAGE_IN.PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.GEN_DIR%%" ^
@@ -107,7 +107,7 @@ set "STAGE_BIN_EXCLUDES_FILE_LIST="
 set "STAGE_BIN_EXCLUDES_FILE=%BUILD_CONFIG_ROOT%\stage_bin_excludes.lst"
 if exist "%STAGE_BIN_EXCLUDES_FILE%" set "STAGE_BIN_EXCLUDES_FILE_LIST=@%STAGE_BIN_EXCLUDES_FILE%"
 
-call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stageout_all_dirs.bat" "stage" "../.." ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_archive_to_stageout_all_dirs.bat" "stage" "../.." ^
   "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.BIN_DIR%%" ^
   "%%PROJECT_STAGE_BUILD_ROOT.PDB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.PDB_DIR%%" ^
   "%%PROJECT_STAGE_BUILD_ROOT.LIB_DIR%%" "%%PROJECT_STAGE_POSTBUILD_ROOT.LIB_DIR%%" ^
@@ -118,7 +118,7 @@ call "%%BUILD_TOOLS_ROOT%%/xcopy_archive_to_stageout_all_dirs.bat" "stage" "../.
 rem saving data for next build step into stage directory
 echo.Exporting build variables into stage...
 if not exist "%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%" || exit /b 32 )
-call "%%BUILD_TOOLS_ROOT%%/export_build_vars.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%\post_build.vars" || exit /b 33
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/export_build_vars.bat" "%%PROJECT_STAGE_POSTBUILD_ROOT.VAR_DIR%%\post_build.vars" || exit /b 33
 echo.
 
 if defined PROJECT_LOCK_TOKEN (

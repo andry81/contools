@@ -20,10 +20,10 @@ goto X64
 
 :NOTX64
 rem WORKAROUND: The last slash must backward otherwise "Unknown algorithm" error will be thrown.
-"%HASHDEEP_ROOT%\hashdeep.exe" %*
+"%CONTOOLS_HASHDEEP_ROOT%\hashdeep.exe" %*
 
 :X64
 rem WORKAROUND: The last slash must backward otherwise "Unknown algorithm" error will be thrown.
-"%HASHDEEP_ROOT%\hashdeep64.exe" %*
+"%CONTOOLS_HASHDEEP_ROOT%\hashdeep64.exe" %*
 
 exit /b

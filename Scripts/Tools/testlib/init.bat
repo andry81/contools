@@ -85,14 +85,14 @@ if %TESTLIB__NEST_LVL%0 EQU 0 (
   if not exist "%TEST_SCRIPT_RETURN_VARS_DIR%\" mkdir "%TEST_SCRIPT_RETURN_VARS_DIR%"
   set TESTLIB__OVERALL_PASSED_TESTS=0
   set TESTLIB__OVERALL_TESTS=0
-) else call "%%TESTLIB_ROOT%%/load_locals.bat"
+) else call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat"
 
 set TESTLIB__CURRENT_PASSED_TESTS=0
 set TESTLIB__CURRENT_TESTS=0
 
 set /A TESTLIB__NEST_LVL%?5%=1
 
-call "%%TESTLIB_ROOT%%/save_locals.bat"
+call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
 
 rem return code from user test script
 set LASTERROR=0

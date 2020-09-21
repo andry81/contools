@@ -24,7 +24,7 @@ mkdir "%TEMP_EXTRACT_DIR_PATH%" || (
   exit /b 2
 ) >&2
 
-call "%%BUILD_TOOLS_ROOT%%/extract_files_from_archive.bat" "%%TEMP_EXTRACT_DIR_PATH%%" "%%FILE_PATH%%" "%%ARCHIVE_PATH%%" -y >nul || ( set LASTERROR=3 & goto EXIT )
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/extract_files_from_archive.bat" "%%TEMP_EXTRACT_DIR_PATH%%" "%%FILE_PATH%%" "%%ARCHIVE_PATH%%" -y >nul || ( set LASTERROR=3 & goto EXIT )
 
 call "%%CONTOOLS_ROOT%%/filesys/get_newest_file.bat" "%%TEMP_EXTRACT_DIR_PATH%%\%%FILE_PATH%%"
 
