@@ -208,6 +208,12 @@ set "REFERENCE_6_VALUE_9='	 '"
 call :TEST test_6_specific.vars TEST_6_VALUE_ REFERENCE_6_VALUE_  1 2 3 4 5 6 7 8 9
 endlocal
 
+setlocal
+set "TEST_7_VALUE_1=AAA"
+set "REFERENCE_7_VALUE_1=AAA"
+call :TEST test_7_once.vars TEST_7_VALUE_ REFERENCE_7_VALUE_  1
+endlocal
+
 echo.
 
 rem WARNING: must be called without the call prefix!

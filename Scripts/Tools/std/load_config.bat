@@ -164,6 +164,11 @@ if not defined __?VAR (
 
 if not defined __?VAR exit /b 1
 
+if not defined __?ATTR goto IGNORE_ATTR
+
+if not "%__?ATTR:once=%" == "%__?ATTR%" if defined %__?VAR% exit /b 1
+
+:IGNORE_ATTR
 if ^/ == ^%__?VALUE:~1,1%/ goto PREPARSE_VALUE
 if not ^/ == ^%__?VALUE:~0,1%/ goto PREPARSE_VALUE
 if not ^/ == ^%__?VALUE:~-1%/ goto PREPARSE_VALUE
@@ -306,6 +311,11 @@ if not defined __?VAR (
 
 if not defined __?VAR exit /b 1
 
+if not defined __?ATTR goto IGNORE_ATTR
+
+if not "%__?ATTR:once=%" == "%__?ATTR%" if defined %__?VAR% exit /b 1
+
+:IGNORE_ATTR
 if ^/ == ^%__?VALUE:~1,1%/ goto PREPARSE_VALUE
 if not ^/ == ^%__?VALUE:~0,1%/ goto PREPARSE_VALUE
 if not ^/ == ^%__?VALUE:~-1%/ goto PREPARSE_VALUE

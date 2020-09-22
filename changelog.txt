@@ -1,3 +1,7 @@
+2020.09.23:
+* new: Scripts/Tools/std: load_config.bat: `once` attribute to assign variable only once
+* new: Scripts/Tests/unit/batscripts: load_config.bat: `once` attribute test
+
 2020.09.21:
 * fixed: missed change
 * changed: project environment variables refactor
