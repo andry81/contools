@@ -203,6 +203,7 @@ Scripts/Tests/unit/batscripts/_testdata/test_std__load_config/test_3_substitutio
 Scripts/Tests/unit/batscripts/_testdata/test_std__load_config/test_4_escape.vars -text
 Scripts/Tests/unit/batscripts/_testdata/test_std__load_config/test_5_commentary.vars -text
 Scripts/Tests/unit/batscripts/_testdata/test_std__load_config/test_6_specific.vars -text
+Scripts/Tests/unit/batscripts/_testdata/test_std__load_config/test_7_once.vars -text
 Scripts/Tests/unit/batscripts/_testdata/test_xml__filter_xpath_list_by_xpath_list/01_empty/output.txt -text
 Scripts/Tests/unit/batscripts/_testdata/test_xml__filter_xpath_list_by_xpath_list/01_empty/xpath_filter.txt -text
 Scripts/Tests/unit/batscripts/_testdata/test_xml__filter_xpath_list_by_xpath_list/11_inexact/output.txt -text
