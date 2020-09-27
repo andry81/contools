@@ -1,47 +1,27 @@
 @echo off
 
-rem Drop last error level
-type nul>nul
-
-rem Create local variable's stack
 setlocal
 
-if 0%__CTRL_SETLOCAL% EQU 1 (
-  echo.%~nx0: error: cmd.exe is broken, please restart it!>&2
-  exit /b 65535
-)
-set __CTRL_SETLOCAL=1
-
 call "%%~dp0__init__.bat" || exit /b
-call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
+
+set "BEGIN_TIME=%TIME%"
 
 set __STRING__=a
-set STRING_LEN=1
+
+setlocal ENABLEDELAYEDEXPANSION
 
 for /L %%i in (1,1,13) do (
-  call :TEST
+  call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v
+
+  set __STRING__=!__STRING__!!__STRING__!
 )
 
-echo.
+endlocal
 
-rem WARNING: must be called without the call prefix!
-"%CONTOOLS_TESTLIB_ROOT%/exit.bat"
+call "%%CONTOOLS_ROOT%%/timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"
 
-rem no code can be executed here, just in case
-exit /b
+set /A TIME_SECS=%TIMEDIFF% / 1000
+set /A TIME_MSECS=%TIMEDIFF% %% 1000
+echo Time spent: %TIME_SECS%.%TIME_MSECS% secs
 
-:TEST
-call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
-
-setlocal EnableDelayedExpansion
-
-set __STRING__=!__STRING__!!__STRING__!
-set /A STRING_LEN*=2
-
-(
-  endlocal
-  set "__STRING__=%__STRING__%"
-  set "STRING_LEN=%STRING_LEN%"
-)
-
-exit /b
+exit /b 0

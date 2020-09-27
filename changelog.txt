@@ -1,3 +1,10 @@
+2020.09.28:
+* fixed: Scripts/Tests: `strlen.bat` script tests
+* fixed: Scripts/Tools: timestamp.bat: milliseconds miscalculation
+* changed: Scripts/Tools/std: strlen.bat: minor speed improvement
+* changed: Scripts/Tools/std: trim_var.bat: speed improvement
+* changed: Scripts/Tools/std: load_config: x2 speed improvement
+
 2020.09.23:
 * new: Scripts/Tools/std: load_config.bat: `once` attribute to assign variable only once
 * new: Scripts/Tests/unit/batscripts: load_config.bat: `once` attribute test

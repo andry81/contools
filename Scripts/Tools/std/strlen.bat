@@ -39,17 +39,12 @@ setlocal EnableDelayedExpansion
 
 if "%~1" == "/v" set "__STRING__=!%__STRING_VAR__%!"
 
+if not defined __STRING__ exit /b 0
 if "!__STRING__:~0,1!" == "" exit /b 0
-if "!__STRING__:~0,1!" == "~0,1" exit /b 0
 
 set __LEN__=0
 
-for %%i in (65536 32768 16384 8192 4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
-  if not "!__STRING__:~%%i,1!" == "" (
-    set /A "__LEN__+=%%i"
-    set "__STRING__=!__STRING__:~%%i!"
-  )
-)
+for %%i in (65536 32768 16384 8192 4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do if not "!__STRING__:~%%i,1!" == "" ( set /A "__LEN__+=%%i" & set "__STRING__=!__STRING__:~%%i!" )
 
 set /A __LEN__+=1
 

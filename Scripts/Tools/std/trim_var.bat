@@ -10,19 +10,11 @@ setlocal DISABLEDELAYEDEXPANSION
 rem Load and replace a value quote characters by the \x01 character.
 call set "RETURN_VALUE=%%%~1:"=%%"
 
-:TRIM_LEFT_LOOP
+call "%%~dp0.trim_var/trim_var.trim_value_left.bat" || exit /b
 if not defined RETURN_VALUE exit /b 0
-if not ^%RETURN_VALUE:~0,1%/ == ^ / if not ^%RETURN_VALUE:~0,1%/ == ^	/ goto TRIM_RIGHT_LOOP
-set "RETURN_VALUE=%RETURN_VALUE:~1%"
-goto TRIM_LEFT_LOOP
-
-:TRIM_RIGHT_LOOP
-if not ^%RETURN_VALUE:~-1%/ == ^ / if not ^%RETURN_VALUE:~-1%/ == ^	/ goto TRIM_RIGHT_LOOP_END
-set "RETURN_VALUE=%RETURN_VALUE:~0,-1%"
+call "%%~dp0.trim_var/trim_var.trim_value_right.bat" || exit /b
 if not defined RETURN_VALUE exit /b 0
-goto TRIM_RIGHT_LOOP
 
-:TRIM_RIGHT_LOOP_END
 rem recode quote and exclamation characters
 set "__ESC__=^"
 set __QUOT__=^"
