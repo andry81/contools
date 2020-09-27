@@ -136,7 +136,6 @@ Scripts/Config/msysdvlpr.vars -text
 Scripts/Config/tmpl/runas_admin.lnk.dat -text
 Scripts/TestScripts/genstrings.py -text
 Scripts/TestScripts/genstrings.tcl -text
-Scripts/Tests/bench/batscripts/.test_std__strlen/impl.bat -text
 Scripts/Tests/bench/batscripts/__init__.bat -text
 Scripts/Tests/bench/batscripts/__init__/__init__.bat -text
 Scripts/Tests/bench/batscripts/_testdata/test_std__load_config/config.system.vars -text
@@ -834,6 +833,15 @@ Scripts/Tools/sqlite/sqldiff.exe -text
 Scripts/Tools/sqlite/sqlite.bat -text
 Scripts/Tools/sqlite/sqlite3.exe -text
 Scripts/Tools/sqlite/sqlite3_analyzer.exe -text
+Scripts/Tools/std/.load_config/load_config.fast_parse.bat -text
+Scripts/Tools/std/.load_config/load_config.full_parse.bat -text
+Scripts/Tools/std/.load_config/load_config.full_parse.parse_value.bat -text
+Scripts/Tools/std/.load_config/load_config.trim_value_left.bat -text
+Scripts/Tools/std/.load_config/load_config.trim_value_right.bat -text
+Scripts/Tools/std/.load_config/load_config.trim_var_left.bat -text
+Scripts/Tools/std/.load_config/load_config.trim_var_right.bat -text
+Scripts/Tools/std/.trim_var/trim_var.trim_value_left.bat -text
+Scripts/Tools/std/.trim_var/trim_var.trim_value_right.bat -text
 Scripts/Tools/std/__init__.bat -text
 Scripts/Tools/std/allocate_temp_dir.bat -text
 Scripts/Tools/std/append_list_from_string.bat -text

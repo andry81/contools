@@ -45,6 +45,21 @@ call :TEST 1
 set "__STRING__="
 call :TEST 0
 
+rem overflow tests
+setlocal ENABLEDELAYEDEXPANSION
+
+set __STRING__=a
+set STRING_LEN=1
+
+for /L %%i in (1,1,13) do (
+  call :TEST "%%STRING_LEN%%"
+
+  set "__STRING__=!__STRING__!!__STRING__!"
+  set /A STRING_LEN*=2
+)
+
+endlocal
+
 echo.
 
 rem WARNING: must be called without the call prefix!
