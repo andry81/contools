@@ -6,6 +6,8 @@ rem
 
 setlocal
 
+call "%%~dp0__init__.bat" || exit /b
+
 set "INPUT_PATH_PTTN=%~1"
 set "OUTPUT_DIR=%~2"
 set "OUTPUT_EXT=%~3"
@@ -50,4 +52,4 @@ exit /b 0
 set "INPUT_FILE_PATH=%INPUT_DIR_PATH%%INPUT_FILE_NAME%"
 set "OUTPUT_FILE_PATH=%OUTPUT_DIR%\%~n1.%OUTPUT_EXT%"
 
-touch.exe /c /m /a /r "%INPUT_FILE_PATH%" "%OUTPUT_FILE_PATH%"
+"%CONTOOLS_UTILITIES_BIN_ROOT%/touch.exe" /c /m /a /r "%INPUT_FILE_PATH%" "%OUTPUT_FILE_PATH%"

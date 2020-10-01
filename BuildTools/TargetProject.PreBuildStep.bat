@@ -37,7 +37,7 @@ if defined THLIBAUTOCFG_CMD_LINE_FLAGS set "THLIBAUTOCFG_CMD_LINE=-%THLIBAUTOCFG
 
 if exist "%CONSOLE_HELP_FILE%.txt" (
   echo   "%CONSOLE_HELP_FILE%_inl.hpp"
-  call :CMD "%CONTOOLS_ROOT%/thlibautocfg.exe" -txt2c %THLIBAUTOCFG_CMD_LINE%"%CONSOLE_HELP_FILE%.txt" "%CONSOLE_HELP_FILE%_inl.hpp"
+  call :CMD "%CONTOOLS_UTILITIES_BIN_ROOT%/thlibautocfg.exe" -txt2c %THLIBAUTOCFG_CMD_LINE%"%CONSOLE_HELP_FILE%.txt" "%CONSOLE_HELP_FILE%_inl.hpp"
 )
 
 rem avoid output of this sequence: "error:"

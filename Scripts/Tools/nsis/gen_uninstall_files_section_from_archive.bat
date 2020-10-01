@@ -85,7 +85,7 @@ exit /b %LASTERROR%
 set ARCHIVE_LIST_FILTER=0
 set ARCHIVE_LIST_EOF=0
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_ROOT%/7zip/7za.exe" l "%ARCHIVE_FILE_PATH%"`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_UTILITIES_BIN_ROOT%/7zip/7za.exe" l "%ARCHIVE_FILE_PATH%"`) do (
   set "ARCHIVE_LIST_LINE=%%i"
   call :PROCESS_ARCHIVE_LIST_LINE || exit /b
   call :IS_ARCHIVE_LIST_EOF && goto PROCESS_ARCHIVE_FILE_IMPL_EXIT

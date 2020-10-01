@@ -65,4 +65,4 @@ set XSLT_FILE[0,1]=xml_to_xpath_leaf_list_no_props.xslt
 set XSLT_FILE[1,0]=xml_to_xpath_node_list.xslt
 set XSLT_FILE[1,1]=xml_to_xpath_node_list_no_props.xslt
 
-call "%%CONTOOLS_XML_TOOLS_ROOT%%/xml.exe" tr "%%CONTOOLS_XML_TOOLS_ROOT%%/xslt/%%XSLT_FILE[%FLAG_LNODES%,%FLAG_NOPROPS%]%%" "%%XML_FILE%%"
+call "%%CONTOOLS_UTILITIES_BIN_ROOT%%/xmlstarlet/xml.exe" tr "%%CONTOOLS_XML_TOOLS_ROOT%%/xslt/%%XSLT_FILE[%FLAG_LNODES%,%FLAG_NOPROPS%]%%" "%%XML_FILE%%"

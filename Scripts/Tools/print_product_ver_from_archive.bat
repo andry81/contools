@@ -25,7 +25,7 @@ mkdir "%TEMP_EXTRACT_DIR_PATH%" || (
 
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/extract_files_from_archive.bat" "%%TEMP_EXTRACT_DIR_PATH%%" "%%FILE_PATH%%" "%%ARCHIVE_PATH%%" -y >nul || ( set LASTERROR=3 & goto EXIT )
 
-"%CONTOOLS_ROOT%/sigcheck.exe" -n "%TEMP_EXTRACT_DIR_PATH%\%FILE_PATH%" 2>nul || ( set LASTERROR=0 & goto EXIT )
+"%CONTOOLS_UTILITIES_BIN_ROOT%/sigcheck.exe" -n "%TEMP_EXTRACT_DIR_PATH%\%FILE_PATH%" 2>nul || ( set LASTERROR=0 & goto EXIT )
 
 :EXIT
 rmdir /S /Q "%TEMP_EXTRACT_DIR_PATH%" 2>nul

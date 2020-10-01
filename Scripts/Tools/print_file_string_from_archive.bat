@@ -28,7 +28,7 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/extract_files_from_archive.bat" "%%TEMP_EXTR
 
 call "%%CONTOOLS_ROOT%%/filesys/get_newest_file.bat" "%%TEMP_EXTRACT_DIR_PATH%%\%%FILE_PATH%%"
 
-"%CONTOOLS_ROOT%/strings.exe" "%FOUND_PATH%" | findstr.exe "%STRING_PREFIX%"
+"%CONTOOLS_UTILITIES_BIN_ROOT%/sysinternals/strings.exe" "%FOUND_PATH%" | findstr.exe "%STRING_PREFIX%"
 
 :EXIT
 rmdir /S /Q "%TEMP_EXTRACT_DIR_PATH%" 2>nul
