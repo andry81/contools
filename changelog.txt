@@ -1,4 +1,7 @@
 2020.10.01:
+* changed: Scripts/Tools/ToolAdapters/totalcmd: directory moved into tacklebar project
+
+2020.10.01:
 * refactor: Scripts/Tools/ToolAdapters: minor init refactor
 
 2020.10.01:
