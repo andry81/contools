@@ -1,4 +1,7 @@
 2020.10.01:
+* refactor: Scripts/Tools/ToolAdapters: minor init refactor
+
+2020.10.01:
 * changed: Scripts/Build: minor changes
 * refactor: Scripts: moved all executables into Utilities directory
 
