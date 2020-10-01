@@ -7,7 +7,7 @@ call "%%CONTOOLS_ROOT%%/std/chcp.bat" 866
 
 if 0%SVNCMD_TOOLS_DEBUG_VERBOSITY_LVL% GEQ 1 (echo.^>^>%0 %*) >&3
 
-"%~dp0sqlite3.exe" %*
+"%CONTOOLS_UTILITIES_SQLITE_ROOT%/sqlite3.exe" %*
 set LASTERROR=%ERRORLEVEL%
 
 rem restore code page

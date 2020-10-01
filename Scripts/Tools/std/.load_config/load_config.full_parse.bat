@@ -89,6 +89,5 @@ set "__?NEXT_CHAR=" & set __?VALUE_CHAR_INDEX=-1 & set __?IS_SUBST_OPEN=0
 rem `$/<char>`, escape sequence does exist on a single line only
 set __?IS_PREV_CHAR_ESCAPED=0 & set __?IS_NEXT_CHAR_TO_ESCAPE=0 & set __?VALUE_FROM_INDEX=0 & set "__?VALUE_SUBSTED="
 
-:PARSE_VALUE_CHAR_LOOP
 call "%%~dp0load_config.full_parse.parse_value.bat"
 exit /b 0

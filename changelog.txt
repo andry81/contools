@@ -1,3 +1,7 @@
+2020.10.01:
+* changed: Scripts/Build: minor changes
+* refactor: Scripts: moved all executables into Utilities directory
+
 2020.09.28:
 * fixed: Scripts/Tests: `strlen.bat` script tests
 * fixed: Scripts/Tools: timestamp.bat: milliseconds miscalculation

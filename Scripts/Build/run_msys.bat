@@ -41,7 +41,7 @@ rem Save all variables to stack again
 setlocal
 
 :CHECK_CMD
-call "%%CONTOOLS_ROOT_NATIVE%%\isnativecmd.bat"
+call "%%CONTOOLS_ROOT%%/isnativecmd.bat"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Script doesn't support not native Command Interpreter.>&2
   exit /b 1
@@ -51,10 +51,10 @@ rem Check path to this script for invalid characters
 set "__STRING__=%~dp0"
 set __CHARS__= ^	-^"'`^?^*^&^|^<^>^(^)^^#%%!
 
-call "%%CONTOOLS_ROOT_NATIVE%%\strchr.bat" /v
+call "%%CONTOOLS_ROOT%%/strchr.bat" /v
 if not %ERRORLEVEL% GEQ 0 goto CHECK_MSYS_VARS
 
-call "%%CONTOOLS_ROOT_NATIVE%%\stresc.bat" /v __STRING__ STRING_ESCAPED __CHARS__ {EC} {#}
+call "%%CONTOOLS_ROOT%%/stresc.bat" /v __STRING__ STRING_ESCAPED __CHARS__ {EC} {#}
 call :cecho %%~nx0: {0C}error{#}: {0C}Path to the script has incorrect characters{#}: ^^^"%%STRING_ESCAPED%%^".>&2
 exit /b 2
 
@@ -149,10 +149,10 @@ exit /b 0
 
 :CLEAN_AND_RESET_ENV_AND_CALL1
 rem Read windows version
-call "%%CONTOOLS_ROOT_NATIVE%%\winver.bat"
+call "%%CONTOOLS_ROOT%%/winver.bat"
 
 rem Reset environment
-call "%%CONTOOLS_ROOT_NATIVE%%\setvarfromstd.bat" "%%CONTOOLS_ROOT%%\splitvars.bat" "%%WINVER_VALUE%%" "|" "-s"
+call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" "%%CONTOOLS_ROOT%%\splitvars.bat" "%%WINVER_VALUE%%" "|" "-s"
 if "%STDOUT_VALUE%" == "Windows2000" goto :CLEAN_AND_RESET_ENV_AND_CALL_WIN2K
 if "%STDOUT_VALUE%" == "WindowsXP" goto :CLEAN_AND_RESET_ENV_AND_CALL_WINXP
 if "%STDOUT_VALUE%" == "WindowsVista" goto :CLEAN_AND_RESET_ENV_AND_CALL_WINVISTA
@@ -225,7 +225,7 @@ exit /b
 :RESET_ENV_AND_CALL
 rem Reset environment
 echo %~nx0: Resetting environment to defaults...
-call "%%CONTOOLS_ROOT_NATIVE%%\resetenv.bat" -p -e "%%~3\env\%%~1"
+call "%%CONTOOLS_ROOT%%/resetenv.bat" -p -e "%%~3\env\%%~1"
 
 rem Return variables
 set "OLDPATH=%PATH%"
@@ -254,8 +254,8 @@ rem Environment will be restored automatically here
 exit /b
 
 :cecho
-if exist "%CONTOOLS_ROOT_NATIVE%\cecho.exe" (
-  "%CONTOOLS_ROOT_NATIVE%\cecho.exe" %*{#}{\n}
+if exist "%CONTOOLS_UTILITIES_BIN_ROOT%/cecho.exe" (
+  "%CONTOOLS_UTILITIES_BIN_ROOT%/cecho.exe" %*{#}{\n}
 ) else (
   echo.%*
 )
