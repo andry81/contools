@@ -1,3 +1,7 @@
+2020.10.05:
+* fixed: Scripts/Tools/std: load_config.bat: invalid multiple sttribute variable parse
+* new: Scripts/Tests/unit/batscripts: load_config.bat: variable multiple attribute tests
+
 2020.10.01:
 * changed: Scripts/Tools/ToolAdapters/totalcmd: directory moved into tacklebar project
 

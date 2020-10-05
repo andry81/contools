@@ -209,9 +209,13 @@ call :TEST test_6_specific.vars TEST_6_VALUE_ REFERENCE_6_VALUE_  1 2 3 4 5 6 7 
 endlocal
 
 setlocal
-set "TEST_7_VALUE_1=AAA"
-set "REFERENCE_7_VALUE_1=AAA"
-call :TEST test_7_once.vars TEST_7_VALUE_ REFERENCE_7_VALUE_  1
+set "TEST_7_VALUE_1=XXX"
+set "TEST_7_VALUE_3=XXX"
+set "REFERENCE_7_VALUE_1=XXX"
+set "REFERENCE_7_VALUE_2=BBB"
+set "REFERENCE_7_VALUE_3=XXX"
+set "REFERENCE_7_VALUE_4=DDD"
+call :TEST test_7_once.vars TEST_7_VALUE_ REFERENCE_7_VALUE_  1 2 3 4
 endlocal
 
 echo.

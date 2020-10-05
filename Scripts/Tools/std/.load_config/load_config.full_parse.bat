@@ -54,12 +54,14 @@ if not defined __?VAR exit /b 1
 
 if defined __?PLATFORM if not "%__?PLATFORM%" == "BAT" if not "%__?PLATFORM%" == "WIN" if not "%__?PLATFORM%" == "OSWIN" exit /b 1
 
-for /F "eol=# tokens=1,* delims=	 " %%i in ("%__?VAR%") do ( set "__?ATTR=%%i" & set "__?VAR=%%j" )
+set "__?ATTR="
 
-if not defined __?VAR ( set "__?VAR=%__?ATTR%" & set "__?ATTR=" )
+for /F "eol=# tokens=1,* delims=	 " %%i in ("%__?VAR%") do ( if "%%j" == "" goto ATTR_PARSE_END ) & ( if defined __?ATTR ( call set "__?ATTR=%%__?ATTR%% %%%%i" ) else set "__?ATTR=%%i" ) & set "__?VAR=%%j"
+for /F "eol= tokens=1,* delims=	 " %%i in ("%__?VAR%") do ( if "%%j" == "" goto ATTR_PARSE_END ) & ( if defined __?ATTR ( call set "__?ATTR=%%__?ATTR%% %%%%i" ) else set "__?ATTR=%%i" ) & set "__?VAR=%%j"
+for /F "eol= tokens=1,* delims=	 " %%i in ("%__?VAR%") do ( if "%%j" == "" goto ATTR_PARSE_END ) & ( if defined __?ATTR ( call set "__?ATTR=%%__?ATTR%% %%%%i" ) else set "__?ATTR=%%i" ) & set "__?VAR=%%j"
+for /F "eol= tokens=1,* delims=	 " %%i in ("%__?VAR%") do ( if "%%j" == "" goto ATTR_PARSE_END ) & ( if defined __?ATTR ( call set "__?ATTR=%%__?ATTR%% %%%%i" ) else set "__?ATTR=%%i" ) & set "__?VAR=%%j"
 
-if not defined __?VAR exit /b 1
-
+:ATTR_PARSE_END
 if not defined __?ATTR goto IGNORE_ATTR
 
 if not "%__?ATTR:once=%" == "%__?ATTR%" if defined %__?VAR% exit /b 1
