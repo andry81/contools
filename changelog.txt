@@ -1,3 +1,6 @@
+2020.10.07:
+* fixed: Scripts/Tools/xcopy: convert_excludes_to_robocopy.bat: invalid robocopy exclude flags
+
 2020.10.05:
 * fixed: Scripts/Tools/std: load_config.bat: invalid multiple sttribute variable parse
 * new: Scripts/Tests/unit/batscripts: load_config.bat: variable multiple attribute tests
