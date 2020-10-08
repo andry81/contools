@@ -1,3 +1,6 @@
+2020.10.08:
+* fixed: Scripts/Tools/filesys: missed change
+
 2020.10.07:
 * fixed: Scripts/Tools/xcopy: convert_excludes_to_robocopy.bat: invalid robocopy exclude flags
 
