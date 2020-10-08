@@ -503,6 +503,7 @@ Scripts/Tools/expandvarx.bat -text
 Scripts/Tools/expandvarxn.bat -text
 Scripts/Tools/extract_version.bat -text
 Scripts/Tools/filelib.sh -text
+Scripts/Tools/filesys/__init__.bat -text
 Scripts/Tools/filesys/get_base_dir_name.bat -text
 Scripts/Tools/filesys/get_newest_file.bat -text
 Scripts/Tools/filesys/get_shared_path.bat -text
