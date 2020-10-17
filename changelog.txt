@@ -1,4 +1,7 @@
 2020.10.17:
+* changed: Scripts/Tools/std: xcopy*: removed wait timeout in case of robocopy usage
+
+2020.10.17:
 * fixed: Scripts/Tools/std: xcopy*: workaround to the robocopy utility which ignores read only files on the DVD-ROM drive if set `/IA:AH` instead of `/IA:RAH` (issue of the robocopy), always use a full set of file flags to fix that (`/IA:RASHCNETO`)
 
 2020.10.08:
