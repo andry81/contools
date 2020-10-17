@@ -18,7 +18,34 @@ echo.^>%~nx0 %*
 
 setlocal
 
-set "?~n0=%~nx0"
+set "?~dp0=%~dp0"
+set "?~n0=%~n0"
+set "?~nx0=%~nx0"
+
+rem script flags
+set FLAG_USE_XCOPY=0
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-use_xcopy" (
+    set FLAG_USE_XCOPY=1
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
+
+  shift
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
 
 set "FROM_PATH=%~1"
 set "TO_PATH=%~2"
@@ -104,8 +131,10 @@ set "FROM_PATH=%~dpf1"
 set "TO_PATH=%~dpf2"
 set XCOPY_FLAGS=%3 %4 %5 %6 %7 %8 %9
 
+if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
 if exist "%WINDIR%\system32\robocopy.exe" goto USE_ROBOCOPY
 
+:USE_XCOPY
 rem switch code page into english compatible locale
 call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
 set RESTORE_LOCALE=1
@@ -127,6 +156,7 @@ if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%
 :IGNORE_XCOPY_EXCLUDES
 
 rem echo.D will ONLY work if locale is compatible with english !!!
+echo.^>^>xcopy.exe "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 echo.D|xcopy.exe "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
 set LASTERROR=%ERRORLEVEL%
 

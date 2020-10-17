@@ -1,4 +1,8 @@
 2020.10.17:
+* fixed: Scripts/Tools/std: xcopy*: missed xcopy command line print
+* new: Scripts/Tools/std: xcopy*: `-use_xcopy` flag to use xcopy explicitly
+
+2020.10.17:
 * changed: Scripts/Tools/std: xcopy*: removed wait timeout in case of robocopy usage
 
 2020.10.17:
