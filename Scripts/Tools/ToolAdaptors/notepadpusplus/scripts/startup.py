@@ -19,4 +19,4 @@ else:
 setattr(npplib, 'notepad', notepad)
 
 # execute
-npplib.reopen_all_files()
+npplib.process_extra_command_line()
