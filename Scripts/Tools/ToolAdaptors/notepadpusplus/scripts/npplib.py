@@ -90,6 +90,8 @@ def process_extra_command_line(open_file_list_from_command_line = True):
       next_arg_is_file_list_path = False
 
   if open_from_file_list_path:
+    print('--open_from_file_list:')
+
     with open(open_from_file_list_path, 'rb') as file_list: # CAUTION: binary mode is required to correctly decode string into `utf-8` below
       file_content = file_list.read()
 
@@ -127,7 +129,7 @@ def process_extra_command_line(open_file_list_from_command_line = True):
 
   else:
     if open_file_list_from_command_line:
-      print('error: file list path is not defined')
+      print('* error: file list path is not defined')
 
   print()
 
