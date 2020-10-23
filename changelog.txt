@@ -1,3 +1,7 @@
+2020.10.24:
+* new: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: `process_extra_command_line` to directly open file list or reopen all opened files using notepad++ extra command line
+* changed: Scripts/Tools/ToolAdapters/notepadplusplus: startup.py: use `process_extra_command_line` function by default instead of the `reopen_all_files` function
+
 2020.10.23:
 * refactor: minor refactor
 
