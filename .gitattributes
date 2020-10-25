@@ -736,6 +736,7 @@ Utilities/bin/printf.exe -text
 Utilities/bin/pstools/Eula.txt -text
 Utilities/bin/pstools/Handle.exe -text
 Utilities/bin/retakeowner.exe -text
+Utilities/bin/ritchielawrence/mtee.exe -text
 Utilities/bin/sigcheck.exe -text
 Utilities/bin/sqlite/sqldiff.exe -text
 Utilities/bin/sqlite/sqlite3.exe -text

@@ -12,11 +12,14 @@ if %NEST_LVL%0 EQU 0 set WITH_LOGGING=1
 
 if %WITH_LOGGING% EQU 0 goto IMPL
 
-if not exist "%CONFIGURE_DIR%\.log" mkdir "%CONFIGURE_DIR%\.log"
-
 rem use stdout/stderr redirection with logging
 call "%%CONTOOLS_ROOT%%\std\get_wmic_local_datetime.bat"
 set "LOG_FILE_NAME_SUFFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
+
+set "PROJECT_LOG_DIR=%PROJECT_LOG_ROOT%/%LOG_FILE_NAME_SUFFIX%.%~n0"
+set "PROJECT_LOG_FILE=%PROJECT_LOG_DIR%/%LOG_FILE_NAME_SUFFIX%.%~n0.log"
+
+if not exist "%PROJECT_LOG_DIR%" ( mkdir "%PROJECT_LOG_DIR%" || exit /b )
 
 set IMPL_MODE=1
 rem CAUTION:
@@ -28,7 +31,7 @@ rem   https://stackoverflow.com/questions/9878007/why-doesnt-my-stderr-redirecti
 rem   A partial analisis:
 rem   https://www.dostips.com/forum/viewtopic.php?p=14612#p14612
 rem
-"%COMSPEC%" /C call %0 %* 2>&1 | "%CONTOOLS_UTILITIES_BIN_ROOT%\unxutils\tee.exe" "%CONFIGURE_DIR%\.log\%LOG_FILE_NAME_SUFFIX%.%~nx0.log"
+"%COMSPEC%" /C call %0 %* 2>&1 | "%CONTOOLS_UTILITIES_BIN_ROOT%/ritchielawrence/mtee.exe" /E "%PROJECT_LOG_FILE:/=\%"
 exit /b
 
 :IMPL
@@ -75,4 +78,4 @@ if defined FLAG (
 set "FROM_PAGE=%~1"
 set "TO_PAGE=%~2"
 
-call "%%DOWNLOAD_TOOLS_ROOT%%\download_url_to_html.bat"%%BARE_FLAGS%% "domain/url-{PAGENUM}" "%%FROM_PAGE%%" "%%TO_PAGE%%" "file #{PAGENUM}.html"
+call "%%CONTOOLS_DOWNLOAD_TOOLS_ROOT%%\download_url_to_html.bat"%%BARE_FLAGS%% "domain/url-{PAGENUM}" "%%FROM_PAGE%%" "%%TO_PAGE%%" "file #{PAGENUM}.html"

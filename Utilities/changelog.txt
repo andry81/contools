@@ -1,3 +1,6 @@
+2020.10.25:
+* new: ritchielawrence tee implementation (mtee)
+
 2020.02.09:
 * fixed: wxwidgets build fixup
 * new: wxFileDialog: added support a directory selection
