@@ -28,11 +28,14 @@ if %NEST_LVL%0 EQU 0 set WITH_LOGGING=1
 
 if %WITH_LOGGING% EQU 0 goto IMPL
 
-if not exist "%PROJECT_ROOT%\.log" mkdir "%PROJECT_ROOT%\.log"
-
 rem use stdout/stderr redirection with logging
 call "%%CONTOOLS_ROOT%%\get_wmic_local_datetime.bat"
 set "LOG_FILE_NAME_SUFFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
+
+set "PROJECT_LOG_DIR=%PROJECT_LOG_ROOT%/%LOG_FILE_NAME_SUFFIX%.%~n0"
+set "PROJECT_LOG_FILE=%PROJECT_LOG_DIR%/%LOG_FILE_NAME_SUFFIX%.%~n0.log"
+
+if not exist "%PROJECT_LOG_DIR%" ( mkdir "%PROJECT_LOG_DIR%" || exit /b )
 
 set IMPL_MODE=1
 rem CAUTION:
@@ -44,7 +47,7 @@ rem   https://stackoverflow.com/questions/9878007/why-doesnt-my-stderr-redirecti
 rem   A partial analisis:
 rem   https://www.dostips.com/forum/viewtopic.php?p=14612#p14612
 rem
-"%COMSPEC%" /C call %0 %* 2>&1 | "%CONTOOLS_UTILITIES_BIN_ROOT%\unxutils\tee.exe" "%PROJECT_ROOT%\.log\%LOG_FILE_NAME_SUFFIX%.%~nx0.log"
+"%COMSPEC%" /C call %0 %* 2>&1 | "%CONTOOLS_UTILITIES_BIN_ROOT%/ritchielawrence/mtee.exe" /E "%PROJECT_LOG_FILE:/=\%"
 exit /b
 
 :IMPL

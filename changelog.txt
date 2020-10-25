@@ -1,4 +1,7 @@
 2020.10.25:
+* changed: switched rest of scripts to ritchielawrence tee implementation
+
+2020.10.25:
 * new: Utilities: ritchielawrence tee implementation (mtee)
 * changed: Scripts/Tools/ToolAdapters/download: switched to ritchielawrence tee implementation
 
