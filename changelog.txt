@@ -1,3 +1,6 @@
+2020.10.28:
+* changed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: implemented builtin flags parse to be able to preprocess a command line before execute it, all flags must be at the beginning of a command line (`-E` - expand command line, `-nowait` - doesn't wait execution completion, `-nowindow` - doesn't show a console window)
+
 2020.10.25:
 * changed: switched rest of scripts to ritchielawrence tee implementation
 

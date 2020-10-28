@@ -351,9 +351,6 @@ Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_cmd_to_run_notepad_and_wait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_notepad_and_wait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/call.vbs -text
-Scripts/Tools/ToolAdaptors/vbs/call_nowait.vbs -text
-Scripts/Tools/ToolAdaptors/vbs/call_nowindow.vbs -text
-Scripts/Tools/ToolAdaptors/vbs/call_nowindow_nowait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/make_sys_shortcut.bat -text
