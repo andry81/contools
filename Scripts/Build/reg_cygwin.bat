@@ -142,7 +142,7 @@ if "%CYGWIN_REGKEY_PATH:~-1%" == "\" set "CYGWIN_REGKEY_PATH=%CYGWIN_REGKEY_PATH
 if "%~1" == "-r" call :REMOUNT_CYGWIN
 
 rem For cygwin versions 1.6.x and older test if cygwin at least was installed.
-call "%%CONTOOLS_ROOT%%/regquery.bat" "%%CYGWIN_REGKEY_PATH%%\/" "native"
+call "%%CONTOOLS_ROOT%%/registry/regquery.bat" "%%CYGWIN_REGKEY_PATH%%\/" "native"
 if %ERRORLEVEL% NEQ 0 (
   call :cecho %%~nx0: {0C}error{#}: ^^^(%%ERRORLEVEL%%^^^) {0C}Cygwin was not installed properly or registry key not found.>&2
   exit /b 9
