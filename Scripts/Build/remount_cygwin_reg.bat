@@ -105,7 +105,7 @@ rem remove back slash
 if "%CYGWIN_REGKEY_PATH:~-1%" == "\" set "CYGWIN_REGKEY_PATH=%CYGWIN_REGKEY_PATH:~0,-1%"
 
 rem For cygwin versions 1.6.x and older test if cygwin at least was installed.
-call "%%CONTOOLS_ROOT%%\regquery.bat" "%%CYGWIN_REGKEY_PATH%%\/" "native"
+call "%%CONTOOLS_ROOT%%/registry/regquery.bat" "%%CYGWIN_REGKEY_PATH%%\/" "native"
 if %ERRORLEVEL% NEQ 0 (
   echo %~nx0: error: ^(%ERRORLEVEL%^) Cygwin was not installed properly or registry key not found.>&2
   exit /b 9
@@ -129,7 +129,7 @@ set __REMOUNTED_PATHS=0
 
 echo Remounting Cygwin installation...
 rem Read each subkey of registry key and process it.
-for /F "usebackq eol= tokens=*" %%i in (`call "%%CONTOOLS_ROOT%%\regenum.bat" "%%CYGWIN_REGKEY_PATH%%\"`) do (
+for /F "usebackq eol= tokens=*" %%i in (`call "%%CONTOOLS_ROOT%%/registry/regenum.bat" "%%CYGWIN_REGKEY_PATH%%\"`) do (
   if not "%%i" == "" (
     call :PROCESS_CYGWIN_MOUNT_REGKEY "%%i"
   )
@@ -147,7 +147,7 @@ if not defined __VALUE exit /b
 if "%__VALUE%" == "~%__CYGWIN_REGKEY_PATH_LEN%" exit /b
 
 set /A __OVERALL_PATHS+=1
-call "%%CONTOOLS_ROOT%%\regquery.bat" "%%CYGWIN_REGKEY_PATH%%\%%__VALUE%%" "native"
+call "%%CONTOOLS_ROOT%%/registry/regquery.bat" "%%CYGWIN_REGKEY_PATH%%\%%__VALUE%%" "native"
 rem Ignore empty mounts.
 if %ERRORLEVEL% NEQ 0 exit /b
 

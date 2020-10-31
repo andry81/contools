@@ -563,9 +563,9 @@ Scripts/Tools/pyxvcs/__init__.bat -text
 Scripts/Tools/pyxvcs/cmdop.py.bat -text
 Scripts/Tools/pyxvcs/configure.py.bat -text
 Scripts/Tools/query_session_id.bat -text
-Scripts/Tools/regenum.bat -text
 Scripts/Tools/regexplib.sh -text
-Scripts/Tools/regquery.bat -text
+Scripts/Tools/registry/regenum.bat -text
+Scripts/Tools/registry/regquery.bat -text
 Scripts/Tools/resetenv.bat -text
 Scripts/Tools/sar.pl -text
 Scripts/Tools/sarf.js -text
