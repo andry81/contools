@@ -1,3 +1,6 @@
+2020.10.01:
+*changed: Scripts/Tools/ToolAdaptors/ffmpeg: code cleanup
+
 2020.10.31:
 * refactor: Scripts/Tools: moved registry scripts into `registry` subdirectory
 
