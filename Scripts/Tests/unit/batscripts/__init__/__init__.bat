@@ -1,5 +1,7 @@
 @echo off
 
+if defined CONTOOLS_PROJECT_ROOT_INIT0_DIR exit /b 0
+
 set LASTERRORLEVEL=0
 
 rem init script search logic
