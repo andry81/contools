@@ -1,5 +1,7 @@
 @echo off
 
+if defined CONTOOLS_PROJECT_ROOT_INIT0_DIR goto INIT
+
 set LASTERRORLEVEL=0
 
 rem init script search logic
@@ -20,7 +22,7 @@ set "LASTERRORLEVEL="
 
 call :INIT
 
-exit /b 255
+exit /b
 
 :INCLUDE
 call :HAS_RECURSION "%%~1\%%~2" && exit /b 1
