@@ -6,13 +6,18 @@ def toggle_readonly_flag_for_all_tabs():
   all_files = notepad.getFiles()
   active_file = notepad.getCurrentFilename()
 
+  num_toggled = 0
+
   for f in reversed(all_files):
+    print("  - {}".format(f))
     notepad.activateFile(f[0])
     notepad.menuCommand(MENUCOMMAND.EDIT_SETREADONLY)
-    print("  - {}".format(f))
+    num_toggled += 1
 
   notepad.activateFile(active_file)
 
+  print()
+  print('* Number of toggled paths: '+ str(num_toggled))
   print()
 
 def clear_readonly_flag_from_all_files():
@@ -21,13 +26,18 @@ def clear_readonly_flag_from_all_files():
   all_files = notepad.getFiles()
   active_file = notepad.getCurrentFilename()
 
+  num_cleared = 0
+
   for f in reversed(all_files):
+    print("  - {}".format(f))
     notepad.activateFile(f[0])
     notepad.menuCommand(MENUCOMMAND.EDIT_CLEARREADONLY)
-    print("  - {}".format(f))
+    num_cleared += 1
 
   notepad.activateFile(active_file)
 
+  print()
+  print('* Number of cleared paths: ' + str(num_cleared))
   print()
 
 def reopen_all_files():
@@ -39,9 +49,12 @@ def reopen_all_files():
   notepad.saveAllFiles()
   notepad.closeAll()
 
+  num_reopened = 0
+
   for f in all_files:
-    notepad.open(f[0])
     print("  - {}".format(f[0]))
+    notepad.open(f[0])
+    num_reopened += 1
 
   # reactive in reverse order
   for f in reversed(all_files):
@@ -49,6 +62,8 @@ def reopen_all_files():
 
   notepad.activateFile(active_file)
 
+  print()
+  print('* Number of reopened paths: ' + str(num_reopened))
   print()
 
 def process_extra_command_line(open_file_list_from_command_line = True):
@@ -89,6 +104,8 @@ def process_extra_command_line(open_file_list_from_command_line = True):
       open_from_file_list_path = str(arg)
       next_arg_is_file_list_path = False
 
+  num_opened = 0
+
   if open_from_file_list_path:
     print('--open_from_file_list:')
 
@@ -126,11 +143,14 @@ def process_extra_command_line(open_file_list_from_command_line = True):
           file_path = file_path.encode('utf-8', errors='ignore')
         print("  - {}".format(file_path))
         notepad.open(file_path)
+        num_opened += 1
 
   else:
     if open_file_list_from_command_line:
       print('* error: file list path is not defined')
 
+  print()
+  print('* Number of opened paths: ' + str(num_opened))
   print()
 
   if do_reopen_all_files:
@@ -139,6 +159,13 @@ def process_extra_command_line(open_file_list_from_command_line = True):
 def open_from_file_list(file_list):
   print('open_from_file_list:')
 
+  num_opened = 0
+
   for file in file_list:
     print("  - {}".format(file))
     notepad.open(file)
+    num_opened += 1
+
+  print()
+  print('* Number of opened paths: ' + str(num_opened))
+  print()
