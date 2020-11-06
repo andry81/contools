@@ -6,19 +6,23 @@ Dim NoWindow
 
 ExpectFlags = True
 ExpandArgs = False
+AlwaysQuote = False
 NoWait = False
 NoWindow = False
 
 Set objShell = WScript.CreateObject("WScript.Shell")
 
+Dim arg
 Dim j
 j = 0
 
 For i = 0 To WScript.Arguments.Count-1
   If ExpectFlags Then
     If Mid(WScript.Arguments(i), 1, 1) = "-" Then
-      If WScript.Arguments(i) = "-E" Then
+      If WScript.Arguments(i) = "-E" Then ' Expand environment variables
         ExpandArgs = True
+      ElseIf WScript.Arguments(i) = "-q" Then ' Always quote arguments (if already has no quote characters)
+        AlwaysQuote = True
       ElseIf WScript.Arguments(i) = "-nowait" Then
         NoWait = True
       ElseIf WScript.Arguments(i) = "-nowindow" Then
@@ -31,16 +35,26 @@ For i = 0 To WScript.Arguments.Count-1
 
   If Not ExpectFlags Then
     If Not ExpandArgs Then
-      If InStr(WScript.Arguments(i), Chr(34)) = 0 Then
-        args(j) = Chr(34) & WScript.Arguments(i) & Chr(34)
+      arg = WScript.Arguments(i)
+      If InStr(arg, Chr(34)) = 0 Then
+        If AlwaysQuote Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
+          args(j) = Chr(34) & arg & Chr(34)
+        Else
+          args(j) = arg
+        End If
       Else
-        args(j) = WScript.Arguments(i)
+        args(j) = arg
       End If
     Else
-      If InStr(WScript.Arguments(i), Chr(34)) = 0 Then
-        args(j) = Chr(34) & objShell.ExpandEnvironmentStrings(WScript.Arguments(i)) & Chr(34)
+      arg = objShell.ExpandEnvironmentStrings(WScript.Arguments(i))
+      If InStr(arg, Chr(34)) = 0 Then
+        If AlwaysQuote Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
+          args(j) = Chr(34) & arg & Chr(34)
+        Else
+          args(j) = arg
+        End If
       Else
-        args(j) = objShell.ExpandEnvironmentStrings(WScript.Arguments(i))
+        args(j) = arg
       End If
     End If
     j = j + 1
