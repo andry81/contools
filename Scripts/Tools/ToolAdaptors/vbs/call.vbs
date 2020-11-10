@@ -37,7 +37,7 @@ For i = 0 To WScript.Arguments.Count-1
     If Not ExpandArgs Then
       arg = WScript.Arguments(i)
       If InStr(arg, Chr(34)) = 0 Then
-        If AlwaysQuote Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
+        If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
           args(j) = Chr(34) & arg & Chr(34)
         Else
           args(j) = arg
@@ -48,7 +48,7 @@ For i = 0 To WScript.Arguments.Count-1
     Else
       arg = objShell.ExpandEnvironmentStrings(WScript.Arguments(i))
       If InStr(arg, Chr(34)) = 0 Then
-        If AlwaysQuote Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
+        If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
           args(j) = Chr(34) & arg & Chr(34)
         Else
           args(j) = arg

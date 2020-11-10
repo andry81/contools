@@ -1,3 +1,6 @@
+2020.11.10:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: missed to process empty arguments
+
 2020.11.06:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: check before a variable expansion (must be after)
 * changed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: removed arguments quoting by default, added the `-q` flag to enable it explicitly
