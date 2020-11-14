@@ -1,3 +1,6 @@
+2020.11.15:
+* new: Scripts/Tools/ToolAdaptors/vbs: call.bat: wrapper script to call the `call.vbs` script from the cmd.exe shell with completion await
+
 2020.11.10:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: missed to process empty arguments
 
