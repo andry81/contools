@@ -138,20 +138,21 @@ goto TO_PATH_OK
 
 :TO_PATH_OK
 
-if not exist "%FROM_PATH%\" (
+set "FROM_PATH_ABS=%~f1"
+set "TO_PATH_ABS=%~f3"
+
+if not exist "\\?\%FROM_PATH_ABS%\" (
   echo.%?~n0%: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -249
 ) >&2
 
-if not exist "%TO_PATH%\" (
+if not exist "\\?\%TO_PATH_ABS%\" (
   echo.%?~n0%: error: output directory does not exist: "%TO_PATH%\"
   exit /b -248
 ) >&2
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "FROM_PATH_ABS=%~dpf1"
-set "TO_PATH_ABS=%~dpf3"
 set XCOPY_FLAGS=%4 %5 %6 %7 %8 %9
 
 if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
