@@ -129,20 +129,20 @@ goto TO_FILE_OK
 
 :TO_FILE_OK
 
-if not exist "%FROM_PATH%\" (
+set "FROM_ROOT=%~f1"
+set "TO_ROOT=%~f2"
+
+if not exist "\\?\%FROM_ROOT%\" (
   echo.%~nx0: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -246
 ) >&2
 
-if not exist "%TO_PATH%\" (
+if not exist "\\?\%TO_ROOT%\" (
   echo.%~nx0: error: output directory does not exist: "%TO_PATH%\"
   exit /b -245
 ) >&2
 
 call "%%~dp0__init__.bat" || exit /b
-
-set "FROM_ROOT=%~dpf1"
-set "TO_ROOT=%~dpf2"
 
 if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
   ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^

@@ -1,3 +1,6 @@
+2020.11.20:
+* fixed: Scripts/Tools/std: xcopy*: long 260+ path issue
+
 2020.11.15:
 * new: Scripts/Tools/ToolAdaptors/vbs: call.bat: wrapper script to call the `call.vbs` script from the cmd.exe shell with completion await
 
