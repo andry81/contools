@@ -1,4 +1,5 @@
 * text=auto !eol
+.github/FUNDING.yml -text
 /.svnignore -text
 /01_preconfigure.bat -text
 /01_preconfigure.sh -text
