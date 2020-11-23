@@ -1,4 +1,8 @@
 2020.11.23:
+* fixed: Scripts/Tools/registry: rare case where `(` character in a key string value stops parsing
+* refactor: Scripts/Tools/registry: minor refactor
+
+2020.11.23:
 * changed: Scripts/Tools/std: allocate_temp_dir.bat: always normalize `SCRIPT_TEMP_ROOT_DIR` variable value to an absolute path
 * changed: Scripts/Tools/std: allocate_temp_dir.bat: support for the long 260+ path characters issue
 

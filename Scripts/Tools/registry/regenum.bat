@@ -34,8 +34,7 @@ if "%__REG_PATH:~-1%" == "\" (
 )
 
 rem test if key is exist
-reg.exe query "%__REG_PATH%" 2>&1 >nul
-if %ERRORLEVEL% NEQ 0 exit /b 1
+reg.exe query "%__REG_PATH%" 2>&1 >nul || exit /b 1
 
 rem call "%%~dp0__init__.bat" || exit /b
 
