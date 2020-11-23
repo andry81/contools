@@ -40,21 +40,15 @@ set "__REG_VAR=%~2"
 if not defined __REG_PATH exit /b 65
 
 rem remove last slash, otherwise reg.exe will exit with error code
-if "%__REG_PATH:~-1%" == "\" (
-  set __REG_PATH=%__REG_PATH:~0,-1%
-)
+if "%__REG_PATH:~-1%" == "\" set "__REG_PATH=%__REG_PATH:~0,-1%"
 
 rem duplicate last slash, otherwise reg.exe will exit with error code
-if defined __REG_VAR if "%__REG_VAR:~-1%" == "\" (
-  set "__REG_VAR=%__REG_VAR%\"
-)
+if defined __REG_VAR if "%__REG_VAR:~-1%" == "\" set "__REG_VAR=%__REG_VAR%\"
 
 rem test if key is exist
-reg.exe query "%__REG_PATH%" /v "%__REG_VAR%" 2>&1 >nul
-if %ERRORLEVEL% NEQ 0 exit /b 1
+reg.exe query "%__REG_PATH%" /v "%__REG_VAR%" 2>&1 >nul || exit /b 1
 
-if "%~2" == "" ^
-if "%~3" == "-t" exit /b 0
+if "%~2" == "" if "%~3" == "-t" exit /b 0
 
 rem call "%%~dp0__init__.bat" || exit /b
 
@@ -79,14 +73,10 @@ exit /b 0
 
 rem count words in key name
 set __KEYVAR_WORDS=1
-for %%i in (%__REG_VAR%) do (
-  set /A __KEYVAR_WORDS+=1
-)
+for %%i in (%__REG_VAR%) do set /A __KEYVAR_WORDS+=1
 
 rem read read.exe output
-for /F "usebackq tokens=* delims=" %%i in (`reg.exe query "%__REG_PATH%" /v "%__REG_VAR%" ^| findstr.exe /I /R /C:"%__KEYVAR%[^a-zA-Z0-9\\/][^a-zA-Z0-9\\/]*REG_[A-Z][A-Z]*" 2^>nul`) do (
-  set "STDOUT_VALUE=%%i"
-)
+for /F "usebackq tokens=* delims=" %%i in (`reg.exe query "%__REG_PATH%" /v "%__REG_VAR%" ^| findstr.exe /I /R /C:"%__KEYVAR%[^a-zA-Z0-9\\/][^a-zA-Z0-9\\/]*REG_[A-Z][A-Z]*" 2^>nul`) do set "STDOUT_VALUE=%%i"
 
 rem count words in name of empty value (language independent parse)
 if not defined __REG_VAR call :EMPTY_KEYNAME_PARSE
