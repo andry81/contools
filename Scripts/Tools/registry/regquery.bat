@@ -43,8 +43,10 @@ rem remove last slash, otherwise reg.exe will exit with error code
 if "%__REG_PATH:~-1%" == "\" set "__REG_PATH=%__REG_PATH:~0,-1%"
 
 rem duplicate last slash, otherwise reg.exe will exit with error code
-if defined __REG_VAR if "%__REG_VAR:~-1%" == "\" set "__REG_VAR=%__REG_VAR%\"
+if not defined __REG_VAR goto IGNORE_REG_VAR
+if "%__REG_VAR:~-1%" == "\" set "__REG_VAR=%__REG_VAR%\"
 
+:IGNORE_REG_VAR
 rem test if key is exist
 reg.exe query "%__REG_PATH%" /v "%__REG_VAR%" 2>&1 >nul || exit /b 1
 
