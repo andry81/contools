@@ -1,4 +1,7 @@
 2020.11.23:
+* fixed: Scripts/Tools/registry: regquery.bat: invalid case handle where a registry variable is empty
+
+2020.11.23:
 * fixed: Scripts/Tools/registry: rare case where `(` character in a key string value stops parsing
 * refactor: Scripts/Tools/registry: minor refactor
 
