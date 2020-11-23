@@ -23,10 +23,10 @@ rem drop last slash character
 if "%FROM_PATH:~-1%" == "\" set "FROM_PATH=%FROM_PATH:~0,-1%"
 if "%TO_PATH:~-1%" == "\" set "TO_PATH=%TO_PATH:~0,-1%"
 
-call "%%CONTOOLS_ROOT%%/index_pathstr" FROM_PATH_ARR \ "%%FROM_PATH%%"
+call "%%CONTOOLS_ROOT%%/filesys/index_pathstr.bat" FROM_PATH_ARR \ "%%FROM_PATH%%"
 set FROM_PATH_ARR_SIZE=%RETURN_VALUE%
 
-call "%%CONTOOLS_ROOT%%/index_pathstr" TO_PATH_ARR \ "%%TO_PATH%%"
+call "%%CONTOOLS_ROOT%%/filesys/index_pathstr.bat" TO_PATH_ARR \ "%%TO_PATH%%"
 set TO_PATH_ARR_SIZE=%RETURN_VALUE%
 
 if %FROM_PATH_ARR_SIZE% EQU 0 exit /b 1
