@@ -330,11 +330,11 @@ Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/mklink_system64.bat -text
 Scripts/Tools/ToolAdaptors/lnk/runas_admin.bat -text
 Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt -text
-Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/clear_readonly_flag_from_all_files.py -text
-Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/npplib.py -text
-Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/reopen_all_files.py -text
 Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/startup.py -text
-Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/toggle_readonly_flag_for_all_tabs.py -text
+Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/clear_readonly_flag_from_all_files.py -text
+Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py -text
+Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/reopen_all_files.py -text
+Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/toggle_readonly_flag_for_all_tabs.py -text
 Scripts/Tools/ToolAdaptors/python/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/python/copy_pycache.bat -text
 Scripts/Tools/ToolAdaptors/python/rebuild_portable_pycache.bat -text
