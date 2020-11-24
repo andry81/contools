@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2020.08.31
+* 2020.11.24
 * contools/notepadplusplus
 
 1. DESCRIPTION
@@ -35,17 +35,17 @@ Now each time when the Notepad++ starts it will call to `startup.py` script.
 3. SCRIPTS
 -------------------------------------------------------------------------------
 
-* `reopen_all_files.py` -
+* `/tacklebar/reopen_all_files.py` -
 
   script to workaround the Notepad++ bug:
     `[Feature Request] Language auto detection from simplified session file`:
     https://github.com/notepad-plus-plus/notepad-plus-plus/issues/5844
 
-* `toggle_readonly_flag_for_all_tabs.py` -
+* `/tacklebar/toggle_readonly_flag_for_all_tabs.py` -
 
   script to toggle the Read-Only flag for all TABS (not files)
 
-* `clear_readonly_flag_from_all_files.py` -
+* `/tacklebar/clear_readonly_flag_from_all_files.py` -
 
   script to clear the Read-Only flag from all TAB FILES
 
@@ -59,6 +59,11 @@ Now each time when the Notepad++ starts it will call to `startup.py` script.
 Basically, `startup.py` will automatically call upon start of each Notepad++
 instance.
 All other scripts can be directly used from the Notepad++ Plugins menu.
+
+Examples of the Notepad++ extra command line:
+
+>
+notepad++.exe -nosession -multiInst -openSession -z -from_utf16 -z --open_from_file_list -z "<utf-16-file-paths-list-file>"
 
 -------------------------------------------------------------------------------
 4. AUTHOR

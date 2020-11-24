@@ -9,15 +9,15 @@ SOURCE_FILE = os.path.normcase(os.path.abspath(inspect.getsourcefile(lambda:0)))
 SOURCE_DIR = os.path.dirname(SOURCE_FILE)
 
 if hasattr(globals(), 'importlib'):
-  npplib_spec = importlib.util.spec_from_loader('npplib', importlib.machinery.SourceFileLoader('npplib', SOURCE_DIR + '/' + 'npplib.py'))
+  npplib_spec = importlib.util.spec_from_loader('npplib', importlib.machinery.SourceFileLoader('npplib', SOURCE_DIR + '/libs/npplib.py'))
   npplib = importlib.util.module_from_spec(npplib_spec)
   npplib_spec.loader.exec_module(npplib)
 else:
-  npplib = imp.load_source('npplib', SOURCE_DIR + '/' + 'npplib.py')
+  npplib = imp.load_source('npplib', SOURCE_DIR + '/libs/npplib.py')
 
 # inject globals
 setattr(npplib, 'notepad', notepad)
 setattr(npplib, 'MENUCOMMAND', MENUCOMMAND)
 
 # execute
-npplib.toggle_readonly_flag_for_all_tabs()
+npplib.clear_readonly_flag_from_all_files()
