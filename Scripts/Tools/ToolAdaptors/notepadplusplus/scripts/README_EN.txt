@@ -63,7 +63,10 @@ All other scripts can be directly used from the Notepad++ Plugins menu.
 Examples of the Notepad++ extra command line:
 
 >
-notepad++.exe -nosession -multiInst -openSession -z -from_utf16 -z --open_from_file_list -z "<utf-16-file-paths-list-file>"
+notepad++.exe -nosession -multiInst -openSession -z -from_utf16 -z --open_from_file_list -z "<utf-16le-with-bom-paths-list-file>"
+
+>
+notepad++.exe -nosession -multiInst -openSession -z -from_utf16le -z --open_from_file_list -z "<utf-16le-without-bom-paths-list-file>"
 
 -------------------------------------------------------------------------------
 4. AUTHOR
