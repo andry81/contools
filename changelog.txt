@@ -1,4 +1,7 @@
 2020.11.24:
+* changed: Scripts/Tools/ToolAdapters/notepadplusplus: readme update
+
+2020.11.24:
 * changed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: execution fixup
 
 2020.11.24:
