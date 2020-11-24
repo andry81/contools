@@ -1,4 +1,7 @@
 2020.11.24:
+* changed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: execution fixup
+
+2020.11.24:
 * changed: Scripts/Tools/ToolAdapters/notepadplusplus: most of scripts moved into tacklebar subdirectory to avoid mix with other user scripts in the PythonScript plugin
 * changed: Scripts/Tools/ToolAdapters/notepadplusplus: readme update
 

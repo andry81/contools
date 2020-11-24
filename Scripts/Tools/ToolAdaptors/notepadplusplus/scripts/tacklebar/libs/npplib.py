@@ -76,7 +76,7 @@ def process_extra_command_line(open_file_list_from_command_line = True):
   from_utf8 = False
   from_utf16 = False
   from_utf16le = False
-  from_utf16Be = False
+  from_utf16be = False
 
   open_from_file_list_path = ''
   next_arg_is_file_list_path = False
@@ -120,6 +120,7 @@ def process_extra_command_line(open_file_list_from_command_line = True):
     recode_to_utf8 = False
     if from_utf8:
       file_content_decoded = file_content.decode('utf-8', errors='ignore')
+      recode_to_utf8 = True
     elif from_utf16:
       file_content_decoded = file_content.decode('utf-16', errors='ignore')
       recode_to_utf8 = True
