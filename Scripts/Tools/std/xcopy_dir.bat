@@ -24,6 +24,8 @@ set "?~nx0=%~nx0"
 
 rem script flags
 set FLAG_USE_XCOPY=0
+rem copy directory as a name additionally to its content as by default
+set FLAG_COPY_DIR=0
 
 :FLAGS_LOOP
 
@@ -36,6 +38,8 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-use_xcopy" (
     set FLAG_USE_XCOPY=1
+  ) else if "%FLAG%" == "-copy_dir" (
+    set FLAG_COPY_DIR=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -117,18 +121,30 @@ goto TO_PATH_OK
 
 set "FROM_PATH=%~f1"
 set "TO_PATH=%~f2"
+set "TO_DIR_ABS=%~dp2"
 
 if not exist "\\?\%FROM_PATH%\" (
   echo.%?~n0%: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -251
 ) >&2
 
+if %FLAG_COPY_DIR% NEQ 0 goto CHECK_PARENT_DIR
+
 if not exist "\\?\%TO_PATH%\" (
   echo.%?~n0%: error: output directory does not exist: "%TO_PATH%\"
   exit /b -250
 ) >&2
 
-call "%%~dp0__init__.bat" || exit /b
+goto INIT
+
+:CHECK_PARENT_DIR
+if not exist "\\?\%TO_DIR_ABS%" (
+  echo.%?~n0%: error: output directory does not exist: "%TO_DIR_ABS%"
+  exit /b -250
+) >&2
+
+:INIT
+call "%%?~dp0%%__init__.bat" || exit /b
 
 set XCOPY_FLAGS=%3 %4 %5 %6 %7 %8 %9
 
@@ -157,8 +173,8 @@ if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%
 :IGNORE_XCOPY_EXCLUDES
 
 rem echo.D will ONLY work if locale is compatible with english !!!
-echo.^>^>xcopy.exe "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
-echo.D|xcopy.exe "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%
+echo.^>^>"%WINDIR%\System32\xcopy.exe" "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
+echo.D|"%WINDIR%\System32\xcopy.exe" "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
 set LASTERROR=%ERRORLEVEL%
 
 if defined XCOPY_EXCLUDES_LIST_TMP (
@@ -173,6 +189,8 @@ exit /b %LASTERROR%
 
 :USE_ROBOCOPY
 set "ROBOCOPY_FLAGS="
+set "ROBOCOPY_ATTR_COPY=0"
+if not defined ROBOCOPY_COPY_FLAGS set "ROBOCOPY_COPY_FLAGS=DAT"
 for %%i in (%XCOPY_FLAGS%) do (
   set XCOPY_FLAG=%%i
   call :XCOPY_FLAGS_CONVERT %%XCOPY_FLAG%%
@@ -190,8 +208,8 @@ if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
 
 :IGNORE_ROBOCOPY_EXCLUDES
 
-echo.^>^>robocopy.exe "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%
-robocopy.exe "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%
+echo.^>^>"%WINDIR%\System32\robocopy.exe" "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+"%WINDIR%\System32\robocopy.exe" "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
@@ -201,6 +219,24 @@ set XCOPY_FLAG_PARSED=0
 if "%XCOPY_FLAG%" == "/Y" exit /b 1
 if "%XCOPY_FLAG%" == "/R" exit /b 1
 if "%XCOPY_FLAG%" == "/D" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/XO " & set XCOPY_FLAG_PARSED=1
-if "%XCOPY_FLAG%" == "/H" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/IA:RASHCNETO " & set XCOPY_FLAG_PARSED=1
+if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/H" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/IA:RASHCNETO " & set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
+if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/K" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/IA:RASHCNETO " & set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
+if "%XCOPY_FLAG%" == "/O" call :SET_ROBOCOPY_SU_FLAGS
+if "%XCOPY_FLAG%" == "/X" call :SET_ROBOCOPY_U_FLAG
 if %XCOPY_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%%XCOPY_FLAG% "
+exit /b 0
+
+:SET_ROBOCOPY_SU_FLAGS
+if not defined ROBOCOPY_COPY_FLAGS ( set "ROBOCOPY_COPY_FLAGS=SO" & exit /b 0 )
+set "ROBOCOPY_COPY_FLAGS=%ROBOCOPY_COPY_FLAGS:S=%"
+set "ROBOCOPY_COPY_FLAGS=%ROBOCOPY_COPY_FLAGS:O=%"
+set "ROBOCOPY_COPY_FLAGS=%ROBOCOPY_COPY_FLAGS%SO"
+set XCOPY_FLAG_PARSED=1
+exit /b 0
+
+:SET_ROBOCOPY_U_FLAG
+if not defined ROBOCOPY_COPY_FLAGS ( set "ROBOCOPY_COPY_FLAGS=U" & exit /b 0 )
+set "ROBOCOPY_COPY_FLAGS=%ROBOCOPY_COPY_FLAGS:U=%"
+set "ROBOCOPY_COPY_FLAGS=%ROBOCOPY_COPY_FLAGS%U"
+set XCOPY_FLAG_PARSED=1
 exit /b 0

@@ -1,3 +1,9 @@
+2020.11.29:
+* fixed: Scripts/Tools/std: xcopy*.bat: minor fixup
+* new: Scripts/Tools/std: xcopy_dir.bat: `-copy_dir` flag to copy directory as a name additionally to its content as by default
+* new: Scripts/Tools/std: xcopy*.bat: support flags for attributes/ACL/owner/audit copy additionally to a file/directory content
+* changed: Scripts/Tools/std: xcopy*.bat: call all executables by absolute paths
+
 2020.11.24:
 * changed: Scripts/Tools/ToolAdapters/notepadplusplus: readme update
 
