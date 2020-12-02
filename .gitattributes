@@ -748,6 +748,7 @@ Utilities/bin/touch.exe -text
 Utilities/bin/unxutils/tee.exe -text
 Utilities/bin/uuidgen.exe -text
 Utilities/bin/wkhtmltopdf/bin/wkhtmltopdf.exe -text
+Utilities/bin/wshbazaar/wshdynacall/wshdynacall32.dll -text
 Utilities/bin/wtee.exe -text
 Utilities/bin/wxFileDialog.exe -text
 Utilities/bin/xmlstarlet/xml.exe -text
