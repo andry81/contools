@@ -24,7 +24,7 @@ set "SOURCES_DIR=%SOLUTION_DIR%..\Utilities\src\%PROJECT_IN_SRC_DIR_PATH%"
 set "CONSOLE_HELP_FILE=%SOURCES_DIR%\help"
 
 pushd "%SOURCES_DIR%" && (
-  "%BUILD_TOOLS_DIR%\msys\bin\autogen.exe" -L "%SOURCES_DIR%" help.def
+  if exist "%SOURCES_DIR%\help.def" "%BUILD_TOOLS_DIR%\msys\bin\autogen.exe" -L "%SOURCES_DIR%" help.def
   "%BUILD_TOOLS_DIR%\msys\bin\autogen.exe" -L "%SOURCES_DIR%" version.def
   popd
 ) || exit /b 65534
@@ -43,7 +43,7 @@ if exist "%CONSOLE_HELP_FILE%.txt" (
 rem avoid output of this sequence: "error:"
 echo Last return code: %ERRORLEVEL%
 
-exit /b
+exit /b %ERRORLEVEL%
 
 :CMD
 echo.^>%*

@@ -6,7 +6,7 @@ int main(int argc, char * argv[])
     if (argc < 1) return 0;
     for (int i = 0; i < argc; i++)
     {
-        printf("%02u|%s|\n", strlen(argv[i]), argv[i]);
+        printf("%02zu|%s|\n", strlen(argv[i]), argv[i]);
     }
     return argc;
 }

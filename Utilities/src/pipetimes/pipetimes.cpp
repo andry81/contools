@@ -29,6 +29,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <time.h>
+#include <inttypes.h>
 
 #include <vector>
 #include <iostream>
@@ -163,7 +164,7 @@ bool query_time(LARGE_INTEGER& time)
 
 bool is_console_handle(HANDLE h)
 {
-  return ((((ULONG)h) & 0x10000003) == 0x3) ? true : false;
+  return ((((ptrdiff_t)h) & 0x10000003) == 0x3) ? true : false;
 }
 
 int main(int argc,const char* argv[])
@@ -466,12 +467,12 @@ int main(int argc,const char* argv[])
 
       if(pipe_file_handle.handle && !_fstat64(_fileno(pipe_file_handle.handle), &pipe_file_stat))
       {
-        fprintf(index_file_handle.handle, "%X %X %X %X %I64X\n",
+        fprintf(index_file_handle.handle, "%X %X %" PRIxPTR " %X %I64X\n",
           begin_time_msec, end_time_msec, size_t(static_cast_extra<uint64_t>(input_stream_offset_index)), num_read_chars, pipe_file_stat.st_mtime); // CAUTION: input_stream_offset_index truncation to 32-bit
       }
       else
       {
-        fprintf(index_file_handle.handle, "%X %X %X %X\n",
+        fprintf(index_file_handle.handle, "%X %X %" PRIxPTR " %X\n",
           begin_time_msec, end_time_msec, size_t(static_cast_extra<uint64_t>(input_stream_offset_index)), num_read_chars); // CAUTION: input_stream_offset_index truncation to 32-bit
       }
       //fflush(index_file_handle.handle);
