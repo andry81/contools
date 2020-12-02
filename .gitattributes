@@ -673,6 +673,7 @@ Utilities/Projects/printargs.vcxproj -text
 Utilities/Projects/printf.vcxproj -text
 Utilities/Projects/retakeowner.vcxproj -text
 Utilities/Projects/thlibautocfg.vcxproj -text
+Utilities/Projects/wshdynacall.vcxproj -text
 Utilities/bin/7zip/7-zip.chm -text
 Utilities/bin/7zip/7z.exe -text
 Utilities/bin/7zip/7za.dll -text
@@ -795,6 +796,16 @@ Utilities/src/thlibautocfg/help.tpl -text
 Utilities/src/thlibautocfg/thlibautocfg.cpp -text
 Utilities/src/thlibautocfg/version.def -text
 Utilities/src/thlibautocfg/version.tpl -text
+Utilities/src/wshbazaar/wshdynacall/MsgBox.VBS -text
+Utilities/src/wshbazaar/wshdynacall/Readme.txt -text
+Utilities/src/wshbazaar/wshdynacall/ccupd.vbs -text
+Utilities/src/wshbazaar/wshdynacall/dynacall.c -text
+Utilities/src/wshbazaar/wshdynacall/dynacall.h -text
+Utilities/src/wshbazaar/wshdynacall/dynwrap.cpp -text
+Utilities/src/wshbazaar/wshdynacall/dynwrap.def -text
+Utilities/src/wshbazaar/wshdynacall/example.bas -text
+Utilities/src/wshbazaar/wshdynacall/version.def -text
+Utilities/src/wshbazaar/wshdynacall/version.tpl -text
 __init__/__init__.bat -text
 __init__/__init__.sh -text
 /changelog.txt -text

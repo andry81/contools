@@ -1,3 +1,8 @@
+2020.12.02:
+* fixed: Utilities: x64 configuration build fixup
+* new: Utilities: x64 configuration
+* new: Utilities: Born's WSH dynacall 32-bit dll (http://www.borncity.com/web/WSHBazaar1/WSHDynaCall.htm ) port to msvc2015 to enable Win32 calls from vbs scripts
+
 2020.11.29:
 * fixed: Scripts/Tools/std: xcopy*.bat: minor fixup
 * new: Scripts/Tools/std: xcopy_dir.bat: `-copy_dir` flag to copy directory as a name additionally to its content as by default

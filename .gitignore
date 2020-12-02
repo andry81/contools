@@ -39,6 +39,7 @@ Utilities/src/thlibautocfg/help.txt
 Utilities/src/thlibautocfg/help_inl.hpp
 Utilities/src/thlibautocfg/version.hpp
 Utilities/src/version.hpp
+Utilities/src/wshbazaar/wshdynacall/version.hpp
 /_3dparty
 /_scripts
 /cmake

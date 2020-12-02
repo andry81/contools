@@ -58,7 +58,7 @@ namespace {
 						strcat(var_buffer, "}");
 
 						// {N}
-						const int var_vn_len = strlen(var_buffer);
+						const size_t var_vn_len = strlen(var_buffer);
 						const int var_vn = strncmp(p, var_buffer, var_vn_len);
 						if (!var_vn) {
 							parsed_str.append(last_offset, p);
@@ -73,7 +73,7 @@ namespace {
 							strcat(var_buffer, int_to_str_buffer);
 							strcat(var_buffer, "hs}");
 
-							const int var_vn_len = strlen(var_buffer);
+							const size_t var_vn_len = strlen(var_buffer);
 							const int var_vn = strncmp(p, var_buffer, var_vn_len);
 							if (!var_vn) {
 								parsed_str.append(last_offset, p);

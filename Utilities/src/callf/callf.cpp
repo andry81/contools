@@ -33,7 +33,7 @@ extern "C" int _CreateProcess(LPCSTR app, size_t app_len, LPCSTR cmd, size_t cmd
   __try {
     if (app && app_len) {
       if (cmd && cmd_len) {
-        cmd_buf_size = (std::max)(cmd_len + sizeof(TCHAR), 32768U);
+        cmd_buf_size = (std::max)(cmd_len + sizeof(TCHAR), size_t(32768U));
         cmd_buf = malloc(cmd_buf_size);
         memcpy(cmd_buf, cmd, cmd_buf_size);
         res = ::CreateProcess(app, (TCHAR *)cmd_buf, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);
@@ -43,7 +43,7 @@ extern "C" int _CreateProcess(LPCSTR app, size_t app_len, LPCSTR cmd, size_t cmd
       }
     }
     else if (cmd && cmd_len) {
-      cmd_buf_size = (std::max)(cmd_len + sizeof(TCHAR), 32768U);
+      cmd_buf_size = (std::max)(cmd_len + sizeof(TCHAR), size_t(32768U));
       cmd_buf = malloc(cmd_buf_size);
       memcpy(cmd_buf, cmd, cmd_buf_size);
       res = ::CreateProcess(NULL, (TCHAR *)cmd_buf, NULL, NULL, TRUE, 0, NULL, NULL, &si, &pi);

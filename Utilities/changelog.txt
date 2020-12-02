@@ -1,3 +1,8 @@
+2020.12.02:
+* fixed: x64 configuration build fixup
+* new: x64 configuration
+* new: Born's WSH dynacall 32-bit dll (http://www.borncity.com/web/WSHBazaar1/WSHDynaCall.htm ) port to msvc2015 to enable Win32 calls from vbs scripts
+
 2020.10.25:
 * new: ritchielawrence tee implementation (mtee)
 
