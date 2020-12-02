@@ -24,6 +24,12 @@ extern "C" {
 #endif
 #endif
 
+LPCSTR CLSIDVAL = "{202774D1-D479-11d1-ACD1-00A024BBB05E}";
+LPCSTR CLASSKEY0 = "CLSID\\{202774D1-D479-11d1-ACD1-00A024BBB05E}";
+LPCSTR CLASSKEY1 = "CLSID\\{202774D1-D479-11d1-ACD1-00A024BBB05E}\\InProcServer32";
+LPCSTR PRODIDKEY0 = "DynamicWrapper";
+LPCSTR PRODIDKEY1 = "DynamicWrapper\\CLSID";
+
 // Allocate on-the-stack LPSTR from LPCWSTR
 LPSTR W2AHelp(LPSTR a, LPCWSTR w, int n)
 {
@@ -523,19 +529,16 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID)
 // Required COM in-proc server exports follow
 STDAPI DllRegisterServer(void)
 {
-    LPCSTR CLSIDVAL = "{202774D1-D479-11d1-ACD1-00A024BBB05E}";
-    LPCSTR CLASSKEY = "CLSID\\{202774D1-D479-11d1-ACD1-00A024BBB05E}\\InProcServer32";
-    LPCSTR PRODIDKEY = "DynamicWrapper\\CLSID";
     HRESULT hr = E_FAIL;
     HKEY key = NULL;
-    if (!RegCreateKey(HKEY_CLASSES_ROOT,CLASSKEY,&key))
+    if (!RegCreateKey(HKEY_CLASSES_ROOT,CLASSKEY1,&key))
     {
         char szModulePath[_MAX_PATH];
         GetModuleFileName(m_Server.m_hInstance,szModulePath, _MAX_PATH);
         if(!RegSetValue(key,NULL,REG_SZ,szModulePath,0))
         {
             RegCloseKey(key);
-            if (!RegCreateKey(HKEY_CLASSES_ROOT,PRODIDKEY,&key))
+            if (!RegCreateKey(HKEY_CLASSES_ROOT,PRODIDKEY1,&key))
             {
                 if (!RegSetValue(key, NULL, REG_SZ, CLSIDVAL, 0)) {
                     hr = S_OK;
@@ -545,6 +548,13 @@ STDAPI DllRegisterServer(void)
     }
     RegCloseKey(key);
     return hr;
+}
+
+STDAPI DllUnregisterServer(void)
+{
+    RegDeleteTree(HKEY_CLASSES_ROOT, CLASSKEY0);
+    RegDeleteTree(HKEY_CLASSES_ROOT, PRODIDKEY0);
+    return S_OK;
 }
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
