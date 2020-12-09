@@ -601,6 +601,7 @@ Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
 Scripts/Tools/std/load_config.bat -text
 Scripts/Tools/std/mkdir.bat -text
+Scripts/Tools/std/pause.bat -text
 Scripts/Tools/std/replace_sys_chars.bat -text
 Scripts/Tools/std/restore_sys_chars.bat -text
 Scripts/Tools/std/restorecp.bat -text

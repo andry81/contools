@@ -1,3 +1,6 @@
+2020.12.09:
+* new: Scripts/Tools/std: `pause.bat` script to pause with correct print in the log with previously has used code page
+
 2020.12.02:
 * new: Utilities: src/wshbazaar/wshdynacall: `DllUnregisterServer` implementation
 
