@@ -25,7 +25,7 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
 if %TESTLIB__NEST_LVL%0 EQU 0 (
   echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% tests is passed.
   echo.^
-  pause
+  call "%%CONTOOLS_ROOT%%/std/pause.bat"
 )
 
 exit /b %LASTERROR%

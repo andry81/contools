@@ -15,7 +15,7 @@ echo.1. Download the local third party project: `contools--3dparty`: `https://sf
 echo.2. Read the instructions from the readme file in the downloaded project to checkout third party sources.
 echo 3. Press any key to continue and select the `_src` subdirectory in the `contools--3dparty` project as a third party catalog.
 
-pause
+call "%%CONTOOLS_ROOT%%/std/pause.bat"
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_UTILITIES_BIN_ROOT%\wxFileDialog.exe" "" "%CONTOOLS_PROJECT_ROOT%" "Select the third party catalog to link with..." -de`) do set "CONTOOLS_3DPARTY_ROOT=%%i"
 
@@ -25,7 +25,7 @@ if not exist "%CONTOOLS_3DPARTY_ROOT%" (
   ) else (
     echo.error: %~nx0: third party catalog does not exist: "%CONTOOLS_3DPARTY_ROOT%".
   )
-  pause
+  call "%%CONTOOLS_ROOT%%/std/pause.bat"
   exit /b 255
 ) >&2
 
@@ -34,7 +34,7 @@ call :CREATE_DIR_LINK "%%CONTOOLS_PROJECT_ROOT%%\_3dparty" "%%CONTOOLS_3DPARTY_R
 call :CREATE_DIR_LINK "%%CONTOOLS_PROJECT_ROOT%%\_scripts" "%%CONTOOLS_PROJECT_ROOT%%\_3dparty\utility\tacklelib\tacklelib\_scripts"
 call :CREATE_DIR_LINK "%%CONTOOLS_PROJECT_ROOT%%\cmake" "%%CONTOOLS_PROJECT_ROOT%%\_3dparty\utility\tacklelib\tacklelib\cmake"
 
-pause
+call "%%CONTOOLS_ROOT%%/std/pause.bat"
 
 exit /b
 

@@ -151,5 +151,5 @@ set /A __NEST_LVL-=1
 
 if %__NEST_LVL%0 EQU 0 (
   echo    %__PASSED_TESTS% of %__OVERALL_TESTS% tests is passed.
-  pause
+  call "%%CONTOOLS_ROOT%%/std/pause.bat"
 )
