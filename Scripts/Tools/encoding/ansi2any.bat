@@ -17,7 +17,7 @@ set LASTERROR=%ERRORLEVEL%
 rem restore locale
 if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
-if %FLAG_PAUSE_ON_EXIT% NEQ 0 pause
+if %FLAG_PAUSE_ON_EXIT% NEQ 0 call "%%CONTOOLS_ROOT%%/std/pause.bat"
 
 exit /b %LASTERROR%
 

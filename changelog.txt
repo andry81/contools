@@ -1,4 +1,7 @@
 2020.12.09:
+* changed: `pause` commands replaced by calls to the `pause.bat` script
+
+2020.12.09:
 * new: Scripts/Tools/std: `pause.bat` script to pause with correct print in the log with previously has used code page
 
 2020.12.02:

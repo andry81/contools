@@ -37,7 +37,7 @@ for /L %%i in (1,1,1000) do (
 echo.
 
 set /A __NEST_LVL-=1
-if %__NEST_LVL%0 EQU 0 pause
+if %__NEST_LVL%0 EQU 0 call "%%CONTOOLS_ROOT%%/std/pause.bat"
 
 exit /b 0
 
