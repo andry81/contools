@@ -33,7 +33,7 @@ case "$OSTYPE" in
 
     Pause
 
-    _3DPARTY_ROOT=$("$UTILITY_ROOT/wxFileDialog" "" "$PROJECT_ROOT" "Select the third party catalog to link with..." -de)
+    _3DPARTY_ROOT=$("$UTILITY_ROOT/contools/wxFileDialog" "" "$PROJECT_ROOT" "Select the third party catalog to link with..." -de)
 
     if [[ ! -d "$_3DPARTY_ROOT" ]]; then
       if [[ -z "$_3DPARTY_ROOT" ]]; then

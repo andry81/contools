@@ -29,6 +29,6 @@ call "%%~dp0__init__.bat" || exit /b
 rem add EULA acception into registry to avoid EULA acception GUI dialog in the build process
 reg add HKCU\Software\Sysinternals\SigCheck /v EulaAccepted /t REG_DWORD /d 0x00000001 /f >nul 2>nul
 
-"%CONTOOLS_UTILITIES_BIN_ROOT%/sigcheck.exe" -n "%FILE_PATH_PREFIX%%FILE_PATH%" 2>nul
+"%CONTOOLS_UTILITIES_BIN_ROOT%/sysinternals/sigcheck.exe" -n "%FILE_PATH_PREFIX%%FILE_PATH%" 2>nul
 
 exit /b 0
