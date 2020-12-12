@@ -404,6 +404,8 @@ Scripts/Tools/admin/WindowsServices/Photoshop/disable_photoshop_flex_svc.bat -te
 Scripts/Tools/admin/WindowsServices/Photoshop/enable_photoshop_flex_svc.bat -text
 Scripts/Tools/admin/WindowsServices/VMware/disable_vmware_auth_svc.bat -text
 Scripts/Tools/admin/WindowsServices/VMware/enable_vmware_auth_svc.bat -text
+Scripts/Tools/admin/WindowsServices/VirtualBox/disable_vbox_svc.bat -text
+Scripts/Tools/admin/WindowsServices/VirtualBox/enable_vbox_svc.bat -text
 Scripts/Tools/admin/__init__.bat -text
 Scripts/Tools/admin/cleanup_acl.bat -text
 Scripts/Tools/admin/comspec_as_svc.bat -text
