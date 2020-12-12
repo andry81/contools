@@ -1,4 +1,7 @@
 2020.12.12:
+* new: markdown readme with links
+
+2020.12.12:
 * new: Scripts/Tools/admin/WindowsServices: VirtualBox enable/disable scripts
 
 2020.12.11:

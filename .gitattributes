@@ -112,6 +112,7 @@ BuildTools/msys/share/guile/ice-9/time.scm -text
 BuildTools/msys/share/guile/ice-9/weak-vector.scm -text
 /Changes_EN.old.txt -text
 Projects/ConsoleTools.sln -text
+/README.md -text
 /README_EN.deps.txt -text
 /README_EN.old.txt -text
 /README_EN.txt -text
