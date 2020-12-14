@@ -1,3 +1,7 @@
+2020.12.14:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: missed args array final resize
+* refactor: Scripts/Tools/ToolAdaptors/vbs: call.vbs: minor refactor
+
 2020.12.12:
 * new: markdown readme with links
 
