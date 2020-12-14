@@ -1,20 +1,15 @@
 ReDim args(WScript.Arguments.Count-1)
-Dim ExpectFlags
-Dim ExpandArgs
-Dim NoWait
-Dim NoWindow
 
-ExpectFlags = True
-ExpandArgs = False
-AlwaysQuote = False
-NoWait = False
-NoWindow = False
+Dim ExpectFlags : ExpectFlags = True
+Dim ExpandArgs : ExpandArgs = False
+Dim AlwaysQuote : AlwaysQuote = False
+Dim NoWait : NoWait = False
+Dim NoWindow : NoWindow = False
 
 Set objShell = WScript.CreateObject("WScript.Shell")
 
 Dim arg
-Dim j
-j = 0
+Dim j : j = 0
 
 For i = 0 To WScript.Arguments.Count-1
   If ExpectFlags Then
@@ -60,6 +55,8 @@ For i = 0 To WScript.Arguments.Count-1
     j = j + 1
   End If
 Next
+
+ReDim args(j - 1)
 
 ' MsgBox Join(args, " ")
 
