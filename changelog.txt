@@ -1,3 +1,6 @@
+2020.12.16:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: missed args ReDim `Preserve` keyword
+
 2020.12.14:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: missed args array final resize
 * refactor: Scripts/Tools/ToolAdaptors/vbs: call.vbs: minor refactor

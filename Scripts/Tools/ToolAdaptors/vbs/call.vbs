@@ -56,7 +56,7 @@ For i = 0 To WScript.Arguments.Count-1
   End If
 Next
 
-ReDim args(j - 1)
+ReDim Preserve args(j - 1)
 
 ' MsgBox Join(args, " ")
 
