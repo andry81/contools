@@ -81,7 +81,12 @@ if not exist "%FILE_PATH%" (
   exit /b 252
 ) >&2
 
-for /f "eol= tokens=* delims=" %%i in ("%FILE_PATH:\=/%") do (
+set "FILE_PATH=%FILE_PATH:\=/%"
+
+rem escape characters
+set "FILE_PATH=%FILE_PATH:'='\''%"
+
+for /f "eol= tokens=* delims=" %%i in ("%FILE_PATH%") do (
   echo.file '%%i'
 ) >> "%TEMP_FILE_LIST%"
 
