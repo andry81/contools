@@ -1,3 +1,6 @@
+2020.12.20:
+* fixed: Scripts/Tools/ToolAdaptors/ffmpeg: ffmpeg_concat_copy_by_list.bat: missed `'` character escape
+
 2020.12.16:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: missed args ReDim `Preserve` keyword
 
