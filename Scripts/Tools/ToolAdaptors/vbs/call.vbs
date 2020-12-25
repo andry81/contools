@@ -1,6 +1,7 @@
 ReDim args(WScript.Arguments.Count-1)
 
 Dim ExpectFlags : ExpectFlags = True
+Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ExpandArgs : ExpandArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
 Dim NoWait : NoWait = False
@@ -14,7 +15,10 @@ Dim j : j = 0
 For i = 0 To WScript.Arguments.Count-1
   If ExpectFlags Then
     If Mid(WScript.Arguments(i), 1, 1) = "-" Then
-      If WScript.Arguments(i) = "-E" Then ' Expand environment variables
+      If WScript.Arguments(i) = "-D" Then ' Change current directory
+        i = i + 1
+        ChangeCurrentDirectory =  WScript.Arguments(i)
+      ElseIf WScript.Arguments(i) = "-E" Then ' Expand environment variables
         ExpandArgs = True
       ElseIf WScript.Arguments(i) = "-q" Then ' Always quote arguments (if already has no quote characters)
         AlwaysQuote = True
@@ -59,6 +63,10 @@ Next
 ReDim Preserve args(j - 1)
 
 ' MsgBox Join(args, " ")
+
+If ChangeCurrentDirectory <> "" Then
+  objShell.CurrentDirectory = ChangeCurrentDirectory
+End If
 
 if Not NoWindow Then
   If Not NoWait Then

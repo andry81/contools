@@ -1,3 +1,6 @@
+2020.12.25:
+* new: Scripts/Tools/ToolAdaptors/vbs: call.vbs: change current directory parameter before run a command
+
 2020.12.20:
 * fixed: Scripts/Tools/ToolAdaptors/ffmpeg: ffmpeg_concat_copy_by_list.bat: missed `'` character escape
 
