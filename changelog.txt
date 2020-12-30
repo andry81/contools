@@ -1,3 +1,7 @@
+2020.12.30:
+* new: Scripts/Tools/ToolAdaptors/vbs: call.vbs: `-showas` parameter
+* new: Scripts/Tools/ToolAdaptors/vbs: `winshell_call.vbs` script to run from Windows Explorer with UAC elevation support
+
 2020.12.25:
 * new: Scripts/Tools/ToolAdaptors/vbs: call.vbs: change current directory parameter before run a command
 

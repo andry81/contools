@@ -361,6 +361,7 @@ Scripts/Tools/ToolAdaptors/vbs/make_sys_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/update_sys_shortcut.bat -text
+Scripts/Tools/ToolAdaptors/vbs/winshell_call.vbs -text
 Scripts/Tools/__init__.bat -text
 Scripts/Tools/__init__.sh -text
 Scripts/Tools/__init__/__init__.bat -text
