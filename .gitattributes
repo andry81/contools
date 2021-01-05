@@ -329,6 +329,7 @@ Scripts/Tools/ToolAdaptors/lnk/cmd_wow64.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/mklink_system64.bat -text
+Scripts/Tools/ToolAdaptors/lnk/mycomputer.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/runas_admin.bat -text
 Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/startup.py -text
@@ -357,10 +358,8 @@ Scripts/Tools/ToolAdaptors/vbs/call.bat -text
 Scripts/Tools/ToolAdaptors/vbs/call.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs -text
-Scripts/Tools/ToolAdaptors/vbs/make_sys_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs -text
-Scripts/Tools/ToolAdaptors/vbs/update_sys_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/winshell_call.vbs -text
 Scripts/Tools/__init__.bat -text
 Scripts/Tools/__init__.sh -text

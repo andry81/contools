@@ -1,3 +1,7 @@
+2021.01.05:
+* new: Scripts/Tools/ToolAdaptors/lnk: mycomputer shortcut
+* changed: Scripts/Tools/ToolAdaptors/vbs: reimplemented make/update shortcut scripts
+
 2020.12.30:
 * new: Scripts/Tools/ToolAdaptors/vbs: call.vbs: `-showas` parameter
 * new: Scripts/Tools/ToolAdaptors/vbs: `winshell_call.vbs` script to run from Windows Explorer with UAC elevation support

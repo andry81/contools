@@ -1,33 +1,40 @@
 @echo off
 
-rem Script to create the Windows shortcut file to the "<cmdline>"
-rem in the current directory.
+rem Script to create the Windows shortcut file.
 
-rem Drom last error level
-type nul>nul
-
-rem Save all variables to stack
 setlocal
 
-set "SC_NAME=%~1"
-set "WD=%~2"
-set "CMD=%~3"
-set "ARGS=%~4"
+call "%%~dp0__init__.bat" || exit /b
 
-if not defined SC_NAME (
-  echo %~nx0: error: Shortcut name is not defined
-  exit /b 1
-) >&2
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%~n0"
 
-call :SET
-exit /b
+for %%i in (1) do (
+    set "PROMPT=$_"
+    echo on
+    for %%b in (1) do rem * #%*#
+    @echo off
+) > "%SCRIPT_TEMP_CURRENT_DIR%\cmdline.txt"
 
-:SET
+for /F "usebackq eol= tokens=* delims=" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%\cmdline.txt") do set "CMDLINE_STR=%%i"
+
 echo.Current directory: "%CD:\=/%"
-call :CMD "%%~dp0make_shortcut.vbs" "%%SC_NAME%%" "%%WD%%" "%%CMD%%" "%%ARGS%%"
 
-exit /b
+setlocal ENABLEDELAYEDEXPANSION
+set "CMDLINE_STR=!CMDLINE_STR:*#=!"
+set "CMDLINE_STR=!CMDLINE_STR:~0,-2!"
+if defined CMDLINE_STR for /F "eol= tokens=* delims=" %%i in ("!CMDLINE_STR!") do (
+  endlocal
+  echo.^>"%~dp0%~n0.vbs" %%i
+  "%~dp0%~n0.vbs" %%i
+) else (
+  endlocal
+  echo.^>"%~dp0%~n0.vbs"
+  "%~dp0%~n0.vbs"
+)
 
-:CMD
-echo.^>%*
-(%*)
+set LASTERROR=%ERRORLEVEL%
+
+rem cleanup temporary files
+call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
+
+exit /b %LASTERROR%
