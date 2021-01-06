@@ -1,7 +1,7 @@
 ''' Updates the Windows shortcut file.
 
 ''' USAGE:
-'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-E] [-q] [-t <ShortcutTarget>] [-args <ShortcutArgs>] <ShortcutFileName>
+'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-E] [-q] [-unesc] [-t <ShortcutTarget>] [-args <ShortcutArgs>] <ShortcutFileName>
 '''
 ''' Note:
 '''   1. Creation of a shortcut under ealier version of the Window makes shortcut
@@ -12,15 +12,32 @@
 '''   3. Update of a shortcut immediately after it's creation does cleanup shortcut
 '''      from redundant data.
 
+''' CAUTION:
+'''   You should remove shortcut file BEFORE creation otherwise the shortcut
+'''   would be updated instead of recreated.
+
 ''' Example to create a minimalistic and clean version of a shortcut:
 '''   >
 '''   del /F /Q cmd_system32.lnk
 '''   make_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk ^%SystemRoot^%\System32\cmd.exe
 '''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
+''' Or
+'''   >
+'''   del /F /Q cmd_system32.lnk
+'''   make_shortcut.bat -CD "%WINDIR%\System32" -unesc cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
+'''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
+
+
+''' Example to create MyComputer shortcut:
+'''   >
+'''   del /F /Q mycomputer.lnk
+'''   make_shortcut.bat mycomputer.lnk
 
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
+
+Dim UnescapeArgs : UnescapeArgs = False
 
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ChangeCurrentDirectoryExist : ChangeCurrentDirectoryExist = False
@@ -40,7 +57,7 @@ Dim ShowAsExist : ShowAsExist = False
 Dim ExpandArgs : ExpandArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
 
-Set objShell = WScript.CreateObject("WScript.Shell")
+Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
 
 Dim arg
 Dim j : j = 0
@@ -48,7 +65,9 @@ Dim j : j = 0
 For i = 0 To WScript.Arguments.Count-1
   If ExpectFlags Then
     If Mid(WScript.Arguments(i), 1, 1) = "-" Then
-      If WScript.Arguments(i) = "-CD" Then ' Change current directory
+      If WScript.Arguments(i) = "-unesc" Then ' Unescape %xx or %uxxxx
+        UnescapeArgs = True
+      ElseIf WScript.Arguments(i) = "-CD" Then ' Change current directory
         i = i + 1
         ChangeCurrentDirectory =  WScript.Arguments(i)
         ChangeCurrentDirectoryExist = True
@@ -82,29 +101,26 @@ For i = 0 To WScript.Arguments.Count-1
   End If
 
   If Not ExpectFlags Then
-    If Not ExpandArgs Then
-      arg = WScript.Arguments(i)
-      If j > 0 And InStr(arg, Chr(34)) = 0 Then
-        If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
-          cmd_args(j) = Chr(34) & arg & Chr(34)
-        Else
-          cmd_args(j) = arg
-        End If
+    arg = WScript.Arguments(i)
+
+    If ExpandArgs Then
+      arg = objShell.ExpandEnvironmentStrings(arg)
+    End If
+
+    If UnescapeArgs Then
+      arg = Unescape(arg)
+    End If
+
+    If j > 0 And InStr(arg, Chr(34)) = 0 Then
+      If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
+        cmd_args(j) = Chr(34) & arg & Chr(34)
       Else
         cmd_args(j) = arg
       End If
     Else
-      arg = objShell.ExpandEnvironmentStrings(WScript.Arguments(i))
-      If j > 0 And InStr(arg, Chr(34)) = 0 Then
-        If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
-          cmd_args(j) = Chr(34) & arg & Chr(34)
-        Else
-          cmd_args(j) = arg
-        End If
-      Else
-        cmd_args(j) = arg
-      End If
+      cmd_args(j) = arg
     End If
+
     j = j + 1
   End If
 Next
@@ -130,6 +146,10 @@ If ShortcutTargetExist Then
   If ExpandArgs Then
     ShortcutTarget = objShell.ExpandEnvironmentStrings(ShortcutTarget)
   End If
+
+  If UnescapeArgs Then
+    ShortcutTarget = Unescape(ShortcutTarget)
+  End If
 Else
   ShortcutTarget = objSC.TargetPath
 End If
@@ -144,10 +164,19 @@ If ShortcutArgsExist Then
   If ExpandArgs Then
     ShortcutArgs = objShell.ExpandEnvironmentStrings(ShortcutArgs)
   End If
+
+  If UnescapeArgs Then
+    ShortcutArgs = Unescape(ShortcutArgs)
+  End If
+
   objSC.Arguments = ShortcutArgs
 End If
 
 If ShortcutWorkingDirectoryExist Then
+  If UnescapeArgs Then
+    ShortcutWorkingDirectory = Unescape(ShortcutWorkingDirectory)
+  End If
+
   objSC.WorkingDirectory = ShortcutWorkingDirectory
 End If
 

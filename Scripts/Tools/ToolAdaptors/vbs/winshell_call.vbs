@@ -5,6 +5,7 @@ If WScript.Arguments.Count > 1 Then
 End If
 
 Dim ExpectFlags : ExpectFlags = True
+Dim UnescapeArgs : UnescapeArgs = False
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim Verb : Verb = "open"
 Dim ShowAs : ShowAs = 1
@@ -12,17 +13,19 @@ Dim ExpandArgs : ExpandArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
 Dim NoWindow : NoWindow = False
 
+Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
+Dim objWinShell : Set objWinShell = WScript.CreateObject("Shell.Application")
+
 Dim arg
 Dim IsCmdArg : IsCmdArg = True
 Dim i, j : j = 0
 
-Set objShell = WScript.CreateObject("WScript.Shell")
-Dim objWinShell : Set objWinShell = WScript.CreateObject("Shell.Application")
-
 For i = 0 To WScript.Arguments.Count-1
   If ExpectFlags Then
     If Mid(WScript.Arguments(i), 1, 1) = "-" Then
-      If WScript.Arguments(i) = "-D" Then ' Change current directory
+      If WScript.Arguments(i) = "-unesc" Then ' Unescape %xx or %uxxxx
+        UnescapeArgs = True
+      ElseIf WScript.Arguments(i) = "-D" Then ' Change current directory
         i = i + 1
         ChangeCurrentDirectory =  WScript.Arguments(i)
       ElseIf WScript.Arguments(i) = "-verb" Then ' Shell Verb
@@ -44,19 +47,19 @@ For i = 0 To WScript.Arguments.Count-1
   End If
 
   If Not ExpectFlags Then
-    If Not ExpandArgs Then
-      arg = WScript.Arguments(i)
-      If InStr(arg, Chr(34)) = 0 Then
-        If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
-          arg = Chr(34) & arg & Chr(34)
-        End If
-      End If
-    Else
-      arg = objShell.ExpandEnvironmentStrings(WScript.Arguments(i))
-      If InStr(arg, Chr(34)) = 0 Then
-        If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
-          arg = Chr(34) & arg & Chr(34)
-        End If
+    arg = WScript.Arguments(i)
+
+    If ExpandArgs Then
+      arg = objShell.ExpandEnvironmentStrings(arg)
+    End If
+
+    If UnescapeArgs Then
+      arg = Unescape(arg)
+    End If
+
+    If InStr(arg, Chr(34)) = 0 Then
+      If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
+        arg = Chr(34) & arg & Chr(34)
       End If
     End If
 
