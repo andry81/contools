@@ -5,6 +5,8 @@ Dim UnescapeArgs : UnescapeArgs = False
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ShowAs : ShowAs = 1
 Dim ExpandArgs : ExpandArgs = False
+Dim ExpandArg0 : ExpandArg0 = False
+Dim ExpandTailArgs : ExpandTailArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
 Dim NoWait : NoWait = False
 Dim NoWindow : NoWindow = False
@@ -25,8 +27,12 @@ For i = 0 To WScript.Arguments.Count-1
       ElseIf WScript.Arguments(i) = "-showas" Then ' Show window as
         i = i + 1
         ShowAs = CInt(WScript.Arguments(i))
-      ElseIf WScript.Arguments(i) = "-E" Then ' Expand environment variables
+      ElseIf WScript.Arguments(i) = "-E" Then ' Expand environment variables in all arguments
         ExpandArgs = True
+      ElseIf WScript.Arguments(i) = "-E0" Then ' Expand environment variables only in the first argument
+        ExpandArg0 = True
+      ElseIf WScript.Arguments(i) = "-Ea" Then ' Expand environment variables only in the tail arguments
+        ExpandTailArgs = True
       ElseIf WScript.Arguments(i) = "-q" Then ' Always quote arguments (if already has no quote characters)
         AlwaysQuote = True
       ElseIf WScript.Arguments(i) = "-nowait" Then
@@ -43,6 +49,10 @@ For i = 0 To WScript.Arguments.Count-1
     arg = WScript.Arguments(i)
 
     If ExpandArgs Then
+      arg = objShell.ExpandEnvironmentStrings(arg)
+    ElseIf ExpandArg0 And j = 0 Then
+      arg = objShell.ExpandEnvironmentStrings(arg)
+    ElseIf ExpandTailArgs And j > 0 Then
       arg = objShell.ExpandEnvironmentStrings(arg)
     End If
 

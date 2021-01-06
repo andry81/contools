@@ -55,6 +55,9 @@ Dim ShowAs : ShowAs = 1
 Dim ShowAsExist : ShowAsExist = False
 
 Dim ExpandArgs : ExpandArgs = False
+Dim ExpandArg0 : ExpandArg0 = False
+Dim ExpandShortcutTarget : ExpandShortcutTarget = False
+Dim ExpandShortcutArgs : ExpandShortcutArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
 
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
@@ -87,8 +90,14 @@ For i = 0 To WScript.Arguments.Count-1
         i = i + 1
         ShowAs = CInt(WScript.Arguments(i))
         ShowAsExist = True
-      ElseIf WScript.Arguments(i) = "-E" Then ' Expand environment variables
+      ElseIf WScript.Arguments(i) = "-E" Then ' Expand environment variables in all arguments
         ExpandArgs = True
+      ElseIf WScript.Arguments(i) = "-E0" Then ' Expand environment variables only in the first argument
+        ExpandArg0 = True
+      ElseIf WScript.Arguments(i) = "-Et" Then ' Expand environment variables only in the shortcut target object
+        ExpandShortcutTarget = True
+      ElseIf WScript.Arguments(i) = "-Ea" Then ' Expand environment variables only in the shortcut arguments
+        ExpandShortcutArgs = True
       ElseIf WScript.Arguments(i) = "-q" Then ' Always quote CMD argument (if has no quote characters)
         AlwaysQuote = True
       Else
@@ -104,6 +113,8 @@ For i = 0 To WScript.Arguments.Count-1
     arg = WScript.Arguments(i)
 
     If ExpandArgs Then
+      arg = objShell.ExpandEnvironmentStrings(arg)
+    ElseIf ExpandArg0 And j = 0 Then
       arg = objShell.ExpandEnvironmentStrings(arg)
     End If
 
@@ -143,7 +154,7 @@ End If
 set objSC = objShell.CreateShortcut(cmd_args(0))
 
 If ShortcutTargetExist Then
-  If ExpandArgs Then
+  If ExpandArgs Or ExpandShortcutTarget Then
     ShortcutTarget = objShell.ExpandEnvironmentStrings(ShortcutTarget)
   End If
 
@@ -161,7 +172,7 @@ End If
 objSC.TargetPath = ShortcutTarget
 
 If ShortcutArgsExist Then
-  If ExpandArgs Then
+  If ExpandArgs Or ExpandShortcutArgs Then
     ShortcutArgs = objShell.ExpandEnvironmentStrings(ShortcutArgs)
   End If
 
