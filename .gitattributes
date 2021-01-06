@@ -358,6 +358,9 @@ Scripts/Tools/ToolAdaptors/vbs/call.bat -text
 Scripts/Tools/ToolAdaptors/vbs/call.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/printargs.bat -text
+Scripts/Tools/ToolAdaptors/vbs/printargs.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/printcmdline.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/winshell_call.vbs -text

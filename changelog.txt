@@ -1,3 +1,6 @@
+2021.01.06:
+* new: Scripts/Tools/ToolAdaptors/vbs: `printargs.*` and `printcmdline.bat` scripts to debug command lines from different places
+
 2021.01.05:
 * new: Scripts/Tools/ToolAdaptors/lnk: mycomputer shortcut
 * changed: Scripts/Tools/ToolAdaptors/vbs: reimplemented make/update shortcut scripts
