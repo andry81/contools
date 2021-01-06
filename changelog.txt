@@ -1,4 +1,9 @@
 2021.01.06:
+* new: Scripts/Tools/ToolAdaptors/vbs: `printargs*.vbs` with environment variables expand and strings unescape + batch files
+* new: Scripts/Tools/ToolAdaptors/vbs: `call.vbs`, `winshell_call.vbs`, `make_shortcut.vbs`, `update_shortcut.vbs` with strings unescape
+* refactor: Scripts/Tools/ToolAdaptors/vbs: moderate refactor
+
+2021.01.06:
 * new: Scripts/Tools/ToolAdaptors/vbs: `printargs.*` and `printcmdline.bat` scripts to debug command lines from different places
 
 2021.01.05:

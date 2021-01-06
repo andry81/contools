@@ -360,6 +360,12 @@ Scripts/Tools/ToolAdaptors/vbs/make_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/printargs.bat -text
 Scripts/Tools/ToolAdaptors/vbs/printargs.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/printargs_exp.bat -text
+Scripts/Tools/ToolAdaptors/vbs/printargs_exp.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/printargs_exp_unesc.bat -text
+Scripts/Tools/ToolAdaptors/vbs/printargs_exp_unesc.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/printargs_unesc.bat -text
+Scripts/Tools/ToolAdaptors/vbs/printargs_unesc.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/printcmdline.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs -text
