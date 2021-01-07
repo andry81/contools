@@ -1,3 +1,6 @@
+2021.01.07:
+* new: Utilities: bin/sysinternals: `movefiles.exe` and `pendmoves.exe` utilities
+
 2021.01.06:
 * new: Scripts/Tools/ToolAdaptors/vbs: `-E*` flags for environment variables expansion in particular arguments
 
