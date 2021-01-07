@@ -1,3 +1,6 @@
+2021.01.07:
+* new: bin/sysinternals: `movefiles.exe` and `pendmoves.exe` utilities
+
 2020.12.02:
 * new: src/wshbazaar/wshdynacall: `DllUnregisterServer` implementation
 

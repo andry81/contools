@@ -756,6 +756,8 @@ Utilities/bin/sqlite/sqldiff.exe -text
 Utilities/bin/sqlite/sqlite3.exe -text
 Utilities/bin/sqlite/sqlite3_analyzer.exe -text
 Utilities/bin/stevemiller/touch.exe -text
+Utilities/bin/sysinternals/movefile.exe -text
+Utilities/bin/sysinternals/pendmoves.exe -text
 Utilities/bin/sysinternals/sigcheck.exe -text
 Utilities/bin/sysinternals/strings.exe -text
 Utilities/bin/thomaspolaert/cecho.exe -text
