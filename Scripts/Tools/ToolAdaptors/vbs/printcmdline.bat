@@ -1,7 +1,5 @@
 @echo off
 
-rem Script to create the Windows shortcut file.
-
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b
