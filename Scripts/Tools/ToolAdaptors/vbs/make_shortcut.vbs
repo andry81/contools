@@ -4,11 +4,12 @@
 '''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-E] [-q] [-unesc] <ShortcutFileName> <ShortcutTarget> <ShortcutArgs>
 '''
 ''' Note:
-'''   1. Creation of a shortcut under ealier version of the Window makes shortcut
+'''   1. Creation of a shortcut under ealier version of the Windows makes shortcut
 '''      cleaner. For example, do use Windows XP instead of the Windows 7 and
 '''      x86 instead of x64 to make a cleaner shortcut without redundant data.
-'''   2. Creation of a shortcut with the current directory in the "%SYSTEMROOT%\system32"
-'''      directory avoids generation of redundant path prefix (offset).
+'''   2. Creation of a shortcut to the `cmd.exe` with the current directory in
+'''      the "%SYSTEMROOT%\system32" directory avoids generation of redundant
+'''      path prefixes (offset) in the shortcut file internals.
 '''   3. Update of a shortcut immediately after it's creation does cleanup shortcut
 '''      from redundant data.
 
