@@ -57,17 +57,17 @@ set "FROM_FILE=%~2"
 set "TO_PATH=%~3"
 
 if not defined FROM_PATH (
-  echo.%?~n0%: error: input directory path argument must be defined.
+  echo.%?~nx0%: error: input directory path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined FROM_FILE (
-  echo.%?~n0%: error: input file argument must be defined.
+  echo.%?~nx0%: error: input file argument must be defined.
   exit /b -254
 ) >&2
 
 if not defined TO_PATH (
-  echo.%?~n0%: error: output directory path argument must be defined.
+  echo.%?~nx0%: error: output directory path argument must be defined.
   exit /b -253
 ) >&2
 
@@ -95,7 +95,7 @@ goto FROM_PATH_OK
 :FROM_PATH_ERROR
 (
   echo.%?~n0%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
-  exit /b -252
+  exit /b -250
 ) >&2
 
 :FROM_PATH_OK
@@ -136,8 +136,8 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%?~n0%: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
-  exit /b -250
+  echo.%?~nx0%: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  exit /b -249
 ) >&2
 
 :TO_PATH_OK

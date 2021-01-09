@@ -17,23 +17,56 @@ echo.^>%~nx0 %*
 
 setlocal
 
+set "?~dp0=%~dp0"
+set "?~n0=%~n0"
+set "?~nx0=%~nx0"
+
+rem script flags
+set FLAG_CHCP=65001
+set FLAG_USE_XCOPY=0
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
+  ) else if "%FLAG%" == "-use_xcopy" (
+    set FLAG_USE_XCOPY=1
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
+
+  shift
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
+
 set "FROM_PATH=%~1"
 set "TO_PATH=%~2"
 set "FROM_FILE=%~3"
 set "TO_FILE=%~4"
 
 if not defined FROM_PATH (
-  echo.%~nx0: error: input directory path argument must be defined.
+  echo.%?~nx0%: error: input directory path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined TO_PATH (
-  echo.%~nx0: error: output directory path argument must be defined.
+  echo.%?~nx0%: error: output directory path argument must be defined.
   exit /b -254
 ) >&2
 
 if not defined FROM_FILE (
-  echo.%~nx0: error: input from file argument must be defined.
+  echo.%?~nx0%: error: input from file argument must be defined.
   exit /b -253
 ) >&2
 
@@ -66,7 +99,7 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%~nx0: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
+  echo.%?~nx0%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
   exit /b -250
 ) >&2
 
@@ -93,7 +126,7 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%~nx0: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
+  echo.%?~nx0%: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
   exit /b -249
 ) >&2
 
@@ -145,7 +178,7 @@ if not exist "\\?\%TO_ROOT%\" (
 call "%%~dp0__init__.bat" || exit /b
 
 if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
-  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^
+  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" -chcp %%FLAG_CHCP%% "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^
       "%FROM_FILE%" == "%TO_FILE%" (
     (
       call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
