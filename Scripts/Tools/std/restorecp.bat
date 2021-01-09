@@ -3,7 +3,10 @@
 rem drop last error level
 type nul>nul
 
-if not defined CURRENT_CP exit /b -255
+if not defined CURRENT_CP (
+  echo.%~nx0: error: CURRENT_CP is not defined.
+  exit /b -255
+) >&2
 
 set "LAST_CP=%CURRENT_CP%"
 
