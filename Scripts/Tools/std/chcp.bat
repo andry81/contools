@@ -14,7 +14,10 @@ type nul>nul
 
 set "CODE_PAGE=%~1"
 
-if not defined CODE_PAGE exit /b -255
+if not defined CODE_PAGE (
+  echo.%~nx0: error: CODE_PAGE is not defined.
+  exit /b -255
+) >&2
 if not defined CURRENT_CP goto INIT
 
 set "LAST_CP=%CURRENT_CP%"

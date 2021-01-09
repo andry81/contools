@@ -1,4 +1,7 @@
 2021.01.09:
+* changed: Scripts/Tools/std: chcp.bat: print error message on empty codepage parameter
+
+2021.01.09:
 * fixed: Scripts/Tools/std: xcopy_file_rename.bat: Windows XP compatibility
 * new: Scripts/Tools/std: xcopy_file_rename.bat: `-chcp` flag for an arbitrary codepage request
 * changed: Scripts/Tools/std: `xcopy_file_rename.bat` to `xcopy_file.bat` duplex merge
