@@ -23,6 +23,7 @@ set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
 rem script flags
+set FLAG_CHCP=65001
 set FLAG_USE_XCOPY=0
 rem copy directory as a name additionally to its content as by default
 set FLAG_COPY_DIR=0
@@ -36,7 +37,10 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-use_xcopy" (
+  if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
+  ) else if "%FLAG%" == "-use_xcopy" (
     set FLAG_USE_XCOPY=1
   ) else if "%FLAG%" == "-copy_dir" (
     set FLAG_COPY_DIR=1
@@ -61,7 +65,7 @@ if not defined FROM_PATH (
 
 if not defined TO_PATH (
   echo.%?~n0%: error: output directory path argument must be defined.
-  exit /b -254
+  exit /b -253
 ) >&2
 
 set "FROM_PATH=%FROM_PATH:/=\%"
@@ -87,7 +91,7 @@ goto FROM_PATH_OK
 :FROM_PATH_ERROR
 (
   echo.%?~n0%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
-  exit /b -253
+  exit /b -252
 ) >&2
 
 :FROM_PATH_OK
@@ -114,25 +118,25 @@ goto TO_PATH_OK
 :TO_PATH_ERROR
 (
   echo.%?~n0%: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
-  exit /b -252
+  exit /b -250
 ) >&2
 
 :TO_PATH_OK
 
-set "FROM_PATH=%~f1"
-set "TO_PATH=%~f2"
+set "FROM_PATH_ABS=%~f1"
+set "TO_PATH_ABS=%~f2"
 set "TO_DIR_ABS=%~dp2"
 
-if not exist "\\?\%FROM_PATH%\" (
+if not exist "\\?\%FROM_PATH_ABS%\" (
   echo.%?~n0%: error: input directory does not exist: "%FROM_PATH%\"
-  exit /b -251
+  exit /b -249
 ) >&2
 
 if %FLAG_COPY_DIR% NEQ 0 goto CHECK_PARENT_DIR
 
-if not exist "\\?\%TO_PATH%\" (
+if not exist "\\?\%TO_PATH_ABS%\" (
   echo.%?~n0%: error: output directory does not exist: "%TO_PATH%\"
-  exit /b -250
+  exit /b -248
 ) >&2
 
 goto INIT
@@ -153,7 +157,7 @@ if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
 
 :USE_XCOPY
 rem switch code page into english compatible locale
-call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 set RESTORE_LOCALE=1
 
 set "XCOPY_EXCLUDES_CMD="
@@ -173,8 +177,8 @@ if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%
 :IGNORE_XCOPY_EXCLUDES
 
 rem echo.D will ONLY work if locale is compatible with english !!!
-echo.^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
-echo.D|"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
+echo.^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
+echo.D|"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
 set LASTERROR=%ERRORLEVEL%
 
 if defined XCOPY_EXCLUDES_LIST_TMP (
@@ -208,8 +212,11 @@ if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
 
 :IGNORE_ROBOCOPY_EXCLUDES
 
-echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
-"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+if "%FROM_PATH_ABS:~-1%" == "\" set "FROM_PATH_ABS=%FROM_PATH_ABS%\"
+if "%TO_PATH_ABS:~-1%" == "\" set "TO_PATH_ABS=%TO_PATH_ABS%\"
+
+echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
