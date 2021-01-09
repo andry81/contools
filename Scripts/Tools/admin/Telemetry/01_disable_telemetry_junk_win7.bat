@@ -70,7 +70,7 @@ call :CMD reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersi
 echo.
 
 echo Updating CompatTelRunner.exe permissions...
-for /F "usebackq eol=; tokens=* delims=" %%i in (`dir "%WINDIR%\CompatTelRunner.exe" /A:-D /S /B`) do (
+for /F "usebackq eol=; tokens=* delims=" %%i in (`dir "%SystemRoot%\CompatTelRunner.exe" /A:-D /S /B`) do (
   set "FILE=%%i"
   call :UPDATE_PERMISSIONS
 )

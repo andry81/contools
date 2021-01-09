@@ -149,7 +149,7 @@ call "%%?~dp0%%__init__.bat" || exit /b
 set XCOPY_FLAGS=%3 %4 %5 %6 %7 %8 %9
 
 if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
-if exist "%WINDIR%\system32\robocopy.exe" goto USE_ROBOCOPY
+if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
 
 :USE_XCOPY
 rem switch code page into english compatible locale
@@ -173,8 +173,8 @@ if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%
 :IGNORE_XCOPY_EXCLUDES
 
 rem echo.D will ONLY work if locale is compatible with english !!!
-echo.^>^>"%WINDIR%\System32\xcopy.exe" "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
-echo.D|"%WINDIR%\System32\xcopy.exe" "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
+echo.^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
+echo.D|"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH%" "%TO_PATH%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
 set LASTERROR=%ERRORLEVEL%
 
 if defined XCOPY_EXCLUDES_LIST_TMP (
@@ -208,8 +208,8 @@ if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
 
 :IGNORE_ROBOCOPY_EXCLUDES
 
-echo.^>^>"%WINDIR%\System32\robocopy.exe" "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
-"%WINDIR%\System32\robocopy.exe" "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH%\\" "%TO_PATH%\\" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
