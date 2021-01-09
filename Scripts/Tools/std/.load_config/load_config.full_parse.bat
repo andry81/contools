@@ -5,7 +5,7 @@ for /F "usebackq eol=# tokens=* delims=" %%i in ("%__?CONFIG_OUT_DIR%/%__?CONFIG
   for /F "eol=# tokens=1,* delims==" %%j in ("%%i") do (
     set "__?VAR=%%j"
     set "__?VALUE=%%k"
-    call :PARSE_EXPR && (
+    call :PARSE_EXPR %%* && (
       setlocal ENABLEDELAYEDEXPANSION
       if defined __?VALUE for /F "tokens=* delims=" %%l in ("!__?VAR!") do for /F "tokens=* delims=" %%m in ("!__?VALUE!") do for /F "tokens=* delims=" %%n in ("%%m") do (
         endlocal
@@ -30,9 +30,8 @@ rem Replace a value quote characters by the \x01 character.
 set "__?VAR=%__?VAR:"=%"
 if defined __?VALUE set "__?VALUE=%__?VALUE:"=%"
 rem check for old style expression quotes
-if defined __?VALUE if "%__?VAR:~0,1%" == "" if "%__?VALUE:~-1%" == "" (
-  set "__?VAR=%__?VAR:~1%" & set "__?VALUE=%__?VALUE:~0,-1%"
-)
+set __?OLD_STYLE_QUOTES=0
+if defined __?VALUE if "%__?VAR:~0,1%" == "" if "%__?VALUE:~-1%" == "" ( set "__?OLD_STYLE_QUOTES=1" & set "__?VAR=%__?VAR:~1%" & set "__?VALUE=%__?VALUE:~0,-1%" )
 
 rem CAUTION:
 rem Inplace trim of surrounded white spaces ONLY from left and right sequences as a whole for performance reasons.
@@ -43,16 +42,27 @@ call "%%~dp0load_config.trim_var_right.bat" || exit /b
 
 if not defined __?VALUE exit /b 0
 
+if %__?OLD_STYLE_QUOTES% NEQ 0 goto IGNORE_VALUE_TRIM
+
 call "%%~dp0load_config.trim_value_left.bat" || exit /b
 if not defined __?VALUE exit /b 0
 call "%%~dp0load_config.trim_value_right.bat" || exit /b
 if not defined __?VALUE exit /b 0
 
+:IGNORE_VALUE_TRIM
 for /F "eol= tokens=1,* delims=:" %%i in ("%__?VAR%") do ( set "__?VAR=%%i" & set "__?PLATFORM=%%j" )
 
 if not defined __?VAR exit /b 1
 
-if defined __?PLATFORM if not "%__?PLATFORM%" == "BAT" if not "%__?PLATFORM%" == "WIN" if not "%__?PLATFORM%" == "OSWIN" exit /b 1
+if defined __?PLATFORM (
+  if %~1 EQU 0 (
+    if not "%__?PLATFORM%" == "BAT" if not "%__?PLATFORM%" == "WIN" if not "%__?PLATFORM%" == "OSWIN" exit /b 1
+  ) else (
+    if "%__?PLATFORM%" == "SH" exit /b 1
+    if "%__?PLATFORM%" == "UNIX" exit /b 1
+    if "%__?PLATFORM%" == "OSUNIX" exit /b 1
+  )
+)
 
 set "__?ATTR="
 
@@ -67,6 +77,8 @@ if not defined __?ATTR goto IGNORE_ATTR
 if not "%__?ATTR:once=%" == "%__?ATTR%" if defined %__?VAR% exit /b 1
 
 :IGNORE_ATTR
+if defined __?PLATFORM if %~1 NEQ 0 set "__?VAR=%__?VAR%:%__?PLATFORM%"
+
 if ^/ == ^%__?VALUE:~1,1%/ goto PREPARSE_VALUE
 if not ^/ == ^%__?VALUE:~0,1%/ goto PREPARSE_VALUE
 if not ^/ == ^%__?VALUE:~-1%/ goto PREPARSE_VALUE
