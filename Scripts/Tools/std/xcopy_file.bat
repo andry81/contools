@@ -24,6 +24,7 @@ set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
 rem script flags
+set FLAG_CHCP=65001
 set FLAG_USE_XCOPY=0
 
 :FLAGS_LOOP
@@ -35,7 +36,10 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-use_xcopy" (
+  if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
+  ) else if "%FLAG%" == "-use_xcopy" (
     set FLAG_USE_XCOPY=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
@@ -160,7 +164,7 @@ if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
 
 :USE_XCOPY
 rem switch code page into english compatible locale
-call "%%CONTOOLS_ROOT%%/std/chcp.bat" 65001
+call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 set RESTORE_LOCALE=1
 
 set "XCOPY_EXCLUDES_CMD="
@@ -180,8 +184,8 @@ if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%
 :IGNORE_XCOPY_EXCLUDES
 
 rem echo.F will ONLY work if locale is compatible with english !!!
-echo.^>^>"%SystemRoot%/System32/xcopy.exe" "%FROM_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_FILE_BARE_FLAGS%
-echo.F|"%SystemRoot%/System32/xcopy.exe" "%FROM_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_FILE_BARE_FLAGS%
+echo.^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_FILE_BARE_FLAGS%
+echo.F|"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_FILE_BARE_FLAGS%
 set LASTERROR=%ERRORLEVEL%
 
 if defined XCOPY_EXCLUDES_LIST_TMP (
@@ -218,8 +222,8 @@ if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
 if "%FROM_PATH_ABS:~-1%" == "\" set "FROM_PATH_ABS=%FROM_PATH_ABS%\"
 if "%TO_PATH_ABS:~-1%" == "\" set "TO_PATH_ABS=%TO_PATH_ABS%\"
 
-echo.^>^>"%SystemRoot%/System32/robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
-"%SystemRoot%/System32/robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
+echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
+"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 

@@ -1,4 +1,9 @@
 2021.01.09:
+* fixed: Scripts/Tools/std: xcopy_*.bat: Windows XP compatibility
+* new: Scripts/Tools/std: xcopy_*.bat: `-chcp` flag for an arbitrary codepage request
+* changed: Scripts/Tools/std: xcopy_dir.bat: missed merge versus `xcopy_file.bat`
+
+2021.01.09:
 * refactor: Scripts/Tools: `WINDIR` variable replaced by `SystemRoot`
 
 2021.01.09:
