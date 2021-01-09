@@ -8,6 +8,7 @@ set "__?~nx0=%~nx0"
 
 rem script flags
 set FLAG_FULL_PARSE=0
+set FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME=0
 
 :FLAGS_LOOP
 
@@ -20,6 +21,8 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-full_parse" (
     set FLAG_FULL_PARSE=1
+  ) else if "%FLAG%" == "-allow_not_known_class_as_var_name" (
+    set FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -74,5 +77,5 @@ if not exist "%__?CONFIG_OUT_DIR%/%__?CONFIG_FILE%" (
 ) >&2
 
 if %FLAG_FULL_PARSE% NEQ 0 (
-  "%__?~dp0%.load_config/load_config.full_parse.bat" %*
-) else "%__?~dp0%/.load_config/load_config.fast_parse.bat" %*
+  "%__?~dp0%.load_config/load_config.full_parse.bat" %FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME%
+) else "%__?~dp0%/.load_config/load_config.fast_parse.bat" %FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME%

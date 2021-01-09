@@ -1,4 +1,8 @@
 2021.01.09:
+* fixed: Scripts/Tools/std: load_config.bat: variable's value trim under old style quotes fix
+* new: Scripts/Tools/std: load_config.bat: `-allow_not_known_class_as_var_name` flag to be able to parse custom (not known) variable classes externally
+
+2021.01.09:
 * new: Scripts/Tools/std: `get_wmic_os_version.bat` script
 
 2021.01.09:
