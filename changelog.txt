@@ -1,6 +1,12 @@
 2021.01.09:
-* fixed: Scripts/Tools/std: xcopy_*.bat: Windows XP compatibility
-* new: Scripts/Tools/std: xcopy_*.bat: `-chcp` flag for an arbitrary codepage request
+* fixed: Scripts/Tools/std: xcopy_file_rename.bat: Windows XP compatibility
+* new: Scripts/Tools/std: xcopy_file_rename.bat: `-chcp` flag for an arbitrary codepage request
+* changed: Scripts/Tools/std: `xcopy_file_rename.bat` to `xcopy_file.bat` duplex merge
+* changed: Scripts/Tools/std: `xcopy_dir.bat` to `xcopy_file.bat` duplex merge
+
+2021.01.09:
+* fixed: Scripts/Tools/std: xcopy_file.bat, xcopy_dir.bat: Windows XP compatibility
+* new: Scripts/Tools/std: xcopy_file.bat, xcopy_dir.bat: `-chcp` flag for an arbitrary codepage request
 * changed: Scripts/Tools/std: xcopy_dir.bat: missed merge versus `xcopy_file.bat`
 
 2021.01.09:
