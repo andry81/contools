@@ -1,3 +1,6 @@
+2021.01.09:
+* fixed: Scripts/Tools/std: pause.bat: Windows XP compatibility
+
 2021.01.08:
 * fixed: Scripts/Tools/std: `xcopy_file.bat`, `xcopy_dir.bat`: dropped usage of the `/IA` flag because it implicitly used as exclusion sequence (1. It does implicitly exclude those files which were not included 2. It does ignore files without any attribute even if all attribute set is used: `/IA:RASHCNETO`)
 

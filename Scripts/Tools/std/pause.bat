@@ -17,7 +17,9 @@ for /F "usebackq eol= tokens=1,* delims=:" %%i in (`chcp.com 2^>nul`) do set "C
 
 if defined CURRENT_CP set "CURRENT_CP=%CURRENT_CP: =%"
 
-if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( chcp.com %LAST_CP% >nul & "%WINDIR%\System32\timeout.exe" /T -1 & chcp.com %CURRENT_CP% >nul & exit /b %LASTERROR% )
+if exist "%SystemRoot%\System32\timeout.exe" (
+  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( chcp.com %LAST_CP% >nul & "%SystemRoot%\System32\timeout.exe" /T -1 & chcp.com %CURRENT_CP% >nul & exit /b %LASTERROR% )
+) else if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( chcp.com %LAST_CP% >nul & pause & chcp.com %CURRENT_CP% >nul & exit /b %LASTERROR% )
 
 pause
 
