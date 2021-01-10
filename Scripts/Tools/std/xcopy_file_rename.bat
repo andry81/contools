@@ -71,7 +71,7 @@ if not defined FROM_FILE (
 ) >&2
 
 if not defined TO_FILE (
-  echo.%~nx0: error: input to file argument must be defined.
+  echo.%?~nx0%: error: input to file argument must be defined.
   exit /b -252
 ) >&2
 
@@ -141,7 +141,7 @@ goto FROM_FILE_OK
 
 :FROM_FILE_ERROR
 (
-  echo.%~nx0: error: input from file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
+  echo.%?~nx0%: error: input from file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
   exit /b -248
 ) >&2
 
@@ -156,7 +156,7 @@ goto TO_FILE_OK
 
 :TO_FILE_ERROR
 (
-  echo.%~nx0: error: input to file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
+  echo.%?~nx0%: error: input to file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
   exit /b -247
 ) >&2
 
@@ -166,19 +166,19 @@ set "FROM_ROOT=%~f1"
 set "TO_ROOT=%~f2"
 
 if not exist "\\?\%FROM_ROOT%\" (
-  echo.%~nx0: error: input directory does not exist: "%FROM_PATH%\"
+  echo.%?~nx0%: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -246
 ) >&2
 
 if not exist "\\?\%TO_ROOT%\" (
-  echo.%~nx0: error: output directory does not exist: "%TO_PATH%\"
+  echo.%?~nx0%: error: output directory does not exist: "%TO_PATH%\"
   exit /b -245
 ) >&2
 
-call "%%~dp0__init__.bat" || exit /b
+call "%%?~dp0%%__init__.bat" || exit /b
 
 if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
-  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" -chcp %%FLAG_CHCP%% "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^
+  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" -chcp "%%FLAG_CHCP%%" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^
       "%FROM_FILE%" == "%TO_FILE%" (
     (
       call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
