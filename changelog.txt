@@ -1,3 +1,6 @@
+2021.01.10:
+* new: Scripts/Tools/std: `chcp.bat`, `restorecp.bat`: `-p` flag to print (not suppress) `chcp.com` output
+
 2021.01.09:
 * fixed: Scripts/Tools/std: load_config.bat: variable's value trim under old style quotes fix
 * new: Scripts/Tools/std: load_config.bat: `-allow_not_known_class_as_var_name` flag to be able to parse custom (not known) variable classes externally

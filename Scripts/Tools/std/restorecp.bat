@@ -3,6 +3,31 @@
 rem drop last error level
 type nul>nul
 
+rem script flags
+set FLAG_PRINT=0
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-p" (
+    set FLAG_PRINT=1
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
+
+  shift
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
+
 if not defined CURRENT_CP (
   echo.%~nx0: error: CURRENT_CP is not defined.
   exit /b -255
@@ -20,4 +45,6 @@ if not defined CURRENT_CP exit /b 0
 if "%CURRENT_CP%" == "%LAST_CP%" exit /b 0
 
 rem echo.chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
-chcp.com %CURRENT_CP% >nul
+if %FLAG_PRINT% NEQ 0 (
+  chcp.com %CURRENT_CP%
+) else chcp.com %CURRENT_CP% >nul
