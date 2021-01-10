@@ -1,4 +1,7 @@
 2021.01.10:
+* fixed: Scripts/Tools/std: xcopy*.bat: execution fixup
+
+2021.01.10:
 * new: Scripts/Tools/std: `chcp.bat`, `restorecp.bat`: `-p` flag to print (not suppress) `chcp.com` output
 
 2021.01.09:
