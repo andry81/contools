@@ -1,4 +1,7 @@
 2021.01.11:
+* fixed: Scripts/Tools/std: load_config.bat: execution fixup
+
+2021.01.11:
 * fixed: Scripts/Tools/std: load_config.bat: lite parse fixup
 * changed: Scripts/Tools/std: load_config.bat: lite parse fast variable trim and value surrounded quotes remove
 
