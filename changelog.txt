@@ -1,3 +1,6 @@
+2021.01.11:
+* new: Scripts/Tools/std: load_config.bat: `-lite_parse` for maximum speed parser (in that case the config file is not compatible with external shells)
+
 2021.01.10:
 * fixed: Scripts/Tools/std: xcopy*.bat: execution fixup
 
