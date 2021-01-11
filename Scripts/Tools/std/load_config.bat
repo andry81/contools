@@ -80,7 +80,7 @@ if not exist "%__?CONFIG_OUT_DIR%/%__?CONFIG_FILE%" (
 ) >&2
 
 if %FLAG_LITE_PARSE% NEQ 0 (
-  %__?~dp0%/.load_config/load_config.lite_parse.bat"
+  "%__?~dp0%/.load_config/load_config.lite_parse.bat"
 ) else if %FLAG_FULL_PARSE% EQU 0 (
   "%__?~dp0%/.load_config/load_config.fast_parse.bat" %FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME%
 ) else "%__?~dp0%.load_config/load_config.full_parse.bat" %FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME%
