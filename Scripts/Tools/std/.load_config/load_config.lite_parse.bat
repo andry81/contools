@@ -8,8 +8,10 @@
 exit /b 0
 
 :PARSE_EXPR
-if ^/ == ^%__?VALUE:~1,1%/ ( set "%~1=" & exit /b 0 )
+if ^/ == ^%__?VALUE:~0,1%/ ( set "%~1=" & exit /b 0 )
+if ^/ == ^%__?VALUE:~1,1%/ ( set %~1=^%__?VALUE:~1,1%& exit /b 0 )
 if ^"/ == ^%__?VALUE:~0,1%/ (
-  if ^"/ == ^%__?VALUE:~-1%/ ( call set %%1=%__?VALUE:~1,-1%
+  if ^"/ == ^%__?VALUE:~-1%/ (
+    call set "%~1=%__?VALUE:~1,-1%"
   ) else call set %%1=%__?VALUE%
 ) else call set %%1=%__?VALUE%
