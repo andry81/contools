@@ -592,6 +592,7 @@ Scripts/Tools/sqlite/sqlite.bat -text
 Scripts/Tools/std/.load_config/load_config.fast_parse.bat -text
 Scripts/Tools/std/.load_config/load_config.full_parse.bat -text
 Scripts/Tools/std/.load_config/load_config.full_parse.parse_value.bat -text
+Scripts/Tools/std/.load_config/load_config.lite_parse.bat -text
 Scripts/Tools/std/.load_config/load_config.trim_value_left.bat -text
 Scripts/Tools/std/.load_config/load_config.trim_value_right.bat -text
 Scripts/Tools/std/.load_config/load_config.trim_var_left.bat -text
