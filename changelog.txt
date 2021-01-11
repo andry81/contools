@@ -1,4 +1,7 @@
 2021.01.11:
+* changed: __init__.bat: revert all directory initialization scripts back into simple not iterative implementation to load as fast as possible
+
+2021.01.11:
 * new: Scripts/Tools/std: load_config.bat: `-lite_parse` for maximum speed parser (in that case the config file is not compatible with external shells)
 
 2021.01.10:
