@@ -609,6 +609,7 @@ Scripts/Tools/std/del_file.bat -text
 Scripts/Tools/std/del_file_pttn.bat -text
 Scripts/Tools/std/echo_var.bat -text
 Scripts/Tools/std/free_temp_dir.bat -text
+Scripts/Tools/std/gen_config.bat -text
 Scripts/Tools/std/get_wmic_local_datetime.bat -text
 Scripts/Tools/std/get_wmic_os_version.bat -text
 Scripts/Tools/std/if_.bat -text

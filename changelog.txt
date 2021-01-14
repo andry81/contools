@@ -1,3 +1,9 @@
+2021.01.14:
+* fixed: Scripts/Tools/std: load_script.bat: minor fixup
+* new: Scripts/Tools/std: `gen_config.bat` script to generate config only (without load)
+* new: Scripts/Tools/std: load_script.bat: added 2 uniform variable parameters to a variable declaration (usage: <varname>:<param0>:<param1>=<value>)
+* new: Scripts/Tools/std: load_script.bat: `-noexpand` flag to explicitly avoid variable expansion on load as by default
+
 2021.01.11:
 * fixed: Scripts/Tools/std: load_config.bat: execution fixup
 
