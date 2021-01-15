@@ -43,4 +43,4 @@ set "__?EXCL__=!" & set "__?ESC__=^"
 set "__?VALUE=%__?VALUE:!=!__?EXCL__!%"
 set "__?VALUE=%__?VALUE:=!__?QUOT__!%"
 set "__?VALUE=%__?VALUE:^=!__?ESC__!%"
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("%__?VALUE%") do ( endlocal & echo "%__?VAR%=%%i" & set "%__?VAR%=%%i" )
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("%__?VALUE%") do ( endlocal & set "%__?VAR%=%%i" )
