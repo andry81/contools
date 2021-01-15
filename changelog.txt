@@ -1,4 +1,7 @@
 2021.01.16:
+* fixed: Scripts/Tools/std: get_wmic_*.bat: execution under Windows XP w/o SP
+
+2021.01.16:
 * fixed: Scripts/Tools/std: load_config.bat: lite parse algorithm
 
 2021.01.16:
