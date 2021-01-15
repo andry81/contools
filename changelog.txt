@@ -1,3 +1,7 @@
+2021.01.15:
+* fixed: Scripts/Tools/std: chcp.bat, restorecp.bat: reimplemented to support invalid code page setup ignore and correct restore
+* changed: Scripts/Tools/std: chcp.bat, restorecp.bat, pause.bat: check the `chcp.com` existence before usage
+
 2021.01.14:
 * fixed: Scripts/Tools/std: load_script.bat: minor fixup
 * new: Scripts/Tools/std: `gen_config.bat` script to generate config only (without load)
