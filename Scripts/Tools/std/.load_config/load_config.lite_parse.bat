@@ -27,11 +27,11 @@ if ^/ == ^%__?VALUE:~0,1%/ if ^/ == ^%__?VALUE:~-1%/ call set "__?VALUE=%__?VA
 :PARSE_VAR
 if not "%~3" =="." ( set "__?PARAM0=%~3" ) else set "__?PARAM0="
 if not "%~4" =="." ( set "__?PARAM1=%~4" ) else set "__?PARAM1="
-if "%~6" == "" ( if "%~7" == "" ( if /i not "%__?PARAM0%" == "" ( set "%~1=" ) else if /i not "%__?PARAM1%" == "" ( set "%~1=" ) else ( goto PARSE_VALUE )
-) else if /i not "%__?PARAM0%" == "" ( set "%~1=" ) else if /i "%__?PARAM1%" == "%~7" ( set "%~1=" & goto PARSE_VALUE ) else if /i not "%__?PARAM1%" == "" set "%~1="
-) else if "%~7" == "" ( if /i not "%__?PARAM1%" == "" ( set "%~1=" ) else if /i "%__?PARAM0%" == "%~6" ( set "%~1=" & goto PARSE_VALUE ) else if /i not "%__?PARAM0%" == "" set "%~1="
-) else if /i "%__?PARAM0%" == "%~6" if /i "%__?PARAM1%" == "%~7" ( set "%~1=" & goto PARSE_VALUE
-) else if /i not "%__?PARAM0%" == "" ( set "%~1=" ) else if /i not "%__?PARAM1%" == "" set "%~1="
+if "%__?PARAM0%" == "" if "%__?PARAM1%" == "" goto PARSE_VALUE
+set "%~1="
+if not "%__?PARAM0%" == "" ( if "%__?PARAM0%" == "%~6" (
+  if not "%__?PARAM1%" == "" ( if "%__?PARAM1%" == "%~7" goto PARSE_VALUE ) else goto PARSE_VALUE
+) ) else if not "%__?PARAM1%" == "" ( if "%__?PARAM1%" == "%~7" goto PARSE_VALUE ) else goto PARSE_VALUE
 exit /b
 
 :PARSE_VALUE
@@ -43,4 +43,4 @@ set "__?EXCL__=!" & set "__?ESC__=^"
 set "__?VALUE=%__?VALUE:!=!__?EXCL__!%"
 set "__?VALUE=%__?VALUE:=!__?QUOT__!%"
 set "__?VALUE=%__?VALUE:^=!__?ESC__!%"
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("%__?VALUE%") do ( endlocal & set "%__?VAR%=%%i" )
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("%__?VALUE%") do ( endlocal & echo "%__?VAR%=%%i" & set "%__?VAR%=%%i" )

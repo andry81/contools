@@ -1,5 +1,8 @@
 2021.01.16:
-* new: Scripts/Tools/std: load_config.bat: support of `once` attribute
+* fixed: Scripts/Tools/std: load_config.bat: lite parse algorithm
+
+2021.01.16:
+* new: Scripts/Tools/std: load_config.bat: support of `once` attribute for lite parse algorithm
 
 2021.01.15:
 * fixed: Scripts/Tools/std: chcp.bat, restorecp.bat: reimplemented to support invalid code page setup ignore and correct restore
