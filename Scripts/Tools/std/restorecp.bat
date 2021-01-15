@@ -28,23 +28,26 @@ if defined FLAG (
   goto FLAGS_LOOP
 )
 
-if not defined CURRENT_CP (
-  echo.%~nx0: error: CURRENT_CP is not defined.
+if not defined CP_HISTORY_LIST (
+  echo.%~nx0: error: CP_HISTORY_LIST is not defined.
+  exit /b -255
+) >&2
+
+if not exist "%SystemRoot%\System32\chcp.com" (
+  echo.%?~nx0%: error: `chcp.com` is not found.
   exit /b -255
 ) >&2
 
 set "LAST_CP=%CURRENT_CP%"
+if not defined LAST_CP for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%SystemRoot%%\System32\chcp.com" 2^>nul`) do set "LAST_CP=%%j"
 
 set "CURRENT_CP="
-for /F "eol= tokens=1,* delims=|" %%i in ("%CP_HISTORY_LIST%") do (
-  set "CURRENT_CP=%%i"
-  set "CP_HISTORY_LIST=%%j"
-)
+for /F "eol= tokens=1,* delims=|" %%i in ("%CP_HISTORY_LIST%") do ( set "CURRENT_CP=%%i" & set "CP_HISTORY_LIST=%%j" )
 
 if not defined CURRENT_CP exit /b 0
 if "%CURRENT_CP%" == "%LAST_CP%" exit /b 0
 
 rem echo.chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
 if %FLAG_PRINT% NEQ 0 (
-  chcp.com %CURRENT_CP%
-) else chcp.com %CURRENT_CP% >nul
+  "%SystemRoot%\System32\chcp.com" %CURRENT_CP%
+) else "%SystemRoot%\System32\chcp.com" %CURRENT_CP% >nul
