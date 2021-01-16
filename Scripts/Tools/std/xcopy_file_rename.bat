@@ -177,7 +177,7 @@ if not exist "\\?\%TO_ROOT%\" (
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
-set "XCOPY_BARE_FLAGS= "
+set "XCOPY_BARE_FLAGS="
 if defined FLAG_CHCP set XCOPY_BARE_FLAGS= -chcp "%FLAG_CHCP%"
 
 if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
