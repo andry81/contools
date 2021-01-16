@@ -24,7 +24,7 @@ set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
 rem script flags
-set FLAG_CHCP=65001
+set "FLAG_CHCP="
 set FLAG_USE_XCOPY=0
 
 :FLAGS_LOOP
@@ -163,9 +163,13 @@ if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
 if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
 
 :USE_XCOPY
-rem switch code page into english compatible locale
-call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
-set RESTORE_LOCALE=1
+rem CAUTION:
+rem   You must switch code page into english compatible locale.
+rem
+if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
+  set RESTORE_LOCALE=1
+)
 
 set "XCOPY_EXCLUDES_CMD="
 set "XCOPY_EXCLUDES_LIST_TMP="
