@@ -4,14 +4,17 @@ rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
 rem   Script creates `System64` directory additionally to the `Sysnative`,
-rem   because it must be visible from any bitness mode, when the `Sysnative`
-rem   is visible only from the 32-bit mode!
+rem   because:
+rem     1. The `Sysnative/cmd.exe` can not be run under the Administrator user.
+rem     2. The `Sysnative` directory visible ONLY from 64-bit applications.
+rem     3. The `Sysnative` directory doesn't exist on the Windows XP x64 and
+rem        lower.
 
-rem   The "%SystemRoot%\Sysnative" directory doesn't exist on the Windows XP x64
-rem   and lower. It can be available only after Windows Vista x64,
+rem Note:
+rem   The `Sysnative` directory can be available only after Windows Vista x64,
 rem   Windows Server 2008 x64 or after Windows Server 2003 x64 with installed
 rem   "Microsoft hotfix 942589".
-
+rem
 rem   For those not server Windows systems or server Windows systems less than
 rem   Windows Server 2003 you have to install at least
 rem   "Windows Server 2003 Resource Kit Tools" to set the tool "linkd.exe"
