@@ -1,3 +1,8 @@
+2021.01.17:
+* fixed: Scripts/Tools/std: load_config.bat: minor fixup
+* new: Scripts/Tools/std: gen_config.bat: placeholder replace functionality
+* changed: Scripts/Tools/std: load_config.bat: `-gen_config` flag to explicitly generate the configuration file, the configuration file does not generate anymore by default
+
 2021.01.16:
 * changed: Scripts/Tools/ToolAdaptors/lnk: mklink_system64.bat: comments update
 
