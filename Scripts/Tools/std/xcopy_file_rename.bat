@@ -22,7 +22,7 @@ set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
 rem script flags
-set FLAG_CHCP=65001
+set "FLAG_CHCP="
 set FLAG_USE_XCOPY=0
 
 :FLAGS_LOOP
@@ -177,8 +177,11 @@ if not exist "\\?\%TO_ROOT%\" (
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
+set "XCOPY_BARE_FLAGS= "
+if defined FLAG_CHCP set XCOPY_BARE_FLAGS= -chcp "%FLAG_CHCP%"
+
 if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
-  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" -chcp "%%FLAG_CHCP%%" "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^
+  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat"%%XCOPY_BARE_FLAGS%% "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^
       "%FROM_FILE%" == "%TO_FILE%" (
     (
       call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b

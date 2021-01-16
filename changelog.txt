@@ -1,4 +1,9 @@
 2021.01.16:
+* new: Scripts/Tools/std: pause.bat: `-chcp` flag to explicitly use specific code page
+* changed: Scripts/Tools/std: xcopy_*.bat: removed setup of 65001 code page if the `-chcp` flag is not set, not a caller responsible to setup a valid code page before to call an xcopy script
+* changed: Scripts/Tools/std: pause.bat: reimplemented to always use `timeout.exe` whenever it is available
+
+2021.01.16:
 * fixed: Scripts/Tools/std: get_wmic_*.bat: execution under Windows XP w/o SP
 
 2021.01.16:
