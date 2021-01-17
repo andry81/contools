@@ -46,7 +46,7 @@ set "LASTERRORLEVEL=%ERRORLEVEL%"
 
 set /A NEST_LVL-=1
 
-if %NEST_LVL% LEQ 0 call "%%CONTOOLS_ROOT%%/std/pause.bat"
+if %NEST_LVL% LEQ 0 if defined OEMCP ( call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
 
 exit /b %LASTERRORLEVEL%
 
