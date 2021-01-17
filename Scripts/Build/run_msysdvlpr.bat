@@ -25,16 +25,11 @@ setlocal DisableDelayedExpansion
 call "%%~dp0__init__.bat" || exit /b
 
 rem make all paths canonical
-call :CANONICAL_PATH CONTOOLS_ROOT "%%CONTOOLS_ROOT%%"
-set "CONTOOLS_ROOT=%CONTOOLS_ROOT:/=\%"
+call :CANONICAL_PATH CONTOOLS_ROOT  "%%CONTOOLS_ROOT%%"
 set "CONTOOLS_ROOT_NATIVE=%CONTOOLS_ROOT%"
-
-call :CANONICAL_PATH CONFIG_PATH "%%~dp0..\Config"
-set "CONFIG_PATH=%CONFIG_PATH:/=\%"
-
+call :CANONICAL_PATH CONFIG_PATH    "%%~dp0..\Config"
 rem Update variables pointing temporary directories
-call :CANONICAL_PATH TEMP "%%~dp0..\Temp"
-set "TEMP=%TEMP:/=\%"
+call :CANONICAL_PATH TEMP           "%%~dp0..\Temp"
 set "TMP=%TEMP%"
 
 rem Save all variables to stack again
@@ -264,7 +259,7 @@ exit /b
 :CANONICAL_PATH
 setlocal DISABLEDELAYEDEXPANSION
 for /F "eol= tokens=* delims=" %%i in ("%~2\.") do set "RETURN_VALUE=%%~fi"
-set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+rem set "RETURN_VALUE=%RETURN_VALUE:\=/%"
 (
   endlocal
   set "%~1=%RETURN_VALUE%"
