@@ -1,4 +1,7 @@
 2021.01.17:
+* changed: switched scripts to use `pause.bat` script with the `-chcp "%OEMCP%"` argument
+
+2021.01.17:
 * new: Scripts/Tools/std: copy.bat: `-chcp` flag to explicitly use specific code page
 * changed: Scripts/Tools/std: xcopy_*.bat: code cleanup
 
