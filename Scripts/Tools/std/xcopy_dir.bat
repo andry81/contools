@@ -159,10 +159,7 @@ if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
 rem CAUTION:
 rem   You must switch code page into english compatible locale.
 rem
-if defined FLAG_CHCP (
-  call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
-  set RESTORE_LOCALE=1
-)
+if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 
 set "XCOPY_EXCLUDES_CMD="
 set "XCOPY_EXCLUDES_LIST_TMP="
@@ -194,7 +191,7 @@ if defined XCOPY_EXCLUDES_LIST_TMP (
 )
 
 rem restore locale
-if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 exit /b %LASTERROR%
 
