@@ -178,20 +178,22 @@ if not exist "\\?\%TO_ROOT%\" (
 call "%%?~dp0%%__init__.bat" || exit /b
 
 set "XCOPY_BARE_FLAGS="
+set "COPY_BARE_FLAGS="
 if defined FLAG_CHCP set XCOPY_BARE_FLAGS= -chcp "%FLAG_CHCP%"
+if defined FLAG_CHCP set COPY_BARE_FLAGS= -chcp "%FLAG_CHCP%"
 
 if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
   ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat"%%XCOPY_BARE_FLAGS%% "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^
       "%FROM_FILE%" == "%TO_FILE%" (
     (
-      call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
+      call "%%CONTOOLS_ROOT%%/std/copy.bat"%%COPY_BARE_FLAGS%% "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
     ) && (
       call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || exit /b
     )
   )
 ) else if /i not "%FROM_FILE%" == "%TO_FILE%" (
   (
-    call "%%CONTOOLS_ROOT%%/std/copy.bat" "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
+    call "%%CONTOOLS_ROOT%%/std/copy.bat"%%COPY_BARE_FLAGS%% "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
   ) && (
     call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || exit /b
   )
