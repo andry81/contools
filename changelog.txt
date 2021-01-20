@@ -1,3 +1,6 @@
+2021.01.21:
+* changed: Scripts/Tools/std: get_wmic_*.bat: use direct path to the `wmic.exe`
+
 2021.01.20:
 * changed: Scripts/Tools/std: allocate_temp_dir.bat: return error code from the last `mkdir` command to handle `access denied` case
 * changed: Scripts/Tools/std: free_temp_dir.bat: check directory existence before `rmdir`
