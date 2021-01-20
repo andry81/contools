@@ -90,7 +90,7 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%?~n0%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+  echo.%?~nx0%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
   exit /b -250
 ) >&2
 
@@ -123,9 +123,9 @@ goto TO_PATH_OK
 
 :TO_PATH_OK
 
-set "FROM_PATH_ABS=%~f1"
-set "TO_PATH_ABS=%~f2"
-set "TO_DIR_ABS=%~dp2"
+for /F "eol= tokens=* delims=" %%i in ("%~f1\.") do set "FROM_PATH_ABS=%%~fi"
+for /F "eol= tokens=* delims=" %%i in ("%~f2\.") do set "TO_PATH_ABS=%%~fi"
+for /F "eol= tokens=* delims=" %%i in ("%~dp2\.") do set "TO_DIR_ABS=%%~fi"
 
 if not exist "\\?\%FROM_PATH_ABS%\" (
   echo.%?~n0%: error: input directory does not exist: "%FROM_PATH%\"
@@ -142,7 +142,7 @@ if not exist "\\?\%TO_PATH_ABS%\" (
 goto INIT
 
 :CHECK_PARENT_DIR
-if not exist "\\?\%TO_DIR_ABS%" (
+if not exist "\\?\%TO_DIR_ABS%\" (
   echo.%?~n0%: error: output directory does not exist: "%TO_DIR_ABS%"
   exit /b -250
 ) >&2
@@ -150,12 +150,19 @@ if not exist "\\?\%TO_DIR_ABS%" (
 :INIT
 call "%%?~dp0%%__init__.bat" || exit /b
 
-set XCOPY_FLAGS=%3 %4 %5 %6 %7 %8 %9
+set XCOPY_FLAGS_=%3 %4 %5 %6 %7 %8 %9
 
 if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
 if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
 
 :USE_XCOPY
+set "XCOPY_FLAGS="
+set XCOPY_FLAG_MOVE=0
+for %%i in (%XCOPY_FLAGS_%) do (
+  set XCOPY_FLAG=%%i
+  call :ROBOCOPY_FLAGS_CONVERT %%XCOPY_FLAG%%
+)
+
 rem CAUTION:
 rem   You must switch code page into english compatible locale.
 rem
@@ -179,9 +186,14 @@ if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%
 
 :IGNORE_XCOPY_EXCLUDES
 
-rem echo.D will ONLY work if locale is compatible with english !!!
-echo.^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
-echo.D|"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%\" %XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
+if %XCOPY_FLAG_MOVE% EQU 0 (
+  rem echo.D will ONLY work if locale is compatible with english !!!
+  echo.^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
+  echo.D|"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
+) else (
+  echo.^>^>move "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
+  move "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
+)
 set LASTERROR=%ERRORLEVEL%
 
 :EXIT
@@ -195,11 +207,19 @@ if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 exit /b %LASTERROR%
 
+:ROBOCOPY_FLAGS_CONVERT
+set "XCOPY_FLAG=%~1"
+set XCOPY_FLAG_PARSED=0
+if "%XCOPY_FLAG%" == "/DCOPY:T" exit /b 1
+if "%XCOPY_FLAG%" == "/MOVE" ( set "XCOPY_FLAG_MOVE=1" & exit /b 1 )
+if %XCOPY_FLAG_PARSED% EQU 0 set "XCOPY_FLAGS=%XCOPY_FLAGS% %XCOPY_FLAG%"
+exit /b 0
+
 :USE_ROBOCOPY
 set "ROBOCOPY_FLAGS="
 set "ROBOCOPY_ATTR_COPY=0"
 if not defined ROBOCOPY_COPY_FLAGS set "ROBOCOPY_COPY_FLAGS=DAT"
-for %%i in (%XCOPY_FLAGS%) do (
+for %%i in (%XCOPY_FLAGS_%) do (
   set XCOPY_FLAG=%%i
   call :XCOPY_FLAGS_CONVERT %%XCOPY_FLAG%%
 )
@@ -216,11 +236,8 @@ if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
 
 :IGNORE_ROBOCOPY_EXCLUDES
 
-if "%FROM_PATH_ABS:~-1%" == "\" set "FROM_PATH_ABS=%FROM_PATH_ABS%\"
-if "%TO_PATH_ABS:~-1%" == "\" set "TO_PATH_ABS=%TO_PATH_ABS%\"
-
-echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
-"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS% %ROBOCOPY_FLAGS%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS%%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /COPY:%ROBOCOPY_COPY_FLAGS%%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
@@ -229,19 +246,19 @@ set "XCOPY_FLAG=%~1"
 set XCOPY_FLAG_PARSED=0
 if "%XCOPY_FLAG%" == "/Y" exit /b 1
 if "%XCOPY_FLAG%" == "/R" exit /b 1
-if "%XCOPY_FLAG%" == "/D" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/XO " & set XCOPY_FLAG_PARSED=1
+if "%XCOPY_FLAG%" == "/D" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /XO" & set XCOPY_FLAG_PARSED=1
 rem CAUTION:
 rem   DO NOT USE "/IA" flag because:
 rem   1. It does implicitly exclude those files which were not included (imlicit exclude).
 rem   2. It does ignore files without any attribute even if all attribute set is used: `/IA:RASHCNETO`.
 rem
-rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/H" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/IA:RASHCNETO " & set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
-rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/K" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/IA:RASHCNETO " & set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
+rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/H" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
+rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/K" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
 if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/H" ( set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
 if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/K" ( set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
 if "%XCOPY_FLAG%" == "/O" call :SET_ROBOCOPY_SO_FLAGS
 if "%XCOPY_FLAG%" == "/X" call :SET_ROBOCOPY_U_FLAG
-if %XCOPY_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%%XCOPY_FLAG% "
+if %XCOPY_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% %XCOPY_FLAG%"
 exit /b 0
 
 :SET_ROBOCOPY_SO_FLAGS

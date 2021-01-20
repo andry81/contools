@@ -1,3 +1,7 @@
+2021.01.20:
+* fixed: Scripts/Tools/std: xcopy_file.bat: handle of `robocopy` `/MOV` flag in case of fall back to the `xcopy.exe` tool
+* fixed: Scripts/Tools/std: xcopy_dir.bat: handle of `robocopy` `/DCOPY:T` and `/MOVE` flags in case of fall back to the `xcopy.exe` tool
+
 2021.01.17:
 * changed: Scripts/Tools/std: xcopy_rename.bat: pass `-chcp` flag to the `copy.bat` script
 * changed: __init__: canonical path subroutine change
