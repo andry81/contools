@@ -163,6 +163,13 @@ if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
 if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
 
 :USE_XCOPY
+set "XCOPY_FLAGS="
+set XCOPY_FLAG_MOVE=0
+for %%i in (%XCOPY_FLAGS_%) do (
+  set XCOPY_FLAG=%%i
+  call :ROBOCOPY_FLAGS_CONVERT %%XCOPY_FLAG%%
+)
+
 rem CAUTION:
 rem   You must switch code page into english compatible locale.
 rem
