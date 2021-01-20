@@ -1,4 +1,8 @@
 2021.01.20:
+* changed: Scripts/Tools/std: allocate_temp_dir.bat: return error code from the last `mkdir` command to handle `access denied` case
+* changed: Scripts/Tools/std: free_temp_dir.bat: check directory existence before `rmdir`
+
+2021.01.20:
 * fixed: Scripts/Tools/std: xcopy_file.bat: handle of `robocopy` `/MOV` flag in case of fall back to the `xcopy.exe` tool
 * fixed: Scripts/Tools/std: xcopy_dir.bat: handle of `robocopy` `/DCOPY:T` and `/MOVE` flags in case of fall back to the `xcopy.exe` tool
 
