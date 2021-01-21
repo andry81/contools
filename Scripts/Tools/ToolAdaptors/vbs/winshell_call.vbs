@@ -14,6 +14,7 @@ Dim ExpandArg0 : ExpandArg0 = False
 Dim ExpandTailArgs : ExpandTailArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
 Dim NoWindow : NoWindow = False
+Dim WaitOnFileExist : WaitOnFileExist = ""
 
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
 Dim objWinShell : Set objWinShell = WScript.CreateObject("Shell.Application")
@@ -46,6 +47,9 @@ For i = 0 To WScript.Arguments.Count-1
         AlwaysQuote = True
       ElseIf WScript.Arguments(i) = "-nowindow" Then
         NoWindow = True
+      ElseIf WScript.Arguments(i) = "-wait_on_file_exist" Then
+        i = i + 1
+        WaitOnFileExist = WScript.Arguments(i)
       End If
     Else
       ExpectFlags = False
@@ -90,3 +94,10 @@ ReDim Preserve param_args(j - 1)
 ' MsgBox cmd_arg & " " & Join(param_args, " ")
 
 objWinShell.ShellExecute cmd_arg, Join(param_args, " "), ChangeCurrentDirectory, Verb, ShowAs
+
+If WaitOnFileExist <> "" Then
+  Dim fs_obj : Set fs_obj = CreateObject("Scripting.FileSystemObject")
+  Do Until Not fs_obj.FileExists(WaitOnFileExist)
+    WScript.Sleep 20
+  Loop
+End If
