@@ -1,3 +1,6 @@
+2021.01.23:
+* changed: Scripts/Tools/std: `get_wmic_os_sp_major_version.bat` script to extract OS service pack major version
+
 2021.01.21:
 * new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs: `-wait_on_file_exist` flag to emulate await of a child process
 
