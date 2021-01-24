@@ -51,7 +51,7 @@ if exist "linkd.exe" goto LINKD
 
 :MKLINK
 if not exist "%SYSTEMROOT%\System64\" (
-  if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
+  if /i "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
     rem already in the 64-bit mode
     call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @mklink /D "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
   ) else if defined PROCESSOR_ARCHITEW6432 (
@@ -64,7 +64,7 @@ exit /b 0
 
 :LINKD
 if not exist "%SYSTEMROOT%\System64\" (
-  if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
+  if /i "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
     rem already in the 64-bit mode
     call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @linkd.exe "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
   ) else if defined PROCESSOR_ARCHITEW6432 (
