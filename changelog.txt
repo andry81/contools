@@ -1,3 +1,7 @@
+2021.01.24:
+* new: Utilities/bin/sysinternals: `junction*.exe` utilities
+* changed: Scripts/Tools/ToolAdaptors/lnk: mklink_system64.bat: minor change
+
 2021.01.23:
 * changed: Scripts/Tools/std: `get_wmic_os_sp_major_version.bat` script to extract OS service pack major version
 
@@ -120,7 +124,7 @@
 * changed: Scripts/Tools/ToolAdaptors/vbs: minor change
 
 2021.01.07:
-* new: Utilities: bin/sysinternals: `movefiles.exe` and `pendmoves.exe` utilities
+* new: Utilities/bin/sysinternals: `movefiles.exe` and `pendmoves.exe` utilities
 
 2021.01.06:
 * new: Scripts/Tools/ToolAdaptors/vbs: `-E*` flags for environment variables expansion in particular arguments
@@ -173,7 +177,7 @@
 * new: Scripts/Tools/std: `pause.bat` script to pause with correct print in the log with previously has used code page
 
 2020.12.02:
-* new: Utilities: src/wshbazaar/wshdynacall: `DllUnregisterServer` implementation
+* new: Utilities/src/wshbazaar/wshdynacall: `DllUnregisterServer` implementation
 
 2020.12.02:
 * fixed: Utilities: x64 configuration build fixup
