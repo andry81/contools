@@ -12,7 +12,14 @@ rem
 
 setlocal & set "LASTERROR=%ERRORLEVEL%"
 
-if not exist "%SystemRoot%\System32\chcp.com" if exist "%SystemRoot%\System32\timeout.exe" ( "%SystemRoot%\System32\timeout.exe" /T -1 & exit /b %LASTERROR% ) else ( pause & exit /b %LASTERROR% )
+set "CHCP_FILE="
+if exist "%SystemRoot%\System32\chcp.com" set "CHCP_FILE=%SystemRoot%\System32\chcp.com"
+if not defined CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "CHCP_FILE=%SystemRoot%\System64\chcp.com"
+
+if not defined CHCP_FILE (
+  if exist "%SystemRoot%\System32\timeout.exe" ( "%SystemRoot%\System32\timeout.exe" /T -1 ) else pause
+  exit /b %LASTERROR%
+)
 
 set "?~dp0=%~dp0"
 set "?~n0=%~n0"
@@ -50,14 +57,15 @@ if defined FLAG_CHCP (
   exit /b %LASTERROR%
 )
 
-if defined "%SystemRoot%\System32\chcp.com" for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%SystemRoot%%\System32\chcp.com" 2^>nul`) do set "CURRENT_CP=%%j"
+for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" 2^>nul`) do set "CURRENT_CP=%%j"
 if defined CURRENT_CP set "CURRENT_CP=%CURRENT_CP: =%"
 
 if exist "%SystemRoot%\System32\timeout.exe" (
-  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%SystemRoot%\System32\chcp.com" %LAST_CP% >nul & "%SystemRoot%\System32\timeout.exe" /T -1 & "%SystemRoot%\System32\chcp.com" %CURRENT_CP% >nul & exit /b %LASTERROR% )
+  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% >nul & "%SystemRoot%\System32\timeout.exe" /T -1 & "%CHCP_FILE%" %CURRENT_CP% >nul & exit /b %LASTERROR% )
   "%SystemRoot%\System32\timeout.exe" /T -1
 ) else (
-  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%SystemRoot%\System32\chcp.com" %LAST_CP% >nul & pause & "%SystemRoot%\System32\chcp.com" %CURRENT_CP% >nul & exit /b %LASTERROR% )
+  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% >nul & pause & "%CHCP_FILE%" %CURRENT_CP% >nul & exit /b %LASTERROR% )
   pause
 )
+
 exit /b %LASTERROR%

@@ -328,6 +328,7 @@ Scripts/Tools/ToolAdaptors/lnk/cmd_system64_minimized.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_admin.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/cmd_wow64_minimized.lnk -text
+Scripts/Tools/ToolAdaptors/lnk/install_system64_link.bat -text
 Scripts/Tools/ToolAdaptors/lnk/mklink_system64.bat -text
 Scripts/Tools/ToolAdaptors/lnk/mycomputer.lnk -text
 Scripts/Tools/ToolAdaptors/lnk/runas_admin.bat -text
@@ -613,6 +614,7 @@ Scripts/Tools/std/gen_config.bat -text
 Scripts/Tools/std/get_wmic_local_datetime.bat -text
 Scripts/Tools/std/get_wmic_os_sp_major_version.bat -text
 Scripts/Tools/std/get_wmic_os_version.bat -text
+Scripts/Tools/std/getcp.bat -text
 Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
 Scripts/Tools/std/load_config.bat -text
