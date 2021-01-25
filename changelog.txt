@@ -1,3 +1,8 @@
+2021.01.26:
+* fixed: Scripts/Tools/std: `chcp.com` tool access additionally from the `%SystemRoot%\System64` directory
+* new: Scripts/Tools/ToolAdaptors/lnk: `install_system64_link.bat` script to portably create `%SystemRoot%\System64` link under Windows XP/7 x64
+* new: Scripts/Tools/std: `getcp.bat` script to portably get code page
+
 2021.01.24:
 * new: Utilities/bin/sysinternals: `junction*.exe` utilities
 * changed: Scripts/Tools/ToolAdaptors/lnk: mklink_system64.bat: minor change
