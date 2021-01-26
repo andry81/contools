@@ -1,4 +1,8 @@
 2021.01.26:
+* fixed: Scripts/Tools/ToolAdaptors/lnk: install_system64_link.bat: elevated call under data protection flag in Windows XP
+* changed: Scripts/Tools/std: wmic_*.bat: important notice of usage in Windows XP
+
+2021.01.26:
 * fixed: Scripts/Tools/std: `chcp.com` tool access additionally from the `%SystemRoot%\System64` directory
 * new: Scripts/Tools/ToolAdaptors/lnk: `install_system64_link.bat` script to portably create `%SystemRoot%\System64` link under Windows XP/7 x64
 * new: Scripts/Tools/std: `getcp.bat` script to portably get code page

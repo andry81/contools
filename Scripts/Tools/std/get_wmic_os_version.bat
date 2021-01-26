@@ -3,8 +3,12 @@
 rem Description:
 rem   Independent to Windows OS version request.
 
+rem CAUTION:
+rem   In Windowx XP an elevated call under data protection flag will block the wmic tool!
+rem
+
 rem Drop last error level
-type nul>nul
+type nul >nul
 
 rem drop return value
 set "RETURN_VALUE="
