@@ -1,3 +1,7 @@
+2021.01.30:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs: invalid type message fix
+* new: Scripts/Tools/ToolAdaptors/vbs: `winshell_call.bat` script
+
 2021.01.26:
 * fixed: Scripts/Tools/ToolAdaptors/lnk: install_system64_link.bat: elevated call under data protection flag in Windows XP
 * changed: Scripts/Tools/std: wmic_*.bat: important notice of usage in Windows XP

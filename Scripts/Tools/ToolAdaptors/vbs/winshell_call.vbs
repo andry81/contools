@@ -1,5 +1,5 @@
 Dim cmd_arg
-Dim param_args
+Dim param_args : param_args = Array()
 If WScript.Arguments.Count > 1 Then
   ReDim param_args(WScript.Arguments.Count - 2)
 End If
