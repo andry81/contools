@@ -1,3 +1,6 @@
+2021.02.01:
+* changed: Scripts/Tools/ToolAdaptors/vbs: minor changes
+
 2021.01.30:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs: invalid type message fix
 * new: Scripts/Tools/ToolAdaptors/vbs: `winshell_call.bat` script
