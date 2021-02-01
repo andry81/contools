@@ -28,11 +28,21 @@
 '''   make_shortcut.bat -CD "%WINDIR%\System32" -unesc cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
 '''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
 
-
 ''' Example to create MyComputer shortcut:
 '''   >
 '''   del /F /Q mycomputer.lnk
 '''   make_shortcut.bat mycomputer.lnk
+''' Or
+'''   >
+'''   del /F /Q mycomputer.lnk
+'''   make_shortcut.bat mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
+
+''' Example to create MTP device folder shortcut:
+'''   >
+'''   del /F /Q mycomputer.lnk
+'''   make_shortcut.bat mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
+'''
+''' , where the `\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}` might be different for each device
 
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
