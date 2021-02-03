@@ -84,8 +84,4 @@ If ChangeCurrentDirectory <> "" Then
   objShell.CurrentDirectory = ChangeCurrentDirectory
 End If
 
-If Not NoWait Then
-  objShell.Run Join(args, " "), ShowAs, True
-Else
-  objShell.Run Join(args, " "), ShowAs, False
-End If
+objShell.Run Join(args, " "), ShowAs, Not NoWait
