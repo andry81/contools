@@ -1,3 +1,6 @@
+2021.02.03:
+* changed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: code cleanup
+
 2021.02.01:
 * changed: Scripts/Tools/ToolAdaptors/vbs: minor changes
 
