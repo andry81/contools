@@ -1,3 +1,9 @@
+2021.02.04:
+* fixed: Scripts/Tools/std: `get_wmic_*.bat` minor fixup
+* new: Scripts/Tools/wmi: `get_wmic_first_display_resolution.bat` script to request first display resolution
+* changed: Scripts/Tools: all scripts moved to use `wmi` directory to access wmi instead of `std`
+* refactor: Scripts/Tools/std: `get_wmic_*.bat` scripts moved into `Scripts/Tools/wmi` directory
+
 2021.02.03:
 * changed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: code cleanup
 

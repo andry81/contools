@@ -612,9 +612,6 @@ Scripts/Tools/std/del_file_pttn.bat -text
 Scripts/Tools/std/echo_var.bat -text
 Scripts/Tools/std/free_temp_dir.bat -text
 Scripts/Tools/std/gen_config.bat -text
-Scripts/Tools/std/get_wmic_local_datetime.bat -text
-Scripts/Tools/std/get_wmic_os_sp_major_version.bat -text
-Scripts/Tools/std/get_wmic_os_version.bat -text
 Scripts/Tools/std/getcp.bat -text
 Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
@@ -663,6 +660,10 @@ Scripts/Tools/vars/iconv.default_ansi_locale.var -text
 Scripts/Tools/wctoansi.bat -text
 Scripts/Tools/which.bat -text
 Scripts/Tools/winver.bat -text
+Scripts/Tools/wmi/get_wmic_first_display_resolution.bat -text
+Scripts/Tools/wmi/get_wmic_local_datetime.bat -text
+Scripts/Tools/wmi/get_wmic_os_sp_major_version.bat -text
+Scripts/Tools/wmi/get_wmic_os_version.bat -text
 Scripts/Tools/xcopy/__init__.bat -text
 Scripts/Tools/xcopy/convert_excludes_to_7zip.bat -text
 Scripts/Tools/xcopy/convert_excludes_to_robocopy.bat -text
