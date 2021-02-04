@@ -16,7 +16,7 @@ set "RETURN_VALUE="
 set "CurrentHorizontalResolution="
 set "CurrentVerticalResolution="
 
-for /F "usebackq eol= tokens=1,2 delims==" %%i in (`"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_VideoController get CurrentHorizontalResolution^,CurrentVerticalResolution /VALUE`) do (
+for /F "usebackq eol= tokens=1,2 delims==" %%i in (`"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_VideoController get CurrentHorizontalResolution^,CurrentVerticalResolution /VALUE 2^>nul`) do (
   if "%%i" == "CurrentHorizontalResolution" set "CurrentHorizontalResolution=%%j"
   if "%%i" == "CurrentVerticalResolution" set "CurrentVerticalResolution=%%j"
 )
