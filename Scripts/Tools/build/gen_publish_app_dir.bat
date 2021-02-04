@@ -49,7 +49,7 @@ if defined PUBLISH_APP_DIR_VALUE exit /b 0
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/get_wmic_local_datetime.bat"
+call "%%CONTOOLS_ROOT%%\wmi\get_wmic_local_datetime.bat"
 if not defined PUBLISH_DATE set "PUBLISH_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
 if not defined PUBLISH_TIME set "PUBLISH_TIME=%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 

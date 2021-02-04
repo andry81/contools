@@ -13,7 +13,7 @@ if %NEST_LVL%0 EQU 0 set WITH_LOGGING=1
 if %WITH_LOGGING% EQU 0 goto IMPL
 
 rem use stdout/stderr redirection with logging
-call "%%CONTOOLS_ROOT%%\std\get_wmic_local_datetime.bat"
+call "%%CONTOOLS_ROOT%%\wmi\get_wmic_local_datetime.bat"
 set "LOG_FILE_NAME_SUFFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
 
 set "PROJECT_LOG_DIR=%PROJECT_LOG_ROOT%/%LOG_FILE_NAME_SUFFIX%.%~n0"

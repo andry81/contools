@@ -12,7 +12,7 @@ for %%i in (PROJECT_CMAKE_ROOT TACKLELIB_CMAKE_SCRIPTS_ROOT) do (
 )
 
 rem create temporary directory
-call "%%CONTOOLS_ROOT%%/std/get_wmic_local_datetime.bat"
+call "%%CONTOOLS_ROOT%%\wmi\get_wmic_local_datetime.bat"
 set "DATETIME_VALUE=%RETURN_VALUE%"
 
 if not defined DATETIME_VALUE (
