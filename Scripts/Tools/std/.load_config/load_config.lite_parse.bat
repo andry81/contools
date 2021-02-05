@@ -40,7 +40,7 @@ if not "%__?ATTR:|once|=%" == "%__?ATTR%" if defined %__?VAR% exit /b 0
 
 set __?QUOT__=^"
 set "__?EXCL__=!" & set "__?ESC__=^"
-set "__?VALUE=%__?VALUE:!=!__?EXCL__!%"
-set "__?VALUE=%__?VALUE:=!__?QUOT__!%"
-set "__?VALUE=%__?VALUE:^=!__?ESC__!%"
+if defined __?VALUE set "__?VALUE=%__?VALUE:!=!__?EXCL__!%"
+if defined __?VALUE set "__?VALUE=%__?VALUE:=!__?QUOT__!%"
+if defined __?VALUE set "__?VALUE=%__?VALUE:^=!__?ESC__!%"
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("%__?VALUE%") do ( endlocal & set "%__?VAR%=%%i" )

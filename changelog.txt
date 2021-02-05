@@ -1,3 +1,6 @@
+2021.02.05:
+* fixed: Scripts/Tools/std: load_config.bat: fast parse of a variable with empty value
+
 2021.02.04:
 * new: Utilities/bin: `conutils` from `ss64.net`
 
