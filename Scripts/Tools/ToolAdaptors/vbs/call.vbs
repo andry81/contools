@@ -11,7 +11,7 @@ Dim AlwaysQuote : AlwaysQuote = False
 Dim NoWait : NoWait = False
 Dim NoWindow : NoWindow = False
 
-Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
+Dim shell_obj : Set shell_obj = WScript.CreateObject("WScript.Shell")
 
 Dim arg
 Dim i, j : j = 0
@@ -49,11 +49,11 @@ For i = 0 To WScript.Arguments.Count-1
     arg = WScript.Arguments(i)
 
     If ExpandArgs Then
-      arg = objShell.ExpandEnvironmentStrings(arg)
+      arg = shell_obj.ExpandEnvironmentStrings(arg)
     ElseIf ExpandArg0 And j = 0 Then
-      arg = objShell.ExpandEnvironmentStrings(arg)
+      arg = shell_obj.ExpandEnvironmentStrings(arg)
     ElseIf ExpandTailArgs And j > 0 Then
-      arg = objShell.ExpandEnvironmentStrings(arg)
+      arg = shell_obj.ExpandEnvironmentStrings(arg)
     End If
 
     If UnescapeArgs Then
@@ -81,7 +81,7 @@ ReDim Preserve args(j - 1)
 ' MsgBox Join(args, " ")
 
 If ChangeCurrentDirectory <> "" Then
-  objShell.CurrentDirectory = ChangeCurrentDirectory
+  shell_obj.CurrentDirectory = ChangeCurrentDirectory
 End If
 
-objShell.Run Join(args, " "), ShowAs, Not NoWait
+shell_obj.Run Join(args, " "), ShowAs, Not NoWait
