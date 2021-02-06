@@ -1,3 +1,8 @@
+2021.02.06:
+* new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs: `-make_temp_dir_as_cwd` option to allocate temporary directory as current directory for the `ShellExecute` call and replace all instances in the command
+* new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs: `-wait_delete_cwd` option to delete current working directory on exit
+* refactor: Scripts/Tools/ToolAdaptors/vbs: call.vbs: minor refactor
+
 2021.02.05:
 * fixed: Scripts/Tools/std: load_config.bat: fast parse of a variable with empty value
 

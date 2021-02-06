@@ -14,10 +14,15 @@ Dim ExpandArg0 : ExpandArg0 = False
 Dim ExpandTailArgs : ExpandTailArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
 Dim NoWindow : NoWindow = False
+Dim MakeTempDirAsCWD : MakeTempDirAsCWD = ""
+Dim WaitDeleteCWD : WaitDeleteCWD = 0
 Dim WaitOnFileExist : WaitOnFileExist = ""
 
-Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
-Dim objWinShell : Set objWinShell = WScript.CreateObject("Shell.Application")
+Dim now_obj, timer_obj
+
+Dim shell_obj : Set shell_obj = WScript.CreateObject("WScript.Shell")
+Dim winshell_obj : Set winshell_obj = WScript.CreateObject("Shell.Application")
+Dim fs_obj : Set fs_obj = CreateObject("Scripting.FileSystemObject")
 
 Dim arg
 Dim IsCmdArg : IsCmdArg = True
@@ -47,6 +52,17 @@ For i = 0 To WScript.Arguments.Count-1
         AlwaysQuote = True
       ElseIf WScript.Arguments(i) = "-nowindow" Then
         NoWindow = True
+      ElseIf WScript.Arguments(i) = "-make_temp_dir_as_cwd" Then
+        i = i + 1
+        MakeTempDirAsCWD = WScript.Arguments(i)
+        now_obj = Now
+        timer_obj = Timer
+        ChangeCurrentDirectory = fs_obj.GetSpecialFolder(2) & "\" & _
+          Year(now_obj) & "'" & Right("0" & Month(now_obj),2) & "'" & Right("0" & Day(now_obj),2) & "." & _
+          Right("0" & Hour(now_obj),2) & "'" & Right("0" & Minute(now_obj),2) & "'" & Right("0" & Second(now_obj),2) & "''" & Right("0" & Int((timer_obj - Int(timer_obj)) * 1000),3) & "." & _
+          "winshell_call"
+      ElseIf WScript.Arguments(i) = "-wait_delete_cwd" Then ' ShellExecute current working directory, because the Windows locks current directory for a process being ran
+        WaitDeleteCWD = 1
       ElseIf WScript.Arguments(i) = "-wait_on_file_exist" Then
         i = i + 1
         WaitOnFileExist = WScript.Arguments(i)
@@ -60,15 +76,19 @@ For i = 0 To WScript.Arguments.Count-1
     arg = WScript.Arguments(i)
 
     If ExpandArgs Then
-      arg = objShell.ExpandEnvironmentStrings(arg)
+      arg = shell_obj.ExpandEnvironmentStrings(arg)
     ElseIf ExpandArg0 And j = 0 Then
-      arg = objShell.ExpandEnvironmentStrings(arg)
+      arg = shell_obj.ExpandEnvironmentStrings(arg)
     ElseIf ExpandTailArgs And j > 0 Then
-      arg = objShell.ExpandEnvironmentStrings(arg)
+      arg = shell_obj.ExpandEnvironmentStrings(arg)
     End If
 
     If UnescapeArgs Then
       arg = Unescape(arg)
+    End If
+
+    If MakeTempDirAsCWD <> "" Then
+      arg = Replace(arg, MakeTempDirAsCWD, ChangeCurrentDirectory, 1, -1, vbBinaryCompare)
     End If
 
     If InStr(arg, Chr(34)) = 0 Then
@@ -93,11 +113,47 @@ ReDim Preserve param_args(j - 1)
 
 ' MsgBox cmd_arg & " " & Join(param_args, " ")
 
-objWinShell.ShellExecute cmd_arg, Join(param_args, " "), ChangeCurrentDirectory, Verb, ShowAs
+If MakeTempDirAsCWD <> "" Then
+  fs_obj.CreateFolder ChangeCurrentDirectory
+End If
+
+Dim PrevCurrentDirectory : PrevCurrentDirectory = shell_obj.CurrentDirectory
+
+If ChangeCurrentDirectory <> "" Then
+  shell_obj.CurrentDirectory = ChangeCurrentDirectory
+End If
+
+winshell_obj.ShellExecute cmd_arg, Join(param_args, " "), ChangeCurrentDirectory, Verb, ShowAs
+
+If WaitDeleteCWD And ChangeCurrentDirectory <> "" Then
+  ' ShellExecute startup synchronization timeout
+  WScript.Sleep 1000
+End If
+
+If ChangeCurrentDirectory <> "" Then
+  shell_obj.CurrentDirectory = PrevCurrentDirectory
+End If
+
+If WaitDeleteCWD And ChangeCurrentDirectory <> "" Then
+  Do Until Not fs_obj.FolderExists(ChangeCurrentDirectory)
+    On Error Resume Next
+    fs_obj.DeleteFolder ChangeCurrentDirectory, False
+    On Error Goto 0
+    WScript.Sleep 20
+  Loop
+End If
 
 If WaitOnFileExist <> "" Then
-  Dim fs_obj : Set fs_obj = CreateObject("Scripting.FileSystemObject")
   Do Until Not fs_obj.FileExists(WaitOnFileExist)
     WScript.Sleep 20
   Loop
+End If
+
+' cleanup
+If MakeTempDirAsCWD <> "" And Not WaitDeleteCWD And ChangeCurrentDirectory <> "" Then
+  If fs_obj.FolderExists(ChangeCurrentDirectory) Then
+    On Error Resume Next
+    fs_obj.DeleteFolder ChangeCurrentDirectory, False
+    On Error Goto 0
+  End If
 End If
