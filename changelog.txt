@@ -1,3 +1,6 @@
+2021.02.07:
+* fixed: Scripts/Tools/std: chcp.bat, getcp.bat, restorecp.bat, pause.bat: suppress stdin to avoid external stdin redirection reset under Windows XP (Windows XP bug)
+
 2021.02.06:
 * new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs: `-make_temp_dir_as_cwd` option to allocate temporary directory as current directory for the `ShellExecute` call and replace all instances in the command
 * new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs: `-wait_delete_cwd` option to delete current working directory on exit

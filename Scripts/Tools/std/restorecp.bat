@@ -49,7 +49,7 @@ if not defined CHCP_FILE (
 ) >&2
 
 set "LAST_CP=%CURRENT_CP%"
-if not defined LAST_CP for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" 2^>nul`) do set "LAST_CP=%%j"
+if not defined LAST_CP for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" ^<nul 2^>nul`) do set "LAST_CP=%%j"
 
 set "CURRENT_CP="
 for /F "eol= tokens=1,* delims=|" %%i in ("%CP_HISTORY_LIST%") do ( set "CURRENT_CP=%%i" & set "CP_HISTORY_LIST=%%j" )
@@ -59,8 +59,8 @@ if "%CURRENT_CP%" == "%LAST_CP%" exit /b 0
 
 rem echo.chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
 if %FLAG_PRINT% NEQ 0 (
-  "%CHCP_FILE%" %CURRENT_CP%
-) else "%CHCP_FILE%" %CURRENT_CP% >nul
+  "%CHCP_FILE%" %CURRENT_CP% <nul
+) else "%CHCP_FILE%" %CURRENT_CP% <nul >nul
 
 (
   endlocal
