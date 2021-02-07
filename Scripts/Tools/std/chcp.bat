@@ -60,7 +60,7 @@ if not defined CHCP_FILE (
 if not defined CP_HISTORY_LIST goto INIT
 
 set "LAST_CP=%CURRENT_CP%"
-if not defined LAST_CP for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" 2^>nul`) do set "LAST_CP=%%j"
+if not defined LAST_CP for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" ^<nul 2^>nul`) do set "LAST_CP=%%j"
 set "CP_HISTORY_LIST=%LAST_CP%|%CP_HISTORY_LIST%"
 set "CURRENT_CP=%CODE_PAGE%"
 
@@ -68,7 +68,7 @@ goto UPDATECP
 
 :INIT
 set "LAST_CP="
-for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" 2^>nul`) do set "LAST_CP=%%j"
+for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" ^<nul 2^>nul`) do set "LAST_CP=%%j"
 if defined LAST_CP set "LAST_CP=%LAST_CP: =%"
 
 set "CURRENT_CP=%CODE_PAGE%"
@@ -78,8 +78,8 @@ set "CP_HISTORY_LIST=%LAST_CP%|"
 if "%CURRENT_CP%" == "%LAST_CP%" goto EXIT
 
 if %FLAG_PRINT% NEQ 0 (
-  "%CHCP_FILE%" %CURRENT_CP% || set "CURRENT_CP=%LAST_CP%"
-) else "%CHCP_FILE%" %CURRENT_CP% >nul || set "CURRENT_CP=%LAST_CP%"
+  "%CHCP_FILE%" %CURRENT_CP% <nul || set "CURRENT_CP=%LAST_CP%"
+) else "%CHCP_FILE%" %CURRENT_CP% <nul >nul || set "CURRENT_CP=%LAST_CP%"
 
 :EXIT
 (

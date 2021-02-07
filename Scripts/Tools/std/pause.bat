@@ -57,14 +57,14 @@ if defined FLAG_CHCP (
   exit /b %LASTERROR%
 )
 
-for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" 2^>nul`) do set "CURRENT_CP=%%j"
+for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" ^<nul 2^>nul`) do set "CURRENT_CP=%%j"
 if defined CURRENT_CP set "CURRENT_CP=%CURRENT_CP: =%"
 
 if exist "%SystemRoot%\System32\timeout.exe" (
-  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% >nul & "%SystemRoot%\System32\timeout.exe" /T -1 & "%CHCP_FILE%" %CURRENT_CP% >nul & exit /b %LASTERROR% )
+  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% <nul >nul & "%SystemRoot%\System32\timeout.exe" /T -1 & "%CHCP_FILE%" %CURRENT_CP% <nul >nul & exit /b %LASTERROR% )
   "%SystemRoot%\System32\timeout.exe" /T -1
 ) else (
-  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% >nul & pause & "%CHCP_FILE%" %CURRENT_CP% >nul & exit /b %LASTERROR% )
+  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% <nul >nul & pause & "%CHCP_FILE%" %CURRENT_CP% <nul >nul & exit /b %LASTERROR% )
   pause
 )
 
