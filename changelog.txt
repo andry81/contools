@@ -1,3 +1,6 @@
+2021.02.08:
+* fixed: Scripts/Tools/std: chcp.bat, restorecp.bat: Windows XP implementation has an issue over double redirection, so the stdin redirection must be separated from the stdout redirection
+
 2021.02.07:
 * fixed: Scripts/Tools/std: chcp.bat, getcp.bat, restorecp.bat, pause.bat: suppress stdin to avoid external stdin redirection reset under Windows XP (Windows XP bug)
 
