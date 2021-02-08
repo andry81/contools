@@ -77,9 +77,14 @@ set "CP_HISTORY_LIST=%LAST_CP%|"
 :UPDATECP
 if "%CURRENT_CP%" == "%LAST_CP%" goto EXIT
 
-if %FLAG_PRINT% NEQ 0 (
-  "%CHCP_FILE%" %CURRENT_CP% <nul || set "CURRENT_CP=%LAST_CP%"
-) else "%CHCP_FILE%" %CURRENT_CP% <nul >nul || set "CURRENT_CP=%LAST_CP%"
+rem CAUTION:
+rem   Windows XP implementation has an issue over double redirection, so the stdin redirection must be separated from the stdout redirection.
+rem
+(
+  if %FLAG_PRINT% NEQ 0 (
+    "%CHCP_FILE%" %CURRENT_CP% || set "CURRENT_CP=%LAST_CP%"
+  ) else "%CHCP_FILE%" %CURRENT_CP% >nul || set "CURRENT_CP=%LAST_CP%"
+) <nul
 
 :EXIT
 (

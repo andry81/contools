@@ -58,9 +58,15 @@ if not defined CURRENT_CP exit /b 0
 if "%CURRENT_CP%" == "%LAST_CP%" exit /b 0
 
 rem echo.chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
-if %FLAG_PRINT% NEQ 0 (
-  "%CHCP_FILE%" %CURRENT_CP% <nul
-) else "%CHCP_FILE%" %CURRENT_CP% <nul >nul
+
+rem CAUTION:
+rem   Windows XP implementation has an issue over double redirection, so the stdin redirection must be separated from the stdout redirection.
+rem
+(
+  if %FLAG_PRINT% NEQ 0 (
+    "%CHCP_FILE%" %CURRENT_CP%
+  ) else "%CHCP_FILE%" %CURRENT_CP% >nul
+) <nul
 
 (
   endlocal
