@@ -1,3 +1,8 @@
+2021.02.08:
+* changed: Projects: moved to build for the Windows XP x86 SP2 or Windows XP x64 SP1
+* changed: bin/contools: rebuild to run at least under Windows XP x86 SP2
+* changed: bin/wshbazaar/wshdynacall: wshdynacall32.dll: rebuild to run at least under Windows XP x86 SP2
+
 2021.02.04:
 * new: bin: `conutils` from `ss64.net`
 
