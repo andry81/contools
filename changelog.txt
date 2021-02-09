@@ -1,3 +1,6 @@
+2021.02.09:
+* fixed: Scripts/Tools/std: load_config.bat: empty value parse issue, value with multiple quotes parse issue
+
 2021.02.08:
 * changed: Utilities/Projects: moved to build for the Windows XP x86 SP2 or Windows XP x64 SP1
 * changed: Utilities/bin/contools: rebuild to run at least under Windows XP x86 SP2
