@@ -31,7 +31,9 @@ set "__?VAR=%__?VAR:"=%"
 if defined __?VALUE set "__?VALUE=%__?VALUE:"=%"
 rem check for old style expression quotes
 set __?OLD_STYLE_QUOTES=0
-if defined __?VALUE if "%__?VAR:~0,1%" == "" if "%__?VALUE:~-1%" == "" ( set "__?OLD_STYLE_QUOTES=1" & set "__?VAR=%__?VAR:~1%" & set "__?VALUE=%__?VALUE:~0,-1%" )
+if not defined __?VALUE goto UNQUOTE_END
+if "%__?VAR:~0,1%" == "" if "%__?VALUE:~-1%" == "" ( set "__?OLD_STYLE_QUOTES=1" & set "__?VAR=%__?VAR:~1%" & set "__?VALUE=%__?VALUE:~0,-1%" )
+:UNQUOTE_END
 
 rem CAUTION:
 rem Inplace trim of surrounded white spaces ONLY from left and right sequences as a whole for performance reasons.
