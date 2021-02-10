@@ -1,4 +1,7 @@
 2021.02.10:
+* fixed: Scripts/Tools/std: echo_var.bat: accidental consume `!` and `^` characters
+
+2021.02.10:
 * new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs, call.vbs: `-qa` flag to always quotes non flag tail positional parameters
 
 2021.02.09:
