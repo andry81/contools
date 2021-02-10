@@ -1,3 +1,6 @@
+2021.02.10:
+* new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs, call.vbs: `-qa` flag to always quotes non flag tail positional parameters
+
 2021.02.09:
 * fixed: Scripts/Tools/std: load_config.bat: empty value parse issue, value with multiple quotes parse issue
 

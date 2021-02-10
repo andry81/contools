@@ -8,12 +8,14 @@ Dim ExpandArgs : ExpandArgs = False
 Dim ExpandArg0 : ExpandArg0 = False
 Dim ExpandTailArgs : ExpandTailArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
+Dim AlwaysQuoteTailPosParams : AlwaysQuoteTailPosParams = False
 Dim NoWait : NoWait = False
 Dim NoWindow : NoWindow = False
 
 Dim shell_obj : Set shell_obj = WScript.CreateObject("WScript.Shell")
 
 Dim arg
+Dim IsCmdArg : IsCmdArg = True
 Dim i, j : j = 0
 
 For i = 0 To WScript.Arguments.Count-1
@@ -35,6 +37,8 @@ For i = 0 To WScript.Arguments.Count-1
         ExpandTailArgs = True
       ElseIf WScript.Arguments(i) = "-q" Then ' Always quote arguments (if already has no quote characters)
         AlwaysQuote = True
+      ElseIf WScript.Arguments(i) = "-qa" Then ' Always quote non flag tail positional parameters (if already has no quote characters)
+        AlwaysQuoteTailPosParams = True
       ElseIf WScript.Arguments(i) = "-nowait" Then
         NoWait = True
       ElseIf WScript.Arguments(i) = "-nowindow" Then
@@ -61,7 +65,8 @@ For i = 0 To WScript.Arguments.Count-1
     End If
 
     If InStr(arg, Chr(34)) = 0 Then
-      If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
+      If (AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0) Or _
+         (Not IsCmdArg And AlwaysQuoteTailPosParams And Left(arg, 1) <> "-") Then
         args(j) = Chr(34) & arg & Chr(34)
       Else
         args(j) = arg
@@ -71,6 +76,8 @@ For i = 0 To WScript.Arguments.Count-1
     End If
 
     j = j + 1
+
+    If IsCmdArg Then IsCmdArg = False
   End If
 Next
 
