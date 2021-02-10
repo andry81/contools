@@ -13,6 +13,7 @@ Dim ExpandArgs : ExpandArgs = False
 Dim ExpandArg0 : ExpandArg0 = False
 Dim ExpandTailArgs : ExpandTailArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
+Dim AlwaysQuoteTailPosParams : AlwaysQuoteTailPosParams = False
 Dim NoWindow : NoWindow = False
 Dim MakeTempDirAsCWD : MakeTempDirAsCWD = ""
 Dim WaitDeleteCWD : WaitDeleteCWD = 0
@@ -50,6 +51,8 @@ For i = 0 To WScript.Arguments.Count-1
         ExpandTailArgs = True
       ElseIf WScript.Arguments(i) = "-q" Then ' Always quote arguments (if already has no quote characters)
         AlwaysQuote = True
+      ElseIf WScript.Arguments(i) = "-qa" Then ' Always quote non flag tail positional parameters (if already has no quote characters)
+        AlwaysQuoteTailPosParams = True
       ElseIf WScript.Arguments(i) = "-nowindow" Then
         NoWindow = True
       ElseIf WScript.Arguments(i) = "-make_temp_dir_as_cwd" Then
@@ -92,7 +95,8 @@ For i = 0 To WScript.Arguments.Count-1
     End If
 
     If InStr(arg, Chr(34)) = 0 Then
-      If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
+      If (AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0) Or _
+         (Not IsCmdArg And AlwaysQuoteTailPosParams And Left(arg, 1) <> "-") Then
         arg = Chr(34) & arg & Chr(34)
       End If
     End If
