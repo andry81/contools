@@ -1,7 +1,7 @@
 ''' Creates the Windows shortcut file.
 
 ''' USAGE:
-'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-E] [-q] [-unesc] <ShortcutFileName> <ShortcutTarget> <ShortcutArgs>
+'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-E | -E0 | -Et | -Ea] [-q] [-u] <ShortcutFileName> <ShortcutTarget> <ShortcutArgs>
 '''
 ''' Note:
 '''   1. Creation of a shortcut under ealier version of the Windows makes shortcut
@@ -25,7 +25,7 @@
 ''' Or
 '''   >
 '''   del /F /Q cmd_system32.lnk
-'''   make_shortcut.bat -CD "%WINDIR%\System32" -unesc cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
+'''   make_shortcut.bat -CD "%WINDIR%\System32" -u cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
 '''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
 
 ''' Example to create MyComputer shortcut:
@@ -48,7 +48,7 @@ ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
 
-Dim UnescapeArgs : UnescapeArgs = False
+Dim UnescapeAllArgs : UnescapeAllArgs = False
 
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ChangeCurrentDirectoryExist : ChangeCurrentDirectoryExist = False
@@ -65,7 +65,7 @@ Dim ShortcutArgsExist : ShortcutArgstExist = False
 Dim ShowAs : ShowAs = 1
 Dim ShowAsExist : ShowAsExist = False
 
-Dim ExpandArgs : ExpandArgs = False
+Dim ExpandAllArgs : ExpandAllArgs = False
 Dim ExpandArg0 : ExpandArg0 = False
 Dim ExpandShortcutTarget : ExpandShortcutTarget = False
 Dim ExpandShortcutArgs : ExpandShortcutArgs = False
@@ -77,34 +77,36 @@ Dim arg
 Dim j : j = 0
 
 For i = 0 To WScript.Arguments.Count-1
+  arg = WScript.Arguments(i)
+
   If ExpectFlags Then
-    If Mid(WScript.Arguments(i), 1, 1) = "-" Then
-      If WScript.Arguments(i) = "-unesc" Then ' Unescape %xx or %uxxxx
-        UnescapeArgs = True
-      ElseIf WScript.Arguments(i) = "-CD" Then ' Change current directory
+    If Mid(arg, 1, 1) = "-" Then
+      If arg = "-u" Then ' Unescape %xx or %uxxxx
+        UnescapeAllArgs = True
+      ElseIf arg = "-CD" Then ' Change current directory
         i = i + 1
         ChangeCurrentDirectory =  WScript.Arguments(i)
         ChangeCurrentDirectoryExist = True
-      ElseIf WScript.Arguments(i) = "-WD" Then ' Shortcut working directory
+      ElseIf arg = "-WD" Then ' Shortcut working directory
         i = i + 1
         ShortcutWorkingDirectory =  WScript.Arguments(i)
         ShortcutWorkingDirectoryExist = True
-      ElseIf WScript.Arguments(i) = "-showas" Then ' Show window as
+      ElseIf arg = "-showas" Then ' Show window as
         i = i + 1
         ShowAs = CInt(WScript.Arguments(i))
         ShowAsExist = True
-      ElseIf WScript.Arguments(i) = "-E" Then ' Expand environment variables in all arguments
-        ExpandArgs = True
-      ElseIf WScript.Arguments(i) = "-E0" Then ' Expand environment variables only in the first argument
+      ElseIf arg = "-E" Then ' Expand environment variables in all arguments
+        ExpandAllArgs = True
+      ElseIf arg = "-E0" Then ' Expand environment variables only in the first argument
         ExpandArg0 = True
-      ElseIf WScript.Arguments(i) = "-Et" Then ' Expand environment variables only in the shortcut target object
+      ElseIf arg = "-Et" Then ' Expand environment variables only in the shortcut target object
         ExpandShortcutTarget = True
-      ElseIf WScript.Arguments(i) = "-Ea" Then ' Expand environment variables only in the shortcut arguments
+      ElseIf arg = "-Ea" Then ' Expand environment variables only in the shortcut arguments
         ExpandShortcutArgs = True
-      ElseIf WScript.Arguments(i) = "-q" Then ' Always quote CMD argument (if has no quote characters)
+      ElseIf arg = "-q" Then ' Always quote CMD argument (if has no quote characters)
         AlwaysQuote = True
       Else
-        WScript.Echo WScript.ScriptName & ": error: unknown flag: `" & WScript.Arguments(i) & "`"
+        WScript.Echo WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
         WScript.Quit 255
       End If
     Else
@@ -113,9 +115,11 @@ For i = 0 To WScript.Arguments.Count-1
   End If
 
   If Not ExpectFlags Then
-    arg = WScript.Arguments(i)
+    If UnescapeAllArgs Then
+      arg = Unescape(arg)
+    End If
 
-    If ExpandArgs Then
+    If ExpandAllArgs Then
       arg = objShell.ExpandEnvironmentStrings(arg)
     ElseIf ExpandArg0 And j = 0 Then
       arg = objShell.ExpandEnvironmentStrings(arg)
@@ -123,10 +127,6 @@ For i = 0 To WScript.Arguments.Count-1
       arg = objShell.ExpandEnvironmentStrings(arg)
     ElseIf ExpandShortcutArgs And j = 2 Then
       arg = objShell.ExpandEnvironmentStrings(arg)
-    End If
-
-    If UnescapeArgs Then
-      arg = Unescape(arg)
     End If
 
     If j > 0 And InStr(arg, Chr(34)) = 0 Then
@@ -181,7 +181,7 @@ If ShortcutArgsExist Then
 End If
 
 If ShortcutWorkingDirectoryExist Then
-  If UnescapeArgs Then
+  If UnescapeAllArgs Then
     ShortcutWorkingDirectory = Unescape(ShortcutWorkingDirectory)
   End If
 

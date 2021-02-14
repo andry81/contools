@@ -1,3 +1,11 @@
+2021.02.14:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: silent %-variables expansion, replaced by explicit `%?.%` variable expansion as a whole command line (added `-s` flag to restore %-variables substitution back)
+* new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs, call.vbs: `-r` flag to replace sequences in command line arguments
+* new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs, call.vbs: `-v` flag to declare environment variable before execute a child process
+* changed: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs, call.vbs, *_shortcut.vbs: `%xx`/`%uxxxx` sequence unescape moved before %-variables expand
+* changed: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs, call.vbs, *_shortcut.vbs: `-unesc` flag replaced by shorter `-u`
+* refactor: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs, call.vbs, *_shortcut.vbs: minor refactor
+
 2021.02.10:
 * fixed: Scripts/Tools/std: echo_var.bat: accidental consume `!` and `^` characters
 
