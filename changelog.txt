@@ -1,3 +1,7 @@
+2021.02.20:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs, winshell_call.vbs: `CDbl` usage fixup
+* new: Scripts/Tools/ToolAdaptors/vbs: call.vbs, winshell_call.vbs: `-E<n>` flag to expand specific command line argument by index
+
 2021.02.14:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: silent %-variables expansion, replaced by explicit `%?.%` variable expansion as a whole command line (added `-s` flag to restore %-variables substitution back)
 * new: Scripts/Tools/ToolAdaptors/vbs: winshell_call.vbs, call.vbs: `-r` flag to replace sequences in command line arguments
