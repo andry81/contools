@@ -62,8 +62,10 @@ Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ShowAs : ShowAs = 1
 
 Dim ExpandAllArgs : ExpandAllArgs = False
-Dim ExpandArg0 : ExpandArg0 = False
 Dim ExpandTailArgs : ExpandTailArgs = False
+
+Dim ExpandArgs : ExpandArgs = Array()
+Dim ExpandArgs_size : ExpandArgs_size = 0
 
 Dim AlwaysQuote : AlwaysQuote = False
 Dim AlwaysQuoteTailPosParams : AlwaysQuoteTailPosParams = False
@@ -100,7 +102,7 @@ For i = 0 To WScript.Arguments.Count - 1
         UnescapeAllArgs = True
       ElseIf Left(arg, 2) = "-u" Then
         arg = Mid(arg, 3)
-        If IsNumeric(arg) And CDbl(Number) <= 2147483647 And CDbl(Number) >= -2147483648 And CStr(CLng(arg)) = CStr(arg) Then
+        If IsNumeric(arg) And CDbl(arg) <= 2147483647 And CDbl(arg) >= -2147483648 And CStr(CLng(arg)) = CStr(arg) Then
           UnescapeArgs_size = UnescapeArgs_size + 1
           GrowArr UnescapeArgs, UnescapeArgs_size
           UnescapeArgs(UnescapeArgs_size - 1) = CLng(arg)
@@ -111,12 +113,17 @@ For i = 0 To WScript.Arguments.Count - 1
       ElseIf arg = "-showas" Then ' Show window as
         i = i + 1
         ShowAs = CInt(WScript.Arguments(i))
-      ElseIf arg = "-E" Then ' Expand environment variables in all arguments
-        ExpandAllArgs = True
-      ElseIf arg = "-E0" Then ' Expand environment variables only in the first argument
-        ExpandArg0 = True
-      ElseIf arg = "-Ea" Then ' Expand environment variables only in the tail arguments
-        ExpandTailArgs = True
+      ElseIf Left(arg, 2) = "-E" Then
+        arg = Mid(arg, 3)
+        If arg = "" Then        ' Expand environment variables in all arguments
+          ExpandAllArgs = True
+        ElseIf arg = "a" Then   ' Expand environment variables only in the tail arguments
+          ExpandTailArgs = True
+        ElseIf IsNumeric(arg) And CDbl(arg) <= 2147483647 And CDbl(arg) >= -2147483648 And CStr(CLng(arg)) = CStr(arg) Then
+          ExpandArgs_size = ExpandArgs_size + 1
+          GrowArr ExpandArgs, ExpandArgs_size
+          ExpandArgs(ExpandArgs_size - 1) = CLng(arg)
+        End If
       ElseIf arg = "-q" Then ' Always quote arguments (if already has no quote characters)
         AlwaysQuote = True
       ElseIf arg = "-qa" Then ' Always quote non flag tail positional parameters (if already has no quote characters)
@@ -143,7 +150,7 @@ For i = 0 To WScript.Arguments.Count - 1
           str_replace_index_arr(str_replace_index_arr_size - 1) = -2 ' greater or equal to 1
         Else
           arg = Mid(arg, 3)
-          If IsNumeric(arg) And CDbl(Number) <= 2147483647 And CDbl(Number) >= -2147483648 And CStr(CLng(arg)) = CStr(arg) Then
+          If IsNumeric(arg) And CDbl(arg) <= 2147483647 And CDbl(arg) >= -2147483648 And CStr(CLng(arg)) = CStr(arg) Then
             str_replace_index_arr(str_replace_index_arr_size - 1) = CLng(arg) ' exact index
           else
             str_replace_index_arr(str_replace_index_arr_size - 1) = ""
@@ -185,10 +192,15 @@ For i = 0 To WScript.Arguments.Count - 1
 
     If ExpandAllArgs Then
       arg = shell_obj.ExpandEnvironmentStrings(arg)
-    ElseIf ExpandArg0 And j = 0 Then
-      arg = shell_obj.ExpandEnvironmentStrings(arg)
     ElseIf ExpandTailArgs And j > 0 Then
       arg = shell_obj.ExpandEnvironmentStrings(arg)
+    Else
+      For k = 0 To ExpandArgs_size - 1
+        If ExpandArgs(k) = j Then
+          arg = shell_obj.ExpandEnvironmentStrings(arg)
+          Exit For
+        End If
+      Next
     End If
 
     If str_replace_index_arr_size > 0 Then
