@@ -6,3 +6,11 @@
 	fetch = :refs/remotes/git-svn
 	remote = svn
 	type = dir
+[submodule "_externals/svncmd/__init__"]
+	path = _externals/svncmd/__init__
+	owner = _externals
+	url = svn://svn.code.sf.net/p/svncmd/scripts/trunk/__init__
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
