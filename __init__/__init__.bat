@@ -7,7 +7,7 @@ set "CONTOOLS_PROJECT_ROOT_INIT0_DIR=%~dp0"
 if not defined NEST_LVL set NEST_LVL=0
 
 if not defined CONTOOLS_PROJECT_ROOT              call :CANONICAL_PATH CONTOOLS_PROJECT_ROOT              "%%~dp0.."
-if not defined CONTOOLS_PROJECT_EXTERNALS_ROOT    call :CANONICAL_PATH CONTOOLS_PROJECT_ROOT              "%%CONTOOLS_PROJECT_ROOT%%/_externals"
+if not defined CONTOOLS_PROJECT_EXTERNALS_ROOT    call :CANONICAL_PATH CONTOOLS_PROJECT_EXTERNALS_ROOT    "%%CONTOOLS_PROJECT_ROOT%%/_externals"
 
 if not defined CONTOOLS_ROOT                      call :CANONICAL_PATH CONTOOLS_ROOT                      "%%CONTOOLS_PROJECT_ROOT%%/Scripts/Tools"
 if not defined CONTOOLS_BUILD_TOOLS_ROOT          call :CANONICAL_PATH CONTOOLS_BUILD_TOOLS_ROOT          "%%CONTOOLS_ROOT%%/build"
