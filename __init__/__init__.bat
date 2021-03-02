@@ -7,6 +7,7 @@ set "CONTOOLS_PROJECT_ROOT_INIT0_DIR=%~dp0"
 if not defined NEST_LVL set NEST_LVL=0
 
 if not defined CONTOOLS_PROJECT_ROOT              call :CANONICAL_PATH CONTOOLS_PROJECT_ROOT              "%%~dp0.."
+if not defined CONTOOLS_PROJECT_EXTERNALS_ROOT    call :CANONICAL_PATH CONTOOLS_PROJECT_ROOT              "%%CONTOOLS_PROJECT_ROOT%%/_externals"
 
 if not defined CONTOOLS_ROOT                      call :CANONICAL_PATH CONTOOLS_ROOT                      "%%CONTOOLS_PROJECT_ROOT%%/Scripts/Tools"
 if not defined CONTOOLS_BUILD_TOOLS_ROOT          call :CANONICAL_PATH CONTOOLS_BUILD_TOOLS_ROOT          "%%CONTOOLS_ROOT%%/build"
@@ -15,7 +16,7 @@ if not defined CONTOOLS_TESTLIB_ROOT              call :CANONICAL_PATH CONTOOLS_
 if not defined CONTOOLS_XML_TOOLS_ROOT            call :CANONICAL_PATH CONTOOLS_XML_TOOLS_ROOT            "%%CONTOOLS_ROOT%%/xml"
 if not defined CONTOOLS_VARS_ROOT                 call :CANONICAL_PATH CONTOOLS_VARS_ROOT                 "%%CONTOOLS_ROOT%%/vars"
 
-if not defined SVNCMD_TOOLS_ROOT                  call :CANONICAL_PATH SVNCMD_TOOLS_ROOT                  "%%CONTOOLS_ROOT%%/scm/svn"
+if not defined SVNCMD_TOOLS_ROOT                  call :CANONICAL_PATH SVNCMD_TOOLS_ROOT                  "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/svncmd/Scripts"
 
 if not defined CONTOOLS_UTILITIES_ROOT            call :CANONICAL_PATH CONTOOLS_UTILITIES_ROOT            "%%CONTOOLS_PROJECT_ROOT%%/Utilities"
 if not defined CONTOOLS_UTILITIES_BIN_ROOT        call :CANONICAL_PATH CONTOOLS_UTILITIES_BIN_ROOT        "%%CONTOOLS_UTILITIES_ROOT%%/bin"

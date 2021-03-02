@@ -1,3 +1,7 @@
+2021.03.02:
+* changed: Scripts/Tools/scm/svn: moved into `_externals` directory
+* refactor: nested externals cleanup
+
 2021.02.20:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs, winshell_call.vbs: `CDbl` usage fixup
 * new: Scripts/Tools/ToolAdaptors/vbs: call.vbs, winshell_call.vbs: `-E<n>` flag to expand specific command line argument by index
