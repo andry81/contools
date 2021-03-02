@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) && "$CONTOOLS_ROOT_INIT0_DIR" != "$BASH_SOURCE_DIR" ]]; then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) && "$CONTOOLS_PROJECT_ROOT_INIT0_DIR" != "$BASH_SOURCE_DIR" ]]; then
 
-CONTOOLS_ROOT_INIT0_DIR="$BASH_SOURCE_DIR" # including guard
+CONTOOLS_PROJECT_ROOT_INIT0_DIR="$BASH_SOURCE_DIR" # including guard
 
 source "/bin/bash_entry" || exit $?
 
@@ -12,6 +12,8 @@ source "/bin/bash_entry" || exit $?
 tkl_normalize_path "$BASH_SOURCE_DIR/.." -a && \
 CONTOOLS_PROJECT_ROOT="$RETURN_VALUE"
 
+[[ -z "$CONTOOLS_PROJECT_EXTERNALS_ROOT" ]] &&    tkl_export CONTOOLS_PROJECT_EXTERNALS_ROOT    "$CONTOOLS_PROJECT_ROOT/_externals"
+
 [[ -z "$CONTOOLS_ROOT" ]] &&                      tkl_export CONTOOLS_ROOT                      "$CONTOOLS_PROJECT_ROOT/Scripts/Tools"
 [[ -z "$CONTOOLS_BUILD_TOOLS_ROOT" ]] &&          tkl_export CONTOOLS_BUILD_TOOLS_ROOT          "$CONTOOLS_ROOT/build"
 [[ -z "$CONTOOLS_SQLITE_TOOLS_ROOT" ]] &&         tkl_export CONTOOLS_SQLITE_TOOLS_ROOT         "$CONTOOLS_ROOT/sqlite"
@@ -19,7 +21,7 @@ CONTOOLS_PROJECT_ROOT="$RETURN_VALUE"
 [[ -z "$CONTOOLS_XML_TOOLS_ROOT" ]] &&            tkl_export CONTOOLS_XML_TOOLS_ROOT            "$CONTOOLS_ROOT/xml"
 [[ -z "$CONTOOLS_VARS_ROOT" ]] &&                 tkl_export CONTOOLS_VARS_ROOT                 "$CONTOOLS_ROOT/vars"
 
-[[ -z "$SVNCMD_TOOLS_ROOT" ]] &&                  tkl_export SVNCMD_TOOLS_ROOT                  "$CONTOOLS_ROOT/scm/svn"
+[[ -z "$SVNCMD_TOOLS_ROOT" ]] &&                  tkl_export SVNCMD_TOOLS_ROOT                  "$CONTOOLS_PROJECT_EXTERNALS_ROOT/svncmd/Scripts"
 
 [[ -z "$CONTOOLS_UTILITIES_ROOT" ]] &&            tkl_export CONTOOLS_UTILITIES_ROOT            "$CONTOOLS_PROJECT_ROOT/Utilities"
 [[ -z "$CONTOOLS_UTILITIES_BIN_ROOT" ]] &&        tkl_export CONTOOLS_UTILITIES_BIN_ROOT        "$CONTOOLS_UTILITIES_ROOT/bin"

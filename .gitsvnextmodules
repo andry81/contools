@@ -1,6 +1,6 @@
-[submodule "Scripts/Tools/scm/svn"]
-	path = Scripts/Tools/scm/svn
-	owner = Scripts
+[submodule "_externals/svncmd/Scripts"]
+	path = _externals/svncmd/Scripts
+	owner = _externals
 	url = svn://svn.code.sf.net/p/svncmd/scripts/trunk/Scripts
 	branch = /
 	fetch = :refs/remotes/git-svn

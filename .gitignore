@@ -1,7 +1,6 @@
 /Output
 Scripts/Tests/bench/batscripts/_output
 Scripts/Tests/unit/batscripts/_output
-Scripts/Tools/*.exe
 Scripts/Tools/admin/ProductKey/__pycache__
 Scripts/Tools/admin/VisualStudio/*.vars
 /Temp
