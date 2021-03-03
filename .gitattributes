@@ -695,6 +695,7 @@ Utilities/Projects/printf.vcxproj -text
 Utilities/Projects/retakeowner.vcxproj -text
 Utilities/Projects/thlibautocfg.vcxproj -text
 Utilities/Projects/wshdynacall.vcxproj -text
+Utilities/TODO.txt -text
 Utilities/bin/7zip/7-zip.chm -text
 Utilities/bin/7zip/7z.exe -text
 Utilities/bin/7zip/7za.dll -text
