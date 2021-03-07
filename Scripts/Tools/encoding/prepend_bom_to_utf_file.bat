@@ -116,7 +116,7 @@ if defined INPUT_FILE_BOM_STR call set "INPUT_FILE_BOM_STR=%%INPUT_FILE_BOM_STR:
 if not defined INPUT_FILE_BOM_STR goto IGNORE_BOM_CHECK
 
 for /F "eol= tokens=* delims=" %%i in ("%INPUT_FILE_BOM_STR%") do (echo.|set /P __DUMMY__=%%i) > "%INPUT_FILE_BOM_PREFIX_TMP%"
-fc "%INPUT_FILE_BOM_PREFIX_TMP%" "%BOM_FILE_PATH%" > nul
+"%SystemRoot%\System32\fc.exe" "%INPUT_FILE_BOM_PREFIX_TMP%" "%BOM_FILE_PATH%" > nul
 if %ERRORLEVEL% NEQ 0 goto IGNORE_BOM_CHECK
 
 if %RESTORE_LOCALE% GTR 1 (
