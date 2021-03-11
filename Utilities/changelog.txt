@@ -1,3 +1,13 @@
+2021.03.11:
+* fixed: compatible_iterator.hpp: fixup under msvc, gcc, clang
+* changed: readme update
+
+2021.03.09:
+* fixed: src/callf: parse of `{...}` placeholders in tail arguments
+* new: src: `compatible_iterator` implementation, upgraded up to C++11 standard usage
+* new: src/callf: code segments reuse with different inner containers through the usage of `compatible_iterator` instead of a direct usage of STL iterators
+* changed: src: code cleanup
+
 2021.03.03:
 * new: todo file
 
