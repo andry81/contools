@@ -1,3 +1,14 @@
+2021.03.11:
+* fixed: Utilities/src/_common/compatible_iterator: fixup under msvc, gcc, clang
+* changed: Utilities/src/_common/compatible_iterator: readme update
+
+2021.03.09:
+* fixed: Utilities/src/callf: parse of `{...}` placeholders in tail arguments
+* fixed: Projects: build fixup
+* new: Utilities/src/_common: `compatible_iterator` implementation, upgraded up to C++11 standard usage
+* new: Utilities/src/callf: code segments reuse with different inner containers through the usage of `compatible_iterator` instead of a direct usage of STL iterators
+* changed: Utilities/src: code cleanup
+
 2021.03.07:
 * changed: `fc` replaced by full path
 

@@ -16,9 +16,6 @@
 #error Unicode is not supported.
 #endif
 
-#define if_break switch(0) case 0: default: if
-#define MAX_ENV_VALUE_SIZE 32767
-
 namespace {
   struct InArgs
   {
@@ -221,9 +218,9 @@ int main(int argc,const char* argv[])
   }
 
   // environment variable buffers
-  char value1[MAX_ENV_VALUE_SIZE];
-  char value2[MAX_ENV_VALUE_SIZE];
-  char value_in_str[MAX_ENV_VALUE_SIZE];
+  char value1[MAX_ENV_BUF_SIZE];
+  char value2[MAX_ENV_BUF_SIZE];
+  char env_buf[MAX_ENV_BUF_SIZE];
 
   if (argc >= 2 && argv[1] && strlen(argv[1])) {
     const DWORD value1Size = ::GetEnvironmentVariableA(argv[1], value1, sizeof(value1)/sizeof(value1[0]));
@@ -300,30 +297,30 @@ int main(int argc,const char* argv[])
   const int res = strcmp(value1, value2);
 
   if (in_args.print_prefix_str) {
-    _parse_string(in_args.print_prefix_str, print_prefix_str, value1, value2, value_in_str, in_args);
+    _parse_string(in_args.print_prefix_str, print_prefix_str, value1, value2, env_buf, in_args);
     if (!print_prefix_str.empty()) puts(print_prefix_str.c_str());
   }
 
   if (!res && in_args.equal_str) {
-    _parse_string(in_args.equal_str, equal_str, value1, value2, value_in_str);
+    _parse_string(in_args.equal_str, equal_str, value1, value2, env_buf);
     if (!equal_str.empty()) puts(equal_str.c_str());
     return 0;
   }
 
   if (res && in_args.not_equal_str) {
-    _parse_string(in_args.not_equal_str, not_equal_str, value1, value2, value_in_str);
+    _parse_string(in_args.not_equal_str, not_equal_str, value1, value2, env_buf);
     if (!not_equal_str.empty()) puts(not_equal_str.c_str());
     return res < 0 ? -1 : 1;
   }
 
   if (res < 0 && in_args.less_str) {
-    _parse_string(in_args.less_str, less_str, value1, value2, value_in_str);
+    _parse_string(in_args.less_str, less_str, value1, value2, env_buf);
     if (!less_str.empty()) puts(less_str.c_str());
     return -1;
   }
 
   if (in_args.greater_or_equal_str) {
-    _parse_string(in_args.greater_or_equal_str, greater_or_equal_str, value1, value2, value_in_str);
+    _parse_string(in_args.greater_or_equal_str, greater_or_equal_str, value1, value2, env_buf);
     if (!greater_or_equal_str.empty()) puts(greater_or_equal_str.c_str());
   }
 

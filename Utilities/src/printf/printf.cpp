@@ -33,7 +33,7 @@ int main(int argc,const char* argv[])
   }
 
   // environment variable buffer
-  char value_in_str[MAX_ENV_VALUE_SIZE];
+  char env_buf[MAX_ENV_BUF_SIZE];
 
   InArgs in_args = InArgs();
   OutArgs out_args = OutArgs();
@@ -51,17 +51,18 @@ int main(int argc,const char* argv[])
   if (argc >= 3) {
     in_args.args.resize(argc - 2);
     out_args.args.resize(argc - 2);
+
     for (int i = 0; i < argc - 2; i++) {
       in_args.args[i] = argv[i + 2];
       if (strcmp(in_args.args[i] , "")) {
-        _parse_string(in_args.args[i], out_args.args[i], value_in_str);
+        _parse_string(i, in_args.args[i], out_args.args[i], env_buf, true, in_args, out_args);
       } else {
-        in_args.args[i] = 0;
+        in_args.args[i] = nullptr;
       }
     }
   }
 
-  _parse_string(in_args.fmt_str, out_args.fmt_str, value_in_str, in_args, out_args);
+  _parse_string(-1, in_args.fmt_str, out_args.fmt_str, env_buf, false, in_args, out_args);
   if (!out_args.fmt_str.empty()) {
     puts(out_args.fmt_str.c_str());
     return 0;

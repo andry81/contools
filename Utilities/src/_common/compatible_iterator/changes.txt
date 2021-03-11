@@ -1,0 +1,14 @@
+2021.03.11:
+* changed: preparations to use as a part of the tacklelib project
+
+2011.07.31:
+* fixed: bug with stepping out of the iterator container range in one case.
+* fixed: other fixes and changes.
+* new: added reverse iterator adaptor for cases where the reverse iterator not implemented or implemented partially.
+* new: added internal availability to check the iterator on singularity with several restrictions.
+* new: Added functions "erase" to support erasing in a container, "getContainer*" to read out a container address which uses by the iterator and "isForward" to find out in which direction the iterator is operated.
+* changed: now all 3 main functions - "start", "step" and "done" has the parameter "forward" to explicitly qualify operational direction.
+* changed: now the iterator can afford setup of container pointer before an iterator to container itself for cases where a container address known before a container iterator. To update the iterator later call to "set" function. (for example: "my_compatible_iterator tmp(mycontainer::iterator(),&mycontainer);").
+
+2010.05.14:
+* initial implementation.

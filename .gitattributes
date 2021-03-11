@@ -803,8 +803,13 @@ Utilities/bin/wtee.exe -text
 Utilities/bin/xmlstarlet/xml.exe -text
 Utilities/changelog.txt -text
 Utilities/src/_common/common.hpp -text
+Utilities/src/_common/compatible_iterator/README_EN.txt -text
+Utilities/src/_common/compatible_iterator/changes.txt -text
+Utilities/src/_common/compatible_iterator/compatible_iterator.hpp -text
+Utilities/src/_common/compatible_iterator/test.cpp -text
 Utilities/src/_common/gui/wxFileDialog.hpp -text
 Utilities/src/_common/printf.hpp -text
+Utilities/src/_common/tacklelib/tackle/addressof.hpp -text
 Utilities/src/_gui/wxFileDialog/help.def -text
 Utilities/src/_gui/wxFileDialog/help.tpl -text
 Utilities/src/_gui/wxFileDialog/version.def -text

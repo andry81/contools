@@ -9,7 +9,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Common", "_Common", "{F126B620-6E7E-42F0-8F64-346B41108838}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GUI", "GUI", "{7E359278-6809-4DA7-B9F6-1F2510131C55}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "compatible_iterator", "compatible_iterator", "{FED2655E-FAD5-49BA-9D71-FEC2040583B8}"
+	ProjectSection(SolutionItems) = preProject
+		..\Utilities\src\_common\compatible_iterator\compatible_iterator.hpp = ..\Utilities\src\_common\compatible_iterator\compatible_iterator.hpp
+		..\Utilities\src\_common\compatible_iterator\compatible_iterator.hpp = ..\Utilities\src\_common\compatible_iterator\compatible_iterator.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gui", "gui", "{B3B938A1-1763-4CB6-A295-23AF4A3A136F}"
+	ProjectSection(SolutionItems) = preProject
+		..\Utilities\src\_common\gui\wxFileDialog.hpp = ..\Utilities\src\_common\gui\wxFileDialog.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tacklelib", "tacklelib", "{B49346B5-FB38-448D-ACD2-3B441C3C83EE}"
+	ProjectSection(SolutionItems) = preProject
+		..\Utilities\src\_common\tacklelib\tackle\addressof.hpp = ..\Utilities\src\_common\tacklelib\tackle\addressof.hpp
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Header Files", "Header Files", "{2909C0F5-E8D4-4975-A49C-2B246EE0DE17}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,32 +31,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Header Files", "Header File
 		..\Utilities\src\_common\printf.hpp = ..\Utilities\src\_common\printf.hpp
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gui", "gui", "{7E359278-6809-4DA7-B9F6-1F2510131C55}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxFileDialog", "..\Utilities\Projects\gui\wxFileDialog.vcxproj", "{01A1ACEA-7261-43C6-B6B0-5C36A6674EE0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thlibautocfg", "..\Utilities\Projects\thlibautocfg.vcxproj", "{6163FDF1-845E-4C24-8A88-B99DC955CA2D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WSHBazaar", "WSHBazaar", "{A63DADA8-B541-4CF2-A971-8DB5D0FCCBD6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pipetimes", "..\Utilities\Projects\pipetimes.vcxproj", "{636E0F9A-7A52-4C2F-8031-8A35D5DC417F}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "envvarcmp", "..\Utilities\Projects\envvarcmp.vcxproj", "{62FC9063-64A6-47AD-90E8-7706570F6B58}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "printf", "..\Utilities\Projects\printf.vcxproj", "{C75114FC-8991-4739-8CF6-ADFBAA2BA818}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "printargs", "..\Utilities\Projects\printargs.vcxproj", "{3BF4DB3A-DD04-4457-A474-D9A534D59B81}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wshdynacall", "..\Utilities\Projects\wshdynacall.vcxproj", "{47A21598-2AFC-4E11-8AAE-5A9AEEB1E414}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "callf", "..\Utilities\Projects\callf.vcxproj", "{B9C215D3-6B7B-4A49-ACD7-4F8DFA69F337}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "clearcache", "..\Utilities\Projects\clearcache.vcxproj", "{DE71ED8C-9F4E-47AC-8E1D-E0053E42F575}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "envvarcmp", "..\Utilities\Projects\envvarcmp.vcxproj", "{62FC9063-64A6-47AD-90E8-7706570F6B58}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pipetimes", "..\Utilities\Projects\pipetimes.vcxproj", "{636E0F9A-7A52-4C2F-8031-8A35D5DC417F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "printargs", "..\Utilities\Projects\printargs.vcxproj", "{3BF4DB3A-DD04-4457-A474-D9A534D59B81}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "printf", "..\Utilities\Projects\printf.vcxproj", "{C75114FC-8991-4739-8CF6-ADFBAA2BA818}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "retakeowner", "..\Utilities\Projects\retakeowner.vcxproj", "{E17B910A-9CF1-4739-B4F0-D10034CA11FE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GUI", "GUI", "{B3B938A1-1763-4CB6-A295-23AF4A3A136F}"
-	ProjectSection(SolutionItems) = preProject
-		..\Utilities\src\_common\gui\wxFileDialog.hpp = ..\Utilities\src\_common\gui\wxFileDialog.hpp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WSHBazaar", "WSHBazaar", "{A63DADA8-B541-4CF2-A971-8DB5D0FCCBD6}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wshdynacall", "..\Utilities\Projects\wshdynacall.vcxproj", "{47A21598-2AFC-4E11-8AAE-5A9AEEB1E414}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thlibautocfg", "..\Utilities\Projects\thlibautocfg.vcxproj", "{6163FDF1-845E-4C24-8A88-B99DC955CA2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,6 +162,8 @@ Global
 		{DE71ED8C-9F4E-47AC-8E1D-E0053E42F575} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{E17B910A-9CF1-4739-B4F0-D10034CA11FE} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{B3B938A1-1763-4CB6-A295-23AF4A3A136F} = {2909C0F5-E8D4-4975-A49C-2B246EE0DE17}
+		{B49346B5-FB38-448D-ACD2-3B441C3C83EE} = {2909C0F5-E8D4-4975-A49C-2B246EE0DE17}
+		{FED2655E-FAD5-49BA-9D71-FEC2040583B8} = {2909C0F5-E8D4-4975-A49C-2B246EE0DE17}
 		{A63DADA8-B541-4CF2-A971-8DB5D0FCCBD6} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{47A21598-2AFC-4E11-8AAE-5A9AEEB1E414} = {A63DADA8-B541-4CF2-A971-8DB5D0FCCBD6}
 	EndGlobalSection

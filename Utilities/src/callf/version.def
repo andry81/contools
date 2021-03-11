@@ -1,7 +1,7 @@
 autogen definitions version;
 
-AppName = "printf";
+AppName = "callf";
 AppMajorVer = 1;
-AppMinorVer = 0;
-AppRevision = 1;
-AppBuildNum = 1;
+AppMinorVer = 1;
+AppRevision = 0;
+AppBuildNum = 2;

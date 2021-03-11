@@ -113,7 +113,7 @@
       <ModuleDefinitionFile>../src/wshbazaar/wshdynacall/dynwrap.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\contools\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -140,7 +140,7 @@
       <ModuleDefinitionFile>../src/wshbazaar/wshdynacall/dynwrap.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\contools\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -165,7 +165,7 @@
       <ModuleDefinitionFile>../src/wshbazaar/wshdynacall/dynwrap.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\contools\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -191,7 +191,7 @@
       <ModuleDefinitionFile>../src/wshbazaar/wshdynacall/dynwrap.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\contools\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
