@@ -11,9 +11,9 @@ rem Load and replace a value quote characters by the \x01 character.
 call set "RETURN_VALUE=%%%~1:"=%%"
 
 call "%%~dp0.trim_var/trim_var.trim_value_left.bat" || exit /b
-if not defined RETURN_VALUE exit /b 0
+if not defined RETURN_VALUE endlocal & ( if "%~2" == "" ( set "%~1=" ) else set "%~2=" ) & exit /b 0
 call "%%~dp0.trim_var/trim_var.trim_value_right.bat" || exit /b
-if not defined RETURN_VALUE exit /b 0
+if not defined RETURN_VALUE endlocal & ( if "%~2" == "" ( set "%~1=" ) else set "%~2=" ) & exit /b 0
 
 rem recode quote and exclamation characters
 set "__ESC__=^"
