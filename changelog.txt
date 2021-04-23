@@ -1,3 +1,6 @@
+2021.04.23:
+* changed: Scripts/Tools/std: let the `trim_var.bat` to remove a variable on trim into the same variable name
+
 2021.03.11:
 * fixed: Utilities/src/_common/compatible_iterator: fixup under msvc, gcc, clang
 * changed: Utilities/src/_common/compatible_iterator: readme update
