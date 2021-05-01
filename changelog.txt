@@ -1,3 +1,30 @@
+2021.05.01:
+* new: Utilities/bin/contools: binaries update
+
+2021.04.30:
+* new: Utilities/src/callf: stdin/stdout/stderr with builtin `tee` implementation (`/tee-*` flags)
+* new: Utilities/src/callf: stdin/stdout/stderr reopen from a file or special `CON`/`CONIN$`/`CONOUT$` input/output devices (`/reopen-*` flags)
+* new: Utilities/src/callf: stdin/stdout/stderr with builtin redirection into/from child process
+* new: Utilities/src/callf: stdin/stdout/stderr with builtin codepage change for console read/write (`/chcp-*` flags), unicode support with codepage `65001`
+* new: Utilities/src/callf: explicitly control stdin (must be console) echo mode (`/stdin-echo` option)
+* new: Utilities/src/callf: print as is without variables expansion or substitution (`/no-expand-env` and `/no-subst-vars` flags)
+* new: Utilities/src/callf: return arbitrary error codes (`/ret-*` flags)
+* new: Utilities/src/callf: other command line options and features (experimental)
+* new: Utilities/src/printf: stdout with builtin codepage change for console write (`/chcp` flag), unicode support with codepage `65001`
+* new: Utilities/src/printf: print as is without variables expansion or substitution (`/no-expand-env` and `/no-subst-vars` flags)
+* new: Utilities/src/printf: other command line options and features (experimental)
+* changed: Utilities/src/callf: converted to use TCHAR instead char (Unicode characters set)
+* changed: Utilities/src/printf: converted to use TCHAR instead char (Unicode characters set)
+* changed: Utilities/src/envvarcmp: converted to use TCHAR instead char (Unicode characters set)
+* changed: Utilities/Projects: callf, clearcache, envvars, envvarcmp, printargs, printf: projects switched to build under Unicode characters set
+* changed: Utilities/src: callf, clearcache, envvars, envvarcmp, pipetimes, printf, retakeowner, thlibautocfg: command line arguments parse reimplementation
+* changed: Utilities/src: merge common error codes between projects
+* changed: Utilities: todo update
+* refactor: Utilities/src: multiple projects formatting changes and code cleanup
+
+2021.04.26:
+* changed: .svnignore, .gitignore: cleanup
+
 2021.04.23:
 * changed: Scripts/Tools/std: let the `trim_var.bat` to remove a variable on trim into the same variable name
 

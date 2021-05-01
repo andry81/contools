@@ -10,12 +10,12 @@ Usage: retakeowner.exe [/?] <File>|<Directory> <User>|<Group>
     <File>|<Directory> - Path to existing file or directory.
     <User>|<Group>     - Existing User or Group to take ownership.
 
-  Return codes (Positive values - errors, negative - warnings):
-   -3   - invalid parameters
-   -2   - help output
-   -1   - unspecified error
-    0   - succeded
-    >0  - Win32 errors
+  Return codes:
+   -255   - unspecified error
+   -128   - help output
+   -3     - invalid parameters
+    0     - succeded
+    >0    - Win32 errors
 
   Examples:
     retakeowner.exe "c:\myfile.exe" User

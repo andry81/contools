@@ -1,13 +1,9 @@
-* Add to callf flags:
-  ** `/ret-create-proc`             - return CreateProcess return value
-  ** `/ret-win-error`               - return Win32 error code
-  ** `/ret-child-exit`              - return child process exit code (if has no `/no-wait` flag)
-  ** `/print-win-error-string`      - print Win32 error string (even if `/ret-win-error` is not set)
-  ** `/no-wait`                     - don't wait a child process exit
-  ** `/no-window`                   - don't show a child process console window
-  ** `/no-expand-env`               - don't expand `${...}` environment variables
-  ** `/no-subst-vars`               - don't substitute `{...}` variables
-  ** `/tee-std[in|out|err] <file>`  - duplicate stream to <file>
-    If more than one `/tee` flag with the same file is present, then handles process order based on `/tee-*` flags order.
-  ** `/tee-std[in|out|err]-append   - append instead of rewrite for the previously declared `<file>`
-  ** `/tee-std[in|out|err]-flush`   - flush after each write to the previously declared `<file>`
+* Fix the case where the `callf.exe "" "cmd.exe /k"` expression has broken
+  autocompletion feature in the `cmd.exe` process and the `cmd.exe` treats all
+  the tab characters as is.
+  The bug is attached to the `STARTF_USESTDHANDLES` flag is used from the
+  `CreateProcess` function.
+  If the flag is not set, then the autocompletion feature works, but the
+  standard output can not be redirected and intercepted.
+  If the flag is set, then the autocompletion feature is broken, but the
+  standard output can be redirected and intercepted.

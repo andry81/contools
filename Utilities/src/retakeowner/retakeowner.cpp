@@ -65,30 +65,25 @@ static BOOL SetPrivilege(
 
 int _tmain(int argc, LPTSTR argv[])
 {
-    if(!argc || !argv[0])
-        return -1;
-
-    bool do_show_help = false;
-
-    if(argc >= 2 && argv[1] && !_tcscmp(argv[1], _T("/?"))) {
-        if (argc >= 3) return 2;
-        do_show_help = true; // /?
+    if (!argc || !argv[0]) {
+        return err_unspecified;
     }
 
-    if(do_show_help) {
-#ifdef _UNICODE
-        ::_putws(
-#else
+    //const TCHAR * arg;
+    int arg_offset = 1;
+
+    if (argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
+        if (argc >= arg_offset + 2) return err_invalid_format;
+
         ::puts(
-#endif
 #include "help_inl.hpp"
         );
 
-        return -2;
+        return err_help_output;
     }
 
     if (argc < 3) {
-        return -3;
+        return err_invalid_params;
     }
 
     DWORD last_error = 0;

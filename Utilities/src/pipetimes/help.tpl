@@ -31,9 +31,9 @@ Usage: pipetimes.exe [/? | [-a] <IndexFile>] [<PipeFile>]
     pipes and wants later to merge them both into one stream, for example, of
     HTML form.
 
-  Return codes (Basically positive values - errors, negative - warnings):
-    0     - succeded.
-    1     - invalid format.
-    2     - help output.
-    3-254 - common errors.
-    255   - unspecified error.
+  Return codes:
+   -255 - unspecified error
+   -128 - help output
+   -2   - invalid format
+    0   - succeded
+   >0   - errors

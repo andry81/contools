@@ -7,15 +7,19 @@ Usage: wxFileDialog.exe [/?] <FileTypes> <StartFolder> <Title> [<Options>]
   Description:
     /?:
       This help.
+
     <FileTypes>:
       File type(s) in format "description (*.ext)|*.ext" or just "*.ext"
       (default: "All files (*.*)|*.*")
+
     <StartFolder>:
       The Initial folder the dialog will show on opening
       (default: current directory)
+
     <Title>:
       The caption in the dialog's title bar
       (default: "Open" or "Save As")
+
     -<Options>: -[o | s]pnemw:
       o - (Default) Open file dialog.
       s - Save file dialog.
@@ -48,6 +52,6 @@ Usage: wxFileDialog.exe [/?] <FileTypes> <StartFolder> <Title> [<Options>]
     255 - unspecified error
 
   Examples:
-    wxFileDialog.exe "" . "Open Me"
-    wxFileDialog.exe "" "" "Save Me" -sp
-    wxFileDialog.exe "Text files (*.txt)|*.txt|C++ Source Files (*.cpp)|*.cpp" . "Save Me" -s
+    1. wxFileDialog.exe "" . "Open Me"
+    2. wxFileDialog.exe "" "" "Save Me" -sp
+    3. wxFileDialog.exe "Text files (*.txt)|*.txt|C++ Source Files (*.cpp)|*.cpp" . "Save Me" -s

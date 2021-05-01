@@ -3,42 +3,40 @@ _out
 Output
 Temp
 
-Scripts/Tools/*.exe
+Utilities/src/gui/wxFileDialog/help.txt
+Utilities/src/gui/wxFileDialog/help_inl.hpp
+Utilities/src/gui/wxFileDialog/version.hpp
 
-Scripts/Tools/ToolAdaptors/totalcmd/*.vars
+Utilities/src/callf/help.txt
+Utilities/src/callf/help_inl.hpp
+Utilities/src/callf/version.hpp
 
-Utilities/Sources/gui/wxSaveFileDialog/help.txt
-Utilities/Sources/gui/wxSaveFileDialog/help_inl.hpp
-Utilities/Sources/gui/wxSaveFileDialog/version.hpp
+Utilities/src/clearcache/help.txt
+Utilities/src/clearcache/help_inl.hpp
+Utilities/src/clearcache/version.hpp
 
-Utilities/Sources/callf/help.txt
-Utilities/Sources/callf/help_inl.hpp
-Utilities/Sources/callf/version.hpp
+Utilities/src/envvarcmp/help.txt
+Utilities/src/envvarcmp/help_inl.hpp
+Utilities/src/envvarcmp/version.hpp
 
-Utilities/Sources/clearcache/help.txt
-Utilities/Sources/clearcache/help_inl.hpp
-Utilities/Sources/clearcache/version.hpp
+Utilities/src/pipetimes/help.txt
+Utilities/src/pipetimes/help_inl.hpp
+Utilities/src/pipetimes/version.hpp
 
-Utilities/Sources/envvarcmp/help.txt
-Utilities/Sources/envvarcmp/help_inl.hpp
-Utilities/Sources/envvarcmp/version.hpp
+Utilities/src/printargs/help.txt
+Utilities/src/printargs/help_inl.hpp
+Utilities/src/printargs/version.hpp
 
-Utilities/Sources/pipetimes/help.txt
-Utilities/Sources/pipetimes/help_inl.hpp
-Utilities/Sources/pipetimes/version.hpp
+Utilities/src/printf/help.txt
+Utilities/src/printf/help_inl.hpp
+Utilities/src/printf/version.hpp
 
-Utilities/Sources/printargs/help.txt
-Utilities/Sources/printargs/help_inl.hpp
-Utilities/Sources/printargs/version.hpp
+Utilities/src/retakeowner/help.txt
+Utilities/src/retakeowner/help_inl.hpp
+Utilities/src/retakeowner/version.hpp
 
-Utilities/Sources/printf/help.txt
-Utilities/Sources/printf/help_inl.hpp
-Utilities/Sources/printf/version.hpp
+Utilities/src/thlibautocfg/help.txt
+Utilities/src/thlibautocfg/help_inl.hpp
+Utilities/src/thlibautocfg/version.hpp
 
-Utilities/Sources/retakeowner/help.txt
-Utilities/Sources/retakeowner/help_inl.hpp
-Utilities/Sources/retakeowner/version.hpp
-
-Utilities/Sources/thlibautocfg/help.txt
-Utilities/Sources/thlibautocfg/help_inl.hpp
-Utilities/Sources/thlibautocfg/version.hpp
+Utilities/src/wshdynacall/version.hpp

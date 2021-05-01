@@ -10,10 +10,13 @@ Usage: envvarcmp.exe [/? | <VarName1> <VarName2> [<PrintPrefix> [<EqualString> [
   Description:
     /?:
       This help.
+
     <VarName1>:
       First environment variable name.
+
     <VarName2>:
       Second environment variable name.
+
     <PrintPrefix>:
       Always prints after compare if not empty.
       Can has common placeholders plus these:
@@ -28,10 +31,13 @@ Usage: envvarcmp.exe [/? | <VarName1> <VarName2> [<PrintPrefix> [<EqualString> [
 
     <EqualString>
       String associated with "equal" result. Can has common placeholders.
+
     <NotEqualString>
       String associated with "not equal" result. Can has common placeholders.
+
     <LessString>
       String associated with "less" result. Can has common placeholders.
+
     <GreaterOrEqualString>
       String associated with "greater or equal" result. Can has common
       placeholders.
@@ -57,15 +63,15 @@ Usage: envvarcmp.exe [/? | <VarName1> <VarName2> [<PrintPrefix> [<EqualString> [
     If the <EqualString> is empty and the <NotEqualString> is empty, then
     the <LessString> and the <GreaterOrEqualString> is used instead.
 
-  Return codes (Basically positive values - errors, negative - warnings):
+  Return codes:
+   -255   - unspecified error
+   -128   - help output
+   -2     - invalid format.
+   -1     - not equal, first variable is less than second.
     0     - equal.
     1     - not equal, first variable is greater or equal than second.
-   -1     - not equal, first variable is less than second.
     2     - <VarName1> string is not defined or it's value having too big size
             (>= 32767).
     3     - <VarName2> string is not defined or it's value having too big size
             (>= 32767).
-    4     - invalid format.
-    5     - help output.
-    6-254 - common errors.
-    255   - unspecified error.
+   >3     - other errors
