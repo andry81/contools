@@ -3,10 +3,23 @@ printf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build
   Print in style of c-function printf, replacing specific backslashed
   character pairs in string arguments with characters.
 
-Usage: printf.exe [/?] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
+Usage: printf.exe [/?] [<Flags>] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
   Description:
     /?:
       This help.
+
+    Flags:
+      /chcp <codepage>
+        Console output code page.
+
+      /no-print-gen-error-string
+        Don't print generic error string.
+
+      /no-expand-env
+        Don't expand `${...}` environment variables.
+
+      /no-subst-vars
+        Don't substitute `{...}` variables.
 
     <FormatString> placeholders:
       ${<VarName>} - <VarName> environment variable value.
@@ -20,14 +33,12 @@ Usage: printf.exe [/?] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
       ${<VarName>} - <VarName> environment variable value.
       \{    - '{' character escape
 
-  Return codes (Positive values - errors, negative - warnings):
-   -1   - empty <FormatString>.
+  Return codes:
+   -255 - unspecified error
+   -128 - help output
+   -2   - invalid format
+   -1   - <FormatString> is empty.
     0   - succeded
-    1   - help output
-    2   - invalid format.
-    3   - <VarName*> string is not defined or it's value having too big size
-          (>= 32767).
-    255 - unspecified error
 
   Examples:
-    printf.exe "{0}={1}" "My profit" "10%"
+    1. printf.exe "{0}={1}" "My profit" "10%"

@@ -1,12 +1,17 @@
 #include <stdio.h>
 #include <string.h>
 
-int main(int argc, char * argv[])
+#include "std/tstring.hpp"
+#include "std/tstdio.hpp"
+
+int _tmain(int argc, const TCHAR * argv[])
 {
     if (argc < 1) return 0;
+
     for (int i = 0; i < argc; i++)
     {
-        printf("%02zu|%s|\n", strlen(argv[i]), argv[i]);
+        _tprintf(_T("%02zu|%s|\n"), tstrlen(argv[i]), argv[i]);
     }
+
     return argc;
 }

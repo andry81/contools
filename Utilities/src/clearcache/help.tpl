@@ -9,11 +9,12 @@ Usage: clearcache.exe [/?] <DriveRoot1> [<DriveRoot2> ... [<DriveRootN>]]
 
     <DriveRoot> - the root of a drive.
 
-  Return codes (Positive values - errors, negative - warnings):
-   -2   - help output
-   -1   - unspecified error
+  Return codes:
+   -255 - unspecified error
+   -128 - help output
+   -2   - invalid format.
     0   - succeded
-    >0  - drive operation Win32 error
+   >0   - Win32 errors
 
   Examples:
     clearcache.exe C: D:\ E:

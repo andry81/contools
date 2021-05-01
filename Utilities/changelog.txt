@@ -1,3 +1,27 @@
+2021.05.01:
+* new: bin/contools: binaries update
+
+2021.04.30:
+* new: src/callf: stdin/stdout/stderr with builtin `tee` implementation (`/tee-*` flags)
+* new: src/callf: stdin/stdout/stderr reopen from a file or special `CON`/`CONIN$`/`CONOUT$` input/output devices (`/reopen-*` flags)
+* new: src/callf: stdin/stdout/stderr with builtin redirection into/from child process
+* new: src/callf: stdin/stdout/stderr with builtin codepage change for console read/write (`/chcp-*` flags), unicode support with codepage `65001`
+* new: src/callf: explicitly control stdin (must be console) echo mode (`/stdin-echo` option)
+* new: src/callf: print as is without variables expansion or substitution (`/no-expand-env` and `/no-subst-vars` flags)
+* new: src/callf: return arbitrary error codes (`/ret-*` flags)
+* new: src/callf: other command line options and features (experimental)
+* new: src/printf: stdout with builtin codepage change for console write (`/chcp` flag), unicode support with codepage `65001`
+* new: src/printf: print as is without variables expansion or substitution (`/no-expand-env` and `/no-subst-vars` flags)
+* new: src/printf: other command line options and features (experimental)
+* changed: src/callf: converted to use TCHAR instead char (Unicode characters set)
+* changed: src/printf: converted to use TCHAR instead char (Unicode characters set)
+* changed: src/envvarcmp: converted to use TCHAR instead char (Unicode characters set)
+* changed: Projects: callf, clearcache, envvars, envvarcmp, printargs, printf: projects switched to build under Unicode characters set
+* changed: src: callf, clearcache, envvars, envvarcmp, pipetimes, printf, retakeowner, thlibautocfg: command line arguments parse reimplementation
+* changed: src: merge common error codes between projects
+* changed: todo update
+* refactor: src: multiple projects formatting changes and code cleanup
+
 2021.03.11:
 * fixed: compatible_iterator.hpp: fixup under msvc, gcc, clang
 * changed: readme update

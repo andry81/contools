@@ -3,10 +3,78 @@ callf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build 
   Create process in style of c-function printf, replacing specific backslashed
   character pairs in string arguments with characters.
 
-Usage: callf.exe [/?] <ApplicationNameFormatString> [<CommandLineFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
+Usage: callf.exe [/?] [<Flags>] <ApplicationNameFormatString> [<CommandLineFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
   Description:
     /?
       This help.
+
+    Flags:
+      /chcp-in <codepage>
+        Console input code page.
+
+      /chcp-out <codepage>
+        Console output code page.
+
+      /ret-create-proc
+        Return CreateProcess return code.
+
+      /ret-win-error
+        Return Win32 error code.
+
+      /ret-child-exit
+        Return child process exit code (if has no `/no-wait` flag).
+
+      /print-win-error-string
+        Print Win32 error string (even if `/ret-win-error` is not set).
+
+      /no-print-gen-error-string
+        Don't print generic error string.
+
+      /no-wait
+        Don't wait a child process exit.
+
+      /no-window
+        Don't show a child process console window.
+
+      /no-expand-env
+        Don't expand `${...}` environment variables.
+
+      /no-subst-vars
+        Don't substitute `{...}` variables.
+
+      /reopen-stdin-as <file>
+        Reopen stdin as a `<file>`.
+
+      /reopen-stdout-as <file>
+        Reopen stdout as a `<file>`.
+
+      /reopen-stderr-as <file>
+        Reopen stderr as a `<file>`.
+
+      /tee-std[in|out|err] <file>
+        Duplicate stream to `<file>`.
+
+      /tee-std[in|out|err]-append
+        Append instead of rewrite into `<file>`.
+
+      /tee-std[in|out|err]-flush
+        Flush after each write into `<file>`.
+
+      /tee-std[in|out|err]-pipe-buf-size <size>
+        Pipe buffer size in bytes.
+
+      /tee-std[in|out|err]-read-buf-size <size>
+        Buffer size in bytes to read into from the standard stream pipe.
+
+      /create-child-console
+        Create new console for child process.
+
+      /detach-parent-console
+        Detach console from parent process.
+
+      /stdin-echo <0|1>
+        Explicitly enable or disable console input buffer echo before start
+        of a child process.
 
     <ApplicationNameFormatString>, <CommandLineFormatString>:
       Win32 `CreateProcess` function 2 first parameters (see related
@@ -30,13 +98,13 @@ Usage: callf.exe [/?] <ApplicationNameFormatString> [<CommandLineFormatString> [
     "CreateProcess".
 
   Return codes if `/ret-*` option is not defined:
-   -1  - empty <FormatString>.
+   -255 - unspecified error
+   -128 - help output
+   -4   - Win32 error
+   -2   - invalid format
+   -1   - both <ApplicationNameFormatString> and <CommandLineFormatString>
+          are empty.
     0   - succeded
-    1   - help output
-    2   - invalid format.
-    3   - <VarName*> string is not defined or it's value having too big size
-          (>= 32767).
-    255 - unspecified error
 
   Examples:
     1. callf.exe "${WINDIR}\system32\cmd.exe" "{0} {1}" "/c" "echo.Hello World!"

@@ -12,7 +12,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "compatible_iterator", "compatible_iterator", "{FED2655E-FAD5-49BA-9D71-FEC2040583B8}"
 	ProjectSection(SolutionItems) = preProject
 		..\Utilities\src\_common\compatible_iterator\compatible_iterator.hpp = ..\Utilities\src\_common\compatible_iterator\compatible_iterator.hpp
-		..\Utilities\src\_common\compatible_iterator\compatible_iterator.hpp = ..\Utilities\src\_common\compatible_iterator\compatible_iterator.hpp
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gui", "gui", "{B3B938A1-1763-4CB6-A295-23AF4A3A136F}"

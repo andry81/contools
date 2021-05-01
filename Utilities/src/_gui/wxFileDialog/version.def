@@ -3,5 +3,5 @@ autogen definitions version;
 AppName = "wxFileDialog";
 AppMajorVer = 1;
 AppMinorVer = 0;
-AppRevision = 2;
-AppBuildNum = 2;
+AppRevision = 3;
+AppBuildNum = 3;
