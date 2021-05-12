@@ -1,3 +1,6 @@
+2021.05.12:
+* new: Utilities/src/printf: `/eval-backslash-esc` or `/e` flag to evaluate backslash escape sequences
+
 2021.05.01:
 * new: Utilities/bin/contools: binaries update
 

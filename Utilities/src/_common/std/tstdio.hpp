@@ -8,10 +8,12 @@
 # define tfopen   _wfopen
 # define tfreopen _wfreopen
 # define tputs    _putws
+# define tfputs   fputws
 #else
 # define tfopen   fopen
 # define tfreopen freopen
 # define tputs    puts
+# define tfputs   fputs
 #endif
 
 #endif
