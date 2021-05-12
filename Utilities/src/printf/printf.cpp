@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include "common.hpp"
 #include "printf.hpp"
 
@@ -17,7 +19,8 @@ namespace {
     {
         bool            no_print_gen_error_string;
         bool            no_expand_env;                  // don't expand `${...}` environment variables
-        bool            no_subst_vars;                  // don't substitute `{...}` variables
+        bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
+        bool            eval_backslash_esc;             // evaluate backslash escape characters
     };
 
     struct _Options
@@ -86,6 +89,9 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/no-subst-vars"))) {
             g_flags.no_subst_vars = true;
         }
+        else if (!tstrcmp(arg, _T("/eval-backslash-esc")) || !tstrcmp(arg, _T("/e"))) {
+            g_flags.eval_backslash_esc = true;
+        }
         else {
             if (!g_flags.no_print_gen_error_string) {
                 _ftprintf(stderr, _T("error: flag is not known: \"%s\""), arg);
@@ -142,7 +148,12 @@ int _tmain(int argc, const TCHAR * argv[])
     _parse_string(-1, in_args.fmt_str, out_args.fmt_str, env_buf,
         g_flags.no_expand_env, g_flags.no_subst_vars, false, in_args, out_args);
 
-    tputs(out_args.fmt_str.c_str());
+    if (g_flags.eval_backslash_esc) {
+        _tprintf(_T("%s"), _eval_backslash_escape_chars(out_args.fmt_str).c_str());
+    }
+    else {
+        tputs(out_args.fmt_str.c_str());
+    }
 
     return err_none;
 }

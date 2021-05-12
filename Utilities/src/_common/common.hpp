@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "std/tctype.hpp"
+#include "std/tstdlib.hpp"
 #include "std/tstring.hpp"
 #include "std/tstdio.hpp"
 
@@ -98,6 +100,339 @@ namespace {
             NULL, win_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&win_error_msg_buf, 0, NULL);
         _ftprintf(stderr, _T("error: win32: \"%s\"\n"), win_error_msg_buf);
         LocalFree(win_error_msg_buf);
+    }
+
+    inline std::tstring _replace_strings(std::tstring str, const std::tstring & from, const std::tstring & to)
+    {
+        size_t start_pos = 0;
+        while ((start_pos = str.find(from, start_pos)) != std::tstring::npos) {
+            str.replace(start_pos, from.length(), to);
+            start_pos += to.length();
+        }
+        return str;
+    }
+
+    inline std::tstring _eval_backslash_escape_chars(const std::tstring & str)
+    {
+        std::vector<TCHAR> str_eval_buf;
+        std::vector<TCHAR> digits_buf;
+        std::vector<TCHAR> digits_eval_buf;
+        TCHAR * stop_scan_char_ptr;
+        size_t str_size = 0;
+        size_t digit_index = 0;
+        bool is_escape_char = false;
+        bool is_digits = false;
+        bool is_hex_digits = false;     // if not, then octal
+
+        str_eval_buf.reserve(str.length() + (str.length() + 1) / 2 + 1); // compensate string expansion for heximal-to-decimal number convertion
+
+        for (auto it = str.begin(); it != str.end(); ++it) {
+            do { // empty do-loop to reuse iterator
+                if (!is_escape_char) {
+                    switch (*it) {
+                    case _T('\\'):
+                        is_escape_char = true;
+                        digit_index = 0;
+                        break;
+                    default:
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = *it;
+                    }
+                }
+                else {
+                    if (is_digits) goto default_;
+
+                    switch (*it) {
+                    case _T('\\'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\\');
+                        is_escape_char = false;
+                        break;
+                    case _T('a'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\a');
+                        is_escape_char = false;
+                        break;
+                    case _T('b'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\b');
+                        is_escape_char = false;
+                        break;
+                    case _T('t'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\t');
+                        is_escape_char = false;
+                        break;
+                    case _T('n'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\n');
+                        is_escape_char = false;
+                        break;
+                    case _T('v'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\v');
+                        is_escape_char = false;
+                        break;
+                    case _T('f'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\f');
+                        is_escape_char = false;
+                        break;
+                    case _T('r'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\r');
+                        is_escape_char = false;
+                        break;
+                    case _T('e'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\x1B');
+                        is_escape_char = false;
+                        break;
+                    case _T('"'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('"');
+                        is_escape_char = false;
+                        break;
+                    case _T('\''):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\'');
+                        is_escape_char = false;
+                        break;
+                    case _T('\?'):
+                        str_size++;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 1] = _T('\?');
+                        is_escape_char = false;
+                        break;
+                    case _T('x'):
+                        is_digits = true;
+                        is_hex_digits = true;
+                        if (digits_buf.capacity() < 16) {
+                            digits_buf.reserve(16);
+                        }
+                        digits_buf.resize(0);
+                        break;
+                    default: default_:
+                        if (is_hex_digits) {
+                            const int is_hex_digit = tisxdigit(*it);
+                            if (is_hex_digit) {
+                                // resize on overflow
+                                if (digits_buf.size() < digit_index + 2) { // including terminal character
+                                    digits_buf.resize(digit_index + 2);
+                                }
+
+                                digits_buf[digit_index] = *it;
+
+                                digit_index++;
+                            }
+
+                            if (!is_hex_digit || digit_index >= 8) {
+                                // resize on overflow
+                                if (digits_buf.size() < digit_index + 2) { // including terminal character
+                                    digits_buf.resize(digit_index + 2);
+                                }
+
+                                digits_buf[digit_index] = _T('\0');
+
+                                _set_errno(0); // just in case
+                                const auto decimal_value = tstrtoul(&digits_buf[0], &stop_scan_char_ptr, 16);
+                                if (errno != ERANGE) {
+                                    digits_eval_buf.resize(10 + 1); // max decimal digits
+                                    digits_eval_buf[0] = _T('\0');
+                                    ultot(decimal_value, &digits_eval_buf[0], 10);
+                                    const size_t digits_num = tstrlen(&digits_eval_buf[0]);
+                                    str_eval_buf.resize(str_size + digits_num);
+                                    tstrcat(&str_eval_buf[str_size], &digits_eval_buf[0]);
+                                    str_size += digits_num;
+                                }
+
+                                is_escape_char = false;
+                                is_digits = false;
+                                is_hex_digits = false;
+
+                                continue; // reuse iterator
+                            }
+                        }
+                        else {
+                            const int is_octal_digit = tisdigit(*it) && *it != _T('8') && *it != _T('9');
+                            if (is_octal_digit) {
+                                if (!digit_index) {
+                                    is_digits = true;
+                                    if (digits_buf.capacity() < 16) {
+                                        digits_buf.reserve(16);
+                                    }
+                                }
+
+                                // resize on overflow
+                                if (digits_buf.size() < digit_index + 2) { // including terminal character
+                                    digits_buf.resize(digit_index + 2);
+                                }
+
+                                digits_buf[digit_index] = *it;
+
+                                digit_index++;
+                            }
+
+                            if (!is_octal_digit || digit_index >= 10) {
+                                // resize on overflow
+                                if (digits_buf.size() < digit_index + 2) { // including terminal character
+                                    digits_buf.resize(digit_index + 2);
+                                }
+
+                                digits_buf[digit_index] = _T('\0');
+
+                                _set_errno(0); // just in case
+                                const auto decimal_value = tstrtoul(&digits_buf[0], &stop_scan_char_ptr, 8);
+                                if (errno != ERANGE) {
+                                    digits_eval_buf.resize(10 + 1); // max decimal digits
+                                    digits_eval_buf[0] = _T('\0');
+                                    ultot(decimal_value, &digits_eval_buf[0], 10);
+                                    const size_t digits_num = tstrlen(&digits_eval_buf[0]);
+                                    str_eval_buf.resize(str_size + digits_num);
+                                    tstrcat(&str_eval_buf[str_size], &digits_eval_buf[0]);
+                                    str_size += digits_num;
+                                }
+
+                                is_escape_char = false;
+                                is_digits = false;
+
+                                continue; // reuse iterator
+                            }
+                        }
+                    }
+                }
+                break;
+            } while (true);
+        }
+
+        // postprocess
+
+        if (is_hex_digits) {
+            // resize on overflow
+            if (digits_buf.size() < digit_index + 2) { // including terminal character
+                digits_buf.resize(digit_index + 2);
+            }
+
+            digits_buf[digit_index] = _T('\0');
+
+            _set_errno(0); // just in case
+            const auto decimal_value = tstrtoul(&digits_buf[0], &stop_scan_char_ptr, 16);
+            if (errno != ERANGE) {
+                digits_eval_buf.resize(10 + 1); // max decimal digits
+                digits_eval_buf[0] = _T('\0');
+                ultot(decimal_value, &digits_eval_buf[0], 10);
+                const size_t digits_num = tstrlen(&digits_eval_buf[0]);
+                str_eval_buf.resize(str_size + digits_num);
+                tstrcat(&str_eval_buf[str_size], &digits_eval_buf[0]);
+                str_size += digits_num;
+            }
+        }
+        else if (is_digits) {
+            // resize on overflow
+            if (digits_buf.size() < digit_index + 2) { // including terminal character
+                digits_buf.resize(digit_index + 2);
+            }
+
+            digits_buf[digit_index] = _T('\0');
+
+            _set_errno(0); // just in case
+            const auto decimal_value = tstrtoul(&digits_buf[0], &stop_scan_char_ptr, 8);
+            if (errno != ERANGE) {
+                digits_eval_buf.resize(10 + 1); // max decimal digits
+                digits_eval_buf[0] = _T('\0');
+                ultot(decimal_value, &digits_eval_buf[0], 10);
+                const size_t digits_num = tstrlen(&digits_eval_buf[0]);
+                str_eval_buf.resize(str_size + digits_num);
+                tstrcat(&str_eval_buf[str_size], &digits_eval_buf[0]);
+                str_size += digits_num;
+            }
+        }
+
+        // resize on overflow
+        if (str_size + 1 > str_eval_buf.size()) {
+            str_eval_buf.resize(str_size + 1);
+        }
+
+        str_eval_buf[str_size] = _T('\0');
+
+        return std::tstring(&str_eval_buf[0], &str_eval_buf[str_size]);
     }
 }
 

@@ -19,19 +19,34 @@ Usage: printf.exe [/?] [<Flags>] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
         Don't expand `${...}` environment variables.
 
       /no-subst-vars
-        Don't substitute `{...}` variables.
+        Don't substitute `{...}` variables (command line parameters).
 
-    <FormatString> placeholders:
+      /eval-backslash-esc or /e
+        Evaluate escape characters:
+          \a = \x07 = alert (bell)
+          \b = \x08 = backspace
+          \t = \x09 = horizontal tab
+          \n = \x0A = newline or line feed
+          \v = \x0B = vertical tab
+          \f = \00C = form feed
+          \r = \x0D = carriage return
+          \e = \x1B = escape (non-standard GCC extension)
+
+          \" = quotation mark
+          \' = apostrophe
+          \? = question mark
+          \\ = backslash
+
+          \N or \NN or \NNN or .. or \NNNNNNNNNN - octal number
+          \xN or \xNN or \xNNN or .. or \xNNNNNNNN - hexidecimal number
+
+    <FormatString>, <ArgN> placeholders:
       ${<VarName>} - <VarName> environment variable value.
       {0}    - first argument value.
       {N}    - N'th argument value.
       {0hs}  - first arguments hexidecimal string (00-FF per character).
       {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
       \{     - '{' character escape
-
-    Arguments placeholders:
-      ${<VarName>} - <VarName> environment variable value.
-      \{    - '{' character escape
 
   Return codes:
    -255 - unspecified error
@@ -41,4 +56,5 @@ Usage: printf.exe [/?] [<Flags>] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
     0   - succeded
 
   Examples:
-    1. printf.exe "{0}={1}" "My profit" "10%"
+    1. printf.exe /e "Hello world!\n"
+    2. printf.exe "{0}={1}" "My profit" "10%"
