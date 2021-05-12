@@ -1,4 +1,7 @@
 2021.05.12:
+* new: bin/contools: binaries update
+
+2021.05.12:
 * new: src/printf: `/eval-backslash-esc` or `/e` flag to evaluate backslash escape sequences
 
 2021.05.01:
