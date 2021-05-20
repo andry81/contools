@@ -1,9 +1,11 @@
 * Fix the case where the `callf.exe "" "cmd.exe /k"` expression has broken
   autocompletion feature in the `cmd.exe` process and the `cmd.exe` treats all
   the tab characters as is.
-  The bug is attached to the `STARTF_USESTDHANDLES` flag is used from the
-  `CreateProcess` function.
-  If the flag is not set, then the autocompletion feature works, but the
-  standard output can not be redirected and intercepted.
-  If the flag is set, then the autocompletion feature is broken, but the
-  standard output can be redirected and intercepted.
+  The bug is attached to the `STARTF_USESTDHANDLES` flag and if related
+  standard handles is used from the `CreateProcess` function.
+  If the flag is not set or all 3 stdandard handles are character (console)
+  handles (not disk or pipe handles), then the autocompletion feature works,
+  but the standard output can not be redirected and intercepted.
+  If the flag is set and one of 3 handles is not character (console) handle,
+  then the autocompletion feature is broken, but the standard output can be
+  redirected and intercepted.

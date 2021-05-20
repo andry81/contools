@@ -3,10 +3,13 @@ callf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build 
   Create process in style of c-function printf, replacing specific backslashed
   character pairs in string arguments with characters.
 
-Usage: callf.exe [/?] [<Flags>] <ApplicationNameFormatString> [<CommandLineFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
+Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLineFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
   Description:
     /?
       This help.
+
+    //:
+      Character sequence to stop parse <Flags> command line parameters.
 
     Flags:
       /chcp-in <codepage>
@@ -40,7 +43,7 @@ Usage: callf.exe [/?] [<Flags>] <ApplicationNameFormatString> [<CommandLineForma
         Don't expand `${...}` environment variables.
 
       /no-subst-vars
-        Don't substitute `{...}` variables.
+        Don't substitute `{...}` variables (command line parameters).
 
       /reopen-stdin-as <file>
         Reopen stdin as a `<file>`.
@@ -76,21 +79,37 @@ Usage: callf.exe [/?] [<Flags>] <ApplicationNameFormatString> [<CommandLineForma
         Explicitly enable or disable console input buffer echo before start
         of a child process.
 
+      /eval-backslash-esc or /e
+        Evaluate escape characters:
+          \a = \x07 = alert (bell)
+          \b = \x08 = backspace
+          \t = \x09 = horizontal tab
+          \n = \x0A = newline or line feed
+          \v = \x0B = vertical tab
+          \f = \00C = form feed
+          \r = \x0D = carriage return
+          \e = \x1B = escape (non-standard GCC extension)
+
+          \" = quotation mark
+          \' = apostrophe
+          \? = question mark
+          \\ = backslash
+
+          \N or \NN or \NNN or .. or \NNNNNNNNNN - octal number
+          \xN or \xNN or \xNNN or .. or \xNNNNNNNN - hexidecimal number
+
     <ApplicationNameFormatString>, <CommandLineFormatString>:
       Win32 `CreateProcess` function 2 first parameters (see related
       documentation).
 
-      Available placeholders:
-        ${<VarName>} - <VarName> environment variable value.
-        {0}    - first argument value.
-        {N}    - N'th argument value.
-        {0hs}  - first arguments hexidecimal string (00-FF per character).
-        {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
-        \{     - '{' character escape
-
-    Other arguments placeholders:
+    <ApplicationNameFormatString>, <CommandLineFormatString>,
+    <ArgN> placeholders:
       ${<VarName>} - <VarName> environment variable value.
-      \{    - '{' character escape
+      {0}    - first argument value.
+      {N}    - N'th argument value.
+      {0hs}  - first arguments hexidecimal string (00-FF per character).
+      {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
+      \{     - '{' character escape
 
     The <ApplicationNameFormatString> can be empty, then the
     <CommandLineFormatString> must have an application file path in the first
@@ -117,7 +136,7 @@ Usage: callf.exe [/?] [<Flags>] <ApplicationNameFormatString> [<CommandLineForma
     7. callf.exe "${COMSPEC}" "/c (echo.Special case characters: ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^&)&pause"
 
     First 5 examples should print:
-            Hello Wold!
+            Hello World!
 
     Last 2 examples should print and pause after:
             Special case characters: |&"|& ^ |&"|& ^ |&"|& ^ |&"|&

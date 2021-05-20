@@ -1,3 +1,12 @@
+2021.05.20:
+* fixed: src/callf: missed to close underlying pipe into the stdin of the child process if parent stdin pipe is being closed
+* fixed: src/callf: missed to close reopened stdin/stdout/stderr handles
+* fixed: src/callf: other multiple fixup
+* new: src: callf, printf: added `//` command line parameter to explicitly stop parse of flag parameters
+* new: src/callf: `/eval-backslash-esc` or `/e` flag to evaluate backslash escape sequences
+* changed: todo update
+* refactor: src/callf: minor refactor
+
 2021.05.12:
 * new: bin/contools: binaries update
 
