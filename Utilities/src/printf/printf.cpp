@@ -138,13 +138,35 @@ int _tmain(int argc, const TCHAR * argv[])
         for (int i = 0; i < num_args; i++) {
             in_args.args[i] = argv[arg_offset + i];
         }
-        for (int i = 0; i < num_args; i++) {
-            if (tstrcmp(in_args.args[i], _T(""))) {
-                _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
-                    g_flags.no_expand_env, g_flags.no_subst_vars, true, in_args, out_args);
+        // double pass to expand ${...} variables before {...} variables
+        if (!g_flags.no_expand_env && !g_flags.no_subst_vars) {
+            std::tstring tmp;
+
+            for (int i = 0; i < num_args; i++) {
+                if (tstrcmp(in_args.args[i], _T(""))) {
+                    _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
+                        false, true, true, in_args, out_args);
+                }
+                else {
+                    in_args.args[i] = nullptr;
+                }
             }
-            else {
-                in_args.args[i] = nullptr;
+            for (int i = 0; i < num_args; i++) {
+                tmp.clear();
+                _parse_string(i, out_args.args[i].c_str(), tmp, env_buf,
+                    true, false, false, InArgs{}, out_args);
+                out_args.args[i] = std::move(tmp);
+            }
+        }
+        else {
+            for (int i = 0; i < num_args; i++) {
+                if (tstrcmp(in_args.args[i], _T(""))) {
+                    _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
+                        g_flags.no_expand_env, g_flags.no_subst_vars, true, in_args, out_args);
+                }
+                else {
+                    in_args.args[i] = nullptr;
+                }
             }
         }
     }

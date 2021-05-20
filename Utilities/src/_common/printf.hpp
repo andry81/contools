@@ -156,7 +156,12 @@ namespace {
                     }
                 }
                 else {
+                    if (p > last_offset_ptr) {
+                        parsed_str.append(last_offset_ptr, p);
+                    }
+
                     parsed_str.append(_T("{"));
+
                     last_offset_ptr = p + 1;
 
                     found = true;

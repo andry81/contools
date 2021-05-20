@@ -53,6 +53,7 @@ namespace {
         std::tstring    tee_stderr_file;
         unsigned int    chcp_in;
         unsigned int    chcp_out;
+        unsigned int    win_error_langid;
         int             tee_stdin_pipe_buf_size;
         int             tee_stdout_pipe_buf_size;
         int             tee_stderr_pipe_buf_size;
@@ -67,7 +68,7 @@ namespace {
         {}, {}, {},
         {}, {}, {},
 
-        0, 0,
+        0, 0, 0,
 
         0, 0, 0, // 0 - to define by system
 
@@ -192,7 +193,7 @@ namespace {
                                         win_error, win_error);
                                 }
                                 if (g_flags.print_win_error_string && win_error) {
-                                    _print_error_message(win_error);
+                                    _print_error_message(win_error, g_options.win_error_langid);
                                 }
                             }
 
@@ -222,7 +223,7 @@ namespace {
                                                 win_error, win_error);
                                         }
                                         if (g_flags.print_win_error_string && win_error) {
-                                            _print_error_message(win_error);
+                                            _print_error_message(win_error, g_options.win_error_langid);
                                         }
                                     }
                                 }
@@ -269,7 +270,7 @@ namespace {
                                         win_error, win_error);
                                 }
                                 if (g_flags.print_win_error_string && win_error) {
-                                    _print_error_message(win_error);
+                                    _print_error_message(win_error, g_options.win_error_langid);
                                 }
                             }
 
@@ -299,7 +300,7 @@ namespace {
                                                 win_error, win_error);
                                         }
                                         if (g_flags.print_win_error_string && win_error) {
-                                            _print_error_message(win_error);
+                                            _print_error_message(win_error, g_options.win_error_langid);
                                         }
                                     }
                                 }
@@ -339,7 +340,7 @@ namespace {
                                         win_error, win_error);
                                 }
                                 if (g_flags.print_win_error_string && win_error) {
-                                    _print_error_message(win_error);
+                                    _print_error_message(win_error, g_options.win_error_langid);
                                 }
                             }
 
@@ -369,7 +370,7 @@ namespace {
                                                 win_error, win_error);
                                         }
                                         if (g_flags.print_win_error_string && win_error) {
-                                            _print_error_message(win_error);
+                                            _print_error_message(win_error, g_options.win_error_langid);
                                         }
                                     }
                                 }
@@ -483,7 +484,7 @@ namespace {
                             win_error, win_error, options.reopen_stdout_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -506,7 +507,7 @@ namespace {
                             win_error, win_error, options.reopen_stdout_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -529,7 +530,7 @@ namespace {
                             win_error, win_error, options.reopen_stderr_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -555,7 +556,7 @@ namespace {
                             win_error, win_error, options.tee_stdin_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -579,7 +580,7 @@ namespace {
                             win_error, win_error, options.tee_stdout_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -603,7 +604,7 @@ namespace {
                             win_error, win_error, options.tee_stderr_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -628,7 +629,7 @@ namespace {
                         win_error, win_error);
                 }
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error);
+                    _print_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
@@ -650,7 +651,7 @@ namespace {
                         win_error, win_error);
                 }
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error);
+                    _print_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
@@ -672,7 +673,7 @@ namespace {
                         win_error, win_error);
                 }
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error);
+                    _print_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
@@ -709,7 +710,7 @@ namespace {
                             win_error, win_error);
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -736,7 +737,7 @@ namespace {
                             win_error, win_error, stdin_handle_type, options.reopen_stdin_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -790,7 +791,7 @@ namespace {
                             win_error, win_error);
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -817,7 +818,7 @@ namespace {
                             win_error, win_error, stdout_handle_type, options.reopen_stdout_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -847,7 +848,7 @@ namespace {
                             win_error, win_error);
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -874,7 +875,7 @@ namespace {
                             win_error, win_error, stderr_handle_type, options.reopen_stderr_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error);
+                        _print_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -936,7 +937,7 @@ namespace {
                 win_error = GetLastError();
             }
 
-            if (pi.hProcess != INVALID_HANDLE_VALUE) {
+            if (pi.hProcess && pi.hProcess != INVALID_HANDLE_VALUE) {
                 g_child_process_handle = pi.hProcess;       // to check the process status from stream pipe threads
                 g_child_process_group_id = pi.dwProcessId;  // to pass parent console signal events into child process
 
@@ -966,7 +967,7 @@ namespace {
                 }
             }
 
-            if (!ret_create_proc || pi.hProcess == INVALID_HANDLE_VALUE) {
+            if (!ret_create_proc || !pi.hProcess || pi.hProcess == INVALID_HANDLE_VALUE) {
                 if (flags.ret_create_proc) {
                     ret = ret_create_proc;
                 }
@@ -981,7 +982,7 @@ namespace {
                         win_error, win_error, app, cmd_buf_ptr ? (TCHAR *)cmd_buf_ptr : _T(""));
                 }
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error);
+                    _print_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
@@ -1059,7 +1060,7 @@ namespace {
                                         win_error, win_error);
                                 }
                                 if (flags.print_win_error_string && win_error) {
-                                    _print_error_message(win_error);
+                                    _print_error_message(win_error, g_options.win_error_langid);
                                 }
                                 break;
                             }
@@ -1074,7 +1075,7 @@ namespace {
             else if (flags.ret_win_error) {
                 ret = win_error;
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error);
+                    _print_error_message(win_error, g_options.win_error_langid);
                 }
             }
         }
@@ -1232,6 +1233,18 @@ int _tmain(int argc, const TCHAR * argv[])
         }
         else if (!tstrcmp(arg, _T("/ret-win-error"))) {
             g_flags.ret_win_error= true;
+        }
+        else if (!tstrcmp(arg, _T("/win-error-langid"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                g_options.win_error_langid = _ttoi(arg);
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
         }
         else if (!tstrcmp(arg, _T("/ret-child-exit"))) {
             g_flags.ret_child_exit = true;
@@ -1521,13 +1534,35 @@ int _tmain(int argc, const TCHAR * argv[])
         for (int i = 0; i < num_args; i++) {
             app_args.args[i] = argv[arg_offset + i];
         }
-        for (int i = 0; i < num_args; i++) {
-            if (tstrcmp(app_args.args[i], _T(""))) {
-                _parse_string(i, app_args.args[i], app_out_args.args[i], env_buf,
-                    g_flags.no_expand_env, g_flags.no_subst_vars, true, app_args, app_out_args);
+        // double pass to expand ${...} variables before {...} variables
+        if (!g_flags.no_expand_env && !g_flags.no_subst_vars) {
+            std::tstring tmp;
+
+            for (int i = 0; i < num_args; i++) {
+                if (tstrcmp(app_args.args[i], _T(""))) {
+                    _parse_string(i, app_args.args[i], app_out_args.args[i], env_buf,
+                        false, true, true, app_args, app_out_args);
+                }
+                else {
+                    app_args.args[i] = nullptr;
+                }
             }
-            else {
-                app_args.args[i] = nullptr;
+            for (int i = 0; i < num_args; i++) {
+                tmp.clear();
+                _parse_string(i, app_out_args.args[i].c_str(), tmp, env_buf,
+                    true, false, false, InArgs{}, app_out_args);
+                app_out_args.args[i] = std::move(tmp);
+            }
+        }
+        else {
+            for (int i = 0; i < num_args; i++) {
+                if (tstrcmp(app_args.args[i], _T(""))) {
+                    _parse_string(i, app_args.args[i], app_out_args.args[i], env_buf,
+                        g_flags.no_expand_env, g_flags.no_subst_vars, true, app_args, app_out_args);
+                }
+                else {
+                    app_args.args[i] = nullptr;
+                }
             }
         }
     }
@@ -1541,12 +1576,35 @@ int _tmain(int argc, const TCHAR * argv[])
         for (int i = 0; i < num_args; i++) {
             cmd_args.args[i] = argv[arg_offset + i];
         }
-        for (int i = 0; i < num_args; i++) {
-            if (tstrcmp(cmd_args.args[i], _T(""))) {
-                _parse_string(i, cmd_args.args[i], cmd_out_args.args[i], env_buf,
-                    g_flags.no_expand_env, g_flags.no_subst_vars, true, cmd_args, cmd_out_args);
-            } else {
-                cmd_args.args[i] = nullptr;
+        // double pass to expand ${...} variables before {...} variables
+        if (!g_flags.no_expand_env && !g_flags.no_subst_vars) {
+            std::tstring tmp;
+
+            for (int i = 0; i < num_args; i++) {
+                if (tstrcmp(cmd_args.args[i], _T(""))) {
+                    _parse_string(i, cmd_args.args[i], cmd_out_args.args[i], env_buf,
+                        false, true, true, cmd_args, cmd_out_args);
+                }
+                else {
+                    cmd_args.args[i] = nullptr;
+                }
+            }
+            for (int i = 0; i < num_args; i++) {
+                tmp.clear();
+                _parse_string(i, cmd_out_args.args[i].c_str(), tmp, env_buf,
+                    true, false, false, InArgs{}, cmd_out_args);
+                cmd_out_args.args[i] = std::move(tmp);
+            }
+        }
+        else {
+            for (int i = 0; i < num_args; i++) {
+                if (tstrcmp(cmd_args.args[i], _T(""))) {
+                    _parse_string(i, cmd_args.args[i], cmd_out_args.args[i], env_buf,
+                        g_flags.no_expand_env, g_flags.no_subst_vars, true, cmd_args, cmd_out_args);
+                }
+                else {
+                    cmd_args.args[i] = nullptr;
+                }
             }
         }
     }
