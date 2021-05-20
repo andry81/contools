@@ -41,6 +41,7 @@ namespace {
         bool            create_child_console;
         bool            detach_parent_console;
         bool            eval_backslash_esc;             // evaluate backslash escape characters
+        bool            eval_dbl_backslash_esc;         // evaluate double backslash escape characters (`\\`)
     };
 
     struct _Options
@@ -1471,6 +1472,9 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/eval-backslash-esc")) || !tstrcmp(arg, _T("/e"))) {
             g_flags.eval_backslash_esc = true;
         }
+        else if (!tstrcmp(arg, _T("/eval-dbl-backslash-esc")) || !tstrcmp(arg, _T("/e\\\\"))) {
+            g_flags.eval_dbl_backslash_esc = true;
+        }
         else if (!tstrcmp(arg, _T("//"))) {
             arg_offset += 1;
             break;
@@ -1618,12 +1622,12 @@ int _tmain(int argc, const TCHAR * argv[])
             g_flags.no_expand_env, g_flags.no_subst_vars, false, cmd_args, cmd_out_args);
     }
 
-    if (g_flags.eval_backslash_esc) {
+    if (g_flags.eval_backslash_esc || g_flags.eval_dbl_backslash_esc) {
         if (app_args.fmt_str) {
-            app_out_args.fmt_str = _eval_backslash_escape_chars(app_out_args.fmt_str);
+            app_out_args.fmt_str = _eval_escape_chars(app_out_args.fmt_str, g_flags.eval_backslash_esc, g_flags.eval_dbl_backslash_esc);
         }
         if (cmd_args.fmt_str) {
-            cmd_out_args.fmt_str = _eval_backslash_escape_chars(cmd_out_args.fmt_str);
+            cmd_out_args.fmt_str = _eval_escape_chars(cmd_out_args.fmt_str, g_flags.eval_backslash_esc, g_flags.eval_dbl_backslash_esc);
         }
     }
 

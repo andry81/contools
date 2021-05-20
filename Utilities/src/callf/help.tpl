@@ -101,6 +101,10 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           \N or \NN or \NNN or .. or \NNNNNNNNNN - octal number
           \xN or \xNN or \xNNN or .. or \xNNNNNNNN - hexidecimal number
 
+      /eval-dbl-backslash-esc or /e\\
+        Evaluate double backslash escape characters:
+          \\ = backslash
+
     <ApplicationNameFormatString>, <CommandLineFormatString>:
       Win32 `CreateProcess` function 2 first parameters (see related
       documentation).
@@ -128,7 +132,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           are empty.
     0   - succeded
 
-  Examples:
+  Examples (no recursion):
     1. callf.exe "${WINDIR}\system32\cmd.exe" "{0} {1}" "/c" "echo.Hello World!"
     2. callf.exe "${COMSPEC}" "{0} {1}" "/c" "echo.Hello World!"
     3. callf.exe "{0}" "\"{1}\" {2}" "${COMSPEC}" "/c" "echo.Hello World!"
@@ -143,3 +147,16 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
     Last 2 examples should print and pause after:
             Special case characters: |&"|& ^ |&"|& ^ |&"|& ^ |&"|&
+
+  Examples (with recursion):
+    1. callf.exe "" "\"${COMSPEC}\" /c echo.{0}" "%%TIME%%"
+    2. callf.exe "" "callf.exe \"\" \"\\\"$\{COMSPEC}\\\" /c echo.{0}\" \"%%TIME%%\""
+    3. callf.exe "" "callf.exe \"\" \"callf.exe \\\"\\\" \\\"\\\\\\\"$\\{COMSPEC}\\\\\\\" /c echo.{0}\\\" \\\"%%TIME%%\\\"\""
+
+    4. callf.exe "" "\"${COMSPEC}\" /c echo.{0}" "%TIME%"
+    5. callf.exe "" "callf.exe \"\" \"\\\"$\{COMSPEC}\\\" /c echo.{0}\" \"%TIME%\""
+    6. callf.exe "" "callf.exe \"\" \"callf.exe \\\"\\\" \\\"\\\\\\\"$\\{COMSPEC}\\\\\\\" /c echo.{0}\\\" \\\"%TIME%\\\"\""
+
+    First 3 examples must be run from the cmd.exe batch file (.bat).
+
+    Last 3 examples must be typed in the cmd.exe console window.

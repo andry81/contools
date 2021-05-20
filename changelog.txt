@@ -1,3 +1,7 @@
+2021.05.21:
+* new: Utilities/src: callf, printf: `/eval-dbl-backslash-esc` or `/e\\` flag to evaluate double backslash escape sequence
+* new: Utilities/callf: help examples over recursion call
+
 2021.05.20:
 * fixed: Utilities/src/callf: minor fixup
 

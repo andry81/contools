@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include <assert.h>
+
 #include "std/tctype.hpp"
 #include "std/tstdlib.hpp"
 #include "std/tstring.hpp"
@@ -116,8 +118,10 @@ namespace {
         return str;
     }
 
-    inline std::tstring _eval_backslash_escape_chars(const std::tstring & str)
+    inline std::tstring _eval_escape_chars(const std::tstring & str, bool eval_backslash_esc, bool eval_dbl_backslash_esc)
     {
+        assert(eval_backslash_esc || eval_dbl_backslash_esc);
+
         std::vector<TCHAR> str_eval_buf;
         std::vector<TCHAR> digits_buf;
         std::vector<TCHAR> digits_eval_buf;
@@ -150,10 +154,28 @@ namespace {
                     }
                 }
                 else {
+                    if (!eval_backslash_esc) {
+                        if (*it == _T('\\')) goto dbl_backslash_esc;
+
+                        str_size += 2;
+
+                        // resize on overflow
+                        if (str_size > str_eval_buf.size()) {
+                            str_eval_buf.resize(str_size);
+                        }
+
+                        str_eval_buf[str_size - 2] = _T('\\');
+                        str_eval_buf[str_size - 1] = *it;
+                        is_escape_char = false;
+                        break;
+                    }
+
                     if (is_digits) goto default_;
 
                     switch (*it) {
                     case _T('\\'):
+                    dbl_backslash_esc:
+
                         str_size++;
 
                         // resize on overflow
