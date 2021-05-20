@@ -3,10 +3,13 @@ printf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build
   Print in style of c-function printf, replacing specific backslashed
   character pairs in string arguments with characters.
 
-Usage: printf.exe [/?] [<Flags>] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
+Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
   Description:
     /?:
       This help.
+
+    //:
+      Character sequence to stop parse <Flags> command line parameters.
 
     Flags:
       /chcp <codepage>

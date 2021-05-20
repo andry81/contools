@@ -92,6 +92,10 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/eval-backslash-esc")) || !tstrcmp(arg, _T("/e"))) {
             g_flags.eval_backslash_esc = true;
         }
+        else if (!tstrcmp(arg, _T("//"))) {
+            arg_offset += 1;
+            break;
+        }
         else {
             if (!g_flags.no_print_gen_error_string) {
                 _ftprintf(stderr, _T("error: flag is not known: \"%s\""), arg);
