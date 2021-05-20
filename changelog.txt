@@ -1,4 +1,7 @@
 2021.05.20:
+* new: Utilities/bin/contools: binaries update
+
+2021.05.20:
 * fixed: Utilities/src: callf, printf: missed to append string before the `{` character if `/no-subst-vars` flag is used
 * fixed: Utilities/src/callf: invalid `<ApplicationNameFormatString>` command line parameter parse
 * new: Utilities/src/callf: `/win-error-langid` option to explicitly set language id for win32 error messages
