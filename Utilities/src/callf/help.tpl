@@ -24,6 +24,9 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       /ret-win-error
         Return Win32 error code.
 
+      /win-error-langid <LANGID>
+        Language ID to format Win32 error messages.
+
       /ret-child-exit
         Return child process exit code (if has no `/no-wait` flag).
 

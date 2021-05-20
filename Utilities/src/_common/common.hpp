@@ -74,11 +74,16 @@ namespace {
                 parsed_str.append(in_str_var_ptr, in_str_var_end_ptr + 1);
                 break;
             }
-            if (!env_buf_size) {
-                env_buf[0] = _T('\0');
+            if (env_buf_size) {
+                parsed_str.append(env_buf);
             }
+            else {
+                env_buf[0] = _T('\0');
 
-            parsed_str.append(env_buf);
+                parsed_str.append(_T("${"));
+                parsed_str.append(in_str_var_name);
+                parsed_str.append(_T("}"));
+            }
         }
 
         return return_offset_ptr;
@@ -92,12 +97,11 @@ namespace {
         return (osv.dwPlatformId == VER_PLATFORM_WIN32_NT);
     }
 
-    inline void _print_error_message(DWORD win_error)
+    inline void _print_error_message(DWORD win_error, UINT langid = LANG_NEUTRAL)
     {
         LPTSTR win_error_msg_buf = nullptr;
-        UINT prev_cp = GetConsoleOutputCP();
         FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, win_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&win_error_msg_buf, 0, NULL);
+            NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPTSTR)&win_error_msg_buf, 0, NULL);
         _ftprintf(stderr, _T("error: win32: \"%s\"\n"), win_error_msg_buf);
         LocalFree(win_error_msg_buf);
     }
