@@ -1,4 +1,7 @@
 2021.05.20:
+* new: Utilities/bin/contools: binaries update
+
+2021.05.20:
 * fixed: Utilities/src/callf: missed to close underlying pipe into the stdin of the child process if parent stdin pipe is being closed
 * fixed: Utilities/src/callf: missed to close reopened stdin/stdout/stderr handles
 * fixed: Utilities/src/callf: other multiple fixup
