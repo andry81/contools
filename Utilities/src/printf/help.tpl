@@ -43,6 +43,10 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
           \N or \NN or \NNN or .. or \NNNNNNNNNN - octal number
           \xN or \xNN or \xNNN or .. or \xNNNNNNNN - hexidecimal number
 
+      /eval-dbl-backslash-esc or /e\\
+        Evaluate double backslash escape characters:
+          \\ = backslash
+
     <FormatString>, <ArgN> placeholders:
       ${<VarName>} - <VarName> environment variable value.
       {0}    - first argument value.
