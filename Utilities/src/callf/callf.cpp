@@ -411,7 +411,7 @@ namespace {
             // just in case
             ret = err_format_empty;
             if (!flags.no_print_gen_error_string) {
-                fputs("error: format arguments are empty", stderr);
+                fputs("error: format arguments are empty\n", stderr);
             }
             return ret;
         }
@@ -1195,7 +1195,7 @@ int _tmain(int argc, const TCHAR * argv[])
         arg = argv[arg_offset];
         if (!arg) {
             if (!g_flags.no_print_gen_error_string) {
-                fputs("error: flag is invalid", stderr);
+                fputs("error: flag is invalid\n", stderr);
             }
             return err_invalid_format;
         }
@@ -1514,7 +1514,7 @@ int _tmain(int argc, const TCHAR * argv[])
 
     if (!app_args.fmt_str && !cmd_args.fmt_str) {
         if (!g_flags.no_print_gen_error_string) {
-            fputs("error: format arguments are empty", stderr);
+            fputs("error: format arguments are empty\n", stderr);
         }
         if (!g_flags.ret_win_error) {
             return err_format_empty;
