@@ -1,4 +1,7 @@
 2021.05.21:
+* new: Scripts/Tools/ToolAdaptors/vbs: added `--` command line parameter to explicitly stop parse of flag parameters
+
+2021.05.21:
 * new: Utilities/src: callf, printf: `/eval-dbl-backslash-esc` or `/e\\` flag to evaluate double backslash escape sequence
 * new: Utilities/callf: help examples over recursion call
 
