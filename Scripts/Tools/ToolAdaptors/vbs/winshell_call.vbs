@@ -101,11 +101,11 @@ Dim arg, index
 Dim IsCmdArg : IsCmdArg = True
 Dim i, j, k : j = 0
 
-For i = 0 To WScript.Arguments.Count - 1
+For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Continue`
   arg = WScript.Arguments(i)
 
   If ExpectFlags Then
-    If Mid(arg, 1, 1) = "-" Then
+    If arg <> "--" And Mid(arg, 1, 1) = "-" Then
       If arg = "-u" Then ' Unescape %xx or %uxxxx
         UnescapeAllArgs = True
       ElseIf Left(arg, 2) = "-u" Then
@@ -198,6 +198,8 @@ For i = 0 To WScript.Arguments.Count - 1
       ReDim Preserve str_replace_index_arr(str_replace_index_arr_size - 1)
       ReDim Preserve from_str_expand_arr(str_expand_arr_size - 1)
       ReDim Preserve to_str_expand_arr(str_expand_arr_size - 1)
+
+      If arg = "--" Then Exit Do
     End If
   End If
 
@@ -285,7 +287,7 @@ For i = 0 To WScript.Arguments.Count - 1
 
     j = j + 1
   End If
-Next
+Loop While False : Next
 
 If NoWindow Then ShowAs = 0
 

@@ -1,7 +1,7 @@
 ''' Creates the Windows shortcut file.
 
 ''' USAGE:
-'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-E | -E0 | -Et | -Ea] [-q] [-u] <ShortcutFileName> <ShortcutTarget> <ShortcutArgs>
+'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-E | -E0 | -Et | -Ea] [-q] [-u] [--] <ShortcutFileName> <ShortcutTarget> <ShortcutArgs>
 '''
 ''' Note:
 '''   1. Creation of a shortcut under ealier version of the Windows makes shortcut
@@ -76,11 +76,11 @@ Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
 Dim arg
 Dim j : j = 0
 
-For i = 0 To WScript.Arguments.Count-1
+For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Continue`
   arg = WScript.Arguments(i)
 
   If ExpectFlags Then
-    If Mid(arg, 1, 1) = "-" Then
+    If arg <> "--" And Mid(arg, 1, 1) = "-" Then
       If arg = "-u" Then ' Unescape %xx or %uxxxx
         UnescapeAllArgs = True
       ElseIf arg = "-CD" Then ' Change current directory
@@ -111,6 +111,8 @@ For i = 0 To WScript.Arguments.Count-1
       End If
     Else
       ExpectFlags = False
+
+      If arg = "--" Then Exit Do
     End If
   End If
 
@@ -141,7 +143,7 @@ For i = 0 To WScript.Arguments.Count-1
 
     j = j + 1
   End If
-Next
+Loop While False : Next
 
 ReDim Preserve cmd_args(j - 1)
 
