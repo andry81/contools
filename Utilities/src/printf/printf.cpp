@@ -69,6 +69,11 @@ int _tmain(int argc, const TCHAR * argv[])
             break;
         }
 
+        if (!tstrncmp(arg, _T("//"), 2)) {
+            arg_offset += 1;
+            break;
+        }
+
         if (!tstrcmp(arg, _T("/chcp"))) {
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
@@ -95,10 +100,6 @@ int _tmain(int argc, const TCHAR * argv[])
         }
         else if (!tstrcmp(arg, _T("/eval-dbl-backslash-esc")) || !tstrcmp(arg, _T("/e\\\\"))) {
             g_flags.eval_dbl_backslash_esc = true;
-        }
-        else if (!tstrcmp(arg, _T("//"))) {
-            arg_offset += 1;
-            break;
         }
         else {
             if (!g_flags.no_print_gen_error_string) {

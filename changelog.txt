@@ -1,4 +1,11 @@
 2021.05.24:
+* new: Utilities/src/callf: ShellExecute call support through the `/shell-exec <Verb>` option
+* new: Utilities/src/callf: `/D <CurrentDirectory>` option to use in both the CreateProcess and ShellExecute
+* new: Utilities/src/callf: `/showas <ShowWindowAsNumber>` option to use in both the CreateProcess and ShellExecute
+* new: Utilities/src/callf: `/print-shell-error-string`, `/no-sys-dialog-ui`, `/shell-exec-expand-env`, `/use-parent-console`, `/init-com`, `/wait-child-start` flags related to the ShellExecute
+* refactor: Utilities/src: callf, printf: minor refactor
+
+2021.05.24:
 * fixed: Utilities/src/callf: `?` characters in the win32 error message in case if `/print-win-error-string` flag is used under non english locale
 
 2021.05.21:

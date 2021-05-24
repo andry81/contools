@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <assert.h>
+#include <ShellAPI.h>
 
 #include "std/tctype.hpp"
 #include "std/tstdlib.hpp"
@@ -53,7 +54,7 @@ namespace {
     };
 
     using const_tchar_ptr_vector_t = std::vector<const TCHAR *>;
-    using tstring_vector_t         = std::vector<std::tstring>;
+    using tstring_vector_t = std::vector<std::tstring>;
 
     inline const TCHAR * _extract_variable(const TCHAR * last_offset_ptr, const TCHAR * parse_str, std::tstring & parsed_str, TCHAR * env_buf)
     {
@@ -99,11 +100,11 @@ namespace {
         return (osv.dwPlatformId == VER_PLATFORM_WIN32_NT);
     }
 
-    inline void _print_error_message(DWORD win_error, UINT langid = LANG_NEUTRAL)
+    inline void _print_win_error_message(DWORD win_error, UINT langid = LANG_NEUTRAL)
     {
-        LPTSTR win_error_msg_buf    = nullptr;
-        LPSTR win_error_msg_buf_a   = nullptr;
-        LPWSTR win_error_msg_buf_w  = nullptr;
+        LPTSTR win_error_msg_buf = nullptr;
+        LPSTR win_error_msg_buf_a = nullptr;
+        LPWSTR win_error_msg_buf_w = nullptr;
 
         [&]() { __try {
             const UINT cp_out = GetConsoleOutputCP();
@@ -140,6 +141,62 @@ namespace {
                 LocalFree(win_error_msg_buf_w);
             }
         } }();
+    }
+
+    inline void _print_shell_exec_error_message(DWORD shell_error, const SHELLEXECUTEINFO & sei) {
+        switch (shell_error) {
+        case 0:
+            _ftprintf(stderr, _T("error: ShellExecute: operating system is out of memory or resources: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_FNF:
+            _ftprintf(stderr, _T("error: ShellExecute: file is not found: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_PNF:
+            _ftprintf(stderr, _T("error: ShellExecute: path is not found: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_ACCESSDENIED:
+            _ftprintf(stderr, _T("error: ShellExecute: access denied: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_OOM:
+            _ftprintf(stderr, _T("error: ShellExecute: out of memory: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_DLLNOTFOUND:
+            _ftprintf(stderr, _T("error: ShellExecute: dynamic-link library is not found: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_SHARE:
+            _ftprintf(stderr, _T("error: ShellExecute: cannot share an open file: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_ASSOCINCOMPLETE:
+            _ftprintf(stderr, _T("error: ShellExecute: file association information is not complete: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_DDETIMEOUT:
+            _ftprintf(stderr, _T("error: ShellExecute: DDE operation is timed out: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_DDEFAIL:
+            _ftprintf(stderr, _T("error: ShellExecute: DDE operation is failed: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_DDEBUSY:
+            _ftprintf(stderr, _T("error: ShellExecute: DDE operation is busy: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        case SE_ERR_NOASSOC:
+            _ftprintf(stderr, _T("error: ShellExecute: file association is not available: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+            break;
+        default:
+            _ftprintf(stderr, _T("error: ShellExecute: unknown error: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                shell_error, shell_error, sei.lpFile, sei.lpParameters);
+        }
     }
 
     inline std::tstring _replace_strings(std::tstring str, const std::tstring & from, const std::tstring & to)
