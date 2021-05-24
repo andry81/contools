@@ -33,19 +33,27 @@ namespace {
         bool            ret_win_error;
         bool            ret_child_exit;
         bool            print_win_error_string;
+        bool            print_shell_error_string;
         bool            no_print_gen_error_string;
+        bool            no_sys_dialog_ui;
         bool            no_wait;                        // has no meaning if a `tee` file is used
         bool            no_window;
         bool            no_expand_env;                  // don't expand `${...}` environment variables
         bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
-        bool            create_child_console;
+        bool            shell_exec_expand_env;
         bool            detach_parent_console;
+        bool            use_parent_console;             // has meaning only for ShellExecute, overrides create_child_console
+        bool            create_child_console;           // has meaning only for CreateProcess
         bool            eval_backslash_esc;             // evaluate backslash escape characters
         bool            eval_dbl_backslash_esc;         // evaluate double backslash escape characters (`\\`)
+        bool            init_com;
+        bool            wait_child_start;
     };
 
     struct _Options
     {
+        std::tstring    shell_exec_verb;
+        std::tstring    change_current_dir;
         std::tstring    reopen_stdin_as;
         std::tstring    reopen_stdout_as;
         std::tstring    reopen_stderr_as;
@@ -62,10 +70,12 @@ namespace {
         int             tee_stdout_read_buf_size;
         int             tee_stderr_read_buf_size;
         int             stdin_echo;
+        unsigned int    show_as;
     };
 
     _Flags g_flags                      = {};
     _Options g_options                  = {
+        {}, {},
         {}, {}, {},
         {}, {}, {},
 
@@ -76,7 +86,7 @@ namespace {
         // 64K read buffer by default
         65536, 65536, 65536,
 
-        -1
+        -1, SW_SHOWNORMAL
     };
 
     FILE * g_stdin_file_handle          = nullptr;
@@ -90,6 +100,10 @@ namespace {
     HANDLE g_stdin_handle               = INVALID_HANDLE_VALUE;
     HANDLE g_stdout_handle              = INVALID_HANDLE_VALUE;
     HANDLE g_stderr_handle              = INVALID_HANDLE_VALUE;
+
+    bool g_is_stdin_redirected          = false;
+    bool g_is_stdout_redirected         = false;
+    bool g_is_stderr_redirected         = false;
 
     HANDLE g_stdin_pipe_read_handle     = INVALID_HANDLE_VALUE;
     HANDLE g_stdin_pipe_write_handle    = INVALID_HANDLE_VALUE;
@@ -120,7 +134,7 @@ namespace {
         HANDLE valid_handles[3];
         size_t num_valid_handles = 0;
         for (int i = 0; i < 3; i++) {
-            if (g_stream_pipe_thread_handles[i] != INVALID_HANDLE_VALUE) {
+            if (g_stream_pipe_thread_handles[i] && g_stream_pipe_thread_handles[i] != INVALID_HANDLE_VALUE) {
                 valid_handles[num_valid_handles] = g_stream_pipe_thread_handles[i];
                 num_valid_handles++;
             }
@@ -196,7 +210,7 @@ namespace {
                                         win_error, win_error);
                                 }
                                 if (g_flags.print_win_error_string && win_error) {
-                                    _print_error_message(win_error, g_options.win_error_langid);
+                                    _print_win_error_message(win_error, g_options.win_error_langid);
                                 }
                             }
 
@@ -226,7 +240,7 @@ namespace {
                                                 win_error, win_error);
                                         }
                                         if (g_flags.print_win_error_string && win_error) {
-                                            _print_error_message(win_error, g_options.win_error_langid);
+                                            _print_win_error_message(win_error, g_options.win_error_langid);
                                         }
                                     }
                                 }
@@ -268,7 +282,7 @@ namespace {
 //                        // CAUTION:
 //                        //  The `ReadConsoleBuffer` function can fail if the length parameter is too big!
 //                        //
-//                        const DWORD tee_stdin_read_buf_size = (std::max)(g_options.tee_stdin_read_buf_size, 32767);
+//                        const DWORD tee_stdin_read_buf_size = (std::max)(g_options.tee_stdin_read_buf_size, 32767U);
 //
 //                        stdin_byte_buf.resize(tee_stdin_read_buf_size * sizeof(INPUT_RECORD));
 //
@@ -297,7 +311,7 @@ namespace {
 //                                            win_error, win_error);
 //                                    }
 //                                    if (g_flags.print_win_error_string && win_error) {
-//                                        _print_error_message(win_error);
+//                                        _print_win_error_message(win_error);
 //                                    }
 //                                }
 //                            }
@@ -314,7 +328,7 @@ namespace {
 //                                                win_error, win_error);
 //                                        }
 //                                        if (g_flags.print_win_error_string && win_error) {
-//                                            _print_error_message(win_error);
+//                                            _print_win_error_message(win_error);
 //                                        }
 //                                    }
 //
@@ -370,7 +384,7 @@ namespace {
 //                                //                win_error, win_error);
 //                                //        }
 //                                //        if (g_flags.print_win_error_string && win_error) {
-//                                //            _print_error_message(win_error);
+//                                //            _print_win_error_message(win_error);
 //                                //        }
 //                                //    }
 //                                //}
@@ -402,7 +416,7 @@ namespace {
                                         win_error, win_error);
                                 }
                                 if (g_flags.print_win_error_string && win_error) {
-                                    _print_error_message(win_error, g_options.win_error_langid);
+                                    _print_win_error_message(win_error, g_options.win_error_langid);
                                 }
                             }
 
@@ -432,7 +446,7 @@ namespace {
                                                 win_error, win_error);
                                         }
                                         if (g_flags.print_win_error_string && win_error) {
-                                            _print_error_message(win_error, g_options.win_error_langid);
+                                            _print_win_error_message(win_error, g_options.win_error_langid);
                                         }
                                     }
                                 }
@@ -472,7 +486,7 @@ namespace {
                                         win_error, win_error);
                                 }
                                 if (g_flags.print_win_error_string && win_error) {
-                                    _print_error_message(win_error, g_options.win_error_langid);
+                                    _print_win_error_message(win_error, g_options.win_error_langid);
                                 }
                             }
 
@@ -502,7 +516,7 @@ namespace {
                                                 win_error, win_error);
                                         }
                                         if (g_flags.print_win_error_string && win_error) {
-                                            _print_error_message(win_error, g_options.win_error_langid);
+                                            _print_win_error_message(win_error, g_options.win_error_langid);
                                         }
                                     }
                                 }
@@ -531,7 +545,7 @@ namespace {
         return 0;
     }
 
-    int _CreateProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, const _Flags & flags, const _Options & options)
+    int _ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, const _Flags & flags, const _Options & options)
     {
 #ifdef _DEBUG
         //_tprintf(_T(">%s\n>%s\n---\n"), app ? app : _T(""), cmd ? cmd : _T(""));
@@ -548,8 +562,7 @@ namespace {
             return ret;
         }
 
-        size_t cmd_buf_size     = 0;
-        void * cmd_buf_ptr      = nullptr;
+        std::vector<uint8_t> cmd_buf;
 
         STARTUPINFO si{};
         PROCESS_INFORMATION pi{};
@@ -559,12 +572,7 @@ namespace {
 
         si.cb = sizeof(si);
         si.dwFlags = STARTF_USESHOWWINDOW;
-        if (!flags.no_window) {
-            si.wShowWindow = SW_SHOWDEFAULT;
-        }
-        else {
-            si.wShowWindow = SW_HIDE;
-        }
+        si.wShowWindow = g_options.show_as;
 
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = TRUE;
@@ -579,6 +587,10 @@ namespace {
         UINT prev_cp_out = 0;
 
         DWORD win_error = 0;
+        INT shell_error = -1;
+
+        SHELLEXECUTEINFO sei{};
+        std::vector<TCHAR> shell_exec_verb;
 
         // NOTE:
         //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
@@ -616,7 +628,7 @@ namespace {
                             win_error, win_error, options.reopen_stdout_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -639,7 +651,7 @@ namespace {
                             win_error, win_error, options.reopen_stdout_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -662,7 +674,7 @@ namespace {
                             win_error, win_error, options.reopen_stderr_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -688,7 +700,7 @@ namespace {
                             win_error, win_error, options.tee_stdin_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -712,7 +724,7 @@ namespace {
                             win_error, win_error, options.tee_stdout_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -736,7 +748,7 @@ namespace {
                             win_error, win_error, options.tee_stderr_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -761,7 +773,7 @@ namespace {
                         win_error, win_error);
                 }
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error, g_options.win_error_langid);
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
@@ -783,7 +795,7 @@ namespace {
                         win_error, win_error);
                 }
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error, g_options.win_error_langid);
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
@@ -805,7 +817,7 @@ namespace {
                         win_error, win_error);
                 }
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error, g_options.win_error_langid);
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
@@ -814,8 +826,8 @@ namespace {
 
             //#define FILE_TYPE_UNKNOWN   0x0000
             //#define FILE_TYPE_DISK      0x0001 // ReadFile
-            //#define FILE_TYPE_CHAR      0x0002 // PeekConsoleInput
-            //#define FILE_TYPE_PIPE      0x0003 // PeekNamedPipe
+            //#define FILE_TYPE_CHAR      0x0002 // ReadConsoleInput, PeekConsoleInput
+            //#define FILE_TYPE_PIPE      0x0003 // ReadFile, PeekNamedPipe
             //#define FILE_TYPE_REMOTE    0x8000
             //
             const DWORD stdin_handle_type = GetFileType(g_stdin_handle);
@@ -842,7 +854,7 @@ namespace {
                             win_error, win_error);
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -869,18 +881,24 @@ namespace {
                             win_error, win_error, stdin_handle_type, options.reopen_stdin_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
 
-                si.hStdInput = g_stdin_pipe_read_handle;
+                if (options.shell_exec_verb.empty()) {
+                    si.hStdInput = g_stdin_pipe_read_handle;
 
-                // CAUTION:
-                //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
-                //  in case if one of handles is not character handle or console buffer.
-                //
-                si.dwFlags |= STARTF_USESTDHANDLES;
+                    // CAUTION:
+                    //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                    //  in case if one of handles is not character handle or console buffer.
+                    //
+                    si.dwFlags |= STARTF_USESTDHANDLES;
+                }
+                else {
+                    g_is_stdin_redirected = true;
+                    SetStdHandle(STD_INPUT_HANDLE, g_stdin_pipe_read_handle);
+                }
             }
             else if (stdin_handle_type == FILE_TYPE_CHAR) {
                 // NOTE:
@@ -898,17 +916,19 @@ namespace {
                     }
                 }
 
-                // CAUTION:
-                //  Must be the original stdin, can not be a buffer from the CreateConsoleScreenBuffer call,
-                //  otherwise, for example, the `cmd.exe /k` process will exit immediately!
-                //
-                si.hStdInput = g_stdin_handle;
+                if (options.shell_exec_verb.empty()) {
+                    // CAUTION:
+                    //  Must be the original stdin, can not be a buffer from the CreateConsoleScreenBuffer call,
+                    //  otherwise, for example, the `cmd.exe /k` process will exit immediately!
+                    //
+                    si.hStdInput = g_stdin_handle;
 
-                // CAUTION:
-                //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
-                //  in case if one of handles is not character handle or console buffer.
-                //
-                si.dwFlags |= STARTF_USESTDHANDLES;
+                    // CAUTION:
+                    //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                    //  in case if one of handles is not character handle or console buffer.
+                    //
+                    si.dwFlags |= STARTF_USESTDHANDLES;
+                }
             }
 
             if (g_tee_stdout_file_handle != INVALID_HANDLE_VALUE) {
@@ -927,7 +947,7 @@ namespace {
                             win_error, win_error);
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -954,18 +974,24 @@ namespace {
                             win_error, win_error, stdout_handle_type, options.reopen_stdout_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
 
-                si.hStdOutput = g_stdout_pipe_write_handle;
+                if (options.shell_exec_verb.empty()) {
+                    si.hStdOutput = g_stdout_pipe_write_handle;
 
-                // CAUTION:
-                //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
-                //  in case if one of handles is not character handle or console buffer.
-                //
-                si.dwFlags |= STARTF_USESTDHANDLES;
+                    // CAUTION:
+                    //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                    //  in case if one of handles is not character handle or console buffer.
+                    //
+                    si.dwFlags |= STARTF_USESTDHANDLES;
+                }
+                else {
+                    g_is_stdout_redirected = true;
+                    SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_pipe_write_handle);
+                }
             }
 
             if (g_tee_stderr_file_handle != INVALID_HANDLE_VALUE) {
@@ -984,7 +1010,7 @@ namespace {
                             win_error, win_error);
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -1011,20 +1037,25 @@ namespace {
                             win_error, win_error, stderr_handle_type, options.reopen_stderr_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
-                        _print_error_message(win_error, g_options.win_error_langid);
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
 
-                si.hStdError = g_stderr_pipe_write_handle;
+                if (options.shell_exec_verb.empty()) {
+                    si.hStdError = g_stderr_pipe_write_handle;
 
-                // CAUTION:
-                //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
-                //  in case if one of handles is not character handle or console buffer.
-                //
-                si.dwFlags |= STARTF_USESTDHANDLES;
+                    // CAUTION:
+                    //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                    //  in case if one of handles is not character handle or console buffer.
+                    //
+                    si.dwFlags |= STARTF_USESTDHANDLES;
+                }
+                else {
+                    g_is_stderr_redirected = true;
+                    SetStdHandle(STD_ERROR_HANDLE, g_stderr_pipe_write_handle);
+                }
             }
-
 
             ret = err_none;
             DWORD ret_create_proc = 0;
@@ -1040,33 +1071,105 @@ namespace {
             SetConsoleCtrlHandler(CtrlHandler, TRUE);   // update parent console signal handler (does not work as expected)
 
             if (app && app_len) {
-                if (cmd && cmd_len) {
-                    cmd_buf_size = (std::max)(cmd_len + sizeof(TCHAR), size_t(32768U));
-                    cmd_buf_ptr = malloc(cmd_buf_size);
-                    memcpy(cmd_buf_ptr, cmd, cmd_buf_size);
+                if (options.shell_exec_verb.empty()) {
+                    if (cmd && cmd_len) {
+                        // CAUTION:
+                        //  cmd argument must be writable!
+                        //
+                        cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
+                        memcpy(&cmd_buf[0], cmd, cmd_buf.size());
 
-                    SetLastError(0); // just in case
-                    ret_create_proc = ::CreateProcess(app, (TCHAR *)cmd_buf_ptr, NULL, NULL, TRUE,
-                        flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
-                        NULL, NULL, &si, &pi);
+                        SetLastError(0); // just in case
+                        ret_create_proc = ::CreateProcess(app, (TCHAR *)&cmd_buf[0], NULL, NULL, TRUE,
+                            flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
+                            NULL,
+                            !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL,
+                            &si, &pi);
+                    }
+                    else {
+                        // CAUTION:
+                        //  cmd argument must be writable!
+                        //
+                        SetLastError(0); // just in case
+                        ret_create_proc = ::CreateProcess(app, NULL, NULL, NULL, TRUE,
+                            flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
+                            NULL,
+                            !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL,
+                            &si, &pi);
+                    }
                 }
                 else {
+                    sei.cbSize = sizeof(sei);
+                    sei.fMask = SEE_MASK_NOCLOSEPROCESS; // use hProcess
+                    if (flags.wait_child_start && !flags.no_wait) {
+                        sei.fMask |= SEE_MASK_NOASYNC | SEE_MASK_FLAG_DDEWAIT;
+                    }
+                    if (flags.shell_exec_expand_env) {
+                        sei.fMask |= SEE_MASK_DOENVSUBST;
+                    }
+                    if (flags.no_sys_dialog_ui) {
+                        sei.fMask |= SEE_MASK_FLAG_NO_UI;
+                    }
+                    if (flags.use_parent_console) {
+                        sei.fMask |= SEE_MASK_NO_CONSOLE;
+                    }
+                    if (flags.no_wait) {
+                        sei.fMask |= SEE_MASK_ASYNCOK;
+                    }
+
+                    if (!options.shell_exec_verb.empty()) {
+                        shell_exec_verb.resize(options.shell_exec_verb.length() + 1);
+                        memcpy(&shell_exec_verb[0], options.shell_exec_verb.c_str(), shell_exec_verb.size() * sizeof(shell_exec_verb[0]));
+                        sei.lpVerb = &shell_exec_verb[0];
+                    }
+
+                    sei.lpFile = app;
+                    sei.lpParameters = cmd;
+                    sei.lpDirectory = !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL;
+                    sei.nShow = options.show_as;
+
+                    if (flags.init_com) {
+                        CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+                    }
+
                     SetLastError(0); // just in case
-                    ret_create_proc = ::CreateProcess(app, NULL, NULL, NULL, TRUE,
-                        flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
-                        NULL, NULL, &si, &pi);
+                    ret_create_proc = ::ShellExecuteEx(&sei);
+
+                    shell_error = (INT)sei.hInstApp;
+
+                    if (sei.hProcess && sei.hProcess != INVALID_HANDLE_VALUE) {
+                        g_child_process_handle = sei.hProcess;
+                        g_child_process_group_id = GetProcessId(sei.hProcess);  // to pass parent console signal events into child process
+                    }
+
+                    // restore standard handles
+                    if (g_is_stdin_redirected) {
+                        SetStdHandle(STD_INPUT_HANDLE, g_stdin_handle);
+                        g_is_stdin_redirected = false;
+                    }
+
+                    if (g_is_stdout_redirected) {
+                        SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_handle);
+                        g_is_stdout_redirected = false;
+                    }
+
+                    if (g_is_stderr_redirected) {
+                        SetStdHandle(STD_ERROR_HANDLE, g_stderr_handle);
+                        g_is_stderr_redirected = false;
+                    }
                 }
             }
             else if (cmd && cmd_len) {
-                cmd_buf_size = (std::max)(cmd_len + sizeof(TCHAR), size_t(32768U));
-                cmd_buf_ptr = malloc(cmd_buf_size);
-                memcpy(cmd_buf_ptr, cmd, cmd_buf_size);
+                cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
+                memcpy(&cmd_buf[0], cmd, cmd_buf.size());
 
 
                 SetLastError(0); // just in case
-                ret_create_proc = ::CreateProcess(NULL, (TCHAR *)cmd_buf_ptr, NULL, NULL, TRUE,
+                ret_create_proc = ::CreateProcess(NULL, (TCHAR *)&cmd_buf[0], NULL, NULL, TRUE,
                     flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
-                    NULL, NULL, &si, &pi);
+                    NULL,
+                    !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL,
+                    &si, &pi);
             }
 
             if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
@@ -1076,8 +1179,9 @@ namespace {
             if (pi.hProcess && pi.hProcess != INVALID_HANDLE_VALUE) {
                 g_child_process_handle = pi.hProcess;       // to check the process status from stream pipe threads
                 g_child_process_group_id = pi.dwProcessId;  // to pass parent console signal events into child process
+            }
 
-
+            if (g_child_process_handle && g_child_process_handle != INVALID_HANDLE_VALUE) {
                 // CAUTION:
                 //  We must close all handles passed into the child process as inheritable,
                 //  otherwise the `ReadFile` in the parent process will be blocked on the pipe
@@ -1103,7 +1207,7 @@ namespace {
                 }
             }
 
-            if (!ret_create_proc || !pi.hProcess || pi.hProcess == INVALID_HANDLE_VALUE) {
+            if (!ret_create_proc || !g_child_process_handle || g_child_process_handle == INVALID_HANDLE_VALUE) {
                 if (flags.ret_create_proc) {
                     ret = ret_create_proc;
                 }
@@ -1114,11 +1218,20 @@ namespace {
                     ret = err_win32_error;
                 }
                 if (!flags.no_print_gen_error_string) {
-                    _ftprintf(stderr, _T("error: could not create child process: win_error=0x%08X (%d) app=\"%s\" cmd=\"%s\"\n"),
-                        win_error, win_error, app, cmd_buf_ptr ? (TCHAR *)cmd_buf_ptr : _T(""));
+                    if (options.shell_exec_verb.empty()) {
+                        _ftprintf(stderr, _T("error: could not create child process: win_error=0x%08X (%d) app=\"%s\" cmd=\"%s\"\n"),
+                            win_error, win_error, app, cmd_buf.size() ? (TCHAR *)&cmd_buf[0] : _T(""));
+                    }
+                    else {
+                        _ftprintf(stderr, _T("error: could not shell execute child process: win_error=0x%08X (%d) shell_error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                            win_error, win_error, shell_error, shell_error, app, cmd);
+                    }
                 }
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error, g_options.win_error_langid);
+                    _print_win_error_message(win_error, g_options.win_error_langid);
+                }
+                if (flags.print_shell_error_string && shell_error != -1 && shell_error <= 32) {
+                    _print_shell_exec_error_message(shell_error, sei);
                 }
                 break;
             }
@@ -1126,10 +1239,6 @@ namespace {
             if (!flags.ret_create_proc && !flags.ret_win_error) {
                 ret = err_none;
             }
-
-            // NOTE:
-            //  We have to read stdin even if the tee file is not used.
-            //
 
             if (g_stdin_handle != INVALID_HANDLE_VALUE &&
                 (g_stdin_file_handle != NULL || /*g_tee_stdin_file_handle != INVALID_HANDLE_VALUE ||*/ g_stdin_pipe_write_handle != INVALID_HANDLE_VALUE)) {
@@ -1161,18 +1270,17 @@ namespace {
                 );
             }
 
-            if (pi.hProcess != INVALID_HANDLE_VALUE &&
+            if (g_child_process_handle && g_child_process_handle != INVALID_HANDLE_VALUE &&
                 (g_tee_stdin_file_handle != INVALID_HANDLE_VALUE ||
                  g_tee_stdout_file_handle != INVALID_HANDLE_VALUE ||
                  g_tee_stderr_file_handle != INVALID_HANDLE_VALUE ||
                  !flags.no_wait)) {
-                WaitForSingleObject(pi.hProcess, INFINITE);
+                WaitForSingleObject(g_child_process_handle, INFINITE);
             }
-
 
             //// ensure all threads are closed before threads wait
             //for (int i = 0; i < 3; i++) {
-            //    if (g_stream_pipe_thread_handles[i] != INVALID_HANDLE_VALUE) {
+            //    if (g_stream_pipe_thread_handles[i] && g_stream_pipe_thread_handles[i] != INVALID_HANDLE_VALUE) {
             //        g_stream_pipe_thread_cancel_ios[i] = true;
             //        CancelSynchronousIo(g_stream_pipe_thread_handles[i]);
             //    }
@@ -1182,11 +1290,11 @@ namespace {
 
             if (!flags.ret_create_proc) {
                 if (!flags.no_wait) {
-                    if (ret_create_proc && pi.hProcess) {
+                    if (ret_create_proc && g_child_process_handle) {
                         if (flags.ret_child_exit) {
                             DWORD exit_code = 0;
                             SetLastError(0); // just in case
-                            if (GetExitCodeProcess(pi.hProcess, &exit_code)) {
+                            if (GetExitCodeProcess(g_child_process_handle, &exit_code)) {
                                 ret = exit_code;
                             }
                             else {
@@ -1196,7 +1304,7 @@ namespace {
                                         win_error, win_error);
                                 }
                                 if (flags.print_win_error_string && win_error) {
-                                    _print_error_message(win_error, g_options.win_error_langid);
+                                    _print_win_error_message(win_error, g_options.win_error_langid);
                                 }
                                 break;
                             }
@@ -1211,7 +1319,7 @@ namespace {
             else if (flags.ret_win_error) {
                 ret = win_error;
                 if (flags.print_win_error_string && win_error) {
-                    _print_error_message(win_error, g_options.win_error_langid);
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
             }
         }
@@ -1235,11 +1343,6 @@ namespace {
             _WaitForStreamPipeThreads();
 
             // not shared resources
-            if (cmd_buf_ptr) {
-                free(cmd_buf_ptr);
-                cmd_buf_ptr = NULL; // just in case
-            }
-
             if (g_tee_stdin_file_handle) {
                 fclose(g_tee_stdin_file_handle);
                 g_tee_stdin_file_handle = NULL; // just in case
@@ -1266,6 +1369,23 @@ namespace {
                 g_stderr_file_handle = NULL; // just in case
             }
 
+            // restore standard handles (again)
+            if (g_is_stdin_redirected) {
+                SetStdHandle(STD_INPUT_HANDLE, g_stdin_handle);
+                g_is_stdin_redirected = false;
+            }
+
+            if (g_is_stdout_redirected) {
+                SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_handle);
+                g_is_stdout_redirected = false;
+            }
+
+            if (g_is_stderr_redirected) {
+                SetStdHandle(STD_ERROR_HANDLE, g_stderr_handle);
+                g_is_stderr_redirected = false;
+            }
+
+            // close pipe handles
             if (g_stdin_pipe_read_handle != INVALID_HANDLE_VALUE) {
                 CloseHandle(g_stdin_pipe_read_handle);
                 g_stdin_pipe_read_handle = NULL; // just in case
@@ -1292,11 +1412,13 @@ namespace {
             }
 
             // must close
-            if (pi.hProcess) {
-                CloseHandle(pi.hProcess);
+            if (g_child_process_handle && g_child_process_handle != INVALID_HANDLE_VALUE) {
+                CloseHandle(g_child_process_handle);
+                pi.hProcess = g_child_process_handle = INVALID_HANDLE_VALUE; // just in case
             }
-            if (pi.hThread) {
+            if (pi.hThread && pi.hThread != INVALID_HANDLE_VALUE) {
                 CloseHandle(pi.hThread);
+                pi.hThread = INVALID_HANDLE_VALUE; // just in case
             }
         } }();
 
@@ -1337,6 +1459,11 @@ int _tmain(int argc, const TCHAR * argv[])
         }
 
         if (tstrncmp(arg, _T("/"), 1)) {
+            break;
+        }
+
+        if (!tstrncmp(arg, _T("//"), 2)) {
+            arg_offset += 1;
             break;
         }
 
@@ -1388,8 +1515,38 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/print-win-error-string"))) {
             g_flags.print_win_error_string = true;
         }
+        else if (!tstrcmp(arg, _T("/print-shell-error-string"))) {
+            g_flags.print_shell_error_string = true;
+        }
         else if (!tstrcmp(arg, _T("/no-print-gen-error-string"))) {
             g_flags.no_print_gen_error_string = true;
+        }
+        else if (!tstrcmp(arg, _T("/no-sys-dialog-ui"))) {
+            g_flags.no_sys_dialog_ui = true;
+        }
+        else if (!tstrcmp(arg, _T("/shell-exec"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                g_options.shell_exec_verb = arg;
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/D"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                g_options.change_current_dir = arg;
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
         }
         else if (!tstrcmp(arg, _T("/no-wait"))) {
             g_flags.no_wait = true;
@@ -1403,11 +1560,38 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/no-subst-vars"))) {
             g_flags.no_subst_vars = true;
         }
-        else if (!tstrcmp(arg, _T("/create-child-console"))) {
-            g_flags.create_child_console = true;
+        else if (!tstrcmp(arg, _T("/shell-exec-expand-env"))) {
+            g_flags.shell_exec_expand_env = true;
+        }
+        else if (!tstrcmp(arg, _T("/init-com"))) {
+            g_flags.init_com = true;
+        }
+        else if (!tstrcmp(arg, _T("/wait-child-start"))) {
+            g_flags.wait_child_start = true;
+        }
+        else if (!tstrcmp(arg, _T("/showas"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                const int showas_value = _ttoi(arg);
+                if (showas_value > 0) {
+                    g_options.show_as = showas_value;
+                }
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
         }
         else if (!tstrcmp(arg, _T("/detach-parent-console"))) {
             g_flags.detach_parent_console = true;
+        }
+        else if (!tstrcmp(arg, _T("/use-parent-console"))) {
+            g_flags.use_parent_console = true;
+        }
+        else if (!tstrcmp(arg, _T("/create-child-console"))) {
+            g_flags.create_child_console = true;
         }
         else if (!tstrcmp(arg, _T("/reopen-stdin-as"))) {
             arg_offset += 1;
@@ -1610,10 +1794,6 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/eval-dbl-backslash-esc")) || !tstrcmp(arg, _T("/e\\\\"))) {
             g_flags.eval_dbl_backslash_esc = true;
         }
-        else if (!tstrcmp(arg, _T("//"))) {
-            arg_offset += 1;
-            break;
-        }
         else {
             if (!g_flags.no_print_gen_error_string) {
                 _ftprintf(stderr, _T("error: flag is not known: \"%s\"\n"), arg);
@@ -1624,12 +1804,23 @@ int _tmain(int argc, const TCHAR * argv[])
         arg_offset += 1;
     }
 
+    if (g_flags.no_window) {
+        g_options.show_as = SW_HIDE;
+    }
+
     // environment variable buffer
     TCHAR env_buf[MAX_ENV_BUF_SIZE];
 
+    // <ApplicationNameFormatString> or <FilePathFormatString>
     InArgs app_args = InArgs();
     OutArgs app_out_args = OutArgs();
 
+    // <CommandLineFormatString> or <ParametersFormatString>
+    //
+    // CAUTION:
+    //  In case of ShellExecute the <ParametersFormatString> must contain only a command line arguments,
+    //  but not the path to the executable itself which is part of <CommandLineFormatString>!
+    //
     InArgs cmd_args = InArgs();
     OutArgs cmd_out_args = OutArgs();
 
@@ -1651,15 +1842,30 @@ int _tmain(int argc, const TCHAR * argv[])
 
     arg_offset += 1;
 
-    if (!app_args.fmt_str && !cmd_args.fmt_str) {
-        if (!g_flags.no_print_gen_error_string) {
-            fputs("error: format arguments are empty\n", stderr);
+    if (g_options.shell_exec_verb.empty()) {
+        if (!app_args.fmt_str && !cmd_args.fmt_str) {
+            if (!g_flags.no_print_gen_error_string) {
+                fputs("error: format arguments are empty\n", stderr);
+            }
+            if (!g_flags.ret_win_error) {
+                return err_format_empty;
+            }
+            else {
+                return GetLastError();
+            }
         }
-        if (!g_flags.ret_win_error) {
-            return err_format_empty;
-        }
-        else {
-            return GetLastError();
+    }
+    else {
+        if (!app_args.fmt_str) {
+            if (!g_flags.no_print_gen_error_string) {
+                fputs("error: file path format argument is empty\n", stderr);
+            }
+            if (!g_flags.ret_win_error) {
+                return err_format_empty;
+            }
+            else {
+                return GetLastError();
+            }
         }
     }
 
@@ -1766,7 +1972,7 @@ int _tmain(int argc, const TCHAR * argv[])
         }
     }
 
-    return _CreateProcess(
+    return _ExecuteProcess(
         app_args.fmt_str ? app_out_args.fmt_str.c_str() : (LPCTSTR)NULL,
         app_args.fmt_str ? app_out_args.fmt_str.length() : 0,
         cmd_args.fmt_str ? cmd_out_args.fmt_str.c_str() : (LPCTSTR)NULL,
