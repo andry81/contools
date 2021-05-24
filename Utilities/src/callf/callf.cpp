@@ -91,8 +91,6 @@ namespace {
     HANDLE g_stdout_handle              = INVALID_HANDLE_VALUE;
     HANDLE g_stderr_handle              = INVALID_HANDLE_VALUE;
 
-    //HANDLE g_stdin_child_handle         = INVALID_HANDLE_VALUE;
-
     HANDLE g_stdin_pipe_read_handle     = INVALID_HANDLE_VALUE;
     HANDLE g_stdin_pipe_write_handle    = INVALID_HANDLE_VALUE;
     HANDLE g_stdout_pipe_read_handle    = INVALID_HANDLE_VALUE;
@@ -157,12 +155,16 @@ namespace {
         //DWORD num_bytes_avail = 0;
         DWORD num_bytes_read = 0;
         DWORD num_bytes_write = 0;
-        DWORD num_events_read = 0;
+        //DWORD num_events_read = 0;
+        //DWORD num_events_written = 0;
         DWORD win_error = 0;
 
         std::vector<std::uint8_t> stdin_byte_buf;
         std::vector<std::uint8_t> stdout_byte_buf;
         std::vector<std::uint8_t> stderr_byte_buf;
+
+        //std::vector<char> stdin_char_buf;
+        //std::vector<wchar_t> stdin_wchar_buf;
 
         // NOTE:
         //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
@@ -178,7 +180,7 @@ namespace {
                     stdin_byte_buf.resize(g_options.tee_stdin_read_buf_size);
 
                     while (!stream_eof) {
-                        // in case if child process early exit
+                        // in case if child process exit
                         if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
                             break;
                         }
@@ -249,6 +251,135 @@ namespace {
                     //  The `CreatePseudoConsole` API function is available only after the `Windows 10 October 2018 Update (version 1809) [desktop apps only]`
                     //  The complete implementation which can be provided here can be done through a remote code injection to a child process and is not yet available.
                     //  
+
+//                    if (g_tee_stdin_file_handle) {
+//                        const UINT cp_out = GetConsoleOutputCP();
+//
+//                        CPINFO cp_info{};
+//                        if (!GetCPInfo(cp_out, &cp_info)) {
+//                            // fallback to module character set
+//#ifdef _UNICODE
+//                            cp_info.MaxCharSize = 2;
+//#else
+//                            cp_info.MaxCharSize = 1;
+//#endif
+//                        }
+//
+//                        // CAUTION:
+//                        //  The `ReadConsoleBuffer` function can fail if the length parameter is too big!
+//                        //
+//                        const DWORD tee_stdin_read_buf_size = (std::max)(g_options.tee_stdin_read_buf_size, 32767);
+//
+//                        stdin_byte_buf.resize(tee_stdin_read_buf_size * sizeof(INPUT_RECORD));
+//
+//                        if (cp_info.MaxCharSize != 1) {
+//                            stdin_wchar_buf.reserve(256);
+//                        }
+//                        else {
+//                            stdin_char_buf.reserve(256);
+//                        }
+//
+//                        INPUT_RECORD tmp_input_record{};
+//
+//                        while (!stream_eof) {
+//                            // in case if child process exit
+//                            if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
+//                                break;
+//                            }
+//
+//                            // non blocking read
+//                            SetLastError(0); // just in case
+//                            if (!PeekConsoleInput(g_stdin_handle, NULL, 0, &num_events_read)) {
+//                                win_error = GetLastError();
+//                                if (win_error) {
+//                                    if (!g_flags.no_print_gen_error_string) {
+//                                        _ftprintf(stderr, _T("error: parent stdin console read error: win_error=0x%08X (%d)\n"),
+//                                            win_error, win_error);
+//                                    }
+//                                    if (g_flags.print_win_error_string && win_error) {
+//                                        _print_error_message(win_error);
+//                                    }
+//                                }
+//                            }
+//
+//                            if (num_events_read) {
+//                                SetLastError(0); // just in case
+//                                if (!ReadConsoleInput(g_stdin_handle, (PINPUT_RECORD)&stdin_byte_buf[0], tee_stdin_read_buf_size, &num_events_read)) {
+//                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+//
+//                                    win_error = GetLastError();
+//                                    if (win_error) {
+//                                        if (!g_flags.no_print_gen_error_string) {
+//                                            _ftprintf(stderr, _T("error: parent stdin console read error: win_error=0x%08X (%d)\n"),
+//                                                win_error, win_error);
+//                                        }
+//                                        if (g_flags.print_win_error_string && win_error) {
+//                                            _print_error_message(win_error);
+//                                        }
+//                                    }
+//
+//                                    stream_eof = true;
+//                                }
+//
+//                                for (size_t i = 0; i < size_t(num_events_read); i++) {
+//                                    const INPUT_RECORD & input_record = PINPUT_RECORD(&stdin_byte_buf[0])[i];
+//
+//                                    if (input_record.EventType == KEY_EVENT) {
+//                                        const KEY_EVENT_RECORD & key_event_record = input_record.Event.KeyEvent;
+//
+//                                        if (key_event_record.bKeyDown) {
+//                                            if (key_event_record.wRepeatCount > 0) { // just in case
+//                                                if (cp_info.MaxCharSize != 1) {
+//                                                    stdin_wchar_buf.resize(size_t(key_event_record.wRepeatCount));
+//
+//                                                    for (size_t j = 0; j < size_t(key_event_record.wRepeatCount); j++) {
+//                                                        stdin_wchar_buf[j] = key_event_record.uChar.UnicodeChar;
+//                                                    }
+//
+//                                                    fwrite(&stdin_wchar_buf[0], sizeof(wchar_t), key_event_record.wRepeatCount, g_tee_stdin_file_handle);
+//                                                }
+//                                                else {
+//                                                    stdin_char_buf.resize(size_t(key_event_record.wRepeatCount));
+//
+//                                                    for (size_t j = 0; j < size_t(key_event_record.wRepeatCount); j++) {
+//                                                        stdin_char_buf[j] = key_event_record.uChar.AsciiChar;
+//                                                    }
+//
+//                                                    fwrite(&stdin_char_buf[0], sizeof(char), key_event_record.wRepeatCount, g_tee_stdin_file_handle);
+//                                                }
+//
+//                                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+//
+//                                                if (g_flags.tee_stdin_file_flush) {
+//                                                    fflush(g_tee_stdin_file_handle);
+//                                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//
+//                                //SetLastError(0); // just in case
+//                                //if (!WriteConsoleInput(g_stdin_child_handle, (PINPUT_RECORD)&stdin_byte_buf[0], num_events_read, &num_events_written)) {
+//                                //    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+//
+//                                //    win_error = GetLastError();
+//                                //    if (win_error) {
+//                                //        if (!g_flags.no_print_gen_error_string) {
+//                                //            _ftprintf(stderr, _T("error: child stdin console write error: win_error=0x%08X (%d)\n"),
+//                                //                win_error, win_error);
+//                                //        }
+//                                //        if (g_flags.print_win_error_string && win_error) {
+//                                //            _print_error_message(win_error);
+//                                //        }
+//                                //    }
+//                                //}
+//                            }
+//                            else {
+//                                Sleep(20); // 20ms input wait
+//                            }
+//                        }
+//                    }
                     break;
                 }
                 }
@@ -767,6 +898,10 @@ namespace {
                     }
                 }
 
+                // CAUTION:
+                //  Must be the original stdin, can not be a buffer from the CreateConsoleScreenBuffer call,
+                //  otherwise, for example, the `cmd.exe /k` process will exit immediately!
+                //
                 si.hStdInput = g_stdin_handle;
 
                 // CAUTION:
@@ -997,7 +1132,7 @@ namespace {
             //
 
             if (g_stdin_handle != INVALID_HANDLE_VALUE &&
-                (g_stdin_file_handle != NULL || g_stdin_pipe_write_handle != INVALID_HANDLE_VALUE)) {
+                (g_stdin_file_handle != NULL || /*g_tee_stdin_file_handle != INVALID_HANDLE_VALUE ||*/ g_stdin_pipe_write_handle != INVALID_HANDLE_VALUE)) {
                 g_stream_pipe_thread_handles[0] = CreateThread(
                     NULL, 0,
                     _StreamPipeThread<0>, &g_stream_pipe_thread_data[0],

@@ -101,11 +101,45 @@ namespace {
 
     inline void _print_error_message(DWORD win_error, UINT langid = LANG_NEUTRAL)
     {
-        LPTSTR win_error_msg_buf = nullptr;
-        FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPTSTR)&win_error_msg_buf, 0, NULL);
-        _ftprintf(stderr, _T("error: win32: \"%s\"\n"), win_error_msg_buf);
-        LocalFree(win_error_msg_buf);
+        LPTSTR win_error_msg_buf    = nullptr;
+        LPSTR win_error_msg_buf_a   = nullptr;
+        LPWSTR win_error_msg_buf_w  = nullptr;
+
+        [&]() { __try {
+            const UINT cp_out = GetConsoleOutputCP();
+
+            CPINFO cp_info{};
+            if (!GetCPInfo(cp_out, &cp_info)) {
+                // fallback to module character set
+#ifdef _UNICODE
+                cp_info.MaxCharSize = 2;
+#else
+                cp_info.MaxCharSize = 1;
+#endif
+            }
+
+            if (cp_info.MaxCharSize != 1) {
+                FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPWSTR)&win_error_msg_buf_w, 0, NULL);
+                fwprintf(stderr, L"error: win32: \"%s\"\n", win_error_msg_buf_w);
+            }
+            else {
+                FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                    NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPSTR)&win_error_msg_buf_a, 0, NULL);
+                fprintf(stderr, "error: win32: \"%s\"\n", win_error_msg_buf_a);
+            }
+        }
+        __finally {
+            if (win_error_msg_buf) {
+                LocalFree(win_error_msg_buf);
+            }
+            if (win_error_msg_buf_a) {
+                LocalFree(win_error_msg_buf_a);
+            }
+            if (win_error_msg_buf_w) {
+                LocalFree(win_error_msg_buf_w);
+            }
+        } }();
     }
 
     inline std::tstring _replace_strings(std::tstring str, const std::tstring & from, const std::tstring & to)
