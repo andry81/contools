@@ -1,4 +1,7 @@
 2021.05.24:
+* new: bin/contools: binaries update
+
+2021.05.24:
 * new: src/callf: ShellExecute call support through the `/shell-exec <Verb>` option
 * new: src/callf: `/D <CurrentDirectory>` option to use in both the CreateProcess and ShellExecute
 * new: src/callf: `/showas <ShowWindowAsNumber>` option to use in both the CreateProcess and ShellExecute
