@@ -686,6 +686,7 @@ Scripts/__init__/__init__.sh -text
 /TODO.txt -text
 Utilities/Projects/TargetProject.PreBuildStep.CommandLine.var -text
 Utilities/Projects/callf.vcxproj -text
+Utilities/Projects/chcp.vcxproj -text
 Utilities/Projects/clearcache.vcxproj -text
 Utilities/Projects/envvarcmp.vcxproj -text
 Utilities/Projects/gui/wxFileDialog.vcxproj -text
@@ -824,6 +825,11 @@ Utilities/src/callf/help.def -text
 Utilities/src/callf/help.tpl -text
 Utilities/src/callf/version.def -text
 Utilities/src/callf/version.tpl -text
+Utilities/src/chcp/chcp.cpp -text
+Utilities/src/chcp/help.def -text
+Utilities/src/chcp/help.tpl -text
+Utilities/src/chcp/version.def -text
+Utilities/src/chcp/version.tpl -text
 Utilities/src/clearcache/clearcache.cpp -text
 Utilities/src/clearcache/help.def -text
 Utilities/src/clearcache/help.tpl -text

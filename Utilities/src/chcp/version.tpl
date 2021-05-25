@@ -1,6 +1,6 @@
 [+ AutoGen5 template hpp=%s.hpp +]
-#ifndef __RETAKEOWNER_VERSION_HPP__
-#define __RETAKEOWNER_VERSION_HPP__
+#ifndef __CHCP_VERSION_HPP__
+#define __CHCP_VERSION_HPP__
 
 #define APP_VERSION_MAJOR    [+ AppMajorVer +]
 #define APP_VERSION_MINOR    [+ AppMinorVer +]

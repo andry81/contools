@@ -1,7 +1,7 @@
 autogen definitions version;
 
-AppName = "printf";
+AppName = "chcp";
 AppMajorVer = 1;
-AppMinorVer = 4;
+AppMinorVer = 0;
 AppRevision = 0;
-AppBuildNum = 9;
+AppBuildNum = 1;
