@@ -14,6 +14,9 @@ Utilities/src/_gui/wxFileDialog/version.hpp
 Utilities/src/callf/help.txt
 Utilities/src/callf/help_inl.hpp
 Utilities/src/callf/version.hpp
+Utilities/src/chcp/help.txt
+Utilities/src/chcp/help_inl.hpp
+Utilities/src/chcp/version.hpp
 Utilities/src/clearcache/help.txt
 Utilities/src/clearcache/help_inl.hpp
 Utilities/src/clearcache/version.hpp

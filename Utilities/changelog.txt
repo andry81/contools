@@ -1,3 +1,10 @@
+2021.05.25:
+* fixed: src/printf: application linked with the Unicode Character Set option does convert command line string into Unicode representation, so we must convert all strings back if the console output code page is used
+* fixed: src/printf: missed to use console current code page
+* fixed: src/printf: missed `/chcp` flag implementation
+* fixed: minor fixup
+* new: chcp utility to change and print console output code page, can return different results opposed to the Windows `chcp.com` utility
+
 2021.05.24:
 * new: bin/contools: binaries update
 
