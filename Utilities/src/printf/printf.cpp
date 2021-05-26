@@ -204,12 +204,12 @@ int _tmain(int argc, const TCHAR * argv[])
                 const auto & fmt_str = _eval_escape_chars(out_args.fmt_str, g_flags.eval_backslash_esc, g_flags.eval_dbl_backslash_esc);
 #ifdef _UNICODE
                 // use current code page
-                const UINT cp = GetConsoleOutputCP();
+                const UINT cp_out = GetConsoleOutputCP();
 
-                int num_chars = WideCharToMultiByte(cp, 0, fmt_str.c_str(), fmt_str.length(), NULL, 0, NULL, NULL);
+                int num_chars = WideCharToMultiByte(cp_out, 0, fmt_str.c_str(), fmt_str.length(), NULL, 0, NULL, NULL);
                 if (num_chars) {
                     byte_buf.resize(size_t(num_chars));
-                    num_chars = WideCharToMultiByte(cp, 0, fmt_str.c_str(), fmt_str.length(), (char *)&byte_buf[0], byte_buf.size(), NULL, NULL);
+                    num_chars = WideCharToMultiByte(cp_out, 0, fmt_str.c_str(), fmt_str.length(), (char *)&byte_buf[0], byte_buf.size(), NULL, NULL);
                 }
 
                 WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), (char *)&byte_buf[0], (std::min)((size_t)num_chars, byte_buf.size()), &num_bytes_written, NULL);
@@ -226,12 +226,12 @@ int _tmain(int argc, const TCHAR * argv[])
 
 #ifdef _UNICODE
             // use current code page
-            const UINT cp = GetConsoleOutputCP();
+            const UINT cp_out = GetConsoleOutputCP();
 
-            int num_chars = WideCharToMultiByte(cp, 0, out_args.fmt_str.c_str(), out_args.fmt_str.length(), NULL, 0, NULL, NULL);
+            int num_chars = WideCharToMultiByte(cp_out, 0, out_args.fmt_str.c_str(), out_args.fmt_str.length(), NULL, 0, NULL, NULL);
             if (num_chars) {
                 byte_buf.resize(size_t(num_chars));
-                num_chars = WideCharToMultiByte(cp, 0, out_args.fmt_str.c_str(), out_args.fmt_str.length(), (char *)&byte_buf[0], byte_buf.size(), NULL, NULL);
+                num_chars = WideCharToMultiByte(cp_out, 0, out_args.fmt_str.c_str(), out_args.fmt_str.length(), (char *)&byte_buf[0], byte_buf.size(), NULL, NULL);
             }
 
             WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), (char *)&byte_buf[0], (std::min)((size_t)num_chars, byte_buf.size()), &num_bytes_written, NULL);

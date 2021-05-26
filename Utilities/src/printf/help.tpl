@@ -5,13 +5,13 @@ printf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build
 
 Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]
   Description:
+    /?:
+    This help.
+
+    //:
+    Character sequence to stop parse <Flags> command line parameters.
+
     Flags:
-      /?:
-        This help.
-
-      //:
-        Character sequence to stop parse <Flags> command line parameters.
-
       /chcp <codepage>
         Console output code page.
 
