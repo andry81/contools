@@ -1,4 +1,7 @@
 2021.05.26:
+* new: Utilities/bin/contools: binaries update
+
+2021.05.26:
 * fixed: Utilities/src/callf: missed stdout/stderr initialize in call to CreateProcess if the tee is not used (for example, in empty call: `callf.exe "" "cmd.exe /k"`)
 * fixed: Utilities/src/callf: `/reopen-stdout-as` and `/reopen-stderr-as` should open files for binary write
 * new: Utilities/src/callf: `/reopen-stdout-append`, `/reopen-stderr-append`, `/reopen-stdout-flush`, `/reopen-stderr-flush` flags to open for append and flush after each write for reopened stdout/stderr
