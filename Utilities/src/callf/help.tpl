@@ -5,13 +5,13 @@ callf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build 
 Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLineFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
        callf.exe [/?] [<Flags>] /shell-exec <Verb> [//] <FilePathFormatString> [<ParametersFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
   Description:
+    /?
+    This help.
+
+    //:
+    Character sequence to stop parse <Flags> command line parameters.
+
     Flags:
-      /?
-        This help.
-
-      //:
-        Character sequence to stop parse <Flags> command line parameters.
-
       /chcp-in <codepage>
         Console input code page.
 
@@ -35,7 +35,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /print-shell-error-string
         CreateProcess
-          Has no meaning.
+          Has no effect.
         ShellExecute
           Print ShellExecute specific error string.
 
@@ -44,7 +44,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /no-sys-dialog-ui
         CreateProcess
-          Has no meaning.
+          Has no effect.
         ShellExecute
           Use SEE_MASK_FLAG_NO_UI flag.
           Do not display an error message box if an error occurs.
@@ -107,7 +107,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /shell-exec-expand-env
         CreateProcess
-          Has no meaning.
+          Has no effect.
         ShellExecute
           Use SEE_MASK_DOENVSUBST flag.
           Expand any environment variables specified in the string given by
@@ -115,7 +115,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /init-com
         CreateProcess
-          Has no meaning.
+          Has no effect.
         ShellExecute
           Call CoInitializeEx before call to ShellExecute.
           Because ShellExecute can delegate execution to Shell extensions
@@ -187,31 +187,49 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /reopen-stdin-as <file>
         Reopen stdin as a `<file>`.
+        Can be used to read from a file instead from the stdin.
+        Can not be used together with another `/reopen-stdin-*` flag.
 
       /reopen-stdout-as <file>
         Reopen stdout as a `<file>`.
+        Can be used to write to a file instead to the stdout.
+        Can be used together with `/tee-stdout*` flags.
+        Can not be used together with another `/reopen-stdout-as-*` flag.
 
       /reopen-stderr-as <file>
         Reopen stderr as a `<file>`.
+        Can be used to write to a file instead to the stderr.
+        Can be used together with `/tee-stderr*` flags.
+        Can not be used together with another `/reopen-stderr-as-*` flag.
+
+      /reopen-std[out|err]-append
+        Append instead of rewrite into reopened stdout/stderr.
+
+      /reopen-std[out|err]-flush
+        Flush after each write into reopened stdout/stderr.
 
       /tee-std[in|out|err] <file>
-        Duplicate stream to `<file>`.
+        Duplicate standard stream to `<file>`.
+        Can be used together with another `/tee-std[in|out|err]-to-*` flag.
 
       /tee-std[in|out|err]-append
         Append instead of rewrite into `<file>`.
 
       /tee-std[in|out|err]-flush
-        Flush after each write into `<file>`.
+        Flush after each write into `<file>.
 
       /tee-std[in|out|err]-pipe-buf-size <size>
-        Pipe buffer size in bytes.
+        Pipe buffer size in bytes attached to the stdin/stdout/stderr or
+        created for the respective tee.
 
       /tee-std[in|out|err]-read-buf-size <size>
-        Buffer size in bytes to read into from the standard stream pipe.
+        Buffer size in bytes to read from stdin to write into attached pipe.
+        Buffer size in bytes to read from an attached pipe to write into
+        stdout/stderr.
 
       /use-parent-console
         CreateProcess
-          Has no meaning.
+          Has no effect.
         ShellExecute
           Use SEE_MASK_NO_CONSOLE flag.
           Use to inherit the parent's console for the new process instead of
@@ -227,8 +245,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           Avoid use
 
       /detach-parent-console
-        Detach console from parent process before call to CreateProcess or
-        ShellExecute.
+        Detach console from parent process before start of a child process.
 
       /stdin-echo <0|1>
         Explicitly enable or disable console input buffer echo before start

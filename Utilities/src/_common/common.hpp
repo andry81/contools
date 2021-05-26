@@ -56,6 +56,56 @@ namespace {
     using const_tchar_ptr_vector_t = std::vector<const TCHAR *>;
     using tstring_vector_t = std::vector<std::tstring>;
 
+    inline bool _is_valid_handle(HANDLE handle)
+    {
+        return handle && handle != INVALID_HANDLE_VALUE;
+    }
+
+    inline void _close_handle(HANDLE & handle)
+    {
+        if (_is_valid_handle(handle)) {
+            CloseHandle(handle);
+        }
+        handle = INVALID_HANDLE_VALUE;
+    }
+
+    inline void _close_handle(HANDLE & handle0, HANDLE & handle1)
+    {
+        _close_handle(handle0);
+        handle1 = INVALID_HANDLE_VALUE;
+    }
+
+    inline bool _is_winnt()
+    {
+        OSVERSIONINFO osv;
+        osv.dwOSVersionInfoSize = sizeof(osv);
+        GetVersionEx(&osv);
+        return (osv.dwPlatformId == VER_PLATFORM_WIN32_NT);
+    }
+
+    inline bool _is_process_elevated()
+    {
+        bool ret = FALSE;
+        HANDLE token_handle = NULL;
+
+        __try {
+            if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token_handle)) {
+                TOKEN_ELEVATION elevation;
+                DWORD cbSize = sizeof(TOKEN_ELEVATION);
+                if (GetTokenInformation(token_handle, TokenElevation, &elevation, sizeof(elevation), &cbSize)) {
+                    ret = !!elevation.TokenIsElevated;
+                }
+            }
+        }
+        __finally {
+            if (token_handle && token_handle != INVALID_HANDLE_VALUE) {
+                CloseHandle(token_handle);
+            }
+        }
+
+        return ret;
+    }
+
     inline const TCHAR * _extract_variable(const TCHAR * last_offset_ptr, const TCHAR * parse_str, std::tstring & parsed_str, TCHAR * env_buf)
     {
         const TCHAR * return_offset_ptr = 0;
@@ -90,14 +140,6 @@ namespace {
         }
 
         return return_offset_ptr;
-    }
-
-    inline bool _is_winnt()
-    {
-        OSVERSIONINFO osv;
-        osv.dwOSVersionInfoSize = sizeof(osv);
-        GetVersionEx(&osv);
-        return (osv.dwPlatformId == VER_PLATFORM_WIN32_NT);
     }
 
     inline void _print_win_error_message(DWORD win_error, UINT langid = LANG_NEUTRAL)

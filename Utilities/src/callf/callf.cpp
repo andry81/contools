@@ -23,6 +23,10 @@ namespace {
     {
         // NOTE: the `tee` applies only to the child process here!
         //
+        bool            reopen_stdout_file_append;
+        bool            reopen_stderr_file_append;
+        bool            reopen_stdout_file_flush;
+        bool            reopen_stderr_file_flush;
         bool            tee_stdin_file_append;
         bool            tee_stdout_file_append;
         bool            tee_stderr_file_append;
@@ -134,7 +138,7 @@ namespace {
         HANDLE valid_handles[3];
         size_t num_valid_handles = 0;
         for (int i = 0; i < 3; i++) {
-            if (g_stream_pipe_thread_handles[i] && g_stream_pipe_thread_handles[i] != INVALID_HANDLE_VALUE) {
+            if (_is_valid_handle(g_stream_pipe_thread_handles[i])) {
                 valid_handles[num_valid_handles] = g_stream_pipe_thread_handles[i];
                 num_valid_handles++;
             }
@@ -228,7 +232,7 @@ namespace {
                                 }
                             }
 
-                            if (g_stdin_pipe_write_handle != INVALID_HANDLE_VALUE) {
+                            if (_is_valid_handle(g_stdin_pipe_write_handle)) {
                                 SetLastError(0); // just in case
                                 if (!WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
@@ -252,10 +256,7 @@ namespace {
                     }
 
                     // explicitly close the child stdin write handle here to trigger the child process reaction
-                    if (g_stdin_pipe_write_handle != INVALID_HANDLE_VALUE) {
-                        CloseHandle(g_stdin_pipe_write_handle);
-                        g_stdin_pipe_write_handle = INVALID_HANDLE_VALUE;
-                    }
+                    _close_handle(g_stdin_pipe_write_handle);
                 } break;
 
                 case FILE_TYPE_CHAR:
@@ -401,7 +402,7 @@ namespace {
 
             case 1: // stdout
             {
-                if (g_stdout_pipe_read_handle != INVALID_HANDLE_VALUE) {
+                if (_is_valid_handle(g_stdout_pipe_read_handle)) {
                     stdout_byte_buf.resize(g_options.tee_stdout_read_buf_size);
 
                     while (!stream_eof) {
@@ -434,9 +435,15 @@ namespace {
                                 }
                             }
 
-                            if (g_stdout_handle != INVALID_HANDLE_VALUE) {
+                            if (_is_valid_handle(g_stdout_handle)) {
                                 SetLastError(0); // just in case
-                                if (!WriteFile(g_stdout_handle, &stdout_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                if (WriteFile(g_stdout_handle, &stdout_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                    if (g_flags.reopen_stdout_file_flush) {
+                                        FlushFileBuffers(g_stdout_handle);
+                                        if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                    }
+                                }
+                                else {
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 
                                     win_error = GetLastError();
@@ -470,7 +477,7 @@ namespace {
 
             case 2: // stderr
             {
-                if (g_stderr_pipe_read_handle != INVALID_HANDLE_VALUE) {
+                if (_is_valid_handle(g_stderr_pipe_read_handle)) {
                     stderr_byte_buf.resize(g_options.tee_stderr_read_buf_size);
 
                     while (!stream_eof) {
@@ -504,9 +511,15 @@ namespace {
                                 }
                             }
 
-                            if (g_stderr_handle != INVALID_HANDLE_VALUE) {
+                            if (_is_valid_handle(g_stderr_handle)) {
                                 SetLastError(0); // just in case
-                                if (!WriteFile(g_stderr_handle, &stderr_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                if (WriteFile(g_stderr_handle, &stderr_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                    if (g_flags.reopen_stderr_file_flush) {
+                                        FlushFileBuffers(g_stderr_handle);
+                                        if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                    }
+                                }
+                                else {
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 
                                     win_error = GetLastError();
@@ -613,7 +626,7 @@ namespace {
 
             if (!options.reopen_stdin_as.empty()) {
                 SetLastError(0); // just in case
-                if (!(g_stdin_file_handle = tfreopen(options.reopen_stdin_as.c_str(), _T("r"), stdin))) {
+                if (!(g_stdin_file_handle = tfreopen(options.reopen_stdin_as.c_str(), _T("rb"), stdin))) {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -624,7 +637,7 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not reopen stdin as file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _ftprintf(stderr, _T("error: could not reopen stdin as file to read: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, options.reopen_stdout_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -636,7 +649,7 @@ namespace {
 
             if (!options.reopen_stdout_as.empty()) {
                 SetLastError(0); // just in case
-                if (!(g_stdout_file_handle = tfreopen(options.reopen_stdout_as.c_str(), _T("r"), stdout))) {
+                if (!(g_stdout_file_handle = tfreopen(options.reopen_stdout_as.c_str(), !flags.reopen_stdout_file_append ? _T("wb") : _T("ab"), stdout))) {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -647,7 +660,7 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not reopen stdout as file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _ftprintf(stderr, _T("error: could not reopen stdout as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, options.reopen_stdout_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -659,7 +672,7 @@ namespace {
 
             if (!options.reopen_stderr_as.empty()) {
                 SetLastError(0); // just in case
-                if (!(g_stderr_file_handle = tfreopen(options.reopen_stderr_as.c_str(), _T("r"), stderr))) {
+                if (!(g_stderr_file_handle = tfreopen(options.reopen_stderr_as.c_str(), !flags.reopen_stderr_file_append ? _T("wb") : _T("ab"), stderr))) {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -670,7 +683,7 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not reopen stderr as file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _ftprintf(stderr, _T("error: could not reopen stderr as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, options.reopen_stderr_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -696,7 +709,7 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not open stdin tee file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _ftprintf(stderr, _T("error: could not open stdin tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, options.tee_stdin_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -720,7 +733,7 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not open stdout tee file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _ftprintf(stderr, _T("error: could not open stdout tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, options.tee_stdout_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -744,7 +757,7 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not open stderr tee file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _ftprintf(stderr, _T("error: could not open stderr tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, options.tee_stderr_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -758,7 +771,7 @@ namespace {
 
             SetLastError(0); // just in case
             g_stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
-            if (g_stdin_handle == INVALID_HANDLE_VALUE) {
+            if (!_is_valid_handle(g_stdin_handle)) {
                 if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -780,7 +793,7 @@ namespace {
 
             SetLastError(0); // just in case
             g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-            if (g_stdout_handle == INVALID_HANDLE_VALUE) {
+            if (!_is_valid_handle(g_stdout_handle)) {
                 if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -802,7 +815,7 @@ namespace {
 
             SetLastError(0); // just in case
             g_stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-            if (g_stderr_handle == INVALID_HANDLE_VALUE) {
+            if (!_is_valid_handle(g_stderr_handle)) {
                 if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -877,7 +890,7 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not set stdin handle information: win_error=0x%08X (%d) type=%d file=\"%s\"\n"),
+                        _ftprintf(stderr, _T("error: could not set stdin handle information: win_error=0x%08X (%d) type=%d reopen_stdin_as=\"%s\"\n"),
                             win_error, win_error, stdin_handle_type, options.reopen_stdin_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -931,7 +944,7 @@ namespace {
                 }
             }
 
-            if (g_tee_stdout_file_handle != INVALID_HANDLE_VALUE) {
+            if (_is_valid_handle(g_tee_stdout_file_handle)) {
                 if (!CreatePipe(&g_stdout_pipe_read_handle, &g_stdout_pipe_write_handle, &sa, options.tee_stdout_pipe_buf_size)) {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
@@ -970,7 +983,7 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not set stdout pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        _ftprintf(stderr, _T("error: could not set stdout pipe handle information: win_error=0x%08X (%d) type=%u reopen_stdout_as=\"%s\"\n"),
                             win_error, win_error, stdout_handle_type, options.reopen_stdout_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -993,8 +1006,17 @@ namespace {
                     SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_pipe_write_handle);
                 }
             }
+            else if (options.shell_exec_verb.empty()) {
+                si.hStdOutput = g_stdout_handle;
 
-            if (g_tee_stderr_file_handle != INVALID_HANDLE_VALUE) {
+                // CAUTION:
+                //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                //  in case if one of handles is not character handle or console buffer.
+                //
+                si.dwFlags |= STARTF_USESTDHANDLES;
+            }
+
+            if (_is_valid_handle(g_tee_stderr_file_handle)) {
                 if (!CreatePipe(&g_stderr_pipe_read_handle, &g_stderr_pipe_write_handle, &sa, options.tee_stderr_pipe_buf_size)) {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
@@ -1033,7 +1055,7 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not set stderr pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        _ftprintf(stderr, _T("error: could not set stderr pipe handle information: win_error=0x%08X (%d) type=%u reopen_stderr_as=\"%s\"\n"),
                             win_error, win_error, stderr_handle_type, options.reopen_stderr_as.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -1055,6 +1077,15 @@ namespace {
                     g_is_stderr_redirected = true;
                     SetStdHandle(STD_ERROR_HANDLE, g_stderr_pipe_write_handle);
                 }
+            }
+            else if (options.shell_exec_verb.empty()) {
+                si.hStdError = g_stderr_handle;
+
+                // CAUTION:
+                //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                //  in case if one of handles is not character handle or console buffer.
+                //
+                si.dwFlags |= STARTF_USESTDHANDLES;
             }
 
             ret = err_none;
@@ -1137,7 +1168,7 @@ namespace {
 
                     shell_error = (INT)sei.hInstApp;
 
-                    if (sei.hProcess && sei.hProcess != INVALID_HANDLE_VALUE) {
+                    if (_is_valid_handle(sei.hProcess)) {
                         g_child_process_handle = sei.hProcess;
                         g_child_process_group_id = GetProcessId(sei.hProcess);  // to pass parent console signal events into child process
                     }
@@ -1176,38 +1207,28 @@ namespace {
                 win_error = GetLastError();
             }
 
-            if (pi.hProcess && pi.hProcess != INVALID_HANDLE_VALUE) {
+            if (_is_valid_handle(pi.hProcess)) {
                 g_child_process_handle = pi.hProcess;       // to check the process status from stream pipe threads
                 g_child_process_group_id = pi.dwProcessId;  // to pass parent console signal events into child process
             }
 
-            if (g_child_process_handle && g_child_process_handle != INVALID_HANDLE_VALUE) {
+            if (_is_valid_handle(g_child_process_handle)) {
                 // CAUTION:
                 //  We must close all handles passed into the child process as inheritable,
                 //  otherwise the `ReadFile` in the parent process will be blocked on the pipe
                 //  even if the child process is closed.
                 //
 
-                //if (g_stdin_handle != INVALID_HANDLE_VALUE && stderr_handle_type == FILE_TYPE_CHAR) {
-                //    CloseHandle(g_stdin_handle);
-                //    g_stdin_handle = INVALID_HANDLE_VALUE;
+                //if (stderr_handle_type == FILE_TYPE_CHAR) {
+                //    _close_handle(g_stdin_handle);
                 //}
 
-                if (g_stdin_pipe_read_handle != INVALID_HANDLE_VALUE) {
-                    CloseHandle(g_stdin_pipe_read_handle);
-                    g_stdin_pipe_read_handle = INVALID_HANDLE_VALUE;
-                }
-                if (g_stdout_pipe_write_handle != INVALID_HANDLE_VALUE) {
-                    CloseHandle(g_stdout_pipe_write_handle);
-                    g_stdout_pipe_write_handle = INVALID_HANDLE_VALUE;
-                }
-                if (g_stderr_pipe_write_handle != INVALID_HANDLE_VALUE) {
-                    CloseHandle(g_stderr_pipe_write_handle);
-                    g_stderr_pipe_write_handle = INVALID_HANDLE_VALUE;
-                }
+                _close_handle(g_stdin_pipe_read_handle);
+                _close_handle(g_stdout_pipe_write_handle);
+                _close_handle(g_stderr_pipe_write_handle);
             }
 
-            if (!ret_create_proc || !g_child_process_handle || g_child_process_handle == INVALID_HANDLE_VALUE) {
+            if (!ret_create_proc || !_is_valid_handle(g_child_process_handle)) {
                 if (flags.ret_create_proc) {
                     ret = ret_create_proc;
                 }
@@ -1240,8 +1261,7 @@ namespace {
                 ret = err_none;
             }
 
-            if (g_stdin_handle != INVALID_HANDLE_VALUE &&
-                (g_stdin_file_handle != NULL || /*g_tee_stdin_file_handle != INVALID_HANDLE_VALUE ||*/ g_stdin_pipe_write_handle != INVALID_HANDLE_VALUE)) {
+            if (_is_valid_handle(g_stdin_handle) && (_is_valid_handle(g_tee_stdin_file_handle) || _is_valid_handle(g_stdin_pipe_write_handle))) {
                 g_stream_pipe_thread_handles[0] = CreateThread(
                     NULL, 0,
                     _StreamPipeThread<0>, &g_stream_pipe_thread_data[0],
@@ -1250,8 +1270,8 @@ namespace {
                 );
             }
 
-            if (g_stdout_handle != INVALID_HANDLE_VALUE &&
-                (g_stdout_file_handle != NULL || g_stdout_pipe_read_handle != INVALID_HANDLE_VALUE)) {
+            if (_is_valid_handle(g_stdout_pipe_read_handle) &&
+                (g_tee_stdout_file_handle != NULL || _is_valid_handle(g_stdout_handle))) {
                 g_stream_pipe_thread_handles[1] = CreateThread(
                     NULL, 0,
                     _StreamPipeThread<1>, &g_stream_pipe_thread_data[1],
@@ -1260,8 +1280,8 @@ namespace {
                 );
             }
 
-            if (g_stderr_handle != INVALID_HANDLE_VALUE &&
-                (g_stderr_file_handle != NULL || g_stderr_pipe_read_handle != INVALID_HANDLE_VALUE)) {
+            if (_is_valid_handle(g_stderr_pipe_read_handle) &&
+                (g_tee_stderr_file_handle != NULL || _is_valid_handle(g_stderr_handle))) {
                 g_stream_pipe_thread_handles[2] = CreateThread(
                     NULL, 0,
                     _StreamPipeThread<2>, &g_stream_pipe_thread_data[2],
@@ -1270,17 +1290,15 @@ namespace {
                 );
             }
 
-            if (g_child_process_handle && g_child_process_handle != INVALID_HANDLE_VALUE &&
-                (g_tee_stdin_file_handle != INVALID_HANDLE_VALUE ||
-                 g_tee_stdout_file_handle != INVALID_HANDLE_VALUE ||
-                 g_tee_stderr_file_handle != INVALID_HANDLE_VALUE ||
+            if (_is_valid_handle(g_child_process_handle) &&
+                (_is_valid_handle(g_tee_stdin_file_handle) || _is_valid_handle(g_tee_stdout_file_handle) || _is_valid_handle(g_tee_stderr_file_handle) ||
                  !flags.no_wait)) {
                 WaitForSingleObject(g_child_process_handle, INFINITE);
             }
 
             //// ensure all threads are closed before threads wait
             //for (int i = 0; i < 3; i++) {
-            //    if (g_stream_pipe_thread_handles[i] && g_stream_pipe_thread_handles[i] != INVALID_HANDLE_VALUE) {
+            //    if (_is_valid_handle(g_stream_pipe_thread_handles[i])) {
             //        g_stream_pipe_thread_cancel_ios[i] = true;
             //        CancelSynchronousIo(g_stream_pipe_thread_handles[i]);
             //    }
@@ -1334,7 +1352,7 @@ namespace {
 
             //// ensure all threads are closed before file handles close
             //for (int i = 0; i < 3; i++) {
-            //    if (g_stream_pipe_thread_handles[i] != INVALID_HANDLE_VALUE) {
+            //    if (_is_valid_handle(g_stream_pipe_thread_handles[i])) {
             //        g_stream_pipe_thread_cancel_ios[i] = true;
             //        CancelSynchronousIo(g_stream_pipe_thread_handles[i]);
             //    }
@@ -1386,40 +1404,16 @@ namespace {
             }
 
             // close pipe handles
-            if (g_stdin_pipe_read_handle != INVALID_HANDLE_VALUE) {
-                CloseHandle(g_stdin_pipe_read_handle);
-                g_stdin_pipe_read_handle = NULL; // just in case
-            }
-            if (g_stdin_pipe_write_handle != INVALID_HANDLE_VALUE) {
-                CloseHandle(g_stdin_pipe_write_handle);
-                g_stdin_pipe_write_handle = NULL; // just in case
-            }
-            if (g_stdout_pipe_read_handle != INVALID_HANDLE_VALUE) {
-                CloseHandle(g_stdout_pipe_read_handle);
-                g_stdout_pipe_read_handle = NULL; // just in case
-            }
-            if (g_stdout_pipe_write_handle != INVALID_HANDLE_VALUE) {
-                CloseHandle(g_stdout_pipe_write_handle);
-                g_stdout_pipe_write_handle = NULL; // just in case
-            }
-            if (g_stderr_pipe_read_handle != INVALID_HANDLE_VALUE) {
-                CloseHandle(g_stderr_pipe_read_handle);
-                g_stderr_pipe_read_handle = NULL; // just in case
-            }
-            if (g_stderr_pipe_write_handle != INVALID_HANDLE_VALUE) {
-                CloseHandle(g_stderr_pipe_write_handle);
-                g_stderr_pipe_write_handle = NULL; // just in case
-            }
+            _close_handle(g_stdin_pipe_read_handle);
+            _close_handle(g_stdin_pipe_write_handle);
+            _close_handle(g_stdout_pipe_read_handle);
+            _close_handle(g_stdout_pipe_write_handle);
+            _close_handle(g_stderr_pipe_read_handle);
+            _close_handle(g_stderr_pipe_write_handle);
 
-            // must close
-            if (g_child_process_handle && g_child_process_handle != INVALID_HANDLE_VALUE) {
-                CloseHandle(g_child_process_handle);
-                pi.hProcess = g_child_process_handle = INVALID_HANDLE_VALUE; // just in case
-            }
-            if (pi.hThread && pi.hThread != INVALID_HANDLE_VALUE) {
-                CloseHandle(pi.hThread);
-                pi.hThread = INVALID_HANDLE_VALUE; // just in case
-            }
+            // in reverse order from threads to a process
+            _close_handle(pi.hThread);
+            _close_handle(g_child_process_handle, pi.hProcess);
         } }();
 
         return ret;
@@ -1428,7 +1422,9 @@ namespace {
 
 int _tmain(int argc, const TCHAR * argv[])
 {
-    //MessageBoxA(NULL, "", "", MB_OK);
+#if _DEBUG
+    MessageBoxA(NULL, "", "", MB_OK);
+#endif
 
     if (!argc || !argv[0]) {
         return err_unspecified;
@@ -1664,6 +1660,18 @@ int _tmain(int argc, const TCHAR * argv[])
                 }
                 return err_invalid_format;
             }
+        }
+        else if (!tstrcmp(arg, _T("/reopen-stdout-append"))) {
+            g_flags.reopen_stdout_file_append = true;
+        }
+        else if (!tstrcmp(arg, _T("/reopen-stderr-append"))) {
+            g_flags.reopen_stderr_file_append = true;
+        }
+        else if (!tstrcmp(arg, _T("/reopen-stdout-flush"))) {
+            g_flags.reopen_stdout_file_flush = true;
+        }
+        else if (!tstrcmp(arg, _T("/reopen-stderr-flush"))) {
+            g_flags.reopen_stderr_file_flush = true;
         }
         else if (!tstrcmp(arg, _T("/tee-stdin-append"))) {
             g_flags.tee_stdin_file_append = true;
