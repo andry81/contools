@@ -1,4 +1,7 @@
 2021.05.26:
+* new: bin/contools: binaries update
+
+2021.05.26:
 * changed: src/chcp: separately print and set console input and output code pages
 * changed: src/printf: minor changes
 
