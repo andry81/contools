@@ -1,4 +1,7 @@
 2021.05.30:
+* new: Utilities/bin/contools: binaries update
+
+2021.05.30:
 * fixed: Utilities/src/callf: auto attach to the visible parent process console in case if current process console is not visible to fix stdout/stderr attachment to the hidden console window
 * fixed: Utilities/src/callf: correct current process console detachment
 
