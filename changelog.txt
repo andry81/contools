@@ -1,3 +1,22 @@
+2021.05.30:
+* fixed: Utilities/src/callf: auto attach to the visible parent process console in case if current process console is not visible to fix stdout/stderr attachment to the hidden console window
+* fixed: Utilities/src/callf: correct current process console detachment
+
+2021.05.28:
+* fixed: Utilities/src/callf: multiple `/reopen-std[out|err] <file>` or `/tee-std[in|out|err] <file>` option usage with the same `<file>` now will reuse a previously opened handle instead open of a new one to fix the output mix
+* new: Utilities/src/callf: `/std[out|err]-dup`, `/tee-std[in|out|err]-dup <fileno>` options to replace a sequence with respective `/reopen-std[out|err] <file>` or `/tee-std[in|out|err] <file>` options with the same `<file>`
+* changed: Utilities/src/callf: replaced all fopen/fwrite/fflush calls by the Win32 CreateFile/WriteFile/FlushFileBuffers calls to avoid any CRT buffering overhead over raw binary writes
+* refactor: Utilities/src/callf: code refactor
+
+2021.05.27:
+* fixed: Utilities/src/callf: `/showas 0` accident ignore
+* fixed: Utilities/src/callf: lock on stdin pipe read while the output handle is closed or broken (pipe)
+* fixed: Utilities/src/callf: immediate exit on error from the stdin thread write function on the output handle w/o check on child process existence
+* new: Utilities/src/callf: `/attach-parent-console` to explicitly reattach console
+* new: Utilities/src/callf: `/mutex-std-writes`, `/mutex-tee-std-file-writes <handles>`, `/mutex-tee-std-pipe-writes <handles>` options to mutual exclude writes into standard handles and tee files/pipes
+* new: Utilities/src/callf: `/stdin-output-flush` to flush after each write into an output handle connected with the process stdin
+* new: Utilities/src/callf: `/std[out|err]-flush` to flush after each write into the process stdout/stderr
+
 2021.05.26:
 * new: Utilities/bin/contools: binaries update
 

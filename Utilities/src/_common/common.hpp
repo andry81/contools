@@ -83,6 +83,224 @@ namespace {
         return (osv.dwPlatformId == VER_PLATFORM_WIN32_NT);
     }
 
+    inline void _set_crt_std_handle(HANDLE file_handle, int id)
+    {
+        int fd;
+        int flags = 0;
+
+#ifdef _UNICODE
+        flags |= _O_WTEXT;
+#else
+        flags |= _O_TEXT;
+#endif
+
+        switch (id)
+        {
+        case 0:
+            fd = _open_osfhandle((intptr_t)file_handle, flags | _O_RDONLY);
+            _dup2(fd, _fileno(stdin));
+            _close(fd);
+            break;
+        case 1:
+            fd = _open_osfhandle((intptr_t)file_handle, flags | _O_WRONLY);
+            _dup2(fd, _fileno(stdout));
+            _close(fd);
+            break;
+        case 2:
+            fd = _open_osfhandle((intptr_t)file_handle, flags | _O_WRONLY);
+            _dup2(fd, _fileno(stderr));
+            _close(fd);
+            break;
+        }
+    }
+
+    inline void _duplicate_std_console_handles(HANDLE & stdin_dup_handle, HANDLE & stdout_dup_handle, HANDLE & stderr_dup_handle)
+    {
+        stdin_dup_handle = stdout_dup_handle = stderr_dup_handle = INVALID_HANDLE_VALUE;
+
+        HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+        HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+
+        const DWORD stdin_handle_type = GetFileType(stdin_handle);
+        const DWORD stdout_handle_type = GetFileType(stdout_handle);
+        const DWORD stderr_handle_type = GetFileType(stderr_handle);
+
+        if (stdin_handle_type == FILE_TYPE_CHAR) {
+            DuplicateHandle(GetCurrentProcess(), stdin_handle, GetCurrentProcess(), &stdin_dup_handle, 0, TRUE, DUPLICATE_SAME_ACCESS);
+        }
+        if (stdout_handle_type == FILE_TYPE_CHAR) {
+            DuplicateHandle(GetCurrentProcess(), stdout_handle, GetCurrentProcess(), &stdout_dup_handle, 0, TRUE, DUPLICATE_SAME_ACCESS);
+        }
+        if (stderr_handle_type == FILE_TYPE_CHAR) {
+            DuplicateHandle(GetCurrentProcess(), stderr_handle, GetCurrentProcess(), &stderr_dup_handle, 0, TRUE, DUPLICATE_SAME_ACCESS);
+        }
+    }
+
+    inline void _reattach_std_console_handles()
+    {
+        // reattach detached or not redirected stdin/stdout/stderr to new console
+
+        // check redirection
+        HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+        HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+
+        const DWORD stdin_handle_type = GetFileType(stdin_handle);
+        const DWORD stdout_handle_type = GetFileType(stdout_handle);
+        const DWORD stderr_handle_type = GetFileType(stderr_handle);
+
+        SECURITY_ATTRIBUTES sa{};
+
+        sa.nLength = sizeof(sa);
+        sa.bInheritHandle = TRUE;
+
+        switch (stdin_handle_type) {
+        case FILE_TYPE_UNKNOWN:
+        case FILE_TYPE_CHAR:
+            HANDLE conin_handle = CreateFile(_T("CONIN$"),
+                GENERIC_READ, FILE_SHARE_READ, &sa, // `sa` just in case
+                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            if (_is_valid_handle(conin_handle)) {
+                _set_crt_std_handle(conin_handle, 0);
+            }
+        }
+
+        switch (stdout_handle_type) {
+        case FILE_TYPE_UNKNOWN:
+        case FILE_TYPE_CHAR: {
+            HANDLE conerr_handle = INVALID_HANDLE_VALUE;
+            HANDLE conout_handle = CreateFile(_T("CONOUT$"),
+                GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa,
+                OPEN_ALWAYS,
+                FILE_ATTRIBUTE_NORMAL, NULL);
+            if (_is_valid_handle(conout_handle)) {
+                if (stderr_handle_type == FILE_TYPE_CHAR) {
+                    // CAUTION:
+                    //  We must duplicate handle before call to `_set_crt_std_handle`, because it closes the handle.
+                    //
+                    if (DuplicateHandle(GetCurrentProcess(), conout_handle, GetCurrentProcess(), &conerr_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                        _set_crt_std_handle(conerr_handle, 2);
+                    }
+                }
+
+                _set_crt_std_handle(conout_handle, 1);
+            }
+        } break;
+
+        default: {
+            switch (stderr_handle_type) {
+            case FILE_TYPE_UNKNOWN:
+            case FILE_TYPE_CHAR:
+                HANDLE conerr_handle = CreateFile(_T("CONOUT$"),
+                    GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa,
+                    OPEN_ALWAYS,
+                    FILE_ATTRIBUTE_NORMAL, NULL);
+                if (_is_valid_handle(conerr_handle)) {
+                    _set_crt_std_handle(conerr_handle, 2);
+                }
+            }
+        }
+        }
+    }
+
+    inline DWORD _find_parent_process_id()
+    {
+        
+        HANDLE proc_list_handle = INVALID_HANDLE_VALUE;
+        const DWORD current_proc_id = GetCurrentProcessId();
+
+        __try {
+            proc_list_handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+            PROCESSENTRY32 pe = { 0 };
+            pe.dwSize = sizeof(PROCESSENTRY32);
+
+            if (Process32First(proc_list_handle, &pe)) {
+                do {
+                    if (pe.th32ProcessID == current_proc_id) {
+                        return pe.th32ParentProcessID;
+                    }
+                } while (Process32Next(proc_list_handle, &pe));
+            }
+        }
+        __finally {
+            _close_handle(proc_list_handle);
+        }
+
+        return (DWORD)-1;
+    }
+
+    struct EnumConsoleWindowsProcData
+    {
+        TCHAR tchar_buf[256];
+        std::vector<HWND> console_window_handles_arr;
+    };
+
+    BOOL CALLBACK EnumConsoleWindowsProc(HWND hwnd, LPARAM lParam)
+    {
+        EnumConsoleWindowsProcData & enum_proc_data = *(EnumConsoleWindowsProcData *)lParam;
+
+        enum_proc_data.tchar_buf[0] = _T('\0');
+
+        GetClassName(hwnd, enum_proc_data.tchar_buf, sizeof(enum_proc_data.tchar_buf));
+
+        if (!tstrcmp(enum_proc_data.tchar_buf, _T("ConsoleWindowClass"))) {
+            enum_proc_data.console_window_handles_arr.push_back(hwnd);
+        }
+
+        return TRUE;
+    }
+
+    inline HWND _find_parent_process_console_window(DWORD & parent_proc_id)
+    {
+        EnumConsoleWindowsProcData enum_proc_data;
+
+        enum_proc_data.console_window_handles_arr.reserve(256);
+
+        parent_proc_id = (DWORD)-1;
+
+        if (!EnumWindows(&EnumConsoleWindowsProc, (LPARAM)&enum_proc_data)) {
+            return NULL;
+        }
+
+        if (!enum_proc_data.console_window_handles_arr.size()) {
+            return NULL;
+        }
+
+        HWND ret = NULL;
+
+        DWORD console_window_proc_id;
+        HANDLE proc_list_handle = INVALID_HANDLE_VALUE;
+        const DWORD current_proc_id = GetCurrentProcessId();
+
+        [&]() { __try {
+            [&]() {
+                proc_list_handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+                PROCESSENTRY32 pe = { 0 };
+                pe.dwSize = sizeof(PROCESSENTRY32);
+
+                if (Process32First(proc_list_handle, &pe)) {
+                    do {
+                        for (auto console_window_handle : enum_proc_data.console_window_handles_arr) {
+                            console_window_proc_id = (DWORD)-1;
+                            GetWindowThreadProcessId(console_window_handle, &console_window_proc_id);
+                            if (console_window_proc_id == pe.th32ParentProcessID) {
+                                parent_proc_id = pe.th32ParentProcessID;
+                                ret = console_window_handle;
+                                return;
+                            }
+                        }
+                    } while (Process32Next(proc_list_handle, &pe));
+                }
+            }();
+        }
+        __finally {
+            _close_handle(proc_list_handle);
+        } }();
+
+        return ret;
+    }
+
     inline bool _is_process_elevated()
     {
         bool ret = FALSE;

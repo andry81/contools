@@ -7,6 +7,8 @@
 #include <string.h>
 #include <memory.h>
 #include <io.h>
+#include <fcntl.h>
+#include <tlhelp32.h>
 
 #include <algorithm>
 #include <atomic>
@@ -23,10 +25,11 @@ namespace {
     {
         // NOTE: the `tee` applies only to the child process here!
         //
+        bool            stdin_output_flush;
+        bool            stdout_flush;
+        bool            stderr_flush;
         bool            reopen_stdout_file_append;
         bool            reopen_stderr_file_append;
-        bool            reopen_stdout_file_flush;
-        bool            reopen_stderr_file_flush;
         bool            tee_stdin_file_append;
         bool            tee_stdout_file_append;
         bool            tee_stderr_file_append;
@@ -45,25 +48,33 @@ namespace {
         bool            no_expand_env;                  // don't expand `${...}` environment variables
         bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
         bool            shell_exec_expand_env;
-        bool            detach_parent_console;
+        bool            detach_console;
+        bool            attach_parent_console;
         bool            use_parent_console;             // has meaning only for ShellExecute, overrides create_child_console
         bool            create_child_console;           // has meaning only for CreateProcess
         bool            eval_backslash_esc;             // evaluate backslash escape characters
         bool            eval_dbl_backslash_esc;         // evaluate double backslash escape characters (`\\`)
         bool            init_com;
         bool            wait_child_start;
+        bool            mutex_std_writes;
     };
 
     struct _Options
     {
         std::tstring    shell_exec_verb;
         std::tstring    change_current_dir;
-        std::tstring    reopen_stdin_as;
-        std::tstring    reopen_stdout_as;
-        std::tstring    reopen_stderr_as;
-        std::tstring    tee_stdin_file;                 // has meaning for disk or pipe handle, does ignore for console input
-        std::tstring    tee_stdout_file;
-        std::tstring    tee_stderr_file;
+        std::tstring    reopen_stdin_as_file;
+        std::tstring    reopen_stdout_as_file;
+        std::tstring    reopen_stderr_as_file;
+        std::tstring    tee_stdin_to_file;              // has meaning for stdin as disk or pipe handle, does ignore for console input
+        std::tstring    tee_stdout_to_file;
+        std::tstring    tee_stderr_to_file;
+        std::tstring    mutex_tee_file_writes;
+        int             stdout_dup;
+        int             stderr_dup;
+        int             tee_stdin_dup;
+        int             tee_stdout_dup;
+        int             tee_stderr_dup;
         unsigned int    chcp_in;
         unsigned int    chcp_out;
         unsigned int    win_error_langid;
@@ -80,8 +91,10 @@ namespace {
     _Flags g_flags                      = {};
     _Options g_options                  = {
         {}, {},
-        {}, {}, {},
-        {}, {}, {},
+        {}, {}, {}, {}, {}, {},
+        {},
+
+        -1, -1, -1, -1, -1,
 
         0, 0, 0,
 
@@ -93,31 +106,52 @@ namespace {
         -1, SW_SHOWNORMAL
     };
 
-    FILE * g_stdin_file_handle          = nullptr;
-    FILE * g_stdout_file_handle         = nullptr;
-    FILE * g_stderr_file_handle         = nullptr;
+    DWORD g_parent_proc_id                  = -1;
 
-    FILE * g_tee_stdin_file_handle      = nullptr;
-    FILE * g_tee_stdout_file_handle     = nullptr;
-    FILE * g_tee_stderr_file_handle     = nullptr;
+    bool g_enable_conout_reattach_to_visible_console = true; // by default
+    bool g_is_enable_conout_reattach_to_visible_console_applied = false;
 
-    HANDLE g_stdin_handle               = INVALID_HANDLE_VALUE;
-    HANDLE g_stdout_handle              = INVALID_HANDLE_VALUE;
-    HANDLE g_stderr_handle              = INVALID_HANDLE_VALUE;
+    HANDLE g_stdin_handle                   = INVALID_HANDLE_VALUE;
+    HANDLE g_stdout_handle                  = INVALID_HANDLE_VALUE;
+    HANDLE g_stderr_handle                  = INVALID_HANDLE_VALUE;
 
-    bool g_is_stdin_redirected          = false;
-    bool g_is_stdout_redirected         = false;
-    bool g_is_stderr_redirected         = false;
+    HANDLE g_stdin_orig_console_handle      = INVALID_HANDLE_VALUE;
+    HANDLE g_stdout_orig_console_handle     = INVALID_HANDLE_VALUE;
+    HANDLE g_stderr_orig_console_handle     = INVALID_HANDLE_VALUE;
 
-    HANDLE g_stdin_pipe_read_handle     = INVALID_HANDLE_VALUE;
-    HANDLE g_stdin_pipe_write_handle    = INVALID_HANDLE_VALUE;
-    HANDLE g_stdout_pipe_read_handle    = INVALID_HANDLE_VALUE;
-    HANDLE g_stdout_pipe_write_handle   = INVALID_HANDLE_VALUE;
-    HANDLE g_stderr_pipe_read_handle    = INVALID_HANDLE_VALUE;
-    HANDLE g_stderr_pipe_write_handle   = INVALID_HANDLE_VALUE;
+    HANDLE g_reopen_stdin_handle            = INVALID_HANDLE_VALUE;
+    HANDLE g_reopen_stdout_handle           = INVALID_HANDLE_VALUE;
+    HANDLE g_reopen_stderr_handle           = INVALID_HANDLE_VALUE;
 
-    HANDLE g_child_process_handle       = INVALID_HANDLE_VALUE;
-    DWORD g_child_process_group_id      = -1; // to pass signals into child process
+    std::tstring g_reopen_stdin_full_name   = {};
+    std::tstring g_reopen_stdout_full_name  = {};
+    std::tstring g_reopen_stderr_full_name  = {};
+
+    HANDLE g_tee_stdin_handle               = INVALID_HANDLE_VALUE;
+    HANDLE g_tee_stdout_handle              = INVALID_HANDLE_VALUE;
+    HANDLE g_tee_stderr_handle              = INVALID_HANDLE_VALUE;
+
+    std::tstring g_tee_stdin_full_name      = {};
+    std::tstring g_tee_stdout_full_name     = {};
+    std::tstring g_tee_stderr_full_name     = {};
+
+    bool g_is_stdin_redirected              = false;
+    bool g_is_stdout_redirected             = false;
+    bool g_is_stderr_redirected             = false;
+
+    HANDLE g_stdin_pipe_read_handle         = INVALID_HANDLE_VALUE;
+    HANDLE g_stdin_pipe_write_handle        = INVALID_HANDLE_VALUE;
+    HANDLE g_stdout_pipe_read_handle        = INVALID_HANDLE_VALUE;
+    HANDLE g_stdout_pipe_write_handle       = INVALID_HANDLE_VALUE;
+    HANDLE g_stderr_pipe_read_handle        = INVALID_HANDLE_VALUE;
+    HANDLE g_stderr_pipe_write_handle       = INVALID_HANDLE_VALUE;
+
+    HANDLE g_child_process_handle           = INVALID_HANDLE_VALUE;
+    DWORD g_child_process_group_id          = -1; // to pass signals into child process
+
+    CRITICAL_SECTION g_std_write_crsec      = {};
+    CRITICAL_SECTION g_tee_file_write_crsec = {};
+    bool g_tee_file_write_crsec_enabled[3]  = { false, false, false };
 
     struct _StreamPipeThreadData
     {
@@ -170,9 +204,10 @@ namespace {
 
         bool stream_eof = false;
 
-        //DWORD num_bytes_avail = 0;
+        DWORD num_bytes_avail = 0;
         DWORD num_bytes_read = 0;
         DWORD num_bytes_write = 0;
+        DWORD num_bytes_written = 0;
         //DWORD num_events_read = 0;
         //DWORD num_events_written = 0;
         DWORD win_error = 0;
@@ -184,6 +219,8 @@ namespace {
         //std::vector<char> stdin_char_buf;
         //std::vector<wchar_t> stdin_wchar_buf;
 
+        OVERLAPPED overlapped_read{};
+
         // NOTE:
         //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
         //
@@ -191,14 +228,19 @@ namespace {
             switch (stream_type) {
             case 0: // stdin
             {
+                // WORKAROUND:
+                //  Synchronous ReadFile function has an issue, where it stays locked on pipe input while the output handle already closed or broken (pipe)!
+                //  To fix that, we have to use PeekNamedPipe+ReadFile with the output handle test for write (WriteFile with 0 bytes) instead of
+                //  single ReadFile w/o the output handle write test.
+                //
+
                 switch (g_stream_pipe_thread_handle_types[stream_type]) {
                 case FILE_TYPE_DISK:
-                case FILE_TYPE_PIPE:
                 {
                     stdin_byte_buf.resize(g_options.tee_stdin_read_buf_size);
 
                     while (!stream_eof) {
-                        // in case if child process exit
+                        // in case if the child process is exited
                         if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
                             break;
                         }
@@ -222,19 +264,37 @@ namespace {
                         }
 
                         if (num_bytes_read) {
-                            if (g_tee_stdin_file_handle) {
-                                fwrite(&stdin_byte_buf[0], num_bytes_read, 1, g_tee_stdin_file_handle);
-                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                            if (g_tee_stdin_handle) {
+                                [&]() { if_break(true) __try {
+                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
+                                        EnterCriticalSection(&g_tee_file_write_crsec);
+                                    }
 
-                                if (g_flags.tee_stdin_file_flush) {
-                                    fflush(g_tee_stdin_file_handle);
+                                    WriteFile(g_tee_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+
+                                    if (g_flags.tee_stdin_file_flush) {
+                                        FlushFileBuffers(g_tee_stdin_handle);
+                                        if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                    }
                                 }
+                                __finally {
+                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
+                                        LeaveCriticalSection(&g_tee_file_write_crsec);
+                                    }
+                                } }();
                             }
 
                             if (_is_valid_handle(g_stdin_pipe_write_handle)) {
                                 SetLastError(0); // just in case
-                                if (!WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                if (WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                    if (g_flags.stdin_output_flush) {
+                                        FlushFileBuffers(g_stdin_pipe_write_handle);
+                                    }
+
+                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                }
+                                else {
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 
                                     win_error = GetLastError();
@@ -247,11 +307,134 @@ namespace {
                                             _print_win_error_message(win_error, g_options.win_error_langid);
                                         }
                                     }
+
+                                    stream_eof = true;
                                 }
                             }
                         }
                         else {
                             stream_eof = true;
+                        }
+                    }
+
+                    // explicitly close the child stdin write handle here to trigger the child process reaction
+                    _close_handle(g_stdin_pipe_write_handle);
+                } break;
+
+                case FILE_TYPE_PIPE:
+                {
+                    stdin_byte_buf.resize(g_options.tee_stdin_read_buf_size);
+
+                    while (!stream_eof) {
+                        // in case if the child process is exited but the output handle is somehow alive (leaked) and not broken
+                        if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
+                            break;
+                        }
+
+                        num_bytes_read = num_bytes_avail = 0;
+
+                        SetLastError(0); // just in case
+                        if (!PeekNamedPipe(g_stdin_handle, NULL, 0, NULL, &num_bytes_avail, NULL)) {
+                            if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+
+                            win_error = GetLastError();
+                            if (win_error != ERROR_BROKEN_PIPE) {
+                                if (!g_flags.no_print_gen_error_string) {
+                                    _ftprintf(stderr, _T("error: parent stdin read error: win_error=0x%08X (%d)\n"),
+                                        win_error, win_error);
+                                }
+                                if (g_flags.print_win_error_string && win_error) {
+                                    _print_win_error_message(win_error, g_options.win_error_langid);
+                                }
+                            }
+
+                            stream_eof = true;
+
+                        }
+
+                        if (num_bytes_avail) {
+                            SetLastError(0); // just in case
+                            if (!ReadFile(g_stdin_handle, &stdin_byte_buf[0], g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
+                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+
+                                win_error = GetLastError();
+                                if (win_error != ERROR_BROKEN_PIPE) {
+                                    if (!g_flags.no_print_gen_error_string) {
+                                        _ftprintf(stderr, _T("error: parent stdin read error: win_error=0x%08X (%d)\n"),
+                                            win_error, win_error);
+                                    }
+                                    if (g_flags.print_win_error_string && win_error) {
+                                        _print_win_error_message(win_error, g_options.win_error_langid);
+                                    }
+                                }
+
+                                stream_eof = true;
+                            }
+                        }
+
+                        if (num_bytes_read) {
+                            if (g_tee_stdin_handle) {
+                                [&]() { if_break(true) __try {
+                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
+                                        EnterCriticalSection(&g_tee_file_write_crsec);
+                                    }
+
+                                    WriteFile(g_tee_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+
+                                    if (g_flags.tee_stdin_file_flush) {
+                                        FlushFileBuffers(g_tee_stdin_handle);
+                                        if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                    }
+                                }
+                                __finally {
+                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
+                                        LeaveCriticalSection(&g_tee_file_write_crsec);
+                                    }
+                                } }();
+                            }
+
+                            if (_is_valid_handle(g_stdin_pipe_write_handle)) {
+                                SetLastError(0); // just in case
+                                if (WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                    if (g_flags.stdin_output_flush) {
+                                        FlushFileBuffers(g_stdin_pipe_write_handle);
+                                    }
+
+                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                }
+                                else {
+                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+
+                                    win_error = GetLastError();
+                                    if (win_error) {
+                                        if (!g_flags.no_print_gen_error_string) {
+                                            _ftprintf(stderr, _T("error: child stdin write error: win_error=0x%08X (%d)\n"),
+                                                win_error, win_error);
+                                        }
+                                        if (g_flags.print_win_error_string && win_error) {
+                                            _print_win_error_message(win_error, g_options.win_error_langid);
+                                        }
+                                    }
+
+                                    stream_eof = true;
+                                }
+                            }
+                        }
+                        else if (!num_bytes_avail) {
+                            SetLastError(0); // just in case
+                            if (!WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], 0, &num_bytes_write, NULL)) {
+                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+
+                                stream_eof = true;
+                            }
+
+                            if (!stream_eof) {
+                                // loop wait
+                                Sleep(20);
+
+                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                            }
                         }
                     }
 
@@ -265,9 +448,9 @@ namespace {
                     //  This branch has no native Win32 implementation portable between Win XP/7/8/10 windows versions.
                     //  The `CreatePseudoConsole` API function is available only after the `Windows 10 October 2018 Update (version 1809) [desktop apps only]`
                     //  The complete implementation which can be provided here can be done through a remote code injection to a child process and is not yet available.
-                    //  
+                    //
 
-//                    if (g_tee_stdin_file_handle) {
+//                    if (g_tee_stdin_handle) {
 //                        const UINT cp_out = GetConsoleOutputCP();
 //
 //                        CPINFO cp_info{};
@@ -351,7 +534,8 @@ namespace {
 //                                                        stdin_wchar_buf[j] = key_event_record.uChar.UnicodeChar;
 //                                                    }
 //
-//                                                    fwrite(&stdin_wchar_buf[0], sizeof(wchar_t), key_event_record.wRepeatCount, g_tee_stdin_file_handle);
+//                                                    WriteFile(g_tee_stdin_handle, &stdin_wchar_buf[0], sizeof(wchar_t) * key_event_record.wRepeatCount,
+//                                                        &num_bytes_written, NULL);
 //                                                }
 //                                                else {
 //                                                    stdin_char_buf.resize(size_t(key_event_record.wRepeatCount));
@@ -360,13 +544,14 @@ namespace {
 //                                                        stdin_char_buf[j] = key_event_record.uChar.AsciiChar;
 //                                                    }
 //
-//                                                    fwrite(&stdin_char_buf[0], sizeof(char), key_event_record.wRepeatCount, g_tee_stdin_file_handle);
+//                                                    WriteFile(g_tee_stdin_handle, &stdin_char_buf[0], sizeof(char) * key_event_record.wRepeatCount,
+//                                                        &num_bytes_written, NULL);
 //                                                }
 //
 //                                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 //
 //                                                if (g_flags.tee_stdin_file_flush) {
-//                                                    fflush(g_tee_stdin_file_handle);
+//                                                    FlushFileBuffers(g_tee_stdin_handle);
 //                                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 //                                                }
 //                                            }
@@ -425,38 +610,67 @@ namespace {
                         }
 
                         if (num_bytes_read) {
-                            if (g_tee_stdout_file_handle) {
-                                fwrite(&stdout_byte_buf[0], num_bytes_read, 1, g_tee_stdout_file_handle);
-                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                            if (g_tee_stdout_handle) {
+                                [&]() { if_break(true) __try {
+                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
+                                        EnterCriticalSection(&g_tee_file_write_crsec);
+                                    }
 
-                                if (g_flags.tee_stdout_file_flush) {
-                                    fflush(g_tee_stdout_file_handle);
+                                    WriteFile(g_tee_stdout_handle, &stdout_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
-                                }
-                            }
 
-                            if (_is_valid_handle(g_stdout_handle)) {
-                                SetLastError(0); // just in case
-                                if (WriteFile(g_stdout_handle, &stdout_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
-                                    if (g_flags.reopen_stdout_file_flush) {
-                                        FlushFileBuffers(g_stdout_handle);
+                                    if (g_flags.tee_stdout_file_flush) {
+                                        FlushFileBuffers(g_tee_stdout_handle);
                                         if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
                                     }
                                 }
-                                else {
-                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                __finally {
+                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
+                                        LeaveCriticalSection(&g_tee_file_write_crsec);
+                                    }
+                                } }();
 
-                                    win_error = GetLastError();
-                                    if (win_error) {
-                                        if (!g_flags.no_print_gen_error_string) {
-                                            _ftprintf(stderr, _T("error: parent stdout write error: win_error=0x%08X (%d)\n"),
-                                                win_error, win_error);
+                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                            }
+
+                            if (_is_valid_handle(g_stdout_handle)) {
+                                [&]() { if_break(true) __try {
+                                    if (g_flags.mutex_std_writes) {
+                                        EnterCriticalSection(&g_std_write_crsec);
+                                    }
+
+                                    SetLastError(0); // just in case
+                                    if (WriteFile(g_stdout_handle, &stdout_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                        if (g_flags.stdout_flush) {
+                                            FlushFileBuffers(g_stdout_handle);
                                         }
-                                        if (g_flags.print_win_error_string && win_error) {
-                                            _print_win_error_message(win_error, g_options.win_error_langid);
+
+                                        if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                    }
+                                    else {
+                                        if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+
+                                        win_error = GetLastError();
+                                        if (win_error) {
+                                            if (!g_flags.no_print_gen_error_string) {
+                                                _ftprintf(stderr, _T("error: parent stdout write error: win_error=0x%08X (%d)\n"),
+                                                    win_error, win_error);
+                                            }
+                                            if (g_flags.print_win_error_string && win_error) {
+                                                _print_win_error_message(win_error, g_options.win_error_langid);
+                                            }
                                         }
+
+                                        stream_eof = true;
                                     }
                                 }
+                                __finally {
+                                    if (g_flags.mutex_std_writes) {
+                                        LeaveCriticalSection(&g_std_write_crsec);
+                                    }
+                                } }();
+
+                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
                             }
                         }
                         else {
@@ -501,38 +715,65 @@ namespace {
                         }
 
                         if (num_bytes_read) {
-                            if (g_tee_stderr_file_handle) {
-                                fwrite(&stderr_byte_buf[0], num_bytes_read, 1, g_tee_stderr_file_handle);
-                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                            if (g_tee_stderr_handle) {
+                                [&]() { if_break(true) __try {
+                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
+                                        EnterCriticalSection(&g_tee_file_write_crsec);
+                                    }
 
-                                if (g_flags.tee_stderr_file_flush) {
-                                    fflush(g_tee_stderr_file_handle);
+                                    WriteFile(g_tee_stderr_handle, &stderr_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
-                                }
-                            }
 
-                            if (_is_valid_handle(g_stderr_handle)) {
-                                SetLastError(0); // just in case
-                                if (WriteFile(g_stderr_handle, &stderr_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
-                                    if (g_flags.reopen_stderr_file_flush) {
-                                        FlushFileBuffers(g_stderr_handle);
+                                    if (g_flags.tee_stderr_file_flush) {
+                                        FlushFileBuffers(g_tee_stderr_handle);
                                         if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
                                     }
                                 }
-                                else {
-                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                __finally {
+                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
+                                        LeaveCriticalSection(&g_tee_file_write_crsec);
+                                    }
+                                } }();
 
-                                    win_error = GetLastError();
-                                    if (win_error) {
-                                        if (!g_flags.no_print_gen_error_string) {
-                                            _ftprintf(stderr, _T("error: parent stderr write error: win_error=0x%08X (%d)\n"),
-                                                win_error, win_error);
+                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                            }
+
+                            if (_is_valid_handle(g_stderr_handle)) {
+                                [&]() { if_break(true) __try {
+                                    if (g_flags.mutex_std_writes) {
+                                        EnterCriticalSection(&g_std_write_crsec);
+                                    }
+
+                                    SetLastError(0); // just in case
+                                    if (WriteFile(g_stderr_handle, &stderr_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                        if (g_flags.stderr_flush) {
+                                            FlushFileBuffers(g_stderr_handle);
                                         }
-                                        if (g_flags.print_win_error_string && win_error) {
-                                            _print_win_error_message(win_error, g_options.win_error_langid);
+
+                                        if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+                                    }
+                                    else {
+                                        if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
+
+                                        win_error = GetLastError();
+                                        if (win_error) {
+                                            if (!g_flags.no_print_gen_error_string) {
+                                                _ftprintf(stderr, _T("error: parent stderr write error: win_error=0x%08X (%d)\n"),
+                                                    win_error, win_error);
+                                            }
+                                            if (g_flags.print_win_error_string && win_error) {
+                                                _print_win_error_message(win_error, g_options.win_error_langid);
+                                            }
                                         }
                                     }
                                 }
+                                __finally {
+                                    if (g_flags.mutex_std_writes) {
+                                        LeaveCriticalSection(&g_std_write_crsec);
+                                    }
+                                } }();
+
+                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
                             }
                         }
                         else {
@@ -590,11 +831,11 @@ namespace {
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = TRUE;
 
-        if (_is_winnt()) {
-            InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
-            SetSecurityDescriptorDacl(&sd, TRUE, NULL, FALSE);
-            sa.lpSecurityDescriptor = NULL; // &sd;
-        }
+        //if (_is_winnt()) {
+        //    InitializeSecurityDescriptor(&sd, SECURITY_DESCRIPTOR_REVISION);
+        //    SetSecurityDescriptorDacl(&sd, TRUE, NULL, FALSE);
+        //    sa.lpSecurityDescriptor = &sd;
+        //}
 
         UINT prev_cp_in = 0;
         UINT prev_cp_out = 0;
@@ -604,6 +845,8 @@ namespace {
 
         SHELLEXECUTEINFO sei{};
         std::vector<TCHAR> shell_exec_verb;
+
+        std::vector<TCHAR> tmp_buf;
 
         // NOTE:
         //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
@@ -622,11 +865,37 @@ namespace {
                 }
             }
 
-            // std reopen files
+            // synchronization objects init
 
-            if (!options.reopen_stdin_as.empty()) {
+            if (g_flags.mutex_std_writes) {
+                InitializeCriticalSection(&g_std_write_crsec);
+            }
+
+            if (!g_options.mutex_tee_file_writes.empty()) {
+                InitializeCriticalSection(&g_tee_file_write_crsec);
+
+                [&]() {
+                    const std::tstring ids_str = std::tstring{ _T(":") } + g_options.mutex_tee_file_writes + _T(":");
+                    if (ids_str.find(_T(":0:")) != std::tstring::npos) {
+                        g_tee_file_write_crsec_enabled[0] = true;
+                    }
+                    if (ids_str.find(_T(":1:")) != std::tstring::npos) {
+                        g_tee_file_write_crsec_enabled[1] = true;
+                    }
+                    if (ids_str.find(_T(":2:")) != std::tstring::npos) {
+                        g_tee_file_write_crsec_enabled[2] = true;
+                    }
+                }();
+            }
+
+            // reopen std
+
+            if (!options.reopen_stdin_as_file.empty()) {
                 SetLastError(0); // just in case
-                if (!(g_stdin_file_handle = tfreopen(options.reopen_stdin_as.c_str(), _T("rb"), stdin))) {
+                if (!_is_valid_handle(g_reopen_stdin_handle =
+                        CreateFile(options.reopen_stdin_as_file.c_str(),
+                            GENERIC_READ, FILE_SHARE_READ, &sa, // `sa` just in case
+                            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL))) {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -638,18 +907,31 @@ namespace {
                     }
                     if (!flags.no_print_gen_error_string) {
                         _ftprintf(stderr, _T("error: could not reopen stdin as file to read: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.reopen_stdout_as.c_str());
+                            win_error, win_error, options.reopen_stdout_as_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
+
+                _set_crt_std_handle(g_reopen_stdin_handle, 0);
             }
 
-            if (!options.reopen_stdout_as.empty()) {
+            if (!options.reopen_stdout_as_file.empty()) {
                 SetLastError(0); // just in case
-                if (!(g_stdout_file_handle = tfreopen(options.reopen_stdout_as.c_str(), !flags.reopen_stdout_file_append ? _T("wb") : _T("ab"), stdout))) {
+                if (_is_valid_handle(g_reopen_stdout_handle =
+                        CreateFile(options.reopen_stdout_as_file.c_str(),
+                            GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa,
+                            !flags.reopen_stdout_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
+                            FILE_ATTRIBUTE_NORMAL, NULL))) {
+                    tmp_buf.resize(MAX_PATH);
+                    tmp_buf[0] = _T('\0');
+                    const DWORD num_chars = GetFullPathName(options.reopen_stdout_as_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
+                    g_reopen_stdout_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+
+                }
+                else {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -661,44 +943,94 @@ namespace {
                     }
                     if (!flags.no_print_gen_error_string) {
                         _ftprintf(stderr, _T("error: could not reopen stdout as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.reopen_stdout_as.c_str());
+                            win_error, win_error, options.reopen_stdout_as_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
+
+                _set_crt_std_handle(g_reopen_stdout_handle, 1);
             }
 
-            if (!options.reopen_stderr_as.empty()) {
-                SetLastError(0); // just in case
-                if (!(g_stderr_file_handle = tfreopen(options.reopen_stderr_as.c_str(), !flags.reopen_stderr_file_append ? _T("wb") : _T("ab"), stderr))) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
+            if (!options.reopen_stderr_as_file.empty()) {
+                tmp_buf.resize(MAX_PATH);
+                tmp_buf[0] = _T('\0');
+                const DWORD num_chars = GetFullPathName(options.reopen_stderr_as_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
+                g_reopen_stderr_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+
+                // compare full names and if equal, then duplicate instead create
+                if (_is_valid_handle(g_reopen_stdout_handle)) {
+                    if (g_reopen_stdout_full_name == g_reopen_stderr_full_name) {
+                        SetLastError(0); // just in case
+                        if (!DuplicateHandle(GetCurrentProcess(), g_reopen_stdout_handle, GetCurrentProcess(), &g_reopen_stderr_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                                win_error = GetLastError();
+                            }
+                            if (!flags.ret_win_error) {
+                                ret = err_win32_error;
+                            }
+                            else {
+                                ret = win_error;
+                            }
+                            if (!flags.no_print_gen_error_string) {
+                                _ftprintf(stderr, _T("error: could not auto duplicate (merge) stdout into stderr: win_error=0x%08X (%d) stdout_file=\"%s\"\n"),
+                                    win_error, win_error, options.reopen_stdout_as_file.c_str());
+                            }
+                            if (flags.print_win_error_string && win_error) {
+                                _print_win_error_message(win_error, g_options.win_error_langid);
+                            }
+                            break;
+                        }
                     }
-                    if (!flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not reopen stderr as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.reopen_stderr_as.c_str());
-                    }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break;
                 }
+
+                if (!_is_valid_handle(g_reopen_stderr_handle)) {
+                    SetLastError(0); // just in case
+                    if (!_is_valid_handle(g_reopen_stderr_handle =
+                        CreateFile(options.reopen_stderr_as_file.c_str(),
+                            GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa,
+                            !flags.reopen_stderr_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
+                            FILE_ATTRIBUTE_NORMAL, NULL))) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not reopen stderr as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                                win_error, win_error, options.reopen_stderr_as_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break;
+                    }
+                }
+
+                _set_crt_std_handle(g_reopen_stderr_handle, 2);
             }
 
-            // tee files
+            // tee std
 
-            if (!options.tee_stdin_file.empty()) {
+            if (!options.tee_stdin_to_file.empty()) {
                 SetLastError(0); // just in case
-                g_tee_stdin_file_handle = tfopen(options.tee_stdin_file.c_str(), !flags.tee_stdin_file_append ? _T("wb") : _T("ab"));
-                if (!g_tee_stdin_file_handle) {
+                if (_is_valid_handle(g_tee_stdin_handle =
+                        CreateFile(options.tee_stdin_to_file.c_str(),
+                            GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                            !flags.tee_stdin_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
+                            FILE_ATTRIBUTE_NORMAL, NULL))) {
+                    tmp_buf.resize(MAX_PATH);
+                    tmp_buf[0] = _T('\0');
+                    const DWORD num_chars = GetFullPathName(options.tee_stdin_to_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
+                    g_tee_stdin_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+                }
+                else {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -710,7 +1042,7 @@ namespace {
                     }
                     if (!flags.no_print_gen_error_string) {
                         _ftprintf(stderr, _T("error: could not open stdin tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stdin_file.c_str());
+                            win_error, win_error, options.tee_stdin_to_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -719,53 +1051,405 @@ namespace {
                 }
             }
 
-            if (!options.tee_stdout_file.empty()) {
-                SetLastError(0); // just in case
-                g_tee_stdout_file_handle = tfopen(options.tee_stdout_file.c_str(), !flags.tee_stdout_file_append ? _T("wb") : _T("ab"));
-                if (!g_tee_stdout_file_handle) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
+            if (!options.tee_stdout_to_file.empty()) {
+                tmp_buf.resize(MAX_PATH);
+                tmp_buf[0] = _T('\0');
+                const DWORD num_chars = GetFullPathName(options.tee_stdout_to_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
+                g_tee_stdout_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+
+                // compare full names and if equal, then duplicate instead create
+                if (_is_valid_handle(g_tee_stdin_handle)) {
+                    if (g_tee_stdin_full_name == g_tee_stdout_full_name) {
+                        SetLastError(0); // just in case
+                        if (!DuplicateHandle(GetCurrentProcess(), g_tee_stdin_handle, GetCurrentProcess(), &g_tee_stdout_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                                win_error = GetLastError();
+                            }
+                            if (!flags.ret_win_error) {
+                                ret = err_win32_error;
+                            }
+                            else {
+                                ret = win_error;
+                            }
+                            if (!flags.no_print_gen_error_string) {
+                                _ftprintf(stderr, _T("error: could not auto duplicate (merge) tee stdin into tee stdout: win_error=0x%08X (%d) stdin_file=\"%s\"\n"),
+                                    win_error, win_error, options.tee_stdin_to_file.c_str());
+                            }
+                            if (flags.print_win_error_string && win_error) {
+                                _print_win_error_message(win_error, g_options.win_error_langid);
+                            }
+                            break;
+                        }
                     }
-                    if (!flags.ret_win_error) {
-                        ret = err_win32_error;
+                }
+
+                if (!_is_valid_handle(g_tee_stdout_handle)) {
+                    SetLastError(0); // just in case
+                    if (!_is_valid_handle(g_tee_stdout_handle =
+                            CreateFile(options.tee_stdout_to_file.c_str(),
+                                GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                                !flags.tee_stdout_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
+                                FILE_ATTRIBUTE_NORMAL, NULL))) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not open stdout tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stdout_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break;
                     }
-                    else {
-                        ret = win_error;
+                }
+            }
+
+            if (!options.tee_stderr_to_file.empty()) {
+                tmp_buf.resize(MAX_PATH);
+                tmp_buf[0] = _T('\0');
+                const DWORD num_chars = GetFullPathName(options.tee_stderr_to_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
+                g_tee_stderr_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+
+                // compare full names and if equal, then duplicate instead create
+                if (_is_valid_handle(g_tee_stdout_handle)) {
+                    if (g_tee_stdout_full_name == g_tee_stderr_full_name) {
+                        SetLastError(0); // just in case
+                        if (!DuplicateHandle(GetCurrentProcess(), g_tee_stdout_handle, GetCurrentProcess(), &g_tee_stderr_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                                win_error = GetLastError();
+                            }
+                            if (!flags.ret_win_error) {
+                                ret = err_win32_error;
+                            }
+                            else {
+                                ret = win_error;
+                            }
+                            if (!flags.no_print_gen_error_string) {
+                                _ftprintf(stderr, _T("error: could not auto duplicate (merge) tee stdout into tee stderr: win_error=0x%08X (%d) stdout_file=\"%s\"\n"),
+                                    win_error, win_error, options.tee_stdout_to_file.c_str());
+                            }
+                            if (flags.print_win_error_string && win_error) {
+                                _print_win_error_message(win_error, g_options.win_error_langid);
+                            }
+                            break;
+                        }
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not open stdout tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stdout_file.c_str());
+                }
+
+                if (!_is_valid_handle(g_tee_stderr_handle)) {
+                    if (_is_valid_handle(g_tee_stdin_handle)) {
+                        if (g_tee_stdin_full_name == g_tee_stderr_full_name) {
+                            SetLastError(0); // just in case
+                            if (!DuplicateHandle(GetCurrentProcess(), g_tee_stdin_handle, GetCurrentProcess(), &g_tee_stderr_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                                    win_error = GetLastError();
+                                }
+                                if (!flags.ret_win_error) {
+                                    ret = err_win32_error;
+                                }
+                                else {
+                                    ret = win_error;
+                                }
+                                if (!flags.no_print_gen_error_string) {
+                                    _ftprintf(stderr, _T("error: could not auto duplicate (merge) tee stdin into tee stderr: win_error=0x%08X (%d) stdin_file=\"%s\"\n"),
+                                        win_error, win_error, options.tee_stdin_to_file.c_str());
+                                }
+                                if (flags.print_win_error_string && win_error) {
+                                    _print_win_error_message(win_error, g_options.win_error_langid);
+                                }
+                                break;
+                            }
+                        }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
+                }
+
+                if (!_is_valid_handle(g_tee_stderr_handle)) {
+                    SetLastError(0); // just in case
+                    if (!_is_valid_handle(g_tee_stderr_handle =
+                            CreateFile(options.tee_stderr_to_file.c_str(),
+                                GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                                !flags.tee_stderr_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
+                                FILE_ATTRIBUTE_NORMAL, NULL))) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not open stderr tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stderr_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // std dup
+
+            bool break_ = false;
+
+            if (!_is_valid_handle(g_stdout_handle)) {
+                switch (options.stdout_dup) {
+                case 2:
+                    SetLastError(0); // just in case
+                    if (!DuplicateHandle(GetCurrentProcess(), g_stderr_handle, GetCurrentProcess(), &g_stdout_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not duplicate stderr into stdout: win_error=0x%08X (%d) stderr_file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stderr_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
                     }
                     break;
                 }
             }
 
-            if (!options.tee_stderr_file.empty()) {
-                SetLastError(0); // just in case
-                g_tee_stderr_file_handle = tfopen(options.tee_stderr_file.c_str(), !flags.tee_stderr_file_append ? _T("wb") : _T("ab"));
-                if (!g_tee_stderr_file_handle) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not open stderr tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stderr_file.c_str());
-                    }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
+            if (break_) break;
+
+            if (!_is_valid_handle(g_stderr_handle)) {
+                switch (options.stderr_dup) {
+                case 1:
+                    SetLastError(0); // just in case
+                    if (!DuplicateHandle(GetCurrentProcess(), g_stdout_handle, GetCurrentProcess(), &g_stderr_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not duplicate stdout into stderr: win_error=0x%08X (%d) stdout_file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stdout_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
                     }
                     break;
                 }
             }
+
+            if (break_) break;
+
+            // tee std dup
+
+            if (!_is_valid_handle(g_tee_stdin_handle)) {
+                switch (options.tee_stdin_dup) {
+                case 1:
+                    SetLastError(0); // just in case
+                    if (!DuplicateHandle(GetCurrentProcess(), g_tee_stdout_handle, GetCurrentProcess(), &g_tee_stdin_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not duplicate stdout into stdin: win_error=0x%08X (%d) stdout_file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stdout_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
+                    }
+                    break;
+                case 2:
+                    SetLastError(0); // just in case
+                    if (!DuplicateHandle(GetCurrentProcess(), g_tee_stderr_handle, GetCurrentProcess(), &g_tee_stdin_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not duplicate stderr into stdin: win_error=0x%08X (%d) stderr_file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stderr_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
+                    }
+                    break;
+                }
+            }
+
+            if (break_) break;
+
+            if (!_is_valid_handle(g_tee_stdout_handle)) {
+                switch (options.tee_stdout_dup) {
+                case 0:
+                    SetLastError(0); // just in case
+                    if (!DuplicateHandle(GetCurrentProcess(), g_tee_stdin_handle, GetCurrentProcess(), &g_tee_stdout_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not duplicate stdin into stdout: win_error=0x%08X (%d) stdin_file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stdin_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
+                    }
+                    break;
+                case 2:
+                    SetLastError(0); // just in case
+                    if (!DuplicateHandle(GetCurrentProcess(), g_tee_stderr_handle, GetCurrentProcess(), &g_tee_stdout_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not duplicate stderr into stdout: win_error=0x%08X (%d) stderr_file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stderr_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
+                    }
+                    break;
+                }
+            }
+
+            if (break_) break;
+
+            if (!_is_valid_handle(g_tee_stderr_handle)) {
+                switch (options.tee_stderr_dup) {
+                case 0:
+                    SetLastError(0); // just in case
+                    if (!DuplicateHandle(GetCurrentProcess(), g_tee_stdin_handle, GetCurrentProcess(), &g_tee_stderr_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not duplicate stdin into stderr: win_error=0x%08X (%d) stdin_file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stdin_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
+                    }
+                    break;
+                case 1:
+                    SetLastError(0); // just in case
+                    if (!DuplicateHandle(GetCurrentProcess(), g_tee_stdout_handle, GetCurrentProcess(), &g_tee_stderr_handle, 0, TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!flags.no_print_gen_error_string) {
+                            _ftprintf(stderr, _T("error: could not duplicate stdout into stderr: win_error=0x%08X (%d) stdout_file=\"%s\"\n"),
+                                win_error, win_error, options.tee_stdout_to_file.c_str());
+                        }
+                        if (flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
+                    }
+                    break;
+                }
+            }
+
+            if (break_) break;
+
+            // tee pipes
+
+            //if (!options.tee_stdin_to_pipe.empty()) {
+            //    SetLastError(0); // just in case
+            //    CreateNamedPipe(pipe.c_str(), PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
+            //        1, )
+            //    g_tee_stdin_handle = _tfsopen(options.tee_stdin_to_file.c_str(), !flags.tee_stdin_file_append ? _T("wb") : _T("ab"), _SH_DENYNO);
+            //    if (!g_tee_stdin_handle) {
+            //        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            //            win_error = GetLastError();
+            //        }
+            //        if (!flags.ret_win_error) {
+            //            ret = err_win32_error;
+            //        }
+            //        else {
+            //            ret = win_error;
+            //        }
+            //        if (!flags.no_print_gen_error_string) {
+            //            _ftprintf(stderr, _T("error: could not open stdin tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+            //                win_error, win_error, options.tee_stdin_to_file.c_str());
+            //        }
+            //        if (flags.print_win_error_string && win_error) {
+            //            _print_win_error_message(win_error, g_options.win_error_langid);
+            //        }
+            //        break;
+            //    }
+            //}
 
             // std handles
 
@@ -890,8 +1574,8 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not set stdin handle information: win_error=0x%08X (%d) type=%d reopen_stdin_as=\"%s\"\n"),
-                            win_error, win_error, stdin_handle_type, options.reopen_stdin_as.c_str());
+                        _ftprintf(stderr, _T("error: could not set stdin handle information: win_error=0x%08X (%d) type=%d reopen_stdin_as_file=\"%s\"\n"),
+                            win_error, win_error, stdin_handle_type, options.reopen_stdin_as_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -944,7 +1628,7 @@ namespace {
                 }
             }
 
-            if (_is_valid_handle(g_tee_stdout_file_handle)) {
+            if (_is_valid_handle(g_tee_stdout_handle)) {
                 if (!CreatePipe(&g_stdout_pipe_read_handle, &g_stdout_pipe_write_handle, &sa, options.tee_stdout_pipe_buf_size)) {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
@@ -983,8 +1667,8 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not set stdout pipe handle information: win_error=0x%08X (%d) type=%u reopen_stdout_as=\"%s\"\n"),
-                            win_error, win_error, stdout_handle_type, options.reopen_stdout_as.c_str());
+                        _ftprintf(stderr, _T("error: could not set stdout pipe handle information: win_error=0x%08X (%d) type=%u reopen_stdout_as_file=\"%s\"\n"),
+                            win_error, win_error, stdout_handle_type, options.reopen_stdout_as_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -1016,7 +1700,7 @@ namespace {
                 si.dwFlags |= STARTF_USESTDHANDLES;
             }
 
-            if (_is_valid_handle(g_tee_stderr_file_handle)) {
+            if (_is_valid_handle(g_tee_stderr_handle)) {
                 if (!CreatePipe(&g_stderr_pipe_read_handle, &g_stderr_pipe_write_handle, &sa, options.tee_stderr_pipe_buf_size)) {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                         win_error = GetLastError();
@@ -1055,8 +1739,8 @@ namespace {
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _ftprintf(stderr, _T("error: could not set stderr pipe handle information: win_error=0x%08X (%d) type=%u reopen_stderr_as=\"%s\"\n"),
-                            win_error, win_error, stderr_handle_type, options.reopen_stderr_as.c_str());
+                        _ftprintf(stderr, _T("error: could not set stderr pipe handle information: win_error=0x%08X (%d) type=%u reopen_stderr_as_file=\"%s\"\n"),
+                            win_error, win_error, stderr_handle_type, options.reopen_stderr_as_file.c_str());
                     }
                     if (flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -1091,8 +1775,26 @@ namespace {
             ret = err_none;
             DWORD ret_create_proc = 0;
 
-            if (flags.detach_parent_console) {
-                FreeConsole();
+            if (!g_is_enable_conout_reattach_to_visible_console_applied) {
+                if (flags.detach_console) {
+                    FreeConsole(); // required before AttachConsole
+                }
+
+                if (flags.attach_parent_console) {
+                    /*const DWORD parent_proc_id = g_parent_proc_id != -1 ? g_parent_proc_id : _find_parent_process_id();
+                    if (parent_proc_id != -1)*/ {
+                        // found
+                        if (!flags.detach_console) {
+                            FreeConsole(); // required before AttachConsole
+                        }
+
+                        //AttachConsole(parent_proc_id);
+                        AttachConsole(ATTACH_PARENT_PROCESS);
+                    }
+                }
+                else if (flags.detach_console) {
+                    AllocConsole(); // required after FreeConsole
+                }
             }
 
             // CAUTION:
@@ -1261,7 +1963,7 @@ namespace {
                 ret = err_none;
             }
 
-            if (_is_valid_handle(g_stdin_handle) && (_is_valid_handle(g_tee_stdin_file_handle) || _is_valid_handle(g_stdin_pipe_write_handle))) {
+            if (_is_valid_handle(g_stdin_handle) && (_is_valid_handle(g_tee_stdin_handle) || _is_valid_handle(g_stdin_pipe_write_handle))) {
                 g_stream_pipe_thread_handles[0] = CreateThread(
                     NULL, 0,
                     _StreamPipeThread<0>, &g_stream_pipe_thread_data[0],
@@ -1271,7 +1973,7 @@ namespace {
             }
 
             if (_is_valid_handle(g_stdout_pipe_read_handle) &&
-                (g_tee_stdout_file_handle != NULL || _is_valid_handle(g_stdout_handle))) {
+                (g_tee_stdout_handle != NULL || _is_valid_handle(g_stdout_handle))) {
                 g_stream_pipe_thread_handles[1] = CreateThread(
                     NULL, 0,
                     _StreamPipeThread<1>, &g_stream_pipe_thread_data[1],
@@ -1281,7 +1983,7 @@ namespace {
             }
 
             if (_is_valid_handle(g_stderr_pipe_read_handle) &&
-                (g_tee_stderr_file_handle != NULL || _is_valid_handle(g_stderr_handle))) {
+                (g_tee_stderr_handle != NULL || _is_valid_handle(g_stderr_handle))) {
                 g_stream_pipe_thread_handles[2] = CreateThread(
                     NULL, 0,
                     _StreamPipeThread<2>, &g_stream_pipe_thread_data[2],
@@ -1291,7 +1993,7 @@ namespace {
             }
 
             if (_is_valid_handle(g_child_process_handle) &&
-                (_is_valid_handle(g_tee_stdin_file_handle) || _is_valid_handle(g_tee_stdout_file_handle) || _is_valid_handle(g_tee_stderr_file_handle) ||
+                (_is_valid_handle(g_tee_stdin_handle) || _is_valid_handle(g_tee_stdout_handle) || _is_valid_handle(g_tee_stderr_handle) ||
                  !flags.no_wait)) {
                 WaitForSingleObject(g_child_process_handle, INFINITE);
             }
@@ -1361,31 +2063,13 @@ namespace {
             _WaitForStreamPipeThreads();
 
             // not shared resources
-            if (g_tee_stdin_file_handle) {
-                fclose(g_tee_stdin_file_handle);
-                g_tee_stdin_file_handle = NULL; // just in case
-            }
-            if (g_tee_stdout_file_handle) {
-                fclose(g_tee_stdout_file_handle);
-                g_tee_stdout_file_handle = NULL; // just in case
-            }
-            if (g_tee_stderr_file_handle) {
-                fclose(g_tee_stderr_file_handle);
-                g_tee_stderr_file_handle = NULL; // just in case
-            }
+            _close_handle(g_reopen_stdin_handle);
+            _close_handle(g_reopen_stdout_handle);
+            _close_handle(g_reopen_stderr_handle);
 
-            if (g_stdin_file_handle) {
-                fclose(g_stdin_file_handle);
-                g_stdin_file_handle = NULL; // just in case
-            }
-            if (g_stdout_file_handle) {
-                fclose(g_stdout_file_handle);
-                g_stdout_file_handle = NULL; // just in case
-            }
-            if (g_stderr_file_handle) {
-                fclose(g_stderr_file_handle);
-                g_stderr_file_handle = NULL; // just in case
-            }
+            _close_handle(g_tee_stdin_handle);
+            _close_handle(g_tee_stdout_handle);
+            _close_handle(g_tee_stderr_handle);
 
             // restore standard handles (again)
             if (g_is_stdin_redirected) {
@@ -1414,6 +2098,10 @@ namespace {
             // in reverse order from threads to a process
             _close_handle(pi.hThread);
             _close_handle(g_child_process_handle, pi.hProcess);
+
+            // delete critical sections
+            DeleteCriticalSection(&g_std_write_crsec);
+            DeleteCriticalSection(&g_tee_file_write_crsec);
         } }();
 
         return ret;
@@ -1430,8 +2118,54 @@ int _tmain(int argc, const TCHAR * argv[])
         return err_unspecified;
     }
 
+    // NOTE:
+    //  While the current process being started it's console can be hidden by the CreateProcess/ShellExecute in the parent process.
+    //  So we have to check stdout/stderr attachment to the current process hidden console window from here and if it is happened and
+    //  the parent process console is visible, then make temporary redirection of respective stdout/stderr handles into the
+    //  parent console, until the `/attach-parent-console` flag would be applied.
+    //  Otherwise the output into the stdout/stderr from here won't be visible by the user until the `/attach-parent-console` flag is
+    //  applied.
+    //  If you don't want such behaviour, then you have to use the `/disable-conout-reattach-to-visible-console` flag.
+    //
+
     const TCHAR * arg;
     int arg_offset = 1;
+
+    bool detach_console = false;
+
+    // silent flags preprocess w/o any errors to search for prioritized flags
+    while (argc >= arg_offset + 1)
+    {
+        arg = argv[arg_offset];
+
+        if (!tstrcmp(arg, _T("/disable-conout-reattach-to-visible-console"))) {
+            g_enable_conout_reattach_to_visible_console = false;
+        }
+        else if (!tstrcmp(arg, _T("/detach-console"))) {
+            detach_console = true;
+        }
+
+        arg_offset += 1;
+    }
+
+    if (g_enable_conout_reattach_to_visible_console) {
+        // check current process console visibility
+        HWND console_window = GetConsoleWindow();
+        if (console_window == NULL || !IsWindowVisible(console_window)) {
+            // reattach to parent process console window
+            HWND parent_console_window_handle =  _find_parent_process_console_window(g_parent_proc_id);
+            if (parent_console_window_handle != NULL && IsWindowVisible(parent_console_window_handle)) {
+                g_is_enable_conout_reattach_to_visible_console_applied = true;
+
+                FreeConsole(); // required before AttachConsole
+
+                //AttachConsole(g_parent_proc_id);
+                AttachConsole(ATTACH_PARENT_PROCESS);
+            }
+        }
+    }
+
+    arg_offset = 1;
 
     if(argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
         if (argc >= arg_offset + 2) return err_invalid_format;
@@ -1569,7 +2303,7 @@ int _tmain(int argc, const TCHAR * argv[])
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
                 const int showas_value = _ttoi(arg);
-                if (showas_value > 0) {
+                if (showas_value >= 0) {
                     g_options.show_as = showas_value;
                 }
             }
@@ -1580,8 +2314,11 @@ int _tmain(int argc, const TCHAR * argv[])
                 return err_invalid_format;
             }
         }
-        else if (!tstrcmp(arg, _T("/detach-parent-console"))) {
-            g_flags.detach_parent_console = true;
+        else if (!tstrcmp(arg, _T("/detach-console"))) {
+            g_flags.detach_console = true;
+        }
+        else if (!tstrcmp(arg, _T("/attach-parent-console"))) {
+            g_flags.attach_parent_console = true;
         }
         else if (!tstrcmp(arg, _T("/use-parent-console"))) {
             g_flags.use_parent_console = true;
@@ -1589,10 +2326,10 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/create-child-console"))) {
             g_flags.create_child_console = true;
         }
-        else if (!tstrcmp(arg, _T("/reopen-stdin-as"))) {
+        else if (!tstrcmp(arg, _T("/reopen-stdin"))) {
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                g_options.reopen_stdin_as = arg;
+                g_options.reopen_stdin_as_file = arg;
             }
             else {
                 if (!g_flags.no_print_gen_error_string) {
@@ -1601,10 +2338,10 @@ int _tmain(int argc, const TCHAR * argv[])
                 return err_invalid_format;
             }
         }
-        else if (!tstrcmp(arg, _T("/reopen-stdout-as"))) {
+        else if (!tstrcmp(arg, _T("/reopen-stdout"))) {
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                g_options.reopen_stdout_as = arg;
+                g_options.reopen_stdout_as_file = arg;
             }
             else {
                 if (!g_flags.no_print_gen_error_string) {
@@ -1613,10 +2350,40 @@ int _tmain(int argc, const TCHAR * argv[])
                 return err_invalid_format;
             }
         }
-        else if (!tstrcmp(arg, _T("/reopen-stderr-as"))) {
+        else if (!tstrcmp(arg, _T("/reopen-stderr"))) {
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                g_options.reopen_stderr_as = arg;
+                g_options.reopen_stderr_as_file = arg;
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/stdout-dup"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                const int fileno_value = _ttoi(arg);
+                if (fileno_value >= 0) {
+                    g_options.stdout_dup = fileno_value;
+                }
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/stderr-dup"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                const int fileno_value = _ttoi(arg);
+                if (fileno_value >= 0) {
+                    g_options.stderr_dup = fileno_value;
+                }
             }
             else {
                 if (!g_flags.no_print_gen_error_string) {
@@ -1628,7 +2395,7 @@ int _tmain(int argc, const TCHAR * argv[])
         else if(!tstrcmp(arg, _T("/tee-stdin"))) {
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                g_options.tee_stdin_file = arg;
+                g_options.tee_stdin_to_file = arg;
             }
             else {
                 if (!g_flags.no_print_gen_error_string) {
@@ -1640,7 +2407,7 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/tee-stdout"))) {
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                g_options.tee_stdout_file = arg;
+                g_options.tee_stdout_to_file = arg;
             }
             else {
                 if (!g_flags.no_print_gen_error_string) {
@@ -1652,7 +2419,7 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/tee-stderr"))) {
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                g_options.tee_stderr_file = arg;
+                g_options.tee_stderr_to_file = arg;
             }
             else {
                 if (!g_flags.no_print_gen_error_string) {
@@ -1661,17 +2428,20 @@ int _tmain(int argc, const TCHAR * argv[])
                 return err_invalid_format;
             }
         }
+        else if (!tstrcmp(arg, _T("/stdin-output-flush"))) {
+            g_flags.stdin_output_flush = true;
+        }
+        else if (!tstrcmp(arg, _T("/stdout-flush"))) {
+            g_flags.stdout_flush = true;
+        }
+        else if (!tstrcmp(arg, _T("/stderr-flush"))) {
+            g_flags.stderr_flush = true;
+        }
         else if (!tstrcmp(arg, _T("/reopen-stdout-append"))) {
             g_flags.reopen_stdout_file_append = true;
         }
         else if (!tstrcmp(arg, _T("/reopen-stderr-append"))) {
             g_flags.reopen_stderr_file_append = true;
-        }
-        else if (!tstrcmp(arg, _T("/reopen-stdout-flush"))) {
-            g_flags.reopen_stdout_file_flush = true;
-        }
-        else if (!tstrcmp(arg, _T("/reopen-stderr-flush"))) {
-            g_flags.reopen_stderr_file_flush = true;
         }
         else if (!tstrcmp(arg, _T("/tee-stdin-append"))) {
             g_flags.tee_stdin_file_append = true;
@@ -1682,13 +2452,13 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/tee-stderr-append"))) {
             g_flags.tee_stderr_file_append = true;
         }
-        else if (!tstrcmp(arg, _T("/tee-stdin-flush"))) {
+        else if (!tstrcmp(arg, _T("/tee-stdin-file-flush"))) {
             g_flags.tee_stdin_file_flush = true;
         }
-        else if (!tstrcmp(arg, _T("/tee-stdout-flush"))) {
+        else if (!tstrcmp(arg, _T("/tee-stdout-file-flush"))) {
             g_flags.tee_stdout_file_flush = true;
         }
-        else if (!tstrcmp(arg, _T("/tee-stderr-flush"))) {
+        else if (!tstrcmp(arg, _T("/tee-stderr-file-flush"))) {
             g_flags.tee_stderr_file_flush = true;
         }
         else if (!tstrcmp(arg, _T("/tee-stdin-pipe-buf-size"))) {
@@ -1781,6 +2551,66 @@ int _tmain(int argc, const TCHAR * argv[])
                 return err_invalid_format;
             }
         }
+        else if (!tstrcmp(arg, _T("/tee-stdin-dup"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                const int fileno_value = _ttoi(arg);
+                if (fileno_value >= 0) {
+                    g_options.tee_stdin_dup = fileno_value;
+                }
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/tee-stdout-dup"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                const int fileno_value = _ttoi(arg);
+                if (fileno_value >= 0) {
+                    g_options.tee_stdout_dup = fileno_value;
+                }
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/tee-stderr-dup"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                const int fileno_value = _ttoi(arg);
+                if (fileno_value >= 0) {
+                    g_options.tee_stderr_dup = fileno_value;
+                }
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/mutex-std-writes"))) {
+            g_flags.mutex_std_writes = true;
+        }
+        else if (!tstrcmp(arg, _T("/mutex-tee-file-writes"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                g_options.mutex_tee_file_writes = arg;
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
+        }
         else if (!tstrcmp(arg, _T("/stdin-echo"))) {
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
@@ -1810,6 +2640,84 @@ int _tmain(int argc, const TCHAR * argv[])
         }
 
         arg_offset += 1;
+    }
+
+    // reopen std
+
+    if (!g_options.reopen_stdout_as_file.empty() && g_options.stdout_dup != -1) {
+        if (!g_flags.no_print_gen_error_string) {
+            fputs("error: flag format is invalid: stdout reopen is mixed\n", stderr);
+        }
+        return err_invalid_format;
+    }
+
+    if (!g_options.reopen_stderr_as_file.empty() && g_options.stderr_dup != -1) {
+        if (!g_flags.no_print_gen_error_string) {
+            fputs("error: flag format is invalid: stderr reopen is mixed\n", stderr);
+        }
+        return err_invalid_format;
+    }
+
+    // std dup
+
+    if (g_options.stdout_dup != -1 && g_options.stdout_dup != 2) {
+        if (!g_flags.no_print_gen_error_string) {
+            _ftprintf(stderr, _T("error: flag format is invalid: stdout duplication has invalid fileno: fileno=%i\n"), g_options.stdout_dup);
+        }
+        return err_invalid_format;
+    }
+
+    if (g_options.stderr_dup != -1 && g_options.stderr_dup != 1) {
+        if (!g_flags.no_print_gen_error_string) {
+            _ftprintf(stderr, _T("error: flag format is invalid: stderr duplication has invalid fileno: fileno=%i\n"), g_options.stderr_dup);
+        }
+        return err_invalid_format;
+    }
+
+    // tee std
+
+    if (!g_options.tee_stdin_to_file.empty() && g_options.tee_stdin_dup != -1) {
+        if (!g_flags.no_print_gen_error_string) {
+            fputs("error: flag format is invalid: tee stdin is mixed\n", stderr);
+        }
+        return err_invalid_format;
+    }
+
+    if (!g_options.tee_stdout_to_file.empty() && g_options.tee_stdout_dup != -1) {
+        if (!g_flags.no_print_gen_error_string) {
+            fputs("error: flag format is invalid: tee stdout is mixed\n", stderr);
+        }
+        return err_invalid_format;
+    }
+
+    if (!g_options.tee_stderr_to_file.empty() && g_options.tee_stderr_dup != -1) {
+        if (!g_flags.no_print_gen_error_string) {
+            fputs("error: flag format is invalid: tee stderr is mixed\n", stderr);
+        }
+        return err_invalid_format;
+    }
+
+    // tee std dup
+
+    if (g_options.tee_stdin_dup != -1 && g_options.tee_stdin_dup != 1 && g_options.tee_stdin_dup != 2) {
+        if (!g_flags.no_print_gen_error_string) {
+            _ftprintf(stderr, _T("error: flag format is invalid: tee stdin duplication has invalid fileno: fileno=%i\n"), g_options.tee_stdin_dup);
+        }
+        return err_invalid_format;
+    }
+
+    if (g_options.tee_stdout_dup != -1 && g_options.tee_stdout_dup != 0 && g_options. tee_stdout_dup != 2) {
+        if (!g_flags.no_print_gen_error_string) {
+            _ftprintf(stderr, _T("error: flag format is invalid: tee stdout duplication has invalid fileno: fileno=%i\n"), g_options.tee_stdout_dup);
+        }
+        return err_invalid_format;
+    }
+
+    if (g_options.tee_stderr_dup != -1 && g_options.tee_stderr_dup != 0 && g_options.tee_stderr_dup != 1) {
+        if (!g_flags.no_print_gen_error_string) {
+            _ftprintf(stderr, _T("error: flag format is invalid: tee stderr duplication has invalid fileno: fileno=%i\n"), g_options.tee_stderr_dup);
+        }
+        return err_invalid_format;
     }
 
     if (g_flags.no_window) {

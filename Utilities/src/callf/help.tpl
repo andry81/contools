@@ -97,6 +97,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /no-window
         Don't show a child process window.
+
         Overrides `/showas` flag.
 
       /no-expand-env
@@ -185,47 +186,97 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
         See detailed documentation in MSDN for the function `ShowWindow`.
 
-      /reopen-stdin-as <file>
+      /reopen-stdin <file>
         Reopen stdin as a `<file>`.
         Can be used to read from a file instead from the stdin.
-        Can not be used together with another `/reopen-stdin-*` flag.
+        Can not be used together with another `/reopen-stdin-*` option.
 
-      /reopen-stdout-as <file>
+      /reopen-stdout <file>
         Reopen stdout as a `<file>`.
         Can be used to write to a file instead to the stdout.
         Can be used together with `/tee-stdout*` flags.
-        Can not be used together with another `/reopen-stdout-as-*` flag.
+        Can not be used together with another `/reopen-stdout-as-*` option.
+        Can not be used together with the `/stdout-dup` option.
 
-      /reopen-stderr-as <file>
+      /reopen-stderr <file>
         Reopen stderr as a `<file>`.
         Can be used to write to a file instead to the stderr.
         Can be used together with `/tee-stderr*` flags.
-        Can not be used together with another `/reopen-stderr-as-*` flag.
+        Can not be used together with another `/reopen-stderr-as-*` option.
+        Can not be used together with the `/stderr-dup` option.
 
       /reopen-std[out|err]-append
         Append instead of rewrite into reopened stdout/stderr.
 
-      /reopen-std[out|err]-flush
-        Flush after each write into reopened stdout/stderr.
+      /std[out|err]-dup <fileno>
+        Duplicate the standard respective handle from another one, where the
+        `<fileno>` is the source handle index:
+          1 = stdout, 2 = stderr.
+        If is used after a respective `/reopen-std[out|err] <file>` option,
+        then has the same behaviour as a sequence of respective
+        `/reopen-stdout` or `/reopen-stderr` options with the same `<file>`
+        and so can be used intead.
+
+        Can not be used together with the same `/reopen-std[out|err]`
+        option.
+
+
+      /stdin-output-flush
+        Flush after each write into an output handle connected with the
+        process stdin.
+
+      /std[out|err]-flush
+        Flush after each write into the process stdout/stderr.
 
       /tee-std[in|out|err] <file>
-        Duplicate standard stream to `<file>`.
+        Duplicate standard stream to a file `<file>`.
         Can be used together with another `/tee-std[in|out|err]-to-*` flag.
 
       /tee-std[in|out|err]-append
-        Append instead of rewrite into `<file>`.
+        Append instead of rewrite into a file `<file>`.
 
-      /tee-std[in|out|err]-flush
-        Flush after each write into `<file>.
+      /tee-std[in|out|err]-file-flush
+        Flush after each write into a file `<file>.
 
       /tee-std[in|out|err]-pipe-buf-size <size>
-        Pipe buffer size in bytes attached to the stdin/stdout/stderr or
-        created for the respective tee.
+        Anonymous pipe buffer size in bytes attached directly to the
+        child process stdin/stdout/stderr.
 
       /tee-std[in|out|err]-read-buf-size <size>
-        Buffer size in bytes to read from stdin to write into attached pipe.
-        Buffer size in bytes to read from an attached pipe to write into
-        stdout/stderr.
+        Buffer size in bytes to read from parent process stdin.
+        Buffer size in bytes to read from child process stdout/stderr.
+
+      /tee-std[in|out|err]-dup <fileno>
+        Duplicate the tee respective handle from another one, where the
+        `<fileno>` is the source handle index:
+          0 = stdin, 1 = stdout, 2 = stderr.
+        Must be used after a respective `/tee-std[in|out|err] <file>` option.
+        Has the same behaviour as a sequence of respective `/tee-stdin`,
+        `/tee-stdout` or `/tee-stderr` options with the same `<file>` and so
+        can be used intead.
+
+      /mutex-std-writes
+        Mutual exclude stdout/stderr writes.
+
+      /mutex-tee-file-writes <handles>
+        Mutual exclude tee file writes of duplicated stdin/stdout/stderr,
+        where <handles> - colon separated number list of standard handles to
+        be associated with exclusive write, ex: `0:1:2`.
+
+      /create-child-console
+        CreateProcess
+          Create new console for a child process instead of reuse the parent
+          process console if exists.
+        ShellExecute
+          Avoid use
+
+      /detach-console
+        Detach console from the process before start of a child process.
+
+      /attach-parent-console
+        Attach console from the parent process before start of a child
+        process. If the current process already has a console, then detaches
+        it at first (no need to use `/detach-console` flag).
 
       /use-parent-console
         CreateProcess
@@ -236,16 +287,6 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           having it create a new console.
 
         Overrides `/create-child-console` flag.
-
-      /create-child-console
-        CreateProcess
-          Create new console for a child process instead of reuse the parent
-          process console if exists.
-        ShellExecute
-          Avoid use
-
-      /detach-parent-console
-        Detach console from parent process before start of a child process.
 
       /stdin-echo <0|1>
         Explicitly enable or disable console input buffer echo before start
@@ -344,9 +385,13 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
   Examples (ShellExecute):
     1. callf.exe /shell-exec open /no-sys-dialog-ui /use-parent-console "${COMSPEC}" "/k"
-
     2. callf.exe /shell-exec runas /no-sys-dialog-ui "${COMSPEC}" "/k"
+    3. callf.exe /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console \"\" \"\\\"${COMSPEC}\\\" /k"
 
-    First 1 example must be run in the same console.
+    Example #1 must be run in the same console.
 
-    Last 1 example must request the Administrator permission to execute.
+    Example #2 must request the Administrator permission to execute in the
+    new (child) console.
+
+    Example #3 must request the Administrator permission to execute in the
+    existing (parent) console.
