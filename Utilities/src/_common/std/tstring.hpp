@@ -11,6 +11,8 @@
 # define tstrcat  wcscat
 # define tstrcmp  wcscmp
 # define tstrncmp wcsncmp
+
+# define to_tstring to_wstring
 #else
 # define tstrlen  strlen
 # define tstrstr  strstr
@@ -18,6 +20,8 @@
 # define tstrcat  strcat
 # define tstrcmp  strcmp
 # define tstrncmp strncmp
+
+# define to_tstring to_string
 #endif
 
 namespace std {

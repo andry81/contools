@@ -5,6 +5,8 @@
 
 #include <string>
 #include <vector>
+#include <locale>
+#include <algorithm>
 
 #include <assert.h>
 #include <ShellAPI.h>
@@ -55,6 +57,50 @@ namespace {
 
     using const_tchar_ptr_vector_t = std::vector<const TCHAR *>;
     using tstring_vector_t = std::vector<std::tstring>;
+
+    std::tstring::value_type _to_lower(std::tstring::value_type ch, unsigned int code_page)
+    {
+        if (code_page) {
+            return std::use_facet<std::ctype<std::tstring::value_type> >(std::locale(std::string(".") + std::to_string(code_page))).toupper(ch);
+        }
+
+        return std::use_facet<std::ctype<std::tstring::value_type> >(std::locale()).toupper(ch);
+    }
+
+    struct _to_lower_with_codepage
+    {
+        _to_lower_with_codepage(unsigned int code_page_) :
+            code_page(code_page_)
+        {
+        }
+
+        std::tstring::value_type operator()(std::tstring::value_type ch_)
+        {
+            return _to_lower(ch_, code_page);
+        }
+
+        unsigned int code_page;
+    };
+
+    // code_page=0 for default std::locale
+    std::tstring _to_lower(std::tstring str, unsigned int code_page)
+    {
+        std::tstring res;
+        res.resize(str.size());
+        std::transform(str.begin(), str.end(), res.begin(), _to_lower_with_codepage(code_page));
+        return res;
+    }
+
+    uint64_t _hash_string_to_u64(std::tstring str, unsigned int code_page)
+    {
+        uint64_t res = 10000019;
+        for (size_t i = 0; i < str.length(); i += 2)
+        {
+            uint64_t merge = _to_lower(str[i], code_page) * 65536 + _to_lower(str[i + 1], code_page);
+            res = res * 8191 + merge; // unchecked arithmetic
+        }
+        return res;
+    }
 
     inline bool _is_valid_handle(HANDLE handle)
     {
@@ -230,7 +276,7 @@ namespace {
         return (DWORD)-1;
     }
 
-    struct EnumConsoleWindowsProcData
+    struct _EnumConsoleWindowsProcData
     {
         TCHAR tchar_buf[256];
         std::vector<HWND> console_window_handles_arr;
@@ -238,7 +284,7 @@ namespace {
 
     BOOL CALLBACK EnumConsoleWindowsProc(HWND hwnd, LPARAM lParam)
     {
-        EnumConsoleWindowsProcData & enum_proc_data = *(EnumConsoleWindowsProcData *)lParam;
+        _EnumConsoleWindowsProcData & enum_proc_data = *(_EnumConsoleWindowsProcData *)lParam;
 
         enum_proc_data.tchar_buf[0] = _T('\0');
 
@@ -251,13 +297,28 @@ namespace {
         return TRUE;
     }
 
-    inline HWND _find_parent_process_console_window(DWORD & parent_proc_id)
+    struct _ConsoleWindowOwnerProc
     {
-        EnumConsoleWindowsProcData enum_proc_data;
+        DWORD proc_id;
+        HWND  console_window;   // NULL if not owned
+    };
+
+    // CAUTION:
+    //  Function GetConsoleWindow() returns already inherited console window handle!
+    //  We have to find console window relation through the console windows enumeration.
+    //  If returns NULL, then it means the current process DOES NOT OWN the console window, but nevertheless can have it.
+    //
+    inline HWND _find_console_window_owner_procs(std::vector<_ConsoleWindowOwnerProc> * ancestors_ptr, DWORD & parent_proc_id)
+    {
+        parent_proc_id = (DWORD)-1;
+
+        if (ancestors_ptr) {
+            ancestors_ptr->reserve(64);
+        }
+
+        _EnumConsoleWindowsProcData enum_proc_data;
 
         enum_proc_data.console_window_handles_arr.reserve(256);
-
-        parent_proc_id = (DWORD)-1;
 
         if (!EnumWindows(&EnumConsoleWindowsProc, (LPARAM)&enum_proc_data)) {
             return NULL;
@@ -267,11 +328,20 @@ namespace {
             return NULL;
         }
 
-        HWND ret = NULL;
+        HWND current_proc_console_window = NULL;
 
         DWORD console_window_proc_id;
         HANDLE proc_list_handle = INVALID_HANDLE_VALUE;
         const DWORD current_proc_id = GetCurrentProcessId();
+
+        for (auto console_window_handle : enum_proc_data.console_window_handles_arr) {
+            console_window_proc_id = (DWORD)-1;
+            GetWindowThreadProcessId(console_window_handle, &console_window_proc_id);
+            if (console_window_proc_id == current_proc_id) {
+                current_proc_console_window = console_window_handle;
+                break;
+            }
+        }
 
         [&]() { __try {
             [&]() {
@@ -280,17 +350,36 @@ namespace {
                 pe.dwSize = sizeof(PROCESSENTRY32);
 
                 if (Process32First(proc_list_handle, &pe)) {
+                    bool continue_search_ancestors = false;
+                    DWORD ancestor_proc_id = (DWORD)-1;
+
                     do {
-                        for (auto console_window_handle : enum_proc_data.console_window_handles_arr) {
-                            console_window_proc_id = (DWORD)-1;
-                            GetWindowThreadProcessId(console_window_handle, &console_window_proc_id);
-                            if (console_window_proc_id == pe.th32ParentProcessID) {
-                                parent_proc_id = pe.th32ParentProcessID;
-                                ret = console_window_handle;
-                                return;
+                        if (current_proc_id == pe.th32ProcessID) {
+                            ancestor_proc_id = parent_proc_id = pe.th32ParentProcessID;
+                            if (ancestors_ptr) {
+                                ancestors_ptr->push_back({ parent_proc_id, NULL });
                             }
+                            continue_search_ancestors = true;
+                            break;
                         }
                     } while (Process32Next(proc_list_handle, &pe));
+
+                    if (!ancestors_ptr) return;
+
+                    while (continue_search_ancestors) {
+                        continue_search_ancestors = false;
+
+                        Process32First(proc_list_handle, &pe);
+
+                        do {
+                            if (ancestor_proc_id == pe.th32ProcessID) {
+                                ancestor_proc_id = pe.th32ParentProcessID;
+                                ancestors_ptr->push_back({ ancestor_proc_id, NULL });
+                                continue_search_ancestors = true;
+                                break;
+                            }
+                        } while (Process32Next(proc_list_handle, &pe));
+                    }
                 }
             }();
         }
@@ -298,7 +387,21 @@ namespace {
             _close_handle(proc_list_handle);
         } }();
 
-        return ret;
+        if (ancestors_ptr && parent_proc_id != -1) {
+            for (auto console_window_handle : enum_proc_data.console_window_handles_arr) {
+                console_window_proc_id = (DWORD)-1;
+                GetWindowThreadProcessId(console_window_handle, &console_window_proc_id);
+
+                for (auto & ancestor_console_window_owner_proc : *ancestors_ptr) {
+                    if (console_window_proc_id == ancestor_console_window_owner_proc.proc_id) {
+                        ancestor_console_window_owner_proc.console_window = console_window_handle;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return current_proc_console_window;
     }
 
     inline bool _is_process_elevated()
