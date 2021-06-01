@@ -205,8 +205,8 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         Can not be used together with another `/reopen-stderr-as-*` option.
         Can not be used together with the `/stderr-dup` option.
 
-      /reopen-std[out|err]-append
-        Append instead of rewrite into reopened stdout/stderr.
+      /reopen-std[out|err]-truncate
+        Truncate instead of append on stdout/stderr reopen.
 
       /std[out|err]-dup <fileno>
         Duplicate the standard respective handle from another one, where the
@@ -215,11 +215,10 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         If is used after a respective `/reopen-std[out|err] <file>` option,
         then has the same behaviour as a sequence of respective
         `/reopen-stdout` or `/reopen-stderr` options with the same `<file>`
-        and so can be used intead.
+        and so can be used instead.
 
         Can not be used together with the same `/reopen-std[out|err]`
         option.
-
 
       /stdin-output-flush
         Flush after each write into an output handle connected with the
@@ -228,15 +227,30 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       /std[out|err]-flush
         Flush after each write into the process stdout/stderr.
 
+      /output-flush
+        Flush after each write into the process stdout or stderr.
+
+      /inout-flush
+        Flush after each write into an output handle connected with the
+        process stdin or into the process stdout or stderr.
+
       /tee-std[in|out|err] <file>
-        Duplicate standard stream to a file `<file>`.
+        Duplicate standard stream to a tee file `<file>`.
         Can be used together with another `/tee-std[in|out|err]-to-*` flag.
 
-      /tee-std[in|out|err]-append
-        Append instead of rewrite into a file `<file>`.
+      /tee-std[in|out|err]-truncate
+        Truncate instead of append on a tee file `<file>` open.
 
       /tee-std[in|out|err]-file-flush
-        Flush after each write into a file `<file>.
+        Flush after each write into a tee file `<file>.
+
+      /tee-output-flush
+        Flush after each write into a tee file `<file> connected with the
+        process stdout or stderr.
+
+      /tee-inout-flush
+        Flush after each write into a tee file `<file> connected with the
+        process stdin or stdout or stderr.
 
       /tee-std[in|out|err]-pipe-buf-size <size>
         Anonymous pipe buffer size in bytes attached directly to the
@@ -253,40 +267,58 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         Must be used after a respective `/tee-std[in|out|err] <file>` option.
         Has the same behaviour as a sequence of respective `/tee-stdin`,
         `/tee-stdout` or `/tee-stderr` options with the same `<file>` and so
-        can be used intead.
+        can be used instead.
 
       /mutex-std-writes
-        Mutual exclude stdout/stderr writes.
+        In case of a write into reopened standard handle opened from a file
+        does mutual excluded write into the same file from different
+        processes.
+        Each unique absolute file path associated with an unique mutex.
+        The handle moves to the end each time after the mutex is locked to
+        guarantee write into the file end between processes.
+        Has no effect in case of a write into not reopened (inherited)
+        standard handle. In this case synchronization depends on the Win32 API
+        and basically happens when all writes does perform on the same handle
+        (for example, when stderr has duplicated from stdout). If handles are
+        different (each opened separately from the same file), then there is
+        can be non synchronized writes.
 
-      /mutex-tee-file-writes <handles>
-        Mutual exclude tee file writes of duplicated stdin/stdout/stderr,
-        where <handles> - colon separated number list of standard handles to
-        be associated with exclusive write, ex: `0:1:2`.
+      /mutex-tee-file-writes
+        Does mutual excluded write into the same file from different
+        processes.
+        Each unique absolute file path associated with an unique mutex.
+        The handle moves to the end each time after the mutex is locked to
+        guarantee write into the file end between processes.
 
       /create-child-console
         CreateProcess
           Create new console for a child process instead of reuse the parent
           process console if exists.
         ShellExecute
-          Avoid use
+          Removes usage of the SEE_MASK_NO_CONSOLE flag.
+          Without this flag a child inherits the parent's console.
 
-      /detach-console
-        Detach console from the process before start of a child process.
+      /create-console
+        Create current process console if not exists. If current process
+        console exists, owned and not visible, then recreates console.
+        If current process console exists and not owned (inherited), then
+        creates new console. Has no effect if current process console already
+        exists, owned and visible.
+        Has priority over the `/attach-parent-console` flag.
+
+      /create-console-title <title>
+        Change console window title on the current process console creation or
+        recreation. Has no effect if the current process console is not owned.
+
+      /own-console-title <title>
+        Change console window title if the current process console is owned.
+        Has no effect on inherited console.
 
       /attach-parent-console
-        Attach console from the parent process before start of a child
-        process. If the current process already has a console, then detaches
-        it at first (no need to use `/detach-console` flag).
-
-      /use-parent-console
-        CreateProcess
-          Has no effect.
-        ShellExecute
-          Use SEE_MASK_NO_CONSOLE flag.
-          Use to inherit the parent's console for the new process instead of
-          having it create a new console.
-
-        Overrides `/create-child-console` flag.
+        Attach console from the parent process or it's ancestors. If the
+        current process console is owned, then detaches it at first. Has no
+        effect if the current process exists but not owned (inherited).
+        Has no effect if the `/create-console` is used.
 
       /stdin-echo <0|1>
         Explicitly enable or disable console input buffer echo before start
@@ -314,6 +346,14 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       /eval-dbl-backslash-esc or /e\\
         Evaluate double backslash escape characters:
           \\ = backslash
+
+    Special flags:
+      /disable-conout-reattach-to-visible-console
+        In case if the current process console is not visible and parent
+        process console is visible, then before print any output the
+        application tries to attach to the parent process console to enable
+        the user to read futher output into console before a child process
+        start. To disable that use this flag.
 
     <ApplicationNameFormatString>, <CommandLineFormatString>,
     <FilePathFormatString>, <ParametersFormatString>,
@@ -384,14 +424,22 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
     Last 3 examples must be typed in the cmd.exe console window.
 
   Examples (ShellExecute):
-    1. callf.exe /shell-exec open /no-sys-dialog-ui /use-parent-console "${COMSPEC}" "/k"
-    2. callf.exe /shell-exec runas /no-sys-dialog-ui "${COMSPEC}" "/k"
-    3. callf.exe /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console \"\" \"\\\"${COMSPEC}\\\" /k"
+    1. callf.exe /shell-exec open /no-sys-dialog-ui "${COMSPEC}" "/k"
+    2. callf.exe /shell-exec open /no-sys-dialog-ui /attach-parent-console "${COMSPEC}" "/k"
+    3. callf.exe /shell-exec open /no-sys-dialog-ui /create-child-console "${COMSPEC}" "/k"
+    4. callf.exe /shell-exec open /no-sys-dialog-ui "callf.exe" "/create-console \"\" \"\\\"${COMSPEC}\\\" /k"
 
-    Example #1 must be run in the same console.
+    5. callf.exe /shell-exec runas /no-sys-dialog-ui "${COMSPEC}" "/k"
+    6. callf.exe /shell-exec runas /no-sys-dialog-ui /attach-parent-console "${COMSPEC}" "/k"
+    7. callf.exe /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "\"\" \"\\\"${COMSPEC}\\\" /k"
+    8. callf.exe /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console \"\" \"\\\"${COMSPEC}\\\" /k"
 
-    Example #2 must request the Administrator permission to execute in the
-    new (child) console.
+    Example #1 and #2 must be run in the same console.
 
-    Example #3 must request the Administrator permission to execute in the
-    existing (parent) console.
+    Example #3 and #4 must be run in the new (child) console.
+
+    Example #5 and #6 must request the Administrator permission to execute in
+    the new (child) console.
+
+    Example #7 and #8 must request the Administrator permission to execute in
+    the existing (parent) console.

@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 //#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 
 #include <windows.h>
@@ -20,22 +20,32 @@
 //#error Unicode is not supported.
 //#endif
 
+// std and tee files has different mutex name prefixes because should not be mixed for write
+#define STD_FILE_WRITE_MUTEX_NAME_PREFIX    "{12FBACAA-9C0D-460F-9B69-5FB8EB747B5C}"
+#define TEE_FILE_WRITE_MUTEX_NAME_PREFIX    "{C50E64BC-9A9F-4507-9B77-4446319A556E}"
+
 namespace {
     struct _Flags
     {
         // NOTE: the `tee` applies only to the child process here!
         //
-        bool            stdin_output_flush;
+        bool            disable_conout_reattach_to_visible_console;
+        bool            disable_conout_duplicate_to_parent_console;
+        bool            stdin_output_flush;             // flush handle connected with stdin input
         bool            stdout_flush;
         bool            stderr_flush;
-        bool            reopen_stdout_file_append;
-        bool            reopen_stderr_file_append;
-        bool            tee_stdin_file_append;
-        bool            tee_stdout_file_append;
-        bool            tee_stderr_file_append;
+        bool            output_flush;                   // flush stdout and stderr
+        bool            inout_flush;                    // flush handle connected with stdin input and flush stdout and stderr
+        bool            reopen_stdout_file_truncate;
+        bool            reopen_stderr_file_truncate;
+        bool            tee_stdin_file_truncate;
+        bool            tee_stdout_file_truncate;
+        bool            tee_stderr_file_truncate;
         bool            tee_stdin_file_flush;
         bool            tee_stdout_file_flush;
         bool            tee_stderr_file_flush;
+        bool            tee_output_flush;               // flush stdout and stderr for tee files and pipes
+        bool            tee_inout_flush;                // flush stdin and stdout and stderr for tee files and pipes
         bool            ret_create_proc;
         bool            ret_win_error;
         bool            ret_child_exit;
@@ -48,15 +58,21 @@ namespace {
         bool            no_expand_env;                  // don't expand `${...}` environment variables
         bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
         bool            shell_exec_expand_env;
-        bool            detach_console;
+        bool            create_child_console;
+        bool            create_console;                 // has priority over attach_parent_console
         bool            attach_parent_console;
-        bool            use_parent_console;             // has meaning only for ShellExecute, overrides create_child_console
-        bool            create_child_console;           // has meaning only for CreateProcess
         bool            eval_backslash_esc;             // evaluate backslash escape characters
         bool            eval_dbl_backslash_esc;         // evaluate double backslash escape characters (`\\`)
         bool            init_com;
         bool            wait_child_start;
         bool            mutex_std_writes;
+        bool            mutex_tee_file_writes;
+    };
+
+    struct _OptionsHas
+    {
+        bool            create_console_title;
+        bool            own_console_title;
     };
 
     struct _Options
@@ -69,7 +85,8 @@ namespace {
         std::tstring    tee_stdin_to_file;              // has meaning for stdin as disk or pipe handle, does ignore for console input
         std::tstring    tee_stdout_to_file;
         std::tstring    tee_stderr_to_file;
-        std::tstring    mutex_tee_file_writes;
+        std::tstring    create_console_title;
+        std::tstring    own_console_title;
         int             stdout_dup;
         int             stderr_dup;
         int             tee_stdin_dup;
@@ -86,13 +103,15 @@ namespace {
         int             tee_stderr_read_buf_size;
         int             stdin_echo;
         unsigned int    show_as;
+
+        _OptionsHas     has;
     };
 
     _Flags g_flags                      = {};
     _Options g_options                  = {
         {}, {},
         {}, {}, {}, {}, {}, {},
-        {},
+        {}, {},
 
         -1, -1, -1, -1, -1,
 
@@ -103,33 +122,36 @@ namespace {
         // 64K read buffer by default
         65536, 65536, 65536,
 
-        -1, SW_SHOWNORMAL
+        -1, SW_SHOWNORMAL,
+
+        {}
     };
 
     DWORD g_parent_proc_id                  = -1;
-
-    bool g_enable_conout_reattach_to_visible_console = true; // by default
-    bool g_is_enable_conout_reattach_to_visible_console_applied = false;
+    HWND  g_current_proc_console_window     = NULL;
+    HWND  g_parent_proc_console_window      = NULL;
 
     HANDLE g_stdin_handle                   = INVALID_HANDLE_VALUE;
     HANDLE g_stdout_handle                  = INVALID_HANDLE_VALUE;
     HANDLE g_stderr_handle                  = INVALID_HANDLE_VALUE;
 
-    HANDLE g_stdin_orig_console_handle      = INVALID_HANDLE_VALUE;
-    HANDLE g_stdout_orig_console_handle     = INVALID_HANDLE_VALUE;
-    HANDLE g_stderr_orig_console_handle     = INVALID_HANDLE_VALUE;
-
     HANDLE g_reopen_stdin_handle            = INVALID_HANDLE_VALUE;
     HANDLE g_reopen_stdout_handle           = INVALID_HANDLE_VALUE;
     HANDLE g_reopen_stderr_handle           = INVALID_HANDLE_VALUE;
 
-    std::tstring g_reopen_stdin_full_name   = {};
+    HANDLE g_reopen_stdout_mutex            = INVALID_HANDLE_VALUE;
+    HANDLE g_reopen_stderr_mutex            = INVALID_HANDLE_VALUE;
+
     std::tstring g_reopen_stdout_full_name  = {};
     std::tstring g_reopen_stderr_full_name  = {};
 
     HANDLE g_tee_stdin_handle               = INVALID_HANDLE_VALUE;
     HANDLE g_tee_stdout_handle              = INVALID_HANDLE_VALUE;
     HANDLE g_tee_stderr_handle              = INVALID_HANDLE_VALUE;
+
+    HANDLE g_tee_stdin_mutex                = INVALID_HANDLE_VALUE;
+    HANDLE g_tee_stdout_mutex               = INVALID_HANDLE_VALUE;
+    HANDLE g_tee_stderr_mutex               = INVALID_HANDLE_VALUE;
 
     std::tstring g_tee_stdin_full_name      = {};
     std::tstring g_tee_stdout_full_name     = {};
@@ -148,10 +170,6 @@ namespace {
 
     HANDLE g_child_process_handle           = INVALID_HANDLE_VALUE;
     DWORD g_child_process_group_id          = -1; // to pass signals into child process
-
-    CRITICAL_SECTION g_std_write_crsec      = {};
-    CRITICAL_SECTION g_tee_file_write_crsec = {};
-    bool g_tee_file_write_crsec_enabled[3]  = { false, false, false };
 
     struct _StreamPipeThreadData
     {
@@ -266,21 +284,23 @@ namespace {
                         if (num_bytes_read) {
                             if (g_tee_stdin_handle) {
                                 [&]() { if_break(true) __try {
-                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
-                                        EnterCriticalSection(&g_tee_file_write_crsec);
+                                    if (_is_valid_handle(g_tee_stdin_mutex)) {
+                                        WaitForSingleObject(g_tee_stdin_mutex, INFINITE);
                                     }
+
+                                    SetFilePointer(g_tee_stdin_handle, 0, NULL, FILE_END);
 
                                     WriteFile(g_tee_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 
-                                    if (g_flags.tee_stdin_file_flush) {
+                                    if (g_flags.tee_stdin_file_flush || g_flags.tee_inout_flush) {
                                         FlushFileBuffers(g_tee_stdin_handle);
                                         if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
                                     }
                                 }
                                 __finally {
-                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
-                                        LeaveCriticalSection(&g_tee_file_write_crsec);
+                                    if (_is_valid_handle(g_tee_stdin_mutex)) {
+                                        ReleaseMutex(g_tee_stdin_mutex);
                                     }
                                 } }();
                             }
@@ -288,7 +308,7 @@ namespace {
                             if (_is_valid_handle(g_stdin_pipe_write_handle)) {
                                 SetLastError(0); // just in case
                                 if (WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
-                                    if (g_flags.stdin_output_flush) {
+                                    if (g_flags.stdin_output_flush || g_flags.inout_flush) {
                                         FlushFileBuffers(g_stdin_pipe_write_handle);
                                     }
 
@@ -375,21 +395,23 @@ namespace {
                         if (num_bytes_read) {
                             if (g_tee_stdin_handle) {
                                 [&]() { if_break(true) __try {
-                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
-                                        EnterCriticalSection(&g_tee_file_write_crsec);
+                                    if (_is_valid_handle(g_tee_stdin_mutex)) {
+                                        WaitForSingleObject(g_tee_stdin_mutex, INFINITE);
                                     }
+
+                                    SetFilePointer(g_tee_stdin_handle, 0, NULL, FILE_END);
 
                                     WriteFile(g_tee_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 
-                                    if (g_flags.tee_stdin_file_flush) {
+                                    if (g_flags.tee_stdin_file_flush || g_flags.tee_inout_flush) {
                                         FlushFileBuffers(g_tee_stdin_handle);
                                         if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
                                     }
                                 }
                                 __finally {
-                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
-                                        LeaveCriticalSection(&g_tee_file_write_crsec);
+                                    if (_is_valid_handle(g_tee_stdin_mutex)) {
+                                        ReleaseMutex(g_tee_stdin_mutex);
                                     }
                                 } }();
                             }
@@ -397,7 +419,7 @@ namespace {
                             if (_is_valid_handle(g_stdin_pipe_write_handle)) {
                                 SetLastError(0); // just in case
                                 if (WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
-                                    if (g_flags.stdin_output_flush) {
+                                    if (g_flags.stdin_output_flush || g_flags.inout_flush) {
                                         FlushFileBuffers(g_stdin_pipe_write_handle);
                                     }
 
@@ -550,7 +572,7 @@ namespace {
 //
 //                                                if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 //
-//                                                if (g_flags.tee_stdin_file_flush) {
+//                                                if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
 //                                                    FlushFileBuffers(g_tee_stdin_handle);
 //                                                    if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 //                                                }
@@ -612,21 +634,23 @@ namespace {
                         if (num_bytes_read) {
                             if (g_tee_stdout_handle) {
                                 [&]() { if_break(true) __try {
-                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
-                                        EnterCriticalSection(&g_tee_file_write_crsec);
+                                    if (_is_valid_handle(g_tee_stdout_mutex)) {
+                                        WaitForSingleObject(g_tee_stdout_mutex, INFINITE);
                                     }
+
+                                    SetFilePointer(g_tee_stdout_handle, 0, NULL, FILE_END);
 
                                     WriteFile(g_tee_stdout_handle, &stdout_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 
-                                    if (g_flags.tee_stdout_file_flush) {
+                                    if (g_flags.tee_stdout_file_flush || g_flags.tee_output_flush || g_flags.tee_inout_flush) {
                                         FlushFileBuffers(g_tee_stdout_handle);
                                         if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
                                     }
                                 }
                                 __finally {
-                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
-                                        LeaveCriticalSection(&g_tee_file_write_crsec);
+                                    if (_is_valid_handle(g_tee_stdout_mutex)) {
+                                        ReleaseMutex(g_tee_stdout_mutex);
                                     }
                                 } }();
 
@@ -635,13 +659,17 @@ namespace {
 
                             if (_is_valid_handle(g_stdout_handle)) {
                                 [&]() { if_break(true) __try {
-                                    if (g_flags.mutex_std_writes) {
-                                        EnterCriticalSection(&g_std_write_crsec);
+                                    if (_is_valid_handle(g_reopen_stdout_mutex)) {
+                                        WaitForSingleObject(g_reopen_stdout_mutex, INFINITE);
+                                    }
+
+                                    if (_is_valid_handle(g_reopen_stdout_handle)) {
+                                        SetFilePointer(g_reopen_stdout_handle, 0, NULL, FILE_END);
                                     }
 
                                     SetLastError(0); // just in case
                                     if (WriteFile(g_stdout_handle, &stdout_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
-                                        if (g_flags.stdout_flush) {
+                                        if (g_flags.stdout_flush || g_flags.output_flush || g_flags.inout_flush) {
                                             FlushFileBuffers(g_stdout_handle);
                                         }
 
@@ -665,8 +693,8 @@ namespace {
                                     }
                                 }
                                 __finally {
-                                    if (g_flags.mutex_std_writes) {
-                                        LeaveCriticalSection(&g_std_write_crsec);
+                                    if (_is_valid_handle(g_reopen_stdout_mutex)) {
+                                        ReleaseMutex(g_reopen_stdout_mutex);
                                     }
                                 } }();
 
@@ -717,21 +745,23 @@ namespace {
                         if (num_bytes_read) {
                             if (g_tee_stderr_handle) {
                                 [&]() { if_break(true) __try {
-                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
-                                        EnterCriticalSection(&g_tee_file_write_crsec);
+                                    if (_is_valid_handle(g_tee_stderr_mutex)) {
+                                        WaitForSingleObject(g_tee_stderr_mutex, INFINITE);
                                     }
+
+                                    SetFilePointer(g_tee_stderr_handle, 0, NULL, FILE_END);
 
                                     WriteFile(g_tee_stderr_handle, &stderr_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
                                     if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
 
-                                    if (g_flags.tee_stderr_file_flush) {
+                                    if (g_flags.tee_stderr_file_flush || g_flags.tee_output_flush || g_flags.tee_inout_flush) {
                                         FlushFileBuffers(g_tee_stderr_handle);
                                         if (g_stream_pipe_thread_cancel_ios[stream_type]) break;
                                     }
                                 }
                                 __finally {
-                                    if (g_tee_file_write_crsec_enabled[stream_type]) {
-                                        LeaveCriticalSection(&g_tee_file_write_crsec);
+                                    if (_is_valid_handle(g_tee_stderr_mutex)) {
+                                        ReleaseMutex(g_tee_stderr_mutex);
                                     }
                                 } }();
 
@@ -740,13 +770,17 @@ namespace {
 
                             if (_is_valid_handle(g_stderr_handle)) {
                                 [&]() { if_break(true) __try {
-                                    if (g_flags.mutex_std_writes) {
-                                        EnterCriticalSection(&g_std_write_crsec);
+                                    if (_is_valid_handle(g_reopen_stderr_mutex)) {
+                                        WaitForSingleObject(g_reopen_stderr_mutex, INFINITE);
+                                    }
+
+                                    if (_is_valid_handle(g_reopen_stderr_handle)) {
+                                        SetFilePointer(g_reopen_stderr_handle, 0, NULL, FILE_END);
                                     }
 
                                     SetLastError(0); // just in case
                                     if (WriteFile(g_stderr_handle, &stderr_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
-                                        if (g_flags.stderr_flush) {
+                                        if (g_flags.stderr_flush || g_flags.output_flush || g_flags.inout_flush) {
                                             FlushFileBuffers(g_stderr_handle);
                                         }
 
@@ -768,8 +802,8 @@ namespace {
                                     }
                                 }
                                 __finally {
-                                    if (g_flags.mutex_std_writes) {
-                                        LeaveCriticalSection(&g_std_write_crsec);
+                                    if (_is_valid_handle(g_reopen_stderr_mutex)) {
+                                        ReleaseMutex(g_reopen_stderr_mutex);
                                     }
                                 } }();
 
@@ -865,28 +899,8 @@ namespace {
                 }
             }
 
-            // synchronization objects init
-
-            if (g_flags.mutex_std_writes) {
-                InitializeCriticalSection(&g_std_write_crsec);
-            }
-
-            if (!g_options.mutex_tee_file_writes.empty()) {
-                InitializeCriticalSection(&g_tee_file_write_crsec);
-
-                [&]() {
-                    const std::tstring ids_str = std::tstring{ _T(":") } + g_options.mutex_tee_file_writes + _T(":");
-                    if (ids_str.find(_T(":0:")) != std::tstring::npos) {
-                        g_tee_file_write_crsec_enabled[0] = true;
-                    }
-                    if (ids_str.find(_T(":1:")) != std::tstring::npos) {
-                        g_tee_file_write_crsec_enabled[1] = true;
-                    }
-                    if (ids_str.find(_T(":2:")) != std::tstring::npos) {
-                        g_tee_file_write_crsec_enabled[2] = true;
-                    }
-                }();
-            }
+            const UINT cp_in = GetConsoleCP();
+            const UINT cp_out = GetConsoleOutputCP();
 
             // reopen std
 
@@ -923,13 +937,29 @@ namespace {
                 if (_is_valid_handle(g_reopen_stdout_handle =
                         CreateFile(options.reopen_stdout_as_file.c_str(),
                             GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa,
-                            !flags.reopen_stdout_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
+                            flags.reopen_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                             FILE_ATTRIBUTE_NORMAL, NULL))) {
+                    if (!flags.reopen_stdout_file_truncate) {
+                        SetFilePointer(g_reopen_stdout_handle, 0, NULL, FILE_END);
+                    }
+
                     tmp_buf.resize(MAX_PATH);
                     tmp_buf[0] = _T('\0');
                     const DWORD num_chars = GetFullPathName(options.reopen_stdout_as_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
                     g_reopen_stdout_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
 
+                    [&]() {
+                        g_reopen_stdout_full_name = _to_lower(g_reopen_stdout_full_name, cp_in);
+
+                        // create associated write mutex
+                        if (g_flags.mutex_std_writes) {
+                            // generate file name hash
+                            const uint64_t reopen_stdout_file_name_hash = _hash_string_to_u64(g_reopen_stdout_full_name, cp_in);
+
+                            g_reopen_stdout_mutex = CreateMutex(NULL, FALSE,
+                                (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(reopen_stdout_file_name_hash)).c_str());
+                        }
+                    }();
                 }
                 else {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
@@ -960,6 +990,19 @@ namespace {
                 const DWORD num_chars = GetFullPathName(options.reopen_stderr_as_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
                 g_reopen_stderr_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
 
+                [&]() {
+                    g_reopen_stderr_full_name = _to_lower(g_reopen_stderr_full_name, cp_in);
+
+                    // create associated write mutex
+                    if (g_flags.mutex_std_writes) {
+                        // generate file name hash
+                        const uint64_t reopen_stderr_file_name_hash = _hash_string_to_u64(g_reopen_stderr_full_name, cp_in);
+
+                        g_reopen_stdout_mutex = CreateMutex(NULL, FALSE,
+                            (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(reopen_stderr_file_name_hash)).c_str());
+                    }
+                }();
+
                 // compare full names and if equal, then duplicate instead create
                 if (_is_valid_handle(g_reopen_stdout_handle)) {
                     if (g_reopen_stdout_full_name == g_reopen_stderr_full_name) {
@@ -988,11 +1031,16 @@ namespace {
 
                 if (!_is_valid_handle(g_reopen_stderr_handle)) {
                     SetLastError(0); // just in case
-                    if (!_is_valid_handle(g_reopen_stderr_handle =
-                        CreateFile(options.reopen_stderr_as_file.c_str(),
-                            GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa,
-                            !flags.reopen_stderr_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
-                            FILE_ATTRIBUTE_NORMAL, NULL))) {
+                    if (_is_valid_handle(g_reopen_stderr_handle =
+                            CreateFile(options.reopen_stderr_as_file.c_str(),
+                                GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa,
+                                flags.reopen_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
+                                FILE_ATTRIBUTE_NORMAL, NULL))) {
+                        if (!flags.reopen_stderr_file_truncate) {
+                            SetFilePointer(g_reopen_stderr_handle, 0, NULL, FILE_END);
+                        }
+                    }
+                    else {
                         if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                             win_error = GetLastError();
                         }
@@ -1023,12 +1071,29 @@ namespace {
                 if (_is_valid_handle(g_tee_stdin_handle =
                         CreateFile(options.tee_stdin_to_file.c_str(),
                             GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                            !flags.tee_stdin_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
+                            flags.tee_stdin_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                             FILE_ATTRIBUTE_NORMAL, NULL))) {
+                    if (!flags.tee_stdin_file_truncate) {
+                        SetFilePointer(g_tee_stdin_handle, 0, NULL, FILE_END);
+                    }
+
                     tmp_buf.resize(MAX_PATH);
                     tmp_buf[0] = _T('\0');
                     const DWORD num_chars = GetFullPathName(options.tee_stdin_to_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
                     g_tee_stdin_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+
+                    [&]() {
+                        g_tee_stdin_full_name = _to_lower(g_tee_stdin_full_name, cp_in);
+
+                        // create associated write mutex
+                        if (g_flags.mutex_tee_file_writes) {
+                            // generate file name hash
+                            const uint64_t tee_stdin_file_name_hash = _hash_string_to_u64(g_tee_stdin_full_name, cp_in);
+
+                            g_tee_stdin_mutex = CreateMutex(NULL, FALSE,
+                                (std::tstring(_T(TEE_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(tee_stdin_file_name_hash)).c_str());
+                        }
+                    }();
                 }
                 else {
                     if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
@@ -1056,6 +1121,19 @@ namespace {
                 tmp_buf[0] = _T('\0');
                 const DWORD num_chars = GetFullPathName(options.tee_stdout_to_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
                 g_tee_stdout_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+
+                [&]() {
+                    g_tee_stdout_full_name = _to_lower(g_tee_stdout_full_name, cp_in);
+
+                    // create associated write mutex
+                    if (g_flags.mutex_tee_file_writes) {
+                        // generate file name hash
+                        const uint64_t tee_stdout_file_name_hash = _hash_string_to_u64(g_tee_stdout_full_name, cp_in);
+
+                        g_tee_stdout_mutex = CreateMutex(NULL, FALSE,
+                            (std::tstring(_T(TEE_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(tee_stdout_file_name_hash)).c_str());
+                    }
+                }();
 
                 // compare full names and if equal, then duplicate instead create
                 if (_is_valid_handle(g_tee_stdin_handle)) {
@@ -1085,11 +1163,16 @@ namespace {
 
                 if (!_is_valid_handle(g_tee_stdout_handle)) {
                     SetLastError(0); // just in case
-                    if (!_is_valid_handle(g_tee_stdout_handle =
+                    if (_is_valid_handle(g_tee_stdout_handle =
                             CreateFile(options.tee_stdout_to_file.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                                !flags.tee_stdout_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
+                                flags.tee_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                                 FILE_ATTRIBUTE_NORMAL, NULL))) {
+                        if (!flags.tee_stdout_file_truncate) {
+                            SetFilePointer(g_tee_stdout_handle, 0, NULL, FILE_END);
+                        }
+                    }
+                    else {
                         if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                             win_error = GetLastError();
                         }
@@ -1116,6 +1199,19 @@ namespace {
                 tmp_buf[0] = _T('\0');
                 const DWORD num_chars = GetFullPathName(options.tee_stderr_to_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
                 g_tee_stderr_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+
+                [&]() {
+                    g_tee_stderr_full_name = _to_lower(g_tee_stderr_full_name, cp_in);
+
+                    // create associated write mutex
+                    if (g_flags.mutex_tee_file_writes) {
+                        // generate file name hash
+                        const uint64_t tee_stderr_file_name_hash = _hash_string_to_u64(g_tee_stderr_full_name, cp_in);
+
+                        g_tee_stderr_mutex = CreateMutex(NULL, FALSE,
+                            (std::tstring(_T(TEE_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(tee_stderr_file_name_hash)).c_str());
+                    }
+                }();
 
                 // compare full names and if equal, then duplicate instead create
                 if (_is_valid_handle(g_tee_stdout_handle)) {
@@ -1172,11 +1268,16 @@ namespace {
 
                 if (!_is_valid_handle(g_tee_stderr_handle)) {
                     SetLastError(0); // just in case
-                    if (!_is_valid_handle(g_tee_stderr_handle =
+                    if (_is_valid_handle(g_tee_stderr_handle =
                             CreateFile(options.tee_stderr_to_file.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                                !flags.tee_stderr_file_append ? CREATE_ALWAYS : OPEN_ALWAYS,
+                                flags.tee_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                                 FILE_ATTRIBUTE_NORMAL, NULL))) {
+                        if (!flags.tee_stderr_file_truncate) {
+                            SetFilePointer(g_tee_stderr_handle, 0, NULL, FILE_END);
+                        }
+                    }
+                    else {
                         if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
                             win_error = GetLastError();
                         }
@@ -1429,7 +1530,7 @@ namespace {
             //    SetLastError(0); // just in case
             //    CreateNamedPipe(pipe.c_str(), PIPE_ACCESS_OUTBOUND, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
             //        1, )
-            //    g_tee_stdin_handle = _tfsopen(options.tee_stdin_to_file.c_str(), !flags.tee_stdin_file_append ? _T("wb") : _T("ab"), _SH_DENYNO);
+            //    g_tee_stdin_handle = _tfsopen(options.tee_stdin_to_file.c_str(), flags.tee_stdin_file_truncate ? _T("wb") : _T("ab"), _SH_DENYNO);
             //    if (!g_tee_stdin_handle) {
             //        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
             //            win_error = GetLastError();
@@ -1775,28 +1876,6 @@ namespace {
             ret = err_none;
             DWORD ret_create_proc = 0;
 
-            if (!g_is_enable_conout_reattach_to_visible_console_applied) {
-                if (flags.detach_console) {
-                    FreeConsole(); // required before AttachConsole
-                }
-
-                if (flags.attach_parent_console) {
-                    /*const DWORD parent_proc_id = g_parent_proc_id != -1 ? g_parent_proc_id : _find_parent_process_id();
-                    if (parent_proc_id != -1)*/ {
-                        // found
-                        if (!flags.detach_console) {
-                            FreeConsole(); // required before AttachConsole
-                        }
-
-                        //AttachConsole(parent_proc_id);
-                        AttachConsole(ATTACH_PARENT_PROCESS);
-                    }
-                }
-                else if (flags.detach_console) {
-                    AllocConsole(); // required after FreeConsole
-                }
-            }
-
             // CAUTION:
             //  DO NOT USE `CREATE_NEW_PROCESS_GROUP` flag in the `CreateProcess`, otherwise a child process would ignore all signals.
             //
@@ -1843,7 +1922,7 @@ namespace {
                     if (flags.no_sys_dialog_ui) {
                         sei.fMask |= SEE_MASK_FLAG_NO_UI;
                     }
-                    if (flags.use_parent_console) {
+                    if (!flags.create_child_console) {
                         sei.fMask |= SEE_MASK_NO_CONSOLE;
                     }
                     if (flags.no_wait) {
@@ -2099,9 +2178,13 @@ namespace {
             _close_handle(pi.hThread);
             _close_handle(g_child_process_handle, pi.hProcess);
 
-            // delete critical sections
-            DeleteCriticalSection(&g_std_write_crsec);
-            DeleteCriticalSection(&g_tee_file_write_crsec);
+            // close mutexes
+            _close_handle(g_reopen_stdout_mutex);
+            _close_handle(g_reopen_stderr_mutex);
+
+            _close_handle(g_tee_stdin_mutex);
+            _close_handle(g_tee_stdout_mutex);
+            _close_handle(g_tee_stderr_mutex);
         } }();
 
         return ret;
@@ -2119,10 +2202,9 @@ int _tmain(int argc, const TCHAR * argv[])
     }
 
     // NOTE:
-    //  While the current process being started it's console can be hidden by the CreateProcess/ShellExecute in the parent process.
-    //  So we have to check stdout/stderr attachment to the current process hidden console window from here and if it is happened and
-    //  the parent process console is visible, then make temporary redirection of respective stdout/stderr handles into the
-    //  parent console, until the `/attach-parent-console` flag would be applied.
+    //  While the current process being started it's console can be hidden by the CreateProcess/ShellExecute from the parent process.
+    //  So we have to check the current process console window on visibility and if it is not exist or not visible and
+    //  the parent process console is visible, then make temporary reattachment to a parent process console.
     //  Otherwise the output into the stdout/stderr from here won't be visible by the user until the `/attach-parent-console` flag is
     //  applied.
     //  If you don't want such behaviour, then you have to use the `/disable-conout-reattach-to-visible-console` flag.
@@ -2139,28 +2221,142 @@ int _tmain(int argc, const TCHAR * argv[])
         arg = argv[arg_offset];
 
         if (!tstrcmp(arg, _T("/disable-conout-reattach-to-visible-console"))) {
-            g_enable_conout_reattach_to_visible_console = false;
+            g_flags.disable_conout_reattach_to_visible_console = true;
         }
-        else if (!tstrcmp(arg, _T("/detach-console"))) {
-            detach_console = true;
+        if (!tstrcmp(arg, _T("/disable-conout-duplicate-to-parent-console"))) {
+            g_flags.disable_conout_duplicate_to_parent_console = true;
+        }
+        else if (!tstrcmp(arg, _T("/create-console"))) {
+            g_flags.create_console = true;
+        }
+        else if (!tstrcmp(arg, _T("/create-console-title"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                g_options.create_console_title = arg;
+                g_options.has.create_console_title = true;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/own-console-title"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                g_options.own_console_title = arg;
+                g_options.has.own_console_title = true;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/attach-parent-console"))) {
+            g_flags.attach_parent_console = true;
         }
 
         arg_offset += 1;
     }
 
-    if (g_enable_conout_reattach_to_visible_console) {
-        // check current process console visibility
-        HWND console_window = GetConsoleWindow();
-        if (console_window == NULL || !IsWindowVisible(console_window)) {
-            // reattach to parent process console window
-            HWND parent_console_window_handle =  _find_parent_process_console_window(g_parent_proc_id);
-            if (parent_console_window_handle != NULL && IsWindowVisible(parent_console_window_handle)) {
-                g_is_enable_conout_reattach_to_visible_console_applied = true;
+    bool is_conout_reattached_to_visible_console = false;
+    bool is_console_window_inited = false;
 
-                FreeConsole(); // required before AttachConsole
+    std::vector<_ConsoleWindowOwnerProc> console_window_owner_procs;
 
-                //AttachConsole(g_parent_proc_id);
-                AttachConsole(ATTACH_PARENT_PROCESS);
+    if (!g_flags.disable_conout_reattach_to_visible_console) {
+        // check if console is not visible
+        HWND inherited_console_window = GetConsoleWindow();
+        if (inherited_console_window && !IsWindowVisible(inherited_console_window)) {
+            if (g_flags.create_console) {
+                // check if console can be just unhided
+                g_current_proc_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
+                is_console_window_inited = true;
+
+                is_conout_reattached_to_visible_console = true;
+
+                if (!g_current_proc_console_window) {
+                    FreeConsole();
+                    AllocConsole();
+                }
+
+                if (g_options.has.create_console_title) {
+                    SetConsoleTitle(g_options.create_console_title.c_str());
+                }
+                else if (g_options.has.own_console_title) {
+                    SetConsoleTitle(g_options.own_console_title.c_str());
+                }
+
+                // update visibility state
+                inherited_console_window = GetConsoleWindow();
+                ShowWindow(inherited_console_window, SW_SHOW);
+                ShowWindow(inherited_console_window, SW_SHOW); // WTF: second ShowWindow (not UpdateWindow) is required, otherwise does not show in Release
+            }
+            else {
+                // check if parent process console can be attached and visible
+                g_current_proc_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
+                is_console_window_inited = true;
+
+                _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
+
+                // search ancestor console window owner process
+                for (const auto & console_window_owner_proc : console_window_owner_procs) {
+                    if (console_window_owner_proc.console_window) {
+                        ancestor_console_window_owner_proc = console_window_owner_proc;
+                        break;
+                    }
+                }
+
+                if (ancestor_console_window_owner_proc.console_window &&
+                    inherited_console_window != ancestor_console_window_owner_proc.console_window &&
+                    IsWindowVisible(ancestor_console_window_owner_proc.console_window) &&
+                    ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
+                    // reattach to parent process console window
+                    is_conout_reattached_to_visible_console = true;
+
+                    FreeConsole();
+                    AttachConsole(ancestor_console_window_owner_proc.proc_id);
+                }
+            }
+        }
+    }
+
+    if (!is_conout_reattached_to_visible_console) {
+        if (g_flags.create_console) {
+            // check if the current process console existence
+            if (!is_console_window_inited) {
+                g_current_proc_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
+            }
+
+            if (!g_current_proc_console_window) {
+                HWND inherited_console_window = GetConsoleWindow();
+                if (inherited_console_window) {
+                    FreeConsole();
+                }
+                AllocConsole();
+
+                if (g_options.has.create_console_title) {
+                    SetConsoleTitle(g_options.create_console_title.c_str());
+                }
+                else if (g_options.has.own_console_title) {
+                    SetConsoleTitle(g_options.own_console_title.c_str());
+                }
+            }
+        }
+        else if (g_flags.attach_parent_console) {
+            // check if the current process console can be attached
+            HWND inherited_console_window = GetConsoleWindow();
+            g_current_proc_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
+
+            _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
+
+            // search ancestor console window owner process
+            for (const auto & console_window_owner_proc : console_window_owner_procs) {
+                if (console_window_owner_proc.console_window) {
+                    ancestor_console_window_owner_proc = console_window_owner_proc;
+                    break;
+                }
+            }
+
+            if (ancestor_console_window_owner_proc.console_window &&
+                inherited_console_window != ancestor_console_window_owner_proc.console_window &&
+                ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
+                // reattach to parent process console window
+                is_conout_reattached_to_visible_console = true;
+
+                FreeConsole();
+                AttachConsole(ancestor_console_window_owner_proc.proc_id);
             }
         }
     }
@@ -2314,17 +2510,38 @@ int _tmain(int argc, const TCHAR * argv[])
                 return err_invalid_format;
             }
         }
-        else if (!tstrcmp(arg, _T("/detach-console"))) {
-            g_flags.detach_console = true;
-        }
-        else if (!tstrcmp(arg, _T("/attach-parent-console"))) {
-            g_flags.attach_parent_console = true;
-        }
-        else if (!tstrcmp(arg, _T("/use-parent-console"))) {
-            g_flags.use_parent_console = true;
-        }
         else if (!tstrcmp(arg, _T("/create-child-console"))) {
             g_flags.create_child_console = true;
+        }
+        else if (!tstrcmp(arg, _T("/create-console"))) {
+            // ignore
+        }
+        else if (!tstrcmp(arg, _T("/create-console-title"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                // ignore
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/own-console-title"))) {
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                // ignore
+            }
+            else {
+                if (!g_flags.no_print_gen_error_string) {
+                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
+                }
+                return err_invalid_format;
+            }
+        }
+        else if (!tstrcmp(arg, _T("/attach-parent-console"))) {
+            // ignore
         }
         else if (!tstrcmp(arg, _T("/reopen-stdin"))) {
             arg_offset += 1;
@@ -2437,20 +2654,26 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/stderr-flush"))) {
             g_flags.stderr_flush = true;
         }
-        else if (!tstrcmp(arg, _T("/reopen-stdout-append"))) {
-            g_flags.reopen_stdout_file_append = true;
+        else if (!tstrcmp(arg, _T("/output-flush"))) {
+            g_flags.output_flush = true;
         }
-        else if (!tstrcmp(arg, _T("/reopen-stderr-append"))) {
-            g_flags.reopen_stderr_file_append = true;
+        else if (!tstrcmp(arg, _T("/inout-flush"))) {
+            g_flags.inout_flush = true;
         }
-        else if (!tstrcmp(arg, _T("/tee-stdin-append"))) {
-            g_flags.tee_stdin_file_append = true;
+        else if (!tstrcmp(arg, _T("/reopen-stdout-truncate"))) {
+            g_flags.reopen_stdout_file_truncate = true;
         }
-        else if (!tstrcmp(arg, _T("/tee-stdout-append"))) {
-            g_flags.tee_stdout_file_append = true;
+        else if (!tstrcmp(arg, _T("/reopen-stderr-truncate"))) {
+            g_flags.reopen_stderr_file_truncate = true;
         }
-        else if (!tstrcmp(arg, _T("/tee-stderr-append"))) {
-            g_flags.tee_stderr_file_append = true;
+        else if (!tstrcmp(arg, _T("/tee-stdin-truncate"))) {
+            g_flags.tee_stdin_file_truncate = true;
+        }
+        else if (!tstrcmp(arg, _T("/tee-stdout-truncate"))) {
+            g_flags.tee_stdout_file_truncate = true;
+        }
+        else if (!tstrcmp(arg, _T("/tee-stderr-truncate"))) {
+            g_flags.tee_stderr_file_truncate = true;
         }
         else if (!tstrcmp(arg, _T("/tee-stdin-file-flush"))) {
             g_flags.tee_stdin_file_flush = true;
@@ -2460,6 +2683,12 @@ int _tmain(int argc, const TCHAR * argv[])
         }
         else if (!tstrcmp(arg, _T("/tee-stderr-file-flush"))) {
             g_flags.tee_stderr_file_flush = true;
+        }
+        else if (!tstrcmp(arg, _T("/tee-output-flush"))) {
+            g_flags.tee_output_flush = true;
+        }
+        else if (!tstrcmp(arg, _T("/tee-inout-flush"))) {
+            g_flags.tee_inout_flush = true;
         }
         else if (!tstrcmp(arg, _T("/tee-stdin-pipe-buf-size"))) {
             arg_offset += 1;
@@ -2600,16 +2829,7 @@ int _tmain(int argc, const TCHAR * argv[])
             g_flags.mutex_std_writes = true;
         }
         else if (!tstrcmp(arg, _T("/mutex-tee-file-writes"))) {
-            arg_offset += 1;
-            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                g_options.mutex_tee_file_writes = arg;
-            }
-            else {
-                if (!g_flags.no_print_gen_error_string) {
-                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\"\n"), arg);
-                }
-                return err_invalid_format;
-            }
+            g_flags.mutex_tee_file_writes = true;
         }
         else if (!tstrcmp(arg, _T("/stdin-echo"))) {
             arg_offset += 1;
@@ -2632,6 +2852,9 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/eval-dbl-backslash-esc")) || !tstrcmp(arg, _T("/e\\\\"))) {
             g_flags.eval_dbl_backslash_esc = true;
         }
+        else if (!tstrcmp(arg, _T("/disable-conout-reattach-to-visible-console"))) {
+            // ignore
+        }
         else {
             if (!g_flags.no_print_gen_error_string) {
                 _ftprintf(stderr, _T("error: flag is not known: \"%s\"\n"), arg);
@@ -2643,6 +2866,13 @@ int _tmain(int argc, const TCHAR * argv[])
     }
 
     // reopen std
+
+    if (!g_options.reopen_stderr_as_file.empty()) {
+        if (!g_flags.no_print_gen_error_string) {
+            fputs("error: flag format is invalid: stderr reopen is mixed\n", stderr);
+        }
+        return err_invalid_format;
+    }
 
     if (!g_options.reopen_stdout_as_file.empty() && g_options.stdout_dup != -1) {
         if (!g_flags.no_print_gen_error_string) {
@@ -2699,25 +2929,52 @@ int _tmain(int argc, const TCHAR * argv[])
 
     // tee std dup
 
-    if (g_options.tee_stdin_dup != -1 && g_options.tee_stdin_dup != 1 && g_options.tee_stdin_dup != 2) {
-        if (!g_flags.no_print_gen_error_string) {
-            _ftprintf(stderr, _T("error: flag format is invalid: tee stdin duplication has invalid fileno: fileno=%i\n"), g_options.tee_stdin_dup);
+    if (g_options.tee_stdin_dup != -1) {
+        if (g_options.tee_stdin_dup != 1 && g_options.tee_stdin_dup != 2) {
+            if (!g_flags.no_print_gen_error_string) {
+                _ftprintf(stderr, _T("error: flag format is invalid: tee stdin duplication has invalid fileno: fileno=%i\n"), g_options.tee_stdin_dup);
+            }
+            return err_invalid_format;
         }
-        return err_invalid_format;
+        else if (g_options.tee_stdin_dup == 1 && g_options.tee_stdout_to_file.empty() ||
+                 g_options.tee_stdin_dup == 2 && g_options.tee_stderr_to_file.empty()) {
+            if (!g_flags.no_print_gen_error_string) {
+                _ftprintf(stderr, _T("error: flag format is invalid: tee stdin duplication of not opened handle: fileno=%i\n"), g_options.tee_stdin_dup);
+            }
+            return err_invalid_format;
+        }
     }
 
-    if (g_options.tee_stdout_dup != -1 && g_options.tee_stdout_dup != 0 && g_options. tee_stdout_dup != 2) {
-        if (!g_flags.no_print_gen_error_string) {
-            _ftprintf(stderr, _T("error: flag format is invalid: tee stdout duplication has invalid fileno: fileno=%i\n"), g_options.tee_stdout_dup);
+    if (g_options.tee_stdout_dup != -1) {
+        if (g_options.tee_stdout_dup != 0 && g_options.tee_stdout_dup != 2) {
+            if (!g_flags.no_print_gen_error_string) {
+                _ftprintf(stderr, _T("error: flag format is invalid: tee stdout duplication has invalid fileno: fileno=%i\n"), g_options.tee_stdout_dup);
+            }
+            return err_invalid_format;
         }
-        return err_invalid_format;
+        else if (g_options.tee_stdout_dup == 0 && g_options.tee_stdin_to_file.empty() ||
+                 g_options.tee_stdout_dup == 2 && g_options.tee_stderr_to_file.empty()) {
+            if (!g_flags.no_print_gen_error_string) {
+                _ftprintf(stderr, _T("error: flag format is invalid: tee stdout duplication of not opened handle: fileno=%i\n"), g_options.tee_stdout_dup);
+            }
+            return err_invalid_format;
+        }
     }
 
-    if (g_options.tee_stderr_dup != -1 && g_options.tee_stderr_dup != 0 && g_options.tee_stderr_dup != 1) {
-        if (!g_flags.no_print_gen_error_string) {
-            _ftprintf(stderr, _T("error: flag format is invalid: tee stderr duplication has invalid fileno: fileno=%i\n"), g_options.tee_stderr_dup);
+    if (g_options.tee_stderr_dup != -1) {
+        if (g_options.tee_stderr_dup != 0 && g_options.tee_stderr_dup != 1) {
+            if (!g_flags.no_print_gen_error_string) {
+                _ftprintf(stderr, _T("error: flag format is invalid: tee stderr duplication has invalid fileno: fileno=%i\n"), g_options.tee_stderr_dup);
+            }
+            return err_invalid_format;
         }
-        return err_invalid_format;
+        else if (g_options.tee_stderr_dup == 0 && g_options.tee_stdin_to_file.empty() ||
+                 g_options.tee_stderr_dup == 1 && g_options.tee_stdout_to_file.empty()) {
+            if (!g_flags.no_print_gen_error_string) {
+                _ftprintf(stderr, _T("error: flag format is invalid: tee stderr duplication of not opened handle: fileno=%i\n"), g_options.tee_stderr_dup);
+            }
+            return err_invalid_format;
+        }
     }
 
     if (g_flags.no_window) {

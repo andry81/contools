@@ -1,3 +1,22 @@
+2021.06.01:
+* fixed: src/callf: minor fixup
+* changed: src/callf: `/mutex-std-writes`, `/mutex-tee-file-writes` now behaves differently and always mutual exclude writes on a unique absolute case insensitive file path between different processes
+* refactor: src/callf: code refactor
+
+2021.05.31:
+* fixed: src/callf: missed to check the parent console window handle on equality with the current process console window handle to detect console window inheritance from the parent process
+* new: src/callf: `/create-console-title`, `/own-console-title` options to change console title
+* changed: src/callf: `/detach-console` flag is replaced by `/create-console` flag because a console detachment creates a standalone instance of console window, `/create-console` flag now has priority over the `/attach-parent-console` flag
+* changed: src/callf: `/use-parent-console` flag is removed, `/create-child-console` is used as an opposite replacement
+* changed: src/callf: `/create-console` and `/attach-parent-console` flags now always applies at very beginning of the application start, before parse of all other flags and output to the stdout or stderr
+* refactor: src/callf: code refactor
+
+2021.05.30:
+* fixed: src/callf: missed `tee-std[in|out|err]-dup <fileno>` option check on not opened `<fileno>`
+* fixed: src/callf: missed to seek the end of a file after open for write with append on standard handle reopen and a tee file create
+* new: src/callf: `/output-flush`, `/inout-flush`, `/tee-std[in|out|err]-file-flush`, `/tee-output-flush`, `/tee-inout-flush` flags for more addressed flush
+* changed: src/callf: All std and tee files now opens by default with the append instead of the overwrite option, all `*-append` flags replaced by `*-truncate`. This will avoid an excessive usage of append option and accidental overwrite a log file in nested callf.exe calls.
+
 2021.05.30:
 * new: bin/contools: binaries update
 
@@ -16,7 +35,7 @@
 * fixed: src/callf: lock on stdin pipe read while the output handle is closed or broken (pipe)
 * fixed: src/callf: immediate exit on error from the stdin thread write function on the output handle w/o check on child process existence
 * new: src/callf: `/attach-parent-console` to explicitly reattach console
-* new: src/callf: `/mutex-std-writes`, `/mutex-tee-std-file-writes <handles>`, `/mutex-tee-std-pipe-writes <handles>` options to mutual exclude writes into standard handles and tee files/pipes
+* new: src/callf: `/mutex-std-writes`, `/mutex-tee-std-file-writes <handles>` options to mutual exclude writes into standard handles and tee files/pipes
 * new: src/callf: `/stdin-output-flush` to flush after each write into an output handle connected with the process stdin
 * new: src/callf: `/std[out|err]-flush` to flush after each write into the process stdout/stderr
 
