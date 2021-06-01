@@ -1,4 +1,7 @@
 2021.06.01:
+* new: bin/contools: binaries update
+
+2021.06.01:
 * fixed: src/callf: minor fixup
 * changed: src/callf: `/mutex-std-writes`, `/mutex-tee-file-writes` now behaves differently and always mutual exclude writes on a unique absolute case insensitive file path between different processes
 * refactor: src/callf: code refactor
