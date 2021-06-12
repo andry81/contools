@@ -66,8 +66,8 @@ def reopen_all_files():
   print('* Number of reopened paths: ' + str(num_reopened))
   print()
 
-def process_extra_command_line(open_file_list_from_command_line = True):
-  import io, shlex
+def process_extra_command_line():
+  import os, io, shlex
 
   print('process_extra_command_line:')
 
@@ -81,13 +81,22 @@ def process_extra_command_line(open_file_list_from_command_line = True):
   open_from_file_list_path = ''
   next_arg_is_file_list_path = False
 
+  chdir_path = ''
+  next_arg_is_chdir_path = False
+
   do_reopen_all_files = False
 
   for arg in cmdline_list:
     if arg == '-z':
       continue
 
-    if not next_arg_is_file_list_path:
+    if next_arg_is_file_list_path:
+      open_from_file_list_path = str(arg)
+      next_arg_is_file_list_path = False
+    elif next_arg_is_chdir_path:
+      chdir_path = str(arg)
+      next_arg_is_chdir_path = False
+    else:
       if arg == '-from_utf8':
         from_utf8 = True
       elif arg == '-from_utf16':
@@ -98,13 +107,16 @@ def process_extra_command_line(open_file_list_from_command_line = True):
         from_utf16be = True
       elif arg == '--open_from_file_list':
         next_arg_is_file_list_path = True
+      elif arg == '--chdir':
+        next_arg_is_chdir_path = True
       elif arg == '-reopen_all_files':
         do_reopen_all_files = True
-    else:
-      open_from_file_list_path = str(arg)
-      next_arg_is_file_list_path = False
 
   num_opened = 0
+
+  if chdir_path:
+    os.chdir(chdir_path)
+    print('--chdir: ' + chdir_path)
 
   if open_from_file_list_path:
     print('--open_from_file_list:')
@@ -145,10 +157,6 @@ def process_extra_command_line(open_file_list_from_command_line = True):
         print("  - {}".format(file_path))
         notepad.open(file_path)
         num_opened += 1
-
-  else:
-    if open_file_list_from_command_line:
-      print('* error: file list path is not defined')
 
   print()
   print('* Number of opened paths: ' + str(num_opened))
