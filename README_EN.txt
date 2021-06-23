@@ -1,6 +1,8 @@
 * README_EN.txt
-* 2020.03.03
+* 2021.06.21
 * contools
+
+** README UNDER CONSTRUCTION **
 
 1. DESCRIPTION
 2. LICENSE
@@ -28,7 +30,7 @@
 -------------------------------------------------------------------------------
 1. DESCRIPTION
 -------------------------------------------------------------------------------
-A wide range of scripts for Windows NT interpreter (cmd.exe) and other
+A wide range of scripts for Windows interpreter (cmd.exe) and other
 interpreters such as bash shell (.sh), visual basic (.vbs), jscript (.js),
 python (.py), perl (.pl) and so on. Plus some set of standalone console
 utilities aside other utilities from cygwin, msys and mingw.
@@ -72,28 +74,27 @@ Second mirror:
 4. PREREQUISITES
 -------------------------------------------------------------------------------
 
-Currently tested these set of OS platforms, compilers, IDE's and interpreters
-to run from:
+Currently used these set of OS platforms, compilers, interpreters, modules,
+IDE's, applications and patches to run with or from:
 
-1. OS platforms.
+1. OS platforms:
 
 * Windows 7 (`.bat` only, minimal version for the cmake 3.14)
-* Cygwin 1.7.x (`.sh` only)
+* Cygwin 1.5+ or 3.0+ (`.sh` only):
+  https://cygwin.com
+  - to run scripts under cygwin
+* Msys2 20190524+ (`.sh` only):
+  https://www.msys2.org
+  - to run scripts under msys2
 * Linux Mint 18.3 x64 (`.sh` only)
 
-2. C++11 compilers.
+2. C++11 compilers:
 
-* (primary) Microsoft Visual C++ 2015 Update 3
+* (primary) Microsoft Visual C++ 2015 Update 3 or Microsoft Visual C++ 2017
 * (secondary) GCC 5.4+
 * (experimental) Clang 3.8+
 
-3. IDE's.
-
-* Microsoft Visual Studio 2015 Update 3
-* Microsoft Visual Studio 2017
-* QtCreator 4.6+
-
-4. Interpreters:
+3. Interpreters:
 
 * bash shell 3.2.48+
   - to run unix shell scripts
@@ -103,11 +104,41 @@ to run from:
 * python 3.7.3 or 3.7.5 (3.4+ or 3.5+)
   https://python.org
   - standard implementation to run python scripts
-  - 3.7.4 has a bug in the `pytest` module execution, see `KNOWN ISSUES`
-    section
+  - 3.7.4 has a bug in the `pytest` module execution (see `KNOWN ISSUES`
+    section).
+  - 3.6.2+ is required due to multiple bugs in the python implementation prior
+    this version (see `KNOWN ISSUES` section).
   - 3.5+ is required for the direct import by a file path (with any extension)
     as noted in the documentation:
     https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
+* cmake 3.15.1 (3.14+):
+  https://cmake.org/download/
+  - to run cmake scripts and modules
+  - 3.14+ does allow use generator expressions at install phase:
+    https://cmake.org/cmake/help/v3.14/policy/CMP0087.html
+* Windows Script Host 5.8+
+  - standard implementation to run vbs scripts
+
+4. Applications:
+
+* subversion 1.8+
+  https://tortoisesvn.net
+  - to run svn client
+* git 2.24+
+  https://git-scm.com
+  - to run git client
+* cygwin cygpath 1.42+
+  - to run `bash_entry` script under cygwin
+* msys cygpath 3.0+
+  - to run `bash_entry` script under msys2
+* cygwin readlink 6.10+
+  - to run specific bash script functions with `readlink` calls
+
+5. IDE's.
+
+* Microsoft Visual Studio 2015 Update 3
+* Microsoft Visual Studio 2017
+* QtCreator 4.6+
 
 Noticeable cmake changes from the version 3.14:
 
@@ -122,16 +153,25 @@ https://cmake.org/cmake/help/v3.14/release/3.14.html#deprecated-and-removed-feat
   The precompiled Windows binaries provided on cmake.org now require Windows 7
   or higher.
 
+https://cmake.org/cmake/help/v3.14/release/3.14.html#id13
+
+* The install(CODE) and install(SCRIPT) commands learned to support generator
+  expressions. See policy CMP0087
+  (https://cmake.org/cmake/help/v3.14/policy/CMP0087.html):
+
+  In CMake 3.13 and earlier, install(CODE) and install(SCRIPT) did not evaluate
+  generator expressions. CMake 3.14 and later will evaluate generator
+  expressions for install(CODE) and install(SCRIPT).
+
 To build GUI utilities is required the wxWidgets library at least of version
 3.1.3.
 
 CAUTION:
-  You have to build wxwidgets before build the utilities.
+  You have to build wxwidgets before build GUI utilities.
 
 -------------------------------------------------------------------------------
 5. DEPENDENCIES
 -------------------------------------------------------------------------------
-
 Read the `README_EN.deps.txt` file for the common dependencies for the Windows
 and the Linux platforms.
 
@@ -205,13 +245,6 @@ To prepare local third party library sources you can:
  |  | # solution.
  |  | # Contains special `__init*__` script to allocate basic environment
  |  | # variables and make common preparations.
- |  |
- |  +-/tools/`bash_entry`
- |  |   #
- |  |   # Script for inclusion into all unix bash shell scripts a basic
- |  |   # functionality directly from the root `/bin` directory. Must be
- |  |   # appropriately copied into the `/bin` directory before the usage any
- |  |   # of below unix bash shell scripts.
  |  |
  |  +-/`01_generate_src.*`
  |  |   #
@@ -288,8 +321,8 @@ To prepare local third party library sources you can:
 7. PROJECT CONFIGURATION VARIABLES
 -------------------------------------------------------------------------------
 
-* `_config/environment_system.vars`
-* `_config/environment_user.vars`
+1. `_config/environment_system.vars`
+   `_config/environment_user.vars`
 
 These files must be designed per a particular project and platform, but several
 values are immutable to a project and a platform, and must always exist.
@@ -314,7 +347,7 @@ dynamic variable.
 * PROJECT_NAME
 
 Name of the project. Must contain the same value as respective `project(...)`
-command in the `CMakeLists.txt` file, otherwise the error will be thrown.
+command in the `CMakeLists.txt` file, otherwise an error will be thrown.
 
 * PROJECT_TOP_ROOT, PROJECT_ROOT
 
@@ -340,7 +373,7 @@ the `/_config/environment_user.vars` configuration files.
 Optional variable which defines a directory with local 3dparty projects or
 libraries.
 
-* CMAKE_CONFIG_TYPES=(<semicolon_separated_list>)
+* CMAKE_CONFIG_TYPES=(<space_separated_list>)
 
 Required variable which defines predefined list of configuration names has used
 from the `/_scripts/*_configure.*` script.
@@ -350,7 +383,7 @@ Example:
 
 * CMAKE_CONFIG_ABBR_TYPES=(<semicolon_separated_list>)
 
-Optional variable which defines a list of associated with the
+An optional variable which defines a list of associated with the
 CMAKE_CONFIG_TYPES variable values of abbreviated configuration names has used
 from the `/_scripts/*_configure.*` script.
 Useful to define short names for respective complete configuration names to
@@ -374,11 +407,16 @@ The cmake version 3.14+ can use a separate architecture name additionally to
 the generator name.
 
 Example:
-  CMAKE_GENERATOR_PLATFORM:WIN=Win32  # required for the CMAKE_OUTPUT_GENERATOR_DIR, because the architecture parameter does not supported in the `environment_system.vars` stage
-  CMAKE_GENERATOR_PLATFORM:UNIX=""    # must be at least empty to avoid the `*:$/{CMAKE_GENERATOR_PLATFORM}` generation as an replacement value
+  # required for the CMAKE_OUTPUT_GENERATOR_DIR, because the architecture
+  # parameter does not supported in the `environment_system.vars` stage
+  CMAKE_GENERATOR_PLATFORM:WIN=Win32
+
+  # must be at least empty to avoid generation of the
+  # `*:$/{CMAKE_GENERATOR_PLATFORM}` as an replacement value
+  CMAKE_GENERATOR_PLATFORM:UNIX=""
 
 -------------------------------------------------------------------------------
-7. PRECONFIGURE
+8. PRECONFIGURE
 -------------------------------------------------------------------------------
 
 NOTE:
@@ -398,7 +436,7 @@ To be able to configure and build the sources you must run the
 `preconfigure.*` script at least once.
 
 -------------------------------------------------------------------------------
-8. CONFIGURE
+9. CONFIGURE
 -------------------------------------------------------------------------------
 
 NOTE:
@@ -412,7 +450,7 @@ Studio C++ 2015 Community Edition. The utilities does not require an installed
 Microsoft Visual C++ 2015 Redistributables at runtime.
 
 -------------------------------------------------------------------------------
-8.1. Generation step(s)
+9.1. Generation step(s)
 -------------------------------------------------------------------------------
 
 To generate the source files which are not included in a version control system
@@ -462,7 +500,7 @@ variables.
 
 For example, if:
 
-_3DPARTY_GLOBAL_ROOTS_LIST=("d:/3dparty1" "d:/3dparty1")
+_3DPARTY_GLOBAL_ROOTS_LIST=("d:/3dparty1" "d:/3dparty2")
 _3DPARTY_GLOBAL_ROOTS_FILE_LIST=("environment1.vars" "environment2.vars")
 
 , then the generated file paths would be ordered like this:
@@ -491,7 +529,7 @@ First mirror:
   * https://github.com/andry81/tacklelib--3dparty.git
 
 -------------------------------------------------------------------------------
-8.2. Configuration step
+9.2. Configuration step
 -------------------------------------------------------------------------------
 
 To make a final configuration call to:
@@ -507,14 +545,14 @@ NOTE:
   to a not multiconfig generator, otherwise it must not be used.
 
 -------------------------------------------------------------------------------
-9. BUILD
+10. BUILD
 -------------------------------------------------------------------------------
 
 Does not matter which one method below would be selected when the output would
 be in a directory pointed by the `CMAKE_BIN_DIR` configuration variable.
 
 -------------------------------------------------------------------------------
-9.1. From scripts
+10.1. From scripts
 -------------------------------------------------------------------------------
 
 1. Run `/_scripts/04_build.* [<ConfigName> [<TargetName>]]`, where:
@@ -530,7 +568,7 @@ NOTE:
   target - `help`.
 
 -------------------------------------------------------------------------------
-9.2. From `Visual Studio`
+10.2. From `Visual Studio`
 -------------------------------------------------------------------------------
 
 1. Open `<PROJECT_NAME>.sln` file addressed by a directory path in the
@@ -540,7 +578,7 @@ NOTE:
 3. Run build from the IDE.
 
 -------------------------------------------------------------------------------
-9.3. From `Qt Creator`
+10.3. From `Qt Creator`
 -------------------------------------------------------------------------------
 
 1. Open `CMakeLists.txt` file.
@@ -552,7 +590,7 @@ NOTE:
 4. Run build from the IDE.
 
 -------------------------------------------------------------------------------
-10. INSTALL
+11. INSTALL
 -------------------------------------------------------------------------------
 
 1. Run `/_scripts/05_install.* [<ConfigName> [<TargetName>]]`, where:
@@ -570,7 +608,7 @@ NOTE:
   The cmake may not support a target selection for a particular generator.
 
 -------------------------------------------------------------------------------
-11. POSTINSTALL
+12. POSTINSTALL
 -------------------------------------------------------------------------------
 
 NOTE:
@@ -588,11 +626,11 @@ CAUTION:
   gain different results!
 
 -------------------------------------------------------------------------------
-12. KNOWN ISSUES
+13. KNOWN ISSUES
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-12.1. The `CMAKE_BUILD_TYPE variable must not be set in case of a multiconfig
+13.1. The `CMAKE_BUILD_TYPE variable must not be set in case of a multiconfig
       generator presence and must be set if not: ...` cmake configuration
       error message
 -------------------------------------------------------------------------------
@@ -622,6 +660,6 @@ Solution #3:
    is not applicable.
 
 -------------------------------------------------------------------------------
-13. AUTHOR
+14. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

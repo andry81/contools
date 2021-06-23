@@ -20,15 +20,19 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /ret-create-proc
         Return CreateProcess or ShellExecute return code.
+        Has priority over all others `/ret-*` flags.
 
       /ret-win-error
         Return Win32 error code.
+        Has priority over `/ret-child-exit` flag.
+        Has no effect if `/ret-create-proc` flag is defined.
 
       /win-error-langid <LANGID>
         Language ID to format Win32 error messages.
 
       /ret-child-exit
         Return child process exit code (if has no `/no-wait` flag).
+        Has no effect if any other `/ret-*` flag is defined.
 
       /print-win-error-string
         Print Win32 error string (even if `/ret-win-error` flag is not set).
@@ -51,6 +55,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /shell-exec <Verb>
         Call to ShellExecute instead of CreateProcess.
+        Has no effect if idle execution is used.
 
         <Verb>:
           edit
@@ -93,6 +98,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           to finish. Note that in certain cases ShellExecuteEx ignores this
           flag and waits for the process to finish before returning.
 
+        Has no effect if a tee is used.
         Overrides `/wait-child-start` flag.
 
       /no-window
@@ -105,6 +111,13 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /no-subst-vars
         Don't substitute `{...}` variables (command line parameters).
+
+      /no-std-inherit
+        Prevent standard handles inheritance into child process.
+
+      /pipe-stdin-to-stdout
+        Pipe the process stdin into stdout. This additionally disables
+        standard handles inheritance (applies the `/no-std-inherit` flag).
 
       /shell-exec-expand-env
         CreateProcess
@@ -127,14 +140,14 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /wait-child-start
         CreateProcess
-          Has no meaning, always waits by default if `/no-wait` flag is not
-          defined.
+          Has no effect, always waits by default if `/no-wait` flag is not
+          used.
         ShellExecute
           Use SEE_MASK_NOASYNC and SEE_MASK_FLAG_DDEWAIT flags.
           Wait for the execute operation to complete before returning. This
           flag should be used by callers that are using ShellExecute forms
-          that might result in an async activation, for example DDE, and
-          create a process that might be run on background.
+          that might result in an asynchronous activation, for example DDE,
+          and create a process that might be run on background.
 
         The `/no-wait` flag has priority over this flag.
 
@@ -187,26 +200,86 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         See detailed documentation in MSDN for the function `ShowWindow`.
 
       /reopen-stdin <file>
-        Reopen stdin as a `<file>`.
+        Reopen stdin as a `<file>` to read from.
         Can be used to read from a file instead from the stdin.
-        Can not be used together with another `/reopen-stdin-*` option.
+        Can not be used together with another `/reopen-stdin-as-*` option.
 
-      /reopen-stdout <file>
-        Reopen stdout as a `<file>`.
-        Can be used to write to a file instead to the stdout.
-        Can be used together with `/tee-stdout*` flags.
-        Can not be used together with another `/reopen-stdout-as-*` option.
-        Can not be used together with the `/stdout-dup` option.
+      /reopen-stdin-as-server-pipe <pipe>
+        Reopen stdin as inbound server pipe `<pipe>` to read from.
+        Can be used to read from a named pipe instead of the stdin.
+        Can not be used together with the `/reopen-stdin` or another
+        `/reopen-stdin-as-*` option.
 
-      /reopen-stderr <file>
-        Reopen stderr as a `<file>`.
-        Can be used to write to a file instead to the stderr.
-        Can be used together with `/tee-stderr*` flags.
-        Can not be used together with another `/reopen-stderr-as-*` option.
-        Can not be used together with the `/stderr-dup` option.
+      /reopen-stdin-as-server-pipe-connect-timeout <timeout>
+        Timeout in milliseconds to wait for an outbound client named pipe
+        `<pipe>` connection to an inbound server named pipe attached to the
+        process stdin. By default 30 seconds timeout is used.
+
+      /reopen-stdin-as-server-pipe-in-buf-size <size>
+        Inbound server named pipe `<pipe>` input buffer size in bytes have
+        used to reopen the process stdin.
+
+      /reopen-stdin-as-server-pipe-out-buf-size <size>
+        Inbound server named pipe `<pipe>` output buffer size in bytes have
+        used to reopen the process stdin.
+
+      /reopen-stdin-as-client-pipe <pipe>
+        Reopen stdin as inbound client named pipe `<pipe>` to read from.
+        Can be used to read from a named pipe instead of the stdin.
+        Can not be used together with the `/reopen-stdin` or another
+        `/reopen-stdin-as-*` option.
+
+      /reopen-stdin-as-client-pipe-connect-timeout <timeout>
+        Timeout in milliseconds to wait for an inbound client named pipe
+        `<pipe>` connection to an outbound server named pipe, where the client
+        named pipe end is attached to the process stdin.
+        By default 30 seconds timeout is used.
+
+      /reopen-std[out|err] <file>
+        Reopen stdout/stderr as a `<file>` to write to.
+        Can be used to write to a file instead to the stdout/stderr.
+        Can be used together with `/tee-std[out|err]*` options.
+        Can not be used together with another `/reopen-std[out|err]-as-*`
+        option.
+        Can not be used together with the `/std[out|err]-dup` option.
+
+      /reopen-std[out|err]-as-server-pipe <pipe>
+        Reopen stdout/stderr as outbound server pipe `<pipe>` to write to.
+        Can be used to write to a named pipe instead of the stdout/stderr.
+        Can not be used together with the `/reopen-std[out|err]` or another
+        `/reopen-std[out|err]-as-*` option.
+        Can not be used together with the `/std[out|err]-dup` option.
+
+      /reopen-std[out|err]-as-server-pipe-connect-timeout <timeout>
+        Timeout in milliseconds to wait for an inbound client named pipe
+        `<pipe>` connection to an outbound server named pipe attached to the
+        process stdout/stderr. By default 30 seconds timeout is used.
+
+      /reopen-std[out|err]-as-server-pipe-in-buf-size <size>
+        Outbound server named pipe `<pipe>` input buffer size in bytes have
+        used to reopen the process stdout/stderr.
+
+      /reopen-std[out|err]-as-server-pipe-out-buf-size <size>
+        Outbound server named pipe `<pipe>` output buffer size in bytes have
+        used to reopen the process stdout/stderr.
+
+      /reopen-std[out|err]-as-client-pipe <pipe>
+        Reopen stdout/stderr as outbound client named pipe `<pipe>` to write
+        to.
+        Can be used to write to a named pipe instead of the stdout/stderr.
+        Can not be used together with the `/reopen-std[out|err]` or
+        another `/reopen-std[out|err]-as-*` option.
+        Can not be used together with the `/std[out|err]-dup` option.
+
+      /reopen-std[out|err]-as-client-pipe-connect-timeout <timeout>
+        Timeout in milliseconds to wait for an outbound server named pipe
+        `<pipe>` connection to an inbound client named pipe, where the server
+        named pipe end is attached to the process stdout/stderr.
+        By default 30 seconds timeout is used.
 
       /reopen-std[out|err]-truncate
         Truncate instead of append on stdout/stderr reopen.
+        Has no effect on not a file.
 
       /std[out|err]-dup <fileno>
         Duplicate the standard respective handle from another one, where the
@@ -216,49 +289,134 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         then has the same behaviour as a sequence of respective
         `/reopen-stdout` or `/reopen-stderr` options with the same `<file>`
         and so can be used instead.
-
-        Can not be used together with the same `/reopen-std[out|err]`
-        option.
+        Can not be used together with the same `/reopen-std[out|err]` option.
 
       /stdin-output-flush
         Flush after each write into an output handle connected with the
-        process stdin.
+        process stdin. Basically used if the process stdin is redirected from
+        a file or an anonymous/named pipe. Has no effect if the process stdin
+        is a console (character) handle (not redirected).
 
       /std[out|err]-flush
         Flush after each write into the process stdout/stderr.
 
       /output-flush
-        Flush after each write into the process stdout or stderr.
+        Flush after each write into the process stdout and stderr.
 
       /inout-flush
         Flush after each write into an output handle connected with the
-        process stdin or into the process stdout or stderr.
+        process stdin and into the process stdout and stderr. The same as the
+        `/stdin-output-flush` plus after each write into the process
+        stdout and stderr.
+
+      /create-outbound-pipe-from-stdin <pipe>
+        Create outbound server named pipe `<pipe>` instead of anonymous as by
+        default to write into a child process stdin from the process stdin.
+        Useful to write stream to elevated or another child `callf.exe`
+        process.
+
+      /create-outbound-pipe-from-stdin-connect-timeout <timeout>
+        Timeout in milliseconds to wait for an inbound client named pipe
+        `<pipe>` connection to an outbound server named pipe connected with
+        the process stdin. By default 30 seconds timeout is used.
+
+      /create-outbound-pipe-from-stdin-in-buf-size <size>
+        Outbound server named pipe `<pipe>` input buffer size in bytes have
+        used to write into from the process stdin.
+
+      /create-outbound-pipe-from-stdin-out-buf-size <size>
+        Outbound server named pipe `<pipe>` output buffer size in bytes have
+        used to write into from the process stdin.
+
+      /create-inbound-pipe-to-std[out|err] <pipe>
+        Create inbound server named pipe `<pipe>` instead of anonymous as by
+        default to read from a child process stdout/stderr to write into
+        the process stdout/stderr.
+        Useful to read stream from elevated or another child `callf.exe`
+        process.
+
+      /create-inbound-pipe-to-std[out|err]-connect-timeout <timeout>
+        Timeout in milliseconds to wait for an outbound client named pipe
+        `<pipe>` connection to an inbound server named pipe connected with
+        the process stdout/stderr. By default 30 seconds timeout is used.
+
+      /create-inbound-pipe-to-std[out|err]-in-buf-size <size>
+        Inbound server named pipe `<pipe>` input buffer size in bytes have
+        used to read from into the process stdout/stderr.
+
+      /create-inbound-pipe-to-std[out|err]-out-buf-size <size>
+        Inbound server named pipe `<pipe>` output buffer size in bytes have
+        used to read from into the process stdout/stderr.
 
       /tee-std[in|out|err] <file>
         Duplicate standard stream to a tee file `<file>`.
         Can be used together with another `/tee-std[in|out|err]-to-*` flag.
 
+      /tee-std[in|out|err]-to-server-pipe <pipe>
+        Duplicate standard stream to a tee outbound server named pipe `<pipe>`
+        to write to. Can be used together with `/tee-std[in|out|err]` option.
+        Can not be used together with the
+        `/tee-std[in|out|err]-to-server-pipe` option.
+        Can not be used together with the `/tee-std[in|out|err]-dup` option.
+
+      /tee-std[in|out|err]-to-server-pipe-connect-timeout <timeout>
+        Timeout in milliseconds to wait for an outbound server named pipe
+        `<pipe>` connection to an inbound client named pipe, where the server
+        named pipe end is connected with the process standard handle as
+        source. By default 30 seconds timeout is used.
+
+      /tee-std[in|out|err]-to-server-pipe-in-buf-size <size>
+        Outbound server named pipe `<pipe>` input buffer size in bytes have
+        used to duplicate the process standard handle as source.
+
+      /tee-std[in|out|err]-to-server-pipe-out-buf-size <size>
+        Outbound server named pipe `<pipe>` output buffer size in bytes have
+        used to duplicate the process standard handle as source.
+
+      /tee-std[in|out|err]-to-client-pipe <pipe>
+        Duplicate standard stream to a tee outbound client named pipe `<pipe>`
+        to write to. Can be used together with `/tee-std[in|out|err]` option.
+        Can not be used together with the
+        `/tee-std[in|out|err]-to-server-pipe` option.
+        Can not be used together with the `/tee-std[in|out|err]-dup` option.
+
+      /tee-std[in|out|err]-to-client-pipe-connect-timeout <timeout>
+        Timeout in milliseconds to wait for an outbound client named pipe
+        `<pipe>` connection to an inbound server named pipe, where the client
+        named pipe end is connected with the process standard handle as
+        source. By default 30 seconds timeout is used.
+
       /tee-std[in|out|err]-truncate
         Truncate instead of append on a tee file `<file>` open.
 
       /tee-std[in|out|err]-file-flush
-        Flush after each write into a tee file `<file>.
+        Flush after each write into a tee file `<file>`.
+
+      /tee-std[in|out|err]-pipe-flush
+        Flush after each write into a tee named pipe `<pipe>`.
+
+      /tee-std[in|out|err]-flush
+        Flush after each write into a tee file `<file> or a tee named pipe
+        `<pipe>` have used to split output from the process
+        stdin/stdout/stderr.
 
       /tee-output-flush
-        Flush after each write into a tee file `<file> connected with the
-        process stdout or stderr.
+        Flush after each write into a tee file `<file> or a named pipe
+        `<pipe>` have used to split output from the process stdout and stderr.
 
       /tee-inout-flush
-        Flush after each write into a tee file `<file> connected with the
-        process stdin or stdout or stderr.
+        Flush after each write into a tee file `<file> or a named pipe
+        `<pipe>` have used to split output from the process stdin and stdout
+        and stderr.
 
       /tee-std[in|out|err]-pipe-buf-size <size>
         Anonymous pipe buffer size in bytes attached directly to the
         child process stdin/stdout/stderr.
+        Has no effect if a respective named pipe is used.
 
       /tee-std[in|out|err]-read-buf-size <size>
-        Buffer size in bytes to read from parent process stdin.
-        Buffer size in bytes to read from child process stdout/stderr.
+        Buffer size in bytes to read from the process stdin.
+        Buffer size in bytes to read from a child process stdout/stderr.
 
       /tee-std[in|out|err]-dup <fileno>
         Duplicate the tee respective handle from another one, where the
@@ -273,34 +431,44 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         In case of a write into reopened standard handle opened from a file
         does mutual excluded write into the same file from different
         processes.
-        Each unique absolute file path associated with an unique mutex.
-        The handle moves to the end each time after the mutex is locked to
-        guarantee write into the file end between processes.
+        Each unique absolute file path (case insensitive) associated with an
+        unique mutex.
+        The handle file pointer moves to the end each time after the mutex is
+        locked to guarantee write into the file end between processes.
         Has no effect in case of a write into not reopened (inherited)
         standard handle. In this case synchronization depends on the Win32 API
         and basically happens when all writes does perform on the same handle
         (for example, when stderr has duplicated from stdout). If handles are
-        different (each opened separately from the same file), then there is
-        can be non synchronized writes.
+        different (each opened separately from the same file), then the
+        process tries to hash absolute lower cased file path and detect file
+        path equality to invoke a file handle duplication instead of initiate
+        a file open.
 
       /mutex-tee-file-writes
         Does mutual excluded write into the same file from different
         processes.
-        Each unique absolute file path associated with an unique mutex.
-        The handle moves to the end each time after the mutex is locked to
-        guarantee write into the file end between processes.
+        Each unique absolute file path (case insensitive) associated with an
+        unique mutex.
+        The handle file pointer moves to the end each time after the mutex is
+        locked to guarantee write into the file end between processes.
+        Synchronization depends on the Win32 API and basically happens when
+        all writes does perform on the same handle (for example, when stderr
+        has duplicated from stdout). If handles are different (each opened
+        separately from the same file), then the process tries to hash
+        absolute lower cased file path and detect file path equality to invoke
+        a file handle duplication instead of initiate a file open.
 
       /create-child-console
         CreateProcess
-          Create new console for a child process instead of reuse the parent
-          process console if exists.
+          Create new console for a child process instead of reuse the process
+          console if exists (inheritance).
         ShellExecute
           Removes usage of the SEE_MASK_NO_CONSOLE flag.
-          Without this flag a child inherits the parent's console.
+          Without this flag a child inherits the process console if exists.
 
       /create-console
         Create current process console if not exists. If current process
-        console exists, owned and not visible, then recreates console.
+        console exists, owned and not visible, then shows it.
         If current process console exists and not owned (inherited), then
         creates new console. Has no effect if current process console already
         exists, owned and visible.
@@ -309,15 +477,23 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       /create-console-title <title>
         Change console window title on the current process console creation or
         recreation. Has no effect if the current process console is not owned.
+        Overrides the `/console-title` option.
+        Can be used together with `/own-console-title` option.
 
       /own-console-title <title>
         Change console window title if the current process console is owned.
+        Overrides the `/console-title` option.
+        Can be used together with `/create-console-title` option.
         Has no effect on inherited console.
 
+      /console-title <title>
+        Change console window title. Applies only if non of
+        `/create-console-title` and `/own-console-title` is applied.
+
       /attach-parent-console
-        Attach console from the parent process or it's ancestors. If the
-        current process console is owned, then detaches it at first. Has no
-        effect if the current process exists but not owned (inherited).
+        Attach console from a parent process or it's ancestors. If the current
+        process console is owned, then detaches it at first. Has no effect if
+        the current process console exists but not owned (inherited).
         Has no effect if the `/create-console` is used.
 
       /stdin-echo <0|1>
@@ -349,10 +525,21 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
     Special flags:
       /disable-conout-reattach-to-visible-console
-        In case if the current process console is not visible and parent
+        In case if the current process console is not visible and a parent
         process console is visible, then before print any output the
         application tries to attach to the parent process console to enable
         the user to read futher output into console before a child process
+        start. To disable that use this flag.
+
+      /disable-conout-duplicate-to-parent-console-on-error
+        In case if the current process has own the console window, then the
+        application tries to save all the output to the stdout/stderr to
+        duplicate it later to the parent process console in case of
+        application early exit just before a child process start. This
+        happens because the leaf process owned console window does close upon
+        the process exit and the user won't see the stdout/stderr output.
+        Saved content print on process exit just before a child process start
+        and is not happen if an error is not happened before a child process
         start. To disable that use this flag.
 
     <ApplicationNameFormatString>, <CommandLineFormatString>,
@@ -365,7 +552,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
       \{     - '{' character escape
 
-    CreateProcess
+    CreateProcess:
       <ApplicationNameFormatString>, <CommandLineFormatString>:
         Respective CreateProcess parameters.
 
@@ -374,9 +561,17 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       first argument. See detailed documentation in MSDN for the function
       `CreateProcess`.
 
-    ShellExecute
+    ShellExecute:
       <FilePathFormatString>, <ParametersFormatString>:
         Respective ShellExecute parameters.
+
+    Idle execution:
+      If <ApplicationNameFormatString> is `.`, then the idle execution is
+      used. In that case not CreateProcess nor ShellExecute is used.
+      The process loops stdin into stdout until EOF or a pipe close.
+      The process does wait only if stdin is a file or a pipe, otherwise a
+      call has no effect. Stderr does not used on idle execution and all
+      operations over it has no effect.
 
     In case of ShellExecute the <ParametersFormatString> must contain only a
     command line arguments, but not the path to the executable (or document)
@@ -388,6 +583,9 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
   Return codes if `/ret-*` option is not defined:
    -255 - unspecified error
    -128 - help output
+   -7   - named pipe connection timeout
+   -6   - named pipe connection error
+   -5   - input/output error
    -4   - Win32 or COM error
    -2   - invalid format
    -1   - both <ApplicationNameFormatString> and <CommandLineFormatString>
@@ -443,3 +641,19 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
     Example #7 and #8 must request the Administrator permission to execute in
     the existing (parent) console.
+
+  Examples (CreateProcess/ShellExecute, with named pipes and idle execution with stdin-to-stdout piping):
+    1. callf.exe /reopen-stdin 0.in .
+
+    2. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123 ."
+
+    3. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123 ."
+
+    Example #1 prints the content of the `0.in` file to the console.
+
+    Example #2 writes the content of the `0.in` file into the `test123` named
+    pipe, where it being read and print to the console by the child process.
+
+    Example #2 writes the content of the `0.in` file into the `test123` named
+    pipe through the Administrator privileges isolation, where it being read
+    and print to the existing (parent) console by the promoted child process.
