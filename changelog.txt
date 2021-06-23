@@ -1,4 +1,7 @@
 2021.06.23:
+* new: Utilities/bin/contools: binaries update
+
+2021.06.23:
 * new: Utilities/src/callf: `/reopen-stdin-as-pipe <pipe>`, `/reopen-stdout-as-pipe <pipe>`, `/reopen-stderr-as-pipe <pipe>` options to reopen standard handle as a named pipe
 * new: Utilities/src/callf: `/tee-std[in|out|err]-as-pipe <pipe>`, `/tee-std[in|out|err]-pipe-flush` options to duplicate output to stdin/stdout/stderr into a named pipe
 * new: Utilities/src/callf: `/create-pipe-to-stdout <pipe>`, `/create-pipe-to-stderr <pipe>` options to create a named pipe to read from to write into stdout/stderr. Useful to read stream from self elevated child callf.exe process.
