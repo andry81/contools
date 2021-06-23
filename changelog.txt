@@ -1,6 +1,45 @@
+2021.06.23:
+* new: Utilities/src/callf: `/reopen-stdin-as-pipe <pipe>`, `/reopen-stdout-as-pipe <pipe>`, `/reopen-stderr-as-pipe <pipe>` options to reopen standard handle as a named pipe
+* new: Utilities/src/callf: `/tee-std[in|out|err]-as-pipe <pipe>`, `/tee-std[in|out|err]-pipe-flush` options to duplicate output to stdin/stdout/stderr into a named pipe
+* new: Utilities/src/callf: `/create-pipe-to-stdout <pipe>`, `/create-pipe-to-stderr <pipe>` options to create a named pipe to read from to write into stdout/stderr. Useful to read stream from self elevated child callf.exe process.
+* new: Utilities/src/callf: `/tee-std[in|out|err]-flush` flag to flush both a tee file and a tee named pipe
+* new: Utilities/src/callf: Use `.` string as `ApplicationNameFormatString` in a command line to avoid child process creation (idle execution). Useful to test a server named pipe connection await or just redirect output from an inbound named pipe to the console window.
+* new: Utilities/src/callf: `/no-std-inherit` flag to prevent standard handles inheritance into child process
+* new: Utilities/src/callf: `/pipe-stdin-to-stdout` flag to explicitly pipe stdin to stdout (applies the `/no-std-inherit` flag)
+
+2021.06.23:
+* fixed: Utilities/src/callf: use `STDIN_FILENO`/`STDOUT_FILENO`/`STDERR_FILENO` instead of `_fileno(stdin)`/`_fileno(stdout)`/`_fileno(stderr)` in call to `_dup2`, otherwise sequenced call to `_close` would close input parameter handle w/o a duplication
+* fixed: Utilities/src/callf: missed stdout flush (and disconnection if a server named pipe end) before close
+
+2021.06.20:
+* changed: readme update
+
+2021.06.16:
+* changed: Utilities/src/callf: now only the main thread prints info/errors to stdout/stderr, all worker threads only postpone info/errors to the main thread (excluding traffic between stdin and stdout/stderr)
+
 2021.06.12:
 * new: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: `--chdir` extra command line option
 * changed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: minor refactor
+
+2021.06.11:
+* new: Utilities/src/callf: Now by default if the process console window is not owned and the process is going to close by an error before execute a child process, then the output does duplicate into a parent process console. To disable that behaviour the `/disable-conout-duplicate-to-parent-console-on-error` flag is added.
+
+2021.06.10:
+* fixed: Utilities/src/callf: minor fixup
+* new: Utilities/src/callf: improved stdout/stderr output, use common format string prefix for all stderr output (example: `[<date> <time>] [<pid>] [<module>] error: <message>`)
+* refactor: Utilities/src/callf: code refactor
+* refactor: Utilities/src/chcp: minor refactor
+* refactor: Utilities/src/envvarcmp: minor refactor
+
+2021.06.09:
+* fixed: Utilities/src/callf: The `0xC0000008: An invalid handle was specified.` SEH exception in random `CloseHandle` function call. Missed to duplicate handle before handle ownership transfer in the function `_open_osfhandle` in the function `_set_crt_std_handle`.
+* fixed: Utilities/src/callf: missed case where to apply `/own-console-title` option
+* new: Utilities/src/callf: `/console-title` option
+* refactor: Utilities/src/callf: code refactor
+
+2021.06.02:
+* fixed: Utilities/src/callf: accidental usage of `toupper` instead of `tolower` as should for a file path case insensitive comparison
+* refactor: Utilities/src/callf: extract source code into separate source files
 
 2021.06.01:
 * new: Utilities/bin/contools: binaries update

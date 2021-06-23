@@ -131,13 +131,13 @@ namespace {
                                     if (it.typeIndex() == 0) {
                                         const std::tstring::size_type vn_value_len = tstrlen(*it.get0());
                                         for (std::tstring::size_type j = 0; j < vn_value_len; j++) {
-                                            parsed_str.append(hextbl[(*it.get0())[j]]);
+                                            parsed_str.append(g_hextbl[(*it.get0())[j]]);
                                         }
                                     }
                                     else if (it.typeIndex() == 1) {
                                         const std::tstring::size_type vn_value_len = it.get1()->length();
                                         for (std::tstring::size_type j = 0; j < vn_value_len; j++) {
-                                            parsed_str.append(hextbl[(*it.get1())[j]]);
+                                            parsed_str.append(g_hextbl[(*it.get1())[j]]);
                                         }
                                     }
                                     else {

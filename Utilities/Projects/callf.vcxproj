@@ -190,8 +190,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\callf\callf.cpp" />
+    <ClCompile Include="..\src\callf\execute.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\callf\callf.hpp" />
+    <ClInclude Include="..\src\callf\execute.hpp" />
     <ClInclude Include="..\src\callf\help_inl.hpp" />
     <ClInclude Include="..\src\callf\version.hpp" />
   </ItemGroup>

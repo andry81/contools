@@ -90,7 +90,7 @@ namespace {
                         last_offset = p + 5;
                         const size_t v0_value_len = tstrlen(v0_value);
                         for(size_t i = 0; i < v0_value_len; i++) {
-                            parsed_str.append(hextbl[v0_value[i]]);
+                            parsed_str.append(g_hextbl[v0_value[i]]);
                         }
                         found = true;
                     }
@@ -104,7 +104,7 @@ namespace {
                         last_offset = p + 5;
                         const size_t v1_value_len = tstrlen(v1_value);
                         for(size_t i = 0; i < v1_value_len; i++) {
-                            parsed_str.append(hextbl[v1_value[i]]);
+                            parsed_str.append(g_hextbl[v1_value[i]]);
                         }
                         found = true;
                     }

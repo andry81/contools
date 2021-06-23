@@ -156,12 +156,12 @@ int _tmain(int argc, const TCHAR * argv[])
     DWORD num_bytes_written = 0;
     std::vector<uint8_t> byte_buf;
 
-    ultot(GetConsoleOutputCP(), &tchar_buf[0], 10);
-    const size_t l0 = _tcslen(&tchar_buf[0]);
+    ultot(GetConsoleOutputCP(), tchar_buf.data(), 10);
+    const size_t l0 = _tcslen(tchar_buf.data());
     tchar_buf[l0] = _T(':');
     ultot(GetConsoleCP(), &tchar_buf[l0 + 1], 10);
 
-    tchar_buf.resize(_tcslen(&tchar_buf[0]));
+    tchar_buf.resize(_tcslen(tchar_buf.data()));
 
     // NOTE:
     //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
@@ -177,18 +177,18 @@ int _tmain(int argc, const TCHAR * argv[])
             // use current code page
             const UINT cp_out = GetConsoleOutputCP();
 
-            int num_chars = WideCharToMultiByte(cp_out, 0, &tchar_buf[0], tchar_buf.size(), NULL, 0, NULL, NULL);
+            int num_chars = WideCharToMultiByte(cp_out, 0, tchar_buf.data(), tchar_buf.size(), NULL, 0, NULL, NULL);
             if (num_chars) {
                 byte_buf.resize(size_t(num_chars));
-                num_chars = WideCharToMultiByte(cp_out, 0, &tchar_buf[0], tchar_buf.size(), (char *)&byte_buf[0], (std::min)((size_t)num_chars, byte_buf.size()), NULL, NULL);
+                num_chars = WideCharToMultiByte(cp_out, 0, tchar_buf.data(), tchar_buf.size(), (char *)byte_buf.data(), (std::min)((size_t)num_chars, byte_buf.size()), NULL, NULL);
 
-                WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), &byte_buf[0], (std::min)((size_t)num_chars, byte_buf.size()), &num_bytes_written, NULL);
+                WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), byte_buf.data(), (std::min)((size_t)num_chars, byte_buf.size()), &num_bytes_written, NULL);
             }
             else {
                 return -127;
             }
 #else
-            WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), tchar_buf[0], tchar_buf.size() * sizeof(tchar_buf[0]), &num_bytes_written, NULL);
+            WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), tchar_buf.data(), tchar_buf.size() * sizeof(tchar_buf[0]), &num_bytes_written, NULL);
 #endif
         }();
     }
