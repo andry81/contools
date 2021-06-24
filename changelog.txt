@@ -1,3 +1,6 @@
+2021.06.25:
+* new: Utilities/src/callf: `{pid}` and `{ppid}` placeholders to use in pipe names to generate unique pipe name
+
 2021.06.24:
 * new: Utilities/bin/contools: binaries update
 

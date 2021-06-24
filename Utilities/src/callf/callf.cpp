@@ -243,6 +243,10 @@ int _tmain(int argc, const TCHAR * argv[])
                 }
             }
 
+            if (g_parent_proc_id == -1) {
+                g_parent_proc_id = _find_parent_proc_id();
+            }
+
             arg_offset = 1;
 
             if(argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
@@ -437,7 +441,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/reopen-stdin-as-server-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.reopen_stdin_as_server_pipe = arg;
+                            g_options.reopen_stdin_as_server_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -478,7 +482,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/reopen-stdin-as-client-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.reopen_stdin_as_client_pipe = arg;
+                            g_options.reopen_stdin_as_client_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -505,7 +509,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/reopen-stdout-as-server-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.reopen_stdout_as_server_pipe = arg;
+                            g_options.reopen_stdout_as_server_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -546,7 +550,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/reopen-stdout-as-client-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.reopen_stdout_as_client_pipe = arg;
+                            g_options.reopen_stdout_as_client_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -614,7 +618,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/reopen-stderr-as-client-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.reopen_stderr_as_client_pipe = arg;
+                            g_options.reopen_stderr_as_client_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -683,7 +687,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/create-outbound-pipe-from-stdin"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.create_outbound_pipe_from_stdin = arg;
+                            g_options.create_outbound_pipe_from_stdin = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -724,7 +728,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/create-inbound-pipe-to-stdout"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.create_inbound_pipe_to_stdout = arg;
+                            g_options.create_inbound_pipe_to_stdout = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -765,7 +769,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/create-inbound-pipe-to-stderr"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.create_inbound_pipe_to_stderr = arg;
+                            g_options.create_inbound_pipe_to_stderr = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -814,7 +818,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/tee-stdin-to-server-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.tee_stdin_to_server_pipe = arg;
+                            g_options.tee_stdin_to_server_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -855,7 +859,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/tee-stdin-to-client-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.tee_stdin_to_client_pipe = arg;
+                            g_options.tee_stdin_to_client_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -882,7 +886,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/tee-stdout-to-server-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.tee_stdout_to_server_pipe = arg;
+                            g_options.tee_stdout_to_server_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -923,7 +927,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/tee-stdout-to-client-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.tee_stdout_to_client_pipe = arg;
+                            g_options.tee_stdout_to_client_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -950,7 +954,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/tee-stderr-to-server-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.tee_stderr_to_server_pipe = arg;
+                            g_options.tee_stderr_to_server_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
@@ -991,7 +995,7 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!tstrcmp(arg, _T("/tee-stderr-to-client-pipe"))) {
                         arg_offset += 1;
                         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                            g_options.tee_stderr_to_client_pipe = arg;
+                            g_options.tee_stderr_to_client_pipe = SubstNamePlaceholders(arg);
                         }
                         else return invalid_format_flag(arg);
                         break;
