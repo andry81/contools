@@ -644,16 +644,29 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
   Examples (CreateProcess/ShellExecute, with named pipes and idle execution with stdin-to-stdout piping):
     1. callf.exe /reopen-stdin 0.in .
+    2. callf.exe /reopen-stdin 0.in "" "cmd.exe /k"
 
-    2. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123 ."
+    3. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123 ."
+    4. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123 \"\" \"cmd.exe /k\""
 
-    3. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123 ."
+    5. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123 ."
+    6. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123 \"\" \"cmd.exe /k\""
 
-    Example #1 prints the content of the `0.in` file to the console.
+    Example #1 prints content of the `0.in` file to the console.
+    Example #2 writes content of the `0.in` file to the `cmd.exe /k` process
+    input.
 
-    Example #2 writes the content of the `0.in` file into the `test123` named
+    Example #3 writes content of the `0.in` file into the `test123` named
     pipe, where it being read and print to the console by the child process.
+    Example #4 writes content of the `0.in` file into the `test123` named
+    pipe, where it being read and write to the `cmd.exe /k` process input.
 
-    Example #2 writes the content of the `0.in` file into the `test123` named
+    Example #5 writes the content of the `0.in` file into the `test123`
+    named pipe through the Administrator privileges isolation, where it being
+    read and print to the existing (parent) console by the child process
+    `callf.exe`.
+    Example #6 writes content of the `0.in` file into the `test123` named
     pipe through the Administrator privileges isolation, where it being read
-    and print to the existing (parent) console by the promoted child process.
+    and write to the `cmd.exe /k` process input with the output has connected
+    back to the child process `callf.exe` which prints to the existing
+    (parent) console.
