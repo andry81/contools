@@ -50,6 +50,8 @@ bool g_is_stderr_redirected         = false;
 bool g_no_std_inherit               = false;
 bool g_pipe_stdin_to_stdout         = false;
 
+std::atomic_bool g_ctrl_handler     = false;
+
 HANDLE g_stdin_pipe_read_handle     = INVALID_HANDLE_VALUE;
 HANDLE g_stdin_pipe_write_handle    = INVALID_HANDLE_VALUE;
 HANDLE g_stdout_pipe_read_handle    = INVALID_HANDLE_VALUE;
@@ -70,16 +72,20 @@ WorkerThreadsReturnData g_worker_threads_return_data;
 
 BOOL WINAPI ChildCtrlHandler(DWORD ctrl_type)
 {
-    // CTRL_C_EVENT         = 0
-    // CTRL_BREAK_EVENT     = 1
-    // CTRL_CLOSE_EVENT     = 2
-    // CTRL_LOGOFF_EVENT    = 5
-    // CTRL_SHUTDOWN_EVENT  = 6
-    if (g_child_process_group_id != -1) {
-        GenerateConsoleCtrlEvent(ctrl_type, g_child_process_group_id);
+    if (g_ctrl_handler) {
+        // CTRL_C_EVENT         = 0
+        // CTRL_BREAK_EVENT     = 1
+        // CTRL_CLOSE_EVENT     = 2
+        // CTRL_LOGOFF_EVENT    = 5
+        // CTRL_SHUTDOWN_EVENT  = 6
+        if (g_child_process_group_id != -1) {
+            GenerateConsoleCtrlEvent(ctrl_type, g_child_process_group_id);
+        }
+
+        return TRUE; // ignore
     }
 
-    return TRUE; // ignore
+    return FALSE;
 }
 
 template <int stream_type>
@@ -173,7 +179,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                         }
 
                         SetLastError(0); // just in case
-                        if (!ReadFile(g_stdin_handle, &stdin_byte_buf[0], g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
+                        if (!ReadFile(g_stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             win_error = GetLastError();
@@ -204,7 +210,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                     SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
 
-                                    WriteFile(g_tee_file_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_file_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                     if (thread_data.cancel_io) break;
 
                                     if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
@@ -222,7 +228,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             }
 
                             if (_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
-                                WriteFile(g_tee_named_pipe_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_named_pipe_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdin_pipe_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
@@ -233,7 +239,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                             if (_is_valid_handle(g_stdin_pipe_write_handle)) {
                                 SetLastError(0); // just in case
-                                if (WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                if (WriteFile(g_stdin_pipe_write_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_write, NULL)) {
                                     if (g_flags.stdin_output_flush || g_flags.inout_flush) {
                                         FlushFileBuffers(g_stdin_pipe_write_handle);
                                     }
@@ -325,7 +331,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                         if (num_bytes_avail) {
                             SetLastError(0); // just in case
-                            if (!ReadFile(g_stdin_handle, &stdin_byte_buf[0], g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
+                            if (!ReadFile(g_stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
                                 if (thread_data.cancel_io) break;
 
                                 win_error = GetLastError();
@@ -357,7 +363,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                     SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
 
-                                    WriteFile(g_tee_file_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_file_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                     if (thread_data.cancel_io) break;
 
                                     if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
@@ -375,7 +381,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             }
 
                             if (_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
-                                WriteFile(g_tee_named_pipe_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_named_pipe_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdin_pipe_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
@@ -386,7 +392,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                             if (_is_valid_handle(g_stdin_pipe_write_handle)) {
                                 SetLastError(0); // just in case
-                                if (WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                if (WriteFile(g_stdin_pipe_write_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_write, NULL)) {
                                     if (g_flags.stdin_output_flush || g_flags.inout_flush) {
                                         FlushFileBuffers(g_stdin_pipe_write_handle);
                                     }
@@ -418,7 +424,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                         }
                         else if (!num_bytes_avail) {
                             SetLastError(0); // just in case
-                            if (!WriteFile(g_stdin_pipe_write_handle, &stdin_byte_buf[0], 0, &num_bytes_write, NULL)) {
+                            if (!WriteFile(g_stdin_pipe_write_handle, stdin_byte_buf.data(), 0, &num_bytes_write, NULL)) {
                                 if (thread_data.cancel_io) break;
 
                                 stream_eof = true;
@@ -511,7 +517,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 //
 //                                if (num_events_read) {
 //                                    SetLastError(0); // just in case
-//                                    if (!ReadConsoleInput(g_stdin_handle, (PINPUT_RECORD)&stdin_byte_buf[0], tee_stdin_read_buf_size, &num_events_read)) {
+//                                    if (!ReadConsoleInput(g_stdin_handle, (PINPUT_RECORD)stdin_byte_buf.data(), tee_stdin_read_buf_size, &num_events_read)) {
 //                                        if (thread_data.cancel_io) break;
 //
 //                                        win_error = GetLastError();
@@ -534,7 +540,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 //                                    }
 //
 //                                    for (size_t i = 0; i < size_t(num_events_read); i++) {
-//                                        const INPUT_RECORD & input_record = PINPUT_RECORD(&stdin_byte_buf[0])[i];
+//                                        const INPUT_RECORD & input_record = PINPUT_RECORD(stdin_byte_buf.data())[i];
 //    
 //                                        if (input_record.EventType == KEY_EVENT) {
 //                                            const KEY_EVENT_RECORD & key_event_record = input_record.Event.KeyEvent;
@@ -548,7 +554,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 //                                                            stdin_wchar_buf[j] = key_event_record.uChar.UnicodeChar;
 //                                                        }
 //
-//                                                        WriteFile(g_tee_file_stdin_handle, &stdin_wchar_buf[0], sizeof(wchar_t) * key_event_record.wRepeatCount,
+//                                                        WriteFile(g_tee_file_stdin_handle, stdin_wchar_buf.data(), sizeof(wchar_t) * key_event_record.wRepeatCount,
 //                                                            &num_bytes_written, NULL);
 //                                                    }
 //                                                    else {
@@ -558,7 +564,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 //                                                            stdin_char_buf[j] = key_event_record.uChar.AsciiChar;
 //                                                        }
 //
-//                                                        WriteFile(g_tee_file_stdin_handle, &stdin_char_buf[0], sizeof(char) * key_event_record.wRepeatCount,
+//                                                        WriteFile(g_tee_file_stdin_handle, stdin_char_buf.data(), sizeof(char) * key_event_record.wRepeatCount,
 //                                                            &num_bytes_written, NULL);
 //                                                    }
 //
@@ -574,7 +580,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 //                                    }
 //
 //                                    //SetLastError(0); // just in case
-//                                    //if (!WriteConsoleInput(g_stdin_child_handle, (PINPUT_RECORD)&stdin_byte_buf[0], num_events_read, &num_events_written)) {
+//                                    //if (!WriteConsoleInput(g_stdin_child_handle, (PINPUT_RECORD)stdin_byte_buf.data(), num_events_read, &num_events_written)) {
 //                                    //    if (thread_data.cancel_io) break;
 //
 //                                    //    win_error = GetLastError();
@@ -649,7 +655,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                     while (!stream_eof) {
                         SetLastError(0); // just in case
-                        if (!ReadFile(g_stdout_pipe_read_handle, &stdout_byte_buf[0], g_options.tee_stdout_read_buf_size, &num_bytes_read, NULL)) {
+                        if (!ReadFile(g_stdout_pipe_read_handle, stdout_byte_buf.data(), g_options.tee_stdout_read_buf_size, &num_bytes_read, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             win_error = GetLastError();
@@ -680,7 +686,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                     SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
 
-                                    WriteFile(g_tee_file_stdout_handle, &stdout_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_file_stdout_handle, stdout_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                     if (thread_data.cancel_io) break;
 
                                     if (g_flags.tee_stdout_file_flush || g_flags.tee_stdout_flush || g_flags.tee_output_flush || g_flags.tee_inout_flush) {
@@ -698,7 +704,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             }
 
                             if (_is_valid_handle(g_tee_named_pipe_stdout_handle)) {
-                                WriteFile(g_tee_named_pipe_stdout_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_named_pipe_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdout_pipe_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush) {
@@ -718,7 +724,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                     }
 
                                     SetLastError(0); // just in case
-                                    if (WriteFile(g_stdout_handle, &stdout_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                    if (WriteFile(g_stdout_handle, stdout_byte_buf.data(), num_bytes_read, &num_bytes_write, NULL)) {
                                         if (g_flags.stdout_flush || g_flags.output_flush || g_flags.inout_flush) {
                                             FlushFileBuffers(g_stdout_handle);
                                         }
@@ -820,7 +826,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                     while (!stream_eof) {
                         SetLastError(0); // just in case
-                        if (!ReadFile(g_stderr_pipe_read_handle, &stderr_byte_buf[0], g_options.tee_stderr_read_buf_size, &num_bytes_read, NULL))
+                        if (!ReadFile(g_stderr_pipe_read_handle, stderr_byte_buf.data(), g_options.tee_stderr_read_buf_size, &num_bytes_read, NULL))
                         {
                             if (thread_data.cancel_io) break;
 
@@ -852,7 +858,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                     SetFilePointer(g_tee_file_stderr_handle, 0, NULL, FILE_END);
 
-                                    WriteFile(g_tee_file_stderr_handle, &stderr_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_file_stderr_handle, stderr_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                     if (thread_data.cancel_io) break;
 
                                     if (g_flags.tee_stderr_file_flush || g_flags.tee_stderr_flush || g_flags.tee_output_flush || g_flags.tee_inout_flush) {
@@ -870,7 +876,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             }
 
                             if (_is_valid_handle(g_tee_named_pipe_stderr_handle)) {
-                                WriteFile(g_tee_named_pipe_stderr_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_named_pipe_stderr_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stderr_pipe_flush || g_flags.tee_stderr_flush || g_flags.tee_inout_flush) {
@@ -890,7 +896,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                     }
 
                                     SetLastError(0); // just in case
-                                    if (WriteFile(g_stderr_handle, &stderr_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                                    if (WriteFile(g_stderr_handle, stderr_byte_buf.data(), num_bytes_read, &num_bytes_write, NULL)) {
                                         if (g_flags.stderr_flush || g_flags.output_flush || g_flags.inout_flush) {
                                             FlushFileBuffers(g_stderr_handle);
                                         }
@@ -1063,7 +1069,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                 while (!stream_eof) {
                     SetLastError(0); // just in case
-                    if (!ReadFile(g_stdin_handle, &stdin_byte_buf[0], g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
+                    if (!ReadFile(g_stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
                         if (thread_data.cancel_io) break;
 
                         win_error = GetLastError();
@@ -1094,7 +1100,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                                 SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
 
-                                WriteFile(g_tee_file_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_file_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
@@ -1119,7 +1125,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                                 SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
 
-                                WriteFile(g_tee_file_stdout_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_file_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdout_file_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush || g_flags.tee_output_flush) {
@@ -1137,7 +1143,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                         }
 
                         if (_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
-                            WriteFile(g_tee_named_pipe_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                            WriteFile(g_tee_named_pipe_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                             if (thread_data.cancel_io) break;
 
                             if (g_flags.tee_stdin_pipe_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
@@ -1147,7 +1153,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                         }
 
                         if (_is_valid_handle(g_tee_named_pipe_stdout_handle)) {
-                            WriteFile(g_tee_named_pipe_stdout_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                            WriteFile(g_tee_named_pipe_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                             if (thread_data.cancel_io) break;
 
                             if (g_flags.tee_stdout_pipe_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush || g_flags.tee_output_flush) {
@@ -1158,7 +1164,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                         if (_is_valid_handle(g_stdout_handle)) {
                             SetLastError(0); // just in case
-                            if (WriteFile(g_stdout_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                            if (WriteFile(g_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_write, NULL)) {
                                 if (g_flags.stdin_output_flush || g_flags.stdout_flush || g_flags.inout_flush || g_flags.output_flush) {
                                     FlushFileBuffers(g_stdout_handle);
                                 }
@@ -1246,7 +1252,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                     if (num_bytes_avail) {
                         SetLastError(0); // just in case
-                        if (!ReadFile(g_stdin_handle, &stdin_byte_buf[0], g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
+                        if (!ReadFile(g_stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             win_error = GetLastError();
@@ -1278,7 +1284,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                                 SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
 
-                                WriteFile(g_tee_file_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_file_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
@@ -1303,7 +1309,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                                 SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
 
-                                WriteFile(g_tee_file_stdout_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_file_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdout_file_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush || g_flags.tee_output_flush) {
@@ -1321,7 +1327,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                         }
 
                         if (_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
-                            WriteFile(g_tee_named_pipe_stdin_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                            WriteFile(g_tee_named_pipe_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                             if (thread_data.cancel_io) break;
 
                             if (g_flags.tee_stdin_pipe_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
@@ -1331,7 +1337,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                         }
 
                         if (_is_valid_handle(g_tee_named_pipe_stdout_handle)) {
-                            WriteFile(g_tee_named_pipe_stdout_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_written, NULL);
+                            WriteFile(g_tee_named_pipe_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                             if (thread_data.cancel_io) break;
 
                             if (g_flags.tee_stdout_pipe_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush || g_flags.tee_output_flush) {
@@ -1342,7 +1348,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                         if (_is_valid_handle(g_stdout_handle)) {
                             SetLastError(0); // just in case
-                            if (WriteFile(g_stdout_handle, &stdin_byte_buf[0], num_bytes_read, &num_bytes_write, NULL)) {
+                            if (WriteFile(g_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_write, NULL)) {
                                 if (g_flags.stdin_output_flush || g_flags.stdout_flush || g_flags.inout_flush || g_flags.output_flush) {
                                     FlushFileBuffers(g_stdout_handle);
                                 }
@@ -1374,7 +1380,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                     }
                     else if (!num_bytes_avail) {
                         SetLastError(0); // just in case
-                        if (!WriteFile(g_stdout_handle, &stdin_byte_buf[0], 0, &num_bytes_write, NULL)) {
+                        if (!WriteFile(g_stdout_handle, stdin_byte_buf.data(), 0, &num_bytes_write, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             stream_eof = true;
@@ -2553,8 +2559,8 @@ bool ReopenStdout(int & ret, DWORD & win_error, const Flags & flags, const Optio
 
             tmp_buf.resize(MAX_PATH);
             tmp_buf[0] = _T('\0');
-            const DWORD num_chars = GetFullPathName(options.reopen_stdout_as_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
-            g_reopen_stdout_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+            const DWORD num_chars = GetFullPathName(options.reopen_stdout_as_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+            g_reopen_stdout_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
             g_reopen_stdout_full_name = _to_lower(g_reopen_stdout_full_name, cp_in);
 
@@ -2692,8 +2698,8 @@ bool ReopenStderr(int & ret, DWORD & win_error, const Flags & flags, const Optio
     if (!options.reopen_stderr_as_file.empty()) {
         tmp_buf.resize(MAX_PATH);
         tmp_buf[0] = _T('\0');
-        const DWORD num_chars = GetFullPathName(options.reopen_stderr_as_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
-        g_reopen_stderr_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+        const DWORD num_chars = GetFullPathName(options.reopen_stderr_as_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+        g_reopen_stderr_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
         g_reopen_stderr_full_name = _to_lower(g_reopen_stderr_full_name, cp_in);
 
@@ -3306,8 +3312,8 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, const Flags & flags,
 
             tmp_buf.resize(MAX_PATH);
             tmp_buf[0] = _T('\0');
-            const DWORD num_chars = GetFullPathName(options.tee_stdin_to_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
-            g_tee_file_stdin_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+            const DWORD num_chars = GetFullPathName(options.tee_stdin_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+            g_tee_file_stdin_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
             g_tee_file_stdin_full_name = _to_lower(g_tee_file_stdin_full_name, cp_in);
 
@@ -3401,8 +3407,8 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, const Flags & flags
     if (!options.tee_stdout_to_file.empty()) {
         tmp_buf.resize(MAX_PATH);
         tmp_buf[0] = _T('\0');
-        const DWORD num_chars = GetFullPathName(options.tee_stdout_to_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
-        g_tee_file_stdout_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+        const DWORD num_chars = GetFullPathName(options.tee_stdout_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+        g_tee_file_stdout_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
         g_tee_file_stdout_full_name = _to_lower(g_tee_file_stdout_full_name, cp_in);
 
@@ -3533,8 +3539,8 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, const Flags & flags
     if (!options.tee_stderr_to_file.empty()) {
         tmp_buf.resize(MAX_PATH);
         tmp_buf[0] = _T('\0');
-        const DWORD num_chars = GetFullPathName(options.tee_stderr_to_file.c_str(), MAX_PATH, &tmp_buf[0], NULL);
-        g_tee_file_stderr_full_name.assign(&tmp_buf[0], &tmp_buf[num_chars]);
+        const DWORD num_chars = GetFullPathName(options.tee_stderr_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+        g_tee_file_stderr_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
         g_tee_file_stderr_full_name = _to_lower(g_tee_file_stderr_full_name, cp_in);
 
@@ -3785,13 +3791,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
         if (break_) break;
 
-        if (!is_idle_execute) {
-            if (!ReopenStderr(ret, win_error, flags, options, cp_in)) {
-                break;
-            }
-
-            if (break_) break;
+        if (!ReopenStderr(ret, win_error, flags, options, cp_in)) {
+            break;
         }
+
+        if (break_) break;
 
         // tee std
 
@@ -3807,13 +3811,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
         if (break_) break;
 
-        if (!is_idle_execute) {
-            if (!CreateTeeOutputFromStderr(ret, win_error, flags, options, cp_in)) {
-                break;
-            }
-
-            if (break_) break;
+        if (!CreateTeeOutputFromStderr(ret, win_error, flags, options, cp_in)) {
+            break;
         }
+
+        if (break_) break;
 
         // Accomplish all client pipe connections for all standard handles from here before duplicate them.
         //
@@ -4578,11 +4580,15 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         stdout_handle_type = g_stdout_handle_type = GetFileType(g_stdout_handle);
         stderr_handle_type = g_stderr_handle_type = GetFileType(g_stderr_handle);
 
-        if (!is_idle_execute && !g_no_std_inherit) {
+        bool has_outbound_pipe_from_conin = false;
+
+        if (!g_no_std_inherit && !g_pipe_stdin_to_stdout) {
             if (stdin_handle_type == FILE_TYPE_DISK || stdin_handle_type == FILE_TYPE_PIPE) {
                 if (!CreateOutboundPipeFromConsoleInput(ret, win_error, flags, options)) {
                     break;
                 }
+
+                has_outbound_pipe_from_conin = true;
 
                 // CAUTION:
                 //  We must set all handles being passed into a child process as inheritable,
@@ -4662,7 +4668,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 }
             }
 
-            if (_is_valid_handle(g_tee_file_stdout_handle)) {
+            if (has_outbound_pipe_from_conin || _is_valid_handle(g_tee_file_stdout_handle)) {
                 if (!CreateInboundPipeToConsoleOutput<1>(ret, win_error, flags, options)) {
                     break;
                 }
@@ -4724,7 +4730,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 si.dwFlags |= STARTF_USESTDHANDLES;
             }
 
-            if (_is_valid_handle(g_tee_file_stderr_handle)) {
+            if (has_outbound_pipe_from_conin || _is_valid_handle(g_tee_file_stderr_handle)) {
                 if (!CreateInboundPipeToConsoleOutput<2>(ret, win_error, flags, options)) {
                     break;
                 }
@@ -4804,6 +4810,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
         if (!is_idle_execute) {
             if_break (app && app_len) {
+                g_ctrl_handler = true;
                 SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update parent console signal handler (does not work as expected)
 
                 if (options.shell_exec_verb.empty()) {
@@ -4812,10 +4819,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                         //  cmd argument must be writable!
                         //
                         cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
-                        memcpy(&cmd_buf[0], cmd, cmd_buf.size());
+                        memcpy(cmd_buf.data(), cmd, cmd_buf.size());
 
                         SetLastError(0); // just in case
-                        ret_create_proc = ::CreateProcess(app, (TCHAR *)&cmd_buf[0], NULL, NULL, TRUE,
+                        ret_create_proc = ::CreateProcess(app, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE,
                             flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                             NULL,
                             !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL,
@@ -4855,7 +4862,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
                     if (!options.shell_exec_verb.empty()) {
                         shell_exec_verb.resize(options.shell_exec_verb.length() + 1);
-                        memcpy(&shell_exec_verb[0], options.shell_exec_verb.c_str(), shell_exec_verb.size() * sizeof(shell_exec_verb[0]));
+                        memcpy(shell_exec_verb.data(), options.shell_exec_verb.c_str(), shell_exec_verb.size() * sizeof(shell_exec_verb[0]));
                         sei.lpVerb = &shell_exec_verb[0];
                     }
 
@@ -4898,13 +4905,14 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 }
             }
             else if (cmd && cmd_len) {
+                g_ctrl_handler = true;
                 SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update parent console signal handler (does not work as expected)
 
                 cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
-                memcpy(&cmd_buf[0], cmd, cmd_buf.size());
+                memcpy(cmd_buf.data(), cmd, cmd_buf.size());
 
                 SetLastError(0); // just in case
-                ret_create_proc = ::CreateProcess(NULL, (TCHAR *)&cmd_buf[0], NULL, NULL, TRUE,
+                ret_create_proc = ::CreateProcess(NULL, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE,
                     flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                     NULL,
                     !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL,
@@ -4929,7 +4937,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 if (!flags.no_print_gen_error_string) {
                     if (options.shell_exec_verb.empty()) {
                         _print_stderr_message(_T("could not create child process: win_error=0x%08X (%d) app=\"%s\" cmd=\"%s\"\n"),
-                            win_error, win_error, app, cmd_buf.size() ? (TCHAR *)&cmd_buf[0] : _T(""));
+                            win_error, win_error, app, cmd_buf.size() ? (TCHAR *)cmd_buf.data() : _T(""));
                     }
                     else {
                         _print_stderr_message(_T("could not shell execute child process: win_error=0x%08X (%d) shell_error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
@@ -5043,6 +5051,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             }
         }
 
+        g_ctrl_handler = false;
+
         if (!g_pipe_stdin_to_stdout) {
             WaitForStreamPipeThreads(g_stream_pipe_thread_locals, false);
         }
@@ -5052,6 +5062,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
     }
     __finally {
         [&]() {
+            g_ctrl_handler = false;
+
             // collect all threads return data
 
             if (!g_pipe_stdin_to_stdout) {

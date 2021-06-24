@@ -1,3 +1,8 @@
+2021.06.24:
+* fixed: Utilities/src/callf: ctrl-c handler disable after child process exit
+* fixed: Utilities/src/callf: always create inbound pipe from child process to console output if outbound pipe to child process from console input is created
+* changed: Utilities/src/callf: minor changes
+
 2021.06.23:
 * new: Utilities/bin/contools: binaries update
 
