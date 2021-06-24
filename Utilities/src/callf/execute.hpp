@@ -375,6 +375,8 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, const Flags & flags
 
 int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, const Flags & flags, const Options & options);
 
+std::tstring SubstNamePlaceholders(std::tstring str);
+
 template <typename T, size_t N>
 inline void WaitForWorkerThreads(T (& locals)[N], bool cancel_io, bool wait_all = true)
 {

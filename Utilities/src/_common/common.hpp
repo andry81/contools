@@ -520,6 +520,36 @@ namespace {
         _ConsoleWindowOwnerProc & operator =(_ConsoleWindowOwnerProc &&) = default;
     };
 
+    inline DWORD _find_parent_proc_id()
+    {
+        DWORD parent_proc_id = -1;
+
+        HANDLE proc_list_handle = INVALID_HANDLE_VALUE;
+        const DWORD current_proc_id = GetCurrentProcessId();
+
+        [&]() { __try {
+            [&]() {
+                proc_list_handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+                PROCESSENTRY32 pe = { 0 };
+                pe.dwSize = sizeof(PROCESSENTRY32);
+
+                if (Process32First(proc_list_handle, &pe)) {
+                    do {
+                        if (current_proc_id == pe.th32ProcessID) {
+                            parent_proc_id = pe.th32ParentProcessID;
+                            break;
+                        }
+                    } while (Process32Next(proc_list_handle, &pe));
+                }
+            }();
+        }
+        __finally {
+            _close_handle(proc_list_handle);
+        } }();
+
+        return parent_proc_id;
+    }
+
     // CAUTION:
     //  Function GetConsoleWindow() returns already inherited console window handle!
     //  We have to find console window relation through the console windows enumeration.
@@ -1318,13 +1348,31 @@ namespace {
         }
     }
 
-    inline std::tstring _replace_strings(std::tstring str, const std::tstring & from, const std::tstring & to)
+    inline std::tstring _replace_strings(std::tstring str, const std::tstring & from, std::tstring to)
     {
         size_t start_pos = 0;
+
         while ((start_pos = str.find(from, start_pos)) != std::tstring::npos) {
             str.replace(start_pos, from.length(), to);
             start_pos += to.length();
         }
+
+        return str;
+    }
+
+    template <typename Functor>
+    inline std::tstring _replace_strings(std::tstring str, const std::tstring & from, Functor && to_functor)
+    {
+        size_t index = 0;
+        size_t start_pos = 0;
+
+        while ((start_pos = str.find(from, start_pos)) != std::tstring::npos) {
+            auto to = std::forward<Functor>(to_functor)(index, start_pos);
+            str.replace(start_pos, from.length(), to);
+            start_pos += to.length();
+            index++;
+        }
+
         return str;
     }
 

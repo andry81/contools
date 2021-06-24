@@ -5262,6 +5262,15 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
     return ret;
 }
 
+std::tstring SubstNamePlaceholders(std::tstring str)
+{
+    std::tstring pid_str = std::to_tstring(GetCurrentProcessId());
+    std::tstring ppid_str = std::to_tstring(g_parent_proc_id);
+
+    std::tstring replaced_str = _replace_strings(str, _T("{pid}"), pid_str);
+    return _replace_strings(replaced_str, _T("{ppid}"), ppid_str);
+}
+
 template DWORD WINAPI StreamPipeThread<0>(LPVOID lpParam);
 template DWORD WINAPI StreamPipeThread<1>(LPVOID lpParam);
 template DWORD WINAPI StreamPipeThread<2>(LPVOID lpParam);

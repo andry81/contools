@@ -573,6 +573,10 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       call has no effect. Stderr does not used on idle execution and all
       operations over it has no effect.
 
+    Name string placeholders:
+      {pid}     - current process identifier as decimal number
+      {ppid}    - parent process identifier as decimal number
+
     In case of ShellExecute the <ParametersFormatString> must contain only a
     command line arguments, but not the path to the executable (or document)
     itself which is part of <CommandLineFormatString>!
@@ -646,11 +650,11 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
     1. callf.exe /reopen-stdin 0.in .
     2. callf.exe /reopen-stdin 0.in "" "cmd.exe /k"
 
-    3. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123 ."
-    4. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123 \"\" \"cmd.exe /k\""
+    3. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123_{ppid} ."
+    4. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123_{ppid} \"\" \"cmd.exe /k\""
 
-    5. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123 ."
-    6. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123 /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123 \"\" \"cmd.exe /k\""
+    5. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123_{ppid} ."
+    6. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123_{ppid} \"\" \"cmd.exe /k\""
 
     Example #1 prints content of the `0.in` file to the console.
     Example #2 writes content of the `0.in` file to the `cmd.exe /k` process
