@@ -1,3 +1,6 @@
+2021.06.30:
+* new: Scripts/Tools/fun: `matrix.bat` script
+
 2021.06.25:
 * new: Utilities/src/callf: `{pid}` and `{ppid}` placeholders to use in pipe names to generate unique pipe name
 
@@ -13,9 +16,9 @@
 * new: Utilities/bin/contools: binaries update
 
 2021.06.23:
-* new: Utilities/src/callf: `/reopen-stdin-as-pipe <pipe>`, `/reopen-stdout-as-pipe <pipe>`, `/reopen-stderr-as-pipe <pipe>` options to reopen standard handle as a named pipe
-* new: Utilities/src/callf: `/tee-std[in|out|err]-as-pipe <pipe>`, `/tee-std[in|out|err]-pipe-flush` options to duplicate output to stdin/stdout/stderr into a named pipe
-* new: Utilities/src/callf: `/create-pipe-to-stdout <pipe>`, `/create-pipe-to-stderr <pipe>` options to create a named pipe to read from to write into stdout/stderr. Useful to read stream from self elevated child callf.exe process.
+* new: Utilities/src/callf: `/reopen-std[in|out|err]-as-[server|client]-pipe <pipe>` options to reopen standard handle as a named pipe
+* new: Utilities/src/callf: `/tee-std[in|out|err]-as-[server|client]-pipe <pipe>`, `/tee-std[in|out|err]-pipe-flush` options to duplicate output to stdin/stdout/stderr into a named pipe
+* new: Utilities/src/callf: `/create-inbound-pipe-to-std[out|err] <pipe>`, `/create-outbound-pipe-from-stdin <pipe>` options to create a named pipe instead of anonymous pipe to read/write from/to child process stdin/stdout/stderr.
 * new: Utilities/src/callf: `/tee-std[in|out|err]-flush` flag to flush both a tee file and a tee named pipe
 * new: Utilities/src/callf: Use `.` string as `ApplicationNameFormatString` in a command line to avoid child process creation (idle execution). Useful to test a server named pipe connection await or just redirect output from an inbound named pipe to the console window.
 * new: Utilities/src/callf: `/no-std-inherit` flag to prevent standard handles inheritance into child process

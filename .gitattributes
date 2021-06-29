@@ -528,6 +528,7 @@ Scripts/Tools/filesys/reduce_relative_path.bat -text
 Scripts/Tools/filesys/split_pathstr.bat -text
 Scripts/Tools/filesys/subtract_path.bat -text
 Scripts/Tools/filesys/subtract_relative_path.bat -text
+Scripts/Tools/fun/matrix.cmd -text
 Scripts/Tools/funclib.sh -text
 Scripts/Tools/gccmrt.bat -text
 Scripts/Tools/gccmrt.sh -text
