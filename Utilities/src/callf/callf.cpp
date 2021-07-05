@@ -28,13 +28,15 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
 
-const TCHAR * g_elevate_flags_to_preparse_arr[] = {
+const TCHAR * g_elevate_parent_flags_to_preparse_arr[] = {
     _T("/create-console"),
     _T("/create-console-title"),
     _T("/own-console-title"),
     _T("/console-title"),
-    _T("/disable-conout-reattach-to-visible-console"),
-    _T("/disable-conout-duplicate-to-parent-console-on-error")
+};
+
+const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
+    _T("/attach-parent-console"),
 };
 
 const TCHAR * g_promote_flags_to_preparse_arr[] = {
@@ -174,7 +176,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
 
-const TCHAR * g_elevate_flags_to_parse_arr[] = {
+const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
     _T("/no-wait"),
@@ -234,6 +236,41 @@ const TCHAR * g_elevate_flags_to_parse_arr[] = {
     _T("/eval-dbl-backslash-esc"), // _T("/e\\\\"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
+};
+
+const TCHAR * g_elevate_child_flags_to_parse_arr[] = {
+    _T("/reopen-stdin"),
+    _T("/reopen-stdin-as-server-pipe"),
+    _T("/reopen-stdin-as-server-pipe-connect-timeout"),
+    _T("/reopen-stdin-as-server-pipe-in-buf-size"),
+    _T("/reopen-stdin-as-server-pipe-out-buf-size"),
+    _T("/reopen-stdin-as-client-pipe"),
+    _T("/reopen-stdin-as-client-pipe-connect-timeout"),
+    _T("/reopen-stdout"),
+    _T("/reopen-stdout-as-server-pipe"),
+    _T("/reopen-stdout-as-server-pipe-connect-timeout"),
+    _T("/reopen-stdout-as-server-pipe-in-buf-size"),
+    _T("/reopen-stdout-as-server-pipe-out-buf-size"),
+    _T("/reopen-stdout-as-client-pipe"),
+    _T("/reopen-stdout-as-client-pipe-connect-timeout"),
+    _T("/reopen-stderr"),
+    _T("/reopen-stderr-as-server-pipe"),
+    _T("/reopen-stderr-as-server-pipe-connect-timeout"),
+    _T("/reopen-stderr-as-server-pipe-in-buf-size"),
+    _T("/reopen-stderr-as-server-pipe-out-buf-size"),
+    _T("/reopen-stderr-as-client-pipe"),
+    _T("/reopen-stderr-as-client-pipe-connect-timeout"),
+    _T("/reopen-stdout-file-truncate"),
+    _T("/reopen-stderr-file-truncate"),
+    _T("/stdout-dup"),
+    _T("/stderr-dup"),
+    _T("/stdin-output-flush"),
+    _T("/stdout-flush"),
+    _T("/stderr-flush"),
+    _T("/output-flush"),
+    _T("/inout-flush"),
+    _T("/mutex-std-writes"),
+    _T("/attach-parent-console"),
 };
 
 const TCHAR * g_promote_flags_to_parse_arr[] = {
@@ -316,7 +353,7 @@ inline int invalid_format_flag_message(const TCHAR * fmt, ...)
     if (!g_flags.no_print_gen_error_string) {
         va_list vl;
         va_start(vl, fmt);
-        _print_stderr_message_va(_T("flag format is invalid: %s\n"), vl);
+        _print_stderr_message_va(fmt, vl);
         va_end(vl);
     }
     return err_invalid_format;
@@ -1830,10 +1867,15 @@ int _tmain(int argc, const TCHAR * argv[])
             {
                 arg = argv[arg_offset];
 
-                if (ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
-                    !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
-                    !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
-                    g_elevate_flags_to_preparse_arr, g_empty_flags_arr) >= 0) {
+                if ((!is_elevate_child_flags ?
+                        ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
+                            !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
+                            g_elevate_parent_flags_to_preparse_arr, g_empty_flags_arr) :
+                        ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
+                            !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
+                            g_elevate_child_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
                     if (parse_error != err_none) {
                         return parse_error;
                     }
@@ -2124,10 +2166,17 @@ int _tmain(int argc, const TCHAR * argv[])
                     {
                         arg = argv[arg_offset];
 
-                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
-                            !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
-                            !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
-                            g_elevate_flags_to_parse_arr, g_elevate_flags_to_preparse_arr)) >= 0) {
+                        if ((parse_result = (!is_elevate_child_flags ?
+                                ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                                    !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
+                                    !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
+                                    g_elevate_parent_flags_to_parse_arr,
+                                    g_elevate_parent_flags_to_preparse_arr) :
+                                ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                                    !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
+                                    !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
+                                    g_elevate_child_flags_to_parse_arr,
+                                    g_elevate_child_flags_to_preparse_arr))) >= 0) {
                             if (!parse_result && parse_error != err_none) {
                                 parse_error = invalid_format_flag(arg);
                             }

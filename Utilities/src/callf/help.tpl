@@ -189,6 +189,11 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           Limited set of flags to pass exceptionally into the child
           (elevated) `callf.exe` process.
 
+          /reopen-std[in|out|err]*
+          /std[in|out|err]-*
+          /output-*
+          /inout-*
+          /mutex-std-*
           /attach-parent-console
 
         All flags has no effect if elevation is not executed.

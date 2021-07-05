@@ -1,4 +1,8 @@
 2021.07.05:
+* fixed: Utilities/src/callf: access violation in the `invalid_format_flag_message` function
+* fixed: Utilities/src/callf: parse of elevation nested flags
+
+2021.07.05:
 * fixed: Utilities/src/callf: `argv[0]` parameter as argument instead of a program
 * new: Utilities/src/callf: `/elevate` flag to self elevate `callf.exe` process with builtin command line translation
 * new: Utilities/src/callf: `/elevate{ <ParentFlags> }[{ <ChildFlags> }]` option for limited set of flags to declare flags exceptionally for the parent (not elevated) `callf.exe` process in case of elevation is executed and for the child (elevated) `callf.exe` process in case of elevation is executed
