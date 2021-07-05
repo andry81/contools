@@ -478,6 +478,10 @@ namespace
 
 int main(int argc, char * argv[])
 {
+    // CAUTION:
+    //  In Windows if you call `CreateProcess` like this: `CreateProcess("a.exe", "/b", ...)`, then the `argv[0]` would be `/b`, not `a.exe`!
+    //
+
     if(!argc || !argv[0])
         return err_unspecified;
 

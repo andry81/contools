@@ -1,7 +1,34 @@
 #include "execute.hpp"
 
+
+#define MERGE_FLAG(flags, flag) \
+    if (flags.flag) { \
+        flag = flags.flag; \
+    } \
+
+#define MERGE_OPTION(options, option, def_value) \
+    if (options.option != def_value) { \
+        option = options.option; \
+    } \
+
+#define MERGE_OPTION_IF(options, option, exp) \
+    if (exp) { \
+        option = options.option; \
+    } \
+
 Flags g_flags                       = {};
+Flags g_regular_flags               = {};
+Flags g_elevate_parent_flags        = {};
+Flags g_elevate_child_flags         = {};
+Flags g_promote_flags               = {};
+Flags g_promote_parent_flags        = {};
+
 Options g_options                   = {};
+Options g_regular_options           = {};
+Options g_elevate_parent_options    = {};
+Options g_elevate_child_options     = {};
+Options g_promote_options           = {};
+Options g_promote_parent_options    = {};
 
 DWORD g_parent_proc_id              = -1;
 HWND  g_current_proc_console_window = NULL;
@@ -64,10 +91,238 @@ DWORD g_child_process_group_id      = -1; // to pass signals into child process
 
 StreamPipeThreadLocals g_stream_pipe_thread_locals[3];
 StreamPipeThreadLocals g_stdin_to_stdout_thread_locals;
+ConnectNamedPipeThreadLocals g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[3];
 ConnectNamedPipeThreadLocals g_connect_server_named_pipe_thread_locals[2][3]; // <int handle_type, int co_stream_type>
 ConnectNamedPipeThreadLocals g_connect_client_named_pipe_thread_locals[2][3]; // <int handle_type, int co_stream_type>
 
 WorkerThreadsReturnData g_worker_threads_return_data;
+
+
+void Flags::merge(const Flags & flags)
+{
+    MERGE_FLAG(flags, show_help);
+    MERGE_FLAG(flags, disable_conout_reattach_to_visible_console);
+    MERGE_FLAG(flags, disable_conout_duplicate_to_parent_console_on_error);
+    MERGE_FLAG(flags, elevate);
+    MERGE_FLAG(flags, stdin_output_flush);
+    MERGE_FLAG(flags, stdout_flush);
+    MERGE_FLAG(flags, stderr_flush);
+    MERGE_FLAG(flags, output_flush);
+    MERGE_FLAG(flags, inout_flush);
+    MERGE_FLAG(flags, reopen_stdout_file_truncate);
+    MERGE_FLAG(flags, reopen_stderr_file_truncate);
+    MERGE_FLAG(flags, tee_stdin_file_truncate);
+    MERGE_FLAG(flags, tee_stdout_file_truncate);
+    MERGE_FLAG(flags, tee_stderr_file_truncate);
+    MERGE_FLAG(flags, tee_stdin_file_flush);
+    MERGE_FLAG(flags, tee_stdin_pipe_flush);
+    MERGE_FLAG(flags, tee_stdin_flush);
+    MERGE_FLAG(flags, tee_stdout_file_flush);
+    MERGE_FLAG(flags, tee_stdout_pipe_flush);
+    MERGE_FLAG(flags, tee_stdout_flush);
+    MERGE_FLAG(flags, tee_stderr_file_flush);
+    MERGE_FLAG(flags, tee_stderr_pipe_flush);
+    MERGE_FLAG(flags, tee_stderr_flush);
+    MERGE_FLAG(flags, tee_output_flush);
+    MERGE_FLAG(flags, tee_inout_flush);
+    MERGE_FLAG(flags, ret_create_proc);
+    MERGE_FLAG(flags, ret_win_error);
+    MERGE_FLAG(flags, ret_child_exit);
+    MERGE_FLAG(flags, print_win_error_string);
+    MERGE_FLAG(flags, print_shell_error_string);
+    MERGE_FLAG(flags, no_print_gen_error_string);
+    MERGE_FLAG(flags, no_sys_dialog_ui);
+    MERGE_FLAG(flags, no_wait);
+    MERGE_FLAG(flags, no_window);
+    MERGE_FLAG(flags, no_expand_env);
+    MERGE_FLAG(flags, no_subst_vars);
+    MERGE_FLAG(flags, no_std_inherit);
+    MERGE_FLAG(flags, pipe_stdin_to_stdout);
+    MERGE_FLAG(flags, shell_exec_expand_env);
+    MERGE_FLAG(flags, create_child_console);
+    MERGE_FLAG(flags, create_console);
+    MERGE_FLAG(flags, attach_parent_console);
+    MERGE_FLAG(flags, eval_backslash_esc);
+    MERGE_FLAG(flags, eval_dbl_backslash_esc);
+    MERGE_FLAG(flags, init_com);
+    MERGE_FLAG(flags, wait_child_start);
+    MERGE_FLAG(flags, mutex_std_writes);
+    MERGE_FLAG(flags, mutex_tee_file_writes);
+}
+
+void Flags::clear()
+{
+    *this = Flags{};
+}
+
+
+Options::Options()
+{
+    chcp_in = chcp_out = win_error_langid = 0;
+
+    stdout_dup = stderr_dup = -1;
+    tee_stdin_dup = tee_stdout_dup = tee_stderr_dup = -1;
+
+    reopen_stdin_as_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+    reopen_stdin_as_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+
+    reopen_stdout_as_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+    reopen_stdout_as_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+
+    reopen_stderr_as_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+    reopen_stderr_as_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+
+    reopen_stdin_as_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
+    reopen_stdout_as_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
+    reopen_stderr_as_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
+
+    reopen_stdin_as_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
+    reopen_stdout_as_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
+    reopen_stderr_as_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
+
+    create_outbound_server_pipe_from_stdin_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+    create_inbound_server_pipe_to_stdout_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+    create_inbound_server_pipe_to_stderr_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+
+    create_outbound_server_pipe_from_stdin_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
+    create_inbound_server_pipe_to_stdout_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
+    create_inbound_server_pipe_to_stderr_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
+
+    create_outbound_server_pipe_from_stdin_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
+    create_inbound_server_pipe_to_stdout_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
+    create_inbound_server_pipe_to_stderr_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
+
+    tee_stdin_to_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+    tee_stdin_to_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+
+    tee_stdout_to_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+    tee_stdout_to_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+
+    tee_stderr_to_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+    tee_stderr_to_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
+
+    tee_stdin_to_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
+    tee_stdout_to_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
+    tee_stderr_to_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
+
+    tee_stdin_to_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
+    tee_stdout_to_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
+    tee_stderr_to_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
+
+    tee_stdin_pipe_buf_size = DEFAULT_ANONYMOUS_PIPE_BUF_SIZE;
+    tee_stdout_pipe_buf_size = DEFAULT_ANONYMOUS_PIPE_BUF_SIZE;
+    tee_stderr_pipe_buf_size = DEFAULT_ANONYMOUS_PIPE_BUF_SIZE;
+
+    // 64K read buffer by default
+    tee_stdin_read_buf_size = DEFAULT_READ_BUF_SIZE;
+    tee_stdout_read_buf_size = DEFAULT_READ_BUF_SIZE;
+    tee_stderr_read_buf_size = DEFAULT_READ_BUF_SIZE;
+
+    stdin_echo = -1;
+
+    show_as = SW_SHOWNORMAL;
+}
+
+void Options::merge(const Options & options)
+{
+    MERGE_OPTION(options, shell_exec_verb, std::tstring{});
+    MERGE_OPTION(options, change_current_dir, std::tstring{});
+
+    MERGE_OPTION(options, reopen_stdin_as_file, std::tstring{});
+    MERGE_OPTION(options, reopen_stdin_as_server_pipe, std::tstring{});
+    MERGE_OPTION(options, reopen_stdin_as_client_pipe, std::tstring{});
+    MERGE_OPTION(options, reopen_stdout_as_file, std::tstring{});
+    MERGE_OPTION(options, reopen_stdout_as_server_pipe, std::tstring{});
+    MERGE_OPTION(options, reopen_stdout_as_client_pipe, std::tstring{});
+    MERGE_OPTION(options, reopen_stderr_as_file, std::tstring{});
+    MERGE_OPTION(options, reopen_stderr_as_server_pipe, std::tstring{});
+    MERGE_OPTION(options, reopen_stderr_as_client_pipe, std::tstring{});
+
+    MERGE_OPTION(options, tee_stdin_to_file, std::tstring{});
+    MERGE_OPTION(options, tee_stdin_to_server_pipe, std::tstring{});
+    MERGE_OPTION(options, tee_stdin_to_client_pipe, std::tstring{});
+    MERGE_OPTION(options, tee_stdout_to_file, std::tstring{});
+    MERGE_OPTION(options, tee_stdout_to_server_pipe, std::tstring{});
+    MERGE_OPTION(options, tee_stdout_to_client_pipe, std::tstring{});
+    MERGE_OPTION(options, tee_stderr_to_file, std::tstring{});
+    MERGE_OPTION(options, tee_stderr_to_server_pipe, std::tstring{});
+    MERGE_OPTION(options, tee_stderr_to_client_pipe, std::tstring{});
+
+    MERGE_OPTION_IF(options, create_console_title, options.has.create_console_title);
+    MERGE_OPTION_IF(options, own_console_title, options.has.own_console_title);
+    MERGE_OPTION_IF(options, console_title, options.has.console_title);
+
+    MERGE_OPTION(options, create_outbound_server_pipe_from_stdin, std::tstring{});
+    MERGE_OPTION(options, create_inbound_server_pipe_to_stdout, std::tstring{});
+    MERGE_OPTION(options, create_inbound_server_pipe_to_stderr, std::tstring{});
+
+    MERGE_OPTION(options, chcp_in, 0);
+    MERGE_OPTION(options, chcp_out, 0);
+    MERGE_OPTION(options, win_error_langid, 0);
+
+    MERGE_OPTION(options, stdout_dup, -1);
+    MERGE_OPTION(options, stderr_dup, -1);
+
+    MERGE_OPTION(options, tee_stdin_dup, -1);
+    MERGE_OPTION(options, tee_stdout_dup, -1);
+    MERGE_OPTION(options, tee_stderr_dup, -1);
+
+    MERGE_OPTION(options, reopen_stdin_as_server_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, reopen_stdin_as_client_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, reopen_stdout_as_server_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, reopen_stdout_as_client_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, reopen_stderr_as_server_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, reopen_stderr_as_client_pipe_connect_timeout_ms, 0);
+
+    MERGE_OPTION(options, reopen_stdin_as_server_pipe_in_buf_size, 0);
+    MERGE_OPTION(options, reopen_stdin_as_server_pipe_out_buf_size, 0);
+    MERGE_OPTION(options, reopen_stdout_as_server_pipe_in_buf_size, 0);
+    MERGE_OPTION(options, reopen_stdout_as_server_pipe_out_buf_size, 0);
+    MERGE_OPTION(options, reopen_stderr_as_server_pipe_in_buf_size, 0);
+    MERGE_OPTION(options, reopen_stderr_as_server_pipe_out_buf_size, 0);
+
+    MERGE_OPTION(options, create_outbound_server_pipe_from_stdin_connect_timeout_ms, 0);
+    MERGE_OPTION(options, create_inbound_server_pipe_to_stdout_connect_timeout_ms, 0);
+    MERGE_OPTION(options, create_inbound_server_pipe_to_stderr_connect_timeout_ms, 0);
+
+    MERGE_OPTION(options, create_outbound_server_pipe_from_stdin_in_buf_size, 0);
+    MERGE_OPTION(options, create_outbound_server_pipe_from_stdin_out_buf_size, 0);
+    MERGE_OPTION(options, create_inbound_server_pipe_to_stdout_in_buf_size, 0);
+    MERGE_OPTION(options, create_inbound_server_pipe_to_stdout_out_buf_size, 0);
+    MERGE_OPTION(options, create_inbound_server_pipe_to_stderr_in_buf_size, 0);
+    MERGE_OPTION(options, create_inbound_server_pipe_to_stderr_out_buf_size, 0);
+
+    MERGE_OPTION(options, tee_stdin_to_server_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, tee_stdin_to_client_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, tee_stdout_to_server_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, tee_stdout_to_client_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, tee_stderr_to_server_pipe_connect_timeout_ms, 0);
+    MERGE_OPTION(options, tee_stderr_to_client_pipe_connect_timeout_ms, 0);
+
+    MERGE_OPTION(options, tee_stdin_to_server_pipe_in_buf_size, 0);
+    MERGE_OPTION(options, tee_stdin_to_server_pipe_out_buf_size, 0);
+    MERGE_OPTION(options, tee_stdout_to_server_pipe_in_buf_size, 0);
+    MERGE_OPTION(options, tee_stdout_to_server_pipe_out_buf_size, 0);
+    MERGE_OPTION(options, tee_stderr_to_server_pipe_in_buf_size, 0);
+    MERGE_OPTION(options, tee_stderr_to_server_pipe_out_buf_size, 0);
+
+    MERGE_OPTION(options, tee_stdin_pipe_buf_size, 0);
+    MERGE_OPTION(options, tee_stdout_pipe_buf_size, 0);
+    MERGE_OPTION(options, tee_stderr_pipe_buf_size, 0);
+    MERGE_OPTION(options, tee_stdin_read_buf_size, 0);
+    MERGE_OPTION(options, tee_stdout_read_buf_size, 0);
+    MERGE_OPTION(options, tee_stderr_read_buf_size, 0);
+
+    MERGE_OPTION(options, stdin_echo, -1);
+    MERGE_OPTION(options, show_as, SW_SHOWNORMAL);
+
+    has = options.has;
+}
+
+void Options::clear()
+{
+    *this = Options{};
+}
 
 
 BOOL WINAPI ChildCtrlHandler(DWORD ctrl_type)
@@ -115,7 +370,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
     bool break_ = false;
 
     // NOTE:
-    //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+    //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
     [&]() { __try {
         [&]() {
@@ -124,6 +379,23 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
             {
                 // Accomplish all server pipe connections before continue.
                 //
+
+                {
+                    auto & connect_server_named_pipe_thread_local = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type];
+
+                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
+
+                    // check errors
+                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
+                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                            g_worker_threads_return_data.add(local.thread_data);
+                            local.thread_data.is_copied = true;
+                        }
+                        if (!break_ && local.thread_data.is_error) {
+                            break_ = true;
+                        }
+                    });
+                }
 
                 {
                     auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[0][stream_type];
@@ -281,7 +553,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                     //
                     FlushFileBuffers(g_stdin_pipe_write_handle);
 
-                    if (!g_options.create_outbound_pipe_from_stdin.empty()) {
+                    if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
                         DisconnectNamedPipe(g_stdin_pipe_write_handle);
                     }
                     _close_handle(g_stdin_pipe_write_handle);
@@ -446,7 +718,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                     //
                     FlushFileBuffers(g_stdin_pipe_write_handle);
 
-                    if (!g_options.create_outbound_pipe_from_stdin.empty()) {
+                    if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
                         DisconnectNamedPipe(g_stdin_pipe_write_handle);
                     }
                     _close_handle(g_stdin_pipe_write_handle);
@@ -613,6 +885,23 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
             {
                 // Accomplish all server pipe connections before continue.
                 //
+
+                {
+                    auto & connect_server_named_pipe_thread_local = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type];
+
+                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
+
+                    // check errors
+                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
+                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                            g_worker_threads_return_data.add(local.thread_data);
+                            local.thread_data.is_copied = true;
+                        }
+                        if (!break_ && local.thread_data.is_error) {
+                            break_ = true;
+                        }
+                    });
+                }
 
                 {
                     auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[0][stream_type];
@@ -784,6 +1073,23 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
             {
                 // Accomplish all server pipe connections before continue.
                 //
+
+                {
+                    auto & connect_server_named_pipe_thread_local = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type];
+
+                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
+
+                    // check errors
+                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
+                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                            g_worker_threads_return_data.add(local.thread_data);
+                            local.thread_data.is_copied = true;
+                        }
+                        if (!break_ && local.thread_data.is_error) {
+                            break_ = true;
+                        }
+                    });
+                }
 
                 {
                     auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[0][stream_type];
@@ -979,7 +1285,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
     bool break_ = false;
 
     // NOTE:
-    //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+    //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
     [&]() { __try {
         [&]() {
@@ -1440,7 +1746,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
     DWORD win_error = 0;
 
     // NOTE:
-    //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+    //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
     return [&]() -> DWORD { __try {
         return [&]() -> DWORD {
@@ -1841,7 +2147,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
     DWORD win_error = 0;
 
     // NOTE:
-    //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+    //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
     return [&]() -> DWORD { __try {
         return [&]() -> DWORD {
@@ -2405,12 +2711,8 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
     }();
 }
 
-bool ReopenStdin(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in)
+bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
-
     ret = err_none;
     win_error = 0;
 
@@ -2419,94 +2721,94 @@ bool ReopenStdin(int & ret, DWORD & win_error, const Flags & flags, const Option
     sa.nLength = sizeof(sa);
     sa.bInheritHandle = g_no_std_inherit ? FALSE : TRUE;
 
-    if (!options.reopen_stdin_as_file.empty()) {
+    if (!g_options.reopen_stdin_as_file.empty()) {
         SetLastError(0); // just in case
         if (!_is_valid_handle(g_reopen_stdin_handle =
-                CreateFile(options.reopen_stdin_as_file.c_str(),
+                CreateFile(g_options.reopen_stdin_as_file.c_str(),
                     GENERIC_READ, FILE_SHARE_READ, &sa, // must use `sa` to setup inheritance
                     OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL))) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not reopen stdin as file to read: win_error=0x%08X (%d) file=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stdin_as_file.c_str());
+                    win_error, win_error, g_options.reopen_stdin_as_file.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
 
         if (!_set_crt_std_handle(g_reopen_stdin_handle, 0, true, !g_no_std_inherit)) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not duplicate reopened stdin as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stdin_as_file.c_str());
+                    win_error, win_error, g_options.reopen_stdin_as_file.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
     }
-    else if (!options.reopen_stdin_as_server_pipe.empty()) {
+    else if (!g_options.reopen_stdin_as_server_pipe.empty()) {
         SetLastError(0); // just in case
         if (!_is_valid_handle(g_reopen_stdin_handle =
-            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + options.reopen_stdin_as_server_pipe).c_str(),
+            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stdin_as_server_pipe).c_str(),
                 PIPE_ACCESS_INBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
-                1, options.reopen_stderr_as_server_pipe_out_buf_size, options.reopen_stderr_as_server_pipe_in_buf_size,
+                1, g_options.reopen_stderr_as_server_pipe_out_buf_size, g_options.reopen_stderr_as_server_pipe_in_buf_size,
                 0, &sa))) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not reopen stdin as server named pipe end to read: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stdin_as_server_pipe.c_str());
+                    win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
 
         if (!_set_crt_std_handle(g_reopen_stdin_handle, 0, true, !g_no_std_inherit)) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not duplicate reopened stdin as server named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stdin_as_server_pipe.c_str());
+                    win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
@@ -2518,7 +2820,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, const Flags & flags, const Option
             &g_connect_server_named_pipe_thread_locals[0][0].thread_id
         );
     }
-    else if (!options.reopen_stdin_as_client_pipe.empty()) {
+    else if (!g_options.reopen_stdin_as_client_pipe.empty()) {
         g_connect_client_named_pipe_thread_locals[0][0].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<0, 0>, &g_connect_client_named_pipe_thread_locals[0][0].thread_data,
@@ -2530,12 +2832,8 @@ bool ReopenStdin(int & ret, DWORD & win_error, const Flags & flags, const Option
     return true;
 }
 
-bool ReopenStdout(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in)
+bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
-
     ret = err_none;
     win_error = 0;
 
@@ -2546,26 +2844,26 @@ bool ReopenStdout(int & ret, DWORD & win_error, const Flags & flags, const Optio
 
     std::vector<TCHAR> tmp_buf;
 
-    if (!options.reopen_stdout_as_file.empty()) {
+    if (!g_options.reopen_stdout_as_file.empty()) {
         SetLastError(0); // just in case
         if (_is_valid_handle(g_reopen_stdout_handle =
-                CreateFile(options.reopen_stdout_as_file.c_str(),
+                CreateFile(g_options.reopen_stdout_as_file.c_str(),
                     GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa, // must use `sa` to setup inheritance
-                    flags.reopen_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
+                    g_flags.reopen_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                     FILE_ATTRIBUTE_NORMAL, NULL))) {
-            if (!flags.reopen_stdout_file_truncate) {
+            if (!g_flags.reopen_stdout_file_truncate) {
                 SetFilePointer(g_reopen_stdout_handle, 0, NULL, FILE_END);
             }
 
             tmp_buf.resize(MAX_PATH);
             tmp_buf[0] = _T('\0');
-            const DWORD num_chars = GetFullPathName(options.reopen_stdout_as_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+            const DWORD num_chars = GetFullPathName(g_options.reopen_stdout_as_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
             g_reopen_stdout_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
             g_reopen_stdout_full_name = _to_lower(g_reopen_stdout_full_name, cp_in);
 
             // create associated write mutex
-            if (flags.mutex_std_writes) {
+            if (g_flags.mutex_std_writes) {
                 // generate file name hash
                 const uint64_t reopen_stdout_file_name_hash = _hash_string_to_u64(g_reopen_stdout_full_name, cp_in);
 
@@ -2574,88 +2872,88 @@ bool ReopenStdout(int & ret, DWORD & win_error, const Flags & flags, const Optio
             }
         }
         else {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not reopen stdout as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stdout_as_file.c_str());
+                    win_error, win_error, g_options.reopen_stdout_as_file.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
 
         if (!_set_crt_std_handle(g_reopen_stdout_handle, 1, true, !g_no_std_inherit)) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not duplicate reopened stdout as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stdout_as_file.c_str());
+                    win_error, win_error, g_options.reopen_stdout_as_file.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
     }
-    else if (!options.reopen_stdout_as_server_pipe.empty()) {
+    else if (!g_options.reopen_stdout_as_server_pipe.empty()) {
         SetLastError(0); // just in case
         if (!_is_valid_handle(g_reopen_stdout_handle =
-            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + options.reopen_stdout_as_server_pipe).c_str(),
+            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stdout_as_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
-                1, options.reopen_stderr_as_server_pipe_out_buf_size, options.reopen_stderr_as_server_pipe_in_buf_size,
+                1, g_options.reopen_stderr_as_server_pipe_out_buf_size, g_options.reopen_stderr_as_server_pipe_in_buf_size,
                 0, &sa))) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not reopen stdout as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stdout_as_server_pipe.c_str());
+                    win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
 
         if (!_set_crt_std_handle(g_reopen_stdout_handle, 1, true, !g_no_std_inherit)) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not duplicate reopened stdout as server named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stdout_as_server_pipe.c_str());
+                    win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
@@ -2667,7 +2965,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, const Flags & flags, const Optio
             &g_connect_server_named_pipe_thread_locals[0][1].thread_id
         );
     }
-    else if (!options.reopen_stdout_as_client_pipe.empty()) {
+    else if (!g_options.reopen_stdout_as_client_pipe.empty()) {
         g_connect_client_named_pipe_thread_locals[0][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<0, 1>, &g_connect_client_named_pipe_thread_locals[0][1].thread_data,
@@ -2679,12 +2977,8 @@ bool ReopenStdout(int & ret, DWORD & win_error, const Flags & flags, const Optio
     return true;
 }
 
-bool ReopenStderr(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in)
+bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
-
     ret = err_none;
     win_error = 0;
 
@@ -2695,16 +2989,16 @@ bool ReopenStderr(int & ret, DWORD & win_error, const Flags & flags, const Optio
 
     std::vector<TCHAR> tmp_buf;
 
-    if (!options.reopen_stderr_as_file.empty()) {
+    if (!g_options.reopen_stderr_as_file.empty()) {
         tmp_buf.resize(MAX_PATH);
         tmp_buf[0] = _T('\0');
-        const DWORD num_chars = GetFullPathName(options.reopen_stderr_as_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+        const DWORD num_chars = GetFullPathName(g_options.reopen_stderr_as_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
         g_reopen_stderr_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
         g_reopen_stderr_full_name = _to_lower(g_reopen_stderr_full_name, cp_in);
 
         // create associated write mutex
-        if (flags.mutex_std_writes) {
+        if (g_flags.mutex_std_writes) {
             // generate file name hash
             const uint64_t reopen_stderr_file_name_hash = _hash_string_to_u64(g_reopen_stderr_full_name, cp_in);
 
@@ -2717,21 +3011,21 @@ bool ReopenStderr(int & ret, DWORD & win_error, const Flags & flags, const Optio
             if (g_reopen_stdout_full_name == g_reopen_stderr_full_name) {
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_reopen_stdout_handle, GetCurrentProcess(), &g_reopen_stderr_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not auto duplicate (merge) stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.reopen_stdout_as_file.c_str());
+                            win_error, win_error, g_options.reopen_stdout_as_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     return false;
                 }
@@ -2741,98 +3035,98 @@ bool ReopenStderr(int & ret, DWORD & win_error, const Flags & flags, const Optio
         if (!_is_valid_handle(g_reopen_stderr_handle)) {
             SetLastError(0); // just in case
             if (_is_valid_handle(g_reopen_stderr_handle =
-                CreateFile(options.reopen_stderr_as_file.c_str(),
+                CreateFile(g_options.reopen_stderr_as_file.c_str(),
                     GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa, // must use `sa` to setup inheritance
-                    flags.reopen_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
+                    g_flags.reopen_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                     FILE_ATTRIBUTE_NORMAL, NULL))) {
-                if (!flags.reopen_stderr_file_truncate) {
+                if (!g_flags.reopen_stderr_file_truncate) {
                     SetFilePointer(g_reopen_stderr_handle, 0, NULL, FILE_END);
                 }
             }
             else {
-                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
-                if (!flags.ret_win_error) {
+                if (!g_flags.ret_win_error) {
                     ret = err_win32_error;
                 }
                 else {
                     ret = win_error;
                 }
-                if (!flags.no_print_gen_error_string) {
+                if (!g_flags.no_print_gen_error_string) {
                     _print_stderr_message(_T("could not reopen stderr as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                        win_error, win_error, options.reopen_stderr_as_file.c_str());
+                        win_error, win_error, g_options.reopen_stderr_as_file.c_str());
                 }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 return false;
             }
         }
 
         if (!_set_crt_std_handle(g_reopen_stderr_handle, 2, true, !g_no_std_inherit)) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not duplicate reopened stderr as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stderr_as_file.c_str());
+                    win_error, win_error, g_options.reopen_stderr_as_file.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
     }
-    else if (!options.reopen_stderr_as_server_pipe.empty()) {
+    else if (!g_options.reopen_stderr_as_server_pipe.empty()) {
         SetLastError(0); // just in case
         if (!_is_valid_handle(g_reopen_stderr_handle =
-            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + options.reopen_stderr_as_server_pipe).c_str(),
+            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stderr_as_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
-                1, options.reopen_stderr_as_server_pipe_out_buf_size, options.reopen_stderr_as_server_pipe_in_buf_size,
+                1, g_options.reopen_stderr_as_server_pipe_out_buf_size, g_options.reopen_stderr_as_server_pipe_in_buf_size,
                 0, &sa))) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not reopen stderr as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stderr_as_server_pipe.c_str());
+                    win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
 
         if (!_set_crt_std_handle(g_reopen_stderr_handle, 2, true, !g_no_std_inherit)) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not duplicate reopened stderr as server named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.reopen_stderr_as_server_pipe.c_str());
+                    win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
@@ -2844,7 +3138,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, const Flags & flags, const Optio
             &g_connect_server_named_pipe_thread_locals[0][2].thread_id
         );
     }
-    else if (!options.reopen_stderr_as_client_pipe.empty()) {
+    else if (!g_options.reopen_stderr_as_client_pipe.empty()) {
         g_connect_client_named_pipe_thread_locals[0][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<0, 2>, &g_connect_client_named_pipe_thread_locals[0][2].thread_data,
@@ -2856,12 +3150,8 @@ bool ReopenStderr(int & ret, DWORD & win_error, const Flags & flags, const Optio
     return true;
 }
 
-bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error, const Flags & flags, const Options & options)
+bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
-
     ret = err_none;
     win_error = 0;
 
@@ -2872,204 +3162,73 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error, const Flag
 
     OVERLAPPED connection_await_overlapped{};
 
-    if (options.create_outbound_pipe_from_stdin.empty()) {
+    if (g_options.create_outbound_server_pipe_from_stdin.empty()) {
         // create anonymous pipe
         SetLastError(0); // just in case
-        if (!CreatePipe(&g_stdin_pipe_read_handle, &g_stdin_pipe_write_handle, &sa, options.tee_stdin_pipe_buf_size)) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+        if (!CreatePipe(&g_stdin_pipe_read_handle, &g_stdin_pipe_write_handle, &sa, g_options.tee_stdin_pipe_buf_size)) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not create outbound anonymous pipe from stdin: win_error=0x%08X (%d)\n"),
                     win_error, win_error);
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
     }
     else {
         // create named pipe
-        const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + options.create_outbound_pipe_from_stdin;
+        const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.create_outbound_server_pipe_from_stdin;
 
         SetLastError(0); // just in case
         if (!_is_valid_handle(g_stdin_pipe_write_handle =
             CreateNamedPipe(pipe_name_str.c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
-                1, options.create_outbound_pipe_from_stdin_in_buf_size, options.create_outbound_pipe_from_stdin_out_buf_size,
+                1, g_options.create_outbound_server_pipe_from_stdin_in_buf_size, g_options.create_outbound_server_pipe_from_stdin_out_buf_size,
                 0, &sa))) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not create outbound server named pipe from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.create_outbound_pipe_from_stdin.c_str());
+                    win_error, win_error, g_options.create_outbound_server_pipe_from_stdin.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
 
-        // start server pipe connection await
-        SetLastError(0); // just in case
-        if (!ConnectNamedPipe(g_stdin_pipe_write_handle, &connection_await_overlapped)) {
-            win_error = GetLastError();
-            if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                if (!flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not initiate connection of outbound client named pipe end from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        win_error, win_error, options.create_outbound_pipe_from_stdin.c_str());
-                }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
-                }
-                return false;
-            }
-        }
-
-        const auto start_time_ms = options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
-
-        // client named pipe end wait loop
-        while (true) {
-            // CAUTION:
-            //  Based on:
-            //    https://stackoverflow.com/questions/8529193/named-pipe-createfile-returns-invalid-handle-value-and-getlasterror-returns/8533189#8533189
-            //    `Named Pipe Client` : https://docs.microsoft.com/en-us/windows/win32/ipc/named-pipe-client
-            //
-            //    A named pipe client uses the CreateFile function to open a handle to a named pipe.
-            //    If the pipe exists but all of its instances are busy, CreateFile returns INVALID_HANDLE_VALUE and
-            //    the GetLastError function returns ERROR_PIPE_BUSY. When this happens, the named pipe client uses
-            //    the WaitNamedPipe function to wait for an instance of the named pipe to become available.
-            //
-            //  So, we still use `CreateFile` in the loop just in case of `ERROR_PIPE_BUSY` error.
-            //
-
-            SetLastError(0); // just in case
-            if (_is_valid_handle(g_stdin_pipe_read_handle =
-                CreateFile(pipe_name_str.c_str(),
-                    GENERIC_READ, FILE_SHARE_READ, &sa, // must use `sa` to setup inheritance
-                    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL))) {
-                break;
-            }
-
-            win_error = GetLastError();
-            if (win_error != ERROR_PIPE_BUSY) {
-                if (!flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not client connect to inbound named pipe end from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        win_error, win_error, options.create_outbound_pipe_from_stdin.c_str());
-                }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
-                }
-                return false;
-            }
-
-            {
-                const auto end_time_ms = options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
-
-                const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
-
-                if (time_delta_ms >= options.create_outbound_pipe_from_stdin_connect_timeout_ms) {
-                    ret = err_named_pipe_connect_timeout;
-                    if (!flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("client connection timeout of inbound named pipe end from stdin: pipe=\"%s\" timeout=%u ms\n"),
-                            options.create_outbound_pipe_from_stdin.c_str(), options.create_outbound_pipe_from_stdin_connect_timeout_ms);
-                    }
-                    return false;
-                }
-
-                const auto wait_named_pipe_timeout_ms = decltype(time_delta_ms){ options.create_outbound_pipe_from_stdin_connect_timeout_ms } - time_delta_ms;
-
-                if (WaitNamedPipe(pipe_name_str.c_str(), (DWORD)wait_named_pipe_timeout_ms)) {
-                    continue;
-                }
-            }
-
-            // check for timeout again
-            {
-                const auto end_time_ms = options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
-
-                const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
-
-                if (time_delta_ms >= options.create_outbound_pipe_from_stdin_connect_timeout_ms) {
-                    ret = err_named_pipe_connect_timeout;
-                    if (!flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("client connection timeout of inbound named pipe end from stdin: pipe=\"%s\" timeout=%u ms\n"),
-                            options.create_outbound_pipe_from_stdin.c_str(), options.create_outbound_pipe_from_stdin_connect_timeout_ms);
-                    }
-                    return false;
-                }
-            }
-        }
-
-        // server named pipe end wait loop
-        while (true) {
-            // NOTE:
-            //  Based on:
-            //    `HasOverlappedIoCompleted macro (winbase.h)` : https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-hasoverlappediocompleted:
-            //
-            //    Do not call this macro unless the call to GetLastError returns ERROR_IO_PENDING, indicating that the overlapped I/O has started.
-            //
-            //  We call both the `WaitNamedPipe` function and after the `HasOverlappedIoCompleted` macro to be sure for the both named pipe ends.
-            //
-
-            if (HasOverlappedIoCompleted(&connection_await_overlapped)) {
-                break;
-            }
-
-            const auto end_time_ms = options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
-
-            const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
-
-            if (time_delta_ms >= options.create_outbound_pipe_from_stdin_connect_timeout_ms) {
-                ret = err_named_pipe_connect_timeout;
-                if (!flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("server connection timeout of outbound named pipe end from stdin: pipe=\"%s\" timeout=%u ms\n"),
-                        options.create_outbound_pipe_from_stdin.c_str(), options.create_outbound_pipe_from_stdin_connect_timeout_ms);
-                }
-                return false;
-            }
-
-            Sleep(20);
-        }
+        g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].thread_handle = CreateThread(
+            NULL, 0,
+            ConnectOutboundServerPipeFromConsoleInputThread, &g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].thread_data,
+            0,
+            &g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].thread_id
+        );
     }
 
     return true;
 }
 
 template <int stream_type>
-bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error, const Flags & flags, const Options & options)
+bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
-
     ret = err_none;
     win_error = 0;
 
@@ -3078,247 +3237,288 @@ bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error, const Flags 
     sa.nLength = sizeof(sa);
     sa.bInheritHandle = g_no_std_inherit ? FALSE : TRUE; // just in case
 
-    OVERLAPPED connection_await_overlapped{};
-
     const auto & conout_name_token_str = UTILITY_CONSTEXPR(stream_type == 1) ? _T("stdout") : _T("stderr");
 
-    const auto & create_inbound_pipe_to_conout = UTILITY_CONSTEXPR(stream_type == 1) ? options.create_inbound_pipe_to_stdout : options.create_inbound_pipe_to_stderr;
+    const auto & create_inbound_server_pipe_to_conout = UTILITY_CONSTEXPR(stream_type == 1) ? g_options.create_inbound_server_pipe_to_stdout : g_options.create_inbound_server_pipe_to_stderr;
 
     auto & conout_pipe_read_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_stdout_pipe_read_handle : g_stderr_pipe_read_handle;
     auto & conout_pipe_write_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_stdout_pipe_write_handle : g_stderr_pipe_write_handle;
 
-    if (create_inbound_pipe_to_conout.empty()) {
+    if (create_inbound_server_pipe_to_conout.empty()) {
         // create anonymous pipe
-        const auto tee_conout_pipe_buf_size = UTILITY_CONSTEXPR(stream_type == 1) ? options.tee_stdout_pipe_buf_size : options.tee_stderr_pipe_buf_size;
+        const auto tee_conout_pipe_buf_size = UTILITY_CONSTEXPR(stream_type == 1) ? g_options.tee_stdout_pipe_buf_size : g_options.tee_stderr_pipe_buf_size;
 
         SetLastError(0); // just in case
         if (!CreatePipe(&conout_pipe_read_handle, &conout_pipe_write_handle, &sa, // must use `sa` to setup inheritance
             tee_conout_pipe_buf_size)) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not create inbound anonymous pipe to %s: win_error=0x%08X (%d)\n"),
                     conout_name_token_str, win_error, win_error);
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
     }
     else {
         // create named pipe
-        const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + create_inbound_pipe_to_conout;
+        const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + create_inbound_server_pipe_to_conout;
 
-        const auto create_inbound_pipe_to_conout_in_buf_size = UTILITY_CONSTEXPR(stream_type == 1) ?
-            options.create_inbound_pipe_to_stdout_in_buf_size : options.create_inbound_pipe_to_stderr_in_buf_size;
-        const auto create_inbound_pipe_to_conout_out_buf_size = UTILITY_CONSTEXPR(stream_type == 1) ?
-            options.create_inbound_pipe_to_stdout_out_buf_size : options.create_inbound_pipe_to_stderr_out_buf_size;
-        const auto create_inbound_pipe_to_conout_connect_timeout_ms = UTILITY_CONSTEXPR(stream_type == 1) ?
-            options.create_inbound_pipe_to_stdout_connect_timeout_ms : options.create_inbound_pipe_to_stderr_connect_timeout_ms;
+        const auto create_inbound_server_pipe_to_conout_in_buf_size = UTILITY_CONSTEXPR(stream_type == 1) ?
+            g_options.create_inbound_server_pipe_to_stdout_in_buf_size : g_options.create_inbound_server_pipe_to_stderr_in_buf_size;
+        const auto create_inbound_server_pipe_to_conout_out_buf_size = UTILITY_CONSTEXPR(stream_type == 1) ?
+            g_options.create_inbound_server_pipe_to_stdout_out_buf_size : g_options.create_inbound_server_pipe_to_stderr_out_buf_size;
 
         SetLastError(0); // just in case
         if (!_is_valid_handle(conout_pipe_read_handle =
             CreateNamedPipe(pipe_name_str.c_str(),
                 PIPE_ACCESS_INBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
-                1, create_inbound_pipe_to_conout_in_buf_size, create_inbound_pipe_to_conout_out_buf_size,
+                1, create_inbound_server_pipe_to_conout_in_buf_size, create_inbound_server_pipe_to_conout_out_buf_size,
                 0, &sa))) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not create inbound server named pipe end to %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    conout_name_token_str, win_error, win_error, create_inbound_pipe_to_conout.c_str());
+                    conout_name_token_str, win_error, win_error, create_inbound_server_pipe_to_conout.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
 
-        // start server pipe connection await
-        SetLastError(0); // just in case
-        if (!ConnectNamedPipe(conout_pipe_read_handle, &connection_await_overlapped)) {
-            win_error = GetLastError();
-            if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                if (!flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not initiate connection of inbound client named pipe end from %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        conout_name_token_str, win_error, win_error, create_inbound_pipe_to_conout.c_str());
-                }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
-                }
-                return false;
-            }
-        }
-
-        const auto start_time_ms = options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
-
-        // client named pipe end wait loop
-        while (true) {
-            // CAUTION:
-            //  Based on:
-            //    https://stackoverflow.com/questions/8529193/named-pipe-createfile-returns-invalid-handle-value-and-getlasterror-returns/8533189#8533189
-            //    `Named Pipe Client` : https://docs.microsoft.com/en-us/windows/win32/ipc/named-pipe-client
-            //
-            //    A named pipe client uses the CreateFile function to open a handle to a named pipe.
-            //    If the pipe exists but all of its instances are busy, CreateFile returns INVALID_HANDLE_VALUE and
-            //    the GetLastError function returns ERROR_PIPE_BUSY. When this happens, the named pipe client uses
-            //    the WaitNamedPipe function to wait for an instance of the named pipe to become available.
-            //
-            //  So, we still use `CreateFile` in the loop just in case of `ERROR_PIPE_BUSY` error.
-            //
-
-            SetLastError(0); // just in case
-            if (_is_valid_handle(conout_pipe_write_handle =
-                CreateFile(pipe_name_str.c_str(),
-                    GENERIC_WRITE, FILE_SHARE_WRITE, &sa, // must use `sa` to setup inheritance
-                    OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL))) {
-                break;
-            }
-
-            win_error = GetLastError();
-            if (win_error != ERROR_PIPE_BUSY) {
-                if (!flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not client connect to outbound named pipe end to %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        conout_name_token_str, win_error, win_error, create_inbound_pipe_to_conout.c_str());
-                }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
-                }
-                return false;
-            }
-
-            {
-                const auto end_time_ms = options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
-
-                const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
-
-                if (time_delta_ms >= create_inbound_pipe_to_conout_connect_timeout_ms) {
-                    ret = err_named_pipe_connect_timeout;
-                    if (!flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("client connection timeout of outbound named pipe end to %s: pipe=\"%s\" timeout=%u ms\n"),
-                            conout_name_token_str, create_inbound_pipe_to_conout.c_str(), create_inbound_pipe_to_conout_connect_timeout_ms);
-                    }
-                    return false;
-                }
-
-                const auto wait_named_pipe_timeout_ms = decltype(time_delta_ms){ create_inbound_pipe_to_conout_connect_timeout_ms } - time_delta_ms;
-
-                if (WaitNamedPipe(pipe_name_str.c_str(), (DWORD)wait_named_pipe_timeout_ms)) {
-                    continue;
-                }
-            }
-
-            // check for timeout again
-            {
-                const auto end_time_ms = options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
-
-                const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
-
-                if (time_delta_ms >= create_inbound_pipe_to_conout_connect_timeout_ms) {
-                    ret = err_named_pipe_connect_timeout;
-                    if (!flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("client connection timeout of outbound named pipe end to %s: pipe=\"%s\" timeout=%u ms\n"),
-                            conout_name_token_str, create_inbound_pipe_to_conout.c_str(), create_inbound_pipe_to_conout_connect_timeout_ms);
-                    }
-                    return false;
-                }
-            }
-        }
-
-        // server named pipe end wait loop
-        while (true) {
-            // NOTE:
-            //  Based on:
-            //    `HasOverlappedIoCompleted macro (winbase.h)` : https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-hasoverlappediocompleted:
-            //
-            //    Do not call this macro unless the call to GetLastError returns ERROR_IO_PENDING, indicating that the overlapped I/O has started.
-            //
-            //  We call both the `WaitNamedPipe` function and after the `HasOverlappedIoCompleted` macro to be sure for the both named pipe ends.
-            //
-
-            if (HasOverlappedIoCompleted(&connection_await_overlapped)) {
-                break;
-            }
-
-            const auto end_time_ms = options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
-
-            const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
-
-            if (time_delta_ms >= create_inbound_pipe_to_conout_connect_timeout_ms) {
-                ret = err_named_pipe_connect_timeout;
-                if (!flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("server connection timeout of inbound named pipe end to %s: pipe=\"%s\" timeout=%u ms\n"),
-                        conout_name_token_str, create_inbound_pipe_to_conout.c_str(), create_inbound_pipe_to_conout_connect_timeout_ms);
-                }
-                return false;
-            }
-
-            Sleep(20);
-        }
+        g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type].thread_handle = CreateThread(
+            NULL, 0,
+            ConnectInboundServerPipeToConsoleOutputThread<stream_type>, &g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type].thread_data,
+            0,
+            &g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type].thread_id
+        );
     }
 
     return true;
 }
 
-bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in)
+DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
+    ConnectNamedPipeThreadData & thread_data = *static_cast<ConnectNamedPipeThreadData *>(lpParam);
 
+    thread_data.ret = err_unspecified;
+    thread_data.is_error = true;
+
+    OVERLAPPED connection_await_overlapped{};
+
+    DWORD win_error = 0;
+
+    // NOTE:
+    //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+    //
+    return [&]() -> DWORD { __try {
+        return [&]() -> DWORD {
+            // start server pipe connection await
+            SetLastError(0); // just in case
+            if (!ConnectNamedPipe(g_stdin_pipe_write_handle, &connection_await_overlapped)) {
+                win_error = GetLastError();
+                if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
+                    thread_data.ret = err_named_pipe_connect_error;
+                    thread_data.win_error = win_error;
+                    if (!g_flags.no_print_gen_error_string) {
+                        thread_data.msg =
+                            _format_stderr_message(_T("could not initiate connection of outbound client named pipe end from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.create_outbound_server_pipe_from_stdin.c_str());
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        thread_data.msg +=
+                            _format_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    return 1;
+                }
+            }
+
+            const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+
+            // server named pipe end wait loop
+            while (true) {
+                // NOTE:
+                //  Based on:
+                //    `HasOverlappedIoCompleted macro (winbase.h)` : https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-hasoverlappediocompleted:
+                //
+                //    Do not call this macro unless the call to GetLastError returns ERROR_IO_PENDING, indicating that the overlapped I/O has started.
+                //
+                //  We call both the `WaitNamedPipe` function and after the `HasOverlappedIoCompleted` macro to be sure for the both named pipe ends.
+                //
+
+                if (HasOverlappedIoCompleted(&connection_await_overlapped)) {
+                    break;
+                }
+
+                const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+
+                const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
+
+                if (time_delta_ms >= g_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms) {
+                    thread_data.ret = err_named_pipe_connect_timeout;
+                    if (!g_flags.no_print_gen_error_string) {
+                        thread_data.msg =
+                            _format_stderr_message(_T("server connection timeout of outbound server named pipe end from stdin: pipe=\"%s\" timeout=%u ms\n"),
+                                g_options.create_outbound_server_pipe_from_stdin.c_str(), g_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms);
+                    }
+                    return 1;
+                }
+
+                Sleep(20);
+            }
+
+            thread_data.is_error = false;
+
+            return 0;
+        }();
+    }
+    __finally {
+        ;
+    }
+
+    return 0;
+    }();
+}
+
+template <int stream_type>
+DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
+{
+    ConnectNamedPipeThreadData & thread_data = *static_cast<ConnectNamedPipeThreadData *>(lpParam);
+
+    thread_data.ret = err_unspecified;
+    thread_data.is_error = true;
+
+    OVERLAPPED connection_await_overlapped{};
+
+    DWORD win_error = 0;
+
+    const auto & conout_name_token_str = UTILITY_CONSTEXPR(stream_type == 1) ? _T("stdout") : _T("stderr");
+
+    const auto & create_inbound_server_pipe_to_conout = UTILITY_CONSTEXPR(stream_type == 1) ? g_options.create_inbound_server_pipe_to_stdout : g_options.create_inbound_server_pipe_to_stderr;
+
+    auto & conout_pipe_read_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_stdout_pipe_read_handle : g_stderr_pipe_read_handle;
+    auto & conout_pipe_write_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_stdout_pipe_write_handle : g_stderr_pipe_write_handle;
+
+    const auto create_inbound_server_pipe_to_conout_connect_timeout_ms = UTILITY_CONSTEXPR(stream_type == 1) ?
+        g_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms : g_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms;
+
+    // NOTE:
+    //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+    //
+    return [&]() -> DWORD { __try {
+        return [&]() -> DWORD {
+            SetLastError(0); // just in case
+            if (!ConnectNamedPipe(conout_pipe_read_handle, &connection_await_overlapped)) {
+                win_error = GetLastError();
+                if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
+                    thread_data.ret = err_named_pipe_connect_error;
+                    thread_data.win_error = win_error;
+                    if (!g_flags.no_print_gen_error_string) {
+                        thread_data.msg =
+                            _format_stderr_message(_T("could not initiate connection of inbound client named pipe end from %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                conout_name_token_str, win_error, win_error, create_inbound_server_pipe_to_conout.c_str());
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        thread_data.msg +=
+                            _format_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    return 1;
+                }
+            }
+
+            // server named pipe end wait loop
+            const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+
+            while (true) {
+                if (thread_data.cancel_io) return -1;
+
+                // NOTE:
+                //  Based on:
+                //    `HasOverlappedIoCompleted macro (winbase.h)` : https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-hasoverlappediocompleted:
+                //
+                //    Do not call this macro unless the call to GetLastError returns ERROR_IO_PENDING, indicating that the overlapped I/O has started.
+                //
+
+                if (HasOverlappedIoCompleted(&connection_await_overlapped)) {
+                    break;
+                }
+
+                const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+
+                const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
+
+                if (time_delta_ms >= create_inbound_server_pipe_to_conout_connect_timeout_ms) {
+                    thread_data.ret = err_named_pipe_connect_timeout;
+                    if (!g_flags.no_print_gen_error_string) {
+                        thread_data.msg =
+                            _format_stderr_message(_T("server connection timeout of inbound server named pipe end to %s: pipe=\"%s\" timeout=%u ms\n"),
+                                conout_name_token_str, create_inbound_server_pipe_to_conout.c_str(), create_inbound_server_pipe_to_conout_connect_timeout_ms);
+                    }
+                    return 1;
+                }
+
+                Sleep(20);
+            }
+
+            thread_data.is_error = false;
+
+            return 0;
+        }();
+    }
+    __finally {
+        ;
+    }
+
+    return 0;
+    }();
+}
+
+bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
+{
     ret = err_none;
     win_error = 0;
 
     std::vector<TCHAR> tmp_buf;
 
-    if (!options.tee_stdin_to_file.empty()) {
+    if (!g_options.tee_stdin_to_file.empty()) {
         SetLastError(0); // just in case
         if (_is_valid_handle(g_tee_file_stdin_handle =
-            CreateFile(options.tee_stdin_to_file.c_str(),
+            CreateFile(g_options.tee_stdin_to_file.c_str(),
                 GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                flags.tee_stdin_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
+                g_flags.tee_stdin_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                 FILE_ATTRIBUTE_NORMAL, NULL))) {
-            if (!flags.tee_stdin_file_truncate) {
+            if (!g_flags.tee_stdin_file_truncate) {
                 SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
             }
 
             tmp_buf.resize(MAX_PATH);
             tmp_buf[0] = _T('\0');
-            const DWORD num_chars = GetFullPathName(options.tee_stdin_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+            const DWORD num_chars = GetFullPathName(g_options.tee_stdin_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
             g_tee_file_stdin_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
             g_tee_file_stdin_full_name = _to_lower(g_tee_file_stdin_full_name, cp_in);
 
             // create associated write mutex
-            if (flags.mutex_tee_file_writes) {
+            if (g_flags.mutex_tee_file_writes) {
                 // generate file name hash
                 const uint64_t tee_stdin_file_name_hash = _hash_string_to_u64(g_tee_file_stdin_full_name, cp_in);
 
@@ -3327,48 +3527,48 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, const Flags & flags,
             }
         }
         else {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not open stdin tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                    win_error, win_error, options.tee_stdin_to_file.c_str());
+                    win_error, win_error, g_options.tee_stdin_to_file.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
     }
-    else if (!options.tee_stdin_to_server_pipe.empty()) {
+    else if (!g_options.tee_stdin_to_server_pipe.empty()) {
         SetLastError(0); // just in case
         if (!_is_valid_handle(g_tee_named_pipe_stdin_handle =
-            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + options.tee_stdin_to_server_pipe).c_str(),
+            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stdin_to_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
-                1, options.tee_stderr_to_server_pipe_out_buf_size, options.tee_stderr_to_server_pipe_in_buf_size,
+                1, g_options.tee_stderr_to_server_pipe_out_buf_size, g_options.tee_stderr_to_server_pipe_in_buf_size,
                 0, NULL))) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not open stdin tee as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.tee_stdin_to_server_pipe.c_str());
+                    win_error, win_error, g_options.tee_stdin_to_server_pipe.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
@@ -3381,7 +3581,7 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, const Flags & flags,
             &g_connect_server_named_pipe_thread_locals[1][0].thread_id
         );
     }
-    else if (!options.tee_stdin_to_client_pipe.empty()) {
+    else if (!g_options.tee_stdin_to_client_pipe.empty()) {
         g_connect_client_named_pipe_thread_locals[1][0].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<1, 0>, &g_connect_client_named_pipe_thread_locals[1][0].thread_data,
@@ -3393,27 +3593,23 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, const Flags & flags,
     return true;
 }
 
-bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in)
+bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
-
     ret = err_none;
     win_error = 0;
 
     std::vector<TCHAR> tmp_buf;
 
-    if (!options.tee_stdout_to_file.empty()) {
+    if (!g_options.tee_stdout_to_file.empty()) {
         tmp_buf.resize(MAX_PATH);
         tmp_buf[0] = _T('\0');
-        const DWORD num_chars = GetFullPathName(options.tee_stdout_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+        const DWORD num_chars = GetFullPathName(g_options.tee_stdout_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
         g_tee_file_stdout_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
         g_tee_file_stdout_full_name = _to_lower(g_tee_file_stdout_full_name, cp_in);
 
         // create associated write mutex
-        if (flags.mutex_tee_file_writes) {
+        if (g_flags.mutex_tee_file_writes) {
             // generate file name hash
             const uint64_t tee_stdout_file_name_hash = _hash_string_to_u64(g_tee_file_stdout_full_name, cp_in);
 
@@ -3426,21 +3622,21 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, const Flags & flags
             if (g_tee_file_stdin_full_name == g_tee_file_stdout_full_name) {
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not auto duplicate (merge) stdin tee into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stdin_to_file.c_str());
+                            win_error, win_error, g_options.tee_stdin_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     return false;
                 }
@@ -3450,58 +3646,58 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, const Flags & flags
         if (!_is_valid_handle(g_tee_file_stdout_handle)) {
             SetLastError(0); // just in case
             if (_is_valid_handle(g_tee_file_stdout_handle =
-                CreateFile(options.tee_stdout_to_file.c_str(),
+                CreateFile(g_options.tee_stdout_to_file.c_str(),
                     GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                    flags.tee_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
+                    g_flags.tee_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                     FILE_ATTRIBUTE_NORMAL, NULL))) {
-                if (!flags.tee_stdout_file_truncate) {
+                if (!g_flags.tee_stdout_file_truncate) {
                     SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
                 }
             }
             else {
-                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
-                if (!flags.ret_win_error) {
+                if (!g_flags.ret_win_error) {
                     ret = err_win32_error;
                 }
                 else {
                     ret = win_error;
                 }
-                if (!flags.no_print_gen_error_string) {
+                if (!g_flags.no_print_gen_error_string) {
                     _print_stderr_message(_T("could not open stdout tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                        win_error, win_error, options.tee_stdout_to_file.c_str());
+                        win_error, win_error, g_options.tee_stdout_to_file.c_str());
                 }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 return false;
             }
         }
     }
-    else if (!options.tee_stdout_to_server_pipe.empty()) {
+    else if (!g_options.tee_stdout_to_server_pipe.empty()) {
         SetLastError(0); // just in case
         if (!_is_valid_handle(g_tee_named_pipe_stdout_handle =
-            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + options.tee_stdout_to_server_pipe).c_str(),
+            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stdout_to_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
-                1, options.tee_stderr_to_server_pipe_out_buf_size, options.tee_stderr_to_server_pipe_in_buf_size,
+                1, g_options.tee_stderr_to_server_pipe_out_buf_size, g_options.tee_stderr_to_server_pipe_in_buf_size,
                 0, NULL))) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not open stdout tee as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.tee_stdout_to_server_pipe.c_str());
+                    win_error, win_error, g_options.tee_stdout_to_server_pipe.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
@@ -3513,7 +3709,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, const Flags & flags
             &g_connect_server_named_pipe_thread_locals[1][1].thread_id
         );
     }
-    else if (!options.tee_stdout_to_client_pipe.empty()) {
+    else if (!g_options.tee_stdout_to_client_pipe.empty()) {
         g_connect_client_named_pipe_thread_locals[1][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<1, 1>, &g_connect_client_named_pipe_thread_locals[1][1].thread_data,
@@ -3525,27 +3721,23 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, const Flags & flags
     return true;
 }
 
-bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in)
+bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
-
     ret = err_none;
     win_error = 0;
 
     std::vector<TCHAR> tmp_buf;
 
-    if (!options.tee_stderr_to_file.empty()) {
+    if (!g_options.tee_stderr_to_file.empty()) {
         tmp_buf.resize(MAX_PATH);
         tmp_buf[0] = _T('\0');
-        const DWORD num_chars = GetFullPathName(options.tee_stderr_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
+        const DWORD num_chars = GetFullPathName(g_options.tee_stderr_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
         g_tee_file_stderr_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
 
         g_tee_file_stderr_full_name = _to_lower(g_tee_file_stderr_full_name, cp_in);
 
         // create associated write mutex
-        if (flags.mutex_tee_file_writes) {
+        if (g_flags.mutex_tee_file_writes) {
             // generate file name hash
             const uint64_t tee_stderr_file_name_hash = _hash_string_to_u64(g_tee_file_stderr_full_name, cp_in);
 
@@ -3558,21 +3750,21 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, const Flags & flags
             if (g_tee_file_stdout_full_name == g_tee_file_stderr_full_name) {
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not auto duplicate (merge) stdout tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stdout_to_file.c_str());
+                            win_error, win_error, g_options.tee_stdout_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     return false;
                 }
@@ -3584,21 +3776,21 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, const Flags & flags
                 if (g_tee_file_stdin_full_name == g_tee_file_stderr_full_name) {
                     SetLastError(0); // just in case
                     if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                        if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                        if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                             win_error = GetLastError();
                         }
-                        if (!flags.ret_win_error) {
+                        if (!g_flags.ret_win_error) {
                             ret = err_win32_error;
                         }
                         else {
                             ret = win_error;
                         }
-                        if (!flags.no_print_gen_error_string) {
+                        if (!g_flags.no_print_gen_error_string) {
                             _print_stderr_message(_T("could not auto duplicate (merge) stdin tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                                win_error, win_error, options.tee_stdin_to_file.c_str());
+                                win_error, win_error, g_options.tee_stdin_to_file.c_str());
                         }
-                        if (flags.print_win_error_string && win_error) {
-                            _print_win_error_message(win_error, options.win_error_langid);
+                        if (g_flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
                         }
                         return false;
                     }
@@ -3609,58 +3801,58 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, const Flags & flags
         if (!_is_valid_handle(g_tee_file_stderr_handle)) {
             SetLastError(0); // just in case
             if (_is_valid_handle(g_tee_file_stderr_handle =
-                CreateFile(options.tee_stderr_to_file.c_str(),
+                CreateFile(g_options.tee_stderr_to_file.c_str(),
                     GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                    flags.tee_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
+                    g_flags.tee_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                     FILE_ATTRIBUTE_NORMAL, NULL))) {
-                if (!flags.tee_stderr_file_truncate) {
+                if (!g_flags.tee_stderr_file_truncate) {
                     SetFilePointer(g_tee_file_stderr_handle, 0, NULL, FILE_END);
                 }
             }
             else {
-                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
-                if (!flags.ret_win_error) {
+                if (!g_flags.ret_win_error) {
                     ret = err_win32_error;
                 }
                 else {
                     ret = win_error;
                 }
-                if (!flags.no_print_gen_error_string) {
+                if (!g_flags.no_print_gen_error_string) {
                     _print_stderr_message(_T("could not open stderr tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                        win_error, win_error, options.tee_stderr_to_file.c_str());
+                        win_error, win_error, g_options.tee_stderr_to_file.c_str());
                 }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 return false;
             }
         }
     }
-    else if (!options.tee_stderr_to_server_pipe.empty()) {
+    else if (!g_options.tee_stderr_to_server_pipe.empty()) {
         SetLastError(0); // just in case
         if (!_is_valid_handle(g_tee_named_pipe_stderr_handle =
-            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + options.tee_stderr_to_server_pipe).c_str(),
+            CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stderr_to_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
-                1, options.tee_stderr_to_server_pipe_out_buf_size, options.tee_stderr_to_server_pipe_in_buf_size,
+                1, g_options.tee_stderr_to_server_pipe_out_buf_size, g_options.tee_stderr_to_server_pipe_in_buf_size,
                 0, NULL))) {
-            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
-            if (!flags.ret_win_error) {
+            if (!g_flags.ret_win_error) {
                 ret = err_win32_error;
             }
             else {
                 ret = win_error;
             }
-            if (!flags.no_print_gen_error_string) {
+            if (!g_flags.no_print_gen_error_string) {
                 _print_stderr_message(_T("could not open stderr tee as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                    win_error, win_error, options.tee_stderr_to_server_pipe.c_str());
+                    win_error, win_error, g_options.tee_stderr_to_server_pipe.c_str());
             }
-            if (flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, options.win_error_langid);
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
             }
             return false;
         }
@@ -3672,7 +3864,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, const Flags & flags
             &g_connect_server_named_pipe_thread_locals[1][2].thread_id
         );
     }
-    else if (!options.tee_stderr_to_client_pipe.empty()) {
+    else if (!g_options.tee_stderr_to_client_pipe.empty()) {
         g_connect_client_named_pipe_thread_locals[1][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<1, 2>, &g_connect_client_named_pipe_thread_locals[1][2].thread_data,
@@ -3684,12 +3876,8 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, const Flags & flags
     return true;
 }
 
-int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, const Flags & flags, const Options & options_)
+int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
-
 #ifdef _DEBUG
     //_tprintf(_T(">%s\n>%s\n---\n"), app ? app : _T(""), cmd ? cmd : _T(""));
 #endif
@@ -3699,18 +3887,16 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
     if ((!app || !app_len) && (!cmd || !cmd_len)) {
         // just in case
         ret = err_format_empty;
-        if (!flags.no_print_gen_error_string) {
+        if (!g_flags.no_print_gen_error_string) {
             _print_stderr_message(_T("format arguments are empty\n"));
         }
         return ret;
     }
 
-    Options options = options_;
-
     // CAUTION:
     //  Has effect only for Windows version up to 8.1 (read MSDN documentation)
     //
-    _get_win_ver(options.win_ver_major, options.win_ver_minor, options.win_ver_build);
+    _get_win_ver(g_options.win_ver_major, g_options.win_ver_minor, g_options.win_ver_build);
 
     std::vector<uint8_t> cmd_buf;
 
@@ -3722,7 +3908,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
     si.cb = sizeof(si);
     si.dwFlags = STARTF_USESHOWWINDOW;
-    si.wShowWindow = options.show_as;
+    si.wShowWindow = g_options.show_as;
 
     sa.nLength = sizeof(sa);
     sa.bInheritHandle = TRUE;
@@ -3750,27 +3936,31 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
     }
 
     // update globals
-    g_no_std_inherit = flags.no_std_inherit || flags.pipe_stdin_to_stdout;
+    if (g_flags.no_window) {
+        g_options.show_as = SW_HIDE;
+    }
+
+    g_no_std_inherit = g_is_process_elevating || g_flags.no_std_inherit || g_flags.pipe_stdin_to_stdout;
 
     // on idle execution always pipe stdin to stdout
-    g_pipe_stdin_to_stdout = is_idle_execute || flags.pipe_stdin_to_stdout;
+    g_pipe_stdin_to_stdout = !g_is_process_elevating && (g_flags.pipe_stdin_to_stdout || is_idle_execute);
 
     bool break_ = false;
 
     // NOTE:
-    //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+    //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
     [&]() { if_break(true) __try {
-        if (options.chcp_in) {
+        if (g_options.chcp_in) {
             prev_cp_in = GetConsoleCP();
-            if (options.chcp_in != prev_cp_in) {
-                SetConsoleCP(options.chcp_in);
+            if (g_options.chcp_in != prev_cp_in) {
+                SetConsoleCP(g_options.chcp_in);
             }
         }
-        if (options.chcp_out) {
+        if (g_options.chcp_out) {
             prev_cp_out = GetConsoleOutputCP();
-            if (options.chcp_out != prev_cp_out) {
-                SetConsoleOutputCP(options.chcp_out);
+            if (g_options.chcp_out != prev_cp_out) {
+                SetConsoleOutputCP(g_options.chcp_out);
             }
         }
 
@@ -3779,19 +3969,19 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
         // reopen std
 
-        if (!ReopenStdin(ret, win_error, flags, options, cp_in)) {
+        if (!ReopenStdin(ret, win_error, cp_in)) {
             break;
         }
 
         if (break_) break;
 
-        if (!ReopenStdout(ret, win_error, flags, options, cp_in)) {
+        if (!ReopenStdout(ret, win_error, cp_in)) {
             break;
         }
 
         if (break_) break;
 
-        if (!ReopenStderr(ret, win_error, flags, options, cp_in)) {
+        if (!ReopenStderr(ret, win_error, cp_in)) {
             break;
         }
 
@@ -3799,19 +3989,19 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
         // tee std
 
-        if (!CreateTeeOutputFromStdin(ret, win_error, flags, options, cp_in)) {
+        if (!CreateTeeOutputFromStdin(ret, win_error, cp_in)) {
             break;
         }
 
         if (break_) break;
 
-        if (!CreateTeeOutputFromStdout(ret, win_error, flags, options, cp_in)) {
+        if (!CreateTeeOutputFromStdout(ret, win_error, cp_in)) {
             break;
         }
 
         if (break_) break;
 
-        if (!CreateTeeOutputFromStderr(ret, win_error, flags, options, cp_in)) {
+        if (!CreateTeeOutputFromStderr(ret, win_error, cp_in)) {
             break;
         }
 
@@ -3845,67 +4035,67 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
         // assign reopened std handles to CRT
 
-        if (!options.reopen_stdin_as_client_pipe.empty()) {
+        if (!g_options.reopen_stdin_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stdin_handle) && !_set_crt_std_handle(g_reopen_stdin_handle, 0, true, !g_no_std_inherit)) {
-                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
-                if (!flags.ret_win_error) {
+                if (!g_flags.ret_win_error) {
                     ret = err_win32_error;
                 }
                 else {
                     ret = win_error;
                 }
-                if (!flags.no_print_gen_error_string) {
+                if (!g_flags.no_print_gen_error_string) {
                     _print_stderr_message(_T("could not duplicate reopened stdin as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        win_error, win_error, options.reopen_stdin_as_server_pipe.c_str());
+                        win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
                 }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
         }
 
-        if (!options.reopen_stdout_as_client_pipe.empty()) {
+        if (!g_options.reopen_stdout_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stdout_handle) && !_set_crt_std_handle(g_reopen_stdout_handle, 1, true, !g_no_std_inherit)) {
-                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
-                if (!flags.ret_win_error) {
+                if (!g_flags.ret_win_error) {
                     ret = err_win32_error;
                 }
                 else {
                     ret = win_error;
                 }
-                if (!flags.no_print_gen_error_string) {
+                if (!g_flags.no_print_gen_error_string) {
                     _print_stderr_message(_T("could not duplicate reopened stdout as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        win_error, win_error, options.reopen_stdout_as_server_pipe.c_str());
+                        win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
                 }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
         }
 
-        if (!options.reopen_stderr_as_client_pipe.empty()) {
+        if (!g_options.reopen_stderr_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stderr_handle) && !_set_crt_std_handle(g_reopen_stderr_handle, 2, true, !g_no_std_inherit)) {
-                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
-                if (!flags.ret_win_error) {
+                if (!g_flags.ret_win_error) {
                     ret = err_win32_error;
                 }
                 else {
                     ret = win_error;
                 }
-                if (!flags.no_print_gen_error_string) {
+                if (!g_flags.no_print_gen_error_string) {
                     _print_stderr_message(_T("could not duplicate reopened stderr as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        win_error, win_error, options.reopen_stderr_as_server_pipe.c_str());
+                        win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
                 }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 break;
             }
@@ -3913,75 +4103,81 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
         // std handles get
 
-        DWORD stdin_handle_type;
-        DWORD stdout_handle_type;
-        DWORD stderr_handle_type;
+        DWORD stdin_handle_type = FILE_TYPE_UNKNOWN;
+        DWORD stdout_handle_type = FILE_TYPE_UNKNOWN;
+        DWORD stderr_handle_type = FILE_TYPE_UNKNOWN;
 
         for (int read_std_handles_iter = 0; read_std_handles_iter < 2; read_std_handles_iter++) {
-            SetLastError(0); // just in case
-            g_stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
-            if (!_is_valid_handle(g_stdin_handle)) {
-                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
-                    win_error = GetLastError();
+            if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
+                SetLastError(0); // just in case
+                g_stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+                if (!_is_valid_handle(g_stdin_handle)) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("invalid stdin handle: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    break;
                 }
-                if (!flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("invalid stdin handle: win_error=0x%08X (%d)\n"),
-                        win_error, win_error);
-                }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
-                }
-                break;
             }
 
-            SetLastError(0); // just in case
-            g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-            if (!_is_valid_handle(g_stdout_handle)) {
-                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
-                    win_error = GetLastError();
+            if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
+                SetLastError(0); // just in case
+                g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+                if (!_is_valid_handle(g_stdout_handle)) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("invalid stdout handle: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    break;
                 }
-                if (!flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("invalid stdout handle: win_error=0x%08X (%d)\n"),
-                        win_error, win_error);
-                }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
-                }
-                break;
             }
 
-            SetLastError(0); // just in case
-            g_stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-            if (!_is_valid_handle(g_stderr_handle)) {
-                if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
-                    win_error = GetLastError();
+            if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
+                SetLastError(0); // just in case
+                g_stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+                if (!_is_valid_handle(g_stderr_handle)) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("invalid stderr handle: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    break;
                 }
-                if (!flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("invalid stderr handle: win_error=0x%08X (%d)\n"),
-                        win_error, win_error);
-                }
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
-                }
-                break;
             }
 
             if (read_std_handles_iter > 0) break;
@@ -4007,75 +4203,79 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
                 _reattach_stderr_to_console(!g_no_std_inherit);
             }
+
+            if (stdin_handle_type != FILE_TYPE_UNKNOWN && stdout_handle_type != FILE_TYPE_UNKNOWN && stderr_handle_type != FILE_TYPE_UNKNOWN) {
+                break;
+            }
         }
 
         if (g_no_std_inherit) {
             // reset std handles inheritance
 
-            if (!options.reopen_stdin_as_file.empty() || !options.reopen_stdin_as_server_pipe.empty() || !options.reopen_stdin_as_client_pipe.empty()) {
+            if (!g_options.reopen_stdin_as_file.empty() || !g_options.reopen_stdin_as_server_pipe.empty() || !g_options.reopen_stdin_as_client_pipe.empty()) {
                 SetLastError(0); // just in case
                 if (!::SetHandleInformation(g_stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not set stdin handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                            win_error, win_error, GetFileType(g_stdin_handle), options.reopen_stdin_as_file.c_str());
+                            win_error, win_error, GetFileType(g_stdin_handle), g_options.reopen_stdin_as_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
             }
 
-            if (!options.reopen_stdout_as_file.empty() || !options.reopen_stdout_as_server_pipe.empty() || !options.reopen_stdout_as_client_pipe.empty()) {
+            if (!g_options.reopen_stdout_as_file.empty() || !g_options.reopen_stdout_as_server_pipe.empty() || !g_options.reopen_stdout_as_client_pipe.empty()) {
                 SetLastError(0); // just in case
                 if (!::SetHandleInformation(g_stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not set stdout handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                            win_error, win_error, GetFileType(g_stdout_handle), options.reopen_stdout_as_file.c_str());
+                            win_error, win_error, GetFileType(g_stdout_handle), g_options.reopen_stdout_as_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
             }
 
-            if (!options.reopen_stderr_as_file.empty() || !options.reopen_stderr_as_server_pipe.empty() || !options.reopen_stderr_as_client_pipe.empty()) {
+            if (!g_options.reopen_stderr_as_file.empty() || !g_options.reopen_stderr_as_server_pipe.empty() || !g_options.reopen_stderr_as_client_pipe.empty()) {
                 SetLastError(0); // just in case
                 if (!::SetHandleInformation(g_stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not set stderr handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                            win_error, win_error, GetFileType(g_stderr_handle), options.reopen_stderr_as_file.c_str());
+                            win_error, win_error, GetFileType(g_stderr_handle), g_options.reopen_stderr_as_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -4085,46 +4285,46 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         // std handles dup
 
         if (!_is_valid_handle(g_stdout_handle)) {
-            switch (options.stdout_dup) {
+            switch (g_options.stdout_dup) {
             case 2:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_stderr_handle, GetCurrentProcess(), &g_stdout_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stderr into stdout: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stderr_to_file.c_str());
+                            win_error, win_error, g_options.tee_stderr_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
                 }
 
                 if (!_set_crt_std_handle(g_stdout_handle, 1, true, !g_no_std_inherit)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stdout before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.reopen_stderr_as_file.c_str());
+                            win_error, win_error, g_options.reopen_stderr_as_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4136,46 +4336,46 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         if (break_) break;
 
         if (!_is_valid_handle(g_stderr_handle)) {
-            switch (options.stderr_dup) {
+            switch (g_options.stderr_dup) {
             case 1:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_stdout_handle, GetCurrentProcess(), &g_stderr_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stdout_to_file.c_str());
+                            win_error, win_error, g_options.tee_stdout_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
                 }
 
                 if (!_set_crt_std_handle(g_stderr_handle, 2, true, !g_no_std_inherit)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stderr before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.reopen_stdout_as_file.c_str());
+                            win_error, win_error, g_options.reopen_stdout_as_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4215,25 +4415,25 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         // tee file handles dup
 
         if (!_is_valid_handle(g_tee_file_stdin_handle)) {
-            switch (options.tee_stdin_dup) {
+            switch (g_options.tee_stdin_dup) {
             case 1:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stdout tee as file into stdin tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stdout_to_file.c_str());
+                            win_error, win_error, g_options.tee_stdout_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4242,21 +4442,21 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             case 2:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stderr_handle, GetCurrentProcess(), &g_tee_file_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stderr tee as file into stdin tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stderr_to_file.c_str());
+                            win_error, win_error, g_options.tee_stderr_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4268,25 +4468,25 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         if (break_) break;
 
         if (!_is_valid_handle(g_tee_file_stdout_handle)) {
-            switch (options.tee_stdout_dup) {
+            switch (g_options.tee_stdout_dup) {
             case 0:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stdin tee as file into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stdin_to_file.c_str());
+                            win_error, win_error, g_options.tee_stdin_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4295,21 +4495,21 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             case 2:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stderr_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stderr tee as file into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stderr_to_file.c_str());
+                            win_error, win_error, g_options.tee_stderr_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4321,25 +4521,25 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         if (break_) break;
 
         if (!_is_valid_handle(g_tee_file_stderr_handle)) {
-            switch (options.tee_stderr_dup) {
+            switch (g_options.tee_stderr_dup) {
             case 0:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stdin tee as file into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stdin_to_file.c_str());
+                            win_error, win_error, g_options.tee_stdin_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4348,21 +4548,21 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             case 1:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not duplicate stdout tee as file into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, options.tee_stdout_to_file.c_str());
+                            win_error, win_error, g_options.tee_stdout_to_file.c_str());
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4376,31 +4576,31 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         // tee named pipe handles dup
 
         if (!_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
-            switch (options.tee_stdin_dup) {
+            switch (g_options.tee_stdin_dup) {
             case 1:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stdout_handle, GetCurrentProcess(), &g_tee_named_pipe_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        if (!options.tee_stdout_to_server_pipe.empty()) {
+                    if (!g_flags.no_print_gen_error_string) {
+                        if (!g_options.tee_stdout_to_server_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stdout tee as server named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stdout_to_server_pipe.c_str());
+                                win_error, win_error, g_options.tee_stdout_to_server_pipe.c_str());
                         }
-                        else if (!options.tee_stdout_to_client_pipe.empty()) {
+                        else if (!g_options.tee_stdout_to_client_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stdout tee as client named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stdout_to_client_pipe.c_str());
+                                win_error, win_error, g_options.tee_stdout_to_client_pipe.c_str());
                         }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4409,27 +4609,27 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             case 2:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stderr_handle, GetCurrentProcess(), &g_tee_named_pipe_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        if (!options.tee_stderr_to_server_pipe.empty()) {
+                    if (!g_flags.no_print_gen_error_string) {
+                        if (!g_options.tee_stderr_to_server_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stderr tee as server named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stderr_to_server_pipe.c_str());
+                                win_error, win_error, g_options.tee_stderr_to_server_pipe.c_str());
                         }
-                        else if (!options.tee_stderr_to_client_pipe.empty()) {
+                        else if (!g_options.tee_stderr_to_client_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stderr tee as client named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stderr_to_client_pipe.c_str());
+                                win_error, win_error, g_options.tee_stderr_to_client_pipe.c_str());
                         }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4441,31 +4641,31 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         if (break_) break;
 
         if (!_is_valid_handle(g_tee_named_pipe_stdout_handle)) {
-            switch (options.tee_stdout_dup) {
+            switch (g_options.tee_stdout_dup) {
             case 0:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stdin_handle, GetCurrentProcess(), &g_tee_named_pipe_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        if (!options.tee_stdin_to_server_pipe.empty()) {
+                    if (!g_flags.no_print_gen_error_string) {
+                        if (!g_options.tee_stdin_to_server_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stdin tee as server named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stdin_to_server_pipe.c_str());
+                                win_error, win_error, g_options.tee_stdin_to_server_pipe.c_str());
                         }
-                        else if (!options.tee_stdin_to_client_pipe.empty()) {
+                        else if (!g_options.tee_stdin_to_client_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stdin tee as client named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stdin_to_client_pipe.c_str());
+                                win_error, win_error, g_options.tee_stdin_to_client_pipe.c_str());
                         }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4474,27 +4674,27 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             case 2:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stderr_handle, GetCurrentProcess(), &g_tee_named_pipe_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        if (!options.tee_stderr_to_server_pipe.empty()) {
+                    if (!g_flags.no_print_gen_error_string) {
+                        if (!g_options.tee_stderr_to_server_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stderr tee as server named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stderr_to_server_pipe.c_str());
+                                win_error, win_error, g_options.tee_stderr_to_server_pipe.c_str());
                         }
-                        else if (!options.tee_stderr_to_client_pipe.empty()) {
+                        else if (!g_options.tee_stderr_to_client_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stderr tee as client named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stderr_to_client_pipe.c_str());
+                                win_error, win_error, g_options.tee_stderr_to_client_pipe.c_str());
                         }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4506,31 +4706,31 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         if (break_) break;
 
         if (!_is_valid_handle(g_tee_named_pipe_stderr_handle)) {
-            switch (options.tee_stderr_dup) {
+            switch (g_options.tee_stderr_dup) {
             case 0:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stdin_handle, GetCurrentProcess(), &g_tee_named_pipe_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        if (!options.tee_stdin_to_server_pipe.empty()) {
+                    if (!g_flags.no_print_gen_error_string) {
+                        if (!g_options.tee_stdin_to_server_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stdin tee as server named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stdin_to_server_pipe.c_str());
+                                win_error, win_error, g_options.tee_stdin_to_server_pipe.c_str());
                         }
-                        else if (!options.tee_stdin_to_client_pipe.empty()) {
+                        else if (!g_options.tee_stdin_to_client_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stdin tee as client named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stdin_to_client_pipe.c_str());
+                                win_error, win_error, g_options.tee_stdin_to_client_pipe.c_str());
                         }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4539,27 +4739,27 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             case 1:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        if (!options.tee_stdout_to_server_pipe.empty()) {
+                    if (!g_flags.no_print_gen_error_string) {
+                        if (!g_options.tee_stdout_to_server_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stdout tee as server named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stdout_to_server_pipe.c_str());
+                                win_error, win_error, g_options.tee_stdout_to_server_pipe.c_str());
                         }
-                        else if (!options.tee_stdout_to_client_pipe.empty()) {
+                        else if (!g_options.tee_stdout_to_client_pipe.empty()) {
                             _print_stderr_message(_T("could not duplicate stdout tee as client named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, options.tee_stdout_to_client_pipe.c_str());
+                                win_error, win_error, g_options.tee_stdout_to_client_pipe.c_str());
                         }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break_ = true;
                     break;
@@ -4582,9 +4782,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
         bool has_outbound_pipe_from_conin = false;
 
-        if (!g_no_std_inherit && !g_pipe_stdin_to_stdout) {
+        if (g_is_process_elevating || !g_no_std_inherit && !g_pipe_stdin_to_stdout) {
             if (stdin_handle_type == FILE_TYPE_DISK || stdin_handle_type == FILE_TYPE_PIPE) {
-                if (!CreateOutboundPipeFromConsoleInput(ret, win_error, flags, options)) {
+                if (!CreateOutboundPipeFromConsoleInput(ret, win_error)) {
                     break;
                 }
 
@@ -4598,32 +4798,32 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
                 SetLastError(0); // just in case
                 if (!::SetHandleInformation(g_stdin_pipe_write_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        if (options.create_outbound_pipe_from_stdin.empty()) {
+                    if (!g_flags.no_print_gen_error_string) {
+                        if (g_options.create_outbound_server_pipe_from_stdin.empty()) {
                             _print_stderr_message(_T("could not set stdin outbound anonymous pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stdin_handle_type, options.reopen_stdin_as_file.c_str());
+                                win_error, win_error, stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
                         }
                         else {
-                            _print_stderr_message(_T("could not set stdin outbound named pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stdin_handle_type, options.reopen_stdin_as_file.c_str());
+                            _print_stderr_message(_T("could not set stdin outbound server named pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                                win_error, win_error, stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
                         }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
 
-                if (options.shell_exec_verb.empty()) {
+                if (g_options.shell_exec_verb.empty()) {
                     si.hStdInput = g_stdin_pipe_read_handle;
 
                     // CAUTION:
@@ -4642,10 +4842,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 //  The stdin console handle can not be changed for inheritance.
                 //
 
-                if (options.stdin_echo != -1) {
+                if (g_options.stdin_echo != -1) {
                     DWORD stdin_handle_mode = 0;
                     GetConsoleMode(g_stdin_handle, &stdin_handle_mode);
-                    if (options.stdin_echo) {
+                    if (g_options.stdin_echo) {
                         SetConsoleMode(g_stdin_handle, stdin_handle_mode | ENABLE_ECHO_INPUT);
                     }
                     else {
@@ -4653,7 +4853,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                     }
                 }
 
-                if (options.shell_exec_verb.empty()) {
+                if (g_options.shell_exec_verb.empty()) {
                     // CAUTION:
                     //  Must be the original stdin, can not be a buffer from the CreateConsoleScreenBuffer call,
                     //  otherwise, for example, the `cmd.exe /k` process will exit immediately!
@@ -4669,7 +4869,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             }
 
             if (has_outbound_pipe_from_conin || _is_valid_handle(g_tee_file_stdout_handle)) {
-                if (!CreateInboundPipeToConsoleOutput<1>(ret, win_error, flags, options)) {
+                if (!CreateInboundPipeToConsoleOutput<1>(ret, win_error)) {
                     break;
                 }
 
@@ -4681,32 +4881,32 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
                 SetLastError(0); // just in case
                 if (!::SetHandleInformation(g_stdout_pipe_read_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        if (options.create_inbound_pipe_to_stdout.empty()) {
+                    if (!g_flags.no_print_gen_error_string) {
+                        if (g_options.create_inbound_server_pipe_to_stdout.empty()) {
                             _print_stderr_message(_T("could not set stdout inbound anonymous pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stdout_handle_type, options.reopen_stdout_as_file.c_str());
+                                win_error, win_error, stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
                         }
                         else {
-                            _print_stderr_message(_T("could not set stdout inbound named pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stdout_handle_type, options.reopen_stdout_as_file.c_str());
+                            _print_stderr_message(_T("could not set stdout inbound server named pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                                win_error, win_error, stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
                         }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
 
-                if (options.shell_exec_verb.empty()) {
+                if (g_options.shell_exec_verb.empty()) {
                     si.hStdOutput = g_stdout_pipe_write_handle;
 
                     // CAUTION:
@@ -4720,7 +4920,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                     SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_pipe_write_handle);
                 }
             }
-            else if (options.shell_exec_verb.empty()) {
+            else if (g_options.shell_exec_verb.empty()) {
                 si.hStdOutput = g_stdout_handle;
 
                 // CAUTION:
@@ -4731,7 +4931,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             }
 
             if (has_outbound_pipe_from_conin || _is_valid_handle(g_tee_file_stderr_handle)) {
-                if (!CreateInboundPipeToConsoleOutput<2>(ret, win_error, flags, options)) {
+                if (!CreateInboundPipeToConsoleOutput<2>(ret, win_error)) {
                     break;
                 }
 
@@ -4743,32 +4943,32 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
                 SetLastError(0); // just in case
                 if (!::SetHandleInformation(g_stderr_pipe_read_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
-                    if (!flags.ret_win_error) {
+                    if (!g_flags.ret_win_error) {
                         ret = err_win32_error;
                     }
                     else {
                         ret = win_error;
                     }
-                    if (!flags.no_print_gen_error_string) {
-                        if (options.create_inbound_pipe_to_stderr.empty()) {
+                    if (!g_flags.no_print_gen_error_string) {
+                        if (g_options.create_inbound_server_pipe_to_stderr.empty()) {
                             _print_stderr_message(_T("could not set stderr inbound anonymous pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stderr_handle_type, options.reopen_stderr_as_file.c_str());
+                                win_error, win_error, stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
                         }
                         else {
-                            _print_stderr_message(_T("could not set stderr inbound named pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stderr_handle_type, options.reopen_stderr_as_file.c_str());
+                            _print_stderr_message(_T("could not set stderr inbound server named pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                                win_error, win_error, stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
                         }
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
 
-                if (options.shell_exec_verb.empty()) {
+                if (g_options.shell_exec_verb.empty()) {
                     si.hStdError = g_stderr_pipe_write_handle;
 
                     // CAUTION:
@@ -4782,7 +4982,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                     SetStdHandle(STD_ERROR_HANDLE, g_stderr_pipe_write_handle);
                 }
             }
-            else if (options.shell_exec_verb.empty()) {
+            else if (g_options.shell_exec_verb.empty()) {
                 si.hStdError = g_stderr_handle;
 
                 // CAUTION:
@@ -4802,7 +5002,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         const bool do_wait_child = !is_idle_execute &&
             (_is_valid_handle(g_tee_file_stdin_handle) || _is_valid_handle(g_tee_file_stdout_handle) || _is_valid_handle(g_tee_file_stderr_handle) ||
              _is_valid_handle(g_tee_named_pipe_stdin_handle) || _is_valid_handle(g_tee_named_pipe_stdout_handle) || _is_valid_handle(g_tee_named_pipe_stderr_handle) ||
-             !flags.no_wait);
+             !g_flags.no_wait);
 
         // CAUTION:
         //  DO NOT USE `CREATE_NEW_PROCESS_GROUP` flag in the `CreateProcess`, otherwise a child process would ignore all signals.
@@ -4813,7 +5013,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 g_ctrl_handler = true;
                 SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update parent console signal handler (does not work as expected)
 
-                if (options.shell_exec_verb.empty()) {
+                if (g_options.shell_exec_verb.empty()) {
                     if (cmd && cmd_len) {
                         // CAUTION:
                         //  cmd argument must be writable!
@@ -4823,9 +5023,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
                         SetLastError(0); // just in case
                         ret_create_proc = ::CreateProcess(app, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE,
-                            flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
+                            g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                             NULL,
-                            !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL,
+                            !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL,
                             &si, &pi);
 
                         win_error = GetLastError();
@@ -4833,9 +5033,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                     else {
                         SetLastError(0); // just in case
                         ret_create_proc = ::CreateProcess(app, NULL, NULL, NULL, TRUE,
-                            flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
+                            g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                             NULL,
-                            !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL,
+                            !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL,
                             &si, &pi);
 
                         win_error = GetLastError();
@@ -4844,34 +5044,34 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 else {
                     sei.cbSize = sizeof(sei);
                     sei.fMask = SEE_MASK_NOCLOSEPROCESS; // use hProcess
-                    if (flags.wait_child_start && do_wait_child) {
+                    if (g_flags.wait_child_start && do_wait_child) {
                         sei.fMask |= SEE_MASK_NOASYNC | SEE_MASK_FLAG_DDEWAIT;
                     }
-                    if (flags.shell_exec_expand_env) {
+                    if (g_flags.shell_exec_expand_env) {
                         sei.fMask |= SEE_MASK_DOENVSUBST;
                     }
-                    if (flags.no_sys_dialog_ui) {
+                    if (g_flags.no_sys_dialog_ui) {
                         sei.fMask |= SEE_MASK_FLAG_NO_UI;
                     }
-                    if (!flags.create_child_console) {
+                    if (!g_flags.create_child_console) {
                         sei.fMask |= SEE_MASK_NO_CONSOLE;
                     }
                     if (!do_wait_child) {
                         sei.fMask |= SEE_MASK_ASYNCOK;
                     }
 
-                    if (!options.shell_exec_verb.empty()) {
-                        shell_exec_verb.resize(options.shell_exec_verb.length() + 1);
-                        memcpy(shell_exec_verb.data(), options.shell_exec_verb.c_str(), shell_exec_verb.size() * sizeof(shell_exec_verb[0]));
+                    if (!g_options.shell_exec_verb.empty()) {
+                        shell_exec_verb.resize(g_options.shell_exec_verb.length() + 1);
+                        memcpy(shell_exec_verb.data(), g_options.shell_exec_verb.c_str(), shell_exec_verb.size() * sizeof(shell_exec_verb[0]));
                         sei.lpVerb = &shell_exec_verb[0];
                     }
 
                     sei.lpFile = app;
                     sei.lpParameters = cmd;
-                    sei.lpDirectory = !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL;
-                    sei.nShow = options.show_as;
+                    sei.lpDirectory = !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL;
+                    sei.nShow = g_options.show_as;
 
-                    if (flags.init_com) {
+                    if (g_flags.init_com) {
                         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
                     }
 
@@ -4913,9 +5113,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
 
                 SetLastError(0); // just in case
                 ret_create_proc = ::CreateProcess(NULL, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE,
-                    flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
+                    g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                     NULL,
-                    !options.change_current_dir.empty() ? options.change_current_dir.c_str() : NULL,
+                    !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL,
                     &si, &pi);
 
                 win_error = GetLastError();
@@ -4934,8 +5134,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 g_is_process_executed = true;
             }
             else {
-                if (!flags.no_print_gen_error_string) {
-                    if (options.shell_exec_verb.empty()) {
+                if (!g_flags.no_print_gen_error_string) {
+                    if (g_options.shell_exec_verb.empty()) {
                         _print_stderr_message(_T("could not create child process: win_error=0x%08X (%d) app=\"%s\" cmd=\"%s\"\n"),
                             win_error, win_error, app, cmd_buf.size() ? (TCHAR *)cmd_buf.data() : _T(""));
                     }
@@ -4945,19 +5145,19 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                     }
                 }
 
-                if (flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, options.win_error_langid);
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
                 }
 
-                if (flags.print_shell_error_string && shell_error != -1 && shell_error <= 32) {
+                if (g_flags.print_shell_error_string && shell_error != -1 && shell_error <= 32) {
                     _print_shell_exec_error_message(shell_error, sei);
                 }
             }
 
-            if (flags.ret_create_proc) {
+            if (g_flags.ret_create_proc) {
                 ret = ret_create_proc;
             }
-            else if (flags.ret_win_error) {
+            else if (g_flags.ret_win_error) {
                 ret = win_error;
             }
             else if (!is_child_executed) {
@@ -5029,7 +5229,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
         if (is_child_executed && do_wait_child) {
             WaitForSingleObject(g_child_process_handle, INFINITE);
 
-            if (flags.ret_child_exit) {
+            if (g_flags.ret_child_exit) {
                 // read child process return code
                 DWORD exit_code = 0;
                 SetLastError(0); // just in case
@@ -5039,12 +5239,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 else {
                     ret = err_win32_error;
                     win_error = GetLastError();
-                    if (!flags.no_print_gen_error_string) {
+                    if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not get child process exit code: win_error=0x%08X (%u)\n"),
                             win_error, win_error);
                     }
-                    if (flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, options.win_error_langid);
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     break;
                 }
@@ -5111,6 +5311,27 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             //
 
             {
+                auto & connect_server_named_pipe_thread_locals = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals;
+
+                // suppress all exceptions while waiting after an exception
+                [&]() { __try {
+                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_locals, true);
+                }
+                __finally {
+                    ;
+                }
+                }();
+
+                // check errors
+                utility::for_each_unroll(connect_server_named_pipe_thread_locals, [&](auto & local) {
+                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                        g_worker_threads_return_data.add(local.thread_data);
+                        local.thread_data.is_copied = true;
+                    }
+                });
+            }
+
+            {
                 auto & connect_server_named_pipe_thread_locals = g_connect_server_named_pipe_thread_locals;
 
                 // suppress all exceptions while waiting after an exception
@@ -5135,10 +5356,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             if (!g_worker_threads_return_data.datas.empty()) {
                 bool is_ret_updated = false;
                 for (const auto & ret_data : g_worker_threads_return_data.datas) {
-                    if (!flags.ret_create_proc && !flags.ret_child_exit) {
+                    if (!g_flags.ret_create_proc && !g_flags.ret_child_exit) {
                         // return the first error code
                         if (!ret && !is_ret_updated && ret_data.is_error) {
-                            if (!flags.ret_win_error) {
+                            if (!g_flags.ret_win_error) {
                                 ret = ret_data.ret;
                             }
                             else {
@@ -5158,10 +5379,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             }
 
             // close shared resources at first
-            if (options.chcp_in && options.chcp_in != prev_cp_in) {
+            if (g_options.chcp_in && g_options.chcp_in != prev_cp_in) {
                 SetConsoleCP(prev_cp_in);
             }
-            if (options.chcp_out && options.chcp_out != prev_cp_out) {
+            if (g_options.chcp_out && g_options.chcp_out != prev_cp_out) {
                 SetConsoleCP(prev_cp_out);
             }
 
@@ -5178,19 +5399,19 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
             _close_handle(g_tee_file_stderr_handle);
 
             // close tee named pipe handles
-            if (!options.tee_stdin_to_server_pipe.empty()) {
+            if (!g_options.tee_stdin_to_server_pipe.empty()) {
                 CancelIo(g_tee_named_pipe_stdin_handle);
                 DisconnectNamedPipe(g_tee_named_pipe_stdin_handle);
             }
             _close_handle(g_tee_named_pipe_stdin_handle);
 
-            if (!options.tee_stdout_to_server_pipe.empty()) {
+            if (!g_options.tee_stdout_to_server_pipe.empty()) {
                 CancelIo(g_tee_named_pipe_stdout_handle);
                 DisconnectNamedPipe(g_tee_named_pipe_stdout_handle);
             }
             _close_handle(g_tee_named_pipe_stdout_handle);
 
-            if (!options.tee_stderr_to_server_pipe.empty()) {
+            if (!g_options.tee_stderr_to_server_pipe.empty()) {
                 CancelIo(g_tee_named_pipe_stderr_handle);
                 DisconnectNamedPipe(g_tee_named_pipe_stderr_handle);
             }
@@ -5214,21 +5435,21 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, con
                 }
 
                 // close anonymous/named pipe handles connected with child process standard handles
-                if (!options.create_outbound_pipe_from_stdin.empty()) {
+                if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
                     CancelIo(g_stdin_pipe_write_handle);
                     DisconnectNamedPipe(g_stdin_pipe_write_handle);
                 }
                 _close_handle(g_stdin_pipe_write_handle);
                 _close_handle(g_stdin_pipe_read_handle);
 
-                if (!options.create_inbound_pipe_to_stdout.empty()) {
+                if (!g_options.create_inbound_server_pipe_to_stdout.empty()) {
                     CancelIo(g_stdout_pipe_read_handle);
                     DisconnectNamedPipe(g_stdout_pipe_read_handle);
                 }
                 _close_handle(g_stdout_pipe_read_handle);
                 _close_handle(g_stdout_pipe_write_handle);
 
-                if (!options.create_inbound_pipe_to_stderr.empty()) {
+                if (!g_options.create_inbound_server_pipe_to_stderr.empty()) {
                     CancelIo(g_stderr_pipe_read_handle);
                     DisconnectNamedPipe(g_stderr_pipe_read_handle);
                 }
@@ -5271,6 +5492,1013 @@ std::tstring SubstNamePlaceholders(std::tstring str)
     return _replace_strings(replaced_str, _T("{ppid}"), ppid_str);
 }
 
+void SubstOptionsPlaceholders(Options & options)
+{
+    if (!options.reopen_stdin_as_server_pipe.empty()) {
+        options.reopen_stdin_as_server_pipe = SubstNamePlaceholders(options.reopen_stdin_as_server_pipe);
+    }
+    if (!options.reopen_stdin_as_client_pipe.empty()) {
+        options.reopen_stdin_as_client_pipe = SubstNamePlaceholders(options.reopen_stdin_as_client_pipe);
+    }
+    if (!options.reopen_stdout_as_server_pipe.empty()) {
+        options.reopen_stdout_as_server_pipe = SubstNamePlaceholders(options.reopen_stdout_as_server_pipe);
+    }
+    if (!options.reopen_stdout_as_client_pipe.empty()) {
+        options.reopen_stdout_as_client_pipe = SubstNamePlaceholders(options.reopen_stdout_as_client_pipe);
+    }
+    if (!options.reopen_stderr_as_client_pipe.empty()) {
+        options.reopen_stderr_as_client_pipe = SubstNamePlaceholders(options.reopen_stderr_as_client_pipe);
+    }
+    if (!options.create_outbound_server_pipe_from_stdin.empty()) {
+        options.create_outbound_server_pipe_from_stdin = SubstNamePlaceholders(options.create_outbound_server_pipe_from_stdin);
+    }
+    if (!options.create_inbound_server_pipe_to_stdout.empty()) {
+        options.create_inbound_server_pipe_to_stdout = SubstNamePlaceholders(options.create_inbound_server_pipe_to_stdout);
+    }
+    if (!options.create_inbound_server_pipe_to_stderr.empty()) {
+        options.create_inbound_server_pipe_to_stderr = SubstNamePlaceholders(options.create_inbound_server_pipe_to_stderr);
+    }
+    if (!options.tee_stdin_to_server_pipe.empty()) {
+        options.tee_stdin_to_server_pipe = SubstNamePlaceholders(options.tee_stdin_to_server_pipe);
+    }
+    if (!options.tee_stdin_to_client_pipe.empty()) {
+        options.tee_stdin_to_client_pipe = SubstNamePlaceholders(options.tee_stdin_to_client_pipe);
+    }
+    if (!options.tee_stdout_to_server_pipe.empty()) {
+        options.tee_stdout_to_server_pipe = SubstNamePlaceholders(options.tee_stdout_to_server_pipe);
+    }
+    if (!options.tee_stdout_to_client_pipe.empty()) {
+        options.tee_stdout_to_client_pipe = SubstNamePlaceholders(options.tee_stdout_to_client_pipe);
+    }
+    if (!options.tee_stderr_to_server_pipe.empty()) {
+        options.tee_stderr_to_server_pipe = SubstNamePlaceholders(options.tee_stderr_to_server_pipe);
+    }
+    if (!options.tee_stderr_to_client_pipe.empty()) {
+        options.tee_stderr_to_client_pipe = SubstNamePlaceholders(options.tee_stderr_to_client_pipe);
+    }
+}
+
+void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std::tstring * cmd_str_ptr, std::tstring * cmd_out_str_ptr,
+                                    Flags & regular_flags, Options & regular_options,
+                                    const Flags & elevate_child_flags, const Options & elevate_child_options,
+                                    const Flags & promote_child_flags, const Options & promote_child_options)
+{
+    std::tstring options_line;
+    std::tstring cmd_line;
+
+    std::tstring tmp_str;
+
+    if (cmd_out_str_ptr) {
+        if (app_str_ptr && !app_str_ptr->empty()) {
+            tmp_str = _replace_strings(*app_str_ptr, _T("\\"), std::tstring{ _T("\\\\") });
+            cmd_line = std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+        else {
+            cmd_line = _T("\"\" ");
+        }
+
+        if (cmd_str_ptr && !cmd_str_ptr->empty()) {
+            tmp_str = _replace_strings(*cmd_str_ptr, _T("\\"), std::tstring{ _T("\\\\") });
+            cmd_line += std::tstring{ _T("\"") } +_replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\"");
+        }
+        else {
+            cmd_line += _T("\"\"");
+        }
+    }
+
+    Flags child_flags = regular_flags;
+    Options child_options = regular_options;
+
+    if (g_is_process_elevating) { // just in case
+        child_flags.merge(elevate_child_flags);
+        child_options.merge(elevate_child_options);
+    }
+
+    child_flags.merge(promote_child_flags);
+    child_options.merge(promote_child_options);
+
+    // NOTE:
+    //  Always apply code page and win error language id for both processes.
+    //
+
+    if (child_options.chcp_in) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/chcp-in ") } + std::to_tstring(child_options.chcp_in) + _T(" ");
+        }
+    }
+
+    if (child_options.chcp_out) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/chcp-out ") } + std::to_tstring(child_options.chcp_out) + _T(" ");
+        }
+    }
+
+    if (child_flags.ret_create_proc) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/ret-create-proc ");
+        }
+    }
+    regular_flags.ret_create_proc = false; // always reset
+
+    if (child_flags.ret_win_error) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/ret-win-error ");
+        }
+    }
+    regular_flags.ret_win_error = false; // always reset
+
+    if (child_options.win_error_langid) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/win-error-langid ") } + std::to_tstring(child_options.win_error_langid) + _T(" ");
+        }
+    }
+
+    if (child_flags.ret_child_exit) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/ret-child-exit ");
+        }
+    }
+    regular_flags.ret_child_exit = true; // always return elevated child exit code
+
+    if (child_flags.print_win_error_string) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/print-win-error-string /print-shell-error-string "); // always print shell error if win32 error is flagged
+        }
+    }
+    regular_flags.print_win_error_string = false; // always reset
+
+    if (child_flags.no_print_gen_error_string) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-print-gen-error-string ");
+        }
+    }
+    regular_flags.no_print_gen_error_string = false; // always reset
+
+    if (child_flags.no_sys_dialog_ui) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-sys-dialog-ui ");
+        }
+    }
+    regular_flags.no_sys_dialog_ui = false; // always reset
+
+    if (!child_options.shell_exec_verb.empty()) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/shell-exec \"") } + child_options.shell_exec_verb + _T("\" ");
+        }
+    }
+    regular_options.shell_exec_verb.clear(); // always reset
+
+    if (child_flags.shell_exec_expand_env) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/shell-exec-expand-env ");
+        }
+    }
+    regular_flags.shell_exec_expand_env = false; // always reset
+
+
+    //options.change_current_dir
+
+
+    if (child_flags.no_wait) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-wait ");
+        }
+    }
+    regular_flags.no_wait = false; // always reset
+
+    if (child_flags.no_window) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-window ");
+        }
+    }
+    regular_flags.no_window = false; // always reset
+
+
+    if (child_flags.no_expand_env) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-expand-env ");
+        }
+    }
+    regular_flags.no_expand_env = false; // always disable expansion for the parent process
+
+    // always disable substitution for a child process
+    if (cmd_out_str_ptr) {
+        options_line += _T("/no-subst-vars ");
+    }
+
+
+    if (child_flags.no_std_inherit) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-std-inherit ");
+        }
+    }
+    regular_flags.no_std_inherit = false; // always reset
+
+    if (child_flags.pipe_stdin_to_stdout) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/pipe-stdin-to-stdout ");
+        }
+    }
+    regular_flags.pipe_stdin_to_stdout = false; // always reset
+
+    if (child_flags.init_com) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/init-com ");
+        }
+    }
+    regular_flags.init_com = false; // always reset
+
+    if (child_flags.wait_child_start) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/wait-child-start ");
+        }
+    }
+    regular_flags.wait_child_start = false; // always reset
+
+    //child_flags.elevate
+
+    if (child_options.show_as != SW_SHOWNORMAL) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/showas ") } + std::to_wstring(child_options.show_as);
+        }
+    }
+    regular_options.show_as = SW_SHOWNORMAL; // always reset
+
+
+    if (!child_options.reopen_stdin_as_file.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.reopen_stdin_as_file, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/reopen-stdin ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.reopen_stdin_as_file.clear(); // always reset
+
+    if (!child_options.reopen_stdout_as_file.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.reopen_stdout_as_file, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/reopen-stdout ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.reopen_stdout_as_file.clear(); // always reset
+
+    if (!child_options.reopen_stderr_as_file.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.reopen_stderr_as_file, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/reopen-stderr ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.reopen_stderr_as_file.clear(); // always reset
+
+
+    if (!child_options.reopen_stdin_as_server_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.reopen_stdin_as_server_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/reopen-stdin-as-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.reopen_stdin_as_server_pipe.clear(); // always reset
+
+    if (child_options.reopen_stdin_as_server_pipe_connect_timeout_ms && child_options.reopen_stdin_as_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stdin-as-server-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stdin_as_server_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.reopen_stdin_as_server_pipe_connect_timeout_ms = 0; // always reset
+
+    if (child_options.reopen_stdin_as_server_pipe_in_buf_size && child_options.reopen_stdin_as_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stdin-as-server-pipe-in-buf-size ") } + std::to_tstring(child_options.reopen_stdin_as_server_pipe_in_buf_size) + _T(" ");
+        }
+    }
+    regular_options.reopen_stdin_as_server_pipe_in_buf_size = 0; // always reset
+
+    if (child_options.reopen_stdin_as_server_pipe_out_buf_size && child_options.reopen_stdin_as_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stdin-as-server-pipe-out-buf-size ") } + std::to_tstring(child_options.reopen_stdin_as_server_pipe_out_buf_size) + _T(" ");
+        }
+    }
+    regular_options.reopen_stdin_as_server_pipe_out_buf_size = 0; // always reset
+
+    if (!child_options.reopen_stdin_as_client_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.reopen_stdin_as_client_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/reopen-stdin-as-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.reopen_stdin_as_client_pipe.clear(); // always reset
+
+    if (child_options.reopen_stdin_as_client_pipe_connect_timeout_ms && child_options.reopen_stdin_as_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stdin-as-client-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stdin_as_client_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.reopen_stdin_as_client_pipe_connect_timeout_ms = 0; // always reset
+
+
+    if (!child_options.reopen_stdout_as_server_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.reopen_stdout_as_server_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/reopen-stdout-as-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.reopen_stdout_as_server_pipe.clear(); // always reset
+
+    if (child_options.reopen_stdout_as_server_pipe_connect_timeout_ms && child_options.reopen_stdout_as_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stdout-as-server-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stdout_as_server_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.reopen_stdout_as_server_pipe_connect_timeout_ms = 0; // always reset
+
+    if (child_options.reopen_stdout_as_server_pipe_in_buf_size && child_options.reopen_stdout_as_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stdout-as-server-pipe-in-buf-size ") } + std::to_tstring(child_options.reopen_stdout_as_server_pipe_in_buf_size) + _T(" ");
+        }
+    }
+    regular_options.reopen_stdout_as_server_pipe_in_buf_size = 0; // always reset
+
+    if (child_options.reopen_stdout_as_server_pipe_out_buf_size && child_options.reopen_stdout_as_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stdout-as-server-pipe-out-buf-size ") } + std::to_tstring(child_options.reopen_stdout_as_server_pipe_out_buf_size) + _T(" ");
+        }
+    }
+    regular_options.reopen_stdout_as_server_pipe_out_buf_size = 0; // always reset
+
+    if (!child_options.reopen_stdout_as_client_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.reopen_stdout_as_client_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/reopen-stdout-as-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.reopen_stdout_as_client_pipe.clear(); // always reset
+
+    if (child_options.reopen_stdout_as_client_pipe_connect_timeout_ms && child_options.reopen_stdout_as_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stdout-as-client-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stdout_as_client_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.reopen_stdout_as_client_pipe_connect_timeout_ms = 0; // always reset
+
+
+    if (!child_options.reopen_stderr_as_server_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.reopen_stderr_as_server_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/reopen-stderr-as-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.reopen_stderr_as_server_pipe.clear(); // always reset
+
+    if (child_options.reopen_stderr_as_server_pipe_connect_timeout_ms && child_options.reopen_stderr_as_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stderr-as-server-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stderr_as_server_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.reopen_stderr_as_server_pipe_connect_timeout_ms = 0; // always reset
+
+    if (child_options.reopen_stderr_as_server_pipe_in_buf_size && child_options.reopen_stderr_as_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stderr-as-server-pipe-in-buf-size ") } + std::to_tstring(child_options.reopen_stderr_as_server_pipe_in_buf_size) + _T(" ");
+        }
+    }
+    regular_options.reopen_stderr_as_server_pipe_in_buf_size = 0; // always reset
+
+    if (child_options.reopen_stderr_as_server_pipe_out_buf_size && child_options.reopen_stderr_as_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stderr-as-server-pipe-out-buf-size ") } + std::to_tstring(child_options.reopen_stderr_as_server_pipe_out_buf_size) + _T(" ");
+        }
+    }
+    regular_options.reopen_stderr_as_server_pipe_out_buf_size = 0; // always reset
+
+    if (!child_options.reopen_stderr_as_client_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.reopen_stderr_as_client_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/reopen-stderr-as-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.reopen_stderr_as_client_pipe.clear(); // always reset
+
+    if (child_options.reopen_stderr_as_client_pipe_connect_timeout_ms && child_options.reopen_stderr_as_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/reopen-stderr-as-client-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stderr_as_client_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.reopen_stderr_as_client_pipe_connect_timeout_ms = 0; // always reset
+
+
+    if (child_flags.reopen_stdout_file_truncate) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/reopen-stdout-file-truncate ");
+        }
+    }
+    regular_flags.reopen_stdout_file_truncate = false; // always reset
+
+    if (child_flags.reopen_stderr_file_truncate) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/reopen-stderr-file-truncate ");
+        }
+    }
+    regular_flags.reopen_stderr_file_truncate = false; // always reset
+
+
+    if (child_options.stdout_dup >= 0) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/stdout-dup ") } + std::to_tstring(child_options.stdout_dup) + _T(" ");
+        }
+    }
+    regular_options.stdout_dup = -1; // always reset
+
+    if (child_options.stderr_dup >= 0) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/stderr-dup ") } + std::to_tstring(child_options.stderr_dup) + _T(" ");
+        }
+    }
+    regular_options.stderr_dup = -1; // always reset
+
+
+    if (child_flags.stdin_output_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/stdin-output-flush ");
+        }
+    }
+    regular_flags.stdin_output_flush = false; // always reset
+
+    if (child_flags.stdout_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/stdout-flush ");
+        }
+    }
+    regular_flags.stdout_flush = false; // always reset
+
+    if (child_flags.stderr_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/stderr-flush ");
+        }
+    }
+    regular_flags.stderr_flush = false; // always reset
+
+    if (child_flags.output_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/output-flush ");
+        }
+    }
+    regular_flags.output_flush = false; // always reset
+
+    if (child_flags.inout_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/inout-flush ");
+        }
+    }
+    regular_flags.inout_flush = false; // always reset
+
+
+    if (!child_options.create_outbound_server_pipe_from_stdin.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.create_outbound_server_pipe_from_stdin, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/create-outbound-server-pipe-from-stdin ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.create_outbound_server_pipe_from_stdin.clear(); // always reset
+
+    if (child_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms && child_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-outbound-server-pipe-from-stdin-connect-timeout ") } + std::to_tstring(child_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms = 0; // always reset
+
+    if (child_options.create_outbound_server_pipe_from_stdin_in_buf_size && child_options.create_outbound_server_pipe_from_stdin_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-outbound-server-pipe-from-stdin-in-buf-size ") } + std::to_tstring(child_options.create_outbound_server_pipe_from_stdin_in_buf_size) + _T(" ");
+        }
+    }
+    regular_options.create_outbound_server_pipe_from_stdin_in_buf_size = 0; // always reset
+
+    if (child_options.create_outbound_server_pipe_from_stdin_out_buf_size && child_options.create_outbound_server_pipe_from_stdin_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-outbound-server-pipe-from-stdin-out-buf-size ") } + std::to_tstring(child_options.create_outbound_server_pipe_from_stdin_out_buf_size) + _T(" ");
+        }
+    }
+    regular_options.create_outbound_server_pipe_from_stdin_out_buf_size = 0; // always reset
+
+
+    if (!child_options.create_inbound_server_pipe_to_stdout.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.create_inbound_server_pipe_to_stdout, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stdout ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.create_inbound_server_pipe_to_stdout.clear(); // always reset
+
+    if (child_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms && child_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stdout-connect-timeout ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms = 0; // always reset
+
+    if (child_options.create_inbound_server_pipe_to_stdout_in_buf_size && child_options.create_inbound_server_pipe_to_stdout_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stdout-in-buf-size ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stdout_in_buf_size) + _T(" ");
+        }
+    }
+    regular_options.create_inbound_server_pipe_to_stdout_in_buf_size = 0; // always reset
+
+    if (child_options.create_inbound_server_pipe_to_stdout_out_buf_size && child_options.create_inbound_server_pipe_to_stdout_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stdout-out-buf-size ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stdout_out_buf_size) + _T(" ");
+        }
+    }
+    regular_options.create_inbound_server_pipe_to_stdout_out_buf_size = 0; // always reset
+
+
+    if (!child_options.create_inbound_server_pipe_to_stderr.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.create_inbound_server_pipe_to_stderr, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stderr ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.create_inbound_server_pipe_to_stderr.clear(); // always reset
+
+    if (child_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms && child_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stderr-connect-timeout ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms = 0; // always reset
+
+    if (child_options.create_inbound_server_pipe_to_stderr_in_buf_size && child_options.create_inbound_server_pipe_to_stderr_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stderr-in-buf-size ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stderr_in_buf_size) + _T(" ");
+        }
+    }
+    regular_options.create_inbound_server_pipe_to_stderr_in_buf_size = 0; // always reset
+
+    if (child_options.create_inbound_server_pipe_to_stderr_out_buf_size && child_options.create_inbound_server_pipe_to_stderr_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stderr-out-buf-size ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stderr_out_buf_size) + _T(" ");
+        }
+    }
+    regular_options.create_inbound_server_pipe_to_stderr_out_buf_size = 0; // always reset
+
+
+    if (!child_options.tee_stdin_to_file.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.tee_stdin_to_file, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/tee-stdin ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.tee_stdin_to_file.clear(); // always reset
+
+    if (!child_options.tee_stdout_to_file.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.tee_stdout_to_file, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/tee-stdout ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.tee_stdout_to_file.clear(); // always reset
+
+    if (!child_options.tee_stderr_to_file.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.tee_stderr_to_file, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/tee-stderr ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.tee_stderr_to_file.clear(); // always reset
+
+
+    if (!child_options.tee_stdin_to_server_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.tee_stdin_to_server_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/tee-stdin-to-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.tee_stdin_to_server_pipe.clear(); // always reset
+
+    if (child_options.tee_stdin_to_server_pipe_connect_timeout_ms && child_options.tee_stdin_to_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdin-to-server-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stdin_to_server_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.tee_stdin_to_server_pipe_connect_timeout_ms = 0; // always reset
+
+    if (child_options.tee_stdin_to_server_pipe_in_buf_size && child_options.tee_stdin_to_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdin-to-server-pipe-in-buf-size ") } + std::to_tstring(child_options.tee_stdin_to_server_pipe_in_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stdin_to_server_pipe_in_buf_size = 0; // always reset
+
+    if (child_options.tee_stdin_to_server_pipe_out_buf_size && child_options.tee_stdin_to_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdin-to-server-pipe-out-buf-size ") } + std::to_tstring(child_options.tee_stdin_to_server_pipe_out_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stdin_to_server_pipe_out_buf_size = 0; // always reset
+
+    if (!child_options.tee_stdin_to_client_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.tee_stdin_to_client_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/tee-stdin-to-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.tee_stdin_to_client_pipe.clear(); // always reset
+
+    if (child_options.tee_stdin_to_client_pipe_connect_timeout_ms && child_options.tee_stdin_to_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdin-to-client-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stdin_to_client_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.tee_stdin_to_client_pipe_connect_timeout_ms = 0; // always reset
+
+
+    if (!child_options.tee_stdout_to_server_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.tee_stdout_to_server_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/tee-stdout-to-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.tee_stdout_to_server_pipe.clear(); // always reset
+
+    if (child_options.tee_stdout_to_server_pipe_connect_timeout_ms && child_options.tee_stdout_to_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdout-to-server-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stdout_to_server_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.tee_stdout_to_server_pipe_connect_timeout_ms = 0; // always reset
+
+    if (child_options.tee_stdout_to_server_pipe_in_buf_size && child_options.tee_stdout_to_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdout-to-server-pipe-in-buf-size ") } + std::to_tstring(child_options.tee_stdout_to_server_pipe_in_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stdout_to_server_pipe_in_buf_size = 0; // always reset
+
+    if (child_options.tee_stdout_to_server_pipe_out_buf_size && child_options.tee_stdout_to_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdout-to-server-pipe-out-buf-size ") } + std::to_tstring(child_options.tee_stdout_to_server_pipe_out_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stdout_to_server_pipe_out_buf_size = 0; // always reset
+
+    if (!child_options.tee_stdout_to_client_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.tee_stdout_to_client_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/tee-stdout-to-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.tee_stdout_to_client_pipe.clear(); // always reset
+
+    if (child_options.tee_stdout_to_client_pipe_connect_timeout_ms && child_options.tee_stdout_to_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdout-to-client-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stdout_to_client_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.tee_stdout_to_client_pipe_connect_timeout_ms = 0; // always reset
+
+
+    if (!child_options.tee_stderr_to_server_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.tee_stderr_to_server_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/tee-stderr-to-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.tee_stderr_to_server_pipe.clear(); // always reset
+
+    if (child_options.tee_stderr_to_server_pipe_connect_timeout_ms && child_options.tee_stderr_to_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stderr-to-server-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stderr_to_server_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.tee_stderr_to_server_pipe_connect_timeout_ms = 0; // always reset
+
+    if (child_options.tee_stderr_to_server_pipe_in_buf_size && child_options.tee_stderr_to_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stderr-to-server-pipe-in-buf-size ") } + std::to_tstring(child_options.tee_stderr_to_server_pipe_in_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stderr_to_server_pipe_in_buf_size = 0; // always reset
+
+    if (child_options.tee_stderr_to_server_pipe_out_buf_size && child_options.tee_stderr_to_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stderr-to-server-pipe-out-buf-size ") } + std::to_tstring(child_options.tee_stderr_to_server_pipe_out_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stderr_to_server_pipe_out_buf_size = 0; // always reset
+
+    if (!child_options.tee_stderr_to_client_pipe.empty()) {
+        if (cmd_out_str_ptr) {
+            tmp_str = _replace_strings(child_options.tee_stderr_to_client_pipe, _T("\\"), std::tstring{ _T("\\\\") });
+
+            options_line += std::tstring{ _T("/tee-stderr-to-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+        }
+    }
+    regular_options.tee_stderr_to_client_pipe.clear(); // always reset
+
+    if (child_options.tee_stderr_to_client_pipe_connect_timeout_ms && child_options.tee_stderr_to_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stderr-to-client-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stderr_to_client_pipe_connect_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.tee_stderr_to_client_pipe_connect_timeout_ms = 0; // always reset
+
+
+    if (child_flags.tee_stdout_file_truncate) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stdout-file-truncate ");
+        }
+    }
+    regular_flags.tee_stdout_file_truncate = false; // always reset
+
+    if (child_flags.tee_stderr_file_truncate) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stderr-file-truncate ");
+        }
+    }
+    regular_flags.tee_stderr_file_truncate = false; // always reset
+
+
+    if (child_options.tee_stdin_dup >= 0) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdin-dup ") } + std::to_tstring(child_options.tee_stdin_dup) + _T(" ");
+        }
+    }
+    regular_options.tee_stdin_dup = -1; // always reset
+
+    if (child_options.tee_stdout_dup >= 0) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdout-dup ") } + std::to_tstring(child_options.tee_stdout_dup) + _T(" ");
+        }
+    }
+    regular_options.tee_stdout_dup = -1; // always reset
+
+    if (child_options.tee_stderr_dup >= 0) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stderr-dup ") } + std::to_tstring(child_options.tee_stderr_dup) + _T(" ");
+        }
+    }
+    regular_options.tee_stderr_dup = -1; // always reset
+
+
+    if (child_flags.tee_stdin_file_truncate) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stdin-file-truncate ");
+        }
+    }
+    regular_flags.tee_stdin_file_truncate = false; // always reset
+
+    if (child_flags.tee_stdout_file_truncate) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stdout-file-truncate ");
+        }
+    }
+    regular_flags.tee_stdout_file_truncate = false; // always reset
+
+    if (child_flags.tee_stderr_file_truncate) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stderr-file-truncate ");
+        }
+    }
+    regular_flags.tee_stderr_file_truncate = false; // always reset
+
+
+    if (child_flags.tee_stdin_file_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stdin-file-flush ");
+        }
+    }
+    regular_flags.tee_stdin_file_flush = false; // always reset
+
+    if (child_flags.tee_stdout_file_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stdout-file-flush ");
+        }
+    }
+    regular_flags.tee_stdout_file_flush = false; // always reset
+
+    if (child_flags.tee_stderr_file_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stderr-file-flush ");
+        }
+    }
+    regular_flags.tee_stderr_file_flush = false; // always reset
+
+
+    if (child_flags.tee_stdin_pipe_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stdin-pipe-flush ");
+        }
+    }
+    regular_flags.tee_stdin_pipe_flush = false; // always reset
+
+    if (child_flags.tee_stdout_pipe_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stdout-pipe-flush ");
+        }
+    }
+    regular_flags.tee_stdout_pipe_flush = false; // always reset
+
+    if (child_flags.tee_stderr_pipe_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stderr-pipe-flush ");
+        }
+    }
+    regular_flags.tee_stderr_pipe_flush = false; // always reset
+
+
+    if (child_flags.tee_stdin_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stdin-flush ");
+        }
+    }
+    regular_flags.tee_stdin_flush = false; // always reset
+
+    if (child_flags.tee_stdout_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stdout-flush ");
+        }
+    }
+    regular_flags.tee_stdout_flush = false; // always reset
+
+    if (child_flags.tee_stderr_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-stderr-flush ");
+        }
+    }
+    regular_flags.tee_stderr_flush = false; // always reset
+
+
+    if (child_flags.tee_output_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-output-flush ");
+        }
+    }
+    regular_flags.tee_output_flush = false; // always reset
+
+    if (child_flags.tee_inout_flush) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/tee-inout-flush ");
+        }
+    }
+    regular_flags.tee_inout_flush = false; // always reset
+
+
+    if (child_options.tee_stdin_pipe_buf_size && child_options.tee_stdin_pipe_buf_size != DEFAULT_ANONYMOUS_PIPE_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdin-pipe-buf-size ") } + std::to_tstring(child_options.tee_stdin_pipe_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stdin_pipe_buf_size = 0; // always reset
+
+    if (child_options.tee_stdout_pipe_buf_size && child_options.tee_stdout_pipe_buf_size != DEFAULT_ANONYMOUS_PIPE_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdout-pipe-buf-size ") } + std::to_tstring(child_options.tee_stdout_pipe_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stdout_pipe_buf_size = 0; // always reset
+
+    if (child_options.tee_stderr_pipe_buf_size && child_options.tee_stderr_pipe_buf_size != DEFAULT_ANONYMOUS_PIPE_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stderr-pipe-buf-size ") } + std::to_tstring(child_options.tee_stderr_pipe_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stderr_pipe_buf_size = 0; // always reset
+
+
+    if (child_options.tee_stdin_read_buf_size && child_options.tee_stdin_read_buf_size != DEFAULT_READ_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdin-read-buf-size ") } + std::to_tstring(child_options.tee_stdin_read_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stdin_read_buf_size = 0; // always reset
+
+    if (child_options.tee_stdout_read_buf_size && child_options.tee_stdout_read_buf_size != DEFAULT_READ_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stdout-read-buf-size ") } + std::to_tstring(child_options.tee_stdout_read_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stdout_read_buf_size = 0; // always reset
+
+    if (child_options.tee_stderr_read_buf_size && child_options.tee_stderr_read_buf_size != DEFAULT_READ_BUF_SIZE) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/tee-stderr-read-buf-size ") } + std::to_tstring(child_options.tee_stderr_read_buf_size) + _T(" ");
+        }
+    }
+    regular_options.tee_stderr_read_buf_size = 0; // always reset
+
+
+    if (child_flags.mutex_std_writes) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/mutex-std-writes ");
+        }
+    }
+    regular_flags.mutex_std_writes = false; // always reset
+
+    if (child_flags.mutex_tee_file_writes) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/mutex-tee-file-writes ");
+        }
+    }
+    regular_flags.mutex_tee_file_writes = false; // always reset
+
+    // leave generic console flags and options as is, to manipulate elevated process console you should use the `/elevate{ ... }` option
+
+    if (child_flags.create_child_console) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/create-child-console ");
+        }
+    }
+    regular_flags.create_child_console = false; // always reset
+
+    if (child_flags.create_console) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/create-console ");
+        }
+    }
+    regular_flags.create_console = false; // always reset
+
+    if (child_flags.attach_parent_console) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/attach-parent-console ");
+        }
+    }
+    regular_flags.attach_parent_console = false; // always reset
+
+    if (child_options.has.create_console_title) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/create-console-title \"") } + child_options.create_console_title + _T("\" ");
+        }
+    }
+    regular_options.has.create_console_title = false; // always reset
+    regular_options.create_console_title.clear();
+
+    if (child_options.has.own_console_title) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/own-console-title \"") } + child_options.own_console_title + _T("\" ");
+        }
+    }
+    regular_options.has.own_console_title = false; // always reset
+    regular_options.own_console_title.clear();
+
+    if (child_options.has.console_title) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/console-title \"") } + child_options.console_title + _T("\" ");
+        }
+    }
+    regular_options.has.console_title = false; // always reset
+    regular_options.console_title.clear();
+
+
+    if (child_options.stdin_echo != -1) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/stdin-echo ") } + std::to_tstring(child_options.stdin_echo) + _T(" ");
+        }
+    }
+    regular_options.stdin_echo = -1; // always reset
+
+
+    //child_flags.eval_backslash_esc
+    //child_flags.eval_dbl_backslash_esc
+
+
+    if (child_flags.disable_conout_reattach_to_visible_console) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/disable-conout-reattach-to-visible-console ");
+        }
+    }
+    regular_flags.disable_conout_reattach_to_visible_console = false; // always reset
+
+    if (child_flags.disable_conout_duplicate_to_parent_console_on_error) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/disable-conout-duplicate-to-parent-console-on-error ");
+        }
+    }
+    regular_flags.disable_conout_duplicate_to_parent_console_on_error = false; // always reset
+
+    if (cmd_out_str_ptr) {
+        *cmd_out_str_ptr = options_line + cmd_line;
+    }
+}
+
 template DWORD WINAPI StreamPipeThread<0>(LPVOID lpParam);
 template DWORD WINAPI StreamPipeThread<1>(LPVOID lpParam);
 template DWORD WINAPI StreamPipeThread<2>(LPVOID lpParam);
@@ -5285,5 +6513,8 @@ template DWORD WINAPI ConnectClientNamedPipeThread<0, 1>(LPVOID lpParam);
 template DWORD WINAPI ConnectClientNamedPipeThread<1, 0>(LPVOID lpParam);
 template DWORD WINAPI ConnectClientNamedPipeThread<1, 1>(LPVOID lpParam);
 
-template bool CreateInboundPipeToConsoleOutput<1>(int & ret, DWORD & win_error, const Flags & flags, const Options & options);
-template bool CreateInboundPipeToConsoleOutput<2>(int & ret, DWORD & win_error, const Flags & flags, const Options & options);
+template bool CreateInboundPipeToConsoleOutput<1>(int & ret, DWORD & win_error);
+template bool CreateInboundPipeToConsoleOutput<2>(int & ret, DWORD & win_error);
+
+template DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread<1>(LPVOID lpParam);
+template DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread<2>(LPVOID lpParam);

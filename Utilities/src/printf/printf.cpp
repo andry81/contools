@@ -41,12 +41,16 @@ int _tmain(int argc, const TCHAR * argv[])
     MessageBoxA(NULL, "", "", MB_OK);
 #endif
 
+    // CAUTION:
+    //  In Windows if you call `CreateProcess` like this: `CreateProcess("a.exe", "/b", ...)`, then the `argv[0]` would be `/b`, not `a.exe`!
+    //
+
     if (!argc || !argv[0]) {
         return err_unspecified;
     }
 
     const TCHAR * arg;
-    int arg_offset = 1;
+    int arg_offset = argv[0][0] != _T('/') ? 1 : 0; // arguments shift detection
 
     if (argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
         if (argc >= arg_offset + 2) return err_invalid_format;
@@ -189,7 +193,7 @@ int _tmain(int argc, const TCHAR * argv[])
     std::vector<uint8_t> byte_buf;
 
     // NOTE:
-    //  labda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+    //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
     [&]() { __try {
         if (g_options.chcp) {

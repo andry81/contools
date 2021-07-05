@@ -23,5 +23,6 @@
 
 
 extern bool g_is_process_executed;
+extern bool g_is_process_elevating;
 
 #endif

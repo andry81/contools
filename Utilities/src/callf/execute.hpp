@@ -13,6 +13,7 @@
 #define STD_FILE_WRITE_MUTEX_NAME_PREFIX    "{12FBACAA-9C0D-460F-9B69-5FB8EB747B5C}"
 #define TEE_FILE_WRITE_MUTEX_NAME_PREFIX    "{C50E64BC-9A9F-4507-9B77-4446319A556E}"
 
+#define DEFAULT_READ_BUF_SIZE               65536
 #define DEFAULT_ANONYMOUS_PIPE_BUF_SIZE     65536
 #define DEFAULT_NAMED_PIPE_IN_BUF_SIZE      65536
 #define DEFAULT_NAMED_PIPE_OUT_BUF_SIZE     65536
@@ -28,6 +29,7 @@ struct Flags
     bool            show_help;
     bool            disable_conout_reattach_to_visible_console;
     bool            disable_conout_duplicate_to_parent_console_on_error;
+    bool            elevate;
     bool            stdin_output_flush;             // flush handle connected with stdin input
     bool            stdout_flush;
     bool            stderr_flush;
@@ -72,9 +74,12 @@ struct Flags
     bool            wait_child_start;
     bool            mutex_std_writes;
     bool            mutex_tee_file_writes;
+
+    void merge(const Flags & flags);
+    void clear();
 };
 
-struct OptionsHas
+struct HasOptions
 {
     bool            create_console_title;
     bool            own_console_title;
@@ -115,9 +120,9 @@ struct Options
     std::tstring    own_console_title;
     std::tstring    console_title;
 
-    std::tstring    create_outbound_pipe_from_stdin;
-    std::tstring    create_inbound_pipe_to_stdout;
-    std::tstring    create_inbound_pipe_to_stderr;
+    std::tstring    create_outbound_server_pipe_from_stdin;
+    std::tstring    create_inbound_server_pipe_to_stdout;
+    std::tstring    create_inbound_server_pipe_to_stderr;
 
     uint_t          chcp_in;
     uint_t          chcp_out;
@@ -145,17 +150,17 @@ struct Options
     int             reopen_stderr_as_server_pipe_in_buf_size;
     int             reopen_stderr_as_server_pipe_out_buf_size;
 
-    uint_t          create_outbound_pipe_from_stdin_connect_timeout_ms;
-    uint_t          create_inbound_pipe_to_stdout_connect_timeout_ms;
-    uint_t          create_inbound_pipe_to_stderr_connect_timeout_ms;
+    uint_t          create_outbound_server_pipe_from_stdin_connect_timeout_ms;
+    uint_t          create_inbound_server_pipe_to_stdout_connect_timeout_ms;
+    uint_t          create_inbound_server_pipe_to_stderr_connect_timeout_ms;
 
     // a named pipe in/out buffer sizes, used instead of anonymous pipe to write into from stdin and read from into stdout/stderr
-    uint_t          create_outbound_pipe_from_stdin_in_buf_size;
-    uint_t          create_outbound_pipe_from_stdin_out_buf_size;
-    uint_t          create_inbound_pipe_to_stdout_in_buf_size;
-    uint_t          create_inbound_pipe_to_stdout_out_buf_size;
-    uint_t          create_inbound_pipe_to_stderr_in_buf_size;
-    uint_t          create_inbound_pipe_to_stderr_out_buf_size;
+    uint_t          create_outbound_server_pipe_from_stdin_in_buf_size;
+    uint_t          create_outbound_server_pipe_from_stdin_out_buf_size;
+    uint_t          create_inbound_server_pipe_to_stdout_in_buf_size;
+    uint_t          create_inbound_server_pipe_to_stdout_out_buf_size;
+    uint_t          create_inbound_server_pipe_to_stderr_in_buf_size;
+    uint_t          create_inbound_server_pipe_to_stderr_out_buf_size;
 
     uint_t          tee_stdin_to_server_pipe_connect_timeout_ms;
     uint_t          tee_stdin_to_client_pipe_connect_timeout_ms;
@@ -183,75 +188,17 @@ struct Options
     int             stdin_echo;
     uint_t          show_as;
 
-    OptionsHas      has;
+    HasOptions      has;
 
-    Options()
-    {
-        chcp_in = chcp_out = win_error_langid = 0;
-
-        stdout_dup = stderr_dup = -1;
-        tee_stdin_dup = tee_stdout_dup = tee_stderr_dup = -1;
-
-        reopen_stdin_as_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-        reopen_stdin_as_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-
-        reopen_stdout_as_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-        reopen_stdout_as_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-
-        reopen_stderr_as_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-        reopen_stderr_as_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-
-        reopen_stdin_as_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
-        reopen_stdout_as_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
-        reopen_stderr_as_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
-
-        reopen_stdin_as_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
-        reopen_stdout_as_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
-        reopen_stderr_as_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
-
-        create_outbound_pipe_from_stdin_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-        create_inbound_pipe_to_stdout_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-        create_inbound_pipe_to_stderr_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-
-        create_outbound_pipe_from_stdin_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
-        create_inbound_pipe_to_stdout_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
-        create_inbound_pipe_to_stderr_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
-
-        create_outbound_pipe_from_stdin_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
-        create_inbound_pipe_to_stdout_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
-        create_inbound_pipe_to_stderr_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
-
-        tee_stdin_to_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-        tee_stdin_to_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-
-        tee_stdout_to_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-        tee_stdout_to_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-
-        tee_stderr_to_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-        tee_stderr_to_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
-
-        tee_stdin_to_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
-        tee_stdout_to_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
-        tee_stderr_to_server_pipe_in_buf_size = DEFAULT_NAMED_PIPE_IN_BUF_SIZE;
-
-        tee_stdin_to_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
-        tee_stdout_to_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
-        tee_stderr_to_server_pipe_out_buf_size = DEFAULT_NAMED_PIPE_OUT_BUF_SIZE;
-
-        tee_stdin_pipe_buf_size = DEFAULT_ANONYMOUS_PIPE_BUF_SIZE;
-        tee_stdout_pipe_buf_size = DEFAULT_ANONYMOUS_PIPE_BUF_SIZE;
-        tee_stderr_pipe_buf_size = DEFAULT_ANONYMOUS_PIPE_BUF_SIZE;
-
-        // 64K read buffer by default
-        tee_stdin_read_buf_size = tee_stdout_read_buf_size = tee_stderr_read_buf_size = 65536;
-
-        stdin_echo = -1;
-
-        show_as = SW_SHOWNORMAL;
-    }
-
+    Options();
     Options(const Options &) = default;
     Options(Options &&) = default;
+
+    void merge(const Options & options);
+    void clear();
+
+    Options & operator =(const Options &) = default;
+    //Options && operator =(Options &&) = default;
 };
 
 struct ThreadReturnData
@@ -341,7 +288,18 @@ struct ConnectNamedPipeThreadLocals : BasicThreadLocals<ConnectNamedPipeThreadDa
 
 
 extern Flags g_flags;
+extern Flags g_regular_flags;
+extern Flags g_elevate_parent_flags;
+extern Flags g_elevate_child_flags;
+extern Flags g_promote_flags;
+extern Flags g_promote_parent_flags;
+
 extern Options g_options;
+extern Options g_regular_options;
+extern Options g_elevate_parent_options;
+extern Options g_elevate_child_options;
+extern Options g_promote_options;
+extern Options g_promote_parent_options;
 
 extern DWORD g_parent_proc_id;
 extern HWND  g_current_proc_console_window;
@@ -359,23 +317,34 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam);
 template <int handle_type, int co_stream_type>
 DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam);
 
-bool ReopenStdin(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in);
-bool ReopenStdout(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in);
-bool ReopenStderr(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in);
+bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in);
+bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in);
+bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in);
 
-bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error, const Flags & flags, const Options & options);
+bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error);
 template <int stream_type>
-bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error, const Flags & flags, const Options & options);
+bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error);
 
-bool CreateStdinToStdoutLoop(int & ret, DWORD & win_error, const Flags & flags, const Options & options);
+DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam);
 
-bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in);
-bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in);
-bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, const Flags & flags, const Options & options, UINT cp_in);
+template <int stream_type>
+DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam);
 
-int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len, const Flags & flags, const Options & options);
+bool CreateStdinToStdoutLoop(int & ret, DWORD & win_error);
+
+bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in);
+bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in);
+bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in);
+
+int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len);
 
 std::tstring SubstNamePlaceholders(std::tstring str);
+void SubstOptionsPlaceholders(Options & options);
+
+void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std::tstring * cmd_str_ptr, std::tstring * cmd_out_str_ptr,
+                                    Flags & regular_flags, Options & regular_options,
+                                    const Flags & elevate_child_flags, const Options & elevate_child_options,
+                                    const Flags & promote_child_flags, const Options & promote_child_options);
 
 template <typename T, size_t N>
 inline void WaitForWorkerThreads(T (& locals)[N], bool cancel_io, bool wait_all = true)

@@ -29,6 +29,25 @@ namespace utility
 
     template <bool B, typename... types>
     const bool constexpr_bool<B, types...>::value;
+
+    // bool identity / identities
+
+    template <bool b>
+    struct bool_identity
+    {
+        using type = bool;
+        static constexpr const bool value = b;
+    };
+
+    template <bool b>
+    constexpr const bool bool_identity<b>::value;
+
+    template <bool... b>
+    struct bool_identities
+    {
+        using type = bool;
+        static constexpr const bool values[] = { b... };
+    };
 }
 
 #endif

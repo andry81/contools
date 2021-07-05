@@ -1,5 +1,17 @@
+2021.07.05:
+* fixed: Utilities/src/callf: `argv[0]` parameter as argument instead of a program
+* new: Utilities/src/callf: `/elevate` flag to self elevate `callf.exe` process with builtin command line translation
+* new: Utilities/src/callf: `/elevate{ <ParentFlags> }[{ <ChildFlags> }]` option for limited set of flags to declare flags exceptionally for the parent (not elevated) `callf.exe` process in case of elevation is executed and for the child (elevated) `callf.exe` process in case of elevation is executed
+* new: Utilities/src/callf: `/promote{ <Flags> }` option for limited set of flags to declare flags for both `callf.exe` process instances in case of elevation is executed, otherwise for the parent `callf.exe` process only
+* changed: Utilities/src/callf: Changed behaviour for the `/create-[in|out]bound-*` options, now them only create server part of a named pipe end instead of both. All `/create-[in|out]bound-pipe-*` options renamed into `/create-[in|out]bound-server-pipe-*`.
+* refactor: Utilities/src/callf: code refactor
+
+2021.07.04:
+* fixed: Utilities/src: callf, chcp, clearcache, envvarcmp, printf, retakeowner: command line variables substitution must avoid `${N*}` variables (where N - is a number) if environment expansion is disabled (`/no-expand-env` flag)
+
 2021.06.30:
 * new: Scripts/Tools/fun: `matrix.bat` script
+* changed: Utilities/src/callf: todo update
 
 2021.06.25:
 * new: Utilities/src/callf: `{pid}` and `{ppid}` placeholders to use in pipe names to generate unique pipe name
