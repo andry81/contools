@@ -91,7 +91,7 @@ namespace {
 
                             const size_t var_vn_len = tstrlen(var_buf);
                             const int var_vn = tstrncmp(p, var_buf, var_vn_len);
-                            if (!var_vn) {
+                            if (!var_vn && (!no_expand_env || p > parse_str && *(p - 1) != _T('$'))) {
                                 parsed_str.append(last_offset_ptr, p);
                                 last_offset_ptr = p + var_vn_len;
 
@@ -124,7 +124,7 @@ namespace {
 
                             const size_t var_vn_len = tstrlen(var_buf);
                             const int var_vn = tstrncmp(p, var_buf, var_vn_len);
-                            if (!var_vn) {
+                            if (!var_vn && (!no_expand_env || p > parse_str && *(p - 1) != _T('$'))) {
                                 parsed_str.append(last_offset_ptr, p);
                                 last_offset_ptr = p + var_vn_len;
                                 if (i != arg_index) {

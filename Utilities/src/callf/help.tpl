@@ -82,6 +82,14 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
             elevated or enter the credentials of an administrator account used
             to run the application.
 
+      /shell-exec-expand-env
+        CreateProcess
+          Has no effect.
+        ShellExecute
+          Use SEE_MASK_DOENVSUBST flag.
+          Expand any environment variables specified in the string given by
+          the <CurrentDirectory> or <FilePathFormatString> parameter.
+
       /D <CurrentDirectory>
         CreateProcess
           Use <CurrentDirectory> as parameter in call to CreateProcess.
@@ -119,14 +127,6 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         Pipe the process stdin into stdout. This additionally disables
         standard handles inheritance (applies the `/no-std-inherit` flag).
 
-      /shell-exec-expand-env
-        CreateProcess
-          Has no effect.
-        ShellExecute
-          Use SEE_MASK_DOENVSUBST flag.
-          Expand any environment variables specified in the string given by
-          the <CurrentDirectory> or <FilePathFormatString> parameter.
-
       /init-com
         CreateProcess
           Has no effect.
@@ -150,6 +150,88 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           and create a process that might be run on background.
 
         The `/no-wait` flag has priority over this flag.
+
+      /elevate or /elevate{ <ParentFlags> }[{ <ChildFlags> }]
+        Self elevate process upto Administrator privileges.
+        If the current `callf.exe` process has no Administrator privileges,
+        then does use ShellExecute with elevation to start new `callf.exe`
+        process with the same command line but different options and flags
+        before run a child process. If the current `callf.exe` process already
+        has Administrator privileges, then has no effect.
+        Silently overrides the same regular flags.
+
+        ParentFlags:
+          Limited set of flags to pass exceptionally into the parent
+          (not elevated) `callf.exe` process.
+
+          /ret-create-proc
+          /ret-win-error
+          /no-wait
+          /no-window
+          /init-com
+          /showas
+          /reopen-std[in|out|err]*
+          /std[in|out|err]-*
+          /output-*
+          /inout-*
+          /create-[in|out]outbound-*
+          /mutex-std-*
+          /create-child-console
+          /create-console
+          /create-console-title
+          /own-console-title
+          /console-title
+          /stdin-echo
+          /eval-backslash-esc or /e
+          /eval-dbl-backslash-esc or /e\\
+
+        ChildFlags:
+          Limited set of flags to pass exceptionally into the child
+          (elevated) `callf.exe` process.
+
+          /attach-parent-console
+
+        All flags has no effect if elevation is not executed.
+        In that case you should use either regular flags and options or
+        `/promote*{ ... }` option.
+
+      /promote{ <Flags> }
+        In case if `/elevate*` flag or option is used and executed, then does
+        declare `<Flags>` for both the parent (not elevated) `callf.exe`
+        process and the child (elevated) `callf.exe` process.
+        In case if `/elevate*` flag or option is not used or is not executed,
+        then does declare `<Flags>` for the parent `callf.exe` process only.
+        The same flag can not be used together with `/promote-parent{ ... }`
+        option. Silently overrides the same regular flags.
+
+        Flags:
+          /chcp-in
+          /chcp-out
+          /win-error-langid
+          /print-win-error-string
+          /print-shell-error-string
+          /no-print-gen-error-string
+          /no-sys-dialog-ui
+          /attach-parent-console
+          /disable-conout-reattach-to-visible-console
+          /disable-conout-duplicate-to-parent-console-on-error
+
+      /promote-parent{ <Flags> }
+        Does declare `<Flags>` for the parent `callf.exe` process only
+        independently to the `/elevate*` flag or option.
+        The same flag can not be used together with `/promote{ ... }`
+        option. Silently overrides the same regular flags.
+
+        Flags:
+          /chcp-in
+          /chcp-out
+          /tee-std[in|out|err]*
+          /tee-output*
+          /tee-inout*
+          /mutex-tee-*
+          /attach-parent-console
+          /disable-conout-reattach-to-visible-console
+          /disable-conout-duplicate-to-parent-console-on-error
 
       /showas <ShowWindowAsNumber>
         Handles a child process window show state.
@@ -277,7 +359,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         named pipe end is attached to the process stdout/stderr.
         By default 30 seconds timeout is used.
 
-      /reopen-std[out|err]-truncate
+      /reopen-std[out|err]-file-truncate
         Truncate instead of append on stdout/stderr reopen.
         Has no effect on not a file.
 
@@ -309,42 +391,42 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         `/stdin-output-flush` plus after each write into the process
         stdout and stderr.
 
-      /create-outbound-pipe-from-stdin <pipe>
+      /create-outbound-server-pipe-from-stdin <pipe>
         Create outbound server named pipe `<pipe>` instead of anonymous as by
         default to write into a child process stdin from the process stdin.
         Useful to write stream to elevated or another child `callf.exe`
         process.
 
-      /create-outbound-pipe-from-stdin-connect-timeout <timeout>
+      /create-outbound-server-pipe-from-stdin-connect-timeout <timeout>
         Timeout in milliseconds to wait for an inbound client named pipe
         `<pipe>` connection to an outbound server named pipe connected with
         the process stdin. By default 30 seconds timeout is used.
 
-      /create-outbound-pipe-from-stdin-in-buf-size <size>
+      /create-outbound-server-pipe-from-stdin-in-buf-size <size>
         Outbound server named pipe `<pipe>` input buffer size in bytes have
         used to write into from the process stdin.
 
-      /create-outbound-pipe-from-stdin-out-buf-size <size>
+      /create-outbound-server-pipe-from-stdin-out-buf-size <size>
         Outbound server named pipe `<pipe>` output buffer size in bytes have
         used to write into from the process stdin.
 
-      /create-inbound-pipe-to-std[out|err] <pipe>
+      /create-inbound-server-pipe-to-std[out|err] <pipe>
         Create inbound server named pipe `<pipe>` instead of anonymous as by
         default to read from a child process stdout/stderr to write into
         the process stdout/stderr.
         Useful to read stream from elevated or another child `callf.exe`
         process.
 
-      /create-inbound-pipe-to-std[out|err]-connect-timeout <timeout>
+      /create-inbound-server-pipe-to-std[out|err]-connect-timeout <timeout>
         Timeout in milliseconds to wait for an outbound client named pipe
         `<pipe>` connection to an inbound server named pipe connected with
         the process stdout/stderr. By default 30 seconds timeout is used.
 
-      /create-inbound-pipe-to-std[out|err]-in-buf-size <size>
+      /create-inbound-server-pipe-to-std[out|err]-in-buf-size <size>
         Inbound server named pipe `<pipe>` input buffer size in bytes have
         used to read from into the process stdout/stderr.
 
-      /create-inbound-pipe-to-std[out|err]-out-buf-size <size>
+      /create-inbound-server-pipe-to-std[out|err]-out-buf-size <size>
         Inbound server named pipe `<pipe>` output buffer size in bytes have
         used to read from into the process stdout/stderr.
 
@@ -386,7 +468,16 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         named pipe end is connected with the process standard handle as
         source. By default 30 seconds timeout is used.
 
-      /tee-std[in|out|err]-truncate
+      /tee-std[in|out|err]-dup <fileno>
+        Duplicate the tee respective handle from another one, where the
+        `<fileno>` is the source handle index:
+          0 = stdin, 1 = stdout, 2 = stderr.
+        Must be used after a respective `/tee-std[in|out|err] <file>` option.
+        Has the same behaviour as a sequence of respective `/tee-stdin`,
+        `/tee-stdout` or `/tee-stderr` options with the same `<file>` and so
+        can be used instead.
+
+      /tee-std[in|out|err]-file-truncate
         Truncate instead of append on a tee file `<file>` open.
 
       /tee-std[in|out|err]-file-flush
@@ -410,22 +501,13 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         and stderr.
 
       /tee-std[in|out|err]-pipe-buf-size <size>
-        Anonymous pipe buffer size in bytes attached directly to the
-        child process stdin/stdout/stderr.
+        Anonymous pipe buffer size in bytes attached directly to the child
+        process stdin/stdout/stderr.
         Has no effect if a respective named pipe is used.
 
       /tee-std[in|out|err]-read-buf-size <size>
         Buffer size in bytes to read from the process stdin.
         Buffer size in bytes to read from a child process stdout/stderr.
-
-      /tee-std[in|out|err]-dup <fileno>
-        Duplicate the tee respective handle from another one, where the
-        `<fileno>` is the source handle index:
-          0 = stdin, 1 = stdout, 2 = stderr.
-        Must be used after a respective `/tee-std[in|out|err] <file>` option.
-        Has the same behaviour as a sequence of respective `/tee-stdin`,
-        `/tee-stdout` or `/tee-stderr` options with the same `<file>` and so
-        can be used instead.
 
       /mutex-std-writes
         In case of a write into reopened standard handle opened from a file
@@ -474,6 +556,12 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         exists, owned and visible.
         Has priority over the `/attach-parent-console` flag.
 
+      /attach-parent-console
+        Attach console from a parent process or it's ancestors. If the current
+        process console is owned, then detaches it at first. Has no effect if
+        the current process console exists but not owned (inherited).
+        Has no effect if the `/create-console` is used.
+
       /create-console-title <title>
         Change console window title on the current process console creation or
         recreation. Has no effect if the current process console is not owned.
@@ -489,12 +577,6 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       /console-title <title>
         Change console window title. Applies only if non of
         `/create-console-title` and `/own-console-title` is applied.
-
-      /attach-parent-console
-        Attach console from a parent process or it's ancestors. If the current
-        process console is owned, then detaches it at first. Has no effect if
-        the current process console exists but not owned (inherited).
-        Has no effect if the `/create-console` is used.
 
       /stdin-echo <0|1>
         Explicitly enable or disable console input buffer echo before start
@@ -665,12 +747,12 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
     Example #4 writes content of the `0.in` file into the `test123` named
     pipe, where it being read and write to the `cmd.exe /k` process input.
 
-    Example #5 writes the content of the `0.in` file into the `test123`
-    named pipe through the Administrator privileges isolation, where it being
-    read and print to the existing (parent) console by the child process
-    `callf.exe`.
-    Example #6 writes content of the `0.in` file into the `test123` named
+    Example #5 writes the content of the `0.in` file into the `test123` named
     pipe through the Administrator privileges isolation, where it being read
-    and write to the `cmd.exe /k` process input with the output has connected
-    back to the child process `callf.exe` which prints to the existing
-    (parent) console.
+    and print to the existing (parent) console by the child process
+    `callf.exe`.
+    Example #6 writes content of the `0.in` file into the `test123` named pipe
+    through the Administrator privileges isolation, where it being read and
+    write to the `cmd.exe /k` process input with the output has connected back
+    to the child process `callf.exe` which prints to the existing (parent)
+    console.

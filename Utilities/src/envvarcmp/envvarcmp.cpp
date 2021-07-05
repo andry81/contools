@@ -195,6 +195,10 @@ namespace {
 
 int _tmain(int argc, const TCHAR * argv[])
 {
+    // CAUTION:
+    //  In Windows if you call `CreateProcess` like this: `CreateProcess("a.exe", "/b", ...)`, then the `argv[0]` would be `/b`, not `a.exe`!
+    //
+
     if(!argc || !argv[0])
         return 255;
 
@@ -203,7 +207,7 @@ int _tmain(int argc, const TCHAR * argv[])
     }
 
     const TCHAR * arg;
-    int arg_offset = 1;
+    int arg_offset = argv[0][0] != _T('/') ? 1 : 0; // arguments shift detection
 
     if (argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
         if (argc >= arg_offset + 2) return err_invalid_format;

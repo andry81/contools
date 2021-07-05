@@ -9,3 +9,7 @@
   If the flag is set and one of 3 handles is not character (console) handle,
   then the autocompletion feature is broken, but the standard output can be
   redirected and intercepted.
+
+* Hookup WriteFile on the stdout/stderr in a child process to force file buffer
+  flush on each write. Can fix a progress stall based on stdout/stderr
+  buffering.
