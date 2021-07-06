@@ -2813,6 +2813,8 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
+        g_connect_server_named_pipe_thread_locals[0][0].server_named_pipe_handle_ptr = &g_reopen_stdin_handle;
+
         g_connect_server_named_pipe_thread_locals[0][0].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<0, 0>, &g_connect_server_named_pipe_thread_locals[0][0].thread_data,
@@ -2821,6 +2823,8 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
         );
     }
     else if (!g_options.reopen_stdin_as_client_pipe.empty()) {
+        g_connect_server_named_pipe_thread_locals[0][0].client_named_pipe_handle_ptr = &g_reopen_stdin_handle;
+
         g_connect_client_named_pipe_thread_locals[0][0].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<0, 0>, &g_connect_client_named_pipe_thread_locals[0][0].thread_data,
@@ -2958,6 +2962,8 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
+        g_connect_server_named_pipe_thread_locals[0][1].server_named_pipe_handle_ptr = &g_reopen_stdout_handle;
+
         g_connect_server_named_pipe_thread_locals[0][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<0, 1>, &g_connect_server_named_pipe_thread_locals[0][1].thread_data,
@@ -2966,6 +2972,8 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
         );
     }
     else if (!g_options.reopen_stdout_as_client_pipe.empty()) {
+        g_connect_server_named_pipe_thread_locals[0][1].client_named_pipe_handle_ptr = &g_reopen_stdout_handle;
+
         g_connect_client_named_pipe_thread_locals[0][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<0, 1>, &g_connect_client_named_pipe_thread_locals[0][1].thread_data,
@@ -3131,6 +3139,8 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
+        g_connect_server_named_pipe_thread_locals[0][2].server_named_pipe_handle_ptr = &g_reopen_stderr_handle;
+
         g_connect_server_named_pipe_thread_locals[0][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<0, 2>, &g_connect_server_named_pipe_thread_locals[0][2].thread_data,
@@ -3139,6 +3149,8 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
         );
     }
     else if (!g_options.reopen_stderr_as_client_pipe.empty()) {
+        g_connect_server_named_pipe_thread_locals[0][2].client_named_pipe_handle_ptr = &g_reopen_stderr_handle;
+
         g_connect_client_named_pipe_thread_locals[0][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<0, 2>, &g_connect_client_named_pipe_thread_locals[0][2].thread_data,
@@ -3214,6 +3226,8 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
             }
             return false;
         }
+
+        g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].server_named_pipe_handle_ptr = &g_stdin_pipe_write_handle;
 
         g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].thread_handle = CreateThread(
             NULL, 0,
@@ -3304,6 +3318,8 @@ bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error)
             }
             return false;
         }
+
+        g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type].server_named_pipe_handle_ptr = &conout_pipe_read_handle;
 
         g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type].thread_handle = CreateThread(
             NULL, 0,
@@ -3573,6 +3589,8 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
+        g_connect_server_named_pipe_thread_locals[1][0].server_named_pipe_handle_ptr = &g_tee_named_pipe_stdin_handle;
+
         // start server pipe connection await
         g_connect_server_named_pipe_thread_locals[1][0].thread_handle = CreateThread(
             NULL, 0,
@@ -3582,6 +3600,8 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
         );
     }
     else if (!g_options.tee_stdin_to_client_pipe.empty()) {
+        g_connect_server_named_pipe_thread_locals[1][0].client_named_pipe_handle_ptr = &g_tee_named_pipe_stdin_handle;
+
         g_connect_client_named_pipe_thread_locals[1][0].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<1, 0>, &g_connect_client_named_pipe_thread_locals[1][0].thread_data,
@@ -3702,6 +3722,8 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
+        g_connect_server_named_pipe_thread_locals[1][1].server_named_pipe_handle_ptr = &g_tee_named_pipe_stdout_handle;
+
         g_connect_server_named_pipe_thread_locals[1][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<1, 1>, &g_connect_server_named_pipe_thread_locals[1][1].thread_data,
@@ -3710,6 +3732,8 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
         );
     }
     else if (!g_options.tee_stdout_to_client_pipe.empty()) {
+        g_connect_server_named_pipe_thread_locals[1][1].client_named_pipe_handle_ptr = &g_tee_named_pipe_stdout_handle;
+
         g_connect_client_named_pipe_thread_locals[1][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<1, 1>, &g_connect_client_named_pipe_thread_locals[1][1].thread_data,
@@ -3857,6 +3881,8 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
+        g_connect_server_named_pipe_thread_locals[1][2].server_named_pipe_handle_ptr = &g_tee_named_pipe_stderr_handle;
+
         g_connect_server_named_pipe_thread_locals[1][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<1, 2>, &g_connect_server_named_pipe_thread_locals[1][2].thread_data,
@@ -3865,6 +3891,8 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
         );
     }
     else if (!g_options.tee_stderr_to_client_pipe.empty()) {
+        g_connect_server_named_pipe_thread_locals[1][2].client_named_pipe_handle_ptr = &g_tee_named_pipe_stderr_handle;
+
         g_connect_client_named_pipe_thread_locals[1][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<1, 2>, &g_connect_client_named_pipe_thread_locals[1][2].thread_data,
@@ -5168,61 +5196,107 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             g_is_process_executed = true; // nop execution is a success
         }
 
-        if (is_child_executed && !g_no_std_inherit) {
-            // CAUTION:
-            //  We must close all handles passed into a child process as inheritable,
-            //  otherwise the `ReadFile` in the parent process will be blocked on the pipe end
-            //  even if a child process is closed.
-            //
+        // CAUTION:
+        //  We must always close all handles prepared for a child process even if them is not inheritable or a child process is not executed,
+        //  otherwise the `ReadFile` in the parent process will be blocked on the pipe end
+        //  even if a child process is closed.
+        //
 
-            //if (stderr_handle_type == FILE_TYPE_CHAR) {
-            //    _close_handle(g_stdin_handle);
-            //}
+        //if (stderr_handle_type == FILE_TYPE_CHAR) {
+        //    _close_handle(g_stdin_handle);
+        //}
 
-            _close_handle(g_stdin_pipe_read_handle);
-            _close_handle(g_stdout_pipe_write_handle);
-            _close_handle(g_stderr_pipe_write_handle);
-        }
+        _close_handle(g_stdin_pipe_read_handle);
+        _close_handle(g_stdout_pipe_write_handle);
+        _close_handle(g_stderr_pipe_write_handle);
 
-        if (!g_pipe_stdin_to_stdout) {
-            if (_is_valid_handle(g_stdin_handle) &&
-                (_is_valid_handle(g_tee_file_stdin_handle) || _is_valid_handle(g_tee_named_pipe_stdin_handle) || _is_valid_handle(g_stdin_pipe_write_handle))) {
-                g_stream_pipe_thread_locals[0].thread_handle = CreateThread(
-                    NULL, 0,
-                    StreamPipeThread<0>, &g_stream_pipe_thread_locals[0].thread_data,
-                    0,
-                    &g_stream_pipe_thread_locals[0].thread_id
-                );
+        if (g_is_process_executed) {
+            if (!g_pipe_stdin_to_stdout) {
+                if (_is_valid_handle(g_stdin_handle) &&
+                    (_is_valid_handle(g_tee_file_stdin_handle) || _is_valid_handle(g_tee_named_pipe_stdin_handle) || _is_valid_handle(g_stdin_pipe_write_handle))) {
+                    g_stream_pipe_thread_locals[0].thread_handle = CreateThread(
+                        NULL, 0,
+                        StreamPipeThread<0>, &g_stream_pipe_thread_locals[0].thread_data,
+                        0,
+                        &g_stream_pipe_thread_locals[0].thread_id
+                    );
+                }
+
+                if (_is_valid_handle(g_stdout_pipe_read_handle) &&
+                    (_is_valid_handle(g_tee_file_stdout_handle) || _is_valid_handle(g_tee_named_pipe_stdout_handle) || _is_valid_handle(g_stdout_handle))) {
+                    g_stream_pipe_thread_locals[1].thread_handle = CreateThread(
+                        NULL, 0,
+                        StreamPipeThread<1>, &g_stream_pipe_thread_locals[1].thread_data,
+                        0,
+                        &g_stream_pipe_thread_locals[1].thread_id
+                    );
+                }
+
+                if (_is_valid_handle(g_stderr_pipe_read_handle) &&
+                    (_is_valid_handle(g_tee_file_stderr_handle) || _is_valid_handle(g_tee_named_pipe_stderr_handle) || _is_valid_handle(g_stderr_handle))) {
+                    g_stream_pipe_thread_locals[2].thread_handle = CreateThread(
+                        NULL, 0,
+                        StreamPipeThread<2>, &g_stream_pipe_thread_locals[2].thread_data,
+                        0,
+                        &g_stream_pipe_thread_locals[2].thread_id
+                    );
+                }
             }
-
-            if (_is_valid_handle(g_stdout_pipe_read_handle) &&
-                (_is_valid_handle(g_tee_file_stdout_handle) || _is_valid_handle(g_tee_named_pipe_stdout_handle) || _is_valid_handle(g_stdout_handle))) {
-                g_stream_pipe_thread_locals[1].thread_handle = CreateThread(
-                    NULL, 0,
-                    StreamPipeThread<1>, &g_stream_pipe_thread_locals[1].thread_data,
-                    0,
-                    &g_stream_pipe_thread_locals[1].thread_id
-                );
-            }
-
-            if (_is_valid_handle(g_stderr_pipe_read_handle) &&
-                (_is_valid_handle(g_tee_file_stderr_handle) || _is_valid_handle(g_tee_named_pipe_stderr_handle) || _is_valid_handle(g_stderr_handle))) {
-                g_stream_pipe_thread_locals[2].thread_handle = CreateThread(
-                    NULL, 0,
-                    StreamPipeThread<2>, &g_stream_pipe_thread_locals[2].thread_data,
-                    0,
-                    &g_stream_pipe_thread_locals[2].thread_id
-                );
+            else {
+                if (_is_valid_handle(g_stdin_handle) && _is_valid_handle(g_stdout_handle) &&
+                    (stdin_handle_type == FILE_TYPE_DISK || stdin_handle_type == FILE_TYPE_PIPE)) {
+                    g_stdin_to_stdout_thread_locals.thread_handle = CreateThread(
+                        NULL, 0,
+                        StdinToStdoutThread, &g_stdin_to_stdout_thread_locals.thread_data,
+                        0,
+                        &g_stdin_to_stdout_thread_locals.thread_id);
+                }
             }
         }
         else {
-            if (_is_valid_handle(g_stdin_handle) && _is_valid_handle(g_stdout_handle) &&
-                (stdin_handle_type == FILE_TYPE_DISK || stdin_handle_type == FILE_TYPE_PIPE)) {
-                g_stdin_to_stdout_thread_locals.thread_handle = CreateThread(
-                    NULL, 0,
-                    StdinToStdoutThread, &g_stdin_to_stdout_thread_locals.thread_data,
-                    0,
-                    &g_stdin_to_stdout_thread_locals.thread_id);
+            // Cancel all server pipe connections before continue if not done yet.
+            //
+
+            {
+                auto & connect_server_named_pipe_thread_locals = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals;
+
+                // suppress all exceptions while waiting after an exception
+                [&]() { __try {
+                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_locals, true);
+                }
+                __finally {
+                    ;
+                }
+                }();
+
+                // check errors
+                utility::for_each_unroll(connect_server_named_pipe_thread_locals, [&](auto & local) {
+                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                        g_worker_threads_return_data.add(local.thread_data);
+                        local.thread_data.is_copied = true;
+                    }
+                });
+            }
+
+            {
+                auto & connect_server_named_pipe_thread_locals = g_connect_server_named_pipe_thread_locals;
+
+                // suppress all exceptions while waiting after an exception
+                [&]() { __try {
+                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_locals, true);
+                }
+                __finally {
+                    ;
+                }
+                }();
+
+                // check errors
+                utility::for_each_unroll(connect_server_named_pipe_thread_locals, [&](auto & local) {
+                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                        g_worker_threads_return_data.add(local.thread_data);
+                        local.thread_data.is_copied = true;
+                    }
+                });
             }
         }
 
@@ -5266,48 +5340,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
             // collect all threads return data
 
-            if (!g_pipe_stdin_to_stdout) {
-                auto & stream_pipe_thread_locals = g_stream_pipe_thread_locals;
-
-                // suppress all exceptions while waiting after an exception
-                [&]() { __try {
-                    WaitForStreamPipeThreads(stream_pipe_thread_locals, true); // wait again with I/O cancel
-                }
-                __finally {
-                    ;
-                }
-                }();
-
-                // check errors
-                utility::for_each_unroll(stream_pipe_thread_locals, [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                });
-            }
-            else {
-                auto & stdin_to_stdout_thread_locals = g_stdin_to_stdout_thread_locals;
-
-                // suppress all exceptions while waiting after an exception
-                [&]() { __try {
-                    WaitForStreamPipeThreads(stdin_to_stdout_thread_locals, true); // wait again with I/O cancel
-                }
-                __finally {
-                    ;
-                }
-                }();
-
-                // check errors
-                utility::for_each_unroll(make_singular_array(stdin_to_stdout_thread_locals), [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                });
-            }
-
-            // Accomplish all server pipe connections before continue if not done yet.
+            // Cancel all server pipe connections before continue if not done yet.
             //
 
             {
@@ -5345,6 +5378,47 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
                 // check errors
                 utility::for_each_unroll(connect_server_named_pipe_thread_locals, [&](auto & local) {
+                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                        g_worker_threads_return_data.add(local.thread_data);
+                        local.thread_data.is_copied = true;
+                    }
+                });
+            }
+
+            if (!g_pipe_stdin_to_stdout) {
+                auto & stream_pipe_thread_locals = g_stream_pipe_thread_locals;
+
+                // suppress all exceptions while waiting after an exception
+                [&]() { __try {
+                    WaitForStreamPipeThreads(stream_pipe_thread_locals, true); // wait again with I/O cancel
+                }
+                __finally {
+                    ;
+                }
+                }();
+
+                // check errors
+                utility::for_each_unroll(stream_pipe_thread_locals, [&](auto & local) {
+                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                        g_worker_threads_return_data.add(local.thread_data);
+                        local.thread_data.is_copied = true;
+                    }
+                });
+            }
+            else {
+                auto & stdin_to_stdout_thread_locals = g_stdin_to_stdout_thread_locals;
+
+                // suppress all exceptions while waiting after an exception
+                [&]() { __try {
+                    WaitForStreamPipeThreads(stdin_to_stdout_thread_locals, true); // wait again with I/O cancel
+                }
+                __finally {
+                    ;
+                }
+                }();
+
+                // check errors
+                utility::for_each_unroll(make_singular_array(stdin_to_stdout_thread_locals), [&](auto & local) {
                     if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
                         g_worker_threads_return_data.add(local.thread_data);
                         local.thread_data.is_copied = true;
@@ -5399,63 +5473,61 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             _close_handle(g_tee_file_stderr_handle);
 
             // close tee named pipe handles
-            if (!g_options.tee_stdin_to_server_pipe.empty()) {
+            if (_is_valid_handle(g_tee_named_pipe_stdin_handle) && !g_options.tee_stdin_to_server_pipe.empty()) {
                 CancelIo(g_tee_named_pipe_stdin_handle);
                 DisconnectNamedPipe(g_tee_named_pipe_stdin_handle);
             }
             _close_handle(g_tee_named_pipe_stdin_handle);
 
-            if (!g_options.tee_stdout_to_server_pipe.empty()) {
+            if (_is_valid_handle(g_tee_named_pipe_stdout_handle) && !g_options.tee_stdout_to_server_pipe.empty()) {
                 CancelIo(g_tee_named_pipe_stdout_handle);
                 DisconnectNamedPipe(g_tee_named_pipe_stdout_handle);
             }
             _close_handle(g_tee_named_pipe_stdout_handle);
 
-            if (!g_options.tee_stderr_to_server_pipe.empty()) {
+            if (_is_valid_handle(g_tee_named_pipe_stderr_handle) && !g_options.tee_stderr_to_server_pipe.empty()) {
                 CancelIo(g_tee_named_pipe_stderr_handle);
                 DisconnectNamedPipe(g_tee_named_pipe_stderr_handle);
             }
             _close_handle(g_tee_named_pipe_stderr_handle);
 
-            if (!is_idle_execute) {
-                // restore standard handles (again)
-                if (g_is_stdin_redirected) {
-                    SetStdHandle(STD_INPUT_HANDLE, g_stdin_handle);
-                    g_is_stdin_redirected = false;
-                }
-
-                if (g_is_stdout_redirected) {
-                    SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_handle);
-                    g_is_stdout_redirected = false;
-                }
-
-                if (g_is_stderr_redirected) {
-                    SetStdHandle(STD_ERROR_HANDLE, g_stderr_handle);
-                    g_is_stderr_redirected = false;
-                }
-
-                // close anonymous/named pipe handles connected with child process standard handles
-                if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
-                    CancelIo(g_stdin_pipe_write_handle);
-                    DisconnectNamedPipe(g_stdin_pipe_write_handle);
-                }
-                _close_handle(g_stdin_pipe_write_handle);
-                _close_handle(g_stdin_pipe_read_handle);
-
-                if (!g_options.create_inbound_server_pipe_to_stdout.empty()) {
-                    CancelIo(g_stdout_pipe_read_handle);
-                    DisconnectNamedPipe(g_stdout_pipe_read_handle);
-                }
-                _close_handle(g_stdout_pipe_read_handle);
-                _close_handle(g_stdout_pipe_write_handle);
-
-                if (!g_options.create_inbound_server_pipe_to_stderr.empty()) {
-                    CancelIo(g_stderr_pipe_read_handle);
-                    DisconnectNamedPipe(g_stderr_pipe_read_handle);
-                }
-                _close_handle(g_stderr_pipe_read_handle);
-                _close_handle(g_stderr_pipe_write_handle);
+            // restore standard handles (again)
+            if (g_is_stdin_redirected) {
+                SetStdHandle(STD_INPUT_HANDLE, g_stdin_handle);
+                g_is_stdin_redirected = false;
             }
+
+            if (g_is_stdout_redirected) {
+                SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_handle);
+                g_is_stdout_redirected = false;
+            }
+
+            if (g_is_stderr_redirected) {
+                SetStdHandle(STD_ERROR_HANDLE, g_stderr_handle);
+                g_is_stderr_redirected = false;
+            }
+
+            // close anonymous/named pipe handles connected with child process standard handles
+            if (_is_valid_handle(g_stdin_pipe_write_handle) && !g_options.create_outbound_server_pipe_from_stdin.empty()) {
+                CancelIo(g_stdin_pipe_write_handle);
+                DisconnectNamedPipe(g_stdin_pipe_write_handle);
+            }
+            _close_handle(g_stdin_pipe_write_handle);
+            _close_handle(g_stdin_pipe_read_handle);
+
+            if (_is_valid_handle(g_stdout_pipe_read_handle) && !g_options.create_inbound_server_pipe_to_stdout.empty()) {
+                CancelIo(g_stdout_pipe_read_handle);
+                DisconnectNamedPipe(g_stdout_pipe_read_handle);
+            }
+            _close_handle(g_stdout_pipe_read_handle);
+            _close_handle(g_stdout_pipe_write_handle);
+
+            if (_is_valid_handle(g_stderr_pipe_read_handle) && !g_options.create_inbound_server_pipe_to_stderr.empty()) {
+                CancelIo(g_stderr_pipe_read_handle);
+                DisconnectNamedPipe(g_stderr_pipe_read_handle);
+            }
+            _close_handle(g_stderr_pipe_read_handle);
+            _close_handle(g_stderr_pipe_write_handle);
 
             // in reverse order from threads to a process
             _close_handle(pi.hThread);
@@ -5719,7 +5791,7 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
 
     if (child_options.show_as != SW_SHOWNORMAL) {
         if (cmd_out_str_ptr) {
-            options_line += std::tstring{ _T("/showas ") } + std::to_wstring(child_options.show_as);
+            options_line += std::tstring{ _T("/showas ") } + std::to_tstring(child_options.show_as);
         }
     }
     regular_options.show_as = SW_SHOWNORMAL; // always reset
