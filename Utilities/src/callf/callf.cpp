@@ -289,6 +289,36 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
 const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/chcp-in"),
     _T("/chcp-out"),
+    _T("/reopen-stdin"),
+    _T("/reopen-stdin-as-server-pipe"),
+    _T("/reopen-stdin-as-server-pipe-connect-timeout"),
+    _T("/reopen-stdin-as-server-pipe-in-buf-size"),
+    _T("/reopen-stdin-as-server-pipe-out-buf-size"),
+    _T("/reopen-stdin-as-client-pipe"),
+    _T("/reopen-stdin-as-client-pipe-connect-timeout"),
+    _T("/reopen-stdout"),
+    _T("/reopen-stdout-as-server-pipe"),
+    _T("/reopen-stdout-as-server-pipe-connect-timeout"),
+    _T("/reopen-stdout-as-server-pipe-in-buf-size"),
+    _T("/reopen-stdout-as-server-pipe-out-buf-size"),
+    _T("/reopen-stdout-as-client-pipe"),
+    _T("/reopen-stdout-as-client-pipe-connect-timeout"),
+    _T("/reopen-stderr"),
+    _T("/reopen-stderr-as-server-pipe"),
+    _T("/reopen-stderr-as-server-pipe-connect-timeout"),
+    _T("/reopen-stderr-as-server-pipe-in-buf-size"),
+    _T("/reopen-stderr-as-server-pipe-out-buf-size"),
+    _T("/reopen-stderr-as-client-pipe"),
+    _T("/reopen-stderr-as-client-pipe-connect-timeout"),
+    _T("/reopen-stdout-file-truncate"),
+    _T("/reopen-stderr-file-truncate"),
+    _T("/stdout-dup"),
+    _T("/stderr-dup"),
+    _T("/stdin-output-flush"),
+    _T("/stdout-flush"),
+    _T("/stderr-flush"),
+    _T("/output-flush"),
+    _T("/inout-flush"),
     _T("/tee-stdin"),
     _T("/tee-stdin-to-server-pipe"),
     _T("/tee-stdin-to-server-pipe-connect-timeout"),
@@ -333,6 +363,7 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/tee-stdin-read-buf-size"),
     _T("/tee-stdout-read-buf-size"),
     _T("/tee-stderr-read-buf-size"),
+    _T("/mutex-std-writes"),
     _T("/mutex-tee-file-writes"),
     _T("/attach-parent-console"),
     _T("/disable-conout-reattach-to-visible-console"),
@@ -1850,7 +1881,7 @@ int _tmain(int argc, const TCHAR * argv[])
             break;
         }
 
-        if (ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_regular_flags, g_regular_options, g_flags_to_preparse_arr, g_empty_flags_arr) >= 0) {
+        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_regular_flags, g_regular_options, g_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
             if (parse_error != err_none) {
                 return parse_error;
             }
@@ -1867,7 +1898,7 @@ int _tmain(int argc, const TCHAR * argv[])
             {
                 arg = argv[arg_offset];
 
-                if ((!is_elevate_child_flags ?
+                if ((parse_result = (!is_elevate_child_flags ?
                         ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
                             !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
                             !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
@@ -1875,7 +1906,7 @@ int _tmain(int argc, const TCHAR * argv[])
                         ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
                             !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
                             !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
-                            g_elevate_child_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                            g_elevate_child_flags_to_preparse_arr, g_empty_flags_arr))) >= 0) {
                     if (parse_error != err_none) {
                         return parse_error;
                     }
@@ -1898,7 +1929,7 @@ int _tmain(int argc, const TCHAR * argv[])
             {
                 arg = argv[arg_offset];
 
-                if (ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_flags, g_promote_options, g_promote_flags_to_preparse_arr, g_empty_flags_arr) >= 0) {
+                if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_flags, g_promote_options, g_promote_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
                     if (parse_error != err_none) {
                         return parse_error;
                     }
@@ -1918,7 +1949,7 @@ int _tmain(int argc, const TCHAR * argv[])
             {
                 arg = argv[arg_offset];
 
-                if (ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_parent_flags, g_promote_parent_options, g_promote_parent_flags_to_preparse_arr, g_empty_flags_arr) >= 0) {
+                if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_parent_flags, g_promote_parent_options, g_promote_parent_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
                     if (parse_error != err_none) {
                         return parse_error;
                     }
@@ -2147,7 +2178,7 @@ int _tmain(int argc, const TCHAR * argv[])
                 //
 
                 if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_regular_flags, g_regular_options, g_flags_to_parse_arr, g_flags_to_preparse_arr)) >= 0) {
-                    if (!parse_result && parse_error != err_none) {
+                    if (!parse_result && parse_error == err_none) {
                         parse_error = invalid_format_flag(arg);
                     }
                     if (parse_error != err_none) {
@@ -2177,7 +2208,7 @@ int _tmain(int argc, const TCHAR * argv[])
                                     !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
                                     g_elevate_child_flags_to_parse_arr,
                                     g_elevate_child_flags_to_preparse_arr))) >= 0) {
-                            if (!parse_result && parse_error != err_none) {
+                            if (!parse_result && parse_error == err_none) {
                                 parse_error = invalid_format_flag(arg);
                             }
                             if (parse_error != err_none) {
@@ -2204,7 +2235,7 @@ int _tmain(int argc, const TCHAR * argv[])
                         arg = argv[arg_offset];
 
                         if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_flags, g_promote_options, g_promote_flags_to_parse_arr, g_promote_flags_to_preparse_arr)) >= 0) {
-                            if (!parse_result && parse_error != err_none) {
+                            if (!parse_result && parse_error == err_none) {
                                 parse_error = invalid_format_flag(arg);
                             }
                             if (parse_error != err_none) {
@@ -2228,7 +2259,7 @@ int _tmain(int argc, const TCHAR * argv[])
                         arg = argv[arg_offset];
 
                         if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_parent_flags, g_promote_parent_options, g_promote_parent_flags_to_parse_arr, g_promote_parent_flags_to_preparse_arr)) >= 0) {
-                            if (!parse_result && parse_error != err_none) {
+                            if (!parse_result && parse_error == err_none) {
                                 parse_error = invalid_format_flag(arg);
                             }
                             if (parse_error != err_none) {

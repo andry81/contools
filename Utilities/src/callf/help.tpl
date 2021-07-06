@@ -230,9 +230,14 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         Flags:
           /chcp-in
           /chcp-out
+          /reopen-std[in|out|err]*
+          /std[in|out|err]-*
+          /output-*
+          /inout-*
           /tee-std[in|out|err]*
           /tee-output*
           /tee-inout*
+          /mutex-std-*
           /mutex-tee-*
           /attach-parent-console
           /disable-conout-reattach-to-visible-console
@@ -708,9 +713,9 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
     5. callf.exe "" "callf.exe \"\" \"\\\"$\{COMSPEC}\\\" /c echo.{0}\" \"%TIME%\""
     6. callf.exe "" "callf.exe \"\" \"callf.exe \\\"\\\" \\\"\\\\\\\"$\\{COMSPEC}\\\\\\\" /c echo.{0}\\\" \\\"%TIME%\\\"\""
 
-    Examples #1-3 examples must be run from the cmd.exe batch file (.bat).
+    Examples #1-3 must be run from the cmd.exe batch file (.bat).
 
-    Examples #4-6 examples must be typed in the cmd.exe console window.
+    Examples #4-6 must be typed in the cmd.exe console window.
 
   Examples (CreateProcess/ShellExecute):
      1. callf.exe /attach-parent-console "${COMSPEC}" "/k"
@@ -767,16 +772,20 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
     console.
 
   Examples (CreateProcess/ShellExecute, elevation with redirection from/to named pipes):
-    1. callf /elevate{ /no-window /reopen-stdin 0.in /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } .
-    2. callf /elevate{ /no-window /reopen-stdin 0.in /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
+    1. callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } .
+    2. callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
 
-    Example #1 writes the content of the `0.in` file into the `test0_{pid}`
-    named pipe through the Administrator privileges isolation, where it being
-    read and write back into the `test1_{pid}` named pipe to print into the
-    existing (parent) console by the parent process `callf.exe`.
+    Example #1 in case of elevation execution does write the content of the
+    `0.in` file into the `test0_{pid}` named pipe through the Administrator
+    privileges isolation, where it being read and write back into the
+    `test1_{pid}` named pipe to print into the existing (parent) console by
+    the parent process `callf.exe`.If process has been already elevated, then
+    just prints content of the `0.in` file to the console.
 
-    Example #2 writes the content of the `0.in` file into the `test0_{pid}`
-    named pipe through the Administrator privileges isolation, where it being
-    read, processed by the `cmd.exe` and write the output back into the
-    `test1_{pid}` named pipe to print to the existing (parent) console by the
-    parent process `callf.exe`.
+    Example #2 in case of elevation execution does write the content of the
+    `0.in` file into the `test0_{pid}` named pipe through the Administrator
+    privileges isolation, where it being read, processed by the `cmd.exe` and
+    write the output back into the `test1_{pid}` named pipe to print to the
+    existing (parent) console by the parent process `callf.exe`. If process has
+    been already elevated, then just writes content of the `0.in` file to the
+    `cmd.exe /k` process input.
