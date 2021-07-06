@@ -264,12 +264,23 @@ struct ConnectNamedPipeThreadData : ThreadReturnData, WorkerThreadsSyncData
 template <typename TData>
 struct BasicThreadLocals
 {
-    HANDLE  thread_handle;
-    DWORD   thread_id;
-    TData   thread_data;
+    HANDLE      thread_handle;
+    DWORD       thread_id;
+    TData       thread_data;
 
     BasicThreadLocals() :
         thread_handle(INVALID_HANDLE_VALUE), thread_id((DWORD)-1)
+    {
+    }
+};
+
+struct BasicNamedPipeLocals
+{
+    HANDLE *    server_named_pipe_handle_ptr;
+    HANDLE *    client_named_pipe_handle_ptr;
+
+    BasicNamedPipeLocals() :
+        server_named_pipe_handle_ptr(nullptr), client_named_pipe_handle_ptr(nullptr)
     {
     }
 };
@@ -282,7 +293,7 @@ struct StdinToStdoutThreadLocals : BasicThreadLocals<StreamPipeThreadData>
 {
 };
 
-struct ConnectNamedPipeThreadLocals : BasicThreadLocals<ConnectNamedPipeThreadData>
+struct ConnectNamedPipeThreadLocals : BasicThreadLocals<ConnectNamedPipeThreadData>, BasicNamedPipeLocals
 {
 };
 
@@ -346,6 +357,26 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
                                     const Flags & elevate_child_flags, const Options & elevate_child_options,
                                     const Flags & promote_child_flags, const Options & promote_child_options);
 
+
+template <typename T>
+inline void DisconnectNamedPipeThreadLocal(BasicThreadLocals<T> & local)
+{
+}
+
+inline void DisconnectNamedPipeThreadLocal(BasicNamedPipeLocals & local)
+{
+    if (local.server_named_pipe_handle_ptr) {
+        CancelIo(*local.server_named_pipe_handle_ptr);
+        DisconnectNamedPipe(*local.server_named_pipe_handle_ptr);
+        local.server_named_pipe_handle_ptr = nullptr;
+    }
+    else if (local.client_named_pipe_handle_ptr) {
+        CancelIo(*local.client_named_pipe_handle_ptr);
+        _close_handle(*local.client_named_pipe_handle_ptr);
+        local.client_named_pipe_handle_ptr = nullptr;
+    }
+}
+
 template <typename T, size_t N>
 inline void WaitForWorkerThreads(T (& locals)[N], bool cancel_io, bool wait_all = true)
 {
@@ -363,6 +394,7 @@ inline void WaitForWorkerThreads(T (& locals)[N], bool cancel_io, bool wait_all 
                 // cancel I/O before wait on a thread
                 local.thread_data.cancel_io = true;
                 CancelSynchronousIo(local.thread_handle);
+                DisconnectNamedPipeThreadLocal(local);
             }
 
             valid_handles[num_valid_handles] = local.thread_handle;

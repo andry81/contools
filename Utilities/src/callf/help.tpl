@@ -693,10 +693,10 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
     6. callf.exe "${COMSPEC}" "/c (echo.Special case characters: ^|^&""|& ^ |&""^|^& ^^ ^|^&""|& ^ |&""^|^&)&pause"
     7. callf.exe "${COMSPEC}" "/c (echo.Special case characters: ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^&)&pause"
 
-    First 5 examples should print:
+    Examples #1-5 should print:
       Hello World!
 
-    Last 2 examples should print and pause after:
+    Examples #6-7 should print and pause after:
       Special case characters: |&"|& ^ |&"|& ^ |&"|& ^ |&"|&
 
   Examples (CreateProcess, with recursion):
@@ -708,29 +708,33 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
     5. callf.exe "" "callf.exe \"\" \"\\\"$\{COMSPEC}\\\" /c echo.{0}\" \"%TIME%\""
     6. callf.exe "" "callf.exe \"\" \"callf.exe \\\"\\\" \\\"\\\\\\\"$\\{COMSPEC}\\\\\\\" /c echo.{0}\\\" \\\"%TIME%\\\"\""
 
-    First 3 examples must be run from the cmd.exe batch file (.bat).
+    Examples #1-3 examples must be run from the cmd.exe batch file (.bat).
 
-    Last 3 examples must be typed in the cmd.exe console window.
+    Examples #4-6 examples must be typed in the cmd.exe console window.
 
-  Examples (ShellExecute):
-    1. callf.exe /shell-exec open /no-sys-dialog-ui "${COMSPEC}" "/k"
-    2. callf.exe /shell-exec open /no-sys-dialog-ui /attach-parent-console "${COMSPEC}" "/k"
-    3. callf.exe /shell-exec open /no-sys-dialog-ui /create-child-console "${COMSPEC}" "/k"
-    4. callf.exe /shell-exec open /no-sys-dialog-ui "callf.exe" "/create-console \"\" \"\\\"${COMSPEC}\\\" /k"
+  Examples (CreateProcess/ShellExecute):
+     1. callf.exe /attach-parent-console "${COMSPEC}" "/k"
+     2. callf.exe /shell-exec open /no-sys-dialog-ui "${COMSPEC}" "/k"
+     3. callf.exe /shell-exec open /no-sys-dialog-ui /attach-parent-console "${COMSPEC}" "/k"
+     
+     4. callf.exe /create-child-console "${COMSPEC}" "/k"
+     5. callf.exe "callf.exe" "/create-console \"\" \"\\\"${COMSPEC}\\\" /k"
+     6. callf.exe /shell-exec open /no-sys-dialog-ui /create-child-console "${COMSPEC}" "/k"
+     7. callf.exe /shell-exec open /no-sys-dialog-ui "callf.exe" "/create-console \"\" \"\\\"${COMSPEC}\\\" /k"
+     
+     8. callf.exe /shell-exec runas /no-sys-dialog-ui "${COMSPEC}" "/k"
+     9. callf.exe /shell-exec runas /no-sys-dialog-ui /attach-parent-console "${COMSPEC}" "/k"
+    10. callf.exe /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "\"\" \"\\\"${COMSPEC}\\\" /k"
+    11. callf.exe /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console \"\" \"\\\"${COMSPEC}\\\" /k"
 
-    5. callf.exe /shell-exec runas /no-sys-dialog-ui "${COMSPEC}" "/k"
-    6. callf.exe /shell-exec runas /no-sys-dialog-ui /attach-parent-console "${COMSPEC}" "/k"
-    7. callf.exe /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "\"\" \"\\\"${COMSPEC}\\\" /k"
-    8. callf.exe /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console \"\" \"\\\"${COMSPEC}\\\" /k"
+    Examples #1-3 must be run in the same console.
 
-    Example #1 and #2 must be run in the same console.
+    Examples #4-7 must be run in the new (child) console.
 
-    Example #3 and #4 must be run in the new (child) console.
+    Examples #8-9 must request the Administrator permission to execute in the
+    new (child) console.
 
-    Example #5 and #6 must request the Administrator permission to execute in
-    the new (child) console.
-
-    Example #7 and #8 must request the Administrator permission to execute in
+    Examples #10-11 must request the Administrator permission to execute in
     the existing (parent) console.
 
   Examples (CreateProcess/ShellExecute, with named pipes and idle execution with stdin-to-stdout piping):
@@ -748,16 +752,31 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
     input.
 
     Example #3 writes content of the `0.in` file into the `test123` named
-    pipe, where it being read and print to the console by the child process.
+    pipe, where it being read and print into the console by the child process.
     Example #4 writes content of the `0.in` file into the `test123` named
     pipe, where it being read and write to the `cmd.exe /k` process input.
 
     Example #5 writes the content of the `0.in` file into the `test123` named
     pipe through the Administrator privileges isolation, where it being read
-    and print to the existing (parent) console by the child process
+    and print into the existing (parent) console by the child process
     `callf.exe`.
     Example #6 writes content of the `0.in` file into the `test123` named pipe
     through the Administrator privileges isolation, where it being read and
     write to the `cmd.exe /k` process input with the output has connected back
     to the child process `callf.exe` which prints to the existing (parent)
     console.
+
+  Examples (CreateProcess/ShellExecute, elevation with redirection from/to named pipes):
+    1. callf /elevate{ /no-window /reopen-stdin 0.in /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } .
+    2. callf /elevate{ /no-window /reopen-stdin 0.in /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
+
+    Example #1 writes the content of the `0.in` file into the `test0_{pid}`
+    named pipe through the Administrator privileges isolation, where it being
+    read and write back into the `test1_{pid}` named pipe to print into the
+    existing (parent) console by the parent process `callf.exe`.
+
+    Example #2 writes the content of the `0.in` file into the `test0_{pid}`
+    named pipe through the Administrator privileges isolation, where it being
+    read, processed by the `cmd.exe` and write the output back into the
+    `test1_{pid}` named pipe to print to the existing (parent) console by the
+    parent process `callf.exe`.

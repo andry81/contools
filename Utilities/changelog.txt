@@ -1,3 +1,12 @@
+2021.07.06:
+* fixed: src/callf: missed to close all anonymous or client named pipe handles prepared for a child process if them is not inheritable or a child process is not executed (parent process waiting for read from an anonymous pipe when a child process is already exited)
+* fixed: src/callf: missed to disconnect server named pipe before wait a thread with servere named pipe connect (process hangs on elevation dialog cancel)
+* fixed: src/callf: avoid start of any pipe stream thread if a child process is not executed (excluding idle execution)
+* fixed: src/callf: cancel all named pipe connection threads before read pipe stream threads errors
+* fixed: src/callf: `error: (null)` error message after elevation dialog cancel (incomplete or incorrect code around `_vsnwprintf`, `vsnwprintf`, `_snwprintf`, `_snprintf` functions)
+* new: src/callf: more example in the help
+* changed: src/callf: always close all handles irrespectively to a child process execution
+
 2021.07.05:
 * fixed: src/callf: access violation in the `invalid_format_flag_message` function
 * fixed: src/callf: parse of elevation nested flags
@@ -7,6 +16,7 @@
 * new: src/callf: `/elevate` flag to self elevate `callf.exe` process with builtin command line translation
 * new: src/callf: `/elevate{ <ParentFlags> }[{ <ChildFlags> }]` option for limited set of flags to declare flags exceptionally for the parent (not elevated) `callf.exe` process in case of elevation is executed and for the child (elevated) `callf.exe` process in case of elevation is executed
 * new: src/callf: `/promote{ <Flags> }` option for limited set of flags to declare flags for both `callf.exe` process instances in case of elevation is executed, otherwise for the parent `callf.exe` process only
+* new: src/callf: `/promote-parent{ <Flags> }` option for limited set of flags to declare flags for parent `callf.exe` process only independently to elevation use or execution
 * changed: src/callf: Changed behaviour for the `/create-[in|out]bound-*` options, now them only create server part of a named pipe end instead of both. All `/create-[in|out]bound-pipe-*` options renamed into `/create-[in|out]bound-server-pipe-*`.
 * refactor: src/callf: code refactor
 

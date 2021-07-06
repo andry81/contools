@@ -720,6 +720,17 @@ namespace {
         va_list args1;
         va_start(args1, fmt);
 
+        // CAUTION:
+        //
+        //  MSDN:
+        //    The vsnprintf function returns the number of characters that are written, not counting the terminating null character.
+        //    If the buffer size specified by count isn't sufficiently large to contain the output specified by format and argptr,
+        //    the return value of vsnprintf is the number of characters that would be written, not counting the null character, if count were sufficiently large.
+        //    If the return value is greater than count - 1, the output has been truncated. A return value of -1 indicates that an encoding error has occurred.
+        //
+        //  The `vsnprintf` returns -1 on encoding error and value greater than count if output string is truncated.
+        //
+
         constexpr const size_t fixed_message_char_buf_size = sizeof(fixed_message_char_buf) / sizeof(fixed_message_char_buf[0]);
         const int num_written_chars = vsnprintf(fixed_message_char_buf, fixed_message_char_buf_size, fmt, args1);
 
@@ -727,7 +738,7 @@ namespace {
 
         if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
             if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ fixed_message_char_buf } });
+                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ fixed_message_char_buf, size_t(num_written_chars) } });
             }
 
             switch (stream_type) {
@@ -739,19 +750,19 @@ namespace {
                 break;
             }
         }
-        else {
+        else if (num_written_chars >= -1) {
             std::vector<char> char_buf;
 
             char_buf.resize(num_written_chars + 1);
 
             va_start(args1, fmt);
 
-            vsnprintf(char_buf.data(), num_written_chars + 1, fmt, args1);
+            vsnprintf(char_buf.data(), char_buf.size(), fmt, args1);
 
             va_end(args1);
 
             if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ char_buf.data() } });
+                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
             }
 
             switch (stream_type) {
@@ -760,6 +771,35 @@ namespace {
                 break;
             case 2:
                 fputs(char_buf.data(), stderr);
+                break;
+            }
+        }
+        else {
+            // CAUTION:
+            //
+            //  MSDN:
+            //   Let len be the length of the formatted data string, not including the terminating null. Both len and count are the number of characters for snprintf and _snprintf,
+            //   and the number of wide characters for _snwprintf.
+            //
+            //   For all functions, if len < count, len characters are stored in buffer, a null - terminator is appended, and len is returned.
+            //
+            //   The snprintf function truncates the output when len is greater than or equal to count, by placing a null-terminator at buffer[count-1].
+            //   The value returned is len, the number of characters that would have been output if count was large enough.
+            //   The snprintf function returns a negative value if an encoding error occurs.
+            //
+
+            const int num_written_chars2 = snprintf(fixed_message_char_buf, fixed_message_char_buf_size, "%s\n", (char *)NULL); // encoding error
+
+            if (g_enable_conout_prints_buffering) {
+                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ fixed_message_char_buf, size_t(num_written_chars2) } });
+            }
+
+            switch (stream_type) {
+            case 1:
+                fputs(fixed_message_char_buf, stdout);
+                break;
+            case 2:
+                fputs(fixed_message_char_buf, stderr);
                 break;
             }
         }
@@ -775,48 +815,37 @@ namespace {
         va_list args1;
         va_start(args1, fmt);
 
-        constexpr const size_t fixed_message_char_buf_size = sizeof(fixed_message_char_buf) / sizeof(fixed_message_char_buf[0]);
-        const int num_written_chars = _vsnwprintf(fixed_message_char_buf, fixed_message_char_buf_size, fmt, args1);
+        // CAUTION:
+        //
+        //  MSDN:
+        //    Both _vsnprintf and _vsnwprintf functions return the number of characters written if the number of characters to write is less than or equal to count.
+        //    If the number of characters to write is greater than count, these functions return -1 indicating that output has been truncated
+        //
+        //  The `_vsnwprintf` has a different behaviour versus the `vsnprintf` function and returns -1 on output string truncation (no an encoding error!),
+        //  so we must call `_vsnwprintf` first time with an empty buffer and zero count to request the buffer size!
+        //
+
+        std::vector<wchar_t> char_buf;
+
+        const int num_written_chars = _vsnwprintf(NULL, 0, fmt, args1);
+
+        char_buf.resize(num_written_chars + 1);
+
+        _vsnwprintf(char_buf.data(), char_buf.size(), fmt, args1);
 
         va_end(args1);
 
-        if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
-            if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::wstring{ fixed_message_char_buf } });
-            }
-
-            switch (stream_type) {
-            case 1:
-                fputws(fixed_message_char_buf, stdout);
-                break;
-            case 2:
-                fputws(fixed_message_char_buf, stderr);
-                break;
-            }
+        if (g_enable_conout_prints_buffering) {
+            g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::wstring{ char_buf.data(), char_buf.data() > 0 ? char_buf.data() - 1 : 0 } });
         }
-        else {
-            std::vector<wchar_t> char_buf;
 
-            char_buf.resize(num_written_chars + 1);
-
-            va_start(args1, fmt);
-
-            _vsnwprintf(char_buf.data(), num_written_chars + 1, fmt, args1);
-
-            va_end(args1);
-
-            if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::wstring{ char_buf.data() } });
-            }
-
-            switch (stream_type) {
-            case 1:
-                fputws(char_buf.data(), stdout);
-                break;
-            case 2:
-                fputws(char_buf.data(), stderr);
-                break;
-            }
+        switch (stream_type) {
+        case 1:
+            fputws(char_buf.data(), stdout);
+            break;
+        case 2:
+            fputws(char_buf.data(), stderr);
+            break;
         }
     }
 
@@ -923,7 +952,6 @@ namespace {
     {
         char module_char_buf[256];
         char fixed_message_char_buf[256];
-        char fixed_message_char_buf2[256];
 
         // just in case
         module_char_buf[0] = '\0';
@@ -935,58 +963,83 @@ namespace {
         GetModuleFileNameA(NULL, module_char_buf, sizeof(module_char_buf) / sizeof(module_char_buf[0]));
         module_char_buf[sizeof(module_char_buf) / sizeof(module_char_buf[0]) - 1] = '\0'; // for Windows XP
 
+        // CAUTION:
+        //
+        //  MSDN:
+        //    The vsnprintf function returns the number of characters that are written, not counting the terminating null character.
+        //    If the buffer size specified by count isn't sufficiently large to contain the output specified by format and argptr,
+        //    the return value of vsnprintf is the number of characters that would be written, not counting the null character, if count were sufficiently large.
+        //    If the return value is greater than count - 1, the output has been truncated. A return value of -1 indicates that an encoding error has occurred.
+        //
+        //  The `vsnprintf` returns -1 on encoding error and value greater than count if output string is truncated.
+        //
+        //  MSDN:
+        //
+        //    For all functions other than snprintf, if len = count, len characters are stored in buffer, no null-terminator is appended, and len is returned.
+        //    If len > count, count characters are stored in buffer, no null-terminator is appended, and a negative value is returned.
+        //
+        //    If buffer is a null pointer and count is zero, len is returned as the count of characters required to format the output, not including the terminating null.
+        //    To make a successful call with the same argument and locale parameters, allocate a buffer holding at least len + 1 characters.
+        //
+        //  The `_snprintf` has a different behaviour versus the `vsnprintf` function and returns a negative value on output string truncation (no an encoding error!),
+        //  so we must call `_snprintf` first time with an empty buffer and zero count to request the buffer size!
+        //
+
         constexpr const size_t fixed_message_char_buf_size = sizeof(fixed_message_char_buf) / sizeof(fixed_message_char_buf[0]);
         const int num_written_chars = vsnprintf(fixed_message_char_buf, fixed_message_char_buf_size, fmt, vl);
 
         if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
-            constexpr const size_t fixed_message_char_buf_size2 = sizeof(fixed_message_char_buf2) / sizeof(fixed_message_char_buf2[0]);
+            std::vector<char> char_buf;
+
             const int num_written_chars2 =
-                _snprintf(fixed_message_char_buf2, fixed_message_char_buf_size2,
+                _snprintf(NULL, 0,
                     "[%s] [%u] [%s] error: %s",
                     local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
 
-            if (num_written_chars2 > 0 && num_written_chars2 < fixed_message_char_buf_size2) {
-                return std::string{ fixed_message_char_buf2, size_t(num_written_chars2) };
-            }
-            else {
-                std::vector<char> char_buf2;
+            char_buf.resize(num_written_chars2 + 1);
 
-                char_buf2.resize(num_written_chars2 + 1);
+            _snprintf(char_buf.data(), char_buf.size(),
+                "[%s] [%u] [%s] error: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
 
-                _snprintf(char_buf2.data(), num_written_chars2 + 1,
+            return std::string{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 };
+        }
+        else if (num_written_chars >= -1) {
+            std::vector<char> char_buf;
+            std::vector<char> char_buf2;
+
+            char_buf.resize(num_written_chars + 1);
+
+            vsnprintf(char_buf.data(), char_buf.size(), fmt, vl);
+
+            const int num_written_chars2 =
+                _snprintf(NULL, 0,
                     "[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
+                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
 
-                return std::string{ char_buf2.data(), size_t(num_written_chars2) };
-            }
+            char_buf2.resize(num_written_chars2 + 1);
+
+            _snprintf(char_buf2.data(), char_buf2.size(),
+                "[%s] [%u] [%s] error: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+
+            return std::string{ char_buf2.data(), char_buf2.size() > 0 ? char_buf2.size() - 1 : 0 };
         }
         else {
             std::vector<char> char_buf;
 
-            char_buf.resize(num_written_chars + 1);
-
-            vsnprintf(char_buf.data(), num_written_chars + 1, fmt, vl);
-
-            constexpr const size_t fixed_message_char_buf_size2 = sizeof(fixed_message_char_buf2) / sizeof(fixed_message_char_buf2[0]);
             const int num_written_chars2 =
-                _snprintf(fixed_message_char_buf2, fixed_message_char_buf_size2,
+                _snprintf(NULL, 0,
                     "[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (char *)NULL);
 
-            if (num_written_chars2 > 0 && num_written_chars2 < fixed_message_char_buf_size2) {
-                return std::string{ fixed_message_char_buf2, size_t(num_written_chars2) };
-            }
-            else {
-                std::vector<char> char_buf2;
+            char_buf.resize(num_written_chars2 + 1);
 
-                char_buf2.resize(num_written_chars2 + 1);
+            _snprintf(char_buf.data(), char_buf.size(),
+                "[%s] [%u] [%s] error: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (char *)NULL);
 
-                _snprintf(char_buf2.data(), num_written_chars2 + 1,
-                    "[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
-
-                return std::string{ char_buf2.data(), size_t(num_written_chars2) };
-            }
+            return std::string{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 };
         }
     }
 
@@ -994,7 +1047,6 @@ namespace {
     {
         wchar_t module_char_buf[256];
         wchar_t fixed_message_char_buf[256];
-        wchar_t fixed_message_char_buf2[256];
 
         // just in case
         module_char_buf[0] = L'\0';
@@ -1006,58 +1058,71 @@ namespace {
         GetModuleFileNameW(NULL, module_char_buf, sizeof(module_char_buf) / sizeof(module_char_buf[0]));
         module_char_buf[sizeof(module_char_buf) / sizeof(module_char_buf[0]) - 1] = L'\0'; // for Windows XP
 
+        // CAUTION:
+        //
+        //  MSDN:
+        //    Both _vsnprintf and _vsnwprintf functions return the number of characters written if the number of characters to write is less than or equal to count.
+        //    If the number of characters to write is greater than count, these functions return -1 indicating that output has been truncated
+        //
+        //  The `_vsnwprintf` has a different behaviour versus the `vsnprintf` function and returns -1 on output string truncation (no an encoding error!),
+        //  so we must call `_vsnwprintf` first time with an empty buffer and zero count to request the buffer size!
+        //
+
         constexpr const size_t fixed_message_char_buf_size = sizeof(fixed_message_char_buf) / sizeof(fixed_message_char_buf[0]);
         const int num_written_chars = _vsnwprintf(fixed_message_char_buf, fixed_message_char_buf_size, fmt, vl);
 
         if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
-            constexpr const size_t fixed_message_char_buf_size2 = sizeof(fixed_message_char_buf2) / sizeof(fixed_message_char_buf2[0]);
+            std::vector<wchar_t> char_buf;
+
             const int num_written_chars2 =
-                _snwprintf(fixed_message_char_buf2, fixed_message_char_buf_size2,
+                _snwprintf(NULL, 0,
                     L"[%s] [%u] [%s] error: %s",
                     local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
 
-            if (num_written_chars2 > 0 && num_written_chars2 < fixed_message_char_buf_size2) {
-                return std::wstring{ fixed_message_char_buf2, size_t(num_written_chars2) };
-            }
-            else {
-                std::vector<wchar_t> char_buf2;
+            char_buf.resize(num_written_chars2 + 1);
 
-                char_buf2.resize(num_written_chars2 + 1);
+            _snwprintf(char_buf.data(), char_buf.size(),
+                L"[%s] [%u] [%s] error: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
 
-                _snwprintf(char_buf2.data(), num_written_chars2 + 1,
+            return std::wstring{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 };
+        }
+        else if (num_written_chars >= -1) {
+            std::vector<wchar_t> char_buf;
+            std::vector<wchar_t> char_buf2;
+
+            char_buf.resize(num_written_chars + 1);
+
+            _vsnwprintf(char_buf.data(), char_buf.size(), fmt, vl);
+
+            const int num_written_chars2 =
+                _snwprintf(NULL, 0,
                     L"[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
+                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
 
-                return std::wstring{ char_buf2.data(), size_t(num_written_chars2) };
-            }
+            char_buf2.resize(num_written_chars2 + 1);
+
+            _snwprintf(char_buf2.data(), char_buf2.size(),
+                L"[%s] [%u] [%s] error: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+
+            return std::wstring{ char_buf2.data(), char_buf2.size() > 0 ? char_buf2.size() - 1 : 0 };
         }
         else {
             std::vector<wchar_t> char_buf;
 
-            char_buf.resize(num_written_chars + 1);
-
-            _vsnwprintf(char_buf.data(), num_written_chars + 1, fmt, vl);
-
-            constexpr const size_t fixed_message_char_buf_size2 = sizeof(fixed_message_char_buf2) / sizeof(fixed_message_char_buf2[0]);
             const int num_written_chars2 =
-                _snwprintf(fixed_message_char_buf2, fixed_message_char_buf_size2,
+                _snwprintf(NULL, 0,
                     L"[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (wchar_t *)NULL);
 
-            if (num_written_chars2 > 0 && num_written_chars2 < fixed_message_char_buf_size2) {
-                return std::wstring{ fixed_message_char_buf2, size_t(num_written_chars2) };
-            }
-            else {
-                std::vector<wchar_t> char_buf2;
+            char_buf.resize(num_written_chars2 + 1);
 
-                char_buf2.resize(num_written_chars2 + 1);
+            _snwprintf(char_buf.data(), char_buf.size(),
+                L"[%s] [%u] [%s] error: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (wchar_t *)NULL);
 
-                _snwprintf(char_buf2.data(), num_written_chars2 + 1,
-                    L"[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
-
-                return std::wstring{ char_buf2.data(), size_t(num_written_chars2) };
-            }
+            return std::wstring{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 };
         }
     }
 
@@ -1097,27 +1162,42 @@ namespace {
         constexpr const size_t fixed_message_char_buf_size = sizeof(fixed_message_char_buf) / sizeof(fixed_message_char_buf[0]);
         const int num_written_chars = vsnprintf(fixed_message_char_buf, fixed_message_char_buf_size, fmt, vl);
 
+        // CAUTION:
+        //
+        //  MSDN:
+        //    The vsnprintf function returns the number of characters that are written, not counting the terminating null character.
+        //    If the buffer size specified by count isn't sufficiently large to contain the output specified by format and argptr,
+        //    the return value of vsnprintf is the number of characters that would be written, not counting the null character, if count were sufficiently large.
+        //    If the return value is greater than count - 1, the output has been truncated. A return value of -1 indicates that an encoding error has occurred.
+        //
+        //  The `vsnprintf` returns -1 on encoding error and value greater than count if output string is truncated.
+        //
+
         if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
             if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 2, std::string{ fixed_message_char_buf } });
+                g_conout_prints_buf.push_back(_ConsoleOutput{ 2, std::string{ fixed_message_char_buf, size_t(num_written_chars) } });
             }
 
             fprintf(stderr, "[%s] [%u] [%s] error: %s",
                 local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
         }
-        else {
+        else if (num_written_chars >= -1) {
             std::vector<char> char_buf;
 
             char_buf.resize(num_written_chars + 1);
 
-            vsnprintf(char_buf.data(), num_written_chars + 1, fmt, vl);
+            vsnprintf(char_buf.data(), char_buf.size(), fmt, vl);
 
             if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ char_buf.data() } });
+                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
             }
 
             fprintf(stderr, "[%s] [%u] [%s] error: %s",
                 local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+        }
+        else {
+            fprintf(stderr, "[%s] [%u] [%s] error: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (char *)NULL); // encoding error
         }
     }
 
@@ -1136,31 +1216,30 @@ namespace {
         GetModuleFileNameW(NULL, module_char_buf, sizeof(module_char_buf) / sizeof(module_char_buf[0]));
         module_char_buf[sizeof(module_char_buf) / sizeof(module_char_buf[0]) - 1] = L'\0'; // for Windows XP
 
-        constexpr const size_t fixed_message_char_buf_size = sizeof(fixed_message_char_buf) / sizeof(fixed_message_char_buf[0]);
-        const int num_written_chars = _vsnwprintf(fixed_message_char_buf, fixed_message_char_buf_size, fmt, vl);
+        // CAUTION:
+        //
+        //  MSDN:
+        //    Both _vsnprintf and _vsnwprintf functions return the number of characters written if the number of characters to write is less than or equal to count.
+        //    If the number of characters to write is greater than count, these functions return -1 indicating that output has been truncated
+        //
+        //  The `_vsnwprintf` has a different behaviour versus the `vsnprintf` function and returns -1 on output string truncation (no an encoding error!),
+        //  so we must call `_vsnwprintf` first time with an empty buffer and zero count to request the buffer size!
+        //
 
-        if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
-            if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::wstring{ fixed_message_char_buf } });
-            }
+        std::vector<wchar_t> char_buf;
 
-            fwprintf(stderr, L"[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
+        const int num_written_chars = _vsnwprintf(NULL, 0, fmt, vl);
+
+        char_buf.resize(num_written_chars + 1);
+
+        _vsnwprintf(char_buf.data(), char_buf.size(), fmt, vl);
+
+        if (g_enable_conout_prints_buffering) {
+            g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::wstring{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
         }
-        else {
-            std::vector<wchar_t> char_buf;
-
-            char_buf.resize(num_written_chars + 1);
-
-            _vsnwprintf(char_buf.data(), num_written_chars + 1, fmt, vl);
-
-            if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::wstring{ char_buf.data() } });
-            }
-
-            fwprintf(stderr, L"[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
-        }
+        
+        fwprintf(stderr, L"[%s] [%u] [%s] error: %s",
+            local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
     }
 
     inline void _print_stderr_message(const char * fmt, ...)
