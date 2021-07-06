@@ -1,4 +1,7 @@
 2021.07.06:
+* new: bin/contools: binaries update
+
+2021.07.06:
 * fixed: src/callf: missed to close all anonymous or client named pipe handles prepared for a child process if them is not inheritable or a child process is not executed (parent process waiting for read from an anonymous pipe when a child process is already exited)
 * fixed: src/callf: missed to disconnect server named pipe before wait a thread with servere named pipe connect (process hangs on elevation dialog cancel)
 * fixed: src/callf: avoid start of any pipe stream thread if a child process is not executed (excluding idle execution)
