@@ -1,4 +1,8 @@
 2021.07.06:
+* fixed: src/callf: ignored check on not valid flag or option
+* fixed: src/callf: elevation examples is changed to run the same way under already elevated environment
+
+2021.07.06:
 * new: bin/contools: binaries update
 
 2021.07.06:
