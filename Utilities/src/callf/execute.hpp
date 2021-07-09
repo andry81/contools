@@ -5,6 +5,8 @@
 
 #include "callf.hpp"
 
+#include <deque>
+#include <tuple>
 #include <type_traits>
 #include <atomic>
 
@@ -187,6 +189,9 @@ struct Options
 
     int             stdin_echo;
     uint_t          show_as;
+
+    std::deque<std::tuple<int, std::tstring, std::tstring> > replace_args; // -1 - all, -2 - greater or equal to 1
+    std::deque<std::tuple<std::tstring, std::tstring> > env_vars;
 
     HasOptions      has;
 
