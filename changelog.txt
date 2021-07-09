@@ -1,4 +1,7 @@
 2021.07.09:
+* new: Utilities/bin/contools: binaries update
+
+2021.07.09:
 * fixed: Utilities/src/callf: use `GetModuleFileName` instead of `argv[0]` in case if a program name is not passed on the command line
 * fixed: Utilities/src/callf: minor fixup
 * new: Utilities/src/callf: `/replace-args <from> <to>`, `/replace-args-in-tail <from> <to>` options to replace strings in command line
