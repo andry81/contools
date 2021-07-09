@@ -707,6 +707,7 @@ Utilities/bin/7zip/history.txt -text
 Utilities/bin/7zip/license.txt -text
 Utilities/bin/7zip/readme.txt -text
 Utilities/bin/Microsoft/uuidgen.exe -text
+Utilities/bin/contools/README_EN.txt -text
 Utilities/bin/contools/callf.exe -text
 Utilities/bin/contools/chcp.exe -text
 Utilities/bin/contools/clearcache.exe -text
