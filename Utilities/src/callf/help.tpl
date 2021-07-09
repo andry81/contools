@@ -151,7 +151,8 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
         The `/no-wait` flag has priority over this flag.
 
-      /elevate or /elevate{ <ParentFlags> }[{ <ChildFlags> }]
+      /elevate
+      /elevate{ <ParentFlags> }[{ <ChildFlags> }]
         Self elevate process upto Administrator privileges.
         If the current `callf.exe` process has no Administrator privileges,
         then does use ShellExecute with elevation to start new `callf.exe`
@@ -592,7 +593,8 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         Explicitly enable or disable console input buffer echo before start
         of a child process.
 
-      /eval-backslash-esc or /e
+      /eval-backslash-esc
+      /e
         Evaluate escape characters:
           \a = \x07 = alert (bell)
           \b = \x08 = backspace
@@ -611,9 +613,24 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           \N or \NN or \NNN or .. or \NNNNNNNNNN - octal number
           \xN or \xNN or \xNNN or .. or \xNNNNNNNN - hexidecimal number
 
-      /eval-dbl-backslash-esc or /e\\
+      /eval-dbl-backslash-esc
+      /e\\
         Evaluate double backslash escape characters:
           \\ = backslash
+
+      /replace-args <from> <to>
+      /r <from> <to>
+        Replace `<from>` string by `<to>` string in all arguments.
+
+      /replace-args-in-tail <from> <to>
+      /ra <from> <to>
+        Replace `<from>` string by `<to>` string in tail arguments (arguments
+        arter the first one).
+
+      /set-env-var <name> <value>
+      /v
+        Set environment variable of name `<name>` to value `<value>`.
+        If `<value>` is empty, the variable is deleted.
 
     Special flags:
       /disable-conout-reattach-to-visible-console

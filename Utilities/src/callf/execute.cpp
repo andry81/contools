@@ -316,6 +316,14 @@ void Options::merge(const Options & options)
     MERGE_OPTION(options, stdin_echo, -1);
     MERGE_OPTION(options, show_as, SW_SHOWNORMAL);
 
+    for (const auto & tuple_ref : options.replace_args) {
+        replace_args.push_back(tuple_ref);
+    }
+
+    for (const auto & tuple_ref : options.env_vars) {
+        env_vars.push_back(tuple_ref);
+    }
+
     has = options.has;
 }
 

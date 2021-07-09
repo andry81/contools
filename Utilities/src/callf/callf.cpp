@@ -168,10 +168,11 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/own-console-title"),
     _T("/console-title"),
     _T("/stdin-echo"),
-    _T("/eval-backslash-esc"),
-    _T("/e"),
-    _T("/eval-dbl-backslash-esc"),
-    _T("/e\\\\"),
+    _T("/eval-backslash-esc"), _T("/e"),
+    _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
+    _T("/replace-args"), _T("/r"),
+    _T("/replace-args-in-tail"), _T("/ra"),
+    _T("/set-env-var"), _T("/v"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
@@ -232,8 +233,8 @@ const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
     _T("/own-console-title"),
     _T("/console-title"),
     _T("/stdin-echo"),
-    _T("/eval-backslash-esc"), //_T("/e"),
-    _T("/eval-dbl-backslash-esc"), // _T("/e\\\\"),
+    _T("/eval-backslash-esc"), _T("/e"),
+    _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
@@ -475,7 +476,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/chcp-out"))) {
@@ -487,7 +488,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/ret-create-proc"))) {
@@ -559,7 +560,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/shell-exec-expand-env"))) {
@@ -578,7 +579,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/no-wait"))) {
@@ -656,7 +657,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin"))) {
@@ -668,7 +669,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-server-pipe"))) {
@@ -680,7 +681,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-server-pipe-connect-timeout"))) {
@@ -695,7 +696,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-server-pipe-in-buf-size"))) {
@@ -710,7 +711,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-server-pipe-out-buf-size"))) {
@@ -725,7 +726,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-client-pipe"))) {
@@ -737,7 +738,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-client-pipe-connect-timeout"))) {
@@ -752,7 +753,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout"))) {
@@ -764,7 +765,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-server-pipe"))) {
@@ -776,7 +777,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-server-pipe-connect-timeout"))) {
@@ -791,7 +792,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-server-pipe-in-buf-size"))) {
@@ -806,7 +807,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-server-pipe-out-buf-size"))) {
@@ -821,7 +822,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-client-pipe"))) {
@@ -833,7 +834,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-client-pipe-connect-timeout"))) {
@@ -848,7 +849,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr"))) {
@@ -860,7 +861,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-server-pipe"))) {
@@ -872,7 +873,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-server-pipe-connect-timeout"))) {
@@ -887,7 +888,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-server-pipe-in-buf-size"))) {
@@ -902,7 +903,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-server-pipe-out-buf-size"))) {
@@ -917,7 +918,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-client-pipe"))) {
@@ -929,7 +930,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-client-pipe-connect-timeout"))) {
@@ -944,7 +945,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-file-truncate"))) {
@@ -973,7 +974,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/stderr-dup"))) {
@@ -988,7 +989,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/stdin-output-flush"))) {
@@ -1035,7 +1036,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-outbound-server-pipe-from-stdin-connect-timeout"))) {
@@ -1050,7 +1051,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-outbound-server-pipe-from-stdin-in-buf-size"))) {
@@ -1065,7 +1066,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-outbound-server-pipe-from-stdin-out-buf-size"))) {
@@ -1080,7 +1081,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stdout"))) {
@@ -1092,7 +1093,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stdout-connect-timeout"))) {
@@ -1107,7 +1108,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stdout-in-buf-size"))) {
@@ -1122,7 +1123,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stdout-out-buf-size"))) {
@@ -1137,7 +1138,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stderr"))) {
@@ -1149,7 +1150,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stderr-connect-timeout"))) {
@@ -1164,7 +1165,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stderr-in-buf-size"))) {
@@ -1179,7 +1180,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stderr-out-buf-size"))) {
@@ -1194,7 +1195,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin"))) {
@@ -1206,7 +1207,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-server-pipe"))) {
@@ -1218,7 +1219,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-server-pipe-connect-timeout"))) {
@@ -1233,7 +1234,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-server-pipe-in-buf-size"))) {
@@ -1248,7 +1249,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-server-pipe-out-buf-size"))) {
@@ -1263,7 +1264,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-client-pipe"))) {
@@ -1275,7 +1276,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-client-pipe-connect-timeout"))) {
@@ -1290,7 +1291,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout"))) {
@@ -1302,7 +1303,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-server-pipe"))) {
@@ -1314,7 +1315,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-server-pipe-connect-timeout"))) {
@@ -1329,7 +1330,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-server-pipe-in-buf-size"))) {
@@ -1344,7 +1345,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-server-pipe-out-buf-size"))) {
@@ -1359,7 +1360,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-client-pipe"))) {
@@ -1371,7 +1372,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-client-pipe-connect-timeout"))) {
@@ -1386,7 +1387,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr"))) {
@@ -1398,7 +1399,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-server-pipe"))) {
@@ -1410,7 +1411,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-server-pipe-connect-timeout"))) {
@@ -1425,7 +1426,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-server-pipe-in-buf-size"))) {
@@ -1440,7 +1441,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-server-pipe-out-buf-size"))) {
@@ -1455,7 +1456,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-client-pipe"))) {
@@ -1467,7 +1468,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-client-pipe-connect-timeout"))) {
@@ -1482,7 +1483,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-dup"))) {
@@ -1497,7 +1498,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-dup"))) {
@@ -1512,7 +1513,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-dup"))) {
@@ -1527,7 +1528,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-file-truncate"))) {
@@ -1640,7 +1641,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-pipe-buf-size"))) {
@@ -1655,7 +1656,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-pipe-buf-size"))) {
@@ -1670,7 +1671,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-read-buf-size"))) {
@@ -1685,7 +1686,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-read-buf-size"))) {
@@ -1700,7 +1701,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-read-buf-size"))) {
@@ -1715,7 +1716,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/mutex-std-writes"))) {
@@ -1763,7 +1764,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/own-console-title"))) {
@@ -1776,7 +1777,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/console-title"))) {
@@ -1789,7 +1790,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/stdin-echo"))) {
@@ -1804,7 +1805,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             }
             return 0;
         }
-        else error = invalid_format_flag(arg);
+        else error = invalid_format_flag(start_arg);
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/eval-backslash-esc")) || IsArgEqualTo(arg, _T("/e"))) {
@@ -1820,6 +1821,69 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             return 1;
         }
         return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/replace-args")) || IsArgEqualTo(arg, _T("/r"))) {
+        arg_offset += 1;
+        if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+            if (IsArgInFilter(start_arg, include_filter_arr)) {
+                const TCHAR * from = arg;
+
+                arg_offset += 1;
+                if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                    const TCHAR * to = arg;
+
+                    options.replace_args.push_back(std::make_tuple(-1, std::tstring{ from }, std::tstring{ to }));
+                    return 1;
+                }
+                else error = invalid_format_flag(start_arg);
+                return 2;
+            }
+            return 0;
+        }
+        else error = invalid_format_flag(start_arg);
+        return 2;
+    }
+    if (IsArgEqualTo(arg, _T("/replace-args-in-tail")) || IsArgEqualTo(arg, _T("/ra"))) {
+        arg_offset += 1;
+        if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+            if (IsArgInFilter(start_arg, include_filter_arr)) {
+                const TCHAR * from = arg;
+
+                arg_offset += 1;
+                if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                    const TCHAR * to = arg;
+
+                    options.replace_args.push_back(std::make_tuple(-2, std::tstring{ from }, std::tstring{ to }));
+                    return 1;
+                }
+                else error = invalid_format_flag(start_arg);
+                return 2;
+            }
+            return 0;
+        }
+        else error = invalid_format_flag(start_arg);
+        return 2;
+    }
+    if (IsArgEqualTo(arg, _T("/set-env-var")) || IsArgEqualTo(arg, _T("/v"))) {
+        arg_offset += 1;
+        if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+            if (IsArgInFilter(start_arg, include_filter_arr)) {
+                const TCHAR * name = arg;
+
+                arg_offset += 1;
+                if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                    const TCHAR * value = arg;
+
+                    options.env_vars.push_back(std::make_tuple(std::tstring{ name }, std::tstring{ value }));
+                    return 1;
+                }
+                else error = invalid_format_flag(start_arg);
+                return 2;
+            }
+            return 0;
+        }
+        else error = invalid_format_flag(start_arg);
+        return 2;
     }
     if (IsArgEqualTo(arg, _T("/disable-conout-reattach-to-visible-console"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
@@ -1862,8 +1926,21 @@ int _tmain(int argc, const TCHAR * argv[])
     //  If you don't want such behaviour, then you have to use the `/disable-conout-reattach-to-visible-console` flag.
     //
 
+    TCHAR module_file_name_buf[MAX_PATH];
+    const TCHAR * program_file_name = nullptr;
+    int arg_offset = 0;
+    
+    if (argv[0][0] != _T('/')) { // arguments shift detection
+        program_file_name = argv[0];
+        arg_offset = 1;
+    }
+    else {
+        if (GetModuleFileName(NULL, module_file_name_buf, sizeof(module_file_name_buf) / sizeof(module_file_name_buf[0]))) {
+            program_file_name = module_file_name_buf;
+        }
+    }
+
     const TCHAR * arg;
-    int arg_offset = argv[0][0] != _T('/') ? 1 : 0; // arguments shift detection
     int parse_error = err_none;
     int parse_result;
 
@@ -2648,9 +2725,28 @@ int _tmain(int argc, const TCHAR * argv[])
                     g_options.shell_exec_verb = _T("runas");
                 }
 
+                // replace strings
+                std::tstring program_file_name_str = program_file_name;
+
+                for (const auto & replace_args_ref : g_options.replace_args) {
+                    const int replace_offset = std::get<0>(replace_args_ref);
+
+                    if (replace_offset >= -1) {
+                        program_file_name_str = _replace_strings(program_file_name_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                    }
+                    if (replace_offset >= -2) {
+                        elevated_cmd_out_str = _replace_strings(elevated_cmd_out_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                    }
+                }
+
+                // update environment variables
+                for (const auto & env_vars_ref : g_options.env_vars) {
+                    SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), std::get<1>(env_vars_ref).c_str());
+                }
+
                 return ExecuteProcess(
-                    argv[0],
-                    tstrlen(argv[0]),
+                    program_file_name_str.c_str(),
+                    program_file_name_str.length(),
                     !elevated_cmd_out_str.empty() ? elevated_cmd_out_str.c_str() : (LPCTSTR)NULL,
                     !elevated_cmd_out_str.empty() ? elevated_cmd_out_str.length() : 0
                 );
@@ -2662,6 +2758,23 @@ int _tmain(int argc, const TCHAR * argv[])
                 g_promote_flags, g_promote_options, g_promote_parent_flags, g_promote_parent_options);
 
             SubstOptionsPlaceholders(g_options);
+
+            // replace strings
+            for (const auto & replace_args_ref : g_options.replace_args) {
+                const int replace_offset = std::get<0>(replace_args_ref);
+
+                if (replace_offset >= -1 && app_args.fmt_str) {
+                    app_out_args.fmt_str = _replace_strings(app_out_args.fmt_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                }
+                if (replace_offset >= -2 && cmd_args.fmt_str) {
+                    cmd_out_args.fmt_str = _replace_strings(cmd_out_args.fmt_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                }
+            }
+
+            // update environment variables
+            for (const auto & env_vars_ref : g_options.env_vars) {
+                SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), std::get<1>(env_vars_ref).c_str());
+            }
 
             return ExecuteProcess(
                 app_args.fmt_str ? app_out_args.fmt_str.c_str() : (LPCTSTR)NULL,
