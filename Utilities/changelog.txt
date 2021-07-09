@@ -1,4 +1,7 @@
 2021.07.09:
+* new: bin/contools: readme file
+
+2021.07.09:
 * new: bin/contools: binaries update
 
 2021.07.09:

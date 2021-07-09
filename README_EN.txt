@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.06.21
+* 2021.07.09
 * contools
 
 ** README UNDER CONSTRUCTION **
@@ -162,12 +162,6 @@ https://cmake.org/cmake/help/v3.14/release/3.14.html#id13
   In CMake 3.13 and earlier, install(CODE) and install(SCRIPT) did not evaluate
   generator expressions. CMake 3.14 and later will evaluate generator
   expressions for install(CODE) and install(SCRIPT).
-
-To build GUI utilities is required the wxWidgets library at least of version
-3.1.3.
-
-CAUTION:
-  You have to build wxwidgets before build GUI utilities.
 
 -------------------------------------------------------------------------------
 5. DEPENDENCIES
