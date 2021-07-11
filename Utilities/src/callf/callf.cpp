@@ -17,7 +17,6 @@ namespace {
     {
         std::tstring        app_fmt_str;
         std::tstring        cmd_fmt_str;
-        tstring_vector_t    args;
     };
 }
 

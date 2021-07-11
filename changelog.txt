@@ -1,4 +1,8 @@
 2021.07.11:
+* fixed: Utilities/src/callf: accidental break in command line variables substitution
+* changed: Utilities/bin/contools: readme update
+
+2021.07.11:
 * fixed: Utilities/src/callf: invalid standard output handle termporary workaround through a complement standard handle duplication (after `_dup2` fail)
 * fixed: Utilities/src/callf: apply `/eval-backslash-esc` and `/eval-dbl-backslash-esc` after `/replace-arg<N> <from> <to>` to be able to replace all backslashes in an argument before backslash evaluation
 * fixed: Utilities/src/callf: backslash escaping must be done before the command line elevation translation

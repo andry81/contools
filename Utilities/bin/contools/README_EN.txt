@@ -89,11 +89,19 @@ Create process or Shell execute in style of c-function printf.
 
 * Execute with elevation.
 
-  Examples:
-  >
-  callf.exe /shell-exec runas "${COMSPEC}" "/c echo.\"{0} {1}\" & pause" "1 2" "3 4"
-  >
-  callf.exe /elevate{ /no-window }{ /attach-parent-console } "" "\"${COMSPEC}\" /c echo.\"{0} {1}\"" "1 2" "3 4"
+  ** Use new console.
+
+     Examples:
+     >
+     callf.exe /shell-exec runas "${COMSPEC}" "/c echo.\"{0} {1}\" & pause" "1 2" "3 4"
+     >
+     callf.exe /elevate "" "\"${COMSPEC}\" /c echo.\"{0} {1}\" & pause" "1 2" "3 4"
+
+  ** Use the same console.
+
+     Examples:
+     >
+     callf.exe /elevate{ /no-window }{ /attach-parent-console } "" "\"${COMSPEC}\" /c echo.\"{0} {1}\"" "1 2" "3 4"
 
 * Backslash escaping.
 
@@ -135,7 +143,27 @@ Create process or Shell execute in style of c-function printf.
   >
   callf.exe /reopen-stdin 0.in /tee-stdout out.log /tee-stderr-dup 1 "" "cmd.exe /k"
 
+* Simple escaping in recursion (escaping for the `cmd.exe` is different).
+
+  Examples:
+  >
+  callf.exe "" "\"${COMSPEC}\" /c echo.{0}" "%TIME%"
+  >
+  callf.exe "" "callf.exe \"\" \"\\\"$\{COMSPEC}\\\" /c echo.{0}\" \"%TIME%\""
+  >
+  callf.exe "" "callf.exe \"\" \"callf.exe \\\"\\\" \\\"\\\\\\\"$\\{COMSPEC}\\\\\\\" /c echo.{0}\\\" \\\"%TIME%\\\"\""
+
+* In case of elevation is executed, connects a named pipe to and from a child
+  process with the Administrator privileges isolation, otherwise fallbacks to
+  a generic piping.
+
+  Examples:
+  >
+  callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } .
+  >
+  callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
+
 -------------------------------------------------------------------------------
-5. AUTHOR
+6. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)
