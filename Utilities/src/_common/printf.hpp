@@ -7,15 +7,13 @@
 #include <compatible_iterator/compatible_iterator.hpp>
 
 namespace {
-    struct InArgs
+    struct InBaseArgs
     {
-        const TCHAR *               fmt_str;
         const_tchar_ptr_vector_t    args;
     };
 
-    struct OutArgs
+    struct OutBaseArgs
     {
-        std::tstring        fmt_str;
         tstring_vector_t    args;
     };
 
@@ -25,7 +23,7 @@ namespace {
 
     void _parse_string(int arg_index, const TCHAR * parse_str, std::tstring & parsed_str, TCHAR * env_buf,
                        bool no_expand_env, bool no_subst_vars, bool use_in_args,
-                       const InArgs & in_args = InArgs(), const OutArgs & out_args = OutArgs()) {
+                       const InBaseArgs & in_args = InBaseArgs(), const OutBaseArgs & out_args = OutBaseArgs()) {
 
         if (no_expand_env && no_subst_vars) {
             parsed_str.append(parse_str);

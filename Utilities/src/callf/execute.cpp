@@ -1523,8 +1523,10 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                 if (!g_options.reopen_stdout_as_server_pipe.empty()) {
                     DisconnectNamedPipe(g_stdout_handle);
                 }
-                _close_handle(g_stdout_handle);
-                //_close(STDOUT_FILENO);
+                //_close_handle(g_stdout_handle); // CAUTION: never close standard handle directly, use CRT _close instead!
+
+                const int stdout_fileno = _fileno(stdout);
+                _close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
             } break;
 
             case FILE_TYPE_PIPE:
@@ -1719,8 +1721,10 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                 if (!g_options.reopen_stdout_as_server_pipe.empty()) {
                     DisconnectNamedPipe(g_stdout_handle);
                 }
-                _close_handle(g_stdout_handle);
-                //_close(STDOUT_FILENO);
+                //_close_handle(g_stdout_handle); // CAUTION: never close standard handle directly, use CRT _close instead!
+
+                const int stdout_fileno = _fileno(stdout);
+                _close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
             } break;
             }
         }();
@@ -4147,7 +4151,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
                 SetLastError(0); // just in case
                 g_stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
-                if (!_is_valid_handle(g_stdin_handle)) {
+                if (!read_std_handles_iter && !_is_valid_handle(g_stdin_handle)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4158,12 +4162,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("invalid stdin handle: win_error=0x%08X (%d)\n"),
+                        _print_stderr_message(_T("stdin handle is invalid: win_error=0x%08X (%d)\n"),
                             win_error, win_error);
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
                     }
+                    break_ = true;
                     break;
                 }
             }
@@ -4171,7 +4176,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
                 SetLastError(0); // just in case
                 g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-                if (!_is_valid_handle(g_stdout_handle)) {
+                if (!read_std_handles_iter && !_is_valid_handle(g_stdout_handle)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4182,12 +4187,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("invalid stdout handle: win_error=0x%08X (%d)\n"),
+                        _print_stderr_message(_T("stdout handle is invalid: win_error=0x%08X (%d)\n"),
                             win_error, win_error);
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
                     }
+                    break_ = true;
                     break;
                 }
             }
@@ -4195,7 +4201,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
                 SetLastError(0); // just in case
                 g_stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-                if (!_is_valid_handle(g_stderr_handle)) {
+                if (!read_std_handles_iter && !_is_valid_handle(g_stderr_handle)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4205,18 +4211,22 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     else {
                         ret = win_error;
                     }
+
+                    // CAUTION:
+                    //  Below code has no effect and is left just in case.
+                    //
+
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("invalid stderr handle: win_error=0x%08X (%d)\n"),
+                        _print_stderr_message(_T("stderr handle is invalid: win_error=0x%08X (%d)\n"),
                             win_error, win_error);
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
                     }
+                    break_ = true;
                     break;
                 }
             }
-
-            if (read_std_handles_iter > 0) break;
 
             // reopen closed std handles from `CONIN$`/`CONOUT$` files
 
@@ -4226,9 +4236,142 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             //#define FILE_TYPE_PIPE      0x0003 // ReadFile, PeekNamedPipe
             //#define FILE_TYPE_REMOTE    0x8000
             //
-            stdin_handle_type = GetFileType(g_stdin_handle);
-            stdout_handle_type = GetFileType(g_stdout_handle);
-            stderr_handle_type = GetFileType(g_stderr_handle);
+
+            stdin_handle_type = _is_valid_handle(g_stdin_handle) ? GetFileType(g_stdin_handle) : FILE_TYPE_UNKNOWN;
+            stdout_handle_type = _is_valid_handle(g_stdout_handle) ? GetFileType(g_stdout_handle) : FILE_TYPE_UNKNOWN;
+            stderr_handle_type = _is_valid_handle(g_stderr_handle) ? GetFileType(g_stderr_handle) : FILE_TYPE_UNKNOWN;
+
+            if (read_std_handles_iter > 0) {
+                if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("stdin handle type is unknown: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    break_ = true;
+                    break;
+                }
+
+                // WORKAROUND:
+                //  Use stdout/stderr duplication instead of reopen from `CONOUT$` to fix issue under elevation in Windows 7, where
+                //  the reopen returns the same broken handle with `FILE_TYPE_UNKNOWN` handle type.
+                //
+
+                if (stdout_handle_type == FILE_TYPE_UNKNOWN && stderr_handle_type != FILE_TYPE_UNKNOWN) {
+                    if (!DuplicateHandle(GetCurrentProcess(), g_stderr_handle, GetCurrentProcess(), &g_stdout_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!g_flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!g_flags.no_print_gen_error_string) {
+                            _print_stderr_message(_T("could not duplicate stderr into stdout: win_error=0x%08X (%d) file=\"%s\"\n"),
+                                win_error, win_error, g_options.reopen_stderr_as_file.c_str());
+                        }
+                        if (g_flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
+                    }
+
+                    if (_is_valid_handle(g_stdout_handle)) {
+                        _set_crt_std_handle(g_stdout_handle, 1, false);
+                    }
+
+                    g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+                    stdout_handle_type = _is_valid_handle(g_stdout_handle) ? GetFileType(g_stdout_handle) : FILE_TYPE_UNKNOWN;
+                }
+                else if (stdout_handle_type != FILE_TYPE_UNKNOWN && stderr_handle_type == FILE_TYPE_UNKNOWN) {
+                    if (!DuplicateHandle(GetCurrentProcess(), g_stdout_handle, GetCurrentProcess(), &g_stderr_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
+                        if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!g_flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!g_flags.no_print_gen_error_string) {
+                            _print_stderr_message(_T("could not duplicate stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
+                                win_error, win_error, g_options.reopen_stderr_as_file.c_str());
+                        }
+                        if (g_flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
+                        break;
+                    }
+
+                    stderr_handle_type = _is_valid_handle(g_stderr_handle) ? GetFileType(g_stderr_handle) : FILE_TYPE_UNKNOWN;
+                }
+
+                if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("stdout handle type is unknown: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    break_ = true;
+                    break;
+                }
+
+                if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+
+                    // CAUTION:
+                    //  Below code has no effect and is left just in case.
+                    //
+
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("stderr handle type is unknown: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    break_ = true;
+                    break;
+                }
+            }
+
+            if (read_std_handles_iter > 0) break;
 
             if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
                 _reattach_stdin_to_console(!g_no_std_inherit);
@@ -4244,6 +4387,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 break;
             }
         }
+
+        if (break_) break;
+
+        // update globals
+        g_stdin_handle_type = stdin_handle_type;
+        g_stdout_handle_type = stdout_handle_type;
+        g_stderr_handle_type = stderr_handle_type;
 
         if (g_no_std_inherit) {
             // reset std handles inheritance
@@ -4262,7 +4412,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not set stdin handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                            win_error, win_error, GetFileType(g_stdin_handle), g_options.reopen_stdin_as_file.c_str());
+                            win_error, win_error, stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -4285,7 +4435,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not set stdout handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                            win_error, win_error, GetFileType(g_stdout_handle), g_options.reopen_stdout_as_file.c_str());
+                            win_error, win_error, stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -4308,7 +4458,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("could not set stderr handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                            win_error, win_error, GetFileType(g_stderr_handle), g_options.reopen_stderr_as_file.c_str());
+                            win_error, win_error, stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -4805,16 +4955,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
 
         if (break_) break;
-
-        //#define FILE_TYPE_UNKNOWN   0x0000
-        //#define FILE_TYPE_DISK      0x0001 // ReadFile
-        //#define FILE_TYPE_CHAR      0x0002 // ReadConsoleInput, PeekConsoleInput
-        //#define FILE_TYPE_PIPE      0x0003 // ReadFile, PeekNamedPipe
-        //#define FILE_TYPE_REMOTE    0x8000
-        //
-        stdin_handle_type = g_stdin_handle_type = GetFileType(g_stdin_handle);
-        stdout_handle_type = g_stdout_handle_type = GetFileType(g_stdout_handle);
-        stderr_handle_type = g_stderr_handle_type = GetFileType(g_stderr_handle);
 
         bool has_outbound_pipe_from_conin = false;
 

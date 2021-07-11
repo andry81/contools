@@ -192,6 +192,7 @@ struct Options
 
     std::deque<std::tuple<int, std::tstring, std::tstring> > replace_args; // -1 - all, -2 - greater or equal to 1
     std::deque<std::tuple<std::tstring, std::tstring> > env_vars;
+    std::deque<std::tuple<int> > eval_backslash_esc;
 
     HasOptions      has;
 

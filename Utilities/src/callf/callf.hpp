@@ -8,19 +8,9 @@
 
 #include <windows.h>
 #include <tchar.h>
-#include <stdio.h>
-#include <string.h>
-#include <memory.h>
-#include <io.h>
-#include <fcntl.h>
-#include <tlhelp32.h>
-
-#include <algorithm>
-#include <atomic>
 
 #include "common.hpp"
 #include "printf.hpp"
-
 
 extern bool g_is_process_executed;
 extern bool g_is_process_elevating;

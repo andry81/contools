@@ -1,12 +1,14 @@
 * README_EN.txt
-* 2021.07.09
+* 2021.07.11
 * contools--utilities--contools
 
 1. DESCRIPTION
 2. LICENSE
 3. REPOSITORIES
 4. PREREQUISITES
-5. AUTHOR
+5. FEATURES
+5.1. callf
+6. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -61,6 +63,77 @@ To build GUI utilities is required the wxWidgets library at least of version
 
 CAUTION:
   You have to build wxwidgets before build GUI utilities.
+
+-------------------------------------------------------------------------------
+5. FEATURES
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+5.1. callf
+-------------------------------------------------------------------------------
+
+Create process or Shell execute in style of c-function printf.
+
+* Command line variadic variables substitution in style of c-function printf
+  with the python placeholders.
+
+  Examples:
+  >
+  callf.exe "" "cmd.exe /c echo.\"{0} {1}\"" "1 2" "3 4"
+
+* Environment variables expansion.
+
+  Examples:
+  >
+  callf.exe "" "\"${COMSPEC}\" /c echo.\"{0} {1}\"" "1 2" "3 4"
+
+* Execute with elevation.
+
+  Examples:
+  >
+  callf.exe /shell-exec runas "${COMSPEC}" "/c echo.\"{0} {1}\" & pause" "1 2" "3 4"
+  >
+  callf.exe /elevate{ /no-window }{ /attach-parent-console } "" "\"${COMSPEC}\" /c echo.\"{0} {1}\"" "1 2" "3 4"
+
+* Backslash escaping.
+
+  Examples:
+  >
+  callf.exe /e2 "${COMSPEC}" "/c echo.\"{0}\"" "Hello\tWorld!\a"
+
+* Text replacing.
+
+  Examples:
+  >
+  callf /r2 "{LR}" "\n" "" "printf /e \"Hello{0}World!{0}\"" "{LR}"
+  >
+  callf /ra "{LR}" "\n" "" "printf /e \"Hello{LR}World!{0}\"" "{LR}"
+
+* Set environment variable.
+
+  Examples:
+  >
+  callf /v "TEST" "123" "" "cmd.exe /c echo.TEST=${TEST}"
+  >
+  callf /v "TEST" "123" "" "cmd.exe /c echo.TEST=%TEST%"
+
+* File print.
+
+  Examples:
+  >
+  callf /reopen-stdin 0.in .
+
+* Process input redirection.
+
+  Examples:
+  >
+  callf.exe /reopen-stdin 0.in "" "cmd.exe /k"
+
+* Output duplication into a file.
+
+  Examples:
+  >
+  callf.exe /reopen-stdin 0.in /tee-stdout out.log /tee-stderr-dup 1 "" "cmd.exe /k"
 
 -------------------------------------------------------------------------------
 5. AUTHOR
