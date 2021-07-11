@@ -1,3 +1,13 @@
+2021.07.11:
+* fixed: src/callf: invalid standard output handle termporary workaround through a complement standard handle duplication (after `_dup2` fail)
+* fixed: src/callf: apply `/eval-backslash-esc` and `/eval-dbl-backslash-esc` after `/replace-arg<N> <from> <to>` to be able to replace all backslashes in an argument before backslash evaluation
+* fixed: src/callf: backslash escaping must be done before the command line elevation translation
+* fixed: src/callf: environment variables set must be done before `${...}` environment variables expansion
+* new: src/callf: `/replace-arg<N> <from> <to>` and `r<N> <from> <to>` options to replace per argument basis
+* new: src/callf: `/eval-backslash-esc<N>` and `e<N>` flags to evaluate backslash escaping per argument basis
+* changed: bin/contools: readme update
+* refactor: src: callf, printf: code refactor
+
 2021.07.09:
 * new: bin/contools: readme file
 

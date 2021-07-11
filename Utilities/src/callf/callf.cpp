@@ -6,6 +6,22 @@
 //#endif
 
 
+namespace {
+    struct InArgs : InBaseArgs
+    {
+        const TCHAR *       app_fmt_str;
+        const TCHAR *       cmd_fmt_str;
+    };
+
+    struct OutArgs : OutBaseArgs
+    {
+        std::tstring        app_fmt_str;
+        std::tstring        cmd_fmt_str;
+        tstring_vector_t    args;
+    };
+}
+
+
 // sets true just after the CreateProcess or ShellExecute success execute
 bool g_is_process_executed = false;
 
@@ -47,6 +63,11 @@ const TCHAR * g_promote_flags_to_preparse_arr[] = {
 const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
+};
+
+const TCHAR * g_flags_w_index_to_parse_arr[] = {
+    _T("/replace-arg"), _T("/r"),
+    _T("/eval-backslash-esc"), _T("/e"),
 };
 
 const TCHAR * g_flags_to_parse_arr[] = {
@@ -168,10 +189,10 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/own-console-title"),
     _T("/console-title"),
     _T("/stdin-echo"),
-    _T("/eval-backslash-esc"), _T("/e"),
-    _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
     _T("/replace-args"), _T("/r"),
     _T("/replace-args-in-tail"), _T("/ra"),
+    _T("/eval-backslash-esc"), _T("/e"),
+    _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
     _T("/set-env-var"), _T("/v"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
@@ -438,9 +459,41 @@ inline bool IsArgInFilter(const TCHAR * arg, const TCHAR * (& filter_arr)[N])
 }
 
 template <size_t N>
+inline bool IsArgWithSuffixInFilter(const TCHAR * arg, size_t arg_len, const TCHAR * (& filter_arr)[N])
+{
+    bool is_found = false;
+
+    utility::for_each_unroll(filter_arr, [&](const TCHAR * str) {
+        const size_t str_len = tstrlen(str);
+        if (str_len != arg_len) {
+            return true;
+        }
+        if (!tstrncmp(arg, str, str_len)) {
+            is_found = true;
+            return false;
+        }
+        return true;
+    });
+
+    return is_found;
+}
+
+template <size_t N>
 inline bool IsArgEqualTo(const TCHAR * arg, const TCHAR (& cmp_arg)[N])
 {
+    static_assert(N > 1, "cmp_arg[N] must contain at least one character");
     return !tstrncmp(arg, cmp_arg, N);
+}
+
+template <size_t N>
+inline bool IsArgWithSuffixEqualTo(const TCHAR * arg, const TCHAR (& cmp_arg)[N], const TCHAR * & arg_suffix)
+{
+    static_assert(N > 1, "cmp_arg[N] must contain at least one character");
+    if (!tstrncmp(arg, cmp_arg, N - 1)) {
+        arg_suffix = arg + N - 1;
+        return true;
+    }
+    return false;
 }
 
 // return:
@@ -460,6 +513,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     error = err_none;
 
     const TCHAR * start_arg = arg;
+    const TCHAR * arg_suffix = nullptr;
 
     if (ptrdiff_t(utility::addressof(exclude_filter_arr)) != ptrdiff_t(utility::addressof(g_empty_flags_arr))) {
         if (IsArgInFilter(arg, exclude_filter_arr)) {
@@ -1808,20 +1862,6 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         else error = invalid_format_flag(start_arg);
         return 2;
     }
-    if (IsArgEqualTo(arg, _T("/eval-backslash-esc")) || IsArgEqualTo(arg, _T("/e"))) {
-        if (IsArgInFilter(start_arg, include_filter_arr)) {
-            flags.eval_backslash_esc = true;
-            return 1;
-        }
-        return 0;
-    }
-    if (IsArgEqualTo(arg, _T("/eval-dbl-backslash-esc")) || IsArgEqualTo(arg, _T("/e\\\\"))) {
-        if (IsArgInFilter(start_arg, include_filter_arr)) {
-            flags.eval_dbl_backslash_esc = true;
-            return 1;
-        }
-        return 0;
-    }
     if (IsArgEqualTo(arg, _T("/replace-args")) || IsArgEqualTo(arg, _T("/r"))) {
         arg_offset += 1;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
@@ -1864,6 +1904,20 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         else error = invalid_format_flag(start_arg);
         return 2;
     }
+    if (IsArgEqualTo(arg, _T("/eval-backslash-esc")) || IsArgEqualTo(arg, _T("/e"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.eval_backslash_esc = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/eval-dbl-backslash-esc")) || IsArgEqualTo(arg, _T("/e\\\\"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.eval_dbl_backslash_esc = true;
+            return 1;
+        }
+        return 0;
+    }
     if (IsArgEqualTo(arg, _T("/set-env-var")) || IsArgEqualTo(arg, _T("/v"))) {
         arg_offset += 1;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
@@ -1898,6 +1952,65 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             return 1;
         }
         return 0;
+    }
+
+    return -1;
+}
+
+template <size_t N>
+int ParseArgWithSuffixToOption(int & error, const TCHAR * arg, int argc, const TCHAR * argv[], int & arg_offset, Flags & flags, Options & options, const TCHAR * (& include_filter_arr)[N])
+{
+    // intercept here specific global variables accidental usage instead of local variables
+    static struct {} g_options;
+    static struct {} g_flags;
+
+    error = err_none;
+
+    const TCHAR * start_arg = arg;
+    const TCHAR * arg_suffix = nullptr;
+
+    if (IsArgWithSuffixEqualTo(arg, _T("/replace-arg"), arg_suffix) || IsArgWithSuffixEqualTo(arg, _T("/r"), arg_suffix)) {
+        const size_t arg_suffix_len = tstrlen(arg_suffix);
+        if (arg_suffix_len && tisdigit(*arg_suffix)) {
+            const int arg_index = _ttoi(arg_suffix);
+            if (arg_index >= 0) {
+                arg_offset += 1;
+                if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                    const TCHAR * from = arg;
+
+                    arg_offset += 1;
+                    if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                        if (IsArgWithSuffixInFilter(start_arg, arg_suffix - start_arg, include_filter_arr)) {
+                            const TCHAR * to = arg;
+
+                            options.replace_args.push_back(std::make_tuple(arg_index, std::tstring{ from }, std::tstring{ to }));
+                            return 1;
+                        }
+                        return 0;
+                    }
+                    else error = invalid_format_flag(start_arg);
+                    return 2;
+                }
+                else error = invalid_format_flag(start_arg);
+            }
+            else error = invalid_format_flag(start_arg);
+        }
+        return -1;
+    }
+    if (IsArgWithSuffixEqualTo(arg, _T("/eval-backslash-esc"), arg_suffix) || IsArgWithSuffixEqualTo(arg, _T("/e"), arg_suffix)) {
+        const size_t arg_suffix_len = tstrlen(arg_suffix);
+        if (arg_suffix_len && tisdigit(*arg_suffix)) {
+            const int arg_index = _ttoi(arg_suffix);
+            if (arg_index >= 0) {
+                if (IsArgWithSuffixInFilter(start_arg, arg_suffix - start_arg, include_filter_arr)) {
+                    options.eval_backslash_esc.push_back(arg_index);
+                    return 1;
+                }
+                return 0;
+            }
+            else error = invalid_format_flag(start_arg);
+        }
+        return -1;
     }
 
     return -1;
@@ -2262,6 +2375,11 @@ int _tmain(int argc, const TCHAR * argv[])
                         return parse_error;
                     }
                 }
+                else if ((parse_result = ParseArgWithSuffixToOption(parse_error, arg, argc, argv, arg_offset, g_regular_flags, g_regular_options, g_flags_w_index_to_parse_arr)) >= 0) {
+                    if (parse_error != err_none) {
+                        return parse_error;
+                    }
+                }
                 else if (!tstrcmp(arg, _T("/elevate{"))) {
                     arg_offset += 1;
 
@@ -2538,38 +2656,35 @@ int _tmain(int argc, const TCHAR * argv[])
             TCHAR env_buf[MAX_ENV_BUF_SIZE];
 
             // <ApplicationNameFormatString> or <FilePathFormatString>
-            InArgs app_args = InArgs();
-            OutArgs app_out_args = OutArgs();
-
             // <CommandLineFormatString> or <ParametersFormatString>
             //
             // CAUTION:
             //  In case of ShellExecute the <ParametersFormatString> must contain only a command line arguments,
             //  but not the path to the executable itself which is part of <CommandLineFormatString>!
             //
-            InArgs cmd_args = InArgs();
-            OutArgs cmd_out_args = OutArgs();
+            InArgs in_args = InArgs();
+            OutArgs out_args = OutArgs();
 
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset]) && tstrlen(arg)) {
-                app_args.fmt_str = arg;
-                if (!tstrcmp(app_args.fmt_str , _T(""))) {
-                    app_args.fmt_str = nullptr;
+                in_args.app_fmt_str = arg;
+                if (!tstrcmp(in_args.app_fmt_str, _T(""))) {
+                    in_args.app_fmt_str = nullptr;
                 }
             }
 
             arg_offset += 1;
 
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset]) && tstrlen(arg)) {
-                cmd_args.fmt_str = arg;
-                if (!tstrcmp(cmd_args.fmt_str, _T(""))) {
-                    cmd_args.fmt_str = nullptr;
+                in_args.cmd_fmt_str = arg;
+                if (!tstrcmp(in_args.cmd_fmt_str, _T(""))) {
+                    in_args.cmd_fmt_str = nullptr;
                 }
             }
 
             arg_offset += 1;
 
             if (g_options.shell_exec_verb.empty()) {
-                if (!app_args.fmt_str && !cmd_args.fmt_str) {
+                if (!in_args.app_fmt_str && !in_args.cmd_fmt_str) {
                     if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("format arguments are empty\n"));
                     }
@@ -2582,7 +2697,7 @@ int _tmain(int argc, const TCHAR * argv[])
                 }
             }
             else {
-                if (!app_args.fmt_str) {
+                if (!in_args.app_fmt_str) {
                     if (!g_flags.no_print_gen_error_string) {
                         _print_stderr_message(_T("file path format argument is empty\n"));
                     }
@@ -2595,106 +2710,213 @@ int _tmain(int argc, const TCHAR * argv[])
                 }
             }
 
+            // update environment variables before ${...} environment variables expansion
+            for (const auto & env_vars_ref : g_options.env_vars) {
+                SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), std::get<1>(env_vars_ref).c_str());
+            }
+
+            if (in_args.app_fmt_str) {
+                out_args.app_fmt_str = in_args.app_fmt_str;
+            }
+
+            if (in_args.cmd_fmt_str) {
+                out_args.cmd_fmt_str = in_args.cmd_fmt_str;
+            }
+
             // read and parse tail arguments
-            if (argc >= arg_offset + 1 && app_args.fmt_str) {
+            if (argc >= arg_offset + 1) {
                 const int num_args = argc - arg_offset;
 
-                app_args.args.resize(num_args);
-                app_out_args.args.resize(num_args);
+                in_args.args.resize(num_args);
+                out_args.args.resize(num_args);
 
                 for (int i = 0; i < num_args; i++) {
-                    app_args.args[i] = argv[arg_offset + i];
+                    in_args.args[i] = argv[arg_offset + i];
                 }
-                // double pass to expand ${...} variables before {...} variables
-                if (!g_flags.no_expand_env && !g_flags.no_subst_vars) {
-                    std::tstring tmp;
 
+                // expand ${...} variables before {...} variables
+                if (!g_flags.no_expand_env) {
                     for (int i = 0; i < num_args; i++) {
-                        if (tstrcmp(app_args.args[i], _T(""))) {
-                            _parse_string(i, app_args.args[i], app_out_args.args[i], env_buf,
-                                false, true, true, app_args, app_out_args);
+                        if (tstrcmp(in_args.args[i], _T(""))) {
+                            _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
+                                false, true, true, in_args, out_args);
                         }
                         else {
-                            app_args.args[i] = nullptr;
+                            in_args.args[i] = nullptr;
                         }
-                    }
-                    for (int i = 0; i < num_args; i++) {
-                        tmp.clear();
-                        _parse_string(i, app_out_args.args[i].c_str(), tmp, env_buf,
-                            true, false, false, InArgs{}, app_out_args);
-                        app_out_args.args[i] = std::move(tmp);
                     }
                 }
                 else {
+                    // copy input arguments to output arguments
                     for (int i = 0; i < num_args; i++) {
-                        if (tstrcmp(app_args.args[i], _T(""))) {
-                            _parse_string(i, app_args.args[i], app_out_args.args[i], env_buf,
-                                g_flags.no_expand_env, g_flags.no_subst_vars, true, app_args, app_out_args);
+                        if (in_args.args[i] && tstrcmp(in_args.args[i], _T(""))) {
+                            out_args.args[i] = in_args.args[i];
                         }
                         else {
-                            app_args.args[i] = nullptr;
+                            in_args.args[i] = nullptr;
                         }
                     }
                 }
-            }
 
-            if (argc >= arg_offset + 1 && cmd_args.fmt_str) {
-                const int num_args = argc - arg_offset;
+                // replace strings per argument
+                for (const auto & replace_args_ref : g_options.replace_args) {
+                    int replace_offset = std::get<0>(replace_args_ref);
 
-                cmd_args.args.resize(num_args);
-                cmd_out_args.args.resize(num_args);
+                    if (replace_offset >= 2) {
+                        // variadic arguments
+                        replace_offset -= 2;
 
-                for (int i = 0; i < num_args; i++) {
-                    cmd_args.args[i] = argv[arg_offset + i];
+                        if (size_t(replace_offset) < out_args.args.size()) {
+                            if (in_args.args[replace_offset]) {
+                                out_args.args[replace_offset] = _replace_strings(out_args.args[replace_offset], std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                            }
+                        }
+                    }
                 }
-                // double pass to expand ${...} variables before {...} variables
-                if (!g_flags.no_expand_env && !g_flags.no_subst_vars) {
+
+                // replace strings per range
+                for (const auto & replace_args_ref : g_options.replace_args) {
+                    const int replace_offset = std::get<0>(replace_args_ref);
+
+                    if (replace_offset < 0) {
+                        for (int i = 0; i < num_args; i++) {
+                            if (in_args.args[i]) {
+                                out_args.args[i] = _replace_strings(out_args.args[i], std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                            }
+                        }
+                    }
+                }
+
+                // expand {...} variables
+                if (!g_flags.no_subst_vars) {
                     std::tstring tmp;
 
                     for (int i = 0; i < num_args; i++) {
-                        if (tstrcmp(cmd_args.args[i], _T(""))) {
-                            _parse_string(i, cmd_args.args[i], cmd_out_args.args[i], env_buf,
-                                false, true, true, cmd_args, cmd_out_args);
-                        }
-                        else {
-                            cmd_args.args[i] = nullptr;
-                        }
-                    }
-                    for (int i = 0; i < num_args; i++) {
                         tmp.clear();
-                        _parse_string(i, cmd_out_args.args[i].c_str(), tmp, env_buf,
-                            true, false, false, InArgs{}, cmd_out_args);
-                        cmd_out_args.args[i] = std::move(tmp);
+                        _parse_string(i, out_args.args[i].c_str(), tmp, env_buf,
+                            true, false, false, InArgs{}, out_args);
+                        out_args.args[i] = std::move(tmp);
                     }
                 }
-                else {
-                    for (int i = 0; i < num_args; i++) {
-                        if (tstrcmp(cmd_args.args[i], _T(""))) {
-                            _parse_string(i, cmd_args.args[i], cmd_out_args.args[i], env_buf,
-                                g_flags.no_expand_env, g_flags.no_subst_vars, true, cmd_args, cmd_out_args);
+
+                // backslash escaping per argument
+                for (const auto & eval_backslash_esc_ref : g_options.eval_backslash_esc) {
+                    int escape_offset = std::get<0>(eval_backslash_esc_ref);
+
+                    if (escape_offset >= 2) {
+                        // variadic arguments
+                        escape_offset -= 2;
+
+                        if (size_t(escape_offset) < out_args.args.size()) {
+                            if (in_args.args[escape_offset]) {
+                                out_args.args[escape_offset] = _eval_escape_chars(out_args.args[escape_offset], true, false);
+                            }
                         }
-                        else {
-                            cmd_args.args[i] = nullptr;
+                    }
+                }
+
+                // backslash escaping per range
+                for (const auto & eval_backslash_esc_ref : g_options.eval_backslash_esc) {
+                    const int escape_offset = std::get<0>(eval_backslash_esc_ref);
+
+                    if (escape_offset < 0) {
+                        for (int i = 0; i < num_args; i++) {
+                            if (in_args.args[i]) {
+                                out_args.args[i] = _eval_escape_chars(out_args.args[i], true, false);
+                            }
                         }
                     }
                 }
             }
 
-            if (app_args.fmt_str) {
-                _parse_string(-2, app_args.fmt_str, app_out_args.fmt_str, env_buf,
-                    g_flags.no_expand_env, g_flags.no_subst_vars, false, app_args, app_out_args);
-            }
-            if (cmd_args.fmt_str) {
-                _parse_string(-1, cmd_args.fmt_str, cmd_out_args.fmt_str, env_buf,
-                    g_flags.no_expand_env, g_flags.no_subst_vars, false, cmd_args, cmd_out_args);
+            // expand ${...} variables before {...} variables
+            if (!g_flags.no_expand_env) {
+                if (in_args.app_fmt_str) {
+                    std::tstring tmp;
+                    _parse_string(-2, out_args.app_fmt_str.c_str(), tmp, env_buf,
+                        false, true, false, in_args, out_args);
+                    out_args.app_fmt_str = std::move(tmp);
+                }
+                if (in_args.cmd_fmt_str) {
+                    std::tstring tmp;
+                    _parse_string(-1, out_args.cmd_fmt_str.c_str(), tmp, env_buf,
+                        false, true, false, in_args, out_args);
+                    out_args.cmd_fmt_str = std::move(tmp);
+                }
             }
 
+            // replace strings per argument
+            for (const auto & replace_args_ref : g_options.replace_args) {
+                const int replace_offset = std::get<0>(replace_args_ref);
+
+                if (replace_offset == 0) {
+                    if (in_args.app_fmt_str) {
+                        out_args.app_fmt_str = _replace_strings(out_args.app_fmt_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                    }
+                }
+                else if (replace_offset == 1) {
+                    if (in_args.cmd_fmt_str) {
+                        out_args.cmd_fmt_str = _replace_strings(out_args.cmd_fmt_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                    }
+                }
+            }
+
+            // replace strings per range
+            for (const auto & replace_args_ref : g_options.replace_args) {
+                const int replace_offset = std::get<0>(replace_args_ref);
+
+                if (replace_offset == -1) {
+                    if (in_args.app_fmt_str) {
+                        out_args.app_fmt_str = _replace_strings(out_args.app_fmt_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                    }
+                }
+                if (replace_offset == -1 || replace_offset == -2) {
+                    if (in_args.cmd_fmt_str) {
+                        out_args.cmd_fmt_str = _replace_strings(out_args.cmd_fmt_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
+                    }
+                }
+            }
+
+            // expand {...} variables
+            if (!g_flags.no_subst_vars) {
+                if (in_args.app_fmt_str) {
+                    std::tstring tmp;
+                    _parse_string(-2, out_args.app_fmt_str.c_str(), tmp, env_buf,
+                        true, false, false, in_args, out_args);
+                    out_args.app_fmt_str = std::move(tmp);
+                }
+                if (in_args.cmd_fmt_str) {
+                    std::tstring tmp;
+                    _parse_string(-1, out_args.cmd_fmt_str.c_str(), tmp, env_buf,
+                        true, false, false, in_args, out_args);
+                    out_args.cmd_fmt_str = std::move(tmp);
+                }
+            }
+
+            // backslash escaping per argument
+            for (const auto & eval_backslash_esc_ref : g_options.eval_backslash_esc) {
+                const int escape_offset = std::get<0>(eval_backslash_esc_ref);
+
+                if (escape_offset == 0) {
+                    if (in_args.app_fmt_str) {
+                        out_args.app_fmt_str = _eval_escape_chars(out_args.app_fmt_str, g_flags.eval_backslash_esc, g_flags.eval_dbl_backslash_esc);
+                    }
+                }
+                else if (escape_offset == 1) {
+                    if (in_args.cmd_fmt_str) {
+                        out_args.cmd_fmt_str = _eval_escape_chars(out_args.cmd_fmt_str, g_flags.eval_backslash_esc, g_flags.eval_dbl_backslash_esc);
+                    }
+                }
+
+            }
+
+            // backslash escaping per range
             if (g_flags.eval_backslash_esc || g_flags.eval_dbl_backslash_esc) {
-                if (app_args.fmt_str) {
-                    app_out_args.fmt_str = _eval_escape_chars(app_out_args.fmt_str, g_flags.eval_backslash_esc, g_flags.eval_dbl_backslash_esc);
+                if (in_args.app_fmt_str) {
+                    out_args.app_fmt_str = _eval_escape_chars(out_args.app_fmt_str, g_flags.eval_backslash_esc, g_flags.eval_dbl_backslash_esc);
                 }
-                if (cmd_args.fmt_str) {
-                    cmd_out_args.fmt_str = _eval_escape_chars(cmd_out_args.fmt_str, g_flags.eval_backslash_esc, g_flags.eval_dbl_backslash_esc);
+                if (in_args.cmd_fmt_str) {
+                    out_args.cmd_fmt_str = _eval_escape_chars(out_args.cmd_fmt_str, g_flags.eval_backslash_esc, g_flags.eval_dbl_backslash_esc);
                 }
             }
 
@@ -2706,8 +2928,8 @@ int _tmain(int argc, const TCHAR * argv[])
                 std::tstring elevated_cmd_out_str;
 
                 TranslateCommandLineToElevated(
-                    app_args.fmt_str ? utility::addressof(app_out_args.fmt_str) : nullptr,
-                    cmd_args.fmt_str ? utility::addressof(cmd_out_args.fmt_str) : nullptr,
+                    in_args.app_fmt_str ? utility::addressof(out_args.app_fmt_str) : nullptr,
+                    in_args.cmd_fmt_str ? utility::addressof(out_args.cmd_fmt_str) : nullptr,
                     utility::addressof(elevated_cmd_out_str),
                     g_flags, g_options,
                     g_elevate_child_flags, g_elevate_child_options,
@@ -2725,28 +2947,9 @@ int _tmain(int argc, const TCHAR * argv[])
                     g_options.shell_exec_verb = _T("runas");
                 }
 
-                // replace strings
-                std::tstring program_file_name_str = program_file_name;
-
-                for (const auto & replace_args_ref : g_options.replace_args) {
-                    const int replace_offset = std::get<0>(replace_args_ref);
-
-                    if (replace_offset >= -1) {
-                        program_file_name_str = _replace_strings(program_file_name_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
-                    }
-                    if (replace_offset >= -2) {
-                        elevated_cmd_out_str = _replace_strings(elevated_cmd_out_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
-                    }
-                }
-
-                // update environment variables
-                for (const auto & env_vars_ref : g_options.env_vars) {
-                    SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), std::get<1>(env_vars_ref).c_str());
-                }
-
                 return ExecuteProcess(
-                    program_file_name_str.c_str(),
-                    program_file_name_str.length(),
+                    program_file_name,
+                    tstrlen(program_file_name),
                     !elevated_cmd_out_str.empty() ? elevated_cmd_out_str.c_str() : (LPCTSTR)NULL,
                     !elevated_cmd_out_str.empty() ? elevated_cmd_out_str.length() : 0
                 );
@@ -2759,28 +2962,11 @@ int _tmain(int argc, const TCHAR * argv[])
 
             SubstOptionsPlaceholders(g_options);
 
-            // replace strings
-            for (const auto & replace_args_ref : g_options.replace_args) {
-                const int replace_offset = std::get<0>(replace_args_ref);
-
-                if (replace_offset >= -1 && app_args.fmt_str) {
-                    app_out_args.fmt_str = _replace_strings(app_out_args.fmt_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
-                }
-                if (replace_offset >= -2 && cmd_args.fmt_str) {
-                    cmd_out_args.fmt_str = _replace_strings(cmd_out_args.fmt_str, std::get<1>(replace_args_ref), std::get<2>(replace_args_ref));
-                }
-            }
-
-            // update environment variables
-            for (const auto & env_vars_ref : g_options.env_vars) {
-                SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), std::get<1>(env_vars_ref).c_str());
-            }
-
             return ExecuteProcess(
-                app_args.fmt_str ? app_out_args.fmt_str.c_str() : (LPCTSTR)NULL,
-                app_args.fmt_str ? app_out_args.fmt_str.length() : 0,
-                cmd_args.fmt_str ? cmd_out_args.fmt_str.c_str() : (LPCTSTR)NULL,
-                cmd_args.fmt_str ? cmd_out_args.fmt_str.length() : 0
+                in_args.app_fmt_str ? out_args.app_fmt_str.c_str() : (LPCTSTR)NULL,
+                in_args.app_fmt_str ? out_args.app_fmt_str.length() : 0,
+                in_args.cmd_fmt_str ? out_args.cmd_fmt_str.c_str() : (LPCTSTR)NULL,
+                in_args.cmd_fmt_str ? out_args.cmd_fmt_str.length() : 0
             );
         }();
     }

@@ -11,10 +11,18 @@
 #include <cstdio>
 #include <cstdarg>
 #include <ctime>
+#include <atomic>
 
 #include <assert.h>
 #include <stdint.h>
 #include <ShellAPI.h>
+
+#include <stdio.h>
+#include <string.h>
+#include <memory.h>
+#include <io.h>
+#include <fcntl.h>
+#include <tlhelp32.h>
 
 #include "std/tctype.hpp"
 #include "std/tstdlib.hpp"
@@ -260,7 +268,6 @@ namespace {
 
     inline bool _set_crt_std_handle(HANDLE file_handle, int id, bool duplicate_input_handle, bool inherit_handle_on_duplicate = true)
     {
-        int fd;
         int flags = 0;
 
 #ifdef _UNICODE
@@ -291,15 +298,21 @@ namespace {
         //    This change allows applications to distinguish this condition from an error.
         //
         //  The `_fileno` can return negative number and it does if a standard handle is already closed (parent process has called `CreateProcess` w/o standard handles inheritance).
-        //  You must use direct number, for example, `STDOUT_FILENO` instead of `_fileno(stdout)`, otherwise all sequenced calls will fail, which means `_close(fd)` will close
+        //  In that case you must use a direct number, for example, `STDOUT_FILENO` instead of `_fileno(stdout)`, otherwise all sequenced calls will fail, which means `_close(fd)` will close
         //  the handle w/o a duplication!
+        //
+
+        // CAUTION:
+        //  The `_open_osfhandle` would ignore `SetStdHandle` if all 3 ids already has been allocated.
+        //  The `_dup2` can fail with -1 return code in case if can not duplicate a handle and it happens
+        //  when the handle has been opened from the `CONOUT$` file!
         //
 
         HANDLE file_handle_crt = file_handle;
 
         switch (id)
         {
-        case 0:
+        case 0: {
             if (duplicate_input_handle) {
                 if (!DuplicateHandle(GetCurrentProcess(), file_handle, GetCurrentProcess(), &file_handle_crt, 0,
                     inherit_handle_on_duplicate ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
@@ -307,12 +320,13 @@ namespace {
                 }
             }
 
-            fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_RDONLY);
-            _dup2(fd, STDIN_FILENO);
+            const int fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_RDONLY);
+            const int stdin_fileno = _fileno(stdin);
+            _dup2(fd, stdin_fileno >= 0 ? stdin_fileno : STDIN_FILENO);
             _close(fd);
-            break;
+        } break;
 
-        case 1:
+        case 1: {
             if (duplicate_input_handle) {
                 if (!DuplicateHandle(GetCurrentProcess(), file_handle, GetCurrentProcess(), &file_handle_crt, 0,
                     inherit_handle_on_duplicate ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
@@ -320,12 +334,13 @@ namespace {
                 }
             }
 
-            fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
-            _dup2(fd, STDOUT_FILENO);
+            const int fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
+            const int stdout_fileno = _fileno(stdout);
+            _dup2(fd, stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
             _close(fd);
-            break;
+        } break;
 
-        case 2:
+        case 2: {
             if (duplicate_input_handle) {
                 if (!DuplicateHandle(GetCurrentProcess(), file_handle, GetCurrentProcess(), &file_handle_crt, 0,
                     inherit_handle_on_duplicate ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
@@ -333,10 +348,11 @@ namespace {
                 }
             }
 
-            fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
-            _dup2(fd, STDERR_FILENO);
+            const int fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
+            const int stderr_fileno = _fileno(stderr);
+            _dup2(fd, stderr_fileno >= 0 ? stderr_fileno : STDERR_FILENO);
             _close(fd);
-            break;
+        } break;
 
         default:
             return false;
@@ -378,6 +394,7 @@ namespace {
         HANDLE conin_handle = CreateFile(_T("CONIN$"),
             GENERIC_READ, FILE_SHARE_READ, &sa,
             OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
         if (_is_valid_handle(conin_handle)) {
             _set_crt_std_handle(conin_handle, 0, false);
         }
@@ -391,9 +408,10 @@ namespace {
         sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
 
         HANDLE conout_handle = CreateFile(_T("CONOUT$"),
-            GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa,
+            GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
             OPEN_ALWAYS,
             FILE_ATTRIBUTE_NORMAL, NULL);
+
         if (_is_valid_handle(conout_handle)) {
             _set_crt_std_handle(conout_handle, 1, false);
         }
@@ -407,9 +425,10 @@ namespace {
         sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
 
         HANDLE conout_handle = CreateFile(_T("CONOUT$"),
-            GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa,
+            GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
             OPEN_ALWAYS,
             FILE_ATTRIBUTE_NORMAL, NULL);
+
         if (_is_valid_handle(conout_handle)) {
             _set_crt_std_handle(conout_handle, 2, false);
         }

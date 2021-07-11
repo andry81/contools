@@ -3,9 +3,6 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <string.h>
-
-#include <algorithm>
 
 #include "common.hpp"
 #include "printf.hpp"
@@ -15,6 +12,16 @@
 //#endif
 
 namespace {
+    struct InArgs : InBaseArgs
+    {
+        const TCHAR *   fmt_str;
+    };
+
+    struct OutArgs : OutBaseArgs
+    {
+        std::tstring    fmt_str;
+    };
+
     struct _Flags
     {
         bool            no_print_gen_error_string;

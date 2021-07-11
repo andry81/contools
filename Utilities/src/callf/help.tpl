@@ -593,9 +593,24 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         Explicitly enable or disable console input buffer echo before start
         of a child process.
 
+      /replace-args-in-tail <from> <to>
+      /ra <from> <to>
+        Replace `<from>` string by `<to>` string in tail arguments (arguments
+        arter the first one).
+
+      /replace-args <from> <to>
+      /replace-arg<N> <from> <to>
+      /r <from> <to>
+      /r<N> <from> <to>
+        Replace `<from>` string by `<to>` string for either all arguments or
+        `<N>` argument, where `<N>` >= 0.
+
       /eval-backslash-esc
+      /eval-backslash-esc<N>
       /e
-        Evaluate escape characters:
+      /e<N>
+        Evaluate escape characters for either all arguments or `<N>` argument,
+        where `<N>` >= 0:
           \a = \x07 = alert (bell)
           \b = \x08 = backspace
           \t = \x09 = horizontal tab
@@ -617,15 +632,6 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       /e\\
         Evaluate double backslash escape characters:
           \\ = backslash
-
-      /replace-args <from> <to>
-      /r <from> <to>
-        Replace `<from>` string by `<to>` string in all arguments.
-
-      /replace-args-in-tail <from> <to>
-      /ra <from> <to>
-        Replace `<from>` string by `<to>` string in tail arguments (arguments
-        arter the first one).
 
       /set-env-var <name> <value>
       /v
