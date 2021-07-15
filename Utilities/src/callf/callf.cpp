@@ -2029,173 +2029,185 @@ int _tmain(int argc, const TCHAR * argv[])
         return err_unspecified;
     }
 
-    // NOTE:
-    //  While the current process being started it's console can be hidden by the CreateProcess/ShellExecute from the parent process.
-    //  So we have to check the current process console window on visibility and if it is not exist or not visible and
-    //  the parent process console is visible, then make temporary reattachment to a parent process console.
-    //  Otherwise the output into the stdout/stderr from here won't be visible by the user until the `/attach-parent-console` flag is
-    //  applied.
-    //  If you don't want such behaviour, then you have to use the `/disable-conout-reattach-to-visible-console` flag.
-    //
+    int ret = err_none;
+    DWORD win_error = 0;
 
-    TCHAR module_file_name_buf[MAX_PATH];
-    const TCHAR * program_file_name = nullptr;
-    int arg_offset = 0;
-    
-    if (argv[0][0] != _T('/')) { // arguments shift detection
-        program_file_name = argv[0];
-        arg_offset = 1;
-    }
-    else {
-        if (GetModuleFileName(NULL, module_file_name_buf, sizeof(module_file_name_buf) / sizeof(module_file_name_buf[0]))) {
-            program_file_name = module_file_name_buf;
-        }
-    }
-
-    const TCHAR * arg;
-    int parse_error = err_none;
-    int parse_result;
-
-    // silent flags preprocess w/o any errors to search for prioritized flags
-    while (argc >= arg_offset + 1)
-    {
-        arg = argv[arg_offset];
-
-        if (tstrncmp(arg, _T("/"), 1)) {
-            break;
-        }
-
-        if (!tstrncmp(arg, _T("//"), 2)) {
-            arg_offset += 1;
-            break;
-        }
-
-        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_regular_flags, g_regular_options, g_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
-            if (parse_error != err_none) {
-                return parse_error;
-            }
-        }
-        else if (!tstrcmp(arg, _T("/elevate{"))) {
-            arg_offset += 1;
-
-            g_regular_flags.elevate = true;
-
-            bool is_elevate_child_flags = false;
-
-            // read inner flags
-            while (argc >= arg_offset + 1)
-            {
-                arg = argv[arg_offset];
-
-                if ((parse_result = (!is_elevate_child_flags ?
-                        ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
-                            !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
-                            !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
-                            g_elevate_parent_flags_to_preparse_arr, g_empty_flags_arr) :
-                        ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
-                            !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
-                            !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
-                            g_elevate_child_flags_to_preparse_arr, g_empty_flags_arr))) >= 0) {
-                    if (parse_error != err_none) {
-                        return parse_error;
-                    }
-                }
-                else if (!is_elevate_child_flags && !tstrcmp(arg, _T("}{"))) {
-                    is_elevate_child_flags = true;
-                }
-                else if (!tstrcmp(arg, _T("}"))) {
-                    break;
-                }
-
-                arg_offset += 1;
-            }
-        }
-        else if (!tstrcmp(arg, _T("/promote{"))) {
-            arg_offset += 1;
-
-            // read inner flags
-            while (argc >= arg_offset + 1)
-            {
-                arg = argv[arg_offset];
-
-                if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_flags, g_promote_options, g_promote_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
-                    if (parse_error != err_none) {
-                        return parse_error;
-                    }
-                }
-                else if (!tstrcmp(arg, _T("}"))) {
-                    break;
-                }
-
-                arg_offset += 1;
-            }
-        }
-        else if (!tstrcmp(arg, _T("/promote-parent{"))) {
-            arg_offset += 1;
-
-            // read inner flags
-            while (argc >= arg_offset + 1)
-            {
-                arg = argv[arg_offset];
-
-                if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_parent_flags, g_promote_parent_options, g_promote_parent_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
-                    if (parse_error != err_none) {
-                        return parse_error;
-                    }
-                }
-                else if (!tstrcmp(arg, _T("}"))) {
-                    break;
-                }
-
-                arg_offset += 1;
-            }
-        }
-
-        arg_offset += 1;
-    }
-
-    // update elevation state
-    if (g_regular_flags.elevate) {
-        const bool is_process_elevated = _is_process_elevated() ? 1 : 0;
-        if (!is_process_elevated) {
-            g_is_process_elevating = true;
-        }
-
-        // we must drop this flag immediately to avoid potential accidental recursion in child process
-        g_regular_flags.elevate = false;
-    }
-
-    // reset flags and options
-    g_flags = g_regular_flags;
-    g_options = g_regular_options;
-
-    if (g_is_process_elevating) {
-        TranslateCommandLineToElevated(nullptr, nullptr, nullptr,
-            g_flags, g_options,
-            g_elevate_child_flags, g_elevate_child_options,
-            g_promote_flags, g_promote_options);
-    }
-
-    // merge options (first time)
-    MergeOptions(g_flags, g_options,
-        g_elevate_parent_flags, g_elevate_parent_options,
-        g_promote_flags, g_promote_options, g_promote_parent_flags, g_promote_parent_options);
-
-    if (!g_flags.disable_conout_duplicate_to_parent_console_on_error) {
-        // enable console output buffering by default
-        g_enable_conout_prints_buffering = true;
-    }
+    std::vector<_ConsoleWindowOwnerProc> console_window_owner_procs;
 
     bool is_conout_reattached_to_visible_console = false;
     bool is_console_window_inited = false;
 
-    std::vector<_ConsoleWindowOwnerProc> console_window_owner_procs;
+    //fprintf(stdout, "1 stdin : %p %u\n", GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)));
+    //fprintf(stdout, "1 stdout: %p %u\n", GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)));
+    //fprintf(stdout, "1 stderr: %p %u\n", GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
+
+    //fprintf(stderr, "2 stdin : %p %u\n", GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)));
+    //fprintf(stderr, "2 stdout: %p %u\n", GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)));
+    //fprintf(stderr, "2 stderr: %p %u\n", GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
 
     // NOTE:
     //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
     return [&]() -> int { __try {
         return [&]() -> int {
+
+            // NOTE:
+            //  While the current process being started it's console can be hidden by the CreateProcess/ShellExecute from the parent process.
+            //  So we have to check the current process console window on visibility and if it is not exist or not visible and
+            //  the parent process console is visible, then make temporary reattachment to a parent process console.
+            //  Otherwise the output into the stdout/stderr from here won't be visible by the user until the `/attach-parent-console` flag is
+            //  applied.
+            //  If you don't want such behaviour, then you have to use the `/disable-conout-reattach-to-visible-console` flag.
+            //
+
+            TCHAR module_file_name_buf[MAX_PATH];
+            const TCHAR * program_file_name = nullptr;
+            int arg_offset = 0;
+    
+            if (argv[0][0] != _T('/')) { // arguments shift detection
+                program_file_name = argv[0];
+                arg_offset = 1;
+            }
+            else {
+                if (GetModuleFileName(NULL, module_file_name_buf, sizeof(module_file_name_buf) / sizeof(module_file_name_buf[0]))) {
+                    program_file_name = module_file_name_buf;
+                }
+            }
+
+            const TCHAR * arg;
+            int parse_error = err_none;
+            int parse_result;
+
+            // silent flags preprocess w/o any errors to search for prioritized flags
+            while (argc >= arg_offset + 1)
+            {
+                arg = argv[arg_offset];
+
+                if (tstrncmp(arg, _T("/"), 1)) {
+                    break;
+                }
+
+                if (!tstrncmp(arg, _T("//"), 2)) {
+                    arg_offset += 1;
+                    break;
+                }
+
+                if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_regular_flags, g_regular_options, g_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                    if (parse_error != err_none) {
+                        return parse_error;
+                    }
+                }
+                else if (!tstrcmp(arg, _T("/elevate{"))) {
+                    arg_offset += 1;
+
+                    g_regular_flags.elevate = true;
+
+                    bool is_elevate_child_flags = false;
+
+                    // read inner flags
+                    while (argc >= arg_offset + 1)
+                    {
+                        arg = argv[arg_offset];
+
+                        if ((parse_result = (!is_elevate_child_flags ?
+                                ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                                    !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
+                                    !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
+                                    g_elevate_parent_flags_to_preparse_arr, g_empty_flags_arr) :
+                                ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                                    !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
+                                    !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
+                                    g_elevate_child_flags_to_preparse_arr, g_empty_flags_arr))) >= 0) {
+                            if (parse_error != err_none) {
+                                return parse_error;
+                            }
+                        }
+                        else if (!is_elevate_child_flags && !tstrcmp(arg, _T("}{"))) {
+                            is_elevate_child_flags = true;
+                        }
+                        else if (!tstrcmp(arg, _T("}"))) {
+                            break;
+                        }
+
+                        arg_offset += 1;
+                    }
+                }
+                else if (!tstrcmp(arg, _T("/promote{"))) {
+                    arg_offset += 1;
+
+                    // read inner flags
+                    while (argc >= arg_offset + 1)
+                    {
+                        arg = argv[arg_offset];
+
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_flags, g_promote_options, g_promote_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                            if (parse_error != err_none) {
+                                return parse_error;
+                            }
+                        }
+                        else if (!tstrcmp(arg, _T("}"))) {
+                            break;
+                        }
+
+                        arg_offset += 1;
+                    }
+                }
+                else if (!tstrcmp(arg, _T("/promote-parent{"))) {
+                    arg_offset += 1;
+
+                    // read inner flags
+                    while (argc >= arg_offset + 1)
+                    {
+                        arg = argv[arg_offset];
+
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_parent_flags, g_promote_parent_options, g_promote_parent_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                            if (parse_error != err_none) {
+                                return parse_error;
+                            }
+                        }
+                        else if (!tstrcmp(arg, _T("}"))) {
+                            break;
+                        }
+
+                        arg_offset += 1;
+                    }
+                }
+
+                arg_offset += 1;
+            }
+
+            // update elevation state
+            if (g_regular_flags.elevate) {
+                const bool is_process_elevated = _is_process_elevated() ? 1 : 0;
+                if (!is_process_elevated) {
+                    g_is_process_elevating = true;
+                }
+
+                // we must drop this flag immediately to avoid potential accidental recursion in child process
+                g_regular_flags.elevate = false;
+            }
+
+            // reset flags and options
+            g_flags = g_regular_flags;
+            g_options = g_regular_options;
+
+            if (g_is_process_elevating) {
+                TranslateCommandLineToElevated(nullptr, nullptr, nullptr,
+                    g_flags, g_options,
+                    g_elevate_child_flags, g_elevate_child_options,
+                    g_promote_flags, g_promote_options);
+            }
+
+            // merge options (first time)
+            MergeOptions(g_flags, g_options,
+                g_elevate_parent_flags, g_elevate_parent_options,
+                g_promote_flags, g_promote_options, g_promote_parent_flags, g_promote_parent_options);
+
+            if (!g_flags.disable_conout_duplicate_to_parent_console_on_error) {
+                // enable console output buffering by default
+                g_enable_conout_prints_buffering = true;
+            }
+
             // update process console
 
             if (!g_flags.disable_conout_reattach_to_visible_console) {
@@ -2333,6 +2345,12 @@ int _tmain(int argc, const TCHAR * argv[])
 
             if (g_parent_proc_id == -1) {
                 g_parent_proc_id = _find_parent_proc_id();
+            }
+
+            // std handles check on consistency before continue, otherwise reopen from `CONIN$`/`CONOUT$`
+
+            if (!_sanitize_std_handles(ret, win_error, g_flags, g_options)) {
+                return ret;
             }
 
             arg_offset = 1;

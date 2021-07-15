@@ -3,6 +3,9 @@
 
 #include <version.hpp>
 
+#include <WinBase.h>
+#include <WinNT.h>
+
 #include <string>
 #include <vector>
 #include <deque>
@@ -44,6 +47,26 @@
 #define STDOUT_FILENO   1
 #define STDERR_FILENO   2
 
+#ifndef _WIN32_WINNT_WIN8
+#define _WIN32_WINNT_WIN8                   0x0602
+#endif
+
+#if _WIN32_WINNT < _WIN32_WINNT_WIN8
+
+typedef struct _FILE_ID_128 {
+    BYTE  Identifier[16];
+} FILE_ID_128, *PFILE_ID_128;
+
+typedef struct _FILE_ID_INFO {
+    ULONGLONG VolumeSerialNumber;
+    FILE_ID_128 FileId;
+} FILE_ID_INFO, *PFILE_ID_INFO;
+
+
+static constexpr FILE_INFO_BY_HANDLE_CLASS FileIdInfo = FILE_INFO_BY_HANDLE_CLASS(18);
+
+#endif
+
 
 namespace {
     enum _error
@@ -68,6 +91,82 @@ namespace {
     using const_tchar_ptr_vector_t = std::vector<const TCHAR *>;
     using tstring_vector_t = std::vector<std::tstring>;
 
+    struct _WinVer
+    {
+        uint_t major;
+        uint_t minor;
+        uint_t build;
+    };
+
+    struct _FileId
+    {
+        enum {
+            fileid_unknown,
+            fileid_index64,
+            fileid_index128
+        } fileid_type;
+
+        union {
+            struct {
+                DWORD dwVolumeSerialNumber;
+                DWORD nFileIndexHigh;
+                DWORD nFileIndexLow;
+            } index64;
+
+            struct {
+                ULONGLONG   VolumeSerialNumber;
+                FILE_ID_128 FileId;
+            } index128;
+        };
+
+        _FileId() :
+            fileid_type(fileid_unknown)
+        {
+        }
+
+        _FileId(DWORD dwVolumeSerialNumber, DWORD nFileIndexHigh, DWORD nFileIndexLow) :
+            fileid_type(fileid_index64)
+        {
+            index64.dwVolumeSerialNumber = dwVolumeSerialNumber;
+            index64.nFileIndexHigh = nFileIndexHigh;
+            index64.nFileIndexLow = nFileIndexLow;
+        }
+
+        _FileId(ULONGLONG VolumeSerialNumber, const FILE_ID_128 & FileId) :
+            fileid_type(fileid_index128)
+        {
+            index128.VolumeSerialNumber = VolumeSerialNumber;
+            index128.FileId = FileId;
+        }
+
+        ~_FileId()
+        {
+        }
+
+        std::tstring to_tstring(TCHAR separator = _T('-')) const;
+    };
+
+    inline bool _is_equal_fileid(const _FileId & fileid0, const _FileId & fileid1)
+    {
+        switch (fileid0.fileid_type)
+        {
+        case _FileId::fileid_index128:
+            if (fileid1.fileid_type == _FileId::fileid_index128) {
+                return fileid0.index128.VolumeSerialNumber == fileid1.index128.VolumeSerialNumber &&
+                    !memcmp(fileid0.index128.FileId.Identifier, fileid1.index128.FileId.Identifier, sizeof(fileid0.index128.FileId.Identifier));
+            }
+            break;
+        case _FileId::fileid_index64:
+            if (fileid1.fileid_type == _FileId::fileid_index64) {
+                return fileid0.index64.dwVolumeSerialNumber == fileid1.index64.dwVolumeSerialNumber &&
+                    fileid0.index64.nFileIndexHigh == fileid1.index64.nFileIndexHigh &&
+                    fileid0.index64.nFileIndexLow == fileid1.index64.nFileIndexLow;
+            }
+            break;
+        }
+
+        return false;
+    }
 
     template <typename T>
     inline T (& make_singular_array(T & ref))[1]
@@ -178,65 +277,138 @@ namespace {
     bool                        g_enable_conout_prints_buffering;
 
 
-    inline void _get_win_ver(uint_t & major, uint_t & minor, uint_t & build)
+    inline std::tstring _FileId::to_tstring(TCHAR separator) const
+    {
+        std::tstring ret;
+
+        switch (fileid_type)
+        {
+        case fileid_index128:
+            for (int i = 0; i < sizeof(index128.VolumeSerialNumber); i++) {
+                ret += g_hextbl[((uint8_t*)&index128.VolumeSerialNumber)[i]];
+            }
+            ret += separator;
+            for (int i = 0; i < sizeof(index128.FileId); i++) {
+                ret += g_hextbl[((uint8_t*)&index128.FileId)[i]];
+            }
+            break;
+        case fileid_index64:
+            for (int i = 0; i < sizeof(index64.dwVolumeSerialNumber); i++) {
+                ret += g_hextbl[((uint8_t*)&index64.dwVolumeSerialNumber)[i]];
+            }
+            ret += separator;
+            for (int i = 0; i < sizeof(index64.nFileIndexHigh); i++) {
+                ret += g_hextbl[((uint8_t*)&index64.nFileIndexHigh)[i]];
+            }
+            ret += separator;
+            for (int i = 0; i < sizeof(index64.nFileIndexLow); i++) {
+                ret += g_hextbl[((uint8_t*)&index64.nFileIndexLow)[i]];
+            }
+            break;
+        }
+
+        return ret;
+    }
+
+
+    inline void _get_win_ver(_WinVer & win_ver)
     {
         // CAUTION:
         //  Has effect only for Windows version up to 8.1 (read MSDN documentation)
         //
         const DWORD dwVersion = GetVersion();
 
-        major = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-        minor = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+        win_ver.major = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+        win_ver.minor = (DWORD)(HIBYTE(LOWORD(dwVersion)));
 
         if (dwVersion < 0x80000000) {
-            build = (DWORD)(HIWORD(dwVersion));
+            win_ver.build = (DWORD)(HIWORD(dwVersion));
+        }
+        else {
+            win_ver.build = 0;
         }
     }
 
-    std::tstring::value_type _to_lower(std::tstring::value_type ch, unsigned int code_page)
-    {
-        if (code_page) {
-            // NOTE: increases executable on + ~200KB
-            return std::use_facet<std::ctype<std::tstring::value_type> >(std::locale(std::string(".") + std::to_string(code_page))).tolower(ch);
-        }
+    // NOTE:
+    //  Deprecated because C++11 standard does not support unicode code page in locales together with
+    //  lowercase/upcase functionality which is not available without a knowledge of language per character.
+    //
 
-        // NOTE: w/o above code increases executable on + ~60KB
-        return std::use_facet<std::ctype<std::tstring::value_type> >(std::locale()).tolower(ch);
-    }
+    //std::tstring::value_type _to_lower(std::tstring::value_type ch, unsigned int code_page)
+    //{
+    //    if (code_page) {
+    //        // NOTE: increases executable on + ~200KB
+    //        return std::use_facet<std::ctype<std::tstring::value_type> >(std::locale(std::string(".") + std::to_string(code_page))).tolower(ch);
+    //    }
 
-    struct _to_lower_with_codepage
-    {
-        _to_lower_with_codepage(unsigned int code_page_) :
-            code_page(code_page_)
-        {
-        }
+    //    // NOTE: w/o above code increases executable on + ~60KB
+    //    return std::use_facet<std::ctype<std::tstring::value_type> >(std::locale()).tolower(ch);
+    //}
 
-        std::tstring::value_type operator()(std::tstring::value_type ch_)
-        {
-            return _to_lower(ch_, code_page);
-        }
+    //struct _to_lower_with_codepage
+    //{
+    //    _to_lower_with_codepage(unsigned int code_page_) :
+    //        code_page(code_page_)
+    //    {
+    //    }
 
-        unsigned int code_page;
-    };
+    //    std::tstring::value_type operator()(std::tstring::value_type ch_)
+    //    {
+    //        return _to_lower(ch_, code_page);
+    //    }
+
+    //    unsigned int code_page;
+    //};
 
     // code_page=0 for default std::locale
-    std::tstring _to_lower(std::tstring str, unsigned int code_page)
-    {
-        std::tstring res;
-        res.resize(str.size());
-        std::transform(str.begin(), str.end(), res.begin(), _to_lower_with_codepage(code_page));
-        return res;
-    }
+    //std::tstring _to_lower(std::tstring str, unsigned int code_page)
+    //{
+    //    std::tstring res;
+    //    res.resize(str.size());
+    //    std::transform(str.begin(), str.end(), res.begin(), _to_lower_with_codepage(code_page));
+    //    return res;
+    //}
 
-    uint64_t _hash_string_to_u64(std::tstring str, unsigned int code_page)
+    //uint64_t _hash_string_to_u64(std::tstring str, unsigned int code_page)
+    //{
+    //    uint64_t res = 10000019;
+    //    const size_t str_len = str.length();
+    //    for (size_t i = 0; i < str_len; i += 2)
+    //    {
+    //        uint64_t merge = _to_lower(str[i], code_page) * 65536 + (i + 1 < str_len ? _to_lower(str[i + 1], code_page) : 0);
+    //        res = res * 8191 + merge; // unchecked arithmetic
+    //    }
+    //    return res;
+    //}
+
+    uint64_t _hash_string_to_u64(std::tstring str)
     {
         uint64_t res = 10000019;
-        for (size_t i = 0; i < str.length(); i += 2)
+        const size_t str_len = str.length();
+        for (size_t i = 0; i < str_len; i += 2)
         {
-            uint64_t merge = _to_lower(str[i], code_page) * 65536 + _to_lower(str[i + 1], code_page);
+            uint64_t merge = str[i] * 65536 + (i + 1 < str_len ? str[i + 1] : 0);
             res = res * 8191 + merge; // unchecked arithmetic
         }
         return res;
+    }
+
+    _FileId _get_fileid_by_file_handle(HANDLE file_handle, const _WinVer & win_ver)
+    {
+        if (win_ver.major > 6 || win_ver.major == 6 && win_ver.minor >= 2) {
+            FILE_ID_INFO fileid_info{};
+            if (GetFileInformationByHandleEx(file_handle, FileIdInfo, &fileid_info, sizeof(fileid_info))) {
+                return _FileId{ fileid_info.VolumeSerialNumber, fileid_info.FileId };
+            }
+        }
+        else {
+            BY_HANDLE_FILE_INFORMATION fileid_info{};
+            if (GetFileInformationByHandle(file_handle, &fileid_info)) {
+                return _FileId{ fileid_info.dwVolumeSerialNumber, fileid_info.nFileIndexHigh, fileid_info.nFileIndexLow };
+            }
+        }
+
+        return _FileId{ 0, 0, 0 };
     }
 
     inline bool _is_valid_handle(HANDLE handle)
@@ -322,8 +494,11 @@ namespace {
 
             const int fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_RDONLY);
             const int stdin_fileno = _fileno(stdin);
-            _dup2(fd, stdin_fileno >= 0 ? stdin_fileno : STDIN_FILENO);
-            _close(fd);
+            const int fd_dup = stdin_fileno >= 0 ? stdin_fileno : STDIN_FILENO;
+            if (fd != fd_dup) {
+                _dup2(fd, fd_dup);
+                _close(fd);
+            }
         } break;
 
         case 1: {
@@ -336,8 +511,11 @@ namespace {
 
             const int fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
             const int stdout_fileno = _fileno(stdout);
-            _dup2(fd, stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
-            _close(fd);
+            const int fd_dup = stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO;
+            if (fd != fd_dup) {
+                _dup2(fd, fd_dup);
+                _close(fd);
+            }
         } break;
 
         case 2: {
@@ -350,8 +528,11 @@ namespace {
 
             const int fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
             const int stderr_fileno = _fileno(stderr);
-            _dup2(fd, stderr_fileno >= 0 ? stderr_fileno : STDERR_FILENO);
-            _close(fd);
+            const int fd_dup = stderr_fileno >= 0 ? stderr_fileno : STDERR_FILENO;
+            if (fd != fd_dup) {
+                _dup2(fd, fd_dup);
+                _close(fd);
+            }
         } break;
 
         default:
@@ -386,89 +567,79 @@ namespace {
 
     inline void _reattach_stdin_to_console(bool inherit_handle)
     {
-        SECURITY_ATTRIBUTES sa{};
+        // CAUTION:
+        //  We can not use here direct `CreateFile` + `_open_osfhandle` calls as long as the standard handle can be already closed and
+        //  so we must to immediately reopen it to continue. Otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert!
+        //
+        tfreopen(_T("CONIN$"), _T("rb"), stdin);
 
-        sa.nLength = sizeof(sa);
-        sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+        // update handle inheritance
+        SetHandleInformation(GetStdHandle(STD_INPUT_HANDLE), HANDLE_FLAG_INHERIT, inherit_handle ? TRUE : FALSE);
 
-        HANDLE conin_handle = CreateFile(_T("CONIN$"),
-            GENERIC_READ, FILE_SHARE_READ, &sa,
-            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+        //SECURITY_ATTRIBUTES sa{};
 
-        if (_is_valid_handle(conin_handle)) {
-            _set_crt_std_handle(conin_handle, 0, false);
-        }
+        //sa.nLength = sizeof(sa);
+        //sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+
+        //HANDLE conin_handle = CreateFile(_T("CONIN$"),
+        //    GENERIC_READ, FILE_SHARE_READ, &sa,
+        //    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+        //if (_is_valid_handle(conin_handle)) {
+        //    _set_crt_std_handle(conin_handle, 0, false);
+        //}
     }
 
     inline void _reattach_stdout_to_console(bool inherit_handle)
     {
-        SECURITY_ATTRIBUTES sa{};
+        // CAUTION:
+        //  We can not use here direct `CreateFile` + `_open_osfhandle` calls as long as the standard handle can be already closed and
+        //  so we must to immediately reopen it to continue. Otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert!
+        //
+        tfreopen(_T("CONOUT$"), _T("wb"), stdout);
 
-        sa.nLength = sizeof(sa);
-        sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+        // update handle inheritance
+        SetHandleInformation(GetStdHandle(STD_OUTPUT_HANDLE), HANDLE_FLAG_INHERIT, inherit_handle ? TRUE : FALSE);
 
-        HANDLE conout_handle = CreateFile(_T("CONOUT$"),
-            GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
-            OPEN_ALWAYS,
-            FILE_ATTRIBUTE_NORMAL, NULL);
+        //SECURITY_ATTRIBUTES sa{};
 
-        if (_is_valid_handle(conout_handle)) {
-            _set_crt_std_handle(conout_handle, 1, false);
-        }
+        //sa.nLength = sizeof(sa);
+        //sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+
+        //HANDLE conout_handle = CreateFile(_T("CONOUT$"),
+        //    GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
+        //    OPEN_ALWAYS,
+        //    FILE_ATTRIBUTE_NORMAL, NULL);
+
+        //if (_is_valid_handle(conout_handle)) {
+        //    _set_crt_std_handle(conout_handle, 1, false);
+        //}
     }
 
     inline void _reattach_stderr_to_console(bool inherit_handle)
     {
-        SECURITY_ATTRIBUTES sa{};
+        // CAUTION:
+        //  We can not use here direct `CreateFile` + `_open_osfhandle` calls as long as the standard handle can be already closed and
+        //  so we must to immediately reopen it to continue. Otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert!
+        //
+        tfreopen(_T("CONOUT$"), _T("wb"), stderr);
 
-        sa.nLength = sizeof(sa);
-        sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+        // update handle inheritance
+        SetHandleInformation(GetStdHandle(STD_ERROR_HANDLE), HANDLE_FLAG_INHERIT, inherit_handle ? TRUE : FALSE);
 
-        HANDLE conout_handle = CreateFile(_T("CONOUT$"),
-            GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
-            OPEN_ALWAYS,
-            FILE_ATTRIBUTE_NORMAL, NULL);
+        //SECURITY_ATTRIBUTES sa{};
 
-        if (_is_valid_handle(conout_handle)) {
-            _set_crt_std_handle(conout_handle, 2, false);
-        }
-    }
+        //sa.nLength = sizeof(sa);
+        //sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
 
-    inline void _reattach_std_console_handles(bool inherit_handles)
-    {
-        // reattach detached or not redirected stdin/stdout/stderr to new console
+        //HANDLE conout_handle = CreateFile(_T("CONOUT$"),
+        //    GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
+        //    OPEN_ALWAYS,
+        //    FILE_ATTRIBUTE_NORMAL, NULL);
 
-        // check redirection
-        HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
-        HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-        HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-
-        const DWORD stdin_handle_type = GetFileType(stdin_handle);
-        const DWORD stdout_handle_type = GetFileType(stdout_handle);
-        const DWORD stderr_handle_type = GetFileType(stderr_handle);
-
-        SECURITY_ATTRIBUTES sa{};
-
-        sa.nLength = sizeof(sa);
-        sa.bInheritHandle = TRUE;
-
-        switch (stdin_handle_type) {
-        case FILE_TYPE_UNKNOWN:
-        case FILE_TYPE_CHAR:
-            _reattach_stdin_to_console(inherit_handles);
-        }
-
-        switch (stdout_handle_type) {
-        case FILE_TYPE_UNKNOWN:
-        case FILE_TYPE_CHAR:
-            _reattach_stdout_to_console(inherit_handles);
-        }
-
-        switch (stderr_handle_type) {
-        case FILE_TYPE_UNKNOWN:
-        case FILE_TYPE_CHAR:
-            _reattach_stderr_to_console(inherit_handles);
-        }
+        //if (_is_valid_handle(conout_handle)) {
+        //    _set_crt_std_handle(conout_handle, 2, false);
+        //}
     }
 
     inline DWORD _find_parent_process_id()
@@ -1829,6 +2000,341 @@ namespace {
         str_eval_buf[str_size] = _T('\0');
 
         return std::tstring(str_eval_buf.data(), &str_eval_buf[str_size]);
+    }
+
+    template <typename Flags, typename Options>
+    inline bool _sanitize_std_handles(int & ret, DWORD & win_error, const Flags & flags, const Options & options)
+    {
+        // intercept here specific global variables accidental usage instead of local variables
+        static struct {} g_options;
+        static struct {} g_flags;
+
+        HANDLE stdin_handle = INVALID_HANDLE_VALUE;
+        HANDLE stdout_handle = INVALID_HANDLE_VALUE;
+        HANDLE stderr_handle = INVALID_HANDLE_VALUE;
+
+        DWORD stdin_handle_type = FILE_TYPE_UNKNOWN;
+        DWORD stdout_handle_type = FILE_TYPE_UNKNOWN;
+        DWORD stderr_handle_type = FILE_TYPE_UNKNOWN;
+
+        bool do_copy_console_mode_from_stdout_to_stderr = false;
+        bool do_copy_console_mode_from_stderr_to_stdout = false;
+
+        for (int read_std_handles_iter = 0; read_std_handles_iter < 2; read_std_handles_iter++) {
+            if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
+                SetLastError(0); // just in case
+                stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+                if (!read_std_handles_iter && !_is_valid_handle(stdin_handle)) {
+                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("stdin handle is invalid: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, options.win_error_langid);
+                    }
+                    return false;
+                }
+            }
+
+            if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
+                SetLastError(0); // just in case
+                stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+                if (!read_std_handles_iter && !_is_valid_handle(stdout_handle)) {
+                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("stdout handle is invalid: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, options.win_error_langid);
+                    }
+                    return false;
+                }
+            }
+
+            if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
+                SetLastError(0); // just in case
+                stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+                if (!read_std_handles_iter && !_is_valid_handle(stderr_handle)) {
+                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+
+                    // CAUTION:
+                    //  Below code has no effect and is left just in case.
+                    //
+
+                    if (!flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("stderr handle is invalid: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, options.win_error_langid);
+                    }
+                    return false;
+                }
+            }
+
+            // reopen closed std handles from `CONIN$`/`CONOUT$` files
+
+            //#define FILE_TYPE_UNKNOWN   0x0000
+            //#define FILE_TYPE_DISK      0x0001 // ReadFile
+            //#define FILE_TYPE_CHAR      0x0002 // ReadConsoleInput, PeekConsoleInput
+            //#define FILE_TYPE_PIPE      0x0003 // ReadFile, PeekNamedPipe
+            //#define FILE_TYPE_REMOTE    0x8000
+            //
+
+            stdin_handle_type = _is_valid_handle(stdin_handle) ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
+            stdout_handle_type = _is_valid_handle(stdout_handle) ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
+            stderr_handle_type = _is_valid_handle(stderr_handle) ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+
+            if (read_std_handles_iter > 0) {
+                // WORKAROUND:
+                //  Sometimes either the stdout or stderr is invalid after process elevation.
+                //  If try to reopen the stdout or stderr handle from the `CONOUT$` pseudo file before close a second one, then it leads to handle duplication of already invalidated handle
+                //  (the `DuplicateHandle` fails inside `_dup` call).
+                //  To avoid that we have to close BOTH stdout AND stderr, and only after try to reopen them from `CONOUT$` pseudo file.
+                //
+
+                if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
+                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("stdin handle type is unknown: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, options.win_error_langid);
+                    }
+                    return false;
+                }
+
+                if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
+                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("stdout handle type is unknown: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, options.win_error_langid);
+                    }
+                    return false;
+                }
+
+                if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
+                    if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+
+                    // CAUTION:
+                    //  Below code has no effect and is left just in case.
+                    //
+
+                    if (!flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("stderr handle type is unknown: win_error=0x%08X (%d)\n"),
+                            win_error, win_error);
+                    }
+                    if (flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, options.win_error_langid);
+                    }
+                    return false;
+                }
+
+                if (do_copy_console_mode_from_stderr_to_stdout) {
+                    //DWORD stdout_handle_mode = 0;
+                    DWORD stderr_handle_mode = 0;
+                    //GetConsoleMode(stdout_handle, &stdout_handle_mode);
+                    GetConsoleMode(stderr_handle, &stderr_handle_mode);
+                    SetConsoleMode(stdout_handle, stderr_handle_mode);
+                }
+                else if (do_copy_console_mode_from_stdout_to_stderr) {
+                    DWORD stdout_handle_mode = 0;
+                    //DWORD stderr_handle_mode = 0;
+                    GetConsoleMode(stdout_handle, &stdout_handle_mode);
+                    //GetConsoleMode(stderr_handle, &stderr_handle_mode);
+                    SetConsoleMode(stderr_handle, stdout_handle_mode);
+                }
+
+                break;
+            }
+
+            if (stdin_handle_type != FILE_TYPE_UNKNOWN && stdout_handle_type != FILE_TYPE_UNKNOWN && stderr_handle_type != FILE_TYPE_UNKNOWN) {
+                return true;
+            }
+
+            // WORKAROUND:
+            //  The CRT has a bug in implementation of a standard handle reopening and we have to close all invalid standard handles before start to reopen them.
+            //
+
+            // CAUTION:
+            //  We still have to call both `fclose` and `_close`, otherwise the `freopen` still would fail to correctly reopen standard handle.
+            //
+
+            if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
+                fclose(stderr);
+                const int stderr_fileno = _fileno(stderr);
+                _close(stderr_fileno >= 0 ? stderr_fileno : STDERR_FILENO);
+            }
+
+            if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
+                fclose(stdout);
+                const int stdout_fileno = _fileno(stdout);
+                _close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
+            }
+
+            if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
+                fclose(stdin);
+                const int stdin_fileno = _fileno(stdin);
+                _close(stdin_fileno >= 0 ? stdin_fileno : STDIN_FILENO);
+            }
+
+            if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
+                _reattach_stdin_to_console(true);
+            }
+
+            if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
+                _reattach_stdout_to_console(true);
+
+                if (stderr_handle_type == FILE_TYPE_CHAR) {
+                    do_copy_console_mode_from_stderr_to_stdout = true;
+                }
+            }
+
+            if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
+                _reattach_stderr_to_console(true);
+
+                if (stdout_handle_type == FILE_TYPE_CHAR) {
+                    do_copy_console_mode_from_stdout_to_stderr = true;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    template <typename Flags, typename Options>
+    inline bool _get_std_handles(int & ret, DWORD & win_error, HANDLE & stdin_handle, HANDLE & stdout_handle, HANDLE & stderr_handle, const Flags & flags, const Options & options)
+    {
+        // intercept here specific global variables accidental usage instead of local variables
+        static struct {} g_options;
+        static struct {} g_flags;
+
+        SetLastError(0); // just in case
+        stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+        if (!_is_valid_handle(stdin_handle)) {
+            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                win_error = GetLastError();
+            }
+            if (!flags.ret_win_error) {
+                ret = err_win32_error;
+            }
+            else {
+                ret = win_error;
+            }
+            if (!flags.no_print_gen_error_string) {
+                _print_stderr_message(_T("stdin handle is invalid: win_error=0x%08X (%d)\n"),
+                    win_error, win_error);
+            }
+            if (flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, options.win_error_langid);
+            }
+            return false;
+        }
+
+        SetLastError(0); // just in case
+        stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        if (!_is_valid_handle(stdout_handle)) {
+            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                win_error = GetLastError();
+            }
+            if (!flags.ret_win_error) {
+                ret = err_win32_error;
+            }
+            else {
+                ret = win_error;
+            }
+            if (!flags.no_print_gen_error_string) {
+                _print_stderr_message(_T("stdout handle is invalid: win_error=0x%08X (%d)\n"),
+                    win_error, win_error);
+            }
+            if (flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, options.win_error_langid);
+            }
+            return false;
+        }
+
+        SetLastError(0); // just in case
+        stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+        if (!_is_valid_handle(stderr_handle)) {
+            if (flags.ret_win_error || flags.print_win_error_string || !flags.no_print_gen_error_string) {
+                win_error = GetLastError();
+            }
+            if (!flags.ret_win_error) {
+                ret = err_win32_error;
+            }
+            else {
+                ret = win_error;
+            }
+
+            // CAUTION:
+            //  Below code has no effect and is left just in case.
+            //
+
+            if (!flags.no_print_gen_error_string) {
+                _print_stderr_message(_T("stderr handle is invalid: win_error=0x%08X (%d)\n"),
+                    win_error, win_error);
+            }
+            if (flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, options.win_error_langid);
+            }
+            return false;
+        }
+
+        return true;
     }
 }
 

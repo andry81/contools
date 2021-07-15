@@ -90,9 +90,7 @@ struct HasOptions
 
 struct Options
 {
-    uint_t          win_ver_major;
-    uint_t          win_ver_minor;
-    uint_t          win_ver_build;
+    _WinVer         win_ver;
 
     std::tstring    shell_exec_verb;
     std::tstring    change_current_dir;
