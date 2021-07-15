@@ -12,7 +12,7 @@
 2021.07.14:
 * fixed: src/callf: Better standard handles sanitizing after process elevation (sometimes `GetFileType` returns `FILE_TYPE_UNKNOWN` on either stdout or stderr, have to correctly reopen them from `CONIN$` and `CONOUT$` pseudo files).
 * fixed: src/callf: Application abort after `std::runtime_error` exception in the `std::locale(".65001")` call (C++11 standard does not support unicode code page locale). Fixed by switching from absolute file path compare (`GetFullPathName` + `tolower`) to opened file handles compare (`GetFileInformationByHandle` + `GetFileInformationByHandleEx`)
-* fixed: src/callf: Error message `could not set std* handle information: ...`. A standard handle can not be changed for inheritance, we must duplicate it and set the duplicated one as current standard handle to be able to change it's inheritance.
+* fixed: src/callf: Error message `could not set std* handle information: ...`. A default standard handle can not be changed for inheritance, we can change for inheritance only reopened standard handles.
 * fixed: src/callf: missed to pass internal "no inherit" flag to `CreateProcess` function
 * changed: src/callf: Rewrited the check of the same file usage. Instead of use the absolute file path compare (`GetFullPathName` + `tolower`), do use the opened file handles compare (`GetFileInformationByHandle`/`GetFileInformationByHandleEx`). As an addition, file hard links now compares correctly.
 * refactor: src/callf: code refactor
