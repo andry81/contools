@@ -13,3 +13,6 @@
 * Hookup WriteFile on the stdout/stderr in a child process to force file buffer
   flush on each write. Can fix a progress stall based on stdout/stderr
   buffering.
+
+* Support console clear by the `cls` command from the `callf "" "cmd.exe /k"`
+  process console input.

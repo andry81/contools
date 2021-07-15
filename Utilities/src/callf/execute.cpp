@@ -38,6 +38,9 @@ HANDLE g_stdin_handle               = INVALID_HANDLE_VALUE;
 HANDLE g_stdout_handle              = INVALID_HANDLE_VALUE;
 HANDLE g_stderr_handle              = INVALID_HANDLE_VALUE;
 
+HANDLE g_stdout_handle_dup          = INVALID_HANDLE_VALUE;
+HANDLE g_stderr_handle_dup          = INVALID_HANDLE_VALUE;
+
 DWORD g_stdin_handle_type           = FILE_TYPE_UNKNOWN;
 DWORD g_stdout_handle_type          = FILE_TYPE_UNKNOWN;
 DWORD g_stderr_handle_type          = FILE_TYPE_UNKNOWN;
@@ -49,8 +52,8 @@ HANDLE g_reopen_stderr_handle       = INVALID_HANDLE_VALUE;
 HANDLE g_reopen_stdout_mutex        = INVALID_HANDLE_VALUE;
 HANDLE g_reopen_stderr_mutex        = INVALID_HANDLE_VALUE;
 
-std::tstring g_reopen_stdout_full_name = {};
-std::tstring g_reopen_stderr_full_name = {};
+_FileId g_reopen_stdout_fileid      = {};
+_FileId g_reopen_stderr_fileid      = {};
 
 // specialized tee file handles
 HANDLE g_tee_file_stdin_handle      = INVALID_HANDLE_VALUE;
@@ -61,14 +64,18 @@ HANDLE g_tee_file_stdin_mutex       = INVALID_HANDLE_VALUE;
 HANDLE g_tee_file_stdout_mutex      = INVALID_HANDLE_VALUE;
 HANDLE g_tee_file_stderr_mutex      = INVALID_HANDLE_VALUE;
 
-std::tstring g_tee_file_stdin_full_name = {};
-std::tstring g_tee_file_stdout_full_name = {};
-std::tstring g_tee_file_stderr_full_name = {};
+_FileId g_tee_file_stdin_fileid     = {};
+_FileId g_tee_file_stdout_fileid    = {};
+_FileId g_tee_file_stderr_fileid    = {};
 
 // specialized tee named pipe handles
 HANDLE g_tee_named_pipe_stdin_handle = INVALID_HANDLE_VALUE;
 HANDLE g_tee_named_pipe_stdout_handle = INVALID_HANDLE_VALUE;
 HANDLE g_tee_named_pipe_stderr_handle = INVALID_HANDLE_VALUE;
+
+bool g_is_stdin_reopened            = false;
+bool g_is_stdout_reopened           = false;
+bool g_is_stderr_reopened           = false;
 
 bool g_is_stdin_redirected          = false;
 bool g_is_stdout_redirected         = false;
@@ -530,7 +537,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                     if (thread_data.cancel_io) break;
 
                                     win_error = GetLastError();
-                                    if (win_error) {
+                                    if (win_error && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
                                         thread_data.ret = err_io_error;
                                         thread_data.win_error = win_error;
                                         if (!g_flags.no_print_gen_error_string) {
@@ -582,7 +589,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                         // CAUTION:
                         //  We is required `PeekNamedPipe` here before the `ReadFile` because of potential break in the output handle, when
                         //  the input handle has no data to read but the output handle is already closed or broken.
-                        //  In that case we must call to `WriteFile` even if has not data on the input.
+                        //  In that case we must call to `WriteFile` even if has no data on the input.
                         //
 
                         SetLastError(0); // just in case
@@ -615,7 +622,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 if (thread_data.cancel_io) break;
 
                                 win_error = GetLastError();
-                                if (win_error != ERROR_BROKEN_PIPE) {
+                                if (win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
                                     thread_data.ret = err_io_error;
                                     thread_data.win_error = win_error;
                                     if (!g_flags.no_print_gen_error_string) {
@@ -683,7 +690,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                     if (thread_data.cancel_io) break;
 
                                     win_error = GetLastError();
-                                    if (win_error) {
+                                    if (win_error && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
                                         thread_data.ret = err_io_error;
                                         thread_data.win_error = win_error;
                                         if (!g_flags.no_print_gen_error_string) {
@@ -702,7 +709,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 }
                             }
                         }
-                        else if (!num_bytes_avail) {
+                        else if (!stream_eof && !num_bytes_avail) {
                             SetLastError(0); // just in case
                             if (!WriteFile(g_stdin_pipe_write_handle, stdin_byte_buf.data(), 0, &num_bytes_write, NULL)) {
                                 if (thread_data.cancel_io) break;
@@ -1032,7 +1039,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                         if (thread_data.cancel_io) break;
 
                                         win_error = GetLastError();
-                                        if (win_error) {
+                                        if (win_error && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
                                             [&]() {
                                                 thread_data.ret = err_io_error;
                                                 thread_data.win_error = win_error;
@@ -1221,7 +1228,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                         if (thread_data.cancel_io) break;
 
                                         win_error = GetLastError();
-                                        if (win_error) {
+                                        if (win_error && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
                                             [&]() {
                                                 thread_data.ret = err_io_error;
                                                 thread_data.win_error = win_error;
@@ -1489,7 +1496,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                                 if (thread_data.cancel_io) break;
 
                                 win_error = GetLastError();
-                                if (win_error) {
+                                if (win_error && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
                                     thread_data.ret = err_io_error;
                                     thread_data.win_error = win_error;
                                     if (!g_flags.no_print_gen_error_string) {
@@ -1523,10 +1530,23 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                 if (!g_options.reopen_stdout_as_server_pipe.empty()) {
                     DisconnectNamedPipe(g_stdout_handle);
                 }
-                //_close_handle(g_stdout_handle); // CAUTION: never close standard handle directly, use CRT _close instead!
 
-                const int stdout_fileno = _fileno(stdout);
-                _close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
+                // CAUTION:
+                //  Never close standard handle directly, use CRT call instead, otherwise the CRT would be in desync with the Win32!
+                //
+                //_close_handle(g_stdout_handle);
+
+                // CAUTION:
+                //  Never close standard handle through the _close, otherwise stream (FILE*) would be always in use (partially closed)!
+                //
+                //const int stdout_fileno = _fileno(stdout);
+                //_close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
+
+                // CAUTION:
+                //  We should not simply close the handle as long as it can be used later even on process exit, but to trigger a child
+                //  process we must close it, so we reopen it instead.
+                //
+                tfreopen(_T("CONOUT$"), _T("wb"), stdout);
             } break;
 
             case FILE_TYPE_PIPE:
@@ -1539,7 +1559,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                     // CAUTION:
                     //  We is required `PeekNamedPipe` here before the `ReadFile` because of potential break in the output handle, when
                     //  the input handle has no data to read but the output handle is already closed or broken.
-                    //  In that case we must call to `WriteFile` even if has not data on the input.
+                    //  In that case we must call to `WriteFile` even if has no data on the input.
                     //
 
                     SetLastError(0); // just in case
@@ -1675,7 +1695,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                                 if (thread_data.cancel_io) break;
 
                                 win_error = GetLastError();
-                                if (win_error) {
+                                if (win_error && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
                                     thread_data.ret = err_io_error;
                                     thread_data.win_error = win_error;
                                     if (!g_flags.no_print_gen_error_string) {
@@ -1694,7 +1714,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                             }
                         }
                     }
-                    else if (!num_bytes_avail) {
+                    else if (!stream_eof && !num_bytes_avail) {
                         SetLastError(0); // just in case
                         if (!WriteFile(g_stdout_handle, stdin_byte_buf.data(), 0, &num_bytes_write, NULL)) {
                             if (thread_data.cancel_io) break;
@@ -1721,10 +1741,23 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                 if (!g_options.reopen_stdout_as_server_pipe.empty()) {
                     DisconnectNamedPipe(g_stdout_handle);
                 }
-                //_close_handle(g_stdout_handle); // CAUTION: never close standard handle directly, use CRT _close instead!
 
-                const int stdout_fileno = _fileno(stdout);
-                _close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
+                // CAUTION:
+                //  Never close standard handle directly, use CRT call instead, otherwise the CRT would be in desync with the Win32!
+                //
+                //_close_handle(g_stdout_handle);
+
+                // CAUTION:
+                //  Never close standard handle through the _close, otherwise stream (FILE*) would be always in use (partially closed)!
+                //
+                //const int stdout_fileno = _fileno(stdout);
+                //_close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
+
+                // CAUTION:
+                //  We should not simply close the handle as long as it can be used later even on process exit, but to trigger a child
+                //  process we must close it, so we reopen it instead.
+                //
+                tfreopen(_T("CONOUT$"), _T("wb"), stdout);
             } break;
             }
         }();
@@ -1787,7 +1820,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -1803,7 +1836,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -1842,7 +1875,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -1858,7 +1891,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -1905,7 +1938,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -1921,7 +1954,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -1960,7 +1993,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -1976,7 +2009,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2023,7 +2056,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2039,7 +2072,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2078,7 +2111,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2094,7 +2127,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2171,7 +2204,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stdin_as_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2214,7 +2247,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2237,7 +2270,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2258,7 +2291,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stdin_to_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2301,7 +2334,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2324,7 +2357,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2353,7 +2386,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stdout_as_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2396,7 +2429,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2419,7 +2452,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2440,7 +2473,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stdout_to_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2483,7 +2516,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2506,7 +2539,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2535,7 +2568,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stderr_as_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2578,7 +2611,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2601,7 +2634,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2622,7 +2655,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stderr_to_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2665,7 +2698,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2688,7 +2721,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2777,6 +2810,8 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
             }
             return false;
         }
+
+        g_is_stdin_reopened = true;
     }
     else if (!g_options.reopen_stdin_as_server_pipe.empty()) {
         SetLastError(0); // just in case
@@ -2825,6 +2860,8 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
+        g_is_stdin_reopened = true;
+
         g_connect_server_named_pipe_thread_locals[0][0].server_named_pipe_handle_ptr = &g_reopen_stdin_handle;
 
         g_connect_server_named_pipe_thread_locals[0][0].thread_handle = CreateThread(
@@ -2858,8 +2895,6 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
     sa.nLength = sizeof(sa);
     sa.bInheritHandle = g_no_std_inherit ? FALSE : TRUE;
 
-    std::vector<TCHAR> tmp_buf;
-
     if (!g_options.reopen_stdout_as_file.empty()) {
         SetLastError(0); // just in case
         if (_is_valid_handle(g_reopen_stdout_handle =
@@ -2871,20 +2906,12 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                 SetFilePointer(g_reopen_stdout_handle, 0, NULL, FILE_END);
             }
 
-            tmp_buf.resize(MAX_PATH);
-            tmp_buf[0] = _T('\0');
-            const DWORD num_chars = GetFullPathName(g_options.reopen_stdout_as_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
-            g_reopen_stdout_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
-
-            g_reopen_stdout_full_name = _to_lower(g_reopen_stdout_full_name, cp_in);
+            g_reopen_stdout_fileid = _get_fileid_by_file_handle(g_reopen_stdout_handle, g_options.win_ver);
 
             // create associated write mutex
             if (g_flags.mutex_std_writes) {
-                // generate file name hash
-                const uint64_t reopen_stdout_file_name_hash = _hash_string_to_u64(g_reopen_stdout_full_name, cp_in);
-
                 g_reopen_stdout_mutex = CreateMutex(NULL, FALSE,
-                    (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(reopen_stdout_file_name_hash)).c_str());
+                    (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + g_reopen_stdout_fileid.to_tstring()).c_str());
             }
         }
         else {
@@ -2926,6 +2953,8 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             }
             return false;
         }
+
+        g_is_stdout_reopened = true;
     }
     else if (!g_options.reopen_stdout_as_server_pipe.empty()) {
         SetLastError(0); // just in case
@@ -2974,6 +3003,8 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
+        g_is_stdout_reopened = true;
+
         g_connect_server_named_pipe_thread_locals[0][1].server_named_pipe_handle_ptr = &g_reopen_stdout_handle;
 
         g_connect_server_named_pipe_thread_locals[0][1].thread_handle = CreateThread(
@@ -3007,63 +3038,47 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
     sa.nLength = sizeof(sa);
     sa.bInheritHandle = g_no_std_inherit ? FALSE : TRUE;
 
-    std::vector<TCHAR> tmp_buf;
-
     if (!g_options.reopen_stderr_as_file.empty()) {
-        tmp_buf.resize(MAX_PATH);
-        tmp_buf[0] = _T('\0');
-        const DWORD num_chars = GetFullPathName(g_options.reopen_stderr_as_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
-        g_reopen_stderr_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
-
-        g_reopen_stderr_full_name = _to_lower(g_reopen_stderr_full_name, cp_in);
-
-        // create associated write mutex
-        if (g_flags.mutex_std_writes) {
-            // generate file name hash
-            const uint64_t reopen_stderr_file_name_hash = _hash_string_to_u64(g_reopen_stderr_full_name, cp_in);
-
-            g_reopen_stdout_mutex = CreateMutex(NULL, FALSE,
-                (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(reopen_stderr_file_name_hash)).c_str());
-        }
-
-        // compare full names and if equal, then duplicate instead create
-        if (_is_valid_handle(g_reopen_stdout_handle)) {
-            if (g_reopen_stdout_full_name == g_reopen_stderr_full_name) {
-                SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_reopen_stdout_handle, GetCurrentProcess(), &g_reopen_stderr_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not auto duplicate (merge) stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, g_options.reopen_stdout_as_file.c_str());
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    return false;
-                }
+        SetLastError(0); // just in case
+        if (_is_valid_handle(g_reopen_stderr_handle =
+            CreateFile(g_options.reopen_stderr_as_file.c_str(),
+                GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa, // must use `sa` to setup inheritance
+                g_flags.reopen_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
+                FILE_ATTRIBUTE_NORMAL, NULL))) {
+            if (!g_flags.reopen_stderr_file_truncate) {
+                SetFilePointer(g_reopen_stderr_handle, 0, NULL, FILE_END);
             }
-        }
 
-        if (!_is_valid_handle(g_reopen_stderr_handle)) {
-            SetLastError(0); // just in case
-            if (_is_valid_handle(g_reopen_stderr_handle =
-                CreateFile(g_options.reopen_stderr_as_file.c_str(),
-                    GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, &sa, // must use `sa` to setup inheritance
-                    g_flags.reopen_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
-                    FILE_ATTRIBUTE_NORMAL, NULL))) {
-                if (!g_flags.reopen_stderr_file_truncate) {
-                    SetFilePointer(g_reopen_stderr_handle, 0, NULL, FILE_END);
-                }
+            g_reopen_stderr_fileid = _get_fileid_by_file_handle(g_reopen_stderr_handle, g_options.win_ver);
+        }
+        else {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                win_error = GetLastError();
+            }
+            if (!g_flags.ret_win_error) {
+                ret = err_win32_error;
             }
             else {
+                ret = win_error;
+            }
+            if (!g_flags.no_print_gen_error_string) {
+                _print_stderr_message(_T("could not reopen stderr as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                    win_error, win_error, g_options.reopen_stderr_as_file.c_str());
+            }
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
+            }
+            return false;
+        }
+
+        // check opened handles on equality
+
+        if (_is_equal_fileid(g_reopen_stdout_fileid, g_reopen_stderr_fileid)) {
+            // reopen handle through the handle duplication
+            _close_handle(g_reopen_stderr_handle);
+
+            SetLastError(0); // just in case
+            if (!DuplicateHandle(GetCurrentProcess(), g_reopen_stdout_handle, GetCurrentProcess(), &g_reopen_stderr_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -3074,13 +3089,22 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not reopen stderr as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                        win_error, win_error, g_options.reopen_stderr_as_file.c_str());
+                    _print_stderr_message(_T("could not auto duplicate (merge) stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        win_error, win_error, g_options.reopen_stdout_as_file.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
                     _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 return false;
+            }
+
+            g_reopen_stderr_mutex = g_reopen_stdout_mutex;
+        }
+        else {
+            // create associated write mutex
+            if (g_flags.mutex_std_writes) {
+                g_reopen_stderr_mutex = CreateMutex(NULL, FALSE,
+                    (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + g_reopen_stderr_fileid.to_tstring()).c_str());
             }
         }
 
@@ -3103,6 +3127,8 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             }
             return false;
         }
+
+        g_is_stderr_reopened = true;
     }
     else if (!g_options.reopen_stderr_as_server_pipe.empty()) {
         SetLastError(0); // just in case
@@ -3150,6 +3176,8 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             }
             return false;
         }
+
+        g_is_stderr_reopened = true;
 
         g_connect_server_named_pipe_thread_locals[0][2].server_named_pipe_handle_ptr = &g_reopen_stderr_handle;
 
@@ -3380,7 +3408,7 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
                 }
             }
 
-            const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+            const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
             // server named pipe end wait loop
             while (true) {
@@ -3397,7 +3425,7 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
                     break;
                 }
 
-                const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                 const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -3474,7 +3502,7 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
             }
 
             // server named pipe end wait loop
-            const auto start_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+            const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
             while (true) {
                 if (thread_data.cancel_io) return -1;
@@ -3490,7 +3518,7 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
                     break;
                 }
 
-                const auto end_time_ms = g_options.win_ver_major >= 6 ? GetTickCount64() : GetTickCount();
+                const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
                 const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -3525,8 +3553,6 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
     ret = err_none;
     win_error = 0;
 
-    std::vector<TCHAR> tmp_buf;
-
     if (!g_options.tee_stdin_to_file.empty()) {
         SetLastError(0); // just in case
         if (_is_valid_handle(g_tee_file_stdin_handle =
@@ -3538,20 +3564,12 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
                 SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
             }
 
-            tmp_buf.resize(MAX_PATH);
-            tmp_buf[0] = _T('\0');
-            const DWORD num_chars = GetFullPathName(g_options.tee_stdin_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
-            g_tee_file_stdin_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
-
-            g_tee_file_stdin_full_name = _to_lower(g_tee_file_stdin_full_name, cp_in);
+            g_tee_file_stdin_fileid = _get_fileid_by_file_handle(g_tee_file_stdin_handle, g_options.win_ver);
 
             // create associated write mutex
             if (g_flags.mutex_tee_file_writes) {
-                // generate file name hash
-                const uint64_t tee_stdin_file_name_hash = _hash_string_to_u64(g_tee_file_stdin_full_name, cp_in);
-
                 g_tee_file_stdin_mutex = CreateMutex(NULL, FALSE,
-                    (std::tstring(_T(TEE_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(tee_stdin_file_name_hash)).c_str());
+                    (std::tstring(_T(TEE_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + g_tee_file_stdin_fileid.to_tstring()).c_str());
             }
         }
         else {
@@ -3630,63 +3648,47 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
     ret = err_none;
     win_error = 0;
 
-    std::vector<TCHAR> tmp_buf;
-
     if (!g_options.tee_stdout_to_file.empty()) {
-        tmp_buf.resize(MAX_PATH);
-        tmp_buf[0] = _T('\0');
-        const DWORD num_chars = GetFullPathName(g_options.tee_stdout_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
-        g_tee_file_stdout_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
-
-        g_tee_file_stdout_full_name = _to_lower(g_tee_file_stdout_full_name, cp_in);
-
-        // create associated write mutex
-        if (g_flags.mutex_tee_file_writes) {
-            // generate file name hash
-            const uint64_t tee_stdout_file_name_hash = _hash_string_to_u64(g_tee_file_stdout_full_name, cp_in);
-
-            g_tee_file_stdout_mutex = CreateMutex(NULL, FALSE,
-                (std::tstring(_T(TEE_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(tee_stdout_file_name_hash)).c_str());
-        }
-
-        // compare full names and if equal, then duplicate instead create
-        if (_is_valid_handle(g_tee_file_stdin_handle)) {
-            if (g_tee_file_stdin_full_name == g_tee_file_stdout_full_name) {
-                SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not auto duplicate (merge) stdin tee into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, g_options.tee_stdin_to_file.c_str());
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    return false;
-                }
+        SetLastError(0); // just in case
+        if (_is_valid_handle(g_tee_file_stdout_handle =
+            CreateFile(g_options.tee_stdout_to_file.c_str(),
+                GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                g_flags.tee_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
+                FILE_ATTRIBUTE_NORMAL, NULL))) {
+            if (!g_flags.tee_stdout_file_truncate) {
+                SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
             }
-        }
 
-        if (!_is_valid_handle(g_tee_file_stdout_handle)) {
-            SetLastError(0); // just in case
-            if (_is_valid_handle(g_tee_file_stdout_handle =
-                CreateFile(g_options.tee_stdout_to_file.c_str(),
-                    GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                    g_flags.tee_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
-                    FILE_ATTRIBUTE_NORMAL, NULL))) {
-                if (!g_flags.tee_stdout_file_truncate) {
-                    SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
-                }
+            g_tee_file_stdout_fileid = _get_fileid_by_file_handle(g_tee_file_stdout_handle, g_options.win_ver);
+        }
+        else {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                win_error = GetLastError();
+            }
+            if (!g_flags.ret_win_error) {
+                ret = err_win32_error;
             }
             else {
+                ret = win_error;
+            }
+            if (!g_flags.no_print_gen_error_string) {
+                _print_stderr_message(_T("could not open stdout tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                    win_error, win_error, g_options.tee_stdout_to_file.c_str());
+            }
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
+            }
+            return false;
+        }
+
+        // check opened handles on equality
+
+        if (_is_equal_fileid(g_tee_file_stdin_fileid, g_tee_file_stdout_fileid)) {
+            // reopen handle through the handle duplication
+            _close_handle(g_tee_file_stdout_handle);
+
+            SetLastError(0); // just in case
+            if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -3697,13 +3699,22 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not open stdout tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                        win_error, win_error, g_options.tee_stdout_to_file.c_str());
+                    _print_stderr_message(_T("could not auto duplicate (merge) stdin tee into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        win_error, win_error, g_options.tee_stdin_to_file.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
                     _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 return false;
+            }
+
+            g_tee_file_stdout_mutex = g_tee_file_stdin_mutex;
+        }
+        else {
+            // create associated write mutex
+            if (g_flags.mutex_tee_file_writes) {
+                g_tee_file_stdout_mutex = CreateMutex(NULL, FALSE,
+                    (std::tstring(_T(TEE_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + g_tee_file_stdout_fileid.to_tstring()).c_str());
             }
         }
     }
@@ -3762,90 +3773,47 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
     ret = err_none;
     win_error = 0;
 
-    std::vector<TCHAR> tmp_buf;
-
     if (!g_options.tee_stderr_to_file.empty()) {
-        tmp_buf.resize(MAX_PATH);
-        tmp_buf[0] = _T('\0');
-        const DWORD num_chars = GetFullPathName(g_options.tee_stderr_to_file.c_str(), MAX_PATH, tmp_buf.data(), NULL);
-        g_tee_file_stderr_full_name.assign(tmp_buf.data(), &tmp_buf[num_chars]);
-
-        g_tee_file_stderr_full_name = _to_lower(g_tee_file_stderr_full_name, cp_in);
-
-        // create associated write mutex
-        if (g_flags.mutex_tee_file_writes) {
-            // generate file name hash
-            const uint64_t tee_stderr_file_name_hash = _hash_string_to_u64(g_tee_file_stderr_full_name, cp_in);
-
-            g_tee_file_stderr_mutex = CreateMutex(NULL, FALSE,
-                (std::tstring(_T(TEE_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + std::to_tstring(tee_stderr_file_name_hash)).c_str());
-        }
-
-        // compare full names and if equal, then duplicate instead create
-        if (_is_valid_handle(g_tee_file_stdout_handle)) {
-            if (g_tee_file_stdout_full_name == g_tee_file_stderr_full_name) {
-                SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not auto duplicate (merge) stdout tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, g_options.tee_stdout_to_file.c_str());
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    return false;
-                }
+        SetLastError(0); // just in case
+        if (_is_valid_handle(g_tee_file_stderr_handle =
+            CreateFile(g_options.tee_stderr_to_file.c_str(),
+                GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                g_flags.tee_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
+                FILE_ATTRIBUTE_NORMAL, NULL))) {
+            if (!g_flags.tee_stderr_file_truncate) {
+                SetFilePointer(g_tee_file_stderr_handle, 0, NULL, FILE_END);
             }
-        }
 
-        if (!_is_valid_handle(g_tee_file_stderr_handle)) {
-            if (_is_valid_handle(g_tee_file_stdin_handle)) {
-                if (g_tee_file_stdin_full_name == g_tee_file_stderr_full_name) {
-                    SetLastError(0); // just in case
-                    if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                        if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                            win_error = GetLastError();
-                        }
-                        if (!g_flags.ret_win_error) {
-                            ret = err_win32_error;
-                        }
-                        else {
-                            ret = win_error;
-                        }
-                        if (!g_flags.no_print_gen_error_string) {
-                            _print_stderr_message(_T("could not auto duplicate (merge) stdin tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
-                                win_error, win_error, g_options.tee_stdin_to_file.c_str());
-                        }
-                        if (g_flags.print_win_error_string && win_error) {
-                            _print_win_error_message(win_error, g_options.win_error_langid);
-                        }
-                        return false;
-                    }
-                }
+            g_tee_file_stderr_fileid = _get_fileid_by_file_handle(g_tee_file_stderr_handle, g_options.win_ver);
+        }
+        else {
+            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                win_error = GetLastError();
             }
-        }
-
-        if (!_is_valid_handle(g_tee_file_stderr_handle)) {
-            SetLastError(0); // just in case
-            if (_is_valid_handle(g_tee_file_stderr_handle =
-                CreateFile(g_options.tee_stderr_to_file.c_str(),
-                    GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                    g_flags.tee_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
-                    FILE_ATTRIBUTE_NORMAL, NULL))) {
-                if (!g_flags.tee_stderr_file_truncate) {
-                    SetFilePointer(g_tee_file_stderr_handle, 0, NULL, FILE_END);
-                }
+            if (!g_flags.ret_win_error) {
+                ret = err_win32_error;
             }
             else {
+                ret = win_error;
+            }
+            if (!g_flags.no_print_gen_error_string) {
+                _print_stderr_message(_T("could not open stderr tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                    win_error, win_error, g_options.tee_stderr_to_file.c_str());
+            }
+            if (g_flags.print_win_error_string && win_error) {
+                _print_win_error_message(win_error, g_options.win_error_langid);
+            }
+            return false;
+        }
+
+        // check opened handles on equality
+
+        if (_is_equal_fileid(g_tee_file_stdout_fileid, g_tee_file_stderr_fileid)) {
+            // reopen handle through the handle duplication
+            _close_handle(g_tee_file_stderr_handle);
+
+            SetLastError(0); // just in case
+            if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -3856,13 +3824,49 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not open stderr tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
-                        win_error, win_error, g_options.tee_stderr_to_file.c_str());
+                    _print_stderr_message(_T("could not auto duplicate (merge) stdout tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        win_error, win_error, g_options.tee_stdout_to_file.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
                     _print_win_error_message(win_error, g_options.win_error_langid);
                 }
                 return false;
+            }
+
+            g_tee_file_stderr_mutex = g_tee_file_stdout_mutex;
+        }
+        else if (_is_equal_fileid(g_tee_file_stdin_fileid, g_tee_file_stderr_fileid)) {
+            // reopen handle through the handle duplication
+            _close_handle(g_tee_file_stderr_handle);
+
+            SetLastError(0); // just in case
+            if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                    win_error = GetLastError();
+                }
+                if (!g_flags.ret_win_error) {
+                    ret = err_win32_error;
+                }
+                else {
+                    ret = win_error;
+                }
+                if (!g_flags.no_print_gen_error_string) {
+                    _print_stderr_message(_T("could not auto duplicate (merge) stdin tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        win_error, win_error, g_options.tee_stdin_to_file.c_str());
+                }
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
+                }
+                return false;
+            }
+
+            g_tee_file_stderr_mutex = g_tee_file_stdin_mutex;
+        }
+        else {
+            // create associated write mutex
+            if (g_flags.mutex_tee_file_writes) {
+                g_tee_file_stderr_mutex = CreateMutex(NULL, FALSE,
+                    (std::tstring(_T(TEE_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + g_tee_file_stderr_fileid.to_tstring()).c_str());
             }
         }
     }
@@ -3936,7 +3940,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     // CAUTION:
     //  Has effect only for Windows version up to 8.1 (read MSDN documentation)
     //
-    _get_win_ver(g_options.win_ver_major, g_options.win_ver_minor, g_options.win_ver_build);
+    _get_win_ver(g_options.win_ver);
 
     std::vector<uint8_t> cmd_buf;
 
@@ -3980,7 +3984,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         g_options.show_as = SW_HIDE;
     }
 
-    g_no_std_inherit = g_is_process_elevating || g_flags.no_std_inherit || g_flags.pipe_stdin_to_stdout;
+    g_no_std_inherit = g_is_process_elevating || g_flags.no_std_inherit || g_flags.pipe_stdin_to_stdout || is_idle_execute;
 
     // on idle execution always pipe stdin to stdout
     g_pipe_stdin_to_stdout = !g_is_process_elevating && (g_flags.pipe_stdin_to_stdout || is_idle_execute);
@@ -4076,331 +4080,124 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         // assign reopened std handles to CRT
 
         if (!g_options.reopen_stdin_as_client_pipe.empty()) {
-            if (_is_valid_handle(g_reopen_stdin_handle) && !_set_crt_std_handle(g_reopen_stdin_handle, 0, true, !g_no_std_inherit)) {
-                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                    win_error = GetLastError();
+            if (_is_valid_handle(g_reopen_stdin_handle)) {
+                if (!_set_crt_std_handle(g_reopen_stdin_handle, 0, true, !g_no_std_inherit)) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("could not duplicate reopened stdin as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    break;
                 }
-                if (!g_flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not duplicate reopened stdin as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
-                }
-                if (g_flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, g_options.win_error_langid);
-                }
-                break;
+
+                g_is_stdin_reopened = true;
             }
         }
 
         if (!g_options.reopen_stdout_as_client_pipe.empty()) {
-            if (_is_valid_handle(g_reopen_stdout_handle) && !_set_crt_std_handle(g_reopen_stdout_handle, 1, true, !g_no_std_inherit)) {
-                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                    win_error = GetLastError();
+            if (_is_valid_handle(g_reopen_stdout_handle)) {
+                if (!_set_crt_std_handle(g_reopen_stdout_handle, 1, true, !g_no_std_inherit)) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("could not duplicate reopened stdout as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    break;
                 }
-                if (!g_flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not duplicate reopened stdout as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
-                }
-                if (g_flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, g_options.win_error_langid);
-                }
-                break;
+
+                g_is_stdout_reopened = true;
             }
         }
 
         if (!g_options.reopen_stderr_as_client_pipe.empty()) {
-            if (_is_valid_handle(g_reopen_stderr_handle) && !_set_crt_std_handle(g_reopen_stderr_handle, 2, true, !g_no_std_inherit)) {
-                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                    win_error = GetLastError();
+            if (_is_valid_handle(g_reopen_stderr_handle)) {
+                if (!_set_crt_std_handle(g_reopen_stderr_handle, 2, true, !g_no_std_inherit)) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("could not duplicate reopened stderr as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    break;
                 }
-                if (!g_flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not duplicate reopened stderr as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                        win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
-                }
-                if (g_flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, g_options.win_error_langid);
-                }
-                break;
+
+                g_is_stderr_reopened = true;
             }
         }
 
-        // std handles get
+        // std handles update
 
-        DWORD stdin_handle_type = FILE_TYPE_UNKNOWN;
-        DWORD stdout_handle_type = FILE_TYPE_UNKNOWN;
-        DWORD stderr_handle_type = FILE_TYPE_UNKNOWN;
-
-        for (int read_std_handles_iter = 0; read_std_handles_iter < 2; read_std_handles_iter++) {
-            if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
-                SetLastError(0); // just in case
-                g_stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
-                if (!read_std_handles_iter && !_is_valid_handle(g_stdin_handle)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("stdin handle is invalid: win_error=0x%08X (%d)\n"),
-                            win_error, win_error);
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
-                }
-            }
-
-            if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
-                SetLastError(0); // just in case
-                g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-                if (!read_std_handles_iter && !_is_valid_handle(g_stdout_handle)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("stdout handle is invalid: win_error=0x%08X (%d)\n"),
-                            win_error, win_error);
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
-                }
-            }
-
-            if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
-                SetLastError(0); // just in case
-                g_stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-                if (!read_std_handles_iter && !_is_valid_handle(g_stderr_handle)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-
-                    // CAUTION:
-                    //  Below code has no effect and is left just in case.
-                    //
-
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("stderr handle is invalid: win_error=0x%08X (%d)\n"),
-                            win_error, win_error);
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
-                }
-            }
-
-            // reopen closed std handles from `CONIN$`/`CONOUT$` files
-
-            //#define FILE_TYPE_UNKNOWN   0x0000
-            //#define FILE_TYPE_DISK      0x0001 // ReadFile
-            //#define FILE_TYPE_CHAR      0x0002 // ReadConsoleInput, PeekConsoleInput
-            //#define FILE_TYPE_PIPE      0x0003 // ReadFile, PeekNamedPipe
-            //#define FILE_TYPE_REMOTE    0x8000
-            //
-
-            stdin_handle_type = _is_valid_handle(g_stdin_handle) ? GetFileType(g_stdin_handle) : FILE_TYPE_UNKNOWN;
-            stdout_handle_type = _is_valid_handle(g_stdout_handle) ? GetFileType(g_stdout_handle) : FILE_TYPE_UNKNOWN;
-            stderr_handle_type = _is_valid_handle(g_stderr_handle) ? GetFileType(g_stderr_handle) : FILE_TYPE_UNKNOWN;
-
-            if (read_std_handles_iter > 0) {
-                if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("stdin handle type is unknown: win_error=0x%08X (%d)\n"),
-                            win_error, win_error);
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
-                }
-
-                // WORKAROUND:
-                //  Use stdout/stderr duplication instead of reopen from `CONOUT$` to fix issue under elevation in Windows 7, where
-                //  the reopen returns the same broken handle with `FILE_TYPE_UNKNOWN` handle type.
-                //
-
-                if (stdout_handle_type == FILE_TYPE_UNKNOWN && stderr_handle_type != FILE_TYPE_UNKNOWN) {
-                    if (!DuplicateHandle(GetCurrentProcess(), g_stderr_handle, GetCurrentProcess(), &g_stdout_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
-                        if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                            win_error = GetLastError();
-                        }
-                        if (!g_flags.ret_win_error) {
-                            ret = err_win32_error;
-                        }
-                        else {
-                            ret = win_error;
-                        }
-                        if (!g_flags.no_print_gen_error_string) {
-                            _print_stderr_message(_T("could not duplicate stderr into stdout: win_error=0x%08X (%d) file=\"%s\"\n"),
-                                win_error, win_error, g_options.reopen_stderr_as_file.c_str());
-                        }
-                        if (g_flags.print_win_error_string && win_error) {
-                            _print_win_error_message(win_error, g_options.win_error_langid);
-                        }
-                        break_ = true;
-                        break;
-                    }
-
-                    if (_is_valid_handle(g_stdout_handle)) {
-                        _set_crt_std_handle(g_stdout_handle, 1, false);
-                    }
-
-                    g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-                    stdout_handle_type = _is_valid_handle(g_stdout_handle) ? GetFileType(g_stdout_handle) : FILE_TYPE_UNKNOWN;
-                }
-                else if (stdout_handle_type != FILE_TYPE_UNKNOWN && stderr_handle_type == FILE_TYPE_UNKNOWN) {
-                    if (!DuplicateHandle(GetCurrentProcess(), g_stdout_handle, GetCurrentProcess(), &g_stderr_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
-                        if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                            win_error = GetLastError();
-                        }
-                        if (!g_flags.ret_win_error) {
-                            ret = err_win32_error;
-                        }
-                        else {
-                            ret = win_error;
-                        }
-                        if (!g_flags.no_print_gen_error_string) {
-                            _print_stderr_message(_T("could not duplicate stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
-                                win_error, win_error, g_options.reopen_stderr_as_file.c_str());
-                        }
-                        if (g_flags.print_win_error_string && win_error) {
-                            _print_win_error_message(win_error, g_options.win_error_langid);
-                        }
-                        break_ = true;
-                        break;
-                    }
-
-                    stderr_handle_type = _is_valid_handle(g_stderr_handle) ? GetFileType(g_stderr_handle) : FILE_TYPE_UNKNOWN;
-                }
-
-                if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("stdout handle type is unknown: win_error=0x%08X (%d)\n"),
-                            win_error, win_error);
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
-                }
-
-                if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-
-                    // CAUTION:
-                    //  Below code has no effect and is left just in case.
-                    //
-
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("stderr handle type is unknown: win_error=0x%08X (%d)\n"),
-                            win_error, win_error);
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
-                }
-            }
-
-            if (read_std_handles_iter > 0) break;
-
-            if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
-                _reattach_stdin_to_console(!g_no_std_inherit);
-            }
-            if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
-                _reattach_stdout_to_console(!g_no_std_inherit);
-            }
-            if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
-                _reattach_stderr_to_console(!g_no_std_inherit);
-            }
-
-            if (stdin_handle_type != FILE_TYPE_UNKNOWN && stdout_handle_type != FILE_TYPE_UNKNOWN && stderr_handle_type != FILE_TYPE_UNKNOWN) {
-                break;
-            }
+        if (!_get_std_handles(ret, win_error, g_stdin_handle, g_stdout_handle, g_stderr_handle, g_flags, g_options)) {
+            break;
         }
-
-        if (break_) break;
 
         // update globals
-        g_stdin_handle_type = stdin_handle_type;
-        g_stdout_handle_type = stdout_handle_type;
-        g_stderr_handle_type = stderr_handle_type;
+        g_stdin_handle_type = GetFileType(g_stdin_handle);
+        g_stdout_handle_type = GetFileType(g_stdout_handle);
+        g_stderr_handle_type = GetFileType(g_stderr_handle);
 
         if (g_no_std_inherit) {
             // reset std handles inheritance
 
-            if (!g_options.reopen_stdin_as_file.empty() || !g_options.reopen_stdin_as_server_pipe.empty() || !g_options.reopen_stdin_as_client_pipe.empty()) {
+            // NOTE:
+            //  We can not change not reopened standard handle inheritance.
+            //
+
+            bool reset_stdin_handle_inherit = true;
+            bool reset_stdout_handle_inherit = true;
+            bool reset_stderr_handle_inherit = true;
+
+            DWORD stdin_handle_flags = 0;
+            DWORD stdout_handle_flags = 0;
+            DWORD stderr_handle_flags = 0;
+
+            if (GetHandleInformation(g_stdin_handle, &stdin_handle_flags) && !(stdin_handle_flags & HANDLE_FLAG_INHERIT)) {
+                reset_stdin_handle_inherit = false;
+            }
+
+            if (GetHandleInformation(g_stdout_handle, &stdout_handle_flags) && !(stdout_handle_flags & HANDLE_FLAG_INHERIT)) {
+                reset_stdout_handle_inherit = false;
+            }
+
+            if (GetHandleInformation(g_stderr_handle, &stderr_handle_flags) && !(stderr_handle_flags & HANDLE_FLAG_INHERIT)) {
+                reset_stderr_handle_inherit = false;
+            }
+
+            if (reset_stdin_handle_inherit && g_is_stdin_reopened) {
                 SetLastError(0); // just in case
-                if (!::SetHandleInformation(g_stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                if (!SetHandleInformation(g_stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4411,8 +4208,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not set stdin handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                            win_error, win_error, stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
+                        _print_stderr_message(_T("could not reset stdin handle inheritance: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                            win_error, win_error, g_stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -4421,9 +4218,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
 
-            if (!g_options.reopen_stdout_as_file.empty() || !g_options.reopen_stdout_as_server_pipe.empty() || !g_options.reopen_stdout_as_client_pipe.empty()) {
+            if (reset_stdout_handle_inherit && g_is_stdout_reopened) {
                 SetLastError(0); // just in case
-                if (!::SetHandleInformation(g_stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                if (!SetHandleInformation(g_stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4434,8 +4231,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not set stdout handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                            win_error, win_error, stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
+                        _print_stderr_message(_T("could not reset stdout handle inheritance: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                            win_error, win_error, g_stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -4444,9 +4241,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
 
-            if (!g_options.reopen_stderr_as_file.empty() || !g_options.reopen_stderr_as_server_pipe.empty() || !g_options.reopen_stderr_as_client_pipe.empty()) {
+            if (reset_stderr_handle_inherit && g_is_stderr_reopened) {
                 SetLastError(0); // just in case
-                if (!::SetHandleInformation(g_stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                if (!SetHandleInformation(g_stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4457,8 +4254,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not set stderr handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                            win_error, win_error, stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
+                        _print_stderr_message(_T("could not reset stderr handle inheritance: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                            win_error, win_error, g_stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
@@ -4470,107 +4267,129 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         // std handles dup
 
-        if (!_is_valid_handle(g_stdout_handle)) {
-            switch (g_options.stdout_dup) {
-            case 2:
-                SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_stderr_handle, GetCurrentProcess(), &g_stdout_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stderr into stdout: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, g_options.tee_stderr_to_file.c_str());
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
+        switch (g_options.stdout_dup) {
+        case 2:
+            SetLastError(0); // just in case
+            if (!DuplicateHandle(GetCurrentProcess(), g_stderr_handle, GetCurrentProcess(), &g_stderr_handle_dup, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                    win_error = GetLastError();
                 }
-
-                if (!_set_crt_std_handle(g_stdout_handle, 1, true, !g_no_std_inherit)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stdout before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, g_options.reopen_stderr_as_file.c_str());
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
+                if (!g_flags.ret_win_error) {
+                    ret = err_win32_error;
                 }
+                else {
+                    ret = win_error;
+                }
+                if (!g_flags.no_print_gen_error_string) {
+                    _print_stderr_message(_T("could not duplicate stderr into stdout: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        win_error, win_error, g_stderr_handle_type, g_options.tee_stderr_to_file.c_str());
+                }
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
+                }
+                break_ = true;
                 break;
             }
+
+            if (!_set_crt_std_handle(g_stderr_handle_dup, 1, false, !g_no_std_inherit)) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                    win_error = GetLastError();
+                }
+                if (!g_flags.ret_win_error) {
+                    ret = err_win32_error;
+                }
+                else {
+                    ret = win_error;
+                }
+                if (!g_flags.no_print_gen_error_string) {
+                    _print_stderr_message(_T("could not duplicate stderr as stdout before transfer handle ownership to CRT: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        win_error, win_error, g_stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
+                }
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
+                }
+                break_ = true;
+                break;
+            }
+
+            g_stderr_handle_dup = INVALID_HANDLE_VALUE; // ownership is passed to CRT
+
+            // reread owned by CRT handles
+            g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+            g_stdout_handle_type = GetFileType(g_stdout_handle);
+
+            g_is_stdout_reopened = g_is_stderr_reopened;
+
+            break;
         }
 
         if (break_) break;
 
-        if (!_is_valid_handle(g_stderr_handle)) {
-            switch (g_options.stderr_dup) {
-            case 1:
-                SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_stdout_handle, GetCurrentProcess(), &g_stderr_handle, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, g_options.tee_stdout_to_file.c_str());
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
+        switch (g_options.stderr_dup) {
+        case 1:
+            SetLastError(0); // just in case
+            if (!DuplicateHandle(GetCurrentProcess(), g_stdout_handle, GetCurrentProcess(), &g_stdout_handle_dup, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                    win_error = GetLastError();
                 }
-
-                if (!_set_crt_std_handle(g_stderr_handle, 2, true, !g_no_std_inherit)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
-                    }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stderr before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, g_options.reopen_stdout_as_file.c_str());
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    break_ = true;
-                    break;
+                if (!g_flags.ret_win_error) {
+                    ret = err_win32_error;
                 }
+                else {
+                    ret = win_error;
+                }
+                if (!g_flags.no_print_gen_error_string) {
+                    _print_stderr_message(_T("could not duplicate stdout into stderr: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        win_error, win_error, g_stdout_handle_type, g_options.tee_stdout_to_file.c_str());
+                }
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
+                }
+                break_ = true;
                 break;
             }
+
+            if (!_set_crt_std_handle(g_stdout_handle_dup, 2, false, !g_no_std_inherit)) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                    win_error = GetLastError();
+                }
+                if (!g_flags.ret_win_error) {
+                    ret = err_win32_error;
+                }
+                else {
+                    ret = win_error;
+                }
+                if (!g_flags.no_print_gen_error_string) {
+                    _print_stderr_message(_T("could not duplicate stderr as stdout before transfer handle ownership to CRT: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        win_error, win_error, g_stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
+                }
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
+                }
+                break_ = true;
+                break;
+            }
+
+            g_stdout_handle_dup = INVALID_HANDLE_VALUE; // ownership is passed to CRT
+
+            // reread owned by CRT handles
+            g_stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+            g_stderr_handle_type = GetFileType(g_stderr_handle);
+
+            g_is_stderr_reopened = g_is_stdout_reopened;
+
+            break;
         }
 
         if (break_) break;
+
+        //fprintf(stdout, "3 stdin : %p %u\n", GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)));
+        //fprintf(stdout, "3 stdout: %p %u\n", GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)));
+        //fprintf(stdout, "3 stderr: %p %u\n", GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
+
+        //fprintf(stderr, "4 stdin : %p %u\n", GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)));
+        //fprintf(stderr, "4 stdout: %p %u\n", GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)));
+        //fprintf(stderr, "4 stderr: %p %u\n", GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
 
         // Accomplish all client pipe connections for all tee handles from here before duplicate them.
         //
@@ -4959,7 +4778,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         bool has_outbound_pipe_from_conin = false;
 
         if (g_is_process_elevating || !g_no_std_inherit && !g_pipe_stdin_to_stdout) {
-            if (stdin_handle_type == FILE_TYPE_DISK || stdin_handle_type == FILE_TYPE_PIPE) {
+            if (g_stdin_handle_type == FILE_TYPE_DISK || g_stdin_handle_type == FILE_TYPE_PIPE) {
                 if (!CreateOutboundPipeFromConsoleInput(ret, win_error)) {
                     break;
                 }
@@ -4973,7 +4792,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 //
 
                 SetLastError(0); // just in case
-                if (!::SetHandleInformation(g_stdin_pipe_write_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                if (!SetHandleInformation(g_stdin_pipe_write_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4986,11 +4805,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     if (!g_flags.no_print_gen_error_string) {
                         if (g_options.create_outbound_server_pipe_from_stdin.empty()) {
                             _print_stderr_message(_T("could not set stdin outbound anonymous pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
+                                win_error, win_error, g_stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
                         }
                         else {
                             _print_stderr_message(_T("could not set stdin outbound server named pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
+                                win_error, win_error, g_stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
                         }
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5003,7 +4822,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     si.hStdInput = g_stdin_pipe_read_handle;
 
                     // CAUTION:
-                    //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                    //  This flag breaks a child process auto completion in the call: `callf.exe "" "cmd.exe /k"`
                     //  in case if one of handles is not character handle or console buffer.
                     //
                     si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5013,7 +4832,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     SetStdHandle(STD_INPUT_HANDLE, g_stdin_pipe_read_handle);
                 }
             }
-            else if (stdin_handle_type == FILE_TYPE_CHAR) {
+            else if (g_stdin_handle_type == FILE_TYPE_CHAR) {
                 // NOTE:
                 //  The stdin console handle can not be changed for inheritance.
                 //
@@ -5037,7 +4856,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     si.hStdInput = g_stdin_handle;
 
                     // CAUTION:
-                    //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                    //  This flag breaks a child process auto completion in the call: `callf.exe "" "cmd.exe /k"`
                     //  in case if one of handles is not character handle or console buffer.
                     //
                     si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5056,7 +4875,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 //
 
                 SetLastError(0); // just in case
-                if (!::SetHandleInformation(g_stdout_pipe_read_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                if (!SetHandleInformation(g_stdout_pipe_read_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5069,11 +4888,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     if (!g_flags.no_print_gen_error_string) {
                         if (g_options.create_inbound_server_pipe_to_stdout.empty()) {
                             _print_stderr_message(_T("could not set stdout inbound anonymous pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
+                                win_error, win_error, g_stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
                         }
                         else {
                             _print_stderr_message(_T("could not set stdout inbound server named pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
+                                win_error, win_error, g_stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
                         }
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5086,7 +4905,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     si.hStdOutput = g_stdout_pipe_write_handle;
 
                     // CAUTION:
-                    //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                    //  This flag breaks a child process auto completion in the call: `callf.exe "" "cmd.exe /k"`
                     //  in case if one of handles is not character handle or console buffer.
                     //
                     si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5100,7 +4919,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 si.hStdOutput = g_stdout_handle;
 
                 // CAUTION:
-                //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                //  This flag breaks a child process auto completion in the call: `callf.exe "" "cmd.exe /k"`
                 //  in case if one of handles is not character handle or console buffer.
                 //
                 si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5118,7 +4937,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 //
 
                 SetLastError(0); // just in case
-                if (!::SetHandleInformation(g_stderr_pipe_read_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                if (!SetHandleInformation(g_stderr_pipe_read_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5131,11 +4950,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     if (!g_flags.no_print_gen_error_string) {
                         if (g_options.create_inbound_server_pipe_to_stderr.empty()) {
                             _print_stderr_message(_T("could not set stderr inbound anonymous pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
+                                win_error, win_error, g_stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
                         }
                         else {
                             _print_stderr_message(_T("could not set stderr inbound server named pipe handle information: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
-                                win_error, win_error, stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
+                                win_error, win_error, g_stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
                         }
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5148,7 +4967,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     si.hStdError = g_stderr_pipe_write_handle;
 
                     // CAUTION:
-                    //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                    //  This flag breaks a child process auto completion in the call: `callf.exe "" "cmd.exe /k"`
                     //  in case if one of handles is not character handle or console buffer.
                     //
                     si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5162,7 +4981,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 si.hStdError = g_stderr_handle;
 
                 // CAUTION:
-                //  This flag breaks a child process autocompletion in the call: `callf.exe "" "cmd.exe /k"`
+                //  This flag breaks a child process auto completion in the call: `callf.exe "" "cmd.exe /k"`
                 //  in case if one of handles is not character handle or console buffer.
                 //
                 si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5187,7 +5006,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         if (!is_idle_execute) {
             if_break (app && app_len) {
                 g_ctrl_handler = true;
-                SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update parent console signal handler (does not work as expected)
+                SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
 
                 if (g_options.shell_exec_verb.empty()) {
                     if (cmd && cmd_len) {
@@ -5198,7 +5017,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         memcpy(cmd_buf.data(), cmd, cmd_buf.size());
 
                         SetLastError(0); // just in case
-                        ret_create_proc = ::CreateProcess(app, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE,
+                        ret_create_proc = CreateProcess(app, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE, //g_no_std_inherit ? FALSE : TRUE, // TODO: research why FALSE does not work here
                             g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                             NULL,
                             !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL,
@@ -5208,7 +5027,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     else {
                         SetLastError(0); // just in case
-                        ret_create_proc = ::CreateProcess(app, NULL, NULL, NULL, TRUE,
+                        ret_create_proc = CreateProcess(app, NULL, NULL, NULL, TRUE, //g_no_std_inherit ? FALSE : TRUE, // TODO: research why FALSE does not work here
                             g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                             NULL,
                             !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL,
@@ -5282,13 +5101,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
             else if (cmd && cmd_len) {
                 g_ctrl_handler = true;
-                SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update parent console signal handler (does not work as expected)
+                SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
 
                 cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
                 memcpy(cmd_buf.data(), cmd, cmd_buf.size());
 
                 SetLastError(0); // just in case
-                ret_create_proc = ::CreateProcess(NULL, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE,
+                ret_create_proc = CreateProcess(NULL, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE, //g_no_std_inherit ? FALSE : TRUE, // TODO: research why FALSE does not work here
                     g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                     NULL,
                     !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL,
@@ -5392,7 +5211,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
             else {
                 if (_is_valid_handle(g_stdin_handle) && _is_valid_handle(g_stdout_handle) &&
-                    (stdin_handle_type == FILE_TYPE_DISK || stdin_handle_type == FILE_TYPE_PIPE)) {
+                    (g_stdin_handle_type == FILE_TYPE_DISK || g_stdin_handle_type == FILE_TYPE_PIPE)) {
                     g_stdin_to_stdout_thread_locals.thread_handle = CreateThread(
                         NULL, 0,
                         StdinToStdoutThread, &g_stdin_to_stdout_thread_locals.thread_data,
@@ -5682,12 +5501,34 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             _close_handle(g_child_process_handle, pi.hProcess);
 
             // close mutexes
+            HANDLE reopen_stdout_mutex = g_reopen_stdout_mutex;
+            HANDLE reopen_stderr_mutex = g_reopen_stderr_mutex;
+
             _close_handle(g_reopen_stdout_mutex);
-            _close_handle(g_reopen_stderr_mutex);
+            if (reopen_stdout_mutex != reopen_stderr_mutex) {
+                _close_handle(g_reopen_stderr_mutex);
+            }
+            else {
+                g_reopen_stderr_mutex = INVALID_HANDLE_VALUE;
+            }
+
+            HANDLE tee_file_stdin_mutex = g_tee_file_stdin_mutex;
+            HANDLE tee_file_stdout_mutex = g_tee_file_stdout_mutex;
+            HANDLE tee_file_stderr_mutex = g_tee_file_stderr_mutex;
 
             _close_handle(g_tee_file_stdin_mutex);
-            _close_handle(g_tee_file_stdout_mutex);
-            _close_handle(g_tee_file_stderr_mutex);
+            if (tee_file_stdin_mutex != tee_file_stdout_mutex) {
+                _close_handle(g_tee_file_stdout_mutex);
+            }
+            else {
+                g_tee_file_stdout_mutex = INVALID_HANDLE_VALUE;
+            }
+            if (tee_file_stdin_mutex != tee_file_stderr_mutex && tee_file_stdout_mutex != tee_file_stderr_mutex) {
+                _close_handle(g_tee_file_stderr_mutex);
+            }
+            else {
+                g_tee_file_stderr_mutex = INVALID_HANDLE_VALUE;
+            }
         }();
     } }();
 
