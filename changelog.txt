@@ -1,4 +1,7 @@
 2021.07.16:
+* new: Utilities/bin/contools: binaries update
+
+2021.07.16:
 * fixed: Utilities/src/callf: incorrect leading `{N}` variable substitution
 
 2021.07.15:
