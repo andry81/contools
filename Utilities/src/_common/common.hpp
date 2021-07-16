@@ -2216,20 +2216,17 @@ namespace {
 
             if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
                 fclose(stderr);
-                const int stderr_fileno = _fileno(stderr);
-                _close(stderr_fileno >= 0 ? stderr_fileno : STDERR_FILENO);
+                _close(STDERR_FILENO);
             }
 
             if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
                 fclose(stdout);
-                const int stdout_fileno = _fileno(stdout);
-                _close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
+                _close(STDOUT_FILENO);
             }
 
             if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
                 fclose(stdin);
-                const int stdin_fileno = _fileno(stdin);
-                _close(stdin_fileno >= 0 ? stdin_fileno : STDIN_FILENO);
+                _close(STDIN_FILENO);
             }
 
             if (stdin_handle_type == FILE_TYPE_UNKNOWN) {

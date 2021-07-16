@@ -96,6 +96,9 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         ShellExecute
           Use <CurrentDirectory> as parameter in call to Shellexecute.
 
+        If `<CurrentDirectory>` is `.`, then it has special meaning to pass
+        current directory into child process.
+
       /no-wait
         CreateProcess
           Don't wait a child process to exit.

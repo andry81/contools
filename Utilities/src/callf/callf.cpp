@@ -2727,9 +2727,19 @@ int _tmain(int argc, const TCHAR * argv[])
                 }
             }
 
-            // update environment variables before ${...} environment variables expansion
+            // update environment variables before ${...} environment variables expansion in command line
             for (const auto & env_vars_ref : g_options.env_vars) {
-                SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), std::get<1>(env_vars_ref).c_str());
+                // expand ${...} variables for `<value>` in `/v <name> <value>` options
+                if (!g_flags.no_expand_env) {
+                    std::tstring tmp;
+
+                    _parse_string(-3, std::get<1>(env_vars_ref).c_str(), tmp, env_buf, false, true, false);
+
+                    SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), tmp.c_str());
+                }
+                else {
+                    SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), std::get<1>(env_vars_ref).c_str());
+                }
             }
 
             if (in_args.app_fmt_str) {

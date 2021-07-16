@@ -1,4 +1,12 @@
 2021.07.16:
+* fixed: src/callf: `{...}` sequence escaping with backslash
+* fixed: src/callf: missed to translate `/replace-arg*` and `/set-env-var` options for elevation
+* new: src/callf: environment variables expansion in `<value>` for `/v <name> <value>` options
+* new: src/callf: `/D .` option to pass current directory into child process
+* changed: src/callf: removed commenting of backslash characters in a command line while translating for elevation
+* changed: src/callf: code cleanup
+
+2021.07.16:
 * new: bin/contools: binaries update
 
 2021.07.16:
