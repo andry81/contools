@@ -3970,6 +3970,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     INT shell_error = -1;
 
     SHELLEXECUTEINFO sei{};
+
+    std::tstring current_dir;
+
     std::vector<TCHAR> shell_exec_verb;
 
     bool is_idle_execute = false;
@@ -4990,6 +4993,20 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             if (break_) break;
         }
 
+        if (g_options.change_current_dir != _T(".")) {
+            current_dir = g_options.change_current_dir;
+        }
+        else {
+            current_dir.resize(GetCurrentDirectory(0, NULL));
+
+            if (current_dir.size()) {
+                current_dir[0] = _T('\0'); // just in case
+
+                GetCurrentDirectory(current_dir.size(), &current_dir[0]);
+            }
+        }
+
+
         ret = err_none;
         win_error = 0;
 
@@ -5020,7 +5037,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret_create_proc = CreateProcess(app, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE, //g_no_std_inherit ? FALSE : TRUE, // TODO: research why FALSE does not work here
                             g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                             NULL,
-                            !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL,
+                            !current_dir.empty() ? current_dir.c_str() : NULL,
                             &si, &pi);
 
                         win_error = GetLastError();
@@ -5030,7 +5047,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret_create_proc = CreateProcess(app, NULL, NULL, NULL, TRUE, //g_no_std_inherit ? FALSE : TRUE, // TODO: research why FALSE does not work here
                             g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                             NULL,
-                            !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL,
+                            !current_dir.empty() ? current_dir.c_str() : NULL,
                             &si, &pi);
 
                         win_error = GetLastError();
@@ -5063,7 +5080,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
                     sei.lpFile = app;
                     sei.lpParameters = cmd;
-                    sei.lpDirectory = !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL;
+                    sei.lpDirectory = !current_dir.empty() ? current_dir.c_str() : NULL;
                     sei.nShow = g_options.show_as;
 
                     if (g_flags.init_com) {
@@ -5110,7 +5127,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 ret_create_proc = CreateProcess(NULL, (TCHAR *)cmd_buf.data(), NULL, NULL, TRUE, //g_no_std_inherit ? FALSE : TRUE, // TODO: research why FALSE does not work here
                     g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0,
                     NULL,
-                    !g_options.change_current_dir.empty() ? g_options.change_current_dir.c_str() : NULL,
+                    !current_dir.empty() ? current_dir.c_str() : NULL,
                     &si, &pi);
 
                 win_error = GetLastError();
@@ -5611,16 +5628,14 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
 
     if (cmd_out_str_ptr) {
         if (app_str_ptr && !app_str_ptr->empty()) {
-            tmp_str = _replace_strings(*app_str_ptr, _T("\\"), std::tstring{ _T("\\\\") });
-            cmd_line = std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
+            cmd_line = std::tstring{ _T("\"") } + _replace_strings(*app_str_ptr, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
         else {
             cmd_line = _T("\"\" ");
         }
 
         if (cmd_str_ptr && !cmd_str_ptr->empty()) {
-            tmp_str = _replace_strings(*cmd_str_ptr, _T("\\"), std::tstring{ _T("\\\\") });
-            cmd_line += std::tstring{ _T("\"") } +_replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\"");
+            cmd_line += std::tstring{ _T("\"") } + _replace_strings(*cmd_str_ptr, _T("\""), std::tstring{ _T("\\\"") }) + _T("\"");
         }
         else {
             cmd_line += _T("\"\"");
@@ -5717,7 +5732,7 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
     regular_flags.shell_exec_expand_env = false; // always reset
 
 
-    //options.change_current_dir
+    //change_current_dir
 
 
     if (child_flags.no_wait) {
@@ -6535,6 +6550,31 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_options.stdin_echo = -1; // always reset
+
+
+    if (cmd_out_str_ptr) {
+        for (const auto & tuple_ref : child_options.replace_args) {
+            const int replace_index = std::get<0>(tuple_ref);
+
+            if (replace_index >= 0) {
+                options_line += std::tstring{ _T("/r") } + std::to_tstring(replace_index) + _T(" \"") + std::get<1>(tuple_ref) + _T("\" \"") + std::get<2>(tuple_ref) + _T("\" ");
+            }
+            else if (replace_index == -1) {
+                options_line += std::tstring{ _T("/r \"") } + std::get<1>(tuple_ref) + _T("\" \"") + std::get<2>(tuple_ref) + _T("\" ");
+            }
+            else if (replace_index == -2) {
+                options_line += std::tstring{ _T("/ra \"") } + std::get<1>(tuple_ref) + _T("\" \"") + std::get<2>(tuple_ref) + _T("\" ");
+            }
+        }
+    }
+    regular_options.replace_args.clear();
+
+    if (cmd_out_str_ptr) {
+        for (const auto & tuple_ref : child_options.env_vars) {
+            options_line += std::tstring{ _T("/v \"") } + std::get<0>(tuple_ref) + _T("\" \"") + std::get<1>(tuple_ref) + _T("\" ");
+        }
+    }
+    regular_options.env_vars.clear();
 
 
     //child_flags.eval_backslash_esc

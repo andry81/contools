@@ -51,18 +51,18 @@ namespace {
                     }
                 }
 
-                // process escapes
-                if (p > last_offset_ptr && *(p - 1) == _T('\\')) {
-                    if (p > last_offset_ptr + 1) {
-                        parsed_str.append(last_offset_ptr, p - 1);
-                    }
-                    parsed_str.append(p, p + 1);
-                    last_offset_ptr = p + 1;
-                    if (*last_offset_ptr) found = true;
-                    break;
-                }
-
                 if (!no_subst_vars) {
+                    // process escapes
+                    if (p > last_offset_ptr && *(p - 1) == _T('\\')) {
+                        if (p > last_offset_ptr + 1) {
+                            parsed_str.append(last_offset_ptr, p - 1);
+                        }
+                        parsed_str.append(p, p + 1);
+                        last_offset_ptr = p + 1;
+                        if (*last_offset_ptr) found = true;
+                        break;
+                    }
+
                     int i = 0;
 
                     compatible_const_it_path it_path;
