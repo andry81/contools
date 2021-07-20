@@ -1,3 +1,6 @@
+2021.07.21:
+* new: Utilities/tests: more manual tests for `callf` utility
+
 2021.07.20:
 * new: Utilities/tests: manual tests for `callf` utility
 * changed: Scripts/Tools/testlib/init.bat: `_output` changed to `_out` directory, set `TEST_SCRIPT_OUTPUT_DIR`/`TEST_SCRIPT_LOCAL_TEMP_DIR` variables only if not defined
