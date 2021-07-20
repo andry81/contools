@@ -2,9 +2,9 @@
 
 if %LASTERROR% NEQ 0 (
   rem copy workingset on error
-  mkdir "%TEST_SRC_BASE_DIR%\_output\%TEST_TEMP_DIR_NAME%\ref"
-  call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" "%%TEST_DATA_REF_DIR_ROOT%%" "%%TEST_SRC_BASE_DIR%%\_output\%%TEST_TEMP_DIR_NAME%%\ref" /Y /H /E
-  call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%TEST_TEMP_DIR%%" "%%TEST_DATA_OUTPUT_FILE_NAME%%" "%%TEST_SRC_BASE_DIR%%\_output\%%TEST_TEMP_DIR_NAME%%" /Y /H /E
+  mkdir "%TEST_DATA_OUT_DIR%\%TEST_TEMP_DIR_NAME%\ref"
+  call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" "%%TEST_DATA_REF_DIR_ROOT%%" "%%TEST_DATA_OUT_DIR%%\%%TEST_TEMP_DIR_NAME%%\ref" /Y /H /E
+  call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%TEST_TEMP_DIR%%" "%%TEST_DATA_OUTPUT_FILE_NAME%%" "%%TEST_DATA_OUT_DIR%%\%%TEST_TEMP_DIR_NAME%%" /Y /H /E
 )
 
 del /F /Q "%TEST_TEMP_DIR%\output*.txt" 2>nul

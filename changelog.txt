@@ -1,3 +1,12 @@
+2021.07.20:
+* new: Utilities/tests: manual tests for `callf` utility
+* changed: Scripts/Tools/testlib/init.bat: `_output` changed to `_out` directory, set `TEST_SCRIPT_OUTPUT_DIR`/`TEST_SCRIPT_LOCAL_TEMP_DIR` variables only if not defined
+* changed: Utilities/bin/contools: readme update
+* refactor: Scrtips/Tests/unit/batscripts: tests refactor
+
+2021.07.19:
+* fixed: Scripts/Tools/std/restorecp.bat: tests pass
+
 2021.07.16:
 * new: Utilities/bin/contools: binaries update
 
@@ -33,7 +42,7 @@
 * changed: Utilities/bin/contools: readme update
 
 2021.07.11:
-* fixed: Utilities/src/callf: invalid standard output handle termporary workaround through a complement standard handle duplication (after `_dup2` fail)
+* fixed: Utilities/src/callf: invalid standard output handle temporary workaround through a complement standard handle duplication (after `_dup2` fail)
 * fixed: Utilities/src/callf: apply `/eval-backslash-esc` and `/eval-dbl-backslash-esc` after `/replace-arg<N> <from> <to>` to be able to replace all backslashes in an argument before backslash evaluation
 * fixed: Utilities/src/callf: backslash escaping must be done before the command line elevation translation
 * fixed: Utilities/src/callf: environment variables set must be done before `${...}` environment variables expansion

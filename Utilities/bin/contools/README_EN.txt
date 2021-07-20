@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.07.11
+* 2021.07.20
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -93,13 +93,15 @@ Create process or Shell execute in style of c-function printf.
 
      Examples:
      >
-     callf.exe /shell-exec runas "${COMSPEC}" "/c echo.\"{0} {1}\" & pause" "1 2" "3 4"
+     callf.exe /shell-exec runas /no-sys-dialog-ui "${COMSPEC}" "/c echo.\"{0} {1}\" & pause" "1 2" "3 4"
      >
      callf.exe /elevate "" "\"${COMSPEC}\" /c echo.\"{0} {1}\" & pause" "1 2" "3 4"
 
   ** Use the same console.
 
      Examples:
+     >
+     callf.exe /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console \"\" \"\\\"${COMSPEC}\\\" /c \\\"echo.\\\"{0} {1}\\\" & pause\\\"\" \"1 2\" \"3 4\""
      >
      callf.exe /elevate{ /no-window }{ /attach-parent-console } "" "\"${COMSPEC}\" /c echo.\"{0} {1}\"" "1 2" "3 4"
 
@@ -153,9 +155,27 @@ Create process or Shell execute in style of c-function printf.
   >
   callf.exe "" "callf.exe \"\" \"callf.exe \\\"\\\" \\\"\\\\\\\"$\\{COMSPEC}\\\\\\\" /c echo.{0}\\\" \\\"%TIME%\\\"\""
 
-* In case of elevation is executed, connects a named pipe to and from a child
-  process with the Administrator privileges isolation, otherwise fallbacks to
-  a generic piping.
+* Connects a named pipe from stdout to a child process stdin with the same
+  privileges.
+
+  Examples:
+  >
+  callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123_{ppid} ."
+  >
+  callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout "" "callf.exe /reopen-stdin-as-client-pipe test123_{ppid} \"\" \"cmd.exe /k\""
+
+* Connects a named pipe from stdout to a child process stdin with the
+  Administrator privileges.
+
+  Examples:
+  >
+  callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123_{ppid} ."
+  >
+  callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123_{ppid} \"\" \"cmd.exe /k\""
+
+* In case of elevation is executed, connects a named pipe to stdin and from
+  stdout of a child process with the Administrator privileges isolation,
+  otherwise fallbacks to a generic piping.
 
   Examples:
   >

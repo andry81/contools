@@ -55,7 +55,13 @@ set "CURRENT_CP="
 for /F "eol= tokens=1,* delims=|" %%i in ("%CP_HISTORY_LIST%") do ( set "CURRENT_CP=%%i" & set "CP_HISTORY_LIST=%%j" )
 
 if not defined CURRENT_CP exit /b 0
-if "%CURRENT_CP%" == "%LAST_CP%" exit /b 0
+if "%CURRENT_CP%" == "%LAST_CP%" (
+  endlocal
+  set "LAST_CP=%LAST_CP%"
+  set "CURRENT_CP=%CURRENT_CP%"
+  set "CP_HISTORY_LIST=%CP_HISTORY_LIST%"
+  exit /b 0
+)
 
 rem echo.chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
 
@@ -73,4 +79,5 @@ rem
   set "LAST_CP=%LAST_CP%"
   set "CURRENT_CP=%CURRENT_CP%"
   set "CP_HISTORY_LIST=%CP_HISTORY_LIST%"
+  exit /b 0
 )

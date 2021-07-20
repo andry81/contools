@@ -1,6 +1,6 @@
 /Output
 Scripts/Tests/bench/batscripts/_output
-Scripts/Tests/unit/batscripts/_output
+Scripts/Tests/unit/batscripts/_out
 Scripts/Tools/admin/ProductKey/__pycache__
 Scripts/Tools/admin/VisualStudio/*.vars
 /Temp
@@ -42,5 +42,6 @@ Utilities/src/thlibautocfg/help_inl.hpp
 Utilities/src/thlibautocfg/version.hpp
 Utilities/src/version.hpp
 Utilities/src/wshbazaar/wshdynacall/version.hpp
+Utilities/tests/manual/contools/callf/_out
 /_3dparty
 /_out
