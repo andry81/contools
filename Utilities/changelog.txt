@@ -1,4 +1,7 @@
 2021.07.21:
+* new: bin/contools: binaries update
+
+2021.07.21:
 * fixed: src/callf: missed to check a handle on registered state in the CRT (`_set_crt_std_handle` function), otherwise the CRT `_dup` function would attempt to close the handle before it's duplication (random invalid handle errors)
 * fixed: src/callf: missed to check `ConnectNamedPipe` on `ERROR_PIPE_CONNECTED` error which means connection is accomplished before the function call
 * fixed: src/callf: all tests pass
