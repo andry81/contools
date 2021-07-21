@@ -146,45 +146,95 @@ namespace {
         std::tstring to_tstring(TCHAR separator = _T('-')) const;
     };
 
-    inline bool _is_equal_fileid(const _FileId & fileid0, const _FileId & fileid1)
+    struct _StdHandlesState
     {
-        switch (fileid0.fileid_type)
+        _StdHandlesState() :
+            is_stdin_inheritable(-1), is_stdout_inheritable(-1), is_stderr_inheritable(-1),
+            stdin_handle_flags(0), stdout_handle_flags(0), stderr_handle_flags(0),
+            has_stdin_console_mode(false), has_stdout_console_mode(false), has_stderr_console_mode(false),
+            stdin_handle_mode(0), stdout_handle_mode(0), stderr_handle_mode(0)
         {
-        case _FileId::fileid_index128:
-            if (fileid1.fileid_type == _FileId::fileid_index128) {
-                return fileid0.index128.VolumeSerialNumber == fileid1.index128.VolumeSerialNumber &&
-                    !memcmp(fileid0.index128.FileId.Identifier, fileid1.index128.FileId.Identifier, sizeof(fileid0.index128.FileId.Identifier));
-            }
-            break;
-        case _FileId::fileid_index64:
-            if (fileid1.fileid_type == _FileId::fileid_index64) {
-                return fileid0.index64.dwVolumeSerialNumber == fileid1.index64.dwVolumeSerialNumber &&
-                    fileid0.index64.nFileIndexHigh == fileid1.index64.nFileIndexHigh &&
-                    fileid0.index64.nFileIndexLow == fileid1.index64.nFileIndexLow;
-            }
-            break;
         }
 
-        return false;
-    }
+        void save_stdin_state(HANDLE stdin_handle)
+        {
+            if (GetHandleInformation(stdin_handle, &stdin_handle_flags)) {
+                is_stdin_inheritable = (stdin_handle_flags & HANDLE_FLAG_INHERIT) ? 1 : 0;
+            }
 
-    template <typename T>
-    inline T (& make_singular_array(T & ref))[1]
-    {
-        return reinterpret_cast<T(&)[1]>(ref);
-    }
+            if (GetConsoleMode(stdin_handle, &stdin_handle_mode)) {
+                has_stdin_console_mode = true;
+            }
+        }
 
-    template <typename T, typename... Args>
-    inline void _construct(T & ref, Args &&... args)
-    {
-        ::new (utility::addressof(ref)) T(std::forward<Args>(args)...);
-    }
+        void save_stdout_state(HANDLE stdout_handle)
+        {
+            if (GetHandleInformation(stdout_handle, &stdout_handle_flags)) {
+                is_stdout_inheritable = (stdout_handle_flags & HANDLE_FLAG_INHERIT) ? 1 : 0;
+            }
 
-    template <typename T>
-    inline void _destruct(T * ptr)
-    {
-        ptr->~T();
-    }
+            if (GetConsoleMode(stdout_handle, &stdout_handle_mode)) {
+                has_stdout_console_mode = true;
+            }
+        }
+
+        void save_stderr_state(HANDLE stderr_handle)
+        {
+            if (GetHandleInformation(stderr_handle, &stderr_handle_flags)) {
+                is_stderr_inheritable = (stderr_handle_flags & HANDLE_FLAG_INHERIT) ? 1 : 0;
+            }
+
+            if (GetConsoleMode(stderr_handle, &stderr_handle_mode)) {
+                has_stderr_console_mode = true;
+            }
+        }
+
+        void restore_stdin_state(HANDLE stdin_handle, bool restore_defaults) const
+        {
+            if (has_stdin_console_mode) {
+                SetConsoleMode(stdin_handle, stdin_handle_mode);
+            }
+            else if (restore_defaults) {
+                SetConsoleMode(stdin_handle, ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_INSERT_MODE | ENABLE_EXTENDED_FLAGS | ENABLE_AUTO_POSITION); // 423
+            }
+        }
+
+        void restore_stdout_state(HANDLE stdout_handle, bool restore_defaults) const
+        {
+            if (has_stdout_console_mode) {
+                SetConsoleMode(stdout_handle, stdout_handle_mode);
+            }
+            else if (restore_defaults) {
+                SetConsoleMode(stdout_handle, ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT); // 3
+            }
+        }
+
+        void restore_stderr_state(HANDLE stderr_handle, bool restore_defaults) const
+        {
+            if (has_stderr_console_mode) {
+                SetConsoleMode(stderr_handle, stderr_handle_mode);
+            }
+            else if (restore_defaults) {
+                SetConsoleMode(stderr_handle, ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT); // 3
+            }
+        }
+
+        int is_stdin_inheritable;
+        int is_stdout_inheritable;
+        int is_stderr_inheritable;
+
+        DWORD stdin_handle_flags;
+        DWORD stdout_handle_flags;
+        DWORD stderr_handle_flags;
+
+        bool has_stdin_console_mode;
+        bool has_stdout_console_mode;
+        bool has_stderr_console_mode;
+
+        DWORD stdin_handle_mode;
+        DWORD stdout_handle_mode;
+        DWORD stderr_handle_mode;
+    };
 
     struct _AnyString
     {
@@ -208,37 +258,10 @@ namespace {
         {
         }
 
-        _AnyString(const _AnyString & anystr) :
-            is_wstr(anystr.is_wstr)
-        {
-            if (is_wstr) {
-                _construct(wstr, anystr.wstr);
-            }
-            else {
-                _construct(astr, anystr.astr);
-            }
-        }
+        _AnyString(const _AnyString & anystr);
+        _AnyString(_AnyString && anystr);
 
-        _AnyString(_AnyString && anystr) :
-            is_wstr(anystr.is_wstr)
-        {
-            if (is_wstr) {
-                _construct(wstr, std::move(anystr.wstr));
-            }
-            else {
-                _construct(astr, std::move(anystr.astr));
-            }
-        }
-
-        ~_AnyString()
-        {
-            if (is_wstr) {
-                _destruct(&wstr);
-            }
-            else {
-                _destruct(&astr);
-            }
-        }
+        ~_AnyString();
 
         union {
             std::string     astr;
@@ -310,8 +333,80 @@ namespace {
         return ret;
     }
 
+    template <typename T>
+    inline T(&make_singular_array(T & ref))[1]
+    {
+        return reinterpret_cast<T(&)[1]>(ref);
+    }
 
-    inline void _get_win_ver(_WinVer & win_ver)
+        template <typename T, typename... Args>
+    inline void _construct(T & ref, Args &&... args)
+    {
+        ::new (utility::addressof(ref)) T(std::forward<Args>(args)...);
+    }
+
+    template <typename T>
+    inline void _destruct(T * ptr)
+    {
+        ptr->~T();
+    }
+
+    inline _AnyString::_AnyString(const _AnyString & anystr) :
+        is_wstr(anystr.is_wstr)
+    {
+        if (is_wstr) {
+            _construct(wstr, anystr.wstr);
+        }
+        else {
+            _construct(astr, anystr.astr);
+        }
+    }
+
+    inline _AnyString::_AnyString(_AnyString && anystr) :
+        is_wstr(anystr.is_wstr)
+    {
+        if (is_wstr) {
+            _construct(wstr, std::move(anystr.wstr));
+        }
+        else {
+            _construct(astr, std::move(anystr.astr));
+        }
+    }
+
+    inline _AnyString::~_AnyString()
+    {
+        if (is_wstr) {
+            _destruct(&wstr);
+        }
+        else {
+            _destruct(&astr);
+        }
+    }
+
+
+    inline bool _is_equal_fileid(const _FileId & fileid0, const _FileId & fileid1)
+    {
+        switch (fileid0.fileid_type)
+        {
+        case _FileId::fileid_index128:
+            if (fileid1.fileid_type == _FileId::fileid_index128) {
+                return fileid0.index128.VolumeSerialNumber == fileid1.index128.VolumeSerialNumber &&
+                    !memcmp(fileid0.index128.FileId.Identifier, fileid1.index128.FileId.Identifier, sizeof(fileid0.index128.FileId.Identifier));
+            }
+            break;
+        case _FileId::fileid_index64:
+            if (fileid1.fileid_type == _FileId::fileid_index64) {
+                return fileid0.index64.dwVolumeSerialNumber == fileid1.index64.dwVolumeSerialNumber &&
+                    fileid0.index64.nFileIndexHigh == fileid1.index64.nFileIndexHigh &&
+                    fileid0.index64.nFileIndexLow == fileid1.index64.nFileIndexLow;
+            }
+            break;
+        }
+
+        return false;
+    }
+
+        inline void _get_win_ver(_WinVer & win_ver)
     {
         // CAUTION:
         //  Has effect only for Windows version up to 8.1 (read MSDN documentation)
@@ -470,14 +565,19 @@ namespace {
         //    This change allows applications to distinguish this condition from an error.
         //
         //  The `_fileno` can return negative number and it does if a standard handle is already closed (parent process has called `CreateProcess` w/o standard handles inheritance).
-        //  In that case you must use a direct number, for example, `STDOUT_FILENO` instead of `_fileno(stdout)`, otherwise all sequenced calls will fail, which means `_close(fd)` will close
-        //  the handle w/o a duplication!
+        //  In that case you must use a direct number, for example, `STDOUT_FILENO` instead of `_fileno(stdout)`, otherwise all sequenced calls will fail, which means
+        //  the `_close(fd)` after failed `_dup(fd, ...)` will close the handle w/o duplication!
         //
 
         // CAUTION:
-        //  The `_open_osfhandle` would ignore `SetStdHandle` if all 3 ids already has been allocated.
+        //  The `_open_osfhandle` would ignore `SetStdHandle` if all 3 descriptors has already been allocated.
         //  The `_dup2` can fail with -1 return code in case if can not duplicate a handle and it happens
         //  when the handle has been opened from the `CONOUT$` file!
+        //
+
+        // CAUTION:
+        //  We must check the input handle if it is already registered in the CRT,
+        //  otherwise the `_dup` function will close it before the duplication!
         //
 
         HANDLE file_handle_crt = file_handle;
@@ -485,15 +585,32 @@ namespace {
         switch (id)
         {
         case 0: {
+            HANDLE registered_stdin_handle = INVALID_HANDLE_VALUE;
+            const int stdin_fileno = _fileno(stdin);
+            if (stdin_fileno >= 0) {
+                registered_stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno);
+                if (_is_valid_handle(registered_stdin_handle) && registered_stdin_handle == file_handle) {
+                    // we are trying to register a handle which is already registered
+                    break;
+                }
+            }
+
             if (duplicate_input_handle) {
                 if (!DuplicateHandle(GetCurrentProcess(), file_handle, GetCurrentProcess(), &file_handle_crt, 0,
                     inherit_handle_on_duplicate ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
                     return false;
                 }
+
+                // CAUTION:
+                //  We must check twice, because the `DuplicateHandle` CAN RETURN the CRT registered handle!
+                //
+                if (_is_valid_handle(registered_stdin_handle) && registered_stdin_handle == file_handle_crt) {
+                    // we are trying to register a handle which is already registered
+                    break;
+                }
             }
 
             const int fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_RDONLY);
-            const int stdin_fileno = _fileno(stdin);
             const int fd_dup = stdin_fileno >= 0 ? stdin_fileno : STDIN_FILENO;
             if (fd != fd_dup) {
                 _dup2(fd, fd_dup);
@@ -502,15 +619,32 @@ namespace {
         } break;
 
         case 1: {
+            HANDLE registered_stdout_handle = INVALID_HANDLE_VALUE;
+            const int stdout_fileno = _fileno(stdout);
+            if (stdout_fileno >= 0) {
+                registered_stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno);
+                if (_is_valid_handle(registered_stdout_handle) && registered_stdout_handle == file_handle) {
+                    // we are trying to register a handle which is already registered
+                    break;
+                }
+            }
+
             if (duplicate_input_handle) {
                 if (!DuplicateHandle(GetCurrentProcess(), file_handle, GetCurrentProcess(), &file_handle_crt, 0,
                     inherit_handle_on_duplicate ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
                     return false;
                 }
+
+                // CAUTION:
+                //  We must check twice, because the `DuplicateHandle` CAN RETURN the CRT registered handle!
+                //
+                if (_is_valid_handle(registered_stdout_handle) && registered_stdout_handle == file_handle_crt) {
+                    // we are trying to register a handle which is already registered
+                    break;
+                }
             }
 
             const int fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
-            const int stdout_fileno = _fileno(stdout);
             const int fd_dup = stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO;
             if (fd != fd_dup) {
                 _dup2(fd, fd_dup);
@@ -519,15 +653,32 @@ namespace {
         } break;
 
         case 2: {
+            HANDLE registered_stderr_handle = INVALID_HANDLE_VALUE;
+            const int stderr_fileno = _fileno(stderr);
+            if (stderr_fileno >= 0) {
+                HANDLE registered_stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
+                if (_is_valid_handle(registered_stderr_handle) && registered_stderr_handle == file_handle) {
+                    // we are trying to register a handle which is already registered
+                    break;
+                }
+            }
+
             if (duplicate_input_handle) {
                 if (!DuplicateHandle(GetCurrentProcess(), file_handle, GetCurrentProcess(), &file_handle_crt, 0,
                     inherit_handle_on_duplicate ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
                     return false;
                 }
+
+                // CAUTION:
+                //  We must check twice, because the `DuplicateHandle` CAN RETURN the CRT registered handle!
+                //
+                if (_is_valid_handle(registered_stderr_handle) && registered_stderr_handle == file_handle_crt) {
+                    // we are trying to register a handle which is already registered
+                    break;
+                }
             }
 
             const int fd = _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
-            const int stderr_fileno = _fileno(stderr);
             const int fd_dup = stderr_fileno >= 0 ? stderr_fileno : STDERR_FILENO;
             if (fd != fd_dup) {
                 _dup2(fd, fd_dup);
@@ -565,81 +716,94 @@ namespace {
         }
     }
 
-    inline void _reattach_stdin_to_console(bool inherit_handle)
+    inline bool _reattach_stdin_to_console(bool inherit_handle)
     {
+        //// CAUTION
+        ////  We can not use `tfreopen` nor `_tfreopen` because it does not support unicode streams (_O_WTEXT flags) and opens a stream always as ANSI.
+        ////
+        //tfreopen(_T("CONIN$"), _T("rb"), stdin);
+
+        SECURITY_ATTRIBUTES sa{};
+
+        sa.nLength = sizeof(sa);
+        sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+
+        HANDLE conin_handle = CreateFile(_T("CONIN$"),
+            GENERIC_READ, FILE_SHARE_READ, &sa,
+            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
         // CAUTION:
-        //  We can not use here direct `CreateFile` + `_open_osfhandle` calls as long as the standard handle can be already closed and
-        //  so we must to immediately reopen it to continue. Otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert!
+        //  We must to immediately reopen the handle, otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert!
         //
-        tfreopen(_T("CONIN$"), _T("rb"), stdin);
+        if (_is_valid_handle(conin_handle)) {
+            return _set_crt_std_handle(conin_handle, 0, false);
+        }
 
-        // update handle inheritance
-        SetHandleInformation(GetStdHandle(STD_INPUT_HANDLE), HANDLE_FLAG_INHERIT, inherit_handle ? TRUE : FALSE);
-
-        //SECURITY_ATTRIBUTES sa{};
-
-        //sa.nLength = sizeof(sa);
-        //sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
-
-        //HANDLE conin_handle = CreateFile(_T("CONIN$"),
-        //    GENERIC_READ, FILE_SHARE_READ, &sa,
-        //    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
-        //if (_is_valid_handle(conin_handle)) {
-        //    _set_crt_std_handle(conin_handle, 0, false);
-        //}
+        return false;
     }
 
-    inline void _reattach_stdout_to_console(bool inherit_handle)
+    inline bool _reattach_stdout_to_console(bool inherit_handle)
     {
+        //// CAUTION
+        ////  We can not use `tfreopen` nor `_tfreopen` because it does not support unicode streams (_O_WTEXT flags) and opens a stream always as ANSI.
+        ////
+        //tfreopen(_T("CONOUT$"), _T("wb"), stdout);
+
+        SECURITY_ATTRIBUTES sa{};
+
+        sa.nLength = sizeof(sa);
+        sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+
+        HANDLE conout_handle = CreateFile(_T("CONOUT$"),
+            GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
+            OPEN_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL, NULL);
+
         // CAUTION:
-        //  We can not use here direct `CreateFile` + `_open_osfhandle` calls as long as the standard handle can be already closed and
-        //  so we must to immediately reopen it to continue. Otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert!
+        //  We must to immediately reopen the handle, otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert!
         //
-        tfreopen(_T("CONOUT$"), _T("wb"), stdout);
+        if (_is_valid_handle(conout_handle)) {
+            return _set_crt_std_handle(conout_handle, 1, false);
+        }
 
-        // update handle inheritance
-        SetHandleInformation(GetStdHandle(STD_OUTPUT_HANDLE), HANDLE_FLAG_INHERIT, inherit_handle ? TRUE : FALSE);
-
-        //SECURITY_ATTRIBUTES sa{};
-
-        //sa.nLength = sizeof(sa);
-        //sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
-
-        //HANDLE conout_handle = CreateFile(_T("CONOUT$"),
-        //    GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
-        //    OPEN_ALWAYS,
-        //    FILE_ATTRIBUTE_NORMAL, NULL);
-
-        //if (_is_valid_handle(conout_handle)) {
-        //    _set_crt_std_handle(conout_handle, 1, false);
-        //}
+        return false;
     }
 
-    inline void _reattach_stderr_to_console(bool inherit_handle)
+    inline bool _reattach_stderr_to_console(bool inherit_handle)
     {
+        //// CAUTION
+        ////  We can not use `tfreopen` nor `_tfreopen` because it does not support unicode streams (_O_WTEXT flags) and opens a stream always as ANSI.
+        ////
+        //tfreopen(_T("CONOUT$"), _T("wb"), stderr);
+
+        SECURITY_ATTRIBUTES sa{};
+
+        sa.nLength = sizeof(sa);
+        sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+
+        HANDLE conout_handle = CreateFile(_T("CONOUT$"),
+            GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
+            OPEN_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL, NULL);
+
         // CAUTION:
-        //  We can not use here direct `CreateFile` + `_open_osfhandle` calls as long as the standard handle can be already closed and
-        //  so we must to immediately reopen it to continue. Otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert!
+        //  We must to immediately reopen the handle, otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert!
         //
-        tfreopen(_T("CONOUT$"), _T("wb"), stderr);
+        if (_is_valid_handle(conout_handle)) {
+            return _set_crt_std_handle(conout_handle, 2, false);
+        }
 
-        // update handle inheritance
-        SetHandleInformation(GetStdHandle(STD_ERROR_HANDLE), HANDLE_FLAG_INHERIT, inherit_handle ? TRUE : FALSE);
+        return false;
+    }
 
-        //SECURITY_ATTRIBUTES sa{};
+    inline bool _duplicate_stdout_to_stderr(bool inherit_handle)
+    {
+        return _set_crt_std_handle(GetStdHandle(STD_OUTPUT_HANDLE), 2, true, inherit_handle);
+    }
 
-        //sa.nLength = sizeof(sa);
-        //sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
-
-        //HANDLE conout_handle = CreateFile(_T("CONOUT$"),
-        //    GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
-        //    OPEN_ALWAYS,
-        //    FILE_ATTRIBUTE_NORMAL, NULL);
-
-        //if (_is_valid_handle(conout_handle)) {
-        //    _set_crt_std_handle(conout_handle, 2, false);
-        //}
+    inline bool _duplicate_stderr_to_stdout(bool inherit_handle)
+    {
+        return _set_crt_std_handle(GetStdHandle(STD_ERROR_HANDLE), 1, true, inherit_handle);
     }
 
     inline DWORD _find_parent_process_id()
@@ -1949,7 +2113,7 @@ namespace {
             } while (true);
         }
 
-        // postprocess
+        // post process
 
         if (is_hex_digits) {
             // resize on overflow
@@ -2003,7 +2167,7 @@ namespace {
     }
 
     template <typename Flags, typename Options>
-    inline bool _sanitize_std_handles(int & ret, DWORD & win_error, const Flags & flags, const Options & options)
+    inline bool _sanitize_std_handles(int & ret, DWORD & win_error, const _StdHandlesState & std_handles_state, const Flags & flags, const Options & options)
     {
         // intercept here specific global variables accidental usage instead of local variables
         static struct {} g_options;
@@ -2016,9 +2180,6 @@ namespace {
         DWORD stdin_handle_type = FILE_TYPE_UNKNOWN;
         DWORD stdout_handle_type = FILE_TYPE_UNKNOWN;
         DWORD stderr_handle_type = FILE_TYPE_UNKNOWN;
-
-        bool do_copy_console_mode_from_stdout_to_stderr = false;
-        bool do_copy_console_mode_from_stderr_to_stdout = false;
 
         for (int read_std_handles_iter = 0; read_std_handles_iter < 2; read_std_handles_iter++) {
             if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
@@ -2043,6 +2204,10 @@ namespace {
                     }
                     return false;
                 }
+
+                //if (read_std_handles_iter) {
+                //    std_handles_state.restore_stdin_state(stdin_handle, false);
+                //}
             }
 
             if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
@@ -2067,6 +2232,10 @@ namespace {
                     }
                     return false;
                 }
+
+                //if (read_std_handles_iter) {
+                //    std_handles_state.restore_stdout_state(stdout_handle, false);
+                //}
             }
 
             if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
@@ -2096,6 +2265,10 @@ namespace {
                     }
                     return false;
                 }
+
+                //if (read_std_handles_iter) {
+                //    std_handles_state.restore_stderr_state(stderr_handle, false);
+                //}
             }
 
             // reopen closed std handles from `CONIN$`/`CONOUT$` files
@@ -2184,21 +2357,6 @@ namespace {
                     return false;
                 }
 
-                if (do_copy_console_mode_from_stderr_to_stdout) {
-                    //DWORD stdout_handle_mode = 0;
-                    DWORD stderr_handle_mode = 0;
-                    //GetConsoleMode(stdout_handle, &stdout_handle_mode);
-                    GetConsoleMode(stderr_handle, &stderr_handle_mode);
-                    SetConsoleMode(stdout_handle, stderr_handle_mode);
-                }
-                else if (do_copy_console_mode_from_stdout_to_stderr) {
-                    DWORD stdout_handle_mode = 0;
-                    //DWORD stderr_handle_mode = 0;
-                    GetConsoleMode(stdout_handle, &stdout_handle_mode);
-                    //GetConsoleMode(stderr_handle, &stderr_handle_mode);
-                    SetConsoleMode(stderr_handle, stdout_handle_mode);
-                }
-
                 break;
             }
 
@@ -2206,47 +2364,25 @@ namespace {
                 return true;
             }
 
-            // WORKAROUND:
-            //  The CRT has a bug in implementation of a standard handle reopening and we have to close all invalid standard handles before start to reopen them.
-            //
-
-            // CAUTION:
-            //  We still have to call both `fclose` and `_close`, otherwise the `freopen` still would fail to correctly reopen standard handle.
-            //
-
-            if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
-                fclose(stderr);
-                _close(STDERR_FILENO);
+            if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
+                _reattach_stdin_to_console(!!std_handles_state.is_stdin_inheritable); // by default - inheritable
             }
 
             if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
-                fclose(stdout);
-                _close(STDOUT_FILENO);
-            }
-
-            if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
-                fclose(stdin);
-                _close(STDIN_FILENO);
-            }
-
-            if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
-                _reattach_stdin_to_console(true);
-            }
-
-            if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
-                _reattach_stdout_to_console(true);
-
-                if (stderr_handle_type == FILE_TYPE_CHAR) {
-                    do_copy_console_mode_from_stderr_to_stdout = true;
+                if (stderr_handle_type != FILE_TYPE_UNKNOWN) {
+                    _duplicate_stderr_to_stdout(!!std_handles_state.is_stdout_inheritable);
+                }
+                else {
+                    if (_reattach_stdout_to_console(!!std_handles_state.is_stdout_inheritable)) { // by default - inheritable
+                        _duplicate_stdout_to_stderr(!!std_handles_state.is_stderr_inheritable);
+                    }
+                    else {
+                        _reattach_stderr_to_console(!!std_handles_state.is_stderr_inheritable); // by default - inheritable
+                    }
                 }
             }
-
-            if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
-                _reattach_stderr_to_console(true);
-
-                if (stdout_handle_type == FILE_TYPE_CHAR) {
-                    do_copy_console_mode_from_stdout_to_stderr = true;
-                }
+            else if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
+                _reattach_stderr_to_console(!!std_handles_state.is_stderr_inheritable); // by default - inheritable
             }
         }
 
@@ -2254,7 +2390,7 @@ namespace {
     }
 
     template <typename Flags, typename Options>
-    inline bool _get_std_handles(int & ret, DWORD & win_error, HANDLE & stdin_handle, HANDLE & stdout_handle, HANDLE & stderr_handle, const Flags & flags, const Options & options)
+    inline bool _get_stdin_handle(int & ret, DWORD & win_error, HANDLE & stdin_handle, const Flags & flags, const Options & options)
     {
         // intercept here specific global variables accidental usage instead of local variables
         static struct {} g_options;
@@ -2282,6 +2418,16 @@ namespace {
             return false;
         }
 
+        return true;
+    }
+
+    template <typename Flags, typename Options>
+    inline bool _get_stdout_handle(int & ret, DWORD & win_error, HANDLE & stdout_handle, const Flags & flags, const Options & options)
+    {
+        // intercept here specific global variables accidental usage instead of local variables
+        static struct {} g_options;
+        static struct {} g_flags;
+
         SetLastError(0); // just in case
         stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
         if (!_is_valid_handle(stdout_handle)) {
@@ -2303,6 +2449,16 @@ namespace {
             }
             return false;
         }
+
+        return true;
+    }
+
+    template <typename Flags, typename Options>
+    inline bool _get_stderr_handle(int & ret, DWORD & win_error, HANDLE & stderr_handle, const Flags & flags, const Options & options)
+    {
+        // intercept here specific global variables accidental usage instead of local variables
+        static struct {} g_options;
+        static struct {} g_flags;
 
         SetLastError(0); // just in case
         stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
@@ -2332,6 +2488,49 @@ namespace {
         }
 
         return true;
+    }
+
+    template <typename Flags, typename Options>
+    inline bool _get_std_handles(int & ret, DWORD & win_error, HANDLE & stdin_handle, HANDLE & stdout_handle, HANDLE & stderr_handle, const Flags & flags, const Options & options)
+    {
+        // intercept here specific global variables accidental usage instead of local variables
+        static struct {} g_options;
+        static struct {} g_flags;
+
+        if (!_get_stdin_handle(ret, win_error, stdin_handle, flags, options)) {
+            return false;
+        }
+        if (!_get_stdout_handle(ret, win_error, stdout_handle, flags, options)) {
+            return false;
+        }
+        if (!_get_stderr_handle(ret, win_error, stderr_handle, flags, options)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    void _free_console(_StdHandlesState & std_handles_state)
+    {
+        HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+        HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+
+        std_handles_state.save_stderr_state(stderr_handle);
+        std_handles_state.save_stdout_state(stdout_handle);
+        std_handles_state.save_stdin_state(stdin_handle);
+
+        FreeConsole();
+    }
+
+    void _alloc_console()
+    {
+        AllocConsole();
+    }
+
+    void _attach_console(DWORD process_id)
+    {
+        AttachConsole(process_id);
     }
 }
 

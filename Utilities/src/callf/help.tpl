@@ -714,20 +714,21 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           are empty or <FilePathFormatString> is empty.
     0   - succeded
 
-  Examples (CreateProcess, no recursion):
+  Examples (CreateProcess, no recursion, `cmd.exe` different escaping rules):
     1. callf.exe "${WINDIR}\system32\cmd.exe" "{0} {1}" "/c" "echo.Hello World!"
     2. callf.exe "${COMSPEC}" "{0} {1}" "/c" "echo.Hello World!"
     3. callf.exe "{0}" "\"{1}\" {2}" "${COMSPEC}" "/c" "echo.Hello World!"
     4. callf.exe "" "\"{0}\" {1} {2}" "cmd.exe" "/c" "echo.Hello World!"
     5. callf.exe "" "\"{0}\" {1} {2}" "${WINDIR}\system32\cmd.exe" "/c" "echo.Hello World!"
 
-    6. callf.exe "${COMSPEC}" "/c (echo.Special case characters: ^|^&""|& ^ |&""^|^& ^^ ^|^&""|& ^ |&""^|^&)&pause"
-    7. callf.exe "${COMSPEC}" "/c (echo.Special case characters: ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^&)&pause"
+    6. callf.exe "${COMSPEC}" "/c echo.Special case characters: ^|^&""|& ^ |&""^|^& ^^ ^|^&""|& ^ |&""^|^&&pause"
+    7. callf.exe "${COMSPEC}" "/c echo.Special case characters: ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^&&pause"
+    8. callf.exe "${COMSPEC}" "/c \"echo.Special case characters: ^^^|^^^&\"|& ^ |&\"^^^|^^^& ^^^^ ^^^|^^^&\"|& ^ |&\"^^^|^^^&^&pause\""
 
     Examples #1-5 should print:
       Hello World!
 
-    Examples #6-7 should print and pause after:
+    Examples #6-8 should print and pause after:
       Special case characters: |&"|& ^ |&"|& ^ |&"|& ^ |&"|&
 
   Examples (CreateProcess, with recursion):

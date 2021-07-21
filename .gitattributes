@@ -906,10 +906,10 @@ Utilities/tests/manual/contools/callf/test_10_escape_recur_03.bat -text
 Utilities/tests/manual/contools/callf/test_11_special_case_chars_01.bat -text
 Utilities/tests/manual/contools/callf/test_11_special_case_chars_02.bat -text
 Utilities/tests/manual/contools/callf/test_11_special_case_chars_03.bat -text
-Utilities/tests/manual/contools/callf/test_12_shell_exec_runas_with_existing_console_01.bat -text
-Utilities/tests/manual/contools/callf/test_12_shell_exec_runas_with_existing_console_02.bat -text
-Utilities/tests/manual/contools/callf/test_13_shell_exec_runas_with_new_console_01.bat -text
-Utilities/tests/manual/contools/callf/test_13_shell_exec_runas_with_new_console_02.bat -text
+Utilities/tests/manual/contools/callf/test_12_shell_exec_runas_with_new_console_01.bat -text
+Utilities/tests/manual/contools/callf/test_12_shell_exec_runas_with_new_console_02.bat -text
+Utilities/tests/manual/contools/callf/test_13_shell_exec_runas_with_existing_console_01.bat -text
+Utilities/tests/manual/contools/callf/test_13_shell_exec_runas_with_existing_console_02.bat -text
 Utilities/tests/manual/contools/callf/test_20_create_process_with_named_pipe_to_child_stdin_01.bat -text
 Utilities/tests/manual/contools/callf/test_20_create_process_with_named_pipe_to_child_stdin_02.bat -text
 Utilities/tests/manual/contools/callf/test_21_shell_exec_runas_with_named_pipe_to_child_stdin_01.bat -text

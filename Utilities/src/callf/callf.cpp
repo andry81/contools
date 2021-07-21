@@ -33,6 +33,13 @@ const TCHAR * g_empty_flags_arr[] = {
 };
 
 const TCHAR * g_flags_to_preparse_arr[] = {
+    _T("/ret-create-proc"),
+    _T("/ret-win-error"),
+    _T("/win-error-langid"),
+    _T("/ret-child-exit"),
+    _T("/print-win-error-string"),
+    _T("/print-shell-error-string"),
+    _T("/no-print-gen-error-string"),
     _T("/elevate"),
     _T("/create-console"),
     _T("/attach-parent-console"),
@@ -2210,6 +2217,8 @@ int _tmain(int argc, const TCHAR * argv[])
 
             // update process console
 
+            _StdHandlesState std_handles_state;
+
             if (!g_flags.disable_conout_reattach_to_visible_console) {
                 // check if console is not visible
                 HWND inherited_console_window = GetConsoleWindow();
@@ -2222,8 +2231,8 @@ int _tmain(int argc, const TCHAR * argv[])
                         is_conout_reattached_to_visible_console = true;
 
                         if (!g_current_proc_console_window) {
-                            FreeConsole();
-                            AllocConsole();
+                            _free_console(std_handles_state);
+                            _alloc_console();
                         }
 
                         if (g_options.has.create_console_title) {
@@ -2263,8 +2272,8 @@ int _tmain(int argc, const TCHAR * argv[])
                             // reattach to parent process console window
                             is_conout_reattached_to_visible_console = true;
 
-                            FreeConsole();
-                            AttachConsole(ancestor_console_window_owner_proc.proc_id);
+                            _free_console(std_handles_state);
+                            _attach_console(ancestor_console_window_owner_proc.proc_id);
 
                             if (g_options.has.console_title) {
                                 SetConsoleTitle(g_options.console_title.c_str());
@@ -2284,9 +2293,9 @@ int _tmain(int argc, const TCHAR * argv[])
                     if (!g_current_proc_console_window) {
                         HWND inherited_console_window = GetConsoleWindow();
                         if (inherited_console_window) {
-                            FreeConsole();
+                            _free_console(std_handles_state);
                         }
-                        AllocConsole();
+                        _alloc_console();
 
                         if (g_options.has.create_console_title) {
                             SetConsoleTitle(g_options.create_console_title.c_str());
@@ -2320,8 +2329,8 @@ int _tmain(int argc, const TCHAR * argv[])
                         // reattach to parent process console window
                         is_conout_reattached_to_visible_console = true;
 
-                        FreeConsole();
-                        AttachConsole(ancestor_console_window_owner_proc.proc_id);
+                        _free_console(std_handles_state);
+                        _attach_console(ancestor_console_window_owner_proc.proc_id);
 
                         if (g_options.has.console_title) {
                             SetConsoleTitle(g_options.console_title.c_str());
@@ -2349,8 +2358,13 @@ int _tmain(int argc, const TCHAR * argv[])
 
             // std handles check on consistency before continue, otherwise reopen from `CONIN$`/`CONOUT$`
 
-            if (!_sanitize_std_handles(ret, win_error, g_flags, g_options)) {
-                return ret;
+            if (!_sanitize_std_handles(ret, win_error, std_handles_state, g_flags, g_options)) {
+                if (!g_flags.ret_win_error) {
+                    return win_error;
+                }
+                else {
+                    return ret;
+                }
             }
 
             arg_offset = 1;
@@ -3019,9 +3033,11 @@ int _tmain(int argc, const TCHAR * argv[])
                     // The process is owning the console window and is going to close it.
                     // Detach console before the exit, attach to parent console and does print the saved console prints into a parent console.
 
-                    FreeConsole();
+                    _StdHandlesState std_handles_state;
+
+                    _free_console(std_handles_state);
                     if (ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
-                        AttachConsole(ancestor_console_window_owner_proc.proc_id);
+                        _attach_console(ancestor_console_window_owner_proc.proc_id);
                     }
 
                     for (const auto & conout : g_conout_prints_buf) {

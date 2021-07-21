@@ -560,18 +560,6 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             stream_eof = true;
                         }
                     }
-
-                    // explicitly disconnect/close all stdout handles here to trigger the child process reaction
-
-                    // CAUTION:
-                    //  Always flush before disconnection/close, otherwise the last bytes would be lost!
-                    //
-                    FlushFileBuffers(g_stdin_pipe_write_handle);
-
-                    if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
-                        DisconnectNamedPipe(g_stdin_pipe_write_handle);
-                    }
-                    _close_handle(g_stdin_pipe_write_handle);
                 } break;
 
                 case FILE_TYPE_PIPE:
@@ -725,18 +713,6 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             }
                         }
                     }
-
-                    // explicitly disconnect/close all stdout handles here to trigger the child process reaction
-
-                    // CAUTION:
-                    //  Always flush before disconnection/close, otherwise the last bytes would be lost!
-                    //
-                    FlushFileBuffers(g_stdin_pipe_write_handle);
-
-                    if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
-                        DisconnectNamedPipe(g_stdin_pipe_write_handle);
-                    }
-                    _close_handle(g_stdin_pipe_write_handle);
                 } break;
 
 //                case FILE_TYPE_CHAR:
@@ -1273,7 +1249,59 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
         }();
     }
     __finally {
-        ;
+        // cleanup
+
+        switch (stream_type) {
+        case 0: // stdin
+        {
+            switch (g_stdin_handle_type) {
+            case FILE_TYPE_DISK:
+            case FILE_TYPE_PIPE:
+            {
+                // explicitly disconnect/close all pipe outbound handles here to trigger the child process reaction
+
+                // CAUTION:
+                //  Always flush before disconnection/close, otherwise the last bytes would be lost!
+                //
+                FlushFileBuffers(g_stdin_pipe_write_handle);
+
+                if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
+                    DisconnectNamedPipe(g_stdin_pipe_write_handle);
+                }
+                _close_handle(g_stdin_pipe_write_handle);
+            } break;
+            }
+        } break;
+
+        // CAUTION:
+        //  DO NOT disconnect in output-to-input direction to avoid data early lost because of buffering between input and output.
+        //
+
+        //case 1: // stdout
+        //{
+        //    if (_is_valid_handle(g_stdout_pipe_read_handle)) {
+        //        // explicitly disconnect/close all pipe inbound handles here to trigger the child process reaction
+
+        //        if (!g_options.create_inbound_server_pipe_to_stdout.empty()) {
+        //            DisconnectNamedPipe(g_stdout_pipe_read_handle);
+        //        }
+        //        _close_handle(g_stdout_pipe_read_handle);
+        //    }
+        //} break;
+
+
+        //case 2: // stderr
+        //{
+        //    if (_is_valid_handle(g_stderr_pipe_read_handle)) {
+        //        // explicitly disconnect/close all pipe inbound handles here to trigger the child process reaction
+
+        //        if (!g_options.create_inbound_server_pipe_to_stderr.empty()) {
+        //            DisconnectNamedPipe(g_stderr_pipe_read_handle);
+        //        }
+        //        _close_handle(g_stderr_pipe_read_handle);
+        //    }
+        //} break;
+        }
     } }();
 
     return 0;
@@ -1519,34 +1547,6 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                         stream_eof = true;
                     }
                 }
-
-                // explicitly disconnect/close all stdout handles here to trigger the child process reaction
-
-                // CAUTION:
-                //  Always flush before disconnection/close, otherwise the last bytes would be lost!
-                //
-                FlushFileBuffers(g_stdout_handle);
-
-                if (!g_options.reopen_stdout_as_server_pipe.empty()) {
-                    DisconnectNamedPipe(g_stdout_handle);
-                }
-
-                // CAUTION:
-                //  Never close standard handle directly, use CRT call instead, otherwise the CRT would be in desync with the Win32!
-                //
-                //_close_handle(g_stdout_handle);
-
-                // CAUTION:
-                //  Never close standard handle through the _close, otherwise stream (FILE*) would be always in use (partially closed)!
-                //
-                //const int stdout_fileno = _fileno(stdout);
-                //_close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
-
-                // CAUTION:
-                //  We should not simply close the handle as long as it can be used later even on process exit, but to trigger a child
-                //  process we must close it, so we reopen it instead.
-                //
-                tfreopen(_T("CONOUT$"), _T("wb"), stdout);
             } break;
 
             case FILE_TYPE_PIPE:
@@ -1730,40 +1730,54 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                         }
                     }
                 }
-
-                // explicitly disconnect/close all stdout handles here to trigger the child process reaction
-
-                // CAUTION:
-                //  Always flush before disconnection/close, otherwise the last bytes would be lost!
-                //
-                FlushFileBuffers(g_stdout_handle);
-
-                if (!g_options.reopen_stdout_as_server_pipe.empty()) {
-                    DisconnectNamedPipe(g_stdout_handle);
-                }
-
-                // CAUTION:
-                //  Never close standard handle directly, use CRT call instead, otherwise the CRT would be in desync with the Win32!
-                //
-                //_close_handle(g_stdout_handle);
-
-                // CAUTION:
-                //  Never close standard handle through the _close, otherwise stream (FILE*) would be always in use (partially closed)!
-                //
-                //const int stdout_fileno = _fileno(stdout);
-                //_close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
-
-                // CAUTION:
-                //  We should not simply close the handle as long as it can be used later even on process exit, but to trigger a child
-                //  process we must close it, so we reopen it instead.
-                //
-                tfreopen(_T("CONOUT$"), _T("wb"), stdout);
             } break;
             }
         }();
     }
     __finally {
-        ;
+        // cleanup
+
+        switch (g_stdin_handle_type) {
+        case FILE_TYPE_DISK:
+        case FILE_TYPE_PIPE:
+        {
+            // explicitly disconnect/close all stdout handles here to trigger the child process reaction
+
+            // CAUTION:
+            //  Always flush before disconnection/close, otherwise the last bytes would be lost!
+            //
+            FlushFileBuffers(g_stdout_handle);
+
+            if (!g_options.reopen_stdout_as_server_pipe.empty()) {
+                DisconnectNamedPipe(g_stdout_handle);
+            }
+
+            // CAUTION:
+            //  Never close standard handle directly, use CRT call instead, otherwise the CRT would be in desync with the Win32!
+            //
+            //_close_handle(g_stdout_handle);
+
+            // CAUTION:
+            //  Never close standard handle through the _close, otherwise stream (FILE*) would be always in use (partially closed)!
+            //
+            //const int stdout_fileno = _fileno(stdout);
+            //_close(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
+
+            // CAUTION:
+            //  We should not simply close the handle as long as it can be used later even on process exit, but to trigger a child
+            //  process we must close it, so we reopen it instead.
+            //
+            _StdHandlesState std_handles_state;
+
+            std_handles_state.save_stdout_state(g_stdout_handle);
+
+            _reattach_stdout_to_console(!!std_handles_state.is_stdout_inheritable);
+
+            // reread owned by CRT handles
+            g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+            g_stdout_handle_type = GetFileType(g_stdout_handle);
+        } break;
+        }
     } }();
 
     return 0;
@@ -1803,6 +1817,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     SetLastError(0); // just in case
                     if (!ConnectNamedPipe(g_reopen_stdin_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
+                        if (win_error == ERROR_PIPE_CONNECTED) {
+                            break;
+                        }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
                             thread_data.ret = err_named_pipe_connect_error;
                             thread_data.win_error = win_error;
@@ -1858,6 +1875,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     SetLastError(0); // just in case
                     if (!ConnectNamedPipe(g_tee_named_pipe_stdin_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
+                        if (win_error == ERROR_PIPE_CONNECTED) {
+                            break;
+                        }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
                             thread_data.ret = err_named_pipe_connect_error;
                             thread_data.win_error = win_error;
@@ -1921,6 +1941,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     SetLastError(0); // just in case
                     if (!ConnectNamedPipe(g_reopen_stdout_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
+                        if (win_error == ERROR_PIPE_CONNECTED) {
+                            break;
+                        }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
                             thread_data.ret = err_named_pipe_connect_error;
                             thread_data.win_error = win_error;
@@ -1976,6 +1999,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     SetLastError(0); // just in case
                     if (!ConnectNamedPipe(g_tee_named_pipe_stdout_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
+                        if (win_error == ERROR_PIPE_CONNECTED) {
+                            break;
+                        }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
                             thread_data.ret = err_named_pipe_connect_error;
                             thread_data.win_error = win_error;
@@ -2039,6 +2065,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     SetLastError(0); // just in case
                     if (!ConnectNamedPipe(g_reopen_stderr_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
+                        if (win_error == ERROR_PIPE_CONNECTED) {
+                            break;
+                        }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
                             thread_data.ret = err_named_pipe_connect_error;
                             thread_data.win_error = win_error;
@@ -2094,6 +2123,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     SetLastError(0); // just in case
                     if (!ConnectNamedPipe(g_tee_named_pipe_stderr_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
+                        if (win_error == ERROR_PIPE_CONNECTED) {
+                            break;
+                        }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
                             thread_data.ret = err_named_pipe_connect_error;
                             thread_data.win_error = win_error;
@@ -2160,7 +2192,61 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
         }();
     }
     __finally {
-        ;
+        // cleanup
+
+        if (thread_data.is_error) {
+            // NOTE:
+            //  Always disconnect a server named pipe end together with the handle close even if connection is not accomplished or SEH exception is thrown,
+            //  otherwise a client may be blocked on the `PeekNamedPipe` call in an infinite loop.
+            //
+
+            switch (co_stream_type) {
+            case 0: // stdin
+            {
+                switch (handle_type) {
+                case 0: {
+                    DisconnectNamedPipe(g_reopen_stdin_handle);
+                    _close_handle(g_reopen_stdin_handle);
+                } break;
+
+                case 1: {
+                    DisconnectNamedPipe(g_tee_named_pipe_stdin_handle);
+                    _close_handle(g_reopen_stdin_handle);
+                } break;
+                }
+            } break;
+
+            case 1: // stdout
+            {
+                switch (handle_type) {
+                case 0: {
+                    DisconnectNamedPipe(g_reopen_stdout_handle);
+                    _close_handle(g_reopen_stdout_handle);
+                } break;
+
+                case 1: {
+                    DisconnectNamedPipe(g_tee_named_pipe_stdout_handle);
+                    _close_handle(g_reopen_stdout_handle);
+                } break;
+                }
+            } break;
+
+            case 2: // stderr
+            {
+                switch (handle_type) {
+                case 0: {
+                    DisconnectNamedPipe(g_reopen_stderr_handle);
+                    _close_handle(g_reopen_stderr_handle);
+                } break;
+
+                case 1: {
+                    DisconnectNamedPipe(g_tee_named_pipe_stderr_handle);
+                    _close_handle(g_reopen_stderr_handle);
+                } break;
+                }
+            } break;
+            }
+        }
     }
 
     return 0;
@@ -3388,58 +3474,64 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
     //
     return [&]() -> DWORD { __try {
         return [&]() -> DWORD {
-            // start server pipe connection await
-            SetLastError(0); // just in case
-            if (!ConnectNamedPipe(g_stdin_pipe_write_handle, &connection_await_overlapped)) {
-                win_error = GetLastError();
-                if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                    thread_data.ret = err_named_pipe_connect_error;
-                    thread_data.win_error = win_error;
-                    if (!g_flags.no_print_gen_error_string) {
-                        thread_data.msg =
-                            _format_stderr_message(_T("could not initiate connection of outbound client named pipe end from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                win_error, win_error, g_options.create_outbound_server_pipe_from_stdin.c_str());
+            if_break(true) {
+                // start server pipe connection await
+                SetLastError(0); // just in case
+                if (!ConnectNamedPipe(g_stdin_pipe_write_handle, &connection_await_overlapped)) {
+                    win_error = GetLastError();
+                    if (win_error == ERROR_PIPE_CONNECTED) {
+                        break;
                     }
-                    if (g_flags.print_win_error_string && win_error) {
-                        thread_data.msg +=
-                            _format_win_error_message(win_error, g_options.win_error_langid);
+                    if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
+                        thread_data.ret = err_named_pipe_connect_error;
+                        thread_data.win_error = win_error;
+                        if (!g_flags.no_print_gen_error_string) {
+                            thread_data.msg =
+                                _format_stderr_message(_T("could not initiate connection of outbound client named pipe end from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                    win_error, win_error, g_options.create_outbound_server_pipe_from_stdin.c_str());
+                        }
+                        if (g_flags.print_win_error_string && win_error) {
+                            thread_data.msg +=
+                                _format_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        return 1;
                     }
-                    return 1;
-                }
-            }
-
-            const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
-
-            // server named pipe end wait loop
-            while (true) {
-                // NOTE:
-                //  Based on:
-                //    `HasOverlappedIoCompleted macro (winbase.h)` : https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-hasoverlappediocompleted:
-                //
-                //    Do not call this macro unless the call to GetLastError returns ERROR_IO_PENDING, indicating that the overlapped I/O has started.
-                //
-                //  We call both the `WaitNamedPipe` function and after the `HasOverlappedIoCompleted` macro to be sure for the both named pipe ends.
-                //
-
-                if (HasOverlappedIoCompleted(&connection_await_overlapped)) {
-                    break;
                 }
 
-                const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
-                const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
+                // server named pipe end wait loop
+                while (true) {
+                    // NOTE:
+                    //  Based on:
+                    //    `HasOverlappedIoCompleted macro (winbase.h)` : https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-hasoverlappediocompleted:
+                    //
+                    //    Do not call this macro unless the call to GetLastError returns ERROR_IO_PENDING, indicating that the overlapped I/O has started.
+                    //
+                    //  We call both the `WaitNamedPipe` function and after the `HasOverlappedIoCompleted` macro to be sure for the both named pipe ends.
+                    //
 
-                if (time_delta_ms >= g_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms) {
-                    thread_data.ret = err_named_pipe_connect_timeout;
-                    if (!g_flags.no_print_gen_error_string) {
-                        thread_data.msg =
-                            _format_stderr_message(_T("server connection timeout of outbound server named pipe end from stdin: pipe=\"%s\" timeout=%u ms\n"),
-                                g_options.create_outbound_server_pipe_from_stdin.c_str(), g_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms);
+                    if (HasOverlappedIoCompleted(&connection_await_overlapped)) {
+                        break;
                     }
-                    return 1;
-                }
 
-                Sleep(20);
+                    const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+
+                    const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
+
+                    if (time_delta_ms >= g_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms) {
+                        thread_data.ret = err_named_pipe_connect_timeout;
+                        if (!g_flags.no_print_gen_error_string) {
+                            thread_data.msg =
+                                _format_stderr_message(_T("server connection timeout of outbound server named pipe end from stdin: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.create_outbound_server_pipe_from_stdin.c_str(), g_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms);
+                        }
+
+                        return 1;
+                    }
+
+                    Sleep(20);
+                }
             }
 
             thread_data.is_error = false;
@@ -3448,7 +3540,16 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
         }();
     }
     __finally {
-        ;
+        if (thread_data.is_error) {
+            // explicitly disconnect/close all pipe outbound handles here to trigger the child process reaction
+
+            // NOTE:
+            //  Always disconnect a server named pipe end together with the handle close even if connection is not accomplished or SEH exception is thrown,
+            //  otherwise a client may be blocked on the `PeekNamedPipe` call in an infinite loop.
+            //
+            DisconnectNamedPipe(g_stdin_pipe_write_handle);
+            _close_handle(g_stdin_pipe_write_handle);
+        }
     }
 
     return 0;
@@ -3482,57 +3583,63 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
     //
     return [&]() -> DWORD { __try {
         return [&]() -> DWORD {
-            SetLastError(0); // just in case
-            if (!ConnectNamedPipe(conout_pipe_read_handle, &connection_await_overlapped)) {
-                win_error = GetLastError();
-                if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                    thread_data.ret = err_named_pipe_connect_error;
-                    thread_data.win_error = win_error;
-                    if (!g_flags.no_print_gen_error_string) {
-                        thread_data.msg =
-                            _format_stderr_message(_T("could not initiate connection of inbound client named pipe end from %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                conout_name_token_str, win_error, win_error, create_inbound_server_pipe_to_conout.c_str());
+            if_break(true) {
+                SetLastError(0); // just in case
+                if (!ConnectNamedPipe(conout_pipe_read_handle, &connection_await_overlapped)) {
+                    win_error = GetLastError();
+                    if (win_error == ERROR_PIPE_CONNECTED) {
+                        break;
                     }
-                    if (g_flags.print_win_error_string && win_error) {
-                        thread_data.msg +=
-                            _format_win_error_message(win_error, g_options.win_error_langid);
+                    if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
+                        thread_data.ret = err_named_pipe_connect_error;
+                        thread_data.win_error = win_error;
+                        if (!g_flags.no_print_gen_error_string) {
+                            thread_data.msg =
+                                _format_stderr_message(_T("could not initiate connection of inbound client named pipe end from %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                    conout_name_token_str, win_error, win_error, create_inbound_server_pipe_to_conout.c_str());
+                        }
+                        if (g_flags.print_win_error_string && win_error) {
+                            thread_data.msg +=
+                                _format_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        return 1;
                     }
-                    return 1;
-                }
-            }
-
-            // server named pipe end wait loop
-            const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
-
-            while (true) {
-                if (thread_data.cancel_io) return -1;
-
-                // NOTE:
-                //  Based on:
-                //    `HasOverlappedIoCompleted macro (winbase.h)` : https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-hasoverlappediocompleted:
-                //
-                //    Do not call this macro unless the call to GetLastError returns ERROR_IO_PENDING, indicating that the overlapped I/O has started.
-                //
-
-                if (HasOverlappedIoCompleted(&connection_await_overlapped)) {
-                    break;
                 }
 
-                const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                // server named pipe end wait loop
+                const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
 
-                const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
+                while (true) {
+                    if (thread_data.cancel_io) return -1;
 
-                if (time_delta_ms >= create_inbound_server_pipe_to_conout_connect_timeout_ms) {
-                    thread_data.ret = err_named_pipe_connect_timeout;
-                    if (!g_flags.no_print_gen_error_string) {
-                        thread_data.msg =
-                            _format_stderr_message(_T("server connection timeout of inbound server named pipe end to %s: pipe=\"%s\" timeout=%u ms\n"),
-                                conout_name_token_str, create_inbound_server_pipe_to_conout.c_str(), create_inbound_server_pipe_to_conout_connect_timeout_ms);
+                    // NOTE:
+                    //  Based on:
+                    //    `HasOverlappedIoCompleted macro (winbase.h)` : https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-hasoverlappediocompleted:
+                    //
+                    //    Do not call this macro unless the call to GetLastError returns ERROR_IO_PENDING, indicating that the overlapped I/O has started.
+                    //
+
+                    if (HasOverlappedIoCompleted(&connection_await_overlapped)) {
+                        break;
                     }
-                    return 1;
-                }
 
-                Sleep(20);
+                    const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+
+                    const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
+
+                    if (time_delta_ms >= create_inbound_server_pipe_to_conout_connect_timeout_ms) {
+                        thread_data.ret = err_named_pipe_connect_timeout;
+                        if (!g_flags.no_print_gen_error_string) {
+                            thread_data.msg =
+                                _format_stderr_message(_T("server connection timeout of inbound server named pipe end to %s: pipe=\"%s\" timeout=%u ms\n"),
+                                    conout_name_token_str, create_inbound_server_pipe_to_conout.c_str(), create_inbound_server_pipe_to_conout_connect_timeout_ms);
+                        }
+
+                        return 1;
+                    }
+
+                    Sleep(20);
+                }
             }
 
             thread_data.is_error = false;
@@ -3541,7 +3648,16 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
         }();
     }
     __finally {
-        ;
+        if (thread_data.is_error) {
+            // explicitly disconnect/close all pipe outbound handles here to trigger the child process reaction
+
+            // NOTE:
+            //  Always disconnect a server named pipe end together with the handle close even if connection is not accomplished or SEH exception is thrown,
+            //  otherwise a client may be blocked on the `PeekNamedPipe` call in an infinite loop.
+            //
+            DisconnectNamedPipe(conout_pipe_read_handle);
+            _close_handle(conout_pipe_read_handle);
+        }
     }
 
     return 0;
@@ -4080,7 +4196,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             if (break_) break;
         }
 
-        // assign reopened std handles to CRT
+        // assign reopened client named pipe as std handle to CRT
 
         if (!g_options.reopen_stdin_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stdin_handle)) {

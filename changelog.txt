@@ -1,4 +1,13 @@
 2021.07.21:
+* fixed: Utilities/src/callf: missed to check a handle on registered state in the CRT (`_set_crt_std_handle` function), otherwise the CRT `_dup` function would attempt to close the handle before it's duplication (random invalid handle errors)
+* fixed: Utilities/src/callf: missed to check `ConnectNamedPipe` on `ERROR_PIPE_CONNECTED` error which means connection is accomplished before the function call
+* fixed: Utilities/src/callf: all tests pass
+* fixed: Utilities/src/callf: other minor fixup
+* fixed: Utilities/tests: minor fixup
+* changed: Utilities/src/callf: help update
+* refactor: Utilities/src/callf: code cleanup
+
+2021.07.21:
 * new: Utilities/tests: more manual tests for `callf` utility
 
 2021.07.20:
@@ -9,6 +18,10 @@
 
 2021.07.19:
 * fixed: Scripts/Tools/std/restorecp.bat: tests pass
+
+2021.07.18:
+* fixed: Utilities/src/callf: missed to close server named pipe end after connection timeout
+* changed: Utilities/src/callf: rewrited code cleanup for all pipe threads to always disconnect a server named pipe end together with the handle close even if connection is not accomplished or SEH exception is thrown, otherwise a client may be blocked on the `PeekNamedPipe` call in an infinite loop
 
 2021.07.16:
 * new: Utilities/bin/contools: binaries update
