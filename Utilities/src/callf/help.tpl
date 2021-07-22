@@ -222,6 +222,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           /no-print-gen-error-string
           /no-sys-dialog-ui
           /attach-parent-console
+          /disable-wow64-fs-redir
           /disable-conout-reattach-to-visible-console
           /disable-conout-duplicate-to-parent-console-on-error
 
@@ -244,6 +245,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           /mutex-std-*
           /mutex-tee-*
           /attach-parent-console
+          /disable-wow64-fs-redir
           /disable-conout-reattach-to-visible-console
           /disable-conout-duplicate-to-parent-console-on-error
 
@@ -642,6 +644,9 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         If `<value>` is empty, the variable is deleted.
 
     Special flags:
+      /disable-wow64-fs-redir
+        Disables file system redirection for the WOW64 process.
+
       /disable-conout-reattach-to-visible-console
         In case if the current process console is not visible and a parent
         process console is visible, then before print any output the

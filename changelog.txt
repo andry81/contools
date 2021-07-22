@@ -1,3 +1,6 @@
+2021.07.22:
+* new: Utilities/src/callf: `/disable-wow64-fs-redir` flag to be able to use 32-bit `callf.exe` process in the 64-bit console environment
+
 2021.07.21:
 * new: Utilities/bin/contools: binaries update
 

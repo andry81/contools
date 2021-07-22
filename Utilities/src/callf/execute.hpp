@@ -29,6 +29,7 @@ struct Flags
     // NOTE: the `tee` applies only to the child process here!
     //
     bool            show_help;
+    bool            disable_wow64_fs_redir;
     bool            disable_conout_reattach_to_visible_console;
     bool            disable_conout_duplicate_to_parent_console_on_error;
     bool            elevate;

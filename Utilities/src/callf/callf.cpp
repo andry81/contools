@@ -21,6 +21,9 @@ namespace {
 }
 
 
+// WOW64 FileSystem redirection data
+PVOID g_disable_wow64_fs_redir_ptr = NULL;
+
 // sets true just after the CreateProcess or ShellExecute success execute
 bool g_is_process_executed = false;
 
@@ -46,6 +49,7 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/create-console-title"),
     _T("/own-console-title"),
     _T("/console-title"),
+    _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
@@ -62,11 +66,13 @@ const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_promote_flags_to_preparse_arr[] = {
+    _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
 
 const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
+    _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
@@ -200,6 +206,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/eval-backslash-esc"), _T("/e"),
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
     _T("/set-env-var"), _T("/v"),
+    _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
@@ -262,6 +269,7 @@ const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
     _T("/stdin-echo"),
     _T("/eval-backslash-esc"), _T("/e"),
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
+    _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
@@ -310,6 +318,7 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
     _T("/no-print-gen-error-string"),
     _T("/no-sys-dialog-ui"),
     _T("/attach-parent-console"),
+    _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
@@ -394,6 +403,7 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/mutex-std-writes"),
     _T("/mutex-tee-file-writes"),
     _T("/attach-parent-console"),
+    _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
@@ -1945,6 +1955,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         else error = invalid_format_flag(start_arg);
         return 2;
     }
+    if (IsArgEqualTo(arg, _T("/disable-wow64-fs-redir"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.disable_wow64_fs_redir = true;
+            return 1;
+        }
+        return 0;
+    }
     if (IsArgEqualTo(arg, _T("/disable-conout-reattach-to-visible-console"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.disable_conout_reattach_to_visible_console = true;
@@ -2213,6 +2230,12 @@ int _tmain(int argc, const TCHAR * argv[])
             if (!g_flags.disable_conout_duplicate_to_parent_console_on_error) {
                 // enable console output buffering by default
                 g_enable_conout_prints_buffering = true;
+            }
+
+            // disable WOW64 FileSystem redirection
+
+            if (g_flags.disable_wow64_fs_redir) {
+                Wow64DisableWow64FsRedirection(&g_disable_wow64_fs_redir_ptr);
             }
 
             // update process console
@@ -3063,6 +3086,11 @@ int _tmain(int argc, const TCHAR * argv[])
                         }
                     }
                 }
+            }
+
+            if (g_disable_wow64_fs_redir_ptr) {
+                Wow64RevertWow64FsRedirection(g_disable_wow64_fs_redir_ptr);
+                g_disable_wow64_fs_redir_ptr = NULL; // just in case
             }
         }();
     }
