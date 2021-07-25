@@ -24,22 +24,55 @@ namespace {
 
     struct _Flags
     {
+        _Flags()
+        {
+            // raw initialization
+            memset(this, 0, sizeof(*this));
+        }
+
+        _Flags(const _Flags &) = default;
+        _Flags(_Flags &&) = default;
+
+        _Flags & operator =(const _Flags &) = default;
+        //_Flags && operator =(_Flags &&) = default;
+
         bool            no_print_gen_error_string;
         bool            no_expand_env;                  // don't expand `${...}` environment variables
         bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
+
+        bool            allow_expand_unexisted_env;
+        bool            allow_subst_empty_args;
+
         bool            eval_backslash_esc;             // evaluate backslash escape characters
         bool            eval_dbl_backslash_esc;         // evaluate double backslash escape characters (`\\`)
     };
 
     struct _Options
     {
+        _Options()
+        {
+            chcp = 0;
+        }
+
+        _Options(const _Options &) = default;
+        _Options(_Options &&) = default;
+
+        _Options & operator =(const _Options &) = default;
+        //_Options && operator =(_Options &&) = default;
+
         unsigned int    chcp;
+
+        // std::tuple<argument_offset_index, allow_expand_unexisted_env_var>:
+        //  argument_offset_index: -1 - all, -2 - greater or equal to 1
+        std::deque<std::tuple<int, bool> > expand_env_args;
+
+        // std::tuple<argument_offset_index, allow_subst_empty_arg>:
+        //  argument_offset_index: -1 - all, -2 - greater or equal to 1
+        std::deque<std::tuple<int, bool> > subst_vars_args;
     };
 
     _Flags g_flags                      = {};
-    _Options g_options                  = {
-        0
-    };
+    _Options g_options                  = {};
 }
 
 int _tmain(int argc, const TCHAR * argv[])
@@ -75,7 +108,7 @@ int _tmain(int argc, const TCHAR * argv[])
         arg = argv[arg_offset];
         if (!arg) {
             if (!g_flags.no_print_gen_error_string) {
-                fputs("error: flag is invalid", stderr);
+                tfputs(_T("error: flag is invalid"), stderr);
             }
             return err_invalid_format;
         }
@@ -110,6 +143,12 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/no-subst-vars"))) {
             g_flags.no_subst_vars = true;
         }
+        else if (!tstrcmp(arg, _T("/allow-expand-unexisted-env"))) {
+            g_flags.allow_expand_unexisted_env = true;
+        }
+        else if (!tstrcmp(arg, _T("/allow-subst-empty-args"))) {
+            g_flags.allow_subst_empty_args = true;
+        }
         else if (!tstrcmp(arg, _T("/eval-backslash-esc")) || !tstrcmp(arg, _T("/e"))) {
             g_flags.eval_backslash_esc = true;
         }
@@ -124,6 +163,18 @@ int _tmain(int argc, const TCHAR * argv[])
         }
 
         arg_offset += 1;
+    }
+
+    // `/no-expand-env` vs `/allow-expand-unexisted-env`
+    if (g_flags.no_expand_env && g_flags.allow_expand_unexisted_env) {
+        tfputs(_T("`/no-expand-env` flag mixed with `/allow-expand-unexisted-env`\n"), stderr);
+        return err_invalid_format;
+    }
+
+    // `/no-subst-vars` vs `/allow-subst-empty-args`
+    if (g_flags.no_subst_vars && g_flags.allow_subst_empty_args) {
+        tfputs(_T("`/no-subst-vars` flag mixed with `/allow-subst-empty-args`\n"), stderr);
+        return err_invalid_format;
     }
 
     // environment variable buffer
@@ -165,7 +216,8 @@ int _tmain(int argc, const TCHAR * argv[])
             for (int i = 0; i < num_args; i++) {
                 if (tstrcmp(in_args.args[i], _T(""))) {
                     _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
-                        false, true, true, in_args, out_args);
+                        false, true, true, g_flags, g_options,
+                        in_args, out_args);
                 }
                 else {
                     in_args.args[i] = nullptr;
@@ -174,7 +226,8 @@ int _tmain(int argc, const TCHAR * argv[])
             for (int i = 0; i < num_args; i++) {
                 tmp.clear();
                 _parse_string(i, out_args.args[i].c_str(), tmp, env_buf,
-                    true, false, false, InArgs{}, out_args);
+                    true, false, false, g_flags, g_options,
+                    InArgs{}, out_args);
                 out_args.args[i] = std::move(tmp);
             }
         }
@@ -182,7 +235,8 @@ int _tmain(int argc, const TCHAR * argv[])
             for (int i = 0; i < num_args; i++) {
                 if (tstrcmp(in_args.args[i], _T(""))) {
                     _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
-                        g_flags.no_expand_env, g_flags.no_subst_vars, true, in_args, out_args);
+                        g_flags.no_expand_env, g_flags.no_subst_vars, true, g_flags, g_options,
+                        in_args, out_args);
                 }
                 else {
                     in_args.args[i] = nullptr;
@@ -192,7 +246,8 @@ int _tmain(int argc, const TCHAR * argv[])
     }
 
     _parse_string(-1, in_args.fmt_str, out_args.fmt_str, env_buf,
-        g_flags.no_expand_env, g_flags.no_subst_vars, false, in_args, out_args);
+        g_flags.no_expand_env, g_flags.no_subst_vars, false, g_flags, g_options,
+        in_args, out_args);
 
     UINT prev_cp = 0;
 

@@ -1,3 +1,14 @@
+2021.07.25:
+* fixed: src: callf, printf, envvarcmp: `Flags` initialization
+* fixed: src/callf: `Options` merge
+* new: src/callf: `/expand-env<N>`, `/E<N>`, `/EE<N>` flags to expand `${...}` environment variables exclusively for `<N>` command line argument and turn off the expansion for the rest arguments
+* new: src/callf: `/subst-var<N>`, `/S<N>`, `/SE<N>` flags to substitute `{...}` variables exclusively for `<N>` command line argument and turn off the expansion for the rest arguments
+* new: src: callf, printf: `/allow-expands-unexisted-env` to allow expansion of unexisted `${...}` environment variables in all command line arguments
+* new: src: callf, printf: `/allow-subst-empty-args` to allow substitution of empty `{...}` variables in all command line arguments
+* changed: src: callf, printf: Disabled by default substitution of empty `{...}` variables in command line arguments. Now you have to explicitly enable the substitution of empty command line arguments by `/allow-subst-empty-arg*` flags.
+* changed: src: callf, printf, envvarcmp: `Flags` initialization reimplemented
+* refactor: src/callf: code refactor
+
 2021.07.22:
 * new: bin/contools: binaries update
 

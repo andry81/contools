@@ -105,19 +105,31 @@ ConnectNamedPipeThreadLocals g_connect_client_named_pipe_thread_locals[2][3]; //
 WorkerThreadsReturnData g_worker_threads_return_data;
 
 
+Flags::Flags()
+{
+    // raw initialization
+    memset(this, 0, sizeof(*this));
+};
+
 void Flags::merge(const Flags & flags)
 {
     MERGE_FLAG(flags, show_help);
+
+    MERGE_FLAG(flags, disable_wow64_fs_redir);
     MERGE_FLAG(flags, disable_conout_reattach_to_visible_console);
     MERGE_FLAG(flags, disable_conout_duplicate_to_parent_console_on_error);
+
     MERGE_FLAG(flags, elevate);
+
     MERGE_FLAG(flags, stdin_output_flush);
     MERGE_FLAG(flags, stdout_flush);
     MERGE_FLAG(flags, stderr_flush);
     MERGE_FLAG(flags, output_flush);
     MERGE_FLAG(flags, inout_flush);
+
     MERGE_FLAG(flags, reopen_stdout_file_truncate);
     MERGE_FLAG(flags, reopen_stderr_file_truncate);
+
     MERGE_FLAG(flags, tee_stdin_file_truncate);
     MERGE_FLAG(flags, tee_stdout_file_truncate);
     MERGE_FLAG(flags, tee_stderr_file_truncate);
@@ -132,11 +144,14 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, tee_stderr_flush);
     MERGE_FLAG(flags, tee_output_flush);
     MERGE_FLAG(flags, tee_inout_flush);
+
     MERGE_FLAG(flags, ret_create_proc);
     MERGE_FLAG(flags, ret_win_error);
     MERGE_FLAG(flags, ret_child_exit);
+
     MERGE_FLAG(flags, print_win_error_string);
     MERGE_FLAG(flags, print_shell_error_string);
+
     MERGE_FLAG(flags, no_print_gen_error_string);
     MERGE_FLAG(flags, no_sys_dialog_ui);
     MERGE_FLAG(flags, no_wait);
@@ -144,15 +159,24 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, no_expand_env);
     MERGE_FLAG(flags, no_subst_vars);
     MERGE_FLAG(flags, no_std_inherit);
+
+    MERGE_FLAG(flags, allow_expand_unexisted_env);
+    MERGE_FLAG(flags, allow_subst_empty_args);
+
     MERGE_FLAG(flags, pipe_stdin_to_stdout);
     MERGE_FLAG(flags, shell_exec_expand_env);
+
     MERGE_FLAG(flags, create_child_console);
     MERGE_FLAG(flags, create_console);
     MERGE_FLAG(flags, attach_parent_console);
+
     MERGE_FLAG(flags, eval_backslash_esc);
     MERGE_FLAG(flags, eval_dbl_backslash_esc);
+
     MERGE_FLAG(flags, init_com);
+
     MERGE_FLAG(flags, wait_child_start);
+
     MERGE_FLAG(flags, mutex_std_writes);
     MERGE_FLAG(flags, mutex_tee_file_writes);
 }
@@ -323,12 +347,24 @@ void Options::merge(const Options & options)
     MERGE_OPTION(options, stdin_echo, -1);
     MERGE_OPTION(options, show_as, SW_SHOWNORMAL);
 
+    for (const auto & tuple_ref : options.expand_env_args) {
+        expand_env_args.push_back(tuple_ref);
+    }
+
+    for (const auto & tuple_ref : options.subst_vars_args) {
+        subst_vars_args.push_back(tuple_ref);
+    }
+
     for (const auto & tuple_ref : options.replace_args) {
         replace_args.push_back(tuple_ref);
     }
 
     for (const auto & tuple_ref : options.env_vars) {
         env_vars.push_back(tuple_ref);
+    }
+
+    for (const auto & tuple_ref : options.eval_backslash_esc) {
+        eval_backslash_esc.push_back(tuple_ref);
     }
 
     has = options.has;
@@ -5885,6 +5921,17 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_flags.no_std_inherit = false; // always reset
+
+
+    if (child_flags.allow_expand_unexisted_env) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/allow-expand-unexisted-env ");
+        }
+    }
+    regular_flags.allow_expand_unexisted_env = false; // always reset
+
+    //allow_subst_empty_args
+
 
     if (child_flags.pipe_stdin_to_stdout) {
         if (cmd_out_str_ptr) {

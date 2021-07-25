@@ -26,20 +26,35 @@
 
 struct Flags
 {
+    Flags();
+    Flags(const Flags &) = default;
+    Flags(Flags &&) = default;
+
+    Flags & operator =(const Flags &) = default;
+    //Flags && operator =(Flags &&) = default;
+
+    void merge(const Flags & flags);
+    void clear();
+
     // NOTE: the `tee` applies only to the child process here!
     //
     bool            show_help;
+
     bool            disable_wow64_fs_redir;
     bool            disable_conout_reattach_to_visible_console;
     bool            disable_conout_duplicate_to_parent_console_on_error;
+
     bool            elevate;
+
     bool            stdin_output_flush;             // flush handle connected with stdin input
     bool            stdout_flush;
     bool            stderr_flush;
     bool            output_flush;                   // flush stdout and stderr
     bool            inout_flush;                    // flush handle connected with stdin input and flush stdout and stderr
+
     bool            reopen_stdout_file_truncate;
     bool            reopen_stderr_file_truncate;
+
     bool            tee_stdin_file_truncate;
     bool            tee_stdout_file_truncate;
     bool            tee_stderr_file_truncate;
@@ -54,11 +69,14 @@ struct Flags
     bool            tee_stderr_flush;               // flush stderr tee files and pipes
     bool            tee_output_flush;               // flush stdout and stderr for tee files and pipes
     bool            tee_inout_flush;                // flush stdin and stdout and stderr for tee files and pipes
+
     bool            ret_create_proc;
     bool            ret_win_error;
     bool            ret_child_exit;
+
     bool            print_win_error_string;
     bool            print_shell_error_string;
+
     bool            no_print_gen_error_string;
     bool            no_sys_dialog_ui;
     bool            no_wait;                        // has no meaning if a `tee` file is used
@@ -66,20 +84,26 @@ struct Flags
     bool            no_expand_env;                  // don't expand `${...}` environment variables
     bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
     bool            no_std_inherit;
+
+    bool            allow_expand_unexisted_env;
+    bool            allow_subst_empty_args;
+
     bool            pipe_stdin_to_stdout;
     bool            shell_exec_expand_env;
+
     bool            create_child_console;
     bool            create_console;                 // has priority over attach_parent_console
     bool            attach_parent_console;
+
     bool            eval_backslash_esc;             // evaluate backslash escape characters
     bool            eval_dbl_backslash_esc;         // evaluate double backslash escape characters (`\\`)
+
     bool            init_com;
+
     bool            wait_child_start;
+
     bool            mutex_std_writes;
     bool            mutex_tee_file_writes;
-
-    void merge(const Flags & flags);
-    void clear();
 };
 
 struct HasOptions
@@ -91,6 +115,16 @@ struct HasOptions
 
 struct Options
 {
+    Options();
+    Options(const Options &) = default;
+    Options(Options &&) = default;
+
+    void merge(const Options & options);
+    void clear();
+
+    Options & operator =(const Options &) = default;
+    //Options && operator =(Options &&) = default;
+
     _WinVer         win_ver;
 
     std::tstring    shell_exec_verb;
@@ -189,21 +223,26 @@ struct Options
     int             stdin_echo;
     uint_t          show_as;
 
-    std::deque<std::tuple<int, std::tstring, std::tstring> > replace_args; // -1 - all, -2 - greater or equal to 1
+    // std::tuple<argument_offset_index, allow_expand_unexisted_env_var>:
+    //  argument_offset_index: -1 - all, -2 - greater or equal to 1
+    std::deque<std::tuple<int, bool> > expand_env_args;
+
+    // std::tuple<argument_offset_index, allow_subst_empty_arg>:
+    //  argument_offset_index: -1 - all, -2 - greater or equal to 1
+    std::deque<std::tuple<int, bool> > subst_vars_args;
+
+    // std::tuple<argument_offset_index, replace_from, replace_to>:
+    //  argument_offset_index: -1 - all, -2 - greater or equal to 1
+    std::deque<std::tuple<int, std::tstring, std::tstring> > replace_args;
+
+    // std::tuple<name, value>
     std::deque<std::tuple<std::tstring, std::tstring> > env_vars;
+
+    // std::tuple<argument_offset_index>
+    //  argument_offset_index: -1 - all, -2 - greater or equal to 1
     std::deque<std::tuple<int> > eval_backslash_esc;
 
     HasOptions      has;
-
-    Options();
-    Options(const Options &) = default;
-    Options(Options &&) = default;
-
-    void merge(const Options & options);
-    void clear();
-
-    Options & operator =(const Options &) = default;
-    //Options && operator =(Options &&) = default;
 };
 
 struct ThreadReturnData

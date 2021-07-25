@@ -1028,8 +1028,12 @@ namespace {
         return ret;
     }
 
-    inline const TCHAR * _extract_variable(const TCHAR * last_offset_ptr, const TCHAR * parse_str, std::tstring & parsed_str, TCHAR * env_buf)
+    inline const TCHAR * _extract_variable(const TCHAR * last_offset_ptr, const TCHAR * parse_str, std::tstring & parsed_str, TCHAR * env_buf, bool allow_expand_unexisted_env)
     {
+        // intercept here specific global variables accidental usage instead of local variables
+        static struct {} g_options;
+        static struct {} g_flags;
+        
         const TCHAR * return_offset_ptr = 0;
 
         const TCHAR * in_str_var_ptr = 0;
@@ -1055,9 +1059,11 @@ namespace {
             else {
                 env_buf[0] = _T('\0');
 
-                parsed_str.append(_T("${"));
-                parsed_str.append(in_str_var_name);
-                parsed_str.append(_T("}"));
+                if (!allow_expand_unexisted_env) {
+                    parsed_str.append(_T("${"));
+                    parsed_str.append(in_str_var_name);
+                    parsed_str.append(_T("}"));
+                }
             }
         }
 

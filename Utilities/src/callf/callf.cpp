@@ -78,6 +78,10 @@ const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_flags_w_index_to_parse_arr[] = {
+    _T("/EE"),
+    _T("/expand-env-arg"), _T("/E"),
+    _T("/SE"),
+    _T("/subst-vars-arg"), _T("/S"),
     _T("/replace-arg"), _T("/r"),
     _T("/eval-backslash-esc"), _T("/e"),
 };
@@ -101,6 +105,8 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/no-expand-env"),
     _T("/no-subst-vars"),
     _T("/no-std-inherit"),
+    _T("/allow-expand-unexisted-env"),
+    _T("/allow-subst-empty-args"),
     _T("/pipe-stdin-to-stdout"),
     _T("/init-com"),
     _T("/wait-child-start"),
@@ -683,6 +689,20 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/no-std-inherit"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_std_inherit = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/allow-expand-unexisted-env"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.allow_expand_unexisted_env = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/allow-subst-empty-args"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.allow_subst_empty_args = true;
             return 1;
         }
         return 0;
@@ -1992,6 +2012,66 @@ int ParseArgWithSuffixToOption(int & error, const TCHAR * arg, int argc, const T
     const TCHAR * start_arg = arg;
     const TCHAR * arg_suffix = nullptr;
 
+    if (IsArgWithSuffixEqualTo(arg, _T("/EE"), arg_suffix)) {
+        const size_t arg_suffix_len = tstrlen(arg_suffix);
+        if (arg_suffix_len && tisdigit(*arg_suffix)) {
+            const int arg_index = _ttoi(arg_suffix);
+            if (arg_index >= 0) {
+                if (IsArgWithSuffixInFilter(start_arg, arg_suffix - start_arg, include_filter_arr)) {
+                    options.expand_env_args.push_back(std::make_tuple(arg_index, true));
+                    return 1;
+                }
+                return 0;
+            }
+            else error = invalid_format_flag(start_arg);
+        }
+        return -1;
+    }
+    if (IsArgWithSuffixEqualTo(arg, _T("/expand-env-arg"), arg_suffix) || IsArgWithSuffixEqualTo(arg, _T("/E"), arg_suffix)) {
+        const size_t arg_suffix_len = tstrlen(arg_suffix);
+        if (arg_suffix_len && tisdigit(*arg_suffix)) {
+            const int arg_index = _ttoi(arg_suffix);
+            if (arg_index >= 0) {
+                if (IsArgWithSuffixInFilter(start_arg, arg_suffix - start_arg, include_filter_arr)) {
+                    options.expand_env_args.push_back(std::make_tuple(arg_index, false));
+                    return 1;
+                }
+                return 0;
+            }
+            else error = invalid_format_flag(start_arg);
+        }
+        return -1;
+    }
+    if (IsArgWithSuffixEqualTo(arg, _T("/SE"), arg_suffix)) {
+        const size_t arg_suffix_len = tstrlen(arg_suffix);
+        if (arg_suffix_len && tisdigit(*arg_suffix)) {
+            const int arg_index = _ttoi(arg_suffix);
+            if (arg_index >= 0) {
+                if (IsArgWithSuffixInFilter(start_arg, arg_suffix - start_arg, include_filter_arr)) {
+                    options.subst_vars_args.push_back(std::make_tuple(arg_index, true));
+                    return 1;
+                }
+                return 0;
+            }
+            else error = invalid_format_flag(start_arg);
+        }
+        return -1;
+    }
+    if (IsArgWithSuffixEqualTo(arg, _T("/subst-vars-arg"), arg_suffix) || IsArgWithSuffixEqualTo(arg, _T("/S"), arg_suffix)) {
+        const size_t arg_suffix_len = tstrlen(arg_suffix);
+        if (arg_suffix_len && tisdigit(*arg_suffix)) {
+            const int arg_index = _ttoi(arg_suffix);
+            if (arg_index >= 0) {
+                if (IsArgWithSuffixInFilter(start_arg, arg_suffix - start_arg, include_filter_arr)) {
+                    options.subst_vars_args.push_back(std::make_tuple(arg_index, false));
+                    return 1;
+                }
+                return 0;
+            }
+            else error = invalid_format_flag(start_arg);
+        }
+        return -1;
+    }
     if (IsArgWithSuffixEqualTo(arg, _T("/replace-arg"), arg_suffix) || IsArgWithSuffixEqualTo(arg, _T("/r"), arg_suffix)) {
         const size_t arg_suffix_len = tstrlen(arg_suffix);
         if (arg_suffix_len && tisdigit(*arg_suffix)) {
@@ -2706,6 +2786,74 @@ int _tmain(int argc, const TCHAR * argv[])
                 return invalid_format_flag_message(_T("promote option mixed with promote-parent option: disable_conout_duplicate_to_parent_console_on_error\n"));
             }
 
+            // `/no-expand-env` vs `/allow-expand-unexisted-env`
+            if (g_flags.no_expand_env && g_flags.allow_expand_unexisted_env) {
+                return invalid_format_flag_message(_T("`/no-expand-env` flag mixed with `/allow-expand-unexisted-env`\n"));
+            }
+
+            // `/expand-env-arg<N>`, `/E<N>`, `/EE<N>` vs `/no-expand-env`
+            if (!g_options.expand_env_args.empty() && g_flags.no_expand_env) {
+                return invalid_format_flag_message(_T("`/expand-env-arg<N>`, `/E<N>`, `/EE<N>` flags mixed with `/no-expand-env`\n"));
+            }
+
+            // `/EE<N>` vs `/allow-expand-unexisted-env`
+            if (!g_options.expand_env_args.empty() && g_flags.allow_expand_unexisted_env) {
+                for (auto it = g_options.expand_env_args.begin(); it != g_options.expand_env_args.end(); ++it) {
+                    const int expand_env_arg_index = std::get<0>(*it);
+                    const bool allow_expand_unexisted_env = std::get<1>(*it);
+                    if (allow_expand_unexisted_env) {
+                        return invalid_format_flag_message(_T("`/EE<N>` flags mixed with `/allow-expand-unexisted-env`\n"));
+                    }
+                }
+            }
+
+            // `/expand-env-arg<N>`, `/E<N>`, `/EE<N>` vs `/expand-env-arg<N>`, `/E<N>`, `/EE<N>`
+            if (g_options.expand_env_args.size() > 1) {
+                for (auto it = g_options.expand_env_args.begin(); it != g_options.expand_env_args.end(); ++it) {
+                    const int expand_env_arg_index = std::get<0>(*it);
+                    for (auto it2 = ++it; it2 != g_options.expand_env_args.end(); ++it2) {
+                        const int expand_env_arg_index2 = std::get<0>(*it2);
+                        if (expand_env_arg_index == expand_env_arg_index2) {
+                            return invalid_format_flag_message(_T("`/expand-env-arg<N>`, `/E<N>`, `/EE<N>` flags mixed with `/expand-env-arg<N>`, `/E<N>`, `/EE<N>`: N=%i\n"), expand_env_arg_index);
+                        }
+                    }
+                }
+            }
+
+            // `/no-subst-vars` vs `/allow-subst-empty-args`
+            if (g_flags.no_subst_vars && g_flags.allow_subst_empty_args) {
+                return invalid_format_flag_message(_T("`/no-subst-vars` flag mixed with `/allow-subst-empty-args`\n"));
+            }
+
+            // `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` vs `/no-expand-env`
+            if (!g_options.subst_vars_args.empty() && g_flags.no_subst_vars) {
+                return invalid_format_flag_message(_T("`/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` flags mixed with `/no-subst-vars`\n"));
+            }
+
+            // `/SE<N>` vs `/allow-subst-empty-args`
+            if (!g_options.subst_vars_args.empty() && g_flags.allow_subst_empty_args) {
+                for (auto it = g_options.subst_vars_args.begin(); it != g_options.subst_vars_args.end(); ++it) {
+                    const int subst_vars_arg_index = std::get<0>(*it);
+                    const bool allow_subst_empty_arg = std::get<1>(*it);
+                    if (allow_subst_empty_arg) {
+                        return invalid_format_flag_message(_T("`/SE<N>` flags mixed with `/allow-subst-empty-args`\n"));
+                    }
+                }
+            }
+
+            // `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` vs `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>`
+            if (g_options.subst_vars_args.size() > 1) {
+                for (auto it = g_options.subst_vars_args.begin(); it != g_options.subst_vars_args.end(); ++it) {
+                    const int subst_arg_index = std::get<0>(*it);
+                    for (auto it2 = ++it; it2 != g_options.subst_vars_args.end(); ++it2) {
+                        const int subst_arg_index2 = std::get<0>(*it2);
+                        if (subst_arg_index == subst_arg_index2) {
+                            return invalid_format_flag_message(_T("`/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` flags mixed with `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>`: N=%i\n"), subst_arg_index);
+                        }
+                    }
+                }
+            }
+
             // environment variable buffer
             TCHAR env_buf[MAX_ENV_BUF_SIZE];
 
@@ -2770,7 +2918,7 @@ int _tmain(int argc, const TCHAR * argv[])
                 if (!g_flags.no_expand_env) {
                     std::tstring tmp;
 
-                    _parse_string(-3, std::get<1>(env_vars_ref).c_str(), tmp, env_buf, false, true, false);
+                    _parse_string(-3, std::get<1>(env_vars_ref).c_str(), tmp, env_buf, false, true, false, g_flags, g_options);
 
                     SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), tmp.c_str());
                 }
@@ -2803,7 +2951,8 @@ int _tmain(int argc, const TCHAR * argv[])
                     for (int i = 0; i < num_args; i++) {
                         if (tstrcmp(in_args.args[i], _T(""))) {
                             _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
-                                false, true, true, in_args, out_args);
+                                false, true, true, g_flags, g_options,
+                                in_args, out_args);
                         }
                         else {
                             in_args.args[i] = nullptr;
@@ -2858,7 +3007,8 @@ int _tmain(int argc, const TCHAR * argv[])
                     for (int i = 0; i < num_args; i++) {
                         tmp.clear();
                         _parse_string(i, out_args.args[i].c_str(), tmp, env_buf,
-                            true, false, false, InArgs{}, out_args);
+                            true, false, false, g_flags, g_options,
+                            InArgs{}, out_args);
                         out_args.args[i] = std::move(tmp);
                     }
                 }
@@ -2898,13 +3048,15 @@ int _tmain(int argc, const TCHAR * argv[])
                 if (in_args.app_fmt_str) {
                     std::tstring tmp;
                     _parse_string(-2, out_args.app_fmt_str.c_str(), tmp, env_buf,
-                        false, true, false, in_args, out_args);
+                        false, true, false, g_flags, g_options,
+                        in_args, out_args);
                     out_args.app_fmt_str = std::move(tmp);
                 }
                 if (in_args.cmd_fmt_str) {
                     std::tstring tmp;
                     _parse_string(-1, out_args.cmd_fmt_str.c_str(), tmp, env_buf,
-                        false, true, false, in_args, out_args);
+                        false, true, false, g_flags, g_options,
+                        in_args, out_args);
                     out_args.cmd_fmt_str = std::move(tmp);
                 }
             }
@@ -2946,13 +3098,15 @@ int _tmain(int argc, const TCHAR * argv[])
                 if (in_args.app_fmt_str) {
                     std::tstring tmp;
                     _parse_string(-2, out_args.app_fmt_str.c_str(), tmp, env_buf,
-                        true, false, false, in_args, out_args);
+                        true, false, false, g_flags, g_options,
+                        in_args, out_args);
                     out_args.app_fmt_str = std::move(tmp);
                 }
                 if (in_args.cmd_fmt_str) {
                     std::tstring tmp;
                     _parse_string(-1, out_args.cmd_fmt_str.c_str(), tmp, env_buf,
-                        true, false, false, in_args, out_args);
+                        true, false, false, g_flags, g_options,
+                        in_args, out_args);
                     out_args.cmd_fmt_str = std::move(tmp);
                 }
             }

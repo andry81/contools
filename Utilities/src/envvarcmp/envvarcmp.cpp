@@ -13,6 +13,27 @@
 //#endif
 
 namespace {
+    struct _Flags
+    {
+        _Flags()
+        {
+            // raw initialization
+            memset(this, 0, sizeof(*this));
+        }
+
+        _Flags(const _Flags &) = default;
+        _Flags(_Flags &&) = default;
+
+        _Flags & operator =(const _Flags &) = default;
+        //_Flags && operator =(_Flags &&) = default;
+
+        bool allow_expand_unexisted_env;
+    };
+
+    struct _Options
+    {
+    };
+
     struct InArgs
     {
         const TCHAR * print_prefix_str;
@@ -22,7 +43,9 @@ namespace {
         const TCHAR * greater_or_equal_str;
     };
 
+    template <typename Flags, typename Options>
     void _parse_string(const TCHAR * parse_str, std::tstring & parsed_str, const TCHAR * v0_value, const TCHAR * v1_value,
+                       const Flags & flags, const Options & options,
                        TCHAR * in_str_value, const InArgs & in_args = InArgs()) {
         bool done = false;
         bool found;
@@ -44,7 +67,7 @@ namespace {
             const TCHAR * p = tstrstr(last_offset, _T("{"));
             if_break (p) {
                 if(p > last_offset) {
-                    const TCHAR * last_offset_var = _extract_variable(last_offset, p - 1, parsed_str, in_str_value);
+                    const TCHAR * last_offset_var = _extract_variable(last_offset, p - 1, parsed_str, in_str_value, flags.allow_expand_unexisted_env);
                     if (last_offset_var) {
                         found = true;
                         last_offset = last_offset_var;
@@ -115,7 +138,7 @@ namespace {
                     const int var_eql = tstrncmp(p, _T("{EQL}"), 5);
                     if (!var_eql) {
                         if (!is_equal_str_parsed) {
-                            _parse_string(in_args.equal_str, equal_str, v0_value, v1_value, in_str_value);
+                            _parse_string(in_args.equal_str, equal_str, v0_value, v1_value, flags, options, in_str_value);
                             is_equal_str_parsed = true;
                         }
                         parsed_str.append(last_offset, p);
@@ -130,7 +153,7 @@ namespace {
                     const int var_neq = tstrncmp(p, _T("{NEQ}"), 5);
                     if (!var_neq) {
                         if (!is_not_equal_str_parsed) {
-                            _parse_string(in_args.not_equal_str, not_equal_str, v0_value, v1_value, in_str_value);
+                            _parse_string(in_args.not_equal_str, not_equal_str, v0_value, v1_value, flags, options, in_str_value);
                             is_not_equal_str_parsed = true;
                         }
                         parsed_str.append(last_offset, p);
@@ -145,7 +168,7 @@ namespace {
                     const int var_less = tstrncmp(p, _T("{LSS}"), 5);
                     if (!var_less) {
                         if (!is_less_str_parsed) {
-                            _parse_string(in_args.less_str, less_str, v0_value, v1_value, in_str_value);
+                            _parse_string(in_args.less_str, less_str, v0_value, v1_value, flags, options, in_str_value);
                             is_less_str_parsed = true;
                         }
                         parsed_str.append(last_offset, p);
@@ -160,7 +183,7 @@ namespace {
                     const int var_gtr = tstrncmp(p, _T("{GEQ}"), 5);
                     if (!var_gtr) {
                         if (!is_greater_or_equal_str_parsed) {
-                            _parse_string(in_args.greater_or_equal_str, greater_or_equal_str, v0_value, v1_value, in_str_value);
+                            _parse_string(in_args.greater_or_equal_str, greater_or_equal_str, v0_value, v1_value, flags, options, in_str_value);
                             is_greater_or_equal_str_parsed = true;
                         }
                         parsed_str.append(last_offset, p);
@@ -313,30 +336,30 @@ int _tmain(int argc, const TCHAR * argv[])
     const int res = tstrcmp(value1, value2);
 
     if (in_args.print_prefix_str) {
-        _parse_string(in_args.print_prefix_str, print_prefix_str, value1, value2, env_buf, in_args);
+        _parse_string(in_args.print_prefix_str, print_prefix_str, value1, value2, _Flags{}, _Options{}, env_buf, in_args);
         if (!print_prefix_str.empty()) tputs(print_prefix_str.c_str());
     }
 
     if (!res && in_args.equal_str) {
-        _parse_string(in_args.equal_str, equal_str, value1, value2, env_buf);
+        _parse_string(in_args.equal_str, equal_str, value1, value2, _Flags{}, _Options{}, env_buf);
         if (!equal_str.empty()) tputs(equal_str.c_str());
         return 0;
     }
 
     if (res && in_args.not_equal_str) {
-        _parse_string(in_args.not_equal_str, not_equal_str, value1, value2, env_buf);
+        _parse_string(in_args.not_equal_str, not_equal_str, value1, value2, _Flags{}, _Options{}, env_buf);
         if (!not_equal_str.empty()) tputs(not_equal_str.c_str());
         return res < 0 ? -1 : 1;
     }
 
     if (res < 0 && in_args.less_str) {
-        _parse_string(in_args.less_str, less_str, value1, value2, env_buf);
+        _parse_string(in_args.less_str, less_str, value1, value2, _Flags{}, _Options{}, env_buf);
         if (!less_str.empty()) tputs(less_str.c_str());
         return -1;
     }
 
     if (in_args.greater_or_equal_str) {
-        _parse_string(in_args.greater_or_equal_str, greater_or_equal_str, value1, value2, env_buf);
+        _parse_string(in_args.greater_or_equal_str, greater_or_equal_str, value1, value2, _Flags{}, _Options{}, env_buf);
         if (!greater_or_equal_str.empty()) tputs(greater_or_equal_str.c_str());
     }
 

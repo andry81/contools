@@ -20,9 +20,21 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
 
       /no-expand-env
         Don't expand `${...}` environment variables.
+        Can not be used together with the `/allow-expand-unexisted-env` flag.
 
       /no-subst-vars
-        Don't substitute `{...}` variables (command line parameters).
+        Don't substitute `{...}` variables (command line arguments).
+        Can not be used together with the `/allow-subst-empty-args` flag.
+
+      /allow-expand-unexisted-env
+        Allow expansion of unexisted `${...}` environment variables in
+        all command line arguments.
+        Can not be used together with the `/no-expand-env` flag.
+
+      /allow-subst-empty-args
+        Allow substitution of empty `{...}` variables in all command line
+        arguments.
+        Can not be used together with the `/no-subst-vars` flag.
 
       /eval-backslash-esc or /e
         Evaluate escape characters:

@@ -119,12 +119,61 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /no-expand-env
         Don't expand `${...}` environment variables.
+        Can not be used together with the `/allow-expand-unexisted-env` flag.
 
       /no-subst-vars
-        Don't substitute `{...}` variables (command line parameters).
+        Don't substitute `{...}` variables (command line arguments).
+        Can not be used together with the `/allow-subst-empty-args` flag.
 
       /no-std-inherit
         Prevent standard handles inheritance into child process.
+
+      /expand-env-arg<N>
+      /E<N>
+        Expand `${...}` environment variables exclusively for `<N>` command
+        line argument, where `<N>` >= 0. This turns off the expansion for the
+        rest of arguments if not specifically enabled.
+        Unexisted environment variables is not expanded by default, use the
+        `/EE<N>` flag instead to specifically allow it.
+        Can not be used together with the `/no-expand-env`, `/EE<N>` flagss.
+        Can be used together with the `/allow-expand-unexisted-env` flag.
+
+      /EE<N>
+        The same as `/E<N>` but additionally allows expansion of unexisted
+        `${...}` environment variables.
+        Can not be used together with the `/no-expand-env`,
+        `/allow-expand-unexisted-env`, `/expand-env-arg<N>`, `/E<N>` flags.
+
+      /subst-vars-arg<N>
+      /S<N>
+        Substitute `{...}` variables exclusively for `<N>` command line
+        argument, where `<N>` >= 0. This turns off the substitution for the
+        rest of arguments if not specifically enabled.
+        Empty arguments is not substituted by default, use the `/SE<N>` flag
+        instead to specifically allow it.
+        Can not be used together with the `/no-subst-vars`, `/SE<N>` flags.
+        Can be used together with the `/allow-subst-empty-args` flag.
+
+      /SE<N>
+        The same as `/S<N>` but additionally allows substitution of empty
+        `{...}` variables.
+        Still can not apply to command line arguments which does not exist,
+        so to avoid that do use quotes without an argument.
+        Can not be used together with the `/no-subst-vars`,
+        `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>` flags.
+
+      /allow-expand-unexisted-env
+        Allow expansion of unexisted `${...}` environment variables in
+        all command line arguments.
+        Can not be used together with the `/no-expand-env`, `/SE<N>` flags.
+
+      /allow-subst-empty-args
+        Allow substitution of empty `{...}` variables in all command line
+        arguments.
+        Still can not apply to command line arguments which does not exist,
+        so to avoid that do use quotes without an argument.
+        Can not be used together with the `/no-subst-vars`, `/E<N>`, `/EE<N>`
+        flags.
 
       /pipe-stdin-to-stdout
         Pipe the process stdin into stdout. This additionally disables
@@ -600,22 +649,22 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
       /replace-args-in-tail <from> <to>
       /ra <from> <to>
-        Replace `<from>` string by `<to>` string in tail arguments (arguments
-        arter the first one).
+        Replace `<from>` string by `<to>` string in tail command line
+        arguments (arguments arter the first one).
 
       /replace-args <from> <to>
       /replace-arg<N> <from> <to>
       /r <from> <to>
       /r<N> <from> <to>
-        Replace `<from>` string by `<to>` string for either all arguments or
-        `<N>` argument, where `<N>` >= 0.
+        Replace `<from>` string by `<to>` string for either all command line
+        arguments or `<N>` command line argument, where `<N>` >= 0.
 
       /eval-backslash-esc
       /eval-backslash-esc<N>
       /e
       /e<N>
-        Evaluate escape characters for either all arguments or `<N>` argument,
-        where `<N>` >= 0:
+        Evaluate escape characters for either all arguments or `<N>` command
+        line argument, where `<N>` >= 0:
           \a = \x07 = alert (bell)
           \b = \x08 = backspace
           \t = \x09 = horizontal tab

@@ -3,5 +3,5 @@ autogen definitions version;
 AppName = "envvarcmp";
 AppMajorVer = 1;
 AppMinorVer = 1;
-AppRevision = 1;
-AppBuildNum = 6;
+AppRevision = 2;
+AppBuildNum = 7;
