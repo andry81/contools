@@ -1,4 +1,7 @@
 2021.07.25:
+* new: Utilities/bin/contools: binaries update
+
+2021.07.25:
 * fixed: Utilities/src: callf, printf, envvarcmp: `Flags` initialization
 * fixed: Utilities/src/callf: `Options` merge
 * new: Utilities/src/callf: `/expand-env<N>`, `/E<N>`, `/EE<N>` flags to expand `${...}` environment variables exclusively for `<N>` command line argument and turn off the expansion for the rest arguments
