@@ -2809,9 +2809,10 @@ int _tmain(int argc, const TCHAR * argv[])
 
             // `/expand-env-arg<N>`, `/E<N>`, `/EE<N>` vs `/expand-env-arg<N>`, `/E<N>`, `/EE<N>`
             if (g_options.expand_env_args.size() > 1) {
-                for (auto it = g_options.expand_env_args.begin(); it != g_options.expand_env_args.end(); ++it) {
+                for (auto it = g_options.expand_env_args.begin(), next_it = it; it != g_options.expand_env_args.end(); it = next_it) {
+                    ++next_it;
                     const int expand_env_arg_index = std::get<0>(*it);
-                    for (auto it2 = ++it; it2 != g_options.expand_env_args.end(); ++it2) {
+                    for (auto it2 = next_it; it2 != g_options.expand_env_args.end(); ++it2) {
                         const int expand_env_arg_index2 = std::get<0>(*it2);
                         if (expand_env_arg_index == expand_env_arg_index2) {
                             return invalid_format_flag_message(_T("`/expand-env-arg<N>`, `/E<N>`, `/EE<N>` flags mixed with `/expand-env-arg<N>`, `/E<N>`, `/EE<N>`: N=%i\n"), expand_env_arg_index);
@@ -2843,9 +2844,10 @@ int _tmain(int argc, const TCHAR * argv[])
 
             // `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` vs `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>`
             if (g_options.subst_vars_args.size() > 1) {
-                for (auto it = g_options.subst_vars_args.begin(); it != g_options.subst_vars_args.end(); ++it) {
+                for (auto it = g_options.subst_vars_args.begin(), next_it = it; it != g_options.subst_vars_args.end(); it = next_it) {
+                    ++next_it;
                     const int subst_arg_index = std::get<0>(*it);
-                    for (auto it2 = ++it; it2 != g_options.subst_vars_args.end(); ++it2) {
+                    for (auto it2 = next_it; it2 != g_options.subst_vars_args.end(); ++it2) {
                         const int subst_arg_index2 = std::get<0>(*it2);
                         if (subst_arg_index == subst_arg_index2) {
                             return invalid_format_flag_message(_T("`/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` flags mixed with `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>`: N=%i\n"), subst_arg_index);

@@ -6744,6 +6744,13 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
     //child_flags.eval_dbl_backslash_esc
 
 
+    if (child_flags.disable_wow64_fs_redir) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/disable-wow64-fs-redir ");
+        }
+    }
+    regular_flags.disable_wow64_fs_redir = false; // always reset
+
     if (child_flags.disable_conout_reattach_to_visible_console) {
         if (cmd_out_str_ptr) {
             options_line += _T("/disable-conout-reattach-to-visible-console ");

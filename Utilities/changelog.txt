@@ -1,4 +1,8 @@
 2021.07.25:
+* fixed: src/callf: access violation around usage of the `/E<N>`, `/EE<N>`, `/S<N>`, `/SE<N>` flags
+* fixed: src/callf: missed to translate for elevation the `/disable-wow64-fs-redir` flag
+
+2021.07.25:
 * new: bin/contools: binaries update
 
 2021.07.25:
