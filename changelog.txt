@@ -1,4 +1,7 @@
 2021.07.26:
+* new: Utilities/bin/contools: binaries update
+
+2021.07.26:
 * fixed: Utilities/src/callf: WOW64 FileSystem redirection restore on exit
 * fixed: Utilities/src/callf: missed to update CRT standard handles immediately after a console window (re)allocation
 * new: Utilities/src/callf: The `callfg.exe` variant of the `callf` utility without initial console window (GUI) (GUI). Exists to workaround some 3dparty application issues like in the Bash shell executable which throws an error after a console window reallocation: `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.

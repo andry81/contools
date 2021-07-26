@@ -711,6 +711,7 @@ Utilities/bin/7zip/readme.txt -text
 Utilities/bin/Microsoft/uuidgen.exe -text
 Utilities/bin/contools/README_EN.txt -text
 Utilities/bin/contools/callf.exe -text
+Utilities/bin/contools/callfg.exe -text
 Utilities/bin/contools/chcp.exe -text
 Utilities/bin/contools/clearcache.exe -text
 Utilities/bin/contools/envvarcmp.exe -text
