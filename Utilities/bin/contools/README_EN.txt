@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.07.20
+* 2021.07.26
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -8,7 +8,9 @@
 4. PREREQUISITES
 5. FEATURES
 5.1. callf
-6. AUTHOR
+6. KNOWN ISSUES
+6.1. The GNU Bash shell executable throws an error: `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
+7. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -184,6 +186,22 @@ Create process or Shell execute in style of c-function printf.
   callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
 
 -------------------------------------------------------------------------------
-6. AUTHOR
+6. KNOWN ISSUES
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+6.1. The GNU Bash shell executable throws an error: `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
+-------------------------------------------------------------------------------
+
+If try to run the Bash shell executable, then it may throw an error after a
+console window reallocation in the `callf` utility.
+
+To workaround that you can use `callfg` utility instead with the
+`/create-console` flag. This will avoid a need to reallocate a console window,
+for example, in the elevated child process in case if elevation is required
+(`/attach-parent-console` flag).
+
+-------------------------------------------------------------------------------
+7. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

@@ -1,4 +1,11 @@
 2021.07.26:
+* fixed: src/callf: WOW64 FileSystem redirection restore on exit
+* fixed: src/callf: missed to update CRT standard handles immediately after a console window (re)allocation
+* new: src/callf: The `callfg.exe` variant of the `callf` utility without initial console window (GUI) (GUI). Exists to workaround some 3dparty application issues like in the Bash shell executable which throws an error after a console window reallocation: `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
+* new: src/callf: `/create-console` flag now can allocate a console window from the `callfg` utility without initial console
+* changed: src/callf: console reallocation reworked
+
+2021.07.26:
 * fixed: src/callf: incorrect parse of `/replace-args`, `/r`, `/replace-args-in-tail`, `/ra`, `/set-env-var`, `/v` options
 * new: src/callf: `/allow-throw-seh-except` flag to allow to throw SEH exceptions out of process
 * new: src/callf: `/pause-on-exit`, `/pause-on-exit-if-error`, `/pause-on-exit-if-error-before-exec` flags to be able to pause on exit before close a console

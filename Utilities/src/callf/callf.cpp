@@ -66,7 +66,11 @@ const TCHAR * g_elevate_parent_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
+    _T("/create-console"),
     _T("/attach-parent-console"),
+    _T("/create-console-title"),
+    _T("/own-console-title"),
+    _T("/console-title"),
 };
 
 const TCHAR * g_promote_flags_to_preparse_arr[] = {
@@ -2181,8 +2185,21 @@ int main_seh_except_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep)
     }
 }
 
+// different main for `callf.exe` and `callfg.exe`
+#ifdef _CONSOLE
 int _tmain(int argc, const TCHAR * argv[])
+#else
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+#endif
 {
+#ifndef _CONSOLE
+    int argc = 0;
+    LPCWSTR * argv = NULL;
+
+    PWSTR cmdline_str = GetCommandLine();
+    argv = const_cast<LPCWSTR *>(CommandLineToArgvW(cmdline_str, &argc));
+#endif
+
 #if _DEBUG
     MessageBoxA(NULL, "", "", MB_OK);
 #endif
@@ -2382,22 +2399,25 @@ int _tmain(int argc, const TCHAR * argv[])
 
             // update process console
 
+            g_inherited_console_window = GetConsoleWindow();
+
             _StdHandlesState std_handles_state;
 
             if (!g_flags.disable_conout_reattach_to_visible_console) {
                 // check if console is not visible
-                HWND inherited_console_window = GetConsoleWindow();
-                if (inherited_console_window && !IsWindowVisible(inherited_console_window)) {
+                if (g_inherited_console_window && !IsWindowVisible(g_inherited_console_window)) {
                     if (g_flags.create_console) {
                         // check if console can be just unhided
-                        g_current_proc_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
+                        g_owned_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
                         is_console_window_inited = true;
 
                         is_conout_reattached_to_visible_console = true;
 
-                        if (!g_current_proc_console_window) {
-                            _free_console(std_handles_state);
-                            _alloc_console();
+                        if (!g_owned_console_window) {
+                            if (g_inherited_console_window) {
+                                _free_console(std_handles_state);
+                            }
+                            g_inherited_console_window = _alloc_console(true);
                         }
 
                         if (g_options.has.create_console_title) {
@@ -2411,13 +2431,12 @@ int _tmain(int argc, const TCHAR * argv[])
                         }
 
                         // update visibility state
-                        inherited_console_window = GetConsoleWindow();
-                        ShowWindow(inherited_console_window, SW_SHOW);
-                        ShowWindow(inherited_console_window, SW_SHOW); // WTF: second ShowWindow (not UpdateWindow) is required, otherwise does not show in Release
+                        ShowWindow(g_inherited_console_window, SW_SHOW);
+                        ShowWindow(g_inherited_console_window, SW_SHOW); // WTF: second ShowWindow (not UpdateWindow) is required, otherwise does not show in Release
                     }
                     else {
                         // check if parent process console can be attached and visible
-                        g_current_proc_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
+                        g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
                         is_console_window_inited = true;
 
                         _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
@@ -2431,14 +2450,16 @@ int _tmain(int argc, const TCHAR * argv[])
                         }
 
                         if (ancestor_console_window_owner_proc.console_window &&
-                            inherited_console_window != ancestor_console_window_owner_proc.console_window &&
+                            g_inherited_console_window != ancestor_console_window_owner_proc.console_window &&
                             IsWindowVisible(ancestor_console_window_owner_proc.console_window) &&
                             ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
                             // reattach to parent process console window
                             is_conout_reattached_to_visible_console = true;
 
-                            _free_console(std_handles_state);
-                            _attach_console(ancestor_console_window_owner_proc.proc_id);
+                            if (g_inherited_console_window) {
+                                _free_console(std_handles_state);
+                            }
+                            g_inherited_console_window = _attach_console(ancestor_console_window_owner_proc.proc_id, true);
 
                             if (g_options.has.console_title) {
                                 SetConsoleTitle(g_options.console_title.c_str());
@@ -2452,15 +2473,14 @@ int _tmain(int argc, const TCHAR * argv[])
                 if (g_flags.create_console) {
                     // check if the current process console existence
                     if (!is_console_window_inited) {
-                        g_current_proc_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
+                        g_owned_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
                     }
 
-                    if (!g_current_proc_console_window) {
-                        HWND inherited_console_window = GetConsoleWindow();
-                        if (inherited_console_window) {
+                    if (!g_owned_console_window) {
+                        if (g_inherited_console_window) {
                             _free_console(std_handles_state);
                         }
-                        _alloc_console();
+                        g_inherited_console_window = _alloc_console(true);
 
                         if (g_options.has.create_console_title) {
                             SetConsoleTitle(g_options.create_console_title.c_str());
@@ -2475,8 +2495,7 @@ int _tmain(int argc, const TCHAR * argv[])
                 }
                 else if (g_flags.attach_parent_console) {
                     // check if the current process console can be attached
-                    HWND inherited_console_window = GetConsoleWindow();
-                    g_current_proc_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
+                    g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
 
                     _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
 
@@ -2489,13 +2508,15 @@ int _tmain(int argc, const TCHAR * argv[])
                     }
 
                     if (ancestor_console_window_owner_proc.console_window &&
-                        inherited_console_window != ancestor_console_window_owner_proc.console_window &&
+                        g_inherited_console_window != ancestor_console_window_owner_proc.console_window &&
                         ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
                         // reattach to parent process console window
                         is_conout_reattached_to_visible_console = true;
 
-                        _free_console(std_handles_state);
-                        _attach_console(ancestor_console_window_owner_proc.proc_id);
+                        if (g_inherited_console_window) {
+                            _free_console(std_handles_state);
+                        }
+                        g_inherited_console_window = _attach_console(ancestor_console_window_owner_proc.proc_id, true);
 
                         if (g_options.has.console_title) {
                             SetConsoleTitle(g_options.console_title.c_str());
@@ -2504,11 +2525,11 @@ int _tmain(int argc, const TCHAR * argv[])
                 }
                 else {
                     if (!is_console_window_inited) {
-                        g_current_proc_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
+                        g_owned_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
                         is_console_window_inited = true;
                     }
 
-                    if (g_current_proc_console_window && g_options.has.own_console_title) {
+                    if (g_owned_console_window && g_options.has.own_console_title) {
                         SetConsoleTitle(g_options.own_console_title.c_str());
                     }
                     else if (g_options.has.console_title) {
@@ -2521,9 +2542,13 @@ int _tmain(int argc, const TCHAR * argv[])
                 g_parent_proc_id = _find_parent_proc_id();
             }
 
-            // std handles check on consistency before continue, otherwise reopen from `CONIN$`/`CONOUT$`
+            // we still need a console to operate on standard handles
 
-            if (!_sanitize_std_handles(ret, win_error, std_handles_state, g_flags, g_options)) {
+            if (!g_inherited_console_window && g_flags.create_console) {
+                g_inherited_console_window = _alloc_console(true);
+            }
+
+            if (g_inherited_console_window && !_sanitize_std_handles(ret, win_error, std_handles_state, g_flags, g_options)) {
                 if (g_flags.ret_win_error) {
                     return win_error;
                 }
@@ -3269,12 +3294,12 @@ int _tmain(int argc, const TCHAR * argv[])
             }
 
             if (g_enable_conout_prints_buffering && !g_is_process_executed) {
-                if (!is_console_window_inited || g_current_proc_console_window && !console_window_owner_procs.size()) {
-                    g_current_proc_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
+                if (!is_console_window_inited || g_owned_console_window && !console_window_owner_procs.size()) {
+                    g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
                     is_console_window_inited = true;
                 }
 
-                if (g_current_proc_console_window) {
+                if (g_owned_console_window) {
                     _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
 
                     // search ancestor console window owner process
@@ -3290,40 +3315,54 @@ int _tmain(int argc, const TCHAR * argv[])
 
                     _StdHandlesState std_handles_state;
 
-                    _free_console(std_handles_state);
-                    if (ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
-                        _attach_console(ancestor_console_window_owner_proc.proc_id);
+                    if (!g_inherited_console_window) {
+                        g_inherited_console_window = GetConsoleWindow();
                     }
 
-                    for (const auto & conout : g_conout_prints_buf) {
-                        if (conout.any_str.is_wstr) {
-                            switch (conout.stream_type) {
-                            case 1:
-                                fputws(conout.any_str.wstr.c_str(), stdout);
-                                break;
-                            case 2:
-                                fputws(conout.any_str.wstr.c_str(), stderr);
-                                break;
+                    if (g_inherited_console_window) {
+                        _free_console(std_handles_state);
+                    }
+                    if (ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
+                        g_inherited_console_window = _attach_console(ancestor_console_window_owner_proc.proc_id, true);
+                    }
+
+                    if (g_inherited_console_window) {
+                        for (const auto & conout : g_conout_prints_buf) {
+                            if (conout.any_str.is_wstr) {
+                                switch (conout.stream_type) {
+                                case 1:
+                                    fputws(conout.any_str.wstr.c_str(), stdout);
+                                    break;
+                                case 2:
+                                    fputws(conout.any_str.wstr.c_str(), stderr);
+                                    break;
+                                }
                             }
-                        }
-                        else {
-                            switch (conout.stream_type) {
-                            case 1:
-                                fputs(conout.any_str.astr.c_str(), stdout);
-                                break;
-                            case 2:
-                                fputs(conout.any_str.astr.c_str(), stderr);
-                                break;
+                            else {
+                                switch (conout.stream_type) {
+                                case 1:
+                                    fputs(conout.any_str.astr.c_str(), stdout);
+                                    break;
+                                case 2:
+                                    fputs(conout.any_str.astr.c_str(), stderr);
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
 
-            if (g_disable_wow64_fs_redir_ptr) {
+            if (g_flags.disable_wow64_fs_redir) {
                 Wow64RevertWow64FsRedirection(g_disable_wow64_fs_redir_ptr);
                 g_disable_wow64_fs_redir_ptr = NULL; // just in case
             }
+
+#ifndef _CONSOLE
+            if (argv) {
+                LocalFree(argv);
+            }
+#endif
         }();
     }
     }();

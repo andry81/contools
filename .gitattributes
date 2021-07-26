@@ -687,6 +687,7 @@ Scripts/__init__/__init__.sh -text
 /TODO.txt -text
 Utilities/Projects/TargetProject.PreBuildStep.CommandLine.var -text
 Utilities/Projects/callf.vcxproj -text
+Utilities/Projects/callfg.vcxproj -text
 Utilities/Projects/chcp.vcxproj -text
 Utilities/Projects/clearcache.vcxproj -text
 Utilities/Projects/envvarcmp.vcxproj -text

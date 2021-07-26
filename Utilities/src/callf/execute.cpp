@@ -31,8 +31,8 @@ Options g_promote_options           = {};
 Options g_promote_parent_options    = {};
 
 DWORD g_parent_proc_id              = -1;
-HWND  g_current_proc_console_window = NULL;
-HWND  g_parent_proc_console_window  = NULL;
+HWND  g_inherited_console_window    = NULL;
+HWND  g_owned_console_window        = NULL;
 
 HANDLE g_stdin_handle               = INVALID_HANDLE_VALUE;
 HANDLE g_stdout_handle              = INVALID_HANDLE_VALUE;
@@ -4319,8 +4319,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         // std handles update
 
-        if (!_get_std_handles(ret, win_error, g_stdin_handle, g_stdout_handle, g_stderr_handle, g_flags, g_options)) {
-            break;
+        if (g_inherited_console_window) {
+            if (!_get_std_handles(ret, win_error, g_stdin_handle, g_stdout_handle, g_stderr_handle, g_flags, g_options)) {
+                break;
+            }
         }
 
         // update globals

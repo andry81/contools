@@ -1,9 +1,9 @@
 [+ AutoGen5 template txt=%s.txt +]
-callf.exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build [+ AppBuildNum +].
+[+ AppModuleName +].exe, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build [+ AppBuildNum +].
   Create process or Shell execute in style of c-function printf.
 
-Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLineFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
-       callf.exe [/?] [<Flags>] /shell-exec <Verb> [//] <FilePathFormatString> [<ParametersFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
+Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLineFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
+       [+ AppModuleName +].exe [/?] [<Flags>] /shell-exec <Verb> [//] <FilePathFormatString> [<ParametersFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
   Description:
     /?
     This help.
@@ -264,7 +264,11 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           /output-*
           /inout-*
           /mutex-std-*
+          /create-console
           /attach-parent-console
+          /create-console-title
+          /own-console-title
+          /console-title
 
         All flags has no effect if elevation is not executed.
         In that case you should use either regular flags and options or

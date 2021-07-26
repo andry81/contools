@@ -575,12 +575,16 @@ namespace {
         // CAUTION:
         //  The `_open_osfhandle` would ignore `SetStdHandle` if all 3 descriptors has already been allocated.
         //  The `_dup2` can fail with -1 return code in case if can not duplicate a handle and it happens
-        //  when the handle has been opened from the `CONOUT$` file!
+        //  when the handle has been opened from the `CONIN$` or `CONOUT$` file!
         //
 
         // CAUTION:
         //  We must check the input handle if it is already registered in the CRT,
-        //  otherwise the `_dup` function will close it before the duplication!
+        //  otherwise the `_dup2` function will close it before the duplication!
+        //
+
+        // CAUTION:
+        //  The CRT `_dup2` function avoids call to `SetStdHandle` in case of GUI (not console) application!
         //
 
         HANDLE file_handle_crt = file_handle;
@@ -589,7 +593,7 @@ namespace {
         {
         case 0: {
             HANDLE registered_stdin_handle = INVALID_HANDLE_VALUE;
-            const int stdin_fileno = _fileno(stdin);
+            int stdin_fileno = _fileno(stdin);
             if (stdin_fileno >= 0) {
                 registered_stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno);
                 if (_is_valid_handle(registered_stdin_handle) && registered_stdin_handle == file_handle) {
@@ -618,12 +622,26 @@ namespace {
             if (fd != fd_dup) {
                 _dup2(fd, fd_dup);
                 _close(fd);
+
+#ifndef _CONSOLE
+                // we must try to register it again
+                stdin_fileno = _fileno(stdin);
+                if (stdin_fileno < 0) {
+                    stdin_fileno = STDIN_FILENO;
+                }
+                if (stdin_fileno >= 0) {
+                    registered_stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno);
+                    if (_is_valid_handle(registered_stdin_handle)) {
+                        SetStdHandle(STD_INPUT_HANDLE, registered_stdin_handle);
+                    }
+                }
+#endif
             }
         } break;
 
         case 1: {
             HANDLE registered_stdout_handle = INVALID_HANDLE_VALUE;
-            const int stdout_fileno = _fileno(stdout);
+            int stdout_fileno = _fileno(stdout);
             if (stdout_fileno >= 0) {
                 registered_stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno);
                 if (_is_valid_handle(registered_stdout_handle) && registered_stdout_handle == file_handle) {
@@ -652,14 +670,28 @@ namespace {
             if (fd != fd_dup) {
                 _dup2(fd, fd_dup);
                 _close(fd);
+
+#ifndef _CONSOLE
+                // we must try to register it again
+                stdout_fileno = _fileno(stdout);
+                if (stdout_fileno < 0) {
+                    stdout_fileno = STDOUT_FILENO;
+                }
+                if (stdout_fileno >= 0) {
+                    registered_stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno);
+                    if (_is_valid_handle(registered_stdout_handle)) {
+                        SetStdHandle(STD_OUTPUT_HANDLE, registered_stdout_handle);
+                    }
+                }
+#endif
             }
         } break;
 
         case 2: {
             HANDLE registered_stderr_handle = INVALID_HANDLE_VALUE;
-            const int stderr_fileno = _fileno(stderr);
+            int stderr_fileno = _fileno(stderr);
             if (stderr_fileno >= 0) {
-                HANDLE registered_stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
+                registered_stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
                 if (_is_valid_handle(registered_stderr_handle) && registered_stderr_handle == file_handle) {
                     // we are trying to register a handle which is already registered
                     break;
@@ -686,6 +718,20 @@ namespace {
             if (fd != fd_dup) {
                 _dup2(fd, fd_dup);
                 _close(fd);
+
+#ifndef _CONSOLE
+                // we must try to register it again
+                stderr_fileno = _fileno(stderr);
+                if (stderr_fileno < 0) {
+                    stderr_fileno = STDERR_FILENO;
+                }
+                if (stderr_fileno >= 0) {
+                    registered_stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
+                    if (_is_valid_handle(registered_stderr_handle)) {
+                        SetStdHandle(STD_ERROR_HANDLE, registered_stderr_handle);
+                    }
+                }
+#endif
             }
         } break;
 
@@ -2532,14 +2578,35 @@ namespace {
         FreeConsole();
     }
 
-    void _alloc_console()
+    HWND _alloc_console(bool inherit_handle, bool hide = false)
     {
         AllocConsole();
+
+        HWND inherited_console_window = GetConsoleWindow();
+
+        if (hide) {
+            // update visibility state
+            ShowWindow(inherited_console_window, SW_HIDE);
+        }
+
+        _set_crt_std_handle(GetStdHandle(STD_INPUT_HANDLE), 0, false, inherit_handle);
+        _set_crt_std_handle(GetStdHandle(STD_OUTPUT_HANDLE), 1, false, inherit_handle);
+        _set_crt_std_handle(GetStdHandle(STD_ERROR_HANDLE), 2, false, inherit_handle);
+
+        return inherited_console_window;
     }
 
-    void _attach_console(DWORD process_id)
+    HWND _attach_console(DWORD process_id, bool inherit_handle)
     {
         AttachConsole(process_id);
+
+        HWND inherited_console_window = GetConsoleWindow();
+
+        _set_crt_std_handle(GetStdHandle(STD_INPUT_HANDLE), 0, false, inherit_handle);
+        _set_crt_std_handle(GetStdHandle(STD_OUTPUT_HANDLE), 1, false, inherit_handle);
+        _set_crt_std_handle(GetStdHandle(STD_ERROR_HANDLE), 2, false, inherit_handle);
+
+        return inherited_console_window;
     }
 }
 

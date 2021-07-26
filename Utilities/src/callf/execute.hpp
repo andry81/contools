@@ -361,8 +361,9 @@ extern Options g_elevate_child_options;
 extern Options g_promote_options;
 extern Options g_promote_parent_options;
 
-extern DWORD g_parent_proc_id;
-extern HWND  g_current_proc_console_window;
+extern DWORD  g_parent_proc_id;
+extern HWND   g_inherited_console_window;
+extern HWND   g_owned_console_window;
 
 BOOL WINAPI CtrlHandler(DWORD ctrl_type);
 
