@@ -1,14 +1,20 @@
-* Fix the case where the `callf.exe "" "cmd.exe /k"` expression has broken
-  autocompletion feature in the `cmd.exe` process and the `cmd.exe` treats all
-  the tab characters as is.
-  The bug is attached to the `STARTF_USESTDHANDLES` flag and if related
-  standard handles is used from the `CreateProcess` function.
-  If the flag is not set or all 3 stdandard handles are character (console)
-  handles (not disk or pipe handles), then the autocompletion feature works,
-  but the standard output can not be redirected and intercepted.
-  If the flag is set and one of 3 handles is not character (console) handle,
-  then the autocompletion feature is broken, but the standard output can be
-  redirected and intercepted.
+* Fix the case where the `callf.exe "" "cmd.exe /k"` expression has
+  broken/altered autocompletion feature in the `cmd.exe` process and the
+  `cmd.exe` treats all the tab characters as is.
+
+  The issue is attached to the stdin handle type inside the `cmd.exe` process.
+  If the stdin handle has not a character device type
+  (GetFileType(GetStdHandle(STD_INPUT_HANDLE)) != FILE_TYPE_CHAR), then the
+  autocompletion feature is turned off and all characters including a tab
+  character processes as is. Otherwise the tab button press triggers
+  the autocompletionn feature.
+
+  The stdin handle changes its type from the `FILE_TYPE_CHAR`, for example, if
+  the process input is redirected.
+
+  The fix can be made portably between different Windows versions, for example,
+  through the code injection into a child process and interception of the
+  `ReadConsole`/`WriteConsole` calls.
 
 * Hookup WriteFile on the stdout/stderr in a child process to force file buffer
   flush on each write. Can fix a progress stall based on stdout/stderr
@@ -16,3 +22,8 @@
 
 * Support console clear by the `cls` command from the `callf "" "cmd.exe /k"`
   process console input.
+
+* Hookup SEH exception filter in a child process to intercept SEH exception
+  being throwed out of a child process to be able to pause-on-error in the
+  parent `callf.exe` process even if a child process didn't return non zero
+  return code.

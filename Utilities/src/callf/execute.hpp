@@ -77,6 +77,10 @@ struct Flags
     bool            print_win_error_string;
     bool            print_shell_error_string;
 
+    bool            pause_on_exit_if_error_before_exec;
+    bool            pause_on_exit_if_error;
+    bool            pause_on_exit;
+
     bool            no_print_gen_error_string;
     bool            no_sys_dialog_ui;
     bool            no_wait;                        // has no meaning if a `tee` file is used
@@ -85,6 +89,7 @@ struct Flags
     bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
     bool            no_std_inherit;
 
+    bool            allow_throw_seh_except;         // by default all SEH exceptions does interception and conversion into specific return code
     bool            allow_expand_unexisted_env;
     bool            allow_subst_empty_args;
 

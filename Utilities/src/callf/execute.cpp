@@ -152,6 +152,10 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, print_win_error_string);
     MERGE_FLAG(flags, print_shell_error_string);
 
+    MERGE_FLAG(flags, pause_on_exit_if_error_before_exec);
+    MERGE_FLAG(flags, pause_on_exit_if_error);
+    MERGE_FLAG(flags, pause_on_exit);
+
     MERGE_FLAG(flags, no_print_gen_error_string);
     MERGE_FLAG(flags, no_sys_dialog_ui);
     MERGE_FLAG(flags, no_wait);
@@ -160,6 +164,7 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, no_subst_vars);
     MERGE_FLAG(flags, no_std_inherit);
 
+    MERGE_FLAG(flags, allow_throw_seh_except);
     MERGE_FLAG(flags, allow_expand_unexisted_env);
     MERGE_FLAG(flags, allow_subst_empty_args);
 
@@ -5869,6 +5874,27 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
     }
     regular_flags.no_sys_dialog_ui = false; // always reset
 
+    if (child_flags.pause_on_exit_if_error_before_exec) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/pause-on-exit-if-error-before-exec ");
+        }
+    }
+    regular_flags.pause_on_exit_if_error_before_exec = false; // always reset
+
+    if (child_flags.pause_on_exit_if_error) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/pause-on-exit-if-error ");
+        }
+    }
+    regular_flags.pause_on_exit_if_error = false; // always reset
+
+    if (child_flags.pause_on_exit) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/pause-on-exit ");
+        }
+    }
+    regular_flags.pause_on_exit = false; // always reset
+
     if (!child_options.shell_exec_verb.empty()) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/shell-exec \"") } + child_options.shell_exec_verb + _T("\" ");
@@ -5922,6 +5948,13 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
     }
     regular_flags.no_std_inherit = false; // always reset
 
+
+    if (child_flags.allow_throw_seh_except) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/allow-throw-seh-except ");
+        }
+    }
+    regular_flags.allow_throw_seh_except = false; // always reset
 
     if (child_flags.allow_expand_unexisted_env) {
         if (cmd_out_str_ptr) {

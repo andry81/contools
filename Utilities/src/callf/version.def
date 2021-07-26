@@ -3,5 +3,5 @@ autogen definitions version;
 AppName = "callf";
 AppMajorVer = 1;
 AppMinorVer = 13;
-AppRevision = 1;
-AppBuildNum = 27;
+AppRevision = 2;
+AppBuildNum = 28;

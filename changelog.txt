@@ -1,3 +1,11 @@
+2021.07.26:
+* fixed: Utilities/src/callf: incorrect parse of `/replace-args`, `/r`, `/replace-args-in-tail`, `/ra`, `/set-env-var`, `/v` options
+* new: Utilities/src/callf: `/allow-throw-seh-except` flag to allow to throw SEH exceptions out of process
+* new: Utilities/src/callf: `/pause-on-exit`, `/pause-on-exit-if-error`, `/pause-on-exit-if-error-before-exec` flags to be able to pause on exit before close a console
+* changed: Utilities/src/callf: catch all SEH exceptions by default and convert into specific error code
+* changed: Utilities: todo update
+* changed: readme update
+
 2021.07.25:
 * fixed: Utilities/src/callf: access violation around usage of the `/E<N>`, `/EE<N>`, `/S<N>`, `/SE<N>` flags
 * fixed: Utilities/src/callf: missed to translate for elevation the `/disable-wow64-fs-redir` flag
@@ -9,10 +17,10 @@
 * fixed: Utilities/src: callf, printf, envvarcmp: `Flags` initialization
 * fixed: Utilities/src/callf: `Options` merge
 * new: Utilities/src/callf: `/expand-env<N>`, `/E<N>`, `/EE<N>` flags to expand `${...}` environment variables exclusively for `<N>` command line argument and turn off the expansion for the rest arguments
-* new: Utilities/src/callf: `/subst-var<N>`, `/S<N>`, `/SE<N>` flags to substitute `{...}` variables exclusively for `<N>` command line argument and turn off the expansion for the rest arguments
-* new: Utilities/src: callf, printf: `/allow-expands-unexisted-env` to allow expansion of unexisted `${...}` environment variables in all command line arguments
+* new: Utilities/src/callf: `/subst-var<N>`, `/S<N>`, `/SE<N>` flags to substitute `{...}` variables exclusively for `<N>` command line argument and turn off the substitution for the rest arguments
+* new: Utilities/src: callf, printf: `/allow-expand-unexisted-env` to allow expansion of unexisted `${...}` environment variables in all command line arguments
 * new: Utilities/src: callf, printf: `/allow-subst-empty-args` to allow substitution of empty `{...}` variables in all command line arguments
-* changed: Utilities/src: callf, printf: Disabled by default substitution of empty `{...}` variables in command line arguments. Now you have to explicitly enable the substitution of empty command line arguments by `/allow-subst-empty-arg*` flags.
+* changed: Utilities/src: callf, printf: Disabled by default substitution of empty `{...}` variables in command line arguments. Now you have to explicitly enable the substitution of empty command line arguments by `/allow-subst-empty-args` or `/SE<N>` flags.
 * changed: Utilities/src: callf, printf, envvarcmp: `Flags` initialization reimplemented
 * refactor: Utilities/src/callf: code refactor
 

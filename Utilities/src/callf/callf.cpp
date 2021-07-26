@@ -43,6 +43,10 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/print-win-error-string"),
     _T("/print-shell-error-string"),
     _T("/no-print-gen-error-string"),
+    _T("/pause-on-exit-if-error-before-exec"),
+    _T("/pause-on-exit-if-error"),
+    _T("/pause-on-exit"),
+    _T("/allow-throw-seh-except"),
     _T("/elevate"),
     _T("/create-console"),
     _T("/attach-parent-console"),
@@ -66,12 +70,20 @@ const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_promote_flags_to_preparse_arr[] = {
+    _T("/pause-on-exit-if-error-before-exec"),
+    _T("/pause-on-exit-if-error"),
+    _T("/pause-on-exit"),
+    _T("/allow-throw-seh-except"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
 
 const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
+    _T("/pause-on-exit-if-error-before-exec"),
+    _T("/pause-on-exit-if-error"),
+    _T("/pause-on-exit"),
+    _T("/allow-throw-seh-except"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/disable-conout-duplicate-to-parent-console-on-error")
@@ -97,6 +109,9 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/print-shell-error-string"),
     _T("/no-print-gen-error-string"),
     _T("/no-sys-dialog-ui"),
+    _T("/pause-on-exit-if-error-before-exec"),
+    _T("/pause-on-exit-if-error"),
+    _T("/pause-on-exit"),
     _T("/shell-exec"),
     _T("/shell-exec-expand-env"),
     _T("/D"),
@@ -105,6 +120,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/no-expand-env"),
     _T("/no-subst-vars"),
     _T("/no-std-inherit"),
+    _T("/allow-throw-seh-except"),
     _T("/allow-expand-unexisted-env"),
     _T("/allow-subst-empty-args"),
     _T("/pipe-stdin-to-stdout"),
@@ -323,6 +339,10 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
     _T("/print-shell-error-string"),
     _T("/no-print-gen-error-string"),
     _T("/no-sys-dialog-ui"),
+    _T("/pause-on-exit-if-error-before-exec"),
+    _T("/pause-on-exit-if-error"),
+    _T("/pause-on-exit"),
+    _T("/allow-throw-seh-except"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-conout-reattach-to-visible-console"),
@@ -332,6 +352,10 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
 const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/chcp-in"),
     _T("/chcp-out"),
+    _T("/pause-on-exit-if-error-before-exec"),
+    _T("/pause-on-exit-if-error"),
+    _T("/pause-on-exit"),
+    _T("/allow-throw-seh-except"),
     _T("/reopen-stdin"),
     _T("/reopen-stdin-as-server-pipe"),
     _T("/reopen-stdin-as-server-pipe-connect-timeout"),
@@ -672,6 +696,27 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         return 0;
     }
+    if (IsArgEqualTo(arg, _T("/pause-on-exit-if-error-before-exec"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.pause_on_exit_if_error_before_exec = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/pause-on-exit-if-error"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.pause_on_exit_if_error = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/pause-on-exit"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.pause_on_exit = true;
+            return 1;
+        }
+        return 0;
+    }
     if (IsArgEqualTo(arg, _T("/no-expand-env"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_expand_env = true;
@@ -689,6 +734,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/no-std-inherit"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_std_inherit = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/allow-throw-seh-except"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.allow_throw_seh_except = true;
             return 1;
         }
         return 0;
@@ -1901,20 +1953,20 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/replace-args")) || IsArgEqualTo(arg, _T("/r"))) {
         arg_offset += 1;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-            if (IsArgInFilter(start_arg, include_filter_arr)) {
-                const TCHAR * from = arg;
+            const TCHAR * from = arg;
 
-                arg_offset += 1;
-                if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                    const TCHAR * to = arg;
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                const TCHAR * to = arg;
 
+                if (IsArgInFilter(start_arg, include_filter_arr)) {
                     options.replace_args.push_back(std::make_tuple(-1, std::tstring{ from }, std::tstring{ to }));
                     return 1;
                 }
-                else error = invalid_format_flag(start_arg);
-                return 2;
+                return 0;
             }
-            return 0;
+            else error = invalid_format_flag(start_arg);
+            return 2;
         }
         else error = invalid_format_flag(start_arg);
         return 2;
@@ -1922,20 +1974,20 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/replace-args-in-tail")) || IsArgEqualTo(arg, _T("/ra"))) {
         arg_offset += 1;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-            if (IsArgInFilter(start_arg, include_filter_arr)) {
-                const TCHAR * from = arg;
+            const TCHAR * from = arg;
 
-                arg_offset += 1;
-                if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                    const TCHAR * to = arg;
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                const TCHAR * to = arg;
 
+                if (IsArgInFilter(start_arg, include_filter_arr)) {
                     options.replace_args.push_back(std::make_tuple(-2, std::tstring{ from }, std::tstring{ to }));
                     return 1;
                 }
-                else error = invalid_format_flag(start_arg);
-                return 2;
+                return 0;
             }
-            return 0;
+            else error = invalid_format_flag(start_arg);
+            return 2;
         }
         else error = invalid_format_flag(start_arg);
         return 2;
@@ -1957,20 +2009,20 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/set-env-var")) || IsArgEqualTo(arg, _T("/v"))) {
         arg_offset += 1;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-            if (IsArgInFilter(start_arg, include_filter_arr)) {
-                const TCHAR * name = arg;
+            const TCHAR * name = arg;
 
-                arg_offset += 1;
-                if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-                    const TCHAR * value = arg;
+            arg_offset += 1;
+            if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+                const TCHAR * value = arg;
 
+                if (IsArgInFilter(start_arg, include_filter_arr)) {
                     options.env_vars.push_back(std::make_tuple(std::tstring{ name }, std::tstring{ value }));
                     return 1;
                 }
-                else error = invalid_format_flag(start_arg);
-                return 2;
+                return 0;
             }
-            return 0;
+            else error = invalid_format_flag(start_arg);
+            return 2;
         }
         else error = invalid_format_flag(start_arg);
         return 2;
@@ -2119,6 +2171,16 @@ int ParseArgWithSuffixToOption(int & error, const TCHAR * arg, int argc, const T
     return -1;
 }
 
+int main_seh_except_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep)
+{
+    if (g_flags.allow_throw_seh_except) {
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+    else {
+        return EXCEPTION_EXECUTE_HANDLER;
+    }
+}
+
 int _tmain(int argc, const TCHAR * argv[])
 {
 #if _DEBUG
@@ -2128,10 +2190,6 @@ int _tmain(int argc, const TCHAR * argv[])
     // CAUTION:
     //  In Windows if you call `CreateProcess` like this: `CreateProcess("a.exe", "/b", ...)`, then the `argv[0]` would be `/b`, not `a.exe`!
     //
-
-    if (!argc || !argv[0]) {
-        return err_unspecified;
-    }
 
     int ret = err_none;
     DWORD win_error = 0;
@@ -2152,8 +2210,8 @@ int _tmain(int argc, const TCHAR * argv[])
     // NOTE:
     //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
-    return [&]() -> int { __try {
-        return [&]() -> int {
+    return ret = [&]() -> int { __try { __try {
+        return ret = [&]() -> int {
 
             // NOTE:
             //  While the current process being started it's console can be hidden by the CreateProcess/ShellExecute from the parent process.
@@ -2164,10 +2222,14 @@ int _tmain(int argc, const TCHAR * argv[])
             //  If you don't want such behaviour, then you have to use the `/disable-conout-reattach-to-visible-console` flag.
             //
 
+            if (!argc || !argv[0]) {
+                return err_unspecified;
+            }
+
             TCHAR module_file_name_buf[MAX_PATH];
             const TCHAR * program_file_name = nullptr;
             int arg_offset = 0;
-    
+
             if (argv[0][0] != _T('/')) { // arguments shift detection
                 program_file_name = argv[0];
                 arg_offset = 1;
@@ -2462,7 +2524,7 @@ int _tmain(int argc, const TCHAR * argv[])
             // std handles check on consistency before continue, otherwise reopen from `CONIN$`/`CONOUT$`
 
             if (!_sanitize_std_handles(ret, win_error, std_handles_state, g_flags, g_options)) {
-                if (!g_flags.ret_win_error) {
+                if (g_flags.ret_win_error) {
                     return win_error;
                 }
                 else {
@@ -2472,7 +2534,7 @@ int _tmain(int argc, const TCHAR * argv[])
 
             arg_offset = 1;
 
-            if(argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
+            if (argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
                 _print_raw_message(
                     1, "%s",
 #include "help_inl.hpp"
@@ -3190,8 +3252,22 @@ int _tmain(int argc, const TCHAR * argv[])
             );
         }();
     }
+    __except (main_seh_except_filter(GetExceptionCode(), GetExceptionInformation())) {
+        return ret = err_seh_exception;
+    }
+    }
     __finally {
         [&]() {
+            // check special case when a child process is not executed while being elevated to still be able to pause-on-exit
+            const bool regular_pause_on_error = g_is_process_elevating && !g_is_process_executed;
+
+            const Flags * flags_ptr = regular_pause_on_error ? &g_regular_flags : &g_flags;
+
+            if (flags_ptr->pause_on_exit || flags_ptr->pause_on_exit_if_error && ret != err_none || flags_ptr->pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none) {
+                tfputs(_T("Press any key to continue . . . \n"), stdout);
+                getch();
+            }
+
             if (g_enable_conout_prints_buffering && !g_is_process_executed) {
                 if (!is_console_window_inited || g_current_proc_console_window && !console_window_owner_procs.size()) {
                     g_current_proc_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);

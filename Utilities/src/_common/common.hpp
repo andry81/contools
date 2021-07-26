@@ -21,6 +21,7 @@
 #include <ShellAPI.h>
 
 #include <stdio.h>
+#include <conio.h>
 #include <string.h>
 #include <memory.h>
 #include <io.h>
@@ -74,6 +75,8 @@ namespace {
         err_none            = 0,
 
         err_unspecified     = -255,
+
+        err_seh_exception   = -254,
 
         err_help_output     = -128,
 

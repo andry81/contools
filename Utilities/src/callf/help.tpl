@@ -117,6 +117,19 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
         Overrides `/showas` flag.
 
+      /pause-on-exit-if-error-before-exec
+        Pause on exist if an error happened before a command line application
+        execution. By default it prints "Press any key to continue..." message
+        to the stdout.
+
+      /pause-on-exit-if-error
+        Pause on exist if an error happened. By default it prints
+        "Press any key to continue..." message to the stdout.
+
+      /pause-on-exit-if-error
+        Pause on exist. By default it prints "Press any key to continue..."
+        message to the stdout.
+
       /no-expand-env
         Don't expand `${...}` environment variables.
         Can not be used together with the `/allow-expand-unexisted-env` flag.
@@ -124,9 +137,6 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
       /no-subst-vars
         Don't substitute `{...}` variables (command line arguments).
         Can not be used together with the `/allow-subst-empty-args` flag.
-
-      /no-std-inherit
-        Prevent standard handles inheritance into child process.
 
       /expand-env-arg<N>
       /E<N>
@@ -162,6 +172,10 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         Can not be used together with the `/no-subst-vars`,
         `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>` flags.
 
+      /allow-throw-seh-except
+        Allow to throw SEH exceptions out of process. By default all SEH
+        exceptions does intercept and convert into specific error code.
+
       /allow-expand-unexisted-env
         Allow expansion of unexisted `${...}` environment variables in
         all command line arguments.
@@ -174,6 +188,9 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         so to avoid that do use quotes without an argument.
         Can not be used together with the `/no-subst-vars`, `/E<N>`, `/EE<N>`
         flags.
+
+      /no-std-inherit
+        Prevent standard handles inheritance into child process.
 
       /pipe-stdin-to-stdout
         Pipe the process stdin into stdout. This additionally disables
@@ -270,6 +287,10 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
           /print-shell-error-string
           /no-print-gen-error-string
           /no-sys-dialog-ui
+          /pause-on-exit-if-error-before-exec
+          /pause-on-exit-if-error
+          /pause-on-exit
+          /allow-throw-seh-except
           /attach-parent-console
           /disable-wow64-fs-redir
           /disable-conout-reattach-to-visible-console
@@ -284,6 +305,10 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
         Flags:
           /chcp-in
           /chcp-out
+          /pause-on-exit-if-error-before-exec
+          /pause-on-exit-if-error
+          /pause-on-exit
+          /allow-throw-seh-except
           /reopen-std[in|out|err]*
           /std[in|out|err]-*
           /output-*
@@ -758,6 +783,7 @@ Usage: callf.exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLine
 
   Return codes if `/ret-*` option is not defined:
    -255 - unspecified error
+   -254 - SEH exception
    -128 - help output
    -7   - named pipe connection timeout
    -6   - named pipe connection error
