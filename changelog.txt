@@ -1,4 +1,9 @@
 2021.07.26:
+* new: Utilities/tests: more manual tests for `callf` utility
+* new: Utilities/tests: manual tests for `callfg` utility
+* changed: Utilities/bin/contools: readme update
+
+2021.07.26:
 * new: Utilities/bin/contools: binaries update
 
 2021.07.26:
