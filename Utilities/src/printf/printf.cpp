@@ -108,7 +108,7 @@ int _tmain(int argc, const TCHAR * argv[])
         arg = argv[arg_offset];
         if (!arg) {
             if (!g_flags.no_print_gen_error_string) {
-                tfputs(_T("error: flag is invalid"), stderr);
+                fputs("error: flag is invalid", stderr);
             }
             return err_invalid_format;
         }
@@ -167,13 +167,13 @@ int _tmain(int argc, const TCHAR * argv[])
 
     // `/no-expand-env` vs `/allow-expand-unexisted-env`
     if (g_flags.no_expand_env && g_flags.allow_expand_unexisted_env) {
-        tfputs(_T("`/no-expand-env` flag mixed with `/allow-expand-unexisted-env`\n"), stderr);
+        fputs("error: `/no-expand-env` flag mixed with `/allow-expand-unexisted-env`\n", stderr);
         return err_invalid_format;
     }
 
     // `/no-subst-vars` vs `/allow-subst-empty-args`
     if (g_flags.no_subst_vars && g_flags.allow_subst_empty_args) {
-        tfputs(_T("`/no-subst-vars` flag mixed with `/allow-subst-empty-args`\n"), stderr);
+        fputs("error: `/no-subst-vars` flag mixed with `/allow-subst-empty-args`\n", stderr);
         return err_invalid_format;
     }
 

@@ -821,11 +821,12 @@ Utilities/src/_common/std/tstdio.hpp -text
 Utilities/src/_common/std/tstdlib.hpp -text
 Utilities/src/_common/std/tstring.hpp -text
 Utilities/src/_common/std/ttime.hpp -text
-Utilities/src/_common/tacklelib/tackle/addressof.hpp -text
-Utilities/src/_common/tacklelib/tackle/platform.hpp -text
-Utilities/src/_common/tacklelib/tackle/string_identity.hpp -text
-Utilities/src/_common/tacklelib/tackle/type_identity.hpp -text
-Utilities/src/_common/tacklelib/tackle/type_traits.hpp -text
+Utilities/src/_common/tacklelib/tackle/explicit_type.hpp -text
+Utilities/src/_common/tacklelib/utility/addressof.hpp -text
+Utilities/src/_common/tacklelib/utility/platform.hpp -text
+Utilities/src/_common/tacklelib/utility/string_identity.hpp -text
+Utilities/src/_common/tacklelib/utility/type_identity.hpp -text
+Utilities/src/_common/tacklelib/utility/type_traits.hpp -text
 Utilities/src/_gui/wxFileDialog/help.def -text
 Utilities/src/_gui/wxFileDialog/help.tpl -text
 Utilities/src/_gui/wxFileDialog/version.def -text

@@ -66,6 +66,7 @@ const TCHAR * g_elevate_parent_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
+    _T("/no-expand-env"),
     _T("/create-console"),
     _T("/attach-parent-console"),
     _T("/create-console-title"),
@@ -2198,10 +2199,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     PWSTR cmdline_str = GetCommandLine();
     argv = const_cast<LPCWSTR *>(CommandLineToArgvW(cmdline_str, &argc));
+#elif defined(_DEBUG)
+    PWSTR cmdline_str = GetCommandLine();
 #endif
 
+    TCHAR module_file_name_buf[MAX_PATH];
+    const TCHAR * program_file_name = nullptr;
+
+    if (argv[0][0] != _T('/')) { // arguments shift detection
+        program_file_name = argv[0];
+    }
+    else if (GetModuleFileName(NULL, module_file_name_buf, sizeof(module_file_name_buf) / sizeof(module_file_name_buf[0]))) {
+        program_file_name = module_file_name_buf;
+    }
+
 #if _DEBUG
-    MessageBoxA(NULL, "", "", MB_OK);
+    MessageBox(NULL, cmdline_str, program_file_name ? program_file_name : _T(""), MB_OK);
 #endif
 
     // CAUTION:
@@ -2243,18 +2256,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return err_unspecified;
             }
 
-            TCHAR module_file_name_buf[MAX_PATH];
-            const TCHAR * program_file_name = nullptr;
             int arg_offset = 0;
 
             if (argv[0][0] != _T('/')) { // arguments shift detection
-                program_file_name = argv[0];
                 arg_offset = 1;
-            }
-            else {
-                if (GetModuleFileName(NULL, module_file_name_buf, sizeof(module_file_name_buf) / sizeof(module_file_name_buf[0]))) {
-                    program_file_name = module_file_name_buf;
-                }
             }
 
             const TCHAR * arg;
@@ -2429,10 +2434,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         else if (g_options.has.console_title) {
                             SetConsoleTitle(g_options.console_title.c_str());
                         }
-
-                        // update visibility state
-                        ShowWindow(g_inherited_console_window, SW_SHOW);
-                        ShowWindow(g_inherited_console_window, SW_SHOW); // WTF: second ShowWindow (not UpdateWindow) is required, otherwise does not show in Release
                     }
                     else {
                         // check if parent process console can be attached and visible
@@ -2538,6 +2539,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
             }
 
+            //fprintf(stdout, "TEST1\n");
+
             if (g_parent_proc_id == -1) {
                 g_parent_proc_id = _find_parent_proc_id();
             }
@@ -2556,6 +2559,26 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     return ret;
                 }
             }
+
+#ifdef _DEBUG
+            // recheck
+            _StdHandlesState std_handles_state2;
+
+            std_handles_state2.save_stdin_state(GetStdHandle(STD_INPUT_HANDLE));
+            std_handles_state2.save_stdout_state(GetStdHandle(STD_OUTPUT_HANDLE));
+            std_handles_state2.save_stderr_state(GetStdHandle(STD_ERROR_HANDLE));
+
+            const int stdin_fileno = _fileno(stdin);
+            const HANDLE registered_stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno >= 0 ? stdin_fileno : STDIN_FILENO);
+
+            const int stdout_fileno = _fileno(stdout);
+            const HANDLE registered_stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
+
+            const int stderr_fileno = _fileno(stderr);
+            const HANDLE registered_stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno >= 0 ? stderr_fileno : STDERR_FILENO);
+#endif
+
+            //fprintf(stdout, "TEST2\n");
 
             arg_offset = 1;
 
@@ -3255,8 +3278,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
 
                 return ExecuteProcess(
-                    program_file_name,
-                    tstrlen(program_file_name),
+                    program_file_name ? program_file_name : (LPCTSTR)NULL,
+                    program_file_name ? tstrlen(program_file_name) : 0,
                     !elevated_cmd_out_str.empty() ? elevated_cmd_out_str.c_str() : (LPCTSTR)NULL,
                     !elevated_cmd_out_str.empty() ? elevated_cmd_out_str.length() : 0
                 );
@@ -3289,7 +3312,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             const Flags * flags_ptr = regular_pause_on_error ? &g_regular_flags : &g_flags;
 
             if (flags_ptr->pause_on_exit || flags_ptr->pause_on_exit_if_error && ret != err_none || flags_ptr->pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none) {
-                tfputs(_T("Press any key to continue . . . \n"), stdout);
+                fputs("Press any key to continue . . . \n", stdout);
                 getch();
             }
 
@@ -3330,20 +3353,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         for (const auto & conout : g_conout_prints_buf) {
                             if (conout.any_str.is_wstr) {
                                 switch (conout.stream_type) {
-                                case 1:
+                                case STDOUT_FILENO:
                                     fputws(conout.any_str.wstr.c_str(), stdout);
                                     break;
-                                case 2:
+                                case STDERR_FILENO:
                                     fputws(conout.any_str.wstr.c_str(), stderr);
                                     break;
                                 }
                             }
                             else {
                                 switch (conout.stream_type) {
-                                case 1:
+                                case STDOUT_FILENO:
                                     fputs(conout.any_str.astr.c_str(), stdout);
                                     break;
-                                case 2:
+                                case STDERR_FILENO:
                                     fputs(conout.any_str.astr.c_str(), stderr);
                                     break;
                                 }

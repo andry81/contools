@@ -4,6 +4,9 @@
 #ifndef UTILITY_TYPE_IDENTITY_HPP
 #define UTILITY_TYPE_IDENTITY_HPP
 
+#include <cstdint>
+#include <type_traits>
+
 
 // CAUTION:
 //  Redundant parentheses are required here to bypass a tricky error in the GCC 5.4.x around expressions with `>` and `<` characters in case of usage inside another expressions with the same characters:
@@ -47,6 +50,34 @@ namespace utility
     {
         using type = bool;
         static constexpr const bool values[] = { b... };
+    };
+
+    // remove_reference + remove_cv
+    template <typename T>
+    struct remove_cvref
+    {
+        using type = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+    };
+
+    // remove_pointer + remove_cv
+    template <typename T>
+    struct remove_cvptr
+    {
+        using type = typename std::remove_cv<typename std::remove_pointer<T>::type>::type;
+    };
+
+    // remove_reference + remove_cv + remove_pointer + remove_cv
+    template <typename T>
+    struct remove_cvref_cvptr
+    {
+        using type = typename remove_cvptr<typename remove_cvref<T>::type>::type;
+    };
+
+    // remove_reference + remove_cv + remove_pointer + remove_cv + remove_extent
+    template <typename T>
+    struct remove_cvref_cvptr_extent
+    {
+        using type = typename std::remove_extent<typename remove_cvref_cvptr<T>::type>::type;
     };
 }
 

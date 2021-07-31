@@ -11,7 +11,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     //:
     Character sequence to stop parse <Flags> command line parameters.
 
-    Flags:
+    <Flags>:
       /chcp-in <codepage>
         Console input code page.
 
@@ -126,7 +126,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Pause on exist if an error happened. By default it prints
         "Press any key to continue..." message to the stdout.
 
-      /pause-on-exit-if-error
+      /pause-on-exit
         Pause on exist. By default it prints "Press any key to continue..."
         message to the stdout.
 
@@ -145,7 +145,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         rest of arguments if not specifically enabled.
         Unexisted environment variables is not expanded by default, use the
         `/EE<N>` flag instead to specifically allow it.
-        Can not be used together with the `/no-expand-env`, `/EE<N>` flagss.
+        Can not be used together with the `/no-expand-env`, `/EE<N>` flags.
         Can be used together with the `/allow-expand-unexisted-env` flag.
 
       /EE<N>
@@ -186,8 +186,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         arguments.
         Still can not apply to command line arguments which does not exist,
         so to avoid that do use quotes without an argument.
-        Can not be used together with the `/no-subst-vars`, `/E<N>`, `/EE<N>`
-        flags.
+        Can not be used together with the `/no-subst-vars`, `/EE<N>` flags.
 
       /no-std-inherit
         Prevent standard handles inheritance into child process.
@@ -223,16 +222,16 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /elevate
       /elevate{ <ParentFlags> }[{ <ChildFlags> }]
         Self elevate process upto Administrator privileges.
-        If the current `callf.exe` process has no Administrator privileges,
-        then does use ShellExecute with elevation to start new `callf.exe`
-        process with the same command line but different options and flags
-        before run a child process. If the current `callf.exe` process already
-        has Administrator privileges, then has no effect.
+        If this process has no Administrator privileges, then does use
+        ShellExecute with elevation to start new this process with the same
+        command line but different options and flags before run a child
+        process. If this process already has Administrator privileges, then
+        has no effect.
         Silently overrides the same regular flags.
 
-        ParentFlags:
-          Limited set of flags to pass exceptionally into the parent
-          (not elevated) `callf.exe` process.
+        <ParentFlags>:
+          Limited set of flags to pass exceptionally into the this-parent
+          (not elevated) process.
 
           /ret-create-proc
           /ret-win-error
@@ -255,10 +254,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /eval-backslash-esc or /e
           /eval-dbl-backslash-esc or /e\\
 
-        ChildFlags:
-          Limited set of flags to pass exceptionally into the child
-          (elevated) `callf.exe` process.
+        <ChildFlags>:
+          Limited set of flags to pass exceptionally into the this-child
+          (elevated) process.
 
+          /no-expand-env
           /reopen-std[in|out|err]*
           /std[in|out|err]-*
           /output-*
@@ -276,14 +276,14 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /promote{ <Flags> }
         In case if `/elevate*` flag or option is used and executed, then does
-        declare `<Flags>` for both the parent (not elevated) `callf.exe`
-        process and the child (elevated) `callf.exe` process.
+        declare `<Flags>` for both the this-parent (not elevated) process and
+        the this-child (elevated) process.
         In case if `/elevate*` flag or option is not used or is not executed,
-        then does declare `<Flags>` for the parent `callf.exe` process only.
+        then does declare `<Flags>` for the this-parent process only.
         The same flag can not be used together with `/promote-parent{ ... }`
         option. Silently overrides the same regular flags.
 
-        Flags:
+        <Flags>:
           /chcp-in
           /chcp-out
           /win-error-langid
@@ -301,12 +301,12 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /disable-conout-duplicate-to-parent-console-on-error
 
       /promote-parent{ <Flags> }
-        Does declare `<Flags>` for the parent `callf.exe` process only
-        independently to the `/elevate*` flag or option.
+        Does declare `<Flags>` for the this-parent process only independently
+        to the `/elevate*` flag or option.
         The same flag can not be used together with `/promote{ ... }`
         option. Silently overrides the same regular flags.
 
-        Flags:
+        <Flags>:
           /chcp-in
           /chcp-out
           /pause-on-exit-if-error-before-exec
@@ -488,7 +488,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /create-outbound-server-pipe-from-stdin <pipe>
         Create outbound server named pipe `<pipe>` instead of anonymous as by
         default to write into a child process stdin from the process stdin.
-        Useful to write stream to elevated or another child `callf.exe`
+        Useful to write stream to elevated this-child process or any elevated
         process.
 
       /create-outbound-server-pipe-from-stdin-connect-timeout <timeout>
@@ -508,7 +508,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Create inbound server named pipe `<pipe>` instead of anonymous as by
         default to read from a child process stdout/stderr to write into
         the process stdout/stderr.
-        Useful to read stream from elevated or another child `callf.exe`
+        Useful to read stream from elevated this-child process or any elevated
         process.
 
       /create-inbound-server-pipe-to-std[out|err]-connect-timeout <timeout>
@@ -890,7 +890,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     `0.in` file into the `test0_{pid}` named pipe through the Administrator
     privileges isolation, where it being read and write back into the
     `test1_{pid}` named pipe to print into the existing (parent) console by
-    the parent process `callf.exe`.If process has been already elevated, then
+    the parent process `callf.exe`. If process has been already elevated, then
     just prints content of the `0.in` file to the console.
 
     Example #2 in case of elevation execution does write the content of the

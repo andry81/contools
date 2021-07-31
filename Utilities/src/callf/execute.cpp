@@ -431,7 +431,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
     [&]() { __try {
         [&]() {
             switch (stream_type) {
-            case 0: // stdin
+            case STDIN_FILENO: // stdin
             {
                 // Accomplish all server pipe connections before continue.
                 //
@@ -913,7 +913,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                 }
             } break;
 
-            case 1: // stdout
+            case STDOUT_FILENO: // stdout
             {
                 // Accomplish all server pipe connections before continue.
                 //
@@ -1101,7 +1101,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
             } break;
 
 
-            case 2: // stderr
+            case STDERR_FILENO: // stderr
             {
                 // Accomplish all server pipe connections before continue.
                 //
@@ -1293,7 +1293,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
         // cleanup
 
         switch (stream_type) {
-        case 0: // stdin
+        case STDIN_FILENO: // stdin
         {
             switch (g_stdin_handle_type) {
             case FILE_TYPE_DISK:
@@ -1318,7 +1318,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
         //  DO NOT disconnect in output-to-input direction to avoid data early lost because of buffering between input and output.
         //
 
-        //case 1: // stdout
+        //case STDOUT_FILENO: // stdout
         //{
         //    if (_is_valid_handle(g_stdout_pipe_read_handle)) {
         //        // explicitly disconnect/close all pipe inbound handles here to trigger the child process reaction
@@ -1331,7 +1331,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
         //} break;
 
 
-        //case 2: // stderr
+        //case STDERR_FILENO: // stderr
         //{
         //    if (_is_valid_handle(g_stderr_pipe_read_handle)) {
         //        // explicitly disconnect/close all pipe inbound handles here to trigger the child process reaction
@@ -1808,15 +1808,23 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
             //  We should not simply close the handle as long as it can be used later even on process exit, but to trigger a child
             //  process we must close it, so we reopen it instead.
             //
-            _StdHandlesState std_handles_state;
 
-            std_handles_state.save_stdout_state(g_stdout_handle);
+            // CAUTION:
+            //  We should not close a character device handle, otherwise another process in process inheritance tree can lose the handle buffer to continue interact with it.
+            //
 
-            _reattach_stdout_to_console(!!std_handles_state.is_stdout_inheritable);
+            if (g_stdout_handle_type != FILE_TYPE_CHAR) {
+                _StdHandlesState std_handles_state;
 
-            // reread owned by CRT handles
-            g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-            g_stdout_handle_type = GetFileType(g_stdout_handle);
+                std_handles_state.save_stdout_state(g_stdout_handle);
+
+                _detach_stdout();
+                _attach_stdout_from_console(std_handles_state, !!std_handles_state.is_stdout_inheritable, true);
+
+                // reread owned by CRT handles
+                g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+                g_stdout_handle_type = GetFileType(g_stdout_handle);
+            }
         } break;
         }
     } }();
@@ -1851,7 +1859,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
     return [&]() -> DWORD { __try {
         return [&]() -> DWORD {
             switch (co_stream_type) {
-            case 0: // stdin
+            case STDIN_FILENO: // stdin
             {
                 switch (handle_type) {
                 case 0: {
@@ -1975,7 +1983,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                 }
             } break;
 
-            case 1: // stdout
+            case STDOUT_FILENO: // stdout
             {
                 switch (handle_type) {
                 case 0: {
@@ -2099,7 +2107,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                 }
             } break;
 
-            case 2: // stderr
+            case STDERR_FILENO: // stderr
             {
                 switch (handle_type) {
                 case 0: {
@@ -2241,47 +2249,63 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
             //  otherwise a client may be blocked on the `PeekNamedPipe` call in an infinite loop.
             //
 
+            // CAUTION:
+            //  We should not close a character device handle, otherwise another process in process inheritance tree can lose the handle buffer to continue interact with it.
+            //
+
             switch (co_stream_type) {
-            case 0: // stdin
+            case STDIN_FILENO: // stdin
             {
                 switch (handle_type) {
                 case 0: {
-                    DisconnectNamedPipe(g_reopen_stdin_handle);
+                    if (!g_options.reopen_stdin_as_server_pipe.empty()) {
+                        DisconnectNamedPipe(g_reopen_stdin_handle);
+                    }
                     _close_handle(g_reopen_stdin_handle);
                 } break;
 
                 case 1: {
-                    DisconnectNamedPipe(g_tee_named_pipe_stdin_handle);
+                    if (!g_options.tee_stdin_to_server_pipe.empty()) {
+                        DisconnectNamedPipe(g_tee_named_pipe_stdin_handle);
+                    }
                     _close_handle(g_reopen_stdin_handle);
                 } break;
                 }
             } break;
 
-            case 1: // stdout
+            case STDOUT_FILENO: // stdout
             {
                 switch (handle_type) {
                 case 0: {
-                    DisconnectNamedPipe(g_reopen_stdout_handle);
+                    if (!g_options.reopen_stdout_as_server_pipe.empty()) {
+                        DisconnectNamedPipe(g_reopen_stdout_handle);
+                    }
                     _close_handle(g_reopen_stdout_handle);
                 } break;
 
                 case 1: {
-                    DisconnectNamedPipe(g_tee_named_pipe_stdout_handle);
+                    if (!g_options.tee_stdout_to_server_pipe.empty()) {
+                        DisconnectNamedPipe(g_tee_named_pipe_stdout_handle);
+                    }
                     _close_handle(g_reopen_stdout_handle);
                 } break;
                 }
             } break;
 
-            case 2: // stderr
+            case STDERR_FILENO: // stderr
             {
                 switch (handle_type) {
                 case 0: {
-                    DisconnectNamedPipe(g_reopen_stderr_handle);
+                    if (!g_options.reopen_stderr_as_server_pipe.empty()) {
+                        DisconnectNamedPipe(g_reopen_stderr_handle);
+                    }
                     _close_handle(g_reopen_stderr_handle);
                 } break;
 
                 case 1: {
-                    DisconnectNamedPipe(g_tee_named_pipe_stderr_handle);
+                    if (!g_options.tee_stderr_to_server_pipe.empty()) {
+                        DisconnectNamedPipe(g_tee_named_pipe_stderr_handle);
+                    }
                     _close_handle(g_reopen_stderr_handle);
                 } break;
                 }
@@ -2324,7 +2348,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
     return [&]() -> DWORD { __try {
         return [&]() -> DWORD {
             switch (co_stream_type) {
-            case 0: // stdin
+            case STDIN_FILENO: // stdin
             {
                 switch (handle_type) {
                 case 0: {
@@ -2506,7 +2530,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                 }
             } break;
 
-            case 1: // stdout
+            case STDOUT_FILENO: // stdout
             {
                 switch (handle_type) {
                 case 0: {
@@ -2688,7 +2712,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                 }
             } break;
 
-            case 2: // stderr
+            case STDERR_FILENO: // stderr
             {
                 switch (handle_type) {
                 case 0: {
@@ -2918,7 +2942,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdin_handle, 0, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, 0, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -2967,7 +2991,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdin_handle, 0, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, 0, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3061,7 +3085,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdout_handle, 1, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, 1, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3110,7 +3134,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdout_handle, 1, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, 1, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3235,7 +3259,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             }
         }
 
-        if (!_set_crt_std_handle(g_reopen_stderr_handle, 2, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, 2, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3284,7 +3308,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stderr_handle, 2, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, 2, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3588,7 +3612,9 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
             //  Always disconnect a server named pipe end together with the handle close even if connection is not accomplished or SEH exception is thrown,
             //  otherwise a client may be blocked on the `PeekNamedPipe` call in an infinite loop.
             //
-            DisconnectNamedPipe(g_stdin_pipe_write_handle);
+            if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
+                DisconnectNamedPipe(g_stdin_pipe_write_handle);
+            }
             _close_handle(g_stdin_pipe_write_handle);
         }
     }
@@ -4241,7 +4267,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!g_options.reopen_stdin_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stdin_handle)) {
-                if (!_set_crt_std_handle(g_reopen_stdin_handle, 0, true, !g_no_std_inherit)) {
+                if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, 0, true, !g_no_std_inherit)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4267,7 +4293,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!g_options.reopen_stdout_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stdout_handle)) {
-                if (!_set_crt_std_handle(g_reopen_stdout_handle, 1, true, !g_no_std_inherit)) {
+                if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, 1, true, !g_no_std_inherit)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4293,7 +4319,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!g_options.reopen_stderr_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stderr_handle)) {
-                if (!_set_crt_std_handle(g_reopen_stderr_handle, 2, true, !g_no_std_inherit)) {
+                if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, 2, true, !g_no_std_inherit)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4430,7 +4456,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         // std handles dup
 
         switch (g_options.stdout_dup) {
-        case 2:
+        case STDERR_FILENO:
             SetLastError(0); // just in case
             if (!DuplicateHandle(GetCurrentProcess(), g_stderr_handle, GetCurrentProcess(), &g_stderr_handle_dup, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4453,7 +4479,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 break;
             }
 
-            if (!_set_crt_std_handle(g_stderr_handle_dup, 1, false, !g_no_std_inherit)) {
+            if (!_set_crt_std_handle(g_stderr_handle_dup, -1, 1, false, !g_no_std_inherit)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -4488,7 +4514,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         if (break_) break;
 
         switch (g_options.stderr_dup) {
-        case 1:
+        case STDOUT_FILENO:
             SetLastError(0); // just in case
             if (!DuplicateHandle(GetCurrentProcess(), g_stdout_handle, GetCurrentProcess(), &g_stdout_handle_dup, 0, g_no_std_inherit ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4511,7 +4537,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 break;
             }
 
-            if (!_set_crt_std_handle(g_stdout_handle_dup, 2, false, !g_no_std_inherit)) {
+            if (!_set_crt_std_handle(g_stdout_handle_dup, -1, 2, false, !g_no_std_inherit)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -4583,7 +4609,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!_is_valid_handle(g_tee_file_stdin_handle)) {
             switch (g_options.tee_stdin_dup) {
-            case 1:
+            case STDOUT_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4606,7 +4632,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     break;
                 }
                 break;
-            case 2:
+            case STDERR_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stderr_handle, GetCurrentProcess(), &g_tee_file_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4636,7 +4662,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!_is_valid_handle(g_tee_file_stdout_handle)) {
             switch (g_options.tee_stdout_dup) {
-            case 0:
+            case STDIN_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4659,7 +4685,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     break;
                 }
                 break;
-            case 2:
+            case STDERR_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stderr_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4689,7 +4715,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!_is_valid_handle(g_tee_file_stderr_handle)) {
             switch (g_options.tee_stderr_dup) {
-            case 0:
+            case STDIN_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4712,7 +4738,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     break;
                 }
                 break;
-            case 1:
+            case STDOUT_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4744,7 +4770,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
             switch (g_options.tee_stdin_dup) {
-            case 1:
+            case STDOUT_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stdout_handle, GetCurrentProcess(), &g_tee_named_pipe_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4773,7 +4799,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     break;
                 }
                 break;
-            case 2:
+            case STDERR_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stderr_handle, GetCurrentProcess(), &g_tee_named_pipe_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4809,7 +4835,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!_is_valid_handle(g_tee_named_pipe_stdout_handle)) {
             switch (g_options.tee_stdout_dup) {
-            case 0:
+            case STDIN_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stdin_handle, GetCurrentProcess(), &g_tee_named_pipe_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4838,7 +4864,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     break;
                 }
                 break;
-            case 2:
+            case STDERR_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stderr_handle, GetCurrentProcess(), &g_tee_named_pipe_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4874,7 +4900,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!_is_valid_handle(g_tee_named_pipe_stderr_handle)) {
             switch (g_options.tee_stderr_dup) {
-            case 0:
+            case STDIN_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stdin_handle, GetCurrentProcess(), &g_tee_named_pipe_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4903,7 +4929,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     break;
                 }
                 break;
-            case 1:
+            case STDOUT_FILENO:
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -5340,14 +5366,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
 
         // CAUTION:
-        //  We must always close all handles prepared for a child process even if them is not inheritable or a child process is not executed,
+        //  We must always close all handles prepared for a child process even if they are not inheritable or a child process is not executed,
         //  otherwise the `ReadFile` in the parent process will be blocked on the pipe end
         //  even if a child process is closed.
         //
-
-        //if (stderr_handle_type == FILE_TYPE_CHAR) {
-        //    _close_handle(g_stdin_handle);
-        //}
 
         _close_handle(g_stdin_pipe_read_handle);
         _close_handle(g_stdout_pipe_write_handle);

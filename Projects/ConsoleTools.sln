@@ -19,13 +19,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gui", "gui", "{B3B938A1-176
 		..\Utilities\src\_common\gui\wxFileDialog.hpp = ..\Utilities\src\_common\gui\wxFileDialog.hpp
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tacklelib", "tacklelib", "{B49346B5-FB38-448D-ACD2-3B441C3C83EE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "std", "std", "{551002A9-4309-4615-9D6E-6E2CF1884115}"
 	ProjectSection(SolutionItems) = preProject
-		..\Utilities\src\_common\tacklelib\tackle\addressof.hpp = ..\Utilities\src\_common\tacklelib\tackle\addressof.hpp
-		..\Utilities\src\_common\tacklelib\tackle\platform.hpp = ..\Utilities\src\_common\tacklelib\tackle\platform.hpp
-		..\Utilities\src\_common\tacklelib\tackle\string_identity.hpp = ..\Utilities\src\_common\tacklelib\tackle\string_identity.hpp
-		..\Utilities\src\_common\tacklelib\tackle\type_identity.hpp = ..\Utilities\src\_common\tacklelib\tackle\type_identity.hpp
-		..\Utilities\src\_common\tacklelib\tackle\type_traits.hpp = ..\Utilities\src\_common\tacklelib\tackle\type_traits.hpp
+		..\Utilities\src\_common\std\tctype.hpp = ..\Utilities\src\_common\std\tctype.hpp
+		..\Utilities\src\_common\std\tstdio.hpp = ..\Utilities\src\_common\std\tstdio.hpp
+		..\Utilities\src\_common\std\tstdlib.hpp = ..\Utilities\src\_common\std\tstdlib.hpp
+		..\Utilities\src\_common\std\tstring.hpp = ..\Utilities\src\_common\std\tstring.hpp
+		..\Utilities\src\_common\std\ttime.hpp = ..\Utilities\src\_common\std\ttime.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tacklelib", "tacklelib", "{B49346B5-FB38-448D-ACD2-3B441C3C83EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tackle", "tackle", "{6BB930D3-85CE-4BCE-804E-B957D2298D8D}"
+	ProjectSection(SolutionItems) = preProject
+		..\Utilities\src\_common\tacklelib\tackle\explicit_type.hpp = ..\Utilities\src\_common\tacklelib\tackle\explicit_type.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utility", "utility", "{F186E554-0EE4-4479-B5F0-6DC35F4719EC}"
+	ProjectSection(SolutionItems) = preProject
+		..\Utilities\src\_common\tacklelib\utility\addressof.hpp = ..\Utilities\src\_common\tacklelib\utility\addressof.hpp
+		..\Utilities\src\_common\tacklelib\utility\platform.hpp = ..\Utilities\src\_common\tacklelib\utility\platform.hpp
+		..\Utilities\src\_common\tacklelib\utility\string_identity.hpp = ..\Utilities\src\_common\tacklelib\utility\string_identity.hpp
+		..\Utilities\src\_common\tacklelib\utility\type_identity.hpp = ..\Utilities\src\_common\tacklelib\utility\type_identity.hpp
+		..\Utilities\src\_common\tacklelib\utility\type_traits.hpp = ..\Utilities\src\_common\tacklelib\utility\type_traits.hpp
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Header Files", "Header Files", "{2909C0F5-E8D4-4975-A49C-2B246EE0DE17}"
@@ -175,7 +191,10 @@ Global
 		{F126B620-6E7E-42F0-8F64-346B41108838} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{FED2655E-FAD5-49BA-9D71-FEC2040583B8} = {2909C0F5-E8D4-4975-A49C-2B246EE0DE17}
 		{B3B938A1-1763-4CB6-A295-23AF4A3A136F} = {2909C0F5-E8D4-4975-A49C-2B246EE0DE17}
+		{551002A9-4309-4615-9D6E-6E2CF1884115} = {2909C0F5-E8D4-4975-A49C-2B246EE0DE17}
 		{B49346B5-FB38-448D-ACD2-3B441C3C83EE} = {2909C0F5-E8D4-4975-A49C-2B246EE0DE17}
+		{6BB930D3-85CE-4BCE-804E-B957D2298D8D} = {B49346B5-FB38-448D-ACD2-3B441C3C83EE}
+		{F186E554-0EE4-4479-B5F0-6DC35F4719EC} = {B49346B5-FB38-448D-ACD2-3B441C3C83EE}
 		{2909C0F5-E8D4-4975-A49C-2B246EE0DE17} = {F126B620-6E7E-42F0-8F64-346B41108838}
 		{7E359278-6809-4DA7-B9F6-1F2510131C55} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{01A1ACEA-7261-43C6-B6B0-5C36A6674EE0} = {7E359278-6809-4DA7-B9F6-1F2510131C55}

@@ -4,7 +4,7 @@
 #ifndef TACKLE_COMPATIBLE_ITEREATOR_HPP
 #define TACKLE_COMPATIBLE_ITEREATOR_HPP
 
-#include <tacklelib/tackle/addressof.hpp>
+#include <tacklelib/utility/addressof.hpp>
 
 #include <assert.h>
 #include <cstring>
