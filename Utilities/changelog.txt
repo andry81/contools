@@ -1,4 +1,7 @@
 2021.07.31:
+* refactor: tests: tests refactor, moved test number in a file name at first to use with a console terminal completion feature, added test sub numbers in file names
+
+2021.07.31:
 * changed: src/callf: help update
 * changed: src/printf: minor changes
 * refactor: src/callf: code refactor
@@ -13,11 +16,17 @@
 2021.07.29:
 * fixed: src/callf: reset console mode on reopened handles in case if they are closed (null) upon `callf` utility start (started by `callfg.exe` utility), otherwise line return prints as character(s)
 
+2021.07.29:
+* new: tests: more manual tests for `callfg` utility
+
 2021.07.28:
 * fixed: src/callf: missed to close duplicated handle after check on registration in the CRT descriptor table even if it is registered (in that case the CRT owns it and responsible to close it)
 * fixed: src/callf: missed to sanitize standrad handles in case if they are closed (null) upon `callf` utility start (started by `callfg.exe` utility)
 * fixed: src/callf: close stdout handle only if it is not a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it
 * fixed: src/callf: call `DisconnectNamedPipe` only if opened as named pipe
+
+2021.07.28:
+* new: tests: added manual tests to test start of `callf.exe` by `callfg.exe` utility
 
 2021.07.27:
 * fixed: src/callf: missed to enable `/no-expand-env` flag in case of elevated callf process
