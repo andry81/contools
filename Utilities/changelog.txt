@@ -1,3 +1,7 @@
+2021.08.01:
+* changed: src/callf: code changes for `USE_CONSOLE_STD_HANDLES_REATTACH_BY_CRT_REOPEN=0`
+* changed: src/callf: code improvements for `_set_crt_std_handle` function
+
 2021.07.31:
 * new: bin/contools: binaries update
 

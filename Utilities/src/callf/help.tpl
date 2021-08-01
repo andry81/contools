@@ -774,7 +774,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       call has no effect. Stderr does not used on idle execution and all
       operations over it has no effect.
 
-    Name string placeholders:
+    Pipe name placeholders:
       {pid}     - current process identifier as decimal number
       {ppid}    - parent process identifier as decimal number
 

@@ -1810,7 +1810,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
             //
 
             // CAUTION:
-            //  We should not close a character device handle, otherwise another process in process inheritance tree can lose the handle buffer to continue interact with it.
+            //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
             //
 
             if (g_stdout_handle_type != FILE_TYPE_CHAR) {
@@ -2250,7 +2250,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
             //
 
             // CAUTION:
-            //  We should not close a character device handle, otherwise another process in process inheritance tree can lose the handle buffer to continue interact with it.
+            //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
             //
 
             switch (co_stream_type) {
@@ -2377,7 +2377,8 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         if (_is_valid_handle(g_reopen_stdin_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_READ, FILE_SHARE_READ, &sa, // must use `sa` to setup inheritance
-                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL))) {
+                                OPEN_EXISTING,
+                                FILE_ATTRIBUTE_NORMAL, NULL))) {
                             break;
                         }
 
@@ -2464,7 +2465,8 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         if (_is_valid_handle(g_tee_named_pipe_stdin_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-                                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL))) {
+                                OPEN_ALWAYS,
+                                FILE_ATTRIBUTE_NORMAL, NULL))) {
                             break;
                         }
 
@@ -2559,7 +2561,8 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         if (_is_valid_handle(g_reopen_stdout_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, &sa, // must use `sa` to setup inheritance
-                                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL))) {
+                                OPEN_ALWAYS,
+                                FILE_ATTRIBUTE_NORMAL, NULL))) {
                             break;
                         }
 
@@ -2646,7 +2649,8 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         if (_is_valid_handle(g_tee_named_pipe_stdout_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-                                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL))) {
+                                OPEN_ALWAYS,
+                                FILE_ATTRIBUTE_NORMAL, NULL))) {
                             break;
                         }
 
@@ -2741,7 +2745,8 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         if (_is_valid_handle(g_reopen_stderr_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, &sa, // must use `sa` to setup inheritance
-                                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL))) {
+                                OPEN_ALWAYS,
+                                FILE_ATTRIBUTE_NORMAL, NULL))) {
                             break;
                         }
 
@@ -2828,7 +2833,8 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         if (_is_valid_handle(g_tee_named_pipe_stderr_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
-                                OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL))) {
+                                OPEN_ALWAYS,
+                                FILE_ATTRIBUTE_NORMAL, NULL))) {
                             break;
                         }
 
@@ -2922,7 +2928,8 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
         if (!_is_valid_handle(g_reopen_stdin_handle =
                 CreateFile(g_options.reopen_stdin_as_file.c_str(),
                     GENERIC_READ, FILE_SHARE_READ, &sa, // must use `sa` to setup inheritance
-                    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL))) {
+                    OPEN_EXISTING,
+                    FILE_ATTRIBUTE_NORMAL, NULL))) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -2942,7 +2949,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, 0, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, 0, _O_BINARY, true, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -2991,7 +2998,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, 0, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, 0, _O_BINARY, true, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3085,7 +3092,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, 1, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, 1, _O_BINARY, true, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3134,7 +3141,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, 1, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, 1, _O_BINARY, true, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3259,7 +3266,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             }
         }
 
-        if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, 2, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, 2, _O_BINARY, true, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3308,7 +3315,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             return false;
         }
 
-        if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, 2, true, !g_no_std_inherit)) {
+        if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, 2, _O_BINARY, true, true, !g_no_std_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -4267,7 +4274,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!g_options.reopen_stdin_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stdin_handle)) {
-                if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, 0, true, !g_no_std_inherit)) {
+                if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, 0, _O_BINARY, true, true, !g_no_std_inherit)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4293,7 +4300,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!g_options.reopen_stdout_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stdout_handle)) {
-                if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, 1, true, !g_no_std_inherit)) {
+                if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, 1, _O_BINARY, true, true, !g_no_std_inherit)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4319,7 +4326,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!g_options.reopen_stderr_as_client_pipe.empty()) {
             if (_is_valid_handle(g_reopen_stderr_handle)) {
-                if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, 2, true, !g_no_std_inherit)) {
+                if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, 2, _O_BINARY, true, true, !g_no_std_inherit)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -4479,7 +4486,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 break;
             }
 
-            if (!_set_crt_std_handle(g_stderr_handle_dup, -1, 1, false, !g_no_std_inherit)) {
+            if (!_set_crt_std_handle(g_stderr_handle_dup, -1, 1, _O_BINARY, true, false, !g_no_std_inherit)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -4537,7 +4544,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 break;
             }
 
-            if (!_set_crt_std_handle(g_stdout_handle_dup, -1, 2, false, !g_no_std_inherit)) {
+            if (!_set_crt_std_handle(g_stdout_handle_dup, -1, 2, _O_BINARY, true, false, !g_no_std_inherit)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }

@@ -15,6 +15,7 @@
 #include <cstdarg>
 #include <ctime>
 #include <atomic>
+#include <iostream>
 
 #include <assert.h>
 #include <stdint.h>
@@ -43,13 +44,28 @@
 #include "tacklelib/tackle/explicit_type.hpp"
 
 #define MAX_ENV_BUF_SIZE 32767
+
+// NOTE:
+//  This definition exists only for research purposes and the alternative code variant will not compile until there would be a way to assign a FILE pointer without `freopen`.
+//
+//  See details:
+//      https://stackoverflow.com/questions/43768749/opening-windows-console-for-stdin-stdout-stderr-for-both-of-win32-and-win64-in-c/43776088#43776088
+//      https://stackoverflow.com/questions/584868/rerouting-stdin-and-stdout-from-c
+//
 #define USE_CONSOLE_STD_HANDLES_REATTACH_BY_CRT_REOPEN 1
+
+#define SYNC_STD_STREAMS_WITH_STDIO 0
 
 #define if_break switch(0) case 0: default: if
 
 #define STDIN_FILENO    0
 #define STDOUT_FILENO   1
 #define STDERR_FILENO   2
+
+// Default Win32 standard handle addresses
+#define STD_INPUT_HANDLE_DEFAULT_ADDRESS    (HANDLE)0x00000003
+#define STD_OUTPUT_HANDLE_DEFAULT_ADDRESS   (HANDLE)0x00000007
+#define STD_ERROR_HANDLE_DEFAULT_ADDRESS    (HANDLE)0x0000000b
 
 #ifndef _WIN32_WINNT_WIN8
 #define _WIN32_WINNT_WIN8                   0x0602
@@ -383,13 +399,13 @@ namespace {
     {
         stdin_last_error = 0;
 
-        if (has_stdin_console_mode) {
-            SetLastError(0);
-            SetConsoleMode(stdin_handle, stdin_handle_mode);
-            stdin_last_error = GetLastError();
-        }
-        else if (restore_console_mode_defaults) {
-            if (GetFileType(stdin_handle) == FILE_TYPE_CHAR) {
+        if (GetFileType(stdin_handle) == FILE_TYPE_CHAR) {
+            if (has_stdin_console_mode) {
+                SetLastError(0);
+                SetConsoleMode(stdin_handle, stdin_handle_mode);
+                stdin_last_error = GetLastError();
+            }
+            else if (restore_console_mode_defaults) {
                 SetLastError(0);
                 SetConsoleMode(stdin_handle, ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_INSERT_MODE | ENABLE_EXTENDED_FLAGS | ENABLE_AUTO_POSITION); // 423
                 stdin_last_error = GetLastError();
@@ -401,15 +417,15 @@ namespace {
     {
         stdout_last_error = 0;
 
-        if (has_stdout_console_mode) {
-            SetLastError(0);
-            SetConsoleMode(stdout_handle, stdout_handle_mode);
-            stdout_last_error = GetLastError();
-        }
-        else if (restore_console_mode_defaults) {
-            if (GetFileType(stdout_handle) == FILE_TYPE_CHAR) {
+        if (GetFileType(stdout_handle) == FILE_TYPE_CHAR) {
+            if (has_stdout_console_mode) {
                 SetLastError(0);
-                SetConsoleMode(stdout_handle, ENABLE_PROCESSED_OUTPUT/* | ENABLE_WRAP_AT_EOL_OUTPUT*/); // 3
+                SetConsoleMode(stdout_handle, stdout_handle_mode);
+                stdout_last_error = GetLastError();
+            }
+            else if (restore_console_mode_defaults) {
+                SetLastError(0);
+                SetConsoleMode(stdout_handle, ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT); // 3
                 stdout_last_error = GetLastError();
             }
         }
@@ -419,15 +435,15 @@ namespace {
     {
         stderr_last_error = 0;
 
-        if (has_stderr_console_mode) {
-            SetLastError(0);
-            SetConsoleMode(stderr_handle, stderr_handle_mode);
-            stderr_last_error = GetLastError();
-        }
-        else if (restore_console_mode_defaults) {
-            if (GetFileType(stderr_handle) == FILE_TYPE_CHAR) {
+        if (GetFileType(stderr_handle) == FILE_TYPE_CHAR) {
+            if (has_stderr_console_mode) {
                 SetLastError(0);
-                SetConsoleMode(stderr_handle, ENABLE_PROCESSED_OUTPUT/* | ENABLE_WRAP_AT_EOL_OUTPUT*/); // 3
+                SetConsoleMode(stderr_handle, stderr_handle_mode);
+                stderr_last_error = GetLastError();
+            }
+            else if (restore_console_mode_defaults) {
+                SetLastError(0);
+                SetConsoleMode(stderr_handle, ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT); // 3
                 stderr_last_error = GetLastError();
             }
         }
@@ -597,19 +613,14 @@ namespace {
         return (osv.dwPlatformId == VER_PLATFORM_WIN32_NT);
     }
 
-    inline bool _set_crt_std_handle(HANDLE file_handle, tackle::explicit_int from_fileno, tackle::explicit_int to_fileno, tackle::explicit_bool duplicate_input_handle, tackle::explicit_bool inherit_handle_on_duplicate = true)
+    inline bool _set_crt_std_handle(HANDLE file_handle, tackle::explicit_int from_fileno, tackle::explicit_int to_fileno, tackle::explicit_int mode_flags,
+                                    tackle::explicit_bool check_on_already_registered, tackle::explicit_bool duplicate_input_handle, tackle::explicit_bool inherit_handle_on_duplicate = true)
     {
         if (!_is_valid_handle(file_handle)) {
             return false;
         }
 
-        int flags = 0;
-
-#ifdef _UNICODE
-        flags |= _O_WTEXT;
-#else
-        flags |= _O_TEXT;
-#endif
+        const int mode_flags_ = mode_flags >= 0 ? mode_flags : _O_BINARY;
 
         // CAUTION:
         //  Based on: `_open_osfhandle` : https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/open-osfhandle
@@ -664,10 +675,12 @@ namespace {
         {
         case STDIN_FILENO: {
             __try {
-                registered_stdin_handle = (HANDLE)_get_osfhandle(STDIN_FILENO);
-                if (_is_valid_handle(registered_stdin_handle) && registered_stdin_handle == file_handle) {
-                    // we are trying to register a handle which is already registered
-                    break;
+                if (check_on_already_registered) {
+                    registered_stdin_handle = (HANDLE)_get_osfhandle(STDIN_FILENO);
+                    if (_is_valid_handle(registered_stdin_handle) && registered_stdin_handle == file_handle) {
+                        // we are trying to register a handle which is already registered
+                        break;
+                    }
                 }
 
                 if (duplicate_input_handle) {
@@ -681,12 +694,14 @@ namespace {
                             return false;
                         }
 
-                        // CAUTION:
-                        //  We must check twice, because the `DuplicateHandle` CAN RETURN the CRT registered handle!
-                        //
-                        if (_is_valid_handle(registered_stdin_handle) && registered_stdin_handle == file_handle_crt) {
-                            // we are trying to register a handle which is already registered
-                            break;
+                        if (check_on_already_registered) {
+                            // CAUTION:
+                            //  We must check twice, because the `DuplicateHandle` CAN RETURN the CRT registered handle!
+                            //
+                            if (_is_valid_handle(registered_stdin_handle) && registered_stdin_handle == file_handle_crt) {
+                                // we are trying to register a handle which is already registered
+                                break;
+                            }
                         }
 
                         is_file_handle_dup_used = true;
@@ -698,18 +713,20 @@ namespace {
                     }
                 }
 
-                const int fd = from_fileno >= 0 ? from_fileno : _open_osfhandle((intptr_t)file_handle_crt, flags | _O_RDONLY);
+                const int fd = from_fileno >= 0 ? from_fileno : _open_osfhandle((intptr_t)file_handle_crt, mode_flags_ | _O_RDONLY);
                 if (fd != STDIN_FILENO) {
                     if (_dup2(fd, STDIN_FILENO) >= 0) {
-                        _setmode(STDIN_FILENO, _O_BINARY);
+                        _close(fd);
                     }
-                    _close(fd);
-#ifndef _CONSOLE
-                    registered_stdin_handle = (HANDLE)_get_osfhandle(STDIN_FILENO);
-#endif
                 }
+
+#ifndef _CONSOLE
+                registered_stdin_handle = (HANDLE)_get_osfhandle(STDIN_FILENO);
+#endif
             }
             __finally {
+                _setmode(STDIN_FILENO, mode_flags_);
+
 #ifndef _CONSOLE
                 // we must to register it, because CRT does ignore that
                 if (_is_valid_handle(registered_stdin_handle)) {
@@ -721,10 +738,12 @@ namespace {
 
         case STDOUT_FILENO: {
             __try {
-                registered_stdout_handle = (HANDLE)_get_osfhandle(STDOUT_FILENO);
-                if (_is_valid_handle(registered_stdout_handle) && registered_stdout_handle == file_handle) {
-                    // we are trying to register a handle which is already registered
-                    break;
+                if (check_on_already_registered) {
+                    registered_stdout_handle = (HANDLE)_get_osfhandle(STDOUT_FILENO);
+                    if (_is_valid_handle(registered_stdout_handle) && registered_stdout_handle == file_handle) {
+                        // we are trying to register a handle which is already registered
+                        break;
+                    }
                 }
 
                 if (duplicate_input_handle) {
@@ -738,12 +757,14 @@ namespace {
                             return false;
                         }
 
-                        // CAUTION:
-                        //  We must check twice, because the `DuplicateHandle` CAN RETURN the CRT registered handle!
-                        //
-                        if (_is_valid_handle(registered_stdout_handle) && registered_stdout_handle == file_handle_crt) {
-                            // we are trying to register a handle which is already registered
-                            break;
+                        if (check_on_already_registered) {
+                            // CAUTION:
+                            //  We must check twice, because the `DuplicateHandle` CAN RETURN the CRT registered handle!
+                            //
+                            if (_is_valid_handle(registered_stdout_handle) && registered_stdout_handle == file_handle_crt) {
+                                // we are trying to register a handle which is already registered
+                                break;
+                            }
                         }
 
                         is_file_handle_dup_used = true;
@@ -755,19 +776,20 @@ namespace {
                     }
                 }
 
-                const int fd = from_fileno >= 0 ? from_fileno : _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
+                const int fd = from_fileno >= 0 ? from_fileno : _open_osfhandle((intptr_t)file_handle_crt, mode_flags_ | _O_WRONLY);
                 if (fd != STDOUT_FILENO) {
                     if (_dup2(fd, STDOUT_FILENO) >= 0) {
-                        _setmode(STDOUT_FILENO, _O_BINARY);
+                        _close(fd);
                     }
-                    _close(fd);
+                }
 
 #ifndef _CONSOLE
-                    registered_stdout_handle = (HANDLE)_get_osfhandle(STDOUT_FILENO);
+                registered_stdout_handle = (HANDLE)_get_osfhandle(STDOUT_FILENO);
 #endif
-                }
             }
             __finally {
+                _setmode(STDOUT_FILENO, mode_flags_);
+
 #ifndef _CONSOLE
                 // we must to register it, because CRT does ignore that
                 if (_is_valid_handle(registered_stdout_handle)) {
@@ -779,10 +801,12 @@ namespace {
 
         case STDERR_FILENO: {
             __try {
-                registered_stderr_handle = (HANDLE)_get_osfhandle(STDERR_FILENO);
-                if (_is_valid_handle(registered_stderr_handle) && registered_stderr_handle == file_handle) {
-                    // we are trying to register a handle which is already registered
-                    break;
+                if (check_on_already_registered) {
+                    registered_stderr_handle = (HANDLE)_get_osfhandle(STDERR_FILENO);
+                    if (_is_valid_handle(registered_stderr_handle) && registered_stderr_handle == file_handle) {
+                        // we are trying to register a handle which is already registered
+                        break;
+                    }
                 }
 
                 if (duplicate_input_handle) {
@@ -796,12 +820,14 @@ namespace {
                             return false;
                         }
 
-                        // CAUTION:
-                        //  We must check twice, because the `DuplicateHandle` CAN RETURN the CRT registered handle!
-                        //
-                        if (_is_valid_handle(registered_stderr_handle) && registered_stderr_handle == file_handle_crt) {
-                            // we are trying to register a handle which is already registered
-                            break;
+                        if (check_on_already_registered) {
+                            // CAUTION:
+                            //  We must check twice, because the `DuplicateHandle` CAN RETURN the CRT registered handle!
+                            //
+                            if (_is_valid_handle(registered_stderr_handle) && registered_stderr_handle == file_handle_crt) {
+                                // we are trying to register a handle which is already registered
+                                break;
+                            }
                         }
 
                         is_file_handle_dup_used = true;
@@ -813,19 +839,20 @@ namespace {
                     }
                 }
 
-                const int fd = from_fileno >= 0 ? from_fileno : _open_osfhandle((intptr_t)file_handle_crt, flags | _O_WRONLY);
+                const int fd = from_fileno >= 0 ? from_fileno : _open_osfhandle((intptr_t)file_handle_crt, mode_flags_ | _O_WRONLY);
                 if (fd != STDERR_FILENO) {
                     if (_dup2(fd, STDERR_FILENO) >= 0) {
-                        _setmode(STDERR_FILENO, _O_BINARY);
+                        _close(fd);
                     }
-                    _close(fd);
+                }
 
 #ifndef _CONSOLE
-                    registered_stderr_handle = (HANDLE)_get_osfhandle(STDERR_FILENO);
+                registered_stderr_handle = (HANDLE)_get_osfhandle(STDERR_FILENO);
 #endif
-                }
             }
             __finally {
+                _setmode(STDERR_FILENO, mode_flags_);
+
 #ifndef _CONSOLE
                 // we must to register it, because CRT does ignore that
                 if (_is_valid_handle(registered_stderr_handle)) {
@@ -901,7 +928,7 @@ namespace {
         //
 
         // CAUTION:
-        //  We should not close a character device handle, otherwise another process in process inheritance tree can lose the handle buffer to continue interact with it.
+        //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
         //
 
 #if USE_CONSOLE_STD_HANDLES_REATTACH_BY_CRT_REOPEN
@@ -910,30 +937,42 @@ namespace {
         const int stdin_fileno = _fileno(stdin);
         const HANDLE registered_stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno >= 0 ? stdin_fileno : STDIN_FILENO);
 
-        // restore before call to `StdStdHandle`
         std_handles_state.restore_stdin_state(registered_stdin_handle, restore_handle_console_mode_defaults);
 
         // NOTE:
         //  We must recheck the handle registration to accomplish some tasks which does ignore by the `freopen`.
         //
-        return _set_crt_std_handle(registered_stdin_handle, stdin_fileno, STDIN_FILENO, false, inherit_handle);
+        return _set_crt_std_handle(registered_stdin_handle, stdin_fileno, STDIN_FILENO, _O_BINARY, true, false, inherit_handle);
 #else
         SECURITY_ATTRIBUTES sa{};
 
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
 
-        HANDLE conin_handle = CreateFile(_T("CONIN$"),
+        HANDLE conin_handle = CreateFileW(L"CONIN$",
             GENERIC_READ, FILE_SHARE_READ, &sa,
-            OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL, NULL);
 
-        // restore before call to `StdStdHandle`
         std_handles_state.restore_stdin_state(conin_handle, restore_handle_console_mode_defaults);
 
         // CAUTION:
         //  We must to immediately assign the handle into CRT, otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert or silently fail.
         //
-        return _set_crt_std_handle(conin_handle, -1, STDIN_FILENO, false, inherit_handle);
+        // NOTE:
+#error  //  This code exists only for research purposes and will not compile until there would be a way to assign a FILE pointer without `freopen`.
+        //
+        //  See details:
+        //      https://stackoverflow.com/questions/43768749/opening-windows-console-for-stdin-stdout-stderr-for-both-of-win32-and-win64-in-c/43776088#43776088
+        //      https://stackoverflow.com/questions/584868/rerouting-stdin-and-stdout-from-c
+        //
+
+        if (_set_crt_std_handle(conin_handle, -1, STDIN_FILENO, _O_BINARY, false, false, inherit_handle)) {
+            *stdin = _fdopen(STDIN_FILENO, "rb");
+            return true;
+        }
+
+        return false;
 #endif
     }
 
@@ -949,7 +988,7 @@ namespace {
         //
 
         // CAUTION:
-        //  We should not close a character device handle, otherwise another process in process inheritance tree can lose the handle buffer to continue interact with it.
+        //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
         //
 
 #if USE_CONSOLE_STD_HANDLES_REATTACH_BY_CRT_REOPEN
@@ -958,31 +997,41 @@ namespace {
         const int stdout_fileno = _fileno(stdout);
         const HANDLE registered_stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno >= 0 ? stdout_fileno : STDOUT_FILENO);
 
-        // restore before call to `StdStdHandle`
         std_handles_state.restore_stdout_state(registered_stdout_handle, restore_handle_console_mode_defaults);
 
         // NOTE:
         //  We must recheck the handle registration to accomplish some tasks which does ignore by the `freopen`.
         //
-        return _set_crt_std_handle(registered_stdout_handle, stdout_fileno, STDOUT_FILENO, false, inherit_handle);
+        return _set_crt_std_handle(registered_stdout_handle, stdout_fileno, STDOUT_FILENO, _O_BINARY, true, false, inherit_handle);
 #else
         SECURITY_ATTRIBUTES sa{};
 
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
 
-        HANDLE conout_handle = CreateFile(_T("CONOUT$"),
+        HANDLE conout_handle = CreateFileW(L"CONOUT$",
             GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
-            OPEN_ALWAYS,
+            CREATE_ALWAYS,
             FILE_ATTRIBUTE_NORMAL, NULL);
 
-        // restore before call to `StdStdHandle`
         std_handles_state.restore_stdout_state(conout_handle, restore_handle_console_mode_defaults);
 
         // CAUTION:
         //  We must to immediately assign the handle into CRT, otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert or silently fail.
         //
-        return _set_crt_std_handle(conout_handle, STDOUT_FILENO, false, inherit_handle);
+        // NOTE:
+#error  //  This code exists only for research purposes and will not compile until there would be a way to assign a FILE pointer without `freopen`.
+        //
+        //  See details:
+        //      https://stackoverflow.com/questions/43768749/opening-windows-console-for-stdin-stdout-stderr-for-both-of-win32-and-win64-in-c/43776088#43776088
+        //      https://stackoverflow.com/questions/584868/rerouting-stdin-and-stdout-from-c
+        //
+        if (_set_crt_std_handle(conout_handle, -1, STDOUT_FILENO, _O_BINARY, false, false, inherit_handle)) {
+            *stdout = _fdopen(STDOUT_FILENO, "wb");
+            return true;
+        }
+
+        return false;
 #endif
     }
 
@@ -998,7 +1047,7 @@ namespace {
         //
 
         // CAUTION:
-        //  We should not close a character device handle, otherwise another process in process inheritance tree can lose the handle buffer to continue interact with it.
+        //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
         //
 
 #if USE_CONSOLE_STD_HANDLES_REATTACH_BY_CRT_REOPEN
@@ -1007,31 +1056,40 @@ namespace {
         const int stderr_fileno = _fileno(stderr);
         const HANDLE registered_stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno >= 0 ? stderr_fileno : STDERR_FILENO);
 
-        // restore before call to `StdStdHandle`
         std_handles_state.restore_stderr_state(registered_stderr_handle, restore_handle_console_mode_defaults);
 
         // NOTE:
         //  We must recheck the handle registration to accomplish some tasks which does ignore by the `freopen`.
         //
-        return _set_crt_std_handle(registered_stderr_handle, stderr_fileno, STDERR_FILENO, false, inherit_handle);
+        return _set_crt_std_handle(registered_stderr_handle, stderr_fileno, STDERR_FILENO, _O_BINARY, true, false, inherit_handle);
 #else
         SECURITY_ATTRIBUTES sa{};
 
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
 
-        HANDLE conout_handle = CreateFile(_T("CONOUT$"),
+        HANDLE conout_handle = CreateFileW("CONOUT$",
             GENERIC_WRITE, FILE_SHARE_WRITE, &sa,
-            OPEN_ALWAYS,
+            CREATE_ALWAYS,
             FILE_ATTRIBUTE_NORMAL, NULL);
 
-        // restore before call to `StdStdHandle`
         std_handles_state.restore_stderr_state(conout_handle, restore_handle_console_mode_defaults);
 
         // CAUTION:
         //  We must to immediately assign the handle into CRT, otherwise the first CRT function like `fprintf` will call to `_isatty` and throw an assert or silently fail.
         //
-        return _set_crt_std_handle(conout_handle, STDERR_FILENO, false, inherit_handle);
+        // NOTE:
+#error  //  This code exists only for research purposes and will not compile until there would be a way to assign a FILE pointer without `freopen`.
+        //
+        //      https://stackoverflow.com/questions/43768749/opening-windows-console-for-stdin-stdout-stderr-for-both-of-win32-and-win64-in-c/43776088#43776088
+        //      https://stackoverflow.com/questions/584868/rerouting-stdin-and-stdout-from-c
+        //
+        if (_set_crt_std_handle(conout_handle, -1, STDERR_FILENO, _O_BINARY, false, false, inherit_handle)) {
+            *stderr = _fdopen(STDERR_FILENO, "wb");
+            return true;
+        }
+
+        return false;
 #endif
     }
 
@@ -1040,7 +1098,7 @@ namespace {
         const int stderr_fileno = _fileno(stderr);
         if (stderr_fileno >= 0) {
             // stderr is opened to reassign
-            return _set_crt_std_handle(GetStdHandle(STD_OUTPUT_HANDLE), -1, STDERR_FILENO, true, inherit_handle);
+            return _set_crt_std_handle(GetStdHandle(STD_OUTPUT_HANDLE), -1, STDERR_FILENO, _O_BINARY, true, true, inherit_handle);
         }
 
         return false;
@@ -1051,7 +1109,7 @@ namespace {
         const int stdout_fileno = _fileno(stdout);
         if (stdout_fileno >= 0) {
             // stdout is opened to reassign
-            return _set_crt_std_handle(GetStdHandle(STD_ERROR_HANDLE), -1, STDOUT_FILENO, true, inherit_handle);
+            return _set_crt_std_handle(GetStdHandle(STD_ERROR_HANDLE), -1, STDOUT_FILENO, _O_BINARY, true, true, inherit_handle);
         }
 
         return false;
@@ -2673,6 +2731,10 @@ namespace {
             else if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
                 _attach_stderr_from_console(std_handles_state, !!std_handles_state.is_stderr_inheritable, true); // by default - inheritable
             }
+
+#if SYNC_STD_STREAMS_WITH_STDIO
+            std::ios::sync_with_stdio(); // sync with C++ streams
+#endif
         }
 
         return true;
