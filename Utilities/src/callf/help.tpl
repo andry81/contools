@@ -50,7 +50,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         CreateProcess
           Has no effect.
         ShellExecute
-          Use SEE_MASK_FLAG_NO_UI flag.
+          Uses SEE_MASK_FLAG_NO_UI flag.
           Do not display an error message box if an error occurs.
 
       /shell-exec <Verb>
@@ -86,15 +86,15 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         CreateProcess
           Has no effect.
         ShellExecute
-          Use SEE_MASK_DOENVSUBST flag.
+          Uses SEE_MASK_DOENVSUBST flag.
           Expand any environment variables specified in the string given by
           the <CurrentDirectory> or <FilePathFormatString> parameter.
 
       /D <CurrentDirectory>
         CreateProcess
-          Use <CurrentDirectory> as parameter in call to CreateProcess.
+          Uses <CurrentDirectory> as parameter in call to CreateProcess.
         ShellExecute
-          Use <CurrentDirectory> as parameter in call to Shellexecute.
+          Uses <CurrentDirectory> as parameter in call to Shellexecute.
 
         If `<CurrentDirectory>` is `.`, then it has special meaning to pass
         current directory into child process.
@@ -103,7 +103,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         CreateProcess
           Don't wait a child process to exit.
         ShellExecute
-          Use SEE_MASK_ASYNCOK flag.
+          Uses SEE_MASK_ASYNCOK flag.
           The execution can be performed on a background thread and the call
           should return immediately without waiting for the background thread
           to finish. Note that in certain cases ShellExecuteEx ignores this
@@ -113,9 +113,24 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Overrides `/wait-child-start` flag.
 
       /no-window
-        Don't show a child process window.
+        Hide a child process window including console window.
+
+        ShellExecute
+          By default uses SEE_MASK_NO_CONSOLE flag.
 
         Overrides `/showas` flag.
+
+      /no-window-console
+        Create child process with hidden console window.
+
+        CreateProcess
+          Uses CREATE_NO_WINDOW flag.
+        ShellExecute
+          Removes usage of the SEE_MASK_NO_CONSOLE flag.
+          Implies `/no-window` flag.
+
+        Has no effect if the `/create-child-console` flag is used.
+        Can not be used together with `/detach-child-console` flags
 
       /pause-on-exit-if-error-before-exec
         Pause on exist if an error happened before a command line application
@@ -237,6 +252,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /ret-win-error
           /no-wait
           /no-window
+          /no-window-console
           /init-com
           /showas
           /reopen-std[in|out|err]*
@@ -245,8 +261,6 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /inout-*
           /create-[in|out]outbound-*
           /mutex-std-*
-          /create-child-console
-          /create-console
           /create-console-title
           /own-console-title
           /console-title
@@ -264,7 +278,6 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /output-*
           /inout-*
           /mutex-std-*
-          /create-console
           /attach-parent-console
           /create-console-title
           /own-console-title
@@ -297,7 +310,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /allow-throw-seh-except
           /attach-parent-console
           /disable-wow64-fs-redir
+          /allow-gui-autoattach-to-parent-console
           /disable-conout-reattach-to-visible-console
+          /allow-conout-attach-to-invisible-parent-console
           /disable-conout-duplicate-to-parent-console-on-error
 
       /promote-parent{ <Flags> }
@@ -322,9 +337,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /tee-inout*
           /mutex-std-*
           /mutex-tee-*
+          /create-console
+          /detach-console
           /attach-parent-console
           /disable-wow64-fs-redir
+          /allow-gui-autoattach-to-parent-console
           /disable-conout-reattach-to-visible-console
+          /allow-conout-attach-to-invisible-parent-console
           /disable-conout-duplicate-to-parent-console-on-error
 
       /showas <ShowWindowAsNumber>
@@ -635,12 +654,27 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         a file handle duplication instead of initiate a file open.
 
       /create-child-console
+        Create new console for a child process, otherwise a child inherits a
+        parent process console if exists.
+
         CreateProcess
-          Create new console for a child process instead of reuse the process
-          console if exists (inheritance).
+          Uses CREATE_NEW_CONSOLE flag.
         ShellExecute
           Removes usage of the SEE_MASK_NO_CONSOLE flag.
-          Without this flag a child inherits the process console if exists.
+
+        Has priority over the `/no-window-console` flag.
+        Can not be used together with `/detach-child-console` flag.
+
+      /detach-child-console
+        Create child process with detached console.
+
+        CreateProcess
+          Uses DETACHED_PROCESS flag.
+        ShellExecute
+          Has no effect, just uses SEE_MASK_NO_CONSOLE flag.
+
+        Can not be used together with `/create-child-console` and
+        `/no-window-console` flags.
 
       /create-console
         Create current process console if not exists. If current process
@@ -648,13 +682,23 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         If current process console exists and not owned (inherited), then
         creates new console. Has no effect if current process console already
         exists, owned and visible.
+
         Has priority over the `/attach-parent-console` flag.
+        Can not be used together with `/detach-console` flag.
+
+      /detach-console
+        Detach current process console if exists.
+
+        Can not be used together with `/create-console` and
+        `/attach-parent-console` flags.
 
       /attach-parent-console
         Attach console from a parent process or it's ancestors. If the current
         process console is owned, then detaches it at first. Has no effect if
         the current process console exists but not owned (inherited).
+
         Has no effect if the `/create-console` is used.
+        Can not be used together with `/detach-console` flag.
 
       /create-console-title <title>
         Change console window title on the current process console creation or
@@ -725,23 +769,40 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /disable-wow64-fs-redir
         Disables file system redirection for the WOW64 process.
 
+      /allow-gui-autoattach-to-parent-console
+        In case if the current process console is not attached, then the
+        process tries to attach to a parent process console. To allow that
+        use this flag.
+
+        Has meaning and implemented only for the `callfg` process.
+
       /disable-conout-reattach-to-visible-console
         In case if the current process console is not visible and a parent
         process console is visible, then before print any output the
-        application tries to attach to the parent process console to enable
-        the user to read futher output into console before a child process
-        start. To disable that use this flag.
+        application tries to attach to a parent process console to enable the
+        user to read futher output into console before a child process start.
+        To disable that use this flag.
+
+      /allow-conout-attach-to-invisible-parent-console
+        In case of search a parent process tree for processes with attached
+        console, the flag allows to attach to an invisible console.
+        By default parent processes tree with invisible consoles has to be
+        skipped while searching for attached console.
+
+        Has no effect if the `/attach-parent-console` is not used.
+        Does not related to the
+        `/disable-conout-reattach-to-visible-console` flag usage.
 
       /disable-conout-duplicate-to-parent-console-on-error
         In case if the current process has own the console window, then the
         application tries to save all the output to the stdout/stderr to
-        duplicate it later to the parent process console in case of
-        application early exit just before a child process start. This
-        happens because the leaf process owned console window does close upon
-        the process exit and the user won't see the stdout/stderr output.
-        Saved content print on process exit just before a child process start
-        and is not happen if an error is not happened before a child process
-        start. To disable that use this flag.
+        duplicate it later to a parent process console in case of application
+        early exit just before a child process start. This happens because the
+        leaf process owned console window does close upon the process exit and
+        the user won't see the stdout/stderr output. Saved content print on
+        process exit just before a child process start and is not happen if an
+        error is not happened before a child process start. To disable that
+        use this flag.
 
     <ApplicationNameFormatString>, <CommandLineFormatString>,
     <FilePathFormatString>, <ParametersFormatString>,

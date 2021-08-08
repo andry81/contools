@@ -1,3 +1,32 @@
+2021.08.08:
+* fixed: src/callf: missed to call `ShowWindow` in `callfg.exe` implementation
+* fixed: src/callf: missed to remove stdin/stdout/stderr handle inheritance in case of reopen from file or named pipe
+* fixed: src/callf: missed to remove stdin/stdout/stderr tee handle inheritance
+* fixed: src/callf: other fixup
+* fixed: src/callf: more tests pass
+* new: src/callf: `/allow-gui-autoattach-to-parent-console` flag to allow `callfg.exe` auto attach to a parent process console if the current process has no attached console
+* new: src/callf: The `/?` flag automatically implies `/allow-gui-autoattach-to-parent-console` flag in case of `callfg.exe` implementation to be able to print help. Can call now `callfg.exe /create-console /pause-on-exit /?` to print help.
+* new: tests: more manual tests for `callf`/`callfg` utilities
+* refactor: tests: minor refactor
+
+2021.08.07:
+* fixed: src/callf: Windows XP/7 workarounds depending to the article: https://github.com/rprichard/win32-console-docs
+* fixed: src/callf: Reworked (again) handles sanitizing to correctly handle standard handles inheritance: https://github.com/rprichard/win32-console-docs#createprocess-traditional
+* changed: tests: readme update
+
+2021.08.06:
+* fixed: src/callf: correct process of the `/no-window` flag in case of the `CreateProcess`
+* new: src/callf: `/no-window-console` flag to create a child process with invisible console
+* new: src/callf: `/detach-console` and `/detach-child-console` flags to detach respective process console
+* new: src/callf: `/allow-conout-attach-to-invisible-parent-console` flag to allow conout attach to invisible parent console
+* refactor: src/callf: flags minor refactor
+
+2021.08.04:
+* new: tests: readme file
+* changed: src/callf: code cleanup, removed unused code
+* refactor: src/callf: code refactor
+* refactor: tests: minor refactor
+
 2021.08.01:
 * changed: src/callf: code changes for `USE_CONSOLE_STD_HANDLES_REATTACH_BY_CRT_REOPEN=0`
 * changed: src/callf: code improvements for `_set_crt_std_handle` function

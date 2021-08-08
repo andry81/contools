@@ -886,6 +886,7 @@ Utilities/src/wshbazaar/wshdynacall/dynwrap.def -text
 Utilities/src/wshbazaar/wshdynacall/example.bas -text
 Utilities/src/wshbazaar/wshdynacall/version.def -text
 Utilities/src/wshbazaar/wshdynacall/version.tpl -text
+Utilities/tests/README_EN.txt -text
 Utilities/tests/__init__/__init__.bat -text
 Utilities/tests/manual/__init__/__init__.bat -text
 Utilities/tests/manual/contools/__init__/__init__.bat -text
@@ -921,14 +922,16 @@ Utilities/tests/manual/contools/callf/21-test--01-shell_exec_runas--01-named_pip
 Utilities/tests/manual/contools/callf/21-test--01-shell_exec_runas--02-named_pipe_to_child_stdin.bat -text
 Utilities/tests/manual/contools/callf/30-test--01-elevate--01-named_pipe_tofrom_child_stdin_to_stdout.bat -text
 Utilities/tests/manual/contools/callf/30-test--01-elevate--02-named_pipe_tofrom_child_stdin_to_stdout.bat -text
-Utilities/tests/manual/contools/callf/31-test--01-elevate--01-stdin_to_stdout_close.bat -text
-Utilities/tests/manual/contools/callf/31-test--01-elevate--02-stdin_to_stdout_close.bat -text
+Utilities/tests/manual/contools/callf/31-test--01-elevate--01-stdin_to_stdout.bat -text
+Utilities/tests/manual/contools/callf/31-test--01-elevate--02-user_input.bat -text
 Utilities/tests/manual/contools/callf/40-test--01-gui_to_cui--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/40-test--01-gui_to_cui--02-elevate--01_existing_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--01-new_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--02-elevate--01-new_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--02-elevate--02-new_console--01-pause_on_exit.bat -text
-Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--03-elevate--01-dbl_console--01-pause_on_exit.bat -text
+Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--02-elevate--03-new_console--01-pause_on_exit.bat -text
+Utilities/tests/manual/contools/callf/51-test--01-cui--01-print_help.bat -text
+Utilities/tests/manual/contools/callf/51-test--02-gui--01-print_help.bat -text
 Utilities/tests/manual/contools/callf/__init__/__init__.bat -text
 Utilities/tests/manual/contools/callf/refs/0.in -text
 __init__/__init__.bat -text

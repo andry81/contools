@@ -41,7 +41,9 @@ struct Flags
     bool            show_help;
 
     bool            disable_wow64_fs_redir;
+    bool            allow_gui_autoattach_to_parent_console;
     bool            disable_conout_reattach_to_visible_console;
+    bool            allow_conout_attach_to_invisible_parent_console;
     bool            disable_conout_duplicate_to_parent_console_on_error;
 
     bool            elevate;
@@ -85,6 +87,7 @@ struct Flags
     bool            no_sys_dialog_ui;
     bool            no_wait;                        // has no meaning if a `tee` file is used
     bool            no_window;
+    bool            no_window_console;
     bool            no_expand_env;                  // don't expand `${...}` environment variables
     bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
     bool            no_std_inherit;
@@ -97,7 +100,9 @@ struct Flags
     bool            shell_exec_expand_env;
 
     bool            create_child_console;
+    bool            detach_child_console;
     bool            create_console;                 // has priority over attach_parent_console
+    bool            detach_console;
     bool            attach_parent_console;
 
     bool            eval_backslash_esc;             // evaluate backslash escape characters
