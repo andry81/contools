@@ -1,4 +1,7 @@
 2021.08.08:
+* new: bin/contools: binaries update
+
+2021.08.08:
 * fixed: src/callf: missed to call `ShowWindow` in `callfg.exe` implementation
 * fixed: src/callf: missed to remove stdin/stdout/stderr handle inheritance in case of reopen from file or named pipe
 * fixed: src/callf: missed to remove stdin/stdout/stderr tee handle inheritance
