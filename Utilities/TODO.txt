@@ -27,3 +27,8 @@
   being throwed out of a child process to be able to pause-on-error in the
   parent `callf.exe` process even if a child process didn't return non zero
   return code.
+
+* Get injected into parent process being used for console window attachment and
+  directly call `GetStdHandle` functions to read standard handle addresses
+  layout to update the standard handles (call `StdStdHandle`) in the process,
+  where console is attached.

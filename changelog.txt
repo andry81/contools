@@ -1,3 +1,10 @@
+2021.08.09:
+* fixed: Utilities/src/callf: More handles sanitizing code to correctly handle CRT standrad handles reinitialization and resynchronization in GUI or console processes, because console can be (re)attached or (re)allocated after the CRT initialization.
+* fixed: Utilities/src/callf: almost all manual tests pass, except `31-test--01-elevate--02-user_input.bat` (ENABLE_PROCESSED_OUTPUT flag is removed from console mode flags by the system on handle duplication/creation) and `51-test--01-cui--01-print_help.bat` (resync function not completely resyncs Win32 handles into CRT, stderr and stdout can point the same handle)
+* changed: Utilities/src/callf: code cleanup
+* changed: Utilities: todo update
+* refactor: Utilities/src/callf: code refactor
+
 2021.08.08:
 * new: Utilities/bin/contools: binaries update
 

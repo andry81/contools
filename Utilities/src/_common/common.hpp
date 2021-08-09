@@ -47,24 +47,39 @@
 
 #define SYNC_STD_STREAMS_WITH_STDIO 0
 
+#define USE_WIN32_CONSOLE_DEVICE_PATH 1
+
 #define if_break switch(0) case 0: default: if
 
 #define STDIN_FILENO    0
 #define STDOUT_FILENO   1
 #define STDERR_FILENO   2
 
+// Details:
+//
+//  https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces
+//
+#if USE_WIN32_CONSOLE_DEVICE_PATH
+#   define CONIN_FILE       "\\\\.\\CON"
+#   define CONOUT_FILE      "\\\\.\\CON"
+#else
+#   define CONIN_FILE       "CONIN$"
+#   define CONOUT_FILE      "CONOUT$"
+#endif
+
 // Default Win32 standard handle addresses
 #define STD_INPUT_HANDLE_DEFAULT_ADDRESS    (HANDLE)0x00000003
 #define STD_OUTPUT_HANDLE_DEFAULT_ADDRESS   (HANDLE)0x00000007
 #define STD_ERROR_HANDLE_DEFAULT_ADDRESS    (HANDLE)0x0000000b
 
-
-#define STD_HANDLE_DEFAULT_ADDRESS_DUP0     (HANDLE)0x0000000f
-#define STD_HANDLE_DEFAULT_ADDRESS_DUP1     (HANDLE)0x000000013
-#define STD_HANDLE_DEFAULT_ADDRESS_DUP2     (HANDLE)0x000000017
+#ifdef _CONSOLE
+#   define IF_CONSOLE_APP(t, f) t
+#else
+#   define IF_CONSOLE_APP(t, f) f
+#endif
 
 #ifndef _WIN32_WINNT_WIN8
-#define _WIN32_WINNT_WIN8                   0x0602
+#   define _WIN32_WINNT_WIN8                   0x0602
 #endif
 
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
@@ -658,7 +673,7 @@ namespace {
 
         // CAUTION:
         //  The `_dup2` may fail with -1 return code in case if can not duplicate a handle and it happens
-        //  when the handle has been opened from the `CONIN$` or `CONOUT$` file.
+        //  when the handle has been opened from the `CONIN$` or `CONOUT$` of `\\.\CON` file.
         //
 
         // CAUTION:
@@ -790,7 +805,7 @@ namespace {
         }
     }
 
-    inline bool _attach_stdin_from_console(bool inherit_handle)
+    inline bool _attach_stdin_from_console(bool set_std_handle, bool inherit_handle)
     {
         // CAUTION
         //  We can not use `_fileno` function in case of duplication into a target CRT standard handle because of instable results.
@@ -805,22 +820,22 @@ namespace {
         //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
         //
 
-        tfreopen(_T("CONIN$"), _T("rb"), stdin);
+        tfreopen(_T(CONIN_FILE), _T("rb"), stdin);
 
-#ifndef _CONSOLE
-        const int stdin_fileno = _fileno(stdin);
-        if (stdin_fileno >= 0) {
-            const HANDLE registered_stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno);
-            if (_is_valid_handle(registered_stdin_handle)) {
-                SetStdHandle(STD_INPUT_HANDLE, registered_stdin_handle);
+        if (set_std_handle) {
+            const int stdin_fileno = _fileno(stdin);
+            if (stdin_fileno >= 0) {
+                const HANDLE registered_stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno);
+                if (_is_valid_handle(registered_stdin_handle)) {
+                    SetStdHandle(STD_INPUT_HANDLE, registered_stdin_handle);
+                }
             }
         }
-#endif
 
         return true;
     }
 
-    inline bool _attach_stdout_from_console(bool inherit_handle)
+    inline bool _attach_stdout_from_console(bool set_std_handle, bool inherit_handle)
     {
         // CAUTION
         //  We must call `freopen` to reinitialize FILE* object, otherwise `_fileno` function will continue return negative values on standard handles and
@@ -835,22 +850,22 @@ namespace {
         //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
         //
 
-        tfreopen(_T("CONOUT$"), _T("wb"), stdout);
+        tfreopen(_T(CONOUT_FILE), _T("wb"), stdout);
 
-#ifndef _CONSOLE
-        const int stdout_fileno = _fileno(stdout);
-        if (stdout_fileno >= 0) {
-            const HANDLE registered_stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno);
-            if (_is_valid_handle(registered_stdout_handle)) {
-                SetStdHandle(STD_OUTPUT_HANDLE, registered_stdout_handle);
+        if (set_std_handle) {
+            const int stdout_fileno = _fileno(stdout);
+            if (stdout_fileno >= 0) {
+                const HANDLE registered_stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno);
+                if (_is_valid_handle(registered_stdout_handle)) {
+                    SetStdHandle(STD_OUTPUT_HANDLE, registered_stdout_handle);
+                }
             }
         }
-#endif
 
         return true;
     }
 
-    inline bool _attach_stderr_from_console(bool inherit_handle)
+    inline bool _attach_stderr_from_console(bool set_std_handle, bool inherit_handle)
     {
         // CAUTION
         //  We must call `freopen` to reinitialize FILE* object, otherwise `_fileno` function will continue return negative values on standard handles and
@@ -865,24 +880,24 @@ namespace {
         //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
         //
 
-        tfreopen(_T("CONOUT$"), _T("wb"), stderr);
+        tfreopen(_T(CONOUT_FILE), _T("wb"), stderr);
 
-#ifndef _CONSOLE
-        const int stderr_fileno = _fileno(stderr);
-        if (stderr_fileno >= 0) {
-            const HANDLE registered_stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
-            if (_is_valid_handle(registered_stderr_handle)) {
-                SetStdHandle(STD_ERROR_HANDLE, registered_stderr_handle);
+        if (set_std_handle) {
+            const int stderr_fileno = _fileno(stderr);
+            if (stderr_fileno >= 0) {
+                const HANDLE registered_stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
+                if (_is_valid_handle(registered_stderr_handle)) {
+                    SetStdHandle(STD_ERROR_HANDLE, registered_stderr_handle);
+                }
             }
         }
-#endif
 
         return true;
     }
 
-    inline bool _duplicate_stdout_to_stderr(bool inherit_handle)
+    inline bool _duplicate_stdout_to_stderr(bool set_std_handle, bool inherit_handle)
     {
-        if (!_attach_stderr_from_console(inherit_handle)) {
+        if (!_attach_stderr_from_console(set_std_handle, inherit_handle)) {
             return false;
         }
 
@@ -893,9 +908,9 @@ namespace {
         return _dup2(stdout_fileno, stderr_fileno) >= 0;
     }
 
-    inline bool _duplicate_stderr_to_stdout(bool inherit_handle)
+    inline bool _duplicate_stderr_to_stdout(bool set_std_handle, bool inherit_handle)
     {
-        if (!_attach_stdout_from_console(inherit_handle)) {
+        if (!_attach_stdout_from_console(set_std_handle, inherit_handle)) {
             return false;
         }
 
@@ -904,6 +919,232 @@ namespace {
         const int stderr_fileno = _fileno(stderr);
 
         return _dup2(stderr_fileno, stdout_fileno) >= 0;
+    }
+
+    inline HANDLE _create_conin_handle(bool inherit_handle)
+    {
+        SECURITY_ATTRIBUTES sa{};
+
+        sa.nLength = sizeof(sa);
+        sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+
+        HANDLE conin_handle_dup = CreateFileW(UTILITY_LITERAL_STRING_WITH_PREFIX(CONIN_FILE, L),
+            GENERIC_READ, FILE_SHARE_READ, inherit_handle ? &sa : NULL, // must use `sa` to setup inheritance
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL, NULL);
+
+        return conin_handle_dup;
+    }
+
+    inline HANDLE _create_conout_handle(bool inherit_handle)
+    {
+        SECURITY_ATTRIBUTES sa{};
+
+        sa.nLength = sizeof(sa);
+        sa.bInheritHandle = inherit_handle ? TRUE : FALSE;
+
+        HANDLE conout_handle_dup = CreateFileW(UTILITY_LITERAL_STRING_WITH_PREFIX(CONOUT_FILE, L),
+            GENERIC_WRITE, FILE_SHARE_WRITE, inherit_handle ? &sa : NULL, // must use `sa` to setup inheritance
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL, NULL);
+
+        return conout_handle_dup;
+    }
+
+    inline void _reinit_crt_std_handles(int stdin_open_flags = _O_RDONLY | _O_BINARY,
+                                        int stdout_open_flags = _O_WRONLY | _O_BINARY,
+                                        int stderr_open_flags = _O_WRONLY | _O_BINARY)
+    {
+        const HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+        const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        const HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+
+        const DWORD stdin_handle_type = _is_valid_handle(stdin_handle) ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdout_handle_type = _is_valid_handle(stdout_handle) ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stderr_handle_type = _is_valid_handle(stderr_handle) ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+
+        _attach_stdin_from_console(false, false);
+
+        _attach_stdout_from_console(false, false);
+        if (!_duplicate_stdout_to_stderr(false, false)) {
+            _attach_stderr_from_console(false, false);
+        }
+
+        int stdin_filno = _fileno(stdin);
+        int stdout_filno = _fileno(stdout);
+        int stderr_filno = _fileno(stderr);
+
+        bool is_stdin_closed = false;
+        bool is_stdout_closed = false;
+        bool is_stderr_closed = false;
+
+        // NOTE:
+        //  In backward order from stderr to stdin.
+        //
+        if (stderr_filno >= 0) {
+            _close(stderr_filno);
+            is_stderr_closed = true;
+        }
+        if (stdout_filno >= 0) {
+            _close(stdout_filno);
+            is_stdout_closed = true;
+        }
+        if (stdin_filno >= 0) {
+            _close(stdin_filno);
+            is_stdin_closed = true;
+        }
+
+        HANDLE stdin_handle_dup = INVALID_HANDLE_VALUE;
+        HANDLE stdout_handle_dup = INVALID_HANDLE_VALUE;
+        HANDLE stderr_handle_dup = INVALID_HANDLE_VALUE;
+
+        // NOTE:
+        //  In forward order from stdin to stderr.
+        //
+        if (is_stdin_closed) {
+            if (stdin_handle_type != FILE_TYPE_UNKNOWN) {
+                stdin_filno = _open_osfhandle((intptr_t)stdin_handle, stdin_open_flags);
+            }
+            else {
+                stdin_handle_dup = _create_conin_handle(false);
+                if (_is_valid_handle(stdin_handle_dup)) {
+                    stdin_filno = _open_osfhandle((intptr_t)stdin_handle_dup, stdin_open_flags);
+                }
+            }
+        }
+
+        if (is_stdout_closed) {
+            if (stdout_handle_type != FILE_TYPE_UNKNOWN) {
+                stdout_filno = _open_osfhandle((intptr_t)stdout_handle, stdout_open_flags);
+            }
+            else {
+                stdout_handle_dup = _create_conout_handle(false);
+                if (_is_valid_handle(stdout_handle_dup)) {
+                    stdout_filno = _open_osfhandle((intptr_t)stdout_handle_dup, stdout_open_flags);
+                }
+            }
+        }
+
+        if (is_stderr_closed) {
+            if (stderr_handle_type != FILE_TYPE_UNKNOWN) {
+                stderr_filno = _open_osfhandle((intptr_t)stderr_handle, stderr_open_flags);
+            }
+            else {
+                stderr_handle_dup = _create_conout_handle(false);
+                if (_is_valid_handle(stderr_handle_dup)) {
+                    stderr_filno = _open_osfhandle((intptr_t)stderr_handle_dup, stderr_open_flags);
+                }
+            }
+        }
+
+        // invalidate duplicated handles to leave them to the `_sanitize_std_handles` call
+
+        // NOTE:
+        //  In backward order from stderr to stdin.
+        //
+        _close_handle(stderr_handle_dup);
+        _close_handle(stdout_handle_dup);
+        _close_handle(stdin_handle_dup);
+    }
+
+    inline void _resync_crt_std_handles(int stdin_open_flags = _O_RDONLY | _O_BINARY,
+                                        int stdout_open_flags = _O_WRONLY | _O_BINARY,
+                                        int stderr_open_flags = _O_WRONLY | _O_BINARY)
+    {
+        const HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+        const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        const HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+
+        const DWORD stdin_handle_type = _is_valid_handle(stdin_handle) ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdout_handle_type = _is_valid_handle(stdout_handle) ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stderr_handle_type = _is_valid_handle(stderr_handle) ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+
+        int stdin_filno = _fileno(stdin);
+        int stdout_filno = _fileno(stdout);
+        int stderr_filno = _fileno(stderr);
+
+        HANDLE registered_stdin_handle = stdin_filno >= 0 ? (HANDLE)_get_osfhandle(stdin_filno) : INVALID_HANDLE_VALUE;
+        HANDLE registered_stdout_handle = stdout_filno >= 0 ? (HANDLE)_get_osfhandle(stdout_filno) : INVALID_HANDLE_VALUE;
+        HANDLE registered_stderr_handle = stderr_filno >= 0 ? (HANDLE)_get_osfhandle(stderr_filno) : INVALID_HANDLE_VALUE;
+
+        bool is_stdin_closed = false;
+        bool is_stdout_closed = false;
+        bool is_stderr_closed = false;
+
+        // Caution:
+        //  The stdout and stderr can point the same handle after the resync.
+        //
+
+        // NOTE:
+        //  In backward order from stderr to stdin.
+        //
+        if (_is_valid_handle(registered_stderr_handle) &&
+            registered_stderr_handle != stderr_handle && registered_stderr_handle != stdout_handle && registered_stderr_handle != stdin_handle) {
+            _close(stderr_filno);
+            is_stderr_closed = true;
+        }
+        if (_is_valid_handle(registered_stdout_handle) &&
+            registered_stdout_handle != stderr_handle && registered_stdout_handle != stdout_handle && registered_stdout_handle != stdin_handle) {
+            _close(stdout_filno);
+            is_stdout_closed = true;
+        }
+        if (_is_valid_handle(registered_stdin_handle) &&
+            registered_stdin_handle != stderr_handle && registered_stdin_handle != stdout_handle && registered_stdin_handle != stdin_handle) {
+            _close(stdin_filno);
+            is_stdin_closed = true;
+        }
+
+        HANDLE stdin_handle_dup = INVALID_HANDLE_VALUE;
+        HANDLE stdout_handle_dup = INVALID_HANDLE_VALUE;
+        HANDLE stderr_handle_dup = INVALID_HANDLE_VALUE;
+
+        // NOTE:
+        //  In forward order from stdin to stderr.
+        //
+        if (is_stdin_closed) {
+            if (stdin_handle_type != FILE_TYPE_UNKNOWN) {
+                stdin_filno = _open_osfhandle((intptr_t)stdin_handle, stdin_open_flags);
+            }
+            else {
+                stdin_handle_dup = _create_conin_handle(false);
+                if (_is_valid_handle(stdin_handle_dup)) {
+                    stdin_filno = _open_osfhandle((intptr_t)stdin_handle_dup, stdin_open_flags);
+                }
+            }
+        }
+
+        if (is_stdout_closed) {
+            if (stdout_handle_type != FILE_TYPE_UNKNOWN) {
+                stdout_filno = _open_osfhandle((intptr_t)stdout_handle, stdout_open_flags);
+            }
+            else {
+                stdout_handle_dup = _create_conout_handle(false);
+                if (_is_valid_handle(stdout_handle_dup)) {
+                    stdout_filno = _open_osfhandle((intptr_t)stdout_handle_dup, stdout_open_flags);
+                }
+            }
+        }
+
+        if (is_stderr_closed) {
+            if (stderr_handle_type != FILE_TYPE_UNKNOWN) {
+                stderr_filno = _open_osfhandle((intptr_t)stderr_handle, stderr_open_flags);
+            }
+            else {
+                stderr_handle_dup = _create_conout_handle(false);
+                if (_is_valid_handle(stderr_handle_dup)) {
+                    stderr_filno = _open_osfhandle((intptr_t)stderr_handle_dup, stderr_open_flags);
+                }
+            }
+        }
+
+        // invalidate duplicated handles to leave them to the `_sanitize_std_handles` call
+
+        // NOTE:
+        //  In backward order from stderr to stdin.
+        //
+        _close_handle(stderr_handle_dup);
+        _close_handle(stdout_handle_dup);
+        _close_handle(stdin_handle_dup);
     }
 
     inline DWORD _find_parent_process_id()
@@ -2272,7 +2513,8 @@ namespace {
         return std::tstring(str_eval_buf.data(), &str_eval_buf[str_size]);
     }
 
-    inline bool _rearrange_std_handles(const _StdHandlesState & std_handles_state, HANDLE stdin_handle, DWORD stdin_handle_type, HANDLE stdout_handle, DWORD stdout_handle_type, HANDLE stderr_handle, DWORD stderr_handle_type)
+    inline bool _rearrange_std_handles(const _StdHandlesState & std_handles_state,
+                                       HANDLE stdin_handle, DWORD stdin_handle_type, HANDLE stdout_handle, DWORD stdout_handle_type, HANDLE stderr_handle, DWORD stderr_handle_type)
     {
         HANDLE stdin_default_address_handle_dup = INVALID_HANDLE_VALUE;
         HANDLE stdout_default_address_handle_dup = INVALID_HANDLE_VALUE;
@@ -2293,16 +2535,8 @@ namespace {
                 DuplicateHandle(GetCurrentProcess(), stdin_handle, GetCurrentProcess(), &stdin_handle_dup, 0, !!std_handles_state.is_stdin_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS);
             }
             else {
-                SECURITY_ATTRIBUTES sa{};
-
-                sa.nLength = sizeof(sa);
-                sa.bInheritHandle = !!std_handles_state.is_stdin_inheritable ? TRUE : FALSE;
-
                 // stdin default address has not valid handle
-                stdin_handle_dup = CreateFileW(L"CONIN$",
-                    GENERIC_READ, FILE_SHARE_READ, &sa, // must use `sa` to setup inheritance
-                    OPEN_EXISTING,
-                    FILE_ATTRIBUTE_NORMAL, NULL);
+                stdin_handle_dup = _create_conin_handle(!!std_handles_state.is_stdin_inheritable);
             }
 
             if (_is_valid_handle(stdin_handle_dup)) {
@@ -2330,16 +2564,8 @@ namespace {
                 DuplicateHandle(GetCurrentProcess(), stdout_handle, GetCurrentProcess(), &stdout_handle_dup, 0, !!std_handles_state.is_stdout_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS);
             }
             else {
-                SECURITY_ATTRIBUTES sa{};
-
-                sa.nLength = sizeof(sa);
-                sa.bInheritHandle = !!std_handles_state.is_stdout_inheritable ? TRUE : FALSE;
-
-                // stdin default address has not valid handle
-                stdout_handle_dup = CreateFileW(L"CONOUT$",
-                    GENERIC_WRITE, FILE_SHARE_WRITE, &sa, // must use `sa` to setup inheritance
-                    OPEN_EXISTING,
-                    FILE_ATTRIBUTE_NORMAL, NULL);
+                // stdout default address has not valid handle
+                stdout_handle_dup = _create_conout_handle(!!std_handles_state.is_stdout_inheritable);
             }
 
             if (_is_valid_handle(stdout_handle_dup)) {
@@ -2358,25 +2584,17 @@ namespace {
         }
 
         if (DuplicateHandle(GetCurrentProcess(), STD_ERROR_HANDLE_DEFAULT_ADDRESS, GetCurrentProcess(), &stderr_default_address_handle_dup, 0, !!std_handles_state.is_stderr_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
-            // stdout default address has valid handle
+            // stderr default address has valid handle
             _close_handle(stderr_default_address_handle_dup);
         }
         else {
-            // stdout default address has not valid handle
+            // stderr default address has not valid handle
             if (stderr_handle_type != FILE_TYPE_CHAR) {
                 DuplicateHandle(GetCurrentProcess(), stderr_handle, GetCurrentProcess(), &stderr_handle_dup, 0, !!std_handles_state.is_stderr_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS);
             }
             else {
-                SECURITY_ATTRIBUTES sa{};
-
-                sa.nLength = sizeof(sa);
-                sa.bInheritHandle = !!std_handles_state.is_stderr_inheritable ? TRUE : FALSE;
-
-                // stdin default address has not valid handle
-                stderr_handle_dup = CreateFileW(L"CONOUT$",
-                    GENERIC_WRITE, FILE_SHARE_WRITE, &sa, // must use `sa` to setup inheritance
-                    OPEN_EXISTING,
-                    FILE_ATTRIBUTE_NORMAL, NULL);
+                // stderr default address has not valid handle
+                stderr_handle_dup = _create_conout_handle(!!std_handles_state.is_stderr_inheritable);
             }
 
             if (_is_valid_handle(stderr_handle_dup)) {
@@ -2512,7 +2730,7 @@ namespace {
                 }
             }
 
-            // reopen closed std handles from `CONIN$`/`CONOUT$` files
+            // reopen closed std handles from `CONIN$` and `CONOUT$` or `\\.\CON` files
 
             //#define FILE_TYPE_UNKNOWN   0x0000
             //#define FILE_TYPE_DISK      0x0001 // ReadFile
@@ -2633,7 +2851,10 @@ namespace {
             //  This happens because:
             //
             //  1. Process B has different or higher privileges than process A.
-            //  2. Process B attaches to the console window of process A (additional issues with console attachment: https://github.com/rprichard/win32-console-docs#allocconsole-attachconsole-traditional )
+            //  2. Process B attaches to the console window of process A.
+            //      NOTE:
+            //        Additional issues with console attachment:
+            //          `AllocConsole, AttachConsole (traditional)` : https://github.com/rprichard/win32-console-docs#allocconsole-attachconsole-traditional
             //  3. Process A has different standard handle address layout opposed to the process B (may be because the process B can not inherit the standard handles addresses layout under the Administrator privileges isolation).
             //
             //  When the console window of the process A attaches to the process B with the same privileges, then the process B gets the standard handle addresses layout of the process A.
@@ -2650,7 +2871,7 @@ namespace {
             //
             //  There is 2 workarounds for that:
             //
-            //  1. Reopen all such handles from `CONIN$` and `CONOUT$` files.
+            //  1. Reopen all such handles from `CONIN$` and `CONOUT$` or `\\.\CON` files.
             //     This method has a problem, the `GetConsoleMode` function returns 0 for such an opened handle which means the `ENABLE_PROCESSED_OUTPUT` flag in stdout/stderr has dropped and
             //     the output will contain printable form of carriage return and line feed characters. In the same time the `SetConsoleMode` fails on such handles opened through the `CreateFile`.
             //     So this method only fixes the standard handles validity without it's console mode flags.
@@ -2660,16 +2881,22 @@ namespace {
             //     This can be achieved because the process B basically has default standard handles addresses layout: stdin=0x03, stdin=0x07, stdin=0x0b.
             //
             //     NOTE: Currently this method does not work properly under the Windows 7 because of an issue with a console handle duplication between processes:
-            //           https://github.com/rprichard/win32-console-docs#console-handles-and-handle-sets-traditional
+            //
+            //           `Console handles and handle sets (traditional)` : https://github.com/rprichard/win32-console-docs#console-handles-and-handle-sets-traditional
             //
             //  The code below has use of method #1. The `_rearrange_std_handles` function has use of method #2.
+            //
+
+            // TODO:
+            //  Get injected from here into parent process being used for console window attachment and
+            //  directly call `GetStdHandle` functions to read standard handle addresses layout to update the standard handles (call `StdStdHandle`) instead of below code.
             //
 
             // Method #1:
             //
 
             // NOTE:
-            //  In reverse order from stderr to stdin.
+            //  In backward order from stderr to stdin.
             //
             if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
                 _detach_stderr();
@@ -2683,27 +2910,32 @@ namespace {
                 _detach_stdin();
             }
 
+            const bool set_std_handle = IF_CONSOLE_APP(false, true);
+
+            // NOTE:
+            //  In forward order from stdin to stderr.
+            //
             if (stdin_handle_type == FILE_TYPE_UNKNOWN) {
-                _attach_stdin_from_console(!!std_handles_state.is_stdin_inheritable); // by default - inheritable
+                _attach_stdin_from_console(set_std_handle, !!std_handles_state.is_stdin_inheritable); // by default - inheritable
             }
 
             if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
                 // attempt to duplicate stdout/stderr from stderr/stdout handle at first
                 if (stderr_handle_type != FILE_TYPE_UNKNOWN) {
-                    if (!_duplicate_stderr_to_stdout(!!std_handles_state.is_stdout_inheritable)) {
-                        _attach_stdout_from_console(!!std_handles_state.is_stdout_inheritable); // by default - inheritable
+                    if (!_duplicate_stderr_to_stdout(set_std_handle, !!std_handles_state.is_stdout_inheritable)) {
+                        _attach_stdout_from_console(set_std_handle, !!std_handles_state.is_stdout_inheritable); // by default - inheritable
                     }
                 }
                 else {
-                    if (!_attach_stdout_from_console(!!std_handles_state.is_stdout_inheritable) || // by default - inheritable
-                        !_duplicate_stdout_to_stderr(!!std_handles_state.is_stderr_inheritable)) {
-                        _attach_stderr_from_console(!!std_handles_state.is_stderr_inheritable); // by default - inheritable
+                    if (!_attach_stdout_from_console(set_std_handle, !!std_handles_state.is_stdout_inheritable) || // by default - inheritable
+                        !_duplicate_stdout_to_stderr(set_std_handle, !!std_handles_state.is_stderr_inheritable)) {
+                        _attach_stderr_from_console(set_std_handle, !!std_handles_state.is_stderr_inheritable); // by default - inheritable
                     }
                 }
             }
             else if (stderr_handle_type == FILE_TYPE_UNKNOWN) {
-                if (!_duplicate_stdout_to_stderr(!!std_handles_state.is_stderr_inheritable)) {
-                    _attach_stderr_from_console(!!std_handles_state.is_stderr_inheritable); // by default - inheritable
+                if (!_duplicate_stdout_to_stderr(set_std_handle, !!std_handles_state.is_stderr_inheritable)) {
+                    _attach_stderr_from_console(set_std_handle, !!std_handles_state.is_stderr_inheritable); // by default - inheritable
                 }
             }
 

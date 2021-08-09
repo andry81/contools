@@ -20,6 +20,11 @@
 #include <algorithm>
 #include <type_traits>
 
+
+#define UTILITY_LITERAL_STRING_WITH_PREFIX_(ansi_str, prefix) prefix ## ansi_str
+#define UTILITY_LITERAL_STRING_WITH_PREFIX(ansi_str, prefix) UTILITY_LITERAL_STRING_WITH_PREFIX_(ansi_str, prefix)
+
+
 namespace utility {
 
     template <class t_elem, class t_traits, class t_alloc>

@@ -2554,18 +2554,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         is_conout_processed_for_detach_alloc_attach_to_console = true;
 
-                        g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
-
                         _detach_stderr();
                         _detach_stdout();
                         _detach_stdin();
 
-                        _attach_stdin_from_console(!!std_handles_state.is_stdin_inheritable); // by default - inheritable
+                        g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
 
-                        _attach_stdout_from_console(!!std_handles_state.is_stdout_inheritable); // by default - inheritable
-                        if (!_duplicate_stdout_to_stderr(!!std_handles_state.is_stderr_inheritable)) {
-                            _attach_stderr_from_console(!!std_handles_state.is_stderr_inheritable); // by default - inheritable
-                        }
+                        _reinit_crt_std_handles();
 
                         if (g_options.has.console_title) {
                             SetConsoleTitle(g_options.console_title.c_str());
@@ -2586,22 +2581,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         is_conout_processed_for_detach_alloc_attach_to_console = true;
 
                         if (!g_owned_console_window) {
+#ifndef _CONSOLE
+                            _detach_stderr();
+                            _detach_stdout();
+                            _detach_stdin();
+#endif
+
                             if (g_inherited_console_window) {
                                 _free_console(std_handles_state);
                             }
                             g_inherited_console_window = _alloc_console(std_handles_state);
 
-#ifndef _CONSOLE
-                            _detach_stderr();
-                            _detach_stdout();
-                            _detach_stdin();
-
-                            _attach_stdin_from_console(!!std_handles_state.is_stdin_inheritable); // by default - inheritable
-
-                            _attach_stdout_from_console(!!std_handles_state.is_stdout_inheritable); // by default - inheritable
-                            if (!_duplicate_stdout_to_stderr(!!std_handles_state.is_stderr_inheritable)) {
-                                _attach_stderr_from_console(!!std_handles_state.is_stderr_inheritable); // by default - inheritable
-                            }
+#ifdef _CONSOLE
+                            _resync_crt_std_handles();
+#else
+                            _reinit_crt_std_handles();
 #endif
                         }
 
@@ -2639,22 +2633,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                             is_conout_processed_for_detach_alloc_attach_to_console = true;
 
+#ifndef _CONSOLE
+                            _detach_stderr();
+                            _detach_stdout();
+                            _detach_stdin();
+#endif
+
                             if (g_inherited_console_window) {
                                 _free_console(std_handles_state);
                             }
                             g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
 
-#ifndef _CONSOLE
-                            _detach_stderr();
-                            _detach_stdout();
-                            _detach_stdin();
-
-                            _attach_stdin_from_console(!!std_handles_state.is_stdin_inheritable); // by default - inheritable
-
-                            _attach_stdout_from_console(!!std_handles_state.is_stdout_inheritable); // by default - inheritable
-                            if (!_duplicate_stdout_to_stderr(!!std_handles_state.is_stderr_inheritable)) {
-                                _attach_stderr_from_console(!!std_handles_state.is_stderr_inheritable); // by default - inheritable
-                            }
+#ifdef _CONSOLE
+                            _resync_crt_std_handles();
+#else
+                            _reinit_crt_std_handles();
 #endif
 
                             if (g_options.has.console_title) {
@@ -2674,22 +2667,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     }
 
                     if (!g_owned_console_window) {
+#ifndef _CONSOLE
+                        _detach_stderr();
+                        _detach_stdout();
+                        _detach_stdin();
+#endif
+
                         if (g_inherited_console_window) {
                             _free_console(std_handles_state);
                         }
                         g_inherited_console_window = _alloc_console(std_handles_state);
 
-#ifndef _CONSOLE
-                        _detach_stderr();
-                        _detach_stdout();
-                        _detach_stdin();
-
-                        _attach_stdin_from_console(!!std_handles_state.is_stdin_inheritable); // by default - inheritable
-
-                        _attach_stdout_from_console(!!std_handles_state.is_stdout_inheritable); // by default - inheritable
-                        if (!_duplicate_stdout_to_stderr(!!std_handles_state.is_stderr_inheritable)) {
-                            _attach_stderr_from_console(!!std_handles_state.is_stderr_inheritable); // by default - inheritable
-                        }
+#ifdef _CONSOLE
+                        _resync_crt_std_handles();
+#else
+                        _reinit_crt_std_handles();
 #endif
 
                         if (g_options.has.create_console_title) {
@@ -2727,22 +2719,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         is_conout_processed_for_detach_alloc_attach_to_console = true;
 
+#ifndef _CONSOLE
+                        _detach_stderr();
+                        _detach_stdout();
+                        _detach_stdin();
+#endif
+
                         if (g_inherited_console_window) {
                             _free_console(std_handles_state);
                         }
                         g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
 
-#ifndef _CONSOLE
-                        _detach_stderr();
-                        _detach_stdout();
-                        _detach_stdin();
-
-                        _attach_stdin_from_console(!!std_handles_state.is_stdin_inheritable); // by default - inheritable
-
-                        _attach_stdout_from_console(!!std_handles_state.is_stdout_inheritable); // by default - inheritable
-                        if (!_duplicate_stdout_to_stderr(!!std_handles_state.is_stderr_inheritable)) {
-                            _attach_stderr_from_console(!!std_handles_state.is_stderr_inheritable); // by default - inheritable
-                        }
+#ifdef _CONSOLE
+                        _resync_crt_std_handles();
+#else
+                        _reinit_crt_std_handles();
 #endif
 
                         if (g_options.has.console_title) {
@@ -2839,23 +2830,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             arg_offset = 1;
 
             if (print_help) {
-                // temporary disable conout print buffering
-                bool enable_conout_prints_buffering = g_enable_conout_prints_buffering;
-
-                g_enable_conout_prints_buffering = false;
-
-                [&]() {
-                    __try {
-                        _print_raw_message(
-                            1, "%s",
+                fputs(
 #include "help_inl.hpp"
-                        );
-                    }
-                    __finally {
-                        // restore conout print buffering
-                        g_enable_conout_prints_buffering = enable_conout_prints_buffering;
-                    }
-                }();
+                    , stdout);
 
                 return err_help_output;
             }

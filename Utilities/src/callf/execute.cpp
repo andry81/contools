@@ -1818,6 +1818,25 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
             // CAUTION:
             //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
             //
+            //  Another issues related to this:
+            //
+            //    `Windows 7 conhost.exe crash with CONOUT$ [win7_conout_crash]` : https://github.com/rprichard/win32-console-docs#windows-7-conhostexe-crash-with-conout-win7_conout_crash
+            //
+            //      There is a bug in Windows 7 involving CONOUT$ and CloseHandle that can easily crash conhost.exe and/or activate the wrong screen buffer.
+            //      The bug is triggered when a process without a handle to the active screen buffer opens CONOUT$ and then closes it using CloseHandle.
+            //      
+            //      Here's what seems to be going on:
+            //      
+            //      Each process may have at most one "console object" referencing a particular buffer.A single console object can be shared between multiple processes,
+            //      and whenever console handles are imported(CreateProcess and AttachConsole), the objects are reused.
+            //      
+            //      If a process opens CONOUT$, however, and does not already have a reference to the active screen buffer, then Windows creates a new console object.
+            //      The bug in Windows 7 is this: if a process calls CloseHandle on the last handle for a console object, then the screen buffer is freed,
+            //      even if there are other handles / objects still referencing it.At that point, the console might display the wrong screen buffer,
+            //      but using the other handles to the buffer can return garbage and / or crash conhost.exe. Closing a dangling handle is especially likely to trigger a crash.
+            //      
+            //      The bug affects Windows 7 SP1, but does not affect Windows Server 2008 R2 SP1, the server version of the OS.
+            //
 
             if (g_stdout_handle_type != FILE_TYPE_CHAR) {
                 _StdHandlesState std_handles_state;
@@ -1825,7 +1844,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                 std_handles_state.save_stdout_state(g_stdout_handle);
 
                 _detach_stdout();
-                _attach_stdout_from_console(!!std_handles_state.is_stdout_inheritable);
+                _attach_stdout_from_console(IF_CONSOLE_APP(false, true), !!std_handles_state.is_stdout_inheritable);
 
                 // reread owned by CRT handles
                 g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -2259,6 +2278,25 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
 
             // CAUTION:
             //  We should not close a character device handle, otherwise another process in process inheritance tree may lose the handle buffer to continue interact with it.
+            //
+            //  Another issues related to this:
+            //
+            //    `Windows 7 conhost.exe crash with CONOUT$ [win7_conout_crash]` : https://github.com/rprichard/win32-console-docs#windows-7-conhostexe-crash-with-conout-win7_conout_crash
+            //
+            //      There is a bug in Windows 7 involving CONOUT$ and CloseHandle that can easily crash conhost.exe and/or activate the wrong screen buffer.
+            //      The bug is triggered when a process without a handle to the active screen buffer opens CONOUT$ and then closes it using CloseHandle.
+            //      
+            //      Here's what seems to be going on:
+            //      
+            //      Each process may have at most one "console object" referencing a particular buffer.A single console object can be shared between multiple processes,
+            //      and whenever console handles are imported(CreateProcess and AttachConsole), the objects are reused.
+            //      
+            //      If a process opens CONOUT$, however, and does not already have a reference to the active screen buffer, then Windows creates a new console object.
+            //      The bug in Windows 7 is this: if a process calls CloseHandle on the last handle for a console object, then the screen buffer is freed,
+            //      even if there are other handles / objects still referencing it.At that point, the console might display the wrong screen buffer,
+            //      but using the other handles to the buffer can return garbage and / or crash conhost.exe. Closing a dangling handle is especially likely to trigger a crash.
+            //      
+            //      The bug affects Windows 7 SP1, but does not affect Windows Server 2008 R2 SP1, the server version of the OS.
             //
 
             switch (co_stream_type) {
@@ -4709,9 +4747,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 //  We can not change console handle inheritance under Windows 7.
                 //
                 //  Details:
-                //    https://github.com/rprichard/win32-console-docs#win7inh
                 //
-                //    Windows 7 inheritability [win7inh]:
+                //    `Windows 7 inheritability [win7inh]` : https://github.com/rprichard/win32-console-docs#win7inh
                 //
                 //      * Calling DuplicateHandle(bInheritHandle=FALSE) on an inheritable console handle produces an inheritable handle,
                 //        but it should be non-inheritable. Previous and later Windows releases work as expected, as does Windows 7 with a non-console handle.
@@ -4820,9 +4857,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 //  We have to restore console handle inheritance under Windows XP.
                 //
                 //  Details:
-                //    https://github.com/rprichard/win32-console-docs#xpinh
                 //
-                //    Windows XP duplication inheritability [xpinh]:
+                //    `Windows XP duplication inheritability [xpinh]` : https://github.com/rprichard/win32-console-docs#xpinh
                 //
                 //      When CreateProcess in XP duplicates an inheritable handle, the duplicated handle is non-inheritable. In Vista and later, the new handle is also inheritable.
                 //
@@ -5685,8 +5721,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         //
         //  Details:
         //
-        //    Windows XP: https://github.com/rprichard/win32-console-docs#xppipe
-        //    Windows 8:  https://github.com/rprichard/win32-console-docs#footnotes
+        //    Windows XP: `Windows XP does not duplicate a pipe's read handle [xppipe]` : https://github.com/rprichard/win32-console-docs#xppipe
+        //    Windows 8:  `Footnotes` : https://github.com/rprichard/win32-console-docs#footnotes
         //
 
         if (!is_idle_execute) {
@@ -6206,7 +6242,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             _close_handle(g_stderr_pipe_read_handle);
             _close_handle(g_stderr_pipe_write_handle);
 
-            // in reverse order from threads to a process
+            // in backward order from threads to a process
             _close_handle(pi.hThread);
             _close_handle(g_child_process_handle, pi.hProcess);
 
