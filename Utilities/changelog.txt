@@ -1,4 +1,7 @@
 2021.08.10:
+* new: bin/contools: binaries update
+
+2021.08.10:
 * fixed: src/callf:
          Reworked (again) handles sanitizing as having unstable results under Windows 8.
          Removed `STD_*_HANDLE_DEFAULT_ADDRESS` and all related code (`_rearrange_std_handles`), Windows 8 does not utilize them anymore as was by default in the Windows 7.
