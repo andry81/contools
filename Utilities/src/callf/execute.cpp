@@ -5798,25 +5798,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
                     }
 
-                    if (g_is_process_elevating) {
-                        // standard handles addresses layout rearrange apply
-
-                        if (g_stdin_handle != STD_INPUT_HANDLE_DEFAULT_ADDRESS) {
-                            g_is_stdin_redirected = true;
-                            SetStdHandle(STD_INPUT_HANDLE, STD_INPUT_HANDLE_DEFAULT_ADDRESS);
-                        }
-
-                        if (g_stdout_handle != STD_OUTPUT_HANDLE_DEFAULT_ADDRESS) {
-                            g_is_stdout_redirected = true;
-                            SetStdHandle(STD_OUTPUT_HANDLE, STD_OUTPUT_HANDLE_DEFAULT_ADDRESS);
-                        }
-
-                        if (g_stderr_handle != STD_ERROR_HANDLE_DEFAULT_ADDRESS) {
-                            g_is_stderr_redirected = true;
-                            SetStdHandle(STD_ERROR_HANDLE, STD_ERROR_HANDLE_DEFAULT_ADDRESS);
-                        }
-                    }
-
                     SetLastError(0); // just in case
                     ret_create_proc = ::ShellExecuteEx(&sei);
 

@@ -1,3 +1,17 @@
+2021.08.10:
+* fixed: src/callf:
+         Reworked (again) handles sanitizing as having unstable results under Windows 8.
+         Removed `STD_*_HANDLE_DEFAULT_ADDRESS` and all related code (`_rearrange_std_handles`), Windows 8 does not utilize them anymore as was by default in the Windows 7.
+         Removed `_resync_crt_std_handles` as having unstable results. Standard handles having too random nature under Windows 8 and, for example, two standard handles can has swapped addresses between 2 processes in inheritance chain (better completely detach CRT standard handles before (re)attach or (re)allocate console).
+* fixed: src/callf: unstable 0xc0000142 exception in `cmd.exe` process in Windows 8
+* fixed: Utilities/src/callf: unstable manual tests crashes in Windows 8
+* fixed: src/callf: manual tests pass under Windows 8 (several tests still fails, see readme file for details)
+* fixed: src/callf: minor flags fixup
+* fixed: src/callf: better os version detection
+* changed: src/callf: code cleanup
+* changed: tests: readme update
+* refactor: tests: minor refactor
+
 2021.08.09:
 * new: bin/contools: binaries update
 

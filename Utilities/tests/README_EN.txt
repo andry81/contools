@@ -1,11 +1,13 @@
 * README_EN.txt
-* 2021.08.08
+* 2021.08.10
 * contools--utilities--tests
 
 1. DESCRIPTION
 2. USAGE
 2.1. manual
 2.1.1. manual/contools/callf
+3. KNOWN ISSUES
+3.1. manual/contools/callf
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -62,3 +64,24 @@ NOTE:
   Administrator.
 
 All these affect test results. All runs must produce the same results.
+
+-------------------------------------------------------------------------------
+3. KNWON ISSUES
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+3.1. manual/contools/callf
+-------------------------------------------------------------------------------
+
+Several tests still fails under specific conditions:
+
+* `20-test-*` fails to print correctly in Windows 8.
+
+* `21-test-*` fails to print correctly under already elevated environment in
+  Windows 7/8.
+
+* `31-test--01-elevate--02-user_input.bat` time to time fails to print
+  correctly under not elevated environment in Windows 7.
+
+* `50-test--01-gui_to_gui--02-elevate--03-new_console--01-pause_on_exit.bat`
+   prints Unicode error in ANSI console if reject elevation under Windows 7/8.

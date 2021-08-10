@@ -892,8 +892,8 @@ Utilities/tests/manual/__init__/__init__.bat -text
 Utilities/tests/manual/contools/__init__/__init__.bat -text
 Utilities/tests/manual/contools/callf/01-test--01-vars_subst.bat -text
 Utilities/tests/manual/contools/callf/02-test--01-env_expand.bat -text
-Utilities/tests/manual/contools/callf/03-test--01-elevate--01-new_console.bat -text
-Utilities/tests/manual/contools/callf/03-test--01-elevate--02-new_console.bat -text
+Utilities/tests/manual/contools/callf/03-test--01-elevate--01-new_console_if_elevated.bat -text
+Utilities/tests/manual/contools/callf/03-test--01-elevate--02-new_console_if_elevated.bat -text
 Utilities/tests/manual/contools/callf/03-test--01-elevate--03-new_console.bat -text
 Utilities/tests/manual/contools/callf/03-test--02-elevate--01-existing_console.bat -text
 Utilities/tests/manual/contools/callf/03-test--02-elevate--02-existing_console.bat -text
@@ -912,8 +912,8 @@ Utilities/tests/manual/contools/callf/10-test--03-escape_recur.bat -text
 Utilities/tests/manual/contools/callf/11-test--01-special_case_chars.bat -text
 Utilities/tests/manual/contools/callf/11-test--02-special_case_chars.bat -text
 Utilities/tests/manual/contools/callf/11-test--03-special_case_chars.bat -text
-Utilities/tests/manual/contools/callf/12-test--01-shell_exec_runas--01-new_console.bat -text
-Utilities/tests/manual/contools/callf/12-test--01-shell_exec_runas--02-new_console.bat -text
+Utilities/tests/manual/contools/callf/12-test--01-shell_exec_runas--01-new_console_if_elevated.bat -text
+Utilities/tests/manual/contools/callf/12-test--01-shell_exec_runas--02-new_console_if_elevated.bat -text
 Utilities/tests/manual/contools/callf/13-test--01-shell_exec_runas--01-existing_console.bat -text
 Utilities/tests/manual/contools/callf/13-test--01-shell_exec_runas--02-existing_console.bat -text
 Utilities/tests/manual/contools/callf/20-test--01-create_process--01-named_pipe_to_child_stdin.bat -text
@@ -927,7 +927,7 @@ Utilities/tests/manual/contools/callf/31-test--01-elevate--02-user_input.bat -te
 Utilities/tests/manual/contools/callf/40-test--01-gui_to_cui--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/40-test--01-gui_to_cui--02-elevate--01_existing_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--01-new_console--01-pause_on_exit.bat -text
-Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--02-elevate--01-new_console--01-pause_on_exit.bat -text
+Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--02-elevate--01-new_console_if_elevated--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--02-elevate--02-new_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--02-elevate--03-new_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/51-test--01-cui--01-print_help.bat -text

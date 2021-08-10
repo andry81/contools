@@ -55,6 +55,8 @@
 #define STDOUT_FILENO   1
 #define STDERR_FILENO   2
 
+#define STATUS_SUCCESS  0x00000000
+
 // Details:
 //
 //  https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces
@@ -66,11 +68,6 @@
 #   define CONIN_FILE       "CONIN$"
 #   define CONOUT_FILE      "CONOUT$"
 #endif
-
-// Default Win32 standard handle addresses
-#define STD_INPUT_HANDLE_DEFAULT_ADDRESS    (HANDLE)0x00000003
-#define STD_OUTPUT_HANDLE_DEFAULT_ADDRESS   (HANDLE)0x00000007
-#define STD_ERROR_HANDLE_DEFAULT_ADDRESS    (HANDLE)0x0000000b
 
 #ifdef _CONSOLE
 #   define IF_CONSOLE_APP(t, f) t
@@ -516,7 +513,7 @@ namespace {
         return false;
     }
 
-        inline void _get_win_ver(_WinVer & win_ver)
+    inline void _get_win_ver(_WinVer & win_ver)
     {
         // CAUTION:
         //  Has effect only for Windows version up to 8.1 (read MSDN documentation)
@@ -532,11 +529,36 @@ namespace {
         else {
             win_ver.build = 0;
         }
+
+        const bool is_os_windows_xp_or_lower = win_ver.major < 6;
+
+        if (!is_os_windows_xp_or_lower) {
+            // Based on: https://stackoverflow.com/questions/36543301/detecting-windows-10-version/36545162#36545162
+            //
+
+            typedef LONG NTSTATUS, *PNTSTATUS;
+
+            typedef NTSTATUS (WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+
+            HMODULE ntdll_hmodule = ::GetModuleHandleW(L"ntdll.dll");
+            if (ntdll_hmodule) {
+                RtlGetVersionPtr RtlGetVersion = (RtlGetVersionPtr)::GetProcAddress(ntdll_hmodule, "RtlGetVersion");
+                if (RtlGetVersion != nullptr) {
+                    RTL_OSVERSIONINFOW rovi{};
+                    rovi.dwOSVersionInfoSize = sizeof(rovi);
+                    if (STATUS_SUCCESS == RtlGetVersion(&rovi)) {
+                        win_ver.major = rovi.dwMajorVersion;
+                        win_ver.minor = rovi.dwMinorVersion;
+                        win_ver.build = rovi.dwBuildNumber;
+                    }
+                }
+            }
+        }
     }
 
     // NOTE:
     //  Deprecated because C++11 standard does not support unicode code page in locales together with
-    //  lowercase/upcase functionality which is not available without a knowledge of language per character.
+    //  lowercase/uppercase functionality which is not available without a knowledge of language per character.
     //
 
     //std::tstring::value_type _to_lower(std::tstring::value_type ch, unsigned int code_page)
@@ -751,7 +773,7 @@ namespace {
         return true;
     }
 
-    inline void _detach_stdin(bool close_default_address_handle = false) {
+    inline void _detach_stdin() {
         // WORKAROUND:
         //  If `_fileno` return negative value, then `fclose` won't call `_close` on associated descriptor, so
         //  we have to do it directly.
@@ -762,14 +784,9 @@ namespace {
         if (stdin_fileno < 0) {
             _close(STDIN_FILENO);
         }
-
-        if (close_default_address_handle) {
-            // close standard handle at default address
-            CloseHandle(STD_INPUT_HANDLE_DEFAULT_ADDRESS);
-        }
     }
 
-    inline void _detach_stdout(bool close_default_address_handle = false) {
+    inline void _detach_stdout() {
         // WORKAROUND:
         //  If `_fileno` return negative value, then `fclose` won't call `_close` on associated descriptor, so
         //  we have to do it directly.
@@ -780,14 +797,9 @@ namespace {
         if (stdout_fileno < 0) {
             _close(STDOUT_FILENO);
         }
-
-        if (close_default_address_handle) {
-            // close standard handle at default address
-            CloseHandle(STD_OUTPUT_HANDLE_DEFAULT_ADDRESS);
-        }
     }
 
-    inline void _detach_stderr(bool close_default_address_handle = false) {
+    inline void _detach_stderr() {
         // WORKAROUND:
         //  If `_fileno` return negative value, then `fclose` won't call `_close` on associated descriptor, so
         //  we have to do it directly.
@@ -797,11 +809,6 @@ namespace {
         fclose(stderr);
         if (stderr_fileno < 0) {
             _close(STDERR_FILENO);
-        }
-
-        if (close_default_address_handle) {
-            // close standard handle at default address
-            CloseHandle(STD_ERROR_HANDLE_DEFAULT_ADDRESS);
         }
     }
 
@@ -990,106 +997,6 @@ namespace {
             is_stdout_closed = true;
         }
         if (stdin_filno >= 0) {
-            _close(stdin_filno);
-            is_stdin_closed = true;
-        }
-
-        HANDLE stdin_handle_dup = INVALID_HANDLE_VALUE;
-        HANDLE stdout_handle_dup = INVALID_HANDLE_VALUE;
-        HANDLE stderr_handle_dup = INVALID_HANDLE_VALUE;
-
-        // NOTE:
-        //  In forward order from stdin to stderr.
-        //
-        if (is_stdin_closed) {
-            if (stdin_handle_type != FILE_TYPE_UNKNOWN) {
-                stdin_filno = _open_osfhandle((intptr_t)stdin_handle, stdin_open_flags);
-            }
-            else {
-                stdin_handle_dup = _create_conin_handle(false);
-                if (_is_valid_handle(stdin_handle_dup)) {
-                    stdin_filno = _open_osfhandle((intptr_t)stdin_handle_dup, stdin_open_flags);
-                }
-            }
-        }
-
-        if (is_stdout_closed) {
-            if (stdout_handle_type != FILE_TYPE_UNKNOWN) {
-                stdout_filno = _open_osfhandle((intptr_t)stdout_handle, stdout_open_flags);
-            }
-            else {
-                stdout_handle_dup = _create_conout_handle(false);
-                if (_is_valid_handle(stdout_handle_dup)) {
-                    stdout_filno = _open_osfhandle((intptr_t)stdout_handle_dup, stdout_open_flags);
-                }
-            }
-        }
-
-        if (is_stderr_closed) {
-            if (stderr_handle_type != FILE_TYPE_UNKNOWN) {
-                stderr_filno = _open_osfhandle((intptr_t)stderr_handle, stderr_open_flags);
-            }
-            else {
-                stderr_handle_dup = _create_conout_handle(false);
-                if (_is_valid_handle(stderr_handle_dup)) {
-                    stderr_filno = _open_osfhandle((intptr_t)stderr_handle_dup, stderr_open_flags);
-                }
-            }
-        }
-
-        // invalidate duplicated handles to leave them to the `_sanitize_std_handles` call
-
-        // NOTE:
-        //  In backward order from stderr to stdin.
-        //
-        _close_handle(stderr_handle_dup);
-        _close_handle(stdout_handle_dup);
-        _close_handle(stdin_handle_dup);
-    }
-
-    inline void _resync_crt_std_handles(int stdin_open_flags = _O_RDONLY | _O_BINARY,
-                                        int stdout_open_flags = _O_WRONLY | _O_BINARY,
-                                        int stderr_open_flags = _O_WRONLY | _O_BINARY)
-    {
-        const HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
-        const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-        const HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-
-        const DWORD stdin_handle_type = _is_valid_handle(stdin_handle) ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
-        const DWORD stdout_handle_type = _is_valid_handle(stdout_handle) ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
-        const DWORD stderr_handle_type = _is_valid_handle(stderr_handle) ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
-
-        int stdin_filno = _fileno(stdin);
-        int stdout_filno = _fileno(stdout);
-        int stderr_filno = _fileno(stderr);
-
-        HANDLE registered_stdin_handle = stdin_filno >= 0 ? (HANDLE)_get_osfhandle(stdin_filno) : INVALID_HANDLE_VALUE;
-        HANDLE registered_stdout_handle = stdout_filno >= 0 ? (HANDLE)_get_osfhandle(stdout_filno) : INVALID_HANDLE_VALUE;
-        HANDLE registered_stderr_handle = stderr_filno >= 0 ? (HANDLE)_get_osfhandle(stderr_filno) : INVALID_HANDLE_VALUE;
-
-        bool is_stdin_closed = false;
-        bool is_stdout_closed = false;
-        bool is_stderr_closed = false;
-
-        // Caution:
-        //  The stdout and stderr can point the same handle after the resync.
-        //
-
-        // NOTE:
-        //  In backward order from stderr to stdin.
-        //
-        if (_is_valid_handle(registered_stderr_handle) &&
-            registered_stderr_handle != stderr_handle && registered_stderr_handle != stdout_handle && registered_stderr_handle != stdin_handle) {
-            _close(stderr_filno);
-            is_stderr_closed = true;
-        }
-        if (_is_valid_handle(registered_stdout_handle) &&
-            registered_stdout_handle != stderr_handle && registered_stdout_handle != stdout_handle && registered_stdout_handle != stdin_handle) {
-            _close(stdout_filno);
-            is_stdout_closed = true;
-        }
-        if (_is_valid_handle(registered_stdin_handle) &&
-            registered_stdin_handle != stderr_handle && registered_stdin_handle != stdout_handle && registered_stdin_handle != stdin_handle) {
             _close(stdin_filno);
             is_stdin_closed = true;
         }
@@ -2513,108 +2420,6 @@ namespace {
         return std::tstring(str_eval_buf.data(), &str_eval_buf[str_size]);
     }
 
-    inline bool _rearrange_std_handles(const _StdHandlesState & std_handles_state,
-                                       HANDLE stdin_handle, DWORD stdin_handle_type, HANDLE stdout_handle, DWORD stdout_handle_type, HANDLE stderr_handle, DWORD stderr_handle_type)
-    {
-        HANDLE stdin_default_address_handle_dup = INVALID_HANDLE_VALUE;
-        HANDLE stdout_default_address_handle_dup = INVALID_HANDLE_VALUE;
-        HANDLE stderr_default_address_handle_dup = INVALID_HANDLE_VALUE;
-
-        HANDLE stdin_handle_dup = INVALID_HANDLE_VALUE;
-        HANDLE stdout_handle_dup = INVALID_HANDLE_VALUE;
-        HANDLE stderr_handle_dup = INVALID_HANDLE_VALUE;
-
-        // find invalid standard handle default addresses and duplicate into it
-        if (DuplicateHandle(GetCurrentProcess(), STD_INPUT_HANDLE_DEFAULT_ADDRESS, GetCurrentProcess(), &stdin_default_address_handle_dup, 0, !!std_handles_state.is_stdin_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
-            // stdin default address has valid handle
-            _close_handle(stdin_default_address_handle_dup);
-        }
-        else {
-            // stdin default address has not valid handle
-            if (stdin_handle_type != FILE_TYPE_CHAR) {
-                DuplicateHandle(GetCurrentProcess(), stdin_handle, GetCurrentProcess(), &stdin_handle_dup, 0, !!std_handles_state.is_stdin_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS);
-            }
-            else {
-                // stdin default address has not valid handle
-                stdin_handle_dup = _create_conin_handle(!!std_handles_state.is_stdin_inheritable);
-            }
-
-            if (_is_valid_handle(stdin_handle_dup)) {
-                int stdin_fileno = _fileno(stdin);
-                if (stdin_fileno >= 0) {
-                    //_close(stdin_fileno);
-
-                    stdin_handle = stdin_handle_dup;
-                    stdin_handle_dup = INVALID_HANDLE_VALUE;
-
-                    //stdin_fileno = _open_osfhandle((intptr_t)stdin_handle, _O_RDONLY | _O_BINARY);
-
-                    //SetStdHandle(STD_INPUT_HANDLE, stdin_handle);
-                }
-            }
-        }
-
-        if (DuplicateHandle(GetCurrentProcess(), STD_OUTPUT_HANDLE_DEFAULT_ADDRESS, GetCurrentProcess(), &stdout_default_address_handle_dup, 0, !!std_handles_state.is_stdout_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
-            // stdout default address has valid handle
-            _close_handle(stdout_default_address_handle_dup);
-        }
-        else {
-            // stdout default address has not valid handle
-            if (stdout_handle_type != FILE_TYPE_CHAR) {
-                DuplicateHandle(GetCurrentProcess(), stdout_handle, GetCurrentProcess(), &stdout_handle_dup, 0, !!std_handles_state.is_stdout_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS);
-            }
-            else {
-                // stdout default address has not valid handle
-                stdout_handle_dup = _create_conout_handle(!!std_handles_state.is_stdout_inheritable);
-            }
-
-            if (_is_valid_handle(stdout_handle_dup)) {
-                int stdout_fileno = _fileno(stdout);
-                if (stdout_fileno >= 0) {
-                    //_close(stdout_fileno);
-
-                    stdout_handle = stdout_handle_dup;
-                    stdout_handle_dup = INVALID_HANDLE_VALUE;
-
-                    //stdout_fileno = _open_osfhandle((intptr_t)stdout_handle, _O_WRONLY | _O_BINARY);
-
-                    //SetStdHandle(STD_OUTPUT_HANDLE, stdout_handle);
-                }
-            }
-        }
-
-        if (DuplicateHandle(GetCurrentProcess(), STD_ERROR_HANDLE_DEFAULT_ADDRESS, GetCurrentProcess(), &stderr_default_address_handle_dup, 0, !!std_handles_state.is_stderr_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
-            // stderr default address has valid handle
-            _close_handle(stderr_default_address_handle_dup);
-        }
-        else {
-            // stderr default address has not valid handle
-            if (stderr_handle_type != FILE_TYPE_CHAR) {
-                DuplicateHandle(GetCurrentProcess(), stderr_handle, GetCurrentProcess(), &stderr_handle_dup, 0, !!std_handles_state.is_stderr_inheritable ? TRUE : FALSE, DUPLICATE_SAME_ACCESS);
-            }
-            else {
-                // stderr default address has not valid handle
-                stderr_handle_dup = _create_conout_handle(!!std_handles_state.is_stderr_inheritable);
-            }
-
-            if (_is_valid_handle(stderr_handle_dup)) {
-                int stderr_fileno = _fileno(stderr);
-                if (stderr_fileno >= 0) {
-                    //_close(stderr_fileno);
-
-                    stderr_handle = stderr_handle_dup;
-                    stderr_handle_dup = INVALID_HANDLE_VALUE;
-
-                    //stderr_fileno = _open_osfhandle((intptr_t)stderr_handle, _O_WRONLY | _O_BINARY);
-
-                    //SetStdHandle(STD_ERROR_HANDLE, stderr_handle);
-                }
-            }
-        }
-
-        return true;
-    }
-
     template <typename Flags, typename Options>
     inline bool _sanitize_std_handles(int & ret, DWORD & win_error, _StdHandlesState & std_handles_state, const Flags & flags, const Options & options)
     {
@@ -2832,14 +2637,6 @@ namespace {
                 break;
             }
             else if (stdin_handle_type != FILE_TYPE_UNKNOWN && stdout_handle_type != FILE_TYPE_UNKNOWN && stderr_handle_type != FILE_TYPE_UNKNOWN) {
-                if (g_is_process_elevating) {
-                    // Method #2:
-                    //
-                    if (!_rearrange_std_handles(std_handles_state, stdin_handle, stdin_handle_type, stdout_handle, stdout_handle_type, stderr_handle, stderr_handle_type)) {
-                        return false;
-                    }
-                }
-
                 break;
             }
 
@@ -2851,14 +2648,16 @@ namespace {
             //  This happens because:
             //
             //  1. Process B has different or higher privileges than process A.
+            //
             //  2. Process B attaches to the console window of process A.
             //      NOTE:
             //        Additional issues with console attachment:
             //          `AllocConsole, AttachConsole (traditional)` : https://github.com/rprichard/win32-console-docs#allocconsole-attachconsole-traditional
+            //
             //  3. Process A has different standard handle address layout opposed to the process B (may be because the process B can not inherit the standard handles addresses layout under the Administrator privileges isolation).
             //
             //  When the console window of the process A attaches to the process B with the same privileges, then the process B gets the standard handle addresses layout of the process A.
-            //  When the console window of the process A attaches to the process B with the different privileges, then the process B gets default standard handle addresses layout,
+            //  When the console window of the process A with Administrator privileges attaches to the process B with a user privileges, then the process B gets default standard handle addresses layout,
             //  which means all the standard handles inside the CRT of the process B must be invalidated and reinitialized, but unfortunately the CRT has no functionality for that.
             //  
             //  Example:
@@ -2869,30 +2668,17 @@ namespace {
             //
             //      The process B would contain invalid stdout handle and function `GetFileType((HANDLE)0x07)` would return 0 (FILE_TYPE_UNKNOWN).
             //
-            //  There is 2 workarounds for that:
+            //  There is a workaround for that:
             //
             //  1. Reopen all such handles from `CONIN$` and `CONOUT$` or `\\.\CON` files.
             //     This method has a problem, the `GetConsoleMode` function returns 0 for such an opened handle which means the `ENABLE_PROCESSED_OUTPUT` flag in stdout/stderr has dropped and
             //     the output will contain printable form of carriage return and line feed characters. In the same time the `SetConsoleMode` fails on such handles opened through the `CreateFile`.
             //     So this method only fixes the standard handles validity without it's console mode flags.
             //
-            //  2. Adjust standard handles in the process A before execute process B.
-            //     This means all standard handles in the process A must be rearranged through the `DuplicateHandle` or `CreateFile` to gain for the process B the standard handle addresses layout before the process B would be executed.
-            //     This can be achieved because the process B basically has default standard handles addresses layout: stdin=0x03, stdin=0x07, stdin=0x0b.
-            //
-            //     NOTE: Currently this method does not work properly under the Windows 7 because of an issue with a console handle duplication between processes:
-            //
-            //           `Console handles and handle sets (traditional)` : https://github.com/rprichard/win32-console-docs#console-handles-and-handle-sets-traditional
-            //
-            //  The code below has use of method #1. The `_rearrange_std_handles` function has use of method #2.
-            //
 
             // TODO:
             //  Get injected from here into parent process being used for console window attachment and
             //  directly call `GetStdHandle` functions to read standard handle addresses layout to update the standard handles (call `StdStdHandle`) instead of below code.
-            //
-
-            // Method #1:
             //
 
             // NOTE:

@@ -268,6 +268,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
 const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
+    _T("/no-sys-dialog-ui"),
     _T("/no-wait"),
     _T("/no-window"),
     _T("/no-window-console"),
@@ -375,7 +376,6 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
     _T("/print-win-error-string"),
     _T("/print-shell-error-string"),
     _T("/no-print-gen-error-string"),
-    _T("/no-sys-dialog-ui"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -2581,22 +2581,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         is_conout_processed_for_detach_alloc_attach_to_console = true;
 
                         if (!g_owned_console_window) {
-#ifndef _CONSOLE
                             _detach_stderr();
                             _detach_stdout();
                             _detach_stdin();
-#endif
 
                             if (g_inherited_console_window) {
                                 _free_console(std_handles_state);
                             }
                             g_inherited_console_window = _alloc_console(std_handles_state);
 
-#ifdef _CONSOLE
-                            _resync_crt_std_handles();
-#else
                             _reinit_crt_std_handles();
-#endif
                         }
 
                         if (g_options.has.create_console_title) {
@@ -2633,22 +2627,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                             is_conout_processed_for_detach_alloc_attach_to_console = true;
 
-#ifndef _CONSOLE
                             _detach_stderr();
                             _detach_stdout();
                             _detach_stdin();
-#endif
 
                             if (g_inherited_console_window) {
                                 _free_console(std_handles_state);
                             }
                             g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
 
-#ifdef _CONSOLE
-                            _resync_crt_std_handles();
-#else
                             _reinit_crt_std_handles();
-#endif
 
                             if (g_options.has.console_title) {
                                 SetConsoleTitle(g_options.console_title.c_str());
@@ -2667,22 +2655,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     }
 
                     if (!g_owned_console_window) {
-#ifndef _CONSOLE
                         _detach_stderr();
                         _detach_stdout();
                         _detach_stdin();
-#endif
 
                         if (g_inherited_console_window) {
                             _free_console(std_handles_state);
                         }
                         g_inherited_console_window = _alloc_console(std_handles_state);
 
-#ifdef _CONSOLE
-                        _resync_crt_std_handles();
-#else
                         _reinit_crt_std_handles();
-#endif
 
                         if (g_options.has.create_console_title) {
                             SetConsoleTitle(g_options.create_console_title.c_str());
@@ -2719,22 +2701,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         is_conout_processed_for_detach_alloc_attach_to_console = true;
 
-#ifndef _CONSOLE
                         _detach_stderr();
                         _detach_stdout();
                         _detach_stdin();
-#endif
 
                         if (g_inherited_console_window) {
                             _free_console(std_handles_state);
                         }
                         g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
 
-#ifdef _CONSOLE
-                        _resync_crt_std_handles();
-#else
                         _reinit_crt_std_handles();
-#endif
 
                         if (g_options.has.console_title) {
                             SetConsoleTitle(g_options.console_title.c_str());
@@ -2810,12 +2786,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             std_handles_state2.save_stdin_state(GetStdHandle(STD_INPUT_HANDLE));
             std_handles_state2.save_stdout_state(GetStdHandle(STD_OUTPUT_HANDLE));
             std_handles_state2.save_stderr_state(GetStdHandle(STD_ERROR_HANDLE));
-
-            _StdHandlesState std_handles_state3;
-
-            std_handles_state3.save_stdin_state(STD_INPUT_HANDLE_DEFAULT_ADDRESS);
-            std_handles_state3.save_stdout_state(STD_OUTPUT_HANDLE_DEFAULT_ADDRESS);
-            std_handles_state3.save_stderr_state(STD_ERROR_HANDLE_DEFAULT_ADDRESS);
 
             const int stdin_fileno2 = _fileno(stdin);
             const HANDLE registered_stdin_handle2 = (HANDLE)_get_osfhandle(stdin_fileno2 >= 0 ? stdin_fileno2 : STDIN_FILENO);

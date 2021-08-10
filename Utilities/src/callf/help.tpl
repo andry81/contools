@@ -136,14 +136,20 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Pause on exist if an error happened before a command line application
         execution. By default it prints "Press any key to continue..." message
         to the stdout.
+        Executable must be attached to a console, otherwise the pause would be
+        skipped.
 
       /pause-on-exit-if-error
         Pause on exist if an error happened. By default it prints
         "Press any key to continue..." message to the stdout.
+        Executable must be attached to a console, otherwise the pause would be
+        skipped.
 
       /pause-on-exit
         Pause on exist. By default it prints "Press any key to continue..."
         message to the stdout.
+        Executable must be attached to a console, otherwise the pause would be
+        skipped.
 
       /no-expand-env
         Don't expand `${...}` environment variables.
@@ -250,6 +256,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
           /ret-create-proc
           /ret-win-error
+          /no-sys-dialog-ui
           /no-wait
           /no-window
           /no-window-console
@@ -303,7 +310,6 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /print-win-error-string
           /print-shell-error-string
           /no-print-gen-error-string
-          /no-sys-dialog-ui
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
