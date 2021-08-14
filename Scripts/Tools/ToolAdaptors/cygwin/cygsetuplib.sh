@@ -7,8 +7,9 @@
 # Script can be ONLY included by "source" command.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
-source "${CONTOOLS_ROOT:-.}/traplib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include 'baselib.sh' || tkl_abort_include
+tkl_include 'traplib.sh' || tkl_abort_include
 
 function CygSetupIniPackageSectionIterator()
 {

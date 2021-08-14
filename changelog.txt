@@ -1,4 +1,8 @@
 2021.08.14:
+* new: Scripts/Tools/ToolAdaptors/cygwin: readme file
+* refactor: Scripts/Tools/ToolAdaptors/cygwin: code refactor
+
+2021.08.14:
 * changed: readmes update
 
 2021.08.10:

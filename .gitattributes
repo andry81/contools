@@ -299,6 +299,10 @@ Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd6432_k.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_nowait_cmd64_k.bat -text
+Scripts/Tools/ToolAdaptors/cygwin/README_EN.txt -text
+Scripts/Tools/ToolAdaptors/cygwin/cygsetupdiff.sh -text
+Scripts/Tools/ToolAdaptors/cygwin/cygsetuplib.sh -text
+Scripts/Tools/ToolAdaptors/cygwin/cygsetupprint.sh -text
 Scripts/Tools/ToolAdaptors/download/__init0__.bat -text
 Scripts/Tools/ToolAdaptors/download/__init__.bat -text
 Scripts/Tools/ToolAdaptors/download/config.vars -text
@@ -482,9 +486,6 @@ Scripts/Tools/cmake/set_vars_from_files.bat -text
 Scripts/Tools/cmake/update_build_type.bat -text
 Scripts/Tools/countlines.bat -text
 Scripts/Tools/cstresc.bat -text
-Scripts/Tools/cygsetupdiff.sh -text
-Scripts/Tools/cygsetuplib.sh -text
-Scripts/Tools/cygsetupprint.sh -text
 Scripts/Tools/cygver.bat -text
 Scripts/Tools/cygver.sh -text
 Scripts/Tools/diff/__init__.bat -text

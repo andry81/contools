@@ -13,7 +13,8 @@
 # Script ONLY for execution.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -eq 0) ]]; then
 
-source "${CONTOOLS_ROOT:-.}/cygsetuplib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include 'cygsetuplib.sh' || tkl_abort_include
 
 PrintPackageFieldFromCygSetupIni "$@"
 exit $?
