@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.07.26
+* 2021.08.14
 * contools
 
 ** README IS NOT ACTUAL AND UNDER CONSTRUCTION **
@@ -33,7 +33,8 @@
 A wide range of scripts for Windows interpreter (cmd.exe) and other
 interpreters such as bash shell (.sh), visual basic (.vbs), jscript (.js),
 python (.py), perl (.pl) and so on. Plus some set of standalone console
-utilities aside other utilities from cygwin, msys and mingw.
+utilities and tools aside other utilities and tools from cygwin, msys and
+mingw.
 
 WARNING:
   Use the SVN access to find out latest functionality and bug fixes.
