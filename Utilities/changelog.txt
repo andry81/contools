@@ -1,3 +1,23 @@
+2021.08.17:
+* new: src/callf: `/tee-conout-dup` flag to shortcut sequence of `/tee-stdout-dup 0` and `/tee-stderr-dup 0` options
+
+2021.08.16:
+* fixed: src/callf: missed to check for `ERROR_NO_DATA` error (pipe closed)
+* changed: src/callf: `/stdin-echo <0|1>` option replaced by pair of `/stdin-echo` and `/no-stdin-echo` flags
+* changed: src/callf: code cleanup
+* refactor: src/callf: code refactor
+
+2021.08.15:
+* fixed: src/callf: stdin tee read from character device stdin
+* changed: src/callf: reworked inbound and outbound pipe creation and utilization
+
+2021.08.12:
+* fixed: src/callf: missed case where stdin can be not reopened but has not a character device handle type and so must be piped into child stdin
+* fixed: src/callf: missed case where stdout/stderr can be not reopened but has not a character device handle type and so must be piped from child stdout/stderr
+* fixed: src/callf: rewrited child in/out piping to control piping over stdin/stdout/stderr independently
+* new: src/callf: `/pipe-stdin-to-child-stdin`, `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`, `/pipe-inout-child` flags to explicitly declare piping to/from a child process
+* refactor: src/callf: code refactor
+
 2021.08.10:
 * new: bin/contools: binaries update
 
@@ -7,7 +27,7 @@
          Removed `STD_*_HANDLE_DEFAULT_ADDRESS` and all related code (`_rearrange_std_handles`), Windows 8 does not utilize them anymore as was by default in the Windows 7.
          Removed `_resync_crt_std_handles` as having unstable results. Standard handles having too random nature under Windows 8 and, for example, two standard handles can has swapped addresses between 2 processes in inheritance chain (better completely detach CRT standard handles before (re)attach or (re)allocate console).
 * fixed: src/callf: unstable 0xc0000142 exception in `cmd.exe` process in Windows 8
-* fixed: Utilities/src/callf: unstable manual tests crashes in Windows 8
+* fixed: src/callf: unstable manual tests crashes in Windows 8
 * fixed: src/callf: manual tests pass under Windows 8 (several tests still fails, see readme file for details)
 * fixed: src/callf: minor flags fixup
 * fixed: src/callf: better os version detection

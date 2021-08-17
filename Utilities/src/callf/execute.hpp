@@ -9,6 +9,7 @@
 #include <tuple>
 #include <type_traits>
 #include <atomic>
+#include <algorithm>
 
 
 // std and tee files has different mutex name prefixes because should not be mixed for write
@@ -57,6 +58,8 @@ struct Flags
     bool            reopen_stdout_file_truncate;
     bool            reopen_stderr_file_truncate;
 
+    bool            tee_conout_dup;
+
     bool            tee_stdin_file_truncate;
     bool            tee_stdout_file_truncate;
     bool            tee_stderr_file_truncate;
@@ -96,8 +99,15 @@ struct Flags
     bool            allow_expand_unexisted_env;
     bool            allow_subst_empty_args;
 
+    bool            pipe_stdin_to_child_stdin;
+    bool            pipe_child_stdout_to_stdout;
+    bool            pipe_child_stderr_to_stderr;
+    bool            pipe_inout_child;
     bool            pipe_stdin_to_stdout;
     bool            shell_exec_expand_env;
+
+    bool            stdin_echo;
+    bool            no_stdin_echo;
 
     bool            create_child_console;
     bool            detach_child_console;
@@ -230,7 +240,6 @@ struct Options
     uint_t          tee_stdout_read_buf_size;
     uint_t          tee_stderr_read_buf_size;
 
-    int             stdin_echo;
     uint_t          show_as;
 
     // std::tuple<argument_offset_index, allow_expand_unexisted_env_var>:

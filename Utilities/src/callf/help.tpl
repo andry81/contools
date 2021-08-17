@@ -20,10 +20,12 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /ret-create-proc
         Return CreateProcess or ShellExecute return code.
+
         Has priority over all others `/ret-*` flags.
 
       /ret-win-error
         Return Win32 error code.
+
         Has priority over `/ret-child-exit` flag.
         Has no effect if `/ret-create-proc` flag is defined.
 
@@ -32,6 +34,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /ret-child-exit
         Return child process exit code (if has no `/no-wait` flag).
+
         Has no effect if any other `/ret-*` flag is defined.
 
       /print-win-error-string
@@ -55,6 +58,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /shell-exec <Verb>
         Call to ShellExecute instead of CreateProcess.
+
         Has no effect if idle execution is used.
 
         <Verb>:
@@ -153,10 +157,12 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /no-expand-env
         Don't expand `${...}` environment variables.
+
         Can not be used together with the `/allow-expand-unexisted-env` flag.
 
       /no-subst-vars
         Don't substitute `{...}` variables (command line arguments).
+
         Can not be used together with the `/allow-subst-empty-args` flag.
 
       /expand-env-arg<N>
@@ -166,12 +172,14 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         rest of arguments if not specifically enabled.
         Unexisted environment variables is not expanded by default, use the
         `/EE<N>` flag instead to specifically allow it.
+
         Can not be used together with the `/no-expand-env`, `/EE<N>` flags.
         Can be used together with the `/allow-expand-unexisted-env` flag.
 
       /EE<N>
         The same as `/E<N>` but additionally allows expansion of unexisted
         `${...}` environment variables.
+
         Can not be used together with the `/no-expand-env`,
         `/allow-expand-unexisted-env`, `/expand-env-arg<N>`, `/E<N>` flags.
 
@@ -182,6 +190,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         rest of arguments if not specifically enabled.
         Empty arguments is not substituted by default, use the `/SE<N>` flag
         instead to specifically allow it.
+
         Can not be used together with the `/no-subst-vars`, `/SE<N>` flags.
         Can be used together with the `/allow-subst-empty-args` flag.
 
@@ -190,6 +199,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         `{...}` variables.
         Still can not apply to command line arguments which does not exist,
         so to avoid that do use quotes without an argument.
+
         Can not be used together with the `/no-subst-vars`,
         `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>` flags.
 
@@ -200,6 +210,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /allow-expand-unexisted-env
         Allow expansion of unexisted `${...}` environment variables in
         all command line arguments.
+
         Can not be used together with the `/no-expand-env`, `/SE<N>` flags.
 
       /allow-subst-empty-args
@@ -207,14 +218,48 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         arguments.
         Still can not apply to command line arguments which does not exist,
         so to avoid that do use quotes without an argument.
+
         Can not be used together with the `/no-subst-vars`, `/EE<N>` flags.
 
       /no-std-inherit
         Prevent standard handles inheritance into child process.
 
+      /pipe-stdin-to-child-stdin
+        Pipe the process stdin into child stdin. This additionally disables
+        stdin handle inheritance.
+
+        Has no effect if idle execution is used.
+        Can not be used together with the `/pipe-stdin-to-stdout` flag.
+
+      /pipe-child-stdout-to-stdout
+        Pipe child stdout to the process stdout. This additionally disables
+        stdout handle inheritance.
+
+        Has no effect if idle execution is used.
+        Can not be used together with the `/pipe-stdin-to-stdout` flag.
+
+      /pipe-child-stderr-to-stderr
+        Pipe child stderr to the process stderr. This additionally disables
+        stderr handle inheritance.
+
+        Has no effect if idle execution is used.
+        Can not be used together with the `/pipe-stdin-to-stdout` flag.
+
+      /pipe-inout-child
+        Implies `/pipe-stdin-to-child-stdin`, `/pipe-child-stdout-to-stdout`,
+        `/pipe-child-stderr-to-stderr` flags altogether.
+
+        Has no effect if idle execution is used.
+        Can not be used together with the `/pipe-stdin-to-stdout` flag.
+
       /pipe-stdin-to-stdout
         Pipe the process stdin into stdout. This additionally disables
         standard handles inheritance (applies the `/no-std-inherit` flag).
+
+        Automatically implies if idle execution is used.
+        Can not be used together with the `/pipe-stdin-to-child-stdin`,
+        `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`,
+        `/pipe-inout-child` flags.
 
       /init-com
         CreateProcess
@@ -272,6 +317,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /own-console-title
           /console-title
           /stdin-echo
+          /no-stdin-echo
           /eval-backslash-esc or /e
           /eval-dbl-backslash-esc or /e\\
 
@@ -300,6 +346,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         the this-child (elevated) process.
         In case if `/elevate*` flag or option is not used or is not executed,
         then does declare `<Flags>` for the this-parent process only.
+
         The same flag can not be used together with `/promote-parent{ ... }`
         option. Silently overrides the same regular flags.
 
@@ -324,6 +371,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /promote-parent{ <Flags> }
         Does declare `<Flags>` for the this-parent process only independently
         to the `/elevate*` flag or option.
+
         The same flag can not be used together with `/promote{ ... }`
         option. Silently overrides the same regular flags.
 
@@ -339,6 +387,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /output-*
           /inout-*
           /tee-std[in|out|err]*
+          /tee-conout-dup
           /tee-output*
           /tee-inout*
           /mutex-std-*
@@ -402,11 +451,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /reopen-stdin <file>
         Reopen stdin as a `<file>` to read from.
+
         Can be used to read from a file instead from the stdin.
         Can not be used together with another `/reopen-stdin-as-*` option.
 
       /reopen-stdin-as-server-pipe <pipe>
         Reopen stdin as inbound server pipe `<pipe>` to read from.
+
         Can be used to read from a named pipe instead of the stdin.
         Can not be used together with the `/reopen-stdin` or another
         `/reopen-stdin-as-*` option.
@@ -426,6 +477,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /reopen-stdin-as-client-pipe <pipe>
         Reopen stdin as inbound client named pipe `<pipe>` to read from.
+
         Can be used to read from a named pipe instead of the stdin.
         Can not be used together with the `/reopen-stdin` or another
         `/reopen-stdin-as-*` option.
@@ -438,18 +490,20 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /reopen-std[out|err] <file>
         Reopen stdout/stderr as a `<file>` to write to.
+
         Can be used to write to a file instead to the stdout/stderr.
         Can be used together with `/tee-std[out|err]*` options.
         Can not be used together with another `/reopen-std[out|err]-as-*`
         option.
-        Can not be used together with the `/std[out|err]-dup` option.
+        Can not be used together with the same `/std[out|err]-dup` option.
 
       /reopen-std[out|err]-as-server-pipe <pipe>
         Reopen stdout/stderr as outbound server pipe `<pipe>` to write to.
+
         Can be used to write to a named pipe instead of the stdout/stderr.
         Can not be used together with the `/reopen-std[out|err]` or another
         `/reopen-std[out|err]-as-*` option.
-        Can not be used together with the `/std[out|err]-dup` option.
+        Can not be used together with the same `/std[out|err]-dup` option.
 
       /reopen-std[out|err]-as-server-pipe-connect-timeout <timeout>
         Timeout in milliseconds to wait for an inbound client named pipe
@@ -467,10 +521,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /reopen-std[out|err]-as-client-pipe <pipe>
         Reopen stdout/stderr as outbound client named pipe `<pipe>` to write
         to.
+
         Can be used to write to a named pipe instead of the stdout/stderr.
         Can not be used together with the `/reopen-std[out|err]` or
         another `/reopen-std[out|err]-as-*` option.
-        Can not be used together with the `/std[out|err]-dup` option.
+        Can not be used together with the same `/std[out|err]-dup` option.
 
       /reopen-std[out|err]-as-client-pipe-connect-timeout <timeout>
         Timeout in milliseconds to wait for an outbound server named pipe
@@ -490,6 +545,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         then has the same behaviour as a sequence of respective
         `/reopen-stdout` or `/reopen-stderr` options with the same `<file>`
         and so can be used instead.
+
         Can not be used together with the same `/reopen-std[out|err]` option.
 
       /stdin-output-flush
@@ -551,14 +607,18 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /tee-std[in|out|err] <file>
         Duplicate standard stream to a tee file `<file>`.
+
         Can be used together with another `/tee-std[in|out|err]-to-*` flag.
 
       /tee-std[in|out|err]-to-server-pipe <pipe>
         Duplicate standard stream to a tee outbound server named pipe `<pipe>`
-        to write to. Can be used together with `/tee-std[in|out|err]` option.
+        to write to.
+
+        Can be used together with `/tee-std[in|out|err]` option.
         Can not be used together with the
         `/tee-std[in|out|err]-to-server-pipe` option.
-        Can not be used together with the `/tee-std[in|out|err]-dup` option.
+        Can not be used together with the same `/tee-std[in|out|err]-dup`
+        option.
 
       /tee-std[in|out|err]-to-server-pipe-connect-timeout <timeout>
         Timeout in milliseconds to wait for an outbound server named pipe
@@ -576,10 +636,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /tee-std[in|out|err]-to-client-pipe <pipe>
         Duplicate standard stream to a tee outbound client named pipe `<pipe>`
-        to write to. Can be used together with `/tee-std[in|out|err]` option.
+        to write to.
+
+        Can be used together with `/tee-std[in|out|err]` option.
         Can not be used together with the
         `/tee-std[in|out|err]-to-server-pipe` option.
-        Can not be used together with the `/tee-std[in|out|err]-dup` option.
+        Can not be used together with the same `/tee-std[in|out|err]-dup`
+        option.
 
       /tee-std[in|out|err]-to-client-pipe-connect-timeout <timeout>
         Timeout in milliseconds to wait for an outbound client named pipe
@@ -591,10 +654,15 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Duplicate the tee respective handle from another one, where the
         `<fileno>` is the source handle index:
           0 = stdin, 1 = stdout, 2 = stderr.
-        Must be used after a respective `/tee-std[in|out|err] <file>` option.
-        Has the same behaviour as a sequence of respective `/tee-stdin`,
-        `/tee-stdout` or `/tee-stderr` options with the same `<file>` and so
-        can be used instead.
+        Must be used after a respective `/tee-std[in|out|err] <fileno>`
+        option. Has the same behaviour as a sequence of respective
+        `/tee-stdin`, `/tee-stdout` or `/tee-stderr` options with the same
+        `<fileno>` and so can be used instead.
+
+      /tee-conout-dup
+        Duplicate the tee stdout and stderr handle from tee stdin.
+        Has the same behaviour as a sequence of `/tee-stdout-dup 0` and
+        `/tee-stderr-dup 0` options and so can be used instead.
 
       /tee-std[in|out|err]-file-truncate
         Truncate instead of append on a tee file `<file>` open.
@@ -700,20 +768,24 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /attach-parent-console
         Attach console from a parent process or it's ancestors. If the current
-        process console is owned, then detaches it at first. Has no effect if
-        the current process console exists but not owned (inherited).
-
+        process console is owned, then detaches it at first.
+        
+        Has no effect if the current process console exists but not owned
+        (inherited).
         Has no effect if the `/create-console` is used.
         Can not be used together with `/detach-console` flag.
 
       /create-console-title <title>
         Change console window title on the current process console creation or
-        recreation. Has no effect if the current process console is not owned.
+        recreation.
+        
+        Has no effect if the current process console is not owned.
         Overrides the `/console-title` option.
         Can be used together with `/own-console-title` option.
 
       /own-console-title <title>
         Change console window title if the current process console is owned.
+
         Overrides the `/console-title` option.
         Can be used together with `/create-console-title` option.
         Has no effect on inherited console.
@@ -722,9 +794,17 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Change console window title. Applies only if non of
         `/create-console-title` and `/own-console-title` is applied.
 
-      /stdin-echo <0|1>
-        Explicitly enable or disable console input buffer echo before start
-        of a child process.
+      /stdin-echo
+        Explicitly enable console input buffer echo before start of a child
+        process.
+
+        Can be used together with `/no-stdin-echo` flag.
+
+      /no-stdin-echo
+        Explicitly disable console input buffer echo before start of a child
+        process.
+
+        Can be used together with `/stdin-echo` flag.
 
       /replace-args-in-tail <from> <to>
       /ra <from> <to>
@@ -780,7 +860,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         process tries to attach to a parent process console. To allow that
         use this flag.
 
-        Has meaning and implemented only for the `callfg` process.
+        Has meaning and implemented only for the `callfg` executable.
 
       /disable-conout-reattach-to-visible-console
         In case if the current process console is not visible and a parent
@@ -793,7 +873,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         In case of search a parent process tree for processes with attached
         console, the flag allows to attach to an invisible console.
         By default parent processes tree with invisible consoles has to be
-        skipped while searching for attached console.
+        skipped while searching for a console to attach.
 
         Has no effect if the `/attach-parent-console` is not used.
         Does not related to the

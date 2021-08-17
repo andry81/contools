@@ -962,6 +962,11 @@ namespace {
                                         int stdout_open_flags = _O_WRONLY | _O_BINARY,
                                         int stderr_open_flags = _O_WRONLY | _O_BINARY)
     {
+        // TODO:
+        //  Get injected from here into parent process being used for console window attachment and
+        //  directly call `GetStdHandle` functions to read standard handle addresses layout to update the standard handles (call `StdStdHandle`) instead of below code.
+        //
+
         const HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
         const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
         const HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
@@ -1881,13 +1886,13 @@ namespace {
                 if (!GetCPInfo(cp_out, &cp_info)) {
                     // fallback to module character set
 #ifdef _UNICODE
-                    cp_info.MaxCharSize = 2;
+                    cp_info.MaxCharSize = sizeof(wchar_t);
 #else
-                    cp_info.MaxCharSize = 1;
+                    cp_info.MaxCharSize = sizeof(char);
 #endif
                 }
 
-                if (cp_info.MaxCharSize != 1) {
+                if (cp_info.MaxCharSize != sizeof(char)) {
                     FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                         NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPWSTR)&win_error_msg_buf_w, 0, NULL);
 #ifdef _UNICODE
@@ -1895,13 +1900,13 @@ namespace {
 #else
                     std::vector<char> char_buf;
 
-                    int num_chars = WideCharToMultiByte(cp_out, 0, win_error_msg_buf_w, -1, NULL, 0, NULL, NULL);
-                    if (num_chars) {
-                        char_buf.resize(size_t(num_chars) + sizeof(char_buf[0]));
-                        num_chars = WideCharToMultiByte(cp_out, 0, win_error_msg_buf_w, -1, char_buf.data(), (std::min)((size_t)num_chars, char_buf.size()), NULL, NULL);
+                    int num_translated_bytes = WideCharToMultiByte(cp_out, 0, win_error_msg_buf_w, -1, NULL, 0, NULL, NULL);
+                    if (num_translated_bytes) {
+                        char_buf.resize(size_t(num_translated_bytes) + sizeof(char_buf[0]));
+                        num_translated_bytes = WideCharToMultiByte(cp_out, 0, win_error_msg_buf_w, -1, char_buf.data(), (std::min)((size_t)num_translated_bytes, char_buf.size()), NULL, NULL);
                     }
 
-                    if (num_chars) {
+                    if (num_translated_bytes) {
                         ret = _format_stderr_message("win32: \"%s\"\n", char_buf.data());
                     }
 #endif
@@ -1912,13 +1917,13 @@ namespace {
 #ifdef _UNICODE
                     std::vector<wchar_t> char_buf;
 
-                    int num_chars = MultiByteToWideChar(cp_out, 0, win_error_msg_buf_a, -1, NULL, 0);
-                    if (num_chars) {
-                        char_buf.resize(size_t(num_chars) + sizeof(char_buf[0]));
-                        num_chars = MultiByteToWideChar(cp_out, 0, win_error_msg_buf_a, -1, char_buf.data(), (std::min)((size_t)num_chars, char_buf.size()));
+                    int num_translated_chars = MultiByteToWideChar(cp_out, 0, win_error_msg_buf_a, -1, NULL, 0);
+                    if (num_translated_chars) {
+                        char_buf.resize(size_t(num_translated_chars) + sizeof(char_buf[0]));
+                        num_translated_chars = MultiByteToWideChar(cp_out, 0, win_error_msg_buf_a, -1, char_buf.data(), (std::min)((size_t)num_translated_chars, char_buf.size()));
                     }
 
-                    if (num_chars) {
+                    if (num_translated_chars) {
                         ret = _format_stderr_message(L"win32: \"%s\"\n", char_buf.data());
                     }
 #else
@@ -1951,13 +1956,13 @@ namespace {
             if (!GetCPInfo(cp_out, &cp_info)) {
                 // fallback to module character set
 #ifdef _UNICODE
-                cp_info.MaxCharSize = 2;
+                cp_info.MaxCharSize = sizeof(wchar_t);
 #else
-                cp_info.MaxCharSize = 1;
+                cp_info.MaxCharSize = sizeof(char);
 #endif
             }
 
-            if (cp_info.MaxCharSize != 1) {
+            if (cp_info.MaxCharSize != sizeof(char)) {
                 FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                     NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPWSTR)&win_error_msg_buf_w, 0, NULL);
                 _print_stderr_message(L"win32: \"%s\"\n", win_error_msg_buf_w);
@@ -2674,11 +2679,6 @@ namespace {
             //     This method has a problem, the `GetConsoleMode` function returns 0 for such an opened handle which means the `ENABLE_PROCESSED_OUTPUT` flag in stdout/stderr has dropped and
             //     the output will contain printable form of carriage return and line feed characters. In the same time the `SetConsoleMode` fails on such handles opened through the `CreateFile`.
             //     So this method only fixes the standard handles validity without it's console mode flags.
-            //
-
-            // TODO:
-            //  Get injected from here into parent process being used for console window attachment and
-            //  directly call `GetStdHandle` functions to read standard handle addresses layout to update the standard handles (call `StdStdHandle`) instead of below code.
             //
 
             // NOTE:

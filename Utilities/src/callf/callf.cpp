@@ -149,6 +149,10 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/allow-throw-seh-except"),
     _T("/allow-expand-unexisted-env"),
     _T("/allow-subst-empty-args"),
+    _T("/pipe-stdin-to-child-stdin"),
+    _T("/pipe-child-stdout-to-stdout"),
+    _T("/pipe-child-stderr-to-stderr"),
+    _T("/pipe-inout-child"),
     _T("/pipe-stdin-to-stdout"),
     _T("/init-com"),
     _T("/wait-child-start"),
@@ -220,6 +224,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/tee-stdin-dup"),
     _T("/tee-stdout-dup"),
     _T("/tee-stderr-dup"),
+    _T("/tee-conout-dup"),
     _T("/tee-stdin-file-truncate"),
     _T("/tee-stdout-file-truncate"),
     _T("/tee-stderr-file-truncate"),
@@ -251,6 +256,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/own-console-title"),
     _T("/console-title"),
     _T("/stdin-echo"),
+    _T("/no-stdin-echo"),
     _T("/replace-args"), _T("/r"),
     _T("/replace-args-in-tail"), _T("/ra"),
     _T("/eval-backslash-esc"), _T("/e"),
@@ -321,6 +327,7 @@ const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
     _T("/own-console-title"),
     _T("/console-title"),
     _T("/stdin-echo"),
+    _T("/no-stdin-echo"),
     _T("/eval-backslash-esc"), _T("/e"),
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
     _T("/disable-wow64-fs-redir"),
@@ -451,6 +458,7 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/tee-stdin-dup"),
     _T("/tee-stdout-dup"),
     _T("/tee-stderr-dup"),
+    _T("/tee-conout-dup"),
     _T("/tee-stdin-file-truncate"),
     _T("/tee-stdout-file-truncate"),
     _T("/tee-stderr-file-truncate"),
@@ -809,6 +817,34 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/allow-subst-empty-args"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.allow_subst_empty_args = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/pipe-stdin-to-child-stdin"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.pipe_stdin_to_child_stdin = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/pipe-child-stdout-to-stdout"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.pipe_child_stdout_to_stdout = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/pipe-child-stderr-to-stderr"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.pipe_child_stderr_to_stderr = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/pipe-inout-child"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.pipe_inout_child = true;
             return 1;
         }
         return 0;
@@ -1727,6 +1763,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         else error = invalid_format_flag(start_arg);
         return 2;
     }
+    if (IsArgEqualTo(arg, _T("/tee-conout-dup"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.tee_conout_dup = true;
+            return 1;
+        }
+        return 0;
+    }
     if (IsArgEqualTo(arg, _T("/tee-stdin-file-truncate"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stdin_file_truncate = true;
@@ -2004,19 +2047,18 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/stdin-echo"))) {
-        arg_offset += 1;
-        if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
-            if (IsArgInFilter(start_arg, include_filter_arr)) {
-                const int stdin_echo = _ttoi(arg);
-                if (stdin_echo >= 0) {
-                    options.stdin_echo = stdin_echo;
-                }
-                return 1;
-            }
-            return 0;
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.stdin_echo = true;
+            return 1;
         }
-        else error = invalid_format_flag(start_arg);
-        return 2;
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/no-stdin-echo"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.no_stdin_echo = true;
+            return 1;
+        }
+        return 0;
     }
     if (IsArgEqualTo(arg, _T("/replace-args")) || IsArgEqualTo(arg, _T("/r"))) {
         arg_offset += 1;
@@ -3062,6 +3104,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("tee stderr is mixed\n"));
             }
 
+            if (g_flags.tee_conout_dup && (tee_stdout_as_count >= 1 || tee_stderr_as_count >= 1 || g_options.tee_stdout_dup != -1 || g_options.tee_stderr_dup != -1)) {
+                return invalid_format_flag_message(_T("tee conout is mixed\n"));
+            }
+
             // tee std dup
 
             if (g_options.tee_stdin_dup != -1) {
@@ -3094,6 +3140,33 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
             }
 
+            if (g_flags.tee_conout_dup && !tee_stdin_as_count) {
+                return invalid_format_flag_message(_T("tee stdin duplication of not opened handle into conout\n"));
+            }
+
+            // /pipe-*
+
+            if (g_flags.pipe_stdin_to_stdout) {
+                if (g_flags.pipe_stdin_to_child_stdin) {
+                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-stdin-to-child-stdin <-> /pipe-stdin-to-stdout\n"));
+                }
+                if (g_flags.pipe_child_stdout_to_stdout) {
+                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-child-stdout-to-stdout <-> /pipe-stdin-to-stdout\n"));
+                }
+                if (g_flags.pipe_child_stderr_to_stderr) {
+                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-child-stderr-to-stderr <-> /pipe-stdin-to-stdout\n"));
+                }
+                if (g_flags.pipe_inout_child) {
+                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-inout-child <-> /pipe-stdin-to-stdout\n"));
+                }
+            }
+
+            // /stdin-echo
+
+            if (g_flags.stdin_echo && g_flags.no_stdin_echo) {
+                return invalid_format_flag_message(_T("stdin echo flags are mixed: /stdin-echo <-> /no-stdin-echo\n"));
+            }
+
             // promote{ ... } vs promote-parent{ ... }
 
             if (g_promote_options.chcp_in != 0 && g_promote_parent_options.chcp_in != 0) {
@@ -3103,53 +3176,53 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_out=%i promote-parent.chcp_out=%i\n"), g_promote_options.chcp_out, g_promote_parent_options.chcp_out);
             }
             if (g_promote_flags.attach_parent_console && g_promote_parent_flags.attach_parent_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: attach_parent_console\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /attach-parent-console\n"));
             }
 
             if (g_promote_flags.pause_on_exit_if_error_before_exec && g_promote_parent_flags.pause_on_exit_if_error_before_exec) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: pause_on_exit_if_error_before_exec\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /pause-on-exit-if-error-before-exec\n"));
             }
             if (g_promote_flags.pause_on_exit_if_error && g_promote_parent_flags.pause_on_exit_if_error) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: pause_on_exit_if_error\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /pause-on-exit-if-error\n"));
             }
             if (g_promote_flags.pause_on_exit && g_promote_parent_flags.pause_on_exit) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: pause_on_exit\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /pause-on-exit\n"));
             }
 
             if (g_promote_flags.disable_wow64_fs_redir && g_promote_parent_flags.disable_wow64_fs_redir) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: disable_wow64_fs_redir\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-wow64-fs-redir\n"));
             }
 
             if (g_promote_flags.allow_gui_autoattach_to_parent_console && g_promote_parent_flags.allow_gui_autoattach_to_parent_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: allow_gui_autoattach_to_parent_console\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /allow-gui-autoattach-to-parent-console\n"));
             }
             if (g_promote_flags.disable_conout_reattach_to_visible_console && g_promote_parent_flags.disable_conout_reattach_to_visible_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: disable_conout_reattach_to_visible_console\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-conout-reattach-to-visible-console\n"));
             }
             if (g_promote_flags.allow_conout_attach_to_invisible_parent_console && g_promote_parent_flags.allow_conout_attach_to_invisible_parent_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: allow_conout_attach_to_invisible_parent_console\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /allow-conout-attach-to-invisible-parent-console\n"));
             }
             if (g_promote_flags.disable_conout_duplicate_to_parent_console_on_error && g_promote_parent_flags.disable_conout_duplicate_to_parent_console_on_error) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: disable_conout_duplicate_to_parent_console_on_error\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-conout-duplicate-to-parent-console-on-error\n"));
             }
 
             // `/no-expand-env` vs `/allow-expand-unexisted-env`
             if (g_flags.no_expand_env && g_flags.allow_expand_unexisted_env) {
-                return invalid_format_flag_message(_T("`/no-expand-env` flag mixed with `/allow-expand-unexisted-env`\n"));
+                return invalid_format_flag_message(_T("environment variables expansion flags are mixed: /no-expand-env <-> /allow-expand-unexisted-env\n"));
             }
 
             // `/expand-env-arg<N>`, `/E<N>`, `/EE<N>` vs `/no-expand-env`
-            if (!g_options.expand_env_args.empty() && g_flags.no_expand_env) {
-                return invalid_format_flag_message(_T("`/expand-env-arg<N>`, `/E<N>`, `/EE<N>` flags mixed with `/no-expand-env`\n"));
+            if (g_flags.no_expand_env && !g_options.expand_env_args.empty()) {
+                return invalid_format_flag_message(_T("environment variables expansion flags are mixed: /no-expand-env <-> /expand-env-arg<N>, /E<N>, /EE<N>\n"));
             }
 
             // `/EE<N>` vs `/allow-expand-unexisted-env`
-            if (!g_options.expand_env_args.empty() && g_flags.allow_expand_unexisted_env) {
+            if (g_flags.allow_expand_unexisted_env && !g_options.expand_env_args.empty()) {
                 for (auto it = g_options.expand_env_args.begin(); it != g_options.expand_env_args.end(); ++it) {
                     const int expand_env_arg_index = std::get<0>(*it);
                     const bool allow_expand_unexisted_env = std::get<1>(*it);
                     if (allow_expand_unexisted_env) {
-                        return invalid_format_flag_message(_T("`/EE<N>` flags mixed with `/allow-expand-unexisted-env`\n"));
+                        return invalid_format_flag_message(_T("environment variables expansion flags are mixed: /allow-expand-unexisted-env <-> /EE<N>\n"));
                     }
                 }
             }
@@ -3162,7 +3235,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     for (auto it2 = next_it; it2 != g_options.expand_env_args.end(); ++it2) {
                         const int expand_env_arg_index2 = std::get<0>(*it2);
                         if (expand_env_arg_index == expand_env_arg_index2) {
-                            return invalid_format_flag_message(_T("`/expand-env-arg<N>`, `/E<N>`, `/EE<N>` flags mixed with `/expand-env-arg<N>`, `/E<N>`, `/EE<N>`: N=%i\n"), expand_env_arg_index);
+                            return invalid_format_flag_message(_T("environment variables expansion flags are mixed: /expand-env-arg<N>, /E<N> <-> /EE<N>: N=%i\n"), expand_env_arg_index);
                         }
                     }
                 }
@@ -3170,12 +3243,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             // `/no-subst-vars` vs `/allow-subst-empty-args`
             if (g_flags.no_subst_vars && g_flags.allow_subst_empty_args) {
-                return invalid_format_flag_message(_T("`/no-subst-vars` flag mixed with `/allow-subst-empty-args`\n"));
+                return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /allow-subst-empty-args\n"));
             }
 
             // `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` vs `/no-expand-env`
             if (!g_options.subst_vars_args.empty() && g_flags.no_subst_vars) {
-                return invalid_format_flag_message(_T("`/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` flags mixed with `/no-subst-vars`\n"));
+                return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /subst-vars-arg<N>, /S<N>, /SE<N>\n"));
             }
 
             // `/SE<N>` vs `/allow-subst-empty-args`
@@ -3184,7 +3257,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     const int subst_vars_arg_index = std::get<0>(*it);
                     const bool allow_subst_empty_arg = std::get<1>(*it);
                     if (allow_subst_empty_arg) {
-                        return invalid_format_flag_message(_T("`/SE<N>` flags mixed with `/allow-subst-empty-args`\n"));
+                        return invalid_format_flag_message(_T("variables substitution flags are mixed: /allow-subst-empty-args <-> /SE<N>\n"));
                     }
                 }
             }
@@ -3197,7 +3270,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     for (auto it2 = next_it; it2 != g_options.subst_vars_args.end(); ++it2) {
                         const int subst_arg_index2 = std::get<0>(*it2);
                         if (subst_arg_index == subst_arg_index2) {
-                            return invalid_format_flag_message(_T("`/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` flags mixed with `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>`: N=%i\n"), subst_arg_index);
+                            return invalid_format_flag_message(_T("variables substitution flags are mixed: /subst-vars-arg<N>, /S<N> <-> /SE<N>: N=%i\n"), subst_arg_index);
                         }
                     }
                 }
@@ -3514,9 +3587,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     g_options.shell_exec_verb = _T("runas");
                 }
 
+                const LPCTSTR app = program_file_name ? program_file_name : (LPCTSTR)NULL;
+                const size_t app_len = program_file_name ? tstrlen(program_file_name) : 0;
+
                 return ExecuteProcess(
-                    program_file_name ? program_file_name : (LPCTSTR)NULL,
-                    program_file_name ? tstrlen(program_file_name) : 0,
+                    app,
+                    app_len,
                     !elevated_cmd_out_str.empty() ? elevated_cmd_out_str.c_str() : (LPCTSTR)NULL,
                     !elevated_cmd_out_str.empty() ? elevated_cmd_out_str.length() : 0
                 );
@@ -3529,9 +3605,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             SubstOptionsPlaceholders(g_options);
 
+            const LPCTSTR app = in_args.app_fmt_str ? out_args.app_fmt_str.c_str() : (LPCTSTR)NULL;
+            const size_t app_len = in_args.app_fmt_str ? out_args.app_fmt_str.length() : 0;
+
             return ExecuteProcess(
-                in_args.app_fmt_str ? out_args.app_fmt_str.c_str() : (LPCTSTR)NULL,
-                in_args.app_fmt_str ? out_args.app_fmt_str.length() : 0,
+                app,
+                app_len,
                 in_args.cmd_fmt_str ? out_args.cmd_fmt_str.c_str() : (LPCTSTR)NULL,
                 in_args.cmd_fmt_str ? out_args.cmd_fmt_str.length() : 0
             );

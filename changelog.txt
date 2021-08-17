@@ -1,9 +1,29 @@
+2021.08.17:
+* new: Utilities/src/callf: `/tee-conout-dup` flag to shortcut sequence of `/tee-stdout-dup 0` and `/tee-stderr-dup 0` options
+
+2021.08.16:
+* fixed: Utilities/src/callf: missed to check for `ERROR_NO_DATA` error (pipe closed)
+* changed: Utilities/src/callf: `/stdin-echo <0|1>` option replaced by pair of `/stdin-echo` and `/no-stdin-echo` flags
+* changed: Utilities/src/callf: code cleanup
+* refactor: Utilities/src/callf: code refactor
+
+2021.08.15:
+* fixed: Utilities/src/callf: stdin tee read from character device stdin
+* changed: Utilities/src/callf: reworked inbound and outbound pipe creation and utilization
+
 2021.08.14:
 * new: Scripts/Tools/ToolAdaptors/cygwin: readme file
 * refactor: Scripts/Tools/ToolAdaptors/cygwin: code refactor
 
 2021.08.14:
 * changed: readmes update
+
+2021.08.12:
+* fixed: Utilities/src/callf: missed case where stdin can be not reopened but has not a character device handle type and so must be piped into child stdin
+* fixed: Utilities/src/callf: missed case where stdout/stderr can be not reopened but has not a character device handle type and so must be piped from child stdout/stderr
+* fixed: Utilities/src/callf: rewrited child in/out piping to control piping over stdin/stdout/stderr independently
+* new: Utilities/src/callf: `/pipe-stdin-to-child-stdin`, `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`, `/pipe-inout-child` flags to explicitly declare piping to/from a child process
+* refactor: Utilities/src/callf: code refactor
 
 2021.08.10:
 * new: Utilities/bin/contools: binaries update
