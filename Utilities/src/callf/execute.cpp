@@ -773,7 +773,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             if (!num_bytes_read && !stream_eof) {
                                 // check on outbound write error
                                 SetLastError(0); // just in case
-                                if (!WriteFile(g_stdin_pipe_write_handle, stdin_byte_buf.data(), 0, &num_bytes_written, NULL)) {
+                                if (!WriteFile(g_stdin_pipe_write_handle, "", 0, &num_bytes_written, NULL)) {
                                     if (thread_data.cancel_io) break;
 
                                     stream_eof = true;
@@ -908,29 +908,13 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             case tm_char_to_char:
                             case tm_wchar_to_char:
                                 // Unicode -> Ascii
-                                num_translated_bytes = WideCharToMultiByte(cp_out, 0, stdin_wchar_buf.data(), num_chars_read, NULL, 0, NULL, NULL);
-                                if (num_translated_bytes) {
-                                    translated_char_buf.resize(num_translated_bytes);
-
-                                    num_translated_bytes = WideCharToMultiByte(cp_out, 0, stdin_wchar_buf.data(), num_chars_read,
-                                        translated_char_buf.data(), num_translated_bytes, NULL, NULL);
-                                }
+                                num_translated_bytes = _wide_char_to_multi_byte(cp_out, stdin_wchar_buf.data(), num_chars_read, translated_char_buf);
                                 break;
 
                             case tm_wchar_to_wchar:
                             case tm_char_to_wchar:
                                 // Unicode -> Unicode
                                 break;
-
-                            //    // Ascii -> Unicode
-                            //    num_translated_chars = MultiByteToWideChar(cp_out, 0, (LPCSTR)stdin_byte_buf.data(), num_bytes_read, NULL, 0);
-                            //    if (num_translated_chars) {
-                            //        translated_wchar_buf.resize(num_translated_chars);
-
-                            //        num_translated_chars = MultiByteToWideChar(cp_out, 0, (LPCSTR)stdin_byte_buf.data(), num_bytes_read,
-                            //            translated_wchar_buf.data(), num_translated_chars);
-                            //    }
-                            //    break;
                             }
 
                             if (_is_valid_handle(g_tee_file_stdin_handle)) {
@@ -944,7 +928,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                     switch (translation_mode) {
                                     case tm_char_to_char:
                                     case tm_wchar_to_char:
-                                        WriteFile(g_tee_file_stdin_handle, translated_char_buf.data(), num_translated_bytes, &num_bytes_written, NULL);
+                                        WriteFile(g_tee_file_stdin_handle, num_translated_bytes ? translated_char_buf.data() : "", num_translated_bytes, &num_bytes_written, NULL);
                                         break;
 
                                     case tm_wchar_to_wchar:
@@ -973,7 +957,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 switch (translation_mode) {
                                 case tm_char_to_char:
                                 case tm_wchar_to_char:
-                                    WriteFile(g_tee_named_pipe_stdin_handle, translated_char_buf.data(), num_translated_bytes, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_named_pipe_stdin_handle, num_translated_bytes ? translated_char_buf.data() : "", num_translated_bytes, &num_bytes_written, NULL);
                                     break;
 
                                 case tm_wchar_to_wchar:
@@ -998,7 +982,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 switch (translation_mode) {
                                 case tm_char_to_char:
                                 case tm_wchar_to_char:
-                                    is_written = WriteFile(g_stdin_pipe_write_handle, translated_char_buf.data(), num_translated_bytes, &num_bytes_written, NULL);
+                                    is_written = WriteFile(g_stdin_pipe_write_handle, num_translated_bytes ? translated_char_buf.data() : "", num_translated_bytes, &num_bytes_written, NULL);
                                     break;
 
                                 case tm_wchar_to_wchar:
@@ -1042,7 +1026,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             if (!num_chars_read && !stream_eof) {
                                 // check on outbound write error
                                 SetLastError(0); // just in case
-                                if (!WriteFile(g_stdin_pipe_write_handle, stdin_wchar_buf.data(), 0, &num_bytes_written, NULL)) {
+                                if (!WriteFile(g_stdin_pipe_write_handle, "", 0, &num_bytes_written, NULL)) {
                                     if (thread_data.cancel_io) break;
 
                                     stream_eof = true;
@@ -1899,7 +1883,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                     }
                     else if (!stream_eof && !num_bytes_avail) {
                         SetLastError(0); // just in case
-                        if (!WriteFile(g_stdout_handle, stdin_byte_buf.data(), 0, &num_bytes_written, NULL)) {
+                        if (!WriteFile(g_stdout_handle, "", 0, &num_bytes_written, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             stream_eof = true;
@@ -2591,7 +2575,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             thread_data.win_error = win_error;
                             if (!g_flags.no_print_gen_error_string) {
                                 thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect to reopened stdin as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                    _format_stderr_message(_T("could not client connect of reopened stdin as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                         win_error, win_error, g_options.reopen_stdin_as_client_pipe.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -2705,7 +2689,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             thread_data.win_error = win_error;
                             if (!g_flags.no_print_gen_error_string) {
                                 thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect to stdin tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                    _format_stderr_message(_T("could not client connect of stdin tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                         win_error, win_error, g_options.tee_stdin_to_client_pipe.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -2827,7 +2811,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             thread_data.win_error = win_error;
                             if (!g_flags.no_print_gen_error_string) {
                                 thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect to reopened stdout as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                    _format_stderr_message(_T("could not client connect of reopened stdout as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                         win_error, win_error, g_options.reopen_stdout_as_client_pipe.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -2941,7 +2925,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             thread_data.win_error = win_error;
                             if (!g_flags.no_print_gen_error_string) {
                                 thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect to stdout tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                    _format_stderr_message(_T("could not client connect of stdout tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                         win_error, win_error, g_options.tee_stdout_to_client_pipe.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -3063,7 +3047,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             thread_data.win_error = win_error;
                             if (!g_flags.no_print_gen_error_string) {
                                 thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect to reopened stderr as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                    _format_stderr_message(_T("could not client connect of reopened stderr as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                         win_error, win_error, g_options.reopen_stderr_as_client_pipe.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -3177,7 +3161,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             thread_data.win_error = win_error;
                             if (!g_flags.no_print_gen_error_string) {
                                 thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect to stderr tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                    _format_stderr_message(_T("could not client connect of stderr tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                         win_error, win_error, g_options.tee_stderr_to_client_pipe.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -4728,7 +4712,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
 int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 {
 #ifdef _DEBUG
-    //_tprintf(_T(">%s\n>%s\n---\n"), app ? app : _T(""), cmd ? cmd : _T(""));
+    //_print_raw_message_impl(0, STDOUT_FILENO, _T(">%s\n>%s\n---\n"), app ? app : _T(""), cmd ? cmd : _T(""));
 #endif
 
     int ret = err_none;
@@ -5348,12 +5332,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
 
 #ifdef _DEBUG
-        fprintf(stdout, "%u 5 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
+        _print_raw_message_impl(0, STDOUT_FILENO, "%u 5 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
             GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
             GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
             GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
 
-        fprintf(stderr, "%u 6 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
+        _print_raw_message_impl(0, STDERR_FILENO, "%u 6 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
             GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
             GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
             GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
@@ -6242,10 +6226,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
 
                     if (!ret_data.is_error) {
-                        _print_raw_message(1, _T("%s"), ret_data.msg.c_str());
+                        _print_raw_message(STDOUT_FILENO, _T("%s"), ret_data.msg.c_str());
                     }
                     else {
-                        _print_raw_message(2, _T("%s"), ret_data.msg.c_str());
+                        _print_raw_message(STDERR_FILENO, _T("%s"), ret_data.msg.c_str());
                     }
                 }
             }

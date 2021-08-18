@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.08.10
+* 2021.08.18
 * contools--utilities--tests
 
 1. DESCRIPTION
@@ -49,7 +49,7 @@ NOTE:
   The `cmd.exe` may "mixing" standard handles addresses layout after each run
   of an executable.
 
-  For example:
+  For example (Windows 7):
 
   Run #1: stdin=0x03, stdout=0x0b, stderr=0x0f
   Run #2: stdin=0x03, stdout=0x0f, stderr=0x13
@@ -62,6 +62,12 @@ NOTE:
   You must run each test from both the User and the Administrator privileges
   process. To do that you can run `Total Commander` or `cmd.exe` as
   Administrator.
+
+NOTE:
+  Tests with elevatation must be run both with allowed and not allowed
+  by the user dialog elevation. In a not allowed case there is must be a
+  readable error about elevation error (in case if console window is visible
+  and not closed).
 
 All these affect test results. All runs must produce the same results.
 

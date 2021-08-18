@@ -1,3 +1,8 @@
+2021.08.18:
+* fixed: src/callf: replaced all `fputws`, `fputs`, `fprintf`, `fwprintf` function calls by the `_print_raw_message` and `_print_std*_message` to correctly translate text from `Unicode` to `Ascii` and vice versa independently to `TCHAR` definition
+* fixed: src/callf: minor fixup
+* changed: tests: readme update
+
 2021.08.17:
 * new: src/callf: `/tee-conout-dup` flag to shortcut sequence of `/tee-stdout-dup 0` and `/tee-stderr-dup 0` options
 

@@ -2351,12 +2351,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     bool is_console_window_inited = false;
 
 #ifdef _DEBUG
-    fprintf(stdout, "%u 1 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
+    _print_raw_message_impl(0, STDOUT_FILENO, "%u 1 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
         GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
         GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
         GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
 
-    fprintf(stderr, "%u 2 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
+    _print_raw_message_impl(0, STDERR_FILENO, "%u 2 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
         GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
         GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
         GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
@@ -2602,7 +2602,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
 
-                        _reinit_crt_std_handles();
+                        if (g_inherited_console_window) {
+                            _reinit_crt_std_handles();
+                        }
 
                         if (g_options.has.console_title) {
                             SetConsoleTitle(g_options.console_title.c_str());
@@ -2632,7 +2634,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                             }
                             g_inherited_console_window = _alloc_console(std_handles_state);
 
-                            _reinit_crt_std_handles();
+                            if (g_inherited_console_window) {
+                                _reinit_crt_std_handles();
+                            }
                         }
 
                         if (g_options.has.create_console_title) {
@@ -2678,7 +2682,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                             }
                             g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
 
-                            _reinit_crt_std_handles();
+                            if (g_inherited_console_window) {
+                                _reinit_crt_std_handles();
+                            }
 
                             if (g_options.has.console_title) {
                                 SetConsoleTitle(g_options.console_title.c_str());
@@ -2706,7 +2712,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         }
                         g_inherited_console_window = _alloc_console(std_handles_state);
 
-                        _reinit_crt_std_handles();
+                        if (g_inherited_console_window) {
+                            _reinit_crt_std_handles();
+                        }
 
                         if (g_options.has.create_console_title) {
                             SetConsoleTitle(g_options.create_console_title.c_str());
@@ -2752,7 +2760,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         }
                         g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
 
-                        _reinit_crt_std_handles();
+                        if (g_inherited_console_window) {
+                            _reinit_crt_std_handles();
+                        }
 
                         if (g_options.has.console_title) {
                             SetConsoleTitle(g_options.console_title.c_str());
@@ -2812,12 +2822,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
 #ifdef _DEBUG
-            fprintf(stdout, "%u 3 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
+            _print_raw_message_impl(0, STDOUT_FILENO, "%u 3 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
                 GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
                 GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
                 GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
 
-            fprintf(stderr, "%u 4 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
+            _print_raw_message_impl(0, STDERR_FILENO, "%u 4 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
                 GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
                 GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
                 GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
@@ -2842,9 +2852,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             arg_offset = 1;
 
             if (print_help) {
-                fputs(
+                _print_raw_message_impl(0, STDOUT_FILENO, "%s",
 #include "help_inl.hpp"
-                    , stdout);
+                    );
 
                 return err_help_output;
             }
@@ -3628,7 +3638,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             const Flags * flags_ptr = regular_pause_on_error ? &g_regular_flags : &g_flags;
 
             if (flags_ptr->pause_on_exit || flags_ptr->pause_on_exit_if_error && ret != err_none || flags_ptr->pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none) {
-                fputs("Press any key to continue . . . \n", stdout);
+                _print_raw_message_impl(0, STDOUT_FILENO, "%s", "Press any key to continue . . . \n");
                 getch();
             }
 
@@ -3658,6 +3668,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         g_inherited_console_window = GetConsoleWindow();
                     }
 
+                    _detach_stderr();
+                    _detach_stdout();
+                    _detach_stdin();
+
                     if (g_inherited_console_window) {
                         _free_console(std_handles_state);
                     }
@@ -3666,26 +3680,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     }
 
                     if (g_inherited_console_window) {
+                        _reinit_crt_std_handles();
+
                         for (const auto & conout : g_conout_prints_buf) {
                             if (conout.any_str.is_wstr) {
-                                switch (conout.stream_type) {
-                                case STDOUT_FILENO:
-                                    fputws(conout.any_str.wstr.c_str(), stdout);
-                                    break;
-                                case STDERR_FILENO:
-                                    fputws(conout.any_str.wstr.c_str(), stderr);
-                                    break;
-                                }
+                                _print_raw_message_impl(0, conout.stream_type, L"%s", conout.any_str.wstr.c_str());
                             }
                             else {
-                                switch (conout.stream_type) {
-                                case STDOUT_FILENO:
-                                    fputs(conout.any_str.astr.c_str(), stdout);
-                                    break;
-                                case STDERR_FILENO:
-                                    fputs(conout.any_str.astr.c_str(), stderr);
-                                    break;
-                                }
+                                _print_raw_message_impl(0, conout.stream_type, "%s", conout.any_str.astr.c_str());
                             }
                         }
                     }

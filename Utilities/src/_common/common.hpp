@@ -1323,15 +1323,53 @@ namespace {
         return return_offset_ptr;
     }
 
-    inline void _print_raw_message(int stream_type, const char * fmt, ...)
+    inline int _wide_char_to_multi_byte(UINT code_page, LPCWSTR in_str, int num_in_chars, std::vector<char> & out_buf)
     {
+        int num_translated_bytes = WideCharToMultiByte(code_page, 0, in_str, num_in_chars, NULL, 0, NULL, NULL);
+        if (num_translated_bytes) {
+            out_buf.resize(size_t(num_translated_bytes) + (num_in_chars > 0 ? 1U : 0U));
+            num_translated_bytes = WideCharToMultiByte(code_page, 0, in_str, num_in_chars, out_buf.data(), num_translated_bytes, NULL, NULL);
+            if (num_in_chars > 0) {
+                out_buf[size_t(num_translated_bytes)] = '\0';
+            }
+
+            return num_translated_bytes;
+        }
+
+        out_buf.clear();
+
+        return 0;
+    }
+
+    inline int _multi_byte_to_wide_char(UINT code_page, LPCSTR in_str, int num_in_chars, std::vector<wchar_t> & out_buf)
+    {
+        int num_translated_chars = MultiByteToWideChar(code_page, 0, in_str, num_in_chars, NULL, 0);
+        if (num_translated_chars) {
+            out_buf.resize(size_t(num_translated_chars) + (num_in_chars > 0 ? 1U : 0U));
+            num_translated_chars = MultiByteToWideChar(code_page, 0, in_str, num_in_chars, out_buf.data(), num_translated_chars);
+            if (num_in_chars > 0) {
+                out_buf[size_t(num_translated_chars)] = L'\0';
+            }
+
+            return num_translated_chars;
+        }
+
+        out_buf.clear();
+
+        return 0;
+    }
+
+    // flags:
+    //  0x01 - enable_conout_prints_buffering
+    //
+    inline void _print_raw_message_va_impl(int flags, int stream_type, const char * fmt, va_list vl)
+    {
+        const bool enable_conout_prints_buffering = flags & 0x01;
+
         char fixed_message_char_buf[256];
 
         // just in case
         fixed_message_char_buf[0] = '\0';
-
-        va_list args1;
-        va_start(args1, fmt);
 
         // CAUTION:
         //
@@ -1345,22 +1383,48 @@ namespace {
         //
 
         constexpr const size_t fixed_message_char_buf_size = sizeof(fixed_message_char_buf) / sizeof(fixed_message_char_buf[0]);
-        const int num_written_chars = vsnprintf(fixed_message_char_buf, fixed_message_char_buf_size, fmt, args1);
+        const int num_written_chars = vsnprintf(fixed_message_char_buf, fixed_message_char_buf_size, fmt, vl);
 
-        va_end(args1);
+        const UINT cp_out = GetConsoleOutputCP();
+
+        CPINFO cp_info{};
+        if (!GetCPInfo(cp_out, &cp_info)) {
+            // fallback to module character set
+#ifdef _UNICODE
+            cp_info.MaxCharSize = sizeof(wchar_t);
+#else
+            cp_info.MaxCharSize = sizeof(char);
+#endif
+        }
 
         if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
-            if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ fixed_message_char_buf, size_t(num_written_chars) } });
+            if (enable_conout_prints_buffering) {
+                g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::string{ fixed_message_char_buf, size_t(num_written_chars) } });
             }
 
-            switch (stream_type) {
-            case STDOUT_FILENO:
-                fputs(fixed_message_char_buf, stdout);
-                break;
-            case STDERR_FILENO:
-                fputs(fixed_message_char_buf, stderr);
-                break;
+            if (cp_info.MaxCharSize == sizeof(char)) {
+                switch (stream_type) {
+                case STDOUT_FILENO:
+                    fputs(fixed_message_char_buf, stdout);
+                    break;
+                case STDERR_FILENO:
+                    fputs(fixed_message_char_buf, stderr);
+                    break;
+                }
+            }
+            else {
+                std::vector<wchar_t> translated_char_buf;
+
+                if (_multi_byte_to_wide_char(cp_out, fixed_message_char_buf, num_written_chars, translated_char_buf)) {
+                    switch (stream_type) {
+                    case STDOUT_FILENO:
+                        fputws(translated_char_buf.data(), stdout);
+                        break;
+                    case STDERR_FILENO:
+                        fputws(translated_char_buf.data(), stderr);
+                        break;
+                    }
+                }
             }
         }
         else if (num_written_chars >= -1) {
@@ -1368,23 +1432,35 @@ namespace {
 
             char_buf.resize(num_written_chars + 1);
 
-            va_start(args1, fmt);
+            vsnprintf(char_buf.data(), char_buf.size(), fmt, vl);
 
-            vsnprintf(char_buf.data(), char_buf.size(), fmt, args1);
-
-            va_end(args1);
-
-            if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
+            if (enable_conout_prints_buffering) {
+                g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::string{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
             }
 
-            switch (stream_type) {
-            case STDOUT_FILENO:
-                fputs(char_buf.data(), stdout);
-                break;
-            case STDERR_FILENO:
-                fputs(char_buf.data(), stderr);
-                break;
+            if (cp_info.MaxCharSize == sizeof(char)) {
+                switch (stream_type) {
+                case STDOUT_FILENO:
+                    fputs(char_buf.data(), stdout);
+                    break;
+                case STDERR_FILENO:
+                    fputs(char_buf.data(), stderr);
+                    break;
+                }
+            }
+            else {
+                std::vector<wchar_t> translated_char_buf;
+
+                if (_multi_byte_to_wide_char(cp_out, char_buf.data(), num_written_chars, translated_char_buf)) {
+                    switch (stream_type) {
+                    case STDOUT_FILENO:
+                        fputws(translated_char_buf.data(), stdout);
+                        break;
+                    case STDERR_FILENO:
+                        fputws(translated_char_buf.data(), stderr);
+                        break;
+                    }
+                }
             }
         }
         else {
@@ -1403,30 +1479,48 @@ namespace {
 
             const int num_written_chars2 = snprintf(fixed_message_char_buf, fixed_message_char_buf_size, "%s\n", (char *)NULL); // encoding error
 
-            if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ fixed_message_char_buf, size_t(num_written_chars2) } });
+            if (enable_conout_prints_buffering) {
+                g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::string{ fixed_message_char_buf, size_t(num_written_chars2) } });
             }
 
-            switch (stream_type) {
-            case STDOUT_FILENO:
-                fputs(fixed_message_char_buf, stdout);
-                break;
-            case STDERR_FILENO:
-                fputs(fixed_message_char_buf, stderr);
-                break;
+            if (cp_info.MaxCharSize == sizeof(char)) {
+                switch (stream_type) {
+                case STDOUT_FILENO:
+                    fputs(fixed_message_char_buf, stdout);
+                    break;
+                case STDERR_FILENO:
+                    fputs(fixed_message_char_buf, stderr);
+                    break;
+                }
+            }
+            else {
+                std::vector<wchar_t> translated_char_buf;
+
+                if (_multi_byte_to_wide_char(cp_out, fixed_message_char_buf, num_written_chars, translated_char_buf)) {
+                    switch (stream_type) {
+                    case STDOUT_FILENO:
+                        fputws(translated_char_buf.data(), stdout);
+                        break;
+                    case STDERR_FILENO:
+                        fputws(translated_char_buf.data(), stderr);
+                        break;
+                    }
+                }
             }
         }
     }
 
-    inline void _print_raw_message(int stream_type, const wchar_t * fmt, ...)
+    // flags:
+    //  0x01 - enable_conout_prints_buffering
+    //
+    inline void _print_raw_message_va_impl(int flags, int stream_type, const wchar_t * fmt, va_list vl)
     {
+        const bool enable_conout_prints_buffering = flags & 0x01;
+
         wchar_t fixed_message_char_buf[256];
 
         // just in case
         fixed_message_char_buf[0] = L'\0';
-
-        va_list args1;
-        va_start(args1, fmt);
 
         // CAUTION:
         //
@@ -1434,32 +1528,90 @@ namespace {
         //    Both _vsnprintf and _vsnwprintf functions return the number of characters written if the number of characters to write is less than or equal to count.
         //    If the number of characters to write is greater than count, these functions return -1 indicating that output has been truncated
         //
-        //  The `_vsnwprintf` has a different behaviour versus the `vsnprintf` function and returns -1 on output string truncation (no an encoding error!),
+        //  The `_vsnwprintf` has a different behaviour versus the `vsnprintf` function and returns -1 on output string truncation (not an encoding error!),
         //  so we must call `_vsnwprintf` first time with an empty buffer and zero count to request the buffer size!
         //
 
         std::vector<wchar_t> char_buf;
 
-        const int num_written_chars = _vsnwprintf(NULL, 0, fmt, args1);
+        const int num_written_chars = _vsnwprintf(NULL, 0, fmt, vl);
 
         char_buf.resize(num_written_chars + 1);
 
-        _vsnwprintf(char_buf.data(), char_buf.size(), fmt, args1);
+        _vsnwprintf(char_buf.data(), char_buf.size(), fmt, vl);
 
-        va_end(args1);
-
-        if (g_enable_conout_prints_buffering) {
-            g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::wstring{ char_buf.data(), char_buf.data() > 0 ? char_buf.data() - 1 : 0 } });
+        if (enable_conout_prints_buffering) {
+            g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::wstring{ char_buf.data(), char_buf.data() > 0 ? char_buf.data() - 1 : 0 } });
         }
 
-        switch (stream_type) {
-        case STDOUT_FILENO:
-            fputws(char_buf.data(), stdout);
-            break;
-        case STDERR_FILENO:
-            fputws(char_buf.data(), stderr);
-            break;
+        const UINT cp_out = GetConsoleOutputCP();
+
+        CPINFO cp_info{};
+        if (!GetCPInfo(cp_out, &cp_info)) {
+            // fallback to module character set
+#ifdef _UNICODE
+            cp_info.MaxCharSize = sizeof(wchar_t);
+#else
+            cp_info.MaxCharSize = sizeof(char);
+#endif
         }
+
+        if (cp_info.MaxCharSize != sizeof(char)) {
+            switch (stream_type) {
+            case STDOUT_FILENO:
+                fputws(char_buf.data(), stdout);
+                break;
+            case STDERR_FILENO:
+                fputws(char_buf.data(), stderr);
+                break;
+            }
+        }
+        else {
+            std::vector<char> translated_char_buf;
+
+            if (_wide_char_to_multi_byte(cp_out, char_buf.data(), char_buf.size(), translated_char_buf)) {
+                switch (stream_type) {
+                case STDOUT_FILENO:
+                    fputs(translated_char_buf.data(), stdout);
+                    break;
+                case STDERR_FILENO:
+                    fputs(translated_char_buf.data(), stderr);
+                    break;
+                }
+            }
+        }
+    }
+
+    inline void _print_raw_message_impl(int flags, int stream_type, const char * fmt, ...)
+    {
+        va_list vl;
+        va_start(vl, fmt);
+        _print_raw_message_va_impl(flags, stream_type, fmt, vl);
+        va_end(vl);
+    }
+
+    inline void _print_raw_message_impl(int flags, int stream_type, const wchar_t * fmt, ...)
+    {
+        va_list vl;
+        va_start(vl, fmt);
+        _print_raw_message_va_impl(flags, stream_type, fmt, vl);
+        va_end(vl);
+    }
+
+    inline void _print_raw_message(int stream_type, const char * fmt, ...)
+    {
+        va_list vl;
+        va_start(vl, fmt);
+        _print_raw_message_va_impl(0, stream_type, fmt, vl);
+        va_end(vl);
+    }
+
+    inline void _print_raw_message(int stream_type, const wchar_t * fmt, ...)
+    {
+        va_list vl;
+        va_start(vl, fmt);
+        _print_raw_message_va_impl(0, stream_type, fmt, vl);
+        va_end(vl);
     }
 
     inline double _get_utc_to_local_time_offset_sec()
@@ -1561,7 +1713,7 @@ namespace {
         return buffer;
     }
 
-    inline std::string _format_stderr_message(const char * fmt, va_list vl)
+    inline std::string _format_stderr_message_va(const char * fmt, va_list vl)
     {
         char module_char_buf[256];
         char fixed_message_char_buf[256];
@@ -1594,7 +1746,7 @@ namespace {
         //    If buffer is a null pointer and count is zero, len is returned as the count of characters required to format the output, not including the terminating null.
         //    To make a successful call with the same argument and locale parameters, allocate a buffer holding at least len + 1 characters.
         //
-        //  The `_snprintf` has a different behaviour versus the `vsnprintf` function and returns a negative value on output string truncation (no an encoding error!),
+        //  The `_snprintf` has a different behaviour versus the `vsnprintf` function and returns a negative value on output string truncation (not an encoding error!),
         //  so we must call `_snprintf` first time with an empty buffer and zero count to request the buffer size!
         //
 
@@ -1656,7 +1808,7 @@ namespace {
         }
     }
 
-    inline std::wstring _format_stderr_message(const wchar_t * fmt, va_list vl)
+    inline std::wstring _format_stderr_message_va(const wchar_t * fmt, va_list vl)
     {
         wchar_t module_char_buf[256];
         wchar_t fixed_message_char_buf[256];
@@ -1677,7 +1829,7 @@ namespace {
         //    Both _vsnprintf and _vsnwprintf functions return the number of characters written if the number of characters to write is less than or equal to count.
         //    If the number of characters to write is greater than count, these functions return -1 indicating that output has been truncated
         //
-        //  The `_vsnwprintf` has a different behaviour versus the `vsnprintf` function and returns -1 on output string truncation (no an encoding error!),
+        //  The `_vsnwprintf` has a different behaviour versus the `vsnprintf` function and returns -1 on output string truncation (not an encoding error!),
         //  so we must call `_vsnwprintf` first time with an empty buffer and zero count to request the buffer size!
         //
 
@@ -1743,7 +1895,7 @@ namespace {
     {
         va_list vl;
         va_start(vl, fmt);
-        const auto ret = _format_stderr_message(fmt, vl);
+        const auto ret = _format_stderr_message_va(fmt, vl);
         va_end(vl);
         return ret;
     }
@@ -1752,7 +1904,7 @@ namespace {
     {
         va_list vl;
         va_start(vl, fmt);
-        const auto ret = _format_stderr_message(fmt, vl);
+        const auto ret = _format_stderr_message_va(fmt, vl);
         va_end(vl);
         return ret;
     }
@@ -1787,11 +1939,7 @@ namespace {
         //
 
         if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
-            if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 2, std::string{ fixed_message_char_buf, size_t(num_written_chars) } });
-            }
-
-            fprintf(stderr, "[%s] [%u] [%s] error: %s",
+            _print_raw_message(STDERR_FILENO, "[%s] [%u] [%s] error: %s",
                 local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
         }
         else if (num_written_chars >= -1) {
@@ -1801,15 +1949,11 @@ namespace {
 
             vsnprintf(char_buf.data(), char_buf.size(), fmt, vl);
 
-            if (g_enable_conout_prints_buffering) {
-                g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::string{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
-            }
-
-            fprintf(stderr, "[%s] [%u] [%s] error: %s",
+            _print_raw_message(STDERR_FILENO, "[%s] [%u] [%s] error: %s",
                 local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
         }
         else {
-            fprintf(stderr, "[%s] [%u] [%s] error: %s",
+            _print_raw_message(STDERR_FILENO, "[%s] [%u] [%s] error: %s",
                 local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (char *)NULL); // encoding error
         }
     }
@@ -1835,7 +1979,7 @@ namespace {
         //    Both _vsnprintf and _vsnwprintf functions return the number of characters written if the number of characters to write is less than or equal to count.
         //    If the number of characters to write is greater than count, these functions return -1 indicating that output has been truncated
         //
-        //  The `_vsnwprintf` has a different behaviour versus the `vsnprintf` function and returns -1 on output string truncation (no an encoding error!),
+        //  The `_vsnwprintf` has a different behaviour versus the `vsnprintf` function and returns -1 on output string truncation (not an encoding error!),
         //  so we must call `_vsnwprintf` first time with an empty buffer and zero count to request the buffer size!
         //
 
@@ -1847,11 +1991,7 @@ namespace {
 
         _vsnwprintf(char_buf.data(), char_buf.size(), fmt, vl);
 
-        if (g_enable_conout_prints_buffering) {
-            g_conout_prints_buf.push_back(_ConsoleOutput{ 1, std::wstring{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
-        }
-        
-        fwprintf(stderr, L"[%s] [%u] [%s] error: %s",
+        _print_raw_message(STDERR_FILENO, L"[%s] [%u] [%s] error: %s",
             local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
     }
 
@@ -1900,13 +2040,7 @@ namespace {
 #else
                     std::vector<char> char_buf;
 
-                    int num_translated_bytes = WideCharToMultiByte(cp_out, 0, win_error_msg_buf_w, -1, NULL, 0, NULL, NULL);
-                    if (num_translated_bytes) {
-                        char_buf.resize(size_t(num_translated_bytes) + sizeof(char_buf[0]));
-                        num_translated_bytes = WideCharToMultiByte(cp_out, 0, win_error_msg_buf_w, -1, char_buf.data(), (std::min)((size_t)num_translated_bytes, char_buf.size()), NULL, NULL);
-                    }
-
-                    if (num_translated_bytes) {
+                    if (_wide_char_to_multi_byte(cp_out, win_error_msg_buf_w, -1, char_buf)) {
                         ret = _format_stderr_message("win32: \"%s\"\n", char_buf.data());
                     }
 #endif
@@ -1917,13 +2051,7 @@ namespace {
 #ifdef _UNICODE
                     std::vector<wchar_t> char_buf;
 
-                    int num_translated_chars = MultiByteToWideChar(cp_out, 0, win_error_msg_buf_a, -1, NULL, 0);
-                    if (num_translated_chars) {
-                        char_buf.resize(size_t(num_translated_chars) + sizeof(char_buf[0]));
-                        num_translated_chars = MultiByteToWideChar(cp_out, 0, win_error_msg_buf_a, -1, char_buf.data(), (std::min)((size_t)num_translated_chars, char_buf.size()));
-                    }
-
-                    if (num_translated_chars) {
+                    if (_multi_byte_to_wide_char(cp_out, win_error_msg_buf_a, -1, char_buf)) {
                         ret = _format_stderr_message(L"win32: \"%s\"\n", char_buf.data());
                     }
 #else
