@@ -1602,7 +1602,7 @@ namespace {
     {
         va_list vl;
         va_start(vl, fmt);
-        _print_raw_message_va_impl(0, stream_type, fmt, vl);
+        _print_raw_message_va_impl(g_enable_conout_prints_buffering ? 0x01 : 0, stream_type, fmt, vl);
         va_end(vl);
     }
 
@@ -1610,7 +1610,7 @@ namespace {
     {
         va_list vl;
         va_start(vl, fmt);
-        _print_raw_message_va_impl(0, stream_type, fmt, vl);
+        _print_raw_message_va_impl(g_enable_conout_prints_buffering ? 0x01 : 0, stream_type, fmt, vl);
         va_end(vl);
     }
 
