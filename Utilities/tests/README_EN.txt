@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.08.18
+* 2021.08.19
 * contools--utilities--tests
 
 1. DESCRIPTION
@@ -83,11 +83,8 @@ Several tests still fails under specific conditions:
 
 * `20-test-*` fails to print correctly in Windows 8.
 
-* `21-test-*` fails to print correctly under already elevated environment in
-  Windows 7/8.
+* `21-test--01-shell_exec_runas--02-named_pipe_to_child_stdin.bat` fails to
+  print correctly under already elevated environment in Windows 7/8.
 
 * `31-test--01-elevate--02-user_input.bat` time to time fails to print
   correctly under not elevated environment in Windows 7.
-
-* `50-test--01-gui_to_gui--02-elevate--03-new_console--01-pause_on_exit.bat`
-   prints Unicode error in ANSI console if reject elevation under Windows 7/8.

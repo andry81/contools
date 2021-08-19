@@ -1,3 +1,11 @@
+2021.08.19:
+* fixed: src/callf: inbound/outbound parent-child pipes incorrect usage
+* fixed: src/callf: `/pause-on-exit*` flags incorrect usage in case of not executed elevation
+* new: tests: more manual tests for `callf`/`callfg` utilities
+* changed: src/callf: minor improvements
+* changed: tests: manual tests improvements
+* changed: tests: readme update
+
 2021.08.18:
 * fixed: src/callf: replaced all `fputws`, `fputs`, `fprintf`, `fwprintf` function calls by the `_print_raw_message` and `_print_std*_message` to correctly translate text from `Unicode` to `Ascii` and vice versa independently to `TCHAR` definition
 * fixed: src/callf: minor fixup

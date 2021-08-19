@@ -1540,10 +1540,6 @@ namespace {
 
         _vsnwprintf(char_buf.data(), char_buf.size(), fmt, vl);
 
-        if (enable_conout_prints_buffering) {
-            g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::wstring{ char_buf.data(), char_buf.data() > 0 ? char_buf.data() - 1 : 0 } });
-        }
-
         const UINT cp_out = GetConsoleOutputCP();
 
         CPINFO cp_info{};
@@ -1554,6 +1550,10 @@ namespace {
 #else
             cp_info.MaxCharSize = sizeof(char);
 #endif
+        }
+
+        if (enable_conout_prints_buffering) {
+            g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::wstring{ char_buf.data(), char_buf.data() > 0 ? char_buf.data() - 1 : 0 } });
         }
 
         if (cp_info.MaxCharSize != sizeof(char)) {
@@ -1612,6 +1612,114 @@ namespace {
         va_start(vl, fmt);
         _print_raw_message_va_impl(g_enable_conout_prints_buffering ? 0x01 : 0, stream_type, fmt, vl);
         va_end(vl);
+    }
+
+    // flags:
+    //  0x01 - enable_conout_prints_buffering
+    //
+    inline void _put_raw_message_impl(int flags, int stream_type, std::string str)
+    {
+        const bool enable_conout_prints_buffering = flags & 0x01;
+
+        const UINT cp_out = GetConsoleOutputCP();
+
+        CPINFO cp_info{};
+        if (!GetCPInfo(cp_out, &cp_info)) {
+            // fallback to module character set
+#ifdef _UNICODE
+            cp_info.MaxCharSize = sizeof(wchar_t);
+#else
+            cp_info.MaxCharSize = sizeof(char);
+#endif
+        }
+
+        if (enable_conout_prints_buffering) {
+            g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, str });
+        }
+
+        if (cp_info.MaxCharSize == sizeof(char)) {
+            switch (stream_type) {
+            case STDOUT_FILENO:
+                fputs(str.c_str(), stdout);
+                break;
+            case STDERR_FILENO:
+                fputs(str.c_str(), stderr);
+                break;
+            }
+        }
+        else {
+            std::vector<wchar_t> translated_char_buf;
+
+            if (_multi_byte_to_wide_char(cp_out, str.c_str(), str.length(), translated_char_buf)) {
+                switch (stream_type) {
+                case STDOUT_FILENO:
+                    fputws(translated_char_buf.data(), stdout);
+                    break;
+                case STDERR_FILENO:
+                    fputws(translated_char_buf.data(), stderr);
+                    break;
+                }
+            }
+        }
+    }
+
+    // flags:
+    //  0x01 - enable_conout_prints_buffering
+    //
+    inline void _put_raw_message_impl(int flags, int stream_type, std::wstring str)
+    {
+        const bool enable_conout_prints_buffering = flags & 0x01;
+
+        const UINT cp_out = GetConsoleOutputCP();
+
+        CPINFO cp_info{};
+        if (!GetCPInfo(cp_out, &cp_info)) {
+            // fallback to module character set
+#ifdef _UNICODE
+            cp_info.MaxCharSize = sizeof(wchar_t);
+#else
+            cp_info.MaxCharSize = sizeof(char);
+#endif
+        }
+
+        if (enable_conout_prints_buffering) {
+            g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, str });
+        }
+
+        if (cp_info.MaxCharSize != sizeof(char)) {
+            switch (stream_type) {
+            case STDOUT_FILENO:
+                fputws(str.c_str(), stdout);
+                break;
+            case STDERR_FILENO:
+                fputws(str.c_str(), stderr);
+                break;
+            }
+        }
+        else {
+            std::vector<char> translated_char_buf;
+
+            if (_wide_char_to_multi_byte(cp_out, str.c_str(), str.length(), translated_char_buf)) {
+                switch (stream_type) {
+                case STDOUT_FILENO:
+                    fputs(translated_char_buf.data(), stdout);
+                    break;
+                case STDERR_FILENO:
+                    fputs(translated_char_buf.data(), stderr);
+                    break;
+                }
+            }
+        }
+    }
+
+    inline void _put_raw_message(int stream_type, std::string str)
+    {
+        _put_raw_message_impl(g_enable_conout_prints_buffering ? 0x01 : 0, stream_type, std::move(str));
+    }
+
+    inline void _put_raw_message(int stream_type, std::wstring str)
+    {
+        _put_raw_message_impl(g_enable_conout_prints_buffering ? 0x01 : 0, stream_type, std::move(str));
     }
 
     inline double _get_utc_to_local_time_offset_sec()

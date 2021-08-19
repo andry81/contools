@@ -5698,24 +5698,23 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
 
         if (!g_pipe_stdin_to_stdout) {
-            if (g_pipe_stdin_to_child_stdin || g_stdin_handle_type == FILE_TYPE_DISK || g_stdin_handle_type == FILE_TYPE_PIPE) {
-                if (!CreateOutboundPipeFromConsoleInput(ret, win_error)) {
-                    break;
-                }
+            if (_is_valid_handle(g_stdin_handle)) {
+                if (!g_options.create_outbound_server_pipe_from_stdin.empty() || g_pipe_stdin_to_child_stdin || g_stdin_handle_type != FILE_TYPE_CHAR) {
+                    if (!CreateOutboundPipeFromConsoleInput(ret, win_error)) {
+                        break;
+                    }
 
-                if (g_options.shell_exec_verb.empty()) {
-                    si.hStdInput = g_stdin_pipe_read_handle;
+                    if (g_options.shell_exec_verb.empty()) {
+                        si.hStdInput = g_stdin_pipe_read_handle;
 
-                    si.dwFlags |= STARTF_USESTDHANDLES;
+                        si.dwFlags |= STARTF_USESTDHANDLES;
+                    }
+                    else {
+                        g_is_stdin_redirected = true;
+                        SetStdHandle(STD_INPUT_HANDLE, g_stdin_pipe_read_handle);
+                    }
                 }
-                else {
-                    g_is_stdin_redirected = true;
-                    SetStdHandle(STD_INPUT_HANDLE, g_stdin_pipe_read_handle);
-                }
-            }
-
-            if (!g_pipe_stdin_to_child_stdin && g_stdin_handle_type == FILE_TYPE_CHAR) {
-                if (_is_valid_handle(g_stdin_handle) && g_options.shell_exec_verb.empty()) {
+                else if (g_options.shell_exec_verb.empty()) {
                     // CAUTION:
                     //  Must be the original stdin, can not be a buffer from the CreateConsoleScreenBuffer call,
                     //  otherwise, for example, the `cmd.exe /k` process will exit immediately!
@@ -5726,46 +5725,50 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
 
-            if (g_pipe_child_stdout_to_stdout || g_has_tee_stdout || g_stdout_handle_type != FILE_TYPE_CHAR) {
-                if (!CreateInboundPipeToConsoleOutput<1>(ret, win_error)) {
-                    break;
-                }
+            if (_is_valid_handle(g_stdout_handle)) {
+                if (!g_options.create_inbound_server_pipe_to_stdout.empty() || g_pipe_child_stdout_to_stdout || g_has_tee_stdout || g_stdout_handle_type != FILE_TYPE_CHAR) {
+                    if (!CreateInboundPipeToConsoleOutput<1>(ret, win_error)) {
+                        break;
+                    }
 
-                if (g_options.shell_exec_verb.empty()) {
-                    si.hStdOutput = g_stdout_pipe_write_handle;
+                    if (g_options.shell_exec_verb.empty()) {
+                        si.hStdOutput = g_stdout_pipe_write_handle;
+
+                        si.dwFlags |= STARTF_USESTDHANDLES;
+                    }
+                    else {
+                        g_is_stdout_redirected = true;
+                        SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_pipe_write_handle);
+                    }
+                }
+                else if (g_options.shell_exec_verb.empty()) {
+                    si.hStdOutput = g_stdout_handle;
 
                     si.dwFlags |= STARTF_USESTDHANDLES;
                 }
-                else {
-                    g_is_stdout_redirected = true;
-                    SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_pipe_write_handle);
-                }
-            }
-            else if (_is_valid_handle(g_stdout_handle) && g_options.shell_exec_verb.empty()) {
-                si.hStdOutput = g_stdout_handle;
-
-                si.dwFlags |= STARTF_USESTDHANDLES;
             }
 
-            if (g_pipe_child_stderr_to_stderr || g_has_tee_stderr || g_stderr_handle_type != FILE_TYPE_CHAR) {
-                if (!CreateInboundPipeToConsoleOutput<2>(ret, win_error)) {
-                    break;
-                }
+            if (_is_valid_handle(g_stderr_handle)) {
+                if (!g_options.create_inbound_server_pipe_to_stderr.empty() || g_pipe_child_stderr_to_stderr || g_has_tee_stderr || g_stderr_handle_type != FILE_TYPE_CHAR) {
+                    if (!CreateInboundPipeToConsoleOutput<2>(ret, win_error)) {
+                        break;
+                    }
 
-                if (g_options.shell_exec_verb.empty()) {
-                    si.hStdError = g_stderr_pipe_write_handle;
+                    if (g_options.shell_exec_verb.empty()) {
+                        si.hStdError = g_stderr_pipe_write_handle;
+
+                        si.dwFlags |= STARTF_USESTDHANDLES;
+                    }
+                    else {
+                        g_is_stderr_redirected = true;
+                        SetStdHandle(STD_ERROR_HANDLE, g_stderr_pipe_write_handle);
+                    }
+                }
+                else if (g_options.shell_exec_verb.empty()) {
+                    si.hStdError = g_stderr_handle;
 
                     si.dwFlags |= STARTF_USESTDHANDLES;
                 }
-                else {
-                    g_is_stderr_redirected = true;
-                    SetStdHandle(STD_ERROR_HANDLE, g_stderr_pipe_write_handle);
-                }
-            }
-            else if (_is_valid_handle(g_stderr_handle) && g_options.shell_exec_verb.empty()) {
-                si.hStdError = g_stderr_handle;
-
-                si.dwFlags |= STARTF_USESTDHANDLES;
             }
         }
 
@@ -6226,10 +6229,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
 
                     if (!ret_data.is_error) {
-                        _print_raw_message(STDOUT_FILENO, _T("%s"), ret_data.msg.c_str());
+                        _put_raw_message(STDOUT_FILENO, ret_data.msg);
                     }
                     else {
-                        _print_raw_message(STDERR_FILENO, _T("%s"), ret_data.msg.c_str());
+                        _put_raw_message(STDERR_FILENO, ret_data.msg);
                     }
                 }
             }

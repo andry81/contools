@@ -80,13 +80,18 @@ const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_promote_flags_to_preparse_arr[] = {
+    _T("/ret-create-proc"),
+    _T("/ret-win-error"),
     _T("/win-error-langid"),
+    _T("/ret-child-exit"),
     _T("/print-win-error-string"),
     _T("/no-print-gen-error-string"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
     _T("/allow-throw-seh-except"),
+    _T("/create-console"),
+    _T("/detach-console"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
 #ifndef _CONSOLE
@@ -98,6 +103,10 @@ const TCHAR * g_promote_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
+    _T("/ret-create-proc"),
+    _T("/ret-win-error"),
+    _T("/win-error-langid"),
+    _T("/ret-child-exit"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -272,8 +281,6 @@ const TCHAR * g_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
-    _T("/ret-create-proc"),
-    _T("/ret-win-error"),
     _T("/no-sys-dialog-ui"),
     _T("/no-wait"),
     _T("/no-window"),
@@ -379,7 +386,10 @@ const TCHAR * g_elevate_child_flags_to_parse_arr[] = {
 const TCHAR * g_promote_flags_to_parse_arr[] = {
     _T("/chcp-in"),
     _T("/chcp-out"),
+    _T("/ret-create-proc"),
+    _T("/ret-win-error"),
     _T("/win-error-langid"),
+    _T("/ret-child-exit"),
     _T("/print-win-error-string"),
     _T("/print-shell-error-string"),
     _T("/no-print-gen-error-string"),
@@ -400,6 +410,10 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
 const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/chcp-in"),
     _T("/chcp-out"),
+    _T("/ret-create-proc"),
+    _T("/ret-win-error"),
+    _T("/win-error-langid"),
+    _T("/ret-child-exit"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -2852,7 +2866,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             arg_offset = 1;
 
             if (print_help) {
-                _print_raw_message_impl(0, STDOUT_FILENO, "%s",
+                _put_raw_message_impl(0, STDOUT_FILENO,
 #include "help_inl.hpp"
                     );
 
@@ -3632,13 +3646,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     }
     __finally {
         [&]() {
-            // check special case when a child process is not executed while being elevated to still be able to pause-on-exit
-            const bool regular_pause_on_error = g_is_process_elevating && !g_is_process_executed;
-
-            const Flags * flags_ptr = regular_pause_on_error ? &g_regular_flags : &g_flags;
-
-            if (flags_ptr->pause_on_exit || flags_ptr->pause_on_exit_if_error && ret != err_none || flags_ptr->pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none) {
-                _print_raw_message_impl(0, STDOUT_FILENO, "%s", "Press any key to continue . . . \n");
+            if (g_flags.pause_on_exit || g_flags.pause_on_exit_if_error && ret != err_none || g_flags.pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none) {
+                _put_raw_message_impl(0, STDOUT_FILENO, "Press any key to continue . . . \n");
                 getch();
             }
 
@@ -3684,10 +3693,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         for (const auto & conout : g_conout_prints_buf) {
                             if (conout.any_str.is_wstr) {
-                                _print_raw_message_impl(0, conout.stream_type, L"%s", conout.any_str.wstr.c_str());
+                                _put_raw_message_impl(0, conout.stream_type, conout.any_str.wstr);
                             }
                             else {
-                                _print_raw_message_impl(0, conout.stream_type, "%s", conout.any_str.astr.c_str());
+                                _put_raw_message_impl(0, conout.stream_type, conout.any_str.astr);
                             }
                         }
                     }

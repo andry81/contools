@@ -896,6 +896,7 @@ Utilities/tests/manual/contools/callf/02-test--01-env_expand.bat -text
 Utilities/tests/manual/contools/callf/03-test--01-elevate--01-new_console_if_elevated.bat -text
 Utilities/tests/manual/contools/callf/03-test--01-elevate--02-new_console_if_elevated.bat -text
 Utilities/tests/manual/contools/callf/03-test--01-elevate--03-new_console.bat -text
+Utilities/tests/manual/contools/callf/03-test--01-elevate--04-new_console_for_all--01-pause_on_exit_if_error.bat -text
 Utilities/tests/manual/contools/callf/03-test--02-elevate--01-existing_console.bat -text
 Utilities/tests/manual/contools/callf/03-test--02-elevate--02-existing_console.bat -text
 Utilities/tests/manual/contools/callf/03-test--02-elevate--03-existing_console.bat -text

@@ -299,8 +299,6 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           Limited set of flags to pass exceptionally into the this-parent
           (not elevated) process.
 
-          /ret-create-proc
-          /ret-win-error
           /no-sys-dialog-ui
           /no-wait
           /no-window
@@ -353,7 +351,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         <Flags>:
           /chcp-in
           /chcp-out
+          /ret-create-proc
+          /ret-win-error
           /win-error-langid
+          /ret-child-exit
           /print-win-error-string
           /print-shell-error-string
           /no-print-gen-error-string
@@ -361,6 +362,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /pause-on-exit-if-error
           /pause-on-exit
           /allow-throw-seh-except
+          /create-console
+          /detach-console
           /attach-parent-console
           /disable-wow64-fs-redir
           /allow-gui-autoattach-to-parent-console
@@ -378,6 +381,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         <Flags>:
           /chcp-in
           /chcp-out
+          /ret-create-proc
+          /ret-win-error
+          /win-error-langid
+          /ret-child-exit
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
