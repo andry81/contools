@@ -1,4 +1,7 @@
 2021.08.19:
+* new: Utilities/bin/contools: binaries update
+
+2021.08.19:
 * fixed: Utilities/src/callf: inbound/outbound parent-child pipes incorrect usage
 * fixed: Utilities/src/callf: `/pause-on-exit*` flags incorrect usage in case of not executed elevation
 * new: Utilities/tests: more manual tests for `callf`/`callfg` utilities
