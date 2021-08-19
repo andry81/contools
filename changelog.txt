@@ -1,4 +1,12 @@
 2021.08.19:
+* new: Utilities/src/callf: `/no-stdin-inherit`, `/no-stdout-inherit`, `/no-stderr-inherit` to explicitly disable standard handles inheritance
+* fixed: Utilities/src/callf: ShellExecute elevation (verb=runas) under already elevated environment and parent process console (re)attachment in the child process involves standard handles inheritance even if standard handles are not character device and declared as not inheritable (Windows 7 bug). Workarounded that by explicitly assign a null handle address to prevent inheritance into child process.
+* fixed: Utilities/src/callf: missed case where reopened standard handle as the `CONIN$`/`CONOUT$`/`\\.\CON` automatically disabled for inheritance (character device must be always inheritable)
+* fixed: Utilities/tests: more manual tests pass
+* changed: Utilities/src/callf: more detailed debug prints
+* changed: Utilities/tests: readme update
+
+2021.08.19:
 * new: Utilities/bin/contools: binaries update
 
 2021.08.19:

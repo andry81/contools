@@ -94,6 +94,9 @@ struct Flags
     bool            no_expand_env;                  // don't expand `${...}` environment variables
     bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
     bool            no_std_inherit;
+    bool            no_stdin_inherit;
+    bool            no_stdout_inherit;
+    bool            no_stderr_inherit;
 
     bool            allow_throw_seh_except;         // by default all SEH exceptions does interception and conversion into specific return code
     bool            allow_expand_unexisted_env;

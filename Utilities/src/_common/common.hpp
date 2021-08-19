@@ -3127,4 +3127,69 @@ namespace {
     }
 }
 
+#ifdef _DEBUG
+inline void _debug_print_win32_std_handles(uint32_t index)
+{
+    const HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+    const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    const HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+
+    const DWORD stdin_handle_type = stdin_handle ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
+    const DWORD stdout_handle_type = stdout_handle ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
+    const DWORD stderr_handle_type = stderr_handle ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+
+    const DWORD current_proc_id = GetCurrentProcessId();
+
+    _StdHandlesState std_handles_state;
+
+    std_handles_state.save_stdin_state(stdin_handle);
+    std_handles_state.save_stdout_state(stdout_handle);
+    std_handles_state.save_stderr_state(stderr_handle);
+
+    _print_raw_message_impl(0, STDOUT_FILENO, "%02uA %06u [WIN32] stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
+        (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
+        (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
+        (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
+
+    _print_raw_message_impl(0, STDERR_FILENO, "%02uB %06u [WIN32] stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
+        (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
+        (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
+        (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
+}
+
+inline void _debug_print_crt_std_handles(uint32_t index)
+{
+    const int stdin_fileno = _fileno(stdin);
+    const HANDLE stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno);
+
+    const int stdout_fileno = _fileno(stdout);
+    const HANDLE stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno);
+
+    const int stderr_fileno = _fileno(stderr);
+    const HANDLE stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
+
+    const DWORD stdin_handle_type = stdin_handle ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
+    const DWORD stdout_handle_type = stdout_handle ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
+    const DWORD stderr_handle_type = stderr_handle ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+
+    const DWORD current_proc_id = GetCurrentProcessId();
+
+    _StdHandlesState std_handles_state;
+
+    std_handles_state.save_stdin_state(stdin_handle);
+    std_handles_state.save_stdout_state(stdout_handle);
+    std_handles_state.save_stderr_state(stderr_handle);
+
+    _print_raw_message_impl(0, STDOUT_FILENO, "%02uA %06u [CRT]   stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
+        (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
+        (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
+        (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
+
+    _print_raw_message_impl(0, STDERR_FILENO, "%02uB %06u [CRT]   stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
+        (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
+        (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
+        (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
+}
+#endif
+
 #endif

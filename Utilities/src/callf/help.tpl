@@ -222,7 +222,25 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Can not be used together with the `/no-subst-vars`, `/EE<N>` flags.
 
       /no-std-inherit
-        Prevent standard handles inheritance into child process.
+        Prevent all standard handles inheritance into child process.
+
+        Can not be used together with the `/no-stdin-inherit`,
+        `/no-stdout-inherit`, `/no-stderr-inherit` flags.
+
+      /no-stdin-inherit
+        Prevent stdin handle inheritance into child process.
+
+        Can not be used together with the `/no-std-inherit` flag.
+
+      /no-stdout-inherit
+        Prevent stdout handle inheritance into child process.
+
+        Can not be used together with the `/no-std-inherit` flag.
+
+      /no-stderr-inherit
+        Prevent stderr handle inheritance into child process.
+
+        Can not be used together with the `/no-std-inherit` flag.
 
       /pipe-stdin-to-child-stdin
         Pipe the process stdin into child stdin. This additionally disables
@@ -254,7 +272,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /pipe-stdin-to-stdout
         Pipe the process stdin into stdout. This additionally disables
-        standard handles inheritance (applies the `/no-std-inherit` flag).
+        standard handles inheritance (implies the `/no-stdin-inherit` and
+        `/no-stdout-inherit` flags).
 
         Automatically implies if idle execution is used.
         Can not be used together with the `/pipe-stdin-to-child-stdin`,
@@ -388,6 +407,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
+          /no-std*-inherit
           /allow-throw-seh-except
           /reopen-std[in|out|err]*
           /std[in|out|err]-*

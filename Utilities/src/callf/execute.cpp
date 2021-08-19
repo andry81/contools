@@ -54,6 +54,10 @@ DWORD g_stdin_handle_type           = FILE_TYPE_UNKNOWN;
 DWORD g_stdout_handle_type          = FILE_TYPE_UNKNOWN;
 DWORD g_stderr_handle_type          = FILE_TYPE_UNKNOWN;
 
+bool g_stdin_handle_inherit         = true;
+bool g_stdout_handle_inherit        = true;
+bool g_stderr_handle_inherit        = true;
+
 HANDLE g_reopen_stdin_handle        = INVALID_HANDLE_VALUE;
 HANDLE g_reopen_stdout_handle       = INVALID_HANDLE_VALUE;
 HANDLE g_reopen_stderr_handle       = INVALID_HANDLE_VALUE;
@@ -92,6 +96,9 @@ bool g_is_stderr_redirected         = false;
 
 bool g_no_std_inherit               = false;    // stdin + stdout + stderr
 bool g_no_stdin_inherit             = false;    // stdin
+bool g_no_stdout_inherit            = false;    // stdout
+bool g_no_stderr_inherit            = false;    // stderr
+
 bool g_pipe_stdin_to_child_stdin    = false;
 bool g_pipe_child_stdout_to_stdout  = false;
 bool g_pipe_child_stderr_to_stderr  = false;
@@ -190,6 +197,9 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, no_expand_env);
     MERGE_FLAG(flags, no_subst_vars);
     MERGE_FLAG(flags, no_std_inherit);
+    MERGE_FLAG(flags, no_stdin_inherit);
+    MERGE_FLAG(flags, no_stdout_inherit);
+    MERGE_FLAG(flags, no_stderr_inherit);
 
     MERGE_FLAG(flags, allow_throw_seh_except);
     MERGE_FLAG(flags, allow_expand_unexisted_env);
@@ -3235,6 +3245,8 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
     ret = err_none;
     win_error = 0;
 
+    const bool is_os_windows_7 = g_options.win_ver.major == 6 && g_options.win_ver.minor == 1;
+
     if (!g_options.reopen_stdin_as_file.empty()) {
         SetLastError(0); // just in case
         if (!_is_valid_handle(g_reopen_stdin_handle =
@@ -3264,34 +3276,40 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
         bool reset_handle_inherit = true;
         DWORD handle_flags = 0;
 
-        if (GetHandleInformation(g_reopen_stdin_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
-            reset_handle_inherit = false;
-        }
+        // character device must always stay inheritable if not explicitly declared as not inheritable
+        const DWORD reopen_stdin_handle_type = GetFileType(g_reopen_stdin_handle);
+        const bool reset_handle_to_inherit = !g_no_stdin_inherit && reopen_stdin_handle_type == FILE_TYPE_CHAR;
 
-        if (reset_handle_inherit) {
-            SetLastError(0); // just in case
-            if (!SetHandleInformation(g_reopen_stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                    win_error = GetLastError();
+        if (reopen_stdin_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
+            if (GetHandleInformation(g_reopen_stdin_handle, &handle_flags) && reset_handle_to_inherit ? (handle_flags & HANDLE_FLAG_INHERIT) : !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                reset_handle_inherit = false;
+            }
+
+            if (reset_handle_inherit) {
+                SetLastError(0); // just in case
+                if (!SetHandleInformation(g_reopen_stdin_handle, HANDLE_FLAG_INHERIT, reset_handle_to_inherit ? TRUE : FALSE)) {
+                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                        win_error = GetLastError();
+                    }
+                    if (!g_flags.ret_win_error) {
+                        ret = err_win32_error;
+                    }
+                    else {
+                        ret = win_error;
+                    }
+                    if (!g_flags.no_print_gen_error_string) {
+                        _print_stderr_message(_T("could not %s handle inheritance of reopened stdin as file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                            reset_handle_to_inherit ? _T("enable") : _T("disable"), win_error, win_error, g_options.reopen_stdin_as_file.c_str());
+                    }
+                    if (g_flags.print_win_error_string && win_error) {
+                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    }
+                    return false;
                 }
-                if (!g_flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not disable handle inheritance of reopened stdin as file: win_error=0x%08X (%d) file=\"%s\"\n"),
-                        win_error, win_error, g_options.reopen_stdin_as_file.c_str());
-                }
-                if (g_flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, g_options.win_error_langid);
-                }
-                return false;
             }
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, STDIN_FILENO, _O_BINARY, true, false)) {
+        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, STDIN_FILENO, _O_BINARY, true, reset_handle_to_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3420,6 +3438,8 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
     ret = err_none;
     win_error = 0;
 
+    const bool is_os_windows_7 = g_options.win_ver.major == 6 && g_options.win_ver.minor == 1;
+
     if (!g_options.reopen_stdout_as_file.empty()) {
         SetLastError(0); // just in case
         if (_is_valid_handle(g_reopen_stdout_handle =
@@ -3431,30 +3451,36 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             bool reset_handle_inherit = true;
             DWORD handle_flags = 0;
 
-            if (GetHandleInformation(g_reopen_stdout_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
-                reset_handle_inherit = false;
-            }
+            // character device must always stay inheritable if not explicitly declared as not inheritable
+            const DWORD reopen_stdout_handle_type = GetFileType(g_reopen_stdout_handle);
+            const bool reset_handle_to_inherit = !g_no_stdout_inherit && reopen_stdout_handle_type == FILE_TYPE_CHAR;
 
-            if (reset_handle_inherit) {
-                SetLastError(0); // just in case
-                if (!SetHandleInformation(g_reopen_stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                    if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                        win_error = GetLastError();
+            if (reopen_stdout_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
+                if (GetHandleInformation(g_reopen_stdout_handle, &handle_flags) && reset_handle_to_inherit ? (handle_flags & HANDLE_FLAG_INHERIT) : !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                    reset_handle_inherit = false;
+                }
+
+                if (reset_handle_inherit) {
+                    SetLastError(0); // just in case
+                    if (!SetHandleInformation(g_reopen_stdout_handle, HANDLE_FLAG_INHERIT, reset_handle_to_inherit ? TRUE : FALSE)) {
+                        if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!g_flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!g_flags.no_print_gen_error_string) {
+                            _print_stderr_message(_T("could not %s handle inheritance of reopened stdout as file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                                reset_handle_to_inherit ? _T("enable") : _T("disable"), win_error, win_error, g_options.reopen_stdout_as_file.c_str());
+                        }
+                        if (g_flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        return false;
                     }
-                    if (!g_flags.ret_win_error) {
-                        ret = err_win32_error;
-                    }
-                    else {
-                        ret = win_error;
-                    }
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not disable handle inheritance of reopened stdout as file: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, g_options.reopen_stdout_as_file.c_str());
-                    }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
-                    }
-                    return false;
                 }
             }
 
@@ -3469,6 +3495,28 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                 g_reopen_stdout_mutex = CreateMutex(NULL, FALSE,
                     (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + g_reopen_stdout_fileid.to_tstring()).c_str());
             }
+
+            if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, STDOUT_FILENO, _O_BINARY, true, reset_handle_to_inherit)) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                    win_error = GetLastError();
+                }
+                if (!g_flags.ret_win_error) {
+                    ret = err_win32_error;
+                }
+                else {
+                    ret = win_error;
+                }
+                if (!g_flags.no_print_gen_error_string) {
+                    _print_stderr_message(_T("could not duplicate reopened stdout as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        win_error, win_error, g_options.reopen_stdout_as_file.c_str());
+                }
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
+                }
+                return false;
+            }
+
+            g_is_stdout_reopened = true;
         }
         else {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -3489,28 +3537,6 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             }
             return false;
         }
-
-        if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, STDOUT_FILENO, _O_BINARY, true, false)) {
-            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                win_error = GetLastError();
-            }
-            if (!g_flags.ret_win_error) {
-                ret = err_win32_error;
-            }
-            else {
-                ret = win_error;
-            }
-            if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not duplicate reopened stdout as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
-                    win_error, win_error, g_options.reopen_stdout_as_file.c_str());
-            }
-            if (g_flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, g_options.win_error_langid);
-            }
-            return false;
-        }
-
-        g_is_stdout_reopened = true;
     }
     else if (!g_options.reopen_stdout_as_server_pipe.empty()) {
         SetLastError(0); // just in case
@@ -3619,6 +3645,8 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
     ret = err_none;
     win_error = 0;
 
+    const bool is_os_windows_7 = g_options.win_ver.major == 6 && g_options.win_ver.minor == 1;
+
     if (!g_options.reopen_stderr_as_file.empty()) {
         SetLastError(0); // just in case
         if (_is_valid_handle(g_reopen_stderr_handle =
@@ -3633,13 +3661,49 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             bool reset_handle_inherit = true;
             DWORD handle_flags = 0;
 
-            if (GetHandleInformation(g_reopen_stderr_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
-                reset_handle_inherit = false;
+            // character device must always stay inheritable if not explicitly declared as not inheritable
+            const DWORD reopen_stderr_handle_type = GetFileType(g_reopen_stderr_handle);
+            const bool reset_handle_to_inherit = !g_no_stderr_inherit && reopen_stderr_handle_type == FILE_TYPE_CHAR;
+
+            if (reopen_stderr_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
+                if (GetHandleInformation(g_reopen_stderr_handle, &handle_flags) && reset_handle_to_inherit ? (handle_flags & HANDLE_FLAG_INHERIT) : !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                    reset_handle_inherit = false;
+                }
+
+                if (reset_handle_inherit) {
+                    SetLastError(0); // just in case
+                    if (!SetHandleInformation(g_reopen_stderr_handle, HANDLE_FLAG_INHERIT, reset_handle_to_inherit ? TRUE : FALSE)) {
+                        if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                            win_error = GetLastError();
+                        }
+                        if (!g_flags.ret_win_error) {
+                            ret = err_win32_error;
+                        }
+                        else {
+                            ret = win_error;
+                        }
+                        if (!g_flags.no_print_gen_error_string) {
+                            _print_stderr_message(_T("could not %s handle inheritance of reopened stderr as file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                                reset_handle_to_inherit ? _T("enable") : _T("disable"), win_error, win_error, g_options.reopen_stderr_as_file.c_str());
+                        }
+                        if (g_flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        return false;
+                    }
+                }
             }
 
-            if (reset_handle_inherit) {
+            g_reopen_stderr_fileid = _get_fileid_by_file_handle(g_reopen_stderr_handle, g_options.win_ver);
+
+            // check opened handles on equality
+
+            if (_is_equal_fileid(g_reopen_stdout_fileid, g_reopen_stderr_fileid)) {
+                // reopen handle through the handle duplication
+                _close_handle(g_reopen_stderr_handle);
+
                 SetLastError(0); // just in case
-                if (!SetHandleInformation(g_reopen_stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_reopen_stdout_handle, GetCurrentProcess(), &g_reopen_stderr_handle, 0, reset_handle_to_inherit ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -3650,17 +3714,46 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not disable handle inheritance of reopened stderr as file: win_error=0x%08X (%d) file=\"%s\"\n"),
-                            win_error, win_error, g_options.reopen_stderr_as_file.c_str());
+                        _print_stderr_message(_T("could not auto duplicate (merge) stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
+                            win_error, win_error, g_options.reopen_stdout_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
                         _print_win_error_message(win_error, g_options.win_error_langid);
                     }
                     return false;
                 }
+
+                g_reopen_stderr_mutex = g_reopen_stdout_mutex;
+            }
+            else {
+                // create associated write mutex
+                if (g_flags.mutex_std_writes) {
+                    g_reopen_stderr_mutex = CreateMutex(NULL, FALSE,
+                        (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + g_reopen_stderr_fileid.to_tstring()).c_str());
+                }
             }
 
-            g_reopen_stderr_fileid = _get_fileid_by_file_handle(g_reopen_stderr_handle, g_options.win_ver);
+            if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, STDERR_FILENO, _O_BINARY, true, reset_handle_to_inherit)) {
+                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
+                    win_error = GetLastError();
+                }
+                if (!g_flags.ret_win_error) {
+                    ret = err_win32_error;
+                }
+                else {
+                    ret = win_error;
+                }
+                if (!g_flags.no_print_gen_error_string) {
+                    _print_stderr_message(_T("could not duplicate reopened stderr as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        win_error, win_error, g_options.reopen_stderr_as_file.c_str());
+                }
+                if (g_flags.print_win_error_string && win_error) {
+                    _print_win_error_message(win_error, g_options.win_error_langid);
+                }
+                return false;
+            }
+
+            g_is_stderr_reopened = true;
         }
         else {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -3681,65 +3774,6 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             }
             return false;
         }
-
-        // check opened handles on equality
-
-        if (_is_equal_fileid(g_reopen_stdout_fileid, g_reopen_stderr_fileid)) {
-            // reopen handle through the handle duplication
-            _close_handle(g_reopen_stderr_handle);
-
-            SetLastError(0); // just in case
-            if (!DuplicateHandle(GetCurrentProcess(), g_reopen_stdout_handle, GetCurrentProcess(), &g_reopen_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
-                if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                    win_error = GetLastError();
-                }
-                if (!g_flags.ret_win_error) {
-                    ret = err_win32_error;
-                }
-                else {
-                    ret = win_error;
-                }
-                if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not auto duplicate (merge) stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
-                        win_error, win_error, g_options.reopen_stdout_as_file.c_str());
-                }
-                if (g_flags.print_win_error_string && win_error) {
-                    _print_win_error_message(win_error, g_options.win_error_langid);
-                }
-                return false;
-            }
-
-            g_reopen_stderr_mutex = g_reopen_stdout_mutex;
-        }
-        else {
-            // create associated write mutex
-            if (g_flags.mutex_std_writes) {
-                g_reopen_stderr_mutex = CreateMutex(NULL, FALSE,
-                    (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + g_reopen_stderr_fileid.to_tstring()).c_str());
-            }
-        }
-
-        if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, STDERR_FILENO, _O_BINARY, true, false)) {
-            if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
-                win_error = GetLastError();
-            }
-            if (!g_flags.ret_win_error) {
-                ret = err_win32_error;
-            }
-            else {
-                ret = win_error;
-            }
-            if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not duplicate reopened stderr as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
-                    win_error, win_error, g_options.reopen_stderr_as_file.c_str());
-            }
-            if (g_flags.print_win_error_string && win_error) {
-                _print_win_error_message(win_error, g_options.win_error_langid);
-            }
-            return false;
-        }
-
-        g_is_stderr_reopened = true;
     }
     else if (!g_options.reopen_stderr_as_server_pipe.empty()) {
         SetLastError(0); // just in case
@@ -4789,9 +4823,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
     }
 
-    g_no_std_inherit = g_is_process_elevating || g_flags.no_std_inherit || g_flags.pipe_stdin_to_stdout || is_idle_execute;
+    g_no_std_inherit = g_is_process_elevating || g_flags.no_std_inherit || is_idle_execute;
 
-    g_no_stdin_inherit = g_no_std_inherit || g_flags.pipe_stdin_to_child_stdin;
+    g_no_stdin_inherit = g_no_std_inherit || g_flags.no_stdin_inherit || g_flags.pipe_stdin_to_child_stdin;
+    g_no_stdout_inherit = g_no_std_inherit || g_flags.no_stdout_inherit || g_flags.pipe_stdin_to_child_stdin;
+    g_no_stderr_inherit = g_no_std_inherit || g_flags.no_stderr_inherit;
 
     g_pipe_stdin_to_child_stdin = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_stdin_to_child_stdin);
     g_pipe_child_stdout_to_stdout = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_child_stdout_to_stdout);
@@ -4975,7 +5011,16 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
 
+#ifdef _DEBUG
+        _debug_print_win32_std_handles(4);
+        _debug_print_crt_std_handles(4);
+#endif
+
         // std handles update
+
+        bool no_stdin_inherit = false;
+        bool no_stdout_inherit = false;
+        bool no_stderr_inherit = false;
 
         if (g_inherited_console_window) {
             if (!_get_std_handles(ret, win_error, g_stdin_handle, g_stdout_handle, g_stderr_handle, g_flags, g_options)) {
@@ -4987,21 +5032,25 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             g_stdout_handle_type = GetFileType(g_stdout_handle);
             g_stderr_handle_type = GetFileType(g_stderr_handle);
 
+            no_stdin_inherit = g_no_stdin_inherit || g_stdin_handle_type != FILE_TYPE_CHAR;
+            no_stdout_inherit = g_no_stdout_inherit || g_stdout_handle_type != FILE_TYPE_CHAR;
+            no_stderr_inherit = g_no_stderr_inherit || g_stderr_handle_type != FILE_TYPE_CHAR;
+
             // change std handles inheritance
 
-            // NOTE:
+            // CAUTION:
             //  We can not change console handle inheritance under Windows 7.
             //
             //  Details:
             //
             //    `Windows 7 inheritability [win7inh]` : https://github.com/rprichard/win32-console-docs#win7inh
             //
-            //      * Calling DuplicateHandle(bInheritHandle=FALSE) on an inheritable console handle produces an inheritable handle,
+            //      * Calling DuplicateHandle(bInheritHandle=FALSE) on an inheritable console handle (and not console handle too) produces an inheritable handle,
             //        but it should be non-inheritable. Previous and later Windows releases work as expected, as does Windows 7 with a non-console handle.
             //      * Calling SetHandleInformation(dwMask=HANDLE_FLAG_INHERIT) fails on console handles, so the inheritability of an existing console handle cannot be changed.
             //
 
-            // NOTE:
+            // CAUTION:
             //  We have to restore console handle inheritance under Windows XP.
             //
             //  Details:
@@ -5011,8 +5060,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             //      When CreateProcess in XP duplicates an inheritable handle, the duplicated handle is non-inheritable. In Vista and later, the new handle is also inheritable.
             //
 
-            if (g_no_std_inherit || g_no_stdin_inherit) {
-                if (!is_os_windows_7 || g_stdin_handle_type != FILE_TYPE_CHAR) {
+            if (g_stdin_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
+                if (no_stdin_inherit) {
+                    // CAUTION:
+                    //  The DuplicateHandle over a not character device handle fails to disable inheritance under Windows 7.
+                    //  We must recheck and reset inheritance here again.
+                    //
                     bool reset_stdin_handle_inherit = true;
                     DWORD stdin_handle_flags = 0;
 
@@ -5043,9 +5096,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         }
                     }
                 }
-            }
-            else {
-                if (is_os_windows_xp_or_lower || !is_os_windows_7 || g_stdin_handle_type != FILE_TYPE_CHAR) {
+                else {
                     bool reset_stdin_handle_inherit = true;
                     DWORD stdin_handle_flags = 0;
 
@@ -5078,8 +5129,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
 
-            if (g_no_std_inherit) {
-                if (!is_os_windows_7 || g_stdout_handle_type != FILE_TYPE_CHAR) {
+            if (g_stdout_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
+                if (no_stdout_inherit) {
+                    // CAUTION:
+                    //  The DuplicateHandle over a not character device handle fails to disable inheritance under Windows 7.
+                    //  We must recheck and reset inheritance here again.
+                    //
                     bool reset_stdout_handle_inherit = true;
                     DWORD stdout_handle_flags = 0;
 
@@ -5110,9 +5165,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         }
                     }
                 }
-            }
-            else {
-                if (is_os_windows_xp_or_lower || !is_os_windows_7 || g_stdout_handle_type != FILE_TYPE_CHAR) {
+                else {
                     bool reset_stdout_handle_inherit = true;
                     DWORD stdout_handle_flags = 0;
 
@@ -5145,8 +5198,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
 
-            if (g_no_std_inherit) {
-                if (!is_os_windows_7 || g_stderr_handle_type != FILE_TYPE_CHAR) {
+            if (g_stderr_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
+                if (no_stderr_inherit) {
+                    // CAUTION:
+                    //  The DuplicateHandle over a not character device handle fails to disable inheritance under Windows 7.
+                    //  We must recheck and reset inheritance here again.
+                    //
                     bool reset_stderr_handle_inherit = true;
                     DWORD stderr_handle_flags = 0;
 
@@ -5177,9 +5234,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         }
                     }
                 }
-            }
-            else {
-                if (is_os_windows_xp_or_lower || !is_os_windows_7 || g_stderr_handle_type != FILE_TYPE_CHAR) {
+                else {
                     bool reset_stderr_handle_inherit = true;
                     DWORD stderr_handle_flags = 0;
 
@@ -5329,19 +5384,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
 
             if (break_) break;
-        }
 
 #ifdef _DEBUG
-        _print_raw_message_impl(0, STDOUT_FILENO, "%u 5 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
-            GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
-            GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
-            GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
-
-        _print_raw_message_impl(0, STDERR_FILENO, "%u 6 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
-            GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
-            GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
-            GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
+            _debug_print_win32_std_handles(5);
+            _debug_print_crt_std_handles(5);
 #endif
+        }
 
         // Accomplish all client pipe connections for all tee handles from here before duplicate them.
         //
@@ -5798,7 +5846,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
 
-
         ret = err_none;
         win_error = 0;
 
@@ -5811,7 +5858,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         //  DO NOT USE `CREATE_NEW_PROCESS_GROUP` flag in the `CreateProcess`, otherwise a child process would ignore all signals.
         //
 
-        // NOTE:
+        // CAUTION:
         //  Windows XP and Windows 8 has issues over standard handles inheritance and duplication.
         //
         //  Details:
@@ -5820,12 +5867,23 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         //    Windows 8:  `Footnotes` : https://github.com/rprichard/win32-console-docs#footnotes
         //
 
+        // CAUTION:
+        //  ShellExecute elevation (verb=runas) under already elevated environment and parent process console (re)attachment in the child process involves
+        //  standard handles inheritance even if standard handles are not character device and declared as not inheritable (Windows 7 bug).
+        //  Workaround that by explicitly assign a null handle address to prevent inheritance into child process.
+        //
+
         if (!is_idle_execute) {
             if_break (app && app_len) {
                 g_ctrl_handler = true;
                 SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
 
                 if (g_options.shell_exec_verb.empty()) {
+#ifdef _DEBUG
+                    _print_raw_message_impl(0, STDOUT_FILENO, "---\n");
+                    _print_raw_message_impl(0, STDERR_FILENO, "---\n");
+#endif
+
                     if (cmd && cmd_len) {
                         // CAUTION:
                         //  cmd argument must be writable!
@@ -5889,6 +5947,36 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     sei.lpDirectory = !current_dir.empty() ? current_dir.c_str() : NULL;
                     sei.nShow = g_options.show_as;
 
+                    // ShellExecute standard handles inheritance issue workaround
+                    if (!g_is_stdin_redirected) {
+                        if (no_stdin_inherit) {
+                            SetStdHandle(STD_INPUT_HANDLE, NULL);
+                            g_is_stdin_redirected = true;
+                        }
+                    }
+                    if (!g_is_stdout_redirected) {
+                        if (no_stdout_inherit) {
+                            SetStdHandle(STD_OUTPUT_HANDLE, NULL);
+                            g_is_stdout_redirected = true;
+                        }
+                    }
+                    if (!g_is_stderr_redirected) {
+                        if (no_stderr_inherit) {
+                            SetStdHandle(STD_ERROR_HANDLE, NULL);
+                            g_is_stderr_redirected = true;
+                        }
+                    }
+
+#ifdef _DEBUG
+                    if (g_is_stdin_redirected || g_is_stdout_redirected || g_is_stderr_redirected) {
+                        _debug_print_win32_std_handles(6);
+                        _debug_print_crt_std_handles(6);
+                    }
+
+                    _print_raw_message_impl(0, STDOUT_FILENO, "---\n");
+                    _print_raw_message_impl(0, STDERR_FILENO, "---\n");
+#endif
+
                     if (g_flags.init_com) {
                         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
                     }
@@ -5923,6 +6011,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
             else if (cmd && cmd_len) {
+#ifdef _DEBUG
+                _print_raw_message_impl(0, STDOUT_FILENO, "---\n");
+                _print_raw_message_impl(0, STDERR_FILENO, "---\n");
+#endif
+
                 g_ctrl_handler = true;
                 SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
 
@@ -5947,6 +6040,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 g_child_process_group_id = pi.dwProcessId;  // to pass parent console signal events into child process
             }
         }
+#ifdef _DEBUG
+        else {
+            _print_raw_message_impl(0, STDOUT_FILENO, "---\n");
+            _print_raw_message_impl(0, STDERR_FILENO, "---\n");
+        }
+#endif
+
 
         const bool is_child_executed = !is_idle_execute && ret_create_proc && _is_valid_handle(g_child_process_handle);
 
@@ -6605,6 +6705,27 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_flags.no_std_inherit = false; // always reset
+
+    if (child_flags.no_stdin_inherit) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-stdin-inherit ");
+        }
+    }
+    regular_flags.no_stdin_inherit = false; // always reset
+
+    if (child_flags.no_stdout_inherit) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-stdout-inherit ");
+        }
+    }
+    regular_flags.no_stdout_inherit = false; // always reset
+
+    if (child_flags.no_stderr_inherit) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-stderr-inherit ");
+        }
+    }
+    regular_flags.no_stderr_inherit = false; // always reset
 
 
     if (child_flags.allow_throw_seh_except) {

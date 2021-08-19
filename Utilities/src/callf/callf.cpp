@@ -155,6 +155,9 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/no-expand-env"),
     _T("/no-subst-vars"),
     _T("/no-std-inherit"),
+    _T("/no-stdin-inherit"),
+    _T("/no-stdout-inherit"),
+    _T("/no-stderr-inherit"),
     _T("/allow-throw-seh-except"),
     _T("/allow-expand-unexisted-env"),
     _T("/allow-subst-empty-args"),
@@ -417,6 +420,10 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/no-std-inherit"),
+    _T("/no-stdin-inherit"),
+    _T("/no-stdout-inherit"),
+    _T("/no-stderr-inherit"),
     _T("/allow-throw-seh-except"),
     _T("/reopen-stdin"),
     _T("/reopen-stdin-as-server-pipe"),
@@ -810,6 +817,27 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/no-std-inherit"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_std_inherit = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/no-stdin-inherit"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.no_stdin_inherit = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/no-stdout-inherit"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.no_stdout_inherit = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/no-stderr-inherit"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.no_stderr_inherit = true;
             return 1;
         }
         return 0;
@@ -2365,15 +2393,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     bool is_console_window_inited = false;
 
 #ifdef _DEBUG
-    _print_raw_message_impl(0, STDOUT_FILENO, "%u 1 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
-        GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
-        GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
-        GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
-
-    _print_raw_message_impl(0, STDERR_FILENO, "%u 2 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
-        GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
-        GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
-        GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
+    _debug_print_win32_std_handles(1);
+    _debug_print_crt_std_handles(1);
 #endif
 
     // NOTE:
@@ -2803,18 +2824,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
 #ifdef _DEBUG
-            HANDLE h0_ = GetStdHandle(STD_INPUT_HANDLE);
-            HANDLE h1_ = GetStdHandle(STD_OUTPUT_HANDLE);
-            HANDLE h2_ = GetStdHandle(STD_ERROR_HANDLE);
-
-            const int stdin_fileno_ = _fileno(stdin);
-            const HANDLE registered_stdin_handle_ = stdin_fileno_ >= 0 ? (HANDLE)_get_osfhandle(stdin_fileno_) : INVALID_HANDLE_VALUE;
-
-            const int stdout_fileno_ = _fileno(stdout);
-            const HANDLE registered_stdout_handle_ = stdout_fileno_ >= 0 ? (HANDLE)_get_osfhandle(stdout_fileno_) : INVALID_HANDLE_VALUE;
-
-            const int stderr_fileno_ = _fileno(stderr);
-            const HANDLE registered_stderr_handle_ = stderr_fileno_ >= 0 ? (HANDLE)_get_osfhandle(stderr_fileno_) : INVALID_HANDLE_VALUE;
+            _debug_print_win32_std_handles(2);
+            _debug_print_crt_std_handles(2);
 #endif
 
             if (g_inherited_console_window) {
@@ -2836,31 +2847,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
 #ifdef _DEBUG
-            _print_raw_message_impl(0, STDOUT_FILENO, "%u 3 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
-                GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
-                GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
-                GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
-
-            _print_raw_message_impl(0, STDERR_FILENO, "%u 4 stdin : %p %u; stdout: %p %u; stderr: %p %u\n", GetCurrentProcessId(),
-                GetStdHandle(STD_INPUT_HANDLE), GetFileType(GetStdHandle(STD_INPUT_HANDLE)),
-                GetStdHandle(STD_OUTPUT_HANDLE), GetFileType(GetStdHandle(STD_OUTPUT_HANDLE)),
-                GetStdHandle(STD_ERROR_HANDLE), GetFileType(GetStdHandle(STD_ERROR_HANDLE)));
-
-            // recheck
-            _StdHandlesState std_handles_state2;
-
-            std_handles_state2.save_stdin_state(GetStdHandle(STD_INPUT_HANDLE));
-            std_handles_state2.save_stdout_state(GetStdHandle(STD_OUTPUT_HANDLE));
-            std_handles_state2.save_stderr_state(GetStdHandle(STD_ERROR_HANDLE));
-
-            const int stdin_fileno2 = _fileno(stdin);
-            const HANDLE registered_stdin_handle2 = (HANDLE)_get_osfhandle(stdin_fileno2 >= 0 ? stdin_fileno2 : STDIN_FILENO);
-
-            const int stdout_fileno2 = _fileno(stdout);
-            const HANDLE registered_stdout_handle2 = (HANDLE)_get_osfhandle(stdout_fileno2 >= 0 ? stdout_fileno2 : STDOUT_FILENO);
-
-            const int stderr_fileno2 = _fileno(stderr);
-            const HANDLE registered_stderr_handle2 = (HANDLE)_get_osfhandle(stderr_fileno2 >= 0 ? stderr_fileno2 : STDERR_FILENO);
+            _debug_print_win32_std_handles(3);
+            _debug_print_crt_std_handles(3);
 #endif
 
             arg_offset = 1;
@@ -3070,6 +3058,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
             if (g_options.stderr_dup != -1 && g_options.stderr_dup != 1) {
                 return invalid_format_flag_message(_T("stderr duplication has invalid fileno: fileno=%i\n"), g_options.stderr_dup);
+            }
+
+            // no-std*-inherit
+
+            if (g_flags.no_std_inherit && (g_flags.no_stdin_inherit || g_flags.no_stdout_inherit || g_flags.no_stderr_inherit)) {
+                return invalid_format_flag_message(_T("standard handles inheritance prevention flags are mixed: /no-std*-inherit\n"));
             }
 
             // tee std
@@ -3646,7 +3640,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     }
     __finally {
         [&]() {
-            if (g_flags.pause_on_exit || g_flags.pause_on_exit_if_error && ret != err_none || g_flags.pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none) {
+            const bool pause_on_exit = g_flags.pause_on_exit || g_flags.pause_on_exit_if_error && ret != err_none || g_flags.pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none;
+
+#ifdef _DEBUG
+            if (pause_on_exit || g_conout_prints_buf.size()) {
+                _debug_print_win32_std_handles(8);
+                _debug_print_crt_std_handles(8);
+            }
+#endif
+
+            if (pause_on_exit) {
                 _put_raw_message_impl(0, STDOUT_FILENO, "Press any key to continue . . . \n");
                 getch();
             }
@@ -3690,6 +3693,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                     if (g_inherited_console_window) {
                         _reinit_crt_std_handles();
+
+#ifdef _DEBUG
+                        if (g_conout_prints_buf.size()) {
+                            _debug_print_win32_std_handles(9);
+                            _debug_print_crt_std_handles(9);
+                        }
+#endif
 
                         for (const auto & conout : g_conout_prints_buf) {
                             if (conout.any_str.is_wstr) {
