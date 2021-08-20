@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.08.19
+* 2021.08.20
 * contools--utilities--tests
 
 1. DESCRIPTION
@@ -81,11 +81,12 @@ All these affect test results. All runs must produce the same results.
 
 Several tests still fails under specific conditions:
 
-* `20-test-*` fails to print correctly in Windows 8.
+* `20-test--01-create_proc--01-reopen_stdin_as_file--02-named_pipe_to_child_stdin--02-user_input.bat`
+  fails to print correctly in Windows 8.
 
-* `21-test--01-shell_exec_runas--02-named_pipe_to_child_stdin.bat` fails to
-  print correctly under already elevated environment in Windows 8.
+* `40-test--02-shell_exec_runas--01-reopen_stdin_as_file--01-named_pipe_to_child_stdin--02-user_input.bat`
+  fails to print correctly under already elevated environment in Windows 8.
 
-* `31-test--01-elevate--02-user_input.bat` time to time fails to print
+* `50-test--01-elevate--02-user_input.bat` time to time fails to print
   correctly from opened `cmd.exe` console under not elevated environment in
   Windows 7.
