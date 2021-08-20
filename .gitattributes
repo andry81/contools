@@ -929,9 +929,9 @@ Utilities/tests/manual/contools/callf/50-test--02-elevate--01-reopen_stdin_as_fi
 Utilities/tests/manual/contools/callf/50-test--02-elevate--01-reopen_stdin_as_file--02-named_pipe_tofrom_child_stdin_to_stdout--02-user_input.bat -text
 Utilities/tests/manual/contools/callf/50-test--03-elevate--01-create_proc--01-tee_inout--01-pipe_inout_child--01-user_input.bat -text
 Utilities/tests/manual/contools/callf/50-test--03-elevate--01-create_proc--01-tee_inout--02-write_console_stdin_back--01-user_input.bat -text
-Utilities/tests/manual/contools/callf/60-test--01-gui_to_cui--01-pause_on_exit.bat -text
+Utilities/tests/manual/contools/callf/60-test--01-gui_to_cui--01-create_proc--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/60-test--01-gui_to_cui--02-elevate--01_existing_console--01-pause_on_exit.bat -text
-Utilities/tests/manual/contools/callf/70-test--01-gui_to_gui--01-new_console--01-pause_on_exit.bat -text
+Utilities/tests/manual/contools/callf/70-test--01-gui_to_gui--01-create_proc--01-new_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/70-test--01-gui_to_gui--02-elevate--01-new_console_if_elevated--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/70-test--01-gui_to_gui--02-elevate--02-new_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/70-test--01-gui_to_gui--02-elevate--03-new_console--01-pause_on_exit.bat -text
