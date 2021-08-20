@@ -926,7 +926,8 @@ Utilities/tests/manual/contools/callf/30-test--01-elevate--01-named_pipe_tofrom_
 Utilities/tests/manual/contools/callf/30-test--01-elevate--02-named_pipe_tofrom_child_stdin_to_stdout.bat -text
 Utilities/tests/manual/contools/callf/31-test--01-elevate--01-stdin_to_stdout.bat -text
 Utilities/tests/manual/contools/callf/31-test--01-elevate--02-user_input.bat -text
-Utilities/tests/manual/contools/callf/31-test--01-elevate--03-user_input_with_tee.bat -text
+Utilities/tests/manual/contools/callf/31-test--01-elevate--03-user_input--01-tee_inout--01-pipe_inout_child.bat -text
+Utilities/tests/manual/contools/callf/31-test--01-elevate--03-user_input--01-tee_inout--02-write_console_stdin_back.bat -text
 Utilities/tests/manual/contools/callf/40-test--01-gui_to_cui--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/40-test--01-gui_to_cui--02-elevate--01_existing_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/50-test--01-gui_to_gui--01-new_console--01-pause_on_exit.bat -text
