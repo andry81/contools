@@ -1,3 +1,8 @@
+2021.08.20:
+* fixed: src/callf: incomplete stdin processing in case of character device handle with redirection into a log file
+* new: tests: a manual test for user input with logging
+* changed: tests: manual test minor change
+
 2021.08.19:
 * new: bin/contools: binaries update
 

@@ -90,6 +90,8 @@ bool g_is_stdin_reopened            = false;
 bool g_is_stdout_reopened           = false;
 bool g_is_stderr_reopened           = false;
 
+bool g_is_child_stdin_char_type     = false;    // is child process inherited stdin as character device
+
 bool g_is_stdin_redirected          = false;
 bool g_is_stdout_redirected         = false;
 bool g_is_stderr_redirected         = false;
@@ -456,7 +458,9 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
     DWORD num_bytes_written = 0;
     //DWORD num_events_avail = 0;
     //DWORD num_events_read = 0;
+    DWORD num_events_written = 0;
     DWORD num_chars_read = 0;
+    DWORD num_chars_written = 0;
     DWORD win_error = 0;
 
     std::vector<std::uint8_t> stdin_byte_buf;
@@ -813,6 +817,8 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                     std::vector<char> translated_char_buf;
                     std::vector<wchar_t> translated_wchar_buf;
 
+                    std::vector<INPUT_RECORD> input_records;
+
                     int num_translated_bytes;
                     //int num_translated_chars;
 
@@ -823,7 +829,6 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
     
                     CPINFO cp_in_info{};
                     CPINFO cp_out_info{};
-
 
                     if (!GetCPInfo(cp_in, &cp_in_info)) {
                         // fallback to module character set
@@ -841,7 +846,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                         cp_out_info.MaxCharSize = sizeof(char);
 #endif
                     }
-    
+
                     // CAUTION:
                     //  The `ReadConsoleInput` function can fail if the length parameter is too big!
                     //
@@ -911,6 +916,30 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             }
 
                             stream_eof = true;
+                        }
+
+                        if (g_is_child_stdin_char_type) {
+                            // return string back to be able to read by a child process ReadConsole
+
+                            input_records.reserve(num_chars_read * 2);
+                            input_records.clear();
+
+                            for (size_t i = 0; i < num_chars_read; i++) {
+                                const wchar_t input_char = stdin_wchar_buf[i];
+
+                                //if (input_char == L'\n') {
+                                //    continue;
+                                //}
+
+                                input_records.push_back(INPUT_RECORD{ KEY_EVENT, KEY_EVENT_RECORD{ TRUE, 1, 0, 0, (WCHAR)input_char, 0 } });
+                                input_records.push_back(INPUT_RECORD{ KEY_EVENT, KEY_EVENT_RECORD{ FALSE, 1, 0, 0, (WCHAR)input_char, 0 } });
+                            }
+
+                            if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
+                                break;
+                            }
+
+                            WriteConsoleInput(g_stdin_handle, input_records.data(), input_records.size(), &num_events_written);
                         }
 
                         if (num_chars_read) {
@@ -5884,6 +5913,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     _print_raw_message_impl(0, STDERR_FILENO, "---\n");
 #endif
 
+                    if (si.dwFlags & STARTF_USESTDHANDLES && (!_is_valid_handle(si.hStdInput) || GetFileType(si.hStdInput) == FILE_TYPE_CHAR)) {
+                        g_is_child_stdin_char_type = true;
+                    }
+                    else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_stdin_handle)) {
+                        g_is_child_stdin_char_type = true;
+                    }
+
                     if (cmd && cmd_len) {
                         // CAUTION:
                         //  cmd argument must be writable!
@@ -5947,11 +5983,17 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     sei.lpDirectory = !current_dir.empty() ? current_dir.c_str() : NULL;
                     sei.nShow = g_options.show_as;
 
+                    if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_stdin_handle)) {
+                        g_is_child_stdin_char_type = true;
+                    }
+
                     // ShellExecute standard handles inheritance issue workaround
                     if (!g_is_stdin_redirected) {
                         if (no_stdin_inherit) {
                             SetStdHandle(STD_INPUT_HANDLE, NULL);
                             g_is_stdin_redirected = true;
+
+                            g_is_child_stdin_char_type = true;
                         }
                     }
                     if (!g_is_stdout_redirected) {
@@ -6015,6 +6057,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 _print_raw_message_impl(0, STDOUT_FILENO, "---\n");
                 _print_raw_message_impl(0, STDERR_FILENO, "---\n");
 #endif
+
+                if (si.dwFlags & STARTF_USESTDHANDLES && (!_is_valid_handle(si.hStdInput) || GetFileType(si.hStdInput) == FILE_TYPE_CHAR)) {
+                    g_is_child_stdin_char_type = true;
+                }
+                else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_stdin_handle)) {
+                    g_is_child_stdin_char_type = true;
+                }
 
                 g_ctrl_handler = true;
                 SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
