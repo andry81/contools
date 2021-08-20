@@ -1553,7 +1553,7 @@ namespace {
         }
 
         if (enable_conout_prints_buffering) {
-            g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::wstring{ char_buf.data(), char_buf.data() > 0 ? char_buf.data() - 1 : 0 } });
+            g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::wstring{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
         }
 
         if (cp_info.MaxCharSize != sizeof(char)) {

@@ -280,7 +280,8 @@ const TCHAR * g_flags_to_parse_arr[] = {
 #endif
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/allow-conout-attach-to-invisible-parent-console"),
-    _T("/disable-conout-duplicate-to-parent-console-on-error")
+    _T("/disable-conout-duplicate-to-parent-console-on-error"),
+    _T("/write-console-stdin-back")
 };
 
 const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
@@ -511,7 +512,8 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
 #endif
     _T("/disable-conout-reattach-to-visible-console"),
     _T("/allow-conout-attach-to-invisible-parent-console"),
-    _T("/disable-conout-duplicate-to-parent-console-on-error")
+    _T("/disable-conout-duplicate-to-parent-console-on-error"),
+    _T("/write-console-stdin-back")
 };
 
 
@@ -2216,6 +2218,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         return 0;
     }
+    if (IsArgEqualTo(arg, _T("/write-console-stdin-back"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.write_console_stdin_back = true;
+            return 1;
+        }
+        return 0;
+    }
 
     return -1;
 }
@@ -3222,6 +3231,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
             if (g_promote_flags.disable_conout_duplicate_to_parent_console_on_error && g_promote_parent_flags.disable_conout_duplicate_to_parent_console_on_error) {
                 return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-conout-duplicate-to-parent-console-on-error\n"));
+            }
+
+            // /write-console-stdin-back vs /pipe-*
+
+            if (g_flags.write_console_stdin_back) {
+                if (g_flags.pipe_stdin_to_child_stdin || g_flags.pipe_child_stdout_to_stdout || g_flags.pipe_child_stderr_to_stderr || g_flags.pipe_inout_child || g_flags.pipe_stdin_to_stdout) {
+                    return invalid_format_flag_message(_T("write console stdin back flag mixed with pipe flags: /write_console_stdin_back <-> /pipe-*\n"));
+                }
             }
 
             // `/no-expand-env` vs `/allow-expand-unexisted-env`

@@ -1,4 +1,9 @@
 2021.08.20:
+* fixed: Utilities/src/callf: potential infinite input loop in case of character device handle with redirection into a log file, use `/write-console-stdin-back` flag to explicitly allow it
+* fixed: Utilities/src/callf: access violation in `_print_raw_message` function
+* new: Utilities/src/callf: `/write-console-stdin-back` to explicitly allow a console input write back with potential infinite input loop
+
+2021.08.20:
 * fixed: Utilities/src/callf: incomplete stdin processing in case of character device handle with redirection into a log file
 * new: Utilities/tests: a manual test for user input with logging
 * changed: Utilities/tests: manual test minor change

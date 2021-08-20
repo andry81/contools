@@ -46,6 +46,7 @@ struct Flags
     bool            disable_conout_reattach_to_visible_console;
     bool            allow_conout_attach_to_invisible_parent_console;
     bool            disable_conout_duplicate_to_parent_console_on_error;
+    bool            write_console_stdin_back;
 
     bool            elevate;
 

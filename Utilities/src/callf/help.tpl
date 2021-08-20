@@ -427,6 +427,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /disable-conout-reattach-to-visible-console
           /allow-conout-attach-to-invisible-parent-console
           /disable-conout-duplicate-to-parent-console-on-error
+          /write-console-stdin-back
 
       /showas <ShowWindowAsNumber>
         Handles a child process window show state.
@@ -916,6 +917,20 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         process exit just before a child process start and is not happen if an
         error is not happened before a child process start. To disable that
         use this flag.
+
+      /write-console-stdin-back
+        When both this-parent and child processes stdin is a character device
+        (console), then this-parent process may write console input back to be
+        pass the last read input to the child. The child must use the same
+        console input buffer and ReadConsole function call in that case,
+        otherwise there is a chance of fall into an infinite input loop.
+
+        Has no effect when a child process stdin is piped from this-parent
+        process stdin.
+        Can not be used together with `/pipe-stdin-to-child-stdin`,
+        `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`,
+        `/pipe-inout-child`, `/pipe-stdin-to-stdout` flags.
+
 
     <ApplicationNameFormatString>, <CommandLineFormatString>,
     <FilePathFormatString>, <ParametersFormatString>,

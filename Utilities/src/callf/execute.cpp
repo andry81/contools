@@ -152,6 +152,8 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, disable_conout_reattach_to_visible_console);
     MERGE_FLAG(flags, disable_conout_duplicate_to_parent_console_on_error);
 
+    MERGE_FLAG(flags, write_console_stdin_back);
+
     MERGE_FLAG(flags, elevate);
 
     MERGE_FLAG(flags, stdin_output_flush);
@@ -918,30 +920,6 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             stream_eof = true;
                         }
 
-                        if (g_is_child_stdin_char_type) {
-                            // return string back to be able to read by a child process ReadConsole
-
-                            input_records.reserve(num_chars_read * 2);
-                            input_records.clear();
-
-                            for (size_t i = 0; i < num_chars_read; i++) {
-                                const wchar_t input_char = stdin_wchar_buf[i];
-
-                                //if (input_char == L'\n') {
-                                //    continue;
-                                //}
-
-                                input_records.push_back(INPUT_RECORD{ KEY_EVENT, KEY_EVENT_RECORD{ TRUE, 1, 0, 0, (WCHAR)input_char, 0 } });
-                                input_records.push_back(INPUT_RECORD{ KEY_EVENT, KEY_EVENT_RECORD{ FALSE, 1, 0, 0, (WCHAR)input_char, 0 } });
-                            }
-
-                            if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
-                                break;
-                            }
-
-                            WriteConsoleInput(g_stdin_handle, input_records.data(), input_records.size(), &num_events_written);
-                        }
-
                         if (num_chars_read) {
                             switch (translation_mode) {
                             case tm_char_to_char:
@@ -1058,6 +1036,31 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                     stream_eof = true;
                                 }
+                            }
+
+                            if (g_is_child_stdin_char_type && g_flags.write_console_stdin_back) {
+                                // return string back to be able to read by a child process ReadConsole
+
+                                input_records.reserve(num_chars_read * 2);
+                                input_records.clear();
+
+                                for (size_t i = 0; i < num_chars_read; i++) {
+                                    const wchar_t input_char = stdin_wchar_buf[i];
+
+                                    //if (input_char == L'\n') {
+                                    //    continue;
+                                    //}
+
+                                    input_records.push_back(INPUT_RECORD{ KEY_EVENT, KEY_EVENT_RECORD{ TRUE, 1, 0, 0, (WCHAR)input_char, 0 } });
+                                    input_records.push_back(INPUT_RECORD{ KEY_EVENT, KEY_EVENT_RECORD{ FALSE, 1, 0, 0, (WCHAR)input_char, 0 } });
+                                }
+
+                                // in case if child process exit
+                                if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
+                                    break;
+                                }
+
+                                WriteConsoleInput(g_stdin_handle, input_records.data(), input_records.size(), &num_events_written);
                             }
                         }
 
@@ -5913,8 +5916,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     _print_raw_message_impl(0, STDERR_FILENO, "---\n");
 #endif
 
-                    if (si.dwFlags & STARTF_USESTDHANDLES && (!_is_valid_handle(si.hStdInput) || GetFileType(si.hStdInput) == FILE_TYPE_CHAR)) {
-                        g_is_child_stdin_char_type = true;
+                    if (si.dwFlags & STARTF_USESTDHANDLES && _is_valid_handle(si.hStdInput)) {
+                        if (GetFileType(si.hStdInput) == FILE_TYPE_CHAR) {
+                            g_is_child_stdin_char_type = true;
+                        }
                     }
                     else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_stdin_handle)) {
                         g_is_child_stdin_char_type = true;
@@ -6058,8 +6063,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 _print_raw_message_impl(0, STDERR_FILENO, "---\n");
 #endif
 
-                if (si.dwFlags & STARTF_USESTDHANDLES && (!_is_valid_handle(si.hStdInput) || GetFileType(si.hStdInput) == FILE_TYPE_CHAR)) {
-                    g_is_child_stdin_char_type = true;
+                if (si.dwFlags & STARTF_USESTDHANDLES && _is_valid_handle(si.hStdInput)) {
+                    if (GetFileType(si.hStdInput) == FILE_TYPE_CHAR) {
+                        g_is_child_stdin_char_type = true;
+                    }
                 }
                 else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_stdin_handle)) {
                     g_is_child_stdin_char_type = true;
@@ -7697,6 +7704,15 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_flags.disable_conout_duplicate_to_parent_console_on_error = false; // always reset
+
+
+    if (child_flags.write_console_stdin_back) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/write-console-stdin-back ");
+        }
+    }
+    regular_flags.write_console_stdin_back = false; // always reset
+
 
     if (cmd_out_str_ptr) {
         *cmd_out_str_ptr = options_line + cmd_line;
