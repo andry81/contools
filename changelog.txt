@@ -1,3 +1,6 @@
+2021.08.21:
+* changed: Scripts/Tools/build/add_files_to_archive.bat: reimplemented with std scripts
+
 2021.08.20:
 * new: Utilities/tests: a manual test for user input with logging and console stdin write back
 * changed: Utilities/tests: readme update

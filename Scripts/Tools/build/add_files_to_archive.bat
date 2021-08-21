@@ -21,9 +21,9 @@ set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 set "?~dp0=%~dp0"
 
-set "DIR=%~dpf1"
+set "DIR=%~f1"
 set "REL_PATH=%~2"
-set "ARCHIVE_PATH=%~dpf3"
+set "ARCHIVE_PATH=%~f3"
 set "ARCHIVE_DIR=%~dp3"
 
 shift
@@ -52,7 +52,8 @@ call "%%?~dp0%%__init__.bat" || exit /b
 
 pushd "%DIR%" || (
   echo.%?~nx0%: error: could not switch current directory: "%DIR%".
-  exit /b 1
+  set LASTERROR=1
+  goto EXIT
 )
 
 echo.  "%DIR%" -^> "%REL_PATH%"
@@ -62,35 +63,53 @@ rem   Explicitly use temporary directory for 7zip. This is required in some case
 rem   archive file around being updated archive file.
 rem   For example: pushd c:\ && ( 7za.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
 
-call "%%CONTOOLS_ROOT%%/uuidgen.bat"
-set "TEMP_DIR_PATH=%TEMP%\%?~n0%.%RETURN_VALUE%"
-
-mkdir "%TEMP_DIR_PATH%" || (
-  popd
-  echo.%?~nx0%: error: could not create temporary directory: "%TEMP_DIR_PATH%".
-  exit /b 2
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
+  echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
+  set LASTERROR=255
+  goto FREE_TEMP_DIR
 ) >&2
 
-if not exist "%ARCHIVE_DIR%" mkdir "%ARCHIVE_DIR%"
-
-call :ARC
+call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
+
+:FREE_TEMP_DIR
+rem cleanup temporary files
+call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
 popd
 
-rmdir /S /Q "%TEMP_DIR_PATH%"
-
+:EXIT
 exit /b %LASTERROR%
 
-:ARC
+:MAIN
+set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\emptydir"
+
+mkdir "%EMPTY_DIR_TMP%" || (
+  echo.%?~n0%: error: could not create a directory: "%EMPTY_DIR_TMP%".
+  exit /b 255
+) >&2
+
+if not exist "%ARCHIVE_DIR%\" ( call :MAKE_DIR "%%ARCHIVE_DIR%%" || exit /b 2 )
+
 rem remove arguments trailing back slashes to avoid exe command line parse old bug
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"
 if "%REL_PATH:~-1%" == "\" set "REL_PATH=%REL_PATH:~0,-1%"
 
-call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/7zip/7za.exe" a -r%%_7ZIP_SWITCHES%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%" "-w%%TEMP_DIR_PATH%%"
+call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/7zip/7za.exe" a -r%%_7ZIP_SWITCHES%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%" "-w%%SCRIPT_TEMP_CURRENT_DIR%%"
 exit /b
 
 :CMD
 echo.^>%*
-(%*)
+(
+  %*
+)
+exit /b
+
+:MAKE_DIR
+for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
+
+mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
+  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
+  exit /b 1
+) >&2
 exit /b
