@@ -5906,6 +5906,22 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         //
 
         if (!is_idle_execute) {
+            // CreateProcess/ShellExecute standard handles inheritance issue workaround
+            if (no_stdin_inherit) {
+                SetStdHandle(STD_INPUT_HANDLE, NULL);
+                g_is_stdin_redirected = true;
+
+                g_is_child_stdin_char_type = true;
+            }
+            if (no_stdout_inherit) {
+                SetStdHandle(STD_OUTPUT_HANDLE, NULL);
+                g_is_stdout_redirected = true;
+            }
+            if (no_stderr_inherit) {
+                SetStdHandle(STD_ERROR_HANDLE, NULL);
+                g_is_stderr_redirected = true;
+            }
+
             if_break (app && app_len) {
                 g_ctrl_handler = true;
                 SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
@@ -5916,8 +5932,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     _print_raw_message_impl(0, STDERR_FILENO, "---\n");
 #endif
 
-                    if (si.dwFlags & STARTF_USESTDHANDLES && _is_valid_handle(si.hStdInput)) {
-                        if (GetFileType(si.hStdInput) == FILE_TYPE_CHAR) {
+                    if (si.dwFlags & STARTF_USESTDHANDLES) {
+                        if (_is_valid_handle(si.hStdInput)) {
+                            if (GetFileType(si.hStdInput) == FILE_TYPE_CHAR) {
+                                g_is_child_stdin_char_type = true;
+                            }
+                        }
+                        else {
                             g_is_child_stdin_char_type = true;
                         }
                     }
@@ -5992,28 +6013,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         g_is_child_stdin_char_type = true;
                     }
 
-                    // ShellExecute standard handles inheritance issue workaround
-                    if (!g_is_stdin_redirected) {
-                        if (no_stdin_inherit) {
-                            SetStdHandle(STD_INPUT_HANDLE, NULL);
-                            g_is_stdin_redirected = true;
-
-                            g_is_child_stdin_char_type = true;
-                        }
-                    }
-                    if (!g_is_stdout_redirected) {
-                        if (no_stdout_inherit) {
-                            SetStdHandle(STD_OUTPUT_HANDLE, NULL);
-                            g_is_stdout_redirected = true;
-                        }
-                    }
-                    if (!g_is_stderr_redirected) {
-                        if (no_stderr_inherit) {
-                            SetStdHandle(STD_ERROR_HANDLE, NULL);
-                            g_is_stderr_redirected = true;
-                        }
-                    }
-
 #ifdef _DEBUG
                     if (g_is_stdin_redirected || g_is_stdout_redirected || g_is_stderr_redirected) {
                         _debug_print_win32_std_handles(6);
@@ -6039,22 +6038,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         g_child_process_handle = sei.hProcess;
                         g_child_process_group_id = GetProcessId(sei.hProcess);  // to pass parent console signal events into child process
                     }
-
-                    // restore standard handles
-                    if (g_is_stdin_redirected) {
-                        SetStdHandle(STD_INPUT_HANDLE, g_stdin_handle);
-                        g_is_stdin_redirected = false;
-                    }
-
-                    if (g_is_stdout_redirected) {
-                        SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_handle);
-                        g_is_stdout_redirected = false;
-                    }
-
-                    if (g_is_stderr_redirected) {
-                        SetStdHandle(STD_ERROR_HANDLE, g_stderr_handle);
-                        g_is_stderr_redirected = false;
-                    }
                 }
             }
             else if (cmd && cmd_len) {
@@ -6063,8 +6046,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 _print_raw_message_impl(0, STDERR_FILENO, "---\n");
 #endif
 
-                if (si.dwFlags & STARTF_USESTDHANDLES && _is_valid_handle(si.hStdInput)) {
-                    if (GetFileType(si.hStdInput) == FILE_TYPE_CHAR) {
+                if (si.dwFlags & STARTF_USESTDHANDLES) {
+                    if (_is_valid_handle(si.hStdInput)) {
+                        if (GetFileType(si.hStdInput) == FILE_TYPE_CHAR) {
+                            g_is_child_stdin_char_type = true;
+                        }
+                    }
+                    else {
                         g_is_child_stdin_char_type = true;
                     }
                 }
@@ -6094,6 +6082,22 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             if (_is_valid_handle(pi.hProcess)) {
                 g_child_process_handle = pi.hProcess;       // to check the process status from stream pipe threads
                 g_child_process_group_id = pi.dwProcessId;  // to pass parent console signal events into child process
+            }
+
+            // restore standard handles
+            if (g_is_stdin_redirected) {
+                SetStdHandle(STD_INPUT_HANDLE, g_stdin_handle);
+                g_is_stdin_redirected = false;
+            }
+
+            if (g_is_stdout_redirected) {
+                SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_handle);
+                g_is_stdout_redirected = false;
+            }
+
+            if (g_is_stderr_redirected) {
+                SetStdHandle(STD_ERROR_HANDLE, g_stderr_handle);
+                g_is_stderr_redirected = false;
             }
         }
 #ifdef _DEBUG

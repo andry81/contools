@@ -2426,9 +2426,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
             int arg_offset = 0;
+            int arg_offset_begin = 0;
 
             if (argv[0][0] != _T('/')) { // arguments shift detection
-                arg_offset = 1;
+                arg_offset = arg_offset_begin = 1;
             }
 
             const TCHAR * arg;
@@ -2860,7 +2861,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             _debug_print_crt_std_handles(3);
 #endif
 
-            arg_offset = 1;
+            arg_offset = arg_offset_begin;
 
             if (print_help) {
                 _put_raw_message_impl(0, STDOUT_FILENO,

@@ -1,4 +1,10 @@
 2021.08.22:
+* fixed: src/callf: incorrect first option parse
+* fixed: src/callf: CreateProcess invalid standard handles inheritance issue even if standard handles are not inheritable (Windows 8 bug). Workarounded that by explicitly assign a null handle address to prevent inheritance into child process.
+* fixed: tests: more manual tests pass
+* changed: tests: readme update
+
+2021.08.22:
 * changed: tests: readme update
 
 2021.08.20:
