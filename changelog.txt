@@ -1,3 +1,6 @@
+2021.08.22:
+* changed: Utilities/tests: readme update
+
 2021.08.21:
 * changed: Scripts/Tools/build/add_files_to_archive.bat: reimplemented with std scripts
 
