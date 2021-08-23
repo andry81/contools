@@ -2,6 +2,10 @@
 
 if [[ -n "$BASH" ]]; then
 
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include 'testlib.sh' || tkl_abort_include
+
 if [[ -n "$BASH_LINENO" ]] && (( ${BASH_LINENO[0]} > 0 )); then
   TestScriptFilePath="${BASH_SOURCE[0]//\\//}"
 else
@@ -17,8 +21,6 @@ TestScriptDirPath="${TestScriptFilePath%[/]*}"
 TestScriptParentDirName="${TestScriptDirPath##*[/]}"
 TestScriptFileName="${TestScriptFilePath##*[/]}"
 TestScriptBaseFileName="${TestScriptFileName%.*}"
-
-source "$TestScriptDirPath/testlib.sh"
 
 TestModuleInit
 
@@ -104,7 +106,7 @@ function Test_2_2()
   }
   Test
   declare -f "$HANDLER_NAME" >/dev/null 2>&1 || TestEcho 2 # should be autodeleted already
-  Unset HANDLER_NAME
+  tkl_unset HANDLER_NAME
   TestAssertHasNoExtraVariables
 }
 
@@ -249,9 +251,9 @@ function Test_5_1()
   function Test()
   {
     (
-      PushTrapHandler test 'UserTrapHandler' 'TestEcho $?; TestAssertHasNoExtraVariables; SetLastError 222' '' EXIT
+      PushTrapHandler test 'UserTrapHandler' 'TestEcho $?; TestAssertHasNoExtraVariables; tkl_set_last_error 222' '' EXIT
       TestAssertHasExtraVariables EXIT
-      SetLastError 123
+      tkl_set_last_error 123
     )
     TestEcho $?
   }

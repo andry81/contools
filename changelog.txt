@@ -1,3 +1,9 @@
+2021.08.23:
+* fixed: Scripts/Tests: bash shell tests run fixup
+* changed: Script/Tools/bash: bash shell scripts reimplemented with `bash_entry` script usage
+* changed: Scripts/Tests: bash shell tests reimplemented with `bash_entry` script usage
+* refactor: Script/Tools/bash: bash shell scripts moved into standalone directory
+
 2021.08.22:
 * new: Utilities/bin/contools: binaries update
 

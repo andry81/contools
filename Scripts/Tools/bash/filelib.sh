@@ -5,14 +5,16 @@
 # Bash file library, supports common file functions.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_FILELIB_SH} )); then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_FILELIB_SH} )); then
 
 SOURCE_CONTOOLS_FILELIB_SH=1 # including guard
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
-source "${CONTOOLS_ROOT:-.}/traplib.sh"
-source "${CONTOOLS_ROOT:-.}/stringlib.sh"
-source "${CONTOOLS_ROOT:-.}/regexplib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/regexplib.sh" || tkl_abort_include
 
 function BufferedRead()
 {
@@ -1221,7 +1223,7 @@ function ReadFileDependents()
   case "$DumpbType" in
     1)
       EvalString="$(
-        "${CONTOOLS_ROOT:-.}/dumpbin.exe" -dependents "$NativeFilePath" | \
+        "$CONTOOLS_UTILITIES_BIN_ROOT/Microsoft/dumpbin.exe" -dependents "$NativeFilePath" | \
         InternalDumpbinRead | tr '[:upper:]' '[:lower:]' | \
         { MakeCommandArgumentsFromFile - && echo -n "$RETURN_VALUE"; }
       )"
@@ -1230,7 +1232,7 @@ function ReadFileDependents()
 
     2)
       EvalString="$(
-        "${CONTOOLS_ROOT:-.}/objdump.exe" -p "$NativeFilePath" | \
+        "$CONTOOLS_UTILITIES_BIN_ROOT/mingw/bin/objdump.exe" -p "$NativeFilePath" | \
         InternalObjdumpRead | tr '[:upper:]' '[:lower:]' | \
         { MakeCommandArgumentsFromFile - && echo -n "$RETURN_VALUE"; }
       )"

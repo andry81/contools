@@ -1,9 +1,11 @@
 #!/bin/bash_entry
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
 
-source "${CONTOOLS_ROOT:-.}/testlib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/testlib.sh" || tkl_abort_include
 
 function TestUserModuleInit()
 {
@@ -18,7 +20,7 @@ function TestUserModuleInit()
   export CH_CODE_MIN=32
   export CH_CODE_MAX=127
 
-  TEST_SOURCES=("${CONTOOLS_ROOT:-.}/hashlib.sh")
+  TEST_SOURCES=("$CONTOOLS_ROOT/bash/hashlib.sh")
   TEST_FUNCTIONS=(GenerateStrings GenerateHashes GenerateHashMap ReadHashMap CheckHashCollisions)
 }
 
@@ -110,7 +112,7 @@ function GenerateStrings()
     for (( j=0; j<StringLen; j++ )); do
       # range: CH_CODE_MIN - CH_CODE_MAX
       let charCode="CH_CODE_MIN + (CH_CODE_MAX - CH_CODE_MIN) * $RANDOM / 32767"
-      byteToChar $charCode
+      tkl_byte_to_char $charCode
       CharsArr[j]="$RETURN_VALUE"
     done
     String="${CharsArr[*]:0:StringLen}" # faster than just append to the end of string
@@ -171,8 +173,8 @@ function GenerateHashes()
       #fi
 
       eval $HashPredFunc '"$line"'
-      decToHex "$RETURN_VALUE"
-      ZeroPadding 8 "$RETURN_VALUE"
+      tkl_dec_to_hex "$RETURN_VALUE"
+      tkl_zero_padding 8 "$RETURN_VALUE"
       echo "$RETURN_VALUE" 1>&8
       (( !(index%1000) )) && echo "$index: $RETURN_VALUE"
       (( index++ ))
@@ -180,8 +182,8 @@ function GenerateHashes()
   else
     for (( i=0; i<STR_NUM; i++ )); do
       eval $HashPredFunc '"$STRINGS[$i]"'
-      decToHex "$RETURN_VALUE"
-      ZeroPadding 8 "$RETURN_VALUE"
+      tkl_dec_to_hex "$RETURN_VALUE"
+      tkl_zero_padding 8 "$RETURN_VALUE"
       HASHES[$i]="$RETURN_VALUE"
       (( !(index%1000) )) && echo "$index: $RETURN_VALUE"
       (( index++ ))
@@ -212,7 +214,7 @@ function ReadHashMap()
     (( !(i%1000) )) && echo "$(( i*2 + 10 )): $RETURN_VALUE"
   done
 
-  SetLastError 0
+  tkl_set_last_error 0
 
   return 0 # test has no internal errors
 }
@@ -411,10 +413,10 @@ function CheckHashCollisions()
       (( NumCollisions++ ))
       for (( j=0; j<colIndex; j++ )); do
         string="${collisionStrings[j]}"
-        decToHex "${#string}"
+        tkl_dec_to_hex "${#string}"
         lenHex="$RETURN_VALUE"
         stringIndex=${collisionStringIndexes[j]}
-        ZeroPaddingArray '' 3 "$NumCollisions" 8 "$hash" 6 "$stringIndex" 4 "$lenHex"
+        tkl_zero_padding_from_args '' 3 "$NumCollisions" 8 "$hash" 6 "$stringIndex" 4 "$lenHex"
         value="${RETURN_VALUES[0]}: ${RETURN_VALUES[1]} ${RETURN_VALUES[2]}: ${RETURN_VALUES[3]} $string"
         echo "$value" 1>&9
         strLen=${#string}
@@ -431,9 +433,9 @@ function CheckHashCollisions()
     fi
   done
   if (( ! NumCollisions )); then
-    SetLastError 0
+    tkl_set_last_error 0
   else
-    SetLastError 1
+    tkl_set_last_error 1
   fi
   echo
   echo "Overall collisions: $NumCollisions"

@@ -6,10 +6,12 @@
 # for the build scripts.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
-source "${CONTOOLS_ROOT:-.}/traplib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/traplib.sh"
 
 function GetUtilityVersion()
 {
@@ -481,7 +483,7 @@ function CheckScriptGccmrt()
 {
   echo -n "Checking \"gccmrt.sh\" script... "
 
-  local GccMrtPath="$CONTOOLS_ROOT/gccmrt.sh"
+  local GccMrtPath="$CONTOOLS_ROOT/bash/gccmrt.sh"
 
   if [[ -z "$GccMrtPath" || ! -f "$GccMrtPath" ]]; then
     echo "Error."

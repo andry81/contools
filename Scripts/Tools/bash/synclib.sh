@@ -3,11 +3,13 @@
 # Script library to support synchronization operations.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_SYNCLIB_SH} )); then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_SYNCLIB_SH} )); then
 
 SOURCE_CONTOOLS_SYNCLIB_SH=1 # including guard
 
-source "${CONTOOLS_ROOT:-.}/traplib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
 
 function TryLockFn1()
 {

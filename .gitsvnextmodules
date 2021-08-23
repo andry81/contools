@@ -14,3 +14,11 @@
 	fetch = :refs/remotes/git-svn
 	remote = svn
 	type = dir
+[submodule "_externals/tacklelib/bash/tacklelib"]
+	path = _externals/tacklelib/bash/tacklelib
+	owner = _externals
+	url = svn://svn.code.sf.net/p/tacklelib/tacklelib/trunk/bash/tacklelib
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir

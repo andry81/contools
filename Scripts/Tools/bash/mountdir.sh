@@ -12,11 +12,13 @@
 
 if [[ -n "$BASH" ]]; then
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
-source "${CONTOOLS_ROOT:-.}/traplib.sh"
-source "${CONTOOLS_ROOT:-.}/filelib.sh"
-source "${CONTOOLS_ROOT:-.}/stringlib.sh"
-source "${CONTOOLS_ROOT:-.}/cygver.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/filelib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/cygver.sh" || tkl_abort_include
 
 function MountDir()
 {

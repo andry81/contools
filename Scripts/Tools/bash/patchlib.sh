@@ -5,13 +5,15 @@
 # Patch library, implements main functions to automate source patching.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_PATCHLIB_SH} )); then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_PATCHLIB_SH} )); then
 
 SOURCE_CONTOOLS_PATCHLIB_SH=1 # including guard
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
-source "${CONTOOLS_ROOT:-.}/traplib.sh"
-source "${CONTOOLS_ROOT:-.}/regexplib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/regexplib.sh" || tkl_abort_include
 
 function PatchFileIterator()
 {

@@ -7,7 +7,7 @@
 # 3. path where to read a file with variable values (each per line, must be the same quantity of lines with the variable names file)
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then 
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then 
 
 function set_vars_from_locked_file_pair()
 {

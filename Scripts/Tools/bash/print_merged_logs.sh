@@ -14,8 +14,10 @@
 
 if [[ -n "$BASH" ]]; then
 
-source "${CONTOOLS_ROOT:-.}/stringlib.sh"
-source "${CONTOOLS_ROOT:-.}/filelib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/filelib.sh" || tkl_abort_include
 
 function PrintMergedLogs()
 {

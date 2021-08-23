@@ -3,13 +3,15 @@
 # Script library to support trap shell operations.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_TRAPLIB_SH} )); then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_TRAPLIB_SH} )); then
 
 SOURCE_CONTOOLS_TRAPLIB_SH=1 # including guard
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
-source "${CONTOOLS_ROOT:-.}/funclib.sh"
-source "${CONTOOLS_ROOT:-.}/stringlib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/funclib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
 
 # TODO OPTIMIZE:
 # - Speedup the CleanupPendingTrapCallCtxsImpl by splitting the GlobalTrapsPindingCallCtxs_*
@@ -60,11 +62,11 @@ function GlobalTrapsStackFuncs_UserTrapHandlerInvoker()
 
   #echo "GlobalTrapsStackFuncs_UserTrapHandlerInvoker $@"
 
-  SafeStringsEval "Unset \
+  tkl_safe_string_eval "tkl_unset \
 CallFlags TrapNameToken TrapType ExternalLastError ShellPID StackCtxId \
 FuncsStackCallNumNames FuncsStackCallNames FuncsStackCallLines \
 NumSkipCallCtxs TrapHandlerFunc TrapHandlerRegisterName" \
-    "SafeFuncCallWithPrefix \"SetLastError $ExternalLastError\" $TrapHandlerFunc \"$TrapNameToken\" \"$TrapType\" \"$ExternalLastError\" \"$ShellPID\" \
+    "tkl_safe_func_call_with_prefix \"tkl_set_last_error $ExternalLastError\" $TrapHandlerFunc \"$TrapNameToken\" \"$TrapType\" \"$ExternalLastError\" \"$ShellPID\" \
       \"$StackCtxId\" \"$FuncsStackCallNumNames\" \"$FuncsStackCallNames\" \"$FuncsStackCallLines\""
   local LastError=$?
 
@@ -167,12 +169,12 @@ function GlobalTrapsStackFuncs_DefaultTrapHandler()
 
   # reverse the user trap handlers array
   local RevList
-  eval ReverseArray "$TrapStackName" RevList
+  eval tkl_reverse_array "$TrapStackName" RevList
 
   # reset last error before each not empty user trap handler eval string
   for (( i=0; i < TrapStackSize-1; i++ )); do
     if (( ${#RevList[i]} )); then
-      RevList[i]="SetLastError $ExternalLastError; ${RevList[i]} ;" # space in case the string already trailed by the ;
+      RevList[i]="tkl_set_last_error $ExternalLastError; ${RevList[i]} ;" # space in case the string already trailed by the ;
     fi
   done
 
@@ -190,7 +192,7 @@ function GlobalTrapsStackFuncs_DefaultTrapHandler()
   #    handlers and a user trap handlers destructor.
   # 2. Restore default INT handling before a user trap handler call
   # 3. Call to user trap handlers.
-  SafeStringsEval "Unset \
+  tkl_safe_string_eval "tkl_unset \
 RETURN_VALUE RETURN_VALUES \
 RevList CallFlags TrapNameToken TrapType ExternalLastError ShellPID StackCtxId \
 FuncsStackCallNumNames FuncsStackCallNames FuncsStackCallLines \
@@ -256,7 +258,7 @@ function PushTrap()
   LastError=$?
   
   # user trap handlers late call
-  SafeStringsEval "Unset \
+  tkl_safe_string_eval "tkl_unset \
 LastError LateCallTrapEvalStrings \
 TrapNameToken TrapCmd TrapTypes" \
     "${LateCallTrapEvalStrings[@]}" \
@@ -273,7 +275,7 @@ function PushTrapHandler()
   LastError=$?
 
   # user trap handlers late call
-  SafeStringsEval "Unset \
+  tkl_safe_string_eval "tkl_unset \
 LastError LateCallTrapEvalStrings" \
     "${LateCallTrapEvalStrings[@]}" \
     "return $LastError"
@@ -366,7 +368,7 @@ function PushTrapHandlerImpl()
     return 4
   fi
 
-  GetShellPID
+  tkl_get_shell_pid
   ShellPID="${RETURN_VALUE:-65535}" # default value if fail
 
   local FuncsStackCallNamesHashToken
@@ -531,16 +533,16 @@ function PushTrapHandlerImpl()
     # always reset trap handler
     if [[ "$TrapType" == 'RETURN' ]]; then
       # and drop trap if a trap handler has not been skipped
-      trap "SafeFuncCall $TrapHandlerFunc 0 \"$TrapNameToken\" \"$TrapType\" \$? \"$ShellPID\" \
+      trap "tkl_safe_func_call $TrapHandlerFunc 0 \"$TrapNameToken\" \"$TrapType\" \$? \"$ShellPID\" \
 \"$StackCtxId\" \"$FuncsStackCallNumNames\" \"$FuncsStackCallNames\" \"$FuncsStackCallLines\"; \
 local LastError=\$?; \
 local NumSkipCallCtxs; \
 eval NumSkipCallCtxs=\${GlobalTrapsRegisterParams_${TrapNameToken}_${TrapType}_${StackCtxId}[2]}; \
 (( \${#NumSkipCallCtxs} && NumSkipCallCtxs >= 0 )) || trap '' '$TrapType'; \
-SetLastError" \
+tkl_set_last_error" \
         "$TrapType"
     else
-      trap "SafeFuncCall $TrapHandlerFunc 0 \"$TrapNameToken\" \"$TrapType\" \$? \"$ShellPID\" \
+      trap "tkl_safe_func_call $TrapHandlerFunc 0 \"$TrapNameToken\" \"$TrapType\" \$? \"$ShellPID\" \
 \"$StackCtxId\" \"$FuncsStackCallNumNames\" \"$FuncsStackCallNames\" \"$FuncsStackCallLines\"" \
         "$TrapType"
     fi
@@ -617,7 +619,7 @@ function CleanupPendingTrapCallCtxsImpl()
   eval PendingTrapStackCallCtxsSize=\$$PendingTrapStackCallCtxsSizeName
   (( ! ${#PendingTrapStackCallCtxsSize} )) && PendingTrapStackCallCtxsSize=0
 
-  GetShellPID
+  tkl_get_shell_pid
   local ShellPID="${RETURN_VALUE:-65535}" # default value if fail
 
   # the cleanup procedure
@@ -679,12 +681,12 @@ function CleanupPendingTrapCallCtxsImpl()
 
             if (( PendingTrapStackSize )); then
               # reverse the user trap handlers array
-              eval ReverseArray \"$PendingTrapStackName\" RevList
+              eval tkl_reverse_array \"$PendingTrapStackName\" RevList
 
               # reset last error before each not empty user trap handler eval string
               for (( j=0; j < PendingTrapStackSize-1; j++ )); do
                 if (( ${#RevList[j]} )); then
-                  RevList[j]="SetLastError $ExternalLastError; ${RevList[j]} ;" # space in case the string already trailed by the ;
+                  RevList[j]="tkl_set_last_error $ExternalLastError; ${RevList[j]} ;" # space in case the string already trailed by the ;
                 fi
               done
 
@@ -794,7 +796,7 @@ function PushTrapFunctionCopy()
   LastError=$?
 
   # user trap handlers late call
-  SafeStringsEval "Unset \
+  tkl_safe_string_eval "tkl_unset \
 LastError LateCallTrapEvalStrings NewFunc \
 TrapNameToken TrapHandlerFunc TrapTypes" \
     "${LateCallTrapEvalStrings[@]}" \
@@ -824,7 +826,7 @@ function PushTrapFunctionMove()
   LastError=$?
 
   # user trap handlers late call
-  SafeStringsEval "Unset \
+  tkl_safe_string_eval "tkl_unset \
 LastError LateCallTrapEvalStrings NewFunc \
 TrapNameToken TrapHandlerFunc TrapTypes" \
     "${LateCallTrapEvalStrings[@]}" \
@@ -878,7 +880,7 @@ function PopTrap()
   LastError=$?
 
   # user trap handlers late call
-  SafeStringsEval "Unset \
+  tkl_safe_string_eval "tkl_unset \
 LastError LateCallTrapEvalStrings \
 TrapNameToken TrapTypes" \
     "${LateCallTrapEvalStrings[@]}" \
@@ -969,7 +971,7 @@ function PopTrapImpl()
     return 4
   fi
 
-  GetShellPID
+  tkl_get_shell_pid
   ShellPID="${RETURN_VALUE:-65535}" # default value if fail
 
   local FuncsStackCallNamesHashToken
@@ -1083,7 +1085,7 @@ function GetTrapNum()
 
   (( ! RETURN_VALUES[0] )) && ignoreReturnTrap=1 # ignore the call
 
-  GetShellPID
+  tkl_get_shell_pid
   ShellPID="${RETURN_VALUE:-65535}" # default value if fail
 
   local FuncsStackCallNamesHashToken

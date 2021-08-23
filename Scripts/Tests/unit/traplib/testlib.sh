@@ -1,9 +1,11 @@
 #!/bin/bash_entry
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
 
-source "${CONTOOLS_ROOT:-.}/testlib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/testlib.sh" || tkl_abort_include
 
 function TestUserModuleInit()
 {
@@ -30,7 +32,7 @@ function TestUserModuleInit()
   )
   IgnoreTrapStackExtraVarsSize_ALL=${#IgnoreTrapStackExtraVars_ALL[@]}
 
-  TEST_SOURCES=("${CONTOOLS_ROOT:-.}/traplib.sh")
+  TEST_SOURCES=("$CONTOOLS_ROOT/bash/traplib.sh")
 }
 
 function TestUserInit() { :; }

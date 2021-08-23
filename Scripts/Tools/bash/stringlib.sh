@@ -5,12 +5,14 @@
 # Bash string library, supports common string functions.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_STRINGLIB_SH} )); then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_STRINGLIB_SH} )); then
 
 SOURCE_CONTOOLS_STRINGLIB_SH=1 # including guard
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
-source "${CONTOOLS_ROOT:-.}/traplib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
 
 function FindChar()
 {

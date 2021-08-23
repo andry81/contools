@@ -3,12 +3,14 @@
 # Script library to support function object.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_FUNCLIB_SH} )); then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_FUNCLIB_SH} )); then
 
 SOURCE_CONTOOLS_FUNCLIB_SH=1 # including guard
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
-source "${CONTOOLS_ROOT:-.}/hashlib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/hashlib.sh" || tkl_abort_include
 
 function GetFunctionDeclaration()
 {
@@ -171,7 +173,7 @@ function MakeFunctionUniqueCopy()
     GetFunctionCallCtx $(( CallCtxLevel + 1 ))
     (( $? )) && return 2
 
-    GetShellPID
+    tkl_get_shell_pid
     local ShellPID="${RETURN_VALUE:-65535}" # default value if fail
 
     MakeFunctionCopyImpl "$Flags" "$FuncName" "$FuncDecl" "${NewFuncName}${IdPrefix:+_}${IdPrefix}_${ShellPID}_${RETURN_VALUES[0]}_${RETURN_VALUES[3]}_${RETURN_VALUES[2]}${IdSuffix:+_}${IdSuffix}" "$SuffixCmd"

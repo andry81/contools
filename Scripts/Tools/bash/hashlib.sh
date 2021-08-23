@@ -3,11 +3,13 @@
 # Script library of hash functions.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_HASHLIB_SH} )); then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_HASHLIB_SH} )); then
 
 SOURCE_CONTOOLS_HASHLIB_SH=1 # including guard
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
 
 # table from bsd libkrnl
 _CRC32_TABLE_BSD=(
@@ -120,7 +122,7 @@ function HashStringBsdCrc32()
   local i
   local len=${#stringToHash}
   for (( i=0; i < len; i++ )); do
-    charToUByte "${stringToHash:i:1}"
+    tkl_char_to_ubyte "${stringToHash:i:1}"
     hash=$(( _CRC32_TABLE_BSD[(hash ^ RETURN_VALUE) & 0xFF] ^ (hash >> 8) ))
   done
 
@@ -150,7 +152,7 @@ function HashStringGnuCrc32()
   local i
   local len=${#stringToHash}
   for (( i=0; i < len; i++ )); do
-    charToUByte "${stringToHash:i:1}"
+    tkl_char_to_ubyte "${stringToHash:i:1}"
     hash=$(( _CRC32_TABLE_GNU[(hash >> 24) ^ RETURN_VALUE] ^ ((hash << 8) & 0xFFFFFFFF) ))
   done
   for (( i=len; i; i >>= 8 )); do
@@ -189,7 +191,7 @@ function HashStringAsToken()
   (( ${#String} )) || return 1
 
   eval "$HashPredFunc" '"$String"'
-  decToHex "$RETURN_VALUE" 8
+  tkl_dec_to_hex "$RETURN_VALUE" 8
 
   return 0
 }

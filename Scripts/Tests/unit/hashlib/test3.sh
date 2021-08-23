@@ -2,6 +2,11 @@
 
 if [[ -n "$BASH" ]]; then
 
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include 'testlib.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/funclib.sh" || tkl_abort_include
+
 if [[ -n "$BASH_LINENO" ]] && (( ${BASH_LINENO[0]} > 0 )); then
   TestScriptFilePath="${BASH_SOURCE[0]//\\//}"
 else
@@ -17,9 +22,6 @@ TestScriptDirPath="${TestScriptFilePath%[/]*}"
 TestScriptParentDirName="${TestScriptDirPath##*[/]}"
 TestScriptFileName="${TestScriptFilePath##*[/]}"
 TestScriptBaseFileName="${TestScriptFileName%.*}"
-
-source "$TestScriptDirPath/testlib.sh"
-source "${CONTOOLS_ROOT:-.}/funclib.sh"
 
 TestModuleInit
 

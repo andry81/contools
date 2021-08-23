@@ -5,9 +5,11 @@
 # Set of bash functions to work with perl. Cygwin/Msys/Mingw system required.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then 
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then 
 
-source "${CONTOOLS_ROOT:-.}/stringlib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
 
 # Function gets perl module list file path.
 function GetPerlModuleListFilePath()

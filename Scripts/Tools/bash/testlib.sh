@@ -3,12 +3,14 @@
 # Script library to support testing.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -gt 0) ]]; then
+if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
 
-source "${CONTOOLS_ROOT:-.}/baselib.sh"
-source "${CONTOOLS_ROOT:-.}/filelib.sh"
-source "${CONTOOLS_ROOT:-.}/funclib.sh"
-source "${CONTOOLS_ROOT:-.}/stringlib.sh"
+source '/bin/bash_entry' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/filelib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/funclib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
 
 function TestReturn()
 {
@@ -33,7 +35,7 @@ function TestModuleInit()
   echo "  PATH=\"$PATH\""
   echo
 
-  TestScriptOutputsDirPath="$TestScriptDirPath/output"
+  TestScriptOutputsDirPath="$TestScriptDirPath/_out"
 
   IFS=$'\r\n' # by default
 
@@ -58,7 +60,7 @@ function TestModuleInit()
 
   trap TestModuleExit EXIT
 
-  SafeFuncCall TestUserModuleInit
+  tkl_safe_func_call TestUserModuleInit
 
   local i
   local Str
@@ -82,13 +84,13 @@ function TestInit()
   (( ! ${#TestScriptSuccessCode} )) && TestScriptSuccessCode=0
   TestFlags=0
 
-  GetShellPID
+  tkl_get_shell_pid
   printf -v ProcId %x ${RETURN_VALUE:-65535} # default value if fail
-  ZeroPadding 4 "$ProcId"
+  tkl_zero_padding 4 "$ProcId"
   ProcId="$RETURN_VALUE"
 
   printf -v RandomId %x%x $RANDOM $RANDOM
-  ZeroPadding 8 "$RandomId"
+  tkl_zero_padding 8 "$RandomId"
   RandomId="$RETURN_VALUE"
 
   TestSessionId="${ProcId}_${RandomId}"
@@ -124,7 +126,7 @@ function TestModuleExit()
 {
   trap '' INT # no interruption while handling trap
 
-  SafeFuncCall TestUserModuleExit
+  tkl_safe_func_call TestUserModuleExit
 
   echo "-------------------------------------------------------------------------------"
   echo "  Tests passed:  $NUM_TESTS_PASSED"
@@ -260,7 +262,7 @@ function RunTestAndWait()
 
   RunTest "$@" &
   LAST_WAIT_PID=$!
-  SafeFuncCall "$FuncBeforeWait"
+  tkl_safe_func_call "$FuncBeforeWait"
   wait $LAST_WAIT_PID
 }
 
@@ -302,11 +304,11 @@ function RunTest()
 trap 'exit 254' INT
 trap '' PIPE
 
-source \"\${CONTOOLS_ROOT:-.}/baselib.sh\"
+source \"\$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh\"
 for src in $TestSourcesCmdLine; do
   source \"\$src\"
 done
-Unset src
+tkl_unset src
 
 TEST_SCRIPT_ARGS=($TestFuncArgsCmdLine)
 TestSessionId='$TestSessionId'
@@ -343,14 +345,14 @@ fi
 
 $TestFuncDecls
 
-SafeFuncCall TestUserInit
+tkl_safe_func_call TestUserInit
 
 function TestScriptExit()
 {
   set -o posix
   set > \"$TestExitEnvFilePath\"
 
-  SafeFuncCall TestUserExit
+  tkl_safe_func_call TestUserExit
 }
 
 trap 'TestScriptExit' EXIT

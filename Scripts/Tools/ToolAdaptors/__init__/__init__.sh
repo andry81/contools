@@ -2,7 +2,9 @@
 
 function __init__()
 {
-  local i, j, RETURN_VALUE
+  local i
+  local j
+  local RETURN_VALUE
 
   # init script search logic
   for i in "../.."; do
