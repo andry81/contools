@@ -18,7 +18,7 @@
 # Script ONLY for execution.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || ${BASH_LINENO[0]} -eq 0) ]]; then
 
-source '/bin/bash_entry' || exit $?
+source '/bin/bash_tacklelib' || exit $?
 tkl_include 'cygsetuplib.sh' || tkl_abort_include
 
 OverallBeginTime="$(date "+%s")"

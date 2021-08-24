@@ -2,7 +2,7 @@
 
 if [[ -n "$BASH" ]]; then
 
-source '/bin/bash_entry' || exit $?
+source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
 tkl_include 'testlib.sh' || tkl_abort_include
 

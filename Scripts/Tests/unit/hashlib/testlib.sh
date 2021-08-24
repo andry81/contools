@@ -5,7 +5,7 @@
 
 SOURCE_CONTOOLS_SCRIPTS_TESTS_UNIT_HASHLIB_TESTLIB_SH=1 # including guard
 
-source '/bin/bash_entry' || exit $?
+source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/testlib.sh" || tkl_abort_include
 

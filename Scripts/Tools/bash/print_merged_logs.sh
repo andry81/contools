@@ -14,7 +14,7 @@
 
 if [[ -n "$BASH" ]]; then
 
-source '/bin/bash_entry' || exit $?
+source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/filelib.sh" || tkl_abort_include

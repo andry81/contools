@@ -3,7 +3,7 @@
 # Script can be ONLY included by "source" command.
 if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
 
-source '/bin/bash_entry' || exit $?
+source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/testlib.sh" || tkl_abort_include
 
