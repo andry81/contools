@@ -1,3 +1,7 @@
+2021.08.25:
+* fixed: __init__: missed `bash_tacklelib` usage instead of `bash_entry` script
+* new: __init__: svncmd-contools cross initialization
+
 2021.08.24:
 * changed: __init__, Scripts/Tools/bash, Scripts/Tools/ToolAdaptors, Scripts/Tests: bash scripts speedup optimization
 * changed: readme update

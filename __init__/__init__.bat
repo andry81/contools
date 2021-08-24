@@ -16,13 +16,16 @@ if not defined CONTOOLS_TESTLIB_ROOT              call :CANONICAL_PATH CONTOOLS_
 if not defined CONTOOLS_XML_TOOLS_ROOT            call :CANONICAL_PATH CONTOOLS_XML_TOOLS_ROOT            "%%CONTOOLS_ROOT%%/xml"
 if not defined CONTOOLS_VARS_ROOT                 call :CANONICAL_PATH CONTOOLS_VARS_ROOT                 "%%CONTOOLS_ROOT%%/vars"
 
-if not defined SVNCMD_TOOLS_ROOT                  call :CANONICAL_PATH SVNCMD_TOOLS_ROOT                  "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/svncmd/Scripts"
-
 if not defined CONTOOLS_UTILITIES_ROOT            call :CANONICAL_PATH CONTOOLS_UTILITIES_ROOT            "%%CONTOOLS_PROJECT_ROOT%%/Utilities"
 if not defined CONTOOLS_UTILITIES_BIN_ROOT        call :CANONICAL_PATH CONTOOLS_UTILITIES_BIN_ROOT        "%%CONTOOLS_UTILITIES_ROOT%%/bin"
 if not defined CONTOOLS_GNUWIN32_ROOT             call :CANONICAL_PATH CONTOOLS_GNUWIN32_ROOT             "%%CONTOOLS_UTILITIES_BIN_ROOT%%/gnuwin32"
 if not defined CONTOOLS_UTILITIES_HASHDEEP_ROOT   call :CANONICAL_PATH CONTOOLS_UTILITIES_HASHDEEP_ROOT   "%%CONTOOLS_UTILITIES_BIN_ROOT%%/hashdeep"
 if not defined CONTOOLS_UTILITIES_SQLITE_ROOT     call :CANONICAL_PATH CONTOOLS_UTILITIES_SQLITE_ROOT     "%%CONTOOLS_UTILITIES_BIN_ROOT%%/sqlite"
+
+rem init svncmd project
+if exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%/svncmd/__init__/__init__.bat" (
+  call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/svncmd/__init__/__init__.bat" || exit /b
+)
 
 exit /b 0
 
