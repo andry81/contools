@@ -1,4 +1,4 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 if [[ -f "$1" ]]; then
   FileBasePath="${1%.*}"

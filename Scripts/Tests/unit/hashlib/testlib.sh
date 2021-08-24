@@ -1,7 +1,9 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$SOURCE_CONTOOLS_SCRIPTS_TESTS_UNIT_HASHLIB_TESTLIB_SH" && SOURCE_CONTOOLS_SCRIPTS_TESTS_UNIT_HASHLIB_TESTLIB_SH -ne 0) ]] && return
+
+SOURCE_CONTOOLS_SCRIPTS_TESTS_UNIT_HASHLIB_TESTLIB_SH=1 # including guard
 
 source '/bin/bash_entry' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
@@ -442,5 +444,3 @@ function CheckHashCollisions()
 
   return 0 # test has no internal errors
 }
-
-fi

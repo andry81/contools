@@ -1,4 +1,4 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 # Author:   Andrey Dibrov (andry at inbox dot ru)
 

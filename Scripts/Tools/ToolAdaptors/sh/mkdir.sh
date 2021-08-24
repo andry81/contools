@@ -1,4 +1,4 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 if [[ -d "$2" ]]; then
   if [[ -n "$MKDIR" ]]; then

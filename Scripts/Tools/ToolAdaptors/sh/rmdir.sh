@@ -1,4 +1,4 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 if [[ -d "$2" ]]; then
   # load all libraries

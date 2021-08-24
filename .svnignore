@@ -39,4 +39,4 @@ Utilities/src/thlibautocfg/help.txt
 Utilities/src/thlibautocfg/help_inl.hpp
 Utilities/src/thlibautocfg/version.hpp
 
-Utilities/src/wshdynacall/version.hpp
+Utilities/src/wshbazaar/wshdynacall/version.hpp

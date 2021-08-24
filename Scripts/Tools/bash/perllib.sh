@@ -1,13 +1,15 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 # Author:   Andrey Dibrov (andry at inbox dot ru)
 
 # Set of bash functions to work with perl. Cygwin/Msys/Mingw system required.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then 
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$SOURCE_CONTOOLS_PERLLIB_SH" && SOURCE_CONTOOLS_PERLLIB_SH -ne 0) ]] && return
 
-source '/bin/bash_entry' || exit $?
+SOURCE_CONTOOLS_PERLLIB_SH=1 # including guard
+
+source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
 
@@ -100,5 +102,3 @@ function CleanInstallPerlModule()
 
   return 0
 }
-
-fi

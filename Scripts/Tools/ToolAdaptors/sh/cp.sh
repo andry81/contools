@@ -1,4 +1,4 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 if [[ -f "$1" ]]; then
   if [[ -n "$CP" ]]; then

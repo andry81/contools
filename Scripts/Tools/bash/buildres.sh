@@ -1,4 +1,4 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 # Author:   Andrey Dibrov (andry at inbox dot ru)
 
@@ -6,7 +6,9 @@
 # for the build scripts.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$SOURCE_CONTOOLS_BUILDRES_SH" && SOURCE_CONTOOLS_BUILDRES_SH -ne 0) ]] && return
+
+SOURCE_CONTOOLS_BUILDRES_SH=1 # including guard
 
 # Build common resources.
 
@@ -71,5 +73,3 @@ function ProjectTargetStageExitHandler()
 
   return 0
 }
-
-fi

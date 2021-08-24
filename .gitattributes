@@ -1,9 +1,6 @@
 * text=auto !eol
 .github/FUNDING.yml -text
 /.svnignore -text
-/01_preconfigure.bat -text
-/01_preconfigure.sh -text
-/02_configure.bat -text
 BuildTools/TargetProject.PostBuildStep.bat -text
 BuildTools/TargetProject.PreBuildStep.bat -text
 BuildTools/__init__.bat -text

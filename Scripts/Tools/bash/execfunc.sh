@@ -1,4 +1,4 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 # Author:   Andrey Dibrov (andry at inbox dot ru)
 
@@ -12,8 +12,10 @@
  
 if [[ -n "$BASH" ]]; then
 
-source "${CONTOOLS_ROOT:-.}/stringlib.sh"
-source "${CONTOOLS_ROOT:-.}/filelib.sh"
+source '/bin/bash_tacklelib' || exit $?
+tkl_include '__init__.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh"
+tkl_include "$CONTOOLS_ROOT/bash/filelib.sh"
 
 function ExecBashFunction()
 {

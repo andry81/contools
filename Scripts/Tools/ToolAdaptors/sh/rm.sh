@@ -1,4 +1,4 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 if [[ -f "$2" ]]; then
   if [[ -n "$RM" ]]; then

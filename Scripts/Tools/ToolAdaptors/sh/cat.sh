@@ -1,4 +1,4 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 if [[ -f "$1" ]]; then
   if [[ -z "$3" || "${3#-*a}" == "$3" ]]; then

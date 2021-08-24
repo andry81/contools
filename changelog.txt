@@ -1,8 +1,16 @@
+2021.08.24:
+* changed: __init__, Scripts/Tools/bash, Scripts/Tools/ToolAdaptors, Scripts/Tests: bash scripts speedup optimization
+* changed: readme update
+* changed: readme dependecies update
+* chnaged: ignores update
+* refactor: Scripts/Tools/bash: tacklelib `bash_tacklelib` script now has used instead of `bash_entry`
+* refactor: removed unused files and data
+
 2021.08.23:
 * fixed: Scripts/Tests: bash shell tests run fixup
-* changed: Script/Tools/bash: bash shell scripts reimplemented with `bash_entry` script usage
+* changed: Scripts/Tools/bash: bash shell scripts reimplemented with `bash_entry` script usage
 * changed: Scripts/Tests: bash shell tests reimplemented with `bash_entry` script usage
-* refactor: Script/Tools/bash: bash shell scripts moved into standalone directory
+* refactor: Scripts/Tools/bash: bash shell scripts moved into standalone directory
 
 2021.08.22:
 * new: Utilities/bin/contools: binaries update

@@ -1,11 +1,11 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 # Author:   Andrey Dibrov (andry at inbox dot ru)
 
 # Regular expression library, implements main functions to automate regular expressions.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_REGEXPLIB_SH} )); then
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$SOURCE_CONTOOLS_REGEXPLIB_SH" && SOURCE_CONTOOLS_REGEXPLIB_SH -ne 0) ]] && return
 
 SOURCE_CONTOOLS_REGEXPLIB_SH=1 # including guard
 
@@ -43,7 +43,3 @@ function MatchString()
 
   return $LastError
 }
-
-unset SOURCE_CONTOOLS_REGEXPLIB_SH # including guard unset
-
-fi

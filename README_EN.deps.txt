@@ -1,5 +1,5 @@
 * README_EN.deps.txt
-* 2019.06.27
+* 2021.08.24
 * contools
 
 1. DESCRIPTION
@@ -68,7 +68,7 @@ Legend:
 # utility
 
 * tacklelib
-  00 demand:    OPTIONAL
+  00 demand:    REQUIRED
   01 platform:  WINDOWS, LINUX
   02 version:   N/A
   03 desc:      C++11 generic library with builtin wrappers/extensions to
@@ -83,10 +83,10 @@ Legend:
   09 patched:   NO
   10 extended:  NO
   11 included:  YES:
-                [01] as sources, locally in the `_3dparty` subdirectory
+                [01] as sources, locally in the `_externals` subdirectory
   12 macroses:  search in: `debug.hpp.in`, `optimization.hpp.in`,
                 `setup.hpp.in`
-  13 used as:   headers, sources, static libraries
+  13 used as:   headers, sources, static libraries, scripts
 ! 14 depend on: YES:
                 [01] (required) boost
                 [02] (required) fmt
@@ -96,6 +96,28 @@ Legend:
                 [06] (optional) libarchive
                 [07] (optional) 7zip
                 [08] (optional) qd
+
+* svncmd
+  00 demand:    OPTIONAL
+  01 platform:  WINDOWS
+  02 version:   N/A
+  03 desc:      svn batch scripts to automate svn working copy offline/online
+                operations
+  04 forked:    NO
+  05 original:  [01] https://sf.net/p/svncmd/scripts
+                [02] https://github.com/andry81/svncmd.git
+  06 build:     N/A
+  07 linkage:   N/A
+  08 variables: SVNCMD_TOOLS_ROOT
+  09 patched:   NO
+  10 extended:  NO
+  11 included:  YES:
+                [01] as sources, locally in the `_externals` subdirectory
+  12 macroses:  N/A
+  13 used as:   scripts
+! 14 depend on: YES:
+                [01] (required) svn
+                [02] (required) sqlite
 
 # gui
 

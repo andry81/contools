@@ -1,15 +1,15 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 # Author:   Andrey Dibrov (andry at inbox dot ru)
 
 # Bash file library, supports common file functions.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] && (( ! ${#SOURCE_CONTOOLS_FILELIB_SH} )); then
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$SOURCE_CONTOOLS_FILELIB_SH" && SOURCE_CONTOOLS_FILELIB_SH -ne 0) ]] && return
 
 SOURCE_CONTOOLS_FILELIB_SH=1 # including guard
 
-source '/bin/bash_entry' || exit $?
+source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
 tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
@@ -1447,7 +1447,3 @@ function PrintDirectoryPermissions()
 
   DirectoryLsIterator '' "$RootDirPath" '' 0 IteratorPredicateFunc1
 }
-
-unset SOURCE_CONTOOLS_FILELIB_SH # including guard unset
-
-fi

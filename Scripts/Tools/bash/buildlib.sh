@@ -1,13 +1,15 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 # Author:   Andrey Dibrov (andry at inbox dot ru)
 
 # Core build library, implements main functions for build scripts.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$SOURCE_CONTOOLS_BUILDLIB_SH" && SOURCE_CONTOOLS_BUILDLIB_SH -ne 0) ]] && return
 
-source '/bin/bash_entry' || exit $?
+SOURCE_CONTOOLS_BUILDLIB_SH=1 # including guard
+
+source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
 tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
@@ -20,7 +22,7 @@ tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/filelib.sh" || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/mountdir.sh" || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/unmountdir.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/buildlibcomponents.sh' || tkl_abort_include
+tkl_include "$CONTOOLS_ROOT/bash/buildlibcomponents.sh" || tkl_abort_include
 if [[ "$OSTYPE" == "cygwin" ]]; then
   tkl_include "$CONTOOLS_ROOT/bash/cygver.sh" || tkl_abort_include
 fi
@@ -2652,5 +2654,3 @@ function PrintProjectBuildDependencies()
 
   return 0
 }
-
-fi

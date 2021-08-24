@@ -1,11 +1,13 @@
-#!/bin/bash_entry
+#!/bin/bash
 
 # Script library to support testing.
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$SOURCE_CONTOOLS_TESTLIB_SH" && SOURCE_CONTOOLS_TESTLIB_SH -ne 0) ]] && return
 
-source '/bin/bash_entry' || exit $?
+SOURCE_CONTOOLS_TESTLIB_SH=1 # including guard
+
+source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
 tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
 tkl_include "$CONTOOLS_ROOT/bash/filelib.sh" || tkl_abort_include
@@ -740,5 +742,3 @@ function ReadMultilineValue()
 
   RETURN_VALUES=("${NewArr[*]}" $EndMultilineIndex)
 }
-
-fi
