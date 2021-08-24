@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # Script can be ONLY included by "source" command.
-[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$SOURCE_CONTOOLS_SCRIPTS_TESTS_UNIT_HASHLIB_TESTLIB_SH" && SOURCE_CONTOOLS_SCRIPTS_TESTS_UNIT_HASHLIB_TESTLIB_SH -ne 0) ]] && return
-
-SOURCE_CONTOOLS_SCRIPTS_TESTS_UNIT_HASHLIB_TESTLIB_SH=1 # including guard
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) ]] && return
 
 source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include

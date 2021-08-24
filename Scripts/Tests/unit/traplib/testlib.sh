@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script can be ONLY included by "source" command.
-if [[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]]; then
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) ]] && return
 
 source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
@@ -38,5 +38,3 @@ function TestUserModuleInit()
 function TestUserInit() { :; }
 function TestUserModuleExit() { :; }
 function TestUserExit() { :; }
-
-fi
