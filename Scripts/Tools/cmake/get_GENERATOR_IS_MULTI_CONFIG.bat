@@ -7,7 +7,7 @@ setlocal
 
 set "CMAKE_GENERATOR=%~1"
 
-for %%i in (CMAKE_GENERATOR PROJECT_ROOT PROJECT_CMAKE_ROOT CONTOOLS_ROOT TACKLELIB_CMAKE_SCRIPTS_ROOT) do (
+for %%i in (CMAKE_GENERATOR CONTOOLS_ROOT TACKLELIB_CMAKE_ROOT) do (
   if not defined %%i (
     echo.%~nx0: error: `%%i` variable is not defined.
     exit /b 255
@@ -59,8 +59,8 @@ rmdir /S /Q "%TEMP_OUTPUT_DIR%"
 :MAIN
 rem arguments: <out_file_file>
 
-call :CMD cmake -G "%%~1" "-DCMAKE_MODULE_PATH=%%PROJECT_CMAKE_ROOT%%" ^
-  -P "%%TACKLELIB_CMAKE_SCRIPTS_ROOT%%/tools/GeneratorIsMulticonfig.cmd.cmake" ^
+call :CMD cmake -G "%%~1" "-DCMAKE_MODULE_PATH=%%TACKLELIB_CMAKE_ROOT%%" ^
+  -P "%%TACKLELIB_CMAKE_ROOT%%/tools/GeneratorIsMulticonfig.cmd.cmake" ^
   --flock "%%TEMP_OUTPUT_DIR%%/lock" "%%TEMP_OUTPUT_DIR%%/var_values.lst" || exit /b
 
 (

@@ -14,11 +14,11 @@ if [[ -n "$BASH" ]]; then
 
 source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/baselib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/filelib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/cygver.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/traplib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/filelib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/stringlib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/cygver.sh" || tkl_abort_include
 
 function MountDir()
 {

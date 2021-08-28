@@ -438,11 +438,8 @@ Scripts/Tools/admin/test_connect.bat -text
 Scripts/Tools/appendvar.bat -text
 Scripts/Tools/assert_msvc.bat -text
 Scripts/Tools/bash/__init__.sh -text
-Scripts/Tools/bash/buildlib.sh -text
-Scripts/Tools/bash/buildlibcomponents.sh -text
-Scripts/Tools/bash/buildres.sh -text
+Scripts/Tools/bash/__init__/__init__.sh -text
 Scripts/Tools/bash/cat2.sh -text
-Scripts/Tools/bash/cygver.sh -text
 Scripts/Tools/bash/dumpmountdirs.sh -text
 Scripts/Tools/bash/execbat.sh -text
 Scripts/Tools/bash/execfunc.sh -text
@@ -460,6 +457,11 @@ Scripts/Tools/bash/stringlib.sh -text
 Scripts/Tools/bash/synclib.sh -text
 Scripts/Tools/bash/tee2.sh -text
 Scripts/Tools/bash/testlib.sh -text
+Scripts/Tools/bash/tools/cygwin/cygver.sh -text
+Scripts/Tools/bash/tools/gnumake/__init__.sh -text
+Scripts/Tools/bash/tools/gnumake/buildlib.sh -text
+Scripts/Tools/bash/tools/gnumake/buildlibcomponents.sh -text
+Scripts/Tools/bash/tools/gnumake/buildres.sh -text
 Scripts/Tools/bash/traplib.sh -text
 Scripts/Tools/bash/unmountdir.sh -text
 Scripts/Tools/build/__init__.bat -text

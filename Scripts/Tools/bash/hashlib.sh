@@ -9,7 +9,7 @@ SOURCE_CONTOOLS_HASHLIB_SH=1 # including guard
 
 source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
-tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
+tkl_include "$TACKLELIB_BASH_ROOT/baselib.sh" || tkl_abort_include
 
 # table from bsd libkrnl
 _CRC32_TABLE_BSD=(

@@ -11,7 +11,7 @@ SOURCE_CONTOOLS_PERLLIB_SH=1 # including guard
 
 source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/stringlib.sh" || tkl_abort_include
 
 # Function gets perl module list file path.
 function GetPerlModuleListFilePath()

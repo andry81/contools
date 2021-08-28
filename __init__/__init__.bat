@@ -2,14 +2,13 @@
 
 if /i "%CONTOOLS_PROJECT_ROOT_INIT0_DIR%" == "%~dp0" exit /b 0
 
-set "CONTOOLS_PROJECT_ROOT_INIT0_DIR=%~dp0"
-
 if not defined NEST_LVL set NEST_LVL=0
 
 if not defined CONTOOLS_PROJECT_ROOT              call :CANONICAL_PATH CONTOOLS_PROJECT_ROOT              "%%~dp0.."
 if not defined CONTOOLS_PROJECT_EXTERNALS_ROOT    call :CANONICAL_PATH CONTOOLS_PROJECT_EXTERNALS_ROOT    "%%CONTOOLS_PROJECT_ROOT%%/_externals"
 
 if not defined CONTOOLS_ROOT                      call :CANONICAL_PATH CONTOOLS_ROOT                      "%%CONTOOLS_PROJECT_ROOT%%/Scripts/Tools"
+if not defined CONTOOLS_BASH_ROOT                 call :CANONICAL_PATH CONTOOLS_BASH_ROOT                 "%%CONTOOLS_ROOT%%/bash"
 if not defined CONTOOLS_BUILD_TOOLS_ROOT          call :CANONICAL_PATH CONTOOLS_BUILD_TOOLS_ROOT          "%%CONTOOLS_ROOT%%/build"
 if not defined CONTOOLS_SQLITE_TOOLS_ROOT         call :CANONICAL_PATH CONTOOLS_SQLITE_TOOLS_ROOT         "%%CONTOOLS_ROOT%%/sqlite"
 if not defined CONTOOLS_TESTLIB_ROOT              call :CANONICAL_PATH CONTOOLS_TESTLIB_ROOT              "%%CONTOOLS_ROOT%%/testlib"
@@ -22,10 +21,17 @@ if not defined CONTOOLS_GNUWIN32_ROOT             call :CANONICAL_PATH CONTOOLS_
 if not defined CONTOOLS_UTILITIES_HASHDEEP_ROOT   call :CANONICAL_PATH CONTOOLS_UTILITIES_HASHDEEP_ROOT   "%%CONTOOLS_UTILITIES_BIN_ROOT%%/hashdeep"
 if not defined CONTOOLS_UTILITIES_SQLITE_ROOT     call :CANONICAL_PATH CONTOOLS_UTILITIES_SQLITE_ROOT     "%%CONTOOLS_UTILITIES_BIN_ROOT%%/sqlite"
 
-rem init svncmd project
+rem init external projects
+
+if exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%/tacklelib/__init__/__init__.bat" (
+  call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/tacklelib/__init__/__init__.bat" || exit /b
+)
+
 if exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%/svncmd/__init__/__init__.bat" (
   call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/svncmd/__init__/__init__.bat" || exit /b
 )
+
+set "CONTOOLS_PROJECT_ROOT_INIT0_DIR=%~dp0"
 
 exit /b 0
 

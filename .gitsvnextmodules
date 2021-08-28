@@ -14,6 +14,22 @@
 	fetch = :refs/remotes/git-svn
 	remote = svn
 	type = dir
+[submodule "_externals/tacklelib/__init__"]
+	path = _externals/tacklelib/__init__
+	owner = _externals
+	url = svn://svn.code.sf.net/p/tacklelib/tacklelib/trunk/__init__
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
+[submodule "_externals/tacklelib/bash/__init__"]
+	path = _externals/tacklelib/bash/__init__
+	owner = _externals
+	url = svn://svn.code.sf.net/p/tacklelib/tacklelib/trunk/bash/__init__
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
 [submodule "_externals/tacklelib/bash/tacklelib"]
 	path = _externals/tacklelib/bash/tacklelib
 	owner = _externals

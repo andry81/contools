@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash_entry
 
 # Author:   Andrey Dibrov (andry at inbox dot ru)
 
@@ -11,20 +11,20 @@ SOURCE_CONTOOLS_BUILDLIB_SH=1 # including guard
 
 source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
-tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/baselib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/funclib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/traplib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/synclib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/hashlib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/patchlib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/stringlib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/filelib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/mountdir.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/unmountdir.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/buildlibcomponents.sh" || tkl_abort_include
+tkl_include "$TACKLELIB_BASH_ROOT/baselib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/traplib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/funclib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/traplib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/synclib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/hashlib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/patchlib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/stringlib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/filelib.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/mountdir.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/unmountdir.sh" || tkl_abort_include
+tkl_include "$CONTOOLS_BASH_ROOT/tools/gnumake/buildlibcomponents.sh" || tkl_abort_include
 if [[ "$OSTYPE" == "cygwin" ]]; then
-  tkl_include "$CONTOOLS_ROOT/bash/cygver.sh" || tkl_abort_include
+  tkl_include "$CONTOOLS_BASH_ROOT/tools/cygwin/cygver.sh" || tkl_abort_include
 fi
 
 function InitializeBuildSystem()

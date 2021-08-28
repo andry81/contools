@@ -5,6 +5,7 @@ setlocal
 set "?~nx0=%~nx0"
 
 rem script flags
+set FLAG_OPTIONAL_COMPARE=0
 set FLAG_OPTIONAL_SYSTEM_FILE_INSTANCE=0
 set FLAG_OPTIONAL_USER_FILE_INSTANCE=0
 
@@ -17,7 +18,9 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-optional_system_file_instance" (
+  if "%FLAG%" == "-optional_compare" (
+    set FLAG_OPTIONAL_COMPARE=1
+  ) else if "%FLAG%" == "-optional_system_file_instance" (
     set FLAG_OPTIONAL_SYSTEM_FILE_INSTANCE=1
   ) else if "%FLAG%" == "-optional_user_file_instance" (
     set FLAG_OPTIONAL_USER_FILE_INSTANCE=1
@@ -30,6 +33,11 @@ if defined FLAG (
 
   rem read until no flags
   goto FLAGS_LOOP
+)
+
+if %FLAG_OPTIONAL_COMPARE%0 NEQ 0 (
+  set FLAG_OPTIONAL_SYSTEM_FILE_INSTANCE=1
+  set FLAG_OPTIONAL_USER_FILE_INSTANCE=1
 )
 
 set "VARS_SYSTEM_FILE_IN=%~1"
