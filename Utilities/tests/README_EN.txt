@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.08.22
+* 2021.09.14
 * contools--utilities--tests
 
 1. DESCRIPTION
@@ -22,14 +22,14 @@ Set of tests for contools utilities.
 2.1. manual
 -------------------------------------------------------------------------------
 
-Manual tests must be run only by hand. Currently for some reason can not
+Manual tests must be run only by hand. Currently for some reason can not be
 automated.
 
 -------------------------------------------------------------------------------
 2.1.1. manual/contools/callf
 -------------------------------------------------------------------------------
 
-You must run each test twice:
+You must run each test at least twice:
 
 1. From GUI application like the `Total Commander`.
 
@@ -65,9 +65,9 @@ NOTE:
 
 NOTE:
   Tests with elevatation must be run both with allowed and not allowed
-  by the user dialog elevation. In a not allowed case there is must be a
-  readable error about elevation error (in case if console window is visible
-  and not closed).
+  by the user dialog elevation. In a not allowed case there must be a readable
+  error about elevation error (in case if console window is visible and not
+  closed).
 
 All these affect test results. All runs must produce the same results.
 

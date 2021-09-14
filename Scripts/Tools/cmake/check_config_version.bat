@@ -90,7 +90,7 @@ if exist "%VARS_SYSTEM_FILE_IN%" if exist "%VARS_SYSTEM_FILE%" (
   if /i "%VARS_SYSTEM_FILE_IN_VER_LINE:~0,12%" == "#%%%% version:" (
     if not "%VARS_SYSTEM_FILE_IN_VER_LINE:~13%" == "%VARS_SYSTEM_FILE_VER_LINE:~13%" (
       echo.%?~nx0%: error: version of "%VARS_SYSTEM_FILE_IN%" is not equal to version of "%VARS_SYSTEM_FILE%", user must merge changes by yourself!
-      exit /b 10
+      exit /b 30
     ) >&2
   )
 )
@@ -117,7 +117,7 @@ if exist "%VARS_USER_FILE_IN%" if exist "%VARS_USER_FILE%" (
   if /i "%VARS_USER_FILE_IN_VER_LINE:~0,12%" == "#%%%% version:" (
     if not "%VARS_USER_FILE_IN_VER_LINE:~13%" == "%VARS_USER_FILE_VER_LINE:~13%" (
       echo.%?~nx0%: error: version of "%VARS_USER_FILE_IN%" is not equal to version of "%VARS_USER_FILE%", user must merge changes by yourself!
-      exit /b 20
+      exit /b 40
     ) >&2
   )
 )

@@ -1,15 +1,15 @@
 @echo off
 
-if /i "%TEST_BENCH_BATSCRIPTS_INIT0_DIR%" == "%~dp0" exit /b 0
+if /i "%CONTOOLS_SCRIPTS_TESTS_INIT0_DIR%" == "%~dp0" exit /b 0
 
 call "%%~dp0__init__/__init__.bat" || exit /b
-
-set "TEST_BENCH_BATSCRIPTS_INIT0_DIR=%~dp0"
 
 call :CANONICAL_PATH TESTS_ROOT "%%~dp0"
 
 call :CANONICAL_PATH TEST_SRC_BASE_DIR  "%%TESTS_ROOT%%"
 call :CANONICAL_PATH TEST_DATA_BASE_DIR "%%TEST_SRC_BASE_DIR%%/_testdata"
+
+set "CONTOOLS_SCRIPTS_TESTS_INIT0_DIR=%~dp0"
 
 exit /b 0
 

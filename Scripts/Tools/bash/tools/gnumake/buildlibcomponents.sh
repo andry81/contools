@@ -12,7 +12,7 @@ SOURCE_CONTOOLS_BUILDLIBCOMPONENTS_SH=1 # including guard
 
 source '/bin/bash_tacklelib' || exit $?
 tkl_include '__init__.sh' || tkl_abort_include
-tkl_include "$TACKLELIB_BASH_ROOT/baselib.sh" || tkl_abort_include
+tkl_include "$TACKLELIB_BASH_ROOT/tacklelib/baselib.sh" || tkl_abort_include
 tkl_include "$CONTOOLS_BASH_ROOT/traplib.sh" || tkl_abort_include
 
 function GetUtilityVersion()

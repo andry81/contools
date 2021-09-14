@@ -7,7 +7,7 @@ call "%%~dp0__init__.bat" || exit /b
 set "BEGIN_TIME=%TIME%"
 
 setlocal
-call "%%CONTOOLS_ROOT%%/std/load_config.bat" "%%TEST_DATA_BASE_DIR%%/test_std__load_config" "%%TEST_DATA_BASE_DIR%%/test_std__load_config" config.system.vars || (
+call "%%CONTOOLS_ROOT%%/std/load_config.bat" "%%TEST_DATA_BASE_DIR%%/test_std__load_config" "%%TEST_DATA_BASE_DIR%%/test_std__load_config" config.system.fast.vars || (
   echo.%~nx0: error: failed to execute `load_config.bat`
   exit /b 255
 ) >&2

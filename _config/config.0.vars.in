@@ -1,0 +1,37 @@
+#%% version: 1
+
+# CAUTION:
+#  This configuration file is designed to be portable between 2 interpreters: unix shell scripts, windows (cmd.exe) batch scripts,
+#  so it is made up to be simple as possible but not simplier as to support a single value or a values list
+#  together with an escape sequence, where the character `\` is not an escape sequence character.
+#  Use `$/<char>` to escape a `<char>` character which is a part of a configuration file format:
+#  `"` -> `$/"` or `$/` -> `$/$/`
+#  Use `$/{` as a start sequence for a variable's value substitution: `$/{<variable>}`, where `<variable>`
+#  is already parsed variable from configuration file WITHOUT condition(s) or `:` characters. Otherwise a not yet parsed variable or
+#  invalid one will be replaced by the `*:$/{<variable>}` sequence to fail the most usage cases in a file path,
+#  where `*:` - is not valid character sequence in a windows path (`:` character additionally can block a relative path *after* the variable)
+#  and `/` is a character to block a file or directory creation with such a name on a Linux system (but not a block for `mkdir -p`!).
+#  In all other cases the `$/` sequence prints as is in all contexts: in a unix shell script and in a windows batch script.
+
+# CAUTION:
+#   The contools `load_config.bat` script by default uses a simplified version of parser (fast parse), where the `%<variable>%` substitution
+#   placeholder is used instead of the `$/{<variable>}` substitution placeholder. You must explicitly use full parse version
+#   (`-full_parse` flag) in the root `__init__.bat` script to be able to parse `$/` substitution placeholders.
+#
+
+# FORMAT:
+#   [<attributes>] <variable>[:[<class_name>]]=<value>
+#
+# <attributes>:           Variable space separated attributes: export
+# <variable>:             Variable name corresponding to the regex: [_a-zA-Z][_a-zA-Z0-9]*
+# <class_name>:           class variant name: OSWIN | OSUNIX | BAT | SH
+#   OSWIN:                Apply on Windows system including cygwin/mingw/msys subsystems.
+#   OSUNIX:               Apply on Unix/Linux systems excluding cygwin/mingw/msys subsystems.
+#   BAT:                  Apply on Windows system when this file has loaded from the Windows batch script loader.
+#   SH:                   Apply on any system when this file has loaded from the Bash shell script loader.
+#
+# <value>:                Has 2 usage cases:
+#                           * Bash or Winbat with full parse: Value with escaping and substitution support: `$/<escape_char>`, `$/{<variable>}`.
+#                           * Winbat with fast parse:         Value without escaping and with substitution support: `%<variable>%`.
+#                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
+#

@@ -920,7 +920,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /write-console-stdin-back
         When both this-parent and child processes stdin is a character device
-        (console), then this-parent process may write console input back to be
+        (console), then this-parent process may write console input back to
         pass the last read input to the child. The child must use the same
         console input buffer and ReadConsole function call in that case,
         otherwise there is a chance of fall into an infinite input loop.

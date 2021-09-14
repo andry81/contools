@@ -1,33 +1,36 @@
 #!/bin/bash
 
 # Script can be ONLY included by "source" command.
-[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || "$CONTOOLS_PROJECT_ROOT_INIT0_DIR" == "$BASH_SOURCE_DIR" ]] && return
+[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$CONTOOLS_PROJECT_ROOT_INIT0_DIR" && "$CONTOOLS_PROJECT_ROOT_INIT0_DIR" == "$BASH_SOURCE_DIR") ]] && return
 
 source '/bin/bash_tacklelib' || exit $?
 
-[[ BASH_SOURCE_NEST_LVL -eq 0 ]] && tkl_make_source_file_components
+tkl_export_path CONTOOLS_PROJECT_ROOT_INIT0_DIR "$BASH_SOURCE_DIR" # including guard
 
-[[ -z "$NEST_LVL" ]] && tkl_declare_global NEST_LVL=0
+[[ -z "$NEST_LVL" ]] && tkl_declare_global NEST_LVL 0
 
-[[ -z "$CONTOOLS_PROJECT_ROOT" ]] && {
-  tkl_normalize_path "$BASH_SOURCE_DIR/.." -a || tkl_abort 9
-  tkl_export CONTOOLS_PROJECT_ROOT                  "${RETURN_VALUE:-*:\$\{CONTOOLS_PROJECT_ROOT\}}" # safety: replace by not applicable or unexisted directory if empty
-}
-[[ -z "$CONTOOLS_PROJECT_EXTERNALS_ROOT" ]] &&      tkl_export CONTOOLS_PROJECT_EXTERNALS_ROOT    "$CONTOOLS_PROJECT_ROOT/_externals"
+[[ -z "$CONTOOLS_PROJECT_ROOT" ]] &&                tkl_export_path -a -s CONTOOLS_PROJECT_ROOT               "$BASH_SOURCE_DIR/.."
+[[ -z "$CONTOOLS_PROJECT_EXTERNALS_ROOT" ]] &&      tkl_export_path -a -s CONTOOLS_PROJECT_EXTERNALS_ROOT     "$CONTOOLS_PROJECT_ROOT/_externals"
 
-[[ -z "$CONTOOLS_ROOT" ]] &&                        tkl_export CONTOOLS_ROOT                      "$CONTOOLS_PROJECT_ROOT/Scripts/Tools"
-[[ -z "$CONTOOLS_BASH_ROOT" ]] &&                   tkl_export CONTOOLS_BASH_ROOT                 "$CONTOOLS_ROOT/bash"
-[[ -z "$CONTOOLS_BUILD_TOOLS_ROOT" ]] &&            tkl_export CONTOOLS_BUILD_TOOLS_ROOT          "$CONTOOLS_ROOT/build"
-[[ -z "$CONTOOLS_SQLITE_TOOLS_ROOT" ]] &&           tkl_export CONTOOLS_SQLITE_TOOLS_ROOT         "$CONTOOLS_ROOT/sqlite"
-[[ -z "$CONTOOLS_TESTLIB_ROOT" ]] &&                tkl_export CONTOOLS_TESTLIB_ROOT              "$CONTOOLS_ROOT/testlib"
-[[ -z "$CONTOOLS_XML_TOOLS_ROOT" ]] &&              tkl_export CONTOOLS_XML_TOOLS_ROOT            "$CONTOOLS_ROOT/xml"
-[[ -z "$CONTOOLS_VARS_ROOT" ]] &&                   tkl_export CONTOOLS_VARS_ROOT                 "$CONTOOLS_ROOT/vars"
+[[ -z "$PROJECT_OUTPUT_ROOT" ]] &&                  tkl_export_path -a -s PROJECT_OUTPUT_ROOT                 "$CONTOOLS_PROJECT_ROOT/_out"
+[[ -z "$PROJECT_LOG_ROOT" ]] &&                     tkl_export_path -a -s PROJECT_LOG_ROOT                    "$CONTOOLS_PROJECT_ROOT/.log"
 
-[[ -z "$CONTOOLS_UTILITIES_ROOT" ]] &&              tkl_export CONTOOLS_UTILITIES_ROOT            "$CONTOOLS_PROJECT_ROOT/Utilities"
-[[ -z "$CONTOOLS_UTILITIES_BIN_ROOT" ]] &&          tkl_export CONTOOLS_UTILITIES_BIN_ROOT        "$CONTOOLS_UTILITIES_ROOT/bin"
-[[ -z "$CONTOOLS_GNUWIN32_ROOT" ]] &&               tkl_export CONTOOLS_GNUWIN32_ROOT             "$CONTOOLS_UTILITIES_BIN_ROOT/gnuwin32"
-[[ -z "$CONTOOLS_UTILITIES_HASHDEEP_ROOT" ]] &&     tkl_export CONTOOLS_UTILITIES_HASHDEEP_ROOT   "$CONTOOLS_UTILITIES_BIN_ROOT/hashdeep"
-[[ -z "$CONTOOLS_UTILITIES_SQLITE_ROOT" ]] &&       tkl_export CONTOOLS_UTILITIES_SQLITE_ROOT     "$CONTOOLS_UTILITIES_BIN_ROOT/sqlite"
+[[ -z "$CONTOOLS_PROJECT_INPUT_CONFIG_ROOT" ]] &&   tkl_export_path -a -s CONTOOLS_PROJECT_INPUT_CONFIG_ROOT  "$CONTOOLS_PROJECT_ROOT/_config"
+[[ -z "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" ]] &&  tkl_export_path -a -s CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT "$PROJECT_OUTPUT_ROOT/config/contools"
+
+[[ -z "$CONTOOLS_ROOT" ]] &&                        tkl_export_path -a -s CONTOOLS_ROOT                       "$CONTOOLS_PROJECT_ROOT/Scripts/Tools"
+[[ -z "$CONTOOLS_BASH_ROOT" ]] &&                   tkl_export_path -a -s CONTOOLS_BASH_ROOT                  "$CONTOOLS_ROOT/bash"
+[[ -z "$CONTOOLS_BUILD_TOOLS_ROOT" ]] &&            tkl_export_path -a -s CONTOOLS_BUILD_TOOLS_ROOT           "$CONTOOLS_ROOT/build"
+[[ -z "$CONTOOLS_SQLITE_TOOLS_ROOT" ]] &&           tkl_export_path -a -s CONTOOLS_SQLITE_TOOLS_ROOT          "$CONTOOLS_ROOT/sqlite"
+[[ -z "$CONTOOLS_TESTLIB_ROOT" ]] &&                tkl_export_path -a -s CONTOOLS_TESTLIB_ROOT               "$CONTOOLS_ROOT/testlib"
+[[ -z "$CONTOOLS_XML_TOOLS_ROOT" ]] &&              tkl_export_path -a -s CONTOOLS_XML_TOOLS_ROOT             "$CONTOOLS_ROOT/xml"
+[[ -z "$CONTOOLS_VARS_ROOT" ]] &&                   tkl_export_path -a -s CONTOOLS_VARS_ROOT                  "$CONTOOLS_ROOT/vars"
+
+[[ -z "$CONTOOLS_UTILITIES_ROOT" ]] &&              tkl_export_path -a -s CONTOOLS_UTILITIES_ROOT             "$CONTOOLS_PROJECT_ROOT/Utilities"
+[[ -z "$CONTOOLS_UTILITIES_BIN_ROOT" ]] &&          tkl_export_path -a -s CONTOOLS_UTILITIES_BIN_ROOT         "$CONTOOLS_UTILITIES_ROOT/bin"
+[[ -z "$CONTOOLS_GNUWIN32_ROOT" ]] &&               tkl_export_path -a -s CONTOOLS_GNUWIN32_ROOT              "$CONTOOLS_UTILITIES_BIN_ROOT/gnuwin32"
+[[ -z "$CONTOOLS_UTILITIES_HASHDEEP_ROOT" ]] &&     tkl_export_path -a -s CONTOOLS_UTILITIES_HASHDEEP_ROOT    "$CONTOOLS_UTILITIES_BIN_ROOT/hashdeep"
+[[ -z "$CONTOOLS_UTILITIES_SQLITE_ROOT" ]] &&       tkl_export_path -a -s CONTOOLS_UTILITIES_SQLITE_ROOT      "$CONTOOLS_UTILITIES_BIN_ROOT/sqlite"
 
 # init external projects
 
@@ -39,6 +42,14 @@ if [[ -f "$CONTOOLS_PROJECT_EXTERNALS_ROOT/svncmd/__init__/__init__.sh" ]]; then
   tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/svncmd/__init__/__init__.sh" || tkl_abort_include
 fi
 
-CONTOOLS_PROJECT_ROOT_INIT0_DIR="$BASH_SOURCE_DIR" # including guard
+tkl_include "$TACKLELIB_BASH_ROOT/tacklelib/buildlib.sh" || tkl_abort_include
+
+[[ ! -e "$PROJECT_OUTPUT_ROOT" ]] && { mkdir -p "$PROJECT_OUTPUT_ROOT" || tkl_abort 10; }
+[[ ! -e "$PROJECT_LOG_ROOT" ]] && { mkdir -p "$PROJECT_LOG_ROOT" || tkl_abort 11; }
+[[ ! -e "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" ]] && { mkdir -p "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" || tkl_abort 12; }
+
+tkl_include "$TACKLELIB_BASH_ROOT/tacklelib/tools/load_config.sh" || tkl_abort_include
+
+tkl_load_config_dir "$CONTOOLS_PROJECT_INPUT_CONFIG_ROOT" "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT"
 
 : # resets exit code to 0

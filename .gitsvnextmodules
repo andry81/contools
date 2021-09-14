@@ -14,10 +14,26 @@
 	fetch = :refs/remotes/git-svn
 	remote = svn
 	type = dir
+[submodule "_externals/svncmd/_config"]
+	path = _externals/svncmd/_config
+	owner = _externals
+	url = svn://svn.code.sf.net/p/svncmd/scripts/trunk/_config
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
 [submodule "_externals/tacklelib/__init__"]
 	path = _externals/tacklelib/__init__
 	owner = _externals
 	url = svn://svn.code.sf.net/p/tacklelib/tacklelib/trunk/__init__
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
+[submodule "_externals/tacklelib/_config"]
+	path = _externals/tacklelib/_config
+	owner = _externals
+	url = svn://svn.code.sf.net/p/tacklelib/tacklelib/trunk/_config
 	branch = /
 	fetch = :refs/remotes/git-svn
 	remote = svn

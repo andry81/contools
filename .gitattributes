@@ -140,7 +140,8 @@ Scripts/Tests/__init__/__init__.sh -text
 Scripts/Tests/bench/__init__/__init__.bat -text
 Scripts/Tests/bench/batscripts/__init__.bat -text
 Scripts/Tests/bench/batscripts/__init__/__init__.bat -text
-Scripts/Tests/bench/batscripts/_testdata/test_std__load_config/config.system.vars -text
+Scripts/Tests/bench/batscripts/_testdata/test_std__load_config/config.system.fast.vars -text
+Scripts/Tests/bench/batscripts/_testdata/test_std__load_config/config.system.full.vars -text
 Scripts/Tests/bench/batscripts/test_std__load_config_fast.bat -text
 Scripts/Tests/bench/batscripts/test_std__load_config_full.bat -text
 Scripts/Tests/bench/batscripts/test_std__strlen.bat -text
@@ -624,6 +625,7 @@ Scripts/Tools/std/getcp.bat -text
 Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
 Scripts/Tools/std/load_config.bat -text
+Scripts/Tools/std/load_config_dir.bat -text
 Scripts/Tools/std/mkdir.bat -text
 Scripts/Tools/std/pause.bat -text
 Scripts/Tools/std/replace_sys_chars.bat -text
@@ -941,6 +943,8 @@ Utilities/tests/manual/contools/callf/__init__/__init__.bat -text
 Utilities/tests/manual/contools/callf/refs/0.in -text
 __init__/__init__.bat -text
 __init__/__init__.sh -text
+_config/config.0.vars.in -text
+_config/config.system.vars.in -text
 /changelog.txt -text
 /contools.tag -text
 /license.txt -text

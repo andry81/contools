@@ -1,6 +1,11 @@
+2021.09.14:
+* new: Scripts/Tools/std: `load_config_dir.bat` script to load `config.system.vars.in` and `config.<index>.vars.in` configuration files from a directory
+* changed: code refactor
+
 2021.08.28:
 * new: __init__: tacklelib-contools cross initialization
 * changed: bash: bash shell scripts moved into `tacklelib` project
+* changed: readme update
 * refactor: global refactor
 
 2021.08.25:
@@ -13,7 +18,7 @@
 2021.08.24:
 * changed: __init__, Scripts/Tools/bash, Scripts/Tools/ToolAdaptors, Scripts/Tests: bash scripts speedup optimization
 * changed: readme update
-* changed: readme dependecies update
+* changed: readme dependencies update
 * chnaged: ignores update
 * refactor: Scripts/Tools/bash: tacklelib `bash_tacklelib` script now has used instead of `bash_entry`
 * refactor: removed unused files and data
