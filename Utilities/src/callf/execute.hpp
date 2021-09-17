@@ -56,6 +56,10 @@ struct Flags
     bool            output_flush;                   // flush stdout and stderr
     bool            inout_flush;                    // flush handle connected with stdin input and flush stdout and stderr
 
+    bool            stdout_vt100;
+    bool            stderr_vt100;
+    bool            output_vt100;
+
     bool            reopen_stdout_file_truncate;
     bool            reopen_stderr_file_truncate;
 

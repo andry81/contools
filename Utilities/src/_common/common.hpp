@@ -95,6 +95,10 @@ static constexpr FILE_INFO_BY_HANDLE_CLASS FileIdInfo = FILE_INFO_BY_HANDLE_CLAS
 
 #endif
 
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
 
 namespace {
     enum _error

@@ -200,6 +200,9 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/stderr-flush"),
     _T("/output-flush"),
     _T("/inout-flush"),
+    _T("/stdout-vt100"),
+    _T("/stderr-vt100"),
+    _T("/output-vt100"),
     _T("/create-outbound-server-pipe-from-stdin"),
     _T("/create-outbound-server-pipe-from-stdin-connect-timeout"),
     _T("/create-outbound-server-pipe-from-stdin-in-buf-size"),
@@ -456,6 +459,9 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/stderr-flush"),
     _T("/output-flush"),
     _T("/inout-flush"),
+    _T("/stdout-vt100"),
+    _T("/stderr-vt100"),
+    _T("/output-vt100"),
     _T("/tee-stdin"),
     _T("/tee-stdin-to-server-pipe"),
     _T("/tee-stdin-to-server-pipe-connect-timeout"),
@@ -1303,6 +1309,29 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         return 0;
     }
+
+    if (IsArgEqualTo(arg, _T("/stdout-vt100"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.stdout_vt100 = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/stderr-vt100"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.stderr_vt100 = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/output-vt100"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.output_vt100 = true;
+            return 1;
+        }
+        return 0;
+    }
+
     if (IsArgEqualTo(arg, _T("/create-outbound-server-pipe-from-stdin"))) {
         arg_offset += 1;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
@@ -3171,6 +3200,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             if (g_flags.tee_conout_dup && !tee_stdin_as_count) {
                 return invalid_format_flag_message(_T("tee stdin duplication of not opened handle into conout\n"));
             }
+
+            // stdout-vt100, stderr-vt100 vs output-vt100
+            if (g_flags.output_vt100) {
+                if (g_flags.stdout_vt100 || g_flags.stderr_vt100) {
+                    return invalid_format_flag_message(_T("vt100 flags are mixed: /output-vt100 <-> /std*-vt100\n"));
+                }
+            }
+
 
             // /pipe-*
 

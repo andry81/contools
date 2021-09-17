@@ -325,8 +325,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /init-com
           /showas
           /reopen-std[in|out|err]*
-          /std[in|out|err]-*
-          /output-*
+          /std[in|out|err]-* (except std[out|err]-vt100)
+          /output-*          (except output-vt100)
           /inout-*
           /create-[in|out]outbound-*
           /mutex-std-*
@@ -344,8 +344,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
           /no-expand-env
           /reopen-std[in|out|err]*
-          /std[in|out|err]-*
-          /output-*
+          /std[in|out|err]-* (except std[out|err]-vt100)
+          /output-*          (except output-vt100)
           /inout-*
           /mutex-std-*
           /attach-parent-console
@@ -593,6 +593,28 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         process stdin and into the process stdout and stderr. The same as the
         `/stdin-output-flush` plus after each write into the process
         stdout and stderr.
+
+      /stdout-vt100
+        Enable processing VT100 and similar control character sequences on
+        stdout.
+
+        Can not be used together with the `/output-vt100` flag.
+        Has no effect on Windows lower than Windows 10 build 10586.
+
+      /stderr-vt100
+        Enable processing VT100 and similar control character sequences on
+        stderr.
+
+        Can not be used together with the `/output-vt100` flag.
+        Has no effect on Windows lower than Windows 10 build 10586.
+
+      /output-vt100
+        Enable processing VT100 and similar control character sequences on
+        stdout and stderr.
+
+        Can not be used together with the `/stdout-vt100` and `/stderr-vt100`
+        flags.
+        Has no effect on Windows lower than Windows 10 build 10586.
 
       /create-outbound-server-pipe-from-stdin <pipe>
         Create outbound server named pipe `<pipe>` instead of anonymous as by

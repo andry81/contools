@@ -101,6 +101,9 @@ bool g_no_stdin_inherit             = false;    // stdin
 bool g_no_stdout_inherit            = false;    // stdout
 bool g_no_stderr_inherit            = false;    // stderr
 
+bool g_stdout_vt100                 = false;
+bool g_stderr_vt100                 = false;
+
 bool g_pipe_stdin_to_child_stdin    = false;
 bool g_pipe_child_stdout_to_stdout  = false;
 bool g_pipe_child_stderr_to_stderr  = false;
@@ -161,6 +164,10 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, stderr_flush);
     MERGE_FLAG(flags, output_flush);
     MERGE_FLAG(flags, inout_flush);
+
+    MERGE_FLAG(flags, stdout_vt100);
+    MERGE_FLAG(flags, stderr_vt100);
+    MERGE_FLAG(flags, output_vt100);
 
     MERGE_FLAG(flags, reopen_stdout_file_truncate);
     MERGE_FLAG(flags, reopen_stderr_file_truncate);
@@ -4861,6 +4868,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     g_no_stdout_inherit = g_no_std_inherit || g_flags.no_stdout_inherit || g_flags.pipe_stdin_to_child_stdin;
     g_no_stderr_inherit = g_no_std_inherit || g_flags.no_stderr_inherit;
 
+    g_stdout_vt100 = g_flags.output_vt100 || g_flags.stdout_vt100;
+    g_stderr_vt100 = g_flags.output_vt100 || g_flags.stderr_vt100;
+
     g_pipe_stdin_to_child_stdin = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_stdin_to_child_stdin);
     g_pipe_child_stdout_to_stdout = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_child_stdout_to_stdout);
     g_pipe_child_stderr_to_stderr = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_child_stderr_to_stderr);
@@ -5862,6 +5872,20 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 else {
                     SetConsoleMode(g_stdin_handle, stdin_handle_mode & ~ENABLE_ECHO_INPUT);
                 }
+            }
+        }
+        if (g_stdout_handle_type == FILE_TYPE_CHAR) {
+            if (g_stdout_vt100) {
+                DWORD stdout_handle_mode = 0;
+                GetConsoleMode(g_stdout_handle, &stdout_handle_mode);
+                SetConsoleMode(g_stdout_handle, stdout_handle_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+            }
+        }
+        if (g_stderr_handle_type == FILE_TYPE_CHAR) {
+            if (g_stderr_vt100) {
+                DWORD stderr_handle_mode = 0;
+                GetConsoleMode(g_stderr_handle, &stderr_handle_mode);
+                SetConsoleMode(g_stderr_handle, stderr_handle_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
             }
         }
 
@@ -7097,6 +7121,23 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_flags.inout_flush = false; // always reset
+
+
+    if (child_flags.stdout_vt100) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/stdout-vt100 ");
+        }
+    }
+    if (child_flags.stderr_vt100) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/stderr-vt100 ");
+        }
+    }
+    if (child_flags.output_vt100) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/output-vt100 ");
+        }
+    }
 
 
     if (!child_options.create_outbound_server_pipe_from_stdin.empty()) {
