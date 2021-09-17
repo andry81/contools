@@ -1,4 +1,7 @@
 2021.09.17:
+* new: Utilities/bin/contools: binaries update
+
+2021.09.17:
 * new: Utilities/src/callf: `output-vt100`, `stdout-vt100`, `stderr-vt100` flags to enable processing VT100 and similar control character sequences, has no effect on Windows lower than Windows 10 build 10586
 
 2021.09.14:
