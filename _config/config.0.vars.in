@@ -35,3 +35,7 @@
 #                           * Winbat with fast parse:         Value without escaping and with substitution support: `%<variable>%`.
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
+
+INIT_VERBOSE                              =0
+TOOLS_VERBOSE                             =0
+PRINT_VARS_SET                            =0

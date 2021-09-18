@@ -2,7 +2,7 @@
 
 setlocal
 
-call "%%CONTOOLS_ROOT%%/std/load_config.bat" . . "%%CONFIG_FILE%%"
+call "%%CONTOOLS_ROOT%%/build/load_config.bat" -full_parse . . "%%CONFIG_FILE%%"
 
 if %TESTLIB__OVERALL_TESTS% GTR %TESTLIB__CURRENT_TESTS% (
   set "TEST_REPORT_PREFIX_STR=%TESTLIB__OVERALL_TESTS%`%TESTLIB__CURRENT_TESTS%"

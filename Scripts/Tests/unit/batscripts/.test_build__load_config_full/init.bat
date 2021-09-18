@@ -17,6 +17,6 @@ shift
 goto READ_TEST_VAR_NAME_SUFFIX_LOOP
 
 :READ_TEST_VAR_NAME_SUFFIX_LOOP_END
-pushd "%TEST_DATA_BASE_DIR%/test_std__load_config"
+pushd "%TEST_DATA_BASE_DIR%/test_build__load_config"
 
 exit /b 0

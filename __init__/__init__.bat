@@ -47,7 +47,7 @@ if not exist "%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%/config.system.vars.in" (
 if not exist "%PROJECT_OUTPUT_ROOT%\" ( mkdir "%PROJECT_OUTPUT_ROOT%" || exit /b 10 )
 if not exist "%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%" || exit /b 11 )
 
-call "%%CONTOOLS_ROOT%%/std/load_config_dir.bat" -gen_config "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
+call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
 if defined CHCP chcp %CHCP%
 

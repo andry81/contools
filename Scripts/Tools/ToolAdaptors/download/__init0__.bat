@@ -16,7 +16,7 @@ for %%i in (CONTOOLS_ROOT) do (
 call :CANONICAL_PATH CONFIGURE_DIR        "%%~dp0"
 call :CANONICAL_PATH DOWNLOAD_TOOLS_ROOT  "%%CONFIGURE_DIR%%"
 
-call "%%CONTOOLS_ROOT%%\std\load_config.bat" "%%CONFIGURE_DIR%%" "config.vars" || (
+call "%%CONTOOLS_ROOT%%\build\load_config.bat" "%%CONFIGURE_DIR%%" "config.vars" || (
   echo.%~nx0: error: config.vars is not loaded.
   exit /b 255
 ) >&2

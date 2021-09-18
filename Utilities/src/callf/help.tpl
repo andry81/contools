@@ -137,23 +137,23 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Can not be used together with `/detach-child-console` flags
 
       /pause-on-exit-if-error-before-exec
-        Pause on exist if an error happened before a command line application
-        execution. By default it prints "Press any key to continue..." message
-        to the stdout.
-        Executable must be attached to a console, otherwise the pause would be
-        skipped.
+        Pause on exit if an error happened before a command line application
+        execution. By default it prints "Press any key to continue . . ."
+        message to the stdout.
+        This-process must be attached to a console, otherwise the pause would
+        be skipped.
 
       /pause-on-exit-if-error
-        Pause on exist if an error happened. By default it prints
-        "Press any key to continue..." message to the stdout.
-        Executable must be attached to a console, otherwise the pause would be
-        skipped.
+        Pause on exit if an error happened. By default it prints
+        "Press any key to continue . . ." message to the stdout.
+        This-process must be attached to a console, otherwise the pause would
+        be skipped.
 
       /pause-on-exit
-        Pause on exist. By default it prints "Press any key to continue..."
+        Pause on exit. By default it prints "Press any key to continue . . ."
         message to the stdout.
-        Executable must be attached to a console, otherwise the pause would be
-        skipped.
+        This-process must be attached to a console, otherwise the pause would
+        be skipped.
 
       /no-expand-env
         Don't expand `${...}` environment variables.
