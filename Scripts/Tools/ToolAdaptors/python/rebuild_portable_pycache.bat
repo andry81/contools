@@ -70,9 +70,9 @@ if defined FLAG (
 
 if not defined FLAG_VALUE_EXCLUDE_DIRS set "FLAG_VALUE_EXCLUDE_DIRS=__pycache__"
 
-set "PYTHON_DIR=%~dpf1"
+set "PYTHON_DIR=%~f1"
 set "DESTDIR=%~2"
-set "DESTDIR_ABS=%~dpf2"
+set "DESTDIR_ABS=%~f2"
 
 set "PYTHON_EXE=%PYTHON_DIR%\python.exe"
 

@@ -53,5 +53,5 @@ set /A DIR_INDEX+=1
 exit /b 0
 
 :GET_ABSOLUTE_PATH
-set "RETURN_VALUE=%~dpf1"
+set "RETURN_VALUE=%~f1"
 exit /b 0

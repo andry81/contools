@@ -2,7 +2,7 @@
 
 setlocal
 
-set "ARCHIVE_PATH=%~dpf1"
+set "ARCHIVE_PATH=%~f1"
 set "FILE_PATH=%~2"
 
 if not exist "%~1" (

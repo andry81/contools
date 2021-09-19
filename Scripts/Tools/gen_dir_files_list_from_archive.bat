@@ -32,8 +32,8 @@ if "%FILE_FILTER:~0,1%" == "\" (
   exit /b 2
 ) >&2
 
-rem double evaluate to % ~dpf1 to handle case with the *
-set "FILE_PATH=%~dpf1"
+rem double evaluate to % ~f1 to handle case with the *
+set "FILE_PATH=%~f1"
 
 shift
 
@@ -59,7 +59,7 @@ goto ARCHIVE_FILE_FILTERS_LOOP
 
 :ARCHIVE_FILE_FILTERS_END
 
-rem double evaluate to % ~dpf1 to handle case with the *: "*" -> "X:\YYY\."
+rem double evaluate to % ~f1 to handle case with the *: "*" -> "X:\YYY\."
 call :PROCESS_FILE_PATH "%%FILE_PATH%%" || exit /b
 
 rem restore code page
@@ -68,7 +68,7 @@ call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 exit /b 0
 
 :PROCESS_FILE_PATH
-set "FILE_PATH=%~dpf1"
+set "FILE_PATH=%~f1"
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%FILE_PATH%" /A:-D /B /S /O:N 2^>nul`) do (
   set "ARCHIVE_FILE_PATH=%%i"
@@ -172,9 +172,9 @@ if "%~1" == "D" set TEMP_FILE_PATH_IS_DIR_PATH=1
 
 if %TEMP_FILE_PATH_IS_DIR_PATH% EQU 0 (
   set "TEMP_FILE_DIR=%~dp2"
-  set "TEMP_FILE_PATH=%~dpf2"
+  set "TEMP_FILE_PATH=%~f2"
 ) else (
-  set "TEMP_FILE_DIR=%~dpf2\"
+  set "TEMP_FILE_DIR=%~f2\"
   set "TEMP_FILE_PATH="
 )
 

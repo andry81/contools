@@ -1,3 +1,9 @@
+2021.09.19:
+* fixed: Scripts/Tests/bench/batscripts: `load_config.bat` script fast parse bench test fixup
+* new: Scripts/Tests/bench/batscripts: `load_config.bat` script lite parse bench test
+* changed: Scripts/Tests: code refactor
+* changed: minor changes
+
 2021.09.18:
 * changed: Scripts/Tools/build: moved `load_config*.bat` scripts into more relevant `build` directory from the `std` directory
 * changed: Scripts/Tools/build: The `load_config_dir.bat` script is reworked to load a system configuration file independently to a user configuration files. Added `-gen_system_config` flag to explicitly load an output system configuration file. The `-gen_user_config` flag is used to explicitly load an output user configuration file.

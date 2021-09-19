@@ -17,9 +17,9 @@ rem 1. call extract_files_from_archive.bat c:\path_for_unpack\app release\x86\ap
 
 setlocal
 
-set "DIR=%~dpf1"
+set "DIR=%~f1"
 set "REL_PATH=%~2"
-set "ARCHIVE_PATH=%~dpf3"
+set "ARCHIVE_PATH=%~f3"
 set "_7ZIP_SWITCHES=%~4"
 
 rem Drop last error level

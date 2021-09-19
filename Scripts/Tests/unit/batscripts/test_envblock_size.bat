@@ -6,7 +6,7 @@ type nul>nul
 rem Create local variable's stack
 setlocal
 
-call "%%~dp0__init__.bat"
+call "%%~dp0__init__/__init__.bat"
 
 echo Running %~nx0...
 

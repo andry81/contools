@@ -179,7 +179,7 @@ if exist "%XCOPY_ARCHIVE_EXCLUDES_FILE%" (
 goto :EXIT
 
 :ABS_PATH
-set "ABS_PATH=%~dpf1"
+set "ABS_PATH=%~f1"
 exit /b
 
 :FILE_PATH
@@ -188,7 +188,7 @@ call :FILE_PATH_IMPL "%%~1/."
 exit /b
 
 :FILE_PATH_IMPL
-set "FILE_PATH=%~dpf1"
+set "FILE_PATH=%~f1"
 exit /b
 
 :PARENT_PATH

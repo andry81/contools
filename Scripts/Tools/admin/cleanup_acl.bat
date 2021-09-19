@@ -6,8 +6,8 @@ rem   not existen directories in the SRC_DIR directory.
 
 setlocal
 
-set "FILE_IN=%~dpf1"
-set "SRC_DIR=%~dpf2"
+set "FILE_IN=%~f1"
+set "SRC_DIR=%~f2"
 
 if not defined FILE_IN exit /b 1
 if not exist "%FILE_IN%" exit /b 2

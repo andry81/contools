@@ -2,7 +2,7 @@
 
 setlocal
 
-set "DIR_PATH=%~dpf1"
+set "DIR_PATH=%~f1"
 set "FILE_PATH=%~2"
 
 set "FILE_PATH_PREFIX="

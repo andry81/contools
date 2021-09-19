@@ -109,7 +109,7 @@ exit /b 0
 :PARENT_DIR
 set "PARENT_DIR="
 if "%~1" == "" exit /b 255
-set "DIR=%~dpf1"
+set "DIR=%~f1"
 set "PARENT_DIR=%~dp1"
 if not exist "%PARENT_DIR%" (
   set "PARENT_DIR="

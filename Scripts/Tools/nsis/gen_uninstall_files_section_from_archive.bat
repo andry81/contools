@@ -52,7 +52,7 @@ call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 exit /b 0
 
 :PROCESS_DIR_PATH
-set "BASE_DIR_PATH=%~dpf1"
+set "BASE_DIR_PATH=%~f1"
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%BASE_DIR_PATH%%FILE_FILTER_SUFFIX%" /A:-D /B /S /O:N 2^>nul`) do (
   set "ARCHIVE_FILE_PATH=%%i"
@@ -144,9 +144,9 @@ if "%~1" == "D" set TEMP_FILE_PATH_IS_DIR_PATH=1
 
 if %TEMP_FILE_PATH_IS_DIR_PATH% EQU 0 (
   set "TEMP_FILE_DIR=%~dp2"
-  set "TEMP_FILE_PATH=%~dpf2"
+  set "TEMP_FILE_PATH=%~f2"
 ) else (
-  set "TEMP_FILE_DIR=%~dpf2\"
+  set "TEMP_FILE_DIR=%~f2\"
   set "TEMP_FILE_PATH="
 )
 

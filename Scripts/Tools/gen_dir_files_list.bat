@@ -31,8 +31,8 @@ if "%FILE_PATH_PTTN:~0,1%" == "\" (
   exit /b 2
 ) >&2
 
-rem double evaluate to % ~dpf1 to handle case with the *: "*" -> "X:\YYY\."
-call :PROCESS_DIR_PATH "%%~dpf1" || exit /b
+rem double evaluate to % ~f1 to handle case with the *: "*" -> "X:\YYY\."
+call :PROCESS_DIR_PATH "%%~f1" || exit /b
 
 :PROCESS_DIR_LOOP_CONTINUE
 shift
@@ -45,7 +45,7 @@ call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 exit /b 0
 
 :PROCESS_DIR_PATH
-set "FILES_PATH=%~dpf1"
+set "FILES_PATH=%~f1"
 
 if not exist "%FILES_PATH%" (
   echo.%?~nx0%: error: file or directory is not found: "%FILES_PATH%".

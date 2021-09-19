@@ -12,8 +12,8 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "FROM_PATH=%~dpf1"
-set "TO_PATH=%~dpf2"
+set "FROM_PATH=%~f1"
+set "TO_PATH=%~f2"
 
 rem the drive must be the same before subtraction
 if /i not "%FROM_PATH:~0,1%" == "%TO_PATH:~0,1%" exit /b 1

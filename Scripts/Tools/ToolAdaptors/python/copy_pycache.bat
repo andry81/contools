@@ -65,9 +65,9 @@ if not defined FLAG_VALUE_PREFIX_DIRS set "FLAG_VALUE_PREFIX_DIRS=__pycache__"
 if not defined FLAG_VALUE_SUFFIX_NAMES set "FLAG_VALUE_SUFFIX_NAMES=.cpython-39|.cpython-38|.cpython-37|.cpython-36|.cpython-35|.cpython-34|.cpython-33|.cpython-32|.cpython-31|.cpython-30"
 
 set "SOURCE_DIR=%~1"
-set "SOURCE_DIR_ABS=%~dpf1"
+set "SOURCE_DIR_ABS=%~f1"
 set "TARGET_DIR=%~2"
-set "TARGET_DIR_ABS=%~dpf2"
+set "TARGET_DIR_ABS=%~f2"
 
 if not defined SOURCE_DIR goto NO_SOURCE_DIR
 if not exist "%SOURCE_DIR%\" goto NO_SOURCE_DIR

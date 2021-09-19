@@ -6,16 +6,11 @@ call "%%~dp0__init__/__init__.bat" || exit /b
 
 set "BEGIN_TIME=%TIME%"
 
-set __STRING__=a
-
-setlocal ENABLEDELAYEDEXPANSION
-
-for /L %%i in (1,1,13) do (
-  call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v
-
-  set __STRING__=!__STRING__!!__STRING__!
-)
-
+setlocal
+call "%%CONTOOLS_ROOT%%/build/load_config.bat" -lite_parse "%%TEST_DATA_BASE_DIR%%/test_build__load_config" "%%TEST_DATA_BASE_DIR%%/test_build__load_config" config.system.01_lite.vars || (
+  echo.%~nx0: error: failed to execute `load_config.bat`
+  exit /b 255
+) >&2
 endlocal
 
 call "%%CONTOOLS_ROOT%%/timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"

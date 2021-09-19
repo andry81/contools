@@ -52,6 +52,6 @@ if not exist "%FROM_PATH%" (
   exit /b -252
 ) >&2
 
-set "FROM_PATH=%~dpf1"
+set "FROM_PATH=%~f1"
 
 del %2 %3 %4 %5 %6 %7 %8 %9 "%FROM_PATH%"

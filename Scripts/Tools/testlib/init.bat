@@ -45,12 +45,12 @@ rem shortcuts to the user test script file name
 set "?~n0=%~n1"
 set "?~x0=%~x1"
 set "?~nx0=%~nx1"
-set "?~dpf0=%~dpf1"
+set "?~f0=%~f1"
 set "?~dp0=%~dp1"
 set "?~d0=%~d1"
 
 rem make builtin canonical user script path variables
-call :CANONICAL_PATH TEST_SCRIPT_FILE_PATH "%%?~dpf0%%"
+call :CANONICAL_PATH TEST_SCRIPT_FILE_PATH "%%?~f0%%"
 
 set "TEST_SCRIPT_FILE_NAME=%?~n0%"
 set "TEST_SCRIPT_FILE_EXT=%?~x0%"

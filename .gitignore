@@ -1,6 +1,5 @@
+/.log
 /Output
-Scripts/Tests/bench/batscripts/_output
-Scripts/Tests/unit/batscripts/_out
 Scripts/Tests/unit/hashlib/_out
 Scripts/Tests/unit/traplib/_out
 Scripts/Tools/admin/ProductKey/__pycache__

@@ -12,8 +12,8 @@ if 0%__CTRL_SETLOCAL% EQU 1 (
 )
 set __CTRL_SETLOCAL=1
 
-call "%%~dp0__init__.bat" || exit /b
-call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~dpf0" || exit /b
+call "%%~dp0__init__/__init__.bat" || exit /b
+call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
 call :TEST "1.7.5.1"      "1.7.5-1"
 call :TEST "1.7.5.1"      "1.7.5-1" -d

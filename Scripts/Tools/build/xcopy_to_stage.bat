@@ -88,7 +88,7 @@ call :FILE_PATH_IMPL "%%~1/."
 exit /b
 
 :FILE_PATH_IMPL
-set "FILE_PATH=%~dpf1"
+set "FILE_PATH=%~f1"
 exit /b
 
 :BASE_PATH

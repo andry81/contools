@@ -113,8 +113,8 @@ if not exist "%FROM_PATH%" (
   exit /b -251
 ) >&2
 
-set "FROM_PATH=%~dpf1"
-set "TO_PATH=%~dpf2"
+set "FROM_PATH=%~f1"
+set "TO_PATH=%~f2"
 
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 

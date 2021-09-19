@@ -21,5 +21,5 @@ if %ERRORLEVEL% NEQ 0 set LASTERROR=23
 exit /b %LASTERROR%
 
 :GET_ABSOLUTE_PATH
-set "RETURN_VALUE=%~dpf1"
+set "RETURN_VALUE=%~f1"
 exit /b 0

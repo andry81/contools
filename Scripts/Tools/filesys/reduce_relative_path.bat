@@ -46,4 +46,4 @@ if %ERRORLEVEL% NEQ 0 set "RETURN_VALUE=%ABS_PATH%"
 exit /b
 
 :ABS_PATH
-set "ABS_PATH=%~dpf1"
+set "ABS_PATH=%~f1"

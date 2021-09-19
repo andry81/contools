@@ -2,7 +2,7 @@
 
 setlocal
 
-set "PATH_VALUE=%~dpf1"
+set "PATH_VALUE=%~f1"
 
 set "RETURN_VALUE="
 

@@ -60,7 +60,7 @@ call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 exit /b 0
 
 :PROCESS_DIR_PATH
-set "BASE_DIR_PATH=%~dpf1"
+set "BASE_DIR_PATH=%~f1"
 
 rem <BASE_DIR_SUFFIX> = <BASE_DIR_PATH> - <PREFIX_PATH>
 

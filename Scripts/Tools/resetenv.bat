@@ -153,7 +153,7 @@ if defined ?CLEAR_VAR_VALUE (
 exit /b
 
 :RESET_LIST
-for /F "usebackq eol= tokens=1,* delims==" %%i in (`type "%~dpf1"`) do if /i "%?CLEAR_VAR_NAME%" == "%%i" exit /b 1
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`type "%~f1"`) do if /i "%?CLEAR_VAR_NAME%" == "%%i" exit /b 1
 exit /b 0
 
 :CLEANUP_AND_EXIT

@@ -11,7 +11,7 @@ rem 1. call write_var_to_file.bat PROJECT_NAME c:\_b\MyProject\build\vars\post_b
 setlocal
 
 set "__VAR_NAME_OUT=%~1"
-set "__FILE_OUT=%~dpf2"
+set "__FILE_OUT=%~f2"
 set "__VAR_VALUE=%~3"
 set "__VAR_NAME_IN=%~4"
 
