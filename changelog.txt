@@ -1,3 +1,6 @@
+2021.09.20:
+* changed: _config: moved not immediate variables from the root `__init__.*` into `config.systen.vars.in`
+
 2021.09.19:
 * fixed: Scripts/Tests/bench/batscripts: `load_config.bat` script fast parse bench test fixup
 * new: Scripts/Tests/bench/batscripts: `load_config.bat` script lite parse bench test

@@ -35,3 +35,16 @@
 #                           * Winbat with fast parse:         Value without escaping and with substitution support: `%<variable>%`.
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
+
+once CONTOOLS_BASH_ROOT                   ="$/{CONTOOLS_ROOT}/bash"
+once CONTOOLS_BUILD_TOOLS_ROOT            ="$/{CONTOOLS_ROOT}/build"
+once CONTOOLS_SQLITE_TOOLS_ROOT           ="$/{CONTOOLS_ROOT}/sqlite"
+once CONTOOLS_TESTLIB_ROOT                ="$/{CONTOOLS_ROOT}/testlib"
+once CONTOOLS_XML_TOOLS_ROOT              ="$/{CONTOOLS_ROOT}/xml"
+once CONTOOLS_VARS_ROOT                   ="$/{CONTOOLS_ROOT}/vars"
+
+once CONTOOLS_UTILITIES_ROOT              ="$/{CONTOOLS_PROJECT_ROOT}/Utilities"
+once CONTOOLS_UTILITIES_BIN_ROOT          ="$/{CONTOOLS_UTILITIES_ROOT}/bin"
+once CONTOOLS_GNUWIN32_ROOT               ="$/{CONTOOLS_UTILITIES_BIN_ROOT}/gnuwin32"
+once CONTOOLS_UTILITIES_HASHDEEP_ROOT     ="$/{CONTOOLS_UTILITIES_BIN_ROOT}/hashdeep"
+once CONTOOLS_UTILITIES_SQLITE_ROOT       ="$/{CONTOOLS_UTILITIES_BIN_ROOT}/sqlite"

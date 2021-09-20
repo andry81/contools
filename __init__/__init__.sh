@@ -19,20 +19,8 @@ tkl_export_path CONTOOLS_PROJECT_ROOT_INIT0_DIR "$BASH_SOURCE_DIR" # including g
 [[ -z "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" ]] &&  tkl_export_path -a -s CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT "$PROJECT_OUTPUT_ROOT/config/contools"
 
 [[ -z "$CONTOOLS_ROOT" ]] &&                        tkl_export_path -a -s CONTOOLS_ROOT                       "$CONTOOLS_PROJECT_ROOT/Scripts/Tools"
-[[ -z "$CONTOOLS_BASH_ROOT" ]] &&                   tkl_export_path -a -s CONTOOLS_BASH_ROOT                  "$CONTOOLS_ROOT/bash"
-[[ -z "$CONTOOLS_BUILD_TOOLS_ROOT" ]] &&            tkl_export_path -a -s CONTOOLS_BUILD_TOOLS_ROOT           "$CONTOOLS_ROOT/build"
-[[ -z "$CONTOOLS_SQLITE_TOOLS_ROOT" ]] &&           tkl_export_path -a -s CONTOOLS_SQLITE_TOOLS_ROOT          "$CONTOOLS_ROOT/sqlite"
-[[ -z "$CONTOOLS_TESTLIB_ROOT" ]] &&                tkl_export_path -a -s CONTOOLS_TESTLIB_ROOT               "$CONTOOLS_ROOT/testlib"
-[[ -z "$CONTOOLS_XML_TOOLS_ROOT" ]] &&              tkl_export_path -a -s CONTOOLS_XML_TOOLS_ROOT             "$CONTOOLS_ROOT/xml"
-[[ -z "$CONTOOLS_VARS_ROOT" ]] &&                   tkl_export_path -a -s CONTOOLS_VARS_ROOT                  "$CONTOOLS_ROOT/vars"
 
-[[ -z "$CONTOOLS_UTILITIES_ROOT" ]] &&              tkl_export_path -a -s CONTOOLS_UTILITIES_ROOT             "$CONTOOLS_PROJECT_ROOT/Utilities"
-[[ -z "$CONTOOLS_UTILITIES_BIN_ROOT" ]] &&          tkl_export_path -a -s CONTOOLS_UTILITIES_BIN_ROOT         "$CONTOOLS_UTILITIES_ROOT/bin"
-[[ -z "$CONTOOLS_GNUWIN32_ROOT" ]] &&               tkl_export_path -a -s CONTOOLS_GNUWIN32_ROOT              "$CONTOOLS_UTILITIES_BIN_ROOT/gnuwin32"
-[[ -z "$CONTOOLS_UTILITIES_HASHDEEP_ROOT" ]] &&     tkl_export_path -a -s CONTOOLS_UTILITIES_HASHDEEP_ROOT    "$CONTOOLS_UTILITIES_BIN_ROOT/hashdeep"
-[[ -z "$CONTOOLS_UTILITIES_SQLITE_ROOT" ]] &&       tkl_export_path -a -s CONTOOLS_UTILITIES_SQLITE_ROOT      "$CONTOOLS_UTILITIES_BIN_ROOT/sqlite"
-
-# init external projects
+# init external projects, common dependencies must be always initialized at first
 
 if [[ -f "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/__init__/__init__.sh" ]]; then
   tkl_include "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/__init__/__init__.sh" || tkl_abort_include
