@@ -76,11 +76,6 @@ if defined FLAG (
   goto FLAGS_LOOP
 )
 
-if not exist "%WKHTMLTOPDF_EXE%" (
-  echo.%?~nx0%: error: WKHTMLTOPDF_EXE does not exist: "%WKHTMLTOPDF_EXE%".
-  exit /b 1
-) >&2
-
 rem Uee {PAGENUM} as placeholder
 set "URL_TMPL=%~1"
 
