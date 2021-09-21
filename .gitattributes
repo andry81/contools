@@ -319,12 +319,9 @@ Scripts/Tools/ToolAdaptors/cygwin/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/cygwin/cygsetupdiff.sh -text
 Scripts/Tools/ToolAdaptors/cygwin/cygsetuplib.sh -text
 Scripts/Tools/ToolAdaptors/cygwin/cygsetupprint.sh -text
-Scripts/Tools/ToolAdaptors/download/__init0__.bat -text
-Scripts/Tools/ToolAdaptors/download/__init__.bat -text
 Scripts/Tools/ToolAdaptors/download/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/download/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/download/_config/config.system.vars.in -text
-Scripts/Tools/ToolAdaptors/download/config.vars -text
 Scripts/Tools/ToolAdaptors/download/download_url_to_html.bat -text
 Scripts/Tools/ToolAdaptors/download/download_url_to_pdf.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/__init__.bat -text
