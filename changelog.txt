@@ -1,3 +1,7 @@
+2021.09.21:
+* fixed: Scrips/Tools/build/load_config_dir.bat: missed to return an exit code
+* changed: __init__: load root directory variable before all externals
+
 2021.09.20:
 * changed: _config: moved not immediate variables from the root `__init__.*` into `config.systen.vars.in`
 

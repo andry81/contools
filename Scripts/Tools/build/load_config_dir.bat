@@ -37,11 +37,14 @@ if defined FLAG (
 )
 
 call :MAIN %%1 %%2
+set __?LASTERROR=%ERRORLEVEL%
 
-rem drop all locals
-for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set __? 2^>nul`) do set "%%i="
+(
+  rem drop all locals
+  for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set __? 2^>nul`) do set "%%i="
 
-exit /b 0
+  exit /b %__?LASTERROR%
+)
 
 :MAIN
 if %__?GEN_SYSTEM_CONFIG% EQU 0 (
