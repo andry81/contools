@@ -13,12 +13,6 @@
 #  and `/` is a character to block a file or directory creation with such a name on a Linux system (but not a block for `mkdir -p`!).
 #  In all other cases the `$/` sequence prints as is in all contexts: in a unix shell script and in a windows batch script.
 
-# CAUTION:
-#   The contools `load_config.bat` script by default uses a simplified version of parser (fast parse), where the `%<variable>%` substitution
-#   placeholder is used instead of the `$/{<variable>}` substitution placeholder. You must explicitly use full parse version
-#   (`-full_parse` flag) in the root `__init__.bat` script to be able to parse `$/` substitution placeholders.
-#
-
 # FORMAT:
 #   [<attributes>] <variable>[:[<class_name>]]=<value>
 #
@@ -30,9 +24,7 @@
 #   BAT:                  Apply on Windows system when this file has loaded from the Windows batch script loader.
 #   SH:                   Apply on any system when this file has loaded from the Bash shell script loader.
 #
-# <value>:                Has 2 usage cases:
-#                           * Bash or Winbat with full parse: Value with escaping and substitution support: `$/<escape_char>`, `$/{<variable>}`.
-#                           * Winbat with fast parse:         Value without escaping and with substitution support: `$/{<variable>}`.
+# <value>:                Value with escaping and substitution support: `$/<escape_char>`, `$/{<variable>}`.
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 

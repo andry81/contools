@@ -1,4 +1,7 @@
 2021.09.21:
+* changed: _config: minor cleanup
+
+2021.09.21:
 * new: Scripts/Tools/ToolAdaptors/app/emule: `add_links.bat`, `search.bat` scripts
 * changed: _config: minor change
 
