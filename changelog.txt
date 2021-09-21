@@ -1,4 +1,7 @@
 2021.09.21:
+* new: Scripts/Tools/ToolAdaptors/app: `emule` and `flylink` setting files backup scripts
+
+2021.09.21:
 * fixed: Scrips/Tools/build/load_config_dir.bat: missed to return an exit code
 * changed: __init__: load root directory variable before all externals
 
