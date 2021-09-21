@@ -1,4 +1,7 @@
 2021.09.21:
+* changed: Scripts/Tools/ToolAdaptors/app: emule, flylink: once variables to be able to set them externally
+
+2021.09.21:
 * new: Scripts/Tools/ToolAdaptors/app: `emule` and `flylink` setting files backup scripts
 
 2021.09.21:

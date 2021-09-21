@@ -39,4 +39,4 @@
 once FLYLINKDC_INSTALL_PATH               ="C:\Programs\Net\Internet\flylinkdc.ru\flylinkdc++ x64"
 once FLYLINKDC_SETTINGS_PATH              ="$/{FLYLINKDC_INSTALL_PATH}/Settings"
 
-FLYLINK_ADAPTOR_BACKUP_DIR                ="$/{PROJECT_OUTPUT_ROOT}/flylink/backup"
+once FLYLINK_ADAPTOR_BACKUP_DIR           ="$/{PROJECT_OUTPUT_ROOT}/flylink/backup"

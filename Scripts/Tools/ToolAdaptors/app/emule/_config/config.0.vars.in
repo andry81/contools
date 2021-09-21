@@ -39,4 +39,4 @@
 once LOCALAPPDATA                         ="$/{APPDATA}/../Local"
 once EMULE_CONFIG_DIR                     ="$/{LOCALAPPDATA}/eMule/config"
 
-EMULE_ADAPTOR_BACKUP_DIR                  ="$/{PROJECT_OUTPUT_ROOT}/emule/backup"
+once EMULE_ADAPTOR_BACKUP_DIR             ="$/{PROJECT_OUTPUT_ROOT}/emule/backup"
