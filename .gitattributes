@@ -274,7 +274,9 @@ Scripts/Tools/ToolAdaptors/app/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/emule/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/emule/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/emule/_config/config.system.vars.in -text
+Scripts/Tools/ToolAdaptors/app/emule/add_links.bat -text
 Scripts/Tools/ToolAdaptors/app/emule/backup_config.bat -text
+Scripts/Tools/ToolAdaptors/app/emule/search.bat -text
 Scripts/Tools/ToolAdaptors/app/flylink/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/flylink/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/flylink/_config/config.system.vars.in -text

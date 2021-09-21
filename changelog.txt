@@ -1,4 +1,8 @@
 2021.09.21:
+* new: Scripts/Tools/ToolAdaptors/app/emule: `add_links.bat`, `search.bat` scripts
+* changed: _config: minor change
+
+2021.09.21:
 * fixed: Scripts/Tools/ToolAdaptors/app: emule, flylink: `%*` expansion in `callf.exe` command line
 * changed: Scripts/Tools/ToolAdaptors/download: code refactor
 

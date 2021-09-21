@@ -32,7 +32,7 @@
 #
 # <value>:                Has 2 usage cases:
 #                           * Bash or Winbat with full parse: Value with escaping and substitution support: `$/<escape_char>`, `$/{<variable>}`.
-#                           * Winbat with fast parse:         Value without escaping and with substitution support: `%<variable>%`.
+#                           * Winbat with fast parse:         Value without escaping and with substitution support: `$/{<variable>}`.
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
