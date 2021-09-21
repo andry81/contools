@@ -1,4 +1,8 @@
 2021.09.21:
+* fixed: Scripts/Tools/ToolAdaptors/app: emule, flylink: `%*` expansion in `callf.exe` command line
+* changed: Scripts/Tools/ToolAdaptors/download: code refactor
+
+2021.09.21:
 * changed: Scripts/Tools/ToolAdaptors/app: emule, flylink: once variables to be able to set them externally
 
 2021.09.21:

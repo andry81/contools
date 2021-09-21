@@ -29,10 +29,12 @@ set "PROJECT_LOG_FILE=%PROJECT_LOG_DIR%\%PROJECT_LOG_FILE_NAME_SUFFIX%.%?~n0%.lo
 
 if not exist "%PROJECT_LOG_DIR%" ( mkdir "%PROJECT_LOG_DIR%" || exit /b )
 
+set ?__CMDLINE__=%*
 "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
   /ret-child-exit /pause-on-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
   /v IMPL_MODE 1 /ra "%%" "%%?01%%" /v "?01" "%%" ^
-  "${COMSPEC}" "/c \"@\"%?~f0%\" %*\""
+  /E0 /S1 /E2 /E3 ^
+  "${COMSPEC}" "/c \"@\"{0}\" {1}\"" "${?~f0}" "${?__CMDLINE__}"
 exit /b
 
 :IMPL
