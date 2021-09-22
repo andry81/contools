@@ -1,3 +1,9 @@
+2021.09.23:
+* new: Scripts/Tools/ToolAdaptors/app: certutil, wkhtmltopdf: `-zeropad` option
+* changed: Scripts/Tools/ToolAdaptors/app: certutil, wkhtmltopdf: scripts self logging and other rework
+* changed: Scripts/Tools/ToolAdaptors/app: certutil, wkhtmltopdf: _config: cleanup
+* refactor: Scripts/Tools/ToolAdaptors: moved download scripts into app subdirectory
+
 2021.09.21:
 * changed: _config: minor cleanup
 

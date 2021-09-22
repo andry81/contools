@@ -271,6 +271,10 @@ Scripts/Tools/PrintUserSessionId.cmd -text
 Scripts/Tools/ToolAdaptors/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/__init__/__init__.sh -text
 Scripts/Tools/ToolAdaptors/app/__init__/__init__.bat -text
+Scripts/Tools/ToolAdaptors/app/certutil/__init__/__init__.bat -text
+Scripts/Tools/ToolAdaptors/app/certutil/_config/config.0.vars.in -text
+Scripts/Tools/ToolAdaptors/app/certutil/_config/config.system.vars.in -text
+Scripts/Tools/ToolAdaptors/app/certutil/download_url_to_file.bat -text
 Scripts/Tools/ToolAdaptors/app/emule/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/emule/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/emule/_config/config.system.vars.in -text
@@ -281,6 +285,10 @@ Scripts/Tools/ToolAdaptors/app/flylink/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/flylink/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/flylink/_config/config.system.vars.in -text
 Scripts/Tools/ToolAdaptors/app/flylink/backup_config.bat -text
+Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/__init__/__init__.bat -text
+Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/_config/config.0.vars.in -text
+Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/_config/config.system.vars.in -text
+Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/download_url_to_pdf.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd32.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd3264.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd3264_k.bat -text
@@ -321,11 +329,6 @@ Scripts/Tools/ToolAdaptors/cygwin/README_EN.txt -text
 Scripts/Tools/ToolAdaptors/cygwin/cygsetupdiff.sh -text
 Scripts/Tools/ToolAdaptors/cygwin/cygsetuplib.sh -text
 Scripts/Tools/ToolAdaptors/cygwin/cygsetupprint.sh -text
-Scripts/Tools/ToolAdaptors/download/__init__/__init__.bat -text
-Scripts/Tools/ToolAdaptors/download/_config/config.0.vars.in -text
-Scripts/Tools/ToolAdaptors/download/_config/config.system.vars.in -text
-Scripts/Tools/ToolAdaptors/download/download_url_to_html.bat -text
-Scripts/Tools/ToolAdaptors/download/download_url_to_pdf.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/__init__.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat -text
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_copy.bat -text

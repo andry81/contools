@@ -28,9 +28,4 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
-once WKHTMLTOPDF_EXE                      ="c:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-
-once DOWNLOAD_ADAPTOR_HTML_DIR            ="$/{PROJECT_OUTPUT_ROOT}/download/html"
-once DOWNLOAD_ADAPTOR_PDF_DIR             ="$/{PROJECT_OUTPUT_ROOT}/download/pdf"
-
 once CHCP                                 =65001
