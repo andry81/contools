@@ -111,7 +111,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           The execution can be performed on a background thread and the call
           should return immediately without waiting for the background thread
           to finish. Note that in certain cases ShellExecuteEx ignores this
-          flag and waits for the process to finish before returning.
+          flag and waits for this-process to finish before returning.
 
         Has no effect if a tee is used.
         Overrides `/wait-child-start` flag.
@@ -119,8 +119,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /no-window
         Hide a child process window including console window.
 
+        CreateProcess
+          Overrides `/showas` option with `SW_HIDE` value.
         ShellExecute
-          By default uses SEE_MASK_NO_CONSOLE flag.
+          By default uses the SEE_MASK_NO_CONSOLE flag.
 
         Overrides `/showas` flag.
 
@@ -133,8 +135,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           Removes usage of the SEE_MASK_NO_CONSOLE flag.
           Implies `/no-window` flag.
 
-        Has no effect if the `/create-child-console` flag is used.
-        Can not be used together with `/detach-child-console` flags
+        Has no effect if `/create-child-console` flag is used.
+        Can not be used together with `/detach-child-console` flag.
 
       /pause-on-exit-if-error-before-exec
         Pause on exit if an error happened before a command line application
@@ -158,12 +160,12 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /no-expand-env
         Don't expand `${...}` environment variables.
 
-        Can not be used together with the `/allow-expand-unexisted-env` flag.
+        Can not be used together with `/allow-expand-unexisted-env` flag.
 
       /no-subst-vars
         Don't substitute `{...}` variables (command line arguments).
 
-        Can not be used together with the `/allow-subst-empty-args` flag.
+        Can not be used together with `/allow-subst-empty-args` flag.
 
       /expand-env-arg<N>
       /E<N>
@@ -173,14 +175,14 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Unexisted environment variables is not expanded by default, use the
         `/EE<N>` flag instead to specifically allow it.
 
-        Can not be used together with the `/no-expand-env`, `/EE<N>` flags.
-        Can be used together with the `/allow-expand-unexisted-env` flag.
+        Can not be used together with `/no-expand-env`, `/EE<N>` flags.
+        Can be used together with `/allow-expand-unexisted-env` flag.
 
       /EE<N>
         The same as `/E<N>` but additionally allows expansion of unexisted
         `${...}` environment variables.
 
-        Can not be used together with the `/no-expand-env`,
+        Can not be used together with `/no-expand-env`,
         `/allow-expand-unexisted-env`, `/expand-env-arg<N>`, `/E<N>` flags.
 
       /subst-vars-arg<N>
@@ -188,11 +190,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Substitute `{...}` variables exclusively for `<N>` command line
         argument, where `<N>` >= 0. This turns off the substitution for the
         rest of arguments if not specifically enabled.
-        Empty arguments is not substituted by default, use the `/SE<N>` flag
+        Empty arguments is not substituted by default, use `/SE<N>` flag
         instead to specifically allow it.
 
-        Can not be used together with the `/no-subst-vars`, `/SE<N>` flags.
-        Can be used together with the `/allow-subst-empty-args` flag.
+        Can not be used together with `/no-subst-vars`, `/SE<N>` flags.
+        Can be used together with `/allow-subst-empty-args` flag.
 
       /SE<N>
         The same as `/S<N>` but additionally allows substitution of empty
@@ -200,7 +202,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Still can not apply to command line arguments which does not exist,
         so to avoid that do use quotes without an argument.
 
-        Can not be used together with the `/no-subst-vars`,
+        Can not be used together with `/no-subst-vars`,
         `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>` flags.
 
       /allow-throw-seh-except
@@ -211,7 +213,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Allow expansion of unexisted `${...}` environment variables in
         all command line arguments.
 
-        Can not be used together with the `/no-expand-env`, `/SE<N>` flags.
+        Can not be used together with `/no-expand-env`, `/EE<N>` flags.
 
       /allow-subst-empty-args
         Allow substitution of empty `{...}` variables in all command line
@@ -219,64 +221,64 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Still can not apply to command line arguments which does not exist,
         so to avoid that do use quotes without an argument.
 
-        Can not be used together with the `/no-subst-vars`, `/EE<N>` flags.
+        Can not be used together with `/no-subst-vars`, `/SE<N>` flags.
 
       /no-std-inherit
         Prevent all standard handles inheritance into child process.
 
-        Can not be used together with the `/no-stdin-inherit`,
+        Can not be used together with `/no-stdin-inherit`,
         `/no-stdout-inherit`, `/no-stderr-inherit` flags.
 
       /no-stdin-inherit
         Prevent stdin handle inheritance into child process.
 
-        Can not be used together with the `/no-std-inherit` flag.
+        Can not be used together with `/no-std-inherit` flag.
 
       /no-stdout-inherit
         Prevent stdout handle inheritance into child process.
 
-        Can not be used together with the `/no-std-inherit` flag.
+        Can not be used together with `/no-std-inherit` flag.
 
       /no-stderr-inherit
         Prevent stderr handle inheritance into child process.
 
-        Can not be used together with the `/no-std-inherit` flag.
+        Can not be used together with `/no-std-inherit` flag.
 
       /pipe-stdin-to-child-stdin
-        Pipe the process stdin into child stdin. This additionally disables
+        Pipe this-process stdin into child stdin. This additionally disables
         stdin handle inheritance.
 
         Has no effect if idle execution is used.
-        Can not be used together with the `/pipe-stdin-to-stdout` flag.
+        Can not be used together with `/pipe-stdin-to-stdout` flag.
 
       /pipe-child-stdout-to-stdout
-        Pipe child stdout to the process stdout. This additionally disables
+        Pipe child stdout to this-process stdout. This additionally disables
         stdout handle inheritance.
 
         Has no effect if idle execution is used.
-        Can not be used together with the `/pipe-stdin-to-stdout` flag.
+        Can not be used together with `/pipe-stdin-to-stdout` flag.
 
       /pipe-child-stderr-to-stderr
-        Pipe child stderr to the process stderr. This additionally disables
+        Pipe child stderr to this-process stderr. This additionally disables
         stderr handle inheritance.
 
         Has no effect if idle execution is used.
-        Can not be used together with the `/pipe-stdin-to-stdout` flag.
+        Can not be used together with `/pipe-stdin-to-stdout` flag.
 
       /pipe-inout-child
         Implies `/pipe-stdin-to-child-stdin`, `/pipe-child-stdout-to-stdout`,
         `/pipe-child-stderr-to-stderr` flags altogether.
 
         Has no effect if idle execution is used.
-        Can not be used together with the `/pipe-stdin-to-stdout` flag.
+        Can not be used together with `/pipe-stdin-to-stdout` flag.
 
       /pipe-stdin-to-stdout
-        Pipe the process stdin into stdout. This additionally disables
-        standard handles inheritance (implies the `/no-stdin-inherit` and
+        Pipe this-process stdin into stdout. This additionally disables
+        standard handles inheritance (implies `/no-stdin-inherit` and
         `/no-stdout-inherit` flags).
 
         Automatically implies if idle execution is used.
-        Can not be used together with the `/pipe-stdin-to-child-stdin`,
+        Can not be used together with `/pipe-stdin-to-child-stdin`,
         `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`,
         `/pipe-inout-child` flags.
 
@@ -307,10 +309,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /elevate
       /elevate{ <ParentFlags> }[{ <ChildFlags> }]
         Self elevate process upto Administrator privileges.
-        If this process has no Administrator privileges, then does use
-        ShellExecute with elevation to start new this process with the same
+        If this-process has no Administrator privileges, then does use
+        ShellExecute with elevation to start new this-process with the same
         command line but different options and flags before run a child
-        process. If this process already has Administrator privileges, then
+        process. If this-process already has Administrator privileges, then
         has no effect.
         Silently overrides the same regular flags.
 
@@ -362,7 +364,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         declare `<Flags>` for both the this-parent (not elevated) process and
         the this-child (elevated) process.
         In case if `/elevate*` flag or option is not used or is not executed,
-        then does declare `<Flags>` for the this-parent process only.
+        then does declare `<Flags>` for the this-process only.
 
         The same flag can not be used together with `/promote-parent{ ... }`
         option. Silently overrides the same regular flags.
@@ -391,8 +393,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /disable-conout-duplicate-to-parent-console-on-error
 
       /promote-parent{ <Flags> }
-        Does declare `<Flags>` for the this-parent process only independently
-        to the `/elevate*` flag or option.
+        Does declare `<Flags>` for the this-parent or this-process only
+        independently to `/elevate*` flag or option.
 
         The same flag can not be used together with `/promote{ ... }`
         option. Silently overrides the same regular flags.
@@ -486,35 +488,34 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /reopen-stdin-as-server-pipe <pipe>
         Reopen stdin as inbound server pipe `<pipe>` to read from.
 
-        Can be used to read from a named pipe instead of the stdin.
-        Can not be used together with the `/reopen-stdin` or another
+        Can be used to read from a named pipe instead from the stdin.
+        Can not be used together with `/reopen-stdin` or another
         `/reopen-stdin-as-*` option.
 
       /reopen-stdin-as-server-pipe-connect-timeout <timeout>
         Timeout in milliseconds to wait for an outbound client named pipe
-        `<pipe>` connection to an inbound server named pipe attached to the
-        process stdin. By default 30 seconds timeout is used.
+        `<pipe>` connection to an inbound server named pipe attached to
+        this-process stdin. By default 30 seconds timeout is used.
 
       /reopen-stdin-as-server-pipe-in-buf-size <size>
         Inbound server named pipe `<pipe>` input buffer size in bytes have
-        used to reopen the process stdin.
+        used to reopen this-process stdin.
 
       /reopen-stdin-as-server-pipe-out-buf-size <size>
         Inbound server named pipe `<pipe>` output buffer size in bytes have
-        used to reopen the process stdin.
+        used to reopen this-process stdin.
 
       /reopen-stdin-as-client-pipe <pipe>
         Reopen stdin as inbound client named pipe `<pipe>` to read from.
 
-        Can be used to read from a named pipe instead of the stdin.
-        Can not be used together with the `/reopen-stdin` or another
+        Can be used to read from a named pipe instead from the stdin.
+        Can not be used together with `/reopen-stdin` or another
         `/reopen-stdin-as-*` option.
 
       /reopen-stdin-as-client-pipe-connect-timeout <timeout>
-        Timeout in milliseconds to wait for an inbound client named pipe
-        `<pipe>` connection to an outbound server named pipe, where the client
-        named pipe end is attached to the process stdin.
-        By default 30 seconds timeout is used.
+        Timeout in milliseconds to wait for an outbound server named pipe
+        `<pipe>` connection to an inbound client named pipe attached to
+        this-process stdin. By default 30 seconds timeout is used.
 
       /reopen-std[out|err] <file>
         Reopen stdout/stderr as a `<file>` to write to.
@@ -529,37 +530,36 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Reopen stdout/stderr as outbound server pipe `<pipe>` to write to.
 
         Can be used to write to a named pipe instead of the stdout/stderr.
-        Can not be used together with the `/reopen-std[out|err]` or another
+        Can not be used together with `/reopen-std[out|err]` or another
         `/reopen-std[out|err]-as-*` option.
         Can not be used together with the same `/std[out|err]-dup` option.
 
       /reopen-std[out|err]-as-server-pipe-connect-timeout <timeout>
         Timeout in milliseconds to wait for an inbound client named pipe
-        `<pipe>` connection to an outbound server named pipe attached to the
-        process stdout/stderr. By default 30 seconds timeout is used.
+        `<pipe>` connection from an outbound server named pipe attached to
+        this-process stdout/stderr. By default 30 seconds timeout is used.
 
       /reopen-std[out|err]-as-server-pipe-in-buf-size <size>
         Outbound server named pipe `<pipe>` input buffer size in bytes have
-        used to reopen the process stdout/stderr.
+        used to reopen this-process stdout/stderr.
 
       /reopen-std[out|err]-as-server-pipe-out-buf-size <size>
         Outbound server named pipe `<pipe>` output buffer size in bytes have
-        used to reopen the process stdout/stderr.
+        used to reopen this-process stdout/stderr.
 
       /reopen-std[out|err]-as-client-pipe <pipe>
         Reopen stdout/stderr as outbound client named pipe `<pipe>` to write
         to.
 
-        Can be used to write to a named pipe instead of the stdout/stderr.
-        Can not be used together with the `/reopen-std[out|err]` or
+        Can be used to write to a named pipe instead to the stdout/stderr.
+        Can not be used together with `/reopen-std[out|err]` or
         another `/reopen-std[out|err]-as-*` option.
         Can not be used together with the same `/std[out|err]-dup` option.
 
       /reopen-std[out|err]-as-client-pipe-connect-timeout <timeout>
-        Timeout in milliseconds to wait for an outbound server named pipe
-        `<pipe>` connection to an inbound client named pipe, where the server
-        named pipe end is attached to the process stdout/stderr.
-        By default 30 seconds timeout is used.
+        Timeout in milliseconds to wait for an inbound server named pipe
+        `<pipe>` connection from an outbound client named pipe attached to
+        this-process stdout/stderr. By default 30 seconds timeout is used.
 
       /reopen-std[out|err]-file-truncate
         Truncate instead of append on stdout/stderr reopen.
@@ -577,83 +577,83 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Can not be used together with the same `/reopen-std[out|err]` option.
 
       /stdin-output-flush
-        Flush after each write into an output handle connected with the
-        process stdin. Basically used if the process stdin is redirected from
-        a file or an anonymous/named pipe. Has no effect if the process stdin
-        is a console (character) handle (not redirected).
+        Flush after each write into an output handle attached to this-process
+        stdin. Basically used if this-process stdin is redirected
+        from a file or an anonymous/named pipe. Has no effect if this-process
+        stdin is a console (character) handle (not redirected).
 
       /std[out|err]-flush
-        Flush after each write into the process stdout/stderr.
+        Flush after each write into this-process stdout/stderr.
 
       /output-flush
-        Flush after each write into the process stdout and stderr.
+        Flush after each write into this-process stdout and stderr.
 
       /inout-flush
-        Flush after each write into an output handle connected with the
-        process stdin and into the process stdout and stderr. The same as the
-        `/stdin-output-flush` plus after each write into the process
-        stdout and stderr.
+        Flush after each write into an output handle attached to this-process
+        stdin or write into this-process stdout/stderr. The same as
+        `/stdin-output-flush` plus after each write into this-process
+        stdout/stderr.
 
       /stdout-vt100
         Enable processing VT100 and similar control character sequences on
         stdout.
 
-        Can not be used together with the `/output-vt100` flag.
+        Can not be used together with `/output-vt100` flag.
         Has no effect on Windows lower than Windows 10 build 10586.
 
       /stderr-vt100
         Enable processing VT100 and similar control character sequences on
         stderr.
 
-        Can not be used together with the `/output-vt100` flag.
+        Can not be used together with `/output-vt100` flag.
         Has no effect on Windows lower than Windows 10 build 10586.
 
       /output-vt100
         Enable processing VT100 and similar control character sequences on
         stdout and stderr.
 
-        Can not be used together with the `/stdout-vt100` and `/stderr-vt100`
+        Can not be used together with `/stdout-vt100` and `/stderr-vt100`
         flags.
         Has no effect on Windows lower than Windows 10 build 10586.
 
       /create-outbound-server-pipe-from-stdin <pipe>
         Create outbound server named pipe `<pipe>` instead of anonymous as by
-        default to write into a child process stdin from the process stdin.
-        Useful to write stream to elevated this-child process or any elevated
-        process.
+        default to write into a child process stdin from this-process stdin.
+        Useful to write stream to elevated this-child process or a child
+        elevated process.
 
       /create-outbound-server-pipe-from-stdin-connect-timeout <timeout>
         Timeout in milliseconds to wait for an inbound client named pipe
-        `<pipe>` connection to an outbound server named pipe connected with
-        the process stdin. By default 30 seconds timeout is used.
+        `<pipe>` connection from an outbound server named pipe attached to
+        this-process stdin. By default 30 seconds timeout is used.
 
       /create-outbound-server-pipe-from-stdin-in-buf-size <size>
         Outbound server named pipe `<pipe>` input buffer size in bytes have
-        used to write into from the process stdin.
+        used to write into from this-process stdin.
 
       /create-outbound-server-pipe-from-stdin-out-buf-size <size>
         Outbound server named pipe `<pipe>` output buffer size in bytes have
-        used to write into from the process stdin.
+        used to write into from this-process stdin.
 
       /create-inbound-server-pipe-to-std[out|err] <pipe>
         Create inbound server named pipe `<pipe>` instead of anonymous as by
         default to read from a child process stdout/stderr to write into
-        the process stdout/stderr.
-        Useful to read stream from elevated this-child process or any elevated
-        process.
+        this-process stdout/stderr.
+        Useful to read stream from elevated this-child process or a child
+        elevated process.
 
       /create-inbound-server-pipe-to-std[out|err]-connect-timeout <timeout>
         Timeout in milliseconds to wait for an outbound client named pipe
-        `<pipe>` connection to an inbound server named pipe connected with
-        the process stdout/stderr. By default 30 seconds timeout is used.
+        `<pipe>` connection to an inbound server named pipe attached to
+        this-process stdout/stderr. By default 30 seconds timeout is used.
 
       /create-inbound-server-pipe-to-std[out|err]-in-buf-size <size>
         Inbound server named pipe `<pipe>` input buffer size in bytes have
-        used to read from into the process stdout/stderr.
+        used to read from into this-process stdout/stderr.
 
       /create-inbound-server-pipe-to-std[out|err]-out-buf-size <size>
         Inbound server named pipe `<pipe>` output buffer size in bytes have
-        used to read from into the process stdout/stderr.
+        used to read from into this-process stdout/stderr.
 
       /tee-std[in|out|err] <file>
         Duplicate standard stream to a tee file `<file>`.
@@ -671,18 +671,18 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         option.
 
       /tee-std[in|out|err]-to-server-pipe-connect-timeout <timeout>
-        Timeout in milliseconds to wait for an outbound server named pipe
-        `<pipe>` connection to an inbound client named pipe, where the server
-        named pipe end is connected with the process standard handle as
-        source. By default 30 seconds timeout is used.
+        Timeout in milliseconds to wait for an inbound client named pipe
+        `<pipe>` connection from an outbound server named pipe attached to
+        this-process stdin/stdout/stderr as source. By default 30 seconds
+        timeout is used.
 
       /tee-std[in|out|err]-to-server-pipe-in-buf-size <size>
         Outbound server named pipe `<pipe>` input buffer size in bytes have
-        used to duplicate the process standard handle as source.
+        used to duplicate this-process stdin/stdout/stderr as source.
 
       /tee-std[in|out|err]-to-server-pipe-out-buf-size <size>
         Outbound server named pipe `<pipe>` output buffer size in bytes have
-        used to duplicate the process standard handle as source.
+        used to duplicate this-process stdin/stdout/stderr as source.
 
       /tee-std[in|out|err]-to-client-pipe <pipe>
         Duplicate standard stream to a tee outbound client named pipe `<pipe>`
@@ -695,10 +695,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         option.
 
       /tee-std[in|out|err]-to-client-pipe-connect-timeout <timeout>
-        Timeout in milliseconds to wait for an outbound client named pipe
-        `<pipe>` connection to an inbound server named pipe, where the client
-        named pipe end is connected with the process standard handle as
-        source. By default 30 seconds timeout is used.
+        Timeout in milliseconds to wait for an inbound server named pipe
+        `<pipe>` connection from an outbound client named pipe attached to
+        this-process stdin/stdout/stderr as source. By default 30 seconds
+        timeout is used.
 
       /tee-std[in|out|err]-dup <fileno>
         Duplicate the tee respective handle from another one, where the
@@ -725,16 +725,16 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /tee-std[in|out|err]-flush
         Flush after each write into a tee file `<file> or a tee named pipe
-        `<pipe>` have used to split output from the process
+        `<pipe>` have used to split output from this-process
         stdin/stdout/stderr.
 
       /tee-output-flush
         Flush after each write into a tee file `<file> or a named pipe
-        `<pipe>` have used to split output from the process stdout and stderr.
+        `<pipe>` have used to split output from this-process stdout and stderr.
 
       /tee-inout-flush
         Flush after each write into a tee file `<file> or a named pipe
-        `<pipe>` have used to split output from the process stdin and stdout
+        `<pipe>` have used to split output from this-process stdin and stdout
         and stderr.
 
       /tee-std[in|out|err]-pipe-buf-size <size>
@@ -743,7 +743,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Has no effect if a respective named pipe is used.
 
       /tee-std[in|out|err]-read-buf-size <size>
-        Buffer size in bytes to read from the process stdin.
+        Buffer size in bytes to read from this-process stdin.
         Buffer size in bytes to read from a child process stdout/stderr.
 
       /mutex-std-writes
@@ -773,20 +773,20 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Synchronization depends on the Win32 API and basically happens when
         all writes does perform on the same handle (for example, when stderr
         has duplicated from stdout). If handles are different (each opened
-        separately from the same file), then the process tries to hash
+        separately from the same file), then this-process tries to hash
         absolute lower cased file path and detect file path equality to invoke
         a file handle duplication instead of initiate a file open.
 
       /create-child-console
-        Create new console for a child process, otherwise a child inherits a
-        parent process console if exists.
+        Create new console for a child process, otherwise a child process
+        inherits a parent process console if exists.
 
         CreateProcess
           Uses CREATE_NEW_CONSOLE flag.
         ShellExecute
           Removes usage of the SEE_MASK_NO_CONSOLE flag.
 
-        Has priority over the `/no-window-console` flag.
+        Has priority over `/no-window-console` flag.
         Can not be used together with `/detach-child-console` flag.
 
       /detach-child-console
@@ -801,42 +801,43 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         `/no-window-console` flags.
 
       /create-console
-        Create current process console if not exists. If current process
-        console exists, owned and not visible, then shows it.
-        If current process console exists and not owned (inherited), then
-        creates new console. Has no effect if current process console already
-        exists, owned and visible.
-
-        Has priority over the `/attach-parent-console` flag.
+        Create this-process console if not exists. If this-process console
+        exists, owned and not visible, then shows it.
+        If this-process console exists and not owned (inherited), then
+        creates new console.
+        
+        Has no effect if this-process console already exists, owned and
+        visible.
+        Has priority over `/attach-parent-console` flag.
         Can not be used together with `/detach-console` flag.
 
       /detach-console
-        Detach current process console if exists.
+        Detach this-process console if exists.
 
         Can not be used together with `/create-console` and
         `/attach-parent-console` flags.
 
       /attach-parent-console
-        Attach console from a parent process or it's ancestors. If the current
-        process console is owned, then detaches it at first.
-        
-        Has no effect if the current process console exists but not owned
+        Attach console from a parent process or it's ancestors. If
+        this-process console is owned, then detaches it at first.
+
+        Has no effect if this-process console exists but not owned
         (inherited).
-        Has no effect if the `/create-console` is used.
+        Has no effect if `/create-console` is used.
         Can not be used together with `/detach-console` flag.
 
       /create-console-title <title>
-        Change console window title on the current process console creation or
+        Change console window title on the this-process console creation or
         recreation.
         
-        Has no effect if the current process console is not owned.
-        Overrides the `/console-title` option.
+        Has no effect if this-process console is not owned.
+        Overrides `/console-title` option.
         Can be used together with `/own-console-title` option.
 
       /own-console-title <title>
-        Change console window title if the current process console is owned.
+        Change console window title if this-process console is owned.
 
-        Overrides the `/console-title` option.
+        Overrides `/console-title` option.
         Can be used together with `/create-console-title` option.
         Has no effect on inherited console.
 
@@ -906,18 +907,18 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Disables file system redirection for the WOW64 process.
 
       /allow-gui-autoattach-to-parent-console
-        In case if the current process console is not attached, then the
-        process tries to attach to a parent process console. To allow that
-        use this flag.
+        In case if this-process console is not attached, then this-process
+        tries to attach to a parent process console. To allow that use this
+        flag.
 
-        Has meaning and implemented only for the `callfg` executable.
+        Has meaning and implemented only for `callfg` executable.
 
       /disable-conout-reattach-to-visible-console
-        In case if the current process console is not visible and a parent
-        process console is visible, then before print any output the
-        application tries to attach to a parent process console to enable the
-        user to read futher output into console before a child process start.
-        To disable that use this flag.
+        In case if this-process console is not visible and a parent process
+        console is visible, then before print any output the application tries
+        to attach to a parent process console to enable the user to read
+        futher output into console before a child process start. To disable
+        that use this flag.
 
       /allow-conout-attach-to-invisible-parent-console
         In case of search a parent process tree for processes with attached
@@ -925,30 +926,31 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         By default parent processes tree with invisible consoles has to be
         skipped while searching for a console to attach.
 
-        Has no effect if the `/attach-parent-console` is not used.
+        Has no effect if `/attach-parent-console` is not used.
         Does not related to the
         `/disable-conout-reattach-to-visible-console` flag usage.
 
       /disable-conout-duplicate-to-parent-console-on-error
-        In case if the current process has own the console window, then the
-        application tries to save all the output to the stdout/stderr to
-        duplicate it later to a parent process console in case of application
-        early exit just before a child process start. This happens because the
-        leaf process owned console window does close upon the process exit and
-        the user won't see the stdout/stderr output. Saved content print on
-        process exit just before a child process start and is not happen if an
-        error is not happened before a child process start. To disable that
-        use this flag.
+        In case if this-process has own the console window, then this-process
+        tries to save all the output to the stdout/stderr to duplicate it
+        later to a parent process console in case of application early exit
+        just before a child process start. This happens because a leaf process
+        owned console window does close upon this-process exit and the user
+        won't see the stdout/stderr output. Saved content print on
+        this-process exit just before a child process start and is not happen
+        if an error is not happened before a child process start. To disable
+        that use this flag.
 
       /write-console-stdin-back
-        When both this-parent and child processes stdin is a character device
-        (console), then this-parent process may write console input back to
-        pass the last read input to the child. The child must use the same
+        When both this-process and a child process stdin is a character device
+        (console), then this-process may write console input back to pass the
+        last read input to a child process. A child process must use the same
         console input buffer and ReadConsole function call in that case,
-        otherwise there is a chance of fall into an infinite input loop.
+        otherwise there is a chance of fall into an infinite input loop in
+        this-proces.
 
-        Has no effect when a child process stdin is piped from this-parent
-        process stdin.
+        Has no effect when a child process stdin is piped from this-process
+        stdin.
         Can not be used together with `/pipe-stdin-to-child-stdin`,
         `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`,
         `/pipe-inout-child`, `/pipe-stdin-to-stdout` flags.
@@ -960,7 +962,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       ${<VarName>} - <VarName> environment variable value.
       {0}    - first argument value.
       {N}    - N'th argument value.
-      {0hs}  - first arguments hexidecimal string (00-FF per character).
+      {0hs}  - first argument hexidecimal string (00-FF per character).
       {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
       \{     - '{' character escape
 
@@ -980,13 +982,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     Idle execution:
       If <ApplicationNameFormatString> is `.`, then the idle execution is
       used. In that case not CreateProcess nor ShellExecute is used.
-      The process loops stdin into stdout until EOF or a pipe close.
-      The process does wait only if stdin is a file or a pipe, otherwise a
+      This-process loops stdin into stdout until EOF or a pipe close.
+      This-process does wait only if stdin is a file or a pipe, otherwise a
       call has no effect. Stderr does not used on idle execution and all
       operations over it has no effect.
 
     Pipe name placeholders:
-      {pid}     - current process identifier as decimal number
+      {pid}     - this-process identifier as decimal number
       {ppid}    - parent process identifier as decimal number
 
     In case of ShellExecute the <ParametersFormatString> must contain only a
@@ -1074,22 +1076,22 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     5. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123_{ppid} ."
     6. callf.exe /reopen-stdin 0.in /reopen-stdout-as-server-pipe test123_{pid} /pipe-stdin-to-stdout /shell-exec runas /no-sys-dialog-ui /no-window "callf.exe" "/attach-parent-console /reopen-stdin-as-client-pipe test123_{ppid} \"\" \"cmd.exe /k\""
 
-    Example #1 prints content of the `0.in` file to the console.
-    Example #2 writes content of the `0.in` file to the `cmd.exe /k` process
-    input.
+    Example #1 prints content of `0.in` file to the console.
+    Example #2 writes content of `0.in` file to `cmd.exe /k` process input.
 
-    Example #3 writes content of the `0.in` file into the `test123` named
-    pipe, where it being read and print into the console by the child process.
-    Example #4 writes content of the `0.in` file into the `test123` named
-    pipe, where it being read and write to the `cmd.exe /k` process input.
+    Example #3 writes content of `0.in` file into `test123` named pipe, where
+    it being read and print into the console by the child process.
 
-    Example #5 writes the content of the `0.in` file into the `test123` named
-    pipe through the Administrator privileges isolation, where it being read
-    and print into the existing (parent) console by the child process
-    `callf.exe`.
-    Example #6 writes content of the `0.in` file into the `test123` named pipe
+    Example #4 writes content of `0.in` file into `test123` named pipe, where
+    it being read and write to `cmd.exe /k` process input.
+
+    Example #5 writes the content of `0.in` file into `test123` named pipe
     through the Administrator privileges isolation, where it being read and
-    write to the `cmd.exe /k` process input with the output has connected back
+    print into the existing (parent) console by the child process `callf.exe`.
+
+    Example #6 writes content of `0.in` file into `test123` named pipe
+    through the Administrator privileges isolation, where it being read and
+    write to `cmd.exe /k` process input with the output has connected back
     to the child process `callf.exe` which prints to the existing (parent)
     console.
 
@@ -1098,16 +1100,16 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     2. callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
 
     Example #1 in case of elevation execution does write the content of the
-    `0.in` file into the `test0_{pid}` named pipe through the Administrator
+    `0.in` file into `test0_{pid}` named pipe through the Administrator
     privileges isolation, where it being read and write back into the
     `test1_{pid}` named pipe to print into the existing (parent) console by
     the parent process `callf.exe`. If process has been already elevated, then
-    just prints content of the `0.in` file to the console.
+    just prints content of `0.in` file to the console.
 
     Example #2 in case of elevation execution does write the content of the
-    `0.in` file into the `test0_{pid}` named pipe through the Administrator
-    privileges isolation, where it being read, processed by the `cmd.exe` and
-    write the output back into the `test1_{pid}` named pipe to print to the
+    `0.in` file into `test0_{pid}` named pipe through the Administrator
+    privileges isolation, where it being read, processed by `cmd.exe` and
+    write the output back into `test1_{pid}` named pipe to print to the
     existing (parent) console by the parent process `callf.exe`. If process has
-    been already elevated, then just writes content of the `0.in` file to the
+    been already elevated, then just writes content of `0.in` file to the
     `cmd.exe /k` process input.

@@ -3451,6 +3451,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
 
         g_connect_server_named_pipe_thread_locals[0][0].server_named_pipe_handle_ptr = &g_reopen_stdin_handle;
 
+        // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[0][0].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<0, 0>, &g_connect_server_named_pipe_thread_locals[0][0].thread_data,
@@ -3461,6 +3462,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
     else if (!g_options.reopen_stdin_as_client_pipe.empty()) {
         g_connect_server_named_pipe_thread_locals[0][0].client_named_pipe_handle_ptr = &g_reopen_stdin_handle;
 
+        // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[0][0].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<0, 0>, &g_connect_client_named_pipe_thread_locals[0][0].thread_data,
@@ -3658,6 +3660,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
 
         g_connect_server_named_pipe_thread_locals[0][1].server_named_pipe_handle_ptr = &g_reopen_stdout_handle;
 
+        // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[0][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<0, 1>, &g_connect_server_named_pipe_thread_locals[0][1].thread_data,
@@ -3668,6 +3671,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
     else if (!g_options.reopen_stdout_as_client_pipe.empty()) {
         g_connect_server_named_pipe_thread_locals[0][1].client_named_pipe_handle_ptr = &g_reopen_stdout_handle;
 
+        // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[0][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<0, 1>, &g_connect_client_named_pipe_thread_locals[0][1].thread_data,
@@ -3895,6 +3899,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
 
         g_connect_server_named_pipe_thread_locals[0][2].server_named_pipe_handle_ptr = &g_reopen_stderr_handle;
 
+        // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[0][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<0, 2>, &g_connect_server_named_pipe_thread_locals[0][2].thread_data,
@@ -3905,6 +3910,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
     else if (!g_options.reopen_stderr_as_client_pipe.empty()) {
         g_connect_server_named_pipe_thread_locals[0][2].client_named_pipe_handle_ptr = &g_reopen_stderr_handle;
 
+        // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[0][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<0, 2>, &g_connect_client_named_pipe_thread_locals[0][2].thread_data,
@@ -4029,6 +4035,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
 
         g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].server_named_pipe_handle_ptr = &g_stdin_pipe_write_handle;
 
+        // start server pipe connection await thread
         g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].thread_handle = CreateThread(
             NULL, 0,
             ConnectOutboundServerPipeFromConsoleInputThread, &g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].thread_data,
@@ -4173,6 +4180,7 @@ bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error)
 
         g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type].server_named_pipe_handle_ptr = &conout_pipe_read_handle;
 
+        // start server pipe connection await thread
         g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type].thread_handle = CreateThread(
             NULL, 0,
             ConnectInboundServerPipeToConsoleOutputThread<stream_type>, &g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type].thread_data,
@@ -4312,6 +4320,7 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
     return [&]() -> DWORD { __try {
         return [&]() -> DWORD {
             if_break(true) {
+                // start server pipe connection await
                 SetLastError(0); // just in case
                 if (!ConnectNamedPipe(conout_pipe_read_handle, &connection_await_overlapped)) {
                     win_error = GetLastError();
@@ -4469,7 +4478,7 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
 
         g_connect_server_named_pipe_thread_locals[1][0].server_named_pipe_handle_ptr = &g_tee_named_pipe_stdin_handle;
 
-        // start server pipe connection await
+        // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[1][0].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<1, 0>, &g_connect_server_named_pipe_thread_locals[1][0].thread_data,
@@ -4482,6 +4491,7 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
 
         g_connect_server_named_pipe_thread_locals[1][0].client_named_pipe_handle_ptr = &g_tee_named_pipe_stdin_handle;
 
+        // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[1][0].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<1, 0>, &g_connect_client_named_pipe_thread_locals[1][0].thread_data,
@@ -4601,6 +4611,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
 
         g_connect_server_named_pipe_thread_locals[1][1].server_named_pipe_handle_ptr = &g_tee_named_pipe_stdout_handle;
 
+        // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[1][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<1, 1>, &g_connect_server_named_pipe_thread_locals[1][1].thread_data,
@@ -4613,6 +4624,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
 
         g_connect_server_named_pipe_thread_locals[1][1].client_named_pipe_handle_ptr = &g_tee_named_pipe_stdout_handle;
 
+        // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[1][1].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<1, 1>, &g_connect_client_named_pipe_thread_locals[1][1].thread_data,
@@ -4759,6 +4771,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
 
         g_connect_server_named_pipe_thread_locals[1][2].server_named_pipe_handle_ptr = &g_tee_named_pipe_stderr_handle;
 
+        // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[1][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectServerNamedPipeThread<1, 2>, &g_connect_server_named_pipe_thread_locals[1][2].thread_data,
@@ -4771,6 +4784,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
 
         g_connect_server_named_pipe_thread_locals[1][2].client_named_pipe_handle_ptr = &g_tee_named_pipe_stderr_handle;
 
+        // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[1][2].thread_handle = CreateThread(
             NULL, 0,
             ConnectClientNamedPipeThread<1, 2>, &g_connect_client_named_pipe_thread_locals[1][2].thread_data,
