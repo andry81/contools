@@ -1,7 +1,7 @@
 
 (
   endlocal
-  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_OUT_DIR%/%__?CONFIG_FILE%") do ( set "__?VALUE=%%j" & call :PARSE "%%~1" "%%~2" "%%~3" %%i )
+  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_DIR%/%__?CONFIG_FILE%") do ( set "__?VALUE=%%j" & call :PARSE "%%~1" "%%~2" "%%~3" %%i )
   set "__?VAR=" & set "__?VALUE=" & set "__?ATTR=" & set "__?VAR_EXPR=" & set "__?PARAM0=" & set "__?PARAM1=" & set "__?QUOT__=" & set "__?EXCL__=" & set "__?ESC__="
 )
 exit /b 0

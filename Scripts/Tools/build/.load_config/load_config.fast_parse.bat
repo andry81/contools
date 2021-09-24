@@ -1,5 +1,5 @@
 
-for /F "usebackq eol=# tokens=* delims=" %%i in ("%__?CONFIG_OUT_DIR%/%__?CONFIG_FILE%") do (
+for /F "usebackq eol=# tokens=* delims=" %%i in ("%__?CONFIG_FILE_DIR%/%__?CONFIG_FILE%") do (
   endlocal
   setlocal DISABLEDELAYEDEXPANSION
   for /F "eol=# tokens=1,* delims==" %%j in ("%%i") do (

@@ -1,3 +1,9 @@
+2021.09.24:
+* new: Scripts/Tools/std: `get_windows_version.bat`, `check_windows_version.bat` scripts
+* new: Scripts/Tools/build: `load_config.bat`: `-load_output_config` flag to explicitly load an output file config instead of input as by default in case if `-gen_config` flag is not defined
+* new: Scripts/Tools/build: `load_config_dir.bat`: `-load_system_output_config`, ``-load_user_output_config`` flags to explicitly load an output file config instead of input as by default in case if respective `-gen_system_config`/`-gen_user_config` flag is not defined
+* changed: Scripts/Tools/build: gen_config.bat: moved into more relevant directory
+
 2021.09.23:
 * new: Scripts/Tools/ToolAdaptors/app: __init__: minor refactor
 

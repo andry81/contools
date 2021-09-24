@@ -497,6 +497,7 @@ Scripts/Tools/build/env_generators/cmake_cmd_line.bat -text
 Scripts/Tools/build/env_generators/makensis_cmd_line.bat -text
 Scripts/Tools/build/export_build_vars.bat -text
 Scripts/Tools/build/extract_files_from_archive.bat -text
+Scripts/Tools/build/gen_config.bat -text
 Scripts/Tools/build/gen_publish_app_dir.bat -text
 Scripts/Tools/build/load_config.bat -text
 Scripts/Tools/build/load_config_dir.bat -text
@@ -632,13 +633,14 @@ Scripts/Tools/std/__init__.bat -text
 Scripts/Tools/std/allocate_temp_dir.bat -text
 Scripts/Tools/std/append_list_from_string.bat -text
 Scripts/Tools/std/chcp.bat -text
+Scripts/Tools/std/check_windows_version.bat -text
 Scripts/Tools/std/clear_list.bat -text
 Scripts/Tools/std/copy.bat -text
 Scripts/Tools/std/del_file.bat -text
 Scripts/Tools/std/del_file_pttn.bat -text
 Scripts/Tools/std/echo_var.bat -text
 Scripts/Tools/std/free_temp_dir.bat -text
-Scripts/Tools/std/gen_config.bat -text
+Scripts/Tools/std/get_windows_version.bat -text
 Scripts/Tools/std/getcp.bat -text
 Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
