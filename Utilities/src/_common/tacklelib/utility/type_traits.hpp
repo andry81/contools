@@ -39,15 +39,15 @@ namespace utility
         struct _for_each_unroll
         {
             template <typename Functor, typename T, std::size_t N>
-            _for_each_unroll(T (& arr)[N], Functor && f) :
-                break_(false)
+            _for_each_unroll(_for_each_unroll * parent_, T (& arr)[N], Functor && f) :
+                parent(parent_), break_(false)
             {
                 invoke(arr, std::forward<Functor>(f));
             }
 
             template <typename Functor, typename T, std::size_t N>
-            _for_each_unroll(T (&& arr)[N], Functor && f) :
-                break_(false)
+            _for_each_unroll(_for_each_unroll * parent_, T (&& arr)[N], Functor && f) :
+                parent(parent_), break_(false)
             {
                 invoke(std::forward<T[N]>(arr), std::forward<Functor>(f));
             }
@@ -68,9 +68,12 @@ namespace utility
             typename std::enable_if<I < N, void>::type
                 invoke(T (& arr)[N], Functor && f)
             {
-                _for_each_unroll<std::is_array<T>::value> nested_for_each{ arr[I], std::forward<Functor>(f) };
-                if (!nested_for_each.break_) {
-                    invoke<I + 1, Functor, T, N>(arr, std::forward<Functor>(f));
+                if (!break_) {
+                    _for_each_unroll<std::is_array<T>::value> nested_for_each{ this, arr[I], std::forward<Functor>(f) };
+                    if (!nested_for_each.break_) {
+                        invoke<I + 1, Functor, T, N>(arr, std::forward<Functor>(f));
+                    }
+                    else if (parent) parent->break_ = true;
                 }
             }
 
@@ -78,12 +81,16 @@ namespace utility
             typename std::enable_if<I < N, void>::type
                 invoke(T (&& arr)[N], Functor && f)
             {
-                _for_each_unroll<std::is_array<T>::value> nested_for_each{ std::forward<T>(arr[I]), std::forward<Functor>(f) };
-                if (!nested_for_each.break_) {
-                    invoke<I + 1, Functor, T, N>(arr, std::forward<Functor>(f));
+                if (!break_) {
+                    _for_each_unroll<std::is_array<T>::value> nested_for_each{ this, std::forward<T>(arr[I]), std::forward<Functor>(f) };
+                    if (!nested_for_each.break_) {
+                        invoke<I + 1, Functor, T, N>(arr, std::forward<Functor>(f));
+                    }
+                    else if (parent) parent->break_ = true;
                 }
             }
 
+            _for_each_unroll * parent;
             bool break_;
         };
 
@@ -119,14 +126,14 @@ namespace utility
         struct _for_each_unroll<false>
         {
             template <typename Functor, typename T>
-            _for_each_unroll(const T & value, Functor && f) :
+            _for_each_unroll(void * parent, const T & value, Functor && f) :
                 break_(false)
             {
                 _invoke_breakable(*this, value, std::forward<Functor>(f), bool_identity<!std::is_void<decltype(f(value))>::value>{});
             }
 
             template <typename Functor, typename T>
-            _for_each_unroll(T && value, Functor && f) :
+            _for_each_unroll(void * parent, T && value, Functor && f) :
                 break_(false)
             {
                 _invoke_breakable(*this, value, std::forward<Functor>(f), bool_identity<!std::is_void<decltype(f(std::forward<T>(value)))>::value>{});
@@ -152,7 +159,7 @@ namespace utility
     typename std::enable_if<I < N, void>::type
         for_each_unroll(T (& arr)[N], Functor && f)
     {
-        detail::_for_each_unroll<std::is_array<T>::value> nested_for_each{ arr[I], std::forward<Functor>(f) };
+        detail::_for_each_unroll<std::is_array<T>::value> nested_for_each{ nullptr, arr[I], std::forward<Functor>(f) };
         if (!nested_for_each.break_) {
             for_each_unroll<I + 1, Functor, T, N>(arr, std::forward<Functor>(f));
         }
@@ -162,7 +169,7 @@ namespace utility
     typename std::enable_if<I < N, void>::type
         for_each_unroll(T (&& arr)[N], Functor && f)
     {
-        detail::_for_each_unroll<std::is_array<T>::value> nested_for_each{ std::forward<T>(arr[I]), std::forward<Functor>(f) };
+        detail::_for_each_unroll<std::is_array<T>::value> nested_for_each{ nullptr, std::forward<T>(arr[I]), std::forward<Functor>(f) };
         if (!nested_for_each.break_) {
             for_each_unroll<I + 1, Functor, T, N>(std::forward<T[N]>(arr), std::forward<Functor>(f));
         }

@@ -9,35 +9,35 @@
 namespace tackle
 {
     template <typename T>
-    class excplicit_type;
+    class explicit_type;
 
     // safe bool idiom
     template <>
-    class excplicit_type<bool>
+    class explicit_type<bool>
     {
-        using bool_type = void (excplicit_type::*)() const;
+        using bool_type = void (explicit_type::*)() const;
 
-        void _true() const
+        void true_() const
         {
         }
 
     public:
-        excplicit_type(bool value) :
+        explicit_type(bool value) :
             value_(value)
         {
         }
 
     public:
-        excplicit_type(const excplicit_type &) = default;
-        excplicit_type(excplicit_type &&) = default;
+        explicit_type(const explicit_type &) = default;
+        explicit_type(explicit_type &&) = default;
 
-        excplicit_type & operator =(const excplicit_type &) = default;
-        //excplicit_type && operator =(excplicit_type &&) = default;
+        explicit_type & operator =(const explicit_type &) = default;
+        //explicit_type && operator =(explicit_type &&) = default;
 
         operator bool_type() const
         {
             if (value_) {
-                return &excplicit_type::_true;
+                return &explicit_type::true_;
             }
             
             return nullptr;
@@ -49,21 +49,21 @@ namespace tackle
 
     // safe int idiom
     template <>
-    class excplicit_type<int>
+    class explicit_type<int>
     {
     public:
         template <typename T_>
-        excplicit_type(T_ value) :
+        explicit_type(T_ value) :
             value_(value)
         {
             static_assert(std::is_same<typename utility::remove_cvref<T_>::type, int>::value, "type T_ must be int");
         }
 
-        excplicit_type(const excplicit_type &) = default;
-        excplicit_type(excplicit_type &&) = default;
+        explicit_type(const explicit_type &) = default;
+        explicit_type(explicit_type &&) = default;
 
-        excplicit_type & operator =(const excplicit_type &) = default;
-        //excplicit_type && operator =(excplicit_type &&) = default;
+        explicit_type & operator =(const explicit_type &) = default;
+        //explicit_type && operator =(explicit_type &&) = default;
 
         operator int() const
         {
@@ -74,8 +74,8 @@ namespace tackle
         int value_;
     };
 
-    using explicit_bool = excplicit_type<bool>;
-    using explicit_int  = excplicit_type<int>;
+    using explicit_bool = explicit_type<bool>;
+    using explicit_int  = explicit_type<int>;
 }
 
 #endif

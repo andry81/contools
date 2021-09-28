@@ -908,6 +908,7 @@ Utilities/src/wshbazaar/wshdynacall/example.bas -text
 Utilities/src/wshbazaar/wshdynacall/version.def -text
 Utilities/src/wshbazaar/wshdynacall/version.tpl -text
 Utilities/tests/README_EN.txt -text
+Utilities/tests/TODO.txt -text
 Utilities/tests/__init__/__init__.bat -text
 Utilities/tests/manual/__init__/__init__.bat -text
 Utilities/tests/manual/contools/__init__/__init__.bat -text

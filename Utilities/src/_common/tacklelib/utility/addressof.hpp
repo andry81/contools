@@ -87,6 +87,7 @@ namespace utility
         static T value{ std::forward<decltype(args)>(args)... };
         return value;
     }
+
 }
 
 #endif
