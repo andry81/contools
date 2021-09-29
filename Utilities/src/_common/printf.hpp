@@ -25,6 +25,7 @@ namespace {
     void _parse_string(int arg_index, const TCHAR * parse_str, std::tstring & parsed_str, TCHAR * env_buf,
                        bool no_expand_env, bool no_subst_vars, bool use_in_args,
                        const Flags & flags, const Options & options,
+                       PWSTR cmdline_str, const ptrdiff_t (& special_cmdline_arg_offset_arr)[2],
                        const InBaseArgs & in_args = InBaseArgs(), const OutBaseArgs & out_args = OutBaseArgs()) {
 
         // intercept here specific global variables accidental usage instead of local variables
@@ -95,6 +96,62 @@ namespace {
                         break;
                     }
 
+                    if (arg_index == -1) {
+                        // {*}, {@}
+                        const TCHAR * arg_placeholders[] = { _T("{*}"), _T("{@}") };
+
+                        for (size_t i = 0; i < sizeof(arg_placeholders) / sizeof(arg_placeholders[0]); i++) {
+                            const size_t arg_offset  = special_cmdline_arg_offset_arr[i];
+
+                            if (arg_offset == (std::numeric_limits<size_t>::max)()) {
+                                continue;
+                            }
+
+                            const auto var_buf = arg_placeholders[i];
+
+                            const size_t var_vn_len = tstrlen(var_buf);
+                            const int var_vn = tstrncmp(p, var_buf, var_vn_len);
+                            if (!var_vn && (!no_expand_env || p == parse_str || p > parse_str && *(p - 1) != _T('$'))) {
+                                bool allow_subst_var_in_all_args = options.subst_vars_args.empty();
+                                bool allow_subst_empty_arg = flags.allow_subst_empty_args;
+
+                                if_break(!allow_subst_var_in_all_args) {
+                                    const int pos_arg_index = arg_index + 2;    // positional argument index
+
+                                    for (const auto & tuple_ref : options.subst_vars_args) {
+                                        const int subst_var_arg_index = std::get<0>(tuple_ref);
+                                        const bool allow_subst_empty_arg2 = std::get<1>(tuple_ref);
+
+                                        if (subst_var_arg_index == pos_arg_index) {
+                                            allow_subst_var_in_all_args = true;
+                                            if (!allow_subst_empty_arg) {
+                                                allow_subst_empty_arg = allow_subst_empty_arg2;
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                parsed_str.append(last_offset_ptr, p);
+                                last_offset_ptr = p + var_vn_len;
+
+                                const std::tstring::size_type vn_value_len = tstrlen(cmdline_str + arg_offset);
+                                if (allow_subst_var_in_all_args && (allow_subst_empty_arg || vn_value_len)) {
+                                    parsed_str.append(cmdline_str + arg_offset);
+                                }
+                                else {
+                                    parsed_str.append(var_buf);
+                                }
+
+                                found = true;
+
+                                break;
+                            }
+                        }
+
+                        if (found) break;
+                    }
+
                     int i = 0;
 
                     compatible_const_it_path it_path;
@@ -122,13 +179,13 @@ namespace {
                             const size_t var_vn_len = tstrlen(var_buf);
                             const int var_vn = tstrncmp(p, var_buf, var_vn_len);
                             if (!var_vn && (!no_expand_env || p == parse_str || p > parse_str && *(p - 1) != _T('$'))) {
-                                bool allow_subst_var_in_arg = options.subst_vars_args.empty();
+                                bool allow_subst_var_in_all_args = options.subst_vars_args.empty();
                                 bool allow_subst_empty_arg = flags.allow_subst_empty_args;
 
-                                if_break(!allow_subst_var_in_arg) {
+                                if_break(!allow_subst_var_in_all_args) {
                                     const int pos_arg_index = arg_index + 2;    // positional argument index
                                     if (pos_arg_index < 0) {                    // `/v <name> <value>` option argument, always allow
-                                        allow_subst_var_in_arg = true;
+                                        allow_subst_var_in_all_args = true;
                                         break;
                                     }
 
@@ -137,7 +194,7 @@ namespace {
                                         const bool allow_subst_empty_arg2 = std::get<1>(tuple_ref);
 
                                         if (subst_var_arg_index == pos_arg_index) {
-                                            allow_subst_var_in_arg = true;
+                                            allow_subst_var_in_all_args = true;
                                             if (!allow_subst_empty_arg) {
                                                 allow_subst_empty_arg = allow_subst_empty_arg2;
                                             }
@@ -152,7 +209,7 @@ namespace {
                                 if (i != arg_index) {
                                     if (it.typeIndex() == 0) {
                                         const std::tstring::size_type vn_value_len = tstrlen(*it.get0());
-                                        if (allow_subst_var_in_arg && (allow_subst_empty_arg || vn_value_len)) {
+                                        if (allow_subst_var_in_all_args && (allow_subst_empty_arg || vn_value_len)) {
                                             parsed_str.append(*it.get0());
                                         }
                                         else {
@@ -161,7 +218,7 @@ namespace {
                                     }
                                     else if (it.typeIndex() == 1) {
                                         const std::tstring::size_type vn_value_len = it.get1()->length();
-                                        if (allow_subst_var_in_arg && (allow_subst_empty_arg || vn_value_len)) {
+                                        if (allow_subst_var_in_all_args && (allow_subst_empty_arg || vn_value_len)) {
                                             parsed_str.append(*it.get1());
                                         }
                                         else {
@@ -191,13 +248,13 @@ namespace {
                             const size_t var_vn_len = tstrlen(var_buf);
                             const int var_vn = tstrncmp(p, var_buf, var_vn_len);
                             if (!var_vn && (!no_expand_env || p == parse_str || p > parse_str && *(p - 1) != _T('$'))) {
-                                bool allow_subst_var_in_arg = options.subst_vars_args.empty();
+                                bool allow_subst_var_in_all_args = options.subst_vars_args.empty();
                                 bool allow_subst_empty_arg = flags.allow_subst_empty_args;
 
-                                if_break(!allow_subst_var_in_arg) {
+                                if_break(!allow_subst_var_in_all_args) {
                                     const int pos_arg_index = arg_index + 2;    // positional argument index
                                     if (pos_arg_index < 0) {                    // `/v <name> <value>` option argument, always allow
-                                        allow_subst_var_in_arg = true;
+                                        allow_subst_var_in_all_args = true;
                                         break;
                                     }
 
@@ -206,7 +263,7 @@ namespace {
                                         const bool allow_subst_empty_arg2 = std::get<1>(tuple_ref);
 
                                         if (subst_var_arg_index == pos_arg_index) {
-                                            allow_subst_var_in_arg = true;
+                                            allow_subst_var_in_all_args = true;
                                             if (!allow_subst_empty_arg) {
                                                 allow_subst_empty_arg = allow_subst_empty_arg2;
                                             }
@@ -220,7 +277,7 @@ namespace {
                                 if (i != arg_index) {
                                     if (it.typeIndex() == 0) {
                                         const std::tstring::size_type vn_value_len = tstrlen(*it.get0());
-                                        if (allow_subst_var_in_arg && (allow_subst_empty_arg || vn_value_len)) {
+                                        if (allow_subst_var_in_all_args && (allow_subst_empty_arg || vn_value_len)) {
                                             for (std::tstring::size_type j = 0; j < vn_value_len; j++) {
                                                 parsed_str.append(g_hextbl[(*it.get0())[j]]);
                                             }
@@ -231,7 +288,7 @@ namespace {
                                     }
                                     else if (it.typeIndex() == 1) {
                                         const std::tstring::size_type vn_value_len = it.get1()->length();
-                                        if (allow_subst_var_in_arg && (allow_subst_empty_arg || vn_value_len)) {
+                                        if (allow_subst_var_in_all_args && (allow_subst_empty_arg || vn_value_len)) {
                                             for (std::tstring::size_type j = 0; j < vn_value_len; j++) {
                                                 parsed_str.append(g_hextbl[(*it.get1())[j]]);
                                             }

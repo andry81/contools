@@ -16,6 +16,7 @@
 #include <ctime>
 #include <atomic>
 #include <iostream>
+#include <limits>
 
 #include <assert.h>
 #include <stdint.h>
@@ -260,6 +261,49 @@ namespace {
         _AnyString  any_str;
     };
 
+    struct _EnumConsoleWindowsProcData
+    {
+        TCHAR tchar_buf[256];
+        std::vector<HWND> console_window_handles_arr;
+    };
+
+    struct _ConsoleWindowOwnerProc
+    {
+        DWORD proc_id;
+        HWND  console_window;   // NULL if not owned
+
+        _ConsoleWindowOwnerProc() :
+            proc_id(-1), console_window()
+        {
+        }
+
+        _ConsoleWindowOwnerProc(DWORD proc_id_, HWND console_window_) :
+            proc_id(proc_id_), console_window(console_window_)
+        {
+        }
+
+        _ConsoleWindowOwnerProc(const _ConsoleWindowOwnerProc &) = default;
+        _ConsoleWindowOwnerProc(_ConsoleWindowOwnerProc &&) = default;
+
+        _ConsoleWindowOwnerProc & operator =(const _ConsoleWindowOwnerProc &) = default;
+        _ConsoleWindowOwnerProc & operator =(_ConsoleWindowOwnerProc &&) = default;
+    };
+
+    //struct _to_lower_with_codepage
+    //{
+    //    _to_lower_with_codepage(unsigned int code_page_) :
+    //        code_page(code_page_)
+    //    {
+    //    }
+
+    //    std::tstring::value_type operator()(std::tstring::value_type ch_)
+    //    {
+    //        return _to_lower(ch_, code_page);
+    //    }
+
+    //    unsigned int code_page;
+    //};
+
 
     const TCHAR * g_hextbl[] = {
         _T("00"), _T("01"), _T("02"), _T("03"), _T("04"), _T("05"), _T("06"), _T("07"), _T("08"), _T("09"), _T("0A"), _T("0B"), _T("0C"), _T("0D"), _T("0E"), _T("0F"),
@@ -323,7 +367,7 @@ namespace {
         return reinterpret_cast<T(&)[1]>(ref);
     }
 
-        template <typename T, typename... Args>
+    template <typename T, typename... Args>
     inline void _construct(T & ref, Args &&... args)
     {
         ::new (utility::addressof(ref)) T(std::forward<Args>(args)...);
@@ -334,7 +378,6 @@ namespace {
     {
         ptr->~T();
     }
-
 
     inline bool _is_valid_handle(HANDLE handle)
     {
@@ -576,21 +619,6 @@ namespace {
     //    return std::use_facet<std::ctype<std::tstring::value_type> >(std::locale()).tolower(ch);
     //}
 
-    //struct _to_lower_with_codepage
-    //{
-    //    _to_lower_with_codepage(unsigned int code_page_) :
-    //        code_page(code_page_)
-    //    {
-    //    }
-
-    //    std::tstring::value_type operator()(std::tstring::value_type ch_)
-    //    {
-    //        return _to_lower(ch_, code_page);
-    //    }
-
-    //    unsigned int code_page;
-    //};
-
     // code_page=0 for default std::locale
     //std::tstring _to_lower(std::tstring str, unsigned int code_page)
     //{
@@ -777,7 +805,8 @@ namespace {
         return true;
     }
 
-    inline void _detach_stdin() {
+    inline void _detach_stdin()
+    {
         // WORKAROUND:
         //  If `_fileno` return negative value, then `fclose` won't call `_close` on associated descriptor, so
         //  we have to do it directly.
@@ -790,7 +819,8 @@ namespace {
         }
     }
 
-    inline void _detach_stdout() {
+    inline void _detach_stdout()
+    {
         // WORKAROUND:
         //  If `_fileno` return negative value, then `fclose` won't call `_close` on associated descriptor, so
         //  we have to do it directly.
@@ -803,7 +833,8 @@ namespace {
         }
     }
 
-    inline void _detach_stderr() {
+    inline void _detach_stderr()
+    {
         // WORKAROUND:
         //  If `_fileno` return negative value, then `fclose` won't call `_close` on associated descriptor, so
         //  we have to do it directly.
@@ -1088,12 +1119,6 @@ namespace {
         return (DWORD)-1;
     }
 
-    struct _EnumConsoleWindowsProcData
-    {
-        TCHAR tchar_buf[256];
-        std::vector<HWND> console_window_handles_arr;
-    };
-
     BOOL CALLBACK EnumConsoleWindowsProc(HWND hwnd, LPARAM lParam)
     {
         _EnumConsoleWindowsProcData & enum_proc_data = *(_EnumConsoleWindowsProcData *)lParam;
@@ -1108,28 +1133,6 @@ namespace {
 
         return TRUE;
     }
-
-    struct _ConsoleWindowOwnerProc
-    {
-        DWORD proc_id;
-        HWND  console_window;   // NULL if not owned
-
-        _ConsoleWindowOwnerProc() :
-            proc_id(-1), console_window()
-        {
-        }
-
-        _ConsoleWindowOwnerProc(DWORD proc_id_, HWND console_window_) :
-            proc_id(proc_id_), console_window(console_window_)
-        {
-        }
-
-        _ConsoleWindowOwnerProc(const _ConsoleWindowOwnerProc &) = default;
-        _ConsoleWindowOwnerProc(_ConsoleWindowOwnerProc &&) = default;
-
-        _ConsoleWindowOwnerProc & operator =(const _ConsoleWindowOwnerProc &) = default;
-        _ConsoleWindowOwnerProc & operator =(_ConsoleWindowOwnerProc &&) = default;
-    };
 
     inline DWORD _find_parent_proc_id()
     {
@@ -1287,10 +1290,6 @@ namespace {
 
     inline const TCHAR * _extract_variable(const TCHAR * last_offset_ptr, const TCHAR * parse_str, std::tstring & parsed_str, TCHAR * env_buf, bool allow_expand_unexisted_env)
     {
-        // intercept here specific global variables accidental usage instead of local variables
-        static struct {} g_options;
-        static struct {} g_flags;
-        
         const TCHAR * return_offset_ptr = 0;
 
         const TCHAR * in_str_var_ptr = 0;
@@ -3095,7 +3094,7 @@ namespace {
         return true;
     }
 
-    void _free_console(_StdHandlesState & std_handles_state)
+    inline void _free_console(_StdHandlesState & std_handles_state)
     {
         HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
         HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -3108,7 +3107,7 @@ namespace {
         FreeConsole();
     }
 
-    HWND _alloc_console(const _StdHandlesState & std_handles_state)
+    inline HWND _alloc_console(const _StdHandlesState & std_handles_state)
     {
         if (!AllocConsole()) {
             return NULL;
@@ -3119,7 +3118,7 @@ namespace {
         return inherited_console_window;
     }
 
-    HWND _attach_console(const _StdHandlesState & std_handles_state, DWORD process_id, bool inherit_handle)
+    inline HWND _attach_console(const _StdHandlesState & std_handles_state, DWORD process_id, bool inherit_handle)
     {
         if (!AttachConsole(process_id)) {
             return NULL;
@@ -3129,71 +3128,241 @@ namespace {
 
         return inherited_console_window;
     }
-}
+
+    // Based on ReactOS implementation:
+    //  https://github.com/reactos/reactos/blob/2636cff09fdb70bfe63c52ea9d2d24dbfc1e337f/dll/win32/shell32/wine/shell32_main.c#L80
+    //
+
+    /*************************************************************************
+    * CommandLineToArgvW            [SHELL32.@]
+    *
+    * We must interpret the quotes in the command line to rebuild the argv
+    * array correctly:
+    * - arguments are separated by spaces or tabs
+    * - quotes serve as optional argument delimiters
+    *   '"a b"'   -> 'a b'
+    * - escaped quotes must be converted back to '"'
+    *   '\"'      -> '"'
+    * - consecutive backslashes preceding a quote see their number halved with
+    *   the remainder escaping the quote:
+    *   2n   backslashes + quote -> n backslashes + quote as an argument delimiter
+    *   2n+1 backslashes + quote -> n backslashes + literal quote
+    * - backslashes that are not followed by a quote are copied literally:
+    *   'a\b'     -> 'a\b'
+    *   'a\\b'    -> 'a\\b'
+    * - in quoted strings, consecutive quotes see their number divided by three
+    *   with the remainder modulo 3 deciding whether to close the string or not.
+    *   Note that the opening quote must be counted in the consecutive quotes,
+    *   that's the (1+) below:
+    *   (1+) 3n   quotes -> n quotes
+    *   (1+) 3n+1 quotes -> n quotes plus closes the quoted string
+    *   (1+) 3n+2 quotes -> n+1 quotes plus closes the quoted string
+    * - in unquoted strings, the first quote opens the quoted string and the
+    *   remaining consecutive quotes follow the above rule.
+    */
+
+    template <size_t N>
+    inline bool _get_cmdline_arg_offsets(LPCWSTR lpCmdLine, const size_t (& from_arg_index_arr)[N], ptrdiff_t (& arg_offset_arr)[N])
+    {
+        const auto max_index = (std::numeric_limits<size_t>::max)();
+
+        for(auto & value : arg_offset_arr) { value = max_index; };
+
+        if (!lpCmdLine) {
+            return false;
+        }
+
+        DWORD argc;
+        LPCWSTR s;
+        int quote_count, backslash_count;
+        bool quote_open = false;
+
+        size_t from_arg_index = 0;
+        size_t arg_index;
+
+        // --- First count the arguments
+        argc = 1;
+        s = lpCmdLine;
+        // The first argument, the executable path, follows special rules
+        if (*s == L'"')
+        {
+            // The executable path ends at the next quote, no matter what
+            s++;
+            while (*s)
+                if (*s++ == L'"')
+                    break;
+        }
+        else
+        {
+            // The executable path ends at the next space, no matter what
+            while (*s && *s != L' ' && *s != L'\t')
+                s++;
+        }
+
+        // skip to the first argument, if any
+        while (*s == L' ' || *s == L'\t')
+            s++;
+
+        if (*s)
+        {
+            argc++;
+
+            arg_index = 0;
+            utility::for_each_unroll(from_arg_index_arr,
+                [&](size_t value) -> bool {
+                    if (arg_index < from_arg_index) {
+                        arg_index++;
+                        return true;
+                    }
+                    if (argc >= value + 1) {
+                        arg_offset_arr[arg_index] = (ptrdiff_t)(s - lpCmdLine);
+                        from_arg_index = arg_index + 1;
+                    }
+                    arg_index++;
+                    return true;
+                }
+            );
+        }
+
+        if (from_arg_index >= N) {
+            return true;
+        }
+
+        // analyze the remaining arguments
+        backslash_count = 0;
+        while (*s)
+        {
+            if ((*s == L' ' || *s == L'\t') && !quote_open)
+            {
+                while (*s == L' ' || *s == L'\t')
+                    s++;
+                if (*s)
+                {
+                    argc++;
+
+                    arg_index = 0;
+                    utility::for_each_unroll(from_arg_index_arr,
+                        [&](size_t value) -> bool {
+                            if (arg_index < from_arg_index) {
+                                arg_index++;
+                                return true;
+                            }
+                            if (argc >= value + 1) {
+                                arg_offset_arr[arg_index] = (ptrdiff_t)(s - lpCmdLine);
+                                from_arg_index = arg_index + 1;
+                            }
+                            arg_index++;
+                            return true;
+                        }
+                    );
+
+                    if (from_arg_index >= N) {
+                        return true;
+                    }
+                }
+
+                backslash_count = 0;
+            }
+            else if (*s == L'\\')
+            {
+                backslash_count++;
+                s++;
+            }
+            else if (*s == L'"')
+            {
+                quote_count = 0;
+
+                if (!(backslash_count & 1))
+                    quote_count++; // unescaped
+
+                s++;
+                backslash_count = 0;
+
+                while (*s == L'"')
+                {
+                    quote_count++;
+                    s++;
+                }
+
+                if (quote_count & 1) {
+                    quote_open = !quote_open;
+                }
+            }
+            else
+            {
+                // a regular character
+                backslash_count = 0;
+                s++;
+            }
+        }
+
+        return 0 < from_arg_index;
+    }
 
 #ifdef _DEBUG
-inline void _debug_print_win32_std_handles(uint32_t index)
-{
-    const HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
-    const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    const HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+    inline void _debug_print_win32_std_handles(uint32_t index)
+    {
+        const HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+        const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        const HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
 
-    const DWORD stdin_handle_type = stdin_handle ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
-    const DWORD stdout_handle_type = stdout_handle ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
-    const DWORD stderr_handle_type = stderr_handle ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdin_handle_type = stdin_handle ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdout_handle_type = stdout_handle ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stderr_handle_type = stderr_handle ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
 
-    const DWORD current_proc_id = GetCurrentProcessId();
+        const DWORD current_proc_id = GetCurrentProcessId();
 
-    _StdHandlesState std_handles_state;
+        _StdHandlesState std_handles_state;
 
-    std_handles_state.save_stdin_state(stdin_handle);
-    std_handles_state.save_stdout_state(stdout_handle);
-    std_handles_state.save_stderr_state(stderr_handle);
+        std_handles_state.save_stdin_state(stdin_handle);
+        std_handles_state.save_stdout_state(stdout_handle);
+        std_handles_state.save_stderr_state(stderr_handle);
 
-    _print_raw_message_impl(0, STDOUT_FILENO, "%02uA %06u [WIN32] stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
-        (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
-        (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
-        (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
+        _print_raw_message_impl(0, STDOUT_FILENO, "%02uA %06u [WIN32] stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
+            (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
+            (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
+            (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
 
-    _print_raw_message_impl(0, STDERR_FILENO, "%02uB %06u [WIN32] stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
-        (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
-        (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
-        (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
-}
+        _print_raw_message_impl(0, STDERR_FILENO, "%02uB %06u [WIN32] stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
+            (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
+            (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
+            (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
+    }
 
-inline void _debug_print_crt_std_handles(uint32_t index)
-{
-    const int stdin_fileno = _fileno(stdin);
-    const HANDLE stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno);
+    inline void _debug_print_crt_std_handles(uint32_t index)
+    {
+        const int stdin_fileno = _fileno(stdin);
+        const HANDLE stdin_handle = (HANDLE)_get_osfhandle(stdin_fileno);
 
-    const int stdout_fileno = _fileno(stdout);
-    const HANDLE stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno);
+        const int stdout_fileno = _fileno(stdout);
+        const HANDLE stdout_handle = (HANDLE)_get_osfhandle(stdout_fileno);
 
-    const int stderr_fileno = _fileno(stderr);
-    const HANDLE stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
+        const int stderr_fileno = _fileno(stderr);
+        const HANDLE stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
 
-    const DWORD stdin_handle_type = stdin_handle ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
-    const DWORD stdout_handle_type = stdout_handle ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
-    const DWORD stderr_handle_type = stderr_handle ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdin_handle_type = stdin_handle ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdout_handle_type = stdout_handle ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stderr_handle_type = stderr_handle ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
 
-    const DWORD current_proc_id = GetCurrentProcessId();
+        const DWORD current_proc_id = GetCurrentProcessId();
 
-    _StdHandlesState std_handles_state;
+        _StdHandlesState std_handles_state;
 
-    std_handles_state.save_stdin_state(stdin_handle);
-    std_handles_state.save_stdout_state(stdout_handle);
-    std_handles_state.save_stderr_state(stderr_handle);
+        std_handles_state.save_stdin_state(stdin_handle);
+        std_handles_state.save_stdout_state(stdout_handle);
+        std_handles_state.save_stderr_state(stderr_handle);
 
-    _print_raw_message_impl(0, STDOUT_FILENO, "%02uA %06u [CRT]   stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
-        (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
-        (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
-        (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
+        _print_raw_message_impl(0, STDOUT_FILENO, "%02uA %06u [CRT]   stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
+            (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
+            (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
+            (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
 
-    _print_raw_message_impl(0, STDERR_FILENO, "%02uB %06u [CRT]   stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
-        (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
-        (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
-        (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
-}
+        _print_raw_message_impl(0, STDERR_FILENO, "%02uB %06u [CRT]   stdin : %04X t=%u i=%u m=%04X; stdout: %04X t=%u i=%u m=%04X; stderr: %04X t=%u i=%u m=%04X\n", index, current_proc_id,
+            (uint16_t)(uintptr_t)stdin_handle, stdin_handle_type, stdin_handle_type ? std_handles_state.is_stdin_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdin_console_mode ? std_handles_state.stdin_handle_mode : (DWORD)-1),
+            (uint16_t)(uintptr_t)stdout_handle, stdout_handle_type, stdout_handle_type ? std_handles_state.is_stdout_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stdout_console_mode ? std_handles_state.stdout_handle_mode : (DWORD)-1),
+            (uint16_t)(uintptr_t)stderr_handle, stderr_handle_type, stderr_handle_type ? std_handles_state.is_stderr_inheritable : 0, (DWORD)(uint16_t)(std_handles_state.has_stderr_console_mode ? std_handles_state.stderr_handle_mode : (DWORD)-1));
+    }
 #endif
+}
 
 #endif

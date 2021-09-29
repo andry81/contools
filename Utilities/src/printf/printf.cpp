@@ -77,8 +77,22 @@ namespace {
 
 int _tmain(int argc, const TCHAR * argv[])
 {
+    PWSTR cmdline_str = GetCommandLine();
+
+    TCHAR module_file_name_buf[MAX_PATH];
+    const TCHAR * program_file_name = nullptr;
+    size_t arg_offset_begin = 0;
+
+    if (argv[0][0] != _T('/')) { // arguments shift detection
+        program_file_name = argv[0];
+        arg_offset_begin = 1;
+    }
+    else if (GetModuleFileName(NULL, module_file_name_buf, sizeof(module_file_name_buf) / sizeof(module_file_name_buf[0]))) {
+        program_file_name = module_file_name_buf;
+    }
+
 #if _DEBUG
-    MessageBoxA(NULL, "", "", MB_OK);
+    MessageBox(NULL, cmdline_str, program_file_name ? program_file_name : _T(""), MB_OK);
 #endif
 
     // CAUTION:
@@ -90,7 +104,7 @@ int _tmain(int argc, const TCHAR * argv[])
     }
 
     const TCHAR * arg;
-    int arg_offset = argv[0][0] != _T('/') ? 1 : 0; // arguments shift detection
+    int arg_offset = arg_offset_begin;
 
     if (argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
         if (argc >= arg_offset + 2) return err_invalid_format;
@@ -177,6 +191,14 @@ int _tmain(int argc, const TCHAR * argv[])
         return err_invalid_format;
     }
 
+    // [0] = `{*}`
+    // [1] = `{@}`
+    //
+    size_t special_cmdline_arg_index_arr[2] = { size_t(arg_offset) + 1, size_t(arg_offset) + 2 };
+    ptrdiff_t special_cmdline_arg_offset_arr[2];
+
+    _get_cmdline_arg_offsets(cmdline_str, special_cmdline_arg_index_arr, special_cmdline_arg_offset_arr);
+
     // environment variable buffer
     TCHAR env_buf[MAX_ENV_BUF_SIZE];
 
@@ -216,7 +238,9 @@ int _tmain(int argc, const TCHAR * argv[])
             for (int i = 0; i < num_args; i++) {
                 if (tstrcmp(in_args.args[i], _T(""))) {
                     _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
-                        false, true, true, g_flags, g_options,
+                        false, true, true,
+                        g_flags, g_options,
+                        cmdline_str, special_cmdline_arg_offset_arr,
                         in_args, out_args);
                 }
                 else {
@@ -226,7 +250,9 @@ int _tmain(int argc, const TCHAR * argv[])
             for (int i = 0; i < num_args; i++) {
                 tmp.clear();
                 _parse_string(i, out_args.args[i].c_str(), tmp, env_buf,
-                    true, false, false, g_flags, g_options,
+                    true, false, false,
+                    g_flags, g_options,
+                    cmdline_str, special_cmdline_arg_offset_arr,
                     InArgs{}, out_args);
                 out_args.args[i] = std::move(tmp);
             }
@@ -235,7 +261,9 @@ int _tmain(int argc, const TCHAR * argv[])
             for (int i = 0; i < num_args; i++) {
                 if (tstrcmp(in_args.args[i], _T(""))) {
                     _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
-                        g_flags.no_expand_env, g_flags.no_subst_vars, true, g_flags, g_options,
+                        g_flags.no_expand_env, g_flags.no_subst_vars, true,
+                        g_flags, g_options,
+                        cmdline_str, special_cmdline_arg_offset_arr,
                         in_args, out_args);
                 }
                 else {
@@ -246,7 +274,9 @@ int _tmain(int argc, const TCHAR * argv[])
     }
 
     _parse_string(-1, in_args.fmt_str, out_args.fmt_str, env_buf,
-        g_flags.no_expand_env, g_flags.no_subst_vars, false, g_flags, g_options,
+        g_flags.no_expand_env, g_flags.no_subst_vars, false,
+        g_flags, g_options,
+        cmdline_str, special_cmdline_arg_offset_arr,
         in_args, out_args);
 
     UINT prev_cp = 0;

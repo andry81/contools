@@ -547,10 +547,6 @@ inline void MergeOptions(Flags & out_flags, Options & out_options,
                          const Flags & promote_flags, const Options & promote_options,
                          const Flags & promote_parent_flags, const Options & promote_parent_options)
 {
-    // intercept here specific global variables accidental usage instead of local variables
-    static struct {} g_options;
-    static struct {} g_flags;
-
     //if (utility::addressof(out_flags) != utility::addressof(flags)) {
     //    out_flags = flags;
     //}
@@ -2400,15 +2396,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     PWSTR cmdline_str = GetCommandLine();
     argv = const_cast<LPCWSTR *>(CommandLineToArgvW(cmdline_str, &argc));
-#elif defined(_DEBUG)
+#else
     PWSTR cmdline_str = GetCommandLine();
 #endif
 
     TCHAR module_file_name_buf[MAX_PATH];
     const TCHAR * program_file_name = nullptr;
+    size_t arg_offset_begin = 0;
 
     if (argv[0][0] != _T('/')) { // arguments shift detection
         program_file_name = argv[0];
+        arg_offset_begin = 1;
     }
     else if (GetModuleFileName(NULL, module_file_name_buf, sizeof(module_file_name_buf) / sizeof(module_file_name_buf[0]))) {
         program_file_name = module_file_name_buf;
@@ -2454,12 +2452,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return err_unspecified;
             }
 
-            int arg_offset = 0;
-            int arg_offset_begin = 0;
-
-            if (argv[0][0] != _T('/')) { // arguments shift detection
-                arg_offset = arg_offset_begin = 1;
-            }
+            int arg_offset = arg_offset_begin;
 
             const TCHAR * arg;
             int parse_error = err_none;
@@ -3349,6 +3342,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
             }
 
+            // [0] = `{*}`
+            // [1] = `{@}`
+            //
+            size_t special_cmdline_arg_index_arr[2] = { size_t(arg_offset) + 2, size_t(arg_offset) + 3 };
+            ptrdiff_t special_cmdline_arg_offset_arr[2];
+
+            _get_cmdline_arg_offsets(cmdline_str, special_cmdline_arg_index_arr, special_cmdline_arg_offset_arr);
+
             // environment variable buffer
             TCHAR env_buf[MAX_ENV_BUF_SIZE];
 
@@ -3413,7 +3414,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 if (!g_flags.no_expand_env) {
                     std::tstring tmp;
 
-                    _parse_string(-3, std::get<1>(env_vars_ref).c_str(), tmp, env_buf, false, true, false, g_flags, g_options);
+                    _parse_string(-3, std::get<1>(env_vars_ref).c_str(), tmp, env_buf, false, true, false, g_flags, g_options, cmdline_str, special_cmdline_arg_offset_arr);
 
                     SetEnvironmentVariable(std::get<0>(env_vars_ref).c_str(), tmp.c_str());
                 }
@@ -3447,6 +3448,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         if (tstrcmp(in_args.args[i], _T(""))) {
                             _parse_string(i, in_args.args[i], out_args.args[i], env_buf,
                                 false, true, true, g_flags, g_options,
+                                cmdline_str, special_cmdline_arg_offset_arr,
                                 in_args, out_args);
                         }
                         else {
@@ -3503,6 +3505,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         tmp.clear();
                         _parse_string(i, out_args.args[i].c_str(), tmp, env_buf,
                             true, false, false, g_flags, g_options,
+                            cmdline_str, special_cmdline_arg_offset_arr,
                             InArgs{}, out_args);
                         out_args.args[i] = std::move(tmp);
                     }
@@ -3544,6 +3547,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     std::tstring tmp;
                     _parse_string(-2, out_args.app_fmt_str.c_str(), tmp, env_buf,
                         false, true, false, g_flags, g_options,
+                        cmdline_str, special_cmdline_arg_offset_arr,
                         in_args, out_args);
                     out_args.app_fmt_str = std::move(tmp);
                 }
@@ -3551,6 +3555,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     std::tstring tmp;
                     _parse_string(-1, out_args.cmd_fmt_str.c_str(), tmp, env_buf,
                         false, true, false, g_flags, g_options,
+                        cmdline_str, special_cmdline_arg_offset_arr,
                         in_args, out_args);
                     out_args.cmd_fmt_str = std::move(tmp);
                 }
@@ -3594,6 +3599,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     std::tstring tmp;
                     _parse_string(-2, out_args.app_fmt_str.c_str(), tmp, env_buf,
                         true, false, false, g_flags, g_options,
+                        cmdline_str, special_cmdline_arg_offset_arr,
                         in_args, out_args);
                     out_args.app_fmt_str = std::move(tmp);
                 }
@@ -3601,6 +3607,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     std::tstring tmp;
                     _parse_string(-1, out_args.cmd_fmt_str.c_str(), tmp, env_buf,
                         true, false, false, g_flags, g_options,
+                        cmdline_str, special_cmdline_arg_offset_arr,
                         in_args, out_args);
                     out_args.cmd_fmt_str = std::move(tmp);
                 }

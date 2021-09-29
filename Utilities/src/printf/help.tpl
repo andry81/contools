@@ -63,9 +63,11 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
       ${<VarName>} - <VarName> environment variable value.
       {0}    - first argument value.
       {N}    - N'th argument value.
+      {@}    - tail arguments as raw string.
+      {*}    - first and tail arguments as raw string.
       {0hs}  - first arguments hexidecimal string (00-FF per character).
       {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
-      \{     - '{' character escape
+      \{     - '{' character escape.
 
   Return codes:
    -255 - unspecified error
@@ -77,3 +79,5 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
   Examples:
     1. printf.exe /e "Hello world!\n"
     2. printf.exe "{0}={1}" "My profit" "10%"
+    3. printf.exe "{@} = {0}" "2" 1 + 1
+    4. printf.exe "{*}" 1 + 1 = 2

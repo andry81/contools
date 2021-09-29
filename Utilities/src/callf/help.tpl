@@ -962,9 +962,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       ${<VarName>} - <VarName> environment variable value.
       {0}    - first argument value.
       {N}    - N'th argument value.
+      {@}    - tail arguments as raw string.
+      {*}    - first and tail arguments as raw string.
       {0hs}  - first argument hexidecimal string (00-FF per character).
       {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
-      \{     - '{' character escape
+      \{     - '{' character escape.
 
     CreateProcess:
       <ApplicationNameFormatString>, <CommandLineFormatString>:
@@ -1017,6 +1019,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     3. callf.exe "{0}" "\"{1}\" {2}" "${COMSPEC}" "/c" "echo.Hello World!"
     4. callf.exe "" "\"{0}\" {1} {2}" "cmd.exe" "/c" "echo.Hello World!"
     5. callf.exe "" "\"{0}\" {1} {2}" "${WINDIR}\system32\cmd.exe" "/c" "echo.Hello World!"
+    6. callf.exe "" "\"{0}\" {@}" "${WINDIR}\system32\cmd.exe" /c echo.Hello World!
+    7. callf.exe "" "{*}" "C:\Windows\system32\cmd.exe" /c echo.Hello World!
 
     6. callf.exe "${COMSPEC}" "/c echo.Special case characters: ^|^&""|& ^ |&""^|^& ^^ ^|^&""|& ^ |&""^|^&&pause"
     7. callf.exe "${COMSPEC}" "/c echo.Special case characters: ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^&&pause"
