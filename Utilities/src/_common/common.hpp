@@ -2901,9 +2901,9 @@ namespace {
             //  3. Process A has different standard handle address layout opposed to the process B (may be because the process B can not inherit the standard handles addresses layout under the Administrator privileges isolation).
             //
             //  When the console window of the process A attaches to the process B with the same privileges, then the process B gets the standard handle addresses layout of the process A.
-            //  When the console window of the process A with Administrator privileges attaches to the process B with a user privileges, then the process B gets default standard handle addresses layout,
+            //  When the console window of the process A with a user privileges attaches to the process B with the Administrator privileges, then the process B gets default standard handle addresses layout,
             //  which means all the standard handles inside the CRT of the process B must be invalidated and reinitialized, but unfortunately the CRT has no functionality for that.
-            //  
+            //
             //  Example:
             //      Process A handles    ->     Process B handles
             //          stdin  = 0x03               stdin  = 0x03
