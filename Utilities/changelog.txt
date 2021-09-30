@@ -1,4 +1,7 @@
 2021.09.30:
+* new: bin/contools: binaries update
+
+2021.09.30:
 * new: src: callf, printf: environment expansion support for `{*}`, `{@}` argument variable values
 
 2021.09.29:
