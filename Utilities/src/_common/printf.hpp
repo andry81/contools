@@ -137,7 +137,9 @@ namespace {
 
                                 const std::tstring::size_type vn_value_len = tstrlen(cmdline_str + arg_offset);
                                 if (allow_subst_var_in_all_args && (allow_subst_empty_arg || vn_value_len)) {
-                                    parsed_str.append(cmdline_str + arg_offset);
+                                    std::tstring expanded_str;
+                                    _expand_all_variables(cmdline_str + arg_offset, expanded_str, env_buf, flags.no_expand_env, flags.allow_expand_unexisted_env);
+                                    parsed_str.append(expanded_str);
                                 }
                                 else {
                                     parsed_str.append(var_buf);

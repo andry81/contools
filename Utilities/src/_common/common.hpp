@@ -1291,8 +1291,8 @@ namespace {
     inline const TCHAR * _extract_variable(const TCHAR * last_offset_ptr, const TCHAR * parse_str, std::tstring & parsed_str, TCHAR * env_buf, bool allow_expand_unexisted_env)
     {
         const TCHAR * return_offset_ptr = 0;
-
         const TCHAR * in_str_var_ptr = 0;
+
         if (!tstrncmp(parse_str, _T("${"), 2)) in_str_var_ptr = parse_str; // must point to `${`
 
         if_break(in_str_var_ptr) {
@@ -1324,6 +1324,52 @@ namespace {
         }
 
         return return_offset_ptr;
+    }
+
+    inline void _expand_all_variables(const TCHAR * parse_str, std::tstring & parsed_str, TCHAR * env_buf, bool no_expand_env, bool allow_expand_unexisted_env)
+    {
+        bool done = false;
+        const TCHAR * last_offset_ptr = parse_str;
+
+        do {
+            const TCHAR * p = tstrstr(last_offset_ptr, _T("{"));
+            if_break(p) {
+                // process unprocessed trailing characters
+                if (p > last_offset_ptr) {
+                    if (!no_expand_env) {
+                        const TCHAR * last_offset_var_ptr = _extract_variable(last_offset_ptr, p - 1, parsed_str, env_buf, allow_expand_unexisted_env);
+                        if (last_offset_var_ptr) {
+                            last_offset_ptr = last_offset_var_ptr;
+                            break;
+                        }
+                    }
+
+                    // process escapes
+                    if (*(p - 1) == _T('\\')) {
+                        if (p > last_offset_ptr + 1) {
+                            parsed_str.append(last_offset_ptr, p - 1);
+                        }
+                        parsed_str.append(p, p + 1);
+                        last_offset_ptr = p + 1;
+                        break;
+                    }
+                }
+
+                if (*(p + 1)) {
+                    const TCHAR * p_end = tstrstr(p + 1, _T("}"));
+                    if (p_end) {
+                        parsed_str.append(last_offset_ptr, p_end + 1);
+                        last_offset_ptr = p_end + 1;
+                        break;
+                    }
+                }
+            }
+            else {
+                done = true;
+                parsed_str.append(last_offset_ptr);
+                last_offset_ptr = 0; // just in case
+            }
+        } while (!done);
     }
 
     inline int _wide_char_to_multi_byte(UINT code_page, LPCWSTR in_str, int num_in_chars, std::vector<char> & out_buf)

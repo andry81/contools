@@ -161,9 +161,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Don't expand `${...}` environment variables.
 
         Can not be used together with `/allow-expand-unexisted-env` flag.
+        Has effect on `{*}` and `{@}` variable values.
 
       /no-subst-vars
         Don't substitute `{...}` variables (command line arguments).
+        Additionally disables `\{` escape sequence expansion.
 
         Can not be used together with `/allow-subst-empty-args` flag.
 
@@ -177,6 +179,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Can not be used together with `/no-expand-env`, `/EE<N>` flags.
         Can be used together with `/allow-expand-unexisted-env` flag.
+        Has no effect on `{*}` and `{@}` variable values.
 
       /EE<N>
         The same as `/E<N>` but additionally allows expansion of unexisted
@@ -195,6 +198,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Can not be used together with `/no-subst-vars`, `/SE<N>` flags.
         Can be used together with `/allow-subst-empty-args` flag.
+        Has no effect on `{*}` and `{@}` variable values.
 
       /SE<N>
         The same as `/S<N>` but additionally allows substitution of empty
@@ -214,6 +218,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         all command line arguments.
 
         Can not be used together with `/no-expand-env`, `/EE<N>` flags.
+        Has effect on `{*}` and `{@}` variable values.
 
       /allow-subst-empty-args
         Allow substitution of empty `{...}` variables in all command line
@@ -222,6 +227,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         so to avoid that do use quotes without an argument.
 
         Can not be used together with `/no-subst-vars`, `/SE<N>` flags.
+        Has effect on `{*}` and `{@}` variable values.
 
       /no-std-inherit
         Prevent all standard handles inheritance into child process.
@@ -1020,7 +1026,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     4. callf.exe "" "\"{0}\" {1} {2}" "cmd.exe" "/c" "echo.Hello World!"
     5. callf.exe "" "\"{0}\" {1} {2}" "${WINDIR}\system32\cmd.exe" "/c" "echo.Hello World!"
     6. callf.exe "" "\"{0}\" {@}" "${WINDIR}\system32\cmd.exe" /c echo.Hello World!
-    7. callf.exe "" "{*}" "C:\Windows\system32\cmd.exe" /c echo.Hello World!
+    7. callf.exe "" "{*}" "${WINDIR}\system32\cmd.exe" /c echo.Hello World!
 
     6. callf.exe "${COMSPEC}" "/c echo.Special case characters: ^|^&""|& ^ |&""^|^& ^^ ^|^&""|& ^ |&""^|^&&pause"
     7. callf.exe "${COMSPEC}" "/c echo.Special case characters: ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^& ^^ ^|^&\"^|^&&pause"

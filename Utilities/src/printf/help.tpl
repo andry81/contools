@@ -20,21 +20,29 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
 
       /no-expand-env
         Don't expand `${...}` environment variables.
+
         Can not be used together with the `/allow-expand-unexisted-env` flag.
+        Has effect on `{*}` and `{@}` variable values.
 
       /no-subst-vars
         Don't substitute `{...}` variables (command line arguments).
+        Additionally disables `\{` escape sequence expansion.
+
         Can not be used together with the `/allow-subst-empty-args` flag.
 
       /allow-expand-unexisted-env
         Allow expansion of unexisted `${...}` environment variables in
         all command line arguments.
+
         Can not be used together with the `/no-expand-env` flag.
+        Has effect on `{*}` and `{@}` variable values.
 
       /allow-subst-empty-args
         Allow substitution of empty `{...}` variables in all command line
         arguments.
+
         Can not be used together with the `/no-subst-vars` flag.
+        Has effect on `{*}` and `{@}` variable values.
 
       /eval-backslash-esc or /e
         Evaluate escape characters:
@@ -81,3 +89,4 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
     2. printf.exe "{0}={1}" "My profit" "10%"
     3. printf.exe "{@} = {0}" "2" 1 + 1
     4. printf.exe "{*}" 1 + 1 = 2
+    5. printf.exe "{*}" $\{TEMP} = `${TEMP}`
