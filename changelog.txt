@@ -1,3 +1,10 @@
+2021.10.03:
+* new: Scripts/Tools/build: `init_project_log.bat` script to initiate a project logging from different projects
+* new: Scripts/Tools/std/get_windows_version.bat: `WINDOWS_X64_VER`, `COMSPEC_X64_VER` variables to distinguish `cmd.exe` process bitness from os bitness
+* changed: Scripts/Tools: update to use new `callf.exe` features
+* changed: Scripts/Tools: removed `-pause-on-*` flags from all scripts as not needed anymore
+* changed: Scripts/Tools: code refactor
+
 2021.09.30:
 * new: Utilities/bin/contools: binaries update
 

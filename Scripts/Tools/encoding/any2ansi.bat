@@ -7,7 +7,6 @@ set "?~nx0=%~nx0"
 call "%%~dp0__init__.bat" || exit /b
 
 rem script flags
-set FLAG_PAUSE_ON_EXIT=0
 set RESTORE_LOCALE=0
 
 call :MAIN %%*
@@ -16,8 +15,6 @@ set LASTERROR=%ERRORLEVEL%
 :EXIT_MAIN
 rem restore locale
 if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
-
-if %FLAG_PAUSE_ON_EXIT% NEQ 0 if defined OEMCP ( call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
 
 exit /b %LASTERROR%
 
@@ -34,9 +31,7 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-pause_on_exit" (
-    set FLAG_PAUSE_ON_EXIT=1
-  ) else if "%FLAG%" == "-chcp" (
+  if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
   ) else (

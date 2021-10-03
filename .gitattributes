@@ -499,6 +499,7 @@ Scripts/Tools/build/export_build_vars.bat -text
 Scripts/Tools/build/extract_files_from_archive.bat -text
 Scripts/Tools/build/gen_config.bat -text
 Scripts/Tools/build/gen_publish_app_dir.bat -text
+Scripts/Tools/build/init_project_log.bat -text
 Scripts/Tools/build/load_config.bat -text
 Scripts/Tools/build/load_config_dir.bat -text
 Scripts/Tools/build/parse_cmd_build_params.bat -text
