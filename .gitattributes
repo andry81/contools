@@ -1,5 +1,6 @@
 * text=auto !eol
 .github/FUNDING.yml -text
+.github/badges/stackoverflow-contools.svg -text
 /.svnignore -text
 BuildTools/TargetProject.PostBuildStep.bat -text
 BuildTools/TargetProject.PreBuildStep.bat -text

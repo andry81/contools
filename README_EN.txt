@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.08.24
+* 2021.10.03
 * contools
 
 1. DESCRIPTION
@@ -19,6 +19,8 @@ interpreters such as bash shell (.sh), visual basic (.vbs), jscript (.js),
 python (.py), perl (.pl) and so on. Plus some set of standalone console
 utilities and tools aside other utilities and tools from cygwin, msys and
 mingw.
+
+The latest version is here: https://sf.net/p/contools
 
 WARNING:
   Use the SVN access to find out latest functionality and bug fixes.

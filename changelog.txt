@@ -1,4 +1,9 @@
 2021.10.03:
+* new: README.md: added dependencies section
+* changed: README_EN.txt: readme update
+* changed: README.md, .github/FUNDING.yml: added sponsor links
+
+2021.10.03:
 * new: Scripts/Tools/std/get_cmdline.bat: to safely read command line string into `RETURN_VALUE` variable
 * changed: Scripts/Tools: code refactor
 
