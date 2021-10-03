@@ -3,8 +3,8 @@
   <linearGradient id="s" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient>
   <clipPath id="r"><rect width="141" height="20" rx="3" fill="#fff"/></clipPath>
   <g clip-path="url(#r)">
-    <rect width="85" height="20" fill="#555"/>
-    <rect x="85" width="141" height="20" fill="#007ec6"/>
+    <rect width="85" height="20" fill="#bcbbbb"/>
+    <rect x="85" width="141" height="20" fill="#eb812f"/>
     <rect width="141" height="20" fill="url(#s)"/>
   </g>
   <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
