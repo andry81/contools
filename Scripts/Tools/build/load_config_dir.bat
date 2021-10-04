@@ -18,29 +18,29 @@ set "__?USER_CONFIG_FILE_EXT="
 :FLAGS_LOOP
 
 rem flags always at first
-set "FLAG=%~1"
+set "__?FLAG=%~1"
 
-if defined FLAG ^
-if not "%FLAG:~0,1%" == "-" set "FLAG="
+if defined __?FLAG ^
+if not "%__?FLAG:~0,1%" == "-" set "__?FLAG="
 
-if defined FLAG (
-  if "%FLAG%" == "-gen_system_config" (
+if defined __?FLAG (
+  if "%__?FLAG%" == "-gen_system_config" (
     set __?FLAG_GEN_SYSTEM_CONFIG=1
     set __?BARE_SYSTEM_FLAGS=%__?BARE_SYSTEM_FLAGS% -gen_config
-  ) else if "%FLAG%" == "-gen_user_config" (
+  ) else if "%__?FLAG%" == "-gen_user_config" (
     set __?FLAG_GEN_USER_CONFIG=1
     set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% -gen_config
-  ) else if "%FLAG%" == "-load_system_output_config" (
+  ) else if "%__?FLAG%" == "-load_system_output_config" (
     set __?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG=1
     set __?BARE_SYSTEM_FLAGS=%__?BARE_SYSTEM_FLAGS% -load_output_config
-  ) else if "%FLAG%" == "-load_user_output_config" (
+  ) else if "%__?FLAG%" == "-load_user_output_config" (
     set __?FLAG_LOAD_USER_OUTPUT_CONFIG=1
     set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% -load_output_config
-  ) else if "%FLAG%" == "-gen_config" (
+  ) else if "%__?FLAG%" == "-gen_config" (
     rem ignore
   ) else (
-    set __?BARE_SYSTEM_FLAGS=%__?BARE_SYSTEM_FLAGS% %FLAG%
-    set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% %FLAG%
+    set __?BARE_SYSTEM_FLAGS=%__?BARE_SYSTEM_FLAGS% %__?FLAG%
+    set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% %__?FLAG%
   )
 
   shift

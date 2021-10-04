@@ -1,4 +1,7 @@
 2021.10.04:
+* fixed: Scripts/Tools/std: missed changes
+
+2021.10.04:
 * new: Utilities/bin/contools: binaries update
 
 2021.10.04:

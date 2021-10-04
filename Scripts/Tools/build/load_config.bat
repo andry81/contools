@@ -17,26 +17,26 @@ set __?FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME=0
 :FLAGS_LOOP
 
 rem flags always at first
-set "FLAG=%~1"
+set "__?FLAG=%~1"
 
-if defined FLAG ^
-if not "%FLAG:~0,1%" == "-" set "FLAG="
+if defined __?FLAG ^
+if not "%__?FLAG:~0,1%" == "-" set "__?FLAG="
 
-if defined FLAG (
-  if "%FLAG%" == "-gen_config" (
+if defined __?FLAG (
+  if "%__?FLAG%" == "-gen_config" (
     set __?FLAG_GEN_CONFIG=1
-  ) else if "%FLAG%" == "-load_output_config" (
+  ) else if "%__?FLAG%" == "-load_output_config" (
     set __?FLAG_LOAD_OUTPUT_CONFIG=1
-  ) else if "%FLAG%" == "-lite_parse" (
+  ) else if "%__?FLAG%" == "-lite_parse" (
     set __?FLAG_LITE_PARSE=1
-  ) else if "%FLAG%" == "-noexpand" (
+  ) else if "%__?FLAG%" == "-noexpand" (
     set __?FLAG_NO_EXPAND=1
-  ) else if "%FLAG%" == "-full_parse" (
+  ) else if "%__?FLAG%" == "-full_parse" (
     set __?FLAG_FULL_PARSE=1
-  ) else if "%FLAG%" == "-allow_not_known_class_as_var_name" (
+  ) else if "%__?FLAG%" == "-allow_not_known_class_as_var_name" (
     set __?FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME=1
   ) else (
-    echo.%__?~nx0%: error: invalid flag: %FLAG%
+    echo.%__?~nx0%: error: invalid flag: %__?FLAG%
     exit /b -255
   ) >&2
 
