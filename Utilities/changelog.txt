@@ -1,4 +1,7 @@
 2021.10.04:
+* new: bin/contools: binaries update
+
+2021.10.04:
 * new: src/callf: `/no-subst-empty-tail-vars` flag to disable substitution empty `{*}` and `{@}` variables
 * changed: src/callf: always substitute empty `{*}` and `{@}` variables except if `/no-subst-empty-tail-vars` flag is defined
 
