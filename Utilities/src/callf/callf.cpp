@@ -154,6 +154,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/no-window-console"),
     _T("/no-expand-env"),
     _T("/no-subst-vars"),
+    _T("/no-subst-empty-tail-vars"),
     _T("/no-std-inherit"),
     _T("/no-stdin-inherit"),
     _T("/no-stdout-inherit"),
@@ -814,6 +815,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/no-subst-vars"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_subst_vars = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/no-subst-empty-tail-vars"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.no_subst_empty_tail_vars = true;
             return 1;
         }
         return 0;

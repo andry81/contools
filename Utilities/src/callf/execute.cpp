@@ -207,6 +207,7 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, no_window_console);
     MERGE_FLAG(flags, no_expand_env);
     MERGE_FLAG(flags, no_subst_vars);
+    MERGE_FLAG(flags, no_subst_empty_tail_vars);
     MERGE_FLAG(flags, no_std_inherit);
     MERGE_FLAG(flags, no_stdin_inherit);
     MERGE_FLAG(flags, no_stdout_inherit);
@@ -6796,6 +6797,12 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         options_line += _T("/no-subst-vars ");
     }
 
+    if (child_flags.no_subst_empty_tail_vars) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/no-subst-empty-tail-vars ");
+        }
+    }
+    regular_flags.no_subst_empty_tail_vars = false; // always reset
 
     if (child_flags.no_std_inherit) {
         if (cmd_out_str_ptr) {

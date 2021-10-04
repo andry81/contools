@@ -3,5 +3,5 @@ autogen definitions version;
 AppName = "printf";
 AppMajorVer = 1;
 AppMinorVer = 5;
-AppRevision = 6;
-AppBuildNum = 16;
+AppRevision = 7;
+AppBuildNum = 17;

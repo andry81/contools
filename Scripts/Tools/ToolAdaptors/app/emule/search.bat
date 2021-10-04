@@ -20,7 +20,7 @@ for %%i in (CONTOOLS_PROJECT_ROOT PROJECT_LOG_ROOT CONTOOLS_ROOT CONTOOLS_UTILIT
 
 if %IMPL_MODE%0 NEQ 0 goto IMPL
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~nx0%%" || exit /b
+call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
 
 "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
   /ret-child-exit /pause-on-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^

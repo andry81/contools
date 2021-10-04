@@ -98,6 +98,7 @@ struct Flags
     bool            no_window_console;
     bool            no_expand_env;                  // don't expand `${...}` environment variables
     bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
+    bool            no_subst_empty_tail_vars;       // don't substitute empty `{*}` and `{@}` variables
     bool            no_std_inherit;
     bool            no_stdin_inherit;
     bool            no_stdout_inherit;

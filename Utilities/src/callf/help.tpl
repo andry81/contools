@@ -169,6 +169,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Can not be used together with `/allow-subst-empty-args` flag.
 
+      /no-subst-empty-tail-vars
+        Don't substitute empty `{*}` and `{@}` variables.
+
+        Can be used together with `/allow-subst-empty-args` flag.
+
       /expand-env-arg<N>
       /E<N>
         Expand `${...}` environment variables exclusively for `<N>` command
@@ -227,7 +232,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         so to avoid that do use quotes without an argument.
 
         Can not be used together with `/no-subst-vars`, `/SE<N>` flags.
-        Has effect on `{*}` and `{@}` variable values.
+        Has effect on `{*}` and `{@}` variable values, but not on the
+        variable placeholders, because they always substitutes.
 
       /no-std-inherit
         Prevent all standard handles inheritance into child process.
@@ -973,6 +979,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       {0hs}  - first argument hexidecimal string (00-FF per character).
       {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
       \{     - '{' character escape.
+
+      The `{*}` and `{@}` variables always substitutes even if value is empty,
+      except if `/no-subst-empty-tail-vars` flag is defined.
 
     CreateProcess:
       <ApplicationNameFormatString>, <CommandLineFormatString>:

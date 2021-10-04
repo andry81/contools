@@ -1,4 +1,9 @@
 2021.10.04:
+* new: Utilities/src/callf: `/no-subst-empty-tail-vars` flag to disable substitution empty `{*}` and `{@}` variables
+* changed: Utilities/src/callf: always substitute empty `{*}` and `{@}` variables except if `/no-subst-empty-tail-vars` flag is defined
+* changed: Scripts/Tools: minor changes
+
+2021.10.04:
 * changed: .github/badges/stackeverflow-contools.svg: colors change
 
 2021.10.04:

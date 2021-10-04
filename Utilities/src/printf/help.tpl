@@ -30,6 +30,11 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
 
         Can not be used together with the `/allow-subst-empty-args` flag.
 
+      /no-subst-empty-tail-vars
+        Don't substitute empty `{*}` and `{@}` variables.
+
+        Can be used together with `/allow-subst-empty-args` flag.
+
       /allow-expand-unexisted-env
         Allow expansion of unexisted `${...}` environment variables in
         all command line arguments.
@@ -42,7 +47,8 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
         arguments.
 
         Can not be used together with the `/no-subst-vars` flag.
-        Has effect on `{*}` and `{@}` variable values.
+        Has effect on `{*}` and `{@}` variable values, but not on the
+        variable placeholders, because they always substitutes.
 
       /eval-backslash-esc or /e
         Evaluate escape characters:
@@ -76,6 +82,9 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
       {0hs}  - first arguments hexidecimal string (00-FF per character).
       {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
       \{     - '{' character escape.
+
+      The `{*}` and `{@}` variables always substitutes even if value is empty,
+      except if `/no-subst-empty-tail-vars` flag is defined.
 
   Return codes:
    -255 - unspecified error

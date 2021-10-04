@@ -103,40 +103,16 @@ namespace {
                         for (size_t i = 0; i < sizeof(arg_placeholders) / sizeof(arg_placeholders[0]); i++) {
                             const size_t arg_offset  = special_cmdline_arg_offset_arr[i];
 
-                            if (arg_offset == (std::numeric_limits<size_t>::max)()) {
-                                continue;
-                            }
-
                             const auto var_buf = arg_placeholders[i];
 
                             const size_t var_vn_len = tstrlen(var_buf);
                             const int var_vn = tstrncmp(p, var_buf, var_vn_len);
                             if (!var_vn && (!no_expand_env || p == parse_str || p > parse_str && *(p - 1) != _T('$'))) {
-                                bool allow_subst_var_in_all_args = options.subst_vars_args.empty();
-                                bool allow_subst_empty_arg = flags.allow_subst_empty_args;
-
-                                if_break(!allow_subst_var_in_all_args) {
-                                    const int pos_arg_index = arg_index + 2;    // positional argument index
-
-                                    for (const auto & tuple_ref : options.subst_vars_args) {
-                                        const int subst_var_arg_index = std::get<0>(tuple_ref);
-                                        const bool allow_subst_empty_arg2 = std::get<1>(tuple_ref);
-
-                                        if (subst_var_arg_index == pos_arg_index) {
-                                            allow_subst_var_in_all_args = true;
-                                            if (!allow_subst_empty_arg) {
-                                                allow_subst_empty_arg = allow_subst_empty_arg2;
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-
                                 parsed_str.append(last_offset_ptr, p);
                                 last_offset_ptr = p + var_vn_len;
 
-                                const std::tstring::size_type vn_value_len = tstrlen(cmdline_str + arg_offset);
-                                if (allow_subst_var_in_all_args && (allow_subst_empty_arg || vn_value_len)) {
+                                const std::tstring::size_type vn_value_len = arg_offset != (std::numeric_limits<size_t>::max)() ? tstrlen(cmdline_str + arg_offset) : 0;
+                                if (!flags.no_subst_empty_tail_vars || vn_value_len) {
                                     std::tstring expanded_str;
                                     _expand_all_variables(cmdline_str + arg_offset, expanded_str, env_buf, flags.no_expand_env, flags.allow_expand_unexisted_env);
                                     parsed_str.append(expanded_str);

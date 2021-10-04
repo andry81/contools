@@ -39,6 +39,7 @@ namespace {
         bool            no_print_gen_error_string;
         bool            no_expand_env;                  // don't expand `${...}` environment variables
         bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
+        bool            no_subst_empty_tail_vars;       // don't substitute empty `{*}` and `{@}` variables
 
         bool            allow_expand_unexisted_env;
         bool            allow_subst_empty_args;
@@ -156,6 +157,9 @@ int _tmain(int argc, const TCHAR * argv[])
         }
         else if (!tstrcmp(arg, _T("/no-subst-vars"))) {
             g_flags.no_subst_vars = true;
+        }
+        else if (!tstrcmp(arg, _T("/no-subst-empty-tail-vars"))) {
+            g_flags.no_subst_empty_tail_vars = true;
         }
         else if (!tstrcmp(arg, _T("/allow-expand-unexisted-env"))) {
             g_flags.allow_expand_unexisted_env = true;
