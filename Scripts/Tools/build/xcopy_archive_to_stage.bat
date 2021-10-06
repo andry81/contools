@@ -17,10 +17,6 @@ rem    "@archive_exclude_file_list.lst|*.lib|*.exp" || exit /b
 
 setlocal
 
-set "?~n0=%~n0"
-set "?~nx0=%~nx0"
-set "?~dp0=%~dp0"
-
 set "MSG_TOKEN=%~1"
 set "STAGE_NAME=%~2"
 set "COPY_FROM_STAGE_ROOT=%~3"
@@ -38,7 +34,9 @@ set "ARCHIVE_EXCLUDE_DIRS_LIST=%~9"
 rem Drop last error level
 type nul>nul
 
-call "%%?~dp0%%__init__.bat" || exit /b
+call "%%~dp0__init__.bat" || exit /b
+
+call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
 
 set LASTERROR=0
 

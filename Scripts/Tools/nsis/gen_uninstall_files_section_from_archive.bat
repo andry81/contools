@@ -10,9 +10,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "?~n0=%~n0"
-set "?~nx0=%~nx0"
-set "?~dp0=%~dp0"
+call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
 
 rem drop last error level
 type nul>nul

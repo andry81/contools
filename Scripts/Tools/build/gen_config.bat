@@ -4,9 +4,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "?~dp0=%~dp0"
-set "?~n0=%~n0"
-set "?~nx0=%~nx0"
+call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
 
 rem script flags
 set "SED_BARE_FLAGS="

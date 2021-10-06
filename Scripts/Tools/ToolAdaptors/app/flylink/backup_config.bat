@@ -2,14 +2,9 @@
 
 setlocal
 
-set "?~0=%~0"
-set "?~f0=%~f0"
-set "?~dp0=%~dp0"
-set "?~n0=%~n0"
-set "?~nx0=%~nx0"
-set "?~x0=%~x0"
-
 call "%%~dp0__init__\__init__.bat" || exit /b
+
+call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
 
 for %%i in (CONTOOLS_PROJECT_ROOT PROJECT_LOG_ROOT CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT) do (
   if not defined %%i (

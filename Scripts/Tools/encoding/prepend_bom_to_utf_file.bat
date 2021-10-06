@@ -8,11 +8,9 @@ rem   have it yet.
 
 setlocal
 
-set "?~dp0=%~dp0"
-set "?~n0=%~n0"
-set "?~nx0=%~nx0"
+call "%%~dp0__init__.bat" || exit /b
 
-call "%%?~dp0%%__init__.bat" || exit /b
+call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
 
 rem script flags
 set RESTORE_LOCALE=0

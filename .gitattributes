@@ -965,6 +965,7 @@ Utilities/tests/manual/contools/callf/__init__/__init__.bat -text
 Utilities/tests/manual/contools/callf/refs/0.in -text
 __init__/__init__.bat -text
 __init__/__init__.sh -text
+__init__/declare_builtins.bat -text
 _config/config.0.vars.in -text
 _config/config.system.vars.in -text
 /changelog.txt -text
