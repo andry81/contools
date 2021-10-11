@@ -28,6 +28,6 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
-INIT_VERBOSE                              =0
-TOOLS_VERBOSE                             =0
-PRINT_VARS_SET                            =0
+once INIT_VERBOSE                         =0
+once TOOLS_VERBOSE                        =0
+once PRINT_VARS_SET                       =0

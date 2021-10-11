@@ -81,7 +81,7 @@ call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_USER_FLAGS%% %%1 %%2 "config.%%_
 exit /b 0
 
 :CMD
-echo ^>%*
+if %LOAD_CONFIG_VERBOSE%0 NEQ 0 echo ^>%*
 (
   %*
 )

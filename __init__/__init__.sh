@@ -22,6 +22,8 @@ tkl_export_path CONTOOLS_PROJECT_ROOT_INIT0_DIR "$BASH_SOURCE_DIR" # including g
 
 [[ ! -e "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" ]] && { mkdir -p "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" || tkl_abort 10; }
 
+[[ -z "$LOAD_CONFIG_VERBOSE" ]] && (( INIT_VERBOSE )) && tkl_export_path LOAD_CONFIG_VERBOSE 1
+
 tkl_load_config_dir "$CONTOOLS_PROJECT_INPUT_CONFIG_ROOT" "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT"
 
 # init external projects, common dependencies must be always initialized at first
