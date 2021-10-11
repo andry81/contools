@@ -41,7 +41,7 @@ if not exist "%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%/config.system.vars.in" (
 if not exist "%PROJECT_OUTPUT_ROOT%\" ( mkdir "%PROJECT_OUTPUT_ROOT%" || exit /b 11 )
 if not exist "%PROJECT_LOG_ROOT%\" ( mkdir "%PROJECT_LOG_ROOT%" || exit /b 12 )
 
-if defined CHCP chcp %CHCP%
+if defined CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CHCP%%
 
 exit /b 0
 
