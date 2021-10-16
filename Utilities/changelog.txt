@@ -1,3 +1,9 @@
+2021.10.16:
+* new: bin/contools: binaries update
+
+2021.10.16:
+* new: src/callf: `/pipe-out-child` to pipe child stdout/stderr only
+
 2021.10.04:
 * new: bin/contools: binaries update
 
