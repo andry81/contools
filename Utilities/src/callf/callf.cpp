@@ -166,6 +166,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/pipe-child-stdout-to-stdout"),
     _T("/pipe-child-stderr-to-stderr"),
     _T("/pipe-inout-child"),
+    _T("/pipe-out-child"),
     _T("/pipe-stdin-to-stdout"),
     _T("/init-com"),
     _T("/wait-child-start"),
@@ -899,6 +900,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/pipe-inout-child"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pipe_inout_child = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/pipe-out-child"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.pipe_out_child = true;
             return 1;
         }
         return 0;
@@ -3225,6 +3233,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 if (g_flags.pipe_inout_child) {
                     return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-inout-child <-> /pipe-stdin-to-stdout\n"));
                 }
+                if (g_flags.pipe_out_child) {
+                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-out-child <-> /pipe-stdin-to-stdout\n"));
+                }
+            }
+
+            if (g_flags.pipe_inout_child && g_flags.pipe_out_child) {
+                return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-inout-child <-> /pipe-out-child\n"));
             }
 
             // /stdin-echo
@@ -3275,7 +3290,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             // /write-console-stdin-back vs /pipe-*
 
             if (g_flags.write_console_stdin_back) {
-                if (g_flags.pipe_stdin_to_child_stdin || g_flags.pipe_child_stdout_to_stdout || g_flags.pipe_child_stderr_to_stderr || g_flags.pipe_inout_child || g_flags.pipe_stdin_to_stdout) {
+                if (g_flags.pipe_stdin_to_child_stdin || g_flags.pipe_child_stdout_to_stdout || g_flags.pipe_child_stderr_to_stderr || g_flags.pipe_inout_child || g_flags.pipe_out_child || g_flags.pipe_stdin_to_stdout) {
                     return invalid_format_flag_message(_T("write console stdin back flag mixed with pipe flags: /write_console_stdin_back <-> /pipe-*\n"));
                 }
             }

@@ -107,7 +107,8 @@ bool g_stderr_vt100                 = false;
 bool g_pipe_stdin_to_child_stdin    = false;
 bool g_pipe_child_stdout_to_stdout  = false;
 bool g_pipe_child_stderr_to_stderr  = false;
-bool g_pipe_inout_child             = false;
+//bool g_pipe_inout_child             = false;
+//bool g_pipe_out_child               = false;
 bool g_pipe_stdin_to_stdout         = false;
 
 bool g_tee_stdout_dup_stdin         = false;
@@ -221,6 +222,7 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, pipe_child_stdout_to_stdout);
     MERGE_FLAG(flags, pipe_child_stderr_to_stderr);
     MERGE_FLAG(flags, pipe_inout_child);
+    MERGE_FLAG(flags, pipe_out_child);
     MERGE_FLAG(flags, pipe_stdin_to_stdout);
     MERGE_FLAG(flags, shell_exec_expand_env);
 
@@ -4887,9 +4889,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     g_stderr_vt100 = g_flags.output_vt100 || g_flags.stderr_vt100;
 
     g_pipe_stdin_to_child_stdin = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_stdin_to_child_stdin);
-    g_pipe_child_stdout_to_stdout = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_child_stdout_to_stdout);
-    g_pipe_child_stderr_to_stderr = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_child_stderr_to_stderr);
-    g_pipe_inout_child = !is_idle_execute && g_flags.pipe_inout_child;
+    g_pipe_child_stdout_to_stdout = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_out_child || g_flags.pipe_child_stdout_to_stdout);
+    g_pipe_child_stderr_to_stderr = !is_idle_execute && (g_flags.pipe_inout_child || g_flags.pipe_out_child || g_flags.pipe_child_stderr_to_stderr);
+    //g_pipe_inout_child = !is_idle_execute && g_flags.pipe_inout_child;
+    //g_pipe_out_child = !is_idle_execute && g_flags.pipe_out_child;
 
     // on idle execution always pipe stdin to stdout
     g_pipe_stdin_to_stdout = !g_is_process_elevating && (g_flags.pipe_stdin_to_stdout || is_idle_execute);
@@ -6877,6 +6880,13 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_flags.pipe_inout_child = false; // always reset
+
+    if (child_flags.pipe_out_child) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/pipe-out-child ");
+        }
+    }
+    regular_flags.pipe_out_child = false; // always reset
 
     if (child_flags.pipe_stdin_to_stdout) {
         if (cmd_out_str_ptr) {

@@ -112,6 +112,7 @@ struct Flags
     bool            pipe_child_stdout_to_stdout;
     bool            pipe_child_stderr_to_stderr;
     bool            pipe_inout_child;
+    bool            pipe_out_child;
     bool            pipe_stdin_to_stdout;
     bool            shell_exec_expand_env;
 

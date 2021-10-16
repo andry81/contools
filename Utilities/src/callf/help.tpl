@@ -282,7 +282,16 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         `/pipe-child-stderr-to-stderr` flags altogether.
 
         Has no effect if idle execution is used.
-        Can not be used together with `/pipe-stdin-to-stdout` flag.
+        Can not be used together with `/pipe-out-child`,
+        `/pipe-stdin-to-stdout` flags.
+
+      /pipe-out-child
+        Implies `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`
+        flags altogether.
+
+        Has no effect if idle execution is used.
+        Can not be used together with `/pipe-inout-child`,
+        `/pipe-stdin-to-stdout` flag.
 
       /pipe-stdin-to-stdout
         Pipe this-process stdin into stdout. This additionally disables
@@ -292,7 +301,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Automatically implies if idle execution is used.
         Can not be used together with `/pipe-stdin-to-child-stdin`,
         `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`,
-        `/pipe-inout-child` flags.
+        `/pipe-inout-child`, `/pipe-out-child` flags.
 
       /init-com
         CreateProcess
@@ -965,7 +974,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         stdin.
         Can not be used together with `/pipe-stdin-to-child-stdin`,
         `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`,
-        `/pipe-inout-child`, `/pipe-stdin-to-stdout` flags.
+        `/pipe-inout-child`, `/pipe-out-child`, `/pipe-stdin-to-stdout` flags.
 
 
     <ApplicationNameFormatString>, <CommandLineFormatString>,
