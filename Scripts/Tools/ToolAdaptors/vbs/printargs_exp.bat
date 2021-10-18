@@ -2,24 +2,5 @@
 
 setlocal
 
-call "%%~dp0__init__.bat" || exit /b
-
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%~n0"
-
-call "%%CONTOOLS_ROOT%%/std/get_cmdline.bat" %%*
-
-setlocal ENABLEDELAYEDEXPANSION
-if defined RETURN_VALUE for /F "eol= tokens=* delims=" %%i in ("!RETURN_VALUE!") do (
-  endlocal
-  "%~dp0%~n0.vbs" %%i
-) else (
-  endlocal
-  "%~dp0%~n0.vbs"
-)
-
-set LASTERROR=%ERRORLEVEL%
-
-rem cleanup temporary files
-call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
-
-exit /b %LASTERROR%
+echo.^>"%~dpn0.vbs" %*
+"%~dpn0.vbs" %*
