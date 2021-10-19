@@ -1,4 +1,7 @@
 2021.10.20:
+* new: bin/contools: binaries update
+
+2021.10.20:
 * new: src: callf, printf: `/no-subst-pos-vars` to disable substitution only for positional variables
 
 2021.10.16:
