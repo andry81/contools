@@ -154,6 +154,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/no-window-console"),
     _T("/no-expand-env"),
     _T("/no-subst-vars"),
+    _T("/no-subst-pos-vars"),
     _T("/no-subst-empty-tail-vars"),
     _T("/no-std-inherit"),
     _T("/no-stdin-inherit"),
@@ -816,6 +817,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/no-subst-vars"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_subst_vars = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/no-subst-pos-vars"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.no_subst_pos_vars = true;
             return 1;
         }
         return 0;
@@ -3330,14 +3338,29 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
             }
 
-            // `/no-subst-vars` vs `/allow-subst-empty-args`
-            if (g_flags.no_subst_vars && g_flags.allow_subst_empty_args) {
-                return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /allow-subst-empty-args\n"));
+            // `/no-subst-vars` vs `/no-subst-pos-vars`
+            if (g_flags.no_subst_vars && g_flags.no_subst_pos_vars) {
+                return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /no-subst-pos-vars\n"));
             }
 
-            // `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` vs `/no-expand-env`
-            if (!g_options.subst_vars_args.empty() && g_flags.no_subst_vars) {
-                return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /subst-vars-arg<N>, /S<N>, /SE<N>\n"));
+            // `/no-subst-vars`, `/no-subst-pos-vars` vs `/allow-subst-empty-args`
+            if (g_flags.allow_subst_empty_args) {
+                if (g_flags.no_subst_vars) {
+                    return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /allow-subst-empty-args\n"));
+                }
+                if (g_flags.no_subst_pos_vars) {
+                    return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-pos-vars <-> /allow-subst-empty-args\n"));
+                }
+            }
+
+            // `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` vs `/no-subst-vars`, `/no-subst-pos-vars`
+            if (!g_options.subst_vars_args.empty()) {
+                if (g_flags.no_subst_vars) {
+                    return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /subst-vars-arg<N>, /S<N>, /SE<N>\n"));
+                }
+                if (g_flags.no_subst_pos_vars) {
+                    return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-pos-vars <-> /subst-vars-arg<N>, /S<N>, /SE<N>\n"));
+                }
             }
 
             // `/SE<N>` vs `/allow-subst-empty-args`
@@ -3521,7 +3544,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
 
                 // expand {...} variables
-                if (!g_flags.no_subst_vars) {
+                if (!g_flags.no_subst_vars && !g_flags.no_subst_pos_vars) {
                     std::tstring tmp;
 
                     for (int i = 0; i < num_args; i++) {

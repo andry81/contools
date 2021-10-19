@@ -1,3 +1,6 @@
+2021.10.20:
+* new: Utilities/src: callf, printf: `/no-subst-pos-vars` to disable substitution only for positional variables
+
 2021.10.18:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: bat scripts execution
 

@@ -25,10 +25,19 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
         Has effect on `{*}` and `{@}` variable values.
 
       /no-subst-vars
-        Don't substitute `{...}` variables (command line arguments).
+        Don't substitute all `{...}` variables (command line arguments).
         Additionally disables `\{` escape sequence expansion.
 
-        Can not be used together with the `/allow-subst-empty-args` flag.
+        Can not be used together with `/no-subst-pos-vars`,
+        `/allow-subst-empty-args` flags.
+
+      /no-subst-pos-vars
+        Don't substitute positional `{...}` variables (command line arguments).
+
+        Has no effect on `{*}` and `{@}` variables (not positional).
+        Does not disable `\{` escape sequence expansion.
+        Can not be used together with `/no-subst-vars`,
+        `/allow-subst-empty-args` flags.
 
       /no-subst-empty-tail-vars
         Don't substitute empty `{*}` and `{@}` variables.

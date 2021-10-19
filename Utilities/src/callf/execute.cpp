@@ -208,6 +208,7 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, no_window_console);
     MERGE_FLAG(flags, no_expand_env);
     MERGE_FLAG(flags, no_subst_vars);
+    MERGE_FLAG(flags, no_subst_pos_vars);
     MERGE_FLAG(flags, no_subst_empty_tail_vars);
     MERGE_FLAG(flags, no_std_inherit);
     MERGE_FLAG(flags, no_stdin_inherit);

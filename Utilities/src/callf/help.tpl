@@ -164,10 +164,19 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Has effect on `{*}` and `{@}` variable values.
 
       /no-subst-vars
-        Don't substitute `{...}` variables (command line arguments).
+        Don't substitute all `{...}` variables (command line arguments).
         Additionally disables `\{` escape sequence expansion.
 
-        Can not be used together with `/allow-subst-empty-args` flag.
+        Can not be used together with `/no-subst-pos-vars`,
+        `/allow-subst-empty-args` flags.
+
+      /no-subst-pos-vars
+        Don't substitute positional `{...}` variables (command line arguments).
+
+        Has no effect on `{*}` and `{@}` variables (not positional).
+        Does not disable `\{` escape sequence expansion.
+        Can not be used together with `/no-subst-vars`,
+        `/allow-subst-empty-args` flags.
 
       /no-subst-empty-tail-vars
         Don't substitute empty `{*}` and `{@}` variables.
@@ -201,7 +210,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Empty arguments is not substituted by default, use `/SE<N>` flag
         instead to specifically allow it.
 
-        Can not be used together with `/no-subst-vars`, `/SE<N>` flags.
+        Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
+        `/SE<N>` flags.
         Can be used together with `/allow-subst-empty-args` flag.
         Has no effect on `{*}` and `{@}` variable values.
 
@@ -211,7 +221,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Still can not apply to command line arguments which does not exist,
         so to avoid that do use quotes without an argument.
 
-        Can not be used together with `/no-subst-vars`,
+        Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
         `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>` flags.
 
       /allow-throw-seh-except
@@ -231,7 +241,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Still can not apply to command line arguments which does not exist,
         so to avoid that do use quotes without an argument.
 
-        Can not be used together with `/no-subst-vars`, `/SE<N>` flags.
+        Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
+        `/SE<N>` flags.
         Has effect on `{*}` and `{@}` variable values, but not on the
         variable placeholders, because they always substitutes.
 

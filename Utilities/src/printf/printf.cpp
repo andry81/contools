@@ -38,7 +38,8 @@ namespace {
 
         bool            no_print_gen_error_string;
         bool            no_expand_env;                  // don't expand `${...}` environment variables
-        bool            no_subst_vars;                  // don't substitute `{...}` variables (command line parameters)
+        bool            no_subst_vars;                  // don't substitute all `{...}` variables (command line parameters)
+        bool            no_subst_pos_vars;              // don't substitute positional `{...}` variables (command line parameters)
         bool            no_subst_empty_tail_vars;       // don't substitute empty `{*}` and `{@}` variables
 
         bool            allow_expand_unexisted_env;
@@ -158,6 +159,9 @@ int _tmain(int argc, const TCHAR * argv[])
         else if (!tstrcmp(arg, _T("/no-subst-vars"))) {
             g_flags.no_subst_vars = true;
         }
+        else if (!tstrcmp(arg, _T("/no-subst-pos-vars"))) {
+            g_flags.no_subst_pos_vars = true;
+        }
         else if (!tstrcmp(arg, _T("/no-subst-empty-tail-vars"))) {
             g_flags.no_subst_empty_tail_vars = true;
         }
@@ -183,16 +187,28 @@ int _tmain(int argc, const TCHAR * argv[])
         arg_offset += 1;
     }
 
-    // `/no-expand-env` vs `/allow-expand-unexisted-env`
-    if (g_flags.no_expand_env && g_flags.allow_expand_unexisted_env) {
-        fputs("error: `/no-expand-env` flag mixed with `/allow-expand-unexisted-env`\n", stderr);
+    // `/no-subst-vars` vs `/no-subst-pos-vars`
+    if (g_flags.no_subst_vars && g_flags.no_subst_pos_vars) {
+        fputs("error: variables substitution flags are mixed: /no-subst-vars <-> /no-subst-pos-vars\n", stderr);
         return err_invalid_format;
     }
 
-    // `/no-subst-vars` vs `/allow-subst-empty-args`
-    if (g_flags.no_subst_vars && g_flags.allow_subst_empty_args) {
-        fputs("error: `/no-subst-vars` flag mixed with `/allow-subst-empty-args`\n", stderr);
+    // `/no-expand-env` vs `/allow-expand-unexisted-env`
+    if (g_flags.no_expand_env && g_flags.allow_expand_unexisted_env) {
+        fputs("error: environment variables expansion flags are mixed: /no-expand-env <-> /allow-expand-unexisted-env\n", stderr);
         return err_invalid_format;
+    }
+
+    // `/no-subst-vars`, `/no-subst-pos-vars` vs `/allow-subst-empty-args`
+    if (g_flags.allow_subst_empty_args) {
+        if (g_flags.no_subst_vars) {
+            fputs("error: variables substitution flags are mixed: /no-subst-vars <-> `/allow-subst-empty-args\n", stderr);
+            return err_invalid_format;
+        }
+        if (g_flags.no_subst_pos_vars) {
+            fputs("error: variables substitution flags are mixed: /no-subst-pos-vars <-> `/allow-subst-empty-args\n", stderr);
+            return err_invalid_format;
+        }
     }
 
     // [0] = `{*}`
@@ -251,14 +267,17 @@ int _tmain(int argc, const TCHAR * argv[])
                     in_args.args[i] = nullptr;
                 }
             }
-            for (int i = 0; i < num_args; i++) {
-                tmp.clear();
-                _parse_string(i, out_args.args[i].c_str(), tmp, env_buf,
-                    true, false, false,
-                    g_flags, g_options,
-                    cmdline_str, special_cmdline_arg_offset_arr,
-                    InArgs{}, out_args);
-                out_args.args[i] = std::move(tmp);
+
+            if (!g_flags.no_subst_pos_vars) {
+                for (int i = 0; i < num_args; i++) {
+                    tmp.clear();
+                    _parse_string(i, out_args.args[i].c_str(), tmp, env_buf,
+                        true, false, false,
+                        g_flags, g_options,
+                        cmdline_str, special_cmdline_arg_offset_arr,
+                        InArgs{}, out_args);
+                    out_args.args[i] = std::move(tmp);
+                }
             }
         }
         else {
