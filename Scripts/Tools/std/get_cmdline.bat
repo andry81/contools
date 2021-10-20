@@ -29,7 +29,6 @@ for /F "usebackq eol= tokens=* delims=" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%\cmdl
 setlocal ENABLEDELAYEDEXPANSION
 set "RETURN_VALUE=!RETURN_VALUE:*#=!"
 set "RETURN_VALUE=!RETURN_VALUE:~0,-2!"
-set RETURN_VALUE=%0 !RETURN_VALUE!
 for /F "eol= tokens=* delims=" %%j in ("!RETURN_VALUE!") do (
   endlocal
   set "RETURN_VALUE=%%j"

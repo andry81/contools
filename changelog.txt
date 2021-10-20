@@ -1,4 +1,7 @@
 2021.10.20:
+* fixed: Scripts/Tools/std/get_cmdline.bat: missed change
+
+2021.10.20:
 * new: Utilities/bin/contools: binaries update
 
 2021.10.20:
