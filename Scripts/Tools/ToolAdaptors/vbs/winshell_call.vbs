@@ -1,3 +1,139 @@
+''' Call an executable through the `Shell.Application.ShellExecute` function.
+
+''' USAGE:
+'''   winshell_call.vbs [-D <CurrentDirectoryPath>] [-verb <ShellVerb>] [-showas <ShowWindowAsNumber>] [-u[<N>]] [-q[a]] [-nowait] [-nowindow]
+''''                    [-make_temp_dir_as_cwd <CwdPlaceholder>] [-wait_delete_cwd] [--wait_on_file_exist] [-E[a | <N>]] [-r[a | <N>] <from> <to>] [-v <name> <value>] [--] <CommandLine>
+'''
+''' DESCRIPTION:
+'''   --
+'''     Separator between flags and positional arguments to explicitly stop the flags parser.
+'''   -D <CurrentDirectoryPath>
+'''     Changes current directory to <CurrentDirectoryPath> before the execution.
+'''
+'''   -verb <ShellVerb>
+'''     Run with specific <ShellVerb> operation, these are:
+'''       edit
+'''         Launches an editor and opens the document for editing.
+'''         If the first argument of <CommandLine> is not a document file, the function will fail.
+'''       explore
+'''         Explores a folder specified by the first argumnet of <CommandLine>.
+'''       find
+'''         Initiates a search beginning in the directory specified by <CurrentDirectoryPath>.
+'''       open
+'''         Opens the item specified by the first argument of <CommandLine> parameter.
+'''         The item can be a file or folder.
+'''       print
+'''         Prints the file specified by the first argument of <CommandLine>.
+'''         If it is not a document file, the function fails.
+'''       properties
+'''         Displays the file or folder's properties.
+'''       runas
+'''         Launches an application as Administrator. User Account Control
+'''         (UAC) will prompt the user for consent to run the application
+'''         elevated or enter the credentials of an administrator account used
+'''         to run the application.
+'''
+'''   -showas <ShowWindowAsNumber>
+''''     Handles a child process window show state.
+'''
+'''      CreateProcess or ShellExecute
+'''        0 = SW_HIDE
+'''          Don't show window.
+'''        1 = SW_SHOWNORMAL
+'''          Activates and displays a window. If the window is minimized or
+'''          maximized, the system restores it to its original size and
+'''          position. An application should specify this flag when displaying
+'''          the window for the first time.
+'''        2 = SW_SHOWMINIMIZED
+'''          Activates the window and displays it as a minimized window.
+'''        3 = SW_SHOWMAXIMIZED
+'''          Activates the window and displays it as a maximized window.
+'''        4 = SW_SHOWNOACTIVATE
+'''          Displays a window in its most recent size and position. This value
+'''          is similar to SW_SHOWNORMAL, except that the window is not
+'''          activated.
+'''        5 = SW_SHOW
+'''          Activates the window and displays it in its current size and
+'''          position.
+'''        6 = SW_MINIMIZE
+'''          Minimizes the specified window and activates the next top-level
+'''          window in the Z order.
+'''        7 = SW_SHOWMINNOACTIVE
+'''          Displays the window as a minimized window. This value is similar
+'''          to SW_SHOWMINIMIZED, except the window is not activated.
+'''        8 = SW_SHOWNA
+'''          Displays the window in its current size and position. This value
+'''          is similar to SW_SHOW, except that the window is not activated.
+'''        9 = SW_RESTORE
+'''          Activates and displays the window. If the window is minimized or
+'''          maximized, the system restores it to its original size and
+'''          position. An application should specify this flag when restoring
+'''          a minimized window.
+'''        11 = SW_FORCEMINIMIZE
+'''          Minimizes a window, even if the thread that owns the window is not
+'''          responding. This flag should only be used when minimizing windows
+'''          from a different thread.
+'''
+'''      The flags that specify how an application is to be displayed when it
+'''      is opened. If the first argument of <CommandLine> specifies a document
+'''      file, the flag is simply passed to the associated application. It is
+'''      up to the application to decide how to handle it.
+'''
+'''      See detailed documentation in MSDN for the function `ShowWindow`.
+'''
+'''   -u
+'''     Unescape %xx or %uxxxx sequences.
+'''   -u<N>
+'''     Unescape %xx or %uxxxx sequences only in the <N>th argument, where N >= 0.
+'''   -q
+'''     Always quote arguments (if already has no quote characters).
+'''   -qa
+'''     Always quote tail positional parameters (if already has no quote characters).
+'''   -nowait
+'''     Does not wait child process exit.
+'''   -nowindow
+'''     Hide child process window upon child process creation.
+''''  -make_temp_dir_as_cwd <CwdPlaceholder>
+'''     Make Current Working Directory as unique subdirectry in the temporary directories storage.
+'''     Replace all <CwdPlaceholder> strings in all arguments by absolute path to Current Working Directory.
+''''  -wait_delete_cwd
+'''     Delete CWD before exit or wait until deleted.
+''''  -wait_on_file_exist <File>
+'''     Wait before exit while <File> is exist.
+'''   -E
+'''     Expand environment variables in all arguments
+'''   -Ea
+'''     Expand environment variables only in the tail arguments.
+'''   -E<N>
+'''     Expand environment variables only in the <N>th argument, where N >= 0.
+'''   -r <from> <to>
+'''     Replace <from> string to <to> string in all arguments.
+'''   -ra <from> <to>
+'''     Replace <from> string to <to> string in tail arguments.
+'''   -r<N> <from> <to>
+'''     Replace <from> string to <to> string only in the <N>th argument, where N >= 0.
+'''   -v <name> <value>
+'''     Create environment variable with name <name> and value <value>.
+'''
+''' CAUTION:
+'''   This implementation has issues which can not be fixed at all (by design).
+'''   There is a better implementation through standalone executable:
+'''     `Utilities/src/callf`
+'''
+''' CAUTION:
+'''   The list of issues around `winshell_call.vbs` implementation:
+'''
+'''   PROS:
+'''     * Can run a child process elevated or as Administrator.
+'''     * Can be run from any Windows version including Windows XP.
+'''     * No need to recompile or rebuild sources to run a `.vbs` script, so can be included as a part into another project.
+'''
+'''   CONS:
+'''     * By default does not wait a child process exit. You have to use `winshell_call.vbs` with `-make_temp_dir_as_cwd` and `-wait_delete_cwd` options
+'''       together with the `call.vbs` to achieve a child process exit wait while being run as Administrator.
+'''     * A `.vbs` script can not use all windows functionality/features and has a lack of functionality by design.
+'''     * Windows antivirus software in some cases reports a `.vbs` script as not safe or requests an explicit action on each `.vbs` script execution.
+
 Sub GrowArr(arr, size)
     Dim reserve : reserve = UBound(arr) + 1
     If reserve < size Then
@@ -150,7 +286,7 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
           Year(now_obj) & "'" & Right("0" & Month(now_obj),2) & "'" & Right("0" & Day(now_obj),2) & "." & _
           Right("0" & Hour(now_obj),2) & "'" & Right("0" & Minute(now_obj),2) & "'" & Right("0" & Second(now_obj),2) & "''" & Right("0" & Int((timer_obj - Int(timer_obj)) * 1000),3) & "." & _
           "winshell_call"
-      ElseIf arg = "-wait_delete_cwd" Then ' ShellExecute current working directory, because the Windows locks current directory for a process being ran
+      ElseIf arg = "-wait_delete_cwd" Then ' delete or wait to delete of the current working directory, because the Windows locks current directory for a process being ran
         WaitDeleteCWD = 1
       ElseIf arg = "-wait_on_file_exist" Then
         i = i + 1

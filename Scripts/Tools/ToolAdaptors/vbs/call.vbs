@@ -1,3 +1,110 @@
+''' Call an executable through the `WScript.Shell.Run` function.
+
+''' USAGE:
+'''   call.vbs [-D <CurrentDirectoryPath>] [-showas <ShowWindowAsNumber>] [-s] [-u[<N>]] [-q[a]] [-nowait] [-nowindow] [-E[a | <N>]] [-r[a | <N>] <from> <to>] [-v <name> <value>] [--] <CommandLine>
+'''
+''' DESCRIPTION:
+'''   --
+'''     Separator between flags and positional arguments to explicitly stop the flags parser.
+'''   -D <CurrentDirectoryPath>
+'''     Changes current directory to <CurrentDirectoryPath> before the execution.
+'''
+'''   -showas <ShowWindowAsNumber>
+''''     Handles a child process window show state.
+'''
+'''      CreateProcess or ShellExecute
+'''        0 = SW_HIDE
+'''          Don't show window.
+'''        1 = SW_SHOWNORMAL
+'''          Activates and displays a window. If the window is minimized or
+'''          maximized, the system restores it to its original size and
+'''          position. An application should specify this flag when displaying
+'''          the window for the first time.
+'''        2 = SW_SHOWMINIMIZED
+'''          Activates the window and displays it as a minimized window.
+'''        3 = SW_SHOWMAXIMIZED
+'''          Activates the window and displays it as a maximized window.
+'''        4 = SW_SHOWNOACTIVATE
+'''          Displays a window in its most recent size and position. This value
+'''          is similar to SW_SHOWNORMAL, except that the window is not
+'''          activated.
+'''        5 = SW_SHOW
+'''          Activates the window and displays it in its current size and
+'''          position.
+'''        6 = SW_MINIMIZE
+'''          Minimizes the specified window and activates the next top-level
+'''          window in the Z order.
+'''        7 = SW_SHOWMINNOACTIVE
+'''          Displays the window as a minimized window. This value is similar
+'''          to SW_SHOWMINIMIZED, except the window is not activated.
+'''        8 = SW_SHOWNA
+'''          Displays the window in its current size and position. This value
+'''          is similar to SW_SHOW, except that the window is not activated.
+'''        9 = SW_RESTORE
+'''          Activates and displays the window. If the window is minimized or
+'''          maximized, the system restores it to its original size and
+'''          position. An application should specify this flag when restoring
+'''          a minimized window.
+'''        11 = SW_FORCEMINIMIZE
+'''          Minimizes a window, even if the thread that owns the window is not
+'''          responding. This flag should only be used when minimizing windows
+'''          from a different thread.
+'''
+'''      The flags that specify how an application is to be displayed when it
+'''      is opened. If the first argument of <CommandLine> specifies a document
+'''      file, the flag is simply passed to the associated application. It is
+'''      up to the application to decide how to handle it.
+'''
+'''      See detailed documentation in MSDN for the function `ShowWindow`.
+'''
+'''   -s
+'''     Enable variables substitution in the `WScript.Shell.Run` function, by default is disabled through the `?.` environment variable usage.
+'''   -u
+'''     Unescape %xx or %uxxxx sequences.
+'''   -u<N>
+'''     Unescape %xx or %uxxxx sequences only in the <N>th argument, where N >= 0.
+'''   -q
+'''     Always quote arguments (if already has no quote characters).
+'''   -qa
+'''     Always quote tail positional parameters (if already has no quote characters).
+'''   -nowait
+'''     Does not wait child process exit.
+'''   -nowindow
+'''     Hide child process window upon child process creation.
+'''   -E
+'''     Expand environment variables in all arguments
+'''   -Ea
+'''     Expand environment variables only in the tail arguments.
+'''   -E<N>
+'''     Expand environment variables only in the <N>th argument, where N >= 0.
+'''   -r <from> <to>
+'''     Replace <from> string to <to> string in all arguments.
+'''   -ra <from> <to>
+'''     Replace <from> string to <to> string in tail arguments.
+'''   -r<N> <from> <to>
+'''     Replace <from> string to <to> string only in the <N>th argument, where N >= 0.
+'''   -v <name> <value>
+'''     Create environment variable with name <name> and value <value>.
+'''
+''' CAUTION:
+'''   This implementation has issues which can not be fixed at all (by design).
+'''   There is a better implementation through standalone executable:
+'''     `Utilities/src/callf`
+'''
+''' CAUTION:
+'''   The list of issues around `call.vbs` implementation:
+'''
+'''   PROS:
+'''     * Can be run from any Windows version including Windows XP.
+'''     * No need to recompile or rebuild sources to run a `.vbs` script, so can be included as a part into another project.
+'''
+'''   CONS:
+'''     * The `WScript.Shell.Run` function has a builtin variables expansion which can interfere with the % character as raw characters.
+'''       By default it is disabled through the `?.` environment variable usage. To use the `WScript.Shell.Run` function as is you can use the `-s` flag.
+'''     * The `WScript.Shell.Run` function can not run elevated or run as Administrator feature (`winshell_call.vbs` script can run as Administrator).
+'''     * A `.vbs` script can not use all windows functionality/features and has a lack of functionality by design.
+'''     * Windows antivirus software in some cases reports a `.vbs` script as not safe or requests an explicit action on each `.vbs` script execution.
+
 Sub GrowArr(arr, size)
     Dim reserve : reserve = UBound(arr) + 1
     If reserve < size Then
@@ -96,9 +203,9 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
 
   If ExpectFlags Then
     If arg <> "--" And Mid(arg, 1, 1) = "-" Then
-      If arg = "-s" Then ' Enable variables substitution in the `WScript.Shell.Run` function, by default is disabled through the `.` environment variable usage
+      If arg = "-s" Then ' Enable variables substitution in the `WScript.Shell.Run` function, by default is disabled through the `?.` environment variable usage
         RunSubst = True
-      ElseIf arg = "-u" Then ' Unescape %xx or %uxxxx
+      ElseIf arg = "-u" Then ' Unescape %xx or %uxxxx sequences
         UnescapeAllArgs = True
       ElseIf Left(arg, 2) = "-u" Then
         arg = Mid(arg, 3)
@@ -126,7 +233,7 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
         End If
       ElseIf arg = "-q" Then ' Always quote arguments (if already has no quote characters)
         AlwaysQuote = True
-      ElseIf arg = "-qa" Then ' Always quote non flag tail positional parameters (if already has no quote characters)
+      ElseIf arg = "-qa" Then ' Always quote tail positional parameters (if already has no quote characters)
         AlwaysQuoteTailPosParams = True
       ElseIf arg = "-nowait" Then
         NoWait = True

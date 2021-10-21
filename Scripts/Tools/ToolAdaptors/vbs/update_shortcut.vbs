@@ -1,7 +1,76 @@
 ''' Updates the Windows shortcut file.
 
 ''' USAGE:
-'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-E | -E0 | -Et | -Ea] [-q] [-u] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFileName>
+'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-u] [-q] [-E[0 | t | a]] [-u] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFileName>
+
+''' DESCRIPTION:
+'''   --
+'''     Separator between flags and positional arguments to explicitly stop the flags parser.
+'''   -D <CurrentDirectoryPath>
+'''     Changes current directory to <CurrentDirectoryPath> before the execution.
+'''   -WD <ShortcutWorkingDirectory>
+'''     Working directory in the shortcut file.
+'''
+'''   -showas <ShowWindowAsNumber>
+''''     Handles a child process window show state.
+'''
+'''      CreateProcess or ShellExecute
+'''        0 = SW_HIDE
+'''          Don't show window.
+'''        1 = SW_SHOWNORMAL
+'''          Activates and displays a window. If the window is minimized or
+'''          maximized, the system restores it to its original size and
+'''          position. An application should specify this flag when displaying
+'''          the window for the first time.
+'''        2 = SW_SHOWMINIMIZED
+'''          Activates the window and displays it as a minimized window.
+'''        3 = SW_SHOWMAXIMIZED
+'''          Activates the window and displays it as a maximized window.
+'''        4 = SW_SHOWNOACTIVATE
+'''          Displays a window in its most recent size and position. This value
+'''          is similar to SW_SHOWNORMAL, except that the window is not
+'''          activated.
+'''        5 = SW_SHOW
+'''          Activates the window and displays it in its current size and
+'''          position.
+'''        6 = SW_MINIMIZE
+'''          Minimizes the specified window and activates the next top-level
+'''          window in the Z order.
+'''        7 = SW_SHOWMINNOACTIVE
+'''          Displays the window as a minimized window. This value is similar
+'''          to SW_SHOWMINIMIZED, except the window is not activated.
+'''        8 = SW_SHOWNA
+'''          Displays the window in its current size and position. This value
+'''          is similar to SW_SHOW, except that the window is not activated.
+'''        9 = SW_RESTORE
+'''          Activates and displays the window. If the window is minimized or
+'''          maximized, the system restores it to its original size and
+'''          position. An application should specify this flag when restoring
+'''          a minimized window.
+'''        11 = SW_FORCEMINIMIZE
+'''          Minimizes a window, even if the thread that owns the window is not
+'''          responding. This flag should only be used when minimizing windows
+'''          from a different thread.
+'''
+'''      The flags that specify how an application is to be displayed when it
+'''      is opened. If the first argument of <CommandLine> specifies a document
+'''      file, the flag is simply passed to the associated application. It is
+'''      up to the application to decide how to handle it.
+'''
+'''      See detailed documentation in MSDN for the function `ShowWindow`.
+'''
+'''   -u
+'''     Unescape %xx or %uxxxx sequences.
+'''   -q
+'''     Always quote CMD argument (if has no quote characters).
+'''   -E
+'''     Expand environment variables in all arguments.
+'''   -E0
+'''     Expand environment variables only in the first argument.
+'''   -Et
+'''     Expand environment variables only in the shortcut target object.
+'''   -Ea
+'''     Expand environment variables only in the shortcut arguments.
 
 ''' Note:
 '''   1. Creation of a shortcut under ealier version of the Windows makes shortcut
@@ -43,6 +112,22 @@
 '''   make_shortcut.bat mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
 '''
 ''' , where the `\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}` might be different for each device
+
+''' CAUTION:
+'''   The list of issues around a shortcut (.lnk) file:
+'''
+'''   PROS:
+'''     * If you want to run a process elevated, then you can raise the `Run as Administrator` flag in the shortcut.
+'''       You don't need a localized version of Administrator account name like for the runas executable.
+'''
+'''   CONS:
+'''     * If create a shortcut to the Windows command interpreter (cmd.exe) with `Run as Administrator` flag raised, then you will run
+'''       elevated only the cmd.exe process. To start any other process you have to either run it from the `cmd.exe` script, or create
+'''       another standalone shortcut with the `Run as Administrator` flag raised.
+'''     * Run from shortcut file (.lnk) in the Windows XP (but not in the Windows 7) brings truncated command line down to ~260 characters.
+'''     * Run from shortcut file (.lnk) loads console windows parameters (font, windows size, buffer size, etc) from the shortcut at first
+'''       and from the registry (HKCU\Console) at second. If try to change and save parameters, then it will be saved ONLY into the shortcut,
+'''       which brings the shortcut file overwrite.
 
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
@@ -103,6 +188,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ShowAs = CInt(WScript.Arguments(i))
         ShowAsExist = True
+      ElseIf arg = "-q" Then ' Always quote CMD argument (if has no quote characters)
+        AlwaysQuote = True
       ElseIf arg = "-E" Then ' Expand environment variables in all arguments
         ExpandAllArgs = True
       ElseIf arg = "-E0" Then ' Expand environment variables only in the first argument
@@ -111,8 +198,6 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         ExpandShortcutTarget = True
       ElseIf arg = "-Ea" Then ' Expand environment variables only in the shortcut arguments
         ExpandShortcutArgs = True
-      ElseIf arg = "-q" Then ' Always quote CMD argument (if has no quote characters)
-        AlwaysQuote = True
       Else
         WScript.Echo WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
         WScript.Quit 255

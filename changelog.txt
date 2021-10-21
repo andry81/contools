@@ -1,3 +1,6 @@
+2021.10.21:
+* changed: Scripts/Tools/ToolAdaptors/vbs: detailed description in file headers
+
 2021.10.20:
 * fixed: Scripts/Tools/std/get_cmdline.bat: missed change
 
