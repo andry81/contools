@@ -1,4 +1,7 @@
 2021.10.23:
+* new: Utilities/bin/contools: binaries update
+
+2021.10.23:
 * fixed: Utilities/src/callf: `/tee-std*-dup` flag implementation
 * changed: Utilities/src/callf: simplified use case for `/write-console-stdin-back` flag
 * changed: Utilities/src/callf: help update
