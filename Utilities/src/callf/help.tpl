@@ -1150,8 +1150,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     console.
 
   Examples (CreateProcess/ShellExecute, elevation with redirection from/to named pipes):
-    1. callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } .
-    2. callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
+    1. callf.exe /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } .
+    2. callf.exe /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
 
     Example #1 in case of elevation execution does write the content of the
     `0.in` file into `test0_{pid}` named pipe through the Administrator
@@ -1167,3 +1167,17 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     existing (parent) console by the parent process `callf.exe`. If process has
     been already elevated, then just writes content of `0.in` file to the
     `cmd.exe /k` process input.
+
+  Examples (CreateProcess, stdin+stdout+stderr redirection into single file within interactive input to console):
+    1. callf.exe /tee-stdin inout.log /pipe-stdin-to-child-stdin /tee-conout-dup "${COMSPEC}" "/k"
+    2. callf.exe /tee-stdin inout.log /write-console-stdin-back /tee-conout-dup "${COMSPEC}" "/k"
+
+    Example #1 creates stdin/stdout/stderr anonymous pipes into/from the child
+    `cmd.exe`process and writes them into the log file.
+
+    Example #2 creates only stdout and stderr anonymous pipes from child
+    process and writes them into the log file. The stdin gets read through the
+    ReadConsole function, writes into the log file and writes back into stdin,
+    where it being read again by ReadConsole from the child `cmd.exe` process.
+    This one works only when only 2 processes in inheritance chain is attached
+    to the same console and both does call to the ReadConsole.

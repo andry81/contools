@@ -3794,6 +3794,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                     if (g_inherited_console_window) {
                         _free_console(std_handles_state);
+
+                        g_inherited_console_window = GetConsoleWindow();
                     }
                     if (ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
                         g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
