@@ -3298,7 +3298,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             // /write-console-stdin-back vs /pipe-*
 
             if (g_flags.write_console_stdin_back) {
-                if (g_flags.pipe_stdin_to_child_stdin || g_flags.pipe_child_stdout_to_stdout || g_flags.pipe_child_stderr_to_stderr || g_flags.pipe_inout_child || g_flags.pipe_out_child || g_flags.pipe_stdin_to_stdout) {
+                if (g_flags.pipe_stdin_to_child_stdin || g_flags.pipe_inout_child || g_flags.pipe_stdin_to_stdout) {
                     return invalid_format_flag_message(_T("write console stdin back flag mixed with pipe flags: /write_console_stdin_back <-> /pipe-*\n"));
                 }
             }

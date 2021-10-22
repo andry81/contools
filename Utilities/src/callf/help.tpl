@@ -272,7 +272,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         stdin handle inheritance.
 
         Has no effect if idle execution is used.
-        Can not be used together with `/pipe-stdin-to-stdout` flag.
+        Can not be used together with `/pipe-stdin-to-stdout`,
+        `/write-console-stdin-back` flags.
 
       /pipe-child-stdout-to-stdout
         Pipe child stdout to this-process stdout. This additionally disables
@@ -294,7 +295,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Has no effect if idle execution is used.
         Can not be used together with `/pipe-out-child`,
-        `/pipe-stdin-to-stdout` flags.
+        `/pipe-stdin-to-stdout`, `/write-console-stdin-back` flags.
 
       /pipe-out-child
         Implies `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`
@@ -312,7 +313,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Automatically implies if idle execution is used.
         Can not be used together with `/pipe-stdin-to-child-stdin`,
         `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`,
-        `/pipe-inout-child`, `/pipe-out-child` flags.
+        `/pipe-inout-child`, `/pipe-out-child`, `/write-console-stdin-back`
+        flags.
 
       /init-com
         CreateProcess
@@ -687,10 +689,24 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Inbound server named pipe `<pipe>` output buffer size in bytes have
         used to read from into this-process stdout/stderr.
 
-      /tee-std[in|out|err] <file>
-        Duplicate standard stream to a tee file `<file>`.
+      /tee-stdin <file>
+        Duplicate stdin to a tee file `<file>`.
 
-        Can be used together with another `/tee-std[in|out|err]-to-*` flag.
+        Can be used together with another `/tee-stdin-to-*` flag.
+
+        DOES NOT imply `/pipe-stdin-to-child-stdin` flag.
+
+        To pipe input into a child process you have explicitly use one of
+        these flags:
+          /pipe-stdin-to-child-stdin
+          /write-console-stdin-back
+
+      /tee-std[out|err] <file>
+        Duplicate standard output stream to a tee file `<file>`.
+
+        Can be used together with another `/tee-std[out|err]-to-*` flag.
+
+        DOES imply respective `/pipe-child-std[out|err]-to-std[out|err]` flag.
 
       /tee-std[in|out|err]-to-server-pipe <pipe>
         Duplicate standard stream to a tee outbound server named pipe `<pipe>`
@@ -881,13 +897,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Explicitly enable console input buffer echo before start of a child
         process.
 
-        Can be used together with `/no-stdin-echo` flag.
+        Can not be used together with `/no-stdin-echo` flag.
 
       /no-stdin-echo
         Explicitly disable console input buffer echo before start of a child
         process.
 
-        Can be used together with `/stdin-echo` flag.
+        Can not be used together with `/stdin-echo` flag.
 
       /replace-args-in-tail <from> <to>
       /ra <from> <to>
@@ -984,8 +1000,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Has no effect when a child process stdin is piped from this-process
         stdin.
         Can not be used together with `/pipe-stdin-to-child-stdin`,
-        `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`,
-        `/pipe-inout-child`, `/pipe-out-child`, `/pipe-stdin-to-stdout` flags.
+        `/pipe-inout-child`, `/pipe-stdin-to-stdout` flags.
 
 
     <ApplicationNameFormatString>, <CommandLineFormatString>,

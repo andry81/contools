@@ -5502,6 +5502,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     break;
                 }
+
+                g_has_tee_stdin = true;
             } else if (g_options.tee_stdin_dup == STDERR_FILENO) {
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stderr_handle, GetCurrentProcess(), &g_tee_file_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
@@ -5523,6 +5525,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     break;
                 }
+
+                g_has_tee_stdin = true;
             }
         }
 
@@ -5548,6 +5552,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     break;
                 }
+
+                g_has_tee_stdout = true;
             } else if (g_options.tee_stdout_dup == STDERR_FILENO) {
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stderr_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
@@ -5569,6 +5575,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     break;
                 }
+
+                g_has_tee_stdout = true;
             }
         }
 
@@ -5594,6 +5602,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     break;
                 }
+
+                g_has_tee_stderr = true;
             } else if (g_options.tee_stderr_dup == STDOUT_FILENO) {
                 SetLastError(0); // just in case
                 if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
@@ -5615,6 +5625,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     break;
                 }
+
+                g_has_tee_stderr = true;
             }
         }
 
