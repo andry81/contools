@@ -11,17 +11,21 @@ The latest version is here: https://sf.net/p/contools</h4>
 <p align="center">
   <a href="https://github.com/andry81/contools/blob/trunk/changelog.txt">Changelog</a> •
   <a href="https://github.com/andry81/contools/blob/trunk/README_EN.txt">Readme</a> •
-  <a href="#copyright-and-license"><img src="https://github.com/andry81/andry81/raw/main/badges/mit-license.svg" valign="middle" alt="copyright and license">&nbsp;Copyright and License</a>
+  <a href="#copyright-and-license"><img src="https://github.com/andry81/andry81/raw/main/badges/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
 </p>
 
 <p align="center">
   <a href="#dependecies">Dependencies</a> •
-  <a href="https://stackoverflow.com/search?q=contools"><img src="https://github.com/andry81/contools/raw/trunk/.github/badges/stackoverflow-contools.svg" valign="middle" alt="stackoverflow search"></a>
+  <a href="https://stackoverflow.com/search?q=contools"><img src="https://github.com/andry81/contools/raw/trunk/.github/badges/stackoverflow-contools.svg" valign="middle" alt="stackoverflow search" /></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/sponsors/andry81"><img src="https://github.com/andry81/andry81/raw/main/badges/github-sponsor.svg" valign="middle" alt="github sponsor"></a> •
-  <a href="https://www.paypal.com/cgi-bin/webscr?item_name=Donation+to+contools&cmd=_donations&business=andry%40inbox.ru"><img src="https://github.com/andry81/andry81/raw/main/badges/paypal-donate.svg" valign="middle" alt="paypal donate"></a>
+  <a href="https://github.com/sponsors/andry81"><img src="https://github.com/andry81/andry81/raw/main/badges/github-sponsor.svg" valign="middle" alt="github sponsor" /></a> •
+  <a href="https://www.paypal.com/cgi-bin/webscr?item_name=Donation+to+contools&cmd=_donations&business=andry%40inbox.ru"><img src="https://github.com/andry81/andry81/raw/main/badges/paypal-donate.svg" valign="middle" alt="paypal donate" /></a>
+</p>
+
+<p align="center">
+  <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fandry81%2Fcontools&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" valign="middle" alt="hits" />
 </p>
 
 ---
