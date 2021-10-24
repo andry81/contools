@@ -9,6 +9,10 @@ mingw.<br/><br/>
 The latest version is here: https://sf.net/p/contools</h4>
 
 <p align="center">
+  <a href="https://www.codefactor.io/repository/github/andry81/contools"><img src="https://www.codefactor.io/repository/github/andry81/contools/badge" valign="middle" alt="codefactor.io" /></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/andry81/contools/blob/trunk/changelog.txt">Changelog</a> •
   <a href="https://github.com/andry81/contools/blob/trunk/README_EN.txt">Readme</a> •
   <a href="#copyright-and-license"><img src="https://github.com/andry81/andry81/raw/main/badges/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
