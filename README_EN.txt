@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.10.03
+* 2021.10.25
 * contools
 
 1. DESCRIPTION
@@ -162,7 +162,7 @@ https://cmake.org/cmake/help/v3.14/release/3.14.html#id13
  |
  +- /`Utilities`
     #
-    # Utilities built by the project.
+    # External utilities and utilities built by the project.
 
 -------------------------------------------------------------------------------
 6. DEPLOY

@@ -1,6 +1,7 @@
-* Fix the case where the `callf.exe "" "cmd.exe /k"` expression has
-  broken/altered autocompletion feature in the `cmd.exe` process and the
-  `cmd.exe` treats all the tab characters as is.
+* Fix the case where the
+  `callf /tee-stdin 0.log /pipe-stdin-to-child-stdin "" "cmd.exe /k"`
+  expression has broken/altered autocompletion feature in the `cmd.exe` process
+  and the `cmd.exe` treats all the tab characters as is.
 
   The issue is attached to the stdin handle type inside the `cmd.exe` process.
   If the stdin handle has not a character device type
@@ -19,9 +20,6 @@
 * Hookup WriteFile on the stdout/stderr in a child process to force file buffer
   flush on each write. Can fix a progress stall based on stdout/stderr
   buffering.
-
-* Support console clear by the `cls` command from the `callf "" "cmd.exe /k"`
-  process console input.
 
 * Hookup SEH exception filter in a child process to intercept SEH exception
   being throwed out of a child process to be able to pause-on-error in the
