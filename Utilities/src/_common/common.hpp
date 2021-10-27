@@ -384,6 +384,11 @@ namespace {
         return handle > 0 && handle != INVALID_HANDLE_VALUE;
     }
 
+    inline DWORD _get_file_type(HANDLE handle)
+    {
+        return GetFileType(handle) & ~FILE_TYPE_REMOTE;
+    }
+
     inline void _close_handle(HANDLE & handle)
     {
         if (_is_valid_handle(handle)) {
@@ -454,7 +459,9 @@ namespace {
     {
         stdin_last_error = 0;
 
-        if (GetFileType(stdin_handle) == FILE_TYPE_CHAR) {
+        DWORD stdin_handle_type = _is_valid_handle(stdin_handle) ? _get_file_type(stdin_handle) : FILE_TYPE_UNKNOWN;
+
+        if (stdin_handle_type == FILE_TYPE_CHAR) {
             if (has_stdin_console_mode) {
                 SetLastError(0);
                 SetConsoleMode(stdin_handle, stdin_handle_mode);
@@ -472,7 +479,9 @@ namespace {
     {
         stdout_last_error = 0;
 
-        if (GetFileType(stdout_handle) == FILE_TYPE_CHAR) {
+        DWORD stdout_handle_type = _is_valid_handle(stdout_handle) ? _get_file_type(stdout_handle) : FILE_TYPE_UNKNOWN;
+
+        if (stdout_handle_type == FILE_TYPE_CHAR) {
             if (has_stdout_console_mode) {
                 SetLastError(0);
                 SetConsoleMode(stdout_handle, stdout_handle_mode);
@@ -490,7 +499,9 @@ namespace {
     {
         stderr_last_error = 0;
 
-        if (GetFileType(stderr_handle) == FILE_TYPE_CHAR) {
+        DWORD stderr_handle_type = _is_valid_handle(stderr_handle) ? _get_file_type(stderr_handle) : FILE_TYPE_UNKNOWN;
+
+        if (stderr_handle_type == FILE_TYPE_CHAR) {
             if (has_stderr_console_mode) {
                 SetLastError(0);
                 SetConsoleMode(stderr_handle, stderr_handle_mode);
@@ -678,6 +689,44 @@ namespace {
         return (osv.dwPlatformId == VER_PLATFORM_WIN32_NT);
     }
 
+    inline int _update_crt_console_handle_text_mode(int fileno_, int mode_flags, bool is_input)
+    {
+        UINT cp = 0;
+        CPINFO cp_info{};
+
+        if (is_input)
+        {
+            cp = GetConsoleCP();
+        }
+        else {
+            cp = GetConsoleOutputCP();
+        }
+
+        if (!GetCPInfo(cp, &cp_info)) {
+            // fallback to module character set
+#ifdef _UNICODE
+            cp_info.MaxCharSize = sizeof(wchar_t);
+#else
+            cp_info.MaxCharSize = sizeof(char);
+#endif
+        }
+
+        if (cp_info.MaxCharSize > 1) {
+            mode_flags |= _O_U16TEXT;
+        }
+        else if (cp_info.MaxCharSize == 1) {
+            switch (cp)
+            {
+            case 65000: // UTF-7
+            case 65001: // UTF-8
+                mode_flags |= _O_U8TEXT;
+                break;
+            }
+        }
+
+        return mode_flags;
+    }
+
     inline bool _set_crt_std_handle(HANDLE file_handle, tackle::explicit_int from_fileno, tackle::explicit_int to_fileno, tackle::explicit_int mode_flags,
                                     tackle::explicit_bool duplicate_input_handle, tackle::explicit_bool inherit_handle_on_duplicate = true)
     {
@@ -693,7 +742,9 @@ namespace {
             }
         }
 
-        const int mode_flags_ = mode_flags >= 0 ? mode_flags : _O_BINARY;
+        const DWORD file_handle_type = _get_file_type(file_handle);
+
+        int mode_flags_ = mode_flags >= 0 ? mode_flags : _O_BINARY;
 
         // CAUTION:
         //  Based on: `_open_osfhandle` : https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/open-osfhandle
@@ -772,7 +823,15 @@ namespace {
 
             }
             __finally {
-                _setmode(to_fileno, mode_flags_);
+                // In case of console handle we must take into account a console handle code page character width to correctly set text mode for the CRT.
+                //
+                if (file_handle_type == FILE_TYPE_CHAR) {
+                    mode_flags_ |= _update_crt_console_handle_text_mode(to_fileno, mode_flags_, to_fileno == STDIN_FILENO);
+                }
+
+                if (mode_flags_) {
+                    _setmode(to_fileno, mode_flags_);
+                }
 
 #ifndef _CONSOLE
                 // we must to register it, because CRT does ignore that
@@ -849,11 +908,6 @@ namespace {
 
     inline bool _attach_stdin_from_console(bool set_std_handle, bool inherit_handle)
     {
-        // CAUTION
-        //  We can not use `_fileno` function in case of duplication into a target CRT standard handle because of instable results.
-        //  The `STDIN_FILENO`/`STDOUT_FILENO`/`STDERR_FILENO` is used instead.
-        //
-
         // CAUTION:
         //  The CRT `_dup2` and `freopen` function avoids call to `SetStdHandle` in case of GUI (not console) application!
         //
@@ -1006,9 +1060,9 @@ namespace {
         const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
         const HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
 
-        const DWORD stdin_handle_type = _is_valid_handle(stdin_handle) ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
-        const DWORD stdout_handle_type = _is_valid_handle(stdout_handle) ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
-        const DWORD stderr_handle_type = _is_valid_handle(stderr_handle) ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdin_handle_type = _is_valid_handle(stdin_handle) ? _get_file_type(stdin_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdout_handle_type = _is_valid_handle(stdout_handle) ? _get_file_type(stdout_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stderr_handle_type = _is_valid_handle(stderr_handle) ? _get_file_type(stderr_handle) : FILE_TYPE_UNKNOWN;
 
         _attach_stdin_from_console(false, false);
 
@@ -1017,9 +1071,9 @@ namespace {
             _attach_stderr_from_console(false, false);
         }
 
-        int stdin_filno = _fileno(stdin);
-        int stdout_filno = _fileno(stdout);
-        int stderr_filno = _fileno(stderr);
+        int stdin_fileno = _fileno(stdin);
+        int stdout_fileno = _fileno(stdout);
+        int stderr_fileno = _fileno(stderr);
 
         bool is_stdin_closed = false;
         bool is_stdout_closed = false;
@@ -1028,16 +1082,16 @@ namespace {
         // NOTE:
         //  In backward order from stderr to stdin.
         //
-        if (stderr_filno >= 0) {
-            _close(stderr_filno);
+        if (stderr_fileno >= 0) {
+            _close(stderr_fileno);
             is_stderr_closed = true;
         }
-        if (stdout_filno >= 0) {
-            _close(stdout_filno);
+        if (stdout_fileno >= 0) {
+            _close(stdout_fileno);
             is_stdout_closed = true;
         }
-        if (stdin_filno >= 0) {
-            _close(stdin_filno);
+        if (stdin_fileno >= 0) {
+            _close(stdin_fileno);
             is_stdin_closed = true;
         }
 
@@ -1050,37 +1104,58 @@ namespace {
         //
         if (is_stdin_closed) {
             if (stdin_handle_type != FILE_TYPE_UNKNOWN) {
-                stdin_filno = _open_osfhandle((intptr_t)stdin_handle, stdin_open_flags);
+                stdin_fileno = _open_osfhandle((intptr_t)stdin_handle, stdin_open_flags);
             }
             else {
                 stdin_handle_dup = _create_conin_handle(false);
                 if (_is_valid_handle(stdin_handle_dup)) {
-                    stdin_filno = _open_osfhandle((intptr_t)stdin_handle_dup, stdin_open_flags);
+                    stdin_fileno = _open_osfhandle((intptr_t)stdin_handle_dup, stdin_open_flags);
                 }
             }
         }
 
         if (is_stdout_closed) {
             if (stdout_handle_type != FILE_TYPE_UNKNOWN) {
-                stdout_filno = _open_osfhandle((intptr_t)stdout_handle, stdout_open_flags);
+                stdout_fileno = _open_osfhandle((intptr_t)stdout_handle, stdout_open_flags);
             }
             else {
                 stdout_handle_dup = _create_conout_handle(false);
                 if (_is_valid_handle(stdout_handle_dup)) {
-                    stdout_filno = _open_osfhandle((intptr_t)stdout_handle_dup, stdout_open_flags);
+                    stdout_fileno = _open_osfhandle((intptr_t)stdout_handle_dup, stdout_open_flags);
                 }
             }
         }
 
         if (is_stderr_closed) {
             if (stderr_handle_type != FILE_TYPE_UNKNOWN) {
-                stderr_filno = _open_osfhandle((intptr_t)stderr_handle, stderr_open_flags);
+                stderr_fileno = _open_osfhandle((intptr_t)stderr_handle, stderr_open_flags);
             }
             else {
                 stderr_handle_dup = _create_conout_handle(false);
                 if (_is_valid_handle(stderr_handle_dup)) {
-                    stderr_filno = _open_osfhandle((intptr_t)stderr_handle_dup, stderr_open_flags);
+                    stderr_fileno = _open_osfhandle((intptr_t)stderr_handle_dup, stderr_open_flags);
                 }
+            }
+        }
+
+        // In case of console handle we must take into account a console handle code page character width to correctly set text mode for the CRT.
+        //
+        if (stdin_handle_type == FILE_TYPE_CHAR) {
+            const int mode_flags = _update_crt_console_handle_text_mode(stdin_fileno, 0, true);
+            if (mode_flags) {
+                _setmode(stdin_fileno, mode_flags);
+            }
+        }
+        if (stdout_handle_type == FILE_TYPE_CHAR) {
+            const int mode_flags = _update_crt_console_handle_text_mode(stdout_fileno, 0, false);
+            if (mode_flags) {
+                _setmode(stdout_fileno, mode_flags);
+            }
+        }
+        if (stderr_handle_type == FILE_TYPE_CHAR) {
+            const int mode_flags = _update_crt_console_handle_text_mode(stderr_fileno, 0, false);
+            if (mode_flags) {
+                _setmode(stderr_fileno, mode_flags);
             }
         }
 
@@ -2834,9 +2909,9 @@ namespace {
             //#define FILE_TYPE_REMOTE    0x8000
             //
 
-            stdin_handle_type = _is_valid_handle(stdin_handle) ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
-            stdout_handle_type = _is_valid_handle(stdout_handle) ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
-            stderr_handle_type = _is_valid_handle(stderr_handle) ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+            stdin_handle_type = _is_valid_handle(stdin_handle) ? _get_file_type(stdin_handle) : FILE_TYPE_UNKNOWN;
+            stdout_handle_type = _is_valid_handle(stdout_handle) ? _get_file_type(stdout_handle) : FILE_TYPE_UNKNOWN;
+            stderr_handle_type = _is_valid_handle(stderr_handle) ? _get_file_type(stderr_handle) : FILE_TYPE_UNKNOWN;
 
             if (read_std_handles_iter) {
                 // WORKAROUND:
@@ -2870,6 +2945,18 @@ namespace {
                     return false;
                 }
 
+                // In case of console handle we must take into account a console handle code page character width to correctly set text mode for the CRT.
+                //
+                if (stdin_handle_type == FILE_TYPE_CHAR) {
+                    const int stdin_fileno = _fileno(stdin);
+                    if (stdin_fileno >= 0) {
+                        const int mode_flags = _update_crt_console_handle_text_mode(stdin_fileno, 0, true);
+                        if (mode_flags) {
+                            _setmode(stdin_fileno, mode_flags);
+                        }
+                    }
+                }
+
                 std_handles_state.restore_stdin_state(stdin_handle, true);
 
                 if (stdout_handle_type == FILE_TYPE_UNKNOWN) {
@@ -2895,6 +2982,19 @@ namespace {
 
                     return false;
                 }
+
+                // In case of console handle we must take into account a console handle code page character width to correctly set text mode for the CRT.
+                //
+                if (stdout_handle_type == FILE_TYPE_CHAR) {
+                    const int stdout_fileno = _fileno(stdout);
+                    if (stdout_fileno >= 0) {
+                        const int mode_flags = _update_crt_console_handle_text_mode(stdout_fileno, 0, false);
+                        if (mode_flags) {
+                            _setmode(stdout_fileno, mode_flags);
+                        }
+                    }
+                }
+
 
                 std_handles_state.restore_stdout_state(stdout_handle, true);
 
@@ -2922,11 +3022,31 @@ namespace {
                     return false;
                 }
 
+                // In case of console handle we must take into account a console handle code page character width to correctly set text mode for the CRT.
+                //
+                if (stderr_handle_type == FILE_TYPE_CHAR) {
+                    const int stderr_fileno = _fileno(stdout);
+                    if (stderr_fileno >= 0) {
+                        const int mode_flags = _update_crt_console_handle_text_mode(stderr_fileno, 0, false);
+                        if (mode_flags) {
+                            _setmode(stderr_fileno, mode_flags);
+                        }
+                    }
+                }
+
                 std_handles_state.restore_stderr_state(stderr_handle, true);
+
+#if SYNC_STD_STREAMS_WITH_STDIO
+                std::ios::sync_with_stdio(); // sync with C++ streams
+#endif
 
                 break;
             }
             else if (stdin_handle_type != FILE_TYPE_UNKNOWN && stdout_handle_type != FILE_TYPE_UNKNOWN && stderr_handle_type != FILE_TYPE_UNKNOWN) {
+#if SYNC_STD_STREAMS_WITH_STDIO
+                std::ios::sync_with_stdio(); // sync with C++ streams
+#endif
+
                 break;
             }
 
@@ -2956,7 +3076,7 @@ namespace {
             //          stdout = 0x13               stdout = 0x07
             //          stderr = 0x0b               stderr = 0x0b
             //
-            //      The process B would contain invalid stdout handle and function `GetFileType((HANDLE)0x07)` would return 0 (FILE_TYPE_UNKNOWN).
+            //      The process B would contain invalid stdout handle and function `_get_file_type((HANDLE)0x07)` would return 0 (FILE_TYPE_UNKNOWN).
             //
             //  There is a workaround for that:
             //
@@ -3009,11 +3129,6 @@ namespace {
                     _attach_stderr_from_console(set_std_handle, !!std_handles_state.is_stderr_inheritable); // by default - inheritable
                 }
             }
-
-
-#if SYNC_STD_STREAMS_WITH_STDIO
-            std::ios::sync_with_stdio(); // sync with C++ streams
-#endif
         }
 
         return true;
@@ -3352,9 +3467,9 @@ namespace {
         const HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
         const HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
 
-        const DWORD stdin_handle_type = stdin_handle ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
-        const DWORD stdout_handle_type = stdout_handle ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
-        const DWORD stderr_handle_type = stderr_handle ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdin_handle_type = stdin_handle ? _get_file_type(stdin_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdout_handle_type = stdout_handle ? _get_file_type(stdout_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stderr_handle_type = stderr_handle ? _get_file_type(stderr_handle) : FILE_TYPE_UNKNOWN;
 
         const DWORD current_proc_id = GetCurrentProcessId();
 
@@ -3386,9 +3501,9 @@ namespace {
         const int stderr_fileno = _fileno(stderr);
         const HANDLE stderr_handle = (HANDLE)_get_osfhandle(stderr_fileno);
 
-        const DWORD stdin_handle_type = stdin_handle ? GetFileType(stdin_handle) : FILE_TYPE_UNKNOWN;
-        const DWORD stdout_handle_type = stdout_handle ? GetFileType(stdout_handle) : FILE_TYPE_UNKNOWN;
-        const DWORD stderr_handle_type = stderr_handle ? GetFileType(stderr_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdin_handle_type = stdin_handle ? _get_file_type(stdin_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stdout_handle_type = stdout_handle ? _get_file_type(stdout_handle) : FILE_TYPE_UNKNOWN;
+        const DWORD stderr_handle_type = stderr_handle ? _get_file_type(stderr_handle) : FILE_TYPE_UNKNOWN;
 
         const DWORD current_proc_id = GetCurrentProcessId();
 

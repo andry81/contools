@@ -1,3 +1,6 @@
+2021.10.25:
+* changed: README_EN.txt: readme update
+
 2021.03.11:
 * changed: preparations to use as a part of the tacklelib project
 

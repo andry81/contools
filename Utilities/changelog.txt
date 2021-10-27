@@ -1,5 +1,19 @@
+2021.10.28:
+* fixed: src/callf: missed to update CRT console handle text mode (utf8/utf16) in case of reallocate or reattach console
+* new: `README_EN.txt` file
+
 2021.10.26:
 * changed: TODO.txt: todo update
+
+2021.10.26:
+* fixed: src/_common: fixup in case of remote device open
+
+2021.10.25:
+* changed: src/_common/compatible_iterator/README_EN.txt: readme update
+
+2021.10.23:
+* changed: src/callf: removed not regular language feature flags, always apply language features for all processes in inheritance chain
+* changed: src/callf: help update
 
 2021.10.23:
 * fixed: src/callf: crt runtime assert on exit

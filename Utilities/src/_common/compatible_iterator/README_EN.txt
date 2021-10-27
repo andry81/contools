@@ -1,9 +1,9 @@
 * README_EN.txt
-* 2021.03.11
+* 2021.10.25
 * compatible_iterator
 
 1. DESCRIPTION
-2. DEPENDENCIES
+2. PREREQUISITES
 3. USAGE
 4. AUTHOR
 

@@ -82,7 +82,6 @@ const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
 const TCHAR * g_promote_flags_to_preparse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
-    _T("/win-error-langid"),
     _T("/ret-child-exit"),
     _T("/print-win-error-string"),
     _T("/no-print-gen-error-string"),
@@ -105,7 +104,6 @@ const TCHAR * g_promote_flags_to_preparse_arr[] = {
 const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
-    _T("/win-error-langid"),
     _T("/ret-child-exit"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
@@ -394,11 +392,8 @@ const TCHAR * g_elevate_child_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_promote_flags_to_parse_arr[] = {
-    _T("/chcp-in"),
-    _T("/chcp-out"),
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
-    _T("/win-error-langid"),
     _T("/ret-child-exit"),
     _T("/print-win-error-string"),
     _T("/print-shell-error-string"),
@@ -418,11 +413,8 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
-    _T("/chcp-in"),
-    _T("/chcp-out"),
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
-    _T("/win-error-langid"),
     _T("/ret-child-exit"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
@@ -3258,12 +3250,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             // promote{ ... } vs promote-parent{ ... }
 
-            if (g_promote_options.chcp_in != 0 && g_promote_parent_options.chcp_in != 0) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_in=%i promote-parent.chcp_in=%i\n"), g_promote_options.chcp_in, g_promote_parent_options.chcp_in);
-            }
-            if (g_promote_options.chcp_out != 0 && g_promote_parent_options.chcp_out != 0) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_out=%i promote-parent.chcp_out=%i\n"), g_promote_options.chcp_out, g_promote_parent_options.chcp_out);
-            }
+            //if (g_promote_options.chcp_in != 0 && g_promote_parent_options.chcp_in != 0) {
+            //    return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_in=%i promote-parent.chcp_in=%i\n"), g_promote_options.chcp_in, g_promote_parent_options.chcp_in);
+            //}
+            //if (g_promote_options.chcp_out != 0 && g_promote_parent_options.chcp_out != 0) {
+            //    return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_out=%i promote-parent.chcp_out=%i\n"), g_promote_options.chcp_out, g_promote_parent_options.chcp_out);
+            //}
             if (g_promote_flags.attach_parent_console && g_promote_parent_flags.attach_parent_console) {
                 return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /attach-parent-console\n"));
             }

@@ -722,6 +722,7 @@ Utilities/Projects/printf.vcxproj -text
 Utilities/Projects/retakeowner.vcxproj -text
 Utilities/Projects/thlibautocfg.vcxproj -text
 Utilities/Projects/wshdynacall.vcxproj -text
+Utilities/README_EN.txt -text
 Utilities/TODO.txt -text
 Utilities/__init__/__init__.bat -text
 Utilities/bin/7zip/7-zip.chm -text

@@ -2021,7 +2021,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                 // reread owned by CRT handles
                 g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-                g_stdout_handle_type = GetFileType(g_stdout_handle);
+                g_stdout_handle_type = _get_file_type(g_stdout_handle);
 
                 std_handles_state.restore_stdout_state(g_stdout_handle, true);
             }
@@ -3320,7 +3320,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
         DWORD handle_flags = 0;
 
         // character device must always stay inheritable if not explicitly declared as not inheritable
-        const DWORD reopen_stdin_handle_type = GetFileType(g_reopen_stdin_handle);
+        const DWORD reopen_stdin_handle_type = _get_file_type(g_reopen_stdin_handle);
         const bool reset_handle_to_inherit = !g_no_stdin_inherit && reopen_stdin_handle_type == FILE_TYPE_CHAR;
 
         if (reopen_stdin_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
@@ -3497,7 +3497,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             DWORD handle_flags = 0;
 
             // character device must always stay inheritable if not explicitly declared as not inheritable
-            const DWORD reopen_stdout_handle_type = GetFileType(g_reopen_stdout_handle);
+            const DWORD reopen_stdout_handle_type = _get_file_type(g_reopen_stdout_handle);
             const bool reset_handle_to_inherit = !g_no_stdout_inherit && reopen_stdout_handle_type == FILE_TYPE_CHAR;
 
             if (reopen_stdout_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
@@ -3709,7 +3709,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             DWORD handle_flags = 0;
 
             // character device must always stay inheritable if not explicitly declared as not inheritable
-            const DWORD reopen_stderr_handle_type = GetFileType(g_reopen_stderr_handle);
+            const DWORD reopen_stderr_handle_type = _get_file_type(g_reopen_stderr_handle);
             const bool reset_handle_to_inherit = !g_no_stderr_inherit && reopen_stderr_handle_type == FILE_TYPE_CHAR;
 
             if (reopen_stderr_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
@@ -5089,9 +5089,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
 
             // update globals
-            g_stdin_handle_type = GetFileType(g_stdin_handle);
-            g_stdout_handle_type = GetFileType(g_stdout_handle);
-            g_stderr_handle_type = GetFileType(g_stderr_handle);
+            g_stdin_handle_type = _get_file_type(g_stdin_handle);
+            g_stdout_handle_type = _get_file_type(g_stdout_handle);
+            g_stderr_handle_type = _get_file_type(g_stderr_handle);
 
             no_stdin_inherit = g_no_stdin_inherit || g_stdin_handle_type != FILE_TYPE_CHAR;
             no_stdout_inherit = g_no_stdout_inherit || g_stdout_handle_type != FILE_TYPE_CHAR;
@@ -5379,7 +5379,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
                 // reread owned by CRT handles
                 g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-                g_stdout_handle_type = GetFileType(g_stdout_handle);
+                g_stdout_handle_type = _get_file_type(g_stdout_handle);
 
                 g_is_stdout_reopened = g_is_stderr_reopened;
 
@@ -5437,7 +5437,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
                 // reread owned by CRT handles
                 g_stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-                g_stderr_handle_type = GetFileType(g_stderr_handle);
+                g_stderr_handle_type = _get_file_type(g_stderr_handle);
 
                 g_is_stderr_reopened = g_is_stdout_reopened;
 
@@ -5989,7 +5989,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
                     if (si.dwFlags & STARTF_USESTDHANDLES) {
                         if (_is_valid_handle(si.hStdInput)) {
-                            if (GetFileType(si.hStdInput) == FILE_TYPE_CHAR) {
+                            if (_get_file_type(si.hStdInput) == FILE_TYPE_CHAR) {
                                 g_is_child_stdin_char_type = true;
                             }
                         }
@@ -6103,7 +6103,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
                 if (si.dwFlags & STARTF_USESTDHANDLES) {
                     if (_is_valid_handle(si.hStdInput)) {
-                        if (GetFileType(si.hStdInput) == FILE_TYPE_CHAR) {
+                        if (_get_file_type(si.hStdInput) == FILE_TYPE_CHAR) {
                             g_is_child_stdin_char_type = true;
                         }
                     }
@@ -6670,7 +6670,7 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
     child_options.merge(promote_child_options);
 
     // NOTE:
-    //  Always apply code page and win error language id for both processes.
+    //  Always apply language features for both processes.
     //
 
     if (child_options.chcp_in) {

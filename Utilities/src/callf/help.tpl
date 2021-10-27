@@ -404,11 +404,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         option. Silently overrides the same regular flags.
 
         <Flags>:
-          /chcp-in
-          /chcp-out
           /ret-create-proc
           /ret-win-error
-          /win-error-langid
           /ret-child-exit
           /print-win-error-string
           /print-shell-error-string
@@ -434,11 +431,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         option. Silently overrides the same regular flags.
 
         <Flags>:
-          /chcp-in
-          /chcp-out
           /ret-create-proc
           /ret-win-error
-          /win-error-langid
           /ret-child-exit
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
