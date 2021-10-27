@@ -1,4 +1,7 @@
 2021.10.28:
+* new: Utilities/bin/contools: binaries update
+
+2021.10.28:
 * fixed: Utilities/src/callf: missed to update CRT console handle text mode (utf8/utf16) in case of reallocate or reattach console
 * new: Utilities: `README_EN.txt` file
 
