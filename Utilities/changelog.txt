@@ -1,3 +1,6 @@
+2021.10.30:
+* fixed: src/callf: multibyte/unicode console input/output misuse
+
 2021.10.28:
 * new: bin/contools: binaries update
 

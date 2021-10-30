@@ -840,26 +840,6 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                     const UINT cp_in = GetConsoleCP();
                     const UINT cp_out = GetConsoleOutputCP();
     
-                    CPINFO cp_in_info{};
-                    CPINFO cp_out_info{};
-
-                    if (!GetCPInfo(cp_in, &cp_in_info)) {
-                        // fallback to module character set
-#ifdef _UNICODE
-                        cp_in_info.MaxCharSize = sizeof(wchar_t);
-#else
-                        cp_in_info.MaxCharSize = sizeof(char);
-#endif
-                    }
-                    if (!GetCPInfo(cp_out, &cp_out_info)) {
-                        // fallback to module character set
-#ifdef _UNICODE
-                        cp_out_info.MaxCharSize = sizeof(wchar_t);
-#else
-                        cp_out_info.MaxCharSize = sizeof(char);
-#endif
-                    }
-
                     // CAUTION:
                     //  The `ReadConsoleInput` function can fail if the length parameter is too big!
                     //
@@ -867,25 +847,37 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                     CONSOLE_READCONSOLE_CONTROL console_read_control{};
 
-                    if (cp_in_info.MaxCharSize != sizeof(char)) {
-                        if (cp_out_info.MaxCharSize == sizeof(char)) {
+                    switch (cp_in) {
+                    case 1200: // UTF-16LE
+                    case 1201: // UTF-16BE
+                        switch (cp_out) {
+                        case 1200: // UTF-16LE
+                        case 1201: // UTF-16BE
+                            translation_mode = tm_wchar_to_wchar;
+                            break;
+
+                        default:
                             translation_mode = tm_wchar_to_char;
 
                             translated_char_buf.reserve(256); // just in case
+                            break;
                         }
-                        else {
-                            translation_mode = tm_wchar_to_wchar;
-                        }
-                    }
-                    else {
-                        if (cp_out_info.MaxCharSize != sizeof(char)) {
+                        break;
+
+                    default:
+                        switch (cp_out) {
+                        case 1200: // UTF-16LE
+                        case 1201: // UTF-16BE
                             translation_mode = tm_char_to_wchar;
 
                             translated_wchar_buf.reserve(256); // just in case
-                        }
-                        else {
+                            break;
+
+                        default:
                             translation_mode = tm_char_to_char;
+                            break;
                         }
+                        break;
                     }
 
                     stdin_wchar_buf.resize(tee_stdin_read_num_chars); // MSDN: ReadConsole

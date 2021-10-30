@@ -692,7 +692,6 @@ namespace {
     inline int _update_crt_console_handle_text_mode(int fileno_, int mode_flags, bool is_input)
     {
         UINT cp = 0;
-        CPINFO cp_info{};
 
         if (is_input)
         {
@@ -702,26 +701,16 @@ namespace {
             cp = GetConsoleOutputCP();
         }
 
-        if (!GetCPInfo(cp, &cp_info)) {
-            // fallback to module character set
-#ifdef _UNICODE
-            cp_info.MaxCharSize = sizeof(wchar_t);
-#else
-            cp_info.MaxCharSize = sizeof(char);
-#endif
-        }
-
-        if (cp_info.MaxCharSize > 1) {
+        switch (cp) {
+        case 1200: // UTF-16LE
+        case 1201: // UTF-16BE
             mode_flags |= _O_U16TEXT;
-        }
-        else if (cp_info.MaxCharSize == 1) {
-            switch (cp)
-            {
-            case 65000: // UTF-7
-            case 65001: // UTF-8
-                mode_flags |= _O_U8TEXT;
-                break;
-            }
+            break;
+
+        case CP_UTF7:
+        case CP_UTF8:
+            mode_flags |= _O_U8TEXT;
+            break;
         }
 
         return mode_flags;
@@ -1511,32 +1500,19 @@ namespace {
 
         const UINT cp_out = GetConsoleOutputCP();
 
-        CPINFO cp_info{};
-        if (!GetCPInfo(cp_out, &cp_info)) {
-            // fallback to module character set
-#ifdef _UNICODE
-            cp_info.MaxCharSize = sizeof(wchar_t);
-#else
-            cp_info.MaxCharSize = sizeof(char);
-#endif
-        }
-
         if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
             if (enable_conout_prints_buffering) {
                 g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::string{ fixed_message_char_buf, size_t(num_written_chars) } });
             }
 
-            if (cp_info.MaxCharSize == sizeof(char)) {
-                switch (stream_type) {
-                case STDOUT_FILENO:
-                    fputs(fixed_message_char_buf, stdout);
-                    break;
-                case STDERR_FILENO:
-                    fputs(fixed_message_char_buf, stderr);
-                    break;
-                }
-            }
-            else {
+            switch (cp_out) {
+            case 1200:  // UTF-16LE
+            case 1201:  // UTF-16BE
+            case 12000: // UTF-32LE
+            case 12001: // UTF-32BE
+            case CP_UTF7:
+            case CP_UTF8:
+            {
                 std::vector<wchar_t> translated_char_buf;
 
                 if (_multi_byte_to_wide_char(cp_out, fixed_message_char_buf, num_written_chars, translated_char_buf)) {
@@ -1549,6 +1525,19 @@ namespace {
                         break;
                     }
                 }
+            } break;
+
+            default:
+            {
+                switch (stream_type) {
+                case STDOUT_FILENO:
+                    fputs(fixed_message_char_buf, stdout);
+                    break;
+                case STDERR_FILENO:
+                    fputs(fixed_message_char_buf, stderr);
+                    break;
+                }
+            } break;
             }
         }
         else if (num_written_chars >= -1) {
@@ -1562,17 +1551,14 @@ namespace {
                 g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::string{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
             }
 
-            if (cp_info.MaxCharSize == sizeof(char)) {
-                switch (stream_type) {
-                case STDOUT_FILENO:
-                    fputs(char_buf.data(), stdout);
-                    break;
-                case STDERR_FILENO:
-                    fputs(char_buf.data(), stderr);
-                    break;
-                }
-            }
-            else {
+            switch (cp_out) {
+            case 1200:  // UTF-16LE
+            case 1201:  // UTF-16BE
+            case 12000: // UTF-32LE
+            case 12001: // UTF-32BE
+            case CP_UTF7:
+            case CP_UTF8:
+            {
                 std::vector<wchar_t> translated_char_buf;
 
                 if (_multi_byte_to_wide_char(cp_out, char_buf.data(), num_written_chars, translated_char_buf)) {
@@ -1585,6 +1571,19 @@ namespace {
                         break;
                     }
                 }
+            } break;
+
+            default:
+            {
+                switch (stream_type) {
+                case STDOUT_FILENO:
+                    fputs(char_buf.data(), stdout);
+                    break;
+                case STDERR_FILENO:
+                    fputs(char_buf.data(), stderr);
+                    break;
+                }
+            } break;
             }
         }
         else {
@@ -1607,7 +1606,14 @@ namespace {
                 g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::string{ fixed_message_char_buf, size_t(num_written_chars2) } });
             }
 
-            if (cp_info.MaxCharSize == sizeof(char)) {
+            switch (cp_out) {
+            case 1200:  // UTF-16LE
+            case 1201:  // UTF-16BE
+            case 12000: // UTF-32LE
+            case 12001: // UTF-32BE
+            case CP_UTF7:
+            case CP_UTF8:
+            {
                 switch (stream_type) {
                 case STDOUT_FILENO:
                     fputs(fixed_message_char_buf, stdout);
@@ -1616,8 +1622,10 @@ namespace {
                     fputs(fixed_message_char_buf, stderr);
                     break;
                 }
-            }
-            else {
+            } break;
+
+            default:
+            {
                 std::vector<wchar_t> translated_char_buf;
 
                 if (_multi_byte_to_wide_char(cp_out, fixed_message_char_buf, num_written_chars, translated_char_buf)) {
@@ -1630,6 +1638,7 @@ namespace {
                         break;
                     }
                 }
+            } break;
             }
         }
     }
@@ -1666,31 +1675,18 @@ namespace {
 
         const UINT cp_out = GetConsoleOutputCP();
 
-        CPINFO cp_info{};
-        if (!GetCPInfo(cp_out, &cp_info)) {
-            // fallback to module character set
-#ifdef _UNICODE
-            cp_info.MaxCharSize = sizeof(wchar_t);
-#else
-            cp_info.MaxCharSize = sizeof(char);
-#endif
-        }
-
         if (enable_conout_prints_buffering) {
             g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, std::wstring{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 } });
         }
 
-        if (cp_info.MaxCharSize != sizeof(char)) {
-            switch (stream_type) {
-            case STDOUT_FILENO:
-                fputws(char_buf.data(), stdout);
-                break;
-            case STDERR_FILENO:
-                fputws(char_buf.data(), stderr);
-                break;
-            }
-        }
-        else {
+        switch (cp_out) {
+        case 1200:  // UTF-16LE
+        case 1201:  // UTF-16BE
+        case 12000: // UTF-32LE
+        case 12001: // UTF-32BE
+        case CP_UTF7:
+        case CP_UTF8:
+        {
             std::vector<char> translated_char_buf;
 
             if (_wide_char_to_multi_byte(cp_out, char_buf.data(), char_buf.size(), translated_char_buf)) {
@@ -1703,6 +1699,19 @@ namespace {
                     break;
                 }
             }
+        } break;
+
+        default:
+        {
+            switch (stream_type) {
+            case STDOUT_FILENO:
+                fputws(char_buf.data(), stdout);
+                break;
+            case STDERR_FILENO:
+                fputws(char_buf.data(), stderr);
+                break;
+            }
+        } break;
         }
     }
 
@@ -1747,31 +1756,18 @@ namespace {
 
         const UINT cp_out = GetConsoleOutputCP();
 
-        CPINFO cp_info{};
-        if (!GetCPInfo(cp_out, &cp_info)) {
-            // fallback to module character set
-#ifdef _UNICODE
-            cp_info.MaxCharSize = sizeof(wchar_t);
-#else
-            cp_info.MaxCharSize = sizeof(char);
-#endif
-        }
-
         if (enable_conout_prints_buffering) {
             g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, str });
         }
 
-        if (cp_info.MaxCharSize == sizeof(char)) {
-            switch (stream_type) {
-            case STDOUT_FILENO:
-                fputs(str.c_str(), stdout);
-                break;
-            case STDERR_FILENO:
-                fputs(str.c_str(), stderr);
-                break;
-            }
-        }
-        else {
+        switch (cp_out) {
+        case 1200:  // UTF-16LE
+        case 1201:  // UTF-16BE
+        case 12000: // UTF-32LE
+        case 12001: // UTF-32BE
+        case CP_UTF7:
+        case CP_UTF8:
+        {
             std::vector<wchar_t> translated_char_buf;
 
             if (_multi_byte_to_wide_char(cp_out, str.c_str(), str.length(), translated_char_buf)) {
@@ -1784,6 +1780,19 @@ namespace {
                     break;
                 }
             }
+        } break;
+
+        default:
+        {
+            switch (stream_type) {
+            case STDOUT_FILENO:
+                fputs(str.c_str(), stdout);
+                break;
+            case STDERR_FILENO:
+                fputs(str.c_str(), stderr);
+                break;
+            }
+        } break;
         }
     }
 
@@ -1796,31 +1805,18 @@ namespace {
 
         const UINT cp_out = GetConsoleOutputCP();
 
-        CPINFO cp_info{};
-        if (!GetCPInfo(cp_out, &cp_info)) {
-            // fallback to module character set
-#ifdef _UNICODE
-            cp_info.MaxCharSize = sizeof(wchar_t);
-#else
-            cp_info.MaxCharSize = sizeof(char);
-#endif
-        }
-
         if (enable_conout_prints_buffering) {
             g_conout_prints_buf.push_back(_ConsoleOutput{ stream_type, str });
         }
 
-        if (cp_info.MaxCharSize != sizeof(char)) {
-            switch (stream_type) {
-            case STDOUT_FILENO:
-                fputws(str.c_str(), stdout);
-                break;
-            case STDERR_FILENO:
-                fputws(str.c_str(), stderr);
-                break;
-            }
-        }
-        else {
+        switch (cp_out) {
+        case 1200:  // UTF-16LE
+        case 1201:  // UTF-16BE
+        case 12000: // UTF-32LE
+        case 12001: // UTF-32BE
+        case CP_UTF7:
+        case CP_UTF8:
+        {
             std::vector<char> translated_char_buf;
 
             if (_wide_char_to_multi_byte(cp_out, str.c_str(), str.length(), translated_char_buf)) {
@@ -1833,6 +1829,20 @@ namespace {
                     break;
                 }
             }
+        } break;
+
+
+        default:
+        {
+            switch (stream_type) {
+            case STDOUT_FILENO:
+                fputws(str.c_str(), stdout);
+                break;
+            case STDERR_FILENO:
+                fputws(str.c_str(), stderr);
+                break;
+            }
+        } break;
         }
     }
 
@@ -2254,17 +2264,14 @@ namespace {
             [&]() {
                 const UINT cp_out = GetConsoleOutputCP();
 
-                CPINFO cp_info{};
-                if (!GetCPInfo(cp_out, &cp_info)) {
-                    // fallback to module character set
-#ifdef _UNICODE
-                    cp_info.MaxCharSize = sizeof(wchar_t);
-#else
-                    cp_info.MaxCharSize = sizeof(char);
-#endif
-                }
-
-                if (cp_info.MaxCharSize != sizeof(char)) {
+                switch (cp_out) {
+                case 1200:  // UTF-16LE
+                case 1201:  // UTF-16BE
+                case 12000: // UTF-32LE
+                case 12001: // UTF-32BE
+                case CP_UTF7:
+                case CP_UTF8:
+                {
                     FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                         NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPWSTR)&win_error_msg_buf_w, 0, NULL);
 #ifdef _UNICODE
@@ -2276,8 +2283,10 @@ namespace {
                         ret = _format_stderr_message("win32: \"%s\"\n", char_buf.data());
                     }
 #endif
-                }
-                else {
+                } break;
+
+                default:
+                {
                     FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                         NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPSTR)&win_error_msg_buf_a, 0, NULL);
 #ifdef _UNICODE
@@ -2289,6 +2298,7 @@ namespace {
 #else
                     ret = _format_stderr_message("win32: \"%s\"\n", win_error_msg_buf_a);
 #endif
+                } break;
                 }
             }();
         }
@@ -2312,25 +2322,25 @@ namespace {
         [&]() { __try {
             const UINT cp_out = GetConsoleOutputCP();
 
-            CPINFO cp_info{};
-            if (!GetCPInfo(cp_out, &cp_info)) {
-                // fallback to module character set
-#ifdef _UNICODE
-                cp_info.MaxCharSize = sizeof(wchar_t);
-#else
-                cp_info.MaxCharSize = sizeof(char);
-#endif
-            }
-
-            if (cp_info.MaxCharSize != sizeof(char)) {
+            switch (cp_out) {
+            case 1200:  // UTF-16LE
+            case 1201:  // UTF-16BE
+            case 12000: // UTF-32LE
+            case 12001: // UTF-32BE
+            case CP_UTF7:
+            case CP_UTF8:
+            {
                 FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                     NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPWSTR)&win_error_msg_buf_w, 0, NULL);
                 _print_stderr_message(L"win32: \"%s\"\n", win_error_msg_buf_w);
-            }
-            else {
+            } break;
+
+            default:
+            {
                 FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                     NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPSTR)&win_error_msg_buf_a, 0, NULL);
                 _print_stderr_message("win32: \"%s\"\n", win_error_msg_buf_a);
+            } break;
             }
         }
         __finally {
