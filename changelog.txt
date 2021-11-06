@@ -1,4 +1,7 @@
 2021.10.30:
+* new: Utilities/bin/contools: binaries update
+
+2021.10.30:
 * fixed: Utilities/src/callf: multibyte/unicode console input/output misuse
 
 2021.10.28:

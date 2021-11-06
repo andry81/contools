@@ -33,11 +33,6 @@ if exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%/svncmd/__init__/__init__.bat" (
   call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/svncmd/__init__/__init__.bat" || exit /b
 )
 
-if not exist "%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%/config.system.vars.in" (
-  echo.%~nx0: error: `%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%/config.system.vars.in` must exist.
-  exit /b 255
-) >&2
-
 if not exist "%PROJECT_OUTPUT_ROOT%\" ( mkdir "%PROJECT_OUTPUT_ROOT%" || exit /b 11 )
 if not exist "%PROJECT_LOG_ROOT%\" ( mkdir "%PROJECT_LOG_ROOT%" || exit /b 12 )
 
