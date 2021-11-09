@@ -121,7 +121,7 @@ exit /b 0
 rem arguments: <flag0>[...<flagN>] "<file0>[...\;<fileN>]" <os_name> <compiler_name> <config_name> <arch_name> <list_separator_char>
 
 call :CMD cmake "-DCMAKE_MODULE_PATH=%%TACKLELIB_CMAKE_ROOT%%" ^
-  -P "%%TACKLELIB_CMAKE_ROOT%%/tools/SetVarsFromFiles.cmd.cmake" %%* || exit /b
+  -P "%%TACKLELIB_CMAKE_ROOT%%/tacklelib/tools/SetVarsFromFiles.cmd.cmake" %%* || exit /b
 
 call :CMD "%%CONTOOLS_ROOT%%/std/set_vars_from_locked_file_pair.bat" ^
   "%%TEMP_OUTPUT_DIR%%/lock" "%%TEMP_OUTPUT_DIR%%/var_names.lst" "%%TEMP_OUTPUT_DIR%%/var_values.lst" ^

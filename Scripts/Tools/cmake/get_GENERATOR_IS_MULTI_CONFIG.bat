@@ -60,7 +60,7 @@ rmdir /S /Q "%TEMP_OUTPUT_DIR%"
 rem arguments: <out_file_file>
 
 call :CMD cmake -G "%%~1" "-DCMAKE_MODULE_PATH=%%TACKLELIB_CMAKE_ROOT%%" ^
-  -P "%%TACKLELIB_CMAKE_ROOT%%/tools/GeneratorIsMulticonfig.cmd.cmake" ^
+  -P "%%TACKLELIB_CMAKE_ROOT%%/tacklelib/tools/GeneratorIsMulticonfig.cmd.cmake" ^
   --flock "%%TEMP_OUTPUT_DIR%%/lock" "%%TEMP_OUTPUT_DIR%%/var_values.lst" || exit /b
 
 (
