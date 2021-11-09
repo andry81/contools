@@ -16,7 +16,7 @@
 # FORMAT:
 #   [<attributes>] <variable>[:[<class_name>]]=<value>
 #
-# <attributes>:           Variable space separated attributes: export
+# <attributes>:           Variable space separated attributes: once | export | upath
 # <variable>:             Variable name corresponding to the regex: [_a-zA-Z][_a-zA-Z0-9]*
 # <class_name>:           class variant name: OSWIN | OSUNIX | BAT | SH
 #   OSWIN:                Apply on Windows system including cygwin/mingw/msys subsystems.

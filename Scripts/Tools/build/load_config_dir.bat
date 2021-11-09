@@ -52,7 +52,9 @@ if defined __?FLAG (
 if %__?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_SYSTEM_CONFIG% EQU 0 set "__?SYSTEM_CONFIG_FILE_EXT=.in"
 if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_USER_CONFIG% EQU 0 set "__?USER_CONFIG_FILE_EXT=.in"
 
-call :MAIN %%1 %%2 %%3 %%4
+if "%~2" == "" (
+  call :MAIN "%%~1" "%%~1" "%%~3" "%%~4"
+) else call :MAIN "%%~1" "%%~2" "%%~3" "%%~4"
 set __?LASTERROR=%ERRORLEVEL%
 
 (

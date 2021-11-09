@@ -38,9 +38,13 @@ exit /b
 set "__?VAR=%~2"
 if not "%__?ATTR:|once|=%" == "%__?ATTR%" if defined %__?VAR% exit /b 0
 
+set __?UPATH=0
+if defined __?ATTR if not "%__?ATTR:|upath|=%" == "%__?ATTR%" set __?UPATH=1
+
 set __?QUOT__=^"
 set "__?EXCL__=!" & set "__?ESC__=^"
 if defined __?VALUE set "__?VALUE=%__?VALUE:!=!__?EXCL__!%"
 if defined __?VALUE set "__?VALUE=%__?VALUE:=!__?QUOT__!%"
 if defined __?VALUE set "__?VALUE=%__?VALUE:^=!__?ESC__!%"
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do ( endlocal & set "%__?VAR%=%%j" )
+if %__?UPATH% NEQ 0 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VAR:\=/!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do ( endlocal & set "%__?VAR%=%%j" )

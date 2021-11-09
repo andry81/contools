@@ -7,10 +7,11 @@ for /F "usebackq eol=# tokens=* delims=" %%i in ("%__?CONFIG_FILE_DIR%/%__?CONFI
     set "__?VALUE=%%k"
     call :PARSE_EXPR %%* && (
       setlocal ENABLEDELAYEDEXPANSION
-      if defined __?VALUE for /F "tokens=* delims=" %%l in ("!__?VAR!") do for /F "tokens=* delims=" %%m in ("!__?VALUE!") do for /F "tokens=* delims=" %%n in ("%%m") do (
+      if defined __?VALUE for /F "tokens=* delims=" %%l in ("!__?VAR!") do for /F "tokens=* delims=" %%m in ("!__?VALUE!") do for /F "tokens=* delims=" %%n in ("!__?UPATH!") do for /F "tokens=* delims=" %%o in ("%%m") do (
         endlocal
         endlocal
-        set "%%l=%%n"
+        set "%%l=%%o"
+        if %%n0 NEQ 0 set "__?VALUE=%%o" & setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%p in ("!__?VALUE:\=/!") do for /F "eol= tokens=* delims=" %%q in ("%%p") do ( endlocal & set "%%l=%%q" )
       ) else for /F "tokens=* delims=" %%l in ("!__?VAR!") do (
         endlocal
         endlocal
@@ -74,9 +75,12 @@ for /F "eol= tokens=1,* delims=	 " %%i in ("%__?VAR%") do ( if "%%j" == "" goto
 for /F "eol= tokens=1,* delims=	 " %%i in ("%__?VAR%") do ( if "%%j" == "" goto ATTR_PARSE_END ) & ( if defined __?ATTR ( call set "__?ATTR=%%__?ATTR%% %%%%i" ) else set "__?ATTR=%%i" ) & set "__?VAR=%%j"
 
 :ATTR_PARSE_END
+set __?UPATH=0
+
 if not defined __?ATTR goto IGNORE_ATTR
 
 if not "%__?ATTR:once=%" == "%__?ATTR%" if defined %__?VAR% exit /b 1
+if not "%__?ATTR:upath=%" == "%__?ATTR%" set __?UPATH=1
 
 :IGNORE_ATTR
 if defined __?PLATFORM if %~1 NEQ 0 set "__?VAR=%__?VAR%:%__?PLATFORM%"
