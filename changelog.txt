@@ -1,4 +1,7 @@
 2021.11.09:
+* fixed: Scripts/Tools/cmake/make_output_directories.bat: cmake paths must be always posix compatible
+
+2021.11.09:
 * fixed: Scripts/Tools/build/load_config_dir.bat: by default use input config directory if output config directory is not defined
 * new: Scripts/Tools/build/load_config.bat: `upath` attribute to convert all backslashes to forward slashes
 

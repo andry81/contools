@@ -10,19 +10,19 @@ if exist "%CMAKE_BUILD_ROOT%/singleconfig.tag" (
     echo.%~nx0: error: CMAKE_BUILD_TYPE must be set for single config cmake cache.
     exit /b 1
   ) >&2
-  set "CMAKE_BUILD_DIR=%CMAKE_BUILD_ROOT%\%CMAKE_BUILD_TYPE%"
-  set "CMAKE_BIN_DIR=%CMAKE_BIN_ROOT%\%CMAKE_BUILD_TYPE%"
-  set "CMAKE_LIB_DIR=%CMAKE_LIB_ROOT%\%CMAKE_BUILD_TYPE%"
-  set "CMAKE_PACK_DIR=%CMAKE_PACK_ROOT%\%CMAKE_BUILD_TYPE%"
+  call :CMAKE_PATH CMAKE_BUILD_DIR  "%%CMAKE_BUILD_ROOT%%\%%CMAKE_BUILD_TYPE%%"
+  call :CMAKE_PATH CMAKE_BIN_DIR    "%%CMAKE_BIN_ROOT%%\%%CMAKE_BUILD_TYPE%%"
+  call :CMAKE_PATH CMAKE_LIB_DIR    "%%CMAKE_LIB_ROOT%%\%%CMAKE_BUILD_TYPE%%"
+  call :CMAKE_PATH CMAKE_PACK_DIR   "%%CMAKE_PACK_ROOT%%\%%CMAKE_BUILD_TYPE%%"
 ) else if exist "%CMAKE_BUILD_ROOT%/multiconfig.tag" (
   if %GENERATOR_IS_MULTI_CONFIG%0 EQU 0 (
     echo.%~nx0: error: GENERATOR_IS_MULTI_CONFIG must be already set for multi config cmake cache.
     exit /b 2
   ) >&2
-  set "CMAKE_BUILD_DIR=%CMAKE_BUILD_ROOT%"
-  set "CMAKE_BIN_DIR=%CMAKE_BIN_ROOT%"
-  set "CMAKE_LIB_DIR=%CMAKE_LIB_ROOT%"
-  set "CMAKE_PACK_DIR=%CMAKE_PACK_ROOT%"
+  call :CMAKE_PATH CMAKE_BUILD_DIR  "%%CMAKE_BUILD_ROOT%%"
+  call :CMAKE_PATH CMAKE_BIN_DIR    "%%CMAKE_BIN_ROOT%%"
+  call :CMAKE_PATH CMAKE_LIB_DIR    "%%CMAKE_LIB_ROOT%%"
+  call :CMAKE_PATH CMAKE_PACK_DIR   "%%CMAKE_PACK_ROOT%%"
 ) else (
   echo.%~nx0: error: cmake cache is not created as single config nor multi config.
   exit /b 3
@@ -90,7 +90,7 @@ if not defined PARENT_DIR (
   exit /b 14
 ) >&2
 
-rem return predefined variables
+rem return variables
 (
   endlocal
   set "CMAKE_BUILD_DIR=%CMAKE_BUILD_DIR%"
@@ -119,5 +119,15 @@ rem check on drive root
 if /i "%DIR%" == "%PARENT_DIR%" (
   set "PARENT_DIR="
   exit /b 128
+)
+exit /b 0
+
+:CMAKE_PATH
+setlocal DISABLEDELAYEDEXPANSION
+for /F "eol= tokens=* delims=" %%i in ("%~2\.") do set "RETURN_VALUE=%%~fi"
+set "RETURN_VALUE=%RETURN_VALUE:\=/%"
+(
+  endlocal
+  set "%~1=%RETURN_VALUE%"
 )
 exit /b 0
