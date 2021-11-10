@@ -1,3 +1,9 @@
+2021.11.11:
+* new: .github/workflows: `contools-gh-clone-stats.yml` to generate `contools` repo clone stats
+* new: README.md: repository/code size badges
+* new: README.md: lines of code badge by `tokei.rs`
+* new: README.md: github all/unique clones badges
+
 2021.11.09:
 * fixed: Scripts/Tools/cmake/make_output_directories.bat: cmake paths must be always posix compatible
 

@@ -14,19 +14,34 @@ The latest version is here: https://sf.net/p/contools</h4>
 </p>
 
 <p align="center">
+  <a href="#"><img src="https://img.shields.io/github/repo-size/andry81/contools" valign="middle" alt="GitHub repo size in bytes" /></a>
+• <a href="#"><img src="https://img.shields.io/github/languages/code-size/andry81/contools" valign="middle" alt="code size in bytes" /></a>
+• <a href="https://github.com/XAMPPRocky/tokei"><img src="https://tokei.rs/b1/github/andry81/contools?category=code" valign="middle" alt="lines of code by tokei.rs" /></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/andry81/contools--gh-stats/commits/master/traffic/clones">
+    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=Github%20clones|all&query=count&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/clones/latest-accum.json?raw=True&logo=github" valign="middle" alt="GitHub clones|any|total" />
+    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=14d&query=count&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/clones/latest.json?raw=True" valign="middle" alt="GitHub clones|any|14d" /></a>
+• <a href="https://github.com/andry81/contools--gh-stats/commits/master/traffic/clones">
+    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=Github%20clones|unq&query=uniques&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/clones/latest-accum.json?raw=True&logo=github" valign="middle" alt="GitHub clones|unique per day|total" />
+    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=14d&query=uniques&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/clones/latest.json?raw=True" valign="middle" alt="GitHub clones|unique per day|14d" /></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/andry81/contools/blob/trunk/changelog.txt">Changelog</a>
 • <a href="https://github.com/andry81/contools/blob/trunk/README_EN.txt">Readme</a>
+• <a href="#dependecies">Dependencies</a>
 • <a href="#copyright-and-license"><img src="https://github.com/andry81/andry81/raw/main/badges/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
 </p>
 
 <p align="center">
-  <a href="#dependecies">Dependencies</a> •
   <a href="https://stackoverflow.com/search?q=contools"><img src="https://github.com/andry81/contools/raw/trunk/.github/badges/stackoverflow-contools.svg" valign="middle" alt="stackoverflow search" /></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/sponsors/andry81"><img src="https://github.com/andry81/andry81/raw/main/badges/github-sponsor.svg" valign="middle" alt="github sponsor" /></a> •
-  <a href="https://www.paypal.com/cgi-bin/webscr?item_name=Donation+to+contools&cmd=_donations&business=andry%40inbox.ru"><img src="https://github.com/andry81/andry81/raw/main/badges/paypal-donate.svg" valign="middle" alt="paypal donate" /></a>
+  <a href="https://github.com/sponsors/andry81"><img src="https://github.com/andry81/andry81/raw/main/badges/github-sponsor.svg" valign="middle" alt="github sponsor" /></a>
+• <a href="https://www.paypal.com/cgi-bin/webscr?item_name=Donation+to+contools&cmd=_donations&business=andry%40inbox.ru"><img src="https://github.com/andry81/andry81/raw/main/badges/paypal-donate.svg" valign="middle" alt="paypal donate" /></a>
 </p>
 
 <!-- -->
