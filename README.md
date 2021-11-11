@@ -9,14 +9,23 @@ mingw.<br/><br/>
 The latest version is here: https://sf.net/p/contools</h4>
 
 <p align="center">
-  <a href="https://www.codefactor.io/repository/github/andry81/contools"><img src="https://www.codefactor.io/repository/github/andry81/contools/badge" valign="middle" alt="codefactor.io" /></a>
-• <a href="https://www.codacy.com/gh/andry81/contools/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andry81/contools&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/09e6de3a65614dd1b85c631ff108c8e5" valign="middle" alt="codacy.com" /></a>
+  <a href="https://www.codefactor.io/repository/github/andry81/contools"><img src="https://img.shields.io/codefactor/grade/github/andry81/contools?logo=codefactor" valign="middle" alt="codefactor.io|quality" /></a>
+  <!-- <a href="https://www.codefactor.io/repository/github/andry81/contools"><img src="https://www.codefactor.io/repository/github/andry81/contools/badge" valign="middle" alt="codefactor.io|quality" /></a> -->
+• <a href="https://www.codacy.com/gh/andry81/contools/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andry81/contools&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/09e6de3a65614dd1b85c631ff108c8e5" valign="middle" alt="codacy.com|quality" /></a>
+<!-- -->
+• <a href="https://codeclimate.com/github/andry81/contools/maintainability"><img src="https://api.codeclimate.com/v1/badges/d7d0415db06ae2e19681/maintainability?logo=codeclimate" valign="middle" alt="codeclimate.com|maintainability"></a>
+  <a href="https://codeclimate.com/github/andry81/contools/issues"><img src="https://img.shields.io/codeclimate/issues/andry81/contools?logo=codeclimate" valign="middle" alt="codeclimate.com|issues"></a>
+  <a href="https://codeclimate.com/github/andry81/contools/trends/technical_debt"><img src="https://img.shields.io/codeclimate/tech-debt/andry81/contools?logo=codeclimate" valign="middle" alt="codeclimate.com|debt"></a>
+<!-- -->
 </p>
 
 <p align="center">
-  <a href="#"><img src="https://img.shields.io/github/repo-size/andry81/contools" valign="middle" alt="GitHub repo size in bytes" /></a>
-• <a href="#"><img src="https://img.shields.io/github/languages/code-size/andry81/contools" valign="middle" alt="code size in bytes" /></a>
+  <a href="#"><img src="https://img.shields.io/github/repo-size/andry81/contools?logo=github" valign="middle" alt="GitHub repo size in bytes" /></a>
+• <a href="#"><img src="https://img.shields.io/github/languages/code-size/andry81/contools?logo=github" valign="middle" alt="code size in bytes" /></a>
 • <a href="https://github.com/XAMPPRocky/tokei"><img src="https://tokei.rs/b1/github/andry81/contools?category=code" valign="middle" alt="lines of code by tokei.rs" /></a>
+<!-- -- >
+• <a href="https://github.com/XAMPPRocky/tokei"><img src="https://img.shields.io/tokei/lines/github/andry81/contools?logo=tokei" valign="middle" alt="total lines by tokei.rs" /></a>
+<!-- -->
 </p>
 
 <p align="center">

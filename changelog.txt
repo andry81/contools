@@ -1,4 +1,8 @@
 2021.11.11:
+* new: README.md: `codeclimate.com` link badges
+* changed: README.md: badge icons and links update
+
+2021.11.11:
 * new: .github/workflows: `contools-gh-clone-stats.yml` to generate `contools` repo clone stats
 * new: README.md: repository/code size badges
 * new: README.md: lines of code badge by `tokei.rs`
