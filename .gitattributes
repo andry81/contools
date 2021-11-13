@@ -780,17 +780,6 @@ Utilities/bin/hashdeep/tigerdeep.exe -text
 Utilities/bin/hashdeep/tigerdeep64.exe -text
 Utilities/bin/hashdeep/whirlpooldeep.exe -text
 Utilities/bin/hashdeep/whirlpooldeep64.exe -text
-Utilities/bin/mingw/bin/error-mode.exe -text
-Utilities/bin/mingw/bin/msys-1.0.dll -text
-Utilities/bin/mingw/bin/msysmnt.exe -text
-Utilities/bin/mingw/bin/patch.exe -text
-Utilities/bin/mingw/bin/patch.exe.manifest -text
-Utilities/bin/mingw/bin/ps.exe -text
-Utilities/bin/mingw/etc/fstab.sample -text
-Utilities/bin/mingw/etc/inputrc.default -text
-Utilities/bin/mingw/etc/profile -text
-Utilities/bin/mingw/m.ico -text
-Utilities/bin/mingw/msys.ico -text
 Utilities/bin/pstools/Eula.txt -text
 Utilities/bin/pstools/Handle.exe -text
 Utilities/bin/ritchielawrence/mtee.exe -text
