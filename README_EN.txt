@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.10.25
+* 2021.11.13
 * contools
 
 1. DESCRIPTION
@@ -36,13 +36,13 @@ https://en.wikipedia.org/wiki/MIT_License)
 3. REPOSITORIES
 -------------------------------------------------------------------------------
 Primary:
-  * https://sf.net/p/contools/contools/HEAD/tree/trunk/
-    https://svn.code.sf.net/p/contools/contools/trunk
+  * https://sf.net/p/contools/contools/HEAD/tree
+    https://svn.code.sf.net/p/contools/contools
 First mirror:
-  * https://github.com/andry81/contools/tree/trunk
+  * https://github.com/andry81/contools/tree/branches
     https://github.com/andry81/contools.git
 Second mirror:
-  * https://bitbucket.org/andry81/contools/src/trunk
+  * https://bitbucket.org/andry81/contools/branches
     https://bitbucket.org/andry81/contools.git
 
 -------------------------------------------------------------------------------
