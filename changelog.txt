@@ -1,4 +1,7 @@
 2021.11.14:
+* changed: Utilities/bin: ritchielawrence, unxutils, wtee.exe: removed obsolete binaries (`contools/callf.exe` and `contools/callfg.exe` is used instead now)
+
+2021.11.14:
 * changed: Utilities/bin/cygwin: removed obsolete binaries
 
 2021.11.14:
