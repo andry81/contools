@@ -1,4 +1,7 @@
 2021.11.14:
+* changed: bin/cygwin: removed obsolete binaries
+
+2021.11.14:
 * changed: bin/mingw: removed obsolete binaries
 
 2021.10.30:

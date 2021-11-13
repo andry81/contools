@@ -747,16 +747,6 @@ Utilities/bin/contools/printf.exe -text
 Utilities/bin/contools/retakeowner.exe -text
 Utilities/bin/contools/thlibautocfg.exe -text
 Utilities/bin/contools/wxFileDialog.exe -text
-Utilities/bin/cygwin/bin/cygattr-1.dll -text
-Utilities/bin/cygwin/bin/cyggcc_s-1.dll -text
-Utilities/bin/cygwin/bin/cygiconv-2.dll -text
-Utilities/bin/cygwin/bin/cygintl-8.dll -text
-Utilities/bin/cygwin/bin/cygsigsegv-2.dll -text
-Utilities/bin/cygwin/bin/cygwin1.dll -text
-Utilities/bin/cygwin/bin/diff.exe -text
-Utilities/bin/cygwin/bin/patch.exe -text
-Utilities/bin/cygwin/bin/sed.exe -text
-Utilities/bin/cygwin/etc/fstab -text
 Utilities/bin/gnuwin32/bin/iconv.exe -text
 Utilities/bin/gnuwin32/bin/libiconv2.dll -text
 Utilities/bin/gnuwin32/bin/libintl3.dll -text
