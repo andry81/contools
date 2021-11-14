@@ -747,12 +747,6 @@ Utilities/bin/contools/printf.exe -text
 Utilities/bin/contools/retakeowner.exe -text
 Utilities/bin/contools/thlibautocfg.exe -text
 Utilities/bin/contools/wxFileDialog.exe -text
-Utilities/bin/gnuwin32/bin/iconv.exe -text
-Utilities/bin/gnuwin32/bin/libiconv2.dll -text
-Utilities/bin/gnuwin32/bin/libintl3.dll -text
-Utilities/bin/gnuwin32/bin/regex2.dll -text
-Utilities/bin/gnuwin32/bin/sed.exe -text
-Utilities/bin/gnuwin32/bin/tr.exe -text
 Utilities/bin/hashdeep/CHANGES.txt -text
 Utilities/bin/hashdeep/COPYING.txt -text
 Utilities/bin/hashdeep/FILEFORMAT.txt -text

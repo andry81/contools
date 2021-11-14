@@ -1,3 +1,11 @@
+[submodule "_externals/gnuwin32"]
+	path = _externals/gnuwin32
+	owner = _externals
+	url = svn://svn.code.sf.net/p/external-tools/gnuwin32/branches/20101227
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
 [submodule "_externals/svncmd/Scripts"]
 	path = _externals/svncmd/Scripts
 	owner = _externals
