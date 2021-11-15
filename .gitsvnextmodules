@@ -6,6 +6,14 @@
 	fetch = :refs/remotes/git-svn
 	remote = svn
 	type = dir
+[submodule "_externals/msys"]
+	path = _externals/msys
+	owner = _externals
+	url = svn://svn.code.sf.net/p/external-tools/msys/branches/1.0.17.x
+	branch = /
+	fetch = :refs/remotes/git-svn
+	remote = svn
+	type = dir
 [submodule "_externals/svncmd/Scripts"]
 	path = _externals/svncmd/Scripts
 	owner = _externals
