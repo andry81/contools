@@ -1,3 +1,6 @@
+2021.11.18:
+* fixed: *.bat: explicitly sort by name in `dir` command if the sort option is not defined to avoid sort by date as by default
+
 2021.11.15:
 * changed: _config, BuildTools/msys: `msys` binaries moved into externals
 * changed: BuildTools/TargetProject.PreBuildStep.bat: minor changes
