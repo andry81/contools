@@ -1,3 +1,6 @@
+2021.11.19:
+* changed: .github/workflows: added reference to the `github-clone-count-badge` repo
+
 2021.11.18:
 * fixed: *.bat: explicitly sort by name in `dir` command if the sort option is not defined to avoid sort by date as by default
 
