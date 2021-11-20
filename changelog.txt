@@ -1,4 +1,7 @@
 2021.11.20:
+* changed: .github/workflows: print `latest.json` into the pipeline for debug purposes
+
+2021.11.20:
 * refactor: BuildTools: minor refactor
 
 2021.11.19:
