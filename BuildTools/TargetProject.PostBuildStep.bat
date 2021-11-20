@@ -5,7 +5,7 @@ setlocal
 rem Drop last error code
 type nul>nul
 
-call "%%~dp0__init__.bat" || exit /b
+call "%%~dp0__init__\__init__.bat" || exit /b
 
 set "TARGET_PATH=%~1"
 set "BINARY_DIR=%~2"

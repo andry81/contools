@@ -6,7 +6,7 @@
 /.svnignore -text
 BuildTools/TargetProject.PostBuildStep.bat -text
 BuildTools/TargetProject.PreBuildStep.bat -text
-BuildTools/__init__.bat -text
+BuildTools/__init__/__init__.bat -text
 /Changes_EN.old.txt -text
 Projects/ConsoleTools.sln -text
 /README.md -text

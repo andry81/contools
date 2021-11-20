@@ -5,7 +5,7 @@ setlocal
 rem Drop last error code
 type nul>nul
 
-call "%%~dp0__init__.bat" || exit /b
+call "%%~dp0__init__\__init__.bat" || exit /b
 
 set "SOLUTION_DIR=%~1"
 set "PROJECT_DIR=%~2"
@@ -47,7 +47,7 @@ pushd "%SOURCES_DIR%" && (
   if exist "%SOURCES_DIR%\help.def" call :CMD "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" help.def
   call :CMD "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" version.def
   popd
-) || exit /b 65534
+) || exit /b 255
 
 set "THLIBAUTOCFG_CMD_LINE_FLAGS="
 if %UNICODE_ENABLED% NEQ 0 set THLIBAUTOCFG_CMD_LINE_FLAGS=%THLIBAUTOCFG_CMD_LINE_FLAGS%u
@@ -64,5 +64,7 @@ exit /b %ERRORLEVEL%
 
 :CMD
 echo.^>%*
-(%*)
+(
+  %*
+)
 exit /b 0
