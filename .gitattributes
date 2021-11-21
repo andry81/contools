@@ -1,8 +1,8 @@
 * text=auto !eol
 .github/FUNDING.yml -text
 .github/badges/stackoverflow-contools.svg -text
-.github/workflows/contools-gh-clone-stats.yml -text
-.github/workflows/contools-gh-view-stats.yml -text
+.github/workflows/accum-gh-clone-stats.yml -text
+.github/workflows/accum-gh-view-stats.yml -text
 /.svnignore -text
 BuildTools/TargetProject.PostBuildStep.bat -text
 BuildTools/TargetProject.PreBuildStep.bat -text
