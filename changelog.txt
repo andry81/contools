@@ -1,3 +1,6 @@
+2021.11.22:
+* changed: BuildTools: scripts cleanup
+
 2021.11.21:
 * new: .github/workflows: GitHub workflow switched to use GitHub composite action
 

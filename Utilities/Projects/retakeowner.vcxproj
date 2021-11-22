@@ -89,7 +89,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "" "$(ProjectName)"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(ProjectName)" "$(SolutionDir)\..\Utilities\src\$(ProjectName)"</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -141,7 +141,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "" "$(ProjectName)"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PreBuildStep.bat" "$(ProjectName)" "$(SolutionDir)\..\Utilities\src\$(ProjectName)"</Command>
     </PreBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>../src/retakeowner;../src/_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
