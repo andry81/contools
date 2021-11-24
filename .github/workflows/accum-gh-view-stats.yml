@@ -23,6 +23,9 @@ jobs:
           stat_repo_read_token:     ${{ secrets.READ_STATS_TOKEN }}
           stats_list_key:           views
 
+          curl_flags: >-
+            -H 'Cache-Control: no-cache'
+
           output_repo_owner:        andry81
           output_repo:              contools--gh-stats
           output_repo_branch:       master
