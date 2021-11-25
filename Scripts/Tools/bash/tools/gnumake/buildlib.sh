@@ -9,7 +9,16 @@
 
 SOURCE_CONTOOLS_BUILDLIB_SH=1 # including guard
 
-source '/bin/bash_tacklelib' || exit $?
+if [[ -z "$SOURCE_TACKLELIB_BASH_TACKLELIB_SH" || SOURCE_TACKLELIB_BASH_TACKLELIB_SH -eq 0 ]]; then
+  # builtin search
+  for BASH_SOURCE_DIR in "/usr/local/bin" "/usr/bin" "/bin"; do
+    [[ -f "$BASH_SOURCE_DIR/bash_tacklelib" ]] && {
+      source "$BASH_SOURCE_DIR/bash_tacklelib" || exit $?
+      break
+    }
+  done
+fi
+
 tkl_include '__init__.sh' || tkl_abort_include
 tkl_include "$TACKLELIB_BASH_ROOT/tacklelib/baselib.sh" || tkl_abort_include
 tkl_include "$CONTOOLS_BASH_ROOT/traplib.sh" || tkl_abort_include

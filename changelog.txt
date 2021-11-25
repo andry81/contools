@@ -1,3 +1,6 @@
+2021.11.25:
+* changed: *.sh: `source '/bin/bash_tacklelib'` replaced by builtin search logic, in all other cases the `bash_tacklelib` script must be already sourced
+
 2021.11.24:
 * new: .github/workflows: use no-cache parameter for curl requests
 
