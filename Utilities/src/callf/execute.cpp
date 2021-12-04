@@ -147,8 +147,6 @@ Flags::Flags()
 
 void Flags::merge(const Flags & flags)
 {
-    MERGE_FLAG(flags, show_help);
-
     MERGE_FLAG(flags, disable_wow64_fs_redir);
 #ifndef _CONSOLE
     MERGE_FLAG(flags, allow_gui_autoattach_to_parent_console);

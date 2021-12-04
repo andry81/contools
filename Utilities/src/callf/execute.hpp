@@ -39,7 +39,6 @@ struct Flags
 
     // NOTE: the `tee` applies only to the child process here!
     //
-    bool            show_help;
 
     bool            disable_wow64_fs_redir;
     bool            allow_gui_autoattach_to_parent_console;
