@@ -217,6 +217,8 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, allow_expand_unexisted_env);
     MERGE_FLAG(flags, allow_subst_empty_args);
 
+    MERGE_FLAG(flags, load_parent_proc_init_env_vars);
+
     MERGE_FLAG(flags, pipe_stdin_to_child_stdin);
     MERGE_FLAG(flags, pipe_child_stdout_to_stdout);
     MERGE_FLAG(flags, pipe_child_stderr_to_stderr);
@@ -6855,6 +6857,7 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
 
     //allow_subst_empty_args
 
+    //load_parent_proc_init_env_vars
 
     if (child_flags.pipe_stdin_to_child_stdin) {
         if (cmd_out_str_ptr) {

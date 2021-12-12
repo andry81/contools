@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.07.26
+* 2021.12.12
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -188,6 +188,16 @@ Create process or Shell execute in style of c-function printf.
   callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } .
   >
   callf /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
+
+* Loads ancestor `callf` process environment variables block to reset all
+  variables in between of 2 closest `callf` processes in process inheritence
+  chain.
+
+  Examples:
+  >
+  callf /v XXX 111 "" "callf /load-parent-proc-init-env-vars /v YYY 222 \"\" \"cmd.exe /c set\""
+  >
+  callf /v XXX 111 "" "callf /load-parent-proc-init-env-vars /v YYY 222 \"\" \"callf /load-parent-proc-init-env-vars /v ZZZ 333 \\\"\\\" \\\"cmd.exe /c set\\\"\""
 
 -------------------------------------------------------------------------------
 6. KNOWN ISSUES

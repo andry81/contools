@@ -1,3 +1,7 @@
+2021.12.12:
+* new: src/callf: `/load-parent-proc-init-env-vars` flag to load environment variables existed on the moment of a process initialization in the parent or ancestor process
+* changed: bin/contools/README_EN.txt: readme update
+
 2021.12.05:
 * changed: src/callf: code cleanup
 

@@ -47,6 +47,7 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/elevate"),
     _T("/create-console"),
@@ -73,6 +74,7 @@ const TCHAR * g_elevate_parent_flags_to_preparse_arr[] = {
 
 const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
     _T("/no-expand-env"),
+    _T("/load-parent-proc-init-env-vars"),
     _T("/attach-parent-console"),
     _T("/create-console-title"),
     _T("/own-console-title"),
@@ -88,6 +90,7 @@ const TCHAR * g_promote_flags_to_preparse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/create-console"),
     _T("/detach-console"),
@@ -108,6 +111,7 @@ const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/create-console"),
     _T("/detach-console"),
@@ -154,6 +158,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/no-subst-vars"),
     _T("/no-subst-pos-vars"),
     _T("/no-subst-empty-tail-vars"),
+    _T("/load-parent-proc-init-env-vars"),
     _T("/no-std-inherit"),
     _T("/no-stdin-inherit"),
     _T("/no-stdout-inherit"),
@@ -355,6 +360,7 @@ const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_elevate_child_flags_to_parse_arr[] = {
+    _T("/load-parent-proc-init-env-vars"),
     _T("/reopen-stdin"),
     _T("/reopen-stdin-as-server-pipe"),
     _T("/reopen-stdin-as-server-pipe-connect-timeout"),
@@ -401,6 +407,7 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
@@ -419,6 +426,7 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/load-parent-proc-init-env-vars"),
     _T("/no-std-inherit"),
     _T("/no-stdin-inherit"),
     _T("/no-stdout-inherit"),
@@ -872,6 +880,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/allow-subst-empty-args"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.allow_subst_empty_args = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/load-parent-proc-init-env-vars"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.load_parent_proc_init_env_vars = true;
             return 1;
         }
         return 0;
@@ -2449,6 +2464,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     _debug_print_crt_std_handles(1);
 #endif
 
+    LPWCH env_strs = NULL;
+    size_t env_strs_len = 0; // excluding last null character
+
+    HANDLE env_strs_shmem_handle = INVALID_HANDLE_VALUE;
+
     // NOTE:
     //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
@@ -2585,6 +2605,65 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
 
                 arg_offset += 1;
+            }
+
+            // load environment block from a parent process
+
+            _load_ancestor_proc_env_strs_from_shmem(std::tstring{ _T("Local\\") _T(PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX) _T("--") });
+
+            // save environment block for a process
+
+            env_strs = GetEnvironmentStringsW();
+            if (env_strs) {
+                // count until double null
+                TCHAR * p = env_strs;
+                while (*p || *(p + 1)) {
+                    env_strs_len++;
+                    p++;
+                }
+                env_strs_len++;
+
+                const DWORD current_proc_id = GetCurrentProcessId();
+
+                const size_t env_strs_shmem_size = (env_strs_len + 1) * sizeof(WCHAR);
+                
+                HANDLE current_process_token = INVALID_HANDLE_VALUE;
+                
+                // NOTE:
+                //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+                //
+                [&]() { __try {
+                    [&]() {
+                        //if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &current_process_token)) {
+                        //if (_set_privilege(current_process_token, SE_CREATE_GLOBAL_NAME, TRUE)) {
+                        env_strs_shmem_handle = CreateFileMapping(
+                            INVALID_HANDLE_VALUE,
+                            NULL,
+                            PAGE_READWRITE,
+                            0,
+                            env_strs_shmem_size,
+                            (std::tstring(_T("Local\\") _T(PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX) _T("--")) + std::to_tstring(current_proc_id)).c_str()
+                        );
+                
+                        if (env_strs_shmem_handle) {
+                            const LPCTSTR env_strs_shmem_buf = (LPTSTR)MapViewOfFile(
+                                env_strs_shmem_handle,
+                                FILE_MAP_ALL_ACCESS,
+                                0,
+                                0,
+                                env_strs_shmem_size
+                            );
+                
+                            if (env_strs_shmem_buf) {
+                                CopyMemory((PVOID)env_strs_shmem_buf, env_strs, env_strs_shmem_size);
+                            }
+                        }
+                    }();
+                }
+                __finally {
+                    _close_handle(current_process_token);
+                }
+                }();
             }
 
             // update elevation state
@@ -3740,6 +3819,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     }
     __finally {
         [&]() {
+            if (_is_valid_handle(env_strs_shmem_handle)) {
+                UnmapViewOfFile(env_strs_shmem_handle);
+                _close_handle(env_strs_shmem_handle);
+            }
+
+            if (env_strs) {
+                FreeEnvironmentStringsW(env_strs);
+                env_strs = NULL; // just in case
+            }
+
             const bool pause_on_exit = g_flags.pause_on_exit || g_flags.pause_on_exit_if_error && ret != err_none || g_flags.pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none;
 
 #ifdef _DEBUG

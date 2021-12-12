@@ -13,16 +13,19 @@
 
 
 // std and tee files has different mutex name prefixes because should not be mixed for write
-#define STD_FILE_WRITE_MUTEX_NAME_PREFIX    "{12FBACAA-9C0D-460F-9B69-5FB8EB747B5C}"
-#define TEE_FILE_WRITE_MUTEX_NAME_PREFIX    "{C50E64BC-9A9F-4507-9B77-4446319A556E}"
+#define STD_FILE_WRITE_MUTEX_NAME_PREFIX                "{12FBACAA-9C0D-460F-9B69-5FB8EB747B5C}"
+#define TEE_FILE_WRITE_MUTEX_NAME_PREFIX                "{C50E64BC-9A9F-4507-9B77-4446319A556E}"
 
-#define DEFAULT_READ_BUF_SIZE               65536
-#define DEFAULT_ANONYMOUS_PIPE_BUF_SIZE     65536
-#define DEFAULT_NAMED_PIPE_IN_BUF_SIZE      65536
-#define DEFAULT_NAMED_PIPE_OUT_BUF_SIZE     65536
+// named shared memory token prefix for a process (guid)
+#define PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX               "{03A76CD0-C8EE-4BAE-9406-7611A7C348CF}" // full name: `Local\<guid>--<procid>`
 
-#define DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS 30000
-#define DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS 30000
+#define DEFAULT_READ_BUF_SIZE                           65536
+#define DEFAULT_ANONYMOUS_PIPE_BUF_SIZE                 65536
+#define DEFAULT_NAMED_PIPE_IN_BUF_SIZE                  65536
+#define DEFAULT_NAMED_PIPE_OUT_BUF_SIZE                 65536
+
+#define DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS    30000
+#define DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS    30000
 
 
 struct Flags
@@ -107,6 +110,8 @@ struct Flags
     bool            allow_throw_seh_except;         // by default all SEH exceptions does interception and conversion into specific return code
     bool            allow_expand_unexisted_env;
     bool            allow_subst_empty_args;
+
+    bool            load_parent_proc_init_env_vars;
 
     bool            pipe_stdin_to_child_stdin;
     bool            pipe_child_stdout_to_stdout;

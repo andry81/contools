@@ -616,7 +616,8 @@ namespace {
 
     // NOTE:
     //  Deprecated because C++11 standard does not support unicode code page in locales together with
-    //  lowercase/uppercase functionality which is not available without a knowledge of language per character.
+    //  lowercase/uppercase functionality which is not available without a knowledge of language per character
+    //  (by Unicode standard design, because only an entire string can be translated per a language token).
     //
 
     //std::tstring::value_type _to_lower(std::tstring::value_type ch, unsigned int code_page)
@@ -1228,6 +1229,109 @@ namespace {
         return parent_proc_id;
     }
 
+    inline BOOL _set_privilege(HANDLE token_handle, LPCTSTR privilege_str, bool enable_privilege)
+    {
+        TOKEN_PRIVILEGES tp;
+        LUID luid;
+
+        if (!LookupPrivilegeValue(NULL, privilege_str, &luid)) {
+            return FALSE;
+        }
+
+        tp.PrivilegeCount = 1;
+        tp.Privileges[0].Luid = luid;
+        if (enable_privilege) {
+            tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+        }
+        else {
+            tp.Privileges[0].Attributes = 0;
+        }
+
+        // enable the privilege or disable all privileges
+
+        if (!AdjustTokenPrivileges(token_handle, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), (PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL)) {
+            return FALSE;
+        }
+
+        if (GetLastError() == ERROR_NOT_ALL_ASSIGNED) {
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    inline DWORD _load_ancestor_proc_env_strs_from_shmem(std::tstring shmem_global_name_prefix_str)
+    {
+        DWORD ancestor_proc_id;
+
+        HANDLE proc_list_handle = INVALID_HANDLE_VALUE;
+        DWORD current_proc_id = GetCurrentProcessId();
+
+        HANDLE env_strs_shmem_handle = INVALID_HANDLE_VALUE;
+        LPCWSTR env_strs_buf = NULL;
+
+        [&]() { __try {
+            [&]() {
+                proc_list_handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+                PROCESSENTRY32 pe = { 0 };
+                pe.dwSize = sizeof(PROCESSENTRY32);
+
+                bool continue_search_ancestors = true;
+
+                while (continue_search_ancestors) {
+                    continue_search_ancestors = false;
+                    ancestor_proc_id = -1;
+
+                    Process32First(proc_list_handle, &pe);
+
+                    do {
+                        if (current_proc_id == pe.th32ProcessID) {
+                            ancestor_proc_id = pe.th32ParentProcessID;
+
+                            env_strs_shmem_handle = OpenFileMapping(
+                                FILE_MAP_READ,
+                                FALSE,
+                                (shmem_global_name_prefix_str + std::to_tstring(ancestor_proc_id)).c_str()
+                            );
+
+                            if (env_strs_shmem_handle) {
+                                env_strs_buf = (LPWSTR)MapViewOfFile(
+                                    env_strs_shmem_handle,
+                                    FILE_MAP_READ,
+                                    0,
+                                    0,
+                                    0
+                                );
+
+                                if (env_strs_buf) {
+                                    SetEnvironmentStringsW((LPWCH)env_strs_buf);
+                                }
+
+                                break;
+                            }
+
+                            current_proc_id = ancestor_proc_id;
+
+                            continue_search_ancestors = true;
+
+                            break;
+                        }
+                    } while (Process32Next(proc_list_handle, &pe));
+                }
+            }();
+        }
+        __finally {
+            _close_handle(env_strs_shmem_handle);
+
+            if (env_strs_buf) {
+                UnmapViewOfFile(env_strs_buf);
+                env_strs_buf = NULL; // just in case
+            }
+        } }();
+
+        return ancestor_proc_id;
+    }
+
     // CAUTION:
     //  Function GetConsoleWindow() returns already inherited console window handle!
     //  We have to find console window relation through the console windows enumeration.
@@ -1344,9 +1448,7 @@ namespace {
             }
         }
         __finally {
-            if (token_handle && token_handle != INVALID_HANDLE_VALUE) {
-                CloseHandle(token_handle);
-            }
+            _close_handle(token_handle);
         }
 
         return ret;

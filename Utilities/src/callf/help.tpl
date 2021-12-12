@@ -246,6 +246,14 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Has effect on `{*}` and `{@}` variable values, but not on the
         variable placeholders, because they always substitutes.
 
+      /load-parent-proc-init-env-vars
+        Loads environment variables existed on the moment of a process
+        initialization in the parent or ancestor process with internal shared
+        memory name (by default in the `callf` or `callfg` process).
+        Intermediate processes can exist between an ancestor and this-process
+        and does not affect on loading if did not allocate a shared memory
+        with internal name.
+
       /no-std-inherit
         Prevent all standard handles inheritance into child process.
 
@@ -379,6 +387,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           (elevated) process.
 
           /no-expand-env
+          /load-parent-proc-init-env-vars
           /reopen-std[in|out|err]*
           /std[in|out|err]-* (except std[out|err]-vt100)
           /output-*          (except output-vt100)
@@ -413,6 +422,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
+          /load-parent-proc-init-env-vars
           /allow-throw-seh-except
           /create-console
           /detach-console
@@ -437,6 +447,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
+          /load-parent-proc-init-env-vars
           /no-std*-inherit
           /allow-throw-seh-except
           /reopen-std[in|out|err]*
