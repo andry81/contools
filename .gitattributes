@@ -533,6 +533,7 @@ Scripts/Tools/std/.trim_var/trim_var.trim_value_right.bat -text
 Scripts/Tools/std/__init__.bat -text
 Scripts/Tools/std/allocate_temp_dir.bat -text
 Scripts/Tools/std/append_list_from_string.bat -text
+Scripts/Tools/std/canonical_path.bat -text
 Scripts/Tools/std/chcp.bat -text
 Scripts/Tools/std/check_windows_version.bat -text
 Scripts/Tools/std/clear_list.bat -text
@@ -835,6 +836,7 @@ Utilities/tests/manual/contools/callf/__init__/__init__.bat -text
 Utilities/tests/manual/contools/callf/refs/0.in -text
 __init__/__init__.bat -text
 __init__/__init__.sh -text
+__init__/canonical_path.bat -text
 __init__/declare_builtins.bat -text
 _config/config.0.vars.in -text
 _config/config.system.vars.in -text
