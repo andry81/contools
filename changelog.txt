@@ -1,3 +1,6 @@
+2021.12.15:
+* changed: Scripts/Tools/build/load_config*.bat: flags read speed optimization
+
 2021.12.12:
 * new: Utilities/bin/contools: binaries update
 

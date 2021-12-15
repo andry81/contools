@@ -4,50 +4,9 @@ set "__?~dp0=%~dp0"
 set "__?~n0=%~n0"
 set "__?~nx0=%~nx0"
 
-rem script flags
-set __?FLAG_GEN_SYSTEM_CONFIG=0
-set __?FLAG_GEN_USER_CONFIG=0
-set __?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG=0
-set __?FLAG_LOAD_USER_OUTPUT_CONFIG=0
-set "__?BARE_SYSTEM_FLAGS="
-set "__?BARE_USER_FLAGS="
+call "%%__?~dp0%%.load_config_dir/load_config_dir.read_flags.bat" %%* || exit /b
 
-set "__?SYSTEM_CONFIG_FILE_EXT="
-set "__?USER_CONFIG_FILE_EXT="
-
-:FLAGS_LOOP
-
-rem flags always at first
-set "__?FLAG=%~1"
-
-if defined __?FLAG ^
-if not "%__?FLAG:~0,1%" == "-" set "__?FLAG="
-
-if defined __?FLAG (
-  if "%__?FLAG%" == "-gen_system_config" (
-    set __?FLAG_GEN_SYSTEM_CONFIG=1
-    set __?BARE_SYSTEM_FLAGS=%__?BARE_SYSTEM_FLAGS% -gen_config
-  ) else if "%__?FLAG%" == "-gen_user_config" (
-    set __?FLAG_GEN_USER_CONFIG=1
-    set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% -gen_config
-  ) else if "%__?FLAG%" == "-load_system_output_config" (
-    set __?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG=1
-    set __?BARE_SYSTEM_FLAGS=%__?BARE_SYSTEM_FLAGS% -load_output_config
-  ) else if "%__?FLAG%" == "-load_user_output_config" (
-    set __?FLAG_LOAD_USER_OUTPUT_CONFIG=1
-    set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% -load_output_config
-  ) else if "%__?FLAG%" == "-gen_config" (
-    rem ignore
-  ) else (
-    set __?BARE_SYSTEM_FLAGS=%__?BARE_SYSTEM_FLAGS% %__?FLAG%
-    set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% %__?FLAG%
-  )
-
-  shift
-
-  rem read until no flags
-  goto FLAGS_LOOP
-)
+if %__?FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%__?FLAG_SHIFT%) do shift
 
 if %__?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_SYSTEM_CONFIG% EQU 0 set "__?SYSTEM_CONFIG_FILE_EXT=.in"
 if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_USER_CONFIG% EQU 0 set "__?USER_CONFIG_FILE_EXT=.in"

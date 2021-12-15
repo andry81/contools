@@ -383,10 +383,12 @@ Scripts/Tools/build/.load_config/load_config.fast_parse.bat -text
 Scripts/Tools/build/.load_config/load_config.full_parse.bat -text
 Scripts/Tools/build/.load_config/load_config.full_parse.parse_value.bat -text
 Scripts/Tools/build/.load_config/load_config.lite_parse.bat -text
+Scripts/Tools/build/.load_config/load_config.read_flags.bat -text
 Scripts/Tools/build/.load_config/load_config.trim_value_left.bat -text
 Scripts/Tools/build/.load_config/load_config.trim_value_right.bat -text
 Scripts/Tools/build/.load_config/load_config.trim_var_left.bat -text
 Scripts/Tools/build/.load_config/load_config.trim_var_right.bat -text
+Scripts/Tools/build/.load_config_dir/load_config_dir.read_flags.bat -text
 Scripts/Tools/build/__init__.bat -text
 Scripts/Tools/build/add_files_to_archive.bat -text
 Scripts/Tools/build/env_generators/base.bat -text
