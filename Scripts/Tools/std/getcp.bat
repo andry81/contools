@@ -3,7 +3,7 @@
 setlocal
 
 rem drop last error level
-type nul >nul
+call;
 
 set "__?VAR_NAME=%~1"
 
@@ -13,12 +13,20 @@ set "__?CHCP_FILE="
 if exist "%SystemRoot%\System32\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System32\chcp.com"
 if not defined __?CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System64\chcp.com"
 
-for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%__?CHCP_FILE%%" ^<nul 2^>nul`) do set "__?CURRENT_CP=%%j"
+set "__?CHCP_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
+
+"%__?CHCP_TEMP_FILE%" <nul 2>nul > "%__?CHCP_TEMP_FILE%"
+for /F "usebackq eol= tokens=1,* delims=:" %%i in ("%__?CHCP_TEMP_FILE%") do set "__?CURRENT_CP=%%j"
+del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>&1
+
+set "__?CHCP_TEMP_FILE="
+
 if defined __?CURRENT_CP set "__?CURRENT_CP=%__?CURRENT_CP: =%"
 
 (
   endlocal
   set "%__?VAR_NAME%=%__?CURRENT_CP%"
+  set "__?CHCP_FILE="
 )
 
 exit /b 0

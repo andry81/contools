@@ -16,12 +16,8 @@ if "%~2" == "" (
 ) else call :MAIN "%%~1" "%%~2" "%%~3" "%%~4"
 set __?LASTERROR=%ERRORLEVEL%
 
-(
-  rem drop all locals
-  for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set __? 2^>nul`) do set "%%i="
-
-  exit /b %__?LASTERROR%
-)
+call "%%__?~dp0%%.load_config_dir/load_config_dir.exit.bat"
+exit /b
 
 :MAIN
 call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_SYSTEM_FLAGS%% %%1 %%2 "config.system.vars%%__?SYSTEM_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b

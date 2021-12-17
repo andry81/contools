@@ -12,7 +12,7 @@ rem Examples:
 rem 1. call gen_dir_hash_lst.bat -c "md5,sha256" -l -r . > dir_hash_list.lst
 
 rem Drop last error level
-type nul>nul
+call;
 
 setlocal
 

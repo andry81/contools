@@ -1,4 +1,3 @@
-@echo off
 
 :PARSE_VALUE_CHAR_LOOP
 set /A __?VALUE_CHAR_INDEX+=1 & set "__?PREV_CHAR=%__?NEXT_CHAR%"

@@ -24,7 +24,7 @@ exit /b
 :NOTX64
 
 rem Drop last error level
-type nul>nul
+call;
 
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion
@@ -325,7 +325,7 @@ exit /b
 
 :RUN_SHELL
 rem Drop last error level before the last call
-type nul>nul
+call;
 
 echo.^
 cmd /K

@@ -6,7 +6,7 @@ rem Description:
 rem   Hashdeep wrapper script.
 
 rem Drop last error level
-type nul>nul
+call;
 
 setlocal
 

@@ -5,7 +5,7 @@ rem  DO NOT kill cmd.exe processes by this script because it can kill
 rem  self cmd.exe host before kill other cmd.exe processes.
 
 rem Drop last error level
-type nul>nul
+call;
 
 setlocal
 

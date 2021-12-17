@@ -48,7 +48,7 @@ rem 1. call strchr.bat "" "Hello world!" W /i
 rem    echo ERRORLEVEL=%ERRORLEVEL%
 
 rem Drop last error level
-type nul>nul
+call;
 
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion

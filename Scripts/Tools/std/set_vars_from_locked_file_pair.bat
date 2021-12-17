@@ -57,7 +57,7 @@ exit /b %LASTERROR%
 
 :MAIN
 rem drop last error
-type nul>nul
+call;
 
 if %~30 NEQ 0 goto SET_WITH_PRINT
 

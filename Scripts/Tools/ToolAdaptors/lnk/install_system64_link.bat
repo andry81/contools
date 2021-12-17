@@ -12,7 +12,7 @@ if exist "%SystemRoot%\System64\" exit /b 0
 setlocal
 
 rem drop last error
-type nul >nul
+call;
 
 for %%i in (CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT) do (
   if not defined %%i (

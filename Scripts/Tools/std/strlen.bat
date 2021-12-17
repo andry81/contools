@@ -21,7 +21,7 @@ rem 1. call strlen.bat "" "Hello world!"
 rem    echo ERRORLEVEL=%ERRORLEVEL%
 
 rem Drop last error level
-type nul>nul
+call;
 
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion

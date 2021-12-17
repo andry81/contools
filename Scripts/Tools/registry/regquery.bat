@@ -29,7 +29,7 @@ rem Drop REGQUERY_VALUE variable
 set "REGQUERY_VALUE="
 
 rem Drop last error level
-type nul>nul
+call;
 
 rem Create local variable's stack
 setlocal

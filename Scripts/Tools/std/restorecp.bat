@@ -3,7 +3,7 @@
 setlocal
 
 rem drop last error level
-type nul >nul
+call;
 
 set "?~dp0=%~dp0"
 set "?~n0=%~n0"
@@ -39,17 +39,25 @@ if not defined CP_HISTORY_LIST (
   exit /b 255
 ) >&2
 
-set "CHCP_FILE="
-if exist "%SystemRoot%\System32\chcp.com" set "CHCP_FILE=%SystemRoot%\System32\chcp.com"
-if not defined CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "CHCP_FILE=%SystemRoot%\System64\chcp.com"
+set "__?CHCP_FILE="
+if exist "%SystemRoot%\System32\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System32\chcp.com"
+if not defined __?CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System64\chcp.com"
 
-if not defined CHCP_FILE (
+if not defined __?CHCP_FILE (
   echo.%?~nx0%: error: `chcp.com` is not found.
   exit /b 255
 ) >&2
 
+set "__?CHCP_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
+
 set "LAST_CP=%CURRENT_CP%"
-if not defined LAST_CP for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" ^<nul 2^>nul`) do set "LAST_CP=%%j"
+if not defined LAST_CP (
+  "%__?CHCP_FILE%" <nul 2>nul > "%__?CHCP_TEMP_FILE%"
+  for /F "usebackq eol= tokens=1,* delims=:" %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
+  del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>&1
+)
+
+set "__?CHCP_TEMP_FILE="
 
 set "CURRENT_CP="
 for /F "eol= tokens=1,* delims=|" %%i in ("%CP_HISTORY_LIST%") do ( set "CURRENT_CP=%%i" & set "CP_HISTORY_LIST=%%j" )
@@ -70,8 +78,8 @@ rem   Windows XP implementation has an issue over double redirection, so the std
 rem
 (
   if %FLAG_PRINT% NEQ 0 (
-    "%CHCP_FILE%" %CURRENT_CP%
-  ) else "%CHCP_FILE%" %CURRENT_CP% >nul
+    "%__?CHCP_FILE%" %CURRENT_CP%
+  ) else "%__?CHCP_FILE%" %CURRENT_CP% >nul
 ) <nul
 
 (
@@ -79,5 +87,6 @@ rem
   set "LAST_CP=%LAST_CP%"
   set "CURRENT_CP=%CURRENT_CP%"
   set "CP_HISTORY_LIST=%CP_HISTORY_LIST%"
+  set "__?CHCP_FILE="
   exit /b 0
 )

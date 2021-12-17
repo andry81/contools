@@ -2,11 +2,19 @@
 
 setlocal
 
+set "__?VER_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
+
+ver 2>nul > "%__?VER_TEMP_FILE%"
+
 rem CAUTION:
 rem   In Windowx XP an elevated call under data protection flag will block the wmic tool, so we have to use `ver` command instead!
 rem
 set "WINDOWS_VER_STR="
-for /F "usebackq tokens=1,2,* delims=[]" %%i in (`ver`) do for /F "tokens=1,2,* delims= " %%l in ("%%j") do set "WINDOWS_VER_STR=%%m"
+for /F "usebackq tokens=1,2,* delims=[]" %%i in ("%__?VER_TEMP_FILE%") do for /F "tokens=1,2,* delims= " %%l in ("%%j") do set "WINDOWS_VER_STR=%%m"
+
+del /F /Q /A:-D "%__?VER_TEMP_FILE%" >nul 2>&1
+
+set "__?VER_TEMP_FILE="
 
 set WINDOWS_MAJOR_VER=0
 set WINDOWS_MINOR_VER=0

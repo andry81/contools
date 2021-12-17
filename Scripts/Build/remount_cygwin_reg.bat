@@ -16,7 +16,7 @@ exit /b
 :NOTX64
 
 rem Drom last error level
-type nul>nul
+call;
 
 rem Save all variables to stack
 setlocal

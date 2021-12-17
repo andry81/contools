@@ -25,7 +25,7 @@ rem   See the file "vars_winxp.lst" as an example of the default Window XP
 rem   environment.
 
 rem Drop last error level
-type nul>nul
+call;
 
 set "?~nx0=%~nx0"
 

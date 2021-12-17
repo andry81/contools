@@ -8,7 +8,7 @@ rem   In Windowx XP an elevated call under data protection flag will block the w
 rem
 
 rem Drop last error level
-type nul >nul
+call;
 
 rem drop return value
 set "RETURN_VALUE="

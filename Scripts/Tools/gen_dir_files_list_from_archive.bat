@@ -7,7 +7,7 @@ call "%%~dp0__init__.bat" || exit /b
 call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
 
 rem drop last error level
-type nul>nul
+call;
 
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="
@@ -163,7 +163,7 @@ exit /b 0
 
 :CREATE_TEMP_TREE_OF_EMPTY_FILES
 rem drop last error level
-type nul>nul
+call;
 
 set TEMP_FILE_PATH_IS_DIR_PATH=0
 if "%~1" == "D" set TEMP_FILE_PATH_IS_DIR_PATH=1

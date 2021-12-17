@@ -82,9 +82,9 @@ echo."PROJECT_TYPE=%PROJECT_TYPE%"
 echo."APP_TARGETS_LIST=%APP_TARGETS_LIST%"
 echo."TARGETS_LIST=%TARGETS_LIST%"
 echo.
-( type nul>nul & set "APP_INTEGRATION_" 2>nul ) && echo.
+( call; & set "APP_INTEGRATION_" 2>nul ) && echo.
 echo.  Build flags:
-( type nul>nul & set "F_DISABLE_" 2>nul ) && echo.
-( type nul>nul & set "F_ENABLE_" 2>nul ) && echo.
+( call; & set "F_DISABLE_" 2>nul ) && echo.
+( call; & set "F_ENABLE_" 2>nul ) && echo.
 
 exit /b 0

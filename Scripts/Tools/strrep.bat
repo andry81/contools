@@ -33,7 +33,7 @@ rem Drop output variable
 set "%~4="
 
 rem Drop last error level
-type nul>nul
+call;
 
 rem Create local variable's stack
 setlocal

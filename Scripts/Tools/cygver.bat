@@ -36,7 +36,7 @@ if "%~2" == "" exit /b 66
 if not exist "%~2\bin\cygcheck.exe" exit /b 67
 
 rem Drop last error level
-type nul>nul
+call;
 
 rem Create local variable's stack
 setlocal

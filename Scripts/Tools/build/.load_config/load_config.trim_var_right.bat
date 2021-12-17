@@ -1,4 +1,3 @@
-@echo off
 
 :TRIM_VAR_NAME_RIGHT_LOOP
 if not ^%__?VAR:~-1%/ == ^ / if not ^%__?VAR:~-1%/ == ^	/ exit /b 0

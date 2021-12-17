@@ -22,7 +22,7 @@ rem Drop return value
 set "RETURN_VALUE=%~1"
 
 rem Drop last error level
-type nul>nul
+call;
 
 setlocal
 

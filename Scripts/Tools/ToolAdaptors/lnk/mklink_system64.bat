@@ -23,7 +23,7 @@ rem   available otherwise the script won't work properly.
 setlocal
 
 rem drop last error
-type nul >nul
+call;
 
 if not defined CONTOOLS_ROOT (
   echo.%~nx0: error: CONTOOLS_ROOT variable is not defined

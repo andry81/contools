@@ -14,7 +14,7 @@ setlocal
 set "EXPORT_VARS_FILE=%~1"
 
 rem Drop last error level
-type nul>nul
+call;
 
 call "%%~dp0__init__.bat" || exit /b
 

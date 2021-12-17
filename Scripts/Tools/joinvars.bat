@@ -23,7 +23,7 @@ rem Drop return value
 set "%~1="
 
 rem Drop last error level
-type nul>nul
+call;
 
 rem Create local variable's stack
 setlocal DISABLEDELAYEDEXPANSION

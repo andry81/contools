@@ -32,7 +32,7 @@ set "ARCHIVE_EXCLUDE_FILES_LIST=%~8"
 set "ARCHIVE_EXCLUDE_DIRS_LIST=%~9"
 
 rem Drop last error level
-type nul>nul
+call;
 
 call "%%~dp0__init__.bat" || exit /b
 

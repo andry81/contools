@@ -13,7 +13,7 @@ if not exist "%PROJECT_ROOT%\" (
 ) >&2
 
 rem drop last error level
-type nul>nul
+call;
 
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="

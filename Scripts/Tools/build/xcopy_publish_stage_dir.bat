@@ -21,7 +21,7 @@ set "TO_APP_DIR_ROOT=%~3"
 set "XCOPY_FLAGS=%~4"
 
 rem Drop last error level
-type nul>nul
+call;
 
 call "%%?~dp0%%__init__.bat" || exit /b
 

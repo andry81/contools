@@ -3,7 +3,7 @@
 setlocal
 
 rem drop last error level
-type nul>nul
+call;
 
 set "SEARCH_PATH_LIST_FILE=%~1"
 

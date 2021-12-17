@@ -26,7 +26,7 @@ rem      line will be filtered no matter does flag set or not.
 rem  -ignore-props - ignore `[@...]' suffix while matching xpaths.
 
 rem Drop last error level
-type nul>nul
+call;
 
 setlocal
 

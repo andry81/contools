@@ -19,7 +19,7 @@ rem 1. call strupcase.bat "" "Hello world!"
 rem    echo ERRORLEVEL=%ERRORLEVEL%
 
 rem Drop last error level
-type nul>nul
+call;
 
 rem Drop return value
 set "RETURN_VALUE="

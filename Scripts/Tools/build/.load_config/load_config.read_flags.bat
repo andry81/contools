@@ -1,4 +1,3 @@
-@echo off
 
 rem script flags
 set __?FLAG_SHIFT=0

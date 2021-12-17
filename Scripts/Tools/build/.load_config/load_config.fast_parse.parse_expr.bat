@@ -1,30 +1,4 @@
 
-for /F "usebackq eol=# tokens=* delims=" %%i in ("%__?CONFIG_FILE_DIR%/%__?CONFIG_FILE%") do (
-  endlocal
-  setlocal DISABLEDELAYEDEXPANSION
-  for /F "eol=# tokens=1,* delims==" %%j in ("%%i") do (
-    set "__?VAR=%%j"
-    set "__?VALUE=%%k"
-    call :PARSE_EXPR %%* && (
-      setlocal ENABLEDELAYEDEXPANSION
-      if defined __?VALUE for /F "tokens=* delims=" %%l in ("!__?VAR!") do for /F "tokens=* delims=" %%m in ("!__?VALUE!") do for /F "tokens=* delims=" %%n in ("!__?UPATH!") do for /F "tokens=* delims=" %%o in ("%%m") do (
-        endlocal
-        endlocal
-        set "%%l=%%n"
-        if %%n0 NEQ 0 set "__?VALUE=%%o" & setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%p in ("!__?VALUE:\=/!") do for /F "eol= tokens=* delims=" %%q in ("%%p") do ( endlocal & set "%%l=%%q" )
-      ) else for /F "tokens=* delims=" %%l in ("!__?VAR!") do (
-        endlocal
-        endlocal
-        set "%%l="
-      )
-      call;
-    ) || endlocal
-  )
-)
-
-exit /b 0
-
-:PARSE_EXPR
 if not defined __?VAR exit /b 1
 
 rem Replace a value quote characters by the \x01 character.
@@ -104,10 +78,19 @@ for /F "eol=# tokens=* delims=" %%i in ("%__?VALUE%") do set __?HAS_VALUE=1
 if %__?HAS_VALUE% EQU 0 ( set "__?VALUE=" & exit /b 0 )
 
 :PARSE_VALUE
-rem apply variable substitutions and evaluate escapes
-set "__?NEXT_CHAR=" & set __?VALUE_CHAR_INDEX=-1 & set __?IS_SUBST_OPEN=0
-rem `$/<char>`, escape sequence does exist on a single line only
-set __?IS_PREV_CHAR_ESCAPED=0 & set __?IS_NEXT_CHAR_TO_ESCAPE=0 & set __?VALUE_FROM_INDEX=0 & set "__?VALUE_SUBSTED="
+rem recode exclamation, quote characters and etc
+set __?QUOT__=^"
+set "__?EXCL__=!" & set "__?ESC__=^" & set "__?01__=$" & set "__?02__=/" & set "__?03__=\" & set "__?04__=}" & set "__?05__=*:$/{}"
+set "__?VALUE=%__?VALUE:!=!__?EXCL__!%"
+set "__?VALUE=%__?VALUE:$/=!__?QUOT__!%"
+set "__?VALUE=%__?VALUE:=!__?QUOT__!%"
+set "__?VALUE=%__?VALUE:^=!__?ESC__!%"
+set "__?VALUE=%__?VALUE:$/$=!__?01__!%"
+set "__?VALUE=%__?VALUE:$//=!__?02__!%"
+set "__?VALUE=%__?VALUE:$/\=!__?03__!%"
+set "__?VALUE=%__?VALUE:$/}=!__?04__!%"
+set "__?VALUE=%__?VALUE:$/{}=!__?05__!%"
+set "__?VALUE=%__?VALUE:$/{=!%"
+set "__?VALUE=%__?VALUE:}=!%"
 
-call "%%~dp0load_config.full_parse.parse_value.bat"
 exit /b 0

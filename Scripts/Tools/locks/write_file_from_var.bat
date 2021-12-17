@@ -35,7 +35,7 @@ set __LOCK_FILE0_ACQUIRE=0
     for /F "eol= tokens=* delims=" %%i in ("%__VAR__%") do (echo.%%i) > "%__WRITE_FILE0%"
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
-    type nul>nul
+    call;
   ) 9> "%__LOCK_FILE0%" && set __LOCK_FILE0_ACQUIRE=1
 ) 2>nul
 

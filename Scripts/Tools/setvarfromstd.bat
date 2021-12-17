@@ -26,7 +26,7 @@ rem    echo STDOUT_VALUE=%STDOUT_VALUE%
 if "%~1" == "" exit /b 65
 
 rem Drop last error level
-type nul>nul
+call;
 
 rem Drop last STDOUT_VALUE
 set "STDOUT_VALUE="

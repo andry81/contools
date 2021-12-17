@@ -26,7 +26,7 @@ for %%i in (%CMD_LINE_FILES_LIST%) do (
 rem special variable return trick to return variables with special characters
 setlocal ENABLEDELAYEDEXPANSION
 
-set "RETURN_EXEC_LINE=type nul>nul"
+set "RETURN_EXEC_LINE=call;"
 if defined MAKENSIS_CMD_LINE.COMPILE set RETURN_EXEC_LINE=!RETURN_EXEC_LINE! ^& set "MAKENSIS_CMD_LINE.COMPILE=%%i"
 
 if defined MAKENSIS_CMD_LINE.COMPILE for /F tokens^=^*^ delims^=^ eol^= %%i in ("!MAKENSIS_CMD_LINE.COMPILE!") do (

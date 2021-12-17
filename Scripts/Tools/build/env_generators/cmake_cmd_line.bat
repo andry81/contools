@@ -28,7 +28,7 @@ for %%i in (%CMD_LINE_FILES_LIST%) do (
 rem special variable return trick to return variables with special characters
 setlocal ENABLEDELAYEDEXPANSION
 
-set "RETURN_EXEC_LINE=type nul>nul"
+set "RETURN_EXEC_LINE=call;"
 if defined CMAKE_CMD_LINE.CONFIGURE set RETURN_EXEC_LINE=!RETURN_EXEC_LINE! ^& set "CMAKE_CMD_LINE.CONFIGURE=%%i"
 if defined CMAKE_CMD_LINE.MAKE set RETURN_EXEC_LINE=!RETURN_EXEC_LINE! ^& set "CMAKE_CMD_LINE.MAKE=%%j"
 if defined CMAKE_CMD_LINE.INSTALL set RETURN_EXEC_LINE=!RETURN_EXEC_LINE! ^& set "CMAKE_CMD_LINE.INSTALL=%%k"

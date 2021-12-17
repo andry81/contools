@@ -33,7 +33,7 @@ if not exist "%FROM_STAGE_DIR_ROOT%" (
 ) >&2
 
 rem Drop last error level
-type nul>nul
+call;
 
 call "%%?~dp0%%__init__.bat" || exit /b
 

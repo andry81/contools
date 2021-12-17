@@ -22,7 +22,7 @@ set LOCK_FILE0_ACQUIRE=0
     (call echo.%%RUNNING_TASKS_COUNTER%%) > "%RUNNING_TASKS_COUNTER_FILE%"
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
-    type nul>nul
+    call;
   ) 9> "%LOCK_FILE0%" && set LOCK_FILE0_ACQUIRE=1
 ) 2>nul
 

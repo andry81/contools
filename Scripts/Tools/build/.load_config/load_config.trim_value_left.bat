@@ -1,4 +1,3 @@
-@echo off
 
 :TRIM_VAR_VALUE_LEFT_LOOP
 if not defined __?VALUE exit /b 0
