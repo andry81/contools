@@ -1,3 +1,6 @@
+2021.12.18:
+* fixed: README.md: badges fixup
+
 2021.12.17:
 * changed: scripts execution optimization
 
