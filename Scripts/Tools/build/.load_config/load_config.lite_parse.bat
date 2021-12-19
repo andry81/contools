@@ -2,7 +2,7 @@
 (
   endlocal
   for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_DIR%/%__?CONFIG_FILE%") do ( set "__?VALUE=%%j" & call :PARSE "%%~1" "%%~2" "%%~3" %%i )
-  set "__?VAR=" & set "__?VALUE=" & set "__?ATTR=" & set "__?VAR_EXPR=" & set "__?PARAM0=" & set "__?PARAM1=" & set "__?QUOT__=" & set "__?EXCL__=" & set "__?ESC__="
+  set "__?VAR=" & set "__?VALUE=" & set "__?ATTR=" & set "__?UPATH=" & set "__?VAR_EXPR=" & set "__?PARAM0=" & set "__?PARAM1=" & set "__?QUOT__=" & set "__?EXCL__=" & set "__?ESC__="
 )
 exit /b 0
 
@@ -46,5 +46,5 @@ set "__?EXCL__=!" & set "__?ESC__=^"
 if defined __?VALUE set "__?VALUE=%__?VALUE:!=!__?EXCL__!%"
 if defined __?VALUE set "__?VALUE=%__?VALUE:=!__?QUOT__!%"
 if defined __?VALUE set "__?VALUE=%__?VALUE:^=!__?ESC__!%"
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do ( endlocal & set "%__?VAR%=%%j" )
-if %__?UPATH% NEQ 0 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VAR:\=/!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do ( endlocal & set "%__?VAR%=%%j" )
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do ( endlocal & set "%__?VAR%=%%j" & set "__?VALUE=%%j" )
+if %__?UPATH% NEQ 0 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:\=/!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do ( endlocal & set "%__?VAR%=%%j" )

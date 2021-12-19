@@ -1,3 +1,8 @@
+2021.12.19:
+* fixed: Scripts/Tools/build/load_config.bat: lite parse local variables cleanup
+* fixed: Scripts/Tools/build/load_config.bat: `upath` attribute parse
+* changed: __init__: rolled back to lite parse configs as fast parse been slow enough in dependentee projects
+
 2021.12.18:
 * fixed: README.md: badges fixup
 
