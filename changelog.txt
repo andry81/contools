@@ -1,3 +1,6 @@
+2021.12.20:
+* new: Utilities/tests: more manual tests
+
 2021.12.19:
 * fixed: Scripts/Tools/build/load_config.bat: lite parse local variables cleanup
 * fixed: Scripts/Tools/build/load_config.bat: `upath` attribute parse

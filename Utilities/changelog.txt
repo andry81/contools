@@ -1,3 +1,6 @@
+2021.12.20:
+* new: tests: more manual tests
+
 2021.12.12:
 * new: bin/contools: binaries update
 
