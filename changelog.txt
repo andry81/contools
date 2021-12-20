@@ -1,4 +1,8 @@
 2021.12.20:
+* fixed: Scripts/Tools/std: chcp.bat, restorecp.bat: stdin double redirection issue
+* changed: Utilities/bin/contools/README_EN.txt: readme update
+
+2021.12.20:
 * new: Utilities/tests: more manual tests
 
 2021.12.19:

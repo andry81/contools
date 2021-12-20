@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.12.12
+* 2021.12.20
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -10,6 +10,7 @@
 5.1. callf
 6. KNOWN ISSUES
 6.1. The GNU Bash shell executable throws an error: `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
+6.2. `set /p DUMMY=` cmd.exe command ignores the input after the `callf` call
 7. AUTHOR
 
 -------------------------------------------------------------------------------
@@ -214,6 +215,45 @@ To workaround that you can use `callfg` utility instead with the
 `/create-console` flag. This will avoid a need to reallocate a console window,
 for example, in the elevated child process in case if elevation is required
 (`/attach-parent-console` flag).
+
+-------------------------------------------------------------------------------
+6.2. `set /p DUMMY=` cmd.exe command ignores the input after the `callf` call
+-------------------------------------------------------------------------------
+
+NOTE:
+  To reproduce the console terminal window must be reopened.
+
+Reproduction example:
+
+```
+@echo off
+
+setlocal
+
+if %IMPL_MODE%0 NEQ 0 goto IMPL
+
+rem bugged:
+call <nul >nul & call <nul >nul
+
+rem workarounded:
+rem ( call >nul & call >nul ) <nul
+
+callf.exe ^
+  /promote-parent{ /pause-on-exit } ^
+  /elevate{ /no-window /create-inbound-server-pipe-to-stdout test_stdout_{pid} /create-inbound-server-pipe-to-stderr test_stderr_{pid} ^
+  }{ /attach-parent-console /reopen-stdout-as-client-pipe test_stdout_{ppid} /reopen-stderr-as-client-pipe test_stderr_{ppid} } ^
+  /v IMPL_MODE 1 "" "cmd.exe /c %0 %*"
+exit /b
+
+:IMPL
+rem all input can be ignored here
+set /P X=AAA
+set /P X=BBB
+set /P X=CCC
+set /P X=DDD
+```
+
+To fix that use the `workarounded` call example line.
 
 -------------------------------------------------------------------------------
 7. AUTHOR

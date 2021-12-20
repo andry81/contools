@@ -50,12 +50,20 @@ if not defined __?CHCP_FILE (
 
 set "__?CHCP_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
 
+rem CAUTION:
+rem   Windows XP/7 implementation has an issue with stdin+stdout/stderr double redirection:
+rem     `call <nul >nul & call <nul >nul` or `call <nul 2>nul & call <nul 2>nul`
+rem     which breaks standard input handle.
+rem   To workaround that we need to separate stdin redirection from stdout/stderr redirections:
+rem     `(... >nul 2>nul) <nul`
+rem
+
 set "LAST_CP=%CURRENT_CP%"
 if not defined LAST_CP (
-  "%__?CHCP_FILE%" <nul 2>nul > "%__?CHCP_TEMP_FILE%"
+  "%__?CHCP_FILE%" 2>nul > "%__?CHCP_TEMP_FILE%"
   for /F "usebackq eol= tokens=1,* delims=:" %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
   del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>&1
-)
+) <nul
 
 set "__?CHCP_TEMP_FILE="
 
@@ -73,9 +81,6 @@ if "%CURRENT_CP%" == "%LAST_CP%" (
 
 rem echo.chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
 
-rem CAUTION:
-rem   Windows XP implementation has an issue over double redirection, so the stdin redirection must be separated from the stdout redirection.
-rem
 (
   if %FLAG_PRINT% NEQ 0 (
     "%__?CHCP_FILE%" %CURRENT_CP%
