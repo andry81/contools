@@ -1,4 +1,7 @@
 2021.12.20:
+* fixed: Scripts/Tools/build/gen_config.bat: accidental change
+
+2021.12.20:
 * fixed: Scripts/Tools/std: chcp.bat, restorecp.bat: stdin double redirection issue
 * changed: Utilities/bin/contools/README_EN.txt: readme update
 
