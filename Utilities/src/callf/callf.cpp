@@ -2505,12 +2505,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     break;
                 }
 
-                if (!tstrncmp(arg, _T("//"), 2)) {
+                if (!tstrncmp(arg, _T("//"), 3)) {
                     arg_offset += 1;
                     break;
                 }
 
-                if (!tstrncmp(arg, _T("/?"), 2)) {
+                if (!tstrncmp(arg, _T("/?"), 3)) {
                     arg_offset += 1;
 
                     print_help = true;
@@ -2998,7 +2998,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     break;
                 }
 
-                if (!tstrncmp(arg, _T("//"), 2)) {
+                if (!tstrncmp(arg, _T("//"), 3)) {
                     arg_offset += 1;
                     break;
                 }

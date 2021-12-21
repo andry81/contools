@@ -22,6 +22,8 @@ exit /b
 :MAIN
 call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_SYSTEM_FLAGS%% %%1 %%2 "config.system.vars%%__?SYSTEM_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
 
+if %__?FLAG_NO_LOAD_USER_CONFIG% NEQ 0 goto LOAD_CONFIG_END
+
 set __?CONFIG_INDEX=0
 
 :LOAD_CONFIG_LOOP

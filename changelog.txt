@@ -1,4 +1,9 @@
 2021.12.20:
+* fixed: Utilities/src/callf: correct `//` and `/?` flag parse
+* new: Scripts/Tools/build/load_config_dir.bat: `no_load_user_config` flag to ignore load of user config
+* changed: __init__: pass all arguments into `load_config_dir.bat` call and inner `__init__.bat` calls
+
+2021.12.20:
 * fixed: Scripts/Tools/build/gen_config.bat: accidental change
 
 2021.12.20:
