@@ -1,3 +1,6 @@
+2021.12.21:
+* new: bin/contools: binaries update
+
 2021.12.20:
 * fixed: src/callf: correct `//` flag parse
 
