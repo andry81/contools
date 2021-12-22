@@ -30,3 +30,15 @@
   directly call `GetStdHandle` functions to read standard handle addresses
   layout to update the standard handles (call `StdStdHandle`) in the process,
   where console is attached.
+
+* In `callfg` by default create/attach the console on demand if not yet
+  attached or created, for example, in case of print into console because of an
+  error. Add a flag to suppress such behaviour.
+  In `callf` by default show if hidden or create if detached/not attached the
+  console on demand the same way as for the `callfg`.
+
+* Fix `callfg.exe /attach-parent-console "" "unexisted.exe"` invalid print and
+  return code in non 65001 code page.
+
+* Fix `callfg.exe /attach-parent-console "" "unexisted.exe"` crash in 65001
+  code page.
