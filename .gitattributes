@@ -183,6 +183,10 @@ Scripts/Tools/ToolAdaptors/app/flylink/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/flylink/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/flylink/_config/config.system.vars.in -text
 Scripts/Tools/ToolAdaptors/app/flylink/backup_config.bat -text
+Scripts/Tools/ToolAdaptors/app/qbittorrent/__init__/__init__.bat -text
+Scripts/Tools/ToolAdaptors/app/qbittorrent/_config/config.0.vars.in -text
+Scripts/Tools/ToolAdaptors/app/qbittorrent/_config/config.system.vars.in -text
+Scripts/Tools/ToolAdaptors/app/qbittorrent/backup_config.bat -text
 Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/_config/config.system.vars.in -text

@@ -19,21 +19,23 @@ call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%EMULE_ADA
 
 call :IF_DEFINED_AND_FILE_EXIST EMULE_EXECUTABLE || (
   echo.%~nx0: error: EMULE_EXECUTABLE file path is not found: "%EMULE_EXECUTABLE%"
-  exit /b 1
+  exit /b 255
 ) >&2
 
 call :IF_DEFINED_AND_DIR_EXIST LOCALAPPDATA || (
   echo.%~nx0: error: LOCALAPPDATA directory is not found: "%LOCALAPPDATA%".
-  exit /b 2
+  exit /b 255
 ) >&2
 
 call :IF_DEFINED_AND_DIR_EXIST EMULE_CONFIG_DIR || (
   echo.%~nx0: error: EMULE_CONFIG_DIR directory is not found: "%EMULE_CONFIG_DIR%".
-  exit /b 3
+  exit /b 255
 ) >&2
 
 call :CANONICAL_PATH LOCALAPPDATA               "%%LOCALAPPDATA%%"
+
 call :CANONICAL_PATH EMULE_CONFIG_DIR           "%%EMULE_CONFIG_DIR%%"
+
 call :CANONICAL_PATH EMULE_ADAPTOR_BACKUP_DIR   "%%EMULE_ADAPTOR_BACKUP_DIR%%"
 
 if not exist "%EMULE_ADAPTOR_BACKUP_DIR%\" ( mkdir "%EMULE_ADAPTOR_BACKUP_DIR%" || exit /b 11 )

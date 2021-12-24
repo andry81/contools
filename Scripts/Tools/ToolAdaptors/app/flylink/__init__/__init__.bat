@@ -19,12 +19,12 @@ call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%FLYLINK_A
 
 call :IF_DEFINED_AND_DIR_EXIST FLYLINKDC_INSTALL_PATH || (
   echo.%~nx0: error: FLYLINKDC_INSTALL_PATH directory is not found: "%FLYLINKDC_INSTALL_PATH%".
-  exit /b 1
+  exit /b 255
 ) >&2
 
 call :IF_DEFINED_AND_DIR_EXIST FLYLINKDC_SETTINGS_PATH || (
   echo.%~nx0: error: FLYLINKDC_SETTINGS_PATH directory is not found: "%FLYLINKDC_SETTINGS_PATH%".
-  exit /b 2
+  exit /b 255
 ) >&2
 
 call :CANONICAL_PATH FLYLINKDC_INSTALL_PATH         "%%FLYLINKDC_INSTALL_PATH%%"

@@ -15,7 +15,10 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
-once FLYLINKDC_INSTALL_PATH               ="C:\Program Files\FlyLink"
-once FLYLINKDC_SETTINGS_PATH              ="$/{FLYLINKDC_INSTALL_PATH}/Settings"
+once LOCALAPPDATA                         ="$/{APPDATA}/../Local"
+once ROAMINGAPPDATA                       ="$/{APPDATA}/../Roaming"
 
-once FLYLINK_ADAPTOR_BACKUP_DIR           ="$/{PROJECT_OUTPUT_ROOT}/flylink/backup"
+once QBITTORRENT_LOCAL_CONFIG_DIR         ="$/{LOCALAPPDATA}/qBittorrent"
+once QBITTORRENT_ROAMING_CONFIG_DIR       ="$/{ROAMINGAPPDATA}/qBittorrent"
+
+once QBITTORRENT_ADAPTOR_BACKUP_DIR       ="$/{PROJECT_OUTPUT_ROOT}/qbittorrent/backup"
