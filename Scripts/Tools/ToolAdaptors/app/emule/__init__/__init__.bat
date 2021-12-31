@@ -32,9 +32,16 @@ call :IF_DEFINED_AND_DIR_EXIST EMULE_CONFIG_DIR || (
   exit /b 255
 ) >&2
 
+call :IF_DEFINED_AND_DIR_EXIST EMULE_LOG_DIR || (
+  echo.%~nx0: error: EMULE_LOG_DIR directory is not found: "%EMULE_LOG_DIR%".
+  exit /b 255
+) >&2
+
 call :CANONICAL_PATH LOCALAPPDATA               "%%LOCALAPPDATA%%"
 
 call :CANONICAL_PATH EMULE_CONFIG_DIR           "%%EMULE_CONFIG_DIR%%"
+
+call :CANONICAL_PATH EMULE_LOG_DIR              "%%EMULE_LOG_DIR%%"
 
 call :CANONICAL_PATH EMULE_ADAPTOR_BACKUP_DIR   "%%EMULE_ADAPTOR_BACKUP_DIR%%"
 
