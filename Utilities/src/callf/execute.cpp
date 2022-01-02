@@ -139,6 +139,12 @@ ConnectNamedPipeThreadLocals g_connect_client_named_pipe_thread_locals[2][3]; //
 
 WorkerThreadsReturnData g_worker_threads_return_data;
 
+// NOTE:
+//  The `ReadConsole` Win32 API function has an issue when it can be blocked on the console input while the output handle is already closed.
+//  To workaround that we have to watch for the output handle in a separate thread and call to `CloseHandle` on console input handle to interrupt the
+//  `ReadConsole` and return to check the output handle.
+//
+WriteHandleWatchThreadLocals g_write_handle_watch_thread_locals[1]; // only for console stdin
 
 Flags::Flags()
 {
@@ -458,6 +464,28 @@ BOOL WINAPI ChildCtrlHandler(DWORD ctrl_type)
     }
 
     return FALSE;
+}
+
+DWORD WINAPI WriteHandleWatchThread(LPVOID lpParam)
+{
+    WriteHandleWatchThreadData & thread_data = *static_cast<WriteHandleWatchThreadData *>(lpParam);
+
+    DWORD num_bytes_written = 0;
+
+    while (!thread_data.cancel_io) {
+        // check on write handle error
+        SetLastError(0); // just in case
+        if (!WriteFile(thread_data.write_handle, "", 0, &num_bytes_written, NULL)) {
+            //FreeConsole(); // CAUTION: raises Access Violation under Windows 7
+            _close_handle(*thread_data.read_handle_ptr);
+            break;
+        }
+
+        // loop wait
+        Sleep(20);
+    }
+
+    return 0;
 }
 
 template <int stream_type>
@@ -896,6 +924,25 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                     //
 
                     console_read_control.dwCtrlWakeupMask = (1 << 4) | (1 << 26) | (1 << '\n');
+
+                    // write handle watch thread
+                    if_break (_is_valid_handle(g_stdin_pipe_write_handle)) {
+                        // in case if child process exit
+                        if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
+                            stream_eof = true;
+                            break;
+                        }
+
+                        g_write_handle_watch_thread_locals[0].thread_data.read_handle_ptr = &g_stdin_handle;
+                        g_write_handle_watch_thread_locals[0].thread_data.write_handle = g_stdin_pipe_write_handle;
+
+                        g_write_handle_watch_thread_locals[0].thread_handle =
+                            CreateThread(
+                                NULL, 0,
+                                WriteHandleWatchThread, &g_write_handle_watch_thread_locals[0].thread_data,
+                                0,
+                                &g_write_handle_watch_thread_locals[0].thread_id);
+                    }
 
                     while (!stream_eof) {
                         // in case if child process exit
@@ -1475,6 +1522,11 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
         case STDIN_FILENO: // stdin
         {
             if (_is_valid_handle(g_stdin_pipe_write_handle)) {
+                if (g_stdin_handle_type == FILE_TYPE_CHAR) {
+                    // interrupt write handle watch thread
+                    WaitForWorkerThreads(g_write_handle_watch_thread_locals, true);
+                }
+
                 // explicitly disconnect/close all pipe outbound handles here to trigger the child process reaction
 
                 // CAUTION:
@@ -6325,8 +6377,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
         }
-
-        g_ctrl_handler = false;
 
         if (!g_pipe_stdin_to_stdout) {
             WaitForStreamPipeThreads(g_stream_pipe_thread_locals, false);

@@ -377,6 +377,24 @@ struct ConnectNamedPipeThreadLocals : BasicThreadLocals<ConnectNamedPipeThreadDa
 {
 };
 
+struct WriteHandleWatcherData
+{
+    HANDLE *            read_handle_ptr;            // read handle to call `CloseHandle` for if write handle is closed
+    HANDLE              write_handle;               // write handle
+
+    WriteHandleWatcherData() :
+        read_handle_ptr(nullptr), write_handle(INVALID_HANDLE_VALUE)
+    {
+    }
+};
+
+struct WriteHandleWatchThreadData : WriteHandleWatcherData, WorkerThreadsSyncData
+{
+};
+
+struct WriteHandleWatchThreadLocals : BasicThreadLocals<WriteHandleWatchThreadData>
+{
+};
 
 extern Flags g_flags;
 extern Flags g_regular_flags;
@@ -397,6 +415,8 @@ extern HWND   g_inherited_console_window;
 extern HWND   g_owned_console_window;
 
 BOOL WINAPI CtrlHandler(DWORD ctrl_type);
+
+DWORD WINAPI WriteHandleWatchThread(LPVOID lpParam);
 
 template <int stream_type>
 DWORD WINAPI StreamPipeThread(LPVOID lpParam);

@@ -266,8 +266,12 @@ To fix that use the `workarounded` call example line.
      while a child process is terminated externally.
 -------------------------------------------------------------------------------
 
+NOTE:
+  Has workarounded in the version 1.20.0.54.
+
 To reproduce do execute the command and terminate the `cmd.exe` child process.
-The parent process will not exit until the line return character would be entered.
+The parent process will not exit until the line return character would be
+entered.
 
 -------------------------------------------------------------------------------
 7. AUTHOR
