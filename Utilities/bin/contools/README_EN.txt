@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.12.20
+* 2022.01.02
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -9,8 +9,12 @@
 5. FEATURES
 5.1. callf
 6. KNOWN ISSUES
-6.1. The GNU Bash shell executable throws an error: `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
-6.2. `set /p DUMMY=` cmd.exe command ignores the input after the `callf` call
+6.1. The GNU Bash shell executable throws an error:
+     `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
+6.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
+     call.
+6.3. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on input
+     while a child process is terminated externally.
 7. AUTHOR
 
 -------------------------------------------------------------------------------
@@ -205,7 +209,8 @@ Create process or Shell execute in style of c-function printf.
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.1. The GNU Bash shell executable throws an error: `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
+6.1. The GNU Bash shell executable throws an error:
+     `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
 -------------------------------------------------------------------------------
 
 If try to run the Bash shell executable, then it may throw an error after a
@@ -217,7 +222,8 @@ for example, in the elevated child process in case if elevation is required
 (`/attach-parent-console` flag).
 
 -------------------------------------------------------------------------------
-6.2. `set /p DUMMY=` cmd.exe command ignores the input after the `callf` call
+6.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
+     call.
 -------------------------------------------------------------------------------
 
 NOTE:
@@ -254,6 +260,14 @@ set /P X=DDD
 ```
 
 To fix that use the `workarounded` call example line.
+
+-------------------------------------------------------------------------------
+6.3. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on input
+     while a child process is terminated externally.
+-------------------------------------------------------------------------------
+
+To reproduce do execute the command and terminate the `cmd.exe` child process.
+The parent process will not exit until the line return character would be entered.
 
 -------------------------------------------------------------------------------
 7. AUTHOR

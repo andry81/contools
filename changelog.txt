@@ -1,4 +1,7 @@
 2022.01.02:
+* changed: Utilities/bin/contools/README_EN.txt: readme update
+
+2022.01.02:
 * new: Utilities/bin/contools: binaries update
 
 2022.01.02:
