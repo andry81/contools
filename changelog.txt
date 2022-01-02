@@ -1,4 +1,7 @@
 2022.01.02:
+* new: Utilities/bin/contools: binaries update
+
+2022.01.02:
 * fixed: Utilities/src/callf: workaround for the `ReadConsole` issue when it does block on the input while the output handle is closed
 * changed: Utilities/bin/contools/README_EN.txt: readme update
 
