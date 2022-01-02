@@ -44,6 +44,8 @@ struct Flags
     //
 
     bool            disable_wow64_fs_redir;
+    bool            disable_ctrl_signals;
+    bool            disable_ctrl_c_signal;
     bool            allow_gui_autoattach_to_parent_console;
     bool            disable_conout_reattach_to_visible_console;
     bool            allow_conout_attach_to_invisible_parent_console;

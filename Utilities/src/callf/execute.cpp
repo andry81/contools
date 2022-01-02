@@ -118,6 +118,7 @@ bool g_has_tee_stdin                = false;
 bool g_has_tee_stdout               = false;
 bool g_has_tee_stderr               = false;
 
+bool g_enable_child_ctrl_handler    = false;
 std::atomic_bool g_ctrl_handler     = false;
 
 HANDLE g_stdin_pipe_read_handle     = INVALID_HANDLE_VALUE;
@@ -148,6 +149,8 @@ Flags::Flags()
 void Flags::merge(const Flags & flags)
 {
     MERGE_FLAG(flags, disable_wow64_fs_redir);
+    MERGE_FLAG(flags, disable_ctrl_signals);
+    MERGE_FLAG(flags, disable_ctrl_c_signal);
 #ifndef _CONSOLE
     MERGE_FLAG(flags, allow_gui_autoattach_to_parent_console);
 #endif
@@ -4893,6 +4896,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     g_tee_stdout_dup_stdin = g_options.tee_stdout_dup == STDIN_FILENO || g_flags.tee_conout_dup;
     g_tee_stderr_dup_stdin = g_options.tee_stderr_dup == STDIN_FILENO || g_flags.tee_conout_dup;
 
+    g_enable_child_ctrl_handler = !g_flags.disable_ctrl_signals && !g_flags.disable_ctrl_c_signal;
+
     // update child show state
     si.wShowWindow = g_options.show_as;
 
@@ -5970,8 +5975,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
 
             if_break (app && app_len) {
-                g_ctrl_handler = true;
-                SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                if (g_enable_child_ctrl_handler) {
+                    g_ctrl_handler = true;
+                    SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                }
 
                 if (g_options.shell_exec_verb.empty()) {
 #ifdef _DEBUG
@@ -6107,8 +6114,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     g_is_child_stdin_char_type = true;
                 }
 
-                g_ctrl_handler = true;
-                SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                if (g_enable_child_ctrl_handler) {
+                    g_ctrl_handler = true;
+                    SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                }
 
                 cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
                 memcpy(cmd_buf.data(), cmd, cmd_buf.size());
@@ -7756,6 +7765,20 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_flags.disable_wow64_fs_redir = false; // always reset
+
+    if (child_flags.disable_ctrl_signals) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/disable-ctrl-signals ");
+        }
+    }
+    regular_flags.disable_ctrl_signals = false; // always reset
+
+    if (child_flags.disable_ctrl_c_signal) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/disable-ctrl-c-signal ");
+        }
+    }
+    regular_flags.disable_ctrl_c_signal = false; // always reset
 
 #ifndef _CONSOLE
     if (child_flags.allow_gui_autoattach_to_parent_console) {

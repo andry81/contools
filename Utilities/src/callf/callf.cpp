@@ -57,6 +57,8 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/own-console-title"),
     _T("/console-title"),
     _T("/disable-wow64-fs-redir"),
+    _T("/disable-ctrl-signals"),
+    _T("/disable-ctrl-c-signal"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -96,6 +98,8 @@ const TCHAR * g_promote_flags_to_preparse_arr[] = {
     _T("/detach-console"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
+    _T("/disable-ctrl-signals"),
+    _T("/disable-ctrl-c-signal"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -117,6 +121,8 @@ const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
     _T("/detach-console"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
+    _T("/disable-ctrl-signals"),
+    _T("/disable-ctrl-c-signal"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -284,6 +290,8 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
     _T("/set-env-var"), _T("/v"),
     _T("/disable-wow64-fs-redir"),
+    _T("/disable-ctrl-signals"),
+    _T("/disable-ctrl-c-signal"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -351,6 +359,8 @@ const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
     _T("/eval-backslash-esc"), _T("/e"),
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
     _T("/disable-wow64-fs-redir"),
+    _T("/disable-ctrl-signals"),
+    _T("/disable-ctrl-c-signal"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -411,6 +421,8 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
     _T("/allow-throw-seh-except"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
+    _T("/disable-ctrl-signals"),
+    _T("/disable-ctrl-c-signal"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -516,6 +528,8 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/detach-console"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
+    _T("/disable-ctrl-signals"),
+    _T("/disable-ctrl-c-signal"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -525,6 +539,11 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/write-console-stdin-back")
 };
 
+
+BOOL WINAPI DisabledCtrlHandler(DWORD ctrl_type)
+{
+    return TRUE; // ignore
+}
 
 inline int invalid_format_flag(const TCHAR * arg)
 {
@@ -2244,6 +2263,20 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         return 0;
     }
+    if (IsArgEqualTo(arg, _T("/disable-ctrl-signals"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.disable_ctrl_signals = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/disable-ctrl-c-signal"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.disable_ctrl_c_signal = true;
+            return 1;
+        }
+        return 0;
+    }
 #ifndef _CONSOLE
     if (IsArgEqualTo(arg, _T("/allow-gui-autoattach-to-parent-console"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
@@ -2711,6 +2744,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             if (g_flags.disable_wow64_fs_redir) {
                 Wow64DisableWow64FsRedirection(&g_disable_wow64_fs_redir_ptr);
+            }
+
+            // disable control signals
+
+            if (g_flags.disable_ctrl_signals) {
+                SetConsoleCtrlHandler(DisabledCtrlHandler, TRUE);
+                SetConsoleCtrlHandler(NULL, TRUE);  // must be, otherwise CTRL-C still will be processed
+            }
+            else if (g_flags.disable_ctrl_c_signal) {
+                SetConsoleCtrlHandler(NULL, TRUE);
             }
 
             // update process console
@@ -3351,6 +3394,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             if (g_promote_flags.disable_wow64_fs_redir && g_promote_parent_flags.disable_wow64_fs_redir) {
                 return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-wow64-fs-redir\n"));
+            }
+
+            if (g_flags.disable_ctrl_signals && g_flags.disable_ctrl_c_signal) {
+                return invalid_format_flag_message(_T("disable control signal flags is mixed: /disable_ctrl_signals <-> /disable_ctrl_c_signal\n"));
+            }
+
+            if (g_promote_flags.disable_ctrl_signals && g_promote_parent_flags.disable_ctrl_signals) {
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable_ctrl_signals\n"));
+            }
+            if (g_promote_flags.disable_ctrl_c_signal && g_promote_parent_flags.disable_ctrl_c_signal) {
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable_ctrl_c_signal\n"));
             }
 
             if (g_promote_flags.allow_gui_autoattach_to_parent_console && g_promote_parent_flags.allow_gui_autoattach_to_parent_console) {

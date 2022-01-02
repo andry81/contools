@@ -1,3 +1,6 @@
+2022.01.02:
+* new: Utilities/src/callf: `/disable-ctrl-signals` and `/disable-ctrl-c-signal` flags to disable respective CTRL signals
+
 2021.12.31:
 * new: Scripts/Tools/ToolAdaptors/app/emule: `delete_corrupted_pending_files_from_log.bat` script
 * changed: Scripts/Tools/ToolAdaptors/app: scripts execution speedup

@@ -428,6 +428,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /detach-console
           /attach-parent-console
           /disable-wow64-fs-redir
+          /disable-ctrl-signals
+          /disable-ctrl-c-signal
           /allow-gui-autoattach-to-parent-console
           /disable-conout-reattach-to-visible-console
           /allow-conout-attach-to-invisible-parent-console
@@ -464,6 +466,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /detach-console
           /attach-parent-console
           /disable-wow64-fs-redir
+          /disable-ctrl-signals
+          /disable-ctrl-c-signals
           /allow-gui-autoattach-to-parent-console
           /disable-conout-reattach-to-visible-console
           /allow-conout-attach-to-invisible-parent-console
@@ -958,6 +962,18 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     Special flags:
       /disable-wow64-fs-redir
         Disables file system redirection for the WOW64 process.
+
+      /disable-ctrl-signals
+        Disable all control signals handling in this-process such as:
+          CTRL_C_EVENT         = 0
+          CTRL_BREAK_EVENT     = 1
+          CTRL_CLOSE_EVENT     = 2
+          CTRL_LOGOFF_EVENT    = 5
+          CTRL_SHUTDOWN_EVENT  = 6
+
+      /disable-ctrl-c-signal
+        Disable only CTRL-C signal handling in this-process.
+        All other control signals will be passed into child process.
 
       /allow-gui-autoattach-to-parent-console
         In case if this-process console is not attached, then this-process
