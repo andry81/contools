@@ -1,4 +1,7 @@
 2022.01.02:
+* new: bin/contools: binaries update
+
+2022.01.02:
 * new: src/callf: `/disable-ctrl-signals` and `/disable-ctrl-c-signal` flags to disable respective CTRL signals
 
 2021.12.22:
