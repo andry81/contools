@@ -1,4 +1,7 @@
 2022.01.03:
+* new: src/callf: Partially implemented `/use-stdin-as-piped-from-conin` flag to treat stdin as piped console input. Currently must be done through the injection into stdin pipe end process and is not implemented yet.
+
+2022.01.03:
 * changed: bin/contools/README_EN.txt: readme update
 
 2022.01.02:

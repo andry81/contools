@@ -368,6 +368,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /no-window-console
           /init-com
           /showas
+          /use-stdin-as-piped-from-conin
           /reopen-std[in|out|err]*
           /std[in|out|err]-* (except std[out|err]-vt100)
           /output-*          (except output-vt100)
@@ -388,6 +389,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
           /no-expand-env
           /load-parent-proc-init-env-vars
+          /use-stdin-as-piped-from-conin
           /reopen-std[in|out|err]*
           /std[in|out|err]-* (except std[out|err]-vt100)
           /output-*          (except output-vt100)
@@ -452,6 +454,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /load-parent-proc-init-env-vars
           /no-std*-inherit
           /allow-throw-seh-except
+          /use-stdin-as-piped-from-conin
           /reopen-std[in|out|err]*
           /std[in|out|err]-*
           /output-*
@@ -521,6 +524,16 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         application to decide how to handle it.
 
         See detailed documentation in MSDN for the function `ShowWindow`.
+
+      /use-stdin-as-piped-from-conin
+        Treat initial this-process stdin pipe handle as pipe from the console
+        input and close on this-process exit both the initial stdin handle and
+        the stdin pipe end process console input handle to trigger the
+        ReadConsole function.
+
+        ex: `type con | callf /use-stdin-as-piped-from-conin "" "cmd.exe /k"`
+
+        CAUTION: stdin pipe end process injection is not implemented
 
       /reopen-stdin <file>
         Reopen stdin as a `<file>` to read from.

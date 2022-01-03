@@ -54,6 +54,8 @@ struct Flags
 
     bool            elevate;
 
+    bool            use_stdin_as_piped_from_conin;  // close stdin and conin on exit
+
     bool            stdin_output_flush;             // flush handle connected with stdin input
     bool            stdout_flush;
     bool            stderr_flush;

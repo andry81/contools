@@ -167,6 +167,8 @@ void Flags::merge(const Flags & flags)
 
     MERGE_FLAG(flags, elevate);
 
+    MERGE_FLAG(flags, use_stdin_as_piped_from_conin);
+
     MERGE_FLAG(flags, stdin_output_flush);
     MERGE_FLAG(flags, stdout_flush);
     MERGE_FLAG(flags, stderr_flush);
@@ -730,7 +732,6 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             }
 
                             stream_eof = true;
-
                         }
 
                         if (num_bytes_avail) {
@@ -6982,6 +6983,14 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_options.show_as = SW_SHOWNORMAL; // always reset
+
+
+    if (child_flags.use_stdin_as_piped_from_conin) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/use-stdin-as-piped-from-conin ");
+        }
+    }
+    regular_flags.use_stdin_as_piped_from_conin = false; // always reset
 
 
     if (!child_options.reopen_stdin_as_file.empty()) {

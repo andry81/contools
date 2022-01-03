@@ -182,6 +182,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/wait-child-start"),
     _T("/elevate"),
     _T("/showas"),
+    _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
     _T("/reopen-stdin-as-server-pipe"),
     _T("/reopen-stdin-as-server-pipe-connect-timeout"),
@@ -308,6 +309,7 @@ const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
     _T("/no-window-console"),
     _T("/init-com"),
     _T("/showas"),
+    _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
     _T("/reopen-stdin-as-server-pipe"),
     _T("/reopen-stdin-as-server-pipe-connect-timeout"),
@@ -371,6 +373,7 @@ const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
 
 const TCHAR * g_elevate_child_flags_to_parse_arr[] = {
     _T("/load-parent-proc-init-env-vars"),
+    _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
     _T("/reopen-stdin-as-server-pipe"),
     _T("/reopen-stdin-as-server-pipe-connect-timeout"),
@@ -444,6 +447,7 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/no-stdout-inherit"),
     _T("/no-stderr-inherit"),
     _T("/allow-throw-seh-except"),
+    _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
     _T("/reopen-stdin-as-server-pipe"),
     _T("/reopen-stdin-as-server-pipe-connect-timeout"),
@@ -987,6 +991,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         else error = invalid_format_flag(start_arg);
         return 2;
+    }
+    if (IsArgEqualTo(arg, _T("/use-stdin-as-piped-from-conin"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.use_stdin_as_piped_from_conin = true;
+            return 1;
+        }
+        return 0;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin"))) {
         arg_offset += 1;
@@ -2497,6 +2508,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     _debug_print_crt_std_handles(1);
 #endif
 
+    HANDLE initial_stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+
     LPWCH env_strs = NULL;
     size_t env_strs_len = 0; // excluding last null character
 
@@ -3969,6 +3982,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 #endif
         }();
+
+        // close on exit
+        if (g_flags.use_stdin_as_piped_from_conin &&_is_valid_handle(initial_stdin_handle)) {
+            const DWORD initial_stdin_handle_type = GetFileType(initial_stdin_handle);
+            if (initial_stdin_handle_type == FILE_TYPE_PIPE) {
+                // TODO:
+                //  Inject to pipe end process of `initial_stdin_handle` and call to CloseHandle(GetStdHandle(STD_INPUT_HANDLE)) if GetStdHandle(STD_INPUT_HANDLE) == FILE_TYPE_CHAR
+                //  ...
+                //
+
+                //ULONG initial_stdin_handle_pipe_end_pid = 0;
+                //GetNamedPipeClientProcessId(initial_stdin_handle, &initial_stdin_handle_pipe_end_pid);
+
+                CloseHandle(initial_stdin_handle);
+            }
+        }
     }
     }();
 }

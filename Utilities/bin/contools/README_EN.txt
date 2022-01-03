@@ -270,7 +270,7 @@ To fix that use the `workarounded` call example line.
 -------------------------------------------------------------------------------
 
 NOTE:
-  Has workarounded in the version 1.20.0.54.
+  Has been workarounded in the version 1.20.0.54.
 
 To reproduce do execute the command and terminate the `cmd.exe` child process.
 The parent process will not exit until the line return character would be
