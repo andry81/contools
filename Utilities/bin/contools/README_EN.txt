@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2022.01.02
+* 2022.01.03
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -15,6 +15,9 @@
      call.
 6.3. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on input
      while a child process is terminated externally.
+6.4. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left behind
+     waiting the last input while the neighbor `callf.exe` process is already
+     exited.
 7. AUTHOR
 
 -------------------------------------------------------------------------------
@@ -272,6 +275,17 @@ NOTE:
 To reproduce do execute the command and terminate the `cmd.exe` child process.
 The parent process will not exit until the line return character would be
 entered.
+
+-------------------------------------------------------------------------------
+6.4. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left behind
+     waiting the last input while the neighbor `callf.exe` process is already
+     exited.
+-------------------------------------------------------------------------------
+
+To reproduce do execute the command and terminate the last `cmd.exe` child
+process.
+The neighbor `cmd.exe` process to already exited `callf.exe` process will not
+exit until the line return character would be entered.
 
 -------------------------------------------------------------------------------
 7. AUTHOR

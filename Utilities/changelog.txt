@@ -1,3 +1,6 @@
+2022.01.03:
+* changed: bin/contools/README_EN.txt: readme update
+
 2022.01.02:
 * changed: TODO.txt: todo update
 
