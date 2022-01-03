@@ -50,3 +50,6 @@
   terminates the child process too when the child process can run in
   interactive mode and should not close upon the ctrl-c press:
   `mintty.exe -e cmd.exe /k`
+
+* Implement process injection related to the partially implemented
+  `/use-stdin-as-piped-from-conin` flag.
