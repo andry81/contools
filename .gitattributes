@@ -629,8 +629,6 @@ Utilities/Projects/printf.vcxproj -text
 Utilities/Projects/retakeowner.vcxproj -text
 Utilities/Projects/thlibautocfg.vcxproj -text
 Utilities/Projects/wshdynacall.vcxproj -text
-Utilities/README_EN.txt -text
-Utilities/TODO.txt -text
 Utilities/__init__/__init__.bat -text
 Utilities/bin/7zip/7-zip.chm -text
 Utilities/bin/7zip/7z.exe -text
@@ -642,6 +640,7 @@ Utilities/bin/7zip/license.txt -text
 Utilities/bin/7zip/readme.txt -text
 Utilities/bin/Microsoft/uuidgen.exe -text
 Utilities/bin/contools/README_EN.txt -text
+Utilities/bin/contools/TODO.txt -text
 Utilities/bin/contools/callf.exe -text
 Utilities/bin/contools/callfg.exe -text
 Utilities/bin/contools/chcp.exe -text

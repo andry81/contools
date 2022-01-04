@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2022.01.03
+* 2022.01.04
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -9,15 +9,26 @@
 5. FEATURES
 5.1. callf
 6. KNOWN ISSUES
-6.1. The GNU Bash shell executable throws an error:
-     `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
-6.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
-     call.
-6.3. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on input
-     while a child process is terminated externally.
-6.4. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left behind
-     waiting the last input while the neighbor `callf.exe` process is already
-     exited.
+
+6.1. With `cmd.exe`
+6.1.1. Autocompletion breakage
+6.1.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
+       call.
+6.1.3. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
+       behind waiting the last input while the neighbor `callf.exe` process is
+       already exited.
+6.1.4. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
+
+6.2. With `callf.exe`/`callfg.exe`
+6.2.1. Console output in particular case prints as untranslated (line feed and
+       return characters become printable)
+6.2.2. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on
+       input while a child process is terminated externally.
+
+6.3. With `bash.exe`
+6.3.1. The GNU Bash shell executable throws an error:
+       `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
+
 7. AUTHOR
 
 -------------------------------------------------------------------------------
@@ -212,21 +223,38 @@ Create process or Shell execute in style of c-function printf.
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.1. The GNU Bash shell executable throws an error:
-     `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
+6.1. With `cmd.exe`
 -------------------------------------------------------------------------------
 
-If try to run the Bash shell executable, then it may throw an error after a
-console window reallocation in the `callf` utility.
+-------------------------------------------------------------------------------
+6.1.1. Autocompletion breakage
+-------------------------------------------------------------------------------
 
-To workaround that you can use `callfg` utility instead with the
-`/create-console` flag. This will avoid a need to reallocate a console window,
-for example, in the elevated child process in case if elevation is required
-(`/attach-parent-console` flag).
+Simultenious stdin or stdout ot stderr redirection and interactive input in the
+child `cmd.exe` process does break autocompletion feature.
+
+Example:
+
+>
+callf /tee-stdin 0.log /pipe-stdin-to-child-stdin "" "cmd.exe /k"
+
+The issue is attached to the stdin handle type inside the `cmd.exe` process.
+If the stdin handle has not a character device type
+(GetFileType(GetStdHandle(STD_INPUT_HANDLE)) != FILE_TYPE_CHAR), then the
+autocompletion feature is turned off and all characters including a tab
+character processes as is. Otherwise the tab button press triggers the
+autocompletionn feature.
+
+The stdin handle changes its type from the `FILE_TYPE_CHAR`, for example, if
+the process input is redirected.
+
+The fix can be made portably between different Windows versions, for example,
+through the code injection into a child process and interception of the
+`ReadConsole`/`WriteConsole` calls.
 
 -------------------------------------------------------------------------------
-6.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
-     call.
+6.1.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
+       call.
 -------------------------------------------------------------------------------
 
 NOTE:
@@ -265,8 +293,56 @@ set /P X=DDD
 To fix that use the `workarounded` call example line.
 
 -------------------------------------------------------------------------------
-6.3. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on input
-     while a child process is terminated externally.
+6.1.3. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
+       behind waiting the last input while the neighbor `callf.exe` process is
+       already exited.
+-------------------------------------------------------------------------------
+
+To reproduce do execute the command and terminate the last `cmd.exe` child
+process.
+The neighbor `cmd.exe` process to already exited `callf.exe` process will not
+exit until the line return character would be entered.
+
+-------------------------------------------------------------------------------
+6.1.4. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
+-------------------------------------------------------------------------------
+
+The command does not wait the `cmd.exe` child process.
+
+To reproduce:
+
+  >
+  set A=111
+  set A=222
+  echo %A%
+  111
+  echo %A%
+  222
+
+To fix:
+
+  >
+  start "" /B /WAIT cmd.exe /k
+
+-------------------------------------------------------------------------------
+6.2. With `callf.exe`/`callfg.exe`
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+6.2.1. Console output in particular case prints as untranslated (line feed and
+       return characters become printable)
+-------------------------------------------------------------------------------
+
+This issue is related to reattachment of a parent console.
+
+Can be fixed only through the parent process injection being used for console
+window attachment and directly call `GetStdHandle` functions to read standard
+handle addresses layout to update the standard handles (call `StdStdHandle`) in
+the process, where console is attached.
+
+-------------------------------------------------------------------------------
+6.2.2. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on
+       input while a child process is terminated externally.
 -------------------------------------------------------------------------------
 
 NOTE:
@@ -277,15 +353,21 @@ The parent process will not exit until the line return character would be
 entered.
 
 -------------------------------------------------------------------------------
-6.4. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left behind
-     waiting the last input while the neighbor `callf.exe` process is already
-     exited.
+6.3. With `bash.exe`
 -------------------------------------------------------------------------------
 
-To reproduce do execute the command and terminate the last `cmd.exe` child
-process.
-The neighbor `cmd.exe` process to already exited `callf.exe` process will not
-exit until the line return character would be entered.
+-------------------------------------------------------------------------------
+6.3.1. The GNU Bash shell executable throws an error:
+       `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
+-------------------------------------------------------------------------------
+
+If try to run the Bash shell executable, then it may throw an error after a
+console window reallocation in the `callf` utility.
+
+To workaround that you can use `callfg` utility instead with the
+`/create-console` flag. This will avoid a need to reallocate a console window,
+for example, in the elevated child process in case if elevation is required
+(`/attach-parent-console` flag).
 
 -------------------------------------------------------------------------------
 7. AUTHOR

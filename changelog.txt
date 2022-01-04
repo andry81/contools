@@ -1,4 +1,9 @@
 2022.01.04:
+* changed: Utilities/README_EN.txt: merged into `bin/contools/README_EN.txt`
+* changed: Utilities/TODO.txt: moved to `bin/contools`
+* changed: Utilities/bin/contools/README_EN.txt: readme update
+
+2022.01.04:
 * fixed: Utilities/src/callf: workaround for the `ReadConsole` issue when it writes an extra character to the input buffer
 
 2022.01.03:
