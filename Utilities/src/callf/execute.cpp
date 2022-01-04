@@ -912,7 +912,16 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                         break;
                     }
 
-                    stdin_wchar_buf.resize(tee_stdin_read_num_chars); // MSDN: ReadConsole
+                    // CAUTION:
+                    //  The `ReadConsoleW` Windows bug workaround:
+                    //
+                    //      https://stackoverflow.com/questions/11875619/why-is-calling-readconsole-in-a-loop-corrupting-the-stack/11876961#11876961
+                    //
+                    //      Looking at the content of cBuf[1] at the time the relevant assertion fails, it appears that ReadConsoleW is writing one extra byte at the end of the buffer.
+                    //
+                    //      The workaround is straightforward : make sure your buffer has at least one extra byte. In your case, use the first character of a two - character array.
+                    //
+                    stdin_wchar_buf.resize(tee_stdin_read_num_chars + 1); // MSDN: ReadConsole
 
                     console_read_control.nLength = sizeof(console_read_control);
 
