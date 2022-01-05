@@ -1,3 +1,6 @@
+2022.01.05:
+* refactor: replaced all `tkl_include` calls by `tkl_include_or_abort` in all bash shell scripts
+
 2022.01.04:
 * changed: Utilities/README_EN.txt: merged into `bin/contools/README_EN.txt`
 * changed: Utilities/TODO.txt: moved to `bin/contools`

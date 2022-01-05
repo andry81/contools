@@ -19,21 +19,21 @@ if [[ -z "$SOURCE_TACKLELIB_BASH_TACKLELIB_SH" || SOURCE_TACKLELIB_BASH_TACKLELI
   done
 fi
 
-tkl_include '__init__.sh' || tkl_abort_include
-tkl_include "$TACKLELIB_BASH_ROOT/tacklelib/baselib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/traplib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/funclib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/traplib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/synclib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/hashlib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/patchlib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/stringlib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/filelib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/mountdir.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/unmountdir.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/tools/gnumake/buildlibcomponents.sh" || tkl_abort_include
+tkl_include_or_abort '__init__.sh'
+tkl_include_or_abort "$TACKLELIB_BASH_ROOT/tacklelib/baselib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/traplib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/funclib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/traplib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/synclib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/hashlib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/patchlib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/stringlib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/filelib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/mountdir.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/unmountdir.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/tools/gnumake/buildlibcomponents.sh"
 if [[ "$OSTYPE" == "cygwin" ]]; then
-  tkl_include "$CONTOOLS_BASH_ROOT/tools/cygwin/cygver.sh" || tkl_abort_include
+  tkl_include_or_abort "$CONTOOLS_BASH_ROOT/tools/cygwin/cygver.sh"
 fi
 
 function InitializeBuildSystem()

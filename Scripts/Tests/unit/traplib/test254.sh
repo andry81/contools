@@ -12,8 +12,8 @@ if [[ -z "$SOURCE_TACKLELIB_BASH_TACKLELIB_SH" || SOURCE_TACKLELIB_BASH_TACKLELI
   done
 fi
 
-tkl_include '__init__.sh' || tkl_abort_include
-tkl_include 'testlib.sh' || tkl_abort_include
+tkl_include_or_abort '__init__.sh'
+tkl_include_or_abort 'testlib.sh'
 
 if [[ -n "$BASH_LINENO" ]] && (( ${BASH_LINENO[0]} > 0 )); then
   TestScriptFilePath="${BASH_SOURCE[0]//\\//}"

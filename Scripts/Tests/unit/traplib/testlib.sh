@@ -13,8 +13,8 @@ if [[ -z "$SOURCE_TACKLELIB_BASH_TACKLELIB_SH" || SOURCE_TACKLELIB_BASH_TACKLELI
   done
 fi
 
-tkl_include '__init__.sh' || tkl_abort_include
-tkl_include "$CONTOOLS_ROOT/bash/testlib.sh" || tkl_abort_include
+tkl_include_or_abort '__init__.sh'
+tkl_include_or_abort "$CONTOOLS_ROOT/bash/testlib.sh"
 
 function TestUserModuleInit()
 {

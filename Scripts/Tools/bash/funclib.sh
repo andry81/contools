@@ -17,9 +17,9 @@ if [[ -z "$SOURCE_TACKLELIB_BASH_TACKLELIB_SH" || SOURCE_TACKLELIB_BASH_TACKLELI
   done
 fi
 
-tkl_include '__init__.sh' || tkl_abort_include
-tkl_include "$TACKLELIB_BASH_ROOT/tacklelib/baselib.sh" || tkl_abort_include
-tkl_include "$CONTOOLS_BASH_ROOT/hashlib.sh" || tkl_abort_include
+tkl_include_or_abort '__init__.sh'
+tkl_include_or_abort "$TACKLELIB_BASH_ROOT/tacklelib/baselib.sh"
+tkl_include_or_abort "$CONTOOLS_BASH_ROOT/hashlib.sh"
 
 function GetFunctionDeclaration()
 {

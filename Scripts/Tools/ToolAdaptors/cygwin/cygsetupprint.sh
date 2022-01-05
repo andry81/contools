@@ -23,7 +23,7 @@ if [[ -z "$SOURCE_TACKLELIB_BASH_TACKLELIB_SH" || SOURCE_TACKLELIB_BASH_TACKLELI
   done
 fi
 
-tkl_include 'cygsetuplib.sh' || tkl_abort_include
+tkl_include_or_abort 'cygsetuplib.sh'
 
 PrintPackageFieldFromCygSetupIni "$@"
 exit $?
