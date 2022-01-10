@@ -1,4 +1,7 @@
 2022.01.10:
+* new: Utilities/bin/contools: binaries update
+
+2022.01.10:
 * new: Utilities/src/callf: parent console attach on demand (or allocation of a new one if not found any in process inheritance chain) or on output into console if console been detached or unexisted
 * new: Utilities/src/callf: print into console in main thread from a worker thread stdout/stderr message buffer while waiting on a child exit
 
