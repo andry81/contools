@@ -14,5 +14,9 @@
 
 extern bool g_is_process_executed;
 extern bool g_is_process_elevating;
+extern bool g_is_process_elevated;
+
+extern struct StdHandles      g_detached_std_handles;
+extern struct StdHandlesState g_detached_std_handles_state;
 
 #endif

@@ -132,6 +132,7 @@ struct Flags
     bool            detach_child_console;
     bool            create_console;                 // has priority over attach_parent_console
     bool            detach_console;
+    bool            detach_inherited_console_on_wait;
     bool            attach_parent_console;
 
     bool            eval_backslash_esc;             // evaluate backslash escape characters
@@ -285,6 +286,7 @@ struct Options
 
 struct ThreadReturnData
 {
+    mutable HANDLE  mutex;
     int             ret;
     DWORD           win_error;
     std::tstring    msg;
@@ -292,37 +294,81 @@ struct ThreadReturnData
     bool            is_copied;
 
     ThreadReturnData() :
-        ret(), win_error(), is_error(false), is_copied(false)
+        mutex(INVALID_HANDLE_VALUE), ret(0), win_error(0), is_error(false), is_copied(false)
     {
+        create_mutex();
     }
 
-    ThreadReturnData(const ThreadReturnData &) = default;
-    ThreadReturnData(ThreadReturnData &&) = default;
-};
-
-struct WorkerThreadsReturnData
-{
-    WorkerThreadsReturnData()
-    {
-        mutex = CreateMutex(NULL, FALSE, NULL);
-    }
-
-    ~WorkerThreadsReturnData()
+    ~ThreadReturnData()
     {
         _close_handle(mutex);
     }
 
-    void add(ThreadReturnData data)
+    ThreadReturnData(const ThreadReturnData & data)
     {
-        WaitForSingleObject(mutex, INFINITE);
+        construct(data);
 
-        datas.push_back(data);
-
-        ReleaseMutex(mutex);
+        // mutex must not be copied
+        create_mutex();
     }
 
-    HANDLE                       mutex;
+    void construct(const ThreadReturnData & data)
+    {
+        mutex = INVALID_HANDLE_VALUE;
+        ret = data.ret;
+        win_error = data.win_error;
+        msg = data.msg;
+        is_error = data.is_error;
+        is_copied = false; // external copy
+    }
+
+private:
+    // mutex must not be copied
+    ThreadReturnData & operator =(const ThreadReturnData & data);
+
+public:
+    void create_mutex()
+    {
+        mutex = CreateMutex(NULL, FALSE, NULL);;
+    }
+
+    void lock() const
+    {
+        WaitForSingleObject(mutex, INFINITE);
+    }
+
+    void unlock() const
+    {
+        ReleaseMutex(mutex);
+    }
+};
+
+struct WorkerThreadsReturnDatas
+{
+    mutable HANDLE               mutex;
     std::deque<ThreadReturnData> datas;
+
+    WorkerThreadsReturnDatas()
+    {
+        mutex = CreateMutex(NULL, FALSE, NULL);
+    }
+
+    ~WorkerThreadsReturnDatas()
+    {
+        _close_handle(mutex);
+    }
+
+private:
+    // mutex must not be copied
+    WorkerThreadsReturnDatas(const WorkerThreadsReturnDatas &);
+
+public:
+    void lock() const;
+    void unlock() const;
+    void add(const ThreadReturnData & data);
+    size_t size() const;
+    void get_first_error_code(int & ret) const;
+    size_t print(size_t from_index) const;
 };
 
 struct WorkerThreadsSyncData
@@ -379,22 +425,22 @@ struct ConnectNamedPipeThreadLocals : BasicThreadLocals<ConnectNamedPipeThreadDa
 {
 };
 
-struct WriteHandleWatcherData
+struct WriteOutputWatcherData
 {
     HANDLE *            read_handle_ptr;            // read handle to call `CloseHandle` for if write handle is closed
     HANDLE              write_handle;               // write handle
 
-    WriteHandleWatcherData() :
+    WriteOutputWatcherData() :
         read_handle_ptr(nullptr), write_handle(INVALID_HANDLE_VALUE)
     {
     }
 };
 
-struct WriteHandleWatchThreadData : WriteHandleWatcherData, WorkerThreadsSyncData
+struct WriteOutputWatchThreadData : WriteOutputWatcherData, WorkerThreadsSyncData
 {
 };
 
-struct WriteHandleWatchThreadLocals : BasicThreadLocals<WriteHandleWatchThreadData>
+struct WriteOutputWatchThreadLocals : BasicThreadLocals<WriteOutputWatchThreadData>
 {
 };
 
@@ -415,10 +461,11 @@ extern Options g_promote_parent_options;
 extern DWORD  g_parent_proc_id;
 extern HWND   g_inherited_console_window;
 extern HWND   g_owned_console_window;
+extern bool   g_is_console_window_owner_proc_searched;
 
 BOOL WINAPI CtrlHandler(DWORD ctrl_type);
 
-DWORD WINAPI WriteHandleWatchThread(LPVOID lpParam);
+DWORD WINAPI WriteOutputWatchThread(LPVOID lpParam);
 
 template <int stream_type>
 DWORD WINAPI StreamPipeThread(LPVOID lpParam);
@@ -459,6 +506,111 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
                                     Flags & regular_flags, Options & regular_options,
                                     const Flags & elevate_child_flags, const Options & elevate_child_options,
                                     const Flags & promote_child_flags, const Options & promote_child_options);
+
+
+inline void WorkerThreadsReturnDatas::lock() const
+{
+    WaitForSingleObject(mutex, INFINITE);
+}
+
+inline void WorkerThreadsReturnDatas::unlock() const
+{
+    ReleaseMutex(mutex);
+}
+
+inline void WorkerThreadsReturnDatas::add(const ThreadReturnData & data)
+{
+    __try {
+        [&]() {
+            lock();
+
+            datas.push_back(data);
+        }();
+    }
+    __finally {
+        unlock();
+    }
+}
+
+inline size_t WorkerThreadsReturnDatas::size() const
+{
+    __try {
+        lock();
+
+        return datas.size();
+    }
+    __finally {
+        unlock();
+    }
+
+    return 0;
+}
+
+inline void WorkerThreadsReturnDatas::get_first_error_code(int & ret) const
+{
+    __try {
+        [&]() {
+            lock();
+
+            const size_t data_size = datas.size();
+            if (!data_size) {
+                return;
+            }
+
+            for (size_t i = 0; i < data_size; i++) {
+                const auto & ret_data = datas[i];
+
+                if (ret_data.is_error) {
+                    if (!g_flags.ret_win_error) {
+                        ret = ret_data.ret;
+                    }
+                    else {
+                        ret = ret_data.win_error;
+                    }
+
+                    return;
+                }
+            }
+        }();
+    }
+    __finally {
+        unlock();
+    }
+}
+
+inline size_t WorkerThreadsReturnDatas::print(size_t from_index) const
+{
+    size_t ret = from_index;
+
+    __try {
+        [&]() {
+            lock();
+
+            const size_t data_size = datas.size();
+            if (!data_size) {
+                return;
+            }
+
+            for (size_t i = from_index; i < data_size; i++) {
+                const auto & ret_data = datas[i];
+
+                if (!ret_data.is_error) {
+                    _put_raw_message(STDOUT_FILENO, ret_data.msg);
+                }
+                else {
+                    _put_raw_message(STDERR_FILENO, ret_data.msg);
+                }
+            }
+
+            ret = data_size;
+        }();
+    }
+    __finally {
+        unlock();
+    }
+
+    return ret;
+}
 
 
 template <typename T>

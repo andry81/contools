@@ -29,6 +29,7 @@ bool g_is_process_executed = false;
 
 // sets true in case if process is not elevated and requested for self elevation
 bool g_is_process_elevating = false;
+bool g_is_process_elevated = false;
 
 
 const TCHAR * g_empty_flags_arr[] = {
@@ -52,6 +53,7 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/elevate"),
     _T("/create-console"),
     _T("/detach-console"),
+    _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
     _T("/create-console-title"),
     _T("/own-console-title"),
@@ -96,6 +98,7 @@ const TCHAR * g_promote_flags_to_preparse_arr[] = {
     _T("/allow-throw-seh-except"),
     _T("/create-console"),
     _T("/detach-console"),
+    _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
@@ -119,6 +122,7 @@ const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
     _T("/allow-throw-seh-except"),
     _T("/create-console"),
     _T("/detach-console"),
+    _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
@@ -279,6 +283,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/detach-child-console"),
     _T("/create-console"),
     _T("/detach-console"),
+    _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
     _T("/create-console-title"),
     _T("/own-console-title"),
@@ -407,6 +412,7 @@ const TCHAR * g_elevate_child_flags_to_parse_arr[] = {
     _T("/mutex-std-writes"),
     _T("/create-console"),
     _T("/detach-console"),
+    _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
 };
 
@@ -530,6 +536,7 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/mutex-tee-file-writes"),
     _T("/create-console"),
     _T("/detach-console"),
+    _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
@@ -2130,6 +2137,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         return 0;
     }
+    if (IsArgEqualTo(arg, _T("/detach-inherited-console-on-wait"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.detach_inherited_console_on_wait = true;
+            return 1;
+        }
+        return 0;
+    }
     if (IsArgEqualTo(arg, _T("/attach-parent-console"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.attach_parent_console = true;
@@ -2500,12 +2514,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     std::vector<_ConsoleWindowOwnerProc> console_window_owner_procs;
 
-    bool is_conout_processed_for_detach_alloc_attach_to_console = false;
-    bool is_console_window_inited = false;
+    bool is_console_processed_for_detach_alloc_attach_to_console = false;
+    bool is_console_window_owners_searched_on_init = false; // for `console_window_owner_procs`
 
 #ifdef _DEBUG
-    _debug_print_win32_std_handles(1);
-    _debug_print_crt_std_handles(1);
+    _debug_print_win32_std_handles(nullptr, 1);
+    _debug_print_crt_std_handles(nullptr, 1);
 #endif
 
     HANDLE initial_stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
@@ -2714,7 +2728,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             // update elevation state
             if (g_regular_flags.elevate) {
-                const bool is_process_elevated = _is_process_elevated() ? 1 : 0;
+                const bool is_process_elevated = g_is_process_elevated = _is_process_elevated() ? 1 : 0;
                 if (!is_process_elevated) {
                     g_is_process_elevating = true;
                 }
@@ -2743,6 +2757,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             if (g_flags.detach_console && (g_flags.create_console || g_flags.attach_parent_console)) {
                 return invalid_format_flag_message(_T("`/detach-console` flag mixed with `/create-console` or `/attach-parent-console`\n"));
+            }
+            if (g_flags.detach_inherited_console_on_wait && (g_flags.create_console || g_flags.no_wait)) {
+                return invalid_format_flag_message(_T("`/detach-inherited-console-on-wait` flag mixed with `/create-console` or `/no-wait`\n"));
             }
             if (g_flags.create_child_console && (g_flags.create_child_console || g_flags.no_window_console)) {
                 return invalid_format_flag_message(_T("`/detach-child-console` flag mixed with `/create-child-console` or `/no-window-console`\n"));
@@ -2773,37 +2790,46 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             g_inherited_console_window = GetConsoleWindow();
 
-            _StdHandlesState std_handles_state;
-
             if (g_flags.detach_console) {
                 // check if console can be detached
 
-                is_conout_processed_for_detach_alloc_attach_to_console = true;
+                is_console_processed_for_detach_alloc_attach_to_console = true;
 
                 if (g_inherited_console_window) {
-                    _free_console(std_handles_state);
+                    g_detached_std_handles.save_handles();
+                    g_detached_std_handles_state.save_all_states(g_detached_std_handles);
+
+                    _detach_all_crt_std_handles_nolock();
+
+                    _free_console_nolock();
+                    g_owned_console_window = NULL; // not owned after detach
 
                     g_inherited_console_window = GetConsoleWindow();
                 }
             }
 
 #ifndef _CONSOLE
-            if (!is_conout_processed_for_detach_alloc_attach_to_console && g_flags.allow_gui_autoattach_to_parent_console) {
+            if (!is_console_processed_for_detach_alloc_attach_to_console && g_flags.allow_gui_autoattach_to_parent_console) {
                 // check if console is not yet exist
                 if (!g_inherited_console_window) {
                     // check if parent process console can be attached
-                    g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
-                    is_console_window_inited = true;
+                    if (!g_is_console_window_owner_proc_searched || !is_console_window_owners_searched_on_init) {
+                        g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, &g_parent_proc_id);
+                        g_is_console_window_owner_proc_searched = true;
+                        is_console_window_owners_searched_on_init = true;
+                    }
 
                     _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
 
                     // search ancestor console window owner process
                     for (const auto & console_window_owner_proc : console_window_owner_procs) {
-                        if (console_window_owner_proc.console_window) {
-                            if (g_flags.allow_conout_attach_to_invisible_parent_console || IsWindowVisible(console_window_owner_proc.console_window)) {
-                                ancestor_console_window_owner_proc = console_window_owner_proc;
-                                break;
-                            }
+                        if (!console_window_owner_proc.console_window) {
+                            continue;
+                        }
+
+                        if (g_flags.allow_conout_attach_to_invisible_parent_console || IsWindowVisible(console_window_owner_proc.console_window)) {
+                            ancestor_console_window_owner_proc = console_window_owner_proc;
+                            break;
                         }
                     }
 
@@ -2812,16 +2838,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
                         // reattach to parent process console window
 
-                        is_conout_processed_for_detach_alloc_attach_to_console = true;
+                        is_console_processed_for_detach_alloc_attach_to_console = true;
 
-                        _detach_stderr();
-                        _detach_stdout();
-                        _detach_stdin();
+                        _detach_all_crt_std_handles_nolock();
 
-                        g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
+                        g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
 
                         if (g_inherited_console_window) {
-                            _reinit_crt_std_handles();
+                            g_owned_console_window = NULL; // not owned after attach
+                            _reinit_crt_std_handles_nolock(nullptr);
                         }
 
                         if (g_options.has.console_title) {
@@ -2832,28 +2857,33 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 #endif
 
-            if (!is_conout_processed_for_detach_alloc_attach_to_console && !g_flags.disable_conout_reattach_to_visible_console) {
+            if (!is_console_processed_for_detach_alloc_attach_to_console && !g_flags.disable_conout_reattach_to_visible_console) {
                 // check if console is not visible
                 if (g_inherited_console_window && !IsWindowVisible(g_inherited_console_window)) {
                     if (g_flags.create_console) {
                         // check if console can be created
-                        g_owned_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
-                        is_console_window_inited = true;
+                        if (!g_is_console_window_owner_proc_searched) {
+                            g_owned_console_window = _find_console_window_owner_procs(NULL, &g_parent_proc_id);
+                            g_is_console_window_owner_proc_searched = true;
+                        }
 
-                        is_conout_processed_for_detach_alloc_attach_to_console = true;
+                        is_console_processed_for_detach_alloc_attach_to_console = true;
 
                         if (!g_owned_console_window) {
-                            _detach_stderr();
-                            _detach_stdout();
-                            _detach_stdin();
+                            g_detached_std_handles.save_handles();
+                            g_detached_std_handles_state.save_all_states(g_detached_std_handles);
+
+                            _detach_all_crt_std_handles_nolock();
 
                             if (g_inherited_console_window) {
-                                _free_console(std_handles_state);
+                                _free_console_nolock();
+                                g_owned_console_window = NULL; // not owned after detach
                             }
-                            g_inherited_console_window = _alloc_console(std_handles_state);
+                            g_inherited_console_window = _alloc_console_nolock();
 
                             if (g_inherited_console_window) {
-                                _reinit_crt_std_handles();
+                                g_owned_console_window = g_inherited_console_window; // owned after alloc
+                                _reinit_crt_std_handles_nolock(&g_detached_std_handles);
                             }
                         }
 
@@ -2869,18 +2899,23 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     }
                     else {
                         // check if parent process console can be attached
-                        g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
-                        is_console_window_inited = true;
+                        if (!g_is_console_window_owner_proc_searched || !is_console_window_owners_searched_on_init) {
+                            g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, &g_parent_proc_id);
+                            g_is_console_window_owner_proc_searched = true;
+                            is_console_window_owners_searched_on_init = true;
+                        }
 
                         _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
 
                         // search ancestor console window owner process
                         for (const auto & console_window_owner_proc : console_window_owner_procs) {
-                            if (console_window_owner_proc.console_window) {
-                                if (IsWindowVisible(console_window_owner_proc.console_window)) {
-                                    ancestor_console_window_owner_proc = console_window_owner_proc;
-                                    break;
-                                }
+                            if (!console_window_owner_proc.console_window) {
+                                continue;
+                            }
+                            
+                            if (IsWindowVisible(console_window_owner_proc.console_window)) {
+                                ancestor_console_window_owner_proc = console_window_owner_proc;
+                                break;
                             }
                         }
 
@@ -2889,19 +2924,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                             ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
                             // reattach to parent process console window
 
-                            is_conout_processed_for_detach_alloc_attach_to_console = true;
+                            is_console_processed_for_detach_alloc_attach_to_console = true;
 
-                            _detach_stderr();
-                            _detach_stdout();
-                            _detach_stdin();
+                            g_detached_std_handles.save_handles();
+                            g_detached_std_handles_state.save_all_states(g_detached_std_handles);
+
+                            _detach_all_crt_std_handles_nolock();
 
                             if (g_inherited_console_window) {
-                                _free_console(std_handles_state);
+                                _free_console_nolock();
+                                g_owned_console_window = NULL; // not owned after detach
                             }
-                            g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
+                            g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
 
                             if (g_inherited_console_window) {
-                                _reinit_crt_std_handles();
+                                g_owned_console_window = NULL; // not owned after attach
+                                _reinit_crt_std_handles_nolock(&g_detached_std_handles);
                             }
 
                             if (g_options.has.console_title) {
@@ -2912,26 +2950,29 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
             }
 
-            if (!is_conout_processed_for_detach_alloc_attach_to_console) {
+            if (!is_console_processed_for_detach_alloc_attach_to_console) {
                 if (g_flags.create_console) {
                     // check if console can be created
-                    if (!is_console_window_inited) {
-                        g_owned_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
-                        is_console_window_inited = true;
+                    if (!is_console_window_owners_searched_on_init) {
+                        g_owned_console_window = _find_console_window_owner_procs(NULL, &g_parent_proc_id);
+                        is_console_window_owners_searched_on_init = true;
                     }
 
                     if (!g_owned_console_window) {
-                        _detach_stderr();
-                        _detach_stdout();
-                        _detach_stdin();
+                        g_detached_std_handles.save_handles();
+                        g_detached_std_handles_state.save_all_states(g_detached_std_handles);
+
+                        _detach_all_crt_std_handles_nolock();
 
                         if (g_inherited_console_window) {
-                            _free_console(std_handles_state);
+                            _free_console_nolock();
+                            g_owned_console_window = NULL; // not owned after detach
                         }
-                        g_inherited_console_window = _alloc_console(std_handles_state);
+                        g_inherited_console_window = _alloc_console_nolock();
 
                         if (g_inherited_console_window) {
-                            _reinit_crt_std_handles();
+                            g_owned_console_window = g_inherited_console_window; // owned after alloc
+                            _reinit_crt_std_handles_nolock(&g_detached_std_handles);
                         }
 
                         if (g_options.has.create_console_title) {
@@ -2947,18 +2988,23 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
                 else if (g_flags.attach_parent_console) {
                     // check if parent process console can be attached
-                    g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
-                    is_console_window_inited = true;
+                    if (!g_is_console_window_owner_proc_searched || !is_console_window_owners_searched_on_init) {
+                        g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, &g_parent_proc_id);
+                        g_is_console_window_owner_proc_searched = true;
+                        is_console_window_owners_searched_on_init = true;
+                    }
 
                     _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
 
                     // search ancestor console window owner process
                     for (const auto & console_window_owner_proc : console_window_owner_procs) {
-                        if (console_window_owner_proc.console_window) {
-                            if (g_flags.allow_conout_attach_to_invisible_parent_console || IsWindowVisible(console_window_owner_proc.console_window)) {
-                                ancestor_console_window_owner_proc = console_window_owner_proc;
-                                break;
-                            }
+                        if (!console_window_owner_proc.console_window) {
+                            continue;
+                        }
+
+                        if (g_flags.allow_conout_attach_to_invisible_parent_console || IsWindowVisible(console_window_owner_proc.console_window)) {
+                            ancestor_console_window_owner_proc = console_window_owner_proc;
+                            break;
                         }
                     }
 
@@ -2967,19 +3013,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
                         // reattach to parent process console window
 
-                        is_conout_processed_for_detach_alloc_attach_to_console = true;
+                        is_console_processed_for_detach_alloc_attach_to_console = true;
 
-                        _detach_stderr();
-                        _detach_stdout();
-                        _detach_stdin();
+                        g_detached_std_handles.save_handles();
+                        g_detached_std_handles_state.save_all_states(g_detached_std_handles);
+
+                        _detach_all_crt_std_handles_nolock();
 
                         if (g_inherited_console_window) {
-                            _free_console(std_handles_state);
+                            _free_console_nolock();
+                            g_owned_console_window = NULL; // not owned after detach
                         }
-                        g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
+                        g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
 
                         if (g_inherited_console_window) {
-                            _reinit_crt_std_handles();
+                            g_owned_console_window = NULL; // not owned after attach
+                            _reinit_crt_std_handles_nolock(&g_detached_std_handles);
                         }
 
                         if (g_options.has.console_title) {
@@ -2988,9 +3037,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     }
                 }
                 else {
-                    if (!is_console_window_inited) {
-                        g_owned_console_window = _find_console_window_owner_procs(NULL, g_parent_proc_id);
-                        is_console_window_inited = true;
+                    if (!is_console_window_owners_searched_on_init) {
+                        g_owned_console_window = _find_console_window_owner_procs(NULL, &g_parent_proc_id);
+                        is_console_window_owners_searched_on_init = true;
                     }
 
                     if (g_owned_console_window && g_options.has.own_console_title) {
@@ -3007,19 +3056,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
 #ifdef _DEBUG
-            _debug_print_win32_std_handles(2);
-            _debug_print_crt_std_handles(2);
+            _debug_print_win32_std_handles(nullptr, 2);
+            _debug_print_crt_std_handles(nullptr, 2);
 #endif
 
             if (g_inherited_console_window) {
 #ifndef _CONSOLE
-                // only owned console available for change the show state
+                // only owned console is available for change the show state
                 if (g_owned_console_window) {
                     ShowWindow(g_inherited_console_window, nCmdShow);
                 }
 #endif
 
-                if (!_sanitize_std_handles(ret, win_error, std_handles_state, g_flags, g_options)) {
+                if (!_sanitize_std_handles_nolock(ret, win_error, g_detached_std_handles_state, g_flags, g_options)) {
                     if (g_flags.ret_win_error) {
                         return win_error;
                     }
@@ -3030,8 +3079,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
 #ifdef _DEBUG
-            _debug_print_win32_std_handles(3);
-            _debug_print_crt_std_handles(3);
+            _debug_print_win32_std_handles(nullptr, 3);
+            _debug_print_crt_std_handles(nullptr, 3);
 #endif
 
             arg_offset = arg_offset_begin;
@@ -3899,10 +3948,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             const bool pause_on_exit = g_flags.pause_on_exit || g_flags.pause_on_exit_if_error && ret != err_none || g_flags.pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none;
 
 #ifdef _DEBUG
-            if (pause_on_exit || g_conout_prints_buf.size()) {
-                _debug_print_win32_std_handles(8);
-                _debug_print_crt_std_handles(8);
-            }
+            _debug_print_win32_std_handles(nullptr, 8);
+            _debug_print_crt_std_handles(nullptr, 8);
 #endif
 
             if (pause_on_exit) {
@@ -3910,18 +3957,26 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 getch();
             }
 
-            if (g_enable_conout_prints_buffering && !g_is_process_executed) {
-                if (!is_console_window_inited || g_owned_console_window && !console_window_owner_procs.size()) {
-                    g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, g_parent_proc_id);
-                    is_console_window_inited = true;
-                }
+            // If a child process is not executed and console windows is owned, then it will be closed with may be error prints.
+            // Reattach to a parent console window to duplicate error prints there.
+            //
+            if (g_enable_conout_prints_buffering && !g_is_process_executed && g_conout_prints_buf.size()) {
+                // search process inheritance chain again
+                g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, nullptr);
+                g_is_console_window_owner_proc_searched = true;
 
-                if (g_owned_console_window) {
+                if (g_owned_console_window && console_window_owner_procs.size()) {
+                    StdHandles std_handles;
+                    StdHandlesState std_handles_state;
                     _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
 
                     // search ancestor console window owner process
                     for (const auto & console_window_owner_proc : console_window_owner_procs) {
-                        if (console_window_owner_proc.console_window) {
+                        if (!console_window_owner_proc.console_window) {
+                            continue;
+                        }
+
+                        if (g_flags.allow_conout_attach_to_invisible_parent_console || IsWindowVisible(console_window_owner_proc.console_window)) {
                             ancestor_console_window_owner_proc = console_window_owner_proc;
                             break;
                         }
@@ -3930,42 +3985,42 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     // The process is owning the console window and is going to close it.
                     // Detach console before the exit, attach to parent console and does print the saved console prints into a parent console.
 
-                    _StdHandlesState std_handles_state;
+                    // always reget console window handle
+                    g_inherited_console_window = GetConsoleWindow();
+
+                    std_handles.save_handles();
+                    std_handles_state.save_all_states(std_handles);
+
+                    _detach_all_crt_std_handles_nolock();
+
+                    if (g_inherited_console_window) {
+                        _free_console_nolock();
+                        g_owned_console_window = NULL; // not owned after detach
+
+                        g_inherited_console_window = GetConsoleWindow();
+                    }
 
                     if (!g_inherited_console_window) {
-                        g_inherited_console_window = GetConsoleWindow();
-                    }
-
-                    _detach_stderr();
-                    _detach_stdout();
-                    _detach_stdin();
-
-                    if (g_inherited_console_window) {
-                        _free_console(std_handles_state);
-
-                        g_inherited_console_window = GetConsoleWindow();
-                    }
-                    if (ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
-                        g_inherited_console_window = _attach_console(std_handles_state, ancestor_console_window_owner_proc.proc_id, true);
+                        if (ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
+                            g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
+                        }
                     }
 
                     if (g_inherited_console_window) {
-                        _reinit_crt_std_handles();
+                        _reinit_crt_std_handles_nolock(&std_handles);
+                    }
 
 #ifdef _DEBUG
-                        if (g_conout_prints_buf.size()) {
-                            _debug_print_win32_std_handles(9);
-                            _debug_print_crt_std_handles(9);
-                        }
+                    _debug_print_win32_std_handles(nullptr, 9);
+                    _debug_print_crt_std_handles(nullptr, 9);
 #endif
 
-                        for (const auto & conout : g_conout_prints_buf) {
-                            if (conout.any_str.is_wstr) {
-                                _put_raw_message_impl(0, conout.stream_type, conout.any_str.wstr);
-                            }
-                            else {
-                                _put_raw_message_impl(0, conout.stream_type, conout.any_str.astr);
-                            }
+                    for (const auto & conout : g_conout_prints_buf) {
+                        if (conout.any_str.is_wstr) {
+                            _put_raw_message_impl(0, conout.stream_type, conout.any_str.wstr);
+                        }
+                        else {
+                            _put_raw_message_impl(0, conout.stream_type, conout.any_str.astr);
                         }
                     }
                 }
@@ -3985,7 +4040,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
         // close on exit
         if (g_flags.use_stdin_as_piped_from_conin &&_is_valid_handle(initial_stdin_handle)) {
-            const DWORD initial_stdin_handle_type = GetFileType(initial_stdin_handle);
+            const DWORD initial_stdin_handle_type = _get_file_type(initial_stdin_handle);
             if (initial_stdin_handle_type == FILE_TYPE_PIPE) {
                 // TODO:
                 //  Inject to pipe end process of `initial_stdin_handle` and call to CloseHandle(GetStdHandle(STD_INPUT_HANDLE)) if GetStdHandle(STD_INPUT_HANDLE) == FILE_TYPE_CHAR

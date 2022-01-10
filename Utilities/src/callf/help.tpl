@@ -400,7 +400,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /own-console-title
           /console-title
 
-        All flags has no effect if elevation is not executed.
+        All nested flags has no effect if elevation is not executed.
         In that case you should use either regular flags and options or
         `/promote*{ ... }` option.
 
@@ -428,6 +428,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /allow-throw-seh-except
           /create-console
           /detach-console
+          /detach-inherited-console-on-wait
           /attach-parent-console
           /disable-wow64-fs-redir
           /disable-ctrl-signals
@@ -439,7 +440,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /promote-parent{ <Flags> }
         Does declare `<Flags>` for the this-parent or this-process only
-        independently to `/elevate*` flag or option.
+        independently to `/elevate*` flag or option. The same as
+        `/promote{ ... }` option but does not affect child this-process.
 
         The same flag can not be used together with `/promote{ ... }`
         option. Silently overrides the same regular flags.
@@ -467,6 +469,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /mutex-tee-*
           /create-console
           /detach-console
+          /detach-inherited-console-on-wait
           /attach-parent-console
           /disable-wow64-fs-redir
           /disable-ctrl-signals
@@ -820,32 +823,32 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         In case of a write into reopened standard handle opened from a file
         does mutual excluded write into the same file from different
         processes.
-        Each unique absolute file path (case insensitive) associated with an
-        unique mutex.
+        Each unique opened file entity associated with an unique mutex.
         The handle file pointer moves to the end each time after the mutex is
         locked to guarantee write into the file end between processes.
         Has no effect in case of a write into not reopened (inherited)
         standard handle. In this case synchronization depends on the Win32 API
         and basically happens when all writes does perform on the same handle
         (for example, when stderr has duplicated from stdout). If handles are
-        different (each opened separately from the same file), then the
-        process tries to hash absolute lower cased file path and detect file
-        path equality to invoke a file handle duplication instead of initiate
-        a file open.
+        different (each opened separately from the same file), then
+        this-process tries to compare file entity identifiers and detect file
+        handles equality (the same file opened from may be different file
+        paths) to replace already opened second handle by a first file handle
+        duplication.
 
       /mutex-tee-file-writes
         Does mutual excluded write into the same file from different
         processes.
-        Each unique absolute file path (case insensitive) associated with an
-        unique mutex.
+        Each unique opened file entity associated with an unique mutex.
         The handle file pointer moves to the end each time after the mutex is
         locked to guarantee write into the file end between processes.
         Synchronization depends on the Win32 API and basically happens when
         all writes does perform on the same handle (for example, when stderr
         has duplicated from stdout). If handles are different (each opened
-        separately from the same file), then this-process tries to hash
-        absolute lower cased file path and detect file path equality to invoke
-        a file handle duplication instead of initiate a file open.
+        separately from the same file), then this-process tries to compare
+        file entity identifiers and detect file handles equality (the same
+        file opened from may be different file paths) to replace already
+        opened second handle by a first file handle duplication.
 
       /create-child-console
         Create new console for a child process, otherwise a child process
@@ -879,13 +882,25 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Has no effect if this-process console already exists, owned and
         visible.
         Has priority over `/attach-parent-console` flag.
-        Can not be used together with `/detach-console` flag.
+        Can not be used together with `/detach-console` and
+        `/detach-inherited-console-on-wait` flags.
 
       /detach-console
         Detach this-process console if exists.
 
         Can not be used together with `/create-console` and
         `/attach-parent-console` flags.
+
+      /detach-inherited-console-on-wait
+        Detach this-process inherited console on waiting child process exit
+        and reattach after the exit.
+
+        Can not be used together with `/create-console` and `no-wait` flags.
+
+        Has no effect if console is already detached or owned.
+
+        May has meaning in particular cases where attachment to the same
+        console can alter execution in a child process.
 
       /attach-parent-console
         Attach console from a parent process or it's ancestors. If
@@ -1072,6 +1087,14 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       This-process does wait only if stdin is a file or a pipe, otherwise a
       call has no effect. Stderr does not used on idle execution and all
       operations over it has no effect.
+
+    Elevation:
+      If one of `/elevate*` flags are used, then most of regular flags does
+      pass into child process command line. To use a flag for the parent
+      process or specifically for the elevation execution or irrelatively to
+      the elevation execution you must use a nested version of regular flags
+      and options inside these options:
+        `/elevate{ ... }{ ... }`, `/promote{ ... }`, `/promote-parent{ ... }`
 
     Pipe name placeholders:
       {pid}     - this-process identifier as decimal number

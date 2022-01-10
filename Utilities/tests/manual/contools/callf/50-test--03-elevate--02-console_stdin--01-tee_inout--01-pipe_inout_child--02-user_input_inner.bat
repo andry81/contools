@@ -10,6 +10,6 @@ set "LOG_FILE_PATH=%TEST_DATA_OUT_DIR%/%LOG_FILE_NAME%"
 
 type nul > "%LOG_FILE_PATH%"
 
-"%CALLF_EXE_PATH%" /elevate{ /no-window }{ /attach-parent-console } /tee-stdin "%LOG_FILE_PATH%" /tee-conout-dup /pipe-inout-child "" "cmd.exe /c set /p input="
+"%CALLF_EXE_PATH%" /elevate{ /no-window }{ /attach-parent-console } /tee-stdin "%LOG_FILE_PATH%" /tee-conout-dup /pipe-inout-child "" "cmd.exe /c set /p \"input=input: \""
 
 pause

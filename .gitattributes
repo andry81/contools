@@ -792,6 +792,10 @@ Utilities/tests/TODO.txt -text
 Utilities/tests/__init__/__init__.bat -text
 Utilities/tests/manual/__init__/__init__.bat -text
 Utilities/tests/manual/contools/__init__/__init__.bat -text
+Utilities/tests/manual/contools/callf/00-test--01-cui--01-new_console--01-print_help.bat -text
+Utilities/tests/manual/contools/callf/00-test--01-cui--02-existing_console--01-print_help.bat -text
+Utilities/tests/manual/contools/callf/00-test--02-gui--01-new_console--01-print_help.bat -text
+Utilities/tests/manual/contools/callf/00-test--02-gui--02-existing_console--01-print_help.bat -text
 Utilities/tests/manual/contools/callf/01-test--01-vars_subst.bat -text
 Utilities/tests/manual/contools/callf/02-test--01-env_expand.bat -text
 Utilities/tests/manual/contools/callf/03-test--01-elevate--01-new_console_if_elevated.bat -text
@@ -842,8 +846,6 @@ Utilities/tests/manual/contools/callf/70-test--01-gui_to_gui--01-create_proc--01
 Utilities/tests/manual/contools/callf/70-test--01-gui_to_gui--02-elevate--01-new_console_if_elevated--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/70-test--01-gui_to_gui--02-elevate--02-new_console--01-pause_on_exit.bat -text
 Utilities/tests/manual/contools/callf/70-test--01-gui_to_gui--02-elevate--03-new_console--01-pause_on_exit.bat -text
-Utilities/tests/manual/contools/callf/80-test--01-cui--01-print_help.bat -text
-Utilities/tests/manual/contools/callf/90-test--02-gui--01-print_help.bat -text
 Utilities/tests/manual/contools/callf/__init__/__init__.bat -text
 Utilities/tests/manual/contools/callf/refs/0.in -text
 __init__/__init__.bat -text

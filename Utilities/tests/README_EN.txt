@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.09.14
+* 2022.01.09
 * contools--utilities--tests
 
 1. DESCRIPTION
@@ -46,8 +46,8 @@ CAUTION:
 
 NOTE:
   You must run each test several times (3-5 times).
-  The `cmd.exe` may "mixing" standard handles addresses layout after each run
-  of an executable.
+  The `cmd.exe` may reorder (Windows 7) or randomize (Windows 8+) standard
+  handles addresses layout after each run of an executable.
 
   For example (Windows 7):
 
@@ -72,7 +72,7 @@ NOTE:
 All these affect test results. All runs must produce the same results.
 
 -------------------------------------------------------------------------------
-3. KNWON ISSUES
+3. KNOWN ISSUES
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -81,6 +81,21 @@ All these affect test results. All runs must produce the same results.
 
 Several tests still fails under specific conditions:
 
-* `50-test--01-elevate--02-user_input.bat` time to time fails to print
-  correctly from opened `cmd.exe` console under not elevated environment in
-  Windows 7.
+* `03-test--01-elevate--04-new_console_for_all--01-pause_on_exit_if_error.bat`
+  `70-test--01-gui_to_gui--02-elevate--03-new_console--01-pause_on_exit.bat`
+
+  Windows 7:
+    If deny elevation does print error as unicode in ansi code page.
+
+* `50-test--01-elevate--02-user_input.bat`
+
+  Windows 7:
+    Time to time fails to print correctly from opened `cmd.exe` console under
+    not elevated environment.
+
+* `70-test--01-gui_to_gui--02-elevate--01-new_console_if_elevated--01-pause_on_exit.bat`
+
+  Windows 7:
+    Child `cmd.exe` must exit without any key press, but callfg process
+    must print `Press any key to continue . . . ` and exit on a key press.
+    If not, then the end callfg process must be terminated manually.

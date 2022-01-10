@@ -1,3 +1,21 @@
+2022.01.10:
+* new: src/callf: parent console attach on demand (or allocation of a new one if not found any in process inheritance chain) or on output into console if console been detached or unexisted
+* new: src/callf: print into console in main thread from a worker thread stdout/stderr message buffer while waiting on a child exit
+
+2022.01.09:
+* fixed: src/callf: missed case where `ReadConsole` being blocked and there is no an output handle to write but a child process does exit anyway and we must check that independently to an output handle
+* new: src/callf: full synchronization on console access: console attach/alloc/detach, console standard handles get/set, console input handle close, CRT standard handles reopen/close, console print
+* changed: tests/manual/contools/callf: tests update
+* changed: tests/README_EN.txt: readme update
+
+2022.01.08:
+* fixed: src/callf: always check CRT streams text mode and use only wide string print functions for not ansi text mode CRT streams (otherise an internal CRT assert will be called)
+* fixed: src/callf: always read STD handles flags and modes before CRT handles detach in case of last STD handles close on CRT handles close
+* new: src/callf: `/detach-inherited-console-on-wait` flag to detach console before wait on child process exit and reattach after exit (workaround to avoid losing arrows key interactive input handling in the child `cmd.exe` process - command line history traverse)
+* changed: src/callf/help.tpl: help update
+* changed: bin/contools/README_EN.txt: readme update
+* refactor: src/callf: CRT reinitialization after console (re)attach refactor
+
 2022.01.04:
 * changed: README_EN.txt: merged into `bin/contools/README_EN.txt`
 * changed: TODO.txt: moved to `bin/contools`

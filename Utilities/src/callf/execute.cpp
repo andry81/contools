@@ -42,10 +42,13 @@ Options g_promote_parent_options    = {};
 DWORD g_parent_proc_id              = -1;
 HWND  g_inherited_console_window    = NULL; // may be inherited or owned or NULL
 HWND  g_owned_console_window        = NULL; // owned or NULL
+bool  g_is_console_window_owner_proc_searched = false; // true if `_find_console_window_owner_procs` called as least once
 
-HANDLE g_stdin_handle               = INVALID_HANDLE_VALUE;
-HANDLE g_stdout_handle              = INVALID_HANDLE_VALUE;
-HANDLE g_stderr_handle              = INVALID_HANDLE_VALUE;
+// saved before detach std handles and states
+StdHandles g_detached_std_handles;
+StdHandlesState g_detached_std_handles_state;
+
+StdHandles g_std_handles;
 
 HANDLE g_stdout_handle_dup          = INVALID_HANDLE_VALUE;
 HANDLE g_stderr_handle_dup          = INVALID_HANDLE_VALUE;
@@ -58,9 +61,7 @@ bool g_stdin_handle_inherit         = true;
 bool g_stdout_handle_inherit        = true;
 bool g_stderr_handle_inherit        = true;
 
-HANDLE g_reopen_stdin_handle        = INVALID_HANDLE_VALUE;
-HANDLE g_reopen_stdout_handle       = INVALID_HANDLE_VALUE;
-HANDLE g_reopen_stderr_handle       = INVALID_HANDLE_VALUE;
+StdHandles g_reopen_std_handles;
 
 HANDLE g_reopen_stdout_mutex        = INVALID_HANDLE_VALUE;
 HANDLE g_reopen_stderr_mutex        = INVALID_HANDLE_VALUE;
@@ -69,9 +70,7 @@ _FileId g_reopen_stdout_fileid      = {};
 _FileId g_reopen_stderr_fileid      = {};
 
 // specialized tee file handles
-HANDLE g_tee_file_stdin_handle      = INVALID_HANDLE_VALUE;
-HANDLE g_tee_file_stdout_handle     = INVALID_HANDLE_VALUE;
-HANDLE g_tee_file_stderr_handle     = INVALID_HANDLE_VALUE;
+StdHandles g_tee_file_std_handles;
 
 HANDLE g_tee_file_stdin_mutex       = INVALID_HANDLE_VALUE;
 HANDLE g_tee_file_stdout_mutex      = INVALID_HANDLE_VALUE;
@@ -82,9 +81,7 @@ _FileId g_tee_file_stdout_fileid    = {};
 _FileId g_tee_file_stderr_fileid    = {};
 
 // specialized tee named pipe handles
-HANDLE g_tee_named_pipe_stdin_handle = INVALID_HANDLE_VALUE;
-HANDLE g_tee_named_pipe_stdout_handle = INVALID_HANDLE_VALUE;
-HANDLE g_tee_named_pipe_stderr_handle = INVALID_HANDLE_VALUE;
+StdHandles g_tee_named_pipe_std_handles;
 
 bool g_is_stdin_reopened            = false;
 bool g_is_stdout_reopened           = false;
@@ -121,30 +118,34 @@ bool g_has_tee_stderr               = false;
 bool g_enable_child_ctrl_handler    = false;
 std::atomic_bool g_ctrl_handler     = false;
 
-HANDLE g_stdin_pipe_read_handle     = INVALID_HANDLE_VALUE;
-HANDLE g_stdin_pipe_write_handle    = INVALID_HANDLE_VALUE;
-HANDLE g_stdout_pipe_read_handle    = INVALID_HANDLE_VALUE;
-HANDLE g_stdout_pipe_write_handle   = INVALID_HANDLE_VALUE;
-HANDLE g_stderr_pipe_read_handle    = INVALID_HANDLE_VALUE;
-HANDLE g_stderr_pipe_write_handle   = INVALID_HANDLE_VALUE;
+// console attach/alloc/detach together with console handle close synchronization
+HANDLE g_console_access_mutex       = INVALID_HANDLE_VALUE;
+
+// prevents early `ReadConsole` worker thread execution to avoid console access in worker threads before detach by `/detach-inherited-console-on-wait`
+HANDLE g_console_access_ready_thread_lock_event = INVALID_HANDLE_VALUE;
+
+StdHandles g_pipe_read_std_handles;
+StdHandles g_pipe_write_std_handles;
 
 HANDLE g_child_process_handle       = INVALID_HANDLE_VALUE;
 DWORD g_child_process_group_id      = -1; // to pass signals into child process
 
-StreamPipeThreadLocals g_stream_pipe_thread_locals[3];
-StreamPipeThreadLocals g_stdin_to_stdout_thread_locals;
-ConnectNamedPipeThreadLocals g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[3];
-ConnectNamedPipeThreadLocals g_connect_server_named_pipe_thread_locals[2][3]; // <int handle_type, int co_stream_type>
-ConnectNamedPipeThreadLocals g_connect_client_named_pipe_thread_locals[2][3]; // <int handle_type, int co_stream_type>
+StreamPipeThreadLocals              g_stream_pipe_thread_locals[3];
+StreamPipeThreadLocals              g_stdin_to_stdout_thread_locals;
 
-WorkerThreadsReturnData g_worker_threads_return_data;
+ConnectNamedPipeThreadLocals        g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[3];
+ConnectNamedPipeThreadLocals        g_connect_server_named_pipe_thread_locals[2][3]; // <int handle_type, int co_stream_type>
+ConnectNamedPipeThreadLocals        g_connect_client_named_pipe_thread_locals[2][3]; // <int handle_type, int co_stream_type>
+
+WorkerThreadsReturnDatas            g_worker_threads_return_datas;
+size_t                              g_worker_threads_return_datas_print_end = 0; // print message from index
 
 // NOTE:
-//  The `ReadConsole` Win32 API function has an issue when it can be blocked on the console input while the output handle is already closed.
-//  To workaround that we have to watch for the output handle in a separate thread and call to `CloseHandle` on console input handle to interrupt the
-//  `ReadConsole` and return to check the output handle.
+//  The `ReadConsole` Win32 API function has an issue when it can be blocked on the console input while the output handle is closed or a child process is exited.
+//  To workaround that we have to watch for the output handle and a child process in a separate thread and call to `CloseHandle` on console input handle to interrupt the
+//  `ReadConsole` and return into the loop to check the output handle or a child process existence.
 //
-WriteHandleWatchThreadLocals g_write_handle_watch_thread_locals[1]; // only for console stdin
+WriteOutputWatchThreadLocals        g_write_output_watch_thread_locals[1]; // only for console stdin
 
 Flags::Flags()
 {
@@ -245,6 +246,7 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, detach_child_console);
     MERGE_FLAG(flags, create_console);
     MERGE_FLAG(flags, detach_console);
+    MERGE_FLAG(flags, detach_inherited_console_on_wait);
     MERGE_FLAG(flags, attach_parent_console);
 
     MERGE_FLAG(flags, eval_backslash_esc);
@@ -468,34 +470,209 @@ BOOL WINAPI ChildCtrlHandler(DWORD ctrl_type)
     return FALSE;
 }
 
-DWORD WINAPI WriteHandleWatchThread(LPVOID lpParam)
+DWORD WINAPI WriteOutputWatchThread(LPVOID lpParam)
 {
-    WriteHandleWatchThreadData & thread_data = *static_cast<WriteHandleWatchThreadData *>(lpParam);
+    WriteOutputWatchThreadData & thread_data = *static_cast<WriteOutputWatchThreadData *>(lpParam);
 
     DWORD num_bytes_written = 0;
 
     while (!thread_data.cancel_io) {
         // check on write handle error
-        SetLastError(0); // just in case
-        if (!WriteFile(thread_data.write_handle, "", 0, &num_bytes_written, NULL)) {
-            //FreeConsole(); // CAUTION: raises Access Violation under Windows 7
+        if (_is_valid_handle(thread_data.write_handle)) {
+            SetLastError(0); // just in case
+            if (!WriteFile(thread_data.write_handle, "", 0, &num_bytes_written, NULL)) {
+                //_free_console(&g_console_access_mutex); // CAUTION: raises Access Violation under Windows 7
+                _close_handle(*thread_data.read_handle_ptr);
+                break;
+            }
+        }
+
+        // in case if a child process exit
+        if (WaitForSingleObject(g_child_process_handle, 20) != WAIT_TIMEOUT) {
             _close_handle(*thread_data.read_handle_ptr);
             break;
         }
-
-        // loop wait
-        Sleep(20);
     }
 
     return 0;
+}
+
+template <typename T>
+inline void CollectThreadsData(T & local)
+{
+    return CollectThreadsData(make_singular_array(local));
+}
+
+template <typename T, size_t N>
+inline void CollectThreadsData(T (& locals)[N])
+{
+    // collect all threads return data
+    utility::for_each_unroll(locals, [&](auto & local) {
+        __try {
+            local.thread_data.lock();
+
+            if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                g_worker_threads_return_datas.add(local.thread_data);
+                local.thread_data.is_copied = true;
+            }
+        }
+        __finally {
+            local.thread_data.unlock();
+        }
+    });
+}
+
+template <typename T>
+inline void AccomplishServerPipeConnections(T & local, bool * break_ptr, bool cancel_io)
+{
+    return AccomplishServerPipeConnections(make_singular_array(local), break_ptr, cancel_io);
+}
+
+template <typename T, size_t N>
+inline void AccomplishServerPipeConnections(T (& locals)[N], bool * break_ptr, bool cancel_io)
+{
+    WaitForConnectNamedPipeThreads(locals, cancel_io);
+
+    // collect all threads return data
+    utility::for_each_unroll(locals, [&](auto & local) {
+        __try {
+            local.thread_data.lock();
+
+            if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                g_worker_threads_return_datas.add(local.thread_data);
+                local.thread_data.is_copied = true;
+            }
+            if (break_ptr && !*break_ptr && local.thread_data.is_error) {
+                *break_ptr = true;
+            }
+        }
+        __finally {
+            local.thread_data.unlock();
+        }
+    });
+}
+
+template <typename T>
+inline void AccomplishClientPipeConnections(T & local, int & ret, bool & break_, bool cancel_io)
+{
+    return AccomplishClientPipeConnections(make_singular_array(local), ret, break_, cancel_io);
+}
+
+template <typename T, size_t N>
+inline void AccomplishClientPipeConnections(T (& locals)[N], int & ret, bool & break_, bool cancel_io)
+{
+    WaitForConnectNamedPipeThreads(locals, cancel_io);
+
+    // collect all threads return data
+    utility::for_each_unroll(locals, [&](auto & local) {
+        __try {
+            local.thread_data.lock();
+
+            if (!break_) {
+                // return error code from the first thread
+                if (local.thread_data.is_error) {
+                    ret = local.thread_data.ret;
+                    break_ = true;
+                }
+            }
+            if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
+                g_worker_threads_return_datas.add(local.thread_data);
+                local.thread_data.is_copied = true;
+            }
+        }
+        __finally {
+            local.thread_data.unlock();
+        }
+    });
+}
+
+inline void FormatThreadDataOutput(ThreadReturnData & thread_data, int ret, DWORD win_error, TCHAR * fmt, ...)
+{
+    __try {
+        [&](TCHAR * fmt_) {
+            thread_data.lock();
+
+            thread_data.ret = ret;
+            thread_data.win_error = win_error;
+            if (!g_flags.no_print_gen_error_string) {
+                va_list vl;
+                va_start(vl, fmt_);
+                thread_data.msg = _format_stderr_message_va(fmt_, vl);
+                va_end(vl);
+            }
+            if (g_flags.print_win_error_string && win_error) {
+                thread_data.msg += _format_win_error_message(win_error, g_options.win_error_langid);
+            }
+            thread_data.is_error = true;
+        }(fmt);
+    }
+    __finally {
+        thread_data.unlock();
+    }
+}
+
+void RestoreConsole(int & ret, DWORD & win_error, StdHandles * std_handles_ptr, StdHandlesState * std_handles_state_ptr, bool alloc_if_not_attached)
+{
+    __try {
+        [&]() {
+            WaitForSingleObject(g_console_access_mutex, INFINITE);
+
+            g_inherited_console_window = GetConsoleWindow();
+            if (g_inherited_console_window) {
+                return;
+            }
+
+            StdHandles std_handles;
+            StdHandlesState std_handles_state;
+            std::vector<_ConsoleWindowOwnerProc> console_window_owner_procs;
+            _ConsoleWindowOwnerProc ancestor_console_window_owner_proc;
+
+            // search process inheritance chain
+            g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, nullptr);
+            g_is_console_window_owner_proc_searched = true;
+
+            // search ancestor console window owner process
+            for (const auto & console_window_owner_proc : console_window_owner_procs) {
+                if (console_window_owner_proc.console_window) {
+                    if (g_flags.allow_conout_attach_to_invisible_parent_console || IsWindowVisible(console_window_owner_proc.console_window)) {
+                        ancestor_console_window_owner_proc = console_window_owner_proc;
+                        break;
+                    }
+                }
+            }
+
+            if (ancestor_console_window_owner_proc.console_window && ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
+                g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
+            }
+            else if (alloc_if_not_attached) {
+                g_owned_console_window = g_inherited_console_window = _alloc_console_nolock();
+            }
+
+            if (g_inherited_console_window) {
+                g_owned_console_window = NULL; // not owned after attach
+
+                std_handles.save_handles(std_handles_ptr);
+
+                _reinit_crt_std_handles_nolock(&std_handles);
+
+                _sanitize_std_handles_nolock(ret, win_error, std_handles_state_ptr ? *std_handles_state_ptr : std_handles_state, g_flags, g_options);
+
+#ifdef _DEBUG
+                _debug_print_win32_std_handles(nullptr, 7);
+                _debug_print_crt_std_handles(nullptr, 7);
+#endif
+            }
+        }();
+    }
+    __finally {
+        ReleaseMutex(g_console_access_mutex);
+    }
 }
 
 template <int stream_type>
 DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 {
     StreamPipeThreadData & thread_data = *static_cast<StreamPipeThreadData *>(lpParam);
-
-    thread_data.ret = err_unspecified;
 
     bool stream_eof = false;
 
@@ -514,6 +691,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
     std::vector<std::uint8_t> stderr_byte_buf;
 
     bool break_ = false;
+    bool try_restore_console = true;
 
     // NOTE:
     //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
@@ -526,56 +704,9 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                 // Accomplish all server pipe connections before continue.
                 //
 
-                {
-                    auto & connect_server_named_pipe_thread_local = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type];
-
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                    // check errors
-                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                            g_worker_threads_return_data.add(local.thread_data);
-                            local.thread_data.is_copied = true;
-                        }
-                        if (!break_ && local.thread_data.is_error) {
-                            break_ = true;
-                        }
-                    });
-                }
-
-                {
-                    auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[0][stream_type];
-
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                    // check errors
-                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                            g_worker_threads_return_data.add(local.thread_data);
-                            local.thread_data.is_copied = true;
-                        }
-                        if (!break_ && local.thread_data.is_error) {
-                            break_ = true;
-                        }
-                    });
-                }
-
-                {
-                    auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[1][stream_type];
-
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                    // check errors
-                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                            g_worker_threads_return_data.add(local.thread_data);
-                            local.thread_data.is_copied = true;
-                        }
-                        if (!break_ && local.thread_data.is_error) {
-                            break_ = true;
-                        }
-                    });
-                }
+                AccomplishServerPipeConnections(g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type], &break_, false);
+                AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[0][stream_type], &break_, false);
+                AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[1][stream_type], &break_, false);
 
                 if (break_) break;
 
@@ -597,42 +728,33 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                         }
 
                         SetLastError(0); // just in case
-                        if (!ReadFile(g_stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
+                        if (!ReadFile(g_std_handles.stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             win_error = GetLastError();
                             if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                thread_data.ret = err_io_error;
-                                thread_data.win_error = win_error;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("stdin file read error: win_error=0x%08X (%d)\n"),
-                                            win_error, win_error);
-                                }
-                                if (g_flags.print_win_error_string && win_error) {
-                                    thread_data.msg +=
-                                        _format_win_error_message(win_error, g_options.win_error_langid);
-                                }
-                                thread_data.is_error = true;
+                                FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                    _T("stdin file read error: win_error=0x%08X (%d)\n"),
+                                    win_error, win_error);
                             }
 
                             stream_eof = true;
                         }
 
                         if (num_bytes_read) {
-                            if (_is_valid_handle(g_tee_file_stdin_handle)) {
+                            if (_is_valid_handle(g_tee_file_std_handles.stdin_handle)) {
                                 [&]() { if_break(true) __try {
                                     if (_is_valid_handle(g_tee_file_stdin_mutex)) {
                                         WaitForSingleObject(g_tee_file_stdin_mutex, INFINITE);
                                     }
 
-                                    SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
+                                    SetFilePointer(g_tee_file_std_handles.stdin_handle, 0, NULL, FILE_END);
 
-                                    WriteFile(g_tee_file_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_file_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                     if (thread_data.cancel_io) break;
 
                                     if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                        FlushFileBuffers(g_tee_file_stdin_handle);
+                                        FlushFileBuffers(g_tee_file_std_handles.stdin_handle);
                                         if (thread_data.cancel_io) break;
                                     }
                                 }
@@ -645,21 +767,21 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 if (thread_data.cancel_io) break;
                             }
 
-                            if (_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
-                                WriteFile(g_tee_named_pipe_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                            if (_is_valid_handle(g_tee_named_pipe_std_handles.stdin_handle)) {
+                                WriteFile(g_tee_named_pipe_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdin_pipe_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                    FlushFileBuffers(g_tee_named_pipe_stdin_handle);
+                                    FlushFileBuffers(g_tee_named_pipe_std_handles.stdin_handle);
                                     if (thread_data.cancel_io) break;
                                 }
                             }
 
-                            if (_is_valid_handle(g_stdin_pipe_write_handle)) {
+                            if (_is_valid_handle(g_pipe_write_std_handles.stdin_handle)) {
                                 SetLastError(0); // just in case
-                                if (WriteFile(g_stdin_pipe_write_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
+                                if (WriteFile(g_pipe_write_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
                                     if (g_flags.stdin_output_flush || g_flags.inout_flush) {
-                                        FlushFileBuffers(g_stdin_pipe_write_handle);
+                                        FlushFileBuffers(g_pipe_write_std_handles.stdin_handle);
                                     }
 
                                     if (thread_data.cancel_io) break;
@@ -669,18 +791,9 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                     win_error = GetLastError();
                                     if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                        thread_data.ret = err_io_error;
-                                        thread_data.win_error = win_error;
-                                        if (!g_flags.no_print_gen_error_string) {
-                                            thread_data.msg =
-                                                _format_stderr_message(_T("child stdin write error: win_error=0x%08X (%d)\n"),
-                                                    win_error, win_error);
-                                        }
-                                        if (g_flags.print_win_error_string && win_error) {
-                                            thread_data.msg +=
-                                                _format_win_error_message(win_error, g_options.win_error_langid);
-                                        }
-                                        thread_data.is_error = true;
+                                        FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                            _T("child stdin write error: win_error=0x%08X (%d)\n"),
+                                            win_error, win_error);
                                     }
 
                                     stream_eof = true;
@@ -712,23 +825,14 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                         //
 
                         SetLastError(0); // just in case
-                        if (!PeekNamedPipe(g_stdin_handle, NULL, 0, NULL, &num_bytes_avail, NULL)) {
+                        if (!PeekNamedPipe(g_std_handles.stdin_handle, NULL, 0, NULL, &num_bytes_avail, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             win_error = GetLastError();
                             if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                thread_data.ret = err_io_error;
-                                thread_data.win_error = win_error;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("stdin pipe peek error: win_error=0x%08X (%d)\n"),
-                                            win_error, win_error);
-                                }
-                                if (g_flags.print_win_error_string && win_error) {
-                                    thread_data.msg +=
-                                        _format_win_error_message(win_error, g_options.win_error_langid);
-                                }
-                                thread_data.is_error = true;
+                                FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                    _T("stdin pipe peek error: win_error=0x%08X (%d)\n"),
+                                    win_error, win_error);
                             }
 
                             stream_eof = true;
@@ -736,23 +840,14 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                         if (num_bytes_avail) {
                             SetLastError(0); // just in case
-                            if (!ReadFile(g_stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
+                            if (!ReadFile(g_std_handles.stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
                                 if (thread_data.cancel_io) break;
 
                                 win_error = GetLastError();
                                 if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                    thread_data.ret = err_io_error;
-                                    thread_data.win_error = win_error;
-                                    if (!g_flags.no_print_gen_error_string) {
-                                        thread_data.msg =
-                                            _format_stderr_message(_T("stdin pipe read error: win_error=0x%08X (%d)\n"),
-                                                win_error, win_error);
-                                    }
-                                    if (g_flags.print_win_error_string && win_error) {
-                                        thread_data.msg +=
-                                            _format_win_error_message(win_error, g_options.win_error_langid);
-                                    }
-                                    thread_data.is_error = true;
+                                    FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                        _T("stdin pipe read error: win_error=0x%08X (%d)\n"),
+                                        win_error, win_error);
                                 }
 
                                 stream_eof = true;
@@ -760,19 +855,19 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                         }
 
                         if (num_bytes_read) {
-                            if (_is_valid_handle(g_tee_file_stdin_handle)) {
+                            if (_is_valid_handle(g_tee_file_std_handles.stdin_handle)) {
                                 [&]() { if_break(true) __try {
                                     if (_is_valid_handle(g_tee_file_stdin_mutex)) {
                                         WaitForSingleObject(g_tee_file_stdin_mutex, INFINITE);
                                     }
 
-                                    SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
+                                    SetFilePointer(g_tee_file_std_handles.stdin_handle, 0, NULL, FILE_END);
 
-                                    WriteFile(g_tee_file_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_file_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                     if (thread_data.cancel_io) break;
 
                                     if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                        FlushFileBuffers(g_tee_file_stdin_handle);
+                                        FlushFileBuffers(g_tee_file_std_handles.stdin_handle);
                                         if (thread_data.cancel_io) break;
                                     }
                                 }
@@ -785,21 +880,21 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 if (thread_data.cancel_io) break;
                             }
 
-                            if (_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
-                                WriteFile(g_tee_named_pipe_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                            if (_is_valid_handle(g_tee_named_pipe_std_handles.stdin_handle)) {
+                                WriteFile(g_tee_named_pipe_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdin_pipe_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                    FlushFileBuffers(g_tee_named_pipe_stdin_handle);
+                                    FlushFileBuffers(g_tee_named_pipe_std_handles.stdin_handle);
                                     if (thread_data.cancel_io) break;
                                 }
                             }
 
-                            if (_is_valid_handle(g_stdin_pipe_write_handle)) {
+                            if (_is_valid_handle(g_pipe_write_std_handles.stdin_handle)) {
                                 SetLastError(0); // just in case
-                                if (WriteFile(g_stdin_pipe_write_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
+                                if (WriteFile(g_pipe_write_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
                                     if (g_flags.stdin_output_flush || g_flags.inout_flush) {
-                                        FlushFileBuffers(g_stdin_pipe_write_handle);
+                                        FlushFileBuffers(g_pipe_write_std_handles.stdin_handle);
                                     }
 
                                     if (thread_data.cancel_io) break;
@@ -809,18 +904,9 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                     win_error = GetLastError();
                                     if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                        thread_data.ret = err_io_error;
-                                        thread_data.win_error = win_error;
-                                        if (!g_flags.no_print_gen_error_string) {
-                                            thread_data.msg =
-                                                _format_stderr_message(_T("child stdin write error: win_error=0x%08X (%d)\n"),
-                                                    win_error, win_error);
-                                        }
-                                        if (g_flags.print_win_error_string && win_error) {
-                                            thread_data.msg +=
-                                                _format_win_error_message(win_error, g_options.win_error_langid);
-                                        }
-                                        thread_data.is_error = true;
+                                        FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                            _T("child stdin write error: win_error=0x%08X (%d)\n"),
+                                            win_error, win_error);
                                     }
 
                                     stream_eof = true;
@@ -828,11 +914,11 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                             }
                         }
 
-                        if (_is_valid_handle(g_stdin_pipe_write_handle)) {
+                        if (_is_valid_handle(g_pipe_write_std_handles.stdin_handle)) {
                             if (!num_bytes_read && !stream_eof) {
                                 // check on outbound write error
                                 SetLastError(0); // just in case
-                                if (!WriteFile(g_stdin_pipe_write_handle, "", 0, &num_bytes_written, NULL)) {
+                                if (!WriteFile(g_pipe_write_std_handles.stdin_handle, "", 0, &num_bytes_written, NULL)) {
                                     if (thread_data.cancel_io) break;
 
                                     stream_eof = true;
@@ -856,6 +942,15 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                     //  The `CreatePseudoConsole` API function is available only after the `Windows 10 October 2018 Update (version 1809) [desktop apps only]`
                     //  The complete implementation which can be provided here can be done through a remote code injection to a child process and is not yet available.
                     //
+
+                    // NOTE:
+                    //  Wait synchronization related to the `/detach-inherited-console-on-wait` flag when we must not interact with
+                    //  the console API until the console would be detached or left attached. If is detached then exit the thread as nothing to do here.
+                    //  If is retained then continue. Otherwise may be an access violation while the console is used while being detached.
+                    //
+                    if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
+                        WaitForSingleObject(g_console_access_ready_thread_lock_event, INFINITE);
+                    }
 
                     std::vector<wchar_t> stdin_wchar_buf;
 
@@ -936,48 +1031,37 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                     console_read_control.dwCtrlWakeupMask = (1 << 4) | (1 << 26) | (1 << '\n');
 
                     // write handle watch thread
-                    if_break (_is_valid_handle(g_stdin_pipe_write_handle)) {
-                        // in case if child process exit
-                        if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
-                            stream_eof = true;
-                            break;
-                        }
 
-                        g_write_handle_watch_thread_locals[0].thread_data.read_handle_ptr = &g_stdin_handle;
-                        g_write_handle_watch_thread_locals[0].thread_data.write_handle = g_stdin_pipe_write_handle;
-
-                        g_write_handle_watch_thread_locals[0].thread_handle =
-                            CreateThread(
-                                NULL, 0,
-                                WriteHandleWatchThread, &g_write_handle_watch_thread_locals[0].thread_data,
-                                0,
-                                &g_write_handle_watch_thread_locals[0].thread_id);
+                    // in case if a child process exit
+                    if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
+                        break;
                     }
 
+                    g_write_output_watch_thread_locals[0].thread_data.read_handle_ptr = &g_std_handles.stdin_handle;
+                    g_write_output_watch_thread_locals[0].thread_data.write_handle = g_pipe_write_std_handles.stdin_handle;
+
+                    g_write_output_watch_thread_locals[0].thread_handle =
+                        CreateThread(
+                            NULL, 0,
+                            WriteOutputWatchThread, &g_write_output_watch_thread_locals[0].thread_data,
+                            0,
+                            &g_write_output_watch_thread_locals[0].thread_id);
+
                     while (!stream_eof) {
-                        // in case if child process exit
+                        // in case if a child process exit
                         if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
                             break;
                         }
 
                         SetLastError(0); // just in case
-                        if (!ReadConsoleW(g_stdin_handle, stdin_wchar_buf.data(), tee_stdin_read_num_chars, &num_chars_read, &console_read_control)) { // always use unicode
+                        if (!ReadConsoleW(g_std_handles.stdin_handle, stdin_wchar_buf.data(), tee_stdin_read_num_chars, &num_chars_read, &console_read_control)) { // always use unicode
                             if (thread_data.cancel_io) break;
 
                             win_error = GetLastError();
                             if (win_error) {
-                                thread_data.ret = err_io_error;
-                                thread_data.win_error = win_error;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("stdin character device read error: win_error=0x%08X (%d)\n"),
-                                            win_error, win_error);
-                                }
-                                if (g_flags.print_win_error_string && win_error) {
-                                    thread_data.msg +=
-                                        _format_win_error_message(win_error);
-                                }
-                                thread_data.is_error = true;
+                                FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                    _T("stdin character device read error: win_error=0x%08X (%d)\n"),
+                                    win_error, win_error);
                             }
 
                             stream_eof = true;
@@ -997,30 +1081,30 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 break;
                             }
 
-                            if (_is_valid_handle(g_tee_file_stdin_handle)) {
+                            if (_is_valid_handle(g_tee_file_std_handles.stdin_handle)) {
                                 [&]() { __try {
                                     if (_is_valid_handle(g_tee_file_stdin_mutex)) {
                                         WaitForSingleObject(g_tee_file_stdin_mutex, INFINITE);
                                     }
 
-                                    SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
+                                    SetFilePointer(g_tee_file_std_handles.stdin_handle, 0, NULL, FILE_END);
 
                                     switch (translation_mode) {
                                     case tm_char_to_char:
                                     case tm_wchar_to_char:
-                                        WriteFile(g_tee_file_stdin_handle, num_translated_bytes ? translated_char_buf.data() : "", num_translated_bytes, &num_bytes_written, NULL);
+                                        WriteFile(g_tee_file_std_handles.stdin_handle, num_translated_bytes ? translated_char_buf.data() : "", num_translated_bytes, &num_bytes_written, NULL);
                                         break;
 
                                     case tm_wchar_to_wchar:
                                     case tm_char_to_wchar:
-                                        WriteFile(g_tee_file_stdin_handle, stdin_wchar_buf.data(), num_chars_read * sizeof(wchar_t), &num_bytes_written, NULL);
+                                        WriteFile(g_tee_file_std_handles.stdin_handle, stdin_wchar_buf.data(), num_chars_read * sizeof(wchar_t), &num_bytes_written, NULL);
                                         break;
                                     }
 
                                     if (thread_data.cancel_io) return;
 
                                     if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                        FlushFileBuffers(g_tee_file_stdin_handle);
+                                        FlushFileBuffers(g_tee_file_std_handles.stdin_handle);
                                         if (thread_data.cancel_io) return;
                                     }
                                 }
@@ -1033,28 +1117,28 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 if (thread_data.cancel_io) break;
                             }
 
-                            if (_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
+                            if (_is_valid_handle(g_tee_named_pipe_std_handles.stdin_handle)) {
                                 switch (translation_mode) {
                                 case tm_char_to_char:
                                 case tm_wchar_to_char:
-                                    WriteFile(g_tee_named_pipe_stdin_handle, num_translated_bytes ? translated_char_buf.data() : "", num_translated_bytes, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_named_pipe_std_handles.stdin_handle, num_translated_bytes ? translated_char_buf.data() : "", num_translated_bytes, &num_bytes_written, NULL);
                                     break;
 
                                 case tm_wchar_to_wchar:
                                 case tm_char_to_wchar:
-                                    WriteFile(g_tee_named_pipe_stdin_handle, stdin_wchar_buf.data(), num_chars_read * sizeof(wchar_t), &num_bytes_written, NULL);
+                                    WriteFile(g_tee_named_pipe_std_handles.stdin_handle, stdin_wchar_buf.data(), num_chars_read * sizeof(wchar_t), &num_bytes_written, NULL);
                                     break;
                                 }
 
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdin_pipe_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                    FlushFileBuffers(g_tee_named_pipe_stdin_handle);
+                                    FlushFileBuffers(g_tee_named_pipe_std_handles.stdin_handle);
                                     if (thread_data.cancel_io) break;
                                 }
                             }
 
-                            if (_is_valid_handle(g_stdin_pipe_write_handle)) {
+                            if (_is_valid_handle(g_pipe_write_std_handles.stdin_handle)) {
                                 BOOL is_written = FALSE;
 
                                 SetLastError(0); // just in case
@@ -1062,18 +1146,18 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 switch (translation_mode) {
                                 case tm_char_to_char:
                                 case tm_wchar_to_char:
-                                    is_written = WriteFile(g_stdin_pipe_write_handle, num_translated_bytes ? translated_char_buf.data() : "", num_translated_bytes, &num_bytes_written, NULL);
+                                    is_written = WriteFile(g_pipe_write_std_handles.stdin_handle, num_translated_bytes ? translated_char_buf.data() : "", num_translated_bytes, &num_bytes_written, NULL);
                                     break;
 
                                 case tm_wchar_to_wchar:
                                 case tm_char_to_wchar:
-                                    is_written = WriteFile(g_stdin_pipe_write_handle, stdin_wchar_buf.data(), num_chars_read * sizeof(wchar_t), &num_bytes_written, NULL);
+                                    is_written = WriteFile(g_pipe_write_std_handles.stdin_handle, stdin_wchar_buf.data(), num_chars_read * sizeof(wchar_t), &num_bytes_written, NULL);
                                     break;
                                 }
 
                                 if (is_written) {
                                     if (g_flags.stdin_output_flush || g_flags.inout_flush) {
-                                        FlushFileBuffers(g_stdin_pipe_write_handle);
+                                        FlushFileBuffers(g_pipe_write_std_handles.stdin_handle);
                                     }
 
                                     if (thread_data.cancel_io) break;
@@ -1083,18 +1167,9 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                     win_error = GetLastError();
                                     if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                        thread_data.ret = err_io_error;
-                                        thread_data.win_error = win_error;
-                                        if (!g_flags.no_print_gen_error_string) {
-                                            thread_data.msg =
-                                                _format_stderr_message(_T("child stdin write error: win_error=0x%08X (%d)\n"),
-                                                    win_error, win_error);
-                                        }
-                                        if (g_flags.print_win_error_string && win_error) {
-                                            thread_data.msg +=
-                                                _format_win_error_message(win_error, g_options.win_error_langid);
-                                        }
-                                        thread_data.is_error = true;
+                                        FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                            _T("child stdin write error: win_error=0x%08X (%d)\n"),
+                                            win_error, win_error);
                                     }
 
                                     stream_eof = true;
@@ -1123,15 +1198,15 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                     break;
                                 }
 
-                                WriteConsoleInput(g_stdin_handle, input_records.data(), input_records.size(), &num_events_written);
+                                WriteConsoleInput(g_std_handles.stdin_handle, input_records.data(), input_records.size(), &num_events_written);
                             }
                         }
 
-                        if (_is_valid_handle(g_stdin_pipe_write_handle)) {
+                        if (_is_valid_handle(g_pipe_write_std_handles.stdin_handle)) {
                             if (!num_chars_read && !stream_eof) {
                                 // check on outbound write error
                                 SetLastError(0); // just in case
-                                if (!WriteFile(g_stdin_pipe_write_handle, "", 0, &num_bytes_written, NULL)) {
+                                if (!WriteFile(g_pipe_write_std_handles.stdin_handle, "", 0, &num_bytes_written, NULL)) {
                                     if (thread_data.cancel_io) break;
 
                                     stream_eof = true;
@@ -1155,100 +1230,44 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                 // Accomplish all server pipe connections before continue.
                 //
 
-                {
-                    auto & connect_server_named_pipe_thread_local = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type];
-
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                    // check errors
-                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                            g_worker_threads_return_data.add(local.thread_data);
-                            local.thread_data.is_copied = true;
-                        }
-                        if (!break_ && local.thread_data.is_error) {
-                            break_ = true;
-                        }
-                    });
-                }
-
-                {
-                    auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[0][stream_type];
-
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                    // check errors
-                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                            g_worker_threads_return_data.add(local.thread_data);
-                            local.thread_data.is_copied = true;
-                        }
-                        if (!break_ && local.thread_data.is_error) {
-                            break_ = true;
-                        }
-                    });
-                }
-
-                {
-                    auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[1][stream_type];
-
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                    // check errors
-                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                            g_worker_threads_return_data.add(local.thread_data);
-                            local.thread_data.is_copied = true;
-                        }
-                        if (!break_ && local.thread_data.is_error) {
-                            break_ = true;
-                        }
-                    });
-                }
+                AccomplishServerPipeConnections(g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type], &break_, false);
+                AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[0][stream_type], &break_, false);
+                AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[1][stream_type], &break_, false);
 
                 if (break_) break;
 
-                if (_is_valid_handle(g_stdout_pipe_read_handle)) {
+                if (_is_valid_handle(g_pipe_read_std_handles.stdout_handle)) {
                     stdout_byte_buf.resize(g_options.tee_stdout_read_buf_size);
 
                     while (!stream_eof) {
                         SetLastError(0); // just in case
-                        if (!ReadFile(g_stdout_pipe_read_handle, stdout_byte_buf.data(), g_options.tee_stdout_read_buf_size, &num_bytes_read, NULL)) {
+                        if (!ReadFile(g_pipe_read_std_handles.stdout_handle, stdout_byte_buf.data(), g_options.tee_stdout_read_buf_size, &num_bytes_read, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             win_error = GetLastError();
                             if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                thread_data.ret = err_io_error;
-                                thread_data.win_error = win_error;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("child stdout read error: win_error=0x%08X (%d)\n"),
-                                            win_error, win_error);
-                                }
-                                if (g_flags.print_win_error_string && win_error) {
-                                    thread_data.msg +=
-                                        _format_win_error_message(win_error, g_options.win_error_langid);
-                                }
-                                thread_data.is_error = true;
+                                FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                    _T("child stdout read error: win_error=0x%08X (%d)\n"),
+                                    win_error, win_error);
                             }
 
                             stream_eof = true;
                         }
 
                         if (num_bytes_read) {
-                            if (_is_valid_handle(g_tee_file_stdout_handle)) {
+                            if (_is_valid_handle(g_tee_file_std_handles.stdout_handle)) {
                                 [&]() { __try {
                                     if (_is_valid_handle(g_tee_file_stdout_mutex)) {
                                         WaitForSingleObject(g_tee_file_stdout_mutex, INFINITE);
                                     }
 
-                                    SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
+                                    SetFilePointer(g_tee_file_std_handles.stdout_handle, 0, NULL, FILE_END);
 
-                                    WriteFile(g_tee_file_stdout_handle, stdout_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_file_std_handles.stdout_handle, stdout_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                     if (thread_data.cancel_io) return;
 
                                     if (g_flags.tee_stdout_file_flush || g_flags.tee_stdout_flush || g_flags.tee_output_flush || g_flags.tee_inout_flush) {
-                                        FlushFileBuffers(g_tee_file_stdout_handle);
+                                        FlushFileBuffers(g_tee_file_std_handles.stdout_handle);
                                         if (thread_data.cancel_io) return;
                                     }
                                 }
@@ -1261,30 +1280,38 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 if (thread_data.cancel_io) break;
                             }
 
-                            if (_is_valid_handle(g_tee_named_pipe_stdout_handle)) {
-                                WriteFile(g_tee_named_pipe_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                            if (_is_valid_handle(g_tee_named_pipe_std_handles.stdout_handle)) {
+                                WriteFile(g_tee_named_pipe_std_handles.stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stdout_pipe_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush) {
-                                    FlushFileBuffers(g_tee_named_pipe_stdout_handle);
+                                    FlushFileBuffers(g_tee_named_pipe_std_handles.stdout_handle);
                                     if (thread_data.cancel_io) break;
                                 }
                             }
 
-                            if (_is_valid_handle(g_stdout_handle)) {
+                            if (_is_valid_handle(g_std_handles.stdout_handle)) {
                                 [&]() { __try {
                                     if (_is_valid_handle(g_reopen_stdout_mutex)) {
                                         WaitForSingleObject(g_reopen_stdout_mutex, INFINITE);
                                     }
 
-                                    if (_is_valid_handle(g_reopen_stdout_handle)) {
-                                        SetFilePointer(g_reopen_stdout_handle, 0, NULL, FILE_END);
+                                    // restore console if output handle is console handle
+                                    if (try_restore_console) {
+                                        if (g_stdout_handle_type == FILE_TYPE_CHAR) {
+                                            RestoreConsole(thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                                        }
+                                        try_restore_console = false;
+                                    }
+
+                                    if (_is_valid_handle(g_reopen_std_handles.stdout_handle)) {
+                                        SetFilePointer(g_reopen_std_handles.stdout_handle, 0, NULL, FILE_END);
                                     }
 
                                     SetLastError(0); // just in case
-                                    if (WriteFile(g_stdout_handle, stdout_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
+                                    if (WriteFile(g_std_handles.stdout_handle, stdout_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
                                         if (g_flags.stdout_flush || g_flags.output_flush || g_flags.inout_flush) {
-                                            FlushFileBuffers(g_stdout_handle);
+                                            FlushFileBuffers(g_std_handles.stdout_handle);
                                         }
 
                                         if (thread_data.cancel_io) return;
@@ -1294,20 +1321,9 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                         win_error = GetLastError();
                                         if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                            [&]() {
-                                                thread_data.ret = err_io_error;
-                                                thread_data.win_error = win_error;
-                                                if (!g_flags.no_print_gen_error_string) {
-                                                    thread_data.msg =
-                                                        _format_stderr_message(_T("stdout write error: win_error=0x%08X (%d)\n"),
-                                                            win_error, win_error);
-                                                }
-                                                if (g_flags.print_win_error_string && win_error) {
-                                                    thread_data.msg +=
-                                                        _format_win_error_message(win_error, g_options.win_error_langid);
-                                                }
-                                                thread_data.is_error = true;
-                                            }();
+                                            FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                                _T("stdout write error: win_error=0x%08X (%d)\n"),
+                                                win_error, win_error);
                                         }
 
                                         stream_eof = true;
@@ -1343,100 +1359,44 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                 // Accomplish all server pipe connections before continue.
                 //
 
-                {
-                    auto & connect_server_named_pipe_thread_local = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type];
-
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                    // check errors
-                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                            g_worker_threads_return_data.add(local.thread_data);
-                            local.thread_data.is_copied = true;
-                        }
-                        if (!break_ && local.thread_data.is_error) {
-                            break_ = true;
-                        }
-                    });
-                }
-
-                {
-                    auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[0][stream_type];
-
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                    // check errors
-                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                            g_worker_threads_return_data.add(local.thread_data);
-                            local.thread_data.is_copied = true;
-                        }
-                        if (!break_ && local.thread_data.is_error) {
-                            break_ = true;
-                        }
-                    });
-                }
-
-                {
-                    auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[1][stream_type];
-
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                    // check errors
-                    utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                        if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                            g_worker_threads_return_data.add(local.thread_data);
-                            local.thread_data.is_copied = true;
-                        }
-                        if (!break_ && local.thread_data.is_error) {
-                            break_ = true;
-                        }
-                    });
-                }
+                AccomplishServerPipeConnections(g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[stream_type], &break_, false);
+                AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[0][stream_type], &break_, false);
+                AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[1][stream_type], &break_, false);
 
                 if (break_) break;
 
-                if (_is_valid_handle(g_stderr_pipe_read_handle)) {
+                if (_is_valid_handle(g_pipe_read_std_handles.stderr_handle)) {
                     stderr_byte_buf.resize(g_options.tee_stderr_read_buf_size);
 
                     while (!stream_eof) {
                         SetLastError(0); // just in case
-                        if (!ReadFile(g_stderr_pipe_read_handle, stderr_byte_buf.data(), g_options.tee_stderr_read_buf_size, &num_bytes_read, NULL)) {
+                        if (!ReadFile(g_pipe_read_std_handles.stderr_handle, stderr_byte_buf.data(), g_options.tee_stderr_read_buf_size, &num_bytes_read, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             win_error = GetLastError();
                             if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                thread_data.ret = err_io_error;
-                                thread_data.win_error = win_error;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("child stderr read error: win_error=0x%08X (%d)\n"),
-                                            win_error, win_error);
-                                }
-                                if (g_flags.print_win_error_string && win_error) {
-                                    thread_data.msg +=
-                                        _format_win_error_message(win_error, g_options.win_error_langid);
-                                }
-                                thread_data.is_error = true;
+                                FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                    _T("child stderr read error: win_error=0x%08X (%d)\n"),
+                                    win_error, win_error);
                             }
 
                             stream_eof = true;
                         }
 
                         if (num_bytes_read) {
-                            if (_is_valid_handle(g_tee_file_stderr_handle)) {
+                            if (_is_valid_handle(g_tee_file_std_handles.stderr_handle)) {
                                 [&]() { __try {
                                     if (_is_valid_handle(g_tee_file_stderr_mutex)) {
                                         WaitForSingleObject(g_tee_file_stderr_mutex, INFINITE);
                                     }
 
-                                    SetFilePointer(g_tee_file_stderr_handle, 0, NULL, FILE_END);
+                                    SetFilePointer(g_tee_file_std_handles.stderr_handle, 0, NULL, FILE_END);
 
-                                    WriteFile(g_tee_file_stderr_handle, stderr_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                                    WriteFile(g_tee_file_std_handles.stderr_handle, stderr_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                     if (thread_data.cancel_io) return;
 
                                     if (g_flags.tee_stderr_file_flush || g_flags.tee_stderr_flush || g_flags.tee_output_flush || g_flags.tee_inout_flush) {
-                                        FlushFileBuffers(g_tee_file_stderr_handle);
+                                        FlushFileBuffers(g_tee_file_std_handles.stderr_handle);
                                         if (thread_data.cancel_io) return;
                                     }
                                 }
@@ -1449,30 +1409,38 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                 if (thread_data.cancel_io) break;
                             }
 
-                            if (_is_valid_handle(g_tee_named_pipe_stderr_handle)) {
-                                WriteFile(g_tee_named_pipe_stderr_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                            if (_is_valid_handle(g_tee_named_pipe_std_handles.stderr_handle)) {
+                                WriteFile(g_tee_named_pipe_std_handles.stderr_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) break;
 
                                 if (g_flags.tee_stderr_pipe_flush || g_flags.tee_stderr_flush || g_flags.tee_inout_flush) {
-                                    FlushFileBuffers(g_tee_named_pipe_stderr_handle);
+                                    FlushFileBuffers(g_tee_named_pipe_std_handles.stderr_handle);
                                     if (thread_data.cancel_io) break;
                                 }
                             }
 
-                            if (_is_valid_handle(g_stderr_handle)) {
+                            if (_is_valid_handle(g_std_handles.stderr_handle)) {
                                 [&]() { __try {
                                     if (_is_valid_handle(g_reopen_stderr_mutex)) {
                                         WaitForSingleObject(g_reopen_stderr_mutex, INFINITE);
                                     }
 
-                                    if (_is_valid_handle(g_reopen_stderr_handle)) {
-                                        SetFilePointer(g_reopen_stderr_handle, 0, NULL, FILE_END);
+                                    // restore console if output handle is console handle
+                                    if (try_restore_console) {
+                                        if (g_stderr_handle_type == FILE_TYPE_CHAR) {
+                                            RestoreConsole(thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                                        }
+                                        try_restore_console = false;
+                                    }
+
+                                    if (_is_valid_handle(g_reopen_std_handles.stderr_handle)) {
+                                        SetFilePointer(g_reopen_std_handles.stderr_handle, 0, NULL, FILE_END);
                                     }
 
                                     SetLastError(0); // just in case
-                                    if (WriteFile(g_stderr_handle, stderr_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
+                                    if (WriteFile(g_std_handles.stderr_handle, stderr_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
                                         if (g_flags.stderr_flush || g_flags.output_flush || g_flags.inout_flush) {
-                                            FlushFileBuffers(g_stderr_handle);
+                                            FlushFileBuffers(g_std_handles.stderr_handle);
                                         }
 
                                         if (thread_data.cancel_io) return;
@@ -1482,20 +1450,9 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                                         win_error = GetLastError();
                                         if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                            [&]() {
-                                                thread_data.ret = err_io_error;
-                                                thread_data.win_error = win_error;
-                                                if (!g_flags.no_print_gen_error_string) {
-                                                    thread_data.msg =
-                                                        _format_stderr_message(_T("stderr write error: win_error=0x%08X (%d)\n"),
-                                                            win_error, win_error);
-                                                }
-                                                if (g_flags.print_win_error_string && win_error) {
-                                                    thread_data.msg +=
-                                                        _format_win_error_message(win_error, g_options.win_error_langid);
-                                                }
-                                                thread_data.is_error = true;
-                                            }();
+                                            FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                                _T("stderr write error: win_error=0x%08X (%d)\n"),
+                                                win_error, win_error);
                                         }
                                     }
                                 }
@@ -1531,10 +1488,10 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
         switch (stream_type) {
         case STDIN_FILENO: // stdin
         {
-            if (_is_valid_handle(g_stdin_pipe_write_handle)) {
+            if (_is_valid_handle(g_pipe_write_std_handles.stdin_handle)) {
                 if (g_stdin_handle_type == FILE_TYPE_CHAR) {
                     // interrupt write handle watch thread
-                    WaitForWorkerThreads(g_write_handle_watch_thread_locals, true);
+                    WaitForWorkerThreads(g_write_output_watch_thread_locals, true);
                 }
 
                 // explicitly disconnect/close all pipe outbound handles here to trigger the child process reaction
@@ -1542,12 +1499,12 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                 // CAUTION:
                 //  Always flush before disconnection/close, otherwise the last bytes would be lost!
                 //
-                FlushFileBuffers(g_stdin_pipe_write_handle);
+                FlushFileBuffers(g_pipe_write_std_handles.stdin_handle);
 
                 if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
-                    DisconnectNamedPipe(g_stdin_pipe_write_handle);
+                    DisconnectNamedPipe(g_pipe_write_std_handles.stdin_handle);
                 }
-                _close_handle(g_stdin_pipe_write_handle);
+                _close_handle(g_pipe_write_std_handles.stdin_handle);
             }
         } break;
 
@@ -1557,26 +1514,26 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
         //case STDOUT_FILENO: // stdout
         //{
-        //    if (_is_valid_handle(g_stdout_pipe_read_handle)) {
+        //    if (_is_valid_handle(g_pipe_read_std_handles.stdout_handle)) {
         //        // explicitly disconnect/close all pipe inbound handles here to trigger the child process reaction
 
         //        if (!g_options.create_inbound_server_pipe_to_stdout.empty()) {
-        //            DisconnectNamedPipe(g_stdout_pipe_read_handle);
+        //            DisconnectNamedPipe(g_pipe_read_std_handles.stdout_handle);
         //        }
-        //        _close_handle(g_stdout_pipe_read_handle);
+        //        _close_handle(g_pipe_read_std_handles.stdout_handle);
         //    }
         //} break;
 
 
         //case STDERR_FILENO: // stderr
         //{
-        //    if (_is_valid_handle(g_stderr_pipe_read_handle)) {
+        //    if (_is_valid_handle(g_pipe_read_std_handles.stderr_handle)) {
         //        // explicitly disconnect/close all pipe inbound handles here to trigger the child process reaction
 
         //        if (!g_options.create_inbound_server_pipe_to_stderr.empty()) {
-        //            DisconnectNamedPipe(g_stderr_pipe_read_handle);
+        //            DisconnectNamedPipe(g_pipe_read_std_handles.stderr_handle);
         //        }
-        //        _close_handle(g_stderr_pipe_read_handle);
+        //        _close_handle(g_pipe_read_std_handles.stderr_handle);
         //    }
         //} break;
         }
@@ -1588,8 +1545,6 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 {
     StreamPipeThreadData & thread_data = *static_cast<StreamPipeThreadData *>(lpParam);
-
-    thread_data.ret = err_unspecified;
 
     bool stream_eof = false;
 
@@ -1603,6 +1558,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
     std::vector<std::uint8_t> stdin_byte_buf;
 
     bool break_ = false;
+    bool try_restore_console = true;
 
     // NOTE:
     //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
@@ -1612,73 +1568,10 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
             // Accomplish all server pipe connections before continue.
             //
 
-            {
-                auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[0][0];
-
-                WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                // check errors
-                utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                    if (!break_ && local.thread_data.is_error) {
-                        break_ = true;
-                    }
-                });
-            }
-
-            {
-                auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[0][1];
-
-                WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                // check errors
-                utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                    if (!break_ && local.thread_data.is_error) {
-                        break_ = true;
-                    }
-                });
-            }
-
-            {
-                auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[1][0];
-
-                WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                // check errors
-                utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                    if (!break_ && local.thread_data.is_error) {
-                        break_ = true;
-                    }
-                });
-            }
-
-            {
-                auto & connect_server_named_pipe_thread_local = g_connect_server_named_pipe_thread_locals[1][1];
-
-                WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_local, false);
-
-                // check errors
-                utility::for_each_unroll(make_singular_array(connect_server_named_pipe_thread_local), [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                    if (!break_ && local.thread_data.is_error) {
-                        break_ = true;
-                    }
-                });
-            }
+            AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[0][0], &break_, false);
+            AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[0][1], &break_, false);
+            AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[1][0], &break_, false);
+            AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals[1][1], &break_, false);
 
             if (break_) return;
 
@@ -1695,42 +1588,33 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                 while (!stream_eof) {
                     SetLastError(0); // just in case
-                    if (!ReadFile(g_stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
+                    if (!ReadFile(g_std_handles.stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
                         if (thread_data.cancel_io) break;
 
                         win_error = GetLastError();
                         if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                            thread_data.ret = err_io_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("stdin read error: win_error=0x%08X (%d)\n"),
-                                        win_error, win_error);
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
-                            thread_data.is_error = true;
+                            FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                _T("stdin read error: win_error=0x%08X (%d)\n"),
+                                win_error, win_error);
                         }
 
                         stream_eof = true;
                     }
 
                     if (num_bytes_read) {
-                        if (_is_valid_handle(g_tee_file_stdin_handle)) {
+                        if (_is_valid_handle(g_tee_file_std_handles.stdin_handle)) {
                             [&]() { __try {
                                 if (_is_valid_handle(g_tee_file_stdin_mutex)) {
                                     WaitForSingleObject(g_tee_file_stdin_mutex, INFINITE);
                                 }
 
-                                SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
+                                SetFilePointer(g_tee_file_std_handles.stdin_handle, 0, NULL, FILE_END);
 
-                                WriteFile(g_tee_file_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_file_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) return;
 
                                 if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                    FlushFileBuffers(g_tee_file_stdin_handle);
+                                    FlushFileBuffers(g_tee_file_std_handles.stdin_handle);
                                     if (thread_data.cancel_io) return;
                                 }
                             }
@@ -1743,19 +1627,19 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                             if (thread_data.cancel_io) break;
                         }
 
-                        if (_is_valid_handle(g_tee_file_stdout_handle)) {
+                        if (_is_valid_handle(g_tee_file_std_handles.stdout_handle)) {
                             [&]() { __try {
                                 if (_is_valid_handle(g_tee_file_stdout_mutex)) {
                                     WaitForSingleObject(g_tee_file_stdout_mutex, INFINITE);
                                 }
 
-                                SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
+                                SetFilePointer(g_tee_file_std_handles.stdout_handle, 0, NULL, FILE_END);
 
-                                WriteFile(g_tee_file_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_file_std_handles.stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) return;
 
                                 if (g_flags.tee_stdout_file_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush || g_flags.tee_output_flush) {
-                                    FlushFileBuffers(g_tee_file_stdout_handle);
+                                    FlushFileBuffers(g_tee_file_std_handles.stdout_handle);
                                     if (thread_data.cancel_io) return;
                                 }
                             }
@@ -1768,31 +1652,39 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                             if (thread_data.cancel_io) break;
                         }
 
-                        if (_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
-                            WriteFile(g_tee_named_pipe_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                        if (_is_valid_handle(g_tee_named_pipe_std_handles.stdin_handle)) {
+                            WriteFile(g_tee_named_pipe_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                             if (thread_data.cancel_io) break;
 
                             if (g_flags.tee_stdin_pipe_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                FlushFileBuffers(g_tee_named_pipe_stdin_handle);
+                                FlushFileBuffers(g_tee_named_pipe_std_handles.stdin_handle);
                                 if (thread_data.cancel_io) break;
                             }
                         }
 
-                        if (_is_valid_handle(g_tee_named_pipe_stdout_handle)) {
-                            WriteFile(g_tee_named_pipe_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                        if (_is_valid_handle(g_tee_named_pipe_std_handles.stdout_handle)) {
+                            WriteFile(g_tee_named_pipe_std_handles.stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                             if (thread_data.cancel_io) break;
 
                             if (g_flags.tee_stdout_pipe_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush || g_flags.tee_output_flush) {
-                                FlushFileBuffers(g_tee_named_pipe_stdout_handle);
+                                FlushFileBuffers(g_tee_named_pipe_std_handles.stdout_handle);
                                 if (thread_data.cancel_io) break;
                             }
                         }
 
-                        if (_is_valid_handle(g_stdout_handle)) {
+                        if (_is_valid_handle(g_std_handles.stdout_handle)) {
+                            // restore console if output handle is console handle
+                            if (try_restore_console) {
+                                if (g_stdout_handle_type == FILE_TYPE_CHAR) {
+                                    RestoreConsole(thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                                }
+                                try_restore_console = false;
+                            }
+
                             SetLastError(0); // just in case
-                            if (WriteFile(g_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
+                            if (WriteFile(g_std_handles.stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
                                 if (g_flags.stdin_output_flush || g_flags.stdout_flush || g_flags.inout_flush || g_flags.output_flush) {
-                                    FlushFileBuffers(g_stdout_handle);
+                                    FlushFileBuffers(g_std_handles.stdout_handle);
                                 }
 
                                 if (thread_data.cancel_io) break;
@@ -1802,18 +1694,9 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                                 win_error = GetLastError();
                                 if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                    thread_data.ret = err_io_error;
-                                    thread_data.win_error = win_error;
-                                    if (!g_flags.no_print_gen_error_string) {
-                                        thread_data.msg =
-                                            _format_stderr_message(_T("stdout write error: win_error=0x%08X (%d)\n"),
-                                                win_error, win_error);
-                                    }
-                                    if (g_flags.print_win_error_string && win_error) {
-                                        thread_data.msg +=
-                                            _format_win_error_message(win_error, g_options.win_error_langid);
-                                    }
-                                    thread_data.is_error = true;
+                                    FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                        _T("stdout write error: win_error=0x%08X (%d)\n"),
+                                        win_error, win_error);
                                 }
 
                                 stream_eof = true;
@@ -1840,23 +1723,14 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                     //
 
                     SetLastError(0); // just in case
-                    if (!PeekNamedPipe(g_stdin_handle, NULL, 0, NULL, &num_bytes_avail, NULL)) {
+                    if (!PeekNamedPipe(g_std_handles.stdin_handle, NULL, 0, NULL, &num_bytes_avail, NULL)) {
                         if (thread_data.cancel_io) break;
 
                         win_error = GetLastError();
                         if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                            thread_data.ret = err_io_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("stdin read error: win_error=0x%08X (%d)\n"),
-                                        win_error, win_error);
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
-                            thread_data.is_error = true;
+                            FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                _T("stdin read error: win_error=0x%08X (%d)\n"),
+                                win_error, win_error);
                         }
 
                         stream_eof = true;
@@ -1865,23 +1739,14 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                     if (num_bytes_avail) {
                         SetLastError(0); // just in case
-                        if (!ReadFile(g_stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
+                        if (!ReadFile(g_std_handles.stdin_handle, stdin_byte_buf.data(), g_options.tee_stdin_read_buf_size, &num_bytes_read, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             win_error = GetLastError();
                             if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                thread_data.ret = err_io_error;
-                                thread_data.win_error = win_error;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("stdin read error: win_error=0x%08X (%d)\n"),
-                                            win_error, win_error);
-                                }
-                                if (g_flags.print_win_error_string && win_error) {
-                                    thread_data.msg +=
-                                        _format_win_error_message(win_error, g_options.win_error_langid);
-                                }
-                                thread_data.is_error = true;
+                                FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                    _T("stdin read error: win_error=0x%08X (%d)\n"),
+                                    win_error, win_error);
                             }
 
                             stream_eof = true;
@@ -1889,19 +1754,19 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                     }
 
                     if (num_bytes_read) {
-                        if (_is_valid_handle(g_tee_file_stdin_handle)) {
+                        if (_is_valid_handle(g_tee_file_std_handles.stdin_handle)) {
                             [&]() { __try {
                                 if (_is_valid_handle(g_tee_file_stdin_mutex)) {
                                     WaitForSingleObject(g_tee_file_stdin_mutex, INFINITE);
                                 }
 
-                                SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
+                                SetFilePointer(g_tee_file_std_handles.stdin_handle, 0, NULL, FILE_END);
 
-                                WriteFile(g_tee_file_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_file_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) return;
 
                                 if (g_flags.tee_stdin_file_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                    FlushFileBuffers(g_tee_file_stdin_handle);
+                                    FlushFileBuffers(g_tee_file_std_handles.stdin_handle);
                                     if (thread_data.cancel_io) return;
                                 }
                             }
@@ -1914,19 +1779,19 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                             if (thread_data.cancel_io) break;
                         }
 
-                        if (_is_valid_handle(g_tee_file_stdout_handle)) {
+                        if (_is_valid_handle(g_tee_file_std_handles.stdout_handle)) {
                             [&]() { __try {
                                 if (_is_valid_handle(g_tee_file_stdout_mutex)) {
                                     WaitForSingleObject(g_tee_file_stdout_mutex, INFINITE);
                                 }
 
-                                SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
+                                SetFilePointer(g_tee_file_std_handles.stdout_handle, 0, NULL, FILE_END);
 
-                                WriteFile(g_tee_file_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                                WriteFile(g_tee_file_std_handles.stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                                 if (thread_data.cancel_io) return;
 
                                 if (g_flags.tee_stdout_file_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush || g_flags.tee_output_flush) {
-                                    FlushFileBuffers(g_tee_file_stdout_handle);
+                                    FlushFileBuffers(g_tee_file_std_handles.stdout_handle);
                                     if (thread_data.cancel_io) return;
                                 }
                             }
@@ -1939,31 +1804,39 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                             if (thread_data.cancel_io) break;
                         }
 
-                        if (_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
-                            WriteFile(g_tee_named_pipe_stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                        if (_is_valid_handle(g_tee_named_pipe_std_handles.stdin_handle)) {
+                            WriteFile(g_tee_named_pipe_std_handles.stdin_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                             if (thread_data.cancel_io) break;
 
                             if (g_flags.tee_stdin_pipe_flush || g_flags.tee_stdin_flush || g_flags.tee_inout_flush) {
-                                FlushFileBuffers(g_tee_named_pipe_stdin_handle);
+                                FlushFileBuffers(g_tee_named_pipe_std_handles.stdin_handle);
                                 if (thread_data.cancel_io) break;
                             }
                         }
 
-                        if (_is_valid_handle(g_tee_named_pipe_stdout_handle)) {
-                            WriteFile(g_tee_named_pipe_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
+                        if (_is_valid_handle(g_tee_named_pipe_std_handles.stdout_handle)) {
+                            WriteFile(g_tee_named_pipe_std_handles.stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL);
                             if (thread_data.cancel_io) break;
 
                             if (g_flags.tee_stdout_pipe_flush || g_flags.tee_stdout_flush || g_flags.tee_inout_flush || g_flags.tee_output_flush) {
-                                FlushFileBuffers(g_tee_named_pipe_stdout_handle);
+                                FlushFileBuffers(g_tee_named_pipe_std_handles.stdout_handle);
                                 if (thread_data.cancel_io) break;
                             }
                         }
 
-                        if (_is_valid_handle(g_stdout_handle)) {
+                        if (_is_valid_handle(g_std_handles.stdout_handle)) {
+                            // restore console if output handle is console handle
+                            if (try_restore_console) {
+                                if (g_stdout_handle_type == FILE_TYPE_CHAR) {
+                                    RestoreConsole(thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                                }
+                                try_restore_console = false;
+                            }
+
                             SetLastError(0); // just in case
-                            if (WriteFile(g_stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
+                            if (WriteFile(g_std_handles.stdout_handle, stdin_byte_buf.data(), num_bytes_read, &num_bytes_written, NULL)) {
                                 if (g_flags.stdin_output_flush || g_flags.stdout_flush || g_flags.inout_flush || g_flags.output_flush) {
-                                    FlushFileBuffers(g_stdout_handle);
+                                    FlushFileBuffers(g_std_handles.stdout_handle);
                                 }
 
                                 if (thread_data.cancel_io) break;
@@ -1973,18 +1846,9 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                                 win_error = GetLastError();
                                 if (win_error && win_error != ERROR_NO_DATA && win_error != ERROR_BROKEN_PIPE && win_error != ERROR_PIPE_NOT_CONNECTED) {
-                                    thread_data.ret = err_io_error;
-                                    thread_data.win_error = win_error;
-                                    if (!g_flags.no_print_gen_error_string) {
-                                        thread_data.msg =
-                                            _format_stderr_message(_T("stdout write error: win_error=0x%08X (%d)\n"),
-                                                win_error, win_error);
-                                    }
-                                    if (g_flags.print_win_error_string && win_error) {
-                                        thread_data.msg +=
-                                            _format_win_error_message(win_error, g_options.win_error_langid);
-                                    }
-                                    thread_data.is_error = true;
+                                    FormatThreadDataOutput(thread_data, err_io_error, win_error,
+                                        _T("stdout write error: win_error=0x%08X (%d)\n"),
+                                        win_error, win_error);
                                 }
 
                                 stream_eof = true;
@@ -1993,7 +1857,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                     }
                     else if (!stream_eof && !num_bytes_avail) {
                         SetLastError(0); // just in case
-                        if (!WriteFile(g_stdout_handle, "", 0, &num_bytes_written, NULL)) {
+                        if (!WriteFile(g_std_handles.stdout_handle, "", 0, &num_bytes_written, NULL)) {
                             if (thread_data.cancel_io) break;
 
                             stream_eof = true;
@@ -2023,16 +1887,16 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
             // CAUTION:
             //  Always flush before disconnection/close, otherwise the last bytes would be lost!
             //
-            FlushFileBuffers(g_stdout_handle);
+            FlushFileBuffers(g_std_handles.stdout_handle);
 
             if (!g_options.reopen_stdout_as_server_pipe.empty()) {
-                DisconnectNamedPipe(g_stdout_handle);
+                DisconnectNamedPipe(g_std_handles.stdout_handle);
             }
 
             // CAUTION:
             //  Never close standard handle directly, use CRT call instead, otherwise the CRT would be in desync with the Win32!
             //
-            //_close_handle(g_stdout_handle);
+            //_close_handle(g_std_handles.stdout_handle);
 
             // CAUTION:
             //  Never close standard handle through the _close, otherwise stream (FILE*) would be always in use (partially closed)!
@@ -2069,18 +1933,18 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
             //
 
             if (g_stdout_handle_type != FILE_TYPE_CHAR) {
-                _StdHandlesState std_handles_state;
+                StdHandlesState std_handles_state;
 
-                std_handles_state.save_stdout_state(g_stdout_handle);
+                std_handles_state.save_stdout_state(g_std_handles.stdout_handle);
 
-                _detach_stdout();
-                _attach_stdout_from_console(IF_CONSOLE_APP(false, true), !!std_handles_state.is_stdout_inheritable);
+                _detach_crt_stdout_nolock();
+                _attach_crt_stdout_from_console_nolock(IF_CONSOLE_APP(false, true), !!std_handles_state.is_stdout_inheritable);
 
                 // reread owned by CRT handles
-                g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-                g_stdout_handle_type = _get_file_type(g_stdout_handle);
+                g_std_handles.stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+                g_stdout_handle_type = _get_file_type(g_std_handles.stdout_handle);
 
-                std_handles_state.restore_stdout_state(g_stdout_handle, true);
+                std_handles_state.restore_stdout_state(g_std_handles.stdout_handle, true);
             }
         } break;
         }
@@ -2121,23 +1985,15 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                 switch (handle_type) {
                 case 0: {
                     SetLastError(0); // just in case
-                    if (!ConnectNamedPipe(g_reopen_stdin_handle, &connection_await_overlapped)) {
+                    if (!ConnectNamedPipe(g_reopen_std_handles.stdin_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
                         if (win_error == ERROR_PIPE_CONNECTED) {
                             break;
                         }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not initiate connection of reopened stdin as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not initiate connection of reopened stdin as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
                             return 1;
                         }
                     }
@@ -2164,12 +2020,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                         if (time_delta_ms >= g_options.reopen_stdin_as_server_pipe_connect_timeout_ms) {
-                            thread_data.ret = err_named_pipe_connect_timeout;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("server connection timeout of reopened stdin as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                        g_options.reopen_stdin_as_server_pipe.c_str(), g_options.reopen_stdin_as_server_pipe_connect_timeout_ms);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                _T("server connection timeout of reopened stdin as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                g_options.reopen_stdin_as_server_pipe.c_str(), g_options.reopen_stdin_as_server_pipe_connect_timeout_ms);
                             return 1;
                         }
 
@@ -2179,23 +2032,15 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
 
                 case 1: {
                     SetLastError(0); // just in case
-                    if (!ConnectNamedPipe(g_tee_named_pipe_stdin_handle, &connection_await_overlapped)) {
+                    if (!ConnectNamedPipe(g_tee_named_pipe_std_handles.stdin_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
                         if (win_error == ERROR_PIPE_CONNECTED) {
                             break;
                         }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not initiate connection of stdin tee as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.tee_stdin_to_server_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not initiate connection of stdin tee as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                               win_error, win_error, g_options.tee_stdin_to_server_pipe.c_str());
                             return 1;
                         }
                     }
@@ -2222,12 +2067,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                         if (time_delta_ms >= g_options.tee_stdin_to_server_pipe_connect_timeout_ms) {
-                            thread_data.ret = err_named_pipe_connect_timeout;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("server connection timeout of stdin tee as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                        g_options.tee_stdin_to_server_pipe.c_str(), g_options.tee_stdin_to_server_pipe_connect_timeout_ms);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                _T("server connection timeout of stdin tee as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                g_options.tee_stdin_to_server_pipe.c_str(), g_options.tee_stdin_to_server_pipe_connect_timeout_ms);
                             return 1;
                         }
 
@@ -2245,23 +2087,15 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                 switch (handle_type) {
                 case 0: {
                     SetLastError(0); // just in case
-                    if (!ConnectNamedPipe(g_reopen_stdout_handle, &connection_await_overlapped)) {
+                    if (!ConnectNamedPipe(g_reopen_std_handles.stdout_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
                         if (win_error == ERROR_PIPE_CONNECTED) {
                             break;
                         }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not initiate connection of reopened stdout as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not initiate connection of reopened stdout as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
                             return 1;
                         }
                     }
@@ -2288,12 +2122,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                         if (time_delta_ms >= g_options.reopen_stdout_as_server_pipe_connect_timeout_ms) {
-                            thread_data.ret = err_named_pipe_connect_timeout;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("server connection timeout of reopened stdout as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                        g_options.reopen_stdout_as_server_pipe.c_str(), g_options.reopen_stdout_as_server_pipe_connect_timeout_ms);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                _T("server connection timeout of reopened stdout as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                g_options.reopen_stdout_as_server_pipe.c_str(), g_options.reopen_stdout_as_server_pipe_connect_timeout_ms);
                             return 1;
                         }
 
@@ -2303,23 +2134,15 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
 
                 case 1: {
                     SetLastError(0); // just in case
-                    if (!ConnectNamedPipe(g_tee_named_pipe_stdout_handle, &connection_await_overlapped)) {
+                    if (!ConnectNamedPipe(g_tee_named_pipe_std_handles.stdout_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
                         if (win_error == ERROR_PIPE_CONNECTED) {
                             break;
                         }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not initiate connection of stdout tee as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.tee_stdout_to_server_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not initiate connection of stdout tee as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.tee_stdout_to_server_pipe.c_str());
                             return 1;
                         }
                     }
@@ -2346,12 +2169,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                         if (time_delta_ms >= g_options.tee_stdout_to_server_pipe_connect_timeout_ms) {
-                            thread_data.ret = err_named_pipe_connect_timeout;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("server connection timeout of stdout tee as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                        g_options.tee_stdout_to_server_pipe.c_str(), g_options.tee_stdout_to_server_pipe_connect_timeout_ms);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                _T("server connection timeout of stdout tee as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                g_options.tee_stdout_to_server_pipe.c_str(), g_options.tee_stdout_to_server_pipe_connect_timeout_ms);
                             return 1;
                         }
 
@@ -2369,23 +2189,15 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                 switch (handle_type) {
                 case 0: {
                     SetLastError(0); // just in case
-                    if (!ConnectNamedPipe(g_reopen_stderr_handle, &connection_await_overlapped)) {
+                    if (!ConnectNamedPipe(g_reopen_std_handles.stderr_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
                         if (win_error == ERROR_PIPE_CONNECTED) {
                             break;
                         }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not initiate connection of reopened stderr as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not initiate connection of reopened stderr as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
                             return 1;
                         }
                     }
@@ -2412,12 +2224,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                         if (time_delta_ms >= g_options.reopen_stderr_as_server_pipe_connect_timeout_ms) {
-                            thread_data.ret = err_named_pipe_connect_timeout;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("server connection timeout of reopened stderr as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                        g_options.reopen_stderr_as_server_pipe.c_str(), g_options.reopen_stderr_as_server_pipe_connect_timeout_ms);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                _T("server connection timeout of reopened stderr as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                g_options.reopen_stderr_as_server_pipe.c_str(), g_options.reopen_stderr_as_server_pipe_connect_timeout_ms);
                             return 1;
                         }
 
@@ -2427,23 +2236,15 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
 
                 case 1: {
                     SetLastError(0); // just in case
-                    if (!ConnectNamedPipe(g_tee_named_pipe_stderr_handle, &connection_await_overlapped)) {
+                    if (!ConnectNamedPipe(g_tee_named_pipe_std_handles.stderr_handle, &connection_await_overlapped)) {
                         win_error = GetLastError();
                         if (win_error == ERROR_PIPE_CONNECTED) {
                             break;
                         }
                         if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not initiate connection of stderr tee as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.tee_stderr_to_server_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not initiate connection of stderr tee as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.tee_stderr_to_server_pipe.c_str());
                             return 1;
                         }
                     }
@@ -2470,12 +2271,9 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                         if (time_delta_ms >= g_options.tee_stderr_to_server_pipe_connect_timeout_ms) {
-                            thread_data.ret = err_named_pipe_connect_timeout;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("server connection timeout of stderr tee as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                        g_options.tee_stderr_to_server_pipe.c_str(), g_options.tee_stderr_to_server_pipe_connect_timeout_ms);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                _T("server connection timeout of stderr tee as server named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                g_options.tee_stderr_to_server_pipe.c_str(), g_options.tee_stderr_to_server_pipe_connect_timeout_ms);
                             return 1;
                         }
 
@@ -2535,16 +2333,16 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                 switch (handle_type) {
                 case 0: {
                     if (!g_options.reopen_stdin_as_server_pipe.empty()) {
-                        DisconnectNamedPipe(g_reopen_stdin_handle);
+                        DisconnectNamedPipe(g_reopen_std_handles.stdin_handle);
                     }
-                    _close_handle(g_reopen_stdin_handle);
+                    _close_handle(g_reopen_std_handles.stdin_handle);
                 } break;
 
                 case 1: {
                     if (!g_options.tee_stdin_to_server_pipe.empty()) {
-                        DisconnectNamedPipe(g_tee_named_pipe_stdin_handle);
+                        DisconnectNamedPipe(g_tee_named_pipe_std_handles.stdin_handle);
                     }
-                    _close_handle(g_reopen_stdin_handle);
+                    _close_handle(g_reopen_std_handles.stdin_handle);
                 } break;
                 }
             } break;
@@ -2554,16 +2352,16 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                 switch (handle_type) {
                 case 0: {
                     if (!g_options.reopen_stdout_as_server_pipe.empty()) {
-                        DisconnectNamedPipe(g_reopen_stdout_handle);
+                        DisconnectNamedPipe(g_reopen_std_handles.stdout_handle);
                     }
-                    _close_handle(g_reopen_stdout_handle);
+                    _close_handle(g_reopen_std_handles.stdout_handle);
                 } break;
 
                 case 1: {
                     if (!g_options.tee_stdout_to_server_pipe.empty()) {
-                        DisconnectNamedPipe(g_tee_named_pipe_stdout_handle);
+                        DisconnectNamedPipe(g_tee_named_pipe_std_handles.stdout_handle);
                     }
-                    _close_handle(g_reopen_stdout_handle);
+                    _close_handle(g_reopen_std_handles.stdout_handle);
                 } break;
                 }
             } break;
@@ -2573,16 +2371,16 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                 switch (handle_type) {
                 case 0: {
                     if (!g_options.reopen_stderr_as_server_pipe.empty()) {
-                        DisconnectNamedPipe(g_reopen_stderr_handle);
+                        DisconnectNamedPipe(g_reopen_std_handles.stderr_handle);
                     }
-                    _close_handle(g_reopen_stderr_handle);
+                    _close_handle(g_reopen_std_handles.stderr_handle);
                 } break;
 
                 case 1: {
                     if (!g_options.tee_stderr_to_server_pipe.empty()) {
-                        DisconnectNamedPipe(g_tee_named_pipe_stderr_handle);
+                        DisconnectNamedPipe(g_tee_named_pipe_std_handles.stderr_handle);
                     }
-                    _close_handle(g_reopen_stderr_handle);
+                    _close_handle(g_reopen_std_handles.stderr_handle);
                 } break;
                 }
             } break;
@@ -2645,7 +2443,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         //
 
                         SetLastError(0); // just in case
-                        if (_is_valid_handle(g_reopen_stdin_handle =
+                        if (_is_valid_handle(g_reopen_std_handles.stdin_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_READ, FILE_SHARE_READ, NULL,
                                 OPEN_EXISTING,
@@ -2654,24 +2452,17 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             bool reset_handle_inherit = true;
                             DWORD handle_flags = 0;
 
-                            if (GetHandleInformation(g_reopen_stdin_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                            if (GetHandleInformation(g_reopen_std_handles.stdin_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
                                 reset_handle_inherit = false;
                             }
 
                             if (reset_handle_inherit) {
                                 SetLastError(0); // just in case
-                                if (!SetHandleInformation(g_reopen_stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                                    thread_data.win_error = GetLastError();
-                                    thread_data.ret = err_win32_error;
-                                    if (!g_flags.no_print_gen_error_string) {
-                                        thread_data.msg =
-                                            _format_stderr_message(_T("could not disable handle inheritance of reopened stdin as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                                win_error, win_error, g_options.reopen_stdin_as_client_pipe.c_str());
-                                    }
-                                    if (g_flags.print_win_error_string && win_error) {
-                                        thread_data.msg +=
-                                            _format_win_error_message(win_error, g_options.win_error_langid);
-                                    }
+                                if (!SetHandleInformation(g_reopen_std_handles.stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                                    win_error = GetLastError();
+                                    FormatThreadDataOutput(thread_data, err_win32_error, win_error,
+                                        _T("could not disable handle inheritance of reopened stdin as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                        win_error, win_error, g_options.reopen_stdin_as_client_pipe.c_str());
                                     return 1;
                                 }
                             }
@@ -2681,17 +2472,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         win_error = GetLastError();
                         if (win_error != ERROR_PIPE_BUSY) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect of reopened stdin as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.reopen_stdin_as_client_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not client connect of reopened stdin as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.reopen_stdin_as_client_pipe.c_str());
                             return 1;
                         }
 
@@ -2701,12 +2484,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.reopen_stdin_as_client_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of reopened stdin as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.reopen_stdin_as_client_pipe.c_str(), g_options.reopen_stdin_as_client_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of reopened stdin as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.reopen_stdin_as_client_pipe.c_str(), g_options.reopen_stdin_as_client_pipe_connect_timeout_ms);
                                 return 1;
                             }
 
@@ -2724,12 +2504,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.reopen_stdin_as_client_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of reopened stdin as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.reopen_stdin_as_client_pipe.c_str(), g_options.reopen_stdin_as_client_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of reopened stdin as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.reopen_stdin_as_client_pipe.c_str(), g_options.reopen_stdin_as_client_pipe_connect_timeout_ms);
                                 return 1;
                             }
                         }
@@ -2759,7 +2536,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         //
 
                         SetLastError(0); // just in case
-                        if (_is_valid_handle(g_tee_named_pipe_stdin_handle =
+                        if (_is_valid_handle(g_tee_named_pipe_std_handles.stdin_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
                                 OPEN_ALWAYS,
@@ -2768,24 +2545,17 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             bool reset_handle_inherit = true;
                             DWORD handle_flags = 0;
 
-                            if (GetHandleInformation(g_tee_named_pipe_stdin_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                            if (GetHandleInformation(g_tee_named_pipe_std_handles.stdin_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
                                 reset_handle_inherit = false;
                             }
 
                             if (reset_handle_inherit) {
                                 SetLastError(0); // just in case
-                                if (!SetHandleInformation(g_tee_named_pipe_stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                                    thread_data.win_error = GetLastError();
-                                    thread_data.ret = err_win32_error;
-                                    if (!g_flags.no_print_gen_error_string) {
-                                        thread_data.msg =
-                                            _format_stderr_message(_T("could not disable handle inheritance of stdin tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                                win_error, win_error, g_options.tee_stdin_to_client_pipe.c_str());
-                                    }
-                                    if (g_flags.print_win_error_string && win_error) {
-                                        thread_data.msg +=
-                                            _format_win_error_message(win_error, g_options.win_error_langid);
-                                    }
+                                if (!SetHandleInformation(g_tee_named_pipe_std_handles.stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                                    win_error = GetLastError();
+                                    FormatThreadDataOutput(thread_data, err_win32_error, win_error,
+                                        _T("could not disable handle inheritance of stdin tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                        win_error, win_error, g_options.tee_stdin_to_client_pipe.c_str());
                                     return 1;
                                 }
                             }
@@ -2795,17 +2565,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         win_error = GetLastError();
                         if (win_error != ERROR_PIPE_BUSY) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect of stdin tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.tee_stdin_to_client_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not client connect of stdin tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.tee_stdin_to_client_pipe.c_str());
                             return 1;
                         }
 
@@ -2815,12 +2577,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.tee_stdin_to_server_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of stdin tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.tee_stdin_to_client_pipe.c_str(), g_options.tee_stdin_to_server_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of stdin tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.tee_stdin_to_client_pipe.c_str(), g_options.tee_stdin_to_server_pipe_connect_timeout_ms);
                                 return 1;
                             }
 
@@ -2838,12 +2597,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.tee_stdin_to_server_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of stdin tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.tee_stdin_to_client_pipe.c_str(), g_options.tee_stdin_to_server_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of stdin tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.tee_stdin_to_client_pipe.c_str(), g_options.tee_stdin_to_server_pipe_connect_timeout_ms);
                                 return 1;
                             }
                         }
@@ -2881,7 +2637,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         //
 
                         SetLastError(0); // just in case
-                        if (_is_valid_handle(g_reopen_stdout_handle =
+                        if (_is_valid_handle(g_reopen_std_handles.stdout_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
                                 OPEN_ALWAYS,
@@ -2890,24 +2646,17 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             bool reset_handle_inherit = true;
                             DWORD handle_flags = 0;
 
-                            if (GetHandleInformation(g_reopen_stdout_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                            if (GetHandleInformation(g_reopen_std_handles.stdout_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
                                 reset_handle_inherit = false;
                             }
 
                             if (reset_handle_inherit) {
                                 SetLastError(0); // just in case
-                                if (!SetHandleInformation(g_reopen_stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                                    thread_data.win_error = GetLastError();
-                                    thread_data.ret = err_win32_error;
-                                    if (!g_flags.no_print_gen_error_string) {
-                                        thread_data.msg =
-                                            _format_stderr_message(_T("could not disable handle inheritance of reopened stdout as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                                win_error, win_error, g_options.reopen_stdout_as_client_pipe.c_str());
-                                    }
-                                    if (g_flags.print_win_error_string && win_error) {
-                                        thread_data.msg +=
-                                            _format_win_error_message(win_error, g_options.win_error_langid);
-                                    }
+                                if (!SetHandleInformation(g_reopen_std_handles.stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                                    win_error = GetLastError();
+                                    FormatThreadDataOutput(thread_data, err_win32_error, win_error,
+                                        _T("could not disable handle inheritance of reopened stdout as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                        win_error, win_error, g_options.reopen_stdout_as_client_pipe.c_str());
                                     return 1;
                                 }
                             }
@@ -2917,17 +2666,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         win_error = GetLastError();
                         if (win_error != ERROR_PIPE_BUSY) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect of reopened stdout as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.reopen_stdout_as_client_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not client connect of reopened stdout as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.reopen_stdout_as_client_pipe.c_str());
                             return 1;
                         }
 
@@ -2937,12 +2678,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.reopen_stdout_as_client_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of reopened stdout as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.reopen_stdout_as_client_pipe.c_str(), g_options.reopen_stdout_as_client_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of reopened stdout as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.reopen_stdout_as_client_pipe.c_str(), g_options.reopen_stdout_as_client_pipe_connect_timeout_ms);
                                 return 1;
                             }
 
@@ -2960,12 +2698,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.reopen_stdout_as_client_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of reopened stdout as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.reopen_stdout_as_client_pipe.c_str(), g_options.reopen_stdout_as_client_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of reopened stdout as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.reopen_stdout_as_client_pipe.c_str(), g_options.reopen_stdout_as_client_pipe_connect_timeout_ms);
                                 return 1;
                             }
                         }
@@ -2995,7 +2730,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         //
 
                         SetLastError(0); // just in case
-                        if (_is_valid_handle(g_tee_named_pipe_stdout_handle =
+                        if (_is_valid_handle(g_tee_named_pipe_std_handles.stdout_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
                                 OPEN_ALWAYS,
@@ -3004,24 +2739,17 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             bool reset_handle_inherit = true;
                             DWORD handle_flags = 0;
 
-                            if (GetHandleInformation(g_tee_named_pipe_stdout_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                            if (GetHandleInformation(g_tee_named_pipe_std_handles.stdout_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
                                 reset_handle_inherit = false;
                             }
 
                             if (reset_handle_inherit) {
                                 SetLastError(0); // just in case
-                                if (!SetHandleInformation(g_tee_named_pipe_stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                                    thread_data.win_error = GetLastError();
-                                    thread_data.ret = err_win32_error;
-                                    if (!g_flags.no_print_gen_error_string) {
-                                        thread_data.msg =
-                                            _format_stderr_message(_T("could not disable handle inheritance of stdout tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                                win_error, win_error, g_options.tee_stdout_to_client_pipe.c_str());
-                                    }
-                                    if (g_flags.print_win_error_string && win_error) {
-                                        thread_data.msg +=
-                                            _format_win_error_message(win_error, g_options.win_error_langid);
-                                    }
+                                if (!SetHandleInformation(g_tee_named_pipe_std_handles.stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                                    win_error = GetLastError();
+                                    FormatThreadDataOutput(thread_data, err_win32_error, win_error,
+                                        _T("could not disable handle inheritance of stdout tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                        win_error, win_error, g_options.tee_stdout_to_client_pipe.c_str());
                                     return 1;
                                 }
                             }
@@ -3031,17 +2759,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         win_error = GetLastError();
                         if (win_error != ERROR_PIPE_BUSY) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect of stdout tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.tee_stdout_to_client_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not client connect of stdout tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.tee_stdout_to_client_pipe.c_str());
                             return 1;
                         }
 
@@ -3051,12 +2771,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.tee_stdout_to_server_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of stdout tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.tee_stdout_to_client_pipe.c_str(), g_options.tee_stdout_to_server_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of stdout tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.tee_stdout_to_client_pipe.c_str(), g_options.tee_stdout_to_server_pipe_connect_timeout_ms);
                                 return 1;
                             }
 
@@ -3074,12 +2791,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.tee_stdout_to_server_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of stdout tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.tee_stdout_to_client_pipe.c_str(), g_options.tee_stdout_to_server_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of stdout tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.tee_stdout_to_client_pipe.c_str(), g_options.tee_stdout_to_server_pipe_connect_timeout_ms);
                                 return 1;
                             }
                         }
@@ -3117,7 +2831,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         //
 
                         SetLastError(0); // just in case
-                        if (_is_valid_handle(g_reopen_stderr_handle =
+                        if (_is_valid_handle(g_reopen_std_handles.stderr_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
                                 OPEN_ALWAYS,
@@ -3126,24 +2840,17 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             bool reset_handle_inherit = true;
                             DWORD handle_flags = 0;
 
-                            if (GetHandleInformation(g_reopen_stderr_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                            if (GetHandleInformation(g_reopen_std_handles.stderr_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
                                 reset_handle_inherit = false;
                             }
 
                             if (reset_handle_inherit) {
                                 SetLastError(0); // just in case
-                                if (!SetHandleInformation(g_reopen_stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                                    thread_data.win_error = GetLastError();
-                                    thread_data.ret = err_win32_error;
-                                    if (!g_flags.no_print_gen_error_string) {
-                                        thread_data.msg =
-                                            _format_stderr_message(_T("could not disable handle inheritance of reopened stderr as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                                win_error, win_error, g_options.reopen_stderr_as_client_pipe.c_str());
-                                    }
-                                    if (g_flags.print_win_error_string && win_error) {
-                                        thread_data.msg +=
-                                            _format_win_error_message(win_error, g_options.win_error_langid);
-                                    }
+                                if (!SetHandleInformation(g_reopen_std_handles.stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                                    win_error = GetLastError();
+                                    FormatThreadDataOutput(thread_data, err_win32_error, win_error,
+                                        _T("could not disable handle inheritance of reopened stderr as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                        win_error, win_error, g_options.reopen_stderr_as_client_pipe.c_str());
                                     return 1;
                                 }
                             }
@@ -3153,17 +2860,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         win_error = GetLastError();
                         if (win_error != ERROR_PIPE_BUSY) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect of reopened stderr as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.reopen_stderr_as_client_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not client connect of reopened stderr as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.reopen_stderr_as_client_pipe.c_str());
                             return 1;
                         }
 
@@ -3173,12 +2872,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.reopen_stderr_as_client_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of reopened stderr as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.reopen_stderr_as_client_pipe.c_str(), g_options.reopen_stderr_as_client_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of reopened stderr as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.reopen_stderr_as_client_pipe.c_str(), g_options.reopen_stderr_as_client_pipe_connect_timeout_ms);
                                 return 1;
                             }
 
@@ -3196,12 +2892,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.reopen_stderr_as_client_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of reopened stderr as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.reopen_stderr_as_client_pipe.c_str(), g_options.reopen_stderr_as_client_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of reopened stderr as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.reopen_stderr_as_client_pipe.c_str(), g_options.reopen_stderr_as_client_pipe_connect_timeout_ms);
                                 return 1;
                             }
                         }
@@ -3231,7 +2924,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         //
 
                         SetLastError(0); // just in case
-                        if (_is_valid_handle(g_tee_named_pipe_stderr_handle =
+                        if (_is_valid_handle(g_tee_named_pipe_std_handles.stderr_handle =
                             CreateFile(pipe_name_str.c_str(),
                                 GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
                                 OPEN_ALWAYS,
@@ -3240,24 +2933,17 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             bool reset_handle_inherit = true;
                             DWORD handle_flags = 0;
 
-                            if (GetHandleInformation(g_tee_named_pipe_stderr_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                            if (GetHandleInformation(g_tee_named_pipe_std_handles.stderr_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
                                 reset_handle_inherit = false;
                             }
 
                             if (reset_handle_inherit) {
                                 SetLastError(0); // just in case
-                                if (!SetHandleInformation(g_tee_named_pipe_stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
-                                    thread_data.win_error = GetLastError();
-                                    thread_data.ret = err_win32_error;
-                                    if (!g_flags.no_print_gen_error_string) {
-                                        thread_data.msg =
-                                            _format_stderr_message(_T("could not disable handle inheritance of stderr tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                                win_error, win_error, g_options.tee_stderr_to_client_pipe.c_str());
-                                    }
-                                    if (g_flags.print_win_error_string && win_error) {
-                                        thread_data.msg +=
-                                            _format_win_error_message(win_error, g_options.win_error_langid);
-                                    }
+                                if (!SetHandleInformation(g_tee_named_pipe_std_handles.stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                                    win_error = GetLastError();
+                                    FormatThreadDataOutput(thread_data, err_win32_error, win_error,
+                                        _T("could not disable handle inheritance of stderr tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                        win_error, win_error, g_options.tee_stderr_to_client_pipe.c_str());
                                     return 1;
                                 }
                             }
@@ -3267,17 +2953,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         win_error = GetLastError();
                         if (win_error != ERROR_PIPE_BUSY) {
-                            thread_data.ret = err_named_pipe_connect_error;
-                            thread_data.win_error = win_error;
-                            if (!g_flags.no_print_gen_error_string) {
-                                thread_data.msg =
-                                    _format_stderr_message(_T("could not client connect of stderr tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                        win_error, win_error, g_options.tee_stderr_to_client_pipe.c_str());
-                            }
-                            if (g_flags.print_win_error_string && win_error) {
-                                thread_data.msg +=
-                                    _format_win_error_message(win_error, g_options.win_error_langid);
-                            }
+                            FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                                _T("could not client connect of stderr tee as client named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                                win_error, win_error, g_options.tee_stderr_to_client_pipe.c_str());
                             return 1;
                         }
 
@@ -3287,12 +2965,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.tee_stderr_to_server_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of stderr tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.tee_stderr_to_client_pipe.c_str(), g_options.tee_stderr_to_server_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of stderr tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.tee_stderr_to_client_pipe.c_str(), g_options.tee_stderr_to_server_pipe_connect_timeout_ms);
                                 return 1;
                             }
 
@@ -3310,12 +2985,9 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                             if (time_delta_ms >= g_options.tee_stderr_to_server_pipe_connect_timeout_ms) {
-                                thread_data.ret = err_named_pipe_connect_timeout;
-                                if (!g_flags.no_print_gen_error_string) {
-                                    thread_data.msg =
-                                        _format_stderr_message(_T("client connection timeout of stderr tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
-                                            g_options.tee_stderr_to_client_pipe.c_str(), g_options.tee_stderr_to_server_pipe_connect_timeout_ms);
-                                }
+                                FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                                    _T("client connection timeout of stderr tee as client named pipe end: pipe=\"%s\" timeout=%u ms\n"),
+                                    g_options.tee_stderr_to_client_pipe.c_str(), g_options.tee_stderr_to_server_pipe_connect_timeout_ms);
                                 return 1;
                             }
                         }
@@ -3349,7 +3021,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
 
     if (!g_options.reopen_stdin_as_file.empty()) {
         SetLastError(0); // just in case
-        if (!_is_valid_handle(g_reopen_stdin_handle =
+        if (!_is_valid_handle(g_reopen_std_handles.stdin_handle =
                 CreateFile(g_options.reopen_stdin_as_file.c_str(),
                     GENERIC_READ, FILE_SHARE_READ, NULL,
                     OPEN_EXISTING,
@@ -3377,17 +3049,17 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
         DWORD handle_flags = 0;
 
         // character device must always stay inheritable if not explicitly declared as not inheritable
-        const DWORD reopen_stdin_handle_type = _get_file_type(g_reopen_stdin_handle);
+        const DWORD reopen_stdin_handle_type = _get_file_type(g_reopen_std_handles.stdin_handle);
         const bool reset_handle_to_inherit = !g_no_stdin_inherit && reopen_stdin_handle_type == FILE_TYPE_CHAR;
 
         if (reopen_stdin_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
-            if (GetHandleInformation(g_reopen_stdin_handle, &handle_flags) && reset_handle_to_inherit ? (handle_flags & HANDLE_FLAG_INHERIT) : !(handle_flags & HANDLE_FLAG_INHERIT)) {
+            if (GetHandleInformation(g_reopen_std_handles.stdin_handle, &handle_flags) && reset_handle_to_inherit ? (handle_flags & HANDLE_FLAG_INHERIT) : !(handle_flags & HANDLE_FLAG_INHERIT)) {
                 reset_handle_inherit = false;
             }
 
             if (reset_handle_inherit) {
                 SetLastError(0); // just in case
-                if (!SetHandleInformation(g_reopen_stdin_handle, HANDLE_FLAG_INHERIT, reset_handle_to_inherit ? TRUE : FALSE)) {
+                if (!SetHandleInformation(g_reopen_std_handles.stdin_handle, HANDLE_FLAG_INHERIT, reset_handle_to_inherit ? TRUE : FALSE)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -3409,7 +3081,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
             }
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, STDIN_FILENO, _O_BINARY, true, reset_handle_to_inherit)) {
+        if (!_set_crt_std_handle_nolock(g_reopen_std_handles.stdin_handle, -1, STDIN_FILENO, _O_BINARY, true, reset_handle_to_inherit)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3433,7 +3105,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
     }
     else if (!g_options.reopen_stdin_as_server_pipe.empty()) {
         SetLastError(0); // just in case
-        if (!_is_valid_handle(g_reopen_stdin_handle =
+        if (!_is_valid_handle(g_reopen_std_handles.stdin_handle =
             CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stdin_as_server_pipe).c_str(),
                 PIPE_ACCESS_INBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
@@ -3461,13 +3133,13 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
         bool reset_handle_inherit = true;
         DWORD handle_flags = 0;
 
-        if (GetHandleInformation(g_reopen_stdin_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
+        if (GetHandleInformation(g_reopen_std_handles.stdin_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
             reset_handle_inherit = false;
         }
 
         if (reset_handle_inherit) {
             SetLastError(0); // just in case
-            if (!SetHandleInformation(g_reopen_stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+            if (!SetHandleInformation(g_reopen_std_handles.stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -3488,7 +3160,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
             }
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, STDIN_FILENO, _O_BINARY, true, false)) {
+        if (!_set_crt_std_handle_nolock(g_reopen_std_handles.stdin_handle, -1, STDIN_FILENO, _O_BINARY, true, false)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3510,7 +3182,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
 
         g_is_stdin_reopened = true;
 
-        g_connect_server_named_pipe_thread_locals[0][0].server_named_pipe_handle_ptr = &g_reopen_stdin_handle;
+        g_connect_server_named_pipe_thread_locals[0][0].server_named_pipe_handle_ptr = &g_reopen_std_handles.stdin_handle;
 
         // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[0][0].thread_handle = CreateThread(
@@ -3521,7 +3193,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
         );
     }
     else if (!g_options.reopen_stdin_as_client_pipe.empty()) {
-        g_connect_server_named_pipe_thread_locals[0][0].client_named_pipe_handle_ptr = &g_reopen_stdin_handle;
+        g_connect_server_named_pipe_thread_locals[0][0].client_named_pipe_handle_ptr = &g_reopen_std_handles.stdin_handle;
 
         // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[0][0].thread_handle = CreateThread(
@@ -3544,7 +3216,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
 
     if (!g_options.reopen_stdout_as_file.empty()) {
         SetLastError(0); // just in case
-        if (_is_valid_handle(g_reopen_stdout_handle =
+        if (_is_valid_handle(g_reopen_std_handles.stdout_handle =
                 CreateFile(g_options.reopen_stdout_as_file.c_str(),
                     GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                     g_flags.reopen_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
@@ -3554,17 +3226,17 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             DWORD handle_flags = 0;
 
             // character device must always stay inheritable if not explicitly declared as not inheritable
-            const DWORD reopen_stdout_handle_type = _get_file_type(g_reopen_stdout_handle);
+            const DWORD reopen_stdout_handle_type = _get_file_type(g_reopen_std_handles.stdout_handle);
             const bool reset_handle_to_inherit = !g_no_stdout_inherit && reopen_stdout_handle_type == FILE_TYPE_CHAR;
 
             if (reopen_stdout_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
-                if (GetHandleInformation(g_reopen_stdout_handle, &handle_flags) && reset_handle_to_inherit ? (handle_flags & HANDLE_FLAG_INHERIT) : !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                if (GetHandleInformation(g_reopen_std_handles.stdout_handle, &handle_flags) && reset_handle_to_inherit ? (handle_flags & HANDLE_FLAG_INHERIT) : !(handle_flags & HANDLE_FLAG_INHERIT)) {
                     reset_handle_inherit = false;
                 }
 
                 if (reset_handle_inherit) {
                     SetLastError(0); // just in case
-                    if (!SetHandleInformation(g_reopen_stdout_handle, HANDLE_FLAG_INHERIT, reset_handle_to_inherit ? TRUE : FALSE)) {
+                    if (!SetHandleInformation(g_reopen_std_handles.stdout_handle, HANDLE_FLAG_INHERIT, reset_handle_to_inherit ? TRUE : FALSE)) {
                         if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                             win_error = GetLastError();
                         }
@@ -3587,10 +3259,10 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             }
 
             if (!g_flags.reopen_stdout_file_truncate) {
-                SetFilePointer(g_reopen_stdout_handle, 0, NULL, FILE_END);
+                SetFilePointer(g_reopen_std_handles.stdout_handle, 0, NULL, FILE_END);
             }
 
-            g_reopen_stdout_fileid = _get_fileid_by_file_handle(g_reopen_stdout_handle, g_options.win_ver);
+            g_reopen_stdout_fileid = _get_fileid_by_file_handle(g_reopen_std_handles.stdout_handle, g_options.win_ver);
 
             // create associated write mutex
             if (g_flags.mutex_std_writes) {
@@ -3598,7 +3270,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                     (std::tstring(_T(STD_FILE_WRITE_MUTEX_NAME_PREFIX) _T("-")) + g_reopen_stdout_fileid.to_tstring()).c_str());
             }
 
-            if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, STDOUT_FILENO, _O_BINARY, true, reset_handle_to_inherit)) {
+            if (!_set_crt_std_handle_nolock(g_reopen_std_handles.stdout_handle, -1, STDOUT_FILENO, _O_BINARY, true, reset_handle_to_inherit)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -3642,7 +3314,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
     }
     else if (!g_options.reopen_stdout_as_server_pipe.empty()) {
         SetLastError(0); // just in case
-        if (!_is_valid_handle(g_reopen_stdout_handle =
+        if (!_is_valid_handle(g_reopen_std_handles.stdout_handle =
             CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stdout_as_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
@@ -3670,13 +3342,13 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
         bool reset_handle_inherit = true;
         DWORD handle_flags = 0;
 
-        if (GetHandleInformation(g_reopen_stdout_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
+        if (GetHandleInformation(g_reopen_std_handles.stdout_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
             reset_handle_inherit = false;
         }
 
         if (reset_handle_inherit) {
             SetLastError(0); // just in case
-            if (!SetHandleInformation(g_reopen_stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+            if (!SetHandleInformation(g_reopen_std_handles.stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -3697,7 +3369,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
             }
         }
 
-        if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, STDOUT_FILENO, _O_BINARY, true, false)) {
+        if (!_set_crt_std_handle_nolock(g_reopen_std_handles.stdout_handle, -1, STDOUT_FILENO, _O_BINARY, true, false)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3719,7 +3391,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
 
         g_is_stdout_reopened = true;
 
-        g_connect_server_named_pipe_thread_locals[0][1].server_named_pipe_handle_ptr = &g_reopen_stdout_handle;
+        g_connect_server_named_pipe_thread_locals[0][1].server_named_pipe_handle_ptr = &g_reopen_std_handles.stdout_handle;
 
         // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[0][1].thread_handle = CreateThread(
@@ -3730,7 +3402,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
         );
     }
     else if (!g_options.reopen_stdout_as_client_pipe.empty()) {
-        g_connect_server_named_pipe_thread_locals[0][1].client_named_pipe_handle_ptr = &g_reopen_stdout_handle;
+        g_connect_server_named_pipe_thread_locals[0][1].client_named_pipe_handle_ptr = &g_reopen_std_handles.stdout_handle;
 
         // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[0][1].thread_handle = CreateThread(
@@ -3753,30 +3425,30 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
 
     if (!g_options.reopen_stderr_as_file.empty()) {
         SetLastError(0); // just in case
-        if (_is_valid_handle(g_reopen_stderr_handle =
+        if (_is_valid_handle(g_reopen_std_handles.stderr_handle =
             CreateFile(g_options.reopen_stderr_as_file.c_str(),
                 GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                 g_flags.reopen_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                 FILE_ATTRIBUTE_NORMAL, NULL))) {
             if (!g_flags.reopen_stderr_file_truncate) {
-                SetFilePointer(g_reopen_stderr_handle, 0, NULL, FILE_END);
+                SetFilePointer(g_reopen_std_handles.stderr_handle, 0, NULL, FILE_END);
             }
 
             bool reset_handle_inherit = true;
             DWORD handle_flags = 0;
 
             // character device must always stay inheritable if not explicitly declared as not inheritable
-            const DWORD reopen_stderr_handle_type = _get_file_type(g_reopen_stderr_handle);
+            const DWORD reopen_stderr_handle_type = _get_file_type(g_reopen_std_handles.stderr_handle);
             const bool reset_handle_to_inherit = !g_no_stderr_inherit && reopen_stderr_handle_type == FILE_TYPE_CHAR;
 
             if (reopen_stderr_handle_type != FILE_TYPE_CHAR || !is_os_windows_7) { // specific for Windows 7 workaround
-                if (GetHandleInformation(g_reopen_stderr_handle, &handle_flags) && reset_handle_to_inherit ? (handle_flags & HANDLE_FLAG_INHERIT) : !(handle_flags & HANDLE_FLAG_INHERIT)) {
+                if (GetHandleInformation(g_reopen_std_handles.stderr_handle, &handle_flags) && reset_handle_to_inherit ? (handle_flags & HANDLE_FLAG_INHERIT) : !(handle_flags & HANDLE_FLAG_INHERIT)) {
                     reset_handle_inherit = false;
                 }
 
                 if (reset_handle_inherit) {
                     SetLastError(0); // just in case
-                    if (!SetHandleInformation(g_reopen_stderr_handle, HANDLE_FLAG_INHERIT, reset_handle_to_inherit ? TRUE : FALSE)) {
+                    if (!SetHandleInformation(g_reopen_std_handles.stderr_handle, HANDLE_FLAG_INHERIT, reset_handle_to_inherit ? TRUE : FALSE)) {
                         if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                             win_error = GetLastError();
                         }
@@ -3798,16 +3470,16 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                 }
             }
 
-            g_reopen_stderr_fileid = _get_fileid_by_file_handle(g_reopen_stderr_handle, g_options.win_ver);
+            g_reopen_stderr_fileid = _get_fileid_by_file_handle(g_reopen_std_handles.stderr_handle, g_options.win_ver);
 
             // check opened handles on equality
 
             if (_is_equal_fileid(g_reopen_stdout_fileid, g_reopen_stderr_fileid)) {
                 // reopen handle through the handle duplication
-                _close_handle(g_reopen_stderr_handle);
+                _close_handle(g_reopen_std_handles.stderr_handle);
 
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_reopen_stdout_handle, GetCurrentProcess(), &g_reopen_stderr_handle, 0, reset_handle_to_inherit ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_reopen_std_handles.stdout_handle, GetCurrentProcess(), &g_reopen_std_handles.stderr_handle, 0, reset_handle_to_inherit ? TRUE : FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -3837,7 +3509,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                 }
             }
 
-            if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, STDERR_FILENO, _O_BINARY, true, reset_handle_to_inherit)) {
+            if (!_set_crt_std_handle_nolock(g_reopen_std_handles.stderr_handle, -1, STDERR_FILENO, _O_BINARY, true, reset_handle_to_inherit)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -3881,7 +3553,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
     }
     else if (!g_options.reopen_stderr_as_server_pipe.empty()) {
         SetLastError(0); // just in case
-        if (!_is_valid_handle(g_reopen_stderr_handle =
+        if (!_is_valid_handle(g_reopen_std_handles.stderr_handle =
             CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stderr_as_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
@@ -3909,13 +3581,13 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
         bool reset_handle_inherit = true;
         DWORD handle_flags = 0;
 
-        if (GetHandleInformation(g_reopen_stderr_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
+        if (GetHandleInformation(g_reopen_std_handles.stderr_handle, &handle_flags) && !(handle_flags & HANDLE_FLAG_INHERIT)) {
             reset_handle_inherit = false;
         }
 
         if (reset_handle_inherit) {
             SetLastError(0); // just in case
-            if (!SetHandleInformation(g_reopen_stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+            if (!SetHandleInformation(g_reopen_std_handles.stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -3936,7 +3608,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
             }
         }
 
-        if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, STDERR_FILENO, _O_BINARY, true, false)) {
+        if (!_set_crt_std_handle_nolock(g_reopen_std_handles.stderr_handle, -1, STDERR_FILENO, _O_BINARY, true, false)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -3958,7 +3630,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
 
         g_is_stderr_reopened = true;
 
-        g_connect_server_named_pipe_thread_locals[0][2].server_named_pipe_handle_ptr = &g_reopen_stderr_handle;
+        g_connect_server_named_pipe_thread_locals[0][2].server_named_pipe_handle_ptr = &g_reopen_std_handles.stderr_handle;
 
         // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[0][2].thread_handle = CreateThread(
@@ -3969,7 +3641,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
         );
     }
     else if (!g_options.reopen_stderr_as_client_pipe.empty()) {
-        g_connect_server_named_pipe_thread_locals[0][2].client_named_pipe_handle_ptr = &g_reopen_stderr_handle;
+        g_connect_server_named_pipe_thread_locals[0][2].client_named_pipe_handle_ptr = &g_reopen_std_handles.stderr_handle;
 
         // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[0][2].thread_handle = CreateThread(
@@ -4002,7 +3674,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
         sa.bInheritHandle = TRUE;
 
         SetLastError(0); // just in case
-        if (!CreatePipe(&g_stdin_pipe_read_handle, &g_stdin_pipe_write_handle, &sa, g_options.tee_stdin_pipe_buf_size)) {
+        if (!CreatePipe(&g_pipe_read_std_handles.stdin_handle, &g_pipe_write_std_handles.stdin_handle, &sa, g_options.tee_stdin_pipe_buf_size)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -4023,7 +3695,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
         }
 
         SetLastError(0); // just in case
-        if (!SetHandleInformation(g_stdin_pipe_write_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+        if (!SetHandleInformation(g_pipe_write_std_handles.stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -4048,7 +3720,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
         const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.create_outbound_server_pipe_from_stdin;
 
         SetLastError(0); // just in case
-        if (!_is_valid_handle(g_stdin_pipe_write_handle =
+        if (!_is_valid_handle(g_pipe_write_std_handles.stdin_handle =
             CreateNamedPipe(pipe_name_str.c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
@@ -4074,7 +3746,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
         }
 
         SetLastError(0); // just in case
-        if (!SetHandleInformation(g_stdin_pipe_write_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+        if (!SetHandleInformation(g_pipe_write_std_handles.stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                 win_error = GetLastError();
             }
@@ -4094,7 +3766,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
             return false;
         }
 
-        g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].server_named_pipe_handle_ptr = &g_stdin_pipe_write_handle;
+        g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].server_named_pipe_handle_ptr = &g_pipe_write_std_handles.stdin_handle;
 
         // start server pipe connection await thread
         g_connect_bound_server_named_pipe_tofrom_conin_thread_locals[0].thread_handle = CreateThread(
@@ -4118,8 +3790,8 @@ bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error)
 
     const auto & create_inbound_server_pipe_to_conout = UTILITY_CONSTEXPR(stream_type == 1) ? g_options.create_inbound_server_pipe_to_stdout : g_options.create_inbound_server_pipe_to_stderr;
 
-    auto & conout_pipe_read_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_stdout_pipe_read_handle : g_stderr_pipe_read_handle;
-    auto & conout_pipe_write_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_stdout_pipe_write_handle : g_stderr_pipe_write_handle;
+    auto & conout_pipe_read_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_pipe_read_std_handles.stdout_handle : g_pipe_read_std_handles.stderr_handle;
+    auto & conout_pipe_write_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_pipe_write_std_handles.stdout_handle : g_pipe_write_std_handles.stderr_handle;
 
     const auto conout_handle_type = UTILITY_CONSTEXPR(stream_type == 1) ? g_stdout_handle_type : g_stderr_handle_type;
 
@@ -4272,23 +3944,15 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
             if_break(true) {
                 // start server pipe connection await
                 SetLastError(0); // just in case
-                if (!ConnectNamedPipe(g_stdin_pipe_write_handle, &connection_await_overlapped)) {
+                if (!ConnectNamedPipe(g_pipe_write_std_handles.stdin_handle, &connection_await_overlapped)) {
                     win_error = GetLastError();
                     if (win_error == ERROR_PIPE_CONNECTED) {
                         break;
                     }
                     if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                        thread_data.ret = err_named_pipe_connect_error;
-                        thread_data.win_error = win_error;
-                        if (!g_flags.no_print_gen_error_string) {
-                            thread_data.msg =
-                                _format_stderr_message(_T("could not initiate connection of outbound client named pipe end from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                    win_error, win_error, g_options.create_outbound_server_pipe_from_stdin.c_str());
-                        }
-                        if (g_flags.print_win_error_string && win_error) {
-                            thread_data.msg +=
-                                _format_win_error_message(win_error, g_options.win_error_langid);
-                        }
+                        FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                            _T("could not initiate connection of outbound client named pipe end from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            win_error, win_error, g_options.create_outbound_server_pipe_from_stdin.c_str());
                         return 1;
                     }
                 }
@@ -4315,13 +3979,9 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
                     const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                     if (time_delta_ms >= g_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms) {
-                        thread_data.ret = err_named_pipe_connect_timeout;
-                        if (!g_flags.no_print_gen_error_string) {
-                            thread_data.msg =
-                                _format_stderr_message(_T("server connection timeout of outbound server named pipe end from stdin: pipe=\"%s\" timeout=%u ms\n"),
-                                    g_options.create_outbound_server_pipe_from_stdin.c_str(), g_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms);
-                        }
-
+                        FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                            _T("server connection timeout of outbound server named pipe end from stdin: pipe=\"%s\" timeout=%u ms\n"),
+                            g_options.create_outbound_server_pipe_from_stdin.c_str(), g_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms);
                         return 1;
                     }
 
@@ -4343,9 +4003,9 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
             //  otherwise a client may be blocked on the `PeekNamedPipe` call in an infinite loop.
             //
             if (!g_options.create_outbound_server_pipe_from_stdin.empty()) {
-                DisconnectNamedPipe(g_stdin_pipe_write_handle);
+                DisconnectNamedPipe(g_pipe_write_std_handles.stdin_handle);
             }
-            _close_handle(g_stdin_pipe_write_handle);
+            _close_handle(g_pipe_write_std_handles.stdin_handle);
         }
     }
 
@@ -4369,8 +4029,8 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
 
     const auto & create_inbound_server_pipe_to_conout = UTILITY_CONSTEXPR(stream_type == 1) ? g_options.create_inbound_server_pipe_to_stdout : g_options.create_inbound_server_pipe_to_stderr;
 
-    auto & conout_pipe_read_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_stdout_pipe_read_handle : g_stderr_pipe_read_handle;
-    auto & conout_pipe_write_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_stdout_pipe_write_handle : g_stderr_pipe_write_handle;
+    auto & conout_pipe_read_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_pipe_read_std_handles.stdout_handle : g_pipe_read_std_handles.stderr_handle;
+    auto & conout_pipe_write_handle = UTILITY_CONSTEXPR(stream_type == 1) ? g_pipe_write_std_handles.stdout_handle : g_pipe_write_std_handles.stderr_handle;
 
     const auto create_inbound_server_pipe_to_conout_connect_timeout_ms = UTILITY_CONSTEXPR(stream_type == 1) ?
         g_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms : g_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms;
@@ -4389,17 +4049,9 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
                         break;
                     }
                     if (win_error != ERROR_IO_PENDING && win_error != ERROR_PIPE_LISTENING) {
-                        thread_data.ret = err_named_pipe_connect_error;
-                        thread_data.win_error = win_error;
-                        if (!g_flags.no_print_gen_error_string) {
-                            thread_data.msg =
-                                _format_stderr_message(_T("could not initiate connection of inbound client named pipe end from %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
-                                    conout_name_token_str, win_error, win_error, create_inbound_server_pipe_to_conout.c_str());
-                        }
-                        if (g_flags.print_win_error_string && win_error) {
-                            thread_data.msg +=
-                                _format_win_error_message(win_error, g_options.win_error_langid);
-                        }
+                        FormatThreadDataOutput(thread_data, err_named_pipe_connect_error, win_error,
+                            _T("could not initiate connection of inbound client named pipe end from %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            conout_name_token_str, win_error, win_error, create_inbound_server_pipe_to_conout.c_str());
                         return 1;
                     }
                 }
@@ -4426,13 +4078,9 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
                     const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
                     if (time_delta_ms >= create_inbound_server_pipe_to_conout_connect_timeout_ms) {
-                        thread_data.ret = err_named_pipe_connect_timeout;
-                        if (!g_flags.no_print_gen_error_string) {
-                            thread_data.msg =
-                                _format_stderr_message(_T("server connection timeout of inbound server named pipe end to %s: pipe=\"%s\" timeout=%u ms\n"),
-                                    conout_name_token_str, create_inbound_server_pipe_to_conout.c_str(), create_inbound_server_pipe_to_conout_connect_timeout_ms);
-                        }
-
+                        FormatThreadDataOutput(thread_data, err_named_pipe_connect_timeout, 0,
+                            _T("server connection timeout of inbound server named pipe end to %s: pipe=\"%s\" timeout=%u ms\n"),
+                            conout_name_token_str, create_inbound_server_pipe_to_conout.c_str(), create_inbound_server_pipe_to_conout_connect_timeout_ms);
                         return 1;
                     }
 
@@ -4469,16 +4117,16 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
 
     if (!g_options.tee_stdin_to_file.empty()) {
         SetLastError(0); // just in case
-        if (_is_valid_handle(g_tee_file_stdin_handle =
+        if (_is_valid_handle(g_tee_file_std_handles.stdin_handle =
             CreateFile(g_options.tee_stdin_to_file.c_str(),
                 GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                 g_flags.tee_stdin_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                 FILE_ATTRIBUTE_NORMAL, NULL))) {
             if (!g_flags.tee_stdin_file_truncate) {
-                SetFilePointer(g_tee_file_stdin_handle, 0, NULL, FILE_END);
+                SetFilePointer(g_tee_file_std_handles.stdin_handle, 0, NULL, FILE_END);
             }
 
-            g_tee_file_stdin_fileid = _get_fileid_by_file_handle(g_tee_file_stdin_handle, g_options.win_ver);
+            g_tee_file_stdin_fileid = _get_fileid_by_file_handle(g_tee_file_std_handles.stdin_handle, g_options.win_ver);
 
             // create associated write mutex
             if (g_flags.mutex_tee_file_writes) {
@@ -4510,7 +4158,7 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
     }
     else if (!g_options.tee_stdin_to_server_pipe.empty()) {
         SetLastError(0); // just in case
-        if (!_is_valid_handle(g_tee_named_pipe_stdin_handle =
+        if (!_is_valid_handle(g_tee_named_pipe_std_handles.stdin_handle =
             CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stdin_to_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
@@ -4537,7 +4185,7 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
 
         g_has_tee_stdin = true;
 
-        g_connect_server_named_pipe_thread_locals[1][0].server_named_pipe_handle_ptr = &g_tee_named_pipe_stdin_handle;
+        g_connect_server_named_pipe_thread_locals[1][0].server_named_pipe_handle_ptr = &g_tee_named_pipe_std_handles.stdin_handle;
 
         // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[1][0].thread_handle = CreateThread(
@@ -4550,7 +4198,7 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
     else if (!g_options.tee_stdin_to_client_pipe.empty()) {
         g_has_tee_stdin = true;
 
-        g_connect_server_named_pipe_thread_locals[1][0].client_named_pipe_handle_ptr = &g_tee_named_pipe_stdin_handle;
+        g_connect_server_named_pipe_thread_locals[1][0].client_named_pipe_handle_ptr = &g_tee_named_pipe_std_handles.stdin_handle;
 
         // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[1][0].thread_handle = CreateThread(
@@ -4571,16 +4219,16 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
 
     if (!g_options.tee_stdout_to_file.empty()) {
         SetLastError(0); // just in case
-        if (_is_valid_handle(g_tee_file_stdout_handle =
+        if (_is_valid_handle(g_tee_file_std_handles.stdout_handle =
             CreateFile(g_options.tee_stdout_to_file.c_str(),
                 GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                 g_flags.tee_stdout_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                 FILE_ATTRIBUTE_NORMAL, NULL))) {
             if (!g_flags.tee_stdout_file_truncate) {
-                SetFilePointer(g_tee_file_stdout_handle, 0, NULL, FILE_END);
+                SetFilePointer(g_tee_file_std_handles.stdout_handle, 0, NULL, FILE_END);
             }
 
-            g_tee_file_stdout_fileid = _get_fileid_by_file_handle(g_tee_file_stdout_handle, g_options.win_ver);
+            g_tee_file_stdout_fileid = _get_fileid_by_file_handle(g_tee_file_std_handles.stdout_handle, g_options.win_ver);
         }
         else {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4608,10 +4256,10 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
 
         if (_is_equal_fileid(g_tee_file_stdin_fileid, g_tee_file_stdout_fileid)) {
             // reopen handle through the handle duplication
-            _close_handle(g_tee_file_stdout_handle);
+            _close_handle(g_tee_file_std_handles.stdout_handle);
 
             SetLastError(0); // just in case
-            if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+            if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stdin_handle, GetCurrentProcess(), &g_tee_file_std_handles.stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -4643,7 +4291,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
     }
     else if (!g_options.tee_stdout_to_server_pipe.empty()) {
         SetLastError(0); // just in case
-        if (!_is_valid_handle(g_tee_named_pipe_stdout_handle =
+        if (!_is_valid_handle(g_tee_named_pipe_std_handles.stdout_handle =
             CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stdout_to_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
@@ -4670,7 +4318,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
 
         g_has_tee_stdout = true;
 
-        g_connect_server_named_pipe_thread_locals[1][1].server_named_pipe_handle_ptr = &g_tee_named_pipe_stdout_handle;
+        g_connect_server_named_pipe_thread_locals[1][1].server_named_pipe_handle_ptr = &g_tee_named_pipe_std_handles.stdout_handle;
 
         // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[1][1].thread_handle = CreateThread(
@@ -4683,7 +4331,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
     else if (!g_options.tee_stdout_to_client_pipe.empty()) {
         g_has_tee_stdout = true;
 
-        g_connect_server_named_pipe_thread_locals[1][1].client_named_pipe_handle_ptr = &g_tee_named_pipe_stdout_handle;
+        g_connect_server_named_pipe_thread_locals[1][1].client_named_pipe_handle_ptr = &g_tee_named_pipe_std_handles.stdout_handle;
 
         // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[1][1].thread_handle = CreateThread(
@@ -4704,16 +4352,16 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
 
     if (!g_options.tee_stderr_to_file.empty()) {
         SetLastError(0); // just in case
-        if (_is_valid_handle(g_tee_file_stderr_handle =
+        if (_is_valid_handle(g_tee_file_std_handles.stderr_handle =
             CreateFile(g_options.tee_stderr_to_file.c_str(),
                 GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                 g_flags.tee_stderr_file_truncate ? CREATE_ALWAYS : OPEN_ALWAYS,
                 FILE_ATTRIBUTE_NORMAL, NULL))) {
             if (!g_flags.tee_stderr_file_truncate) {
-                SetFilePointer(g_tee_file_stderr_handle, 0, NULL, FILE_END);
+                SetFilePointer(g_tee_file_std_handles.stderr_handle, 0, NULL, FILE_END);
             }
 
-            g_tee_file_stderr_fileid = _get_fileid_by_file_handle(g_tee_file_stderr_handle, g_options.win_ver);
+            g_tee_file_stderr_fileid = _get_fileid_by_file_handle(g_tee_file_std_handles.stderr_handle, g_options.win_ver);
         }
         else {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4741,10 +4389,10 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
 
         if (_is_equal_fileid(g_tee_file_stdout_fileid, g_tee_file_stderr_fileid)) {
             // reopen handle through the handle duplication
-            _close_handle(g_tee_file_stderr_handle);
+            _close_handle(g_tee_file_std_handles.stderr_handle);
 
             SetLastError(0); // just in case
-            if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+            if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stdout_handle, GetCurrentProcess(), &g_tee_file_std_handles.stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -4768,10 +4416,10 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
         }
         else if (_is_equal_fileid(g_tee_file_stdin_fileid, g_tee_file_stderr_fileid)) {
             // reopen handle through the handle duplication
-            _close_handle(g_tee_file_stderr_handle);
+            _close_handle(g_tee_file_std_handles.stderr_handle);
 
             SetLastError(0); // just in case
-            if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+            if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stdin_handle, GetCurrentProcess(), &g_tee_file_std_handles.stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                 if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                     win_error = GetLastError();
                 }
@@ -4803,7 +4451,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
     }
     else if (!g_options.tee_stderr_to_server_pipe.empty()) {
         SetLastError(0); // just in case
-        if (!_is_valid_handle(g_tee_named_pipe_stderr_handle =
+        if (!_is_valid_handle(g_tee_named_pipe_std_handles.stderr_handle =
             CreateNamedPipe((std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stderr_to_server_pipe).c_str(),
                 PIPE_ACCESS_OUTBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE | FILE_FLAG_OVERLAPPED,
                 PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT | PIPE_REJECT_REMOTE_CLIENTS,
@@ -4830,7 +4478,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
 
         g_has_tee_stderr = true;
 
-        g_connect_server_named_pipe_thread_locals[1][2].server_named_pipe_handle_ptr = &g_tee_named_pipe_stderr_handle;
+        g_connect_server_named_pipe_thread_locals[1][2].server_named_pipe_handle_ptr = &g_tee_named_pipe_std_handles.stderr_handle;
 
         // start server pipe connection await thread
         g_connect_server_named_pipe_thread_locals[1][2].thread_handle = CreateThread(
@@ -4843,7 +4491,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
     else if (!g_options.tee_stderr_to_client_pipe.empty()) {
         g_has_tee_stderr = true;
 
-        g_connect_server_named_pipe_thread_locals[1][2].client_named_pipe_handle_ptr = &g_tee_named_pipe_stderr_handle;
+        g_connect_server_named_pipe_thread_locals[1][2].client_named_pipe_handle_ptr = &g_tee_named_pipe_std_handles.stderr_handle;
 
         // start client pipe connection await thread
         g_connect_client_named_pipe_thread_locals[1][2].thread_handle = CreateThread(
@@ -4969,6 +4617,14 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
     [&]() { if_break(true) __try {
+        // mutex initialization
+
+        g_console_access_mutex = CreateMutex(NULL, FALSE, NULL);
+
+        if (g_flags.detach_inherited_console_on_wait) {
+            g_console_access_ready_thread_lock_event = CreateEvent(NULL, FALSE, FALSE, NULL); // CAUTION: create not signaled
+        }
+
         if (g_options.chcp_in) {
             prev_cp_in = GetConsoleCP();
             if (g_options.chcp_in != prev_cp_in) {
@@ -5028,34 +4684,15 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         // Accomplish all client pipe connections for all standard handles from here before duplicate them.
         //
 
-        {
-            auto & connect_client_named_pipe_thread_locals = g_connect_client_named_pipe_thread_locals[0];
+        AccomplishClientPipeConnections(g_connect_client_named_pipe_thread_locals[0], ret, break_, false);
 
-            WaitForConnectNamedPipeThreads(connect_client_named_pipe_thread_locals, false);
-
-            // check errors
-            utility::for_each_unroll(connect_client_named_pipe_thread_locals, [&](auto & local) {
-                if (!break_) {
-                    // return error code from the first thread
-                    if (local.thread_data.is_error) {
-                        ret = local.thread_data.ret;
-                        break_ = true;
-                    }
-                }
-                if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                    g_worker_threads_return_data.add(local.thread_data);
-                    local.thread_data.is_copied = true;
-                }
-            });
-
-            if (break_) break;
-        }
+        if (break_) break;
 
         // assign reopened client named pipe as std handle to CRT
 
         if (!g_options.reopen_stdin_as_client_pipe.empty()) {
-            if (_is_valid_handle(g_reopen_stdin_handle)) {
-                if (!_set_crt_std_handle(g_reopen_stdin_handle, -1, STDIN_FILENO, _O_BINARY, true, false)) {
+            if (_is_valid_handle(g_reopen_std_handles.stdin_handle)) {
+                if (!_set_crt_std_handle_nolock(g_reopen_std_handles.stdin_handle, -1, STDIN_FILENO, _O_BINARY, true, false)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5080,8 +4717,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
 
         if (!g_options.reopen_stdout_as_client_pipe.empty()) {
-            if (_is_valid_handle(g_reopen_stdout_handle)) {
-                if (!_set_crt_std_handle(g_reopen_stdout_handle, -1, STDOUT_FILENO, _O_BINARY, true, false)) {
+            if (_is_valid_handle(g_reopen_std_handles.stdout_handle)) {
+                if (!_set_crt_std_handle_nolock(g_reopen_std_handles.stdout_handle, -1, STDOUT_FILENO, _O_BINARY, true, false)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5106,8 +4743,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
 
         if (!g_options.reopen_stderr_as_client_pipe.empty()) {
-            if (_is_valid_handle(g_reopen_stderr_handle)) {
-                if (!_set_crt_std_handle(g_reopen_stderr_handle, -1, STDERR_FILENO, _O_BINARY, true, false)) {
+            if (_is_valid_handle(g_reopen_std_handles.stderr_handle)) {
+                if (!_set_crt_std_handle_nolock(g_reopen_std_handles.stderr_handle, -1, STDERR_FILENO, _O_BINARY, true, false)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5132,8 +4769,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
 
 #ifdef _DEBUG
-        _debug_print_win32_std_handles(4);
-        _debug_print_crt_std_handles(4);
+        _debug_print_win32_std_handles(nullptr, 4);
+        _debug_print_crt_std_handles(nullptr, 4);
 #endif
 
         // std handles update
@@ -5143,14 +4780,14 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         bool no_stderr_inherit = false;
 
         if (g_inherited_console_window) {
-            if (!_get_std_handles(ret, win_error, g_stdin_handle, g_stdout_handle, g_stderr_handle, g_flags, g_options)) {
+            if (!_get_std_handles_nolock(ret, win_error, g_std_handles, g_flags, g_options)) {
                 break;
             }
 
             // update globals
-            g_stdin_handle_type = _get_file_type(g_stdin_handle);
-            g_stdout_handle_type = _get_file_type(g_stdout_handle);
-            g_stderr_handle_type = _get_file_type(g_stderr_handle);
+            g_stdin_handle_type = _get_file_type(g_std_handles.stdin_handle);
+            g_stdout_handle_type = _get_file_type(g_std_handles.stdout_handle);
+            g_stderr_handle_type = _get_file_type(g_std_handles.stderr_handle);
 
             no_stdin_inherit = g_no_stdin_inherit || g_stdin_handle_type != FILE_TYPE_CHAR;
             no_stdout_inherit = g_no_stdout_inherit || g_stdout_handle_type != FILE_TYPE_CHAR;
@@ -5189,13 +4826,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     bool reset_stdin_handle_inherit = true;
                     DWORD stdin_handle_flags = 0;
 
-                    if (GetHandleInformation(g_stdin_handle, &stdin_handle_flags) && !(stdin_handle_flags & HANDLE_FLAG_INHERIT)) {
+                    if (GetHandleInformation(g_std_handles.stdin_handle, &stdin_handle_flags) && !(stdin_handle_flags & HANDLE_FLAG_INHERIT)) {
                         reset_stdin_handle_inherit = false;
                     }
 
                     if (reset_stdin_handle_inherit) {
                         SetLastError(0); // just in case
-                        if (!SetHandleInformation(g_stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                        if (!SetHandleInformation(g_std_handles.stdin_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                                 win_error = GetLastError();
                             }
@@ -5220,13 +4857,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     bool reset_stdin_handle_inherit = true;
                     DWORD stdin_handle_flags = 0;
 
-                    if (GetHandleInformation(g_stdin_handle, &stdin_handle_flags) && (stdin_handle_flags & HANDLE_FLAG_INHERIT)) {
+                    if (GetHandleInformation(g_std_handles.stdin_handle, &stdin_handle_flags) && (stdin_handle_flags & HANDLE_FLAG_INHERIT)) {
                         reset_stdin_handle_inherit = false;
                     }
 
                     if (reset_stdin_handle_inherit) {
                         SetLastError(0); // just in case
-                        if (!SetHandleInformation(g_stdin_handle, HANDLE_FLAG_INHERIT, TRUE)) {
+                        if (!SetHandleInformation(g_std_handles.stdin_handle, HANDLE_FLAG_INHERIT, TRUE)) {
                             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                                 win_error = GetLastError();
                             }
@@ -5258,13 +4895,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     bool reset_stdout_handle_inherit = true;
                     DWORD stdout_handle_flags = 0;
 
-                    if (GetHandleInformation(g_stdout_handle, &stdout_handle_flags) && !(stdout_handle_flags & HANDLE_FLAG_INHERIT)) {
+                    if (GetHandleInformation(g_std_handles.stdout_handle, &stdout_handle_flags) && !(stdout_handle_flags & HANDLE_FLAG_INHERIT)) {
                         reset_stdout_handle_inherit = false;
                     }
 
                     if (reset_stdout_handle_inherit) {
                         SetLastError(0); // just in case
-                        if (!SetHandleInformation(g_stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                        if (!SetHandleInformation(g_std_handles.stdout_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                                 win_error = GetLastError();
                             }
@@ -5289,13 +4926,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     bool reset_stdout_handle_inherit = true;
                     DWORD stdout_handle_flags = 0;
 
-                    if (GetHandleInformation(g_stdout_handle, &stdout_handle_flags) && (stdout_handle_flags & HANDLE_FLAG_INHERIT)) {
+                    if (GetHandleInformation(g_std_handles.stdout_handle, &stdout_handle_flags) && (stdout_handle_flags & HANDLE_FLAG_INHERIT)) {
                         reset_stdout_handle_inherit = false;
                     }
 
                     if (reset_stdout_handle_inherit) {
                         SetLastError(0); // just in case
-                        if (!SetHandleInformation(g_stdout_handle, HANDLE_FLAG_INHERIT, TRUE)) {
+                        if (!SetHandleInformation(g_std_handles.stdout_handle, HANDLE_FLAG_INHERIT, TRUE)) {
                             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                                 win_error = GetLastError();
                             }
@@ -5327,13 +4964,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     bool reset_stderr_handle_inherit = true;
                     DWORD stderr_handle_flags = 0;
 
-                    if (GetHandleInformation(g_stderr_handle, &stderr_handle_flags) && !(stderr_handle_flags & HANDLE_FLAG_INHERIT)) {
+                    if (GetHandleInformation(g_std_handles.stderr_handle, &stderr_handle_flags) && !(stderr_handle_flags & HANDLE_FLAG_INHERIT)) {
                         reset_stderr_handle_inherit = false;
                     }
 
                     if (reset_stderr_handle_inherit) {
                         SetLastError(0); // just in case
-                        if (!SetHandleInformation(g_stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
+                        if (!SetHandleInformation(g_std_handles.stderr_handle, HANDLE_FLAG_INHERIT, FALSE)) {
                             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                                 win_error = GetLastError();
                             }
@@ -5358,13 +4995,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     bool reset_stderr_handle_inherit = true;
                     DWORD stderr_handle_flags = 0;
 
-                    if (GetHandleInformation(g_stderr_handle, &stderr_handle_flags) && (stderr_handle_flags & HANDLE_FLAG_INHERIT)) {
+                    if (GetHandleInformation(g_std_handles.stderr_handle, &stderr_handle_flags) && (stderr_handle_flags & HANDLE_FLAG_INHERIT)) {
                         reset_stderr_handle_inherit = false;
                     }
 
                     if (reset_stderr_handle_inherit) {
                         SetLastError(0); // just in case
-                        if (!SetHandleInformation(g_stderr_handle, HANDLE_FLAG_INHERIT, TRUE)) {
+                        if (!SetHandleInformation(g_std_handles.stderr_handle, HANDLE_FLAG_INHERIT, TRUE)) {
                             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                                 win_error = GetLastError();
                             }
@@ -5392,7 +5029,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             switch (g_options.stdout_dup) {
             case STDERR_FILENO:
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_stderr_handle, GetCurrentProcess(), &g_stderr_handle_dup, 0, g_is_stderr_reopened ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_std_handles.stderr_handle, GetCurrentProcess(), &g_stderr_handle_dup, 0, g_is_stderr_reopened ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5413,7 +5050,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     break;
                 }
 
-                if (!_set_crt_std_handle(g_stderr_handle_dup, -1, STDOUT_FILENO, _O_BINARY, false, !g_is_stderr_reopened)) {
+                if (!_set_crt_std_handle_nolock(g_stderr_handle_dup, -1, STDOUT_FILENO, _O_BINARY, false, !g_is_stderr_reopened)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5437,8 +5074,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 g_stderr_handle_dup = INVALID_HANDLE_VALUE; // ownership is passed to CRT
 
                 // reread owned by CRT handles
-                g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-                g_stdout_handle_type = _get_file_type(g_stdout_handle);
+                g_std_handles.stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+                g_stdout_handle_type = _get_file_type(g_std_handles.stdout_handle);
 
                 g_is_stdout_reopened = g_is_stderr_reopened;
 
@@ -5450,7 +5087,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             switch (g_options.stderr_dup) {
             case STDOUT_FILENO:
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_stdout_handle, GetCurrentProcess(), &g_stdout_handle_dup, 0, g_is_stdout_reopened ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_std_handles.stdout_handle, GetCurrentProcess(), &g_stdout_handle_dup, 0, g_is_stdout_reopened ? FALSE : TRUE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5471,7 +5108,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     break;
                 }
 
-                if (!_set_crt_std_handle(g_stdout_handle_dup, -1, STDERR_FILENO, _O_BINARY, false, !g_is_stdout_reopened)) {
+                if (!_set_crt_std_handle_nolock(g_stdout_handle_dup, -1, STDERR_FILENO, _O_BINARY, false, !g_is_stdout_reopened)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5495,8 +5132,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 g_stdout_handle_dup = INVALID_HANDLE_VALUE; // ownership is passed to CRT
 
                 // reread owned by CRT handles
-                g_stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
-                g_stderr_handle_type = _get_file_type(g_stderr_handle);
+                g_std_handles.stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+                g_stderr_handle_type = _get_file_type(g_std_handles.stderr_handle);
 
                 g_is_stderr_reopened = g_is_stdout_reopened;
 
@@ -5506,43 +5143,24 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             if (break_) break;
 
 #ifdef _DEBUG
-            _debug_print_win32_std_handles(5);
-            _debug_print_crt_std_handles(5);
+            _debug_print_win32_std_handles(nullptr, 5);
+            _debug_print_crt_std_handles(nullptr, 5);
 #endif
         }
 
         // Accomplish all client pipe connections for all tee handles from here before duplicate them.
         //
 
-        {
-            auto & connect_client_named_pipe_thread_locals = g_connect_client_named_pipe_thread_locals[1];
+        AccomplishClientPipeConnections(g_connect_client_named_pipe_thread_locals[1], ret, break_, false);
 
-            WaitForConnectNamedPipeThreads(connect_client_named_pipe_thread_locals, false);
-
-            // check errors
-            utility::for_each_unroll(connect_client_named_pipe_thread_locals, [&](auto & local) {
-                if (!break_) {
-                    // return error code from the first thread
-                    if (local.thread_data.is_error) {
-                        ret = local.thread_data.ret;
-                        break_ = true;
-                    }
-                }
-                if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                    g_worker_threads_return_data.add(local.thread_data);
-                    local.thread_data.is_copied = true;
-                }
-            });
-
-            if (break_) break;
-        }
+        if (break_) break;
 
         // tee file handles dup
 
-        if (!_is_valid_handle(g_tee_file_stdin_handle)) {
+        if (!_is_valid_handle(g_tee_file_std_handles.stdin_handle)) {
             if (g_options.tee_stdin_dup == STDOUT_FILENO) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stdout_handle, GetCurrentProcess(), &g_tee_file_std_handles.stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5565,7 +5183,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 g_has_tee_stdin = true;
             } else if (g_options.tee_stdin_dup == STDERR_FILENO) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stderr_handle, GetCurrentProcess(), &g_tee_file_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stderr_handle, GetCurrentProcess(), &g_tee_file_std_handles.stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5589,10 +5207,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
 
-        if (!_is_valid_handle(g_tee_file_stdout_handle)) {
+        if (!_is_valid_handle(g_tee_file_std_handles.stdout_handle)) {
             if (g_tee_stdout_dup_stdin) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stdin_handle, GetCurrentProcess(), &g_tee_file_std_handles.stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5615,7 +5233,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 g_has_tee_stdout = true;
             } else if (g_options.tee_stdout_dup == STDERR_FILENO) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stderr_handle, GetCurrentProcess(), &g_tee_file_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stderr_handle, GetCurrentProcess(), &g_tee_file_std_handles.stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5639,10 +5257,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
 
-        if (!_is_valid_handle(g_tee_file_stderr_handle)) {
+        if (!_is_valid_handle(g_tee_file_std_handles.stderr_handle)) {
             if (g_tee_stderr_dup_stdin) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdin_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stdin_handle, GetCurrentProcess(), &g_tee_file_std_handles.stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5665,7 +5283,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 g_has_tee_stderr = true;
             } else if (g_options.tee_stderr_dup == STDOUT_FILENO) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stdout_handle, GetCurrentProcess(), &g_tee_file_std_handles.stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5691,10 +5309,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         // tee named pipe handles dup
 
-        if (!_is_valid_handle(g_tee_named_pipe_stdin_handle)) {
+        if (!_is_valid_handle(g_tee_named_pipe_std_handles.stdin_handle)) {
             if (g_options.tee_stdin_dup == STDOUT_FILENO) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stdout_handle, GetCurrentProcess(), &g_tee_named_pipe_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_std_handles.stdout_handle, GetCurrentProcess(), &g_tee_named_pipe_std_handles.stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5723,7 +5341,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 g_has_tee_stdin = true;
             } else if (g_options.tee_stdin_dup == STDERR_FILENO) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stderr_handle, GetCurrentProcess(), &g_tee_named_pipe_stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_std_handles.stderr_handle, GetCurrentProcess(), &g_tee_named_pipe_std_handles.stdin_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5753,10 +5371,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
 
-        if (!_is_valid_handle(g_tee_named_pipe_stdout_handle)) {
+        if (!_is_valid_handle(g_tee_named_pipe_std_handles.stdout_handle)) {
             if (g_tee_stdout_dup_stdin) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stdin_handle, GetCurrentProcess(), &g_tee_named_pipe_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_std_handles.stdin_handle, GetCurrentProcess(), &g_tee_named_pipe_std_handles.stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5785,7 +5403,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 g_has_tee_stdout = true;
             } else if (g_options.tee_stdout_dup == STDERR_FILENO) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stderr_handle, GetCurrentProcess(), &g_tee_named_pipe_stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_std_handles.stderr_handle, GetCurrentProcess(), &g_tee_named_pipe_std_handles.stdout_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5815,10 +5433,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
 
-        if (!_is_valid_handle(g_tee_named_pipe_stderr_handle)) {
+        if (!_is_valid_handle(g_tee_named_pipe_std_handles.stderr_handle)) {
             if (g_tee_stderr_dup_stdin) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_stdin_handle, GetCurrentProcess(), &g_tee_named_pipe_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_named_pipe_std_handles.stdin_handle, GetCurrentProcess(), &g_tee_named_pipe_std_handles.stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5847,7 +5465,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 g_has_tee_stderr = true;
             } else if (g_options.tee_stderr_dup == STDOUT_FILENO) {
                 SetLastError(0); // just in case
-                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_stdout_handle, GetCurrentProcess(), &g_tee_file_stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+                if (!DuplicateHandle(GetCurrentProcess(), g_tee_file_std_handles.stdout_handle, GetCurrentProcess(), &g_tee_file_std_handles.stderr_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
                     if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
                         win_error = GetLastError();
                     }
@@ -5878,20 +5496,20 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
 
         if (!g_pipe_stdin_to_stdout) {
-            if (_is_valid_handle(g_stdin_handle)) {
+            if (_is_valid_handle(g_std_handles.stdin_handle)) {
                 if (!g_options.create_outbound_server_pipe_from_stdin.empty() || g_pipe_stdin_to_child_stdin || g_stdin_handle_type != FILE_TYPE_CHAR) {
                     if (!CreateOutboundPipeFromConsoleInput(ret, win_error)) {
                         break;
                     }
 
                     if (g_options.shell_exec_verb.empty()) {
-                        si.hStdInput = g_stdin_pipe_read_handle;
+                        si.hStdInput = g_pipe_read_std_handles.stdin_handle;
 
                         si.dwFlags |= STARTF_USESTDHANDLES;
                     }
                     else {
                         g_is_stdin_redirected = true;
-                        SetStdHandle(STD_INPUT_HANDLE, g_stdin_pipe_read_handle);
+                        SetStdHandle(STD_INPUT_HANDLE, g_pipe_read_std_handles.stdin_handle);
                     }
                 }
                 else if (g_options.shell_exec_verb.empty()) {
@@ -5899,53 +5517,53 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     //  Must be the original stdin, can not be a buffer from the CreateConsoleScreenBuffer call,
                     //  otherwise, for example, the `cmd.exe /k` process will exit immediately!
                     //
-                    si.hStdInput = g_stdin_handle;
+                    si.hStdInput = g_std_handles.stdin_handle;
 
                     si.dwFlags |= STARTF_USESTDHANDLES;
                 }
             }
 
-            if (_is_valid_handle(g_stdout_handle)) {
+            if (_is_valid_handle(g_std_handles.stdout_handle)) {
                 if (!g_options.create_inbound_server_pipe_to_stdout.empty() || g_pipe_child_stdout_to_stdout || g_has_tee_stdout || g_stdout_handle_type != FILE_TYPE_CHAR) {
                     if (!CreateInboundPipeToConsoleOutput<1>(ret, win_error)) {
                         break;
                     }
 
                     if (g_options.shell_exec_verb.empty()) {
-                        si.hStdOutput = g_stdout_pipe_write_handle;
+                        si.hStdOutput = g_pipe_write_std_handles.stdout_handle;
 
                         si.dwFlags |= STARTF_USESTDHANDLES;
                     }
                     else {
                         g_is_stdout_redirected = true;
-                        SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_pipe_write_handle);
+                        SetStdHandle(STD_OUTPUT_HANDLE, g_pipe_write_std_handles.stdout_handle);
                     }
                 }
                 else if (g_options.shell_exec_verb.empty()) {
-                    si.hStdOutput = g_stdout_handle;
+                    si.hStdOutput = g_std_handles.stdout_handle;
 
                     si.dwFlags |= STARTF_USESTDHANDLES;
                 }
             }
 
-            if (_is_valid_handle(g_stderr_handle)) {
+            if (_is_valid_handle(g_std_handles.stderr_handle)) {
                 if (!g_options.create_inbound_server_pipe_to_stderr.empty() || g_pipe_child_stderr_to_stderr || g_has_tee_stderr || g_stderr_handle_type != FILE_TYPE_CHAR) {
                     if (!CreateInboundPipeToConsoleOutput<2>(ret, win_error)) {
                         break;
                     }
 
                     if (g_options.shell_exec_verb.empty()) {
-                        si.hStdError = g_stderr_pipe_write_handle;
+                        si.hStdError = g_pipe_write_std_handles.stderr_handle;
 
                         si.dwFlags |= STARTF_USESTDHANDLES;
                     }
                     else {
                         g_is_stderr_redirected = true;
-                        SetStdHandle(STD_ERROR_HANDLE, g_stderr_pipe_write_handle);
+                        SetStdHandle(STD_ERROR_HANDLE, g_pipe_write_std_handles.stderr_handle);
                     }
                 }
                 else if (g_options.shell_exec_verb.empty()) {
-                    si.hStdError = g_stderr_handle;
+                    si.hStdError = g_std_handles.stderr_handle;
 
                     si.dwFlags |= STARTF_USESTDHANDLES;
                 }
@@ -5955,27 +5573,27 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         if (g_stdin_handle_type == FILE_TYPE_CHAR) {
             if (g_flags.stdin_echo || g_flags.no_stdin_echo) {
                 DWORD stdin_handle_mode = 0;
-                GetConsoleMode(g_stdin_handle, &stdin_handle_mode);
+                GetConsoleMode(g_std_handles.stdin_handle, &stdin_handle_mode);
                 if (g_flags.stdin_echo) {
-                    SetConsoleMode(g_stdin_handle, stdin_handle_mode | ENABLE_ECHO_INPUT);
+                    SetConsoleMode(g_std_handles.stdin_handle, stdin_handle_mode | ENABLE_ECHO_INPUT);
                 }
                 else {
-                    SetConsoleMode(g_stdin_handle, stdin_handle_mode & ~ENABLE_ECHO_INPUT);
+                    SetConsoleMode(g_std_handles.stdin_handle, stdin_handle_mode & ~ENABLE_ECHO_INPUT);
                 }
             }
         }
         if (g_stdout_handle_type == FILE_TYPE_CHAR) {
             if (g_stdout_vt100) {
                 DWORD stdout_handle_mode = 0;
-                GetConsoleMode(g_stdout_handle, &stdout_handle_mode);
-                SetConsoleMode(g_stdout_handle, stdout_handle_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+                GetConsoleMode(g_std_handles.stdout_handle, &stdout_handle_mode);
+                SetConsoleMode(g_std_handles.stdout_handle, stdout_handle_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
             }
         }
         if (g_stderr_handle_type == FILE_TYPE_CHAR) {
             if (g_stderr_vt100) {
                 DWORD stderr_handle_mode = 0;
-                GetConsoleMode(g_stderr_handle, &stderr_handle_mode);
-                SetConsoleMode(g_stderr_handle, stderr_handle_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+                GetConsoleMode(g_std_handles.stderr_handle, &stderr_handle_mode);
+                SetConsoleMode(g_std_handles.stderr_handle, stderr_handle_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
             }
         }
 
@@ -6058,7 +5676,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                             g_is_child_stdin_char_type = true;
                         }
                     }
-                    else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_stdin_handle)) {
+                    else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_std_handles.stdin_handle)) {
                         g_is_child_stdin_char_type = true;
                     }
 
@@ -6125,14 +5743,14 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     sei.lpDirectory = !current_dir.empty() ? current_dir.c_str() : NULL;
                     sei.nShow = g_options.show_as;
 
-                    if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_stdin_handle)) {
+                    if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_std_handles.stdin_handle)) {
                         g_is_child_stdin_char_type = true;
                     }
 
 #ifdef _DEBUG
                     if (g_is_stdin_redirected || g_is_stdout_redirected || g_is_stderr_redirected) {
-                        _debug_print_win32_std_handles(6);
-                        _debug_print_crt_std_handles(6);
+                        _debug_print_win32_std_handles(nullptr, 6);
+                        _debug_print_crt_std_handles(nullptr, 6);
                     }
 
                     _print_raw_message_impl(0, STDOUT_FILENO, "---\n");
@@ -6172,7 +5790,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         g_is_child_stdin_char_type = true;
                     }
                 }
-                else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_stdin_handle)) {
+                else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_std_handles.stdin_handle)) {
                     g_is_child_stdin_char_type = true;
                 }
 
@@ -6204,17 +5822,17 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
             // restore standard handles
             if (g_is_stdin_redirected) {
-                SetStdHandle(STD_INPUT_HANDLE, g_stdin_handle);
+                SetStdHandle(STD_INPUT_HANDLE, g_std_handles.stdin_handle);
                 g_is_stdin_redirected = false;
             }
 
             if (g_is_stdout_redirected) {
-                SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_handle);
+                SetStdHandle(STD_OUTPUT_HANDLE, g_std_handles.stdout_handle);
                 g_is_stdout_redirected = false;
             }
 
             if (g_is_stderr_redirected) {
-                SetStdHandle(STD_ERROR_HANDLE, g_stderr_handle);
+                SetStdHandle(STD_ERROR_HANDLE, g_std_handles.stderr_handle);
                 g_is_stderr_redirected = false;
             }
         }
@@ -6224,7 +5842,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             _print_raw_message_impl(0, STDERR_FILENO, "---\n");
         }
 #endif
-
 
         const bool is_child_executed = !is_idle_execute && ret_create_proc && _is_valid_handle(g_child_process_handle);
 
@@ -6264,7 +5881,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
         else {
-            g_is_process_executed = true; // nop execution is a success
+            g_is_process_executed = true; // NOP execution is a success
         }
 
         // CAUTION:
@@ -6273,13 +5890,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         //  even if a child process is closed.
         //
 
-        _close_handle(g_stdin_pipe_read_handle);
-        _close_handle(g_stdout_pipe_write_handle);
-        _close_handle(g_stderr_pipe_write_handle);
+        _close_handle(g_pipe_read_std_handles.stdin_handle);
+        _close_handle(g_pipe_write_std_handles.stdout_handle);
+        _close_handle(g_pipe_write_std_handles.stderr_handle);
 
         if (g_is_process_executed) {
             if (!g_pipe_stdin_to_stdout) {
-                if (_is_valid_handle(g_stdin_handle) && (g_has_tee_stdin || _is_valid_handle(g_stdin_pipe_write_handle))) {
+                if (_is_valid_handle(g_std_handles.stdin_handle) && (g_has_tee_stdin || _is_valid_handle(g_pipe_write_std_handles.stdin_handle))) {
                     g_stream_pipe_thread_locals[0].thread_handle = CreateThread(
                         NULL, 0,
                         StreamPipeThread<0>, &g_stream_pipe_thread_locals[0].thread_data,
@@ -6288,7 +5905,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     );
                 }
 
-                if (_is_valid_handle(g_stdout_pipe_read_handle) && (g_has_tee_stdout || _is_valid_handle(g_stdout_handle))) {
+                if (_is_valid_handle(g_pipe_read_std_handles.stdout_handle) && (g_has_tee_stdout || _is_valid_handle(g_std_handles.stdout_handle))) {
                     g_stream_pipe_thread_locals[1].thread_handle = CreateThread(
                         NULL, 0,
                         StreamPipeThread<1>, &g_stream_pipe_thread_locals[1].thread_data,
@@ -6297,7 +5914,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     );
                 }
 
-                if (_is_valid_handle(g_stderr_pipe_read_handle) && (g_has_tee_stderr || _is_valid_handle(g_stderr_handle))) {
+                if (_is_valid_handle(g_pipe_read_std_handles.stderr_handle) && (g_has_tee_stderr || _is_valid_handle(g_std_handles.stderr_handle))) {
                     g_stream_pipe_thread_locals[2].thread_handle = CreateThread(
                         NULL, 0,
                         StreamPipeThread<2>, &g_stream_pipe_thread_locals[2].thread_data,
@@ -6307,7 +5924,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
             else {
-                if (_is_valid_handle(g_stdin_handle) && _is_valid_handle(g_stdout_handle) && (g_stdin_handle_type == FILE_TYPE_DISK || g_stdin_handle_type == FILE_TYPE_PIPE)) {
+                if (_is_valid_handle(g_std_handles.stdin_handle) && _is_valid_handle(g_std_handles.stdout_handle) && (g_stdin_handle_type == FILE_TYPE_DISK || g_stdin_handle_type == FILE_TYPE_PIPE)) {
                     g_stdin_to_stdout_thread_locals.thread_handle = CreateThread(
                         NULL, 0,
                         StdinToStdoutThread, &g_stdin_to_stdout_thread_locals.thread_data,
@@ -6320,51 +5937,87 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             // Cancel all server pipe connections before continue if not done yet.
             //
 
-            {
-                auto & connect_server_named_pipe_thread_locals = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals;
-
-                // suppress all exceptions while waiting after an exception
-                [&]() { __try {
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_locals, true);
-                }
-                __finally {
-                    ;
-                }
-                }();
-
-                // check errors
-                utility::for_each_unroll(connect_server_named_pipe_thread_locals, [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                });
-            }
-
-            {
-                auto & connect_server_named_pipe_thread_locals = g_connect_server_named_pipe_thread_locals;
-
-                // suppress all exceptions while waiting after an exception
-                [&]() { __try {
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_locals, true);
-                }
-                __finally {
-                    ;
-                }
-                }();
-
-                // check errors
-                utility::for_each_unroll(connect_server_named_pipe_thread_locals, [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                });
-            }
+            AccomplishServerPipeConnections(g_connect_bound_server_named_pipe_tofrom_conin_thread_locals, nullptr, true);
+            AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals, nullptr, true);
         }
 
         if (is_child_executed && do_wait_child) {
-            WaitForSingleObject(g_child_process_handle, INFINITE);
+            [&]() {
+                bool is_console_processed_for_detach_on_wait = false;
+
+                if (g_flags.detach_inherited_console_on_wait) {
+                    // check if console can be detached
+                    g_inherited_console_window = GetConsoleWindow();
+
+                    if (g_inherited_console_window) {
+                        if (!g_is_console_window_owner_proc_searched) {
+                            g_owned_console_window = _find_console_window_owner_procs(nullptr, nullptr);
+                            g_is_console_window_owner_proc_searched = true;
+                        }
+
+                        if (!g_owned_console_window) {
+                            is_console_processed_for_detach_on_wait = true;
+
+                            [&]() {
+                                __try {
+                                    WaitForSingleObject(g_console_access_mutex, INFINITE);
+
+                                    g_detached_std_handles.save_handles();
+                                    g_detached_std_handles_state.save_all_states(g_detached_std_handles);
+
+                                    _detach_all_crt_std_handles_nolock();
+
+                                    _free_console_nolock();
+                                    g_owned_console_window = NULL; // not owned after detach
+
+                                    g_inherited_console_window = GetConsoleWindow();
+                                }
+                                __finally {
+                                    ReleaseMutex(g_console_access_mutex);
+                                }
+                            }();
+                        }
+                    }
+                }
+
+                // allow console access before wait on waiting threads
+                if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
+                    SetEvent(g_console_access_ready_thread_lock_event);
+                }
+
+                // loop to read and print all worker thread messages
+                break_ = false;
+
+                while (!break_) {
+                    if (WaitForSingleObject(g_child_process_handle, 20) != WAIT_TIMEOUT) {
+                        break_ = true;
+                    }
+
+                    if (!g_pipe_stdin_to_stdout) {
+                        CollectThreadsData(g_stream_pipe_thread_locals);
+                    }
+                    else {
+                        CollectThreadsData(g_stdin_to_stdout_thread_locals);
+                    }
+
+                    CollectThreadsData(g_connect_bound_server_named_pipe_tofrom_conin_thread_locals);
+                    CollectThreadsData(g_connect_server_named_pipe_thread_locals);
+                    CollectThreadsData(g_connect_client_named_pipe_thread_locals);
+
+                    // print last registered messages
+                    if (g_worker_threads_return_datas.size()) {
+                        // restore console if detached
+                        RestoreConsole(ret, win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+
+                        g_worker_threads_return_datas_print_end = g_worker_threads_return_datas.print(g_worker_threads_return_datas_print_end);
+                    }
+                }
+
+                // restore detached-on-wait console
+                if (is_console_processed_for_detach_on_wait) {
+                    RestoreConsole(ret, win_error, &g_detached_std_handles, &g_detached_std_handles_state, false);
+                }
+            }();
 
             if (g_flags.ret_child_exit) {
                 // read child process return code
@@ -6387,6 +6040,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
         }
+        else {
+            // release waiting threads
+            if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
+                SetEvent(g_console_access_ready_thread_lock_event);
+            }
+        }
 
         if (!g_pipe_stdin_to_stdout) {
             WaitForStreamPipeThreads(g_stream_pipe_thread_locals, false);
@@ -6399,118 +6058,36 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         [&]() {
             g_ctrl_handler = false;
 
+            // release waiting threads
+
+            if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
+                SetEvent(g_console_access_ready_thread_lock_event);
+            }
+
+            if (_is_valid_handle(g_console_access_mutex)) {
+                ReleaseMutex(g_console_access_mutex); // just in case
+            }
+
             // collect all threads return data
 
             // Cancel all server pipe connections before continue if not done yet.
             //
 
-            {
-                auto & connect_server_named_pipe_thread_locals = g_connect_bound_server_named_pipe_tofrom_conin_thread_locals;
-
-                // suppress all exceptions while waiting after an exception
-                [&]() { __try {
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_locals, true);
-                }
-                __finally {
-                    ;
-                }
-                }();
-
-                // check errors
-                utility::for_each_unroll(connect_server_named_pipe_thread_locals, [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                });
-            }
-
-            {
-                auto & connect_server_named_pipe_thread_locals = g_connect_server_named_pipe_thread_locals;
-
-                // suppress all exceptions while waiting after an exception
-                [&]() { __try {
-                    WaitForConnectNamedPipeThreads(connect_server_named_pipe_thread_locals, true);
-                }
-                __finally {
-                    ;
-                }
-                }();
-
-                // check errors
-                utility::for_each_unroll(connect_server_named_pipe_thread_locals, [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                });
-            }
+            AccomplishServerPipeConnections(g_connect_bound_server_named_pipe_tofrom_conin_thread_locals, nullptr, true);
+            AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals, nullptr, true);
 
             if (!g_pipe_stdin_to_stdout) {
-                auto & stream_pipe_thread_locals = g_stream_pipe_thread_locals;
-
-                // suppress all exceptions while waiting after an exception
-                [&]() { __try {
-                    WaitForStreamPipeThreads(stream_pipe_thread_locals, true); // wait again with I/O cancel
-                }
-                __finally {
-                    ;
-                }
-                }();
-
-                // check errors
-                utility::for_each_unroll(stream_pipe_thread_locals, [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                });
+                AccomplishServerPipeConnections(g_stream_pipe_thread_locals, nullptr, true);
             }
             else {
-                auto & stdin_to_stdout_thread_locals = g_stdin_to_stdout_thread_locals;
-
-                // suppress all exceptions while waiting after an exception
-                [&]() { __try {
-                    WaitForStreamPipeThreads(stdin_to_stdout_thread_locals, true); // wait again with I/O cancel
-                }
-                __finally {
-                    ;
-                }
-                }();
-
-                // check errors
-                utility::for_each_unroll(make_singular_array(stdin_to_stdout_thread_locals), [&](auto & local) {
-                    if (!local.thread_data.is_copied && !local.thread_data.msg.empty()) {
-                        g_worker_threads_return_data.add(local.thread_data);
-                        local.thread_data.is_copied = true;
-                    }
-                });
+                AccomplishServerPipeConnections(g_stdin_to_stdout_thread_locals, nullptr, true);
             }
 
-            // print all registered messages
-            if (!g_worker_threads_return_data.datas.empty()) {
-                bool is_ret_updated = false;
-                for (const auto & ret_data : g_worker_threads_return_data.datas) {
-                    if (!g_flags.ret_create_proc && !g_flags.ret_child_exit) {
-                        // return the first error code
-                        if (!ret && !is_ret_updated && ret_data.is_error) {
-                            if (!g_flags.ret_win_error) {
-                                ret = ret_data.ret;
-                            }
-                            else {
-                                ret = ret_data.win_error;
-                            }
-                            is_ret_updated = true;
-                        }
-                    }
+            // print last registered messages
+            g_worker_threads_return_datas_print_end = g_worker_threads_return_datas.print(g_worker_threads_return_datas_print_end);
 
-                    if (!ret_data.is_error) {
-                        _put_raw_message(STDOUT_FILENO, ret_data.msg);
-                    }
-                    else {
-                        _put_raw_message(STDERR_FILENO, ret_data.msg);
-                    }
-                }
+            if (!g_flags.ret_create_proc && !g_flags.ret_child_exit) {
+                g_worker_threads_return_datas.get_first_error_code(ret);
             }
 
             // close shared resources at first
@@ -6524,71 +6101,71 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             // not shared resources
 
             // close reopened standard handles
-            _close_handle(g_reopen_stdin_handle);
-            _close_handle(g_reopen_stdout_handle);
-            _close_handle(g_reopen_stderr_handle);
+            _close_handle(g_reopen_std_handles.stdin_handle);
+            _close_handle(g_reopen_std_handles.stdout_handle);
+            _close_handle(g_reopen_std_handles.stderr_handle);
 
             // close tee file handles
-            _close_handle(g_tee_file_stdin_handle);
-            _close_handle(g_tee_file_stdout_handle);
-            _close_handle(g_tee_file_stderr_handle);
+            _close_handle(g_tee_file_std_handles.stdin_handle);
+            _close_handle(g_tee_file_std_handles.stdout_handle);
+            _close_handle(g_tee_file_std_handles.stderr_handle);
 
             // close tee named pipe handles
-            if (_is_valid_handle(g_tee_named_pipe_stdin_handle) && !g_options.tee_stdin_to_server_pipe.empty()) {
-                CancelIo(g_tee_named_pipe_stdin_handle);
-                DisconnectNamedPipe(g_tee_named_pipe_stdin_handle);
+            if (_is_valid_handle(g_tee_named_pipe_std_handles.stdin_handle) && !g_options.tee_stdin_to_server_pipe.empty()) {
+                CancelIo(g_tee_named_pipe_std_handles.stdin_handle);
+                DisconnectNamedPipe(g_tee_named_pipe_std_handles.stdin_handle);
             }
-            _close_handle(g_tee_named_pipe_stdin_handle);
+            _close_handle(g_tee_named_pipe_std_handles.stdin_handle);
 
-            if (_is_valid_handle(g_tee_named_pipe_stdout_handle) && !g_options.tee_stdout_to_server_pipe.empty()) {
-                CancelIo(g_tee_named_pipe_stdout_handle);
-                DisconnectNamedPipe(g_tee_named_pipe_stdout_handle);
+            if (_is_valid_handle(g_tee_named_pipe_std_handles.stdout_handle) && !g_options.tee_stdout_to_server_pipe.empty()) {
+                CancelIo(g_tee_named_pipe_std_handles.stdout_handle);
+                DisconnectNamedPipe(g_tee_named_pipe_std_handles.stdout_handle);
             }
-            _close_handle(g_tee_named_pipe_stdout_handle);
+            _close_handle(g_tee_named_pipe_std_handles.stdout_handle);
 
-            if (_is_valid_handle(g_tee_named_pipe_stderr_handle) && !g_options.tee_stderr_to_server_pipe.empty()) {
-                CancelIo(g_tee_named_pipe_stderr_handle);
-                DisconnectNamedPipe(g_tee_named_pipe_stderr_handle);
+            if (_is_valid_handle(g_tee_named_pipe_std_handles.stderr_handle) && !g_options.tee_stderr_to_server_pipe.empty()) {
+                CancelIo(g_tee_named_pipe_std_handles.stderr_handle);
+                DisconnectNamedPipe(g_tee_named_pipe_std_handles.stderr_handle);
             }
-            _close_handle(g_tee_named_pipe_stderr_handle);
+            _close_handle(g_tee_named_pipe_std_handles.stderr_handle);
 
             // restore standard handles (again)
             if (g_is_stdin_redirected) {
-                SetStdHandle(STD_INPUT_HANDLE, g_stdin_handle);
+                SetStdHandle(STD_INPUT_HANDLE, g_std_handles.stdin_handle);
                 g_is_stdin_redirected = false;
             }
 
             if (g_is_stdout_redirected) {
-                SetStdHandle(STD_OUTPUT_HANDLE, g_stdout_handle);
+                SetStdHandle(STD_OUTPUT_HANDLE, g_std_handles.stdout_handle);
                 g_is_stdout_redirected = false;
             }
 
             if (g_is_stderr_redirected) {
-                SetStdHandle(STD_ERROR_HANDLE, g_stderr_handle);
+                SetStdHandle(STD_ERROR_HANDLE, g_std_handles.stderr_handle);
                 g_is_stderr_redirected = false;
             }
 
             // close anonymous/named pipe handles connected with child process standard handles
-            if (_is_valid_handle(g_stdin_pipe_write_handle) && !g_options.create_outbound_server_pipe_from_stdin.empty()) {
-                CancelIo(g_stdin_pipe_write_handle);
-                DisconnectNamedPipe(g_stdin_pipe_write_handle);
+            if (_is_valid_handle(g_pipe_write_std_handles.stdin_handle) && !g_options.create_outbound_server_pipe_from_stdin.empty()) {
+                CancelIo(g_pipe_write_std_handles.stdin_handle);
+                DisconnectNamedPipe(g_pipe_write_std_handles.stdin_handle);
             }
-            _close_handle(g_stdin_pipe_write_handle);
-            _close_handle(g_stdin_pipe_read_handle);
+            _close_handle(g_pipe_write_std_handles.stdin_handle);
+            _close_handle(g_pipe_read_std_handles.stdin_handle);
 
-            if (_is_valid_handle(g_stdout_pipe_read_handle) && !g_options.create_inbound_server_pipe_to_stdout.empty()) {
-                CancelIo(g_stdout_pipe_read_handle);
-                DisconnectNamedPipe(g_stdout_pipe_read_handle);
+            if (_is_valid_handle(g_pipe_read_std_handles.stdout_handle) && !g_options.create_inbound_server_pipe_to_stdout.empty()) {
+                CancelIo(g_pipe_read_std_handles.stdout_handle);
+                DisconnectNamedPipe(g_pipe_read_std_handles.stdout_handle);
             }
-            _close_handle(g_stdout_pipe_read_handle);
-            _close_handle(g_stdout_pipe_write_handle);
+            _close_handle(g_pipe_read_std_handles.stdout_handle);
+            _close_handle(g_pipe_write_std_handles.stdout_handle);
 
-            if (_is_valid_handle(g_stderr_pipe_read_handle) && !g_options.create_inbound_server_pipe_to_stderr.empty()) {
-                CancelIo(g_stderr_pipe_read_handle);
-                DisconnectNamedPipe(g_stderr_pipe_read_handle);
+            if (_is_valid_handle(g_pipe_read_std_handles.stderr_handle) && !g_options.create_inbound_server_pipe_to_stderr.empty()) {
+                CancelIo(g_pipe_read_std_handles.stderr_handle);
+                DisconnectNamedPipe(g_pipe_read_std_handles.stderr_handle);
             }
-            _close_handle(g_stderr_pipe_read_handle);
-            _close_handle(g_stderr_pipe_write_handle);
+            _close_handle(g_pipe_read_std_handles.stderr_handle);
+            _close_handle(g_pipe_write_std_handles.stderr_handle);
 
             // in backward order from threads to a process
             _close_handle(pi.hThread);
@@ -6623,6 +6200,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             else {
                 g_tee_file_stderr_mutex = INVALID_HANDLE_VALUE;
             }
+
+            // close all mutexes
+
+            _close_handle(g_console_access_ready_thread_lock_event);
+            _close_handle(g_console_access_mutex);
         }();
     } }();
 
@@ -6853,14 +6435,6 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_flags.no_window_console = false; // always reset
-
-    if (child_flags.detach_console) {
-        if (cmd_out_str_ptr) {
-            options_line += _T("/detach-console ");
-        }
-    }
-    regular_flags.detach_console = false; // always reset
-
 
     if (child_flags.no_expand_env) {
         if (cmd_out_str_ptr) {
@@ -7750,6 +7324,13 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_flags.detach_console = false; // always reset
+
+    if (child_flags.detach_inherited_console_on_wait) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/detach-inherited-console-on-wait ");
+        }
+    }
+    regular_flags.detach_inherited_console_on_wait = false; // always reset
 
     if (child_flags.attach_parent_console) {
         if (cmd_out_str_ptr) {

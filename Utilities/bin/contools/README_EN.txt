@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2022.01.04
+* 2022.01.08
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -8,22 +8,28 @@
 4. PREREQUISITES
 5. FEATURES
 5.1. callf
+5.2. clearcache
 6. KNOWN ISSUES
 
 6.1. With `cmd.exe`
-6.1.1. Autocompletion breakage
+6.1.1. Interactive input autocompletion disable.
 6.1.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
        call.
 6.1.3. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
        behind waiting the last input while the neighbor `callf.exe` process is
        already exited.
 6.1.4. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
+6.1.5. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
+       arrows key interactive input (command history traverse).
 
 6.2. With `callf.exe`/`callfg.exe`
 6.2.1. Console output in particular case prints as untranslated (line feed and
        return characters become printable)
 6.2.2. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on
        input while a child process is terminated externally.
+6.2.3. The `callf /tee-stdin 0.log /pipe-child-stdout-to-stdout "" "cmd.exe /k"`
+       command is blocked on input while a child process is terminated
+       externally.
 
 6.3. With `bash.exe`
 6.3.1. The GNU Bash shell executable throws an error:
@@ -219,6 +225,21 @@ Create process or Shell execute in style of c-function printf.
   callf /v XXX 111 "" "callf /load-parent-proc-init-env-vars /v YYY 222 \"\" \"callf /load-parent-proc-init-env-vars /v ZZZ 333 \\\"\\\" \\\"cmd.exe /c set\\\"\""
 
 -------------------------------------------------------------------------------
+5.2. clearcache
+-------------------------------------------------------------------------------
+
+Clears a drive or volume cache including the swap file mapping.
+Must be run under the Administrator permissions to take effect.
+
+To test:
+
+1. Open Windows Explorer properties dialog for a big sized folder. Observe the
+   fast size calculation.
+2. Clear the cache of the driver where the folder is located.
+3. Reopen Windows Explorer properties dialog for the same folder. Observe the
+   folder size calculation slowdown.
+
+-------------------------------------------------------------------------------
 6. KNOWN ISSUES
 -------------------------------------------------------------------------------
 
@@ -227,26 +248,32 @@ Create process or Shell execute in style of c-function printf.
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.1.1. Autocompletion breakage
+6.1.1. Interactive input autocompletion disable.
 -------------------------------------------------------------------------------
 
-Simultenious stdin or stdout ot stderr redirection and interactive input in the
-child `cmd.exe` process does break autocompletion feature.
+If at least stdin or stdout (but not stderr) is redirected, then the
+interactive input in the child `cmd.exe` process does disable autocompletion
+feature.
 
-Example:
+Examples:
 
 >
 callf /tee-stdin 0.log /pipe-stdin-to-child-stdin "" "cmd.exe /k"
 
-The issue is attached to the stdin handle type inside the `cmd.exe` process.
-If the stdin handle has not a character device type
-(GetFileType(GetStdHandle(STD_INPUT_HANDLE)) != FILE_TYPE_CHAR), then the
+>
+callf /tee-stdout 1.log /pipe-child-stdout-to-stdout "" "cmd.exe /k"
+
+The issue is attached to the stdin/stdout handle type inside the `cmd.exe`
+process.
+
+If the stdin or stdout handle has not a character device type
+(ex: GetFileType(GetStdHandle(STD_INPUT_HANDLE)) != FILE_TYPE_CHAR), then the
 autocompletion feature is turned off and all characters including a tab
 character processes as is. Otherwise the tab button press triggers the
-autocompletionn feature.
+autocompletion feature.
 
-The stdin handle changes its type from the `FILE_TYPE_CHAR`, for example, if
-the process input is redirected.
+A standard handle changes its type from the `FILE_TYPE_CHAR`, for example, if
+a process standard handle is redirected.
 
 The fix can be made portably between different Windows versions, for example,
 through the code injection into a child process and interception of the
@@ -325,6 +352,22 @@ To fix:
   start "" /B /WAIT cmd.exe /k
 
 -------------------------------------------------------------------------------
+6.1.5. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
+       arrows key interactive input (command history traverse).
+-------------------------------------------------------------------------------
+
+NOTE:
+  Has been workarounded in the version 1.21.0.57.
+
+The command loses arrow keys interactive input and can not traverse command
+line input history.
+
+To fix:
+
+  >
+  callf /detach-inherited-console-on-wait "" "cmd.exe /c callf \"\" \"cmd.exe /k\""
+
+-------------------------------------------------------------------------------
 6.2. With `callf.exe`/`callfg.exe`
 -------------------------------------------------------------------------------
 
@@ -347,6 +390,16 @@ the process, where console is attached.
 
 NOTE:
   Has been workarounded in the version 1.20.0.54.
+
+To reproduce do execute the command and terminate the `cmd.exe` child process.
+The parent process will not exit until the line return character would be
+entered.
+
+-------------------------------------------------------------------------------
+6.2.3. The `callf /tee-stdin 0.log /pipe-child-stdout-to-stdout "" "cmd.exe /k"`
+       command is blocked on input while a child process is terminated
+       externally.
+-------------------------------------------------------------------------------
 
 To reproduce do execute the command and terminate the `cmd.exe` child process.
 The parent process will not exit until the line return character would be
