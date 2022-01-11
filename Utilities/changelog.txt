@@ -1,4 +1,7 @@
 2022.01.11:
+* new: bin/contools: binaries update
+
+2022.01.11:
 * fixed: src/callf: access violation on print into detached console on exit
 * fixed: src/callf: accidental deadlock in worker threads on console access event
 * new: src/callf: `/skip-pause-on-detached-console` flag to skip pause in case of detached console
