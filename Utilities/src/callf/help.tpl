@@ -157,6 +157,14 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         This-process must be attached to a console, otherwise the pause would
         be skipped.
 
+      /skip-pause-on-detached-console
+        By default all `/pause*` flags does restore console if was detached
+        before. The console window search of does the same way as like for the
+        `/attach-parent-console` flag.
+        Use this flag if you want to skip the pause in such case.
+
+        Has no effect if `/pause*` flag is not used.
+
       /no-expand-env
         Don't expand `${...}` environment variables.
 
@@ -348,6 +356,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         The `/no-wait` flag has priority over this flag.
 
+      /wait-child-first-time-timeout <timeout>
+        Child first time wait timeout in milliseconds.
+
+        Has no effect if `/no-wait` flag is used.
+
       /elevate
       /elevate{ <ParentFlags> }[{ <ChildFlags> }]
         Self elevate process upto Administrator privileges.
@@ -424,7 +437,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
+          /skip-pause-on-detached-console
           /load-parent-proc-init-env-vars
+          /wait-child-first-time-timeout
           /allow-throw-seh-except
           /create-console
           /detach-console
@@ -453,8 +468,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
+          /skip-pause-on-detached-console
           /load-parent-proc-init-env-vars
           /no-std*-inherit
+          /wait-child-first-time-timeout
           /allow-throw-seh-except
           /use-stdin-as-piped-from-conin
           /reopen-std[in|out|err]*

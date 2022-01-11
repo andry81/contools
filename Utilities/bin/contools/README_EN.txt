@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2022.01.08
+* 2022.01.11
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -224,6 +224,12 @@ Create process or Shell execute in style of c-function printf.
   >
   callf /v XXX 111 "" "callf /load-parent-proc-init-env-vars /v YYY 222 \"\" \"callf /load-parent-proc-init-env-vars /v ZZZ 333 \\\"\\\" \\\"cmd.exe /c set\\\"\""
 
+* Skip pause on detached console.
+
+  Examples:
+  >
+  start "" /B /WAIT callfg /pause-on-exit /skip-pause-on-detached-console "" "cmd.exe /k"
+
 -------------------------------------------------------------------------------
 5.2. clearcache
 -------------------------------------------------------------------------------
@@ -357,7 +363,7 @@ To fix:
 -------------------------------------------------------------------------------
 
 NOTE:
-  Has been workarounded in the version 1.21.0.57.
+  Has been workarounded in the version 1.21.1.58.
 
 The command loses arrow keys interactive input and can not traverse command
 line input history.
@@ -366,6 +372,15 @@ To fix:
 
   >
   callf /detach-inherited-console-on-wait "" "cmd.exe /c callf \"\" \"cmd.exe /k\""
+
+NOTE:
+  In some cases above fix does not work because of a race condition inside
+  the `cmd.exe` inner parent console window search logic.
+
+  You can use wait timeout to increase the chances:
+
+  >
+  callf /detach-inherited-console-on-wait /wait-child-first-time-timeout 300 "" "cmd.exe /c callf \"\" \"cmd.exe /k\""
 
 -------------------------------------------------------------------------------
 6.2. With `callf.exe`/`callfg.exe`

@@ -1,3 +1,10 @@
+2022.01.11:
+* fixed: src/callf: access violation on print into detached console on exit
+* fixed: src/callf: accidental deadlock in worker threads on console access event
+* new: src/callf: `/skip-pause-on-detached-console` flag to skip pause in case of detached console
+* changed: src/callf: All `/pause*` flags now by default does restore console if was detached before (the console window search of does the same way as like for the `/attach-parent-console` flag). To skip that use `/skip-pause-on-detached-console` flag.
+* changed: bin/contools/README_EN.txt: readme update
+
 2022.01.10:
 * new: bin/contools: binaries update
 

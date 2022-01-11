@@ -210,6 +210,7 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, pause_on_exit_if_error_before_exec);
     MERGE_FLAG(flags, pause_on_exit_if_error);
     MERGE_FLAG(flags, pause_on_exit);
+    MERGE_FLAG(flags, skip_pause_on_detached_console);
 
     MERGE_FLAG(flags, no_print_gen_error_string);
     MERGE_FLAG(flags, no_sys_dialog_ui);
@@ -272,6 +273,8 @@ Options::Options()
 
     stdout_dup = stderr_dup = -1;
     tee_stdin_dup = tee_stdout_dup = tee_stderr_dup = -1;
+
+    wait_child_first_time_timeout_ms = 0;
 
     reopen_stdin_as_server_pipe_connect_timeout_ms = DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS;
     reopen_stdin_as_client_pipe_connect_timeout_ms = DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS;
@@ -367,6 +370,8 @@ void Options::merge(const Options & options)
     MERGE_OPTION(options, chcp_in, 0);
     MERGE_OPTION(options, chcp_out, 0);
     MERGE_OPTION(options, win_error_langid, 0);
+
+    MERGE_OPTION(options, wait_child_first_time_timeout_ms, 0);
 
     MERGE_OPTION(options, stdout_dup, -1);
     MERGE_OPTION(options, stderr_dup, -1);
@@ -488,7 +493,7 @@ DWORD WINAPI WriteOutputWatchThread(LPVOID lpParam)
         }
 
         // in case if a child process exit
-        if (WaitForSingleObject(g_child_process_handle, 20) != WAIT_TIMEOUT) {
+        if (WaitForSingleObject(g_child_process_handle, DEFAULT_WAIT_CHILD_TIMEOUT_MS) != WAIT_TIMEOUT) {
             _close_handle(*thread_data.read_handle_ptr);
             break;
         }
@@ -498,13 +503,13 @@ DWORD WINAPI WriteOutputWatchThread(LPVOID lpParam)
 }
 
 template <typename T>
-inline void CollectThreadsData(T & local)
+inline void CollectWorkerThreadsData(T & local)
 {
-    return CollectThreadsData(make_singular_array(local));
+    return CollectWorkerThreadsData(make_singular_array(local));
 }
 
 template <typename T, size_t N>
-inline void CollectThreadsData(T (& locals)[N])
+inline void CollectWorkerThreadsData(T (& locals)[N])
 {
     // collect all threads return data
     utility::for_each_unroll(locals, [&](auto & local) {
@@ -611,11 +616,15 @@ inline void FormatThreadDataOutput(ThreadReturnData & thread_data, int ret, DWOR
     }
 }
 
-void RestoreConsole(int & ret, DWORD & win_error, StdHandles * std_handles_ptr, StdHandlesState * std_handles_state_ptr, bool alloc_if_not_attached)
+extern inline bool RestoreConsole(HANDLE * console_access_mutex_ptr, int & ret, DWORD & win_error, StdHandles * std_handles_ptr, StdHandlesState * std_handles_state_ptr, bool alloc_if_not_attached)
 {
+    bool is_restored = false;
+
     __try {
         [&]() {
-            WaitForSingleObject(g_console_access_mutex, INFINITE);
+            if (console_access_mutex_ptr) {
+                WaitForSingleObject(*console_access_mutex_ptr, INFINITE);
+            }
 
             g_inherited_console_window = GetConsoleWindow();
             if (g_inherited_console_window) {
@@ -649,6 +658,8 @@ void RestoreConsole(int & ret, DWORD & win_error, StdHandles * std_handles_ptr, 
             }
 
             if (g_inherited_console_window) {
+                is_restored = true;
+
                 g_owned_console_window = NULL; // not owned after attach
 
                 std_handles.save_handles(std_handles_ptr);
@@ -665,8 +676,12 @@ void RestoreConsole(int & ret, DWORD & win_error, StdHandles * std_handles_ptr, 
         }();
     }
     __finally {
-        ReleaseMutex(g_console_access_mutex);
+        if (console_access_mutex_ptr) {
+            ReleaseMutex(*console_access_mutex_ptr);
+        }
     }
+
+    return is_restored;
 }
 
 template <int stream_type>
@@ -928,7 +943,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                         if (!num_bytes_read && !stream_eof) {
                             // loop wait
-                            Sleep(20);
+                            Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
 
                             if (thread_data.cancel_io) break;
                         }
@@ -945,8 +960,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                     // NOTE:
                     //  Wait synchronization related to the `/detach-inherited-console-on-wait` flag when we must not interact with
-                    //  the console API until the console would be detached or left attached. If is detached then exit the thread as nothing to do here.
-                    //  If is retained then continue. Otherwise may be an access violation while the console is used while being detached.
+                    //  the console API until the console would be detached. Console will be attached here on first access.
                     //
                     if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
                         WaitForSingleObject(g_console_access_ready_thread_lock_event, INFINITE);
@@ -1051,6 +1065,12 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                         // in case if a child process exit
                         if (WaitForSingleObject(g_child_process_handle, 0) != WAIT_TIMEOUT) {
                             break;
+                        }
+
+                        // restore console on first access
+                        if (try_restore_console) {
+                            RestoreConsole(&g_console_access_mutex, thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                            try_restore_console = false;
                         }
 
                         SetLastError(0); // just in case
@@ -1216,7 +1236,7 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
 
                         if (!num_chars_read && !stream_eof) {
                             // loop wait
-                            Sleep(20);
+                            Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
 
                             if (thread_data.cancel_io) break;
                         }
@@ -1296,10 +1316,18 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                         WaitForSingleObject(g_reopen_stdout_mutex, INFINITE);
                                     }
 
-                                    // restore console if output handle is console handle
+                                    // restore console on first access if output handle is console handle
                                     if (try_restore_console) {
                                         if (g_stdout_handle_type == FILE_TYPE_CHAR) {
-                                            RestoreConsole(thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                                            // NOTE:
+                                            //  Wait synchronization related to the `/detach-inherited-console-on-wait` flag when we must not interact with
+                                            //  the console API until the console would be detached. Console will be attached here on first access.
+                                            //
+                                            if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
+                                                WaitForSingleObject(g_console_access_ready_thread_lock_event, INFINITE);
+                                            }
+
+                                            RestoreConsole(&g_console_access_mutex, thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
                                         }
                                         try_restore_console = false;
                                     }
@@ -1425,10 +1453,18 @@ DWORD WINAPI StreamPipeThread(LPVOID lpParam)
                                         WaitForSingleObject(g_reopen_stderr_mutex, INFINITE);
                                     }
 
-                                    // restore console if output handle is console handle
+                                    // restore console on first access if output handle is console handle
                                     if (try_restore_console) {
                                         if (g_stderr_handle_type == FILE_TYPE_CHAR) {
-                                            RestoreConsole(thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                                            // NOTE:
+                                            //  Wait synchronization related to the `/detach-inherited-console-on-wait` flag when we must not interact with
+                                            //  the console API until the console would be detached. Console will be attached here on first access.
+                                            //
+                                            if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
+                                                WaitForSingleObject(g_console_access_ready_thread_lock_event, INFINITE);
+                                            }
+
+                                            RestoreConsole(&g_console_access_mutex, thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
                                         }
                                         try_restore_console = false;
                                     }
@@ -1673,10 +1709,18 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                         }
 
                         if (_is_valid_handle(g_std_handles.stdout_handle)) {
-                            // restore console if output handle is console handle
+                            // restore console on first access if output handle is console handle
                             if (try_restore_console) {
                                 if (g_stdout_handle_type == FILE_TYPE_CHAR) {
-                                    RestoreConsole(thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                                    // NOTE:
+                                    //  Wait synchronization related to the `/detach-inherited-console-on-wait` flag when we must not interact with
+                                    //  the console API until the console would be detached. Console will be attached here on first access.
+                                    //
+                                    if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
+                                        WaitForSingleObject(g_console_access_ready_thread_lock_event, INFINITE);
+                                    }
+
+                                    RestoreConsole(&g_console_access_mutex, thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
                                 }
                                 try_restore_console = false;
                             }
@@ -1825,10 +1869,18 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
                         }
 
                         if (_is_valid_handle(g_std_handles.stdout_handle)) {
-                            // restore console if output handle is console handle
+                            // restore console on first access if output handle is console handle
                             if (try_restore_console) {
                                 if (g_stdout_handle_type == FILE_TYPE_CHAR) {
-                                    RestoreConsole(thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                                    // NOTE:
+                                    //  Wait synchronization related to the `/detach-inherited-console-on-wait` flag when we must not interact with
+                                    //  the console API until the console would be detached. Console will be attached here on first access.
+                                    //
+                                    if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
+                                        WaitForSingleObject(g_console_access_ready_thread_lock_event, INFINITE);
+                                    }
+
+                                    RestoreConsole(&g_console_access_mutex, thread_data.ret, thread_data.win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
                                 }
                                 try_restore_console = false;
                             }
@@ -1865,7 +1917,7 @@ DWORD WINAPI StdinToStdoutThread(LPVOID lpParam)
 
                         if (!stream_eof) {
                             // loop wait
-                            Sleep(20);
+                            Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
 
                             if (thread_data.cancel_io) break;
                         }
@@ -2026,7 +2078,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             return 1;
                         }
 
-                        Sleep(20);
+                        Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
                     }
                 } break;
 
@@ -2073,7 +2125,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             return 1;
                         }
 
-                        Sleep(20);
+                        Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
                     }
                 } break;
 
@@ -2128,7 +2180,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             return 1;
                         }
 
-                        Sleep(20);
+                        Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
                     }
                 } break;
 
@@ -2175,7 +2227,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             return 1;
                         }
 
-                        Sleep(20);
+                        Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
                     }
                 } break;
 
@@ -2230,7 +2282,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             return 1;
                         }
 
-                        Sleep(20);
+                        Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
                     }
                 } break;
 
@@ -2277,7 +2329,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             return 1;
                         }
 
-                        Sleep(20);
+                        Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
                     }
                 } break;
 
@@ -3985,7 +4037,7 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
                         return 1;
                     }
 
-                    Sleep(20);
+                    Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
                 }
             }
 
@@ -4084,7 +4136,7 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
                         return 1;
                     }
 
-                    Sleep(20);
+                    Sleep(DEFAULT_WAIT_PIPE_TIMEOUT_MS);
                 }
             }
 
@@ -4611,6 +4663,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     // update child show state
     si.wShowWindow = g_options.show_as;
 
+    bool is_console_access_ready_thread_lock_event_signaled = false;
     bool break_ = false;
 
     // NOTE:
@@ -4622,7 +4675,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         g_console_access_mutex = CreateMutex(NULL, FALSE, NULL);
 
         if (g_flags.detach_inherited_console_on_wait) {
-            g_console_access_ready_thread_lock_event = CreateEvent(NULL, FALSE, FALSE, NULL); // CAUTION: create not signaled
+            g_console_access_ready_thread_lock_event = CreateEvent(NULL, TRUE, FALSE, NULL); // CAUTION: create signaled (not acquired)
         }
 
         if (g_options.chcp_in) {
@@ -5941,6 +5994,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             AccomplishServerPipeConnections(g_connect_server_named_pipe_thread_locals, nullptr, true);
         }
 
+        break_ = false;
+
         if (is_child_executed && do_wait_child) {
             [&]() {
                 bool is_console_processed_for_detach_on_wait = false;
@@ -5980,34 +6035,43 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                 }
 
-                // allow console access before wait on waiting threads
-                if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
-                    SetEvent(g_console_access_ready_thread_lock_event);
-                }
+                bool first_time_wait = true;
 
                 // loop to read and print all worker thread messages
-                break_ = false;
-
                 while (!break_) {
-                    if (WaitForSingleObject(g_child_process_handle, 20) != WAIT_TIMEOUT) {
-                        break_ = true;
+                    if (!first_time_wait) {
+                        if (WaitForSingleObject(g_child_process_handle, DEFAULT_WAIT_CHILD_FIRST_TIME_TIMEOUT_MS) != WAIT_TIMEOUT) {
+                            break_ = true;
+                        }
+                    }
+                    else {
+                        first_time_wait = false;
+                        if (WaitForSingleObject(g_child_process_handle, g_options.wait_child_first_time_timeout_ms) != WAIT_TIMEOUT) {
+                            break_ = true;
+                        }
+
+                        // allow console access after first time child wait but before wait on worker threads
+                        if (!is_console_access_ready_thread_lock_event_signaled && _is_valid_handle(g_console_access_ready_thread_lock_event)) {
+                            is_console_access_ready_thread_lock_event_signaled = true;
+                            SetEvent(g_console_access_ready_thread_lock_event);
+                        }
                     }
 
                     if (!g_pipe_stdin_to_stdout) {
-                        CollectThreadsData(g_stream_pipe_thread_locals);
+                        CollectWorkerThreadsData(g_stream_pipe_thread_locals);
                     }
                     else {
-                        CollectThreadsData(g_stdin_to_stdout_thread_locals);
+                        CollectWorkerThreadsData(g_stdin_to_stdout_thread_locals);
                     }
 
-                    CollectThreadsData(g_connect_bound_server_named_pipe_tofrom_conin_thread_locals);
-                    CollectThreadsData(g_connect_server_named_pipe_thread_locals);
-                    CollectThreadsData(g_connect_client_named_pipe_thread_locals);
+                    CollectWorkerThreadsData(g_connect_bound_server_named_pipe_tofrom_conin_thread_locals);
+                    CollectWorkerThreadsData(g_connect_server_named_pipe_thread_locals);
+                    CollectWorkerThreadsData(g_connect_client_named_pipe_thread_locals);
 
                     // print last registered messages
                     if (g_worker_threads_return_datas.size()) {
                         // restore console if detached
-                        RestoreConsole(ret, win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
+                        RestoreConsole(&g_console_access_mutex, ret, win_error, &g_detached_std_handles, &g_detached_std_handles_state, true);
 
                         g_worker_threads_return_datas_print_end = g_worker_threads_return_datas.print(g_worker_threads_return_datas_print_end);
                     }
@@ -6015,37 +6079,40 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
                 // restore detached-on-wait console
                 if (is_console_processed_for_detach_on_wait) {
-                    RestoreConsole(ret, win_error, &g_detached_std_handles, &g_detached_std_handles_state, false);
+                    RestoreConsole(&g_console_access_mutex, ret, win_error, &g_detached_std_handles, &g_detached_std_handles_state, false);
                 }
-            }();
 
-            if (g_flags.ret_child_exit) {
-                // read child process return code
-                DWORD exit_code = 0;
-                SetLastError(0); // just in case
-                if (GetExitCodeProcess(g_child_process_handle, &exit_code)) {
-                    ret = exit_code;
-                }
-                else {
-                    ret = err_win32_error;
-                    win_error = GetLastError();
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not get child process exit code: win_error=0x%08X (%u)\n"),
-                            win_error, win_error);
+                if (g_flags.ret_child_exit) {
+                    // read child process return code
+                    DWORD exit_code = 0;
+                    SetLastError(0); // just in case
+                    if (GetExitCodeProcess(g_child_process_handle, &exit_code)) {
+                        ret = exit_code;
                     }
-                    if (g_flags.print_win_error_string && win_error) {
-                        _print_win_error_message(win_error, g_options.win_error_langid);
+                    else {
+                        ret = err_win32_error;
+                        win_error = GetLastError();
+                        if (!g_flags.no_print_gen_error_string) {
+                            _print_stderr_message(_T("could not get child process exit code: win_error=0x%08X (%u)\n"),
+                                win_error, win_error);
+                        }
+                        if (g_flags.print_win_error_string && win_error) {
+                            _print_win_error_message(win_error, g_options.win_error_langid);
+                        }
+                        break_ = true;
                     }
-                    break;
                 }
-            }
+
+                if (break_) return;
+            }();
         }
-        else {
-            // release waiting threads
-            if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
-                SetEvent(g_console_access_ready_thread_lock_event);
-            }
+
+        // release waiting for console access in worker threads
+        if (!is_console_access_ready_thread_lock_event_signaled && _is_valid_handle(g_console_access_ready_thread_lock_event)) {
+            SetEvent(g_console_access_ready_thread_lock_event);
         }
+
+        if (break_) break;
 
         if (!g_pipe_stdin_to_stdout) {
             WaitForStreamPipeThreads(g_stream_pipe_thread_locals, false);
@@ -6058,9 +6125,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         [&]() {
             g_ctrl_handler = false;
 
-            // release waiting threads
+            // release worker threads
 
-            if (_is_valid_handle(g_console_access_ready_thread_lock_event)) {
+            if (!is_console_access_ready_thread_lock_event_signaled && _is_valid_handle(g_console_access_ready_thread_lock_event)) {
                 SetEvent(g_console_access_ready_thread_lock_event);
             }
 
@@ -6081,6 +6148,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
             else {
                 AccomplishServerPipeConnections(g_stdin_to_stdout_thread_locals, nullptr, true);
+            }
+
+            if (!g_pipe_stdin_to_stdout) {
+                WaitForStreamPipeThreads(g_stream_pipe_thread_locals, true);
+            }
+            else {
+                WaitForStreamPipeThreads(g_stdin_to_stdout_thread_locals, true);
             }
 
             // print last registered messages
@@ -6397,6 +6471,13 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
     }
     regular_flags.pause_on_exit = false; // always reset
 
+    if (child_flags.skip_pause_on_detached_console) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/skip-pause-on-detached-console ");
+        }
+    }
+    regular_flags.skip_pause_on_detached_console = false; // always reset
+
     if (!child_options.shell_exec_verb.empty()) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/shell-exec \"") } + child_options.shell_exec_verb + _T("\" ");
@@ -6557,6 +6638,13 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
         }
     }
     regular_flags.wait_child_start = false; // always reset
+
+    if (child_options.wait_child_first_time_timeout_ms) {
+        if (cmd_out_str_ptr) {
+            options_line += std::tstring{ _T("/wait-child-first-time-timeout ") } +std::to_tstring(child_options.wait_child_first_time_timeout_ms) + _T(" ");
+        }
+    }
+    regular_options.wait_child_first_time_timeout_ms = 0; // always reset
 
     //child_flags.elevate
 

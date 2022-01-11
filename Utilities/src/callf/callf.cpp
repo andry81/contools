@@ -1,10 +1,6 @@
 ﻿#include "callf.hpp"
 #include "execute.hpp"
 
-//#ifdef _UNICODE
-//#error Unicode is not supported.
-//#endif
-
 
 namespace {
     struct InArgs : InBaseArgs
@@ -48,6 +44,7 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/skip-pause-on-detached-console"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/elevate"),
@@ -94,6 +91,7 @@ const TCHAR * g_promote_flags_to_preparse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/skip-pause-on-detached-console"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/create-console"),
@@ -118,6 +116,7 @@ const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/skip-pause-on-detached-console"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/create-console"),
@@ -158,6 +157,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/skip-pause-on-detached-console"),
     _T("/shell-exec"),
     _T("/shell-exec-expand-env"),
     _T("/D"),
@@ -184,6 +184,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/pipe-stdin-to-stdout"),
     _T("/init-com"),
     _T("/wait-child-start"),
+    _T("/wait-child-first-time-timeout"),
     _T("/elevate"),
     _T("/showas"),
     _T("/use-stdin-as-piped-from-conin"),
@@ -426,7 +427,9 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/skip-pause-on-detached-console"),
     _T("/load-parent-proc-init-env-vars"),
+    _T("/wait-child-first-time-timeout"),
     _T("/allow-throw-seh-except"),
     _T("/attach-parent-console"),
     _T("/disable-wow64-fs-redir"),
@@ -447,11 +450,13 @@ const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
+    _T("/skip-pause-on-detached-console"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/no-std-inherit"),
     _T("/no-stdin-inherit"),
     _T("/no-stdout-inherit"),
     _T("/no-stderr-inherit"),
+    _T("/wait-child-first-time-timeout"),
     _T("/allow-throw-seh-except"),
     _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
@@ -837,6 +842,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         return 0;
     }
+    if (IsArgEqualTo(arg, _T("/skip-pause-on-detached-console"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.skip_pause_on_detached_console = true;
+            return 1;
+        }
+        return 0;
+    }
     if (IsArgEqualTo(arg, _T("/no-expand-env"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_expand_env = true;
@@ -976,6 +988,21 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             return 1;
         }
         return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/wait-child-first-time-timeout"))) {
+        arg_offset += 1;
+        if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
+            if (IsArgInFilter(start_arg, include_filter_arr)) {
+                const int timeout_ms = _ttoi(arg);
+                if (timeout_ms > 0) {
+                    options.wait_child_first_time_timeout_ms = timeout_ms;
+                }
+                return 1;
+            }
+            return 0;
+        }
+        else error = invalid_format_flag(start_arg);
+        return 2;
     }
     if (IsArgEqualTo(arg, _T("/elevate"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
@@ -2833,9 +2860,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         }
                     }
 
-                    if (ancestor_console_window_owner_proc.console_window &&
-                        g_inherited_console_window != ancestor_console_window_owner_proc.console_window &&
-                        ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
+                    if (ancestor_console_window_owner_proc.console_window && ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
                         // reattach to parent process console window
 
                         is_console_processed_for_detach_alloc_attach_to_console = true;
@@ -3434,16 +3459,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             // promote{ ... } vs promote-parent{ ... }
 
-            //if (g_promote_options.chcp_in != 0 && g_promote_parent_options.chcp_in != 0) {
-            //    return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_in=%i promote-parent.chcp_in=%i\n"), g_promote_options.chcp_in, g_promote_parent_options.chcp_in);
-            //}
-            //if (g_promote_options.chcp_out != 0 && g_promote_parent_options.chcp_out != 0) {
-            //    return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_out=%i promote-parent.chcp_out=%i\n"), g_promote_options.chcp_out, g_promote_parent_options.chcp_out);
-            //}
-            if (g_promote_flags.attach_parent_console && g_promote_parent_flags.attach_parent_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /attach-parent-console\n"));
-            }
-
             if (g_promote_flags.pause_on_exit_if_error_before_exec && g_promote_parent_flags.pause_on_exit_if_error_before_exec) {
                 return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /pause-on-exit-if-error-before-exec\n"));
             }
@@ -3454,19 +3469,37 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /pause-on-exit\n"));
             }
 
+            if (g_promote_flags.skip_pause_on_detached_console && g_promote_parent_flags.skip_pause_on_detached_console) {
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /skip-pause-on-detached-console\n"));
+            }
+
+            if (g_promote_options.wait_child_first_time_timeout_ms && g_promote_parent_options.wait_child_first_time_timeout_ms) {
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /wait-child-first-time-timeout\n"));
+            }
+
+            //if (g_promote_options.chcp_in != 0 && g_promote_parent_options.chcp_in != 0) {
+            //    return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_in=%i promote-parent.chcp_in=%i\n"), g_promote_options.chcp_in, g_promote_parent_options.chcp_in);
+            //}
+            //if (g_promote_options.chcp_out != 0 && g_promote_parent_options.chcp_out != 0) {
+            //    return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_out=%i promote-parent.chcp_out=%i\n"), g_promote_options.chcp_out, g_promote_parent_options.chcp_out);
+            //}
+            if (g_promote_flags.attach_parent_console && g_promote_parent_flags.attach_parent_console) {
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /attach-parent-console\n"));
+            }
+
             if (g_promote_flags.disable_wow64_fs_redir && g_promote_parent_flags.disable_wow64_fs_redir) {
                 return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-wow64-fs-redir\n"));
             }
 
             if (g_flags.disable_ctrl_signals && g_flags.disable_ctrl_c_signal) {
-                return invalid_format_flag_message(_T("disable control signal flags is mixed: /disable_ctrl_signals <-> /disable_ctrl_c_signal\n"));
+                return invalid_format_flag_message(_T("disable control signal flags is mixed: /disable-ctrl-signals <-> /disable-ctrl-c-signal\n"));
             }
 
             if (g_promote_flags.disable_ctrl_signals && g_promote_parent_flags.disable_ctrl_signals) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable_ctrl_signals\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-ctrl-signals\n"));
             }
             if (g_promote_flags.disable_ctrl_c_signal && g_promote_parent_flags.disable_ctrl_c_signal) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable_ctrl_c_signal\n"));
+                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-ctrl-c-signal\n"));
             }
 
             if (g_promote_flags.allow_gui_autoattach_to_parent_console && g_promote_parent_flags.allow_gui_autoattach_to_parent_console) {
@@ -3935,6 +3968,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     }
     __finally {
         [&]() {
+            int ret_ = 0;
+            DWORD win_error_ = 0;
+            bool is_console_restored = false;
+
+#ifdef _DEBUG
+            _debug_print_win32_std_handles(nullptr, 8);
+            _debug_print_crt_std_handles(nullptr, 8);
+#endif
+
             if (_is_valid_handle(env_strs_shmem_handle)) {
                 UnmapViewOfFile(env_strs_shmem_handle);
                 _close_handle(env_strs_shmem_handle);
@@ -3945,22 +3987,27 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 env_strs = NULL; // just in case
             }
 
+            // always reget console window handle
+            g_inherited_console_window = GetConsoleWindow();
+
             const bool pause_on_exit = g_flags.pause_on_exit || g_flags.pause_on_exit_if_error && ret != err_none || g_flags.pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none;
+            const bool skip_pause_on_exit = !g_inherited_console_window && g_flags.skip_pause_on_detached_console;
 
-#ifdef _DEBUG
-            _debug_print_win32_std_handles(nullptr, 8);
-            _debug_print_crt_std_handles(nullptr, 8);
-#endif
+            if (pause_on_exit && !skip_pause_on_exit) {
+                is_console_restored = RestoreConsole(nullptr, ret_, win_error_, &g_detached_std_handles, &g_detached_std_handles_state, false);
 
-            if (pause_on_exit) {
-                _put_raw_message_impl(0, STDOUT_FILENO, "Press any key to continue . . . \n");
+                if (g_inherited_console_window) {
+                    _put_raw_message_impl(0, STDOUT_FILENO, "Press any key to continue . . . \n");
+                }
+
                 getch();
             }
 
-            // If a child process is not executed and console windows is owned, then it will be closed with may be error prints.
-            // Reattach to a parent console window to duplicate error prints there.
+
+            // If a child process is not executed and console windows is owned (`disable_conout_duplicate_to_parent_console_on_error` is not defined),
+            // then it will be closed with may be error prints. Reattach to a parent console window to duplicate error prints there.
             //
-            if (g_enable_conout_prints_buffering && !g_is_process_executed && g_conout_prints_buf.size()) {
+            if (!is_console_restored && g_enable_conout_prints_buffering && g_conout_prints_buf.size()) {
                 // search process inheritance chain again
                 g_owned_console_window = _find_console_window_owner_procs(&console_window_owner_procs, nullptr);
                 g_is_console_window_owner_proc_searched = true;
@@ -3984,43 +4031,50 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                     // The process is owning the console window and is going to close it.
                     // Detach console before the exit, attach to parent console and does print the saved console prints into a parent console.
+                    // If there is no a parent console, then do nothing.
 
-                    // always reget console window handle
-                    g_inherited_console_window = GetConsoleWindow();
+                    if (ancestor_console_window_owner_proc.console_window) {
+                        std_handles.save_handles();
+                        std_handles_state.save_all_states(std_handles);
 
-                    std_handles.save_handles();
-                    std_handles_state.save_all_states(std_handles);
+                        _detach_all_crt_std_handles_nolock();
 
-                    _detach_all_crt_std_handles_nolock();
+                        if (g_inherited_console_window) {
+                            _free_console_nolock();
+                            g_owned_console_window = NULL; // not owned after detach
 
-                    if (g_inherited_console_window) {
-                        _free_console_nolock();
-                        g_owned_console_window = NULL; // not owned after detach
+                            g_inherited_console_window = GetConsoleWindow();
+                        }
 
-                        g_inherited_console_window = GetConsoleWindow();
-                    }
-
-                    if (!g_inherited_console_window) {
-                        if (ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
+                        if (!g_inherited_console_window && ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
                             g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
                         }
-                    }
 
-                    if (g_inherited_console_window) {
-                        _reinit_crt_std_handles_nolock(&std_handles);
-                    }
+                        if (g_inherited_console_window) {
+                            _reinit_crt_std_handles_nolock(&std_handles);
 
 #ifdef _DEBUG
-                    _debug_print_win32_std_handles(nullptr, 9);
-                    _debug_print_crt_std_handles(nullptr, 9);
+                            _debug_print_win32_std_handles(nullptr, 9);
+                            _debug_print_crt_std_handles(nullptr, 9);
 #endif
 
-                    for (const auto & conout : g_conout_prints_buf) {
-                        if (conout.any_str.is_wstr) {
-                            _put_raw_message_impl(0, conout.stream_type, conout.any_str.wstr);
-                        }
-                        else {
-                            _put_raw_message_impl(0, conout.stream_type, conout.any_str.astr);
+                            // print only if console window was owned, otherwise treat it as console window was never owned
+                            for (const auto & conout : g_conout_prints_buf) {
+                                if (conout.any_str.is_wstr) {
+                                    _put_raw_message_impl(0, conout.stream_type, conout.any_str.wstr);
+                                }
+                                else {
+                                    _put_raw_message_impl(0, conout.stream_type, conout.any_str.astr);
+                                }
+                            }
+
+#ifdef _DEBUG
+                            // pause again for debugging purposes
+                            if (pause_on_exit) {
+                                _put_raw_message_impl(0, STDOUT_FILENO, "[DEBUG] Press any key to continue . . . \n");
+                                getch();
+                            }
+#endif
                         }
                     }
                 }
@@ -4036,23 +4090,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 LocalFree(argv);
             }
 #endif
-        }();
+            // close on exit
+            if (g_flags.use_stdin_as_piped_from_conin &&_is_valid_handle(initial_stdin_handle)) {
+                const DWORD initial_stdin_handle_type = _get_file_type(initial_stdin_handle);
+                if (initial_stdin_handle_type == FILE_TYPE_PIPE) {
+                    // TODO:
+                    //  Inject to pipe end process of `initial_stdin_handle` and call to CloseHandle(GetStdHandle(STD_INPUT_HANDLE)) if GetStdHandle(STD_INPUT_HANDLE) == FILE_TYPE_CHAR
+                    //  ...
+                    //
 
-        // close on exit
-        if (g_flags.use_stdin_as_piped_from_conin &&_is_valid_handle(initial_stdin_handle)) {
-            const DWORD initial_stdin_handle_type = _get_file_type(initial_stdin_handle);
-            if (initial_stdin_handle_type == FILE_TYPE_PIPE) {
-                // TODO:
-                //  Inject to pipe end process of `initial_stdin_handle` and call to CloseHandle(GetStdHandle(STD_INPUT_HANDLE)) if GetStdHandle(STD_INPUT_HANDLE) == FILE_TYPE_CHAR
-                //  ...
-                //
+                    //ULONG initial_stdin_handle_pipe_end_pid = 0;
+                    //GetNamedPipeClientProcessId(initial_stdin_handle, &initial_stdin_handle_pipe_end_pid);
 
-                //ULONG initial_stdin_handle_pipe_end_pid = 0;
-                //GetNamedPipeClientProcessId(initial_stdin_handle, &initial_stdin_handle_pipe_end_pid);
-
-                CloseHandle(initial_stdin_handle);
+                    CloseHandle(initial_stdin_handle);
+                }
             }
-        }
+        }();
     }
     }();
 }

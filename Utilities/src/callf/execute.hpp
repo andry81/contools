@@ -19,6 +19,10 @@
 // named shared memory token prefix for a process (guid)
 #define PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX               "{03A76CD0-C8EE-4BAE-9406-7611A7C348CF}" // full name: `Local\<guid>--<procid>`
 
+#define DEFAULT_WAIT_CHILD_FIRST_TIME_TIMEOUT_MS        20
+#define DEFAULT_WAIT_CHILD_TIMEOUT_MS                   20
+#define DEFAULT_WAIT_PIPE_TIMEOUT_MS                    20
+
 #define DEFAULT_READ_BUF_SIZE                           65536
 #define DEFAULT_ANONYMOUS_PIPE_BUF_SIZE                 65536
 #define DEFAULT_NAMED_PIPE_IN_BUF_SIZE                  65536
@@ -96,6 +100,7 @@ struct Flags
     bool            pause_on_exit_if_error_before_exec;
     bool            pause_on_exit_if_error;
     bool            pause_on_exit;
+    bool            skip_pause_on_detached_console;
 
     bool            no_print_gen_error_string;
     bool            no_sys_dialog_ui;
@@ -202,6 +207,8 @@ struct Options
     uint_t          chcp_in;
     uint_t          chcp_out;
     uint_t          win_error_langid;
+
+    uint_t          wait_child_first_time_timeout_ms;
 
     int             stdout_dup;
     int             stderr_dup;
@@ -466,6 +473,8 @@ extern bool   g_is_console_window_owner_proc_searched;
 BOOL WINAPI CtrlHandler(DWORD ctrl_type);
 
 DWORD WINAPI WriteOutputWatchThread(LPVOID lpParam);
+
+bool RestoreConsole(HANDLE * console_access_mutex_ptr, int & ret, DWORD & win_error, StdHandles * std_handles_ptr, StdHandlesState * std_handles_state_ptr, bool alloc_if_not_attached);
 
 template <int stream_type>
 DWORD WINAPI StreamPipeThread(LPVOID lpParam);
