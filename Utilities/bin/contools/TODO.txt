@@ -37,11 +37,10 @@
   In `callf` by default show if hidden or create if detached/not attached the
   console on demand the same way as for the `callfg`.
 
-* Fix `callfg.exe /attach-parent-console "" "unexisted.exe"` invalid print and
-  return code in non 65001 code page.
+* Fix `start "" /WAIT callfg.exe /attach-parent-console "" "unexisted.exe"`
+  invalid print in non 65001 code page.
 
-* Fix `callfg.exe /attach-parent-console "" "unexisted.exe"` crash in 65001
-  code page.
+* Fix `callf.exe /detach-console "" "unexisted.exe"` crash.
 
 * Implement `/disable-parent-ctrl-signals` and `/disable-parent-ctrl-c-signal`
   through a parent process injection to avoid a parent process to close when it
