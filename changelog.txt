@@ -1,4 +1,7 @@
 2022.01.20:
+* new: Scripts/Tools/ToolAdaptors/app/amule: `add_links.bat` script
+
+2022.01.20:
 * new: Scripts/Tools/ToolAdaptors/app/amule: `backup_config.bat` script
 * changed: Scripts/Tools/ToolAdaptors/app/emule: code cleanup
 
