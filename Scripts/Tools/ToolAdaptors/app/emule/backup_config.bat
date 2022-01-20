@@ -62,6 +62,7 @@ call :XCOPY_FILE "%%EMULE_CONFIG_DIR%%"           downloads.txt                 
 
 call :XCOPY_FILE "%%EMULE_CONFIG_DIR%%"           clients.met                   "%%EMULE_ADAPTOR_BACKUP_DIR%%/emule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 call :XCOPY_FILE "%%EMULE_CONFIG_DIR%%"           known.met                     "%%EMULE_ADAPTOR_BACKUP_DIR%%/emule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+rem call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           known2_64.met                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 call :XCOPY_FILE "%%EMULE_CONFIG_DIR%%"           KnownPrefs.met                "%%EMULE_ADAPTOR_BACKUP_DIR%%/emule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 call :XCOPY_FILE "%%EMULE_CONFIG_DIR%%"           server.met                    "%%EMULE_ADAPTOR_BACKUP_DIR%%/emule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 call :XCOPY_FILE "%%EMULE_CONFIG_DIR%%"           emfriends.met                 "%%EMULE_ADAPTOR_BACKUP_DIR%%/emule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10

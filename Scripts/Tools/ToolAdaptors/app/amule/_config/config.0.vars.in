@@ -15,10 +15,10 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
-once EMULE_EXECUTABLE                     ="c:\Program Files\eMule"
+once AMULE_EXECUTABLE                     ="c:\Program Files\aMule"
 
-once EMULE_CONFIG_DIR                     ="$/{LOCALAPPDATA}/eMule/config"
+once AMULE_CONFIG_DIR                     ="$/{APPDATA}/aMule"
 
-once EMULE_ADAPTOR_BACKUP_DIR             ="$/{PROJECT_OUTPUT_ROOT}/emule/backup"
+once AMULE_ADAPTOR_BACKUP_DIR             ="$/{PROJECT_OUTPUT_ROOT}/amule/backup"
 
-once EMULE_LOG_DIR                        ="$/{LOCALAPPDATA}/eMule/logs"
+once AMULE_LOG_DIR                        ="$/{APPDATA}/aMule"

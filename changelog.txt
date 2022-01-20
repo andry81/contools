@@ -1,3 +1,7 @@
+2022.01.20:
+* new: Scripts/Tools/ToolAdaptors/app/amule: `backup_config.bat` script
+* changed: Scripts/Tools/ToolAdaptors/app/emule: code cleanup
+
 2022.01.11:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 
