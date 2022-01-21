@@ -2696,7 +2696,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             // load environment block from a parent process
 
-            _load_ancestor_proc_env_strs_from_shmem(std::tstring{ _T("Local\\") _T(PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX) _T("--") });
+            if (g_flags.load_parent_proc_init_env_vars) {
+                _load_ancestor_proc_env_strs_from_shmem(std::tstring{ _T("Local\\") _T(PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX) _T("--") });
+            }
 
             // save environment block for a process
 

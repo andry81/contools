@@ -1,3 +1,6 @@
+2022.01.21:
+* fixed: src/callf: `/load-parent-proc-init-env-vars` flag always been applied
+
 2022.01.11:
 * changed: bin/contools/TODO.txt: todo update
 

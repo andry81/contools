@@ -1,3 +1,6 @@
+2022.01.21:
+* fixed: Utilities/src/callf: `/load-parent-proc-init-env-vars` flag always been applied
+
 2022.01.20:
 * new: Scripts/Tools/ToolAdaptors/app/amule: `add_links.bat` script
 
