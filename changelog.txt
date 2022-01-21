@@ -1,4 +1,9 @@
 2022.01.21:
+* new: Scripts/Tools/ToolAdaptors/app/amule: `backup_downloads.bat`, `backup_logs.bat`, `exec_gui_amule.bat` scripts
+* changed: Scripts/Tools/ToolAdaptors/app/*mule: code cleanup
+* refactor: Scripts/Tools/ToolAdaptors/app/*mule: code refactor
+
+2022.01.21:
 * new: Utilities/bin/contools: binaries update
 
 2022.01.21:

@@ -17,8 +17,13 @@ if not exist "%AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%AMULE_ADAPT
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%AMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
-call :IF_DEFINED_AND_FILE_EXIST AMULE_EXECUTABLE || (
-  echo.%~nx0: error: AMULE_EXECUTABLE file path is not found: "%AMULE_EXECUTABLE%"
+call :IF_DEFINED_AND_FILE_EXIST AMULE_CMD_EXECUTABLE || (
+  echo.%~nx0: error: AMULE_CMD_EXECUTABLE file path is not found: "%AMULE_CMD_EXECUTABLE%"
+  exit /b 255
+) >&2
+
+call :IF_DEFINED_AND_FILE_EXIST AMULE_GUI_EXECUTABLE || (
+  echo.%~nx0: error: AMULE_GUI_EXECUTABLE file path is not found: "%AMULE_GUI_EXECUTABLE%"
   exit /b 255
 ) >&2
 

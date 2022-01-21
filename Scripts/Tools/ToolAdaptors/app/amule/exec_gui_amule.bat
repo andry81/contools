@@ -44,57 +44,22 @@ rem ) >&2
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
-rem :FREE_TEMP_DIR
-rem rem cleanup temporary files
+:FREE_TEMP_DIR
+rem cleanup temporary files
 rem call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
 exit /b %LASTERROR%
 
 :MAIN
-set "LINK_LIST_FILE=%~1"
-set "LINK_SUFFIX=%~2"
-set "ECPASS=%~3"
+set "ECPASS=%~1"
 
-if defined LINK_SUFFIX set "LINK_SUFFIX=|%LINK_SUFFIX%"
+rem backup all before start
+call "%?~dp0%backup_logs.bat" || exit /b
+call "%?~dp0%backup_config.bat" || exit /b
 
-if not exist "%LINK_LIST_FILE%" (
-  echo.%~nx0: error: LINK_LIST_FILE file path is not found: "%LINK_LIST_FILE%"
-  exit /b 1
-) >&2
-
-set NUM_OVERALL_LINK_STR=0
-for /F "usebackq eol=# tokens=* delims=" %%i in ("%LINK_LIST_FILE%") do (
-  set "LINE_STR=%%i"
-  call :COUNT
-)
-
-goto :COUNT_END
-
-:COUNT
-if not defined LINE_STR exit /b 0
-if "%LINE_STR:~0,1%" == ":" exit /b 0
-
-set /A NUM_OVERALL_LINK_STR+=1
-
-exit /b 0
-
-:COUNT_END
-
-set NUM_LINK_STR=0
-for /F "usebackq eol=# tokens=* delims=" %%i in ("%LINK_LIST_FILE%") do (
-  set "AMULE_LINK_STR=%%i"
-  call :ADD_LINK
-)
-
-exit /b 0
-
-:ADD_LINK
-if not defined AMULE_LINK_STR exit /b 0
-
-set /A NUM_LINK_STR+=1
+echo.
 
 if defined ECPASS set AMULE_CMDLINE=/P "%ECPASS%"
-set AMULE_CMDLINE=%AMULE_CMDLINE% /c "add %AMULE_LINK_STR%%LINK_SUFFIX%"
 
-echo.%NUM_LINK_STR% of %NUM_OVERALL_LINK_STR%: ^>"%AMULE_CMD_EXECUTABLE%" %AMULE_CMDLINE%
-"%AMULE_CMD_EXECUTABLE%" %AMULE_CMDLINE%
+echo.^>"%AMULE_CMD_EXECUTABLE%" %AMULE_CMDLINE%
+"%AMULE_GUI_EXECUTABLE%" %AMULE_CMDLINE%

@@ -15,7 +15,8 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
-once AMULE_EXECUTABLE                     ="c:\Program Files\aMule"
+once AMULE_CMD_EXECUTABLE                 ="c:\Program Files\aMule\amule.exe"
+once AMULE_GUI_EXECUTABLE                 ="c:\Program Files\aMule\amulecmd.exe"
 
 once AMULE_CONFIG_DIR                     ="$/{APPDATA}/aMule"
 

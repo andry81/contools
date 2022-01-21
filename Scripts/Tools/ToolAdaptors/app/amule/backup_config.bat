@@ -35,68 +35,71 @@ exit /b 0
 rem load initialization environment variables
 for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%INIT_VARS_FILE%") do set "%%i=%%j"
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
-  echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
-  set LASTERROR=255
-  goto FREE_TEMP_DIR
-) >&2
+rem call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
+rem   echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
+rem   set LASTERROR=255
+rem   goto FREE_TEMP_DIR
+rem ) >&2
 
 call :MAIN %%*
 set LASTERROR=%ERRORLEVEL%
 
 :FREE_TEMP_DIR
 rem cleanup temporary files
-call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
+rem call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
 exit /b %LASTERROR%
 
 :MAIN
-set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\emptydir"
+rem set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\emptydir"
+rem 
+rem mkdir "%EMPTY_DIR_TMP%" || (
+rem   echo.%?~n0%: error: could not create a directory: "%EMPTY_DIR_TMP%".
+rem   exit /b 255
+rem ) >&2
 
-mkdir "%EMPTY_DIR_TMP%" || (
-  echo.%?~n0%: error: could not create a directory: "%EMPTY_DIR_TMP%".
-  exit /b 255
-) >&2
+set "AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX=amule--"
+set "PROJECT_LOG_FILE_NAME_SUFFIX=%PROJECT_LOG_FILE_NAME_SUFFIX%--config"
 
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           downloads.txt                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           downloads.txt                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           amule.conf.bak                "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           server.met.bak                "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           amule.conf.bak                "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           server.met.bak                "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           amule.conf                    "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           amule.conf                    "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           addresses.dat                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           cryptkey.dat                  "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           addresses.dat                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           cryptkey.dat                  "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           ipfilter.dat                  "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           ipfilter_static.dat           "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           ipfilter.dat                  "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           ipfilter_static.dat           "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           clients.met                   "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           clients.met                   "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 if exist "%AMULE_CONFIG_DIR%\emfriends.met" (
-  call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"         emfriends.met                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+  call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"         emfriends.met                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 )
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           known.met                     "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
-rem call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           known2_64.met                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           server.met                    "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           known.met                     "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+rem call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           known2_64.met                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           server.met                    "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 if exist "%AMULE_CONFIG_DIR%\staticservers.dat" (
-  call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"         staticservers.dat             "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+  call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"         staticservers.dat             "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 )
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           preferences.dat               "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           preferences.dat               "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 
 rem Kademlia files
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           key_index.dat                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           load_index.dat                "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           nodes.dat                     "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           preferencesKad.dat            "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           src_index.dat                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           key_index.dat                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           load_index.dat                "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           nodes.dat                     "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           preferencesKad.dat            "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           src_index.dat                 "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 
-call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           statistics.dat                "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_FILE "%%AMULE_CONFIG_DIR%%"           statistics.dat                "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 
 echo.Archiving backup directory...
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%AMULE_ADAPTOR_BACKUP_DIR%%" "amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%/*.*" "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%AMULE_ADAPTOR_BACKUP_DIR%%" "%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%/*" "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
 echo.
 
-call :CMD rmdir /S /Q "%%AMULE_ADAPTOR_BACKUP_DIR%%/amule--%%PROJECT_LOG_FILE_NAME_SUFFIX%%"
+call :CMD rmdir /S /Q "%%AMULE_ADAPTOR_BACKUP_DIR%%/%%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%"
 
 exit /b 0
 
