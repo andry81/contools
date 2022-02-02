@@ -1,3 +1,7 @@
+2022.02.02:
+* fixed: BuildTools/TargetProject.PreBuildStep.bat: invalid `-u` flag usage for the `thlibautocfg` utility
+* refactor: Scripts/Tools/gen_product_ver.bat: moved into build subdirectory
+
 2022.01.21:
 * new: Scripts/Tools/ToolAdaptors/app/amule: `backup_downloads.bat`, `backup_logs.bat`, `exec_gui_amule.bat` scripts
 * changed: Scripts/Tools/ToolAdaptors/app/*mule: code cleanup

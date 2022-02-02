@@ -413,6 +413,7 @@ Scripts/Tools/build/env_generators/makensis_cmd_line.bat -text
 Scripts/Tools/build/export_build_vars.bat -text
 Scripts/Tools/build/extract_files_from_archive.bat -text
 Scripts/Tools/build/gen_config.bat -text
+Scripts/Tools/build/gen_product_ver.bat -text
 Scripts/Tools/build/gen_publish_app_dir.bat -text
 Scripts/Tools/build/init_project_log.bat -text
 Scripts/Tools/build/load_config.bat -text
@@ -495,7 +496,6 @@ Scripts/Tools/fun/matrix.cmd -text
 Scripts/Tools/gccmrt.bat -text
 Scripts/Tools/gen_dir_files_list.bat -text
 Scripts/Tools/gen_dir_files_list_from_archive.bat -text
-Scripts/Tools/gen_product_ver.bat -text
 Scripts/Tools/hash/__init__.bat -text
 Scripts/Tools/hash/gen_diff_dir_hash_lst.bat -text
 Scripts/Tools/hash/gen_dir_hash_lst.bat -text

@@ -42,10 +42,10 @@ pushd "%SOURCES_DIR%" && (
   popd
 ) || exit /b 255
 
-set "THLIBAUTOCFG_BARE_FLAGS="
+set "THLIBAUTOCFG_BARE_FLAGS= -txt2c"
 if %UNICODE_ENABLED% NEQ 0 set THLIBAUTOCFG_BARE_FLAGS=%THLIBAUTOCFG_BARE_FLAGS% -u
 
-if exist "%CONSOLE_HELP_FILE%.txt" call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools/thlibautocfg.exe"%%THLIBAUTOCFG_BARE_FLAGS%% -txt2c "%%CONSOLE_HELP_FILE%%.txt" "%%CONSOLE_HELP_FILE%%_inl.hpp"
+if exist "%CONSOLE_HELP_FILE%.txt" call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools/thlibautocfg.exe"%%THLIBAUTOCFG_BARE_FLAGS%% "%%CONSOLE_HELP_FILE%%.txt" "%%CONSOLE_HELP_FILE%%_inl.hpp"
 
 rem avoid output of this sequence: "error:"
 echo Last return code: %ERRORLEVEL%
