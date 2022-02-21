@@ -392,6 +392,7 @@ Scripts/Tools/bash/tools/gnumake/buildlibcomponents.sh -text
 Scripts/Tools/bash/tools/gnumake/buildres.sh -text
 Scripts/Tools/bash/traplib.sh -text
 Scripts/Tools/bash/unmountdir.sh -text
+Scripts/Tools/build/.extract_files_from_archives_by_pttn/extract_files_from_archives_by_pttn.read_flags.bat -text
 Scripts/Tools/build/.load_config/load_config.fast_parse.bat -text
 Scripts/Tools/build/.load_config/load_config.fast_parse.parse_expr.bat -text
 Scripts/Tools/build/.load_config/load_config.full_parse.bat -text
@@ -412,6 +413,7 @@ Scripts/Tools/build/env_generators/cmake_cmd_line.bat -text
 Scripts/Tools/build/env_generators/makensis_cmd_line.bat -text
 Scripts/Tools/build/export_build_vars.bat -text
 Scripts/Tools/build/extract_files_from_archive.bat -text
+Scripts/Tools/build/extract_files_from_archives_by_pttn.bat -text
 Scripts/Tools/build/gen_config.bat -text
 Scripts/Tools/build/gen_product_ver.bat -text
 Scripts/Tools/build/gen_publish_app_dir.bat -text
@@ -441,6 +443,7 @@ Scripts/Tools/build/write_var_to_file.bat -text
 Scripts/Tools/build/xcopy_archive_from_stagein_all_dirs.bat -text
 Scripts/Tools/build/xcopy_archive_to_stage.bat -text
 Scripts/Tools/build/xcopy_archive_to_stageout_all_dirs.bat -text
+Scripts/Tools/build/xcopy_files_from_dir_by_pttn.bat -text
 Scripts/Tools/build/xcopy_publish_stage_dir.bat -text
 Scripts/Tools/build/xcopy_to_stage.bat -text
 Scripts/Tools/callargs.bat -text
@@ -553,6 +556,7 @@ Scripts/Tools/std/chcp.bat -text
 Scripts/Tools/std/check_windows_version.bat -text
 Scripts/Tools/std/clear_list.bat -text
 Scripts/Tools/std/copy.bat -text
+Scripts/Tools/std/declare_builtins.bat -text
 Scripts/Tools/std/del_file.bat -text
 Scripts/Tools/std/del_file_pttn.bat -text
 Scripts/Tools/std/echo_var.bat -text
@@ -564,6 +568,7 @@ Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
 Scripts/Tools/std/mkdir.bat -text
 Scripts/Tools/std/pause.bat -text
+Scripts/Tools/std/read_args_to_var.bat -text
 Scripts/Tools/std/replace_sys_chars.bat -text
 Scripts/Tools/std/restore_sys_chars.bat -text
 Scripts/Tools/std/restorecp.bat -text

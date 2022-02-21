@@ -1,3 +1,8 @@
+2022.02.21:
+* new: Scripts/Tools/build: `extract_files_from_archives_by_pttn.bat` script to extract multiple archives with preserving relative paths to each archive file
+* new: Scripts/Tools/build: `xcopy_files_from_dir_by_pttn.bat` script to xcopy files from a directory preserving relative paths to each file
+* new: Scripts/Tools/std: `declare_builtins.bat`, `read_args_to_var.bat` support scripts
+
 2022.02.02:
 * fixed: BuildTools/TargetProject.PreBuildStep.bat: invalid `-u` flag usage for the `thlibautocfg` utility
 * refactor: Scripts/Tools/gen_product_ver.bat: moved into build subdirectory
