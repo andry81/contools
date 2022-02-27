@@ -8,7 +8,7 @@
   (GetFileType(GetStdHandle(STD_INPUT_HANDLE)) != FILE_TYPE_CHAR), then the
   autocompletion feature is turned off and all characters including a tab
   character processes as is. Otherwise the tab button press triggers
-  the autocompletionn feature.
+  the autocompletion feature.
 
   The stdin handle changes its type from the `FILE_TYPE_CHAR`, for example, if
   the process input is redirected.
@@ -52,3 +52,5 @@
 
 * Implement process injection related to the partially implemented
   `/use-stdin-as-piped-from-conin` flag.
+
+* Fix `callf.exe` long paths open.

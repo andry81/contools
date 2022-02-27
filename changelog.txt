@@ -1,4 +1,7 @@
 2022.02.27:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
+2022.02.27:
 * new: _config/config.system.vars.in: added `CONTOOLS_TOOL_ADAPTORS_ROOT` variable
 
 2022.02.21:
