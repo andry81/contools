@@ -22,6 +22,8 @@ once CONTOOLS_TESTLIB_ROOT                ="%CONTOOLS_ROOT%/testlib"
 once CONTOOLS_XML_TOOLS_ROOT              ="%CONTOOLS_ROOT%/xml"
 once CONTOOLS_VARS_ROOT                   ="%CONTOOLS_ROOT%/vars"
 
+once CONTOOLS_TOOL_ADAPTORS_ROOT          ="%CONTOOLS_ROOT%/ToolAdaptors"
+
 once CONTOOLS_UTILITIES_ROOT              ="%CONTOOLS_PROJECT_ROOT%/Utilities"
 once CONTOOLS_UTILITIES_BIN_ROOT          ="%CONTOOLS_UTILITIES_ROOT%/bin"
 once CONTOOLS_GNUWIN32_ROOT               ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/gnuwin32"
