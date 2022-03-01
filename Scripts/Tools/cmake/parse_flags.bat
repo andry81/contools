@@ -1,4 +1,7 @@
 
+rem script flags
+set __?FLAG_SHIFT=0
+
 :FLAGS_LOOP
 
 rem flags always at first
