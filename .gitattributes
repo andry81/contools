@@ -453,6 +453,7 @@ Scripts/Tools/cmake/check_build_type.bat -text
 Scripts/Tools/cmake/check_config_version.bat -text
 Scripts/Tools/cmake/get_GENERATOR_IS_MULTI_CONFIG.bat -text
 Scripts/Tools/cmake/make_output_directories.bat -text
+Scripts/Tools/cmake/parse_flags.bat -text
 Scripts/Tools/cmake/set_vars_from_files.bat -text
 Scripts/Tools/cmake/update_build_type.bat -text
 Scripts/Tools/countlines.bat -text

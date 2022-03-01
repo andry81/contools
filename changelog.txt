@@ -1,3 +1,6 @@
+2022.03.01:
+* new: Scripts/Tools/cmake: added `parse_flags.bat` script to partially parse cmake flags like `-T` and `-A` as a part of another script
+
 2022.02.27:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 
