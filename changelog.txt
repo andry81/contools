@@ -1,4 +1,7 @@
 2022.03.16:
+* changed: Scripts/Tools/ToolAdaptors/app: cleanup
+
+2022.03.16:
 * changed: Scripts/Tools/ToolAdaptors/app: missed changes
 
 2022.03.01:

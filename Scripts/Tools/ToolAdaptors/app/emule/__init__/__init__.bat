@@ -8,10 +8,10 @@ set "EMULE_ADAPTOR_PROJECT_ROOT_INIT0_DIR=%~dp0"
 
 if not defined NEST_LVL set NEST_LVL=0
 
-if not defined EMULE_ADAPTOR_PROJECT_ROOT               call :CANONICAL_PATH EMULE_ADAPTOR_PROJECT_ROOT               "%%~dp0.."
+if not defined EMULE_ADAPTOR_PROJECT_ROOT               call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_ADAPTOR_PROJECT_ROOT                "%%~dp0.."
 
-if not defined EMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT  call :CANONICAL_PATH EMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT  "%%EMULE_ADAPTOR_PROJECT_ROOT%%/_config"
-if not defined EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT call :CANONICAL_PATH EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT "%%PROJECT_OUTPUT_ROOT%%/config/contools/tool_adaptors/emule"
+if not defined EMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT  call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT   "%%EMULE_ADAPTOR_PROJECT_ROOT%%/_config"
+if not defined EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT  "%%PROJECT_OUTPUT_ROOT%%/config/contools/tool_adaptors/emule"
 
 if not exist "%EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%" || exit /b 10 )
 
@@ -37,11 +37,11 @@ call :IF_DEFINED_AND_DIR_EXIST EMULE_LOG_DIR || (
   exit /b 255
 ) >&2
 
-call :CANONICAL_PATH EMULE_CONFIG_DIR           "%%EMULE_CONFIG_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_CONFIG_DIR            "%%EMULE_CONFIG_DIR%%"
 
-call :CANONICAL_PATH EMULE_LOG_DIR              "%%EMULE_LOG_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_LOG_DIR               "%%EMULE_LOG_DIR%%"
 
-call :CANONICAL_PATH EMULE_ADAPTOR_BACKUP_DIR   "%%EMULE_ADAPTOR_BACKUP_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_ADAPTOR_BACKUP_DIR    "%%EMULE_ADAPTOR_BACKUP_DIR%%"
 
 if not exist "%EMULE_ADAPTOR_BACKUP_DIR%\" ( mkdir "%EMULE_ADAPTOR_BACKUP_DIR%" || exit /b 11 )
 
@@ -63,14 +63,4 @@ if not defined %~1 exit /b 1
 call set "DIR_PATH=%%%~1%%"
 if not defined DIR_PATH exit /b 1
 if not exist "%DIR_PATH%\" exit /b 1
-exit /b 0
-
-:CANONICAL_PATH
-setlocal DISABLEDELAYEDEXPANSION
-for /F "eol= tokens=* delims=" %%i in ("%~2\.") do set "RETURN_VALUE=%%~fi"
-rem set "RETURN_VALUE=%RETURN_VALUE:\=/%"
-(
-  endlocal
-  set "%~1=%RETURN_VALUE%"
-)
 exit /b 0
