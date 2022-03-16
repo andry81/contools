@@ -1,4 +1,7 @@
 2022.03.16:
+* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_user_repos_list.bat` user repos list backup script
+
+2022.03.16:
 * changed: Scripts/Tools/ToolAdaptors/app: cleanup
 
 2022.03.16:
