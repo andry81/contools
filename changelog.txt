@@ -1,3 +1,6 @@
+2022.03.17:
+* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_org_repos_list.bat` org repos list backup script
+
 2022.03.16:
 * new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_user_repos_list.bat` user repos list backup script
 
