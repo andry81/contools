@@ -51,16 +51,16 @@ call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 exit /b %LASTERROR%
 
 :MAIN
-set "ORG=%~1"
-set "TYPE=%~2"
+set "OWNER=%~1"
+set "REPO=%~2"
 
-if not defined ORG (
-  echo.%?~n0%: error: ORG is not defined.
+if not defined OWNER (
+  echo.%?~n0%: error: OWNER is not defined.
   exit /b 255
 ) >&2
 
-if not defined TYPE (
-  echo.%?~n0%: error: TYPE is not defined.
+if not defined REPO (
+  echo.%?~n0%: error: REPO is not defined.
   exit /b 255
 ) >&2
 
@@ -76,8 +76,8 @@ set "GH_ADAPTOR_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_DIR%/_temp"
 
 if exist "%GH_ADAPTOR_BACKUP_TEMP_DIR%\" rmdir /S /Q "%GH_ADAPTOR_BACKUP_TEMP_DIR%"
 
-set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/repos/org/%ORG%"
-set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/repos/org/%ORG%"
+set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/releases/%OWNER%/%REPO%"
+set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/releases/%OWNER%/%REPO%"
 
 mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
   echo.%?~n0%: error: could not create a directory: "%GH_REPOS_BACKUP_TEMP_DIR%".
@@ -89,16 +89,16 @@ if not exist "%GH_REPOS_BACKUP_DIR%\" mkdir "%GH_REPOS_BACKUP_DIR%"
 set PAGE=1
 
 :PAGE_LOOP
-call set "GH_RESTAPI_ORG_REPOS_URL_PATH=%%GH_RESTAPI_ORG_REPOS_URL:{{ORG}}=%ORG%%%"
+call set "GH_RESTAPI_REPO_RELEASES_URL_PATH=%%GH_RESTAPI_REPO_RELEASES_URL:{{OWNER}}=%OWNER%%%"
+call set "GH_RESTAPI_REPO_RELEASES_URL_PATH=%%GH_RESTAPI_REPO_RELEASES_URL_PATH:{{REPO}}=%REPO%%%"
 
-set "GH_RESTAPI_ORG_REPOS_URL_PATH=%GH_RESTAPI_ORG_REPOS_URL_PATH%?type=%TYPE%&per_page=%GH_RESTAPI_PARAM_PER_PAGE%&page=%PAGE%"
+set "GH_RESTAPI_REPO_RELEASES_URL_PATH=%GH_RESTAPI_REPO_RELEASES_URL_PATH%?per_page=%GH_RESTAPI_PARAM_PER_PAGE%&page=%PAGE%"
 
-set "CURL_OUTPUT_FILE=%GH_REPOS_BACKUP_TEMP_DIR%/%GH_RESTAPI_ORG_REPOS_FILE%"
+set "CURL_OUTPUT_FILE=%GH_REPOS_BACKUP_TEMP_DIR%/%GH_RESTAPI_REPO_RELEASES_FILE%"
 
-call set "CURL_OUTPUT_FILE=%%CURL_OUTPUT_FILE:{{TYPE}}=%TYPE%%%"
 call set "CURL_OUTPUT_FILE=%%CURL_OUTPUT_FILE:{{PAGE}}=%PAGE%%%"
 
-call :CURL "%%GH_RESTAPI_ORG_REPOS_URL_PATH%%" || goto MAIN_EXIT
+call :CURL "%%GH_RESTAPI_REPO_RELEASES_URL_PATH%%" || goto MAIN_EXIT
 echo.
 
 "%JQ_EXECUTABLE%" "length" "%CURL_OUTPUT_FILE%" 2>nul > "%QUERY_TEMP_FILE%"
@@ -125,7 +125,7 @@ if %PAGE% LSS 2 if %QUERY_LEN% EQU 0 (
 ) >&2
 
 echo.Archiving backup directory...
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/org-repos--[%%ORG%%][%%TYPE%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/releases--[%%OWNER%%][%%REPO%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
 echo.
 
 :SKIP_ARCHIVE

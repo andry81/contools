@@ -98,7 +98,7 @@ set "CURL_OUTPUT_FILE=%GH_REPOS_BACKUP_TEMP_DIR%/%GH_RESTAPI_USER_REPOS_FILE%"
 call set "CURL_OUTPUT_FILE=%%CURL_OUTPUT_FILE:{{TYPE}}=%TYPE%%%"
 call set "CURL_OUTPUT_FILE=%%CURL_OUTPUT_FILE:{{PAGE}}=%PAGE%%%"
 
-call :CURL "%%GH_RESTAPI_USER_REPOS_URL_PATH%%"
+call :CURL "%%GH_RESTAPI_USER_REPOS_URL_PATH%%" || goto MAIN_EXIT
 echo.
 
 "%JQ_EXECUTABLE%" "length" "%CURL_OUTPUT_FILE%" 2>nul > "%QUERY_TEMP_FILE%"
@@ -119,8 +119,18 @@ if %QUERY_LEN% GEQ %GH_RESTAPI_PARAM_PER_PAGE% ( set /A "PAGE+=1" & goto PAGE_LO
 
 :PAGE_LOOP_END
 
+if %PAGE% LSS 2 if %QUERY_LEN% EQU 0 (
+  echo.%?~n0%: warning: query response is empty.
+  goto SKIP_ARCHIVE
+) >&2
+
 echo.Archiving backup directory...
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/user-repos--[%%OWNER%%]--%%TYPE%%--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/user-repos--[%%OWNER%%][%%TYPE%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
+echo.
+
+:SKIP_ARCHIVE
+
+:MAIN_EXIT
 echo.
 
 call :CMD rmdir /S /Q "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%"
