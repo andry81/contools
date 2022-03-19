@@ -25,6 +25,10 @@ bool g_is_process_executed = false;
 
 // sets true in case if process is not elevated and requested for self elevation
 bool g_is_process_elevating = false;
+
+// sets true in case if process is elevated and requested for self unelevation
+bool g_is_process_unelevating = false;
+
 bool g_is_process_elevated = false;
 
 
@@ -48,6 +52,7 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/elevate"),
+    _T("/unelevate"),
     _T("/create-console"),
     _T("/detach-console"),
     _T("/detach-inherited-console-on-wait"),
@@ -66,14 +71,14 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
 
-const TCHAR * g_elevate_parent_flags_to_preparse_arr[] = {
+const TCHAR * g_elevate_or_unelevate_parent_flags_to_preparse_arr[] = {
     _T("/no-windows-console"),
     _T("/create-console-title"),
     _T("/own-console-title"),
     _T("/console-title"),
 };
 
-const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
+const TCHAR * g_elevate_or_unelevate_child_flags_to_preparse_arr[] = {
     _T("/no-expand-env"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/attach-parent-console"),
@@ -82,7 +87,7 @@ const TCHAR * g_elevate_child_flags_to_preparse_arr[] = {
     _T("/console-title"),
 };
 
-const TCHAR * g_promote_flags_to_preparse_arr[] = {
+const TCHAR * g_promote_or_demote_flags_to_preparse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
     _T("/ret-child-exit"),
@@ -109,7 +114,7 @@ const TCHAR * g_promote_flags_to_preparse_arr[] = {
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
 
-const TCHAR * g_promote_parent_flags_to_preparse_arr[] = {
+const TCHAR * g_promote_or_demote_parent_flags_to_preparse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
     _T("/ret-child-exit"),
@@ -186,6 +191,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/wait-child-start"),
     _T("/wait-child-first-time-timeout"),
     _T("/elevate"),
+    _T("/unelevate"),
     _T("/showas"),
     _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
@@ -308,7 +314,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/write-console-stdin-back")
 };
 
-const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
+const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
     _T("/no-sys-dialog-ui"),
     _T("/no-wait"),
     _T("/no-window"),
@@ -377,7 +383,7 @@ const TCHAR * g_elevate_parent_flags_to_parse_arr[] = {
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
 
-const TCHAR * g_elevate_child_flags_to_parse_arr[] = {
+const TCHAR * g_elevate_or_unelevate_child_flags_to_parse_arr[] = {
     _T("/load-parent-proc-init-env-vars"),
     _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
@@ -417,7 +423,7 @@ const TCHAR * g_elevate_child_flags_to_parse_arr[] = {
     _T("/attach-parent-console"),
 };
 
-const TCHAR * g_promote_flags_to_parse_arr[] = {
+const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
     _T("/ret-child-exit"),
@@ -443,7 +449,7 @@ const TCHAR * g_promote_flags_to_parse_arr[] = {
     _T("/disable-conout-duplicate-to-parent-console-on-error")
 };
 
-const TCHAR * g_promote_parent_flags_to_parse_arr[] = {
+const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
     _T("/ret-child-exit"),
@@ -581,9 +587,9 @@ inline int invalid_format_flag_message(const TCHAR * fmt, ...)
 }
 
 inline void MergeOptions(Flags & out_flags, Options & out_options,
-                         const Flags & elevate_parent_flags, const Options & elevate_parent_options,
-                         const Flags & promote_flags, const Options & promote_options,
-                         const Flags & promote_parent_flags, const Options & promote_parent_options)
+                         const Flags & elevate_or_unelevate_parent_flags, const Options & elevate_or_unelevate_parent_options,
+                         const Flags & promote_or_demote_flags, const Options & promote_or_demote_options,
+                         const Flags & promote_or_demote_parent_flags, const Options & promote_or_demote_parent_options)
 {
     //if (utility::addressof(out_flags) != utility::addressof(flags)) {
     //    out_flags = flags;
@@ -594,16 +600,16 @@ inline void MergeOptions(Flags & out_flags, Options & out_options,
 
     // merge all except child flags and options
 
-    if (g_is_process_elevating) {
-        out_flags.merge(elevate_parent_flags);
-        out_options.merge(elevate_parent_options);
+    if (g_is_process_elevating || g_is_process_unelevating) {
+        out_flags.merge(elevate_or_unelevate_parent_flags);
+        out_options.merge(elevate_or_unelevate_parent_options);
     }
 
-    out_flags.merge(promote_flags);
-    out_options.merge(promote_options);
+    out_flags.merge(promote_or_demote_flags);
+    out_options.merge(promote_or_demote_options);
 
-    out_flags.merge(promote_parent_flags);
-    out_options.merge(promote_parent_options);
+    out_flags.merge(promote_or_demote_parent_flags);
+    out_options.merge(promote_or_demote_parent_options);
 }
 
 template <size_t N>
@@ -1007,6 +1013,13 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/elevate"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.elevate = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/unelevate"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.unelevate = true;
             return 1;
         }
         return 0;
@@ -2582,6 +2595,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             int parse_result;
 
             bool print_help = false;
+            bool is_promote = false;
+            bool is_demote = false;
 
             // silent flags preprocess w/o any errors to search for prioritized flags
             while (argc >= arg_offset + 1)
@@ -2610,7 +2625,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     break;
                 }
 
-                if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_regular_flags, g_regular_options, g_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                    g_regular_flags, g_regular_options, g_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
                     if (parse_error != err_none) {
                         return parse_error;
                     }
@@ -2629,13 +2645,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         if ((parse_result = (!is_elevate_child_flags ?
                             ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
-                                !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
-                                !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
-                                g_elevate_parent_flags_to_preparse_arr, g_empty_flags_arr) :
+                                g_elevate_or_unelevate_parent_flags,
+                                g_elevate_or_unelevate_parent_options,
+                                g_elevate_or_unelevate_parent_flags_to_preparse_arr, g_empty_flags_arr) :
                             ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
-                                !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
-                                !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
-                                g_elevate_child_flags_to_preparse_arr, g_empty_flags_arr))) >= 0) {
+                                g_elevate_or_unelevate_child_flags,
+                                g_elevate_or_unelevate_child_options,
+                                g_elevate_or_unelevate_child_flags_to_preparse_arr, g_empty_flags_arr))) >= 0) {
                             if (parse_error != err_none) {
                                 return parse_error;
                             }
@@ -2653,12 +2669,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 else if (!tstrcmp(arg, _T("/promote{"))) {
                     arg_offset += 1;
 
+                    is_promote = true;
+
                     // read inner flags
                     while (argc >= arg_offset + 1)
                     {
                         arg = argv[arg_offset];
 
-                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_flags, g_promote_options, g_promote_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            g_promote_or_demote_flags, g_promote_or_demote_options, g_promote_or_demote_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
                             if (parse_error != err_none) {
                                 return parse_error;
                             }
@@ -2673,12 +2692,96 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 else if (!tstrcmp(arg, _T("/promote-parent{"))) {
                     arg_offset += 1;
 
+                    is_promote = true;
+
                     // read inner flags
                     while (argc >= arg_offset + 1)
                     {
                         arg = argv[arg_offset];
 
-                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_parent_flags, g_promote_parent_options, g_promote_parent_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            g_promote_or_demote_parent_flags, g_promote_or_demote_parent_options, g_promote_or_demote_parent_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                            if (parse_error != err_none) {
+                                return parse_error;
+                            }
+                        }
+                        else if (!tstrcmp(arg, _T("}"))) {
+                            break;
+                        }
+
+                        arg_offset += 1;
+                    }
+                }
+                else if (!tstrcmp(arg, _T("/unelevate{"))) {
+                    arg_offset += 1;
+
+                    g_regular_flags.unelevate = true;
+
+                    bool is_unelevate_child_flags = false;
+
+                    // read inner flags
+                    while (argc >= arg_offset + 1)
+                    {
+                        arg = argv[arg_offset];
+
+                        if ((parse_result = (!is_unelevate_child_flags ?
+                            ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                                g_elevate_or_unelevate_parent_flags,
+                                g_elevate_or_unelevate_parent_options,
+                                g_elevate_or_unelevate_parent_flags_to_preparse_arr, g_empty_flags_arr) :
+                            ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                                g_elevate_or_unelevate_child_flags,
+                                g_elevate_or_unelevate_child_options,
+                                g_elevate_or_unelevate_child_flags_to_preparse_arr, g_empty_flags_arr))) >= 0) {
+                            if (parse_error != err_none) {
+                                return parse_error;
+                            }
+                        }
+                        else if (!is_unelevate_child_flags && !tstrcmp(arg, _T("}{"))) {
+                            is_unelevate_child_flags = true;
+                        }
+                        else if (!tstrcmp(arg, _T("}"))) {
+                            break;
+                        }
+
+                        arg_offset += 1;
+                    }
+                }
+                else if (!tstrcmp(arg, _T("/demote{"))) {
+                    arg_offset += 1;
+
+                    is_demote = true;
+
+                    // read inner flags
+                    while (argc >= arg_offset + 1)
+                    {
+                        arg = argv[arg_offset];
+
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            g_promote_or_demote_flags, g_promote_or_demote_options, g_promote_or_demote_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                            if (parse_error != err_none) {
+                                return parse_error;
+                            }
+                        }
+                        else if (!tstrcmp(arg, _T("}"))) {
+                            break;
+                        }
+
+                        arg_offset += 1;
+                    }
+                }
+                else if (!tstrcmp(arg, _T("/demote-parent{"))) {
+                    arg_offset += 1;
+
+                    is_demote = true;
+
+                    // read inner flags
+                    while (argc >= arg_offset + 1)
+                    {
+                        arg = argv[arg_offset];
+
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            g_promote_or_demote_parent_flags, g_promote_or_demote_parent_options, g_promote_or_demote_parent_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
                             if (parse_error != err_none) {
                                 return parse_error;
                             }
@@ -2692,6 +2795,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
 
                 arg_offset += 1;
+            }
+
+            // elevate*, promote* vs unelevate*, demote*
+            if (g_regular_flags.elevate && g_regular_flags.unelevate) {
+                return invalid_format_flag_message(_T("`/elevate*` option or flag is mixed with `/unelevate`\n"));
+            }
+            if (is_promote && g_regular_flags.unelevate) {
+                return invalid_format_flag_message(_T("`/promote*` option is mixed with `/unelevate`\n"));
+            }
+            if (is_demote && g_regular_flags.elevate) {
+                return invalid_format_flag_message(_T("`/demote*` option is mixed with `/elevate`\n"));
+            }
+            if (is_promote && is_demote) {
+                return invalid_format_flag_message(_T("`/promote*` option is mixed with `/demote`\n"));
             }
 
             // load environment block from a parent process
@@ -2765,22 +2882,32 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 // we must drop this flag immediately to avoid potential accidental recursion in child process
                 g_regular_flags.elevate = false;
             }
+            else if (g_regular_flags.unelevate) {
+                const bool is_process_elevated = g_is_process_elevated = _is_process_elevated() ? 1 : 0;
+                if (is_process_elevated) {
+                    g_is_process_unelevating = true;
+                }
+
+                // we must drop this flag immediately to avoid potential accidental recursion in child process
+                g_regular_flags.unelevate = false;
+            }
 
             // reset flags and options
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_elevating) {
-                TranslateCommandLineToElevated(nullptr, nullptr, nullptr,
+            if (g_is_process_elevating || g_is_process_unelevating) {
+                TranslateCommandLineToElevatedOrUnelevated(
+                    nullptr, nullptr, nullptr,
                     g_flags, g_options,
-                    g_elevate_child_flags, g_elevate_child_options,
-                    g_promote_flags, g_promote_options);
+                    g_elevate_or_unelevate_child_flags, g_elevate_or_unelevate_child_options,
+                    g_promote_or_demote_flags, g_promote_or_demote_options);
             }
 
             // merge options (first time)
             MergeOptions(g_flags, g_options,
-                g_elevate_parent_flags, g_elevate_parent_options,
-                g_promote_flags, g_promote_options, g_promote_parent_flags, g_promote_parent_options);
+                g_elevate_or_unelevate_parent_flags, g_elevate_or_unelevate_parent_options,
+                g_promote_or_demote_flags, g_promote_or_demote_options, g_promote_or_demote_parent_flags, g_promote_or_demote_parent_options);
 
             // console detach, attach, alloc
 
@@ -3140,7 +3267,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 //  `fatal error C1061: compiler limit : blocks nested too deeply`
                 //
 
-                if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_regular_flags, g_regular_options, g_flags_to_parse_arr, g_flags_to_preparse_arr)) >= 0) {
+                if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                    g_regular_flags, g_regular_options, g_flags_to_parse_arr, g_flags_to_preparse_arr)) >= 0) {
                     if (!parse_result && parse_error == err_none) {
                         parse_error = invalid_format_flag(arg);
                     }
@@ -3148,7 +3276,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         return parse_error;
                     }
                 }
-                else if ((parse_result = ParseArgWithSuffixToOption(parse_error, arg, argc, argv, arg_offset, g_regular_flags, g_regular_options, g_flags_w_index_to_parse_arr)) >= 0) {
+                else if ((parse_result = ParseArgWithSuffixToOption(parse_error, arg, argc, argv, arg_offset,
+                         g_regular_flags, g_regular_options, g_flags_w_index_to_parse_arr)) >= 0) {
                     if (parse_error != err_none) {
                         return parse_error;
                     }
@@ -3167,15 +3296,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         if ((parse_result = (!is_elevate_child_flags ?
                                 ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
-                                    !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
-                                    !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
-                                    g_elevate_parent_flags_to_parse_arr,
-                                    g_elevate_parent_flags_to_preparse_arr) :
+                                    g_elevate_or_unelevate_parent_flags,
+                                    g_elevate_or_unelevate_parent_options,
+                                    g_elevate_or_unelevate_parent_flags_to_parse_arr,
+                                    g_elevate_or_unelevate_parent_flags_to_preparse_arr) :
                                 ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
-                                    !is_elevate_child_flags ? g_elevate_parent_flags : g_elevate_child_flags,
-                                    !is_elevate_child_flags ? g_elevate_parent_options : g_elevate_child_options,
-                                    g_elevate_child_flags_to_parse_arr,
-                                    g_elevate_child_flags_to_preparse_arr))) >= 0) {
+                                    g_elevate_or_unelevate_child_flags,
+                                    g_elevate_or_unelevate_child_options,
+                                    g_elevate_or_unelevate_child_flags_to_parse_arr,
+                                    g_elevate_or_unelevate_child_flags_to_preparse_arr))) >= 0) {
                             if (!parse_result && parse_error == err_none) {
                                 parse_error = invalid_format_flag(arg);
                             }
@@ -3197,12 +3326,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 else if (!tstrcmp(arg, _T("/promote{"))) {
                     arg_offset += 1;
 
+                    is_promote = true;
+
                     // read inner flags
                     while (argc >= arg_offset + 1)
                     {
                         arg = argv[arg_offset];
 
-                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_flags, g_promote_options, g_promote_flags_to_parse_arr, g_promote_flags_to_preparse_arr)) >= 0) {
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            g_promote_or_demote_flags, g_promote_or_demote_options, g_promote_or_demote_flags_to_parse_arr, g_promote_or_demote_flags_to_preparse_arr)) >= 0) {
                             if (!parse_result && parse_error == err_none) {
                                 parse_error = invalid_format_flag(arg);
                             }
@@ -3221,12 +3353,110 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 else if (!tstrcmp(arg, _T("/promote-parent{"))) {
                     arg_offset += 1;
 
+                    is_promote = true;
+
                     // read inner flags
                     while (argc >= arg_offset + 1)
                     {
                         arg = argv[arg_offset];
 
-                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset, g_promote_parent_flags, g_promote_parent_options, g_promote_parent_flags_to_parse_arr, g_promote_parent_flags_to_preparse_arr)) >= 0) {
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            g_promote_or_demote_parent_flags, g_promote_or_demote_parent_options, g_promote_or_demote_parent_flags_to_parse_arr, g_promote_or_demote_parent_flags_to_preparse_arr)) >= 0) {
+                            if (!parse_result && parse_error == err_none) {
+                                parse_error = invalid_format_flag(arg);
+                            }
+                            if (parse_error != err_none) {
+                                return parse_error;
+                            }
+                        }
+                        else if (!tstrcmp(arg, _T("}"))) {
+                            break;
+                        }
+                        else return invalid_format_flag(arg);
+
+                        arg_offset += 1;
+                    }
+                }
+                else if (!tstrcmp(arg, _T("/unelevate{"))) {
+                    arg_offset += 1;
+
+                    g_regular_flags.unelevate = true;
+
+                    bool is_unelevate_child_flags = false;
+
+                    // read inner flags
+                    while (argc >= arg_offset + 1)
+                    {
+                        arg = argv[arg_offset];
+
+                        if ((parse_result = (!is_unelevate_child_flags ?
+                            ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                                g_elevate_or_unelevate_parent_flags,
+                                g_elevate_or_unelevate_parent_options,
+                                g_elevate_or_unelevate_parent_flags_to_parse_arr,
+                                g_elevate_or_unelevate_parent_flags_to_preparse_arr) :
+                            ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                                g_elevate_or_unelevate_child_flags,
+                                g_elevate_or_unelevate_child_options,
+                                g_elevate_or_unelevate_child_flags_to_parse_arr,
+                                g_elevate_or_unelevate_child_flags_to_preparse_arr))) >= 0) {
+                            if (!parse_result && parse_error == err_none) {
+                                parse_error = invalid_format_flag(arg);
+                            }
+                            if (parse_error != err_none) {
+                                return parse_error;
+                            }
+                        }
+                        else if (!is_unelevate_child_flags && !tstrcmp(arg, _T("}{"))) {
+                            is_unelevate_child_flags = true;
+                        }
+                        else if (!tstrcmp(arg, _T("}"))) {
+                            break;
+                        }
+                        else return invalid_format_flag(arg);
+
+                        arg_offset += 1;
+                    }
+                }
+                else if (!tstrcmp(arg, _T("/demote{"))) {
+                    arg_offset += 1;
+
+                    is_demote = true;
+
+                    // read inner flags
+                    while (argc >= arg_offset + 1)
+                    {
+                        arg = argv[arg_offset];
+
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            g_promote_or_demote_flags, g_promote_or_demote_options, g_promote_or_demote_flags_to_parse_arr, g_promote_or_demote_flags_to_preparse_arr)) >= 0) {
+                            if (!parse_result && parse_error == err_none) {
+                                parse_error = invalid_format_flag(arg);
+                            }
+                            if (parse_error != err_none) {
+                                return parse_error;
+                            }
+                        }
+                        else if (!tstrcmp(arg, _T("}"))) {
+                            break;
+                        }
+                        else return invalid_format_flag(arg);
+
+                        arg_offset += 1;
+                    }
+                }
+                else if (!tstrcmp(arg, _T("/mote-parent{"))) {
+                    arg_offset += 1;
+
+                    is_demote = true;
+
+                    // read inner flags
+                    while (argc >= arg_offset + 1)
+                    {
+                        arg = argv[arg_offset];
+
+                        if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
+                            g_promote_or_demote_parent_flags, g_promote_or_demote_parent_options, g_promote_or_demote_parent_flags_to_parse_arr, g_promote_or_demote_parent_flags_to_preparse_arr)) >= 0) {
                             if (!parse_result && parse_error == err_none) {
                                 parse_error = invalid_format_flag(arg);
                             }
@@ -3251,17 +3481,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_elevating) {
-                TranslateCommandLineToElevated(nullptr, nullptr, nullptr,
+            if (g_is_process_elevating || g_is_process_unelevating) {
+                TranslateCommandLineToElevatedOrUnelevated(
+                    nullptr, nullptr, nullptr,
                     g_flags, g_options,
-                    g_elevate_child_flags, g_elevate_child_options,
-                    g_promote_flags, g_promote_options);
+                    g_elevate_or_unelevate_child_flags, g_elevate_or_unelevate_child_options,
+                    g_promote_or_demote_flags, g_promote_or_demote_options);
             }
 
             // merge options (second time)
             MergeOptions(g_flags, g_options,
-                g_elevate_parent_flags, g_elevate_parent_options,
-                g_promote_flags, g_promote_options, g_promote_parent_flags, g_promote_parent_options);
+                g_elevate_or_unelevate_parent_flags, g_elevate_or_unelevate_parent_options,
+                g_promote_or_demote_flags, g_promote_or_demote_options,
+                g_promote_or_demote_parent_flags, g_promote_or_demote_parent_options);
 
             // reopen std
 
@@ -3461,60 +3693,62 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             // promote{ ... } vs promote-parent{ ... }
 
-            if (g_promote_flags.pause_on_exit_if_error_before_exec && g_promote_parent_flags.pause_on_exit_if_error_before_exec) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /pause-on-exit-if-error-before-exec\n"));
+            if (g_promote_or_demote_flags.pause_on_exit_if_error_before_exec && g_promote_or_demote_parent_flags.pause_on_exit_if_error_before_exec) {
+                return invalid_format_flag_message(_T("promote/deomote option mixed with promote-parent/demote-parent option: /pause-on-exit-if-error-before-exec\n"));
             }
-            if (g_promote_flags.pause_on_exit_if_error && g_promote_parent_flags.pause_on_exit_if_error) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /pause-on-exit-if-error\n"));
+            if (g_promote_or_demote_flags.pause_on_exit_if_error && g_promote_or_demote_parent_flags.pause_on_exit_if_error) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /pause-on-exit-if-error\n"));
             }
-            if (g_promote_flags.pause_on_exit && g_promote_parent_flags.pause_on_exit) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /pause-on-exit\n"));
-            }
-
-            if (g_promote_flags.skip_pause_on_detached_console && g_promote_parent_flags.skip_pause_on_detached_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /skip-pause-on-detached-console\n"));
+            if (g_promote_or_demote_flags.pause_on_exit && g_promote_or_demote_parent_flags.pause_on_exit) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /pause-on-exit\n"));
             }
 
-            if (g_promote_options.wait_child_first_time_timeout_ms && g_promote_parent_options.wait_child_first_time_timeout_ms) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /wait-child-first-time-timeout\n"));
+            if (g_promote_or_demote_flags.skip_pause_on_detached_console && g_promote_or_demote_parent_flags.skip_pause_on_detached_console) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /skip-pause-on-detached-console\n"));
             }
 
-            //if (g_promote_options.chcp_in != 0 && g_promote_parent_options.chcp_in != 0) {
-            //    return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_in=%i promote-parent.chcp_in=%i\n"), g_promote_options.chcp_in, g_promote_parent_options.chcp_in);
+            if (g_promote_or_demote_options.wait_child_first_time_timeout_ms && g_promote_or_demote_parent_options.wait_child_first_time_timeout_ms) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /wait-child-first-time-timeout\n"));
+            }
+
+            //if (g_promote_or_demote_options.chcp_in != 0 && g_promote_or_demote_parent_options.chcp_in != 0) {
+            //    return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: *mote.chcp_in=%i *mote-parent.chcp_in=%i\n"),
+            //        g_promote_or_demote_options.chcp_in, g_promote_or_demote_parent_options.chcp_in);
             //}
-            //if (g_promote_options.chcp_out != 0 && g_promote_parent_options.chcp_out != 0) {
-            //    return invalid_format_flag_message(_T("promote option mixed with promote-parent option: promote.chcp_out=%i promote-parent.chcp_out=%i\n"), g_promote_options.chcp_out, g_promote_parent_options.chcp_out);
+            //if (g_promote_or_demote_options.chcp_out != 0 && g_promote_or_demote_parent_options.chcp_out != 0) {
+            //    return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: *mote.chcp_out=%i *mote-parent.chcp_out=%i\n"),
+            //        g_promote_or_demote_options.chcp_out, g_promote_or_demote_parent_options.chcp_out);
             //}
-            if (g_promote_flags.attach_parent_console && g_promote_parent_flags.attach_parent_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /attach-parent-console\n"));
+            if (g_promote_or_demote_flags.attach_parent_console && g_promote_or_demote_parent_flags.attach_parent_console) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /attach-parent-console\n"));
             }
 
-            if (g_promote_flags.disable_wow64_fs_redir && g_promote_parent_flags.disable_wow64_fs_redir) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-wow64-fs-redir\n"));
+            if (g_promote_or_demote_flags.disable_wow64_fs_redir && g_promote_or_demote_parent_flags.disable_wow64_fs_redir) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-wow64-fs-redir\n"));
             }
 
             if (g_flags.disable_ctrl_signals && g_flags.disable_ctrl_c_signal) {
                 return invalid_format_flag_message(_T("disable control signal flags is mixed: /disable-ctrl-signals <-> /disable-ctrl-c-signal\n"));
             }
 
-            if (g_promote_flags.disable_ctrl_signals && g_promote_parent_flags.disable_ctrl_signals) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-ctrl-signals\n"));
+            if (g_promote_or_demote_flags.disable_ctrl_signals && g_promote_or_demote_parent_flags.disable_ctrl_signals) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-ctrl-signals\n"));
             }
-            if (g_promote_flags.disable_ctrl_c_signal && g_promote_parent_flags.disable_ctrl_c_signal) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-ctrl-c-signal\n"));
+            if (g_promote_or_demote_flags.disable_ctrl_c_signal && g_promote_or_demote_parent_flags.disable_ctrl_c_signal) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-ctrl-c-signal\n"));
             }
 
-            if (g_promote_flags.allow_gui_autoattach_to_parent_console && g_promote_parent_flags.allow_gui_autoattach_to_parent_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /allow-gui-autoattach-to-parent-console\n"));
+            if (g_promote_or_demote_flags.allow_gui_autoattach_to_parent_console && g_promote_or_demote_parent_flags.allow_gui_autoattach_to_parent_console) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /allow-gui-autoattach-to-parent-console\n"));
             }
-            if (g_promote_flags.disable_conout_reattach_to_visible_console && g_promote_parent_flags.disable_conout_reattach_to_visible_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-conout-reattach-to-visible-console\n"));
+            if (g_promote_or_demote_flags.disable_conout_reattach_to_visible_console && g_promote_or_demote_parent_flags.disable_conout_reattach_to_visible_console) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-conout-reattach-to-visible-console\n"));
             }
-            if (g_promote_flags.allow_conout_attach_to_invisible_parent_console && g_promote_parent_flags.allow_conout_attach_to_invisible_parent_console) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /allow-conout-attach-to-invisible-parent-console\n"));
+            if (g_promote_or_demote_flags.allow_conout_attach_to_invisible_parent_console && g_promote_or_demote_parent_flags.allow_conout_attach_to_invisible_parent_console) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /allow-conout-attach-to-invisible-parent-console\n"));
             }
-            if (g_promote_flags.disable_conout_duplicate_to_parent_console_on_error && g_promote_parent_flags.disable_conout_duplicate_to_parent_console_on_error) {
-                return invalid_format_flag_message(_T("promote option mixed with promote-parent option: /disable-conout-duplicate-to-parent-console-on-error\n"));
+            if (g_promote_or_demote_flags.disable_conout_duplicate_to_parent_console_on_error && g_promote_or_demote_parent_flags.disable_conout_duplicate_to_parent_console_on_error) {
+                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-conout-duplicate-to-parent-console-on-error\n"));
             }
 
             // /write-console-stdin-back vs /pipe-*
@@ -3912,27 +4146,30 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_elevating) {
+            if (g_is_process_elevating || g_is_process_unelevating) {
                 std::tstring elevated_cmd_out_str;
 
-                TranslateCommandLineToElevated(
+                TranslateCommandLineToElevatedOrUnelevated(
                     in_args.app_fmt_str ? utility::addressof(out_args.app_fmt_str) : nullptr,
                     in_args.cmd_fmt_str ? utility::addressof(out_args.cmd_fmt_str) : nullptr,
                     utility::addressof(elevated_cmd_out_str),
                     g_flags, g_options,
-                    g_elevate_child_flags, g_elevate_child_options,
-                    g_promote_flags, g_promote_options);
+                    g_elevate_or_unelevate_child_flags, g_elevate_or_unelevate_child_options,
+                    g_promote_or_demote_flags, g_promote_or_demote_options);
 
                 // merge options (third time)
                 MergeOptions(g_flags, g_options,
-                    g_elevate_parent_flags, g_elevate_parent_options,
-                    g_promote_flags, g_promote_options, g_promote_parent_flags, g_promote_parent_options);
+                    g_elevate_or_unelevate_parent_flags, g_elevate_or_unelevate_parent_options,
+                    g_promote_or_demote_flags, g_promote_or_demote_options,
+                    g_promote_or_demote_parent_flags, g_promote_or_demote_parent_options);
 
                 SubstOptionsPlaceholders(g_options);
 
                 // update options
-                if (g_options.shell_exec_verb != _T("runas")) {
-                    g_options.shell_exec_verb = _T("runas");
+                if (g_is_process_elevating) {
+                    if (g_options.shell_exec_verb != _T("runas")) {
+                        g_options.shell_exec_verb = _T("runas");
+                    }
                 }
 
                 const LPCTSTR app = program_file_name ? program_file_name : (LPCTSTR)NULL;
@@ -3948,8 +4185,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             // merge options (third time)
             MergeOptions(g_flags, g_options,
-                g_elevate_parent_flags, g_elevate_parent_options,
-                g_promote_flags, g_promote_options, g_promote_parent_flags, g_promote_parent_options);
+                g_elevate_or_unelevate_parent_flags, g_elevate_or_unelevate_parent_options,
+                g_promote_or_demote_flags, g_promote_or_demote_options,
+                g_promote_or_demote_parent_flags, g_promote_or_demote_parent_options);
 
             SubstOptionsPlaceholders(g_options);
 

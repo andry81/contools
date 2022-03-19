@@ -47,6 +47,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Header Files", "Header Files", "{2909C0F5-E8D4-4975-A49C-2B246EE0DE17}"
 	ProjectSection(SolutionItems) = preProject
 		..\Utilities\src\_common\common.hpp = ..\Utilities\src\_common\common.hpp
+		..\Utilities\src\_common\elevation.hpp = ..\Utilities\src\_common\elevation.hpp
 		..\Utilities\src\_common\printf.hpp = ..\Utilities\src\_common\printf.hpp
 	EndProjectSection
 EndProject
@@ -77,6 +78,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "retakeowner", "..\Utilities\Projects\retakeowner.vcxproj", "{E17B910A-9CF1-4739-B4F0-D10034CA11FE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "thlibautocfg", "..\Utilities\Projects\thlibautocfg.vcxproj", "{6163FDF1-845E-4C24-8A88-B99DC955CA2D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nt", "nt", "{10338F80-0138-4ADE-A891-091A17DC35A8}"
+	ProjectSection(SolutionItems) = preProject
+		..\Utilities\src\_common\nt\ntifs.h = ..\Utilities\src\_common\nt\ntifs.h
+		..\Utilities\src\_common\nt\ntseapi.h = ..\Utilities\src\_common\nt\ntseapi.h
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -210,6 +217,7 @@ Global
 		{C75114FC-8991-4739-8CF6-ADFBAA2BA818} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{E17B910A-9CF1-4739-B4F0-D10034CA11FE} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{6163FDF1-845E-4C24-8A88-B99DC955CA2D} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
+		{10338F80-0138-4ADE-A891-091A17DC35A8} = {2909C0F5-E8D4-4975-A49C-2B246EE0DE17}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}

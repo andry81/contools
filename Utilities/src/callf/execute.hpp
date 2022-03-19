@@ -4,6 +4,7 @@
 #define __EXECUTE_HPP__
 
 #include "callf.hpp"
+#include "elevation.hpp"
 
 #include <deque>
 #include <tuple>
@@ -57,6 +58,7 @@ struct Flags
     bool            write_console_stdin_back;
 
     bool            elevate;
+    bool            unelevate;
 
     bool            use_stdin_as_piped_from_conin;  // close stdin and conin on exit
 
@@ -453,17 +455,17 @@ struct WriteOutputWatchThreadLocals : BasicThreadLocals<WriteOutputWatchThreadDa
 
 extern Flags g_flags;
 extern Flags g_regular_flags;
-extern Flags g_elevate_parent_flags;
-extern Flags g_elevate_child_flags;
-extern Flags g_promote_flags;
-extern Flags g_promote_parent_flags;
+extern Flags g_elevate_or_unelevate_parent_flags;
+extern Flags g_elevate_or_unelevate_child_flags;
+extern Flags g_promote_or_demote_flags;
+extern Flags g_promote_or_demote_parent_flags;
 
 extern Options g_options;
 extern Options g_regular_options;
-extern Options g_elevate_parent_options;
-extern Options g_elevate_child_options;
-extern Options g_promote_options;
-extern Options g_promote_parent_options;
+extern Options g_elevate_or_unelevate_parent_options;
+extern Options g_elevate_or_unelevate_child_options;
+extern Options g_promote_or_demote_options;
+extern Options g_promote_or_demote_parent_options;
 
 extern DWORD  g_parent_proc_id;
 extern HWND   g_inherited_console_window;
@@ -511,10 +513,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len);
 std::tstring SubstNamePlaceholders(std::tstring str);
 void SubstOptionsPlaceholders(Options & options);
 
-void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std::tstring * cmd_str_ptr, std::tstring * cmd_out_str_ptr,
-                                    Flags & regular_flags, Options & regular_options,
-                                    const Flags & elevate_child_flags, const Options & elevate_child_options,
-                                    const Flags & promote_child_flags, const Options & promote_child_options);
+void TranslateCommandLineToElevatedOrUnelevated(
+    const std::tstring * app_str_ptr, const std::tstring * cmd_str_ptr, std::tstring * cmd_out_str_ptr,
+    Flags & regular_flags, Options & regular_options,
+    const Flags & elevate_or_unelevate_child_flags, const Options & elevate_or_unelevate_child_options,
+    const Flags & promote_or_demote_child_flags, const Options & promote_or_demote_child_options);
 
 
 inline void WorkerThreadsReturnDatas::lock() const

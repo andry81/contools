@@ -25,24 +25,24 @@ enum TranslationMode {
         option = options.option; \
     } \
 
-Flags g_flags                       = {};
-Flags g_regular_flags               = {};
-Flags g_elevate_parent_flags        = {};
-Flags g_elevate_child_flags         = {};
-Flags g_promote_flags               = {};
-Flags g_promote_parent_flags        = {};
+Flags g_flags                                   = {};
+Flags g_regular_flags                           = {};
+Flags g_elevate_or_unelevate_parent_flags       = {};
+Flags g_elevate_or_unelevate_child_flags        = {};
+Flags g_promote_or_demote_flags                 = {};
+Flags g_promote_or_demote_parent_flags          = {};
 
-Options g_options                   = {};
-Options g_regular_options           = {};
-Options g_elevate_parent_options    = {};
-Options g_elevate_child_options     = {};
-Options g_promote_options           = {};
-Options g_promote_parent_options    = {};
+Options g_options                               = {};
+Options g_regular_options                       = {};
+Options g_elevate_or_unelevate_parent_options   = {};
+Options g_elevate_or_unelevate_child_options    = {};
+Options g_promote_or_demote_options             = {};
+Options g_promote_or_demote_parent_options      = {};
 
-DWORD g_parent_proc_id              = -1;
-HWND  g_inherited_console_window    = NULL; // may be inherited or owned or NULL
-HWND  g_owned_console_window        = NULL; // owned or NULL
-bool  g_is_console_window_owner_proc_searched = false; // true if `_find_console_window_owner_procs` called as least once
+DWORD g_parent_proc_id                          = -1;
+HWND  g_inherited_console_window                = NULL; // may be inherited or owned or NULL
+HWND  g_owned_console_window                    = NULL; // owned or NULL
+bool  g_is_console_window_owner_proc_searched   = false; // true if `_find_console_window_owner_procs` called as least once
 
 // saved before detach std handles and states
 StdHandles g_detached_std_handles;
@@ -50,76 +50,76 @@ StdHandlesState g_detached_std_handles_state;
 
 StdHandles g_std_handles;
 
-HANDLE g_stdout_handle_dup          = INVALID_HANDLE_VALUE;
-HANDLE g_stderr_handle_dup          = INVALID_HANDLE_VALUE;
+HANDLE g_stdout_handle_dup                      = INVALID_HANDLE_VALUE;
+HANDLE g_stderr_handle_dup                      = INVALID_HANDLE_VALUE;
 
-DWORD g_stdin_handle_type           = FILE_TYPE_UNKNOWN;
-DWORD g_stdout_handle_type          = FILE_TYPE_UNKNOWN;
-DWORD g_stderr_handle_type          = FILE_TYPE_UNKNOWN;
+DWORD g_stdin_handle_type                       = FILE_TYPE_UNKNOWN;
+DWORD g_stdout_handle_type                      = FILE_TYPE_UNKNOWN;
+DWORD g_stderr_handle_type                      = FILE_TYPE_UNKNOWN;
 
-bool g_stdin_handle_inherit         = true;
-bool g_stdout_handle_inherit        = true;
-bool g_stderr_handle_inherit        = true;
+bool g_stdin_handle_inherit                     = true;
+bool g_stdout_handle_inherit                    = true;
+bool g_stderr_handle_inherit                    = true;
 
 StdHandles g_reopen_std_handles;
 
-HANDLE g_reopen_stdout_mutex        = INVALID_HANDLE_VALUE;
-HANDLE g_reopen_stderr_mutex        = INVALID_HANDLE_VALUE;
+HANDLE g_reopen_stdout_mutex                    = INVALID_HANDLE_VALUE;
+HANDLE g_reopen_stderr_mutex                    = INVALID_HANDLE_VALUE;
 
-_FileId g_reopen_stdout_fileid      = {};
-_FileId g_reopen_stderr_fileid      = {};
+_FileId g_reopen_stdout_fileid                  = {};
+_FileId g_reopen_stderr_fileid                  = {};
 
 // specialized tee file handles
 StdHandles g_tee_file_std_handles;
 
-HANDLE g_tee_file_stdin_mutex       = INVALID_HANDLE_VALUE;
-HANDLE g_tee_file_stdout_mutex      = INVALID_HANDLE_VALUE;
-HANDLE g_tee_file_stderr_mutex      = INVALID_HANDLE_VALUE;
+HANDLE g_tee_file_stdin_mutex                   = INVALID_HANDLE_VALUE;
+HANDLE g_tee_file_stdout_mutex                  = INVALID_HANDLE_VALUE;
+HANDLE g_tee_file_stderr_mutex                  = INVALID_HANDLE_VALUE;
 
-_FileId g_tee_file_stdin_fileid     = {};
-_FileId g_tee_file_stdout_fileid    = {};
-_FileId g_tee_file_stderr_fileid    = {};
+_FileId g_tee_file_stdin_fileid                 = {};
+_FileId g_tee_file_stdout_fileid                = {};
+_FileId g_tee_file_stderr_fileid                = {};
 
 // specialized tee named pipe handles
 StdHandles g_tee_named_pipe_std_handles;
 
-bool g_is_stdin_reopened            = false;
-bool g_is_stdout_reopened           = false;
-bool g_is_stderr_reopened           = false;
+bool g_is_stdin_reopened                        = false;
+bool g_is_stdout_reopened                       = false;
+bool g_is_stderr_reopened                       = false;
 
-bool g_is_child_stdin_char_type     = false;    // is child process inherited stdin as character device
+bool g_is_child_stdin_char_type                 = false;    // is child process inherited stdin as character device
 
-bool g_is_stdin_redirected          = false;
-bool g_is_stdout_redirected         = false;
-bool g_is_stderr_redirected         = false;
+bool g_is_stdin_redirected                      = false;
+bool g_is_stdout_redirected                     = false;
+bool g_is_stderr_redirected                     = false;
 
-bool g_no_std_inherit               = false;    // stdin + stdout + stderr
-bool g_no_stdin_inherit             = false;    // stdin
-bool g_no_stdout_inherit            = false;    // stdout
-bool g_no_stderr_inherit            = false;    // stderr
+bool g_no_std_inherit                           = false;    // stdin + stdout + stderr
+bool g_no_stdin_inherit                         = false;    // stdin
+bool g_no_stdout_inherit                        = false;    // stdout
+bool g_no_stderr_inherit                        = false;    // stderr
 
-bool g_stdout_vt100                 = false;
-bool g_stderr_vt100                 = false;
+bool g_stdout_vt100                             = false;
+bool g_stderr_vt100                             = false;
 
-bool g_pipe_stdin_to_child_stdin    = false;
-bool g_pipe_child_stdout_to_stdout  = false;
-bool g_pipe_child_stderr_to_stderr  = false;
-//bool g_pipe_inout_child             = false;
-//bool g_pipe_out_child               = false;
-bool g_pipe_stdin_to_stdout         = false;
+bool g_pipe_stdin_to_child_stdin                = false;
+bool g_pipe_child_stdout_to_stdout              = false;
+bool g_pipe_child_stderr_to_stderr              = false;
+//bool g_pipe_inout_child                         = false;
+//bool g_pipe_out_child                           = false;
+bool g_pipe_stdin_to_stdout                     = false;
 
-bool g_tee_stdout_dup_stdin         = false;
-bool g_tee_stderr_dup_stdin         = false;
+bool g_tee_stdout_dup_stdin                     = false;
+bool g_tee_stderr_dup_stdin                     = false;
 
-bool g_has_tee_stdin                = false;
-bool g_has_tee_stdout               = false;
-bool g_has_tee_stderr               = false;
+bool g_has_tee_stdin                            = false;
+bool g_has_tee_stdout                           = false;
+bool g_has_tee_stderr                           = false;
 
-bool g_enable_child_ctrl_handler    = false;
-std::atomic_bool g_ctrl_handler     = false;
+bool g_enable_child_ctrl_handler                = false;
+std::atomic_bool g_ctrl_handler                 = false;
 
 // console attach/alloc/detach together with console handle close synchronization
-HANDLE g_console_access_mutex       = INVALID_HANDLE_VALUE;
+HANDLE g_console_access_mutex                   = INVALID_HANDLE_VALUE;
 
 // prevents early `ReadConsole` worker thread execution to avoid console access in worker threads before detach by `/detach-inherited-console-on-wait`
 HANDLE g_console_access_ready_thread_lock_event = INVALID_HANDLE_VALUE;
@@ -127,8 +127,8 @@ HANDLE g_console_access_ready_thread_lock_event = INVALID_HANDLE_VALUE;
 StdHandles g_pipe_read_std_handles;
 StdHandles g_pipe_write_std_handles;
 
-HANDLE g_child_process_handle       = INVALID_HANDLE_VALUE;
-DWORD g_child_process_group_id      = -1; // to pass signals into child process
+HANDLE g_child_process_handle                   = INVALID_HANDLE_VALUE;
+DWORD g_child_process_group_id                  = -1; // to pass signals into child process
 
 StreamPipeThreadLocals              g_stream_pipe_thread_locals[3];
 StreamPipeThreadLocals              g_stdin_to_stdout_thread_locals;
@@ -167,6 +167,7 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, write_console_stdin_back);
 
     MERGE_FLAG(flags, elevate);
+    MERGE_FLAG(flags, unelevate);
 
     MERGE_FLAG(flags, use_stdin_as_piped_from_conin);
 
@@ -4663,6 +4664,9 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     // update child show state
     si.wShowWindow = g_options.show_as;
 
+    //HANDLE this_process_handle = INVALID_HANDLE_VALUE;
+    //HANDLE this_process_limited_token = INVALID_HANDLE_VALUE;
+
     bool is_console_access_ready_thread_lock_event_signaled = false;
     bool break_ = false;
 
@@ -5708,11 +5712,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
 
             if_break (app && app_len) {
-                if (g_enable_child_ctrl_handler) {
-                    g_ctrl_handler = true;
-                    SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
-                }
-
                 if (g_options.shell_exec_verb.empty()) {
 #ifdef _DEBUG
                     _print_raw_message_impl(0, STDOUT_FILENO, "---\n");
@@ -5733,35 +5732,81 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         g_is_child_stdin_char_type = true;
                     }
 
+                    //if (g_is_process_unelevating) {
+                    //    if (OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &this_process_handle)) {
+                    //        if (CreateRestrictedToken(this_process_handle, LUA_TOKEN, 0, 0, 0, 0, 0, 0, &this_process_limited_token)) {
+                    //            TOKEN_ELEVATION_TYPE token_elevation_type{ TokenElevationTypeLimited };
+                    //            SetTokenInformation(this_process_limited_token, TokenElevationType, &token_elevation_type, sizeof(token_elevation_type));
+                    //        }
+                    //    }
+                    //}
+
                     if (cmd && cmd_len) {
                         // CAUTION:
                         //  cmd argument must be writable!
                         //
                         cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
                         memcpy(cmd_buf.data(), cmd, cmd_buf.size());
+                    }
 
-                        SetLastError(0); // just in case
-                        ret_create_proc = CreateProcess(app, (TCHAR *)cmd_buf.data(), NULL, NULL,
-                            TRUE, // must be always TRUE because there can be any arbitrary handle
-                            (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
+                    if (g_enable_child_ctrl_handler) {
+                        g_ctrl_handler = true;
+                        SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                    }
+
+                    if (cmd && cmd_len) {
+                        if (!g_is_process_unelevating) {
+                            SetLastError(0); // just in case
+                            ret_create_proc = CreateProcess(
+                                app, (TCHAR *)cmd_buf.data(),
+                                NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
+                                (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
                                 (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
                                 (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
-                            NULL,
-                            !current_dir.empty() ? current_dir.c_str() : NULL,
-                            &si, &pi);
+                                NULL,
+                                !current_dir.empty() ? current_dir.c_str() : NULL,
+                                &si, &pi);
+                        }
+                        else {
+                            SetLastError(0); // just in case
+                            ret_create_proc = CreateProcessNonElevated(
+                                app, (TCHAR *)cmd_buf.data(),
+                                NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
+                                (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
+                                (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
+                                (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
+                                NULL,
+                                !current_dir.empty() ? current_dir.c_str() : NULL,
+                                &si, &pi);
+                        }
 
                         win_error = GetLastError();
                     }
                     else {
-                        SetLastError(0); // just in case
-                        ret_create_proc = CreateProcess(app, NULL, NULL, NULL,
-                            TRUE, // must be always TRUE because there can be any arbitrary handle
-                            (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
+                        if (!g_is_process_unelevating) {
+                            SetLastError(0); // just in case
+                            ret_create_proc = CreateProcess(
+                                app, NULL,
+                                NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
+                                (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
                                 (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
                                 (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
-                            NULL,
-                            !current_dir.empty() ? current_dir.c_str() : NULL,
-                            &si, &pi);
+                                NULL,
+                                !current_dir.empty() ? current_dir.c_str() : NULL,
+                                &si, &pi);
+                        }
+                        else {
+                            SetLastError(0); // just in case
+                            ret_create_proc = CreateProcessNonElevated(
+                                app, NULL,
+                                NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
+                                (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
+                                (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
+                                (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
+                                NULL,
+                                !current_dir.empty() ? current_dir.c_str() : NULL,
+                                &si, &pi);
+                        }
 
                         win_error = GetLastError();
                     }
@@ -5814,6 +5859,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
                     }
 
+                    if (g_enable_child_ctrl_handler) {
+                        g_ctrl_handler = true;
+                        SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                    }
+
                     SetLastError(0); // just in case
                     ret_create_proc = ::ShellExecuteEx(&sei);
 
@@ -5847,23 +5897,50 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     g_is_child_stdin_char_type = true;
                 }
 
+                //if (g_is_process_unelevating) {
+                //    if (OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &this_process_handle)) {
+                //        if (CreateRestrictedToken(this_process_handle, LUA_TOKEN, 0, 0, 0, 0, 0, 0, &this_process_limited_token)) {
+                //            TOKEN_ELEVATION_TYPE token_elevation_type{ TokenElevationTypeLimited };
+                //            SetTokenInformation(this_process_limited_token, TokenElevationType, &token_elevation_type, sizeof(token_elevation_type));
+                //        }
+                //    }
+                //}
+
+                // CAUTION:
+                //  cmd argument must be writable!
+                //
+                cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
+                memcpy(cmd_buf.data(), cmd, cmd_buf.size());
+
                 if (g_enable_child_ctrl_handler) {
                     g_ctrl_handler = true;
                     SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
                 }
 
-                cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
-                memcpy(cmd_buf.data(), cmd, cmd_buf.size());
-
-                SetLastError(0); // just in case
-                ret_create_proc = CreateProcess(NULL, (TCHAR *)cmd_buf.data(), NULL, NULL,
-                    TRUE, // must be always TRUE because there can be any arbitrary handle
-                    (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
+                if (!g_is_process_unelevating) {
+                    SetLastError(0); // just in case
+                    ret_create_proc = CreateProcess(
+                        NULL, (TCHAR *)cmd_buf.data(),
+                        NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
+                        (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
                         (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
                         (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
-                    NULL,
-                    !current_dir.empty() ? current_dir.c_str() : NULL,
-                    &si, &pi);
+                        NULL,
+                        !current_dir.empty() ? current_dir.c_str() : NULL,
+                        &si, &pi);
+                }
+                else {
+                    SetLastError(0); // just in case
+                    ret_create_proc = CreateProcessNonElevated(
+                        NULL, (TCHAR *)cmd_buf.data(),
+                        NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
+                        (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
+                        (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
+                        (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
+                        NULL,
+                        !current_dir.empty() ? current_dir.c_str() : NULL,
+                        &si, &pi);
+                }
 
                 win_error = GetLastError();
             }
@@ -6174,6 +6251,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
             // not shared resources
 
+            //// close process tokens
+            //_close_handle(this_process_limited_token);
+            //_close_handle(this_process_handle);
+
             // close reopened standard handles
             _close_handle(g_reopen_std_handles.stdin_handle);
             _close_handle(g_reopen_std_handles.stdout_handle);
@@ -6349,10 +6430,11 @@ void SubstOptionsPlaceholders(Options & options)
     }
 }
 
-void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std::tstring * cmd_str_ptr, std::tstring * cmd_out_str_ptr,
-                                    Flags & regular_flags, Options & regular_options,
-                                    const Flags & elevate_child_flags, const Options & elevate_child_options,
-                                    const Flags & promote_child_flags, const Options & promote_child_options)
+void TranslateCommandLineToElevatedOrUnelevated(
+    const std::tstring * app_str_ptr, const std::tstring * cmd_str_ptr, std::tstring * cmd_out_str_ptr,
+    Flags & regular_flags, Options & regular_options,
+    const Flags & elevate_or_unelevate_child_flags, const Options & elevate_or_unelevate_child_options,
+    const Flags & promote_or_demote_child_flags, const Options & promote_or_demote_child_options)
 {
     std::tstring options_line;
     std::tstring cmd_line;
@@ -6379,12 +6461,12 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
     Options child_options = regular_options;
 
     if (g_is_process_elevating) { // just in case
-        child_flags.merge(elevate_child_flags);
-        child_options.merge(elevate_child_options);
+        child_flags.merge(elevate_or_unelevate_child_flags);
+        child_options.merge(elevate_or_unelevate_child_options);
     }
 
-    child_flags.merge(promote_child_flags);
-    child_options.merge(promote_child_options);
+    child_flags.merge(promote_or_demote_child_flags);
+    child_options.merge(promote_or_demote_child_options);
 
     // NOTE:
     //  Always apply language features for both processes.
@@ -6427,7 +6509,7 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
             options_line += _T("/ret-child-exit ");
         }
     }
-    regular_flags.ret_child_exit = true; // always return elevated child exit code
+    regular_flags.ret_child_exit = true; // always return elevated/unelevated child exit code
 
     if (child_flags.print_win_error_string) {
         if (cmd_out_str_ptr) {
@@ -6647,6 +6729,7 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
     regular_options.wait_child_first_time_timeout_ms = 0; // always reset
 
     //child_flags.elevate
+    //child_flags.unelevate
 
     if (child_options.show_as != SW_SHOWNORMAL) {
         if (cmd_out_str_ptr) {
@@ -7383,7 +7466,7 @@ void TranslateCommandLineToElevated(const std::tstring * app_str_ptr, const std:
     }
     regular_flags.mutex_tee_file_writes = false; // always reset
 
-    // leave generic console flags and options as is, to manipulate elevated process console you should use the `/elevate{ ... }` option
+    // leave generic console flags and options as is, to manipulate elevated/unelevated process console you should use the `/elevate{ ... }` or `/unelevate{ ... }` option
 
     if (child_flags.create_child_console) {
         if (cmd_out_str_ptr) {

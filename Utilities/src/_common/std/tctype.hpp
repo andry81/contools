@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __STD_TCTYPE_HPP__
 #define __STD_TCTYPE_HPP__
 

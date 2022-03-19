@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __STD_TSTDLIB_HPP__
 #define __STD_TSTDLIB_HPP__
 

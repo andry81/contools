@@ -363,13 +363,16 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /elevate
       /elevate{ <ParentFlags> }[{ <ChildFlags> }]
-        Self elevate process upto Administrator privileges.
-        If this-process has no Administrator privileges, then does use
+        Self elevate process upto elevated privileges.
+        If this-process has no elevated privileges, then does use
         ShellExecute with elevation to start new this-process with the same
         command line but different options and flags before run a child
-        process. If this-process already has Administrator privileges, then
-        has no effect.
+        process.
+        If this-process already has elevated privileges, then has no effect.
         Silently overrides the same regular flags.
+
+        Can not be used together with `/unelevate*`, `/demote*` options and
+        flags.
 
         <ParentFlags>:
           Limited set of flags to pass exceptionally into the this-parent
@@ -427,6 +430,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         The same flag can not be used together with `/promote-parent{ ... }`
         option. Silently overrides the same regular flags.
 
+        Can not be used together with `/unelevate*`, `/demote*` options and
+        flags.
+
         <Flags>:
           /ret-create-proc
           /ret-win-error
@@ -460,6 +466,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         The same flag can not be used together with `/promote{ ... }`
         option. Silently overrides the same regular flags.
+
+        Can not be used together with `/unelevate*`, `/demote*` options and
+        flags.
 
         <Flags>:
           /ret-create-proc
@@ -496,6 +505,53 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /allow-conout-attach-to-invisible-parent-console
           /disable-conout-duplicate-to-parent-console-on-error
           /write-console-stdin-back
+
+      /unelevate
+      /unelevate{ <ParentFlags> }[{ <ChildFlags> }]
+        Self unelevate process downfrom elevated privileges account to an
+        unelevated original user account.
+        If this-process has elevated privileges, then does search for an
+        original user process token to adjust it to an unelevated process
+        token to use it in a call to CreateProcessWithToken to start new
+        this-process with the same command line but different options and
+        flags before run a child process.
+        If this-process already has no elevated privileges, then has no
+        effect.
+
+        Can not be used together with `/elevate*`, `/promote*` options and
+        flags.
+
+        All the rest options has the same meaning as for `/elevate*` option.
+
+      /demote{ <Flags> }
+        In case if `/unelevate*` flag or option is used and executed, then
+        does declare `<Flags>` for both the this-parent (elevated) process and
+        the this-child (unelevated) process.
+        In case if `/unelevate*` flag or option is not used or is not
+        executed, then does declare `<Flags>` for the this-process only.
+
+        The same flag can not be used together with `/deomote-parent{ ... }`
+        option. Silently overrides the same regular flags.
+
+        Can not be used together with `/elevate*` and `/promote*` options and
+        flags.
+
+        All the rest options has the same meaning as for `/promote{ ... }`
+        option.
+
+      /demote-parent{ <Flags> }
+        Does declare `<Flags>` for the this-parent or this-process only
+        independently to `/unelevate*` flag or option. The same as
+        `/demote{ ... }` option but does not affect child this-process.
+
+        The same flag can not be used together with `/demote{ ... }`
+        option. Silently overrides the same regular flags.
+
+        Can not be used together with `/elevate*`, `/promote*` options and
+        flags.
+
+        All the rest options has the same meaning as for
+        `/promote-parent{ ... }` option.
 
       /showas <ShowWindowAsNumber>
         Handles a child process window show state.
@@ -695,8 +751,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /create-outbound-server-pipe-from-stdin <pipe>
         Create outbound server named pipe `<pipe>` instead of anonymous as by
         default to write into a child process stdin from this-process stdin.
-        Useful to write stream to elevated this-child process or a child
-        elevated process.
+        Useful to write stream to (un)elevated this-child process or a child
+        (un)elevated process.
 
       /create-outbound-server-pipe-from-stdin-connect-timeout <timeout>
         Timeout in milliseconds to wait for an inbound client named pipe
@@ -715,8 +771,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Create inbound server named pipe `<pipe>` instead of anonymous as by
         default to read from a child process stdout/stderr to write into
         this-process stdout/stderr.
-        Useful to read stream from elevated this-child process or a child
-        elevated process.
+        Useful to read stream from (un)elevated this-child process or a child
+        (un)elevated process.
 
       /create-inbound-server-pipe-to-std[out|err]-connect-timeout <timeout>
         Timeout in milliseconds to wait for an outbound client named pipe
@@ -1106,12 +1162,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       operations over it has no effect.
 
     Elevation:
-      If one of `/elevate*` flags are used, then most of regular flags does
-      pass into child process command line. To use a flag for the parent
-      process or specifically for the elevation execution or irrelatively to
-      the elevation execution you must use a nested version of regular flags
-      and options inside these options:
-        `/elevate{ ... }{ ... }`, `/promote{ ... }`, `/promote-parent{ ... }`
+      If one of `/elevate*` or `/unelevate*` flags are used, then most of
+      regular flags does pass into child process command line. To use a flag
+      for the parent process or specifically for the elevation execution or
+      irrelatively to the elevation execution you must use a nested version of
+      regular flags and options inside these options:
+        `/elevate{ ... }{ ... }`, `/promote{ ... }`, `/promote-parent{ ... }`,
+        `/unelevate{ ... }{ ... }`, `/demote{ ... }`, `/demote-parent{ ... }`
 
     Pipe name placeholders:
       {pid}     - this-process identifier as decimal number
@@ -1223,7 +1280,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     to the child process `callf.exe` which prints to the existing (parent)
     console.
 
-  Examples (CreateProcess/ShellExecute, elevation with redirection from/to named pipes):
+  Examples (CreateProcess/ShellExecute, elevation with redirection from/to
+            named pipes):
     1. callf.exe /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } .
     2. callf.exe /promote-parent{ /reopen-stdin 0.in } /elevate{ /no-window /create-outbound-server-pipe-from-stdin test0_{pid} /create-inbound-server-pipe-to-stdout test1_{pid} }{ /attach-parent-console /reopen-stdin-as-client-pipe test0_{ppid} /reopen-stdout-as-client-pipe test1_{ppid} } "" "cmd.exe /k"
 
@@ -1242,7 +1300,23 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     been already elevated, then just writes content of `0.in` file to the
     `cmd.exe /k` process input.
 
-  Examples (CreateProcess, stdin+stdout+stderr redirection into single file within interactive input to console):
+  Examples (CreateProcessWithToken, elevation by search an original user
+            account process token):
+    1. call.exe /elevate "" "callf.exe /unelevate \"\" \"cmd.exe /k"
+    2. call.exe /unelevate "" "callf.exe /elevate \"\" \"cmd.exe /k"
+
+    Example #1 tries to create an elevated child this-process if this-process
+    is not elevated, otherwise just executes the command line. The command
+    line does create a not elevated child this-process and then creates the
+    `cmd.exe /k` process.
+
+    Example #2 tries to create a not elevated child this-process if
+    this-process is elevated, otherwise just executes the command line. The
+    command line does create an elevated child this-process and then creates
+    the `cmd.exe /k` process.
+
+  Examples (CreateProcess, stdin+stdout+stderr redirection into single file
+            within interactive input to console):
     1. callf.exe /tee-stdin inout.log /pipe-stdin-to-child-stdin /tee-conout-dup "${COMSPEC}" "/k"
     2. callf.exe /tee-stdin inout.log /write-console-stdin-back /tee-conout-dup "${COMSPEC}" "/k"
 

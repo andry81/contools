@@ -1,3 +1,15 @@
+2022.03.19:
+* new: Utilities/src/callf: `unelevate*` options opposite to `/elevate*` options to execute command line from unelevated original account
+* refactor: Utilities/src/callf: code refactor
+
+2022.03.17:
+* fixed: Scripts/Tools/ToolAdaptors/app/github: execution fixup
+* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_auth_user_repos_list.bat` authenticated user repos list backup script
+* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_repo_forks_list.bat` repos forks list backup script
+* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_repo_releases_list.bat` repos releases list backup script
+* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_repo_subscribers_list.bat` repos subscribers list backup script
+* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_starred_repos_list.bat` starred repos list backup script
+
 2022.03.17:
 * new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_org_repos_list.bat` org repos list backup script
 

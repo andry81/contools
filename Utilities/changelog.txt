@@ -1,3 +1,7 @@
+2022.03.19:
+* new: src/callf: `unelevate*` options opposite to `/elevate*` options to execute command line from unelevated original account
+* refactor: src/callf: code refactor
+
 2022.02.27:
 * changed: bin/contools/TODO.txt: todo update
 

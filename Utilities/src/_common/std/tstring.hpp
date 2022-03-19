@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __STD_TSTRING_HPP__
 #define __STD_TSTRING_HPP__
 

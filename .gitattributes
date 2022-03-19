@@ -740,7 +740,10 @@ Utilities/src/_common/compatible_iterator/README_EN.txt -text
 Utilities/src/_common/compatible_iterator/changes.txt -text
 Utilities/src/_common/compatible_iterator/compatible_iterator.hpp -text
 Utilities/src/_common/compatible_iterator/test.cpp -text
+Utilities/src/_common/elevation.hpp -text
 Utilities/src/_common/gui/wxFileDialog.hpp -text
+Utilities/src/_common/nt/ntifs.h -text
+Utilities/src/_common/nt/ntseapi.h -text
 Utilities/src/_common/printf.hpp -text
 Utilities/src/_common/std/tctype.hpp -text
 Utilities/src/_common/std/tstdio.hpp -text

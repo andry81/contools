@@ -18,13 +18,13 @@ namespace utility
     //
 
     template <std::size_t I = 0, typename Functor, typename... Args>
-    typename std::enable_if<I == sizeof...(Args), void>::type
+    inline typename std::enable_if<I == sizeof...(Args), void>::type
         for_each(std::tuple<Args...> &, Functor &&)
     {
     }
 
     template<std::size_t I = 0, typename Functor, typename... Args>
-    typename std::enable_if<I < sizeof...(Args), void>::type
+    inline typename std::enable_if<I < sizeof...(Args), void>::type
         for_each(std::tuple<Args...> & t, Functor && f)
     {
         f(std::get<I>(t));
@@ -144,19 +144,19 @@ namespace utility
     }
 
     template <std::size_t I = 0, typename Functor, typename T, std::size_t N>
-    typename std::enable_if<I == N, void>::type
+    inline typename std::enable_if<I == N, void>::type
         for_each_unroll(T (& arr)[N], Functor && f)
     {
     }
 
     template <std::size_t I = 0, typename Functor, typename T, std::size_t N>
-    typename std::enable_if<I == N, void>::type
+    inline typename std::enable_if<I == N, void>::type
         for_each_unroll(T (&& arr)[N], Functor && f)
     {
     }
 
     template <std::size_t I = 0, typename Functor, typename T, std::size_t N>
-    typename std::enable_if<I < N, void>::type
+    inline typename std::enable_if<I < N, void>::type
         for_each_unroll(T (& arr)[N], Functor && f)
     {
         detail::_for_each_unroll<std::is_array<T>::value> nested_for_each{ nullptr, arr[I], std::forward<Functor>(f) };
@@ -166,7 +166,7 @@ namespace utility
     }
 
     template <std::size_t I = 0, typename Functor, typename T, std::size_t N>
-    typename std::enable_if<I < N, void>::type
+    inline typename std::enable_if<I < N, void>::type
         for_each_unroll(T (&& arr)[N], Functor && f)
     {
         detail::_for_each_unroll<std::is_array<T>::value> nested_for_each{ nullptr, std::forward<T>(arr[I]), std::forward<Functor>(f) };

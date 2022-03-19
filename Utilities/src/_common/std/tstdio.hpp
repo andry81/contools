@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __STD_TSTDIO_HPP__
 #define __STD_TSTDIO_HPP__
 

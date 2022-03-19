@@ -1,10 +1,15 @@
+#pragma once
+
 #ifndef __COMMON_HPP__
 #define __COMMON_HPP__
 
-#include <version.hpp>
+#include "version.hpp"
 
 #include <WinBase.h>
 #include <WinNT.h>
+
+#include <nt/ntseapi.h>
+#include <nt/ntifs.h>
 
 #include <string>
 #include <vector>

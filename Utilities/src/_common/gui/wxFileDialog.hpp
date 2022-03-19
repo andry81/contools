@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __COMMON_GUI_WX_FILE_DIALOG_HPP__
 #define __COMMON_GUI_WX_FILE_DIALOG_HPP__
 

@@ -1,8 +1,9 @@
+#pragma once
+
 #ifndef __COMMON_PRINTF_HPP__
 #define __COMMON_PRINTF_HPP__
 
-#include <version.hpp>
-#include <common.hpp>
+#include "common.hpp"
 
 #include <compatible_iterator/compatible_iterator.hpp>
 

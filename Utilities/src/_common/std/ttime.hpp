@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __STD_TTIME_HPP__
 #define __STD_TTIME_HPP__
 
