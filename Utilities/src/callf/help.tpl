@@ -45,6 +45,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           Has no effect.
         ShellExecute
           Print ShellExecute specific error string.
+        /unelevate-2
+        /unelevate-by-shell-exec-from-explorer
+          Print related COM error string.
 
       /no-print-gen-error-string
         Don't print generic error string.
@@ -510,6 +513,27 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /unelevate{ <ParentFlags> }[{ <ChildFlags> }]
         Self unelevate process downfrom elevated privileges account to an
         unelevated original user account.
+
+        If this-process has elevated privileges, then use a call to
+        CreateProcessWithToken to start new this-process with the same
+        command line but different options and flags before run a child
+        process.
+        If this-process already has no elevated privileges, then has no
+        effect.
+
+        The default method has used is described for `/unelevate-1` option.
+
+        Can not be used together with `/elevate*`, `/promote*` and others
+        `/unelevate*` options and flags.
+
+        All the rest options has the same meaning as for `/elevate*` option.
+
+      /unelevate-1
+      /unelevate-1{ <ParentFlags> }[{ <ChildFlags> }]
+      /unelevate-by-search-proc-to-adjust-token
+      /unelevate-by-search-proc-to-adjust-token{ <ParentFlags> }[{ <ChildFlags> }]
+        Shortcut to SearchProcToAdjustToken method of unelevation.
+
         If this-process has elevated privileges, then does search for an
         original user process token to adjust it to an unelevated process
         token to use it in a call to CreateProcessWithToken to start new
@@ -518,8 +542,33 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         If this-process already has no elevated privileges, then has no
         effect.
 
-        Can not be used together with `/elevate*`, `/promote*` options and
-        flags.
+        Can not be used together with `/elevate*`, `/promote*` and others
+        `/unelevate*` options and flags.
+
+        All the rest options has the same meaning as for `/elevate*` option.
+
+      /unelevate-2
+      /unelevate-2{ <ParentFlags> }[{ <ChildFlags> }]
+      /unelevate-by-shell-exec-from-explorer
+      /unelevate-by-shell-exec-from-explorer{ <ParentFlags> }[{ <ChildFlags> }]
+        Shortcut to ShellExecuteFromExplorer method of unelevation.
+
+        If this-process has elevated privileges, then does use SaferAPI to
+        compute the token to use it in a call to CreateProcessWithToken to
+        start new this-process with the same command line but different
+        options and flags before run a child process.
+        If this-process already has no elevated privileges, then has no
+        effect.
+
+        CAUTION:
+          Implementation does use IShellDispatch2::ShellExecute interface
+          function which does not return a child process handle to wait on.
+          So this-parent will not wait this-child process to close and a
+          parent process to the this-child will be the Windows Shell process
+          instead of the this-process.
+
+        Can not be used together with `/elevate*`, `/promote*` and others
+        `/unelevate*` options and flags.
 
         All the rest options has the same meaning as for `/elevate*` option.
 

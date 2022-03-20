@@ -212,6 +212,8 @@ struct Options
 
     uint_t          wait_child_first_time_timeout_ms;
 
+    UnelevationMethod unelevate_method;
+
     int             stdout_dup;
     int             stderr_dup;
 

@@ -21,8 +21,10 @@
 #include <type_traits>
 
 
-#define UTILITY_LITERAL_STRING_WITH_PREFIX_(ansi_str, prefix) prefix ## ansi_str
-#define UTILITY_LITERAL_STRING_WITH_PREFIX(ansi_str, prefix) UTILITY_LITERAL_STRING_WITH_PREFIX_(ansi_str, prefix)
+#define UTILITY_LITERAL_STRING_WITH_PREFIX_(ansi_str, prefix)   prefix ## ansi_str
+#define UTILITY_LITERAL_STRING_WITH_PREFIX(ansi_str, prefix)    UTILITY_LITERAL_STRING_WITH_PREFIX_(ansi_str, prefix)
+
+#define UTILITY_LITERAL_STRING_WITH_LENGTH_TUPLE(str)           (str), (sizeof(str) / sizeof((str)[0]) - 1)
 
 
 namespace utility {

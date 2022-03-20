@@ -1,3 +1,7 @@
+2022.03.21:
+* fixed: Utilities/src/callf: minor fixup
+* new: Utilities/src/callf: `/unelevate-by-shell-exec-from-explorer` option with different implementation to unelevate from COM interface
+
 2022.03.19:
 * new: Utilities/bin/contools: binaries update
 

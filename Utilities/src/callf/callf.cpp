@@ -53,6 +53,10 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/allow-throw-seh-except"),
     _T("/elevate"),
     _T("/unelevate"),
+    _T("/unelevate-1"),
+    _T("/unelevate-by-search-proc-to-adjust-token"),
+    _T("/unelevate-2"),
+    _T("/unelevate-by-shell-exec-from-explorer"),
     _T("/create-console"),
     _T("/detach-console"),
     _T("/detach-inherited-console-on-wait"),
@@ -192,6 +196,10 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/wait-child-first-time-timeout"),
     _T("/elevate"),
     _T("/unelevate"),
+    _T("/unelevate-1"),
+    _T("/unelevate-by-search-proc-to-adjust-token"),
+    _T("/unelevate-2"),
+    _T("/unelevate-by-shell-exec-from-explorer"),
     _T("/showas"),
     _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
@@ -1019,7 +1027,35 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/unelevate"))) {
         if (IsArgInFilter(start_arg, include_filter_arr)) {
+            if (flags.unelevate && options.unelevate_method != UnelevationMethod_Default) {
+                return invalid_format_flag_message(_T("`/unelevate` option or flag is mixed with another `/unelevate*`\n"));
+            }
+
             flags.unelevate = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/unelevate-1")) || IsArgEqualTo(arg, _T("/unelevate-by-search-proc-to-adjust-token"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            if (flags.unelevate && options.unelevate_method != UnelevationMethod_SearchProcToAdjustToken) {
+                return invalid_format_flag_message(_T("`/unelevate-1` option or flag is mixed with another `/unelevate*`\n"));
+            }
+
+            flags.unelevate = true;
+            options.unelevate_method = UnelevationMethod_SearchProcToAdjustToken;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/unelevate-2")) || IsArgEqualTo(arg, _T("/unelevate-by-shell-exec-from-explorer"))) {
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            if (flags.unelevate && options.unelevate_method != UnelevationMethod_ShellExecuteFromExplorer) {
+                return invalid_format_flag_message(_T("`/unelevate-2` option or flag is mixed with another `/unelevate*`\n"));
+            }
+
+            flags.unelevate = true;
+            options.unelevate_method = UnelevationMethod_ShellExecuteFromExplorer;
             return 1;
         }
         return 0;
@@ -2607,12 +2643,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     break;
                 }
 
-                if (!tstrncmp(arg, _T("//"), 3)) {
+                if (!tstrcmp(arg, _T("//"))) {
                     arg_offset += 1;
                     break;
                 }
 
-                if (!tstrncmp(arg, _T("/?"), 3)) {
+                if (!tstrcmp(arg, _T("/?"))) {
                     arg_offset += 1;
 
                     print_help = true;
@@ -2712,10 +2748,23 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         arg_offset += 1;
                     }
                 }
-                else if (!tstrcmp(arg, _T("/unelevate{"))) {
-                    arg_offset += 1;
+                else if_break (!tstrncmp(arg, UTILITY_LITERAL_STRING_WITH_LENGTH_TUPLE(_T("/unelevate")))) {
+                    if (!tstrcmp(arg, _T("/unelevate{"))) {
+                        g_regular_flags.unelevate = true;
+                    }
+                    else if (!tstrcmp(arg, _T("/unelevate-1{")) || !tstrcmp(arg, _T("/unelevate-by-search-proc-to-adjust-token{"))) {
+                        g_regular_flags.unelevate = true;
+                        g_regular_options.unelevate_method = UnelevationMethod_SearchProcToAdjustToken;
+                    }
+                    else if (!tstrcmp(arg, _T("/unelevate-2{")) || !tstrcmp(arg, _T("/unelevate-by-shell-exec-from-explorer{"))) {
+                        g_regular_flags.unelevate = true;
+                        g_regular_options.unelevate_method = UnelevationMethod_ShellExecuteFromExplorer;
+                    }
+                    else {
+                        break;
+                    }
 
-                    g_regular_flags.unelevate = true;
+                    arg_offset += 1;
 
                     bool is_unelevate_child_flags = false;
 
@@ -3257,7 +3306,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     break;
                 }
 
-                if (!tstrncmp(arg, _T("//"), 3)) {
+                if (!tstrcmp(arg, _T("//"))) {
                     arg_offset += 1;
                     break;
                 }
@@ -3377,10 +3426,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         arg_offset += 1;
                     }
                 }
-                else if (!tstrcmp(arg, _T("/unelevate{"))) {
-                    arg_offset += 1;
+                else if (!tstrncmp(arg, UTILITY_LITERAL_STRING_WITH_LENGTH_TUPLE(_T("/unelevate")))) {
+                    if (!tstrcmp(arg, _T("/unelevate{"))) {
+                        g_regular_flags.unelevate = true;
+                    }
+                    else if (!tstrcmp(arg, _T("/unelevate-1{")) || !tstrcmp(arg, _T("/unelevate-by-search-proc-to-adjust-token{"))) {
+                        g_regular_flags.unelevate = true;
+                        g_regular_options.unelevate_method = UnelevationMethod_SearchProcToAdjustToken;
+                    }
+                    else if (!tstrcmp(arg, _T("/unelevate-2{")) || !tstrcmp(arg, _T("/unelevate-by-shell-exec-from-explorer{"))) {
+                        g_regular_flags.unelevate = true;
+                        g_regular_options.unelevate_method = UnelevationMethod_ShellExecuteFromExplorer;
+                    }
+                    else return invalid_format_flag(arg);
 
-                    g_regular_flags.unelevate = true;
+                    arg_offset += 1;
 
                     bool is_unelevate_child_flags = false;
 
@@ -3445,7 +3505,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         arg_offset += 1;
                     }
                 }
-                else if (!tstrcmp(arg, _T("/mote-parent{"))) {
+                else if (!tstrcmp(arg, _T("/demote-parent{"))) {
                     arg_offset += 1;
 
                     is_demote = true;

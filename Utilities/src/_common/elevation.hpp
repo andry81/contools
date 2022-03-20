@@ -8,9 +8,19 @@
 #include <nt/ntseapi.h>
 #include <nt/ntifs.h>
 
-// Based on:
-//  https://stackoverflow.com/questions/45915599/how-can-i-unelevate-a-process/45921237#45921237
-//
+#include <shldisp.h>
+#include <shlobj.h>
+#include <exdisp.h>
+#include <atlbase.h>
+#include <stdlib.h>
+
+enum UnelevationMethod
+{
+    UnelevationMethod_SearchProcToAdjustToken       = 1,    // based on: https://stackoverflow.com/questions/45915599/how-can-i-unelevate-a-process/45921237#45921237
+    UnelevationMethod_ShellExecuteFromExplorer      = 2,    // based on: https://stackoverflow.com/questions/37948064/how-to-launch-non-elevated-administrator-process-from-elevated-administrator-con/37949303#37949303
+
+    UnelevationMethod_Default                       = UnelevationMethod_SearchProcToAdjustToken
+};
 
 inline BOOL CreateProcessNonElevated(
     HANDLE hParentProcessToken, HANDLE hCurrentProcessToken, PCWSTR lpApplicationName, PWSTR lpCommandLine,
@@ -18,7 +28,7 @@ inline BOOL CreateProcessNonElevated(
     DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
     LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
 {
-    static volatile UCHAR guz;
+    DWORD win_error = NOERROR;
 
     HANDLE hParentProcessTokenDup;
     union {
@@ -32,9 +42,8 @@ inline BOOL CreateProcessNonElevated(
     TOKEN_LINKED_TOKEN tlt;
     ULONG cb = 0;
     ULONG rcb;
-    DWORD win_error = NOERROR;
 
-    PVOID stack = alloca(guz);
+    PVOID stack = alloca(sizeof(UCHAR));
     // NOTE: no stack allocations after that point
 
     rcb = FIELD_OFFSET(TOKEN_PRIVILEGES, Privileges[SE_MAX_WELL_KNOWN_PRIVILEGE]);
@@ -144,14 +153,15 @@ inline BOOL CreateProcessNonElevated(
     DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
     LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
 {
-    static TOKEN_PRIVILEGES tp = {
-        1, { { { SE_DEBUG_PRIVILEGE } , SE_PRIVILEGE_ENABLED } }
-    };
+    DWORD win_error = NOERROR;
 
     HANDLE hSnapshot;
     HANDLE hParentProcess;
     HANDLE hParentProcessToken;
-    DWORD win_error = NOERROR;
+
+    TOKEN_PRIVILEGES tp = {
+        1,{ { { SE_DEBUG_PRIVILEGE } , SE_PRIVILEGE_ENABLED } }
+    };
 
     AdjustTokenPrivileges(hCurrentProcessToken, FALSE, &tp, sizeof(tp), NULL, NULL);
 
@@ -210,11 +220,11 @@ inline BOOL CreateProcessNonElevated(
     DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
     LPSTARTUPINFOW lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation)
 {
+    DWORD win_error = NOERROR;
+
     HANDLE hCurrentProcessToken;
     TOKEN_ELEVATION_TYPE tet{};
     ULONG rcb;
-
-    DWORD win_error = NOERROR;
 
     SetLastError(0); // just in case
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &hCurrentProcessToken)) { // replaced: NtCurrentProcess()
@@ -245,6 +255,94 @@ inline BOOL CreateProcessNonElevated(
     SetLastError(win_error);
 
     return !win_error;
+}
+
+inline HRESULT FindDesktopFolderView(REFIID riid, void **ppv)
+{
+    HRESULT hr = S_OK;
+
+    CComPtr<IShellWindows> spShellWindows;
+    if (FAILED(hr = spShellWindows.CoCreateInstance(CLSID_ShellWindows))) {
+        return hr;
+    }
+
+    CComVariant vtLoc(CSIDL_DESKTOP);
+    CComVariant vtEmpty;
+    long lhwnd;
+    CComPtr<IDispatch> spdisp;
+
+    if (FAILED(hr = spShellWindows->FindWindowSW(&vtLoc, &vtEmpty, SWC_DESKTOP, &lhwnd, SWFO_NEEDDISPATCH, &spdisp))) {
+        return hr;
+    }
+
+    CComPtr<IShellBrowser> spBrowser;
+
+    if (FAILED(hr = CComQIPtr<IServiceProvider>(spdisp)->QueryService(SID_STopLevelBrowser, IID_PPV_ARGS(&spBrowser)))) {
+        return hr;
+    }
+
+    CComPtr<IShellView> spView;
+
+    if (FAILED(hr = spBrowser->QueryActiveShellView(&spView))) {
+        return hr;
+    }
+
+    if (FAILED(hr = spView->QueryInterface(riid, ppv))) {
+        return hr;
+    }
+
+    return hr;
+}
+
+// FindDesktopFolderView incorporated by reference
+inline HRESULT GetDesktopAutomationObject(REFIID riid, void **ppv)
+{
+    HRESULT hr = S_OK;
+
+    CComPtr<IShellView> spsv;
+
+    if (FAILED(hr = FindDesktopFolderView(IID_PPV_ARGS(&spsv)))) {
+        return hr;
+    }
+
+    CComPtr<IDispatch> spdispView;
+
+    if (FAILED(hr = spsv->GetItemObject(SVGIO_BACKGROUND, IID_PPV_ARGS(&spdispView)))) {
+        return hr;
+    }
+
+    if (FAILED(hr = spdispView->QueryInterface(riid, ppv))) {
+        return hr;
+    }
+
+    return hr;
+}
+
+inline HRESULT ShellExecuteNonElevated(PCWSTR pszFile, PCWSTR pszParameters, PCWSTR pszDirectory, PCWSTR pszOperation, int nShowCmd)
+{
+    HRESULT hr = S_OK;
+
+    CComPtr<IShellFolderViewDual> spFolderView;
+
+    if (FAILED(hr = GetDesktopAutomationObject(IID_PPV_ARGS(&spFolderView)))) {
+        return hr;
+    }
+
+    CComPtr<IDispatch> spdispShell;
+
+    if (FAILED(hr = spFolderView->get_Application(&spdispShell))) {
+        return hr;
+    }
+
+    if (FAILED(hr = CComQIPtr<IShellDispatch2>(spdispShell)->ShellExecute(CComBSTR(pszFile),
+        CComVariant(pszParameters ? pszParameters : L""),
+        CComVariant(pszDirectory ? pszDirectory : L""),
+        CComVariant(pszOperation ? pszOperation : L""),
+        CComVariant(nShowCmd)))) {
+        return hr;
+    }
+
+    return hr;
 }
 
 #endif

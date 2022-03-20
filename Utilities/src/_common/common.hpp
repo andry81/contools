@@ -11,6 +11,8 @@
 #include <nt/ntseapi.h>
 #include <nt/ntifs.h>
 
+#include <comdef.h>
+
 #include <string>
 #include <vector>
 #include <deque>
@@ -2700,6 +2702,12 @@ namespace {
             _print_stderr_message(_T("ShellExecute: unknown error: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
         }
+    }
+
+    inline void _print_com_error_message(HRESULT hr)
+    {
+        _com_error err(hr);
+        _print_stderr_message(_T("COM: 0x%08X: %s\n"), hr, err.ErrorMessage());
     }
 
     inline std::tstring _replace_strings(std::tstring str, const std::tstring & from, std::tstring to)
