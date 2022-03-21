@@ -211,6 +211,7 @@ Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/_config/config.system.vars.in -text
 Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/download_url_to_pdf.bat -text
+Scripts/Tools/ToolAdaptors/bat/__init__.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd32.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd3264.bat -text
 Scripts/Tools/ToolAdaptors/bat/call_cmd3264_k.bat -text
@@ -231,6 +232,7 @@ Scripts/Tools/ToolAdaptors/bat/start64.bat -text
 Scripts/Tools/ToolAdaptors/bat/start6432.bat -text
 Scripts/Tools/ToolAdaptors/bat/start6432_nowait.bat -text
 Scripts/Tools/ToolAdaptors/bat/start64_nowait.bat -text
+Scripts/Tools/ToolAdaptors/bat/start_app_at_system_date.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_cmd32.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_cmd3264.bat -text
 Scripts/Tools/ToolAdaptors/bat/start_cmd3264_k.bat -text

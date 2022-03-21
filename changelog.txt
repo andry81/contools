@@ -1,4 +1,7 @@
 2022.03.21:
+* new: Scripts/Tools/ToolAdaptors/bat: `start_app_at_system_date.bat` script to start an arbitrary application with different system date
+
+2022.03.21:
 * new: Utilities/bin/contools: binaries update
 
 2022.03.21:
