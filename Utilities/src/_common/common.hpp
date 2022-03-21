@@ -1956,8 +1956,22 @@ namespace {
         case 1201:  // UTF-16BE
         case 12000: // UTF-32LE
         case 12001: // UTF-32BE
+        {
+        wide_string_crt:
+
+            switch (stream_type) {
+            case STDOUT_FILENO:
+                fputws(char_buf.data(), stdout);
+                break;
+            case STDERR_FILENO:
+                fputws(char_buf.data(), stderr);
+                break;
+            }
+        } break;
+
         case CP_UTF7:
         case CP_UTF8:
+        default:
         {
             std::vector<char> translated_char_buf;
 
@@ -1970,20 +1984,6 @@ namespace {
                     fputs(translated_char_buf.data(), stderr);
                     break;
                 }
-            }
-        } break;
-
-        default:
-        {
-        wide_string_crt:
-
-            switch (stream_type) {
-            case STDOUT_FILENO:
-                fputws(char_buf.data(), stdout);
-                break;
-            case STDERR_FILENO:
-                fputws(char_buf.data(), stderr);
-                break;
             }
         } break;
         }
@@ -2106,8 +2106,22 @@ namespace {
         case 1201:  // UTF-16BE
         case 12000: // UTF-32LE
         case 12001: // UTF-32BE
+        {
+        wide_string_crt:
+
+            switch (stream_type) {
+            case STDOUT_FILENO:
+                fputws(str.c_str(), stdout);
+                break;
+            case STDERR_FILENO:
+                fputws(str.c_str(), stderr);
+                break;
+            }
+        } break;
+
         case CP_UTF7:
         case CP_UTF8:
+        default:
         {
             std::vector<char> translated_char_buf;
 
@@ -2120,21 +2134,6 @@ namespace {
                     fputs(translated_char_buf.data(), stderr);
                     break;
                 }
-            }
-        } break;
-
-
-        default:
-        {
-        wide_string_crt:
-
-            switch (stream_type) {
-            case STDOUT_FILENO:
-                fputws(str.c_str(), stdout);
-                break;
-            case STDERR_FILENO:
-                fputws(str.c_str(), stderr);
-                break;
             }
         } break;
         }

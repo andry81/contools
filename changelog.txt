@@ -1,3 +1,6 @@
+2022.03.22:
+* fixed: Utilities/src/callf: utf-16 text in non unicode locale print fixup
+
 2022.03.21:
 * fixed: Scripts/Tools/ToolAdaptors/app: execution fixup
 * new: Scripts/Tools/ToolAdaptors/app/curl: `download_url_to_file.bat` curl downloader script

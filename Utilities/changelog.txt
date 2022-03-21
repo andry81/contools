@@ -1,3 +1,6 @@
+2022.03.22:
+* fixed: src/callf: utf-16 text in non unicode locale print fixup
+
 2022.03.21:
 * new: bin/contools: binaries update
 
