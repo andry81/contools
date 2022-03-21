@@ -1,4 +1,8 @@
 2022.03.21:
+* fixed: Scripts/Tools/ToolAdaptors/app: execution fixup
+* new: Scripts/Tools/ToolAdaptors/app/curl: `download_url_to_file.bat` curl downloader script
+
+2022.03.21:
 * new: Scripts/Tools/ToolAdaptors/bat: `start_app_at_system_date.bat` script to start an arbitrary application with different system date
 
 2022.03.21:

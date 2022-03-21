@@ -17,8 +17,6 @@ if not exist "%CERTUTIL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%CERTUTIL
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%CERTUTIL_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%CERTUTIL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
-if defined CHCP chcp %CHCP%
-
 exit /b 0
 
 :IF_DEFINED_AND_FILE_EXIST

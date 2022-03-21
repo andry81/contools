@@ -17,8 +17,6 @@ if not exist "%WKHTMLTOPDF_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%WKHTM
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%WKHTMLTOPDF_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%WKHTMLTOPDF_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
-if defined CHCP chcp %CHCP%
-
 exit /b 0
 
 :IF_DEFINED_AND_FILE_EXIST

@@ -181,6 +181,10 @@ Scripts/Tools/ToolAdaptors/app/certutil/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/certutil/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/certutil/_config/config.system.vars.in -text
 Scripts/Tools/ToolAdaptors/app/certutil/download_url_to_file.bat -text
+Scripts/Tools/ToolAdaptors/app/curl/__init__/__init__.bat -text
+Scripts/Tools/ToolAdaptors/app/curl/_config/config.0.vars.in -text
+Scripts/Tools/ToolAdaptors/app/curl/_config/config.system.vars.in -text
+Scripts/Tools/ToolAdaptors/app/curl/download_url_to_file.bat -text
 Scripts/Tools/ToolAdaptors/app/emule/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/emule/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/emule/_config/config.system.vars.in -text

@@ -83,7 +83,7 @@ set "URL_TMPL=%~1"
 set "FROM_PAGE=%~2"
 set "TO_PAGE=%~3"
 
-rem Uee {PAGENUM} as placeholder
+rem Use {PAGENUM} as placeholder
 set "OUT_FILE_PATH_TMPL=%~4"
 
 if not defined FROM_PAGE (

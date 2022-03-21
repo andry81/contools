@@ -11,18 +11,12 @@
 #   BAT:                  Apply on Windows system when this file has loaded from the Windows batch script loader.
 #   SH:                   Apply on any system when this file has loaded from the Bash shell script loader.
 #
-# <value>:                Value with substitution support: `%<variable>%`.
+# <value>:                Value with escaping and substitution support: `$/<escape_char>`, `$/{<variable>}`.
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
 once CURL_EXECUTABLE                      ="c:\cygwin\bin\curl.exe"
-once JQ_EXECUTABLE                        ="c:\cygwin\bin\jq.exe"
 
-once GH_ADAPTOR_BACKUP_DIR                ="%PROJECT_OUTPUT_ROOT%/github/backup"
-
-# 100 is a maximum
-once GH_RESTAPI_PARAM_PER_PAGE            =100
-
-once CURL_BARE_FLAGS                      =-H "Accept: application/vnd.github.v3+json"
+once CURL_ADAPTOR_DOWNLOAD_DIR            ="%PROJECT_OUTPUT_ROOT%/curl/download"
 
 once CHCP                                 =65001
