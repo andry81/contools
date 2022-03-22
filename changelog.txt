@@ -1,4 +1,7 @@
 2022.03.22:
+* new: Utilities/bin/contools: binaries update
+
+2022.03.22:
 * fixed: Utilities/src/callf: command line parse fixup
 * fixed: Utilities/src/callf: execution fixup
 * new: Utilities/src/callf: `/shell-exec-unelevate-from-explorer` option to shell execute from COM interface
