@@ -57,6 +57,8 @@ struct Flags
     bool            disable_conout_duplicate_to_parent_console_on_error;
     bool            write_console_stdin_back;
 
+    bool            shell_exec;
+    bool            shell_exec_unelevate;
     bool            elevate;
     bool            unelevate;
 

@@ -23,6 +23,9 @@ PVOID g_disable_wow64_fs_redir_ptr = NULL;
 // sets true just after the CreateProcess or ShellExecute success execute
 bool g_is_process_executed = false;
 
+// sets true in case if process is on self elevation
+bool g_is_process_self_elevation = false;
+
 // sets true in case if process is not elevated and requested for self elevation
 bool g_is_process_elevating = false;
 
@@ -49,6 +52,8 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
     _T("/skip-pause-on-detached-console"),
+    _T("/shell-exec"),
+    _T("/shell-exec-unelevate-from-explorer"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/elevate"),
@@ -168,6 +173,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/pause-on-exit"),
     _T("/skip-pause-on-detached-console"),
     _T("/shell-exec"),
+    _T("/shell-exec-unelevate-from-explorer"),
     _T("/shell-exec-expand-env"),
     _T("/D"),
     _T("/no-wait"),
@@ -608,7 +614,7 @@ inline void MergeOptions(Flags & out_flags, Options & out_options,
 
     // merge all except child flags and options
 
-    if (g_is_process_elevating || g_is_process_unelevating) {
+    if (g_is_process_self_elevation) {
         out_flags.merge(elevate_or_unelevate_parent_flags);
         out_options.merge(elevate_or_unelevate_parent_options);
     }
@@ -693,14 +699,17 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     const TCHAR * start_arg = arg;
     const TCHAR * arg_suffix = nullptr;
 
+    bool is_excluded = false;
+
     if (ptrdiff_t(utility::addressof(exclude_filter_arr)) != ptrdiff_t(utility::addressof(g_empty_flags_arr))) {
         if (IsArgInFilter(arg, exclude_filter_arr)) {
-            return 3;
+            is_excluded = true;
         }
     }
 
     if (IsArgEqualTo(arg, _T("/chcp-in"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.chcp_in = _ttoi(arg);
@@ -712,6 +721,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/chcp-out"))) {
+        if (is_excluded) return 3;
         arg_offset += 1;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
@@ -724,6 +734,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/ret-create-proc"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.ret_create_proc = true;
             return 1;
@@ -731,6 +742,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/ret-win-error"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.ret_win_error = true;
             return 1;
@@ -738,6 +750,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/win-error-langid"))) {
+        if (is_excluded) return 3;
         arg_offset += 1;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
@@ -749,6 +762,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/ret-child-exit"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.ret_child_exit = true;
             return 1;
@@ -756,6 +770,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/print-win-error-string"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.print_win_error_string = true;
             return 1;
@@ -763,6 +778,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/print-shell-error-string"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.print_shell_error_string = true;
             return 1;
@@ -770,6 +786,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-print-gen-error-string"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_print_gen_error_string = true;
             return 1;
@@ -777,6 +794,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-sys-dialog-ui"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_sys_dialog_ui = true;
             return 1;
@@ -785,8 +803,14 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/shell-exec"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
+                if (flags.shell_exec_unelevate) {
+                    return invalid_format_flag_message(_T("`/shell-exec` option is mixed with another `/shell-exec-unelevate*`\n"));
+                }
+
+                flags.shell_exec = true;
                 options.shell_exec_verb = arg;
                 return 1;
             }
@@ -795,7 +819,24 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         else error = invalid_format_flag(start_arg);
         return 2;
     }
+    if (IsArgEqualTo(arg, _T("/shell-exec-unelevate-from-explorer"))) {
+        if (is_excluded) return 3;
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            if (flags.shell_exec) {
+                return invalid_format_flag_message(_T("`/shell-exec-unelevate-from-explorer` option is mixed with `/shell-exec`\n"));
+            }
+            if (flags.unelevate && options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer) {
+                return invalid_format_flag_message(_T("`/shell-exec-unelevate-from-explorer` option is mixed with `/unelevate-by-shell-exec-from-explorer`\n"));
+            }
+
+            flags.shell_exec_unelevate = true;
+            options.unelevate_method = UnelevationMethod_ShellExecuteFromExplorer;
+            return 1;
+        }
+        return 0;
+    }
     if (IsArgEqualTo(arg, _T("/shell-exec-expand-env"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.shell_exec_expand_env = true;
             return 1;
@@ -804,6 +845,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/D"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.change_current_dir = arg;
@@ -815,6 +857,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/no-wait"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_wait = true;
             return 1;
@@ -822,6 +865,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-window"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_window = true;
             return 1;
@@ -829,6 +873,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-window-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_window_console = true;
             return 1;
@@ -836,6 +881,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/pause-on-exit-if-error-before-exec"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pause_on_exit_if_error_before_exec = true;
             return 1;
@@ -843,6 +889,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/pause-on-exit-if-error"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pause_on_exit_if_error = true;
             return 1;
@@ -850,6 +897,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/pause-on-exit"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pause_on_exit = true;
             return 1;
@@ -857,6 +905,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/skip-pause-on-detached-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.skip_pause_on_detached_console = true;
             return 1;
@@ -864,6 +913,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-expand-env"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_expand_env = true;
             return 1;
@@ -871,6 +921,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-subst-vars"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_subst_vars = true;
             return 1;
@@ -878,6 +929,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-subst-pos-vars"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_subst_pos_vars = true;
             return 1;
@@ -885,6 +937,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-subst-empty-tail-vars"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_subst_empty_tail_vars = true;
             return 1;
@@ -892,6 +945,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-std-inherit"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_std_inherit = true;
             return 1;
@@ -899,6 +953,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-stdin-inherit"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_stdin_inherit = true;
             return 1;
@@ -906,6 +961,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-stdout-inherit"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_stdout_inherit = true;
             return 1;
@@ -913,6 +969,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-stderr-inherit"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_stderr_inherit = true;
             return 1;
@@ -920,6 +977,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/allow-throw-seh-except"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.allow_throw_seh_except = true;
             return 1;
@@ -927,6 +985,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/allow-expand-unexisted-env"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.allow_expand_unexisted_env = true;
             return 1;
@@ -934,6 +993,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/allow-subst-empty-args"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.allow_subst_empty_args = true;
             return 1;
@@ -941,6 +1001,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/load-parent-proc-init-env-vars"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.load_parent_proc_init_env_vars = true;
             return 1;
@@ -948,6 +1009,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/pipe-stdin-to-child-stdin"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pipe_stdin_to_child_stdin = true;
             return 1;
@@ -955,6 +1017,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/pipe-child-stdout-to-stdout"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pipe_child_stdout_to_stdout = true;
             return 1;
@@ -962,6 +1025,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/pipe-child-stderr-to-stderr"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pipe_child_stderr_to_stderr = true;
             return 1;
@@ -969,6 +1033,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/pipe-inout-child"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pipe_inout_child = true;
             return 1;
@@ -976,6 +1041,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/pipe-out-child"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pipe_out_child = true;
             return 1;
@@ -983,6 +1049,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/pipe-stdin-to-stdout"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.pipe_stdin_to_stdout = true;
             return 1;
@@ -990,6 +1057,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/init-com"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.init_com = true;
             return 1;
@@ -997,6 +1065,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/wait-child-start"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.wait_child_start = true;
             return 1;
@@ -1005,6 +1074,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/wait-child-first-time-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1019,6 +1089,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/elevate"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.elevate = true;
             return 1;
@@ -1026,17 +1097,27 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/unelevate"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
-            if (flags.unelevate && options.unelevate_method != UnelevationMethod_Default) {
-                return invalid_format_flag_message(_T("`/unelevate` option or flag is mixed with another `/unelevate*`\n"));
+            if (!flags.shell_exec) {
+                if (flags.unelevate && options.unelevate_method != UnelevationMethod_Default) {
+                    return invalid_format_flag_message(_T("`/unelevate` option or flag is mixed with another `/unelevate*`\n"));
+                }
+            }
+            else if (UnelevationMethod_Default == UnelevationMethod_ShellExecuteFromExplorer) {
+                if (flags.unelevate && options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer) {
+                    return invalid_format_flag_message(_T("`/unelevate-by-shell-exec-from-explorer` option is mixed with `/shell-exec-unelevate-from-explorer`\n"));
+                }
             }
 
             flags.unelevate = true;
+            options.unelevate_method = UnelevationMethod_Default; // just in case
             return 1;
         }
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/unelevate-1")) || IsArgEqualTo(arg, _T("/unelevate-by-search-proc-to-adjust-token"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             if (flags.unelevate && options.unelevate_method != UnelevationMethod_SearchProcToAdjustToken) {
                 return invalid_format_flag_message(_T("`/unelevate-1` option or flag is mixed with another `/unelevate*`\n"));
@@ -1049,9 +1130,15 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/unelevate-2")) || IsArgEqualTo(arg, _T("/unelevate-by-shell-exec-from-explorer"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
-            if (flags.unelevate && options.unelevate_method != UnelevationMethod_ShellExecuteFromExplorer) {
-                return invalid_format_flag_message(_T("`/unelevate-2` option or flag is mixed with another `/unelevate*`\n"));
+            if (!flags.shell_exec) {
+                if (flags.unelevate && options.unelevate_method != UnelevationMethod_ShellExecuteFromExplorer) {
+                    return invalid_format_flag_message(_T("`/unelevate-2` option or flag is mixed with another `/unelevate*`\n"));
+                }
+            }
+            else if (flags.unelevate && options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer) {
+                return invalid_format_flag_message(_T("`/unelevate-by-shell-exec-from-explorer` option is mixed with `/shell-exec-unelevate-from-explorer`\n"));
             }
 
             flags.unelevate = true;
@@ -1062,6 +1149,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/showas"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int showas_value = _ttoi(arg);
@@ -1076,6 +1164,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/use-stdin-as-piped-from-conin"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.use_stdin_as_piped_from_conin = true;
             return 1;
@@ -1084,6 +1173,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.reopen_stdin_as_file = arg;
@@ -1096,6 +1186,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-server-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.reopen_stdin_as_server_pipe = arg;
@@ -1108,6 +1199,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-server-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1123,6 +1215,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-server-pipe-in-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1138,6 +1231,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-server-pipe-out-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1153,6 +1247,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-client-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.reopen_stdin_as_client_pipe = arg;
@@ -1165,6 +1260,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdin-as-client-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1180,6 +1276,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.reopen_stdout_as_file = arg;
@@ -1192,6 +1289,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-server-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.reopen_stdout_as_server_pipe = arg;
@@ -1204,6 +1302,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-server-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1219,6 +1318,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-server-pipe-in-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1234,6 +1334,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-server-pipe-out-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1249,6 +1350,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-client-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.reopen_stdout_as_client_pipe = arg;
@@ -1261,6 +1363,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-as-client-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1276,6 +1379,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.reopen_stderr_as_file = arg;
@@ -1288,6 +1392,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-server-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.reopen_stderr_as_server_pipe = arg;
@@ -1300,6 +1405,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-server-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1315,6 +1421,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-server-pipe-in-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1330,6 +1437,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-server-pipe-out-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1345,6 +1453,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-client-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.reopen_stderr_as_client_pipe = arg;
@@ -1357,6 +1466,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-as-client-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1371,6 +1481,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stdout-file-truncate"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.reopen_stdout_file_truncate = true;
             return 1;
@@ -1378,6 +1489,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/reopen-stderr-file-truncate"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.reopen_stderr_file_truncate = true;
             return 1;
@@ -1386,6 +1498,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/stdout-dup"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int fileno_value = _ttoi(arg);
@@ -1401,6 +1514,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/stderr-dup"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int fileno_value = _ttoi(arg);
@@ -1415,6 +1529,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/stdin-output-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.stdin_output_flush = true;
             return 1;
@@ -1422,6 +1537,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/stdout-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.stdout_flush = true;
             return 1;
@@ -1429,6 +1545,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/stderr-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.stderr_flush = true;
             return 1;
@@ -1436,6 +1553,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/output-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.output_flush = true;
             return 1;
@@ -1443,6 +1561,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/inout-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.inout_flush = true;
             return 1;
@@ -1451,6 +1570,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
 
     if (IsArgEqualTo(arg, _T("/stdout-vt100"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.stdout_vt100 = true;
             return 1;
@@ -1458,6 +1578,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/stderr-vt100"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.stderr_vt100 = true;
             return 1;
@@ -1465,6 +1586,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/output-vt100"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.output_vt100 = true;
             return 1;
@@ -1474,6 +1596,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
 
     if (IsArgEqualTo(arg, _T("/create-outbound-server-pipe-from-stdin"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.create_outbound_server_pipe_from_stdin = arg;
@@ -1486,6 +1609,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-outbound-server-pipe-from-stdin-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1501,6 +1625,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-outbound-server-pipe-from-stdin-in-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1516,6 +1641,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-outbound-server-pipe-from-stdin-out-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1531,6 +1657,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stdout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.create_inbound_server_pipe_to_stdout = arg;
@@ -1543,6 +1670,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stdout-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1558,6 +1686,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stdout-in-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1573,6 +1702,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stdout-out-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1588,6 +1718,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stderr"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.create_inbound_server_pipe_to_stderr = arg;
@@ -1600,6 +1731,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stderr-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1615,6 +1747,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stderr-in-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1630,6 +1763,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-inbound-server-pipe-to-stderr-out-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1645,6 +1779,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.tee_stdin_to_file = arg;
@@ -1657,6 +1792,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-server-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.tee_stdin_to_server_pipe = arg;
@@ -1669,6 +1805,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-server-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1684,6 +1821,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-server-pipe-in-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1699,6 +1837,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-server-pipe-out-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1714,6 +1853,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-client-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.tee_stdin_to_client_pipe = arg;
@@ -1726,6 +1866,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-to-client-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1741,6 +1882,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.tee_stdout_to_file = arg;
@@ -1753,6 +1895,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-server-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.tee_stdout_to_server_pipe = arg;
@@ -1765,6 +1908,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-server-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1780,6 +1924,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-server-pipe-in-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1795,6 +1940,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-server-pipe-out-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1810,6 +1956,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-client-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.tee_stdout_to_client_pipe = arg;
@@ -1822,6 +1969,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-to-client-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1837,6 +1985,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.tee_stderr_to_file = arg;
@@ -1849,6 +1998,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-server-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.tee_stderr_to_server_pipe = arg;
@@ -1861,6 +2011,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-server-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1876,6 +2027,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-server-pipe-in-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1891,6 +2043,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-server-pipe-out-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -1906,6 +2059,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-client-pipe"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.tee_stderr_to_client_pipe = arg;
@@ -1918,6 +2072,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-to-client-pipe-connect-timeout"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int timeout_ms = _ttoi(arg);
@@ -1933,6 +2088,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-dup"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int fileno_value = _ttoi(arg);
@@ -1948,6 +2104,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-dup"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int fileno_value = _ttoi(arg);
@@ -1963,6 +2120,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-dup"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int fileno_value = _ttoi(arg);
@@ -1977,6 +2135,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/tee-conout-dup"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_conout_dup = true;
             return 1;
@@ -1984,6 +2143,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-file-truncate"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stdin_file_truncate = true;
             return 1;
@@ -1991,6 +2151,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-file-truncate"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stdout_file_truncate = true;
             return 1;
@@ -1998,6 +2159,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-file-truncate"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stderr_file_truncate = true;
             return 1;
@@ -2005,6 +2167,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-file-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stdin_file_flush = true;
             return 1;
@@ -2012,6 +2175,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-file-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stdout_file_flush = true;
             return 1;
@@ -2019,6 +2183,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-file-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stderr_file_flush = true;
             return 1;
@@ -2026,6 +2191,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-pipe-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stdin_pipe_flush = true;
             return 1;
@@ -2033,6 +2199,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-pipe-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stdout_pipe_flush = true;
             return 1;
@@ -2040,6 +2207,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-pipe-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stderr_pipe_flush = true;
             return 1;
@@ -2047,6 +2215,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stdin_flush = true;
             return 1;
@@ -2054,6 +2223,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stdout_flush = true;
             return 1;
@@ -2061,6 +2231,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_stderr_flush = true;
             return 1;
@@ -2068,6 +2239,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-output-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_output_flush = true;
             return 1;
@@ -2075,6 +2247,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/tee-inout-flush"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.tee_inout_flush = true;
             return 1;
@@ -2083,6 +2256,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-pipe-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -2098,6 +2272,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-pipe-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -2113,6 +2288,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-pipe-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -2128,6 +2304,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdin-read-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -2143,6 +2320,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stdout-read-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -2158,6 +2336,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/tee-stderr-read-buf-size"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 const int buf_size = _ttoi(arg);
@@ -2172,6 +2351,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/mutex-std-writes"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.mutex_std_writes = true;
             return 1;
@@ -2179,6 +2359,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/mutex-tee-file-writes"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.mutex_tee_file_writes = true;
             return 1;
@@ -2186,6 +2367,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/create-child-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.create_child_console = true;
             return 1;
@@ -2193,6 +2375,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/detach-child-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.detach_child_console = true;
             return 1;
@@ -2200,6 +2383,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/create-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.create_console = true;
             return 1;
@@ -2207,6 +2391,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/detach-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.detach_console = true;
             return 1;
@@ -2214,6 +2399,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/detach-inherited-console-on-wait"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.detach_inherited_console_on_wait = true;
             return 1;
@@ -2221,6 +2407,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/attach-parent-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.attach_parent_console = true;
             return 1;
@@ -2229,6 +2416,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/create-console-title"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.create_console_title = arg;
@@ -2242,6 +2430,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/own-console-title"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.own_console_title = arg;
@@ -2255,6 +2444,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
     if (IsArgEqualTo(arg, _T("/console-title"))) {
         arg_offset += 1;
+        if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
                 options.console_title = arg;
@@ -2267,6 +2457,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/stdin-echo"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.stdin_echo = true;
             return 1;
@@ -2274,6 +2465,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/no-stdin-echo"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.no_stdin_echo = true;
             return 1;
@@ -2288,6 +2480,8 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             arg_offset += 1;
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
                 const TCHAR * to = arg;
+
+                if (is_excluded) return 3;
 
                 if (IsArgInFilter(start_arg, include_filter_arr)) {
                     options.replace_args.push_back(std::make_tuple(-1, std::tstring{ from }, std::tstring{ to }));
@@ -2310,6 +2504,8 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
                 const TCHAR * to = arg;
 
+                if (is_excluded) return 3;
+
                 if (IsArgInFilter(start_arg, include_filter_arr)) {
                     options.replace_args.push_back(std::make_tuple(-2, std::tstring{ from }, std::tstring{ to }));
                     return 1;
@@ -2323,6 +2519,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/eval-backslash-esc")) || IsArgEqualTo(arg, _T("/e"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.eval_backslash_esc = true;
             return 1;
@@ -2330,6 +2527,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/eval-dbl-backslash-esc")) || IsArgEqualTo(arg, _T("/e\\\\"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.eval_dbl_backslash_esc = true;
             return 1;
@@ -2345,6 +2543,8 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
             if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
                 const TCHAR * value = arg;
 
+                if (is_excluded) return 3;
+
                 if (IsArgInFilter(start_arg, include_filter_arr)) {
                     options.env_vars.push_back(std::make_tuple(std::tstring{ name }, std::tstring{ value }));
                     return 1;
@@ -2358,6 +2558,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 2;
     }
     if (IsArgEqualTo(arg, _T("/disable-wow64-fs-redir"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.disable_wow64_fs_redir = true;
             return 1;
@@ -2365,6 +2566,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/disable-ctrl-signals"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.disable_ctrl_signals = true;
             return 1;
@@ -2372,6 +2574,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/disable-ctrl-c-signal"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.disable_ctrl_c_signal = true;
             return 1;
@@ -2380,6 +2583,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
 #ifndef _CONSOLE
     if (IsArgEqualTo(arg, _T("/allow-gui-autoattach-to-parent-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.allow_gui_autoattach_to_parent_console = true;
             return 1;
@@ -2388,6 +2592,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     }
 #endif
     if (IsArgEqualTo(arg, _T("/disable-conout-reattach-to-visible-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.disable_conout_reattach_to_visible_console = true;
             return 1;
@@ -2395,6 +2600,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/allow-conout-attach-to-invisible-parent-console"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.allow_conout_attach_to_invisible_parent_console = true;
             return 1;
@@ -2402,6 +2608,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/disable-conout-duplicate-to-parent-console-on-error"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.disable_conout_duplicate_to_parent_console_on_error = true;
             return 1;
@@ -2409,12 +2616,15 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         return 0;
     }
     if (IsArgEqualTo(arg, _T("/write-console-stdin-back"))) {
+        if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.write_console_stdin_back = true;
             return 1;
         }
         return 0;
     }
+
+    if (is_excluded) return 3;
 
     return -1;
 }
@@ -2638,6 +2848,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             while (argc >= arg_offset + 1)
             {
                 arg = argv[arg_offset];
+                if (!arg) return invalid_format_flag(arg);
 
                 if (tstrncmp(arg, _T("/"), 1)) {
                     break;
@@ -2922,7 +3133,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
             // update elevation state
-            if (g_regular_flags.elevate) {
+            if (g_regular_flags.elevate || g_regular_flags.unelevate) {
+                g_is_process_self_elevation = true;
+            }
+
+            if (g_regular_flags.elevate || g_regular_flags.shell_exec && g_regular_options.shell_exec_verb == _T("runas")) {
                 const bool is_process_elevated = g_is_process_elevated = _is_process_elevated() ? 1 : 0;
                 if (!is_process_elevated) {
                     g_is_process_elevating = true;
@@ -2931,7 +3146,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 // we must drop this flag immediately to avoid potential accidental recursion in child process
                 g_regular_flags.elevate = false;
             }
-            else if (g_regular_flags.unelevate) {
+            else if (g_regular_flags.unelevate || g_regular_flags.shell_exec_unelevate) {
                 const bool is_process_elevated = g_is_process_elevated = _is_process_elevated() ? 1 : 0;
                 if (is_process_elevated) {
                     g_is_process_unelevating = true;
@@ -2941,11 +3156,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 g_regular_flags.unelevate = false;
             }
 
+            // reset if no need self elevation
+            if (g_is_process_self_elevation) {
+                if (!g_is_process_elevating && !g_is_process_unelevating) {
+                    g_is_process_self_elevation = false;
+                }
+            }
+
             // reset flags and options
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_elevating || g_is_process_unelevating) {
+            if (g_is_process_self_elevation) {
                 TranslateCommandLineToElevatedOrUnelevated(
                     nullptr, nullptr, nullptr,
                     g_flags, g_options,
@@ -3541,7 +3763,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_elevating || g_is_process_unelevating) {
+            if (g_is_process_self_elevation) {
                 TranslateCommandLineToElevatedOrUnelevated(
                     nullptr, nullptr, nullptr,
                     g_flags, g_options,
@@ -3943,30 +4165,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             arg_offset += 1;
 
-            if (g_options.shell_exec_verb.empty()) {
-                if (!in_args.app_fmt_str && !in_args.cmd_fmt_str) {
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("format arguments are empty\n"));
-                    }
-                    if (!g_flags.ret_win_error) {
-                        return err_format_empty;
-                    }
-                    else {
-                        return GetLastError();
-                    }
+            if (!in_args.app_fmt_str && !in_args.cmd_fmt_str) {
+                if (!g_flags.no_print_gen_error_string) {
+                    _print_stderr_message(_T("format arguments are empty\n"));
                 }
-            }
-            else {
-                if (!in_args.app_fmt_str) {
-                    if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("file path format argument is empty\n"));
-                    }
-                    if (!g_flags.ret_win_error) {
-                        return err_format_empty;
-                    }
-                    else {
-                        return GetLastError();
-                    }
+                if (!g_flags.ret_win_error) {
+                    return err_format_empty;
+                }
+                else {
+                    return GetLastError();
                 }
             }
 
@@ -4206,7 +4413,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_elevating || g_is_process_unelevating) {
+            if (g_is_process_self_elevation) {
                 std::tstring elevated_cmd_out_str;
 
                 TranslateCommandLineToElevatedOrUnelevated(

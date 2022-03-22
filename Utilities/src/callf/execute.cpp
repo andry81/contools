@@ -166,6 +166,8 @@ void Flags::merge(const Flags & flags)
 
     MERGE_FLAG(flags, write_console_stdin_back);
 
+    MERGE_FLAG(flags, shell_exec);
+    MERGE_FLAG(flags, shell_exec_unelevate);
     MERGE_FLAG(flags, elevate);
     MERGE_FLAG(flags, unelevate);
 
@@ -4628,8 +4630,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
     }
 
+    const bool is_shell_exec = g_flags.shell_exec || g_flags.shell_exec_unelevate;
+
     // update globals
-    if(!app || !app_len || g_options.shell_exec_verb.empty()) {
+    if(!is_shell_exec) {
         // CreateProcess
         if (g_flags.no_window) {
             g_options.show_as = SW_HIDE;
@@ -5563,7 +5567,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         break;
                     }
 
-                    if (g_options.shell_exec_verb.empty()) {
+                    if (!is_shell_exec) {
                         si.hStdInput = g_pipe_read_std_handles.stdin_handle;
 
                         si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5573,7 +5577,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         SetStdHandle(STD_INPUT_HANDLE, g_pipe_read_std_handles.stdin_handle);
                     }
                 }
-                else if (g_options.shell_exec_verb.empty()) {
+                else if (!is_shell_exec) {
                     // CAUTION:
                     //  Must be the original stdin, can not be a buffer from the CreateConsoleScreenBuffer call,
                     //  otherwise, for example, the `cmd.exe /k` process will exit immediately!
@@ -5590,7 +5594,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         break;
                     }
 
-                    if (g_options.shell_exec_verb.empty()) {
+                    if (!is_shell_exec) {
                         si.hStdOutput = g_pipe_write_std_handles.stdout_handle;
 
                         si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5600,7 +5604,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         SetStdHandle(STD_OUTPUT_HANDLE, g_pipe_write_std_handles.stdout_handle);
                     }
                 }
-                else if (g_options.shell_exec_verb.empty()) {
+                else if (!is_shell_exec) {
                     si.hStdOutput = g_std_handles.stdout_handle;
 
                     si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5613,7 +5617,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         break;
                     }
 
-                    if (g_options.shell_exec_verb.empty()) {
+                    if (!is_shell_exec) {
                         si.hStdError = g_pipe_write_std_handles.stderr_handle;
 
                         si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5623,7 +5627,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         SetStdHandle(STD_ERROR_HANDLE, g_pipe_write_std_handles.stderr_handle);
                     }
                 }
-                else if (g_options.shell_exec_verb.empty()) {
+                else if (!is_shell_exec) {
                     si.hStdError = g_std_handles.stderr_handle;
 
                     si.dwFlags |= STARTF_USESTDHANDLES;
@@ -5658,15 +5662,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
 
-        const bool is_unelevate_shell_exec = g_is_process_unelevating && g_options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer;
+        const bool is_shell_exec_unelevate_from_explorer = g_is_process_unelevating && g_options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer;
 
         if (g_options.change_current_dir != _T(".")) {
             current_dir = g_options.change_current_dir;
         }
 
-        if (g_options.change_current_dir == _T(".") ||
-            // special case for `IShellDispach2::ShellExecute` function
-            is_unelevate_shell_exec && current_dir.empty()) {
+        if (g_options.change_current_dir == _T(".")) {
             current_dir.resize(GetCurrentDirectory(0, NULL));
 
             if (current_dir.size()) {
@@ -5681,12 +5683,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         DWORD ret_create_proc = 0;
 
-        const bool do_wait_child = !is_idle_execute && (!is_unelevate_shell_exec ?
+        const bool do_wait_child = !is_idle_execute && (!is_shell_exec_unelevate_from_explorer ?
             g_flags.pipe_stdin_to_child_stdin || g_flags.pipe_child_stdout_to_stdout || g_flags.pipe_child_stderr_to_stderr ||
             g_has_tee_stdout || g_has_tee_stderr || !g_flags.no_wait :
             false);
-
-        const bool is_shell_exec = app && app_len && !g_options.shell_exec_verb.empty();
 
         // CAUTION:
         //  DO NOT USE `CREATE_NEW_PROCESS_GROUP` flag in the `CreateProcess`, otherwise a child process would ignore all signals.
@@ -5734,155 +5734,53 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             _print_raw_message_impl(0, STDERR_FILENO, "---\n");
 #endif
 
-            if_break (app && app_len) {
-                if (!is_shell_exec) {
-                    if (si.dwFlags & STARTF_USESTDHANDLES) {
-                        if (_is_valid_handle(si.hStdInput)) {
-                            if (_get_file_type(si.hStdInput) == FILE_TYPE_CHAR) {
-                                g_is_child_stdin_char_type = true;
-                            }
-                        }
-                        else {
+            if (cmd && cmd_len) {
+                // CAUTION:
+                //  cmd argument must be writable!
+                //
+                cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
+                memcpy(cmd_buf.data(), cmd, cmd_buf.size());
+            }
+
+            if (!is_shell_exec && !g_is_process_self_elevation) {
+                if (si.dwFlags & STARTF_USESTDHANDLES) {
+                    if (_is_valid_handle(si.hStdInput)) {
+                        if (_get_file_type(si.hStdInput) == FILE_TYPE_CHAR) {
                             g_is_child_stdin_char_type = true;
                         }
                     }
-                    else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_std_handles.stdin_handle)) {
+                    else {
                         g_is_child_stdin_char_type = true;
                     }
-
-                    //if (g_is_process_unelevating) {
-                    //    if (OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &this_process_handle)) {
-                    //        if (CreateRestrictedToken(this_process_handle, LUA_TOKEN, 0, 0, 0, 0, 0, 0, &this_process_limited_token)) {
-                    //            TOKEN_ELEVATION_TYPE token_elevation_type{ TokenElevationTypeLimited };
-                    //            SetTokenInformation(this_process_limited_token, TokenElevationType, &token_elevation_type, sizeof(token_elevation_type));
-                    //        }
-                    //    }
-                    //}
-
-                    if (cmd && cmd_len) {
-                        // CAUTION:
-                        //  cmd argument must be writable!
-                        //
-                        cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
-                        memcpy(cmd_buf.data(), cmd, cmd_buf.size());
-                    }
-
-                    if (g_enable_child_ctrl_handler) {
-                        g_ctrl_handler = true;
-                        SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
-                    }
-
-                    if (cmd && cmd_len) {
-                        if (!g_is_process_unelevating) {
-                            SetLastError(0); // just in case
-                            ret_create_proc = CreateProcess(
-                                app, (TCHAR *)cmd_buf.data(),
-                                NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
-                                (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
-                                (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
-                                (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
-                                NULL,
-                                !current_dir.empty() ? current_dir.c_str() : NULL,
-                                &si, &pi);
-                        }
-                        else {
-                            switch (g_options.unelevate_method) {
-                            case UnelevationMethod_SearchProcToAdjustToken:
-                            {
-                                SetLastError(0); // just in case
-                                ret_create_proc = CreateProcessNonElevated(
-                                    app, (TCHAR *)cmd_buf.data(),
-                                    NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
-                                    (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
-                                    (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
-                                    (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
-                                    NULL,
-                                    !current_dir.empty() ? current_dir.c_str() : NULL,
-                                    &si, &pi);
-                                win_error = GetLastError();
-                            }
-                            break;
-
-                            case UnelevationMethod_ShellExecuteFromExplorer:
-                            {
-                                // always initialize
-                                CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-
-                                if (g_enable_child_ctrl_handler) {
-                                    g_ctrl_handler = true;
-                                    SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
-                                }
-
-                                SetLastError(0); // just in case
-                                ret_create_proc = ShellExecuteNonElevated(app, cmd, !current_dir.empty() ? current_dir.c_str() : NULL, NULL, SW_SHOWNORMAL);
-
-                                win_error = GetLastError();
-                            }
-                            break;
-
-                            default:
-                                ret_create_proc = FALSE;
-                                win_error = 0;
-                            }
-                        }
-                    }
-                    else {
-                        if (!g_is_process_unelevating) {
-                            SetLastError(0); // just in case
-                            ret_create_proc = CreateProcess(
-                                app, NULL,
-                                NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
-                                (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
-                                (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
-                                (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
-                                NULL,
-                                !current_dir.empty() ? current_dir.c_str() : NULL,
-                                &si, &pi);
-                            win_error = GetLastError();
-                        }
-                        else {
-                            switch (g_options.unelevate_method) {
-                            case UnelevationMethod_SearchProcToAdjustToken:
-                            {
-                                SetLastError(0); // just in case
-                                ret_create_proc = CreateProcessNonElevated(
-                                    app, NULL,
-                                    NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
-                                    (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
-                                    (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
-                                    (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
-                                    NULL,
-                                    !current_dir.empty() ? current_dir.c_str() : NULL,
-                                    &si, &pi);
-                                win_error = GetLastError();
-                            }
-                            break;
-
-                            case UnelevationMethod_ShellExecuteFromExplorer:
-                            {
-                                // always initialize
-                                CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-
-                                if (g_enable_child_ctrl_handler) {
-                                    g_ctrl_handler = true;
-                                    SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
-                                }
-
-                                SetLastError(0); // just in case
-                                ret_create_proc = ShellExecuteNonElevated(app, cmd, !current_dir.empty() ? current_dir.c_str() : NULL, NULL, SW_SHOWNORMAL);
-
-                                win_error = GetLastError();
-                            }
-                            break;
-
-                            default:
-                                ret_create_proc = FALSE;
-                                win_error = 0;
-                            }
-                        }
-                    }
                 }
-                else {
+                else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_std_handles.stdin_handle)) {
+                    g_is_child_stdin_char_type = true;
+                }
+
+                if (g_enable_child_ctrl_handler) {
+                    g_ctrl_handler = true;
+                    SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                }
+
+                SetLastError(0); // just in case
+                ret_create_proc = CreateProcess(
+                    (app && app_len) ? app : NULL, (cmd && cmd_len) ? (TCHAR *)cmd_buf.data() : NULL,
+                    NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
+                    (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
+                    (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
+                    (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
+                    NULL,
+                    !current_dir.empty() ? current_dir.c_str() : NULL,
+                    &si, &pi);
+                win_error = GetLastError();
+
+                if (_is_valid_handle(pi.hProcess)) {
+                    g_child_process_handle = pi.hProcess;       // to check the process status from stream pipe threads
+                    g_child_process_group_id = pi.dwProcessId;  // to pass parent console signal events into child process
+                }
+            }
+            else {
+                if (!g_is_process_unelevating) {
                     sei.cbSize = sizeof(sei);
                     sei.fMask = SEE_MASK_NOCLOSEPROCESS; // use hProcess and sei.hInstApp
 
@@ -5909,8 +5807,8 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         sei.lpVerb = &shell_exec_verb[0];
                     }
 
-                    sei.lpFile = app;
-                    sei.lpParameters = cmd;
+                    sei.lpFile = (app && app_len) ? app : NULL;
+                    sei.lpParameters = (cmd && cmd_len) ? cmd : NULL;
                     sei.lpDirectory = !current_dir.empty() ? current_dir.c_str() : NULL;
                     sei.nShow = g_options.show_as;
 
@@ -5939,61 +5837,13 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         g_child_process_group_id = GetProcessId(sei.hProcess);  // to pass parent console signal events into child process
                     }
                 }
-            }
-            else if (cmd && cmd_len) {
-                if (si.dwFlags & STARTF_USESTDHANDLES) {
-                    if (_is_valid_handle(si.hStdInput)) {
-                        if (_get_file_type(si.hStdInput) == FILE_TYPE_CHAR) {
-                            g_is_child_stdin_char_type = true;
-                        }
-                    }
-                    else {
-                        g_is_child_stdin_char_type = true;
-                    }
-                }
-                else if (g_stdin_handle_type == FILE_TYPE_CHAR || !_is_valid_handle(g_std_handles.stdin_handle)) {
-                    g_is_child_stdin_char_type = true;
-                }
-
-                //if (g_is_process_unelevating) {
-                //    if (OpenProcessToken(GetCurrentProcess(), TOKEN_ALL_ACCESS, &this_process_handle)) {
-                //        if (CreateRestrictedToken(this_process_handle, LUA_TOKEN, 0, 0, 0, 0, 0, 0, &this_process_limited_token)) {
-                //            TOKEN_ELEVATION_TYPE token_elevation_type{ TokenElevationTypeLimited };
-                //            SetTokenInformation(this_process_limited_token, TokenElevationType, &token_elevation_type, sizeof(token_elevation_type));
-                //        }
-                //    }
-                //}
-
-                // CAUTION:
-                //  cmd argument must be writable!
-                //
-                cmd_buf.resize((std::max)(cmd_len + sizeof(TCHAR), size_t(32768U)));
-                memcpy(cmd_buf.data(), cmd, cmd_buf.size());
-
-                if (g_enable_child_ctrl_handler) {
-                    g_ctrl_handler = true;
-                    SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
-                }
-
-                if (!g_is_process_unelevating) {
-                    SetLastError(0); // just in case
-                    ret_create_proc = CreateProcess(
-                        NULL, (TCHAR *)cmd_buf.data(),
-                        NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
-                        (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
-                        (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
-                        (g_flags.no_window_console ? CREATE_NO_WINDOW : 0),
-                        NULL,
-                        !current_dir.empty() ? current_dir.c_str() : NULL,
-                        &si, &pi);
-                }
                 else {
                     switch (g_options.unelevate_method) {
                     case UnelevationMethod_SearchProcToAdjustToken:
                     {
                         SetLastError(0); // just in case
                         ret_create_proc = CreateProcessNonElevated(
-                            NULL, (TCHAR *)cmd_buf.data(),
+                            (app && app_len) ? app : NULL, (cmd && cmd_len) ? (TCHAR *)cmd_buf.data() : NULL,
                             NULL, NULL, TRUE, // must be always TRUE because there can be any arbitrary handle
                             (g_flags.detach_child_console ? DETACHED_PROCESS : 0) |
                             (g_flags.create_child_console ? CREATE_NEW_CONSOLE : 0) |
@@ -6002,6 +5852,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                             !current_dir.empty() ? current_dir.c_str() : NULL,
                             &si, &pi);
                         win_error = GetLastError();
+
+                        if (_is_valid_handle(pi.hProcess)) {
+                            g_child_process_handle = pi.hProcess;       // to check the process status from stream pipe threads
+                            g_child_process_group_id = pi.dwProcessId;  // to pass parent console signal events into child process
+                        }
                     }
                     break;
 
@@ -6016,7 +5871,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         }
 
                         SetLastError(0); // just in case
-                        ret_create_proc = ShellExecuteNonElevated(app, cmd, !current_dir.empty() ? current_dir.c_str() : NULL, NULL, SW_SHOWNORMAL);
+                        ret_create_proc = ShellExecuteNonElevated(
+                            (app && app_len) ? app : NULL,
+                            (cmd && cmd_len) ? cmd : NULL,
+                            !current_dir.empty() ? current_dir.c_str() : NULL,
+                            NULL, g_options.show_as);
 
                         win_error = GetLastError();
                     }
@@ -6027,11 +5886,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         win_error = 0;
                     }
                 }
-            }
-
-            if (_is_valid_handle(pi.hProcess)) {
-                g_child_process_handle = pi.hProcess;       // to check the process status from stream pipe threads
-                g_child_process_group_id = pi.dwProcessId;  // to pass parent console signal events into child process
             }
 
             // restore standard handles
@@ -6058,7 +5912,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 #endif
 
         const bool is_child_executed = !is_idle_execute && 
-            (!is_unelevate_shell_exec ?
+            (!is_shell_exec_unelevate_from_explorer ?
                 ret_create_proc && _is_valid_handle(g_child_process_handle) :
                 SUCCEEDED(ret_create_proc));
 
@@ -6086,7 +5940,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     _print_shell_exec_error_message(shell_error, sei);
                 }
 
-                if (is_unelevate_shell_exec && g_flags.print_shell_error_string) {
+                if (is_shell_exec_unelevate_from_explorer && g_flags.print_shell_error_string) {
                     _print_com_error_message(ret_create_proc);
                 }
             }

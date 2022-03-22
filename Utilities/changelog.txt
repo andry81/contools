@@ -1,4 +1,11 @@
 2022.03.22:
+* fixed: src/callf: command line parse fixup
+* fixed: src/callf: execution fixup
+* new: src/callf: `/shell-exec-unelevate-from-explorer` option to shell execute from COM interface
+* changed: src/callf: ExecuteProcess partial reimplementation
+* refactor: src/callf/help.tpl: help refactor
+
+2022.03.22:
 * fixed: src/callf: utf-16 text in non unicode locale print fixup
 
 2022.03.21:

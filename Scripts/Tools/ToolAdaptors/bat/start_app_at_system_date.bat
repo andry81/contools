@@ -69,5 +69,5 @@ set "CURRENT_DATE=%DATE%"
 echo.%1 %2
 
 if %FLAG_TIMEOUT_SEC% NEQ 0 (
-  "%CALLF_ELEVATE_EXECUTABLE%" /pause-on-exit-if-error /ret-child-exit /shell-exec runas /S1%CALLF_ELEVATE_BARE_FLAGS% "${COMSPEC}" "/c \"( date ${FLAG_AT_DATE} ^) ^^^&^^^& ( \"${CALLF_UNELEVATE_EXECUTABLE}\" /unelevate%START_BARE_FLAGS% {*} ^) ^^^&^^^& ( timeout /T ${FLAG_TIMEOUT_SEC} ^) ^^^& ( date ${CURRENT_DATE} ^)\"" %1 %2 %3 %4 %5 %6 %7 %8 %9
-) else "%CALLF_ELEVATE_EXECUTABLE%" /pause-on-exit-if-error /ret-child-exit /shell-exec runas /S1%CALLF_ELEVATE_BARE_FLAGS% "${COMSPEC}" "/c \"( date ${FLAG_AT_DATE} ^) ^^^&^^^& ( \"${CALLF_UNELEVATE_EXECUTABLE}\" /unelevate%START_BARE_FLAGS% {*} ^) ^^^& ( date ${CURRENT_DATE} ^)\"" %1 %2 %3 %4 %5 %6 %7 %8 %9
+  "%CALLF_ELEVATE_EXECUTABLE%" /pause-on-exit-if-error /ret-child-exit /shell-exec runas /S1%CALLF_ELEVATE_BARE_FLAGS% "${COMSPEC}" "/c \"( date ${FLAG_AT_DATE} ^) ^^^&^^^& ( \"${CALLF_UNELEVATE_EXECUTABLE}\" /shell-exec-unelevate-from-explorer%START_BARE_FLAGS% {*} ^) ^^^&^^^& ( timeout /T ${FLAG_TIMEOUT_SEC} ^) ^^^& ( date ${CURRENT_DATE} ^)\"" %1 %2 %3 %4 %5 %6 %7 %8 %9
+) else "%CALLF_ELEVATE_EXECUTABLE%" /pause-on-exit-if-error /ret-child-exit /shell-exec runas /S1%CALLF_ELEVATE_BARE_FLAGS% "${COMSPEC}" "/c \"( date ${FLAG_AT_DATE} ^) ^^^&^^^& ( \"${CALLF_UNELEVATE_EXECUTABLE}\" /shell-exec-unelevate-from-explorer%START_BARE_FLAGS% {*} ^) ^^^& ( date ${CURRENT_DATE} ^)\"" %1 %2 %3 %4 %5 %6 %7 %8 %9

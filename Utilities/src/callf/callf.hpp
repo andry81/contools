@@ -13,6 +13,7 @@
 #include "printf.hpp"
 
 extern bool g_is_process_executed;
+extern bool g_is_process_self_elevation;
 extern bool g_is_process_elevating;
 extern bool g_is_process_unelevating;
 extern bool g_is_process_elevated;
