@@ -2,9 +2,9 @@
 
 setlocal
 
-if %IMPL_MODE%0 NEQ 0 goto IMPL
-
 call "%%~dp0__init__\__init__.bat" || exit /b
+
+if %IMPL_MODE%0 NEQ 0 goto IMPL
 
 call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
 
