@@ -17,6 +17,10 @@ if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%GITHUB_ADA
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -lite_parse -gen_user_config "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
+if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-user.lst"  call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" accounts-user.lst.in  accounts-user.lst || exit /b
+if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-org.lst"   call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" accounts-org.lst.in   accounts-org.lst || exit /b
+if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst"          call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos.lst.in          repos.lst || exit /b
+
 call :IF_DEFINED_AND_FILE_EXIST CURL_EXECUTABLE || (
   echo.%~nx0: error: CURL_EXECUTABLE file path is not found: "%EMULE_EXECUTABLE%"
   exit /b 255

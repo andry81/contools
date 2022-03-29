@@ -1,3 +1,7 @@
+2022.03.29:
+* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_all.bat` backup script to backup all restapi resources for all accounts and repositories
+* new: _config: `accounts-org.lst.in`, `accounts-user.lst.in`, `repos.lst.in` template list files to store organization/user accounts and repositories list
+
 2022.03.28:
 * changed: Scripts/Tools/ToolAdaptors/app/github: scripts initialization order change
 

@@ -197,9 +197,13 @@ Scripts/Tools/ToolAdaptors/app/flylink/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/flylink/_config/config.system.vars.in -text
 Scripts/Tools/ToolAdaptors/app/flylink/backup_config.bat -text
 Scripts/Tools/ToolAdaptors/app/github/__init__/__init__.bat -text
+Scripts/Tools/ToolAdaptors/app/github/_config/accounts-org.lst.in -text
+Scripts/Tools/ToolAdaptors/app/github/_config/accounts-user.lst.in -text
 Scripts/Tools/ToolAdaptors/app/github/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/github/_config/config.1.vars.in -text
 Scripts/Tools/ToolAdaptors/app/github/_config/config.system.vars.in -text
+Scripts/Tools/ToolAdaptors/app/github/_config/repos.lst.in -text
+Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_auth_user_repos_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_org_repos_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_repo_forks_list.bat -text
