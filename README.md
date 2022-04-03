@@ -8,6 +8,12 @@ mingw.<br/><br/>
 
 The latest version is here: https://sf.net/p/contools</h4>
 
+<!-- -->
+<p align="center">
+  <a href="#"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fandry81%2Fcontools&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" valign="middle" alt="hits" /></a>
+</p>
+<!-- -->
+
 <p align="center">
   <a href="https://www.codefactor.io/repository/github/andry81/contools"><img src="https://img.shields.io/codefactor/grade/github/andry81/contools?label=quality&logo=codefactor" valign="middle" alt="codefactor.io|quality" /></a>
   <!-- <a href="https://www.codefactor.io/repository/github/andry81/contools"><img src="https://www.codefactor.io/repository/github/andry81/contools/badge" valign="middle" alt="codefactor.io|quality" /></a> -->
@@ -66,22 +72,15 @@ The latest version is here: https://sf.net/p/contools</h4>
 </p>
 
 <p align="center">
-  <a href="https://github.com/sponsors/andry81"><img src="https://github.com/andry81/andry81/raw/master/badges/github-sponsor.svg" valign="middle" alt="github sponsor" /></a>
-• <a href="https://www.paypal.com/cgi-bin/webscr?item_name=Donation+to+contools&cmd=_donations&business=andry%40inbox.ru"><img src="https://github.com/andry81/andry81/raw/master/badges/paypal-donate.svg" valign="middle" alt="paypal donate" /></a>
+  <a href="https://github.com/andry81/donate"><img src="https://github.com/andry81/andry81/raw/master/badges/donate.svg" valign="middle" alt="donate" /></a>
 </p>
-
-<!-- -->
-<p align="center">
-  <a href="#"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fandry81%2Fcontools&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" valign="middle" alt="hits" /></a>
-</p>
-<!-- -->
 
 ---
 
-## Dependencies<a name="dependecies"></a>
+## <a name="dependecies">Dependencies</a>
 
 * https://github.com/andry81/contools--3dparty--wxwidgets
 
-## Copyright and License<a name="copyright-and-license"></a>
+## <a name="copyright-and-license">Copyright and License</a>
 
 Code and documentation copyright 2021 Andrey Dibrov. Code released under [MIT License](https://github.com/andry81/contools/blob/trunk/license.txt)
