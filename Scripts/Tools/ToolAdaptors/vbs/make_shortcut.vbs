@@ -1,7 +1,7 @@
 ''' Creates the Windows shortcut file.
 
 ''' USAGE:
-'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-u] [-q] [-E[0 | t | a]] [-u] [--] <ShortcutFileName> <ShortcutTarget> <ShortcutArgs>
+'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-u] [-q] [-E[0 | t | a]] [-u] [--] <ShortcutFilePath> <ShortcutTarget> <ShortcutArgs>
 '''
 ''' DESCRIPTION:
 '''   --
@@ -170,11 +170,11 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         UnescapeAllArgs = True
       ElseIf arg = "-CD" Then ' Change current directory
         i = i + 1
-        ChangeCurrentDirectory =  WScript.Arguments(i)
+        ChangeCurrentDirectory = WScript.Arguments(i)
         ChangeCurrentDirectoryExist = True
       ElseIf arg = "-WD" Then ' Shortcut working directory
         i = i + 1
-        ShortcutWorkingDirectory =  WScript.Arguments(i)
+        ShortcutWorkingDirectory = WScript.Arguments(i)
         ShortcutWorkingDirectoryExist = True
       ElseIf arg = "-showas" Then ' Show window as
         i = i + 1

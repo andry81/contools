@@ -1,7 +1,7 @@
 ''' Updates the Windows shortcut file.
 
 ''' USAGE:
-'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-u] [-q] [-E[0 | t | a]] [-u] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFileName>
+'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-u] [-q] [-E[0 | t | a]] [-u] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFilePath>
 
 ''' DESCRIPTION:
 '''   --
@@ -170,19 +170,19 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         UnescapeAllArgs = True
       ElseIf arg = "-CD" Then ' Change current directory
         i = i + 1
-        ChangeCurrentDirectory =  WScript.Arguments(i)
+        ChangeCurrentDirectory = WScript.Arguments(i)
         ChangeCurrentDirectoryExist = True
       ElseIf arg = "-WD" Then ' Shortcut working directory
         i = i + 1
-        ShortcutWorkingDirectory =  WScript.Arguments(i)
+        ShortcutWorkingDirectory = WScript.Arguments(i)
         ShortcutWorkingDirectoryExist = True
       ElseIf arg = "-t" Then ' Shortcut target object
         i = i + 1
-        ShortcutTarget =  WScript.Arguments(i)
+        ShortcutTarget = WScript.Arguments(i)
         ShortcutTargetExist = True
       ElseIf arg = "-args" Then ' Shortcut target object arguments
         i = i + 1
-        ShortcutArgs =  WScript.Arguments(i)
+        ShortcutArgs = WScript.Arguments(i)
         ShortcutArgsExist = True
       ElseIf arg = "-showas" Then ' Show window as
         i = i + 1
