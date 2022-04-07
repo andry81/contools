@@ -1,4 +1,7 @@
 2022.04.07:
+* changed: Scripts/Tools/ToolAdaptors: missed changes
+
+2022.04.07:
 * new: Scripts/Tools/ToolAdaptors/vbs: `read_shortcut.vbs` script
 * refactor: Scripts/Tools/ToolAdaptors/vbs: minor refactor
 
