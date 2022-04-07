@@ -309,7 +309,7 @@ Scripts/Tools/ToolAdaptors/timestamp/__init__.bat -text
 Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_cmd_to_run_notepad_and_wait.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/Samples/run_notepad_and_wait.vbs -text
-Scripts/Tools/ToolAdaptors/vbs/__init__.bat -text
+Scripts/Tools/ToolAdaptors/vbs/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/vbs/call.bat -text
 Scripts/Tools/ToolAdaptors/vbs/call.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/make_shortcut.bat -text
@@ -326,6 +326,7 @@ Scripts/Tools/ToolAdaptors/vbs/printcmdline.bat -text
 Scripts/Tools/ToolAdaptors/vbs/read_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat -text
 Scripts/Tools/ToolAdaptors/vbs/winshell_call.bat -text
 Scripts/Tools/ToolAdaptors/vbs/winshell_call.vbs -text
 Scripts/Tools/__init__.bat -text

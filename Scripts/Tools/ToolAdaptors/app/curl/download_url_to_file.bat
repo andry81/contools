@@ -79,7 +79,7 @@ if defined FLAG (
 
 :FLAGS_LOOP_END
 
-rem Uee {PAGENUM} as placeholder
+rem Use {PAGENUM} as placeholder
 set "URL_TMPL=%~1"
 
 rem can be `.` to ignore

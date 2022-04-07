@@ -77,7 +77,7 @@ if defined FLAG (
   goto FLAGS_LOOP
 )
 
-rem Uee {PAGENUM} as placeholder
+rem Use {PAGENUM} as placeholder
 set "URL_TMPL=%~1"
 
 set "FROM_PAGE=%~2"

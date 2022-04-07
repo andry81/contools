@@ -1,4 +1,8 @@
 2022.04.07:
+* new: Scripts/Tools/ToolAdaptors/vbs: `update_shortcut_props_from_dir.bat` script to update shortcut properties from a directory
+* changed: Scripts/Tools/ToolAdaptors/vbs: minor changes
+
+2022.04.07:
 * changed: Scripts/Tools/ToolAdaptors: missed changes
 
 2022.04.07:
