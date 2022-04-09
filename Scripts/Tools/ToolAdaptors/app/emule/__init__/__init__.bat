@@ -37,9 +37,16 @@ call :IF_DEFINED_AND_DIR_EXIST EMULE_LOG_DIR || (
   exit /b 255
 ) >&2
 
+call :IF_DEFINED_AND_DIR_EXIST EMULE_TEMP_DIR || (
+  echo.%~nx0: error: EMULE_TEMP_DIR directory is not found: "%EMULE_TEMP_DIR%".
+  exit /b 255
+) >&2
+
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_CONFIG_DIR            "%%EMULE_CONFIG_DIR%%"
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_LOG_DIR               "%%EMULE_LOG_DIR%%"
+
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_TEMP_DIR              "%%EMULE_TEMP_DIR%%"
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_ADAPTOR_BACKUP_DIR    "%%EMULE_ADAPTOR_BACKUP_DIR%%"
 

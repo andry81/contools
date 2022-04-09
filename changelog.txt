@@ -1,3 +1,6 @@
+2022.04.09:
+* new: Scripts/Tools/ToolAdaptors/app/emule: `backup_part_met_files.bat` script
+
 2022.04.07:
 * new: Scripts/Tools/ToolAdaptors/vbs: `update_shortcut_props_from_dir.bat` script to update shortcut properties from a directory
 * changed: Scripts/Tools/ToolAdaptors/vbs: minor changes

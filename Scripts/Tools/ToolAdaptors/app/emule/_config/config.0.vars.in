@@ -22,3 +22,5 @@ once EMULE_CONFIG_DIR                     ="$/{LOCALAPPDATA}/eMule/config"
 once EMULE_ADAPTOR_BACKUP_DIR             ="$/{PROJECT_OUTPUT_ROOT}/emule/backup"
 
 once EMULE_LOG_DIR                        ="$/{LOCALAPPDATA}/eMule/logs"
+
+once EMULE_TEMP_DIR                       =""
