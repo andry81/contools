@@ -1,4 +1,7 @@
 2022.04.18:
+* changed: .github/badges, README.md: content moved into `andry81-cache/andry81--gh-content-cache` repository
+
+2022.04.18:
 * new: Scripts/Tools/ToolAdaptors/app/github: `print_*_repos_from_restapi_json.bat` print script to print `html_url` only parameter from restapi json file with repositories list
 
 2022.04.09:
