@@ -212,6 +212,8 @@ Scripts/Tools/ToolAdaptors/app/github/backup_restapi_repo_releases_list.bat -tex
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_repo_subscribers_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_starred_repos_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_user_repos_list.bat -text
+Scripts/Tools/ToolAdaptors/app/github/print_all_repos_from_restapi_json.bat -text
+Scripts/Tools/ToolAdaptors/app/github/print_source_repos_from_restapi_json.bat -text
 Scripts/Tools/ToolAdaptors/app/qbittorrent/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/qbittorrent/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/qbittorrent/_config/config.system.vars.in -text

@@ -1,3 +1,6 @@
+2022.04.18:
+* new: Scripts/Tools/ToolAdaptors/app/github: `print_*_repos_from_restapi_json.bat` print script to print `html_url` only parameter from restapi json file with repositories list
+
 2022.04.09:
 * new: Scripts/Tools/ToolAdaptors/app/emule: `backup_part_met_files.bat` script
 
