@@ -65,43 +65,15 @@ set HAS_AUTH_USER=0
 if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{GH_AUTH_USER}}" ^
 if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
 
-if %HAS_AUTH_USER% NEQ 0 (
-  rem including private repos
-  call :CMD "backup_restapi_auth_user_repos_list.bat" owner || exit /b 255
-  echo.---
-  call :CMD "backup_restapi_auth_user_repos_list.bat" all || exit /b 255
-  echo.---
-)
+if %HAS_AUTH_USER% EQU 0 (
+  echo.%~nx0: error: GH_AUTH_USER or GH_AUTH_PASS is not defined.
+  exit /b 255
+) >&2
 
-rem including private repos if authentication is declared
-for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-user.lst") do (
-  set "REPO_OWNER=%%i"
-  call :CMD "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" owner || exit /b 255
-  echo.---
-  call :CMD "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" all || exit /b 255
-  echo.---
-  call :CMD "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || exit /b 255
-  echo.---
-)
-
-for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-org.lst") do (
-  set "REPO_OWNER=%%i"
-  call :CMD "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources || exit /b 255
-  echo.---
-  call :CMD "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all || exit /b 255
-  echo.---
-  call :CMD "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || exit /b 255
-  echo.---
-)
-
-for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst") do (
+for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos-auth.lst") do (
   set "REPO_OWNER=%%i"
   set "REPO=%%j"
-  call :CMD "backup_restapi_repo_subscribers_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
-  echo.---
-  call :CMD "backup_restapi_repo_forks_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
-  echo.---
-  call :CMD "backup_restapi_repo_releases_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
+  call :CMD "backup_bare_auth_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
   echo.---
 )
 

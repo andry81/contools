@@ -66,10 +66,10 @@ mkdir "%EMPTY_DIR_TMP%" || (
   exit /b 255
 ) >&2
 
-set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup"
+set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup\restapi"
 
 set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/repos/starred/%OWNER%"
-set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/repos/starred/%OWNER%"
+set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/restapi/repos/starred/%OWNER%"
 
 mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
   echo.%?~n0%: error: could not create a directory: "%GH_REPOS_BACKUP_TEMP_DIR%".
@@ -126,7 +126,7 @@ echo.
 exit /b 0
 
 :CURL
-if defined GH_RESTAPI_USER if not "%GH_RESTAPI_USER%" == "{{USER}}" goto CURL_WITH_USER
+if defined GH_AUTH_USER if not "%GH_AUTH_USER%" == "{{USER}}" goto CURL_WITH_USER
 
 echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% %*
 (
@@ -135,9 +135,9 @@ echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% %*
 exit /b
 
 :CURL_WITH_USER
-echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_RESTAPI_USER%:%GH_RESTAPI_PASS%" %*
+echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
 (
-  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_RESTAPI_USER%:%GH_RESTAPI_PASS%" %*
+  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
 ) > "%CURL_OUTPUT_FILE%"
 exit /b
 

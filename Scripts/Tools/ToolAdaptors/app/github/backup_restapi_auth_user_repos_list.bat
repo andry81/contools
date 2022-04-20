@@ -66,13 +66,23 @@ mkdir "%EMPTY_DIR_TMP%" || (
   exit /b 255
 ) >&2
 
-set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup"
+set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup\restapi"
 
-set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/repos/user/%GH_RESTAPI_USER%"
-set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/repos/user/%GH_RESTAPI_USER%"
+set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/repos/user/%GH_AUTH_USER%"
+set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/restapi/repos/user/%GH_AUTH_USER%"
 
 mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
   echo.%?~n0%: error: could not create a directory: "%GH_REPOS_BACKUP_TEMP_DIR%".
+  exit /b 255
+) >&2
+
+set HAS_AUTH_USER=0
+
+if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{GH_AUTH_USER}}" ^
+if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
+
+if %HAS_AUTH_USER% EQU 0 (
+  echo.%~nx0: error: GH_AUTH_USER or GH_AUTH_PASS is not defined.
   exit /b 255
 ) >&2
 
@@ -114,7 +124,7 @@ if %PAGE% LSS 2 if %QUERY_LEN% EQU 0 (
 
 echo.Archiving backup directory...
 if not exist "%GH_REPOS_BACKUP_DIR%\" mkdir "%GH_REPOS_BACKUP_DIR%"
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/auth-user-repos--[%%GH_RESTAPI_USER%%][%%TYPE%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/auth-user-repos--[%%GH_AUTH_USER%%][%%TYPE%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
 echo.
 
 :SKIP_ARCHIVE
@@ -125,17 +135,9 @@ echo.
 exit /b 0
 
 :CURL
-if defined GH_RESTAPI_USER if not "%GH_RESTAPI_USER%" == "{{USER}}" goto CURL_WITH_USER
-
+echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
 (
-  echo.%?~n0%: error: GH_RESTAPI_USER is not properly defined for authenticated request.
-  exit /b 255
-) >&2
-
-:CURL_WITH_USER
-echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_RESTAPI_USER%:%GH_RESTAPI_PASS%" %*
-(
-  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_RESTAPI_USER%:%GH_RESTAPI_PASS%" %*
+  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
 ) > "%CURL_OUTPUT_FILE%"
 exit /b
 

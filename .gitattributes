@@ -202,7 +202,12 @@ Scripts/Tools/ToolAdaptors/app/github/_config/accounts-user.lst.in -text
 Scripts/Tools/ToolAdaptors/app/github/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/github/_config/config.1.vars.in -text
 Scripts/Tools/ToolAdaptors/app/github/_config/config.system.vars.in -text
+Scripts/Tools/ToolAdaptors/app/github/_config/repos-auth.lst.in -text
 Scripts/Tools/ToolAdaptors/app/github/_config/repos.lst.in -text
+Scripts/Tools/ToolAdaptors/app/github/backup_bare_all_auth_repos.bat -text
+Scripts/Tools/ToolAdaptors/app/github/backup_bare_all_repos.bat -text
+Scripts/Tools/ToolAdaptors/app/github/backup_bare_auth_repo.bat -text
+Scripts/Tools/ToolAdaptors/app/github/backup_bare_repo.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_auth_user_repos_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_org_repos_list.bat -text

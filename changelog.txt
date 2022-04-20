@@ -1,5 +1,10 @@
 2022.04.20:
-* fixed: backup_restapi_auth_user_repos_list.bat: incorrect user name usage
+* new: Scripts/Tools/ToolAdaptors/app/github: `backup_bare_*.bat` scripts to back bare remote repositories
+* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_*.bat: minor fixup
+* refactor: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_*.bat: minor refactor
+
+2022.04.20:
+* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_auth_user_repos_list.bat: incorrect user name usage
 * fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: avoid creation empty directories
 * changed: backup_restapi_all.bat: use logged used name if not empty to backup by an authenticated user url (`backup_restapi_auth_user_repos_list.bat`)
 
