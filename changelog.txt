@@ -1,3 +1,8 @@
+2022.04.20:
+* fixed: backup_restapi_auth_user_repos_list.bat: incorrect user name usage
+* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: avoid creation empty directories
+* changed: backup_restapi_all.bat: use logged used name if not empty to backup by an authenticated user url (`backup_restapi_auth_user_repos_list.bat`)
+
 2022.04.18:
 * changed: .github/badges, README.md: content moved into `andry81-cache/andry81--gh-content-cache` repository
 

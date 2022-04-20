@@ -82,8 +82,6 @@ mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
   exit /b 255
 ) >&2
 
-if not exist "%GH_REPOS_BACKUP_DIR%\" mkdir "%GH_REPOS_BACKUP_DIR%"
-
 set PAGE=1
 
 :PAGE_LOOP
@@ -123,6 +121,7 @@ if %PAGE% LSS 2 if %QUERY_LEN% EQU 0 (
 ) >&2
 
 echo.Archiving backup directory...
+if not exist "%GH_REPOS_BACKUP_DIR%\" mkdir "%GH_REPOS_BACKUP_DIR%"
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/subscribers--[%%OWNER%%][%%REPO%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
 echo.
 

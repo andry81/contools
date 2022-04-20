@@ -60,6 +60,19 @@ pushd "%?~dp0%" && (
 exit /b
 
 :MAIN_IMPL
+set SKIP_AUTH_USER=0
+
+if defined GH_RESTAPI_USER if not "%GH_RESTAPI_USER%" == "{{USER}}" set SKIP_AUTH_USER=1
+
+if SKIP_AUTH_USER EQU 0 (
+  rem including private repos
+  call :CMD "backup_restapi_auth_user_repos_list.bat" owner || exit /b 255
+  echo.---
+  call :CMD "backup_restapi_auth_user_repos_list.bat" all || exit /b 255
+  echo.---
+)
+
+rem excluding private repos if not authenticated
 for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-user.lst") do (
   set "REPO_OWNER=%%i"
   call :CMD "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" owner || exit /b 255
