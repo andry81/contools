@@ -25,4 +25,10 @@ once GH_RESTAPI_PARAM_PER_PAGE            =100
 
 once CURL_BARE_FLAGS                      =-H "Accept: application/vnd.github.v3+json"
 
+# timeout between restapi backups
+once GH_RESTAPI_BACKUP_USE_TIMEOUT_MS     =5000
+
+# timeout between bare repo backups
+once GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS   =5000
+
 once CHCP                                 =65001

@@ -60,28 +60,12 @@ pushd "%?~dp0%" && (
 exit /b
 
 :MAIN_IMPL
-set HAS_AUTH_USER=0
-
-if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{GH_AUTH_USER}}" ^
-if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
-
-if %HAS_AUTH_USER% EQU 0 (
-  echo.%~nx0: error: GH_AUTH_USER or GH_AUTH_PASS is not defined.
-  exit /b 255
-) >&2
-
-for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos-auth.lst") do (
-  set "REPO_OWNER=%%i"
-  set "REPO=%%j"
-  call :CMD "backup_bare_auth_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
-  echo.---
-)
-
 for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst") do (
   set "REPO_OWNER=%%i"
   set "REPO=%%j"
   call :CMD "backup_bare_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
   echo.---
+  if defined GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS%%"
 )
 
 exit /b 0

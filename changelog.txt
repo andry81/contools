@@ -1,3 +1,8 @@
+2022.04.21:
+* fixed: Scripts/Tools/ToolAdaptors/app/github: minor fixup
+* new: Scripts/Tools/ToolAdaptors/app/github: added `GH_RESTAPI_BACKUP_USE_TIMEOUT_MS` and `GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS` for timeouts between calls
+* changed: Scripts/Tools/ToolAdaptors/app/github/backup_bare_all_repos.bat: removed backup repositories required authentication, left it for `backup_bare_all_auth_repos.bat` script
+
 2022.04.20:
 * new: Scripts/Tools/ToolAdaptors/app/github: `backup_bare_*.bat` scripts to back bare remote repositories
 * fixed: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_*.bat: minor fixup

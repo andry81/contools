@@ -62,7 +62,7 @@ exit /b
 :MAIN_IMPL
 set HAS_AUTH_USER=0
 
-if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{GH_AUTH_USER}}" ^
+if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{USER}}" ^
 if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
 
 if %HAS_AUTH_USER% EQU 0 (
@@ -75,6 +75,7 @@ for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUT
   set "REPO=%%j"
   call :CMD "backup_bare_auth_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
   echo.---
+  if defined GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS%%"
 )
 
 exit /b 0
