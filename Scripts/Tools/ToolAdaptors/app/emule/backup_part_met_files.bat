@@ -58,13 +58,15 @@ mkdir "%EMPTY_DIR_TMP%" || (
   exit /b 255
 ) >&2
 
-call :XCOPY_FILE "%%EMULE_TEMP_DIR%%"             *.part.met                    "%%EMULE_ADAPTOR_BACKUP_DIR%%/emule--part-met-%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+set "EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX=emule--part-met-"
+
+call :XCOPY_FILE "%%EMULE_TEMP_DIR%%"             *.part.met                    "%%EMULE_ADAPTOR_BACKUP_DIR%%/%%EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 
 echo.Archiving backup directory...
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%EMULE_ADAPTOR_BACKUP_DIR%%" "emule--part-met-%%PROJECT_LOG_FILE_NAME_SUFFIX%%/*" "%%EMULE_ADAPTOR_BACKUP_DIR%%/emule--part-met-%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%EMULE_ADAPTOR_BACKUP_DIR%%" "%%EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%/*" "%%EMULE_ADAPTOR_BACKUP_DIR%%/%%EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
 echo.
 
-call :CMD rmdir /S /Q "%%EMULE_ADAPTOR_BACKUP_DIR%%/emule--part-met-%%PROJECT_LOG_FILE_NAME_SUFFIX%%"
+call :CMD rmdir /S /Q "%%EMULE_ADAPTOR_BACKUP_DIR%%/%%EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_SUFFIX%%"
 
 exit /b 0
 

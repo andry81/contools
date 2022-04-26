@@ -1,3 +1,7 @@
+2022.04.26:
+* changed: Scripts/Tools/ToolAdaptors/app/qbittorrent: extracted database files backup from the config backup
+* refactor: Scripts/Tools/ToolAdaptors/app: amule, emula, qbittorrent: code refactor
+
 2022.04.21:
 * fixed: Scripts/Tools/ToolAdaptors/app/github: minor fixup
 * new: Scripts/Tools/ToolAdaptors/app/github: added `GH_RESTAPI_BACKUP_USE_TIMEOUT_MS` and `GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS` for timeouts between calls
