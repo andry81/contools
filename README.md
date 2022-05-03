@@ -8,71 +8,72 @@ mingw.<br/><br/>
 
 The latest version is here: https://sf.net/p/contools</h4>
 
-<!-- -->
 <p align="center">
-  <a href="#"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fandry81%2Fcontools&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" valign="middle" alt="hits" /></a>
-</p>
+  <a href="https://www.codefactor.io/repository/github/andry81/contools">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codefactor-grade.svg" valign="middle" alt="codefactor.io|quality" /></a>
+• <a href="https://www.codacy.com/gh/andry81/contools/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andry81/contools&amp;utm_campaign=Badge_Grade">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codacy-grade.svg" valign="middle" alt="codacy.com|quality" /></a>
+<!-- • <a href="https://www.codacy.com/gh/andry81/contools/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andry81/contools&amp;utm_campaign=Badge_Grade">
+    <img src="https://app.codacy.com/project/badge/Grade/09e6de3a65614dd1b85c631ff108c8e5" valign="middle" alt="codacy.com|quality" /></a> -->
 <!-- -->
-
-<p align="center">
-  <a href="https://www.codefactor.io/repository/github/andry81/contools"><img src="https://img.shields.io/codefactor/grade/github/andry81/contools?label=quality&logo=codefactor" valign="middle" alt="codefactor.io|quality" /></a>
-  <!-- <a href="https://www.codefactor.io/repository/github/andry81/contools"><img src="https://www.codefactor.io/repository/github/andry81/contools/badge" valign="middle" alt="codefactor.io|quality" /></a> -->
-• <a href="https://www.codacy.com/gh/andry81/contools/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andry81/contools&amp;utm_campaign=Badge_Grade"><img src="https://img.shields.io/codacy/grade/09e6de3a65614dd1b85c631ff108c8e5?label=quality&logo=codacy" valign="middle" alt="codacy.com|quality" /></a>
-<!-- • <a href="https://www.codacy.com/gh/andry81/contools/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andry81/contools&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/09e6de3a65614dd1b85c631ff108c8e5" valign="middle" alt="codacy.com|quality" /></a> -->
-<!-- -->
-• <a href="https://lgtm.com/projects/g/andry81/contools/context:python"><img src="https://img.shields.io/lgtm/grade/python/g/andry81/contools.svg?label=quality: python&logo=lgtm" valign="middle" alt="lgtm.com|quality|python" /></a>
-  <a href="https://lgtm.com/projects/g/andry81/contools/alerts"><img src="https://img.shields.io/lgtm/alerts/github/andry81/contools?label=alerts&logo=lgtm" valign="middle" alt="lgtm.com|alerts" /></a>
+• <a href="https://lgtm.com/projects/g/andry81/contools/context:python">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/lgtm-grade-python.svg" valign="middle" alt="lgtm.com|quality|python" /></a>
+  <a href="https://lgtm.com/projects/g/andry81/contools/alerts">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/lgtm-alerts.svg" valign="middle" alt="lgtm.com|alerts" /></a>
 <!-- -->
 </p>
 
 <!-- -->
 <p align="center">
-  <a href="https://codeclimate.com/github/andry81/contools/maintainability"><img src="https://api.codeclimate.com/v1/badges/d7d0415db06ae2e19681/maintainability?logo=codeclimate" valign="middle" alt="codeclimate.com|maintainability" /></a>
-  <a href="https://codeclimate.com/github/andry81/contools/issues"><img src="https://img.shields.io/codeclimate/issues/andry81/contools?logo=codeclimate" valign="middle" alt="codeclimate.com|issues" /></a>
-  <a href="https://codeclimate.com/github/andry81/contools/trends/technical_debt"><img src="https://img.shields.io/codeclimate/tech-debt/andry81/contools?logo=codeclimate" valign="middle" alt="codeclimate.com|debt" /></a>
+  <a href="https://codeclimate.com/github/andry81/contools/maintainability">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codeclimate-maintainability.svg" valign="middle" alt="codeclimate.com|maintainability" /></a>
+  <a href="https://codeclimate.com/github/andry81/contools/issues">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codeclimate-issues.svg" valign="middle" alt="codeclimate.com|issues" /></a>
+  <a href="https://codeclimate.com/github/andry81/contools/trends/technical_debt">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codeclimate-tech-debt.svg" valign="middle" alt="codeclimate.com|debt" /></a>
 </p>
 <!-- -->
 
 <p align="center">
-  <a href="#"><img src="https://img.shields.io/github/repo-size/andry81/contools?logo=github" valign="middle" alt="GitHub repo size in bytes" /></a>
-• <a href="#"><img src="https://img.shields.io/github/languages/code-size/andry81/contools?logo=github" valign="middle" alt="code size in bytes" /></a>
-• <a href="https://github.com/XAMPPRocky/tokei"><img src="https://tokei.rs/b1/github/andry81/contools?category=code" valign="middle" alt="lines of code by tokei.rs" /></a>
-<!-- -- >
-• <a href="https://github.com/XAMPPRocky/tokei"><img src="https://img.shields.io/tokei/lines/github/andry81/contools?logo=tokei" valign="middle" alt="total lines by tokei.rs" /></a>
-<!-- -->
+  <a href="#">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/shields-repo-size.svg" valign="middle" alt="GitHub repo size in bytes" /></a>
+• <a href="#">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/shields-code-size.svg" valign="middle" alt="code size in bytes" /></a>
+• <a href="https://github.com/XAMPPRocky/tokei">
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/tokei-lines-of-code.svg" valign="middle" alt="lines of code by tokei.rs" /></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/andry81/contools--gh-stats/commits/master/traffic/views">
-    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=Github%20views|all&query=count&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/views/latest-accum.json?raw=True&logo=github" valign="middle" alt="GitHub views|any|total" />
-    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=14d&query=count&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/views/latest.json?raw=True" valign="middle" alt="GitHub views|any|14d" /></a>
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/traffic/views/all.svg" valign="middle" alt="GitHub views|any|total" />
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/traffic/views/all-14d.svg" valign="middle" alt="GitHub views|any|14d" /></a>
 • <a href="https://github.com/andry81/contools--gh-stats/commits/master/traffic/views">
-    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=Github%20views|unq&query=uniques&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/views/latest-accum.json?raw=True&logo=github" valign="middle" alt="GitHub views|unique per day|total" />
-    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=14d&query=uniques&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/views/latest.json?raw=True" valign="middle" alt="GitHub views|unique per day|14d" /></a>
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/traffic/views/unq.svg" valign="middle" alt="GitHub views|unique per day|total" />
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/traffic/views/unq-14d.svg" valign="middle" alt="GitHub views|unique per day|14d" /></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/andry81/contools--gh-stats/commits/master/traffic/clones">
-    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=Github%20clones|all&query=count&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/clones/latest-accum.json?raw=True&logo=github" valign="middle" alt="GitHub clones|any|total" />
-    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=14d&query=count&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/clones/latest.json?raw=True" valign="middle" alt="GitHub clones|any|14d" /></a>
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/traffic/clones/all.svg" valign="middle" alt="GitHub clones|any|total" />
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/traffic/clones/all-14d.svg" valign="middle" alt="GitHub clones|any|14d" /></a>
 • <a href="https://github.com/andry81/contools--gh-stats/commits/master/traffic/clones">
-    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=Github%20clones|unq&query=uniques&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/clones/latest-accum.json?raw=True&logo=github" valign="middle" alt="GitHub clones|unique per day|total" />
-    <img src="https://img.shields.io/badge/dynamic/json?color=success&label=14d&query=uniques&url=https://github.com/andry81/contools--gh-stats/raw/master/traffic/clones/latest.json?raw=True" valign="middle" alt="GitHub clones|unique per day|14d" /></a>
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/traffic/clones/unq.svg" valign="middle" alt="GitHub clones|unique per day|total" />
+    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/traffic/clones/unq-14d.svg" valign="middle" alt="GitHub clones|unique per day|14d" /></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/andry81/contools/blob/trunk/changelog.txt">Changelog</a>
 • <a href="https://github.com/andry81/contools/blob/trunk/README_EN.txt">Readme</a>
 • <a href="#dependecies">Dependencies</a>
-• <a href="#copyright-and-license"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/badges/common/license/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
+• <a href="#copyright-and-license"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/common/badges/license/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
 </p>
 
 <p align="center">
-  <a href="https://stackoverflow.com/search?q=contools"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/badges/common/board/stackoverflow-contools.svg" valign="middle" alt="stackoverflow search" /></a>
+  <a href="https://stackoverflow.com/search?q=contools"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/common/badges/board/stackoverflow-contools.svg" valign="middle" alt="stackoverflow search" /></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/andry81/donate"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/badges/common/donate/donate.svg" valign="middle" alt="donate" /></a>
+  <a href="https://github.com/andry81/donate"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/common/badges/donate/donate.svg" valign="middle" alt="donate" /></a>
 </p>
 
 ---

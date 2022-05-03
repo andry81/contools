@@ -1,3 +1,9 @@
+2022.05.04:
+* changed: README.md: replaced the rest of links by content cache links, removed `seeyoufarm` hits counter as not actual anymore
+
+2022.04.29:
+* changed: README.md: content cache links update
+
 2022.04.26:
 * changed: Scripts/Tools/ToolAdaptors/app/qbittorrent: extracted database files backup from the config backup
 * refactor: Scripts/Tools/ToolAdaptors/app: amule, emula, qbittorrent: code refactor
