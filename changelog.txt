@@ -1,4 +1,7 @@
 2022.05.04:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-chcp` parameter to be able to explicitly change unicode or non unicode shortcut parameters
+
+2022.05.04:
 * changed: README.md: replaced the rest of links by content cache links, removed `seeyoufarm` hits counter as not actual anymore
 
 2022.04.29:

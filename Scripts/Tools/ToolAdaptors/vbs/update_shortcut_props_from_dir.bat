@@ -31,6 +31,32 @@ set 2>nul > "%INIT_VARS_FILE%"
 exit /b 0
 
 :IMPL
+rem script flags
+set "FLAG_CHCP="
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-chcp" (
+    set "FLAG_CHCP=%~2"
+    shift
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
+
+  shift
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
+
 rem load initialization environment variables
 for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%INIT_VARS_FILE%") do set "%%i=%%j"
 
@@ -40,8 +66,16 @@ call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
   goto FREE_TEMP_DIR
 ) >&2
 
-call :MAIN %%*
+if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+  set RESTORE_LOCALE=1
+)
+
+call :MAIN %%1 %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9
 set LASTERROR=%ERRORLEVEL%
+
+rem restore locale
+if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 :FREE_TEMP_DIR
 rem cleanup temporary files
@@ -100,23 +134,23 @@ exit /b 0
 :UPDATE_LINK
 echo.%LINK_FILE_PATH%
 
-"%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+if "%CURRENT_CP%" == "65001" (
+  type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+) else type nul > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
 
-set "UPDATE_SHORTCUT_CMDLINE="
+"%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
 
 for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst") do (
   set "PROP_NAME=%%i"
   set "PROP_VALUE=%%j"
-  call :UPDATE_SHORTCUT_CMDLINE
+  call :UPDATE_SHORTCUT
 )
 
 echo.
 
-if defined UPDATE_SHORTCUT_CMDLINE "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_CMDLINE% -- "%LINK_FILE_PATH%"
-
 exit /b
 
-:UPDATE_SHORTCUT_CMDLINE
+:UPDATE_SHORTCUT
 rem remove quotes at first
 set "PROP_VALUE=%PROP_VALUE:"=%"
 
@@ -126,9 +160,9 @@ set "PROP_LINE=%PROP_NAME%=%PROP_VALUE%"
 
 if /i "%PROP_NAME%" == "TargetPath" (
   call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
-  set UPDATE_SHORTCUT_CMDLINE=%UPDATE_SHORTCUT_CMDLINE% -t "%PROP_VALUE%"
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -t "%PROP_VALUE%" -- "%LINK_FILE_PATH%"
 )
 if /i "%PROP_NAME%" == "WorkingDirectory" (
   call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
-  set UPDATE_SHORTCUT_CMDLINE=%UPDATE_SHORTCUT_CMDLINE% -WD "%PROP_VALUE%"
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -WD "%PROP_VALUE%" -- "%LINK_FILE_PATH%"
 )
