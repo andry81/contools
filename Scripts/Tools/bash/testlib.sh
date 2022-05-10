@@ -380,9 +380,9 @@ $TestFuncBody
     (( TestScriptLastError == $TestScriptSuccessCode )) || TestExitWithCode 3
     local Output="${TestStdoutDeclare%$'\n'}" # remove last line return as optional
     echo -n -e "$Output${Output:+$'\n'}" >"$TestStdoutDefFilePath"
-    local StdoutsDiff=$(
-      diff -c "$TestStdoutFilePath" "$TestStdoutDefFilePath" |
-      sed -e 's|--- /tmp/traplib/|--- |' -e 's|\*\*\* /tmp/traplib/|\*\*\* |')
+    local StdoutsDiff="$( \
+      diff -c "$TestStdoutFilePath" "$TestStdoutDefFilePath" | \
+      sed -e 's|--- /tmp/traplib/|--- |' -e 's|\*\*\* /tmp/traplib/|\*\*\* |')"
     if (( ${#StdoutsDiff} )); then
       echo -n "$StdoutsDiff" >"$TestStdoutsDiffFilePath"
       TestSetLastError 4 0x01
@@ -396,9 +396,9 @@ $TestFuncBody
       # checking output from the test, slow but necessary
       local CleanEnvironment
       local TestEnvironment
-      InitialEnv=$(cat "$TestInitialEnvFilePath")
+      InitialEnv="$(cat "$TestInitialEnvFilePath")"
       if (( ${#InitialEnv} )); then
-        HasVarsEnv=$(cat "$TestHasVarsEnvFilePath")
+        HasVarsEnv="$(cat "$TestHasVarsEnvFilePath")"
         if (( ${#HasVarsEnv} )); then
           CompareEnvs "$HasVarsEnv" "$InitialEnv" "%%=*" "%%=*"
           if (( ! $? && ${#RETURN_VALUE} )); then
@@ -406,7 +406,7 @@ $TestFuncBody
               TestSetLastError 5 0x02
           fi
         fi
-        HasNoVarsEnv=$(cat "$TestHasNoVarsEnvFilePath")
+        HasNoVarsEnv="$(cat "$TestHasNoVarsEnvFilePath")"
         if (( ${#HasNoVarsEnv} )); then
           CompareEnvs "$HasNoVarsEnv" "$InitialEnv" "%%=*" "%%=*"
           if (( ! $? && ${#RETURN_VALUE} )); then

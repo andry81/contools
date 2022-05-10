@@ -221,10 +221,10 @@ mountdir.sh: info: \"$WindowsPath\"" >&2
     # at second, add a mount point to the storage
     if (( CygwinVer_1_7_X )); then
       # extract fstab records and reuse it's fields
-      FstabFile=$("$MountTool" -m)
+      FstabFile="$("$MountTool" -m)"
       if (( ${#FstabFile} )); then
-        MountRecord=$("$MountTool" -m |\
-          /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m '^([ \t]*[^\r\n]+[ \t]+)'"$MountPathEscaped"'([ \t]+[^\r\n]+?|[ \t]*)$' '\1'"$MountPathEscaped"'\2' ms;)
+        MountRecord="$("$MountTool" -m | \
+          /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" m '^([ \t]*[^\r\n]+[ \t]+)'"$MountPathEscaped"'([ \t]+[^\r\n]+?|[ \t]*)$' '\1'"$MountPathEscaped"'\2' ms;)"
         LastError=$?
       else
         return 20
@@ -238,19 +238,19 @@ mountdir.sh: info: \"$WindowsPath\"" >&2
     fi
 
     if [[ -f "/etc/fstab" ]]; then
-      FstabFile=$(IFS=""; PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab')
+      FstabFile="$(IFS=""; PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab')"
       if (( ${#FstabFile} )); then
         # Replace mount point in existed mount path.
-        FstabFile=$(IFS=""; PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab' |\
-          /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s '(.*?^[ \t]*)[^\r\n]+[ \t]+'"$MountPathEscaped"'(?:[ \t]+[^\r\n]+?|[ \t]*)$(.*?)' '\1'"$WindowsPathEscaped $MountPathEscaped${MountRecordSuffix:+ }$MountRecordSuffix"'\2' ms;\
-          LastError=$?; echo -n '.'; exit $LastError)
+        FstabFile="$(IFS=""; PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab' | \
+          /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s '(.*?^[ \t]*)[^\r\n]+[ \t]+'"$MountPathEscaped"'(?:[ \t]+[^\r\n]+?|[ \t]*)$(.*?)' '\1'"$WindowsPathEscaped $MountPathEscaped${MountRecordSuffix:+ }$MountRecordSuffix"'\2' ms; \
+          LastError=$?; echo -n '.'; exit $LastError)"
         LastError=$?
 
         if (( LastError )); then
           # Mount path is not replaced because not matched (not existed), then try to append to the end of list of printable string lines.
-          FstabFile=$(IFS=""; PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab' |\
-            /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s '(.*?[ \t]*[^\r\n]+(?:[ \t]+[^\r\n]+)?)\r?\n?([ \t\r\n]*)$' '\1'$'\n'"$WindowsPathEscaped $MountPathEscaped${MountRecordSuffix:+ }$MountRecordSuffix"$'\n''\2' s;\
-            LastError=$?; echo -n '.'; exit $LastError)
+          FstabFile="$(IFS=""; PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab' | \
+            /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s '(.*?[ \t]*[^\r\n]+(?:[ \t]+[^\r\n]+)?)\r?\n?([ \t\r\n]*)$' '\1'$'\n'"$WindowsPathEscaped $MountPathEscaped${MountRecordSuffix:+ }$MountRecordSuffix"$'\n''\2' s; \
+            LastError=$?; echo -n '.'; exit $LastError)"
           LastError=$?
         fi
 

@@ -89,9 +89,9 @@ function UnmountDir()
     EscapeString "$MountPath" "$EscapeChars"
     MountPathEscaped="$RETURN_VALUE"
 
-    FstabFile=$(IFS=""; local PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab' |\
-      /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s '(.*?)^[ \t]*[^\r\n]+[ \t]+'"$MountPathEscaped"'(?:[ \t]+[^\r\n]+?|[ \t]*)$\r?\n?(.*?)' '\1\2' ms;\
-      LastError=$?; echo -n '.'; exit $LastError)
+    FstabFile="$(IFS=""; local PATH='/usr/local/bin:/usr/bin:/bin'; cat '/etc/fstab' | \
+      /bin/perl.exe "$CONTOOLS_ROOT/sar.pl" s '(.*?)^[ \t]*[^\r\n]+[ \t]+'"$MountPathEscaped"'(?:[ \t]+[^\r\n]+?|[ \t]*)$\r?\n?(.*?)' '\1\2' ms; \
+      LastError=$?; echo -n '.'; exit $LastError)"
     LastError=$?
 
     (( LastError )) && return 30

@@ -34,7 +34,7 @@ function GetFunctionDeclaration()
   local FuncDecl
   local FuncDeclSize
 
-  FuncDecl=$(declare -f "$FuncName")
+  FuncDecl="$(declare -f "$FuncName")"
   LastError=$?
   FuncDeclSize=${#FuncDecl}
 
@@ -97,7 +97,7 @@ function MakeFunctionCopyImpl()
 
   if [[ "${Flags//f/}" == "$Flags" ]]; then
     # new function should not exist
-    NewFuncDecl=$(declare -f "$NewFuncName")
+    NewFuncDecl="$(declare -f "$NewFuncName")"
     LastError=$?
     local NewFuncDeclSize=${#NewFuncDecl}
 

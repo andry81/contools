@@ -256,9 +256,9 @@ function GetAbsolutePathFromDirPath()
   if [[ -n "$DirPath" ]]; then
     if [[ -x "/bin/readlink" ]]; then
       if [[ "${RelativePath:0:1}" != '/' ]]; then
-        RETURN_VALUE=$(/bin/readlink -m "$DirPath${RelativePath:+/}$RelativePath")
+        RETURN_VALUE="$(/bin/readlink -m "$DirPath${RelativePath:+/}$RelativePath")"
       else
-        RETURN_VALUE=$(/bin/readlink -m "$RelativePath")
+        RETURN_VALUE="$(/bin/readlink -m "$RelativePath")"
       fi
     else
       return 1

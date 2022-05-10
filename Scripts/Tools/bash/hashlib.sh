@@ -221,7 +221,7 @@ function HashFunctionBodyAsToken()
   local FuncDecl
   local FuncDeclSize
 
-  FuncDecl=$(declare -f "$FuncName")
+  FuncDecl="$(declare -f "$FuncName")"
   LastError=$?
   FuncDeclSize=${#FuncDecl}
 
@@ -261,7 +261,7 @@ function HashFunctionAsToken()
   local FuncDecl
   local FuncDeclSize
 
-  FuncDecl=$(declare -f "$FuncName")
+  FuncDecl="$(declare -f "$FuncName")"
   LastError=$?
   FuncDeclSize=${#FuncDecl}
 

@@ -327,7 +327,7 @@ function PushTrapHandlerImpl()
   local KnownTrapTypes
   local KnownTrapTypesSize
   if (( ! ${#BASH_SIGNALS} )); then
-    KnownTrapTypes=$(trap -l)
+    KnownTrapTypes="$(trap -l)"
     KnownTrapTypes="${KnownTrapTypes//)/}"
     eval BASH_SIGNALS="(0 RETURN 0 EXIT $KnownTrapTypes)"
   fi
@@ -930,7 +930,7 @@ function PopTrapImpl()
   local KnownTrapTypes
   local KnownTrapTypesSize
   if (( ! ${#BASH_SIGNALS} )); then
-    KnownTrapTypes=$(trap -l)
+    KnownTrapTypes="$(trap -l)"
     KnownTrapTypes="${KnownTrapTypes//)/}"
     eval BASH_SIGNALS="(0 RETURN 0 EXIT $KnownTrapTypes)"
   fi
