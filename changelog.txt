@@ -1,4 +1,7 @@
-2022.05.11:
+2022.05.20:
+* changed: README.md: readme update
+
+2022.05.10:
 * new: Scripts/Tools/admin/WindowsServices: WUS, Epson Printer scripts
 
 2022.05.10:
