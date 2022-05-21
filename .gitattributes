@@ -213,6 +213,7 @@ Scripts/Tools/ToolAdaptors/app/github/backup_restapi_auth_user_repos_list.bat -t
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_org_repos_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_repo_forks_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_repo_releases_list.bat -text
+Scripts/Tools/ToolAdaptors/app/github/backup_restapi_repo_stargazers_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_repo_subscribers_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_starred_repos_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_user_repos_list.bat -text

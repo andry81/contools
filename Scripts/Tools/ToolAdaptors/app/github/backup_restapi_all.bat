@@ -105,6 +105,8 @@ for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT
 for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst") do (
   set "REPO_OWNER=%%i"
   set "REPO=%%j"
+  call :CMD "backup_restapi_repo_stargazers_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
+  echo.---
   call :CMD "backup_restapi_repo_subscribers_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
   echo.---
   if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"

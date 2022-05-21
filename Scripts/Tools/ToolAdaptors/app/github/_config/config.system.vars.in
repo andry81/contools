@@ -24,6 +24,9 @@ GH_RESTAPI_USER_REPOS_FILE        =repos-{{TYPE}}-{{PAGE}}.json
 GH_RESTAPI_ORG_REPOS_URL          =https://api.github.com/orgs/{{ORG}}/repos
 GH_RESTAPI_ORG_REPOS_FILE         =repos-{{TYPE}}-{{PAGE}}.json
 
+GH_RESTAPI_REPO_STARGAZERS_URL    =https://api.github.com/repos/{{OWNER}}/{{REPO}}/stargazers
+GH_RESTAPI_REPO_STARGAZERS_FILE   =stargazers-{{PAGE}}.json
+
 GH_RESTAPI_REPO_SUBSCRIBERS_URL   =https://api.github.com/repos/{{OWNER}}/{{REPO}}/subscribers
 GH_RESTAPI_REPO_SUBSCRIBERS_FILE  =subscribers-{{PAGE}}.json
 
