@@ -132,7 +132,7 @@ for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S "%LINKS_DIR%\*
 exit /b 0
 
 :UPDATE_LINK
-echo.%LINK_FILE_PATH%
+echo."%LINK_FILE_PATH%"
 
 if "%CURRENT_CP%" == "65001" (
   type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
@@ -154,15 +154,17 @@ exit /b
 rem remove quotes at first
 set "PROP_VALUE=%PROP_VALUE:"=%"
 
-call set "PROP_VALUE=%%PROP_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%
+rem remove BOM prefix (CAUTION: byte sequence might be not visible in the editor)
+set "PROP_NAME=%PROP_NAME:?=%"
+
+call set "PROP_VALUE=%%PROP_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
 
 set "PROP_LINE=%PROP_NAME%=%PROP_VALUE%"
 
+call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
+
 if /i "%PROP_NAME%" == "TargetPath" (
-  call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
   "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -t "%PROP_VALUE%" -- "%LINK_FILE_PATH%"
-)
-if /i "%PROP_NAME%" == "WorkingDirectory" (
-  call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
+) else if /i "%PROP_NAME%" == "WorkingDirectory" (
   "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -WD "%PROP_VALUE%" -- "%LINK_FILE_PATH%"
 )

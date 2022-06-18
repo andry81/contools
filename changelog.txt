@@ -1,3 +1,6 @@
+2022.06.19:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: execution fixup
+
 2022.05.21:
 * new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_repo_stargazers_list.bat` repos stargazers list backup script
 * new: Scripts/Tools/ToolAdaptors/app/github/backup_bare_all_repos.bat: added stargazers list backup
