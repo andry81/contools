@@ -32,6 +32,7 @@ exit /b 0
 
 :IMPL
 rem script flags
+set RESTORE_LOCALE=0
 set "FLAG_CHCP="
 
 :FLAGS_LOOP
@@ -124,7 +125,7 @@ if "%PROPS_LIST%" == "." set "PROPS_LIST=TargetPath|WorkingDirectory"
 
 for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S "%LINKS_DIR%\*.lnk"`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S "%LINKS_DIR%\*.lnk" 2^>nul`) do (
   set "LINK_FILE_PATH=%%i"
   call :UPDATE_LINK
 )
@@ -154,8 +155,8 @@ exit /b
 rem remove quotes at first
 set "PROP_VALUE=%PROP_VALUE:"=%"
 
-rem remove BOM prefix (CAUTION: byte sequence might be not visible in the editor)
-set "PROP_NAME=%PROP_NAME:?=%"
+rem remove BOM prefix (CAUTION: byte sequence might be not visible in an editor and not copyable in a text merger)
+set "PROP_NAME=%PROP_NAME:﻿=%"
 
 call set "PROP_VALUE=%%PROP_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
 
