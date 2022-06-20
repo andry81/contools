@@ -333,6 +333,7 @@ Scripts/Tools/ToolAdaptors/vbs/printargs_unesc.bat -text
 Scripts/Tools/ToolAdaptors/vbs/printargs_unesc.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/printcmdline.bat -text
 Scripts/Tools/ToolAdaptors/vbs/read_shortcut.vbs -text
+Scripts/Tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.bat -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs -text
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat -text
