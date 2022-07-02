@@ -98,7 +98,7 @@ if defined LINKS_DIR if exist "%LINKS_DIR%\" goto LINKS_DIR_EXIST
 
 for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S "%LINKS_DIR%\*.lnk" 2^>nul`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S /O:N "%LINKS_DIR%\*.lnk" 2^>nul`) do (
   set "LINK_FILE_PATH=%%i"
   call :UPDATE_LINK
 )

@@ -1,3 +1,6 @@
+2022.07.02:
+* changed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: shortcut files traverse sorted by name
+
 2022.06.20:
 * new: Scripts/Tools/ToolAdaptors/vbs: added `reset_shortcut_from_dir.bat` script to reset shortcut by read/write it (does shortcut file shrink and cleanup)
 
