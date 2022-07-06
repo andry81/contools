@@ -1,5 +1,27 @@
 @echo off
 
+rem Examples:
+rem
+rem For details: https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar/1056632#1056632
+rem
+rem * reencode with better quality (default: `-crf 23`):
+rem
+rem   -enable_reencode -c:v -/ <encoder> -crf -/ 18 -preset -/ slow -q:v -/ 0 -c:a -/ copy ...
+rem
+rem * reencode with maximum quality (slower and bigger output file):
+rem
+rem   -enable_reencode -c:v -/ <encoder> -crf -/ 0 -preset -/ slow -q:v -/ 0 -c:a -/ copy ...
+rem
+rem <encoder> variants:
+rem
+rem * libx264
+rem * libx265
+rem * mjpeg
+rem * mpeg1video
+rem * mpeg2video
+rem * mpeg4
+rem
+
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b
@@ -7,6 +29,8 @@ call "%%~dp0__init__.bat" || exit /b
 call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
 
 rem script flags
+set NO_DEFAULT_FLAGS=0
+set ENABLE_REENCODE=0
 set "BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -17,14 +41,28 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if defined FLAG (
-  set BARE_FLAGS=%BARE_FLAGS% %1
+if not defined FLAG goto FLAGS_END
 
+if "%FLAG%" == "-no_default_flags" (
+  set NO_DEFAULT_FLAGS=1
+) else if "%FLAG%" == "-enable_reencode" (
+  set ENABLE_REENCODE=1
+) else if "%FLAG%" == "-/" ( rem pass on to ffmpeg command line
+  set BARE_FLAGS=%BARE_FLAGS% %2
   shift
-
-  rem read until no flags
-  goto FLAGS_LOOP
+) else if "%FLAG%" == "--" ( rem stop flags parser
+  shift
+  goto FLAGS_END
+) else (
+  set BARE_FLAGS=%BARE_FLAGS% %1
 )
+
+shift
+
+rem read until no flags
+goto FLAGS_LOOP
+
+:FLAGS_END
 
 set "FILE_LIST_IN=%~1"
 set "FILE_OUT=%~fx2"
@@ -91,8 +129,11 @@ for /f "eol= tokens=* delims=" %%i in ("%FILE_PATH%") do (
 exit /b
 
 :ENCODE
-call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
-
+if %NO_DEFAULT_FLAGS% NEQ 0 (
+  call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -i "%%TEMP_FILE_LIST%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
+) else if %ENABLE_REENCODE% NEQ 0 (
+  call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
+) else call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
 exit /b
 
 :CMD

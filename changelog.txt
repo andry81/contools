@@ -1,3 +1,6 @@
+2022.07.06:
+* changed: Scripts/Tools/ToolAdaptors/ffmpeg: `-enable_reencode`, `-no_default_flags`, `-/`, `--` uniform options for all scripts
+
 2022.07.02:
 * changed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: shortcut files traverse sorted by name
 
