@@ -1,7 +1,7 @@
 ''' Creates the Windows shortcut file.
 
 ''' USAGE:
-'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-u] [-q] [-E[0 | t | a]] [-u] [--] <ShortcutFilePath> <ShortcutTarget> <ShortcutArgs>
+'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-u] [-q] [-E[0 | t | a]] [-u] [--] <ShortcutFilePath> <ShortcutTarget> <ShortcutArgs>
 '''
 ''' DESCRIPTION:
 '''   --
@@ -59,6 +59,10 @@
 '''
 '''      See detailed documentation in MSDN for the function `ShowWindow`.
 '''
+'''   -reassign-target-path
+'''     Reassign target path property which does trigger the shell to validate
+'''     the path and rewrite the shortcut file even if nothing is changed
+'''     reducing the shortcut content.
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
 '''   -q
@@ -133,6 +137,8 @@ ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
 
+Dim ReassignTargetPath : ReassignTargetPath = False
+
 Dim UnescapeAllArgs : UnescapeAllArgs = False
 
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
@@ -166,7 +172,9 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
 
   If ExpectFlags Then
     If arg <> "--" And Mid(arg, 1, 1) = "-" Then
-      If arg = "-u" Then ' Unescape %xx or %uxxxx sequences
+      If arg = "-reassign-target-path" Then
+        ReassignTargetPath = True
+      ElseIf arg = "-u" Then ' Unescape %xx or %uxxxx
         UnescapeAllArgs = True
       ElseIf arg = "-CD" Then ' Change current directory
         i = i + 1
@@ -255,13 +263,20 @@ If ChangeCurrentDirectoryExist Then
   objShell.CurrentDirectory = ChangeCurrentDirectory
 End If
 
-set objSC = objShell.CreateShortcut(cmd_args(0))
+Set objSC = objShell.CreateShortcut(cmd_args(0))
 
-If AlwaysQuote And InStr(ShortcutTarget, Chr(34)) = 0 Then
-  ShortcutTarget = Chr(34) & ShortcutTarget & Chr(34)
+If ShortcutTargetExist Then
+  If AlwaysQuote And InStr(ShortcutTarget, Chr(34)) = 0 Then
+    ShortcutTarget = Chr(34) & ShortcutTarget & Chr(34)
+  End If
+ElseIf ReassignTargetPath Then
+  ShortcutTarget = objSC.TargetPath
+  ShortcutTargetExist = True
 End If
 
-objSC.TargetPath = ShortcutTarget
+If ShortcutTargetExist Then
+  objSC.TargetPath = ShortcutTarget
+End If
 
 If ShortcutArgsExist Then
   objSC.Arguments = ShortcutArgs

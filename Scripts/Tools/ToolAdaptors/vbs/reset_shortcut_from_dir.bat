@@ -98,7 +98,9 @@ if defined LINKS_DIR if exist "%LINKS_DIR%\" goto LINKS_DIR_EXIST
 
 for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S /O:N "%LINKS_DIR%\*.lnk" 2^>nul`) do (
+if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S /O:N "%LINKS_DIR%*.lnk" 2^>nul`) do (
   set "LINK_FILE_PATH=%%i"
   call :UPDATE_LINK
 )
@@ -108,4 +110,4 @@ exit /b 0
 :UPDATE_LINK
 echo."%LINK_FILE_PATH%"
 
-"%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -- "%LINK_FILE_PATH%"
+"%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -reassign-target-path -- "%LINK_FILE_PATH%"
