@@ -22,11 +22,16 @@ set "INIT_VARS_FILE=%PROJECT_LOG_DIR%\init.vars"
 rem register all environment variables
 set 2>nul > "%INIT_VARS_FILE%"
 
+rem variables escaping
+set "?~f0=%?~f0:{=\{%"
+set "COMSPECLNK=%COMSPEC:{=\{%"
+
 "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
   /ret-child-exit /pause-on-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
+  /no-subst-pos-vars ^
   /v IMPL_MODE 1 /v INIT_VARS_FILE "%INIT_VARS_FILE%" ^
   /ra "%%" "%%?01%%" /v "?01" "%%" ^
-  "${COMSPEC}" "/c \"@\"${?~f0}\" {*}\"" %* || exit /b
+  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %* || exit /b
 
 exit /b 0
 

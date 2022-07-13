@@ -39,10 +39,10 @@ set "COMSPECLNK=%COMSPEC:{=\{%"
 
 "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
   /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
-  /no-expand-env /no-subst-pos-vars ^
+  /no-subst-pos-vars ^
   /v IMPL_MODE 1 ^
   /ra "%%" "%%?01%%" /v "?01" "%%" ^
-  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" %*
+  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %*
 set LASTERROR=%ERRORLEVEL%
 
 rem ...

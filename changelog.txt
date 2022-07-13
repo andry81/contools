@@ -1,3 +1,11 @@
+2022.07.13:
+* fixed: Scripts/Tools: scripts minor fixup
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
+2022.07.09:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: reset_shortcut_from_dir.bat, update_shortcut_props_from_dir.bat: execution fix from a drive root directory
+* changed: Scripts/Tools/ToolAdaptors/vbs: *_shortcut.vbs: added `-reassign-target-path` flag to explicitly reassign `TargetPath` shortcut file property
+
 2022.07.06:
 * changed: Scripts/Tools/ToolAdaptors/ffmpeg: `-enable_reencode`, `-no_default_flags`, `-/`, `--` uniform options for all scripts
 

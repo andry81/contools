@@ -54,3 +54,6 @@
   `/use-stdin-as-piped-from-conin` flag.
 
 * Fix `callf.exe` long paths open.
+
+* Optionally disable `\{` escape sequence expansion for the positional
+  arguments in case of the `/no-subst-pos-vars` flag.
