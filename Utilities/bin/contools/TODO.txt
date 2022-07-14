@@ -57,3 +57,27 @@
 
 * Optionally disable `\{` escape sequence expansion for the positional
   arguments in case of the `/no-subst-pos-vars` flag.
+
+* Add `/v-* <name> <value>` options to use additionally in the
+  `/elevate{ ... }` option to be able to expand and to substitute variables in
+  the `<value>`:
+
+  `/v-E`, `/v-EE`, `/v-S`, `/v-SE`, `/v-S-E`, `/v-SE-E`, `/v-S-EE`, `/v-SE-EE`
+
+* Add ability for variables late expansion in case of process elevation to
+  expand after the elevation instead of before:
+
+  >
+  callf /elevate{ }{ /E1 } "" "cmd.exe /k echo.$\{MY_ELEVATED_VAR}"
+
+  In case of variables which can not pass the elevation barrier or does reset,
+  for example, - `COMSPEC`, do implement environment variables substitution
+  with the new option - `/v-* <name> <value>`:
+
+  >
+  callf /elevate{ /v-E COMSPECLNK "${COMSPEC}" } "$\{COMSPECLNK}" "/k"
+
+  NOTE:
+    Beause elevation does execute through the `ShellExecuteEx` Win32 API which
+    does not support explicit environment variables setup, then we use the
+    parent process shared memory to setup the environment variables.
