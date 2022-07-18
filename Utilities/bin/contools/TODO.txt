@@ -64,6 +64,8 @@
 
   `/v-E`, `/v-EE`, `/v-S`, `/v-SE`, `/v-S-E`, `/v-SE-E`, `/v-S-EE`, `/v-SE-EE`
 
+  Use `\` escape sequence as in the generic command line expansion.
+
 * Add ability for variables late expansion in case of process elevation to
   expand after the elevation instead of before:
 
@@ -81,3 +83,6 @@
     Beause elevation does execute through the `ShellExecuteEx` Win32 API which
     does not support explicit environment variables setup, then we use the
     parent process shared memory to setup the environment variables.
+
+* Improve rearranged output between stdout and stderr while being redirected,
+  by saving stdout and stderr read/write times as a key to resort the output.
