@@ -159,6 +159,9 @@ echo.
 exit /b
 
 :UPDATE_SHORTCUT
+rem skip empty
+if not defined PROP_VALUE exit /b 0
+
 rem remove quotes at first
 set "PROP_VALUE=%PROP_VALUE:"=%"
 
