@@ -1,3 +1,15 @@
+2022.07.24:
+* changed: bin/contools/TODO.txt: todo update
+
+2022.07.19:
+* changed: bin/contools/TODO.txt: todo update
+
+2022.07.14:
+* changed: bin/contools/TODO.txt: todo update
+
+2022.07.13:
+* changed: bin/contools/TODO.txt: todo update
+
 2022.03.22:
 * new: bin/contools: binaries update
 

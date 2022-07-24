@@ -15,17 +15,16 @@ if not defined __?CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "__?CH
 
 set "__?CHCP_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
 
-"%__?CHCP_TEMP_FILE%" <nul 2>nul > "%__?CHCP_TEMP_FILE%"
+"%__?CHCP_FILE%" <nul 2>nul > "%__?CHCP_TEMP_FILE%"
 for /F "usebackq eol= tokens=1,* delims=:" %%i in ("%__?CHCP_TEMP_FILE%") do set "__?CURRENT_CP=%%j"
 del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>&1
-
-set "__?CHCP_TEMP_FILE="
 
 if defined __?CURRENT_CP set "__?CURRENT_CP=%__?CURRENT_CP: =%"
 
 (
   endlocal
   set "%__?VAR_NAME%=%__?CURRENT_CP%"
+  set "__?CHCP_TEMP_FILE="
   set "__?CHCP_FILE="
 )
 

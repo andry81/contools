@@ -125,6 +125,9 @@ if "%REPLACE_FROM%" == "%REPLACE_TO%" (
   exit /b 255
 ) >&2
 
+rem reread CURRENT_CP variable from current code page value
+call "%%CONTOOLS_ROOT%%/std/getcp.bat"
+
 rem default props list
 if "%PROPS_LIST%" == "." set "PROPS_LIST=TargetPath|WorkingDirectory"
 
@@ -163,19 +166,22 @@ rem skip empty
 if not defined PROP_VALUE exit /b 0
 
 rem remove quotes at first
-set "PROP_VALUE=%PROP_VALUE:"=%"
+set "PROP_PREV_VALUE=%PROP_VALUE:"=%"
 
 rem remove BOM prefix (CAUTION: byte sequence might be not visible in an editor and not copyable in a text merger)
 set "PROP_NAME=%PROP_NAME:﻿=%"
 
-call set "PROP_VALUE=%%PROP_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
+call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
 
-set "PROP_LINE=%PROP_NAME%=%PROP_VALUE%"
+rem skip on empty change
+if "%PROP_NEXT_VALUE%" == "%PROP_PREV_VALUE%" exit /b 0
+
+set "PROP_LINE=%PROP_NAME%=%PROP_NEXT_VALUE%"
 
 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
 if /i "%PROP_NAME%" == "TargetPath" (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -t "%PROP_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 ) else if /i "%PROP_NAME%" == "WorkingDirectory" (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -WD "%PROP_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -WD "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 )

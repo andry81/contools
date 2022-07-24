@@ -1,4 +1,9 @@
 2022.07.24:
+* fixed: Scripts/Tools/std/getcp.bat: script execution fixup
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: missed to reread CURRENT_CP variable from current code page value
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
+2022.07.24:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: missed to skip empty values
 * new: Scripts/Tools/ToolAdaptors/app/emule: `exec_gui_emule.bat` script to start emule using path from the config
 

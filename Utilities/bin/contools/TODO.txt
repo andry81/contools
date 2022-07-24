@@ -86,3 +86,16 @@
 
 * Improve rearranged output between stdout and stderr while being redirected,
   by saving stdout and stderr read/write times as a key to resort the output.
+
+* Add
+  `/set-lang-ids <id1-hex>[,<id2-hex>[,...]]` and
+  `/set-lang-names <name1>[,<name2>[,...]]` to call
+  `SetProcessPreferredUILanguages` to set preferred UI languages.
+
+  For en-US and en:
+
+  >
+  callf /set-lang-ids 0409,0009 "" "..."
+
+  >
+  callf /set-lang-names en-US,en "" "..."
