@@ -1,13 +1,19 @@
 ''' Updates the Windows shortcut file.
 
+''' CAUTION:
+'''   WScript.Shell can not handle all Unicode characters.
+'''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
+
 ''' USAGE:
 '''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-u] [-q] [-E[0 | t | a]] [-u] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFilePath>
 
 ''' DESCRIPTION:
 '''   --
-'''     Separator between flags and positional arguments to explicitly stop the flags parser.
+'''     Separator between flags and positional arguments to explicitly stop the
+'''     flags parser.
 '''   -D <CurrentDirectoryPath>
-'''     Changes current directory to <CurrentDirectoryPath> before the execution.
+'''     Changes current directory to <CurrentDirectoryPath> before the
+'''     execution.
 '''   -WD <ShortcutWorkingDirectory>
 '''     Working directory in the shortcut file.
 '''
@@ -77,14 +83,15 @@
 '''     Expand environment variables only in the shortcut arguments.
 
 ''' Note:
-'''   1. Creation of a shortcut under ealier version of the Windows makes shortcut
-'''      cleaner. For example, do use Windows XP instead of the Windows 7 and
-'''      x86 instead of x64 to make a cleaner shortcut without redundant data.
+'''   1. Creation of a shortcut under ealier version of the Windows makes
+'''      shortcut cleaner. For example, do use Windows XP instead of the
+'''      Windows 7 and x86 instead of x64 to make a cleaner shortcut without
+'''      redundant data.
 '''   2. Creation of a shortcut to the `cmd.exe` with the current directory in
 '''      the "%SYSTEMROOT%\system32" directory avoids generation of redundant
 '''      path prefixes (offset) in the shortcut file internals.
-'''   3. Update of a shortcut immediately after it's creation does cleanup shortcut
-'''      from redundant data.
+'''   3. Update of a shortcut immediately after it's creation does cleanup
+'''      shortcut from redundant data.
 
 ''' CAUTION:
 '''   You should remove shortcut file BEFORE creation otherwise the shortcut
@@ -92,14 +99,24 @@
 
 ''' Example to create a minimalistic and clean version of a shortcut:
 '''   >
-'''   del /F /Q cmd_system32.lnk
+'''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
 '''   make_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk ^%SystemRoot^%\System32\cmd.exe
 '''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
 ''' Or
 '''   >
-'''   del /F /Q cmd_system32.lnk
+'''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
 '''   make_shortcut.bat -CD "%WINDIR%\System32" -u cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
 '''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
+'''
+''' Note:
+'''   A difference in above examples between call to `make_shortcut.vbs` and
+'''   call to `make_shortcut.vbs`+`update_shortcut.vbs` has first found in the
+'''   `Windows XP x64 Pro SP2` and `Windows XP x86 Pro SP3`.
+'''
+''' Note:
+'''   The single call in above example to `make_shortcut.vbs` instead of
+'''   `make_shortcut.vbs`+`update_shortcut.vbs` does generate a cleaner
+''    shortcut, but in other cases is vice versa.
 
 ''' Example to create MyComputer shortcut:
 '''   >
@@ -115,23 +132,32 @@
 '''   del /F /Q mycomputer.lnk
 '''   make_shortcut.bat mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
 '''
-''' , where the `\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}` might be different for each device
+'''   , where the `\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}` might be different for each device
+'''
+'''   See details: https://stackoverflow.com/questions/39397348/open-folder-on-portable-device-with-batch-file/65997169#65997169
 
 ''' CAUTION:
 '''   The list of issues around a shortcut (.lnk) file:
 '''
 '''   PROS:
-'''     * If you want to run a process elevated, then you can raise the `Run as Administrator` flag in the shortcut.
-'''       You don't need a localized version of Administrator account name like for the runas executable.
+'''     * If you want to run a process elevated, then you can raise the
+'''       `Run as Administrator` flag in the shortcut.
+'''       You don't need a localized version of Administrator account name like
+'''       for the runas executable.
 '''
 '''   CONS:
-'''     * If create a shortcut to the Windows command interpreter (cmd.exe) with `Run as Administrator` flag raised, then you will run
-'''       elevated only the cmd.exe process. To start any other process you have to either run it from the `cmd.exe` script, or create
-'''       another standalone shortcut with the `Run as Administrator` flag raised.
-'''     * Run from shortcut file (.lnk) in the Windows XP (but not in the Windows 7) brings truncated command line down to ~260 characters.
-'''     * Run from shortcut file (.lnk) loads console windows parameters (font, windows size, buffer size, etc) from the shortcut at first
-'''       and from the registry (HKCU\Console) at second. If try to change and save parameters, then it will be saved ONLY into the shortcut,
-'''       which brings the shortcut file overwrite.
+'''     * If create a shortcut to the Windows command interpreter (cmd.exe)
+'''       with `Run as Administrator` flag raised, then you will run elevated
+'''       only the cmd.exe process. To start any other process you have to
+'''       either run it from the `cmd.exe` script, or create another standalone
+'''       shortcut with the `Run as Administrator` flag raised.
+'''     * Run from shortcut file (.lnk) in the Windows XP (but not in the
+'''       Windows 7) brings truncated command line down to ~260 characters.
+'''     * Run from shortcut file (.lnk) loads console windows parameters (font,
+'''       windows size, buffer size, etc) from the shortcut at first and from
+'''       the registry (HKCU\Console) at second. If try to change and save
+'''       parameters, then it will be saved ONLY into the shortcut, which
+'''       brings the shortcut file overwrite.
 
 ReDim cmd_args(WScript.Arguments.Count - 1)
 

@@ -1,3 +1,6 @@
+2022.07.31:
+* changed: Scripts/Tools/ToolAdaptors/vbs: *_shortcut.vbs: details update
+
 2022.07.24:
 * fixed: Scripts/Tools/std/getcp.bat: script execution fixup
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: missed to reread CURRENT_CP variable from current code page value

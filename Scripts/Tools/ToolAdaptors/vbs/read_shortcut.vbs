@@ -1,5 +1,9 @@
 ''' Read the Windows shortcut file property.
 
+''' CAUTION:
+'''   WScript.Shell can not handle all Unicode characters.
+'''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
+
 ''' USAGE:
 '''   read_shortcut.vbs [-u] [-q] [-E[0 | t | a]] [-u] [-p <PropertyPattern>] [--] <ShortcutFilePath>
 
