@@ -1,3 +1,8 @@
+2022.08.06:
+* fixed: __init__.bat: fixed case for the `mkdir` command when a directory can exist as a disconnected directory link but still exist as a directory path (report it with the warning)
+* new: Scripts/Tools: mkdir_if_notexist*.bat: added scripts to check for directory existence including disconnected directory links
+* changed: __init__.bat: replaced `mkdir` calls by `mkdir_if_notexist.bat` script
+
 2022.07.31:
 * changed: Scripts/Tools/ToolAdaptors/vbs: *_shortcut.vbs: details update
 

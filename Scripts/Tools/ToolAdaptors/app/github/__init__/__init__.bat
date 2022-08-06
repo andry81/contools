@@ -13,7 +13,7 @@ if not defined GITHUB_ADAPTOR_PROJECT_ROOT                call "%%CONTOOLS_ROOT%
 if not defined GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT   call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT    "%%GITHUB_ADAPTOR_PROJECT_ROOT%%/_config"
 if not defined GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT  call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT   "%%PROJECT_OUTPUT_ROOT%%/config/contools/tool_adaptors/github"
 
-if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%" || exit /b 10 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b 10
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -lite_parse -gen_user_config "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
@@ -33,7 +33,7 @@ call :IF_DEFINED_AND_FILE_EXIST JQ_EXECUTABLE || (
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" GH_ADAPTOR_BACKUP_DIR   "%%GH_ADAPTOR_BACKUP_DIR%%"
 
-if not exist "%GH_ADAPTOR_BACKUP_DIR%\" ( mkdir "%GH_ADAPTOR_BACKUP_DIR%" || exit /b 11 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%GH_ADAPTOR_BACKUP_DIR%%" || exit /b 11
 
 exit /b 0
 

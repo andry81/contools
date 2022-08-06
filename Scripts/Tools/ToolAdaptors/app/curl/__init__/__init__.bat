@@ -13,7 +13,7 @@ if not defined CURL_ADAPTOR_PROJECT_ROOT                        call "%%CONTOOLS
 if not defined CURL_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT           call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" CURL_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT    "%%CURL_ADAPTOR_PROJECT_ROOT%%/_config"
 if not defined CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT          call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT   "%%PROJECT_OUTPUT_ROOT%%/config/contools/tool_adaptors/curl"
 
-if not exist "%CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%" || exit /b 10 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b 10
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -lite_parse -gen_user_config "%%CURL_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 

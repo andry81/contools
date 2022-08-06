@@ -13,7 +13,7 @@ if not defined FLYLINK_ADAPTOR_PROJECT_ROOT               call "%%CONTOOLS_ROOT%
 if not defined FLYLINK_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT  call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" FLYLINK_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT   "%%FLYLINK_ADAPTOR_PROJECT_ROOT%%/_config"
 if not defined FLYLINK_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" FLYLINK_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT  "%%PROJECT_OUTPUT_ROOT%%/config/contools/tool_adaptors/flylink"
 
-if not exist "%FLYLINK_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%FLYLINK_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%" || exit /b 10 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%FLYLINK_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b 10
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%FLYLINK_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%FLYLINK_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
@@ -31,7 +31,7 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" FLYLINKDC_INSTALL_PATH          
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" FLYLINKDC_SETTINGS_PATH         "%%FLYLINKDC_SETTINGS_PATH%%"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" FLYLINKDC_ADAPTOR_BACKUP_DIR    "%%FLYLINKDC_ADAPTOR_BACKUP_DIR%%"
 
-if not exist "%FLYLINK_ADAPTOR_BACKUP_DIR%\" ( mkdir "%FLYLINK_ADAPTOR_BACKUP_DIR%" || exit /b 11 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%FLYLINK_ADAPTOR_BACKUP_DIR%%" || exit /b 10
 
 exit /b 0
 

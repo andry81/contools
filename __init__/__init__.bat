@@ -17,7 +17,7 @@ if not defined CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT  call "%%~dp0canonical_path.b
 
 if not defined CONTOOLS_ROOT                        call "%%~dp0canonical_path.bat" CONTOOLS_ROOT                        "%%CONTOOLS_PROJECT_ROOT%%/Scripts/Tools"
 
-if not exist "%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%" || exit /b 10 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b 10
 
 if not defined LOAD_CONFIG_VERBOSE if %INIT_VERBOSE%0 NEQ 0 set LOAD_CONFIG_VERBOSE=1
 
@@ -33,8 +33,8 @@ if exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%/svncmd/__init__/__init__.bat" (
   call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/svncmd/__init__/__init__.bat" %%* || exit /b
 )
 
-if not exist "%PROJECT_OUTPUT_ROOT%\" ( mkdir "%PROJECT_OUTPUT_ROOT%" || exit /b 11 )
-if not exist "%PROJECT_LOG_ROOT%\" ( mkdir "%PROJECT_LOG_ROOT%" || exit /b 12 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%PROJECT_OUTPUT_ROOT%%" || exit /b 11
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%PROJECT_LOG_ROOT%%" || exit /b 12
 
 if defined CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CHCP%%
 

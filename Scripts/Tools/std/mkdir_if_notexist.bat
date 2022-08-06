@@ -3,12 +3,14 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   The `mkdir` wrapper script with echo and some conditions check before
-rem   call.
+rem   The `mkdir` if not exist wrapper script with echo and some conditions
+rem   check before call.
 
 echo.^>%~nx0 %*
 
 setlocal
+
+set "DIR_PATHS="
 
 :MKDIR_LOOP
 
@@ -47,7 +49,23 @@ goto DIR_PATH_OK
 
 :DIR_PATH_OK
 
-rem for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
+for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do ( set "DIR_PATH=%%~fi" && set "DIR_DRIVE=%%~di" )
+
+rem CAUTION:
+rem   The directory can or can not exist on the disconnected drive.
+rem
+if not exist "%DIR_DRIVE%" (
+  echo.%~nx0: error: the directory path drive is not exist: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  exit /b -254
+) >&2
+
+rem CAUTION:
+rem   The `mklink` command can create symbolic directory link and in the disconnected state it does
+rem   report existences of a directory without the trailing back slash:
+rem     `x:\<path-to-dir-without-trailing-back-slash>`
+rem   So we must test the path with the trailing back slash to check existence of the link AND it's connection state.
+rem
+if not exist "\\?\%DIR_PATH%" if not exist "\\?\%DIR_PATH%\" set DIR_PATHS=%DIR_PATHS% "%DIR_PATH%"
 
 shift
 
@@ -58,4 +76,4 @@ set /A DIR_COUNT+=1
 goto MKDIR_LOOP
 
 :MKDIR_LOOP_END
-mkdir %*
+if defined DIR_PATHS mkdir%DIR_PATHS%

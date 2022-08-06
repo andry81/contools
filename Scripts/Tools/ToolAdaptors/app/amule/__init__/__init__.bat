@@ -13,7 +13,7 @@ if not defined AMULE_ADAPTOR_PROJECT_ROOT               call "%%CONTOOLS_ROOT%%/
 if not defined AMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT  call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" AMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT   "%%AMULE_ADAPTOR_PROJECT_ROOT%%/_config"
 if not defined AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT  "%%PROJECT_OUTPUT_ROOT%%/config/contools/tool_adaptors/amule"
 
-if not exist "%AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%" || exit /b 10 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b 10
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%AMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
@@ -48,7 +48,7 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" AMULE_LOG_DIR               "%%A
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" AMULE_ADAPTOR_BACKUP_DIR    "%%AMULE_ADAPTOR_BACKUP_DIR%%"
 
-if not exist "%AMULE_ADAPTOR_BACKUP_DIR%\" ( mkdir "%AMULE_ADAPTOR_BACKUP_DIR%" || exit /b 11 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%AMULE_ADAPTOR_BACKUP_DIR%%" || exit /b 11
 
 exit /b 0
 

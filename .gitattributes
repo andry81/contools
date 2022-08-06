@@ -608,6 +608,7 @@ Scripts/Tools/std/getcp.bat -text
 Scripts/Tools/std/if_.bat -text
 Scripts/Tools/std/iterate_index.bat -text
 Scripts/Tools/std/mkdir.bat -text
+Scripts/Tools/std/mkdir_if_notexist.bat -text
 Scripts/Tools/std/pause.bat -text
 Scripts/Tools/std/read_args_to_var.bat -text
 Scripts/Tools/std/replace_sys_chars.bat -text

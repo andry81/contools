@@ -13,7 +13,7 @@ if not defined EMULE_ADAPTOR_PROJECT_ROOT               call "%%CONTOOLS_ROOT%%/
 if not defined EMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT  call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT   "%%EMULE_ADAPTOR_PROJECT_ROOT%%/_config"
 if not defined EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT  "%%PROJECT_OUTPUT_ROOT%%/config/contools/tool_adaptors/emule"
 
-if not exist "%EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%\" ( mkdir "%EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%" || exit /b 10 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b 10
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%EMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%EMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
@@ -50,7 +50,7 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_TEMP_DIR              "%%E
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" EMULE_ADAPTOR_BACKUP_DIR    "%%EMULE_ADAPTOR_BACKUP_DIR%%"
 
-if not exist "%EMULE_ADAPTOR_BACKUP_DIR%\" ( mkdir "%EMULE_ADAPTOR_BACKUP_DIR%" || exit /b 11 )
+call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%EMULE_ADAPTOR_BACKUP_DIR%" || exit /b 11
 
 exit /b 0
 
