@@ -1,6 +1,9 @@
 2022.08.06:
+* new: Scripts/Tools: mkdir_if_notexist_strict.bat: added scripts to check for a directory existence including disconnected directory links, return an error on a directory link disconnection state, return an error on a directory link drive unexistence/disconnection
+
+2022.08.06:
 * fixed: __init__.bat: fixed case for the `mkdir` command when a directory can exist as a disconnected directory link but still exist as a directory path (report it with the warning)
-* new: Scripts/Tools: mkdir_if_notexist*.bat: added scripts to check for directory existence including disconnected directory links
+* new: Scripts/Tools: mkdir_if_notexist.bat: added script to check for a directory existence including disconnected directory links, print a warning on a directory link disconnection state, return an error on a directory link drive unexistence/disconnection
 * changed: __init__.bat: replaced `mkdir` calls by `mkdir_if_notexist.bat` script
 
 2022.07.31:
