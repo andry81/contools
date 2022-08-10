@@ -65,12 +65,52 @@ pushd "%?~dp0%" && (
 exit /b
 
 :MAIN_IMPL
+rem script flags
+set "FLAG_FROM_CMD_NAME="
+set "FLAG_FROM_CMD_PARAM0="
+set "FLAG_FROM_CMD_PARAM1="
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-from-cmd" (
+    set "FLAG_FROM_CMD=%~2"
+    set "FLAG_FROM_CMD_PARAM0=%~3"
+    set "FLAG_FROM_CMD_PARAM1=%~4"
+    shift
+    shift
+    shift
+  )
+
+  shift
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
+
+rem must be empty
+if defined FLAG_FROM_CMD (
+  if not defined SKIPPING_CMD echo.Skipping commands:
+  set SKIPPING_CMD=1
+)
+
 for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst") do (
   set "REPO_OWNER=%%i"
   set "REPO=%%j"
-  call :CMD "backup_bare_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
-  echo.---
-  if defined GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS%%"
+
+  call "%%~dp0.impl/update_skip_state.bat" "backup_bare_repo.bat" "%%REPO_OWNER%%" "%%REPO%%"
+
+  if not defined SKIPPING_CMD (
+    call :CMD "backup_bare_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
+    echo.---
+    if defined GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS%%"
+  ) else call echo.* backup_bare_repo.bat "%%REPO_OWNER%%" "%%REPO%%"
 )
 
 exit /b 0

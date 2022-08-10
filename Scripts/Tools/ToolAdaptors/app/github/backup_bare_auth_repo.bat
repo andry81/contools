@@ -108,9 +108,11 @@ echo.
 :SKIP_ARCHIVE
 
 :MAIN_EXIT
+set LASTERROR=%ERRORLEVEL%
+
 echo.
 
-exit /b 0
+exit /b %LASTERROR%
 
 :GIT
 echo.^>git.exe %GIT_BARE_FLAGS% %*

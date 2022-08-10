@@ -96,9 +96,11 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACK
 echo.
 
 :MAIN_EXIT
+set LASTERROR=%ERRORLEVEL%
+
 echo.
 
-exit /b 0
+exit /b %LASTERROR%
 
 :GIT
 echo.^>git.exe %GIT_BARE_FLAGS% %*

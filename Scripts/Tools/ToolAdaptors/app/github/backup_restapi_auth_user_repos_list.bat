@@ -56,6 +56,36 @@ call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 exit /b %LASTERROR%
 
 :MAIN
+rem script flags
+set "FLAG_FROM_SCRIPT_NAME="
+set "FLAG_FROM_SCRIPT_PARAM0="
+set "FLAG_FROM_SCRIPT_PARAM1="
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-from-script" (
+    set "FLAG_FROM_SCRIPT_NAME=%~2"
+    shift
+  ) else if "%FLAG%" == "-from-script-params" (
+    set "FLAG_FROM_SCRIPT_PARAM0=%~2"
+    set "FLAG_FROM_SCRIPT_PARAM1=%~3"
+    shift
+    shift
+  )
+
+  shift
+
+  rem read until no flags
+  goto FLAGS_LOOP
+)
+
 set "TYPE=%~1"
 
 if not defined TYPE (
@@ -135,9 +165,11 @@ echo.
 :SKIP_ARCHIVE
 
 :MAIN_EXIT
+set LASTERROR=%ERRORLEVEL%
+
 echo.
 
-exit /b 0
+exit /b %LASTERROR%
 
 :CURL
 echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*

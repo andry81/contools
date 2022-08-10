@@ -1,3 +1,6 @@
+2022.08.10:
+* new: Scripts/Tools/ToolAdaptors/app/github: `-from-cmd` parameter to resume from specific command with parameters
+
 2022.08.06:
 * new: Scripts/Tools: mkdir_if_notexist_strict.bat: added scripts to check for a directory existence including disconnected directory links, return an error on a directory link disconnection state, return an error on a directory link drive unexistence/disconnection
 

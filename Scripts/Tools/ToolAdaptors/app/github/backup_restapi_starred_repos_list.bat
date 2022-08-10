@@ -126,9 +126,11 @@ echo.
 :SKIP_ARCHIVE
 
 :MAIN_EXIT
+set LASTERROR=%ERRORLEVEL%
+
 echo.
 
-exit /b 0
+exit /b %LASTERROR%
 
 :CURL
 if defined GH_AUTH_USER if not "%GH_AUTH_USER%" == "{{USER}}" goto CURL_WITH_USER
