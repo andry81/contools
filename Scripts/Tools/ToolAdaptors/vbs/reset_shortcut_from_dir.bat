@@ -95,7 +95,7 @@ set "LINKS_DIR=%~1"
 if defined LINKS_DIR if exist "%LINKS_DIR%\" goto LINKS_DIR_EXIST
 
 (
-  echo.%~nx0: error: LINKS_DIR does not exist: `%LINKS_DIR%`.
+  echo.%~nx0: error: LINKS_DIR does not exist: "%LINKS_DIR%".
   exit /b 255
 ) >&2
 

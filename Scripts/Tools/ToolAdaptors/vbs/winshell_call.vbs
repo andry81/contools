@@ -2,11 +2,12 @@
 
 ''' USAGE:
 '''   winshell_call.vbs [-D <CurrentDirectoryPath>] [-verb <ShellVerb>] [-showas <ShowWindowAsNumber>] [-u[<N>]] [-q[a]] [-nowait] [-nowindow]
-''''                    [-make_temp_dir_as_cwd <CwdPlaceholder>] [-wait_delete_cwd] [--wait_on_file_exist] [-E[a | <N>]] [-r[a | <N>] <from> <to>] [-v <name> <value>] [--] <CommandLine>
+''''                    [-make_temp_dir_as_cwd <CwdPlaceholder>] [-wait_delete_cwd] [--wait_on_file_exist] [-E[a | <N>]] [-re[a | <N>] <from> <to>] [-r[a | <N>] <from> <to>] [-v <name> <value>] [--] <CommandLine>
 '''
 ''' DESCRIPTION:
 '''   --
-'''     Separator between flags and positional arguments to explicitly stop the flags parser.
+'''     Separator between flags and positional arguments to explicitly stop the
+'''     flags parser.
 '''   -D <CurrentDirectoryPath>
 '''     Changes current directory to <CurrentDirectoryPath> before the execution.
 '''
@@ -14,14 +15,16 @@
 '''     Run with specific <ShellVerb> operation, these are:
 '''       edit
 '''         Launches an editor and opens the document for editing.
-'''         If the first argument of <CommandLine> is not a document file, the function will fail.
+'''         If the first argument of <CommandLine> is not a document file, the
+'''         function will fail.
 '''       explore
 '''         Explores a folder specified by the first argumnet of <CommandLine>.
 '''       find
-'''         Initiates a search beginning in the directory specified by <CurrentDirectoryPath>.
+'''         Initiates a search beginning in the directory specified by
+'''         <CurrentDirectoryPath>.
 '''       open
-'''         Opens the item specified by the first argument of <CommandLine> parameter.
-'''         The item can be a file or folder.
+'''         Opens the item specified by the first argument of <CommandLine>
+'''         parameter. The item can be a file or folder.
 '''       print
 '''         Prints the file specified by the first argument of <CommandLine>.
 '''         If it is not a document file, the function fails.
@@ -84,18 +87,21 @@
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
 '''   -u<N>
-'''     Unescape %xx or %uxxxx sequences only in the <N>th argument, where N >= 0.
+'''     Unescape %xx or %uxxxx sequences only in the <N>th argument, where
+'''     N >= 0.
 '''   -q
 '''     Always quote arguments (if already has no quote characters).
 '''   -qa
-'''     Always quote tail positional parameters (if already has no quote characters).
+'''     Always quote tail positional parameters (if already has no quote
+'''     characters).
 '''   -nowait
 '''     Does not wait child process exit.
 '''   -nowindow
 '''     Hide child process window upon child process creation.
 ''''  -make_temp_dir_as_cwd <CwdPlaceholder>
-'''     Make Current Working Directory as unique subdirectry in the temporary directories storage.
-'''     Replace all <CwdPlaceholder> strings in all arguments by absolute path to Current Working Directory.
+'''     Make Current Working Directory as unique subdirectry in the temporary
+'''     directories storage. Replace all <CwdPlaceholder> strings in all
+'''     arguments by absolute path to Current Working Directory.
 ''''  -wait_delete_cwd
 '''     Delete CWD before exit or wait until deleted.
 ''''  -wait_on_file_exist <File>
@@ -108,10 +114,30 @@
 '''     Expand environment variables only in the <N>th argument, where N >= 0.
 '''   -r <from> <to>
 '''     Replace <from> string to <to> string in all arguments.
+'''     The replace does execute after %-unescape and $-environment variables
+'''     expand.
+'''   -re <from> <to>
+'''     Replace early <from> string to <to> string in all arguments.
+'''     The replace does execute before %-unescape and $-environment variables
+'''     expand.
 '''   -ra <from> <to>
 '''     Replace <from> string to <to> string in tail arguments.
+'''     The replace does execute after %-unescape and $-environment variables
+'''     expand.
+'''   -rea <from> <to>
+'''     Replace early <from> string to <to> string in tail arguments.
+'''     The replace does execute before %-unescape and $-environment variables
+'''     expand.
 '''   -r<N> <from> <to>
-'''     Replace <from> string to <to> string only in the <N>th argument, where N >= 0.
+'''     Replace <from> string to <to> string only in the <N>th argument, where
+'''     N >= 0.
+'''     The replace does execute after %-unescape and $-environment variables
+'''     expand.
+'''   -re<N> <from> <to>
+'''     Replace early <from> string to <to> string only in the <N>th argument,
+'''     where N >= 0.
+'''     The replace does execute after %-unescape and $-environment variables
+'''     expand.
 '''   -v <name> <value>
 '''     Create environment variable with name <name> and value <value>.
 '''
@@ -126,13 +152,19 @@
 '''   PROS:
 '''     * Can run a child process elevated or as Administrator.
 '''     * Can be run from any Windows version including Windows XP.
-'''     * No need to recompile or rebuild sources to run a `.vbs` script, so can be included as a part into another project.
+'''     * No need to recompile or rebuild sources to run a `.vbs` script, so
+'''       can be included as a part into another project.
 '''
 '''   CONS:
-'''     * By default does not wait a child process exit. You have to use `winshell_call.vbs` with `-make_temp_dir_as_cwd` and `-wait_delete_cwd` options
-'''       together with the `call.vbs` to achieve a child process exit wait while being run as Administrator.
-'''     * A `.vbs` script can not use all windows functionality/features and has a lack of functionality by design.
-'''     * Windows antivirus software in some cases reports a `.vbs` script as not safe or requests an explicit action on each `.vbs` script execution.
+'''     * By default does not wait a child process exit. You have to use
+'''       `winshell_call.vbs` with `-make_temp_dir_as_cwd` and
+'''       `-wait_delete_cwd` options together with the `call.vbs` to achieve a
+'''       child process exit wait while being run as Administrator.
+'''     * A `.vbs` script can not use all windows functionality/features and
+'''       has a lack of functionality by design.
+'''     * Windows antivirus software in some cases reports a `.vbs` script as
+'''       not safe or requests an explicit action on each `.vbs` script
+'''       execution.
 
 Sub GrowArr(arr, size)
     Dim reserve : reserve = UBound(arr) + 1
@@ -214,13 +246,19 @@ Dim MakeTempDirAsCWD : MakeTempDirAsCWD = ""
 Dim WaitDeleteCWD : WaitDeleteCWD = 0
 Dim WaitOnFileExist : WaitOnFileExist = ""
 
-Dim from_str_replace_indexed_arr : from_str_replace_indexed_arr = Array()
-Dim to_str_replace_indexed_arr : to_str_replace_indexed_arr = Array()
-Dim str_replace_index_arr : str_replace_index_arr = Array()
+''' early replace
+Dim from_str_early_replace_indexed_arr : from_str_early_replace_indexed_arr = Array()
+Dim to_str_early_replace_indexed_arr : to_str_early_replace_indexed_arr = Array()
+Dim str_early_replace_index_arr : str_early_replace_index_arr = Array()
+Dim str_early_replace_index_arr_size : str_early_replace_index_arr_size = 0
+Dim from_str_early_replace_arr, to_str_early_replace_arr, str_early_replace_arr_size
 
-Dim str_replace_index_arr_size : str_replace_index_arr_size = 0
-
-Dim from_str_replace_arr, to_str_replace_arr, str_replace_arr_size
+''' late replace
+Dim from_str_late_replace_indexed_arr : from_str_late_replace_indexed_arr = Array()
+Dim to_str_late_replace_indexed_arr : to_str_late_replace_indexed_arr = Array()
+Dim str_late_replace_index_arr : str_late_replace_index_arr = Array()
+Dim str_late_replace_index_arr_size : str_late_replace_index_arr_size = 0
+Dim from_str_late_replace_arr, to_str_late_replace_arr, str_late_replace_arr_size
 
 Dim from_str_expand_arr : from_str_expand_arr = Array()
 Dim to_str_expand_arr : to_str_expand_arr = Array()
@@ -291,6 +329,30 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
       ElseIf arg = "-wait_on_file_exist" Then
         i = i + 1
         WaitOnFileExist = WScript.Arguments(i)
+      ElseIf Left(arg, 3) = "-re" Then
+        str_early_replace_index_arr_size = str_early_replace_index_arr_size + 1
+
+        GrowArr from_str_early_replace_indexed_arr, str_early_replace_index_arr_size
+        i = i + 1
+        from_str_early_replace_indexed_arr(str_early_replace_index_arr_size - 1) = WScript.Arguments(i)
+
+        GrowArr to_str_early_replace_indexed_arr, str_early_replace_index_arr_size
+        i = i + 1
+        to_str_early_replace_indexed_arr(str_early_replace_index_arr_size - 1) = WScript.Arguments(i)
+
+        GrowArr str_early_replace_index_arr, str_early_replace_index_arr_size
+        If arg = "-re" Then
+          str_early_replace_index_arr(str_early_replace_index_arr_size - 1) = -1 ' all
+        ElseIf arg = "-rea" Then
+          str_early_replace_index_arr(str_early_replace_index_arr_size - 1) = -2 ' greater or equal to 1
+        Else
+          arg = Mid(arg, 4)
+          If IsNumeric(arg) And CDbl(arg) <= 2147483647 And CDbl(arg) >= -2147483648 And CStr(CLng(arg)) = CStr(arg) Then
+            str_early_replace_index_arr(str_early_replace_index_arr_size - 1) = CLng(arg) ' exact index
+          else
+            str_early_replace_index_arr(str_early_replace_index_arr_size - 1) = ""
+          End If
+        End If
       ElseIf Left(arg, 2) = "-r" Then
         str_replace_index_arr_size = str_replace_index_arr_size + 1
 
@@ -328,10 +390,19 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
       End If
     Else
       ExpectFlags = False
+     
       ReDim Preserve UnescapeArgs(UnescapeArgs_size - 1)
-      ReDim Preserve from_str_replace_indexed_arr(str_replace_index_arr_size - 1)
-      ReDim Preserve to_str_replace_indexed_arr(str_replace_index_arr_size - 1)
-      ReDim Preserve str_replace_index_arr(str_replace_index_arr_size - 1)
+
+      ''' early replace
+      ReDim Preserve from_str_early_replace_indexed_arr(str_early_replace_index_arr_size - 1)
+      ReDim Preserve to_str_early_replace_indexed_arr(str_early_replace_index_arr_size - 1)
+      ReDim Preserve str_early_replace_index_arr(str_early_replace_index_arr_size - 1)
+
+      ''' late replace
+      ReDim Preserve from_str_late_replace_indexed_arr(str_late_replace_index_arr_size - 1)
+      ReDim Preserve to_str_late_replace_indexed_arr(str_late_replace_index_arr_size - 1)
+      ReDim Preserve str_late_replace_index_arr(str_late_replace_index_arr_size - 1)
+
       ReDim Preserve from_str_expand_arr(str_expand_arr_size - 1)
       ReDim Preserve to_str_expand_arr(str_expand_arr_size - 1)
 
@@ -340,6 +411,48 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
   End If
 
   If Not ExpectFlags Then
+    ''' early replace
+    If str_early_replace_index_arr_size > 0 Then
+      from_str_early_replace_arr = Array()
+      to_str_early_replace_arr = Array()
+      str_early_replace_arr_size = 0
+
+      ''' collect all replace parameters for the same argument
+      For k = 0 To str_early_replace_index_arr_size - 1
+        index = str_early_replace_index_arr(k)
+        if index = "" Then index = -1
+        If index < 0 Then
+          If index = -1 Or j >= -1 - index Then
+            str_early_replace_arr_size = str_early_replace_arr_size + 1
+
+            GrowArr from_str_early_replace_arr, str_early_replace_arr_size
+            from_str_early_replace_arr(str_early_replace_arr_size - 1) = from_str_early_replace_indexed_arr(k)
+
+            GrowArr to_str_early_replace_arr, str_early_replace_arr_size
+            to_str_early_replace_arr(str_early_replace_arr_size - 1) = to_str_early_replace_indexed_arr(k)
+          End If
+        Else
+          If j = index Then
+            str_early_replace_arr_size = str_early_replace_arr_size + 1
+
+            GrowArr from_str_early_replace_arr, str_early_replace_arr_size
+            from_str_early_replace_arr(str_early_replace_arr_size - 1) = from_str_early_replace_indexed_arr(k)
+
+            GrowArr to_str_early_replace_arr, str_early_replace_arr_size
+            to_str_early_replace_arr(str_early_replace_arr_size - 1) = to_str_early_replace_indexed_arr(k)
+          End If
+        End If
+      Next
+
+      If str_early_replace_arr_size > 0 Then
+        ReDim Preserve from_str_early_replace_arr(str_early_replace_arr_size - 1)
+        ReDim Preserve to_str_early_replace_arr(str_early_replace_arr_size - 1)
+
+        arg = ReplaceStringArr(arg, Len(arg), str_early_replace_arr_size, from_str_early_replace_arr, to_str_early_replace_arr)
+      End If
+    End If
+
+    ''' %-unescape
     If UnescapeAllArgs Then
       arg = Unescape(arg)
     ElseIf UnescapeArgs_size > 0 Then
@@ -351,6 +464,7 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
       Next
     End If
 
+    ''' $-environment variables expand
     If ExpandAllArgs Then
       arg = shell_obj.ExpandEnvironmentStrings(arg)
     ElseIf ExpandTailArgs And j > 0 Then
@@ -368,42 +482,44 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
       arg = Replace(arg, MakeTempDirAsCWD, ChangeCurrentDirectory, 1, -1, vbBinaryCompare)
     End If
 
-    If str_replace_index_arr_size > 0 Then
-      from_str_replace_arr = Array()
-      to_str_replace_arr = Array()
-      str_replace_arr_size = 0
+    ''' late replace
+    If str_late_replace_index_arr_size > 0 Then
+      from_str_late_replace_arr = Array()
+      to_str_late_replace_arr = Array()
+      str_late_replace_arr_size = 0
 
-      For k = 0 To str_replace_index_arr_size - 1
-        index = str_replace_index_arr(k)
+      ''' collect all replace parameters for the same argument
+      For k = 0 To str_late_replace_index_arr_size - 1
+        index = str_late_replace_index_arr(k)
         if index = "" Then index = -1
         If index < 0 Then
           If index = -1 Or j >= -1 - index Then
-            str_replace_arr_size = str_replace_arr_size + 1
+            str_late_replace_arr_size = str_late_replace_arr_size + 1
 
-            GrowArr from_str_replace_arr, str_replace_arr_size
-            from_str_replace_arr(str_replace_arr_size - 1) = from_str_replace_indexed_arr(k)
+            GrowArr from_str_late_replace_arr, str_late_replace_arr_size
+            from_str_late_replace_arr(str_late_replace_arr_size - 1) = from_str_late_replace_indexed_arr(k)
 
-            GrowArr to_str_replace_arr, str_replace_arr_size
-            to_str_replace_arr(str_replace_arr_size - 1) = to_str_replace_indexed_arr(k)
+            GrowArr to_str_late_replace_arr, str_late_replace_arr_size
+            to_str_late_replace_arr(str_late_replace_arr_size - 1) = to_str_late_replace_indexed_arr(k)
           End If
         Else
           If j = index Then
-            str_replace_arr_size = str_replace_arr_size + 1
+            str_late_replace_arr_size = str_late_replace_arr_size + 1
 
-            GrowArr from_str_replace_arr, str_replace_arr_size
-            from_str_replace_arr(str_replace_arr_size - 1) = from_str_replace_indexed_arr(k)
+            GrowArr from_str_late_replace_arr, str_late_replace_arr_size
+            from_str_late_replace_arr(str_late_replace_arr_size - 1) = from_str_late_replace_indexed_arr(k)
 
-            GrowArr to_str_replace_arr, str_replace_arr_size
-            to_str_replace_arr(str_replace_arr_size - 1) = to_str_replace_indexed_arr(k)
+            GrowArr to_str_late_replace_arr, str_late_replace_arr_size
+            to_str_late_replace_arr(str_late_replace_arr_size - 1) = to_str_late_replace_indexed_arr(k)
           End If
         End If
       Next
 
-      If str_replace_arr_size > 0 Then
-        ReDim Preserve from_str_replace_arr(str_replace_arr_size - 1)
-        ReDim Preserve to_str_replace_arr(str_replace_arr_size - 1)
+      If str_late_replace_arr_size > 0 Then
+        ReDim Preserve from_str_late_replace_arr(str_late_replace_arr_size - 1)
+        ReDim Preserve to_str_late_replace_arr(str_late_replace_arr_size - 1)
 
-        arg = ReplaceStringArr(arg, Len(arg), str_replace_arr_size, from_str_replace_arr, to_str_replace_arr)
+        arg = ReplaceStringArr(arg, Len(arg), str_late_replace_arr_size, from_str_late_replace_arr, to_str_late_replace_arr)
       End If
     End If
 

@@ -1,3 +1,7 @@
+2022.08.12:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: reset_shortcut_from_dir.bat: executions fixup in case of `)` characters in arguments
+* new: Scripts/Tools/ToolAdaptors/vbs: call.vbs, winshell_call.vbs: `-re*` options for early replace additionally to `-r*` options for late replace
+
 2022.08.10:
 * new: Scripts/Tools/ToolAdaptors/app/github: `-from-cmd` parameter to resume from specific command with parameters
 
