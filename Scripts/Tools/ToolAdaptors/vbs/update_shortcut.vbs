@@ -136,6 +136,19 @@
 '''
 '''   See details: https://stackoverflow.com/questions/39397348/open-folder-on-portable-device-with-batch-file/65997169#65997169
 
+''' Example to create the Master Control Panel link or directory on the Desktop
+'''   >
+'''   make_shortcut.bat "%USERPROFILE%\Desktop\GodMode.lnk" "shell:::{ED7BA470-8E54-465E-825C-99712043E01C}"
+''' Or
+'''   >
+'''   mkdir "%USERPROFILE%\Desktop\GodMode.{ED7BA470-8E54-465E-825C-99712043E01C}"
+'''
+''' Example to open the Master Control Panel from Taskbar pinned shortcut
+'''   >
+'''   explorer "shell:::{ED7BA470-8E54-465E-825C-99712043E01C}"
+'''
+'''   See details: https://en.wikipedia.org/wiki/Windows_Master_Control_Panel_shortcut
+
 ''' CAUTION:
 '''   The list of issues around a shortcut (.lnk) file:
 '''

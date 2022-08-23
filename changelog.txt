@@ -1,5 +1,8 @@
+2022.08.23:
+* new: Scripts/Tools: admin/WindowsServices, ToolAdaptors/vbs: added Window Master Control Panel feature
+
 2022.08.12:
-* fixed: Scripts/Tools/ToolAdaptors/vbs: reset_shortcut_from_dir.bat: executions fixup in case of `)` characters in arguments
+* fixed: Scripts/Tools/ToolAdaptors/vbs: reset_shortcut_from_dir.bat: execution fixup in case of `)` characters in arguments
 * new: Scripts/Tools/ToolAdaptors/vbs: call.vbs, winshell_call.vbs: `-re*` options for early replace additionally to `-r*` options for late replace
 
 2022.08.10:
