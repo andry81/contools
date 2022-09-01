@@ -32,7 +32,7 @@ if defined HAD_SKIPPING_CMD if not defined SKIPPING_CMD (
 :MAIN
 set SKIPPING_CMD=1
 
-if not "%FLAG_FROM_CMD%" == "%CMD%" exit /b 255
+if not "%FLAG_FROM_CMD%" == "*" if not "%FLAG_FROM_CMD%" == "%CMD%" exit /b 255
 
 set "MATCH_PARAM0="
 set "MATCH_PARAM1="
