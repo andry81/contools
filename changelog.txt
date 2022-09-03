@@ -1,3 +1,6 @@
+2022.09.03:
+* fixed: Scripts/Tools/build/extract_files_from_archives_by_pttn.bat: missed change
+
 2022.08.31:
 * fixed: Scripts/Tools/ToolAdaptors/app/github: `-from-cmd` parameter usage fixup, now `*` is used as `all` or `any`
 

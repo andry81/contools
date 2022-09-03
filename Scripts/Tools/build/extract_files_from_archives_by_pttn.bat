@@ -25,7 +25,7 @@ setlocal
 
 if %IMPL_MODE%0 NEQ 0 goto IMPL
 
-set PROJECT_LOG_ROOT=.log
+if not defined PROJECT_LOG_ROOT set PROJECT_LOG_ROOT=.log
 
 call "%%~dp0__init__.bat" || exit /b
 
