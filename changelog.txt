@@ -1,3 +1,6 @@
+2022.09.05:
+* fixed: Scripts/Tools/build/init_project_log.bat: missed to ignore project log path reinit if `PROJECT_LOG_DIR` or `PROJECT_LOG_FILE` been already defined
+
 2022.09.03:
 * fixed: Scripts/Tools/build/extract_files_from_archives_by_pttn.bat: missed change
 
