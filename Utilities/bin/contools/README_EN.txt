@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2022.01.11
+* 2022.09.05
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -31,8 +31,12 @@
        command is blocked on input while a child process is terminated
        externally.
 
-6.3. With `bash.exe`
-6.3.1. The GNU Bash shell executable throws an error:
+6.3. With `callf.exe`/`callfg.exe` under VirtualBox
+6.3.1. The `callf /elevate ...` shows system dialog
+       `The specified path does not exist.`
+
+6.4. With `bash.exe`
+6.4.1. The GNU Bash shell executable throws an error:
        `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
 
 7. AUTHOR
@@ -421,11 +425,23 @@ The parent process will not exit until the line return character would be
 entered.
 
 -------------------------------------------------------------------------------
-6.3. With `bash.exe`
+6.3. With `callf.exe`/`callfg.exe` under VirtualBox
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.3.1. The GNU Bash shell executable throws an error:
+6.3.1. The `callf /elevate ...` shows system dialog
+       `The specified path does not exist.`
+-------------------------------------------------------------------------------
+
+The ShellExecute API can not run an executable from the VirtualBox Shared
+Folder because it is not a fixed volume but a Network Drive.
+
+-------------------------------------------------------------------------------
+6.4. With `bash.exe`
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+6.4.1. The GNU Bash shell executable throws an error:
        `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
 -------------------------------------------------------------------------------
 

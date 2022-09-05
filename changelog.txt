@@ -1,4 +1,7 @@
 2022.09.05:
+* changed: Utilities/bin/contools/README_EN.txt: readme update
+
+2022.09.05:
 * fixed: Scripts/Tools/build/init_project_log.bat: missed to ignore project log path reinit if `PROJECT_LOG_DIR` or `PROJECT_LOG_FILE` been already defined
 
 2022.09.03:
