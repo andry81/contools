@@ -17,6 +17,11 @@
 
 once EMULE_EXECUTABLE                     ="c:\Program Files\eMule"
 
+# To be able to use arbitrary user independently to current user
+#once RUN_AS_USER                          =<RunAsUSer>
+#APPDATA                                   =c:\Users\$/{RUN_AS_USER}\AppData\Roaming
+#LOCALAPPDATA                              =c:\Users\$/{RUN_AS_USER}\AppData\Local
+
 once EMULE_CONFIG_DIR                     ="$/{LOCALAPPDATA}/eMule/config"
 
 once EMULE_ADAPTOR_BACKUP_DIR             ="$/{PROJECT_OUTPUT_ROOT}/emule/backup"

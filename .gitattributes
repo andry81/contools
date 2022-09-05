@@ -221,11 +221,13 @@ Scripts/Tools/ToolAdaptors/app/github/backup_restapi_starred_repos_list.bat -tex
 Scripts/Tools/ToolAdaptors/app/github/backup_restapi_user_repos_list.bat -text
 Scripts/Tools/ToolAdaptors/app/github/print_all_repos_from_restapi_json.bat -text
 Scripts/Tools/ToolAdaptors/app/github/print_source_repos_from_restapi_json.bat -text
+Scripts/Tools/ToolAdaptors/app/qbittorrent/.update_registry_to_run_as_user/update_registry_to_run_as_user.update.bat -text
 Scripts/Tools/ToolAdaptors/app/qbittorrent/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/qbittorrent/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/qbittorrent/_config/config.system.vars.in -text
 Scripts/Tools/ToolAdaptors/app/qbittorrent/backup_config.bat -text
 Scripts/Tools/ToolAdaptors/app/qbittorrent/backup_db_files.bat -text
+Scripts/Tools/ToolAdaptors/app/qbittorrent/update_registry_to_run_as_user.bat -text
 Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/__init__/__init__.bat -text
 Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/_config/config.0.vars.in -text
 Scripts/Tools/ToolAdaptors/app/wkhtmltopdf/_config/config.system.vars.in -text

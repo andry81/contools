@@ -18,6 +18,11 @@
 once AMULE_CMD_EXECUTABLE                 ="c:\Program Files\aMule\amule.exe"
 once AMULE_GUI_EXECUTABLE                 ="c:\Program Files\aMule\amulecmd.exe"
 
+# To be able to use arbitrary user independently to current user
+#once RUN_AS_USER                          =<RunAsUSer>
+#APPDATA                                   =c:\Users\$/{RUN_AS_USER}\AppData\Roaming
+#LOCALAPPDATA                              =c:\Users\$/{RUN_AS_USER}\AppData\Local
+
 once AMULE_CONFIG_DIR                     ="$/{APPDATA}/aMule"
 
 once AMULE_ADAPTOR_BACKUP_DIR             ="$/{PROJECT_OUTPUT_ROOT}/amule/backup"

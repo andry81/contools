@@ -22,6 +22,11 @@ call :IF_DEFINED_AND_FILE_EXIST EMULE_EXECUTABLE || (
   exit /b 255
 ) >&2
 
+call :IF_DEFINED_AND_DIR_EXIST APPDATA || (
+  echo.%~nx0: error: APPDATA directory is not found: "%APPDATA%".
+  exit /b 255
+) >&2
+
 call :IF_DEFINED_AND_DIR_EXIST LOCALAPPDATA || (
   echo.%~nx0: error: LOCALAPPDATA directory is not found: "%LOCALAPPDATA%".
   exit /b 255

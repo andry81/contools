@@ -33,7 +33,9 @@
 
 6.3. With `callf.exe`/`callfg.exe` under VirtualBox
 6.3.1. The `callf /elevate ...` shows system dialog
-       `The specified path does not exist.`
+       `The specified path does not exist.`.
+6.3.2. The `callf.exe` execuable can not be removed if has been run at least
+       once as `callf /elevate ...`.
 
 6.4. With `bash.exe`
 6.4.1. The GNU Bash shell executable throws an error:
@@ -430,11 +432,24 @@ entered.
 
 -------------------------------------------------------------------------------
 6.3.1. The `callf /elevate ...` shows system dialog
-       `The specified path does not exist.`
+       `The specified path does not exist.`.
 -------------------------------------------------------------------------------
 
 The ShellExecute API can not run an executable from the VirtualBox Shared
 Folder because it is not a fixed volume but a Network Drive.
+
+-------------------------------------------------------------------------------
+6.3.2. The `callf.exe` execuable can not be removed if has been run at least
+       once as `callf /elevate ...`.
+-------------------------------------------------------------------------------
+
+The system does protection on executable been run at least once as elevated
+from removement by not elevated processes. We have to attempt to remove and if
+didn't then, postpone the rest upon reboot.
+
+NOTE:
+  To postpone the removement you still must access the registry keys under an
+  elevated user.
 
 -------------------------------------------------------------------------------
 6.4. With `bash.exe`

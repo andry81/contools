@@ -32,6 +32,11 @@ call :IF_DEFINED_AND_DIR_EXIST APPDATA || (
   exit /b 255
 ) >&2
 
+call :IF_DEFINED_AND_DIR_EXIST LOCALAPPDATA || (
+  echo.%~nx0: error: LOCALAPPDATA directory is not found: "%LOCALAPPDATA%".
+  exit /b 255
+) >&2
+
 call :IF_DEFINED_AND_DIR_EXIST AMULE_CONFIG_DIR || (
   echo.%~nx0: error: AMULE_CONFIG_DIR directory is not found: "%AMULE_CONFIG_DIR%".
   exit /b 255

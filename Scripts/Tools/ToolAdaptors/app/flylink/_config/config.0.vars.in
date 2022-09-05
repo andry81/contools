@@ -15,6 +15,11 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
+# To be able to use arbitrary user independently to current user
+#once RUN_AS_USER                          =<RunAsUSer>
+#APPDATA                                   =c:\Users\$/{RUN_AS_USER}\AppData\Roaming
+#LOCALAPPDATA                              =c:\Users\$/{RUN_AS_USER}\AppData\Local
+
 once FLYLINKDC_INSTALL_PATH               ="C:\Program Files\FlyLink"
 once FLYLINKDC_SETTINGS_PATH              ="$/{FLYLINKDC_INSTALL_PATH}/Settings"
 

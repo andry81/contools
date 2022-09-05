@@ -17,6 +17,16 @@ call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%QBITTORRENT_ADAPTOR_PROJEC
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%QBITTORRENT_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%QBITTORRENT_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
+call :IF_DEFINED_AND_FILE_EXIST QBITTORRENT_EXECUTABLE || (
+  echo.%~nx0: error: QBITTORRENT_EXECUTABLE file path is not found: "%QBITTORRENT_EXECUTABLE%"
+  exit /b 255
+) >&2
+
+call :IF_DEFINED_AND_DIR_EXIST APPDATA || (
+  echo.%~nx0: error: APPDATA directory is not found: "%APPDATA%".
+  exit /b 255
+) >&2
+
 call :IF_DEFINED_AND_DIR_EXIST LOCALAPPDATA || (
   echo.%~nx0: error: LOCALAPPDATA directory is not found: "%LOCALAPPDATA%".
   exit /b 255

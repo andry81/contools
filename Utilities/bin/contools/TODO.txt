@@ -99,3 +99,7 @@
 
   >
   callf /set-lang-names en-US,en "" "..."
+
+* Add
+  `/run-as-user <user>`
+  to run under different user with system password input dialog.

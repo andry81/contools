@@ -1,4 +1,12 @@
 2022.09.05:
+* new: Scripts/Tools/ToolAdaptors/app: config: added `RUN_AS_USER` variable to use in `APPDATA` and `LOCALAPPDATA`
+* new: Scripts/Tools/ToolAdaptors/app/qbittorrent: added `update_registry_to_run_as_user.bat` to update qbittorrent file associations to run the application under different user
+* changed: Scripts/Tools/ToolAdaptors/app: __init__: always use and check `APPDATA` and `LOCALAPPDATA` variables
+* changed: Scripts/Tools/ToolAdaptors/app/qbittorrent: __init__: always use and check `QBITTORRENT_EXECUTABLE` variable
+* changed: Utilities/bin/contools/README_EN.txt: readme update
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
+2022.09.05:
 * changed: Utilities/bin/contools/README_EN.txt: readme update
 
 2022.09.05:

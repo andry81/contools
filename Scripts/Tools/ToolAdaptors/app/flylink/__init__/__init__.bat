@@ -17,6 +17,16 @@ call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%FLYLINK_ADAPTOR_PROJECT_OU
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -gen_user_config "%%FLYLINK_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%FLYLINK_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
+call :IF_DEFINED_AND_DIR_EXIST APPDATA || (
+  echo.%~nx0: error: APPDATA directory is not found: "%APPDATA%".
+  exit /b 255
+) >&2
+
+call :IF_DEFINED_AND_DIR_EXIST LOCALAPPDATA || (
+  echo.%~nx0: error: LOCALAPPDATA directory is not found: "%LOCALAPPDATA%".
+  exit /b 255
+) >&2
+
 call :IF_DEFINED_AND_DIR_EXIST FLYLINKDC_INSTALL_PATH || (
   echo.%~nx0: error: FLYLINKDC_INSTALL_PATH directory is not found: "%FLYLINKDC_INSTALL_PATH%".
   exit /b 255
