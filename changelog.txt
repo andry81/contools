@@ -1,3 +1,6 @@
+2022.09.07:
+* changed: Scripts/Tools/ToolAdaptors/app/qbittorrent/update_registry_to_run_as_user.bat: no need to use `REG_EXPAND_SZ` with `callf` as long as it can expand environment variables on its own
+
 2022.09.05:
 * new: Scripts/Tools/ToolAdaptors/app: config: added `RUN_AS_USER` variable to use in `APPDATA` and `LOCALAPPDATA`
 * new: Scripts/Tools/ToolAdaptors/app/qbittorrent: added `update_registry_to_run_as_user.bat` to update qbittorrent file associations to run the application under different user
