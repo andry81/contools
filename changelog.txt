@@ -1,3 +1,6 @@
+2022.09.14:
+* fixed: Scripts/Tools/ToolAdaptors: fixed script call in case if `INIT_VARS_FILE` variable is not defined
+
 2022.09.07:
 * changed: Scripts/Tools/ToolAdaptors/app/qbittorrent/update_registry_to_run_as_user.bat: no need to use `REG_EXPAND_SZ` with `callf` as long as it can expand environment variables on its own
 
