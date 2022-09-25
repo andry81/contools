@@ -1,3 +1,6 @@
+2022.09.25:
+* fixed: Scripts/Tools/ToolAdaptors/app/qbittorrent/update_registry_to_run_as_user.bat: minor fixup
+
 2022.09.14:
 * fixed: Scripts/Tools/ToolAdaptors: fixed script call in case if `INIT_VARS_FILE` variable is not defined
 

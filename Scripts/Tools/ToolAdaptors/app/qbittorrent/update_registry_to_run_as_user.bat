@@ -112,9 +112,6 @@ mkdir "%CONTOOLS_DIR_TMP%" || (
 rem copy `callf.exe` into temporary directory to be able to run elevated from a Network Drive
 call :XCOPY_FILE "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools" callf.exe "%%CONTOOLS_DIR_TMP%%" || exit /b 255
 
-rem variables escaping specifically for `reg.exe`
-set "QBITTORRENT_EXECUTABLE_ESCAPED=%QBITTORRENT_EXECUTABLE:\=\\%"
-
 rem NOTE: In the `callf.exe` the backslash character escaping requires only in case of conjunction with the double quote character escaping: `\\\"`.
 rem
 
@@ -130,7 +127,7 @@ call :CMD "%%CONTOOLS_DIR_TMP%%/callf.exe" ^
   /v FLAG_USE_CALLF_EXECUTABLE "%%FLAG_USE_CALLF_EXECUTABLE%%" ^
   /v CONTOOLS_UTILITIES_BIN_ROOT "%%CONTOOLS_UTILITIES_BIN_ROOT%%" ^
   /v TEMP_DIR "%%TEMP_DIR%%" ^
-  /v QBITTORRENT_EXECUTABLE_ESCAPED "%%QBITTORRENT_EXECUTABLE_ESCAPED%%" ^
+  /v QBITTORRENT_EXECUTABLE "%%QBITTORRENT_EXECUTABLE%%" ^
   "${COMSPECLNK}" "/c \"@\"${?~dp0}.${?~n0}\${?~n0}.update.bat\" {*}\"" %%* || exit /b
 
 rem ...
