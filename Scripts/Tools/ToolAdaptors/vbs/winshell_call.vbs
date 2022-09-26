@@ -94,6 +94,16 @@
 '''   -qa
 '''     Always quote tail positional parameters (if already has no quote
 '''     characters).
+'''   -q-sep <chars>
+'''     Explicit set of command line argument separator characters for all
+'''     arguments to trigger an argument quoting.
+'''     By default, only the space and the tabulation characters does trigger
+'''     an argument quoting.
+'''     If an argument already has a quote character, then an argument quoting
+'''     is ignored.
+'''     CAUTION:
+'''       The parameter redefines the characters set, so the space character
+'''       must be issued to leave the default behaviour as is.
 '''   -nowait
 '''     Does not wait child process exit.
 '''   -nowindow
@@ -165,6 +175,20 @@
 '''     * Windows antivirus software in some cases reports a `.vbs` script as
 '''       not safe or requests an explicit action on each `.vbs` script
 '''       execution.
+'''     * Nested quote characters can not be escaped and must be replaced by
+'''       string `%22` with the usage of the `-q` flag or it's derivatives.
+'''
+''' KNOWN ISSUES:
+'''
+'''   * The `cmd.exe` command line parser use %-character expansion for all
+'''     parameters.
+'''     You must use, for example, the `-ra "%" "%?01%" -v "?01" "%"` options
+'''     to workaround the issue for the `cmd.exe` command line.
+'''   * The `cmd.exe` command line parser treats the `,` character as command
+'''     line parameters separator additionally to the space character.
+'''     You must use the `-q-sep " ,"` option to workaround the issue for the
+'''     `cmd.exe` command line.
+'''
 
 Sub GrowArr(arr, size)
     Dim reserve : reserve = UBound(arr) + 1
@@ -237,6 +261,10 @@ Dim ExpandTailArgs : ExpandTailArgs = False
 
 Dim ExpandArgs : ExpandArgs = Array()
 Dim ExpandArgs_size : ExpandArgs_size = 0
+
+Dim QuoteArg
+Dim AlwaysQuoteSeparatorChar : AlwaysQuoteSeparatorChar = ""
+Dim AlwaysQuoteSeparatorChars : AlwaysQuoteSeparatorChars = " "
 
 Dim AlwaysQuote : AlwaysQuote = False
 Dim AlwaysQuoteTailPosParams : AlwaysQuoteTailPosParams = False
@@ -313,6 +341,9 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
         AlwaysQuote = True
       ElseIf arg = "-qa" Then ' Always quote non flag tail positional parameters (if already has no quote characters)
         AlwaysQuoteTailPosParams = True
+      ElseIf arg = "-q-sep" Then ' command line arguments separator characters
+        i = i + 1
+        AlwaysQuoteSeparatorChars =  WScript.Arguments(i)
       ElseIf arg = "-nowindow" Then
         NoWindow = True
       ElseIf arg = "-make_temp_dir_as_cwd" Then
@@ -524,8 +555,25 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
     End If
 
     If InStr(arg, Chr(34)) = 0 Then
-      If (AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0) Or _
-         (Not IsCmdArg And AlwaysQuoteTailPosParams And Left(arg, 1) <> "-") Then
+      If AlwaysQuote Or Len(arg & "") = 0 Then
+        QuoteArg = True
+      Else
+        QuoteArg = False
+        For k = 1 To Len(AlwaysQuoteSeparatorChars)
+          AlwaysQuoteSeparatorChar = Mid(AlwaysQuoteSeparatorChars, k, 1)
+          If AlwaysQuoteSeparatorChar <> Space(1) Then
+            If InStr(arg, AlwaysQuoteSeparatorChar) <> 0 Then
+              QuoteArg = True
+            End If
+          Else
+            If InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then ' together with tabulation character
+              QuoteArg = True
+            End If
+          End If
+        Next
+      End If
+
+      If QuoteArg Or (Not IsCmdArg And AlwaysQuoteTailPosParams And Left(arg, 1) <> "-") Then
         arg = Chr(34) & arg & Chr(34)
       End If
     End If

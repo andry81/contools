@@ -1,3 +1,6 @@
+2022.09.26:
+* new: Scripts/Tools/ToolAdaptors/vbs: call.vbs, winshell_call.vbs: `-q-sep` option for explicit command line arguments separator characters
+
 2022.09.25:
 * fixed: Scripts/Tools/ToolAdaptors/app/qbittorrent/update_registry_to_run_as_user.bat: minor fixup
 
