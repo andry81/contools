@@ -1,3 +1,6 @@
+2022.09.27:
+* changed: Scripts/Tools/admin/ProductKey/admin_windows7_product_key_manipulation.txt: added install/activation details
+
 2022.09.26:
 * new: Scripts/Tools/ToolAdaptors/vbs: call.vbs, winshell_call.vbs: `-q-sep` option for explicit command line arguments separator characters
 

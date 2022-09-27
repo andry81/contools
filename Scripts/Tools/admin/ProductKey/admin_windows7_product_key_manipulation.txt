@@ -1,12 +1,14 @@
 * admin_windows7_product_key_manipulation.txt
-* 2019.07.06
+* 2022.09.27
 * admin/ProductKey
 
 1. DESCRIPTION
 2. REPOSITORIES
-3. UNINSTALL PRODUCT KEY IN THE WINDOWS
-4. EXTRACT PRODUCT KEY FROM REGISTRY OR RUNNING IMAGE
-5. CHANGE PRODUCT KEY IN THE IMAGE BEFORE INSTALL
+3. INSTALL
+4. ACTIVATE
+5. UNINSTALL
+6. EXTRACT PRODUCT KEY FROM REGISTRY OR RUNNING IMAGE
+7. CHANGE PRODUCT KEY IN THE IMAGE BEFORE INSTALL
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -22,7 +24,25 @@ Primary:
   * https://svn.code.sf.net/p/contools/contools/trunk/Scripts/Tools/admin/ProductKey
 
 -------------------------------------------------------------------------------
-3. UNINSTALL PRODUCT KEY IN THE WINDOWS
+3. INSTALL
+-------------------------------------------------------------------------------
+
+To intall product keys:
+
+1.) Open a command prompt as an Administrator.
+2.) Enter `slmgr /ipk "<product-key>"` and wait for this to complete.
+
+-------------------------------------------------------------------------------
+4. ACTIVATE
+-------------------------------------------------------------------------------
+
+To activate product keys:
+
+1.) Open a command prompt as an Administrator.
+2.) Enter `slmgr /ato` and wait for this to complete.
+
+-------------------------------------------------------------------------------
+5. UNINSTALL
 -------------------------------------------------------------------------------
 
 To unintall product keys (based on: https://stackoverflow.com/questions/7759642/reset-windows-activation-remove-license-key ):
@@ -37,13 +57,13 @@ To unintall product keys (based on: https://stackoverflow.com/questions/7759642/
     Windows when they put in the key.
 
 -------------------------------------------------------------------------------
-4. EXTRACT PRODUCT KEY FROM REGISTRY OR RUNNING IMAGE
+6. EXTRACT PRODUCT KEY FROM REGISTRY OR RUNNING IMAGE
 -------------------------------------------------------------------------------
 
 Read the `README_EN.txt` from `admin/ProductKey` directory for the details.
 
 -------------------------------------------------------------------------------
-5. CHANGE PRODUCT KEY IN THE IMAGE BEFORE INSTALL
+7. CHANGE PRODUCT KEY IN THE IMAGE BEFORE INSTALL
 -------------------------------------------------------------------------------
 
 Change them in the script file:
