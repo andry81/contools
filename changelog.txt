@@ -1,3 +1,7 @@
+2022.10.10:
+* new: Scripts/Tools/ToolAdaptors/lnk: added set of standalone batch scripts to generate `cmd.exe` shortcut file in the temporary directory and run from it
+* changed: Scripts/Tools/ToolAdaptors/lnk/runas_admin.bat: renamed because is obsolete
+
 2022.09.27:
 * changed: Scripts/Tools/admin/ProductKey/admin_windows7_product_key_manipulation.txt: added install/activation details
 
