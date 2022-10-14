@@ -1,4 +1,7 @@
 2022.10.14:
+* fixed: Scripts/Tools/admin/VisualStudio: `--update` flag usage fixup
+
+2022.10.14:
 * changed: Scripts/Tools/admin/VisualStudio: new Visual Studio 2017/2019/2022 layout create/run uniform scripts and readme
 
 2022.10.10:

@@ -170,17 +170,17 @@ Run in these order:
 
 2. `vs_run_layout.bat`
 
-   This will download the packages from the layout and install them.
+   This will download the packages from the layout and install/update them.
 
 -------------------------------------------------------------------------------
 7. KNOWN ISSUES
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-7.1. The setup does not go to update the layout
+7.1. The setup does not go to update
 -------------------------------------------------------------------------------
 
-You need to explicitly run `vs_create_layout.bat` with the '--update' key
+You need to explicitly run `vs_run_layout.bat` with the '--update' key
 parameter to initiate an update.
 
 -------------------------------------------------------------------------------
