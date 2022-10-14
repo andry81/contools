@@ -378,13 +378,10 @@ Scripts/Tools/admin/Telemetry/04_disable_telemetry_junk_win7.bat -text
 Scripts/Tools/admin/Telemetry/admin_windows7_telemetry_precaution.txt -text
 Scripts/Tools/admin/VM/compact_vdi.bat -text
 Scripts/Tools/admin/VisualStudio/README_EN.txt -text
-Scripts/Tools/admin/VisualStudio/__init__.bat -text
-Scripts/Tools/admin/VisualStudio/config.vars.in -text
-Scripts/Tools/admin/VisualStudio/configure.bat -text
-Scripts/Tools/admin/VisualStudio/vs2017_Community_create_layout.bat -text
-Scripts/Tools/admin/VisualStudio/vs2017_Community_run.bat -text
-Scripts/Tools/admin/VisualStudio/vs2017_Professional_create_layout.bat -text
-Scripts/Tools/admin/VisualStudio/vs2017_Professional_run.bat -text
+Scripts/Tools/admin/VisualStudio/__init__/__init__.bat -text
+Scripts/Tools/admin/VisualStudio/__init__/canonical_path.bat -text
+Scripts/Tools/admin/VisualStudio/vs_create_layout.bat -text
+Scripts/Tools/admin/VisualStudio/vs_run_layout.bat -text
 Scripts/Tools/admin/WMI/fix_reactivated_in_namespace_eventviewer_error_Event_ID_10.vbs -text
 Scripts/Tools/admin/WindowsServices/Epson/disable_epson_svc.bat -text
 Scripts/Tools/admin/WindowsServices/Epson/enable_epson_svc.bat -text

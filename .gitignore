@@ -3,7 +3,6 @@
 Scripts/Tests/unit/hashlib/_out
 Scripts/Tests/unit/traplib/_out
 Scripts/Tools/admin/ProductKey/__pycache__
-Scripts/Tools/admin/VisualStudio/*.vars
 /Temp
 Utilities/Projects/*.user
 Utilities/src/_common/help.txt
