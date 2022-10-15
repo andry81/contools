@@ -8,8 +8,22 @@ call "%%__?~dp0%%.load_config_dir/load_config_dir.read_flags.bat" %%* || exit /b
 
 if %__?FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%__?FLAG_SHIFT%) do shift
 
-if %__?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_SYSTEM_CONFIG% EQU 0 set "__?SYSTEM_CONFIG_FILE_EXT=.in"
-if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_USER_CONFIG% EQU 0 set "__?USER_CONFIG_FILE_EXT=.in"
+if %NO_GEN%0 EQU 0 (
+  if %__?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_SYSTEM_CONFIG% EQU 0 set "__?SYSTEM_CONFIG_FILE_EXT=.in"
+  if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_USER_CONFIG% EQU 0 set "__?USER_CONFIG_FILE_EXT=.in"
+) else (
+  if %__?FLAG_GEN_SYSTEM_CONFIG% NEQ 0 (
+    echo.%__?~nx0%: error: can not generate system config while NO_GEN is set.
+    exit /b 255
+  ) >&2
+  if %__?FLAG_GEN_USER_CONFIG% NEQ 0 (
+    echo.%__?~nx0%: error: can not generate user config while NO_GEN is set.
+    exit /b 255
+  ) >&2
+
+  if %__?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG% EQU 0 set "__?SYSTEM_CONFIG_FILE_EXT=.in"
+  if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 set "__?USER_CONFIG_FILE_EXT=.in"
+)
 
 if "%~2" == "" (
   call :MAIN "%%~1" "%%~1" "%%~3" "%%~4"

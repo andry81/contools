@@ -10,6 +10,9 @@ rem
 
 setlocal
 
+rem disable all generation: creation files/directories, generation config, logging, etc
+set NO_GEN=1
+
 call "%%~dp0__init__.bat" || exit /b
 
 call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*

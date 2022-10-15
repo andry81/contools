@@ -2,6 +2,9 @@
 
 setlocal
 
+if %NO_LOG%0 NEQ 0 exit /b 0
+if %NO_GEN%0 NEQ 0 exit /b 0
+
 set "SUFFIX_NAME=%~1"
 
 for %%i in (CONTOOLS_ROOT) do (
