@@ -103,3 +103,8 @@
 * Add
   `/run-as-user <user>`
   to run under different user with system password input dialog.
+
+* Add ability to run specifically as System Local account:
+  `/run-as-local-system`
+
+  Example: https://github.com/zodiacon/sysrun/blob/master/sysrun.cpp

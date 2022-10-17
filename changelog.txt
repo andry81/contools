@@ -1,3 +1,6 @@
+2022.10.17:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
 2022.10.15:
 * new: Scripts/Tools: added `NO_GEN` and `NO_LOG` environment variables to disable files and directories generation and logging
 * new: Scripts/Tools/ToolAdaptors/bat/start_app_at_system_date.bat: always set `NO_GEN` variable to disable files and directories generation
