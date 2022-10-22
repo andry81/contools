@@ -1,3 +1,6 @@
+2022.10.22:
+* changed: Scripts/Tools/admin/ProductKey/admin_windows7_product_key_manipulation.txt: added `known issues` section
+
 2022.10.17:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 

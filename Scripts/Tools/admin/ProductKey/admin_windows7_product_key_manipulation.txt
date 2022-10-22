@@ -1,5 +1,5 @@
 * admin_windows7_product_key_manipulation.txt
-* 2022.09.27
+* 2022.10.22
 * admin/ProductKey
 
 1. DESCRIPTION
@@ -9,6 +9,9 @@
 5. UNINSTALL
 6. EXTRACT PRODUCT KEY FROM REGISTRY OR RUNNING IMAGE
 7. CHANGE PRODUCT KEY IN THE IMAGE BEFORE INSTALL
+8. KNOWN ISSUES
+8.1. Messege `Error: 0xC004D307 The maximum allowed number of re-arms has been
+     exceeded. You must re-install the OS before trying yo re-arm again`
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -69,3 +72,23 @@ Read the `README_EN.txt` from `admin/ProductKey` directory for the details.
 Change them in the script file:
 
 `sources\$OEM$\$$\SETUP\SCRIPTS\SetupComplete.cmd`
+
+-------------------------------------------------------------------------------
+8. KNOWN ISSUES
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+8.1. Messege `Error: 0xC004D307 The maximum allowed number of re-arms has been
+     exceeded. You must re-install the OS before trying yo re-arm again`
+-------------------------------------------------------------------------------
+
+Issue:
+
+  You has been run `slmgr /rearm` more than 3 times.
+
+Solution:
+
+  Reset the registry key:
+
+  HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows NT/CurrentVersion/SoftwareProtectionPlatform
+  "SkipRearm"=dword:00000001
