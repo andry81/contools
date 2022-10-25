@@ -6,7 +6,7 @@ rem Description:
 rem   The `mkdir` wrapper script with echo and some conditions check before
 rem   call.
 
-echo.^>%~nx0 %*
+if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 
 setlocal
 
@@ -58,4 +58,5 @@ set /A DIR_COUNT+=1
 goto MKDIR_LOOP
 
 :MKDIR_LOOP_END
+echo.^>mkdir %*
 mkdir %*

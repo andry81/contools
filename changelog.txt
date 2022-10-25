@@ -1,4 +1,7 @@
 2022.10.25:
+* changed: Scripts/Tools/std/mkdir*.bat: print only before immediate directory creation, use `TOOLS_VERBOSE` variable to print script command line
+
+2022.10.25:
 * fixed: Scripts/Tools/build/load_config.bat: `-gen_config` option must imply `-load_output_config`
 
 2022.10.22:

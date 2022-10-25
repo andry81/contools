@@ -6,7 +6,7 @@ rem Description:
 rem   The `mkdir` if not exist wrapper script with echo and some conditions
 rem   check before call.
 
-echo.^>%~nx0 %*
+if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 
 setlocal
 
@@ -81,4 +81,7 @@ set /A DIR_COUNT+=1
 goto MKDIR_LOOP
 
 :MKDIR_LOOP_END
-if defined DIR_PATHS mkdir%DIR_PATHS%
+if not defined DIR_PATHS exit /b
+
+echo.^>mkdir%DIR_PATHS%
+mkdir%DIR_PATHS%
