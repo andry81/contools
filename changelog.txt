@@ -1,3 +1,6 @@
+2022.10.25:
+* fixed: Scripts/Tools/build/load_config.bat: `-gen_config` option must imply `-load_output_config`
+
 2022.10.22:
 * changed: Scripts/Tools/admin/ProductKey/admin_windows7_product_key_manipulation.txt: added `known issues` section
 
