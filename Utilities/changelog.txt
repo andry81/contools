@@ -1,3 +1,9 @@
+2022.10.27:
+* changed: Utilities/bin/7zip: updated `7zip` up to version `22.01` for 32-bit and 64-bit (console only)
+
+2022.10.27:
+* changed: bin/contools/TODO.txt: todo update
+
 2022.10.17:
 * changed: bin/contools/TODO.txt: todo update
 

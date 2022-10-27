@@ -1,4 +1,7 @@
 2022.10.27:
+* changed: Utilities/bin/7zip: updated `7zip` up to version `22.01` for 32-bit and 64-bit (console only)
+
+2022.10.27:
 * new: Scripts/Tools/arc/7zip: `7z.bat` script to automatically select `7z.exe` executable dependent on `cmd.exe` bitness
 * changed: Scripts/Tools: switch to `7z.bat` script usage
 * changed: Utilities/bin/contools/TODO.txt: todo update
