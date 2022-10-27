@@ -413,6 +413,8 @@ Scripts/Tools/admin/scan_broken_reg_keys.py -text
 Scripts/Tools/admin/sfc_scan.bat -text
 Scripts/Tools/admin/test_connect.bat -text
 Scripts/Tools/appendvar.bat -text
+Scripts/Tools/arc/7zip/7z.bat -text
+Scripts/Tools/arc/7zip/__init__/__init__.bat -text
 Scripts/Tools/assert_msvc.bat -text
 Scripts/Tools/bash/__init__.sh -text
 Scripts/Tools/bash/__init__/__init__.sh -text

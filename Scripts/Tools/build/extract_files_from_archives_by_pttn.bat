@@ -104,7 +104,7 @@ if not defined _7ZIP_SWITCHES set _7ZIP_SWITCHES=-bd
 rem CAUTION:
 rem   Explicitly use temporary directory for 7zip. This is required in some cases where 7zip can't create temporary
 rem   archive file around being updated archive file.
-rem   For example: pushd c:\ && ( 7za.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
+rem   For example: pushd c:\ && ( 7z.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
 rem
 set "TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
@@ -137,4 +137,4 @@ echo."%ARC_FILE_REL_PATH%"
 
 if not exist "%UNPACK_TO_FILE_DIR%\" mkdir "%UNPACK_TO_FILE_DIR%"
 
-"%CONTOOLS_UTILITIES_BIN_ROOT%/7zip/7za.exe" x %_7ZIP_SWITCHES% "%ARC_FILE_PATH%" *.* "-w%TEMP_DIR_PATH%" "-o%UNPACK_TO_FILE_DIR%" > nul
+"%CONTOOLS_ROOT%/arc/7zip/7z.bat" x %_7ZIP_SWITCHES% "%ARC_FILE_PATH%" *.* "-w%TEMP_DIR_PATH%" "-o%UNPACK_TO_FILE_DIR%" > nul

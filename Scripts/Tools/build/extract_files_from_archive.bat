@@ -42,7 +42,7 @@ echo.  "%REL_PATH%" -^> "%DIR%"
 rem CAUTION:
 rem   Explicitly use temporary directory for 7zip. This is required in some cases where 7zip can't create temporary
 rem   archive file around being updated archive file.
-rem   For example: pushd c:\ && ( 7za.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
+rem   For example: pushd c:\ && ( 7z.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
 
 call "%%CONTOOLS_ROOT%%/uuidgen.bat"
 set "TEMP_DIR_PATH=%TEMP%\%~n0.%RETURN_VALUE%"
@@ -83,4 +83,4 @@ for /F "usebackq eol= tokens=* delims=" %%i in (`dir /S /B /A:-D "%ARCHIVE_PATH
 exit /b
 
 :EXTRACT_FROM_FILE
-"%CONTOOLS_UTILITIES_BIN_ROOT%/7zip/7za.exe" x %_7ZIP_SWITCHES% "%ARCHIVE_FILE%" "%REL_PATH%" "-w%TEMP_DIR_PATH%"
+"%CONTOOLS_ROOT%/arc/7zip/7z.bat" x %_7ZIP_SWITCHES% "%ARCHIVE_FILE%" "%REL_PATH%" "-w%TEMP_DIR_PATH%"

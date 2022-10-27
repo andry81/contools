@@ -1,3 +1,8 @@
+2022.10.27:
+* new: Scripts/Tools/arc/7zip: `7z.bat` script to automatically select `7z.exe` executable dependent on `cmd.exe` bitness
+* changed: Scripts/Tools: switch to `7z.bat` script usage
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
 2022.10.25:
 * changed: Scripts/Tools/std/mkdir*.bat: print only before immediate directory creation, use `TOOLS_VERBOSE` variable to print script command line
 

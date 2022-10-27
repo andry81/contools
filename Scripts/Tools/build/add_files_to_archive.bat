@@ -61,7 +61,7 @@ echo.  "%DIR%" -^> "%REL_PATH%"
 rem CAUTION:
 rem   Explicitly use temporary directory for 7zip. This is required in some cases where 7zip can't create temporary
 rem   archive file around being updated archive file.
-rem   For example: pushd c:\ && ( 7za.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
+rem   For example: pushd c:\ && ( 7z.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
   echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
@@ -95,7 +95,7 @@ rem remove arguments trailing back slashes to avoid exe command line parse old b
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"
 if "%REL_PATH:~-1%" == "\" set "REL_PATH=%REL_PATH:~0,-1%"
 
-call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/7zip/7za.exe" a -r%%_7ZIP_SWITCHES%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%" "-w%%SCRIPT_TEMP_CURRENT_DIR%%"
+call :CMD "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" a -r%%_7ZIP_SWITCHES%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%" "-w%%SCRIPT_TEMP_CURRENT_DIR%%"
 exit /b
 
 :CMD

@@ -101,10 +101,27 @@
   callf /set-lang-names en-US,en "" "..."
 
 * Add
-  `/run-as-user <user>`
+  `/runas-user <user>`
   to run under different user with system password input dialog.
 
 * Add ability to run specifically as System Local account:
-  `/run-as-local-system`
+  `/runas-local-system`
 
   Example: https://github.com/zodiacon/sysrun/blob/master/sysrun.cpp
+
+* Add 64-bit version of callf:
+
+  - callf64.exe
+  - callfg64.exe
+
+  Add `/runas-parent-bitness` to automatically choose 32-bit or 64-bit version
+  based on parent process bitness.
+
+  If elevation is enabled, then run a different bitness callf executable before
+  the elevation.
+
+  Add batch scripts to automatically select 32-bit or 64-bit version of
+  callf executable:
+
+  - callf.bat
+  - callfg.bat
