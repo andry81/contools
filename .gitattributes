@@ -551,7 +551,7 @@ Scripts/Tools/fun/matrix.cmd -text
 Scripts/Tools/gccmrt.bat -text
 Scripts/Tools/gen_dir_files_list.bat -text
 Scripts/Tools/gen_dir_files_list_from_archive.bat -text
-Scripts/Tools/hash/__init__.bat -text
+Scripts/Tools/hash/__init__/__init__.bat -text
 Scripts/Tools/hash/gen_diff_dir_hash_lst.bat -text
 Scripts/Tools/hash/gen_dir_hash_lst.bat -text
 Scripts/Tools/hash/gen_file_hash_cvs.bat -text

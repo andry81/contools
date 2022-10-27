@@ -10,7 +10,7 @@ call;
 
 setlocal
 
-call "%%~dp0__init__.bat" || exit /b
+call "%%~dp0__init__\__init__.bat" || exit /b
 
 rem use 64-bit application in 64-bit OS
 if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
@@ -19,11 +19,11 @@ if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 goto X64
 
 :NOTX64
-rem WORKAROUND: The last slash must backward otherwise "Unknown algorithm" error will be thrown.
+rem WORKAROUND: The last slash must be backward otherwise "Unknown algorithm" error will be thrown.
 "%CONTOOLS_UTILITIES_HASHDEEP_ROOT%\hashdeep.exe" %*
+exit /b
 
 :X64
-rem WORKAROUND: The last slash must backward otherwise "Unknown algorithm" error will be thrown.
+rem WORKAROUND: The last slash must be backward otherwise "Unknown algorithm" error will be thrown.
 "%CONTOOLS_UTILITIES_HASHDEEP_ROOT%\hashdeep64.exe" %*
-
 exit /b
