@@ -78,5 +78,5 @@ goto MKDIR_LOOP
 :MKDIR_LOOP_END
 if not defined DIR_PATHS exit /b
 
-echo.^>mkdir%DIR_PATHS%
+echo.^>^>mkdir%DIR_PATHS%
 mkdir%DIR_PATHS%

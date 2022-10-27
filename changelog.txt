@@ -1,4 +1,7 @@
 2022.10.27:
+* refactor: Scripts/Tools: `TOOLS_VERBOSE` usage refactor
+
+2022.10.27:
 * fixed: Scripts/Tools/hash: execution fixup
 
 2022.10.27:

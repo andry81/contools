@@ -58,5 +58,5 @@ set /A DIR_COUNT+=1
 goto MKDIR_LOOP
 
 :MKDIR_LOOP_END
-echo.^>mkdir %*
+echo.^>^>mkdir %*
 mkdir %*
