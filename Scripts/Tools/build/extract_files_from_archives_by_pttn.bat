@@ -137,4 +137,4 @@ echo."%ARC_FILE_REL_PATH%"
 
 if not exist "%UNPACK_TO_FILE_DIR%\" mkdir "%UNPACK_TO_FILE_DIR%"
 
-"%CONTOOLS_ROOT%/arc/7zip/7z.bat" x %_7ZIP_SWITCHES% "%ARC_FILE_PATH%" *.* "-w%TEMP_DIR_PATH%" "-o%UNPACK_TO_FILE_DIR%" > nul
+call "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x %%_7ZIP_SWITCHES%% "%%ARC_FILE_PATH%%" *.* "-w%%TEMP_DIR_PATH%%" "-o%%UNPACK_TO_FILE_DIR%%" > nul

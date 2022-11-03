@@ -1,3 +1,6 @@
+2022.11.03:
+* fixed: Scripts/Tools: execution fixup
+
 2022.10.27:
 * refactor: Scripts/Tools: `TOOLS_VERBOSE` usage refactor
 

@@ -83,4 +83,4 @@ for /F "usebackq eol= tokens=* delims=" %%i in (`dir /S /B /A:-D "%ARCHIVE_PATH
 exit /b
 
 :EXTRACT_FROM_FILE
-"%CONTOOLS_ROOT%/arc/7zip/7z.bat" x %_7ZIP_SWITCHES% "%ARCHIVE_FILE%" "%REL_PATH%" "-w%TEMP_DIR_PATH%"
+call "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x %%_7ZIP_SWITCHES%% "%%ARCHIVE_FILE%%" "%%REL_PATH%%" "-w%%TEMP_DIR_PATH%%"
