@@ -87,7 +87,7 @@ mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
   exit /b 255
 ) >&2
 
-call :GIT clone -v --bare --recurse-submodules --progress "https://github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%" || goto MAIN_EXIT
+call :GIT clone -v --bare --mirror --recurse-submodules --progress "https://github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%" || goto MAIN_EXIT
 echo.
 
 echo.Archiving backup directory...

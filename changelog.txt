@@ -1,3 +1,6 @@
+2022.12.13:
+* changed: Scripts/Tools/ToolAdaptors/app/github/backup_bare_*.bat: missed `--mirror` parameter for a bare backup to backaup all references
+
 2022.11.06:
 * changed: Scripts/Tools/ToolAdaptors/app/emule/backup_part_met_files.bat: added `*.met.bak` files into backup together with `*.met` files
 
