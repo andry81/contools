@@ -115,7 +115,7 @@
   - callfg64.exe
 
   Add `/runas-parent-bitness` to automatically choose 32-bit or 64-bit version
-  based on parent process bitness.
+  based on parent process bitness. If bitness is the same then, just ignore it.
 
   If elevation is enabled, then run a different bitness callf executable before
   the elevation.
@@ -125,3 +125,7 @@
 
   - callf.bat
   - callfg.bat
+
+  Add for all executables `/disable-wow64-fs-redir-if-this-proc-x86` to
+  additionally disable WOW64 file system redirection in case of 32-bit
+  this-process.

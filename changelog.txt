@@ -1,3 +1,6 @@
+2022.12.20:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
 2022.12.13:
 * changed: Scripts/Tools/ToolAdaptors/app/github/backup_bare_*.bat: missed `--mirror` parameter for a bare backup to backaup all references
 
