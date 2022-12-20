@@ -1,4 +1,7 @@
 2022.12.20:
+* new: Scripts/Tools/admin/KnownIssues: added `admin_windows7_virtualbox_known_issues.txt` file for VirtualBox known issues under Windows 7
+
+2022.12.20:
 * fixed: Scripts/Tools: scripts execution fixup
 
 2022.12.20:
