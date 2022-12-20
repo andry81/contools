@@ -24,7 +24,7 @@ if %TOOLS_VERBOSE%0 NEQ 0 (
   echo.^>^>"%CONTOOLS_UTILITIES_7ZIP_ROOT%\x86\7z.exe" %*
   echo.
 )
-"%CONTOOLS_UTILITIES_7ZIP_ROOT%\x86\7z.exe" %*
+"%CONTOOLS_UTILITIES_7ZIP_ROOT%\x86\7z.exe" %* > nul
 
 exit /b
 
@@ -34,6 +34,6 @@ if %TOOLS_VERBOSE%0 NEQ 0 (
   echo.^>^>"%CONTOOLS_UTILITIES_7ZIP_ROOT%\x64\7z.exe" %*
   echo.
 )
-"%CONTOOLS_UTILITIES_7ZIP_ROOT%\x64\7z.exe" %*
+"%CONTOOLS_UTILITIES_7ZIP_ROOT%\x64\7z.exe" %* > nul
 
 exit /b

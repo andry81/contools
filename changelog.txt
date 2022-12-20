@@ -1,4 +1,7 @@
 2022.12.20:
+* fixed: Scripts/Tools: scripts execution fixup
+
+2022.12.20:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 
 2022.12.13:
