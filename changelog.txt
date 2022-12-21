@@ -1,3 +1,7 @@
+2022.12.21:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: execution fixup
+* refactor: Scripts/Tools/ToolAdaptors/vbs: minor refactor
+
 2022.12.20:
 * new: Scripts/Tools/admin/KnownIssues: added `admin_windows7_virtualbox_known_issues.txt` file for VirtualBox known issues under Windows 7
 

@@ -147,9 +147,22 @@ echo."%LINK_FILE_PATH%"
 
 if "%CURRENT_CP%" == "65001" (
   type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
-) else type nul > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
 
-"%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+  rem CAUTION:
+  rem   Print in UTF-16LE to save Unicode characters which does print in the vbs script.
+  rem
+  "%SystemRoot%\System32\cscript.exe" //U //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props-utf-16le.lst"
+
+  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16LE UTF-8 "%%SCRIPT_TEMP_CURRENT_DIR%%/shortcut_props-utf-16le.lst" >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+) else (
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+)
+
+rem if "%CURRENT_CP%" == "65001" (
+rem   type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+rem ) else type nul > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+rem 
+rem "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
 
 for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst") do (
   set "PROP_NAME=%%i"

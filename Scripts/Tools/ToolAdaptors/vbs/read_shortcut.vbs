@@ -102,6 +102,8 @@ Dim PropertyArrUbound : PropertyArrUbound = UBound(PropertyArr)
 Dim PropertyName
 Dim PropertyValue
 
+' MsgBox "Link=" & cmd_args(0) & vbCrLf & "TargetPath=" & objSC.TargetPath & vbCrLf & "WorkingDirectory=" & objSC.WorkingDirectory
+
 For i = 0 To PropertyArrUbound
   PropertyName = PropertyArr(i)
   PropertyValue = Eval("objSC." & PropertyName)

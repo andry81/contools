@@ -316,6 +316,7 @@ ElseIf ReassignTargetPath Then
 End If
 
 If ShortcutTargetExist Then
+  ' MsgBox "TargetPath=" & ShortcutTarget
   objSC.TargetPath = ShortcutTarget
 End If
 
@@ -336,6 +337,7 @@ If ShortcutWorkingDirectoryExist Then
     ShortcutWorkingDirectory = Unescape(ShortcutWorkingDirectory)
   End If
 
+  ' MsgBox "WorkingDirectory=" & ShortcutWorkingDirectory
   objSC.WorkingDirectory = ShortcutWorkingDirectory
 End If
 
