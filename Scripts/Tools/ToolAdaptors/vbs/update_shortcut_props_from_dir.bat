@@ -39,6 +39,7 @@ exit /b 0
 rem script flags
 set RESTORE_LOCALE=0
 set "FLAG_CHCP="
+set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=0
 
 :FLAGS_LOOP
 
@@ -52,6 +53,8 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
+  ) else if "%FLAG%" == "-reset-wd-from-target-path" (
+    set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -131,6 +134,14 @@ call "%%CONTOOLS_ROOT%%/std/getcp.bat"
 rem default props list
 if "%PROPS_LIST%" == "." set "PROPS_LIST=TargetPath|WorkingDirectory"
 
+if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% EQU 0 goto RESET_WORKINGDIR_FROM_TARGET_PATH_END
+
+set "PROPS_LIST=|%PROPS_LIST%|"
+set "PROPS_LIST=%PROPS_LIST:|WorkingDirectory|=|%"
+set "PROPS_LIST=%PROPS_LIST:~1,-1%"
+
+:RESET_WORKINGDIR_FROM_TARGET_PATH_END
+
 for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
 if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
@@ -170,6 +181,29 @@ for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/s
   call :UPDATE_SHORTCUT
 )
 
+if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% EQU 0 goto RESET_WORKINGDIR_FROM_TARGET_PATH_END
+
+if "%CURRENT_CP%" == "65001" (
+  type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+
+  rem CAUTION:
+  rem   Print in UTF-16LE to save Unicode characters which does print in the vbs script.
+  rem
+  "%SystemRoot%\System32\cscript.exe" //U //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "TargetPath" -- "%LINK_FILE_PATH%" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props-utf-16le.lst"
+
+  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16LE UTF-8 "%%SCRIPT_TEMP_CURRENT_DIR%%/shortcut_props-utf-16le.lst" >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+) else (
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "TargetPath" -- "%LINK_FILE_PATH%" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+)
+
+for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst") do (
+  set "PROP_NAME=WorkingDirectoryFromTargetPath"
+  set "PROP_VALUE=%%j"
+  call :UPDATE_SHORTCUT
+)
+
+:RESET_WORKINGDIR_FROM_TARGET_PATH_END
+
 echo.
 
 exit /b
@@ -197,4 +231,6 @@ if /i "%PROP_NAME%" == "TargetPath" (
   "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 ) else if /i "%PROP_NAME%" == "WorkingDirectory" (
   "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -WD "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+) else if "%PROP_NAME%" == "WorkingDirectoryFromTargetPath" (
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -reset-wd-from-target-path -- "%LINK_FILE_PATH%"
 )

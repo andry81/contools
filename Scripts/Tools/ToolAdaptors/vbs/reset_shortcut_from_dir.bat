@@ -39,6 +39,7 @@ exit /b 0
 rem script flags
 set RESTORE_LOCALE=0
 set "FLAG_CHCP="
+set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=0
 
 :FLAGS_LOOP
 
@@ -52,6 +53,8 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
+  ) else if "%FLAG%" == "-reset-wd-from-target-path" (
+    set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -115,4 +118,6 @@ exit /b 0
 :UPDATE_LINK
 echo."%LINK_FILE_PATH%"
 
-"%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -reassign-target-path -- "%LINK_FILE_PATH%"
+if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% NEQ 0 (
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -reassign-target-path -reset-wd-from-target-path -- "%LINK_FILE_PATH%"
+) else "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -reassign-target-path -- "%LINK_FILE_PATH%"

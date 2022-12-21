@@ -1,11 +1,12 @@
 ''' Updates the Windows shortcut file.
 
 ''' CAUTION:
-'''   WScript.Shell can not handle all Unicode characters.
+'''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
 '''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
+'''
 
 ''' USAGE:
-'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-u] [-q] [-E[0 | t | a]] [-u] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFilePath>
+'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-reset-wd-from-target-path] [-u] [-q] [-E[0 | t | a]] [-u] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFilePath>
 
 ''' DESCRIPTION:
 '''   --
@@ -69,6 +70,8 @@
 '''     Reassign target path property which does trigger the shell to validate
 '''     the path and rewrite the shortcut file even if nothing is changed
 '''     reducing the shortcut content.
+'''   -reset-wd-from-target-path
+'''     Reset WorkingDirectory from TargetPath.
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
 '''   -q
@@ -177,6 +180,7 @@ ReDim cmd_args(WScript.Arguments.Count - 1)
 Dim ExpectFlags : ExpectFlags = True
 
 Dim ReassignTargetPath : ReassignTargetPath = False
+Dim ResetWorkingDirFromTargetPath : ResetWorkingDirFromTargetPath = False
 
 Dim UnescapeAllArgs : UnescapeAllArgs = False
 
@@ -213,6 +217,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
     If arg <> "--" And Mid(arg, 1, 1) = "-" Then
       If arg = "-reassign-target-path" Then
         ReassignTargetPath = True
+      ElseIf arg = "-reset-wd-from-target-path" Then
+        ResetWorkingDirFromTargetPath = True
       ElseIf arg = "-u" Then ' Unescape %xx or %uxxxx
         UnescapeAllArgs = True
       ElseIf arg = "-CD" Then ' Change current directory
@@ -310,7 +316,7 @@ If ShortcutTargetExist Then
   If AlwaysQuote And InStr(ShortcutTarget, Chr(34)) = 0 Then
     ShortcutTarget = Chr(34) & ShortcutTarget & Chr(34)
   End If
-ElseIf ReassignTargetPath Then
+ElseIf ReassignTargetPath Or ResetWorkingDirFromTargetPath Then
   ShortcutTarget = objSC.TargetPath
   ShortcutTargetExist = True
 End If
@@ -332,13 +338,23 @@ If ShortcutArgsExist Then
   objSC.Arguments = ShortcutArgs
 End If
 
-If ShortcutWorkingDirectoryExist Then
-  If UnescapeAllArgs Then
-    ShortcutWorkingDirectory = Unescape(ShortcutWorkingDirectory)
-  End If
+' ignore shortcut working directory set on reset
+If Not ResetWorkingDirFromTargetPath Then
+  If ShortcutWorkingDirectoryExist Then
+    If UnescapeAllArgs Then
+      ShortcutWorkingDirectory = Unescape(ShortcutWorkingDirectory)
+    End If
 
-  ' MsgBox "WorkingDirectory=" & ShortcutWorkingDirectory
-  objSC.WorkingDirectory = ShortcutWorkingDirectory
+    ' MsgBox "WorkingDirectory=" & ShortcutWorkingDirectory
+    objSC.WorkingDirectory = ShortcutWorkingDirectory
+  End If
+Else
+  Set objFS = CreateObject("Scripting.FileSystemObject")
+  Dim ShortcutParentDir : ShortcutParentDir = objFS.GetParentFolderName(ShortcutTarget)
+  If Len(ShortcutParentDir) > 0 Then
+    ' MsgBox "WorkingDirectory=" & ShortcutParentDir
+    objSC.WorkingDirectory = ShortcutParentDir
+  End If
 End If
 
 If ShowAsExist Then

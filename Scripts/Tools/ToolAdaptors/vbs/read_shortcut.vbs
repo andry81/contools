@@ -1,8 +1,9 @@
 ''' Read the Windows shortcut file property.
 
 ''' CAUTION:
-'''   WScript.Shell can not handle all Unicode characters.
+'''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
 '''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
+'''
 
 ''' USAGE:
 '''   read_shortcut.vbs [-u] [-q] [-E[0 | t | a]] [-u] [-p <PropertyPattern>] [--] <ShortcutFilePath>
@@ -95,14 +96,16 @@ End If
 
 PropertyArr = Split(PropertyPattern, "|", -1, vbTextCompare)
 
-set objSC = objShell.CreateShortcut(cmd_args(0))
+Dim ShortcutFilePath : ShortcutFilePath = cmd_args(0)
+
+Set objSC = objShell.CreateShortcut(ShortcutFilePath)
 
 Dim PropertyArrUbound : PropertyArrUbound = UBound(PropertyArr)
 
 Dim PropertyName
 Dim PropertyValue
 
-' MsgBox "Link=" & cmd_args(0) & vbCrLf & "TargetPath=" & objSC.TargetPath & vbCrLf & "WorkingDirectory=" & objSC.WorkingDirectory
+' MsgBox "Link=" & ShortcutFilePath & vbCrLf & "TargetPath=" & objSC.TargetPath & vbCrLf & "WorkingDirectory=" & objSC.WorkingDirectory
 
 For i = 0 To PropertyArrUbound
   PropertyName = PropertyArr(i)
