@@ -350,10 +350,14 @@ If Not ResetWorkingDirFromTargetPath Then
   End If
 Else
   Set objFS = CreateObject("Scripting.FileSystemObject")
-  Dim ShortcutParentDir : ShortcutParentDir = objFS.GetParentFolderName(ShortcutTarget)
-  If Len(ShortcutParentDir) > 0 Then
-    ' MsgBox "WorkingDirectory=" & ShortcutParentDir
-    objSC.WorkingDirectory = ShortcutParentDir
+  ' shortcut target must not be an existed directory path, otherwise WorkingDirectory must be not empty, otherwise - ignore
+  Dim IsShortcutTargetExistedDir : IsShortcutTargetExistedDir = objFS.FolderExists(ShortcutTarget)
+  If (Not objFS.FolderExists(ShortcutTarget)) Or Len(objSC.WorkingDirectory) > 0 Then
+    Dim ShortcutParentDir : ShortcutParentDir = objFS.GetParentFolderName(ShortcutTarget)
+    If Len(ShortcutParentDir) > 0 Then
+      ' MsgBox "WorkingDirectory=" & ShortcutParentDir
+      objSC.WorkingDirectory = ShortcutParentDir
+    End If
   End If
 End If
 

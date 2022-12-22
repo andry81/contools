@@ -1,3 +1,6 @@
+2022.12.22:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: avoid reset on shortcuts to existed directory with initially empty `WorkingDirectory` property
+
 2022.12.21:
 * new: Scripts/Tools/ToolAdaptors/vbs: reset_shortcut_from_dir.bat, update_shortcut.vbs, update_shortcut_props_from_dir.bat: added `-reset-wd-from-target-path` to reset `WorkingDirectory` from `TargetPath` property instead of direct assign (`-WD` argument is ignored in this case)
 * refactor: Scripts/Tools/ToolAdaptors/vbs: minor refactor
