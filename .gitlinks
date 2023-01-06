@@ -1,0 +1,4 @@
+gnuwin32      _externals/gnuwin32      https://github.com/andry81-3dparty/external-tools--gnuwin32      20101227
+msys          _externals/msys          https://github.com/andry81-3dparty/external-tools--msys          1.0.17.x
+svncmd        _externals/svncmd        https://github.com/andry81/svncmd                                master
+tacklelib     _externals/tacklelib     https://github.com/andry81/tacklelib                             master

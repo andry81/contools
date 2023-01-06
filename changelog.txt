@@ -1,3 +1,7 @@
+2023.01.06:
+* new: .gitlinks: added usage of `git-links` (https://github.com/chronoxor/gil) project to port `svn:externals` dependencies from svn into git
+* changed: subgit import from svn, branches rework, cleanup of svn related files
+
 2022.12.22:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: avoid reset on shortcuts to existed directory with initially empty `WorkingDirectory` property
 
