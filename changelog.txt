@@ -1,3 +1,8 @@
+2023.02.11:
+* changed: .externals: added usage of `vcstool` fork (https://github.com/plusone-robotics/vcstool) project to port `svn:externals` dependencies from svn into git
+* changed: .gitlinks: removed usage of `git-links` (https://github.com/chronoxor/gil) project because found as not acceptable for usage: https://github.com/chronoxor/gil/issues/6, https://lore.kernel.org/git/1716310675.20230122233403@inbox.ru
+* changed: README.md: readme update
+
 2023.01.06:
 * new: .gitlinks: added usage of `git-links` (https://github.com/chronoxor/gil) project to port `svn:externals` dependencies from svn into git
 * changed: subgit import from svn, branches rework, cleanup of svn related files

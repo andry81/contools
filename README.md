@@ -1,4 +1,4 @@
-> **Warning** FOR GIT USERS: Before to clone the repository ensure you have required git extension to process `.gitsvnextmodules` file because the basic functionality of the git does not support that extension!
+> **Warning** FOR GIT USERS: To clone including all dependecies you must use [fork](https://github.com/plusone-robotics/vcstool) (has the sparse checkout feature) of the [vcstool](https://github.com/dirk-thomas/vcstool) python module (currently the sparse checkout feature is not merged).
 
 <h4 align="center">A wide range of scripts for Windows interpreter (cmd.exe) and other
 interpreters such as bash shell (.sh), visual basic (.vbs), jscript (.js),

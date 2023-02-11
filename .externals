@@ -1,0 +1,30 @@
+repositories:
+
+  _externals/tacklelib:
+    type:         git
+    url:          https://github.com/andry81/tacklelib
+    version:      master
+    subpaths:
+      - __init__
+      - _config
+      - bash/__init__
+      - bash/tacklelib
+
+  _externals/svncmd:
+    type:         git
+    url:          https://github.com/andry81/svncmd
+    version:      master
+    subpaths:
+      - __init__
+      - _config
+      - Scripts
+
+  _externals/gnuwin32:
+    type:         git
+    url:          https://github.com/andry81-3dparty/external-tools--gnuwin32
+    version:      20101227
+
+  _externals/msys:
+    type:         git
+    url:          https://github.com/andry81-3dparty/external-tools--msys
+    version:      1.0.17.x
