@@ -1,7 +1,36 @@
 2023.02.11:
+* changed: svn related files cleanup
+
+2023.02.11:
 * changed: .externals: added usage of `vcstool` fork (https://github.com/plusone-robotics/vcstool) project to port `svn:externals` dependencies from svn into git
 * changed: .gitlinks: removed usage of `git-links` (https://github.com/chronoxor/gil) project because found as not acceptable for usage: https://github.com/chronoxor/gil/issues/6, https://lore.kernel.org/git/1716310675.20230122233403@inbox.ru
 * changed: README.md: readme update
+
+2023.02.08:
+* new: Scripts/Tools/admin/RecentLists: added scripts and pattern lists of registry keys to cleanup recent (file) lists in the windows registry for various applications
+* changed: Scripts/Tools/registry/regquery.bat: bug comment "too long values would be empty"
+
+2023.02.05:
+* changed: Scripts: *.bat: don't suppress stderr on directory list command
+
+2023.02.01:
+* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: environment variables single initialization and single log cleanup between nested script calls
+* new: Scripts/Tools/build/init_project_log.bat: added `PROJECT_LOG_DIR_NAME`, `PROJECT_LOG_FILE_NAME` variables to address currently logging file and directory names
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_bare_*.bat: added bared checkout backup with submodules recursion through the `-checkout` flag
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_bared_checkout_*.bat: added script wrappers for bared checkout backup with submodules recursion
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: copy log directory into backup directory at exit
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_*_all*.bat: added `repos-forks.lst` as a standalone list for forked repositories and added `-skip-fork-lists` flag to skip this list
+* changed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: moved pause before a call instead of after
+
+2023.01.31:
+* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: cleanup log file from GitHub private tokens
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_checkouted_*.bat: added scripts for checkouted (not bare) backup with submodules recursion
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all.bat: added `-skip-auth-repo-list`, `-skip-account-lists`, `-query-repo-info-only` flags
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_user_repo_info.bat: to query only repo information from repos list
+* changed: Scripts/Tools/ToolAdaptors/app/github/backup_*_all*.bat: changed default behaviour to skip all errors to continue query and added `-exit-on-error` flag to exit on first error
+
+2023.01.15:
+* changed: Utilities/bin/contools/TODO.txt: todo update
 
 2023.01.06:
 * new: .gitlinks: added usage of `git-links` (https://github.com/chronoxor/gil) project to port `svn:externals` dependencies from svn into git

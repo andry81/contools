@@ -27,18 +27,32 @@ set "?~f0=%?~f0:{=\{%"
 set "COMSPECLNK=%COMSPEC:{=\{%"
 
 "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
-  /ret-child-exit /pause-on-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
+  /ret-child-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
   /no-subst-pos-vars ^
   /v IMPL_MODE 1 /v INIT_VARS_FILE "%INIT_VARS_FILE%" ^
   /ra "%%" "%%?01%%" /v "?01" "%%" ^
-  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %* || exit /b
+  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %*
+set LASTERROR=%ERRORLEVEL%
 
-exit /b 0
+if %NEST_LVL% EQU 0 (
+  call "%%~dp0.impl/cleanup_log.bat"
+
+  rem copy log into backup directory
+  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/bare/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+)
+
+pause
+
+exit /b %LASTERROR%
 
 :IMPL
 
-rem load initialization environment variables
-if defined INIT_VARS_FILE for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%INIT_VARS_FILE%") do set "%%i=%%j"
+set /A NEST_LVL+=1
+
+if %NEST_LVL% EQU 1 (
+  rem load initialization environment variables
+  if defined INIT_VARS_FILE for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%INIT_VARS_FILE%") do if /i not "%%i" == "NEST_LVL" set "%%i=%%j"
+)
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
   echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
@@ -53,9 +67,38 @@ set LASTERROR=%ERRORLEVEL%
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
+set /A NEST_LVL-=1
+
 exit /b %LASTERROR%
 
 :MAIN
+rem script flags
+set FLAG_CHECKOUT=0
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-checkout" (
+    set FLAG_CHECKOUT=1
+  ) else if "%FLAG%" == "--" (
+    rem
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
+
+  shift
+
+  rem read until no flags
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
+)
+
 set "OWNER=%~1"
 set "REPO=%~2"
 
@@ -79,20 +122,40 @@ mkdir "%EMPTY_DIR_TMP%" || (
 
 set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup\bare"
 
-set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/repos/user/%OWNER%"
-set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/bare/repos/user/%OWNER%"
+set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/repo/user/%OWNER%/%REPO%"
+set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/bare/repo/user/%OWNER%/%REPO%"
 
 mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
   echo.%?~n0%: error: could not create a directory: "%GH_REPOS_BACKUP_TEMP_DIR%".
   exit /b 255
 ) >&2
 
-call :GIT clone -v --bare --mirror --recurse-submodules --progress "https://github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%" || goto MAIN_EXIT
+if defined GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS%%"
+
+call :GIT clone -v --bare --mirror --recurse-submodules --progress "https://github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%/db" || goto MAIN_EXIT
 echo.
+
+if %FLAG_CHECKOUT% EQU 0 goto SKIP_CHECKOUT
+
+pushd "%GH_REPOS_BACKUP_TEMP_DIR%/db" && (
+  call :GIT config --bool core.bare false
+  echo.
+
+  call :GIT clone -v --recurse-submodules --progress "%%GH_REPOS_BACKUP_TEMP_DIR%%/db" "%%GH_REPOS_BACKUP_TEMP_DIR%%/wc" || goto MAIN_EXIT
+  echo.
+
+  popd
+)
+
+:SKIP_CHECKOUT
+
+set REPO_TYPE_STR=bare
+
+if %FLAG_CHECKOUT% NEQ 0 set REPO_TYPE_STR=bared-checkout
 
 echo.Archiving backup directory...
 if not exist "%GH_REPOS_BACKUP_DIR%\" mkdir "%GH_REPOS_BACKUP_DIR%"
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/nonauth-bare-repo--[%%OWNER%%][%%REPO%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/nonauth-%%REPO_TYPE_STR%%-repo--[%%OWNER%%][%%REPO%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
 echo.
 
 :MAIN_EXIT
@@ -105,4 +168,37 @@ exit /b %LASTERROR%
 :GIT
 echo.^>git.exe %GIT_BARE_FLAGS% %*
 git.exe %GIT_BARE_FLAGS% %*
+exit /b
+
+:XCOPY_FILE
+if not exist "\\?\%~f3" (
+  echo.^>mkdir "%~3"
+  call :MAKE_DIR "%%~3" || (
+    echo.%?~nx0%: error: could not create a target file directory: "%~3".
+    exit /b 255
+  ) >&2
+  echo.
+)
+call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%*
+exit /b
+
+:XCOPY_DIR
+if not exist "\\?\%~f2" (
+  echo.^>mkdir "%~2"
+  call :MAKE_DIR "%%~2" || (
+    echo.%?~nx0%: error: could not create a target directory: "%~2".
+    exit /b 255
+  ) >&2
+  echo.
+)
+call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%*
+exit /b
+
+:MAKE_DIR
+for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
+
+mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
+  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
+  exit /b 1
+) >&2
 exit /b

@@ -27,18 +27,32 @@ set "?~f0=%?~f0:{=\{%"
 set "COMSPECLNK=%COMSPEC:{=\{%"
 
 "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
-  /ret-child-exit /pause-on-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
+  /ret-child-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
   /no-subst-pos-vars ^
   /v IMPL_MODE 1 /v INIT_VARS_FILE "%INIT_VARS_FILE%" ^
   /ra "%%" "%%?01%%" /v "?01" "%%" ^
-  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %* || exit /b
+  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %*
+set LASTERROR=%ERRORLEVEL%
 
-exit /b 0
+if %NEST_LVL% EQU 0 (
+  call "%%~dp0.impl/cleanup_log.bat"
+
+  rem copy log into backup directory
+  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+)
+
+pause
+
+exit /b %LASTERROR%
 
 :IMPL
 
-rem load initialization environment variables
-if defined INIT_VARS_FILE for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%INIT_VARS_FILE%") do set "%%i=%%j"
+set /A NEST_LVL+=1
+
+if %NEST_LVL% EQU 1 (
+  rem load initialization environment variables
+  if defined INIT_VARS_FILE for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%INIT_VARS_FILE%") do if /i not "%%i" == "NEST_LVL" set "%%i=%%j"
+)
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
   echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
@@ -53,6 +67,8 @@ set LASTERROR=%ERRORLEVEL%
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
+set /A NEST_LVL-=1
+
 exit /b %LASTERROR%
 
 :MAIN
@@ -66,6 +82,11 @@ exit /b
 
 :MAIN_IMPL
 rem script flags
+set FLAG_SKIP_AUTH_REPO_LIST=0
+set FLAG_SKIP_ACCOUNT_LISTS=0
+set FLAG_SKIP_FORK_LISTS=0
+set FLAG_QUERY_REPO_INFO_ONLY=0
+set FLAG_EXIT_ON_ERROR=0
 set "FLAG_FROM_CMD_NAME="
 set "FLAG_FROM_CMD_PARAM0="
 set "FLAG_FROM_CMD_PARAM1="
@@ -79,20 +100,44 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-from-cmd" (
+  if "%FLAG%" == "-skip-auth-repo-list" (
+    set FLAG_SKIP_AUTH_REPO_LIST=1
+  ) else if "%FLAG%" == "-skip-account-lists" (
+    set FLAG_SKIP_ACCOUNT_LISTS=1
+  ) else if "%FLAG%" == "-skip-fork-lists" (
+    set FLAG_SKIP_FORK_LISTS=1
+  ) else if "%FLAG%" == "-query-repo-info-only" (
+    set FLAG_QUERY_REPO_INFO_ONLY=1
+  ) else if "%FLAG%" == "-exit-on-error" (
+    set FLAG_EXIT_ON_ERROR=1
+  ) else if "%FLAG%" == "-from-cmd" (
     set "FLAG_FROM_CMD=%~2"
     set "FLAG_FROM_CMD_PARAM0=%~3"
     set "FLAG_FROM_CMD_PARAM1=%~4"
     shift
     shift
     shift
-  )
+  ) else if "%FLAG%" == "--" (
+    rem
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
 
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
+
+set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\emptydir"
+
+mkdir "%EMPTY_DIR_TMP%" || (
+  echo.%?~n0%: error: could not create a directory: "%EMPTY_DIR_TMP%".
+  exit /b 255
+) >&2
+
+if %FLAG_SKIP_AUTH_REPO_LIST% NEQ 0 goto SKIP_AUTH_REPO_LIST
 
 set HAS_AUTH_USER=0
 
@@ -112,20 +157,21 @@ rem including private repos
 call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_auth_user_repos_list.bat" owner
 
 if not defined SKIPPING_CMD (
-  call :CMD "backup_restapi_auth_user_repos_list.bat" owner || exit /b 255
+  call :CMD "backup_restapi_auth_user_repos_list.bat" owner || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
   echo.---
-  if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
 ) else call echo.* backup_restapi_auth_user_repos_list.bat owner
 
 call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_auth_user_repos_list.bat" all
 
 if not defined SKIPPING_CMD (
-  call :CMD "backup_restapi_auth_user_repos_list.bat" all || exit /b 255
+  call :CMD "backup_restapi_auth_user_repos_list.bat" all || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
   echo.---
-  if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
 ) else call echo.* backup_restapi_auth_user_repos_list.bat all
 
 :SKIP_AUTH_USER
+:SKIP_AUTH_REPO_LIST
+
+if %FLAG_SKIP_ACCOUNT_LISTS% NEQ 0 goto SKIP_ACCOUNT_LISTS
 
 rem including private repos if authentication is declared
 for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-user.lst") do (
@@ -134,25 +180,22 @@ for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT
   call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" owner
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" owner || exit /b 255
+    call :CMD "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" owner || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
   ) else call echo.* backup_restapi_user_repos_list.bat "%%REPO_OWNER%%" owner
 
   call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" all
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" all || exit /b 255
+    call :CMD "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" all || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
   ) else call echo.* backup_restapi_user_repos_list.bat "%%REPO_OWNER%%" all
 
   call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%"
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || exit /b 255
+    call :CMD "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
   ) else call echo.* backup_restapi_starred_repos_list.bat "%%REPO_OWNER%%"
 )
 
@@ -162,63 +205,73 @@ for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT
   call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources || exit /b 255
+    call :CMD "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
   ) else call echo.* backup_restapi_org_repos_list.bat "%%REPO_OWNER%%" sources
 
   call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all || exit /b 255
+    call :CMD "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
   ) else call echo.* backup_restapi_org_repos_list.bat "%%REPO_OWNER%%" all
 
   call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%"
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || exit /b 255
+    call :CMD "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
   ) else call echo.* backup_restapi_starred_repos_list.bat "%%REPO_OWNER%%"
 )
 
-for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst") do (
+:SKIP_ACCOUNT_LISTS
+
+set REPO_LISTS="%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst"
+
+if %FLAG_SKIP_FORK_LISTS% EQU 0 (
+  set REPO_LISTS=%REPO_LISTS% "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos-forks.lst"
+)
+
+for /F "usebackq eol=# tokens=1,* delims=/" %%i in (%REPO_LISTS%) do (
   set "REPO_OWNER=%%i"
   set "REPO=%%j"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_stargazers_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
+  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_user_repo_info.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_repo_stargazers_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
+    call :CMD "backup_restapi_user_repo_info.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
-  ) else call echo.* backup_restapi_repo_stargazers_list.bat "%%REPO_OWNER%%" "%%REPO%%"
+  ) else call echo.* backup_restapi_user_repo_info.bat "%%REPO_OWNER%%" "%%REPO%%"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_subscribers_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
+  if %FLAG_QUERY_REPO_INFO_ONLY% EQU 0 (
+    call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_stargazers_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
-  if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_repo_subscribers_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
-    echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
-  ) else call echo.* backup_restapi_repo_subscribers_list.bat "%%REPO_OWNER%%" "%%REPO%%"
+    if not defined SKIPPING_CMD (
+      call :CMD "backup_restapi_repo_stargazers_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+      echo.---
+    ) else call echo.* backup_restapi_repo_stargazers_list.bat "%%REPO_OWNER%%" "%%REPO%%"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_forks_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
+    call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_subscribers_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
-  if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_repo_forks_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
-    echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
-  ) else call echo.* backup_restapi_repo_forks_list.bat "%%REPO_OWNER%%" "%%REPO%%"
+    if not defined SKIPPING_CMD (
+      call :CMD "backup_restapi_repo_subscribers_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+      echo.---
+    ) else call echo.* backup_restapi_repo_subscribers_list.bat "%%REPO_OWNER%%" "%%REPO%%"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_releases_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
+    call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_forks_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
-  if not defined SKIPPING_CMD (
-    call :CMD "backup_restapi_repo_releases_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || exit /b 255
-    echo.---
-    if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
-  ) else call echo.* backup_restapi_repo_releases_list.bat "%%REPO_OWNER%%" "%%REPO%%"
+    if not defined SKIPPING_CMD (
+      call :CMD "backup_restapi_repo_forks_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+      echo.---
+    ) else call echo.* backup_restapi_repo_forks_list.bat "%%REPO_OWNER%%" "%%REPO%%"
+
+    call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_releases_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
+
+    if not defined SKIPPING_CMD (
+      call :CMD "backup_restapi_repo_releases_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+      echo.---
+    ) else call echo.* backup_restapi_repo_releases_list.bat "%%REPO_OWNER%%" "%%REPO%%"
+  )
 )
 
 exit /b 0
@@ -228,4 +281,37 @@ echo.^>%*
 (
   %*
 )
+exit /b
+
+:XCOPY_FILE
+if not exist "\\?\%~f3" (
+  echo.^>mkdir "%~3"
+  call :MAKE_DIR "%%~3" || (
+    echo.%?~nx0%: error: could not create a target file directory: "%~3".
+    exit /b 255
+  ) >&2
+  echo.
+)
+call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%*
+exit /b
+
+:XCOPY_DIR
+if not exist "\\?\%~f2" (
+  echo.^>mkdir "%~2"
+  call :MAKE_DIR "%%~2" || (
+    echo.%?~nx0%: error: could not create a target directory: "%~2".
+    exit /b 255
+  ) >&2
+  echo.
+)
+call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%*
+exit /b
+
+:MAKE_DIR
+for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
+
+mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
+  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
+  exit /b 1
+) >&2
 exit /b

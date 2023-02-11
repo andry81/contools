@@ -118,7 +118,7 @@ call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v SEARCH_FROM_DIR
 set /A SEARCH_FROM_DIR_OFFSET=%ERRORLEVEL%+1
 
 pushd "%SEARCH_FROM_DIR%" && (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`@dir %ARC_FILE_PTTN_LIST% /A:-D /B /S /O:N 2^>nul`) do ( set "ARC_FILE_PATH=%%i" & call :PROCESS )
+  for /F "usebackq eol= tokens=* delims=" %%i in (`@dir %ARC_FILE_PTTN_LIST% /A:-D /B /S /O:N`) do ( set "ARC_FILE_PATH=%%i" & call :PROCESS )
   popd
 )
 exit /b 0

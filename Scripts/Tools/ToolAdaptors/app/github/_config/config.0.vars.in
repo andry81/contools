@@ -15,20 +15,23 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
-once CURL_EXECUTABLE                      ="c:\cygwin\bin\curl.exe"
-once JQ_EXECUTABLE                        ="c:\cygwin\bin\jq.exe"
+once CURL_EXECUTABLE                            ="c:\cygwin\bin\curl.exe"
+once JQ_EXECUTABLE                              ="c:\cygwin\bin\jq.exe"
 
-once GH_ADAPTOR_BACKUP_DIR                ="%PROJECT_OUTPUT_ROOT%/github/backup"
+once GH_ADAPTOR_BACKUP_DIR                      ="%PROJECT_OUTPUT_ROOT%/github/backup"
 
 # 100 is a maximum
-once GH_RESTAPI_PARAM_PER_PAGE            =100
+once GH_RESTAPI_PARAM_PER_PAGE                  =100
 
-once CURL_BARE_FLAGS                      =-H "Accept: application/vnd.github.v3+json"
+once CURL_BARE_FLAGS                            =-H "Accept: application/vnd.github.v3+json"
 
 # timeout between restapi backups
-once GH_RESTAPI_BACKUP_USE_TIMEOUT_MS     =5000
+once GH_RESTAPI_BACKUP_USE_TIMEOUT_MS           =5000
 
 # timeout between bare repo backups
-once GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS   =5000
+once GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS        =5000
 
-once CHCP                                 =65001
+# timeout between checkouted repo backups
+once GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS  =%GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS%
+
+once CHCP                                       =65001

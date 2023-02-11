@@ -68,7 +68,7 @@ exit /b 0
 :PROCESS_FILE_PATH
 set "FILE_PATH=%~f1"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%FILE_PATH%" /A:-D /B /S /O:N 2^>nul`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%FILE_PATH%" /A:-D /B /S /O:N`) do (
   set "ARCHIVE_FILE_PATH=%%i"
   call :PROCESS_ARCHIVE_FILE || exit /b
 )

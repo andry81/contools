@@ -77,7 +77,8 @@ rem count words in key name
 set __KEYVAR_WORDS=1
 for %%i in (%__REG_VAR%) do set /A __KEYVAR_WORDS+=1
 
-rem read read.exe output
+rem Read reg.exe output.
+rem BUG: Too long values would be empty!
 for /F "usebackq tokens=* delims=" %%i in (`reg.exe query "%__REG_PATH%" /v "%__REG_VAR%" ^| findstr.exe /I /R /C:"%__KEYVAR%[^a-zA-Z0-9\\/][^a-zA-Z0-9\\/]*REG_[A-Z][A-Z]*" 2^>nul`) do set "STDOUT_VALUE=%%i"
 
 rem count words in name of empty value (language independent parse)

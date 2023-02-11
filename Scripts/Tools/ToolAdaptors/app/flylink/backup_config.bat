@@ -63,7 +63,7 @@ mkdir "%EMPTY_DIR_TMP%" || (
   exit /b 255
 ) >&2
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@dir /A:-D /B /O:N "%FLYLINKDC_SETTINGS_PATH%\*.sqlite" 2^>nul`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir /A:-D /B /O:N "%FLYLINKDC_SETTINGS_PATH%\*.sqlite"`) do (
   set "FILE_NAME=%%i"
   call :XCOPY_FILE "%%FLYLINKDC_SETTINGS_PATH%%" "%%FILE_NAME%%"  "%%FLYLINK_ADAPTOR_BACKUP_DIR%%/flylink--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
 )

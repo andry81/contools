@@ -27,18 +27,32 @@ set "?~f0=%?~f0:{=\{%"
 set "COMSPECLNK=%COMSPEC:{=\{%"
 
 "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
-  /ret-child-exit /pause-on-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
+  /ret-child-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
   /no-subst-pos-vars ^
   /v IMPL_MODE 1 /v INIT_VARS_FILE "%INIT_VARS_FILE%" ^
   /ra "%%" "%%?01%%" /v "?01" "%%" ^
-  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %* || exit /b
+  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %*
+set LASTERROR=%ERRORLEVEL%
 
-exit /b 0
+if %NEST_LVL% EQU 0 (
+  call "%%~dp0.impl/cleanup_log.bat"
+
+  rem copy log into backup directory
+  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+)
+
+pause
+
+exit /b %LASTERROR%
 
 :IMPL
 
-rem load initialization environment variables
-if defined INIT_VARS_FILE for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%INIT_VARS_FILE%") do set "%%i=%%j"
+set /A NEST_LVL+=1
+
+if %NEST_LVL% EQU 1 (
+  rem load initialization environment variables
+  if defined INIT_VARS_FILE for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%INIT_VARS_FILE%") do if /i not "%%i" == "NEST_LVL" set "%%i=%%j"
+)
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
   echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
@@ -53,9 +67,35 @@ set LASTERROR=%ERRORLEVEL%
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
+set /A NEST_LVL-=1
+
 exit /b %LASTERROR%
 
 :MAIN
+rem script flags
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "--" (
+    rem
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
+
+  shift
+
+  rem read until no flags
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
+)
+
 set "OWNER=%~1"
 set "REPO=%~2"
 
@@ -86,6 +126,8 @@ mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
   echo.%?~n0%: error: could not create a directory: "%GH_REPOS_BACKUP_TEMP_DIR%".
   exit /b 255
 ) >&2
+
+if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
 
 set PAGE=1
 

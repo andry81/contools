@@ -1,0 +1,4 @@
+# araxis merge
+
+n|HKEY_CURRENT_USER\Software\Araxis\Merge\*|REG_SZ|FolderComparisonHistory
+n|HKEY_CURRENT_USER\Software\Araxis\Merge\*|REG_SZ|FileComparisonHistory

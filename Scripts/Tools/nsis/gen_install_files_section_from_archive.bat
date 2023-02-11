@@ -87,7 +87,7 @@ set "DIR_PATH=%BASE_DIR_PATH%"
 call :PROCESS_DIR_FILES || ( popd & exit /b )
 
 pushd "%BASE_DIR_PATH%" && (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`dir . /A:D /B /S /O:N 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`dir . /A:D /B /S /O:N`) do (
     set "DIR_PATH=%%i"
     call :PROCESS_DIR_FILES || ( popd & exit /b )
   )
@@ -102,7 +102,7 @@ call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
 if defined FILE_DIR_PATH set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
 set FILE_INDEX=0
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /A:-D /B /O:N 2^>nul`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /A:-D /B /O:N`) do (
   if not "%%i" == "" ( call :PROCESS_FILE "%%i" || exit /b )
 )
 

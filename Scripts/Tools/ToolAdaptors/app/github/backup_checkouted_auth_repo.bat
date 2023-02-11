@@ -38,7 +38,7 @@ if %NEST_LVL% EQU 0 (
   call "%%~dp0.impl/cleanup_log.bat"
 
   rem copy log into backup directory
-  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/checkout/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
 )
 
 pause
@@ -117,59 +117,34 @@ mkdir "%EMPTY_DIR_TMP%" || (
   exit /b 255
 ) >&2
 
-set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup\restapi"
+set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup\checkout"
 
-set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/forks/%OWNER%/%REPO%"
-set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/restapi/forks/%OWNER%/%REPO%"
+set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/repo/user/%OWNER%/%REPO%"
+set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/checkout/repo/user/%OWNER%/%REPO%"
 
 mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
   echo.%?~n0%: error: could not create a directory: "%GH_REPOS_BACKUP_TEMP_DIR%".
   exit /b 255
 ) >&2
 
-if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
+set HAS_AUTH_USER=0
 
-set PAGE=1
+if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{USER}}" ^
+if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
 
-:PAGE_LOOP
-call set "GH_RESTAPI_REPO_FORKS_URL_PATH=%%GH_RESTAPI_REPO_FORKS_URL:{{OWNER}}=%OWNER%%%"
-call set "GH_RESTAPI_REPO_FORKS_URL_PATH=%%GH_RESTAPI_REPO_FORKS_URL_PATH:{{REPO}}=%REPO%%%"
+if %HAS_AUTH_USER% EQU 0 (
+  echo.%~nx0: error: GH_AUTH_USER or GH_AUTH_PASS is not defined.
+  exit /b 255
+) >&2
 
-set "GH_RESTAPI_REPO_FORKS_URL_PATH=%GH_RESTAPI_REPO_FORKS_URL_PATH%?per_page=%GH_RESTAPI_PARAM_PER_PAGE%&page=%PAGE%"
+if defined GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS%%"
 
-set "CURL_OUTPUT_FILE=%GH_REPOS_BACKUP_TEMP_DIR%/%GH_RESTAPI_REPO_FORKS_FILE%"
-
-call set "CURL_OUTPUT_FILE=%%CURL_OUTPUT_FILE:{{PAGE}}=%PAGE%%%"
-
-call :CURL "%%GH_RESTAPI_REPO_FORKS_URL_PATH%%" || goto MAIN_EXIT
+call :GIT clone -v --recurse-submodules --progress "https://%%GH_AUTH_PASS%%@github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%" || goto MAIN_EXIT
 echo.
-
-"%JQ_EXECUTABLE%" "length" "%CURL_OUTPUT_FILE%" 2>nul > "%QUERY_TEMP_FILE%"
-
-set QUERY_LEN=0
-for /F "usebackq eol= tokens=* delims=" %%i in ("%QUERY_TEMP_FILE%") do set QUERY_LEN=%%i
-
-if not defined QUERY_LEN set QUERY_LEN=0
-if "%QUERY_LEN%" == "null" set QUERY_LEN=0
-
-rem just in case
-if %PAGE% GEQ 100 (
-  echo.%?~n0%: error: too many pages, skip processing.
-  goto PAGE_LOOP_END
-) >&2
-
-if %QUERY_LEN% GEQ %GH_RESTAPI_PARAM_PER_PAGE% ( set /A "PAGE+=1" & goto PAGE_LOOP )
-
-:PAGE_LOOP_END
-
-if %PAGE% LSS 2 if %QUERY_LEN% EQU 0 (
-  echo.%?~n0%: warning: query response is empty.
-  goto SKIP_ARCHIVE
-) >&2
 
 echo.Archiving backup directory...
 if not exist "%GH_REPOS_BACKUP_DIR%\" mkdir "%GH_REPOS_BACKUP_DIR%"
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/forks--[%%OWNER%%][%%REPO%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/auth-checkout-repo--[%%OWNER%%][%%REPO%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
 echo.
 
 :SKIP_ARCHIVE
@@ -181,27 +156,9 @@ echo.
 
 exit /b %LASTERROR%
 
-:CURL
-if defined GH_AUTH_USER if not "%GH_AUTH_USER%" == "{{USER}}" goto CURL_WITH_USER
-
-echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% %*
-(
-  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% %*
-) > "%CURL_OUTPUT_FILE%"
-exit /b
-
-:CURL_WITH_USER
-echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
-(
-  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
-) > "%CURL_OUTPUT_FILE%"
-exit /b
-
-:CMD
-echo.^>%*
-(
-  %*
-)
+:GIT
+echo.^>git.exe %GIT_BARE_FLAGS% %*
+git.exe %GIT_BARE_FLAGS% %*
 exit /b
 
 :XCOPY_FILE

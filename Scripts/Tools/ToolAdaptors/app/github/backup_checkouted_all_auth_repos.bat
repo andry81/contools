@@ -38,7 +38,7 @@ if %NEST_LVL% EQU 0 (
   call "%%~dp0.impl/cleanup_log.bat"
 
   rem copy log into backup directory
-  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/checkout/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
 )
 
 pause
@@ -72,7 +72,20 @@ set /A NEST_LVL-=1
 exit /b %LASTERROR%
 
 :MAIN
+pushd "%?~dp0%" && (
+  call :MAIN_IMPL %%* || ( popd & goto EXIT )
+  popd
+)
+
+:EXIT
+exit /b
+
+:MAIN_IMPL
 rem script flags
+set FLAG_EXIT_ON_ERROR=0
+set "FLAG_FROM_CMD_NAME="
+set "FLAG_FROM_CMD_PARAM0="
+set "FLAG_FROM_CMD_PARAM1="
 
 :FLAGS_LOOP
 
@@ -83,7 +96,16 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "--" (
+  if "%FLAG%" == "-exit-on-error" (
+    set FLAG_EXIT_ON_ERROR=1
+  ) else if "%FLAG%" == "-from-cmd" (
+    set "FLAG_FROM_CMD=%~2"
+    set "FLAG_FROM_CMD_PARAM0=%~3"
+    set "FLAG_FROM_CMD_PARAM1=%~4"
+    shift
+    shift
+    shift
+  ) else if "%FLAG%" == "--" (
     rem
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
@@ -96,106 +118,42 @@ if defined FLAG (
   if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
-set "OWNER=%~1"
-set "REPO=%~2"
-
-if not defined OWNER (
-  echo.%?~n0%: error: OWNER is not defined.
-  exit /b 255
-) >&2
-
-if not defined REPO (
-  echo.%?~n0%: error: REPO is not defined.
-  exit /b 255
-) >&2
-
 set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\emptydir"
-set "QUERY_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\query.txt"
 
 mkdir "%EMPTY_DIR_TMP%" || (
   echo.%?~n0%: error: could not create a directory: "%EMPTY_DIR_TMP%".
   exit /b 255
 ) >&2
 
-set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup\restapi"
+set HAS_AUTH_USER=0
 
-set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/forks/%OWNER%/%REPO%"
-set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/restapi/forks/%OWNER%/%REPO%"
+if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{USER}}" ^
+if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
 
-mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
-  echo.%?~n0%: error: could not create a directory: "%GH_REPOS_BACKUP_TEMP_DIR%".
+if %HAS_AUTH_USER% EQU 0 (
+  echo.%~nx0: error: GH_AUTH_USER or GH_AUTH_PASS is not defined.
   exit /b 255
 ) >&2
 
-if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
+rem must be empty
+if defined FLAG_FROM_CMD (
+  if not defined SKIPPING_CMD echo.Skipping commands:
+  set SKIPPING_CMD=1
+)
 
-set PAGE=1
+for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos-auth.lst") do (
+  set "REPO_OWNER=%%i"
+  set "REPO=%%j"
 
-:PAGE_LOOP
-call set "GH_RESTAPI_REPO_FORKS_URL_PATH=%%GH_RESTAPI_REPO_FORKS_URL:{{OWNER}}=%OWNER%%%"
-call set "GH_RESTAPI_REPO_FORKS_URL_PATH=%%GH_RESTAPI_REPO_FORKS_URL_PATH:{{REPO}}=%REPO%%%"
+  call "%%~dp0.impl/update_skip_state.bat" "backup_checkouted_repo.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
-set "GH_RESTAPI_REPO_FORKS_URL_PATH=%GH_RESTAPI_REPO_FORKS_URL_PATH%?per_page=%GH_RESTAPI_PARAM_PER_PAGE%&page=%PAGE%"
+  if not defined SKIPPING_CMD (
+    call :CMD "backup_checkouted_auth_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+    echo.---
+  ) else call echo.* backup_checkouted_auth_repo.bat "%%REPO_OWNER%%" "%%REPO%%"
+)
 
-set "CURL_OUTPUT_FILE=%GH_REPOS_BACKUP_TEMP_DIR%/%GH_RESTAPI_REPO_FORKS_FILE%"
-
-call set "CURL_OUTPUT_FILE=%%CURL_OUTPUT_FILE:{{PAGE}}=%PAGE%%%"
-
-call :CURL "%%GH_RESTAPI_REPO_FORKS_URL_PATH%%" || goto MAIN_EXIT
-echo.
-
-"%JQ_EXECUTABLE%" "length" "%CURL_OUTPUT_FILE%" 2>nul > "%QUERY_TEMP_FILE%"
-
-set QUERY_LEN=0
-for /F "usebackq eol= tokens=* delims=" %%i in ("%QUERY_TEMP_FILE%") do set QUERY_LEN=%%i
-
-if not defined QUERY_LEN set QUERY_LEN=0
-if "%QUERY_LEN%" == "null" set QUERY_LEN=0
-
-rem just in case
-if %PAGE% GEQ 100 (
-  echo.%?~n0%: error: too many pages, skip processing.
-  goto PAGE_LOOP_END
-) >&2
-
-if %QUERY_LEN% GEQ %GH_RESTAPI_PARAM_PER_PAGE% ( set /A "PAGE+=1" & goto PAGE_LOOP )
-
-:PAGE_LOOP_END
-
-if %PAGE% LSS 2 if %QUERY_LEN% EQU 0 (
-  echo.%?~n0%: warning: query response is empty.
-  goto SKIP_ARCHIVE
-) >&2
-
-echo.Archiving backup directory...
-if not exist "%GH_REPOS_BACKUP_DIR%\" mkdir "%GH_REPOS_BACKUP_DIR%"
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/forks--[%%OWNER%%][%%REPO%%]--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
-echo.
-
-:SKIP_ARCHIVE
-
-:MAIN_EXIT
-set LASTERROR=%ERRORLEVEL%
-
-echo.
-
-exit /b %LASTERROR%
-
-:CURL
-if defined GH_AUTH_USER if not "%GH_AUTH_USER%" == "{{USER}}" goto CURL_WITH_USER
-
-echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% %*
-(
-  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% %*
-) > "%CURL_OUTPUT_FILE%"
-exit /b
-
-:CURL_WITH_USER
-echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
-(
-  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
-) > "%CURL_OUTPUT_FILE%"
-exit /b
+exit /b 0
 
 :CMD
 echo.^>%*

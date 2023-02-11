@@ -98,7 +98,7 @@ call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v XCOPY_FROM_DIR
 set /A XCOPY_FROM_DIR_OFFSET=%ERRORLEVEL%+1
 
 pushd "%XCOPY_FROM_DIR%" && (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`@dir %FILE_PTTN_LIST% /A:-D /B /S /O:N 2^>nul`) do ( set "FILE_PATH=%%i" & call :PROCESS )
+  for /F "usebackq eol= tokens=* delims=" %%i in (`@dir %FILE_PTTN_LIST% /A:-D /B /S /O:N`) do ( set "FILE_PATH=%%i" & call :PROCESS )
   popd
 )
 exit /b 0

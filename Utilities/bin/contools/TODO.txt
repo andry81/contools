@@ -129,3 +129,6 @@
   Add for all executables `/disable-wow64-fs-redir-if-this-proc-x86` to
   additionally disable WOW64 file system redirection in case of 32-bit
   this-process.
+
+* Add `/allow-subst-pos-vars-after-env-var-expand` and disable by default
+  positional variables substitution after environment variables expansion.

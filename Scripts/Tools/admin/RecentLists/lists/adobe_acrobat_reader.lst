@@ -1,0 +1,5 @@
+# adobe acrobat reader
+
+*|HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\DC\AVGeneral\cRecentFiles
+*|HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\DC\AVGeneral\cRecentFolders
+*|HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\DC\AVConnector\cIconCache
