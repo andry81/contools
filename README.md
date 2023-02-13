@@ -6,8 +6,6 @@ python (.py), perl (.pl) and so on. Plus some set of standalone console
 utilities and tools aside other utilities and tools from cygwin, msys and
 mingw.<br/><br/>
 
-The latest version is here: https://sf.net/p/contools</h4>
-
 <p align="center">
   <a href="https://www.codefactor.io/repository/github/andry81/contools">
     <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codefactor-grade.svg" valign="middle" alt="codefactor.io|quality" /></a>

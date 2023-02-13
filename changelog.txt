@@ -1,3 +1,8 @@
+2023.02.13:
+* fixed: Scripts/Tools/ToolAdaptors/app/github/__init__/__init__.bat: missed output files generation
+* changed: README_EN.txt: changed primary and secondary repository source
+* changed: README.md: readme update
+
 2023.02.11:
 * changed: svn related files cleanup
 

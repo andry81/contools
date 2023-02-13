@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2021.11.13
+* 2022.02.13
 * contools
 
 1. DESCRIPTION
@@ -20,12 +20,6 @@ python (.py), perl (.pl) and so on. Plus some set of standalone console
 utilities and tools aside other utilities and tools from cygwin, msys and
 mingw.
 
-The latest version is here: https://sf.net/p/contools
-
-WARNING:
-  Use the SVN access to find out latest functionality and bug fixes.
-  See the REPOSITORIES section.
-
 -------------------------------------------------------------------------------
 2. LICENSE
 -------------------------------------------------------------------------------
@@ -36,11 +30,11 @@ https://en.wikipedia.org/wiki/MIT_License)
 3. REPOSITORIES
 -------------------------------------------------------------------------------
 Primary:
-  * https://sf.net/p/contools/contools/HEAD/tree
-    https://svn.code.sf.net/p/contools/contools
-First mirror:
-  * https://github.com/andry81/contools/tree/branches
+  * https://github.com/andry81/contools/branches
     https://github.com/andry81/contools.git
+First mirror:
+  * https://sf.net/p/contools/contools/ci/HEAD/tree
+    https://git.code.sf.net/p/contools/contools
 Second mirror:
   * https://bitbucket.org/andry81/contools/branches
     https://bitbucket.org/andry81/contools.git
