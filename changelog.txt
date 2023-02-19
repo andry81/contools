@@ -1,4 +1,7 @@
 2023.02.19:
+* new: Scripts/Tools/admin/FireFox/default-shell-open-commands.reg: Firefox default shell open commands to open shortcuts in private browsing by default to avoid cookies usage from 3dparty applications
+
+2023.02.19:
 * new: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline.vbs: script to run command line from `<ScriptName>.cmdline` file
 
 2023.02.13:
