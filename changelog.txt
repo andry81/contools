@@ -1,3 +1,6 @@
+2023.02.19:
+* new: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline.vbs: script to run command line from `<ScriptName>.cmdline` file
+
 2023.02.13:
 * fixed: Scripts/Tools/ToolAdaptors/app/github/__init__/__init__.bat: missed output files generation
 * changed: README_EN.txt: changed primary and secondary repository source
