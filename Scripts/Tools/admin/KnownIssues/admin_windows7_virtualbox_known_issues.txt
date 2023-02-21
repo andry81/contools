@@ -1,32 +1,23 @@
 * admin_windows7_virtualbox_known_issues.txt
-* 2022.12.20
+* 2023.02.25
 * admin/KnownIssues
 
 1. DESCRIPTION
-2. REPOSITORIES
 
-3. EXECUTION ERRORS
-3.1. VirtualBox COM Component error ERROR_KEY_DELETED 0x800703fa
+2. EXECUTION ERRORS
+2.1. VirtualBox COM Component error ERROR_KEY_DELETED 0x800703fa
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
 -------------------------------------------------------------------------------
-This is a readme file from the `sf.net/p/contools` project.
+This is a readme file from the `contools` project.
 
 -------------------------------------------------------------------------------
-2. REPOSITORIES
--------------------------------------------------------------------------------
-
-Primary:
-  * https://sf.net/p/contools/contools/HEAD/tree/trunk/Scripts/Tools/admin
-  * https://svn.code.sf.net/p/contools/contools/trunk/Scripts/Tools/admin
-
--------------------------------------------------------------------------------
-3. EXECUTION ERRORS
+2. EXECUTION ERRORS
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-3.1. VirtualBox COM Component error ERROR_KEY_DELETED 0x800703fa
+2.1. VirtualBox COM Component error ERROR_KEY_DELETED 0x800703fa
 -------------------------------------------------------------------------------
 
 Reason #1:

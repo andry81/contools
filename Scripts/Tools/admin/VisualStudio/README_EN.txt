@@ -1,16 +1,14 @@
 * README_EN.txt
-* 2022.10.14
+* 2023.02.21
 * contools/admin/VisualStudio
 
 1. DESCRIPTION
 2. CATALOG CONTENT DESCRIPTION
-3. REPOSITORIES
-4. PREREQUISITES
-5. CONFIGURE
-6. USAGE
-7. KNOWN ISSUES
-7.1. The setup does not go to update the layout
-8. AUTHOR
+3. PREREQUISITES
+4. CONFIGURE
+5. USAGE
+6. KNOWN ISSUES
+6.1. The setup does not go to update the layout
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -49,20 +47,7 @@ installation package.
          # (`VS_PACKAGES_CACHE_ROOT`).
 
 -------------------------------------------------------------------------------
-3. REPOSITORIES
--------------------------------------------------------------------------------
-Primary:
-  * https://sf.net/p/contools/contools/HEAD/tree/trunk
-  * https://svn.code.sf.net/p/contools/contools/trunk
-First mirror:
-  * https://github.com/andry81/contools/tree/trunk
-  * https://github.com/andry81/contools.git
-Second mirror:
-  * https://bitbucket.org/andry81/contools/src/trunk
-  * https://bitbucket.org/andry81/contools.git
-
--------------------------------------------------------------------------------
-4. PREREQUISITES
+3. PREREQUISITES
 -------------------------------------------------------------------------------
 Microsoft Visual Studio setup requires to download the setup bootstrapper to
 use offline setup or update an installation using the online:
@@ -116,7 +101,7 @@ Setup bootstrapper version variants:
     Current channel.
 
 -------------------------------------------------------------------------------
-5. CONFIGURE
+4. CONFIGURE
 -------------------------------------------------------------------------------
 
 1. Copy the `vssetup` directory described in the `CATALOG CONTENT DESCRIPTION`
@@ -158,7 +143,7 @@ Setup bootstrapper version variants:
       installations of the same type.
 
 -------------------------------------------------------------------------------
-6. USAGE
+5. USAGE
 -------------------------------------------------------------------------------
 
 Run in these order:
@@ -173,17 +158,12 @@ Run in these order:
    This will download the packages from the layout and install/update them.
 
 -------------------------------------------------------------------------------
-7. KNOWN ISSUES
+6. KNOWN ISSUES
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-7.1. The setup does not go to update
+6.1. The setup does not go to update
 -------------------------------------------------------------------------------
 
 You need to explicitly run `vs_run_layout.bat` with the '--update' key
 parameter to initiate an update.
-
--------------------------------------------------------------------------------
-8. AUTHOR
--------------------------------------------------------------------------------
-Andrey Dibrov (andry at inbox dot ru)

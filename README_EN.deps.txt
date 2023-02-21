@@ -1,5 +1,5 @@
 * README_EN.deps.txt
-* 2021.08.24
+* 2023.02.21
 * contools
 
 1. DESCRIPTION
@@ -74,8 +74,8 @@ Legend:
   03 desc:      C++11 generic library with builtin wrappers/extensions to
                 p7 logger, fmt, libarchive, gtest and etc
   04 forked:    NO
-  05 original:  [01] https://sf.net/p/tacklelib/tacklelib
-                [02] https://github.com/andry81/tacklelib.git
+  05 original:  [01] https://github.com/andry81/tacklelib
+                [02] https://sf.net/p/tacklelib/tacklelib
   06 build:     (default)   build from sources in a dependentee project
   07 linkage:   (default)   as a static library
   08 variables: UTILITY_TACKLELIB_ROOT, TACKLELIB_ADDRESS_MODEL,
@@ -104,8 +104,8 @@ Legend:
   03 desc:      svn batch scripts to automate svn working copy offline/online
                 operations
   04 forked:    NO
-  05 original:  [01] https://sf.net/p/svncmd/scripts
-                [02] https://github.com/andry81/svncmd.git
+  05 original:  [01] https://github.com/andry81/svncmd
+                [02] https://sf.net/p/svncmd/scripts
   06 build:     N/A
   07 linkage:   N/A
   08 variables: SVNCMD_TOOLS_ROOT

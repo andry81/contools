@@ -1,43 +1,34 @@
 * admin_windows7_known_issues.txt
-* 2019.07.06
+* 2023.02.25
 * admin/KnownIssues
 
 1. DESCRIPTION
-2. REPOSITORIES
 
-3. ACTIVATION ERRORS
-3.1. Windows Activation reports a problem: Error Code 0xC004E003
+2. ACTIVATION ERRORS
+2.1. Windows Activation reports a problem: Error Code 0xC004E003
 
-4. WINDOWS UPDATE (WSUS) ERRORS
-4.1. Some times WSUS updates reject to install (Windows 7 x64)
+3. WINDOWS UPDATE (WSUS) ERRORS
+3.1. Some times WSUS updates reject to install (Windows 7 x64)
 
-5. EXECUTION ERRORS
-5.1. Can not run any application in an administrative mode (promoted UAC mode) or
+4. EXECUTION ERRORS
+4.1. Can not run any application in an administrative mode (promoted UAC mode) or
     `Run as administrator` ends with the error message:
    `The service cannot be started, either because it is disabled or because it has no enabled devices associated with it`
 
-6. WINDOWS EVENT VIEWER ERRORS
-6.1. Message `Event filter with query "..." could not be reactivated in namespace "//./root/CIMV2" because of error 0x80041003`
+5. WINDOWS EVENT VIEWER ERRORS
+5.1. Message `Event filter with query "..." could not be reactivated in namespace "//./root/CIMV2" because of error 0x80041003`
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
 -------------------------------------------------------------------------------
-This is a readme file from the `sf.net/p/contools` project.
+This is a readme file from the `contools` project.
 
 -------------------------------------------------------------------------------
-2. REPOSITORIES
--------------------------------------------------------------------------------
-
-Primary:
-  * https://sf.net/p/contools/contools/HEAD/tree/trunk/Scripts/Tools/admin
-  * https://svn.code.sf.net/p/contools/contools/trunk/Scripts/Tools/admin
-
--------------------------------------------------------------------------------
-3. ACTIVATION ERRORS
+2. ACTIVATION ERRORS
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-3.1. Windows Activation reports a problem: Error Code 0xC004E003
+2.1. Windows Activation reports a problem: Error Code 0xC004E003
 -------------------------------------------------------------------------------
 
 Solution #1:
@@ -45,11 +36,11 @@ Solution #1:
 Run Windows Update at least once to update Windows Update itself.
 
 -------------------------------------------------------------------------------
-4. WINDOWS UPDATE (WSUS) ERRORS
+3. WINDOWS UPDATE (WSUS) ERRORS
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-4.1. Some times WSUS updates reject to install (Windows 7 x64)
+3.1. Some times WSUS updates reject to install (Windows 7 x64)
 -------------------------------------------------------------------------------
 
 Updates:
@@ -71,11 +62,11 @@ Solution #1:
     * `Microsoft Visual C++ 2010 x64 Redistributable - 10.0.40219`
 
 -------------------------------------------------------------------------------
-5. EXECUTION ERRORS
+4. EXECUTION ERRORS
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-5.1. Can not run any application in an administrative mode (promoted UAC mode) or
+4.1. Can not run any application in an administrative mode (promoted UAC mode) or
     `Run as administrator` ends with the error message:
    `The service cannot be started, either because it is disabled or because it has no enabled devices associated with it`
 -------------------------------------------------------------------------------
@@ -99,11 +90,11 @@ Reboot in the Safe Mode and change the file permissions:
 3. Restore ownership to the TrustedInstaller: `NT SERVICE\TrustedInstaller`.
 
 -------------------------------------------------------------------------------
-6. WINDOWS EVENT VIEWER ERRORS
+5. WINDOWS EVENT VIEWER ERRORS
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.1. Message `Event filter with query "..." could not be reactivated in namespace "//./root/CIMV2" because of error 0x80041003`
+5.1. Message `Event filter with query "..." could not be reactivated in namespace "//./root/CIMV2" because of error 0x80041003`
 -------------------------------------------------------------------------------
 
 The error:

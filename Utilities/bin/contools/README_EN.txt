@@ -1,47 +1,43 @@
 * README_EN.txt
-* 2022.09.05
+* 2023.02.21
 * contools--utilities--contools
 
 1. DESCRIPTION
-2. LICENSE
-3. REPOSITORIES
-4. PREREQUISITES
-5. FEATURES
-5.1. callf
-5.2. clearcache
-6. KNOWN ISSUES
+2. PREREQUISITES
+3. FEATURES
+3.1. callf
+3.2. clearcache
+4. KNOWN ISSUES
 
-6.1. With `cmd.exe`
-6.1.1. Interactive input autocompletion disable.
-6.1.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
+4.1. With `cmd.exe`
+4.1.1. Interactive input autocompletion disable.
+4.1.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
        call.
-6.1.3. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
+4.1.3. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
        behind waiting the last input while the neighbor `callf.exe` process is
        already exited.
-6.1.4. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
-6.1.5. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
+4.1.4. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
+4.1.5. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
        arrows key interactive input (command history traverse).
 
-6.2. With `callf.exe`/`callfg.exe`
-6.2.1. Console output in particular case prints as untranslated (line feed and
+4.2. With `callf.exe`/`callfg.exe`
+4.2.1. Console output in particular case prints as untranslated (line feed and
        return characters become printable)
-6.2.2. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on
+4.2.2. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on
        input while a child process is terminated externally.
-6.2.3. The `callf /tee-stdin 0.log /pipe-child-stdout-to-stdout "" "cmd.exe /k"`
+4.2.3. The `callf /tee-stdin 0.log /pipe-child-stdout-to-stdout "" "cmd.exe /k"`
        command is blocked on input while a child process is terminated
        externally.
 
-6.3. With `callf.exe`/`callfg.exe` under VirtualBox
-6.3.1. The `callf /elevate ...` shows system dialog
+4.3. With `callf.exe`/`callfg.exe` under VirtualBox
+4.3.1. The `callf /elevate ...` shows system dialog
        `The specified path does not exist.`.
-6.3.2. The `callf.exe` execuable can not be removed if has been run at least
+4.3.2. The `callf.exe` execuable can not be removed if has been run at least
        once as `callf /elevate ...`.
 
-6.4. With `bash.exe`
-6.4.1. The GNU Bash shell executable throws an error:
+4.4. With `bash.exe`
+4.4.1. The GNU Bash shell executable throws an error:
        `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
-
-7. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -53,26 +49,7 @@ WARNING:
   See the REPOSITORIES section.
 
 -------------------------------------------------------------------------------
-2. LICENSE
--------------------------------------------------------------------------------
-The MIT license (see included text file "license.txt" or
-https://en.wikipedia.org/wiki/MIT_License)
-
--------------------------------------------------------------------------------
-3. REPOSITORIES
--------------------------------------------------------------------------------
-Primary:
-  * https://sf.net/p/contools/contools/HEAD/tree/trunk/Utilities
-    https://svn.code.sf.net/p/contools/contools/trunk/Utilities
-First mirror:
-  * https://github.com/andry81/contools/tree/trunk/Utilities
-    https://github.com/andry81/contools.git
-Second mirror:
-  * https://bitbucket.org/andry81/contools/src/trunk/Utilities
-    https://bitbucket.org/andry81/contools.git
-
--------------------------------------------------------------------------------
-4. PREREQUISITES
+2. PREREQUISITES
 -------------------------------------------------------------------------------
 
 Currently used these set of OS platforms, compilers, interpreters, modules,
@@ -98,11 +75,11 @@ CAUTION:
   You have to build wxwidgets before build GUI utilities.
 
 -------------------------------------------------------------------------------
-5. FEATURES
+3. FEATURES
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-5.1. callf
+3.1. callf
 -------------------------------------------------------------------------------
 
 Create process or Shell execute in style of c-function printf.
@@ -237,7 +214,7 @@ Create process or Shell execute in style of c-function printf.
   start "" /B /WAIT callfg /pause-on-exit /skip-pause-on-detached-console "" "cmd.exe /k"
 
 -------------------------------------------------------------------------------
-5.2. clearcache
+3.2. clearcache
 -------------------------------------------------------------------------------
 
 Clears a drive or volume cache including the swap file mapping.
@@ -252,15 +229,15 @@ To test:
    folder size calculation slowdown.
 
 -------------------------------------------------------------------------------
-6. KNOWN ISSUES
+4. KNOWN ISSUES
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.1. With `cmd.exe`
+4.1. With `cmd.exe`
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.1.1. Interactive input autocompletion disable.
+4.1.1. Interactive input autocompletion disable.
 -------------------------------------------------------------------------------
 
 If at least stdin or stdout (but not stderr) is redirected, then the
@@ -292,7 +269,7 @@ through the code injection into a child process and interception of the
 `ReadConsole`/`WriteConsole` calls.
 
 -------------------------------------------------------------------------------
-6.1.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
+4.1.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
        call.
 -------------------------------------------------------------------------------
 
@@ -332,7 +309,7 @@ set /P X=DDD
 To fix that use the `workarounded` call example line.
 
 -------------------------------------------------------------------------------
-6.1.3. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
+4.1.3. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
        behind waiting the last input while the neighbor `callf.exe` process is
        already exited.
 -------------------------------------------------------------------------------
@@ -343,7 +320,7 @@ The neighbor `cmd.exe` process to already exited `callf.exe` process will not
 exit until the line return character would be entered.
 
 -------------------------------------------------------------------------------
-6.1.4. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
+4.1.4. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
 -------------------------------------------------------------------------------
 
 The command does not wait the `cmd.exe` child process.
@@ -364,7 +341,7 @@ To fix:
   start "" /B /WAIT cmd.exe /k
 
 -------------------------------------------------------------------------------
-6.1.5. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
+4.1.5. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
        arrows key interactive input (command history traverse).
 -------------------------------------------------------------------------------
 
@@ -389,11 +366,11 @@ NOTE:
   callf /detach-inherited-console-on-wait /wait-child-first-time-timeout 300 "" "cmd.exe /c callf \"\" \"cmd.exe /k\""
 
 -------------------------------------------------------------------------------
-6.2. With `callf.exe`/`callfg.exe`
+4.2. With `callf.exe`/`callfg.exe`
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.2.1. Console output in particular case prints as untranslated (line feed and
+4.2.1. Console output in particular case prints as untranslated (line feed and
        return characters become printable)
 -------------------------------------------------------------------------------
 
@@ -405,7 +382,7 @@ handle addresses layout to update the standard handles (call `StdStdHandle`) in
 the process, where console is attached.
 
 -------------------------------------------------------------------------------
-6.2.2. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on
+4.2.2. The `callf /pipe-inout-child "" "cmd.exe /k"` command is blocked on
        input while a child process is terminated externally.
 -------------------------------------------------------------------------------
 
@@ -417,7 +394,7 @@ The parent process will not exit until the line return character would be
 entered.
 
 -------------------------------------------------------------------------------
-6.2.3. The `callf /tee-stdin 0.log /pipe-child-stdout-to-stdout "" "cmd.exe /k"`
+4.2.3. The `callf /tee-stdin 0.log /pipe-child-stdout-to-stdout "" "cmd.exe /k"`
        command is blocked on input while a child process is terminated
        externally.
 -------------------------------------------------------------------------------
@@ -427,11 +404,11 @@ The parent process will not exit until the line return character would be
 entered.
 
 -------------------------------------------------------------------------------
-6.3. With `callf.exe`/`callfg.exe` under VirtualBox
+4.3. With `callf.exe`/`callfg.exe` under VirtualBox
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.3.1. The `callf /elevate ...` shows system dialog
+4.3.1. The `callf /elevate ...` shows system dialog
        `The specified path does not exist.`.
 -------------------------------------------------------------------------------
 
@@ -439,7 +416,7 @@ The ShellExecute API can not run an executable from the VirtualBox Shared
 Folder because it is not a fixed volume but a Network Drive.
 
 -------------------------------------------------------------------------------
-6.3.2. The `callf.exe` execuable can not be removed if has been run at least
+4.3.2. The `callf.exe` execuable can not be removed if has been run at least
        once as `callf /elevate ...`.
 -------------------------------------------------------------------------------
 
@@ -452,11 +429,11 @@ NOTE:
   elevated user.
 
 -------------------------------------------------------------------------------
-6.4. With `bash.exe`
+4.4. With `bash.exe`
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-6.4.1. The GNU Bash shell executable throws an error:
+4.4.1. The GNU Bash shell executable throws an error:
        `select_stuff::wait: WaitForMultipleObjects failed, Win32 error 6`.
 -------------------------------------------------------------------------------
 
@@ -467,8 +444,3 @@ To workaround that you can use `callfg` utility instead with the
 `/create-console` flag. This will avoid a need to reallocate a console window,
 for example, in the elevated child process in case if elevation is required
 (`/attach-parent-console` flag).
-
--------------------------------------------------------------------------------
-7. AUTHOR
--------------------------------------------------------------------------------
-Andrey Dibrov (andry at inbox dot ru)

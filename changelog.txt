@@ -1,3 +1,8 @@
+2023.02.21:
+* changed: Scripts/Tools/admin: KnownIssues/admin_*.txt, ProductKey/admin_*.txt, Steam/README_EN.txt, Telemetry/admin_*.txt, VisualStudio/README_EN.txt, README_EN.txt: readme cleanup
+* changed: Utilities/bin/contools/README_EN.txt: readme cleanup
+* changed: README_EN.deps.txt, README.md: readme update
+
 2023.02.19:
 * new: Scripts/Tools/admin/FireFox/default-shell-open-commands.reg: Firefox default shell open commands to open shortcuts in private browsing by default to avoid cookies usage from 3dparty applications
 

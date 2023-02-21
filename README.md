@@ -56,8 +56,8 @@ mingw.<br/><br/>
 </p>
 
 <p align="center">
-  <a href="https://github.com/andry81/contools/blob/trunk/changelog.txt">Changelog</a>
-• <a href="https://github.com/andry81/contools/blob/trunk/README_EN.txt">Readme</a>
+  <a href="https://github.com/andry81/contools/blob/master/changelog.txt">Changelog</a>
+• <a href="https://github.com/andry81/contools/blob/master/README_EN.txt">Readme</a>
 • <a href="#dependecies">Dependencies</a>
 • <a href="#copyright-and-license"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/common/badges/license/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
 </p>
@@ -78,4 +78,4 @@ mingw.<br/><br/>
 
 ## <a name="copyright-and-license">Copyright and License</a>
 
-Code and documentation copyright 2021 Andrey Dibrov. Code released under [MIT License](https://github.com/andry81/contools/blob/trunk/license.txt)
+Code and documentation copyright 2021 Andrey Dibrov. Code released under [MIT License](https://github.com/andry81/contools/blob/master/license.txt)

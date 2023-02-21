@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2022.02.13
+* 2023.02.21
 * contools
 
 1. DESCRIPTION
@@ -33,7 +33,7 @@ Primary:
   * https://github.com/andry81/contools/branches
     https://github.com/andry81/contools.git
 First mirror:
-  * https://sf.net/p/contools/contools/ci/HEAD/tree
+  * https://sf.net/p/contools/contools/ci/master/tree
     https://git.code.sf.net/p/contools/contools
 Second mirror:
   * https://bitbucket.org/andry81/contools/branches
