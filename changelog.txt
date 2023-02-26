@@ -1,3 +1,6 @@
+2023.02.26:
+* new: Scripts/Tools/ToolAdaptors/app/git/git_unmirror_refs.bat: added `git_unmirror_refs.bat` script to unmirror mirrored remote repositories
+
 2023.02.21:
 * changed: Scripts/Tools/admin: KnownIssues/admin_*.txt, ProductKey/admin_*.txt, Steam/README_EN.txt, Telemetry/admin_*.txt, VisualStudio/README_EN.txt, README_EN.txt: readme cleanup
 * changed: Utilities/bin/contools/README_EN.txt: readme cleanup
