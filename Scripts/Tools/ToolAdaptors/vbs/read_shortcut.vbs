@@ -6,7 +6,7 @@
 '''
 
 ''' USAGE:
-'''   read_shortcut.vbs [-u] [-q] [-E[0 | t | a]] [-u] [-p <PropertyPattern>] [--] <ShortcutFilePath>
+'''   read_shortcut.vbs [-u] [-q] [-E[0 | t | a]] [-p <PropertyPattern>] [--] <ShortcutFilePath>
 
 ''' DESCRIPTION:
 '''   --

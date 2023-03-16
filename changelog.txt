@@ -1,3 +1,8 @@
+2023.03.16:
+* new: Scripts/Tools/ToolAdaptors/vbs: update_shortcut.vbs, reset_shortcut_from_dir.bat: added `-p[rint-assign]` flag to print all assignments
+* new: Scripts/Tools/ToolAdaptors/vbs: update_shortcut.vbs, reset_shortcut_from_dir.bat: added `-reset-wd` flag as shorter version of `-reset-wd-from-target-path`
+* changed: Scripts/Tools/ToolAdaptors/vbs: code cleanup
+
 2023.03.04:
 * new: Scripts/Tools/admin/DeviceManager/run_devmgmt.bat: script to run Device Manager with nonpresent hidden devices to uninstall inactive devices
 

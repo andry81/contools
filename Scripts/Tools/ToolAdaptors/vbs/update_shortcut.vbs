@@ -6,7 +6,7 @@
 '''
 
 ''' USAGE:
-'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-reset-wd-from-target-path] [-u] [-q] [-E[0 | t | a]] [-u] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFilePath>
+'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-reset-wd[-from-target-path]] [-p[rint-assing]] [-u] [-q] [-E[0 | t | a]] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFilePath>
 
 ''' DESCRIPTION:
 '''   --
@@ -70,8 +70,10 @@
 '''     Reassign target path property which does trigger the shell to validate
 '''     the path and rewrite the shortcut file even if nothing is changed
 '''     reducing the shortcut content.
-'''   -reset-wd-from-target-path
+'''   -reset-wd[-from-target-path]
 '''     Reset WorkingDirectory from TargetPath.
+'''   -p[rint-assign]
+''      Print assign.
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
 '''   -q
@@ -179,6 +181,8 @@ ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
 
+Dim PrintAssign : PrintAssign = False
+
 Dim ReassignTargetPath : ReassignTargetPath = False
 Dim ResetWorkingDirFromTargetPath : ResetWorkingDirFromTargetPath = False
 
@@ -217,8 +221,10 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
     If arg <> "--" And Mid(arg, 1, 1) = "-" Then
       If arg = "-reassign-target-path" Then
         ReassignTargetPath = True
-      ElseIf arg = "-reset-wd-from-target-path" Then
+      ElseIf arg = "-reset-wd-from-target-path" Or arg = "-reset-wd" Then
         ResetWorkingDirFromTargetPath = True
+      ElseIf arg = "-print-assign" Or arg = "-p" Then ' Print assign
+        PrintAssign = True
       ElseIf arg = "-u" Then ' Unescape %xx or %uxxxx
         UnescapeAllArgs = True
       ElseIf arg = "-CD" Then ' Change current directory
@@ -323,6 +329,9 @@ End If
 
 If ShortcutTargetExist Then
   ' MsgBox "TargetPath=" & ShortcutTarget
+  If PrintAssign Then
+    WScript.Echo "TargetPath=" & ShortcutTarget
+  End If
   objSC.TargetPath = ShortcutTarget
 End If
 
@@ -346,16 +355,28 @@ If Not ResetWorkingDirFromTargetPath Then
     End If
 
     ' MsgBox "WorkingDirectory=" & ShortcutWorkingDirectory
+    If PrintAssign Then
+      WScript.Echo "WorkingDirectory=" & ShortcutWorkingDirectory
+    End If
     objSC.WorkingDirectory = ShortcutWorkingDirectory
   End If
 Else
   Set objFS = CreateObject("Scripting.FileSystemObject")
-  ' shortcut target must not be an existed directory path, otherwise WorkingDirectory must be not empty, otherwise - ignore
+  ' NOTE:
+  '   Shortcut target must not be an existed directory path, otherwise WorkingDirectory must be not empty, otherwise - ignore.
+  '   Meaning:
+  '     A directory shortcut basically does not use the WorkingDirectory property, but if does, then
+  '     the WorkingDirectory property must be not empty to initiate a change.
+  '     If a directory does not exist by the target path, then the target path is treated as a file path.
+  '
   Dim IsShortcutTargetExistedDir : IsShortcutTargetExistedDir = objFS.FolderExists(ShortcutTarget)
   If (Not objFS.FolderExists(ShortcutTarget)) Or Len(objSC.WorkingDirectory) > 0 Then
     Dim ShortcutParentDir : ShortcutParentDir = objFS.GetParentFolderName(ShortcutTarget)
     If Len(ShortcutParentDir) > 0 Then
       ' MsgBox "WorkingDirectory=" & ShortcutParentDir
+      If PrintAssign Then
+        WScript.Echo "WorkingDirectory=" & ShortcutParentDir
+      End If
       objSC.WorkingDirectory = ShortcutParentDir
     End If
   End If

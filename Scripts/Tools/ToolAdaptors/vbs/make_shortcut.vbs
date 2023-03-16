@@ -5,7 +5,7 @@
 '''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
 
 ''' USAGE:
-'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-u] [-q] [-E[0 | t | a]] [-u] [--] <ShortcutFilePath> <ShortcutTarget> <ShortcutArgs>
+'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-u] [-q] [-E[0 | t | a]] [--] <ShortcutFilePath> <ShortcutTarget> <ShortcutArgs>
 '''
 ''' DESCRIPTION:
 '''   --

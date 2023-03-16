@@ -40,6 +40,8 @@ rem script flags
 set RESTORE_LOCALE=0
 set "FLAG_CHCP="
 set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=0
+set FLAG_PRINT_ASSIGN=0
+set "BARE_FLAGS="
 
 :FLAGS_LOOP
 
@@ -55,6 +57,14 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-reset-wd-from-target-path" (
     set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
+  ) else if "%FLAG%" == "-reset-wd" (
+    set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
+  ) else if "%FLAG%" == "-print-assign" (
+    if %FLAG_PRINT_ASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -p
+    set FLAG_PRINT_ASSIGN=1
+  ) else if "%FLAG%" == "-p" (
+    if %FLAG_PRINT_ASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -p
+    set FLAG_PRINT_ASSIGN=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -119,5 +129,5 @@ exit /b 0
 echo."%LINK_FILE_PATH%"
 
 if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% NEQ 0 (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -reassign-target-path -reset-wd-from-target-path -- "%LINK_FILE_PATH%"
-) else "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -reassign-target-path -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -reassign-target-path -reset-wd-from-target-path -- "%LINK_FILE_PATH%"
+) else "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -reassign-target-path -- "%LINK_FILE_PATH%"
