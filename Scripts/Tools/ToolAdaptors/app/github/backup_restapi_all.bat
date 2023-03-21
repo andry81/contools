@@ -1,5 +1,34 @@
 @echo off
 
+rem USAGE:
+rem   backup_restapi_all.bat [<Flags>]
+
+rem Description:
+rem   Script to request all restapi responces including request of private
+rem   repositories with credentials.
+
+rem <Flags>:
+rem   --
+rem     Stop flags parse.
+rem   -skip-auth-repo-list
+rem     Skip request to private repositories in the auth repo list file.
+rem   -skip-account-lists
+rem     Skip request to accounts in the account list file.
+rem   -skip-forks-list
+rem     Skip request to forked repositories in the fork list file.
+rem     Note:
+rem       All forked repositories must be properly synchronized with the parent
+rem       repository before each new backup.
+rem   -query-repo-info-only
+rem     Request only repository information (including parent repository
+rem     address) avoding repository else like repo stargazers, subscribers,
+rem     forks and releases.
+rem   -exit-on-error
+rem     Don't continue on error.
+rem   -from-cmd
+rem     Continue from specific command with parameters.
+rem     Useful to continue after the last error after specific command.
+
 setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b
@@ -37,8 +66,10 @@ set LASTERROR=%ERRORLEVEL%
 if %NEST_LVL% EQU 0 (
   call "%%~dp0.impl/cleanup_log.bat"
 
-  rem copy log into backup directory
-  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  if %LASTERROR% EQU 0 (
+    rem copy log into backup directory
+    call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  )
 )
 
 pause
@@ -84,7 +115,7 @@ exit /b
 rem script flags
 set FLAG_SKIP_AUTH_REPO_LIST=0
 set FLAG_SKIP_ACCOUNT_LISTS=0
-set FLAG_SKIP_FORK_LISTS=0
+set FLAG_SKIP_FORKS_LIST=0
 set FLAG_QUERY_REPO_INFO_ONLY=0
 set FLAG_EXIT_ON_ERROR=0
 set "FLAG_FROM_CMD_NAME="
@@ -104,8 +135,8 @@ if defined FLAG (
     set FLAG_SKIP_AUTH_REPO_LIST=1
   ) else if "%FLAG%" == "-skip-account-lists" (
     set FLAG_SKIP_ACCOUNT_LISTS=1
-  ) else if "%FLAG%" == "-skip-fork-lists" (
-    set FLAG_SKIP_FORK_LISTS=1
+  ) else if "%FLAG%" == "-skip-forks-list" (
+    set FLAG_SKIP_FORKS_LIST=1
   ) else if "%FLAG%" == "-query-repo-info-only" (
     set FLAG_QUERY_REPO_INFO_ONLY=1
   ) else if "%FLAG%" == "-exit-on-error" (
@@ -228,7 +259,7 @@ for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT
 
 set REPO_LISTS="%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst"
 
-if %FLAG_SKIP_FORK_LISTS% EQU 0 (
+if %FLAG_SKIP_FORKS_LIST% EQU 0 (
   set REPO_LISTS=%REPO_LISTS% "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos-forks.lst"
 )
 

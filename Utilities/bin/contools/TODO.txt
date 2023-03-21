@@ -132,3 +132,8 @@
 
 * Add `/allow-subst-pos-vars-after-env-var-expand` and disable by default
   positional variables substitution after environment variables expansion.
+
+* Add `/print-to-stderr` to redirect all stdandard output from the `callf*.exe`
+  process itself into error output.
+  For example, `/pause-on-*` flags does print into stdout and can be redirected
+  with this flag.

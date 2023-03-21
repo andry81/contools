@@ -1,23 +1,17 @@
 @echo off
 
 rem USAGE:
-rem   backup_bare_all_repos.bat [<Flags>]
+rem   backup_restapi_all_org_repos_list.bat [<Flags>]
 
 rem Description:
-rem   Script to backup all repositories include private repositories with
-rem   credentials.
-rem   Backup by default includes only a bare repository backup.
+rem   Script to request all restapi responces from all organization accounts in
+rem   the user organization accounts file.
 
 rem <Flags>:
 rem   --
 rem     Stop flags parse.
-rem   -skip-forks-list
-rem     Skip backup forked repositories in the fork list file.
-rem     Note:
-rem       All forked repositories must be properly synchronized with the parent
-rem       repository before each new backup.
-rem   -checkout
-rem     Additionally execute git checkout with recursion to backup submodules.
+rem   -skip-auth-repo-list
+rem     Skip request to private repositories in the auth repo list file.
 rem   -exit-on-error
 rem     Don't continue on error.
 rem   -from-cmd
@@ -63,7 +57,7 @@ if %NEST_LVL% EQU 0 (
 
   if %LASTERROR% EQU 0 (
     rem copy log into backup directory
-    call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/bare/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+    call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
   )
 )
 
@@ -108,13 +102,11 @@ exit /b
 
 :MAIN_IMPL
 rem script flags
-set FLAG_CHECKOUT=0
-set FLAG_SKIP_FORKS_LIST=0
+set FLAG_SKIP_AUTH_REPO_LIST=0
 set FLAG_EXIT_ON_ERROR=0
 set "FLAG_FROM_CMD_NAME="
 set "FLAG_FROM_CMD_PARAM0="
 set "FLAG_FROM_CMD_PARAM1="
-set "BARE_FLAGS="
 
 :FLAGS_LOOP
 
@@ -125,11 +117,8 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-skip-forks-list" (
-    set FLAG_SKIP_FORKS_LIST=1
-  ) else if "%FLAG%" == "-checkout" (
-    set FLAG_CHECKOUT=1
-    set BARE_FLAGS=%BARE_FLAGS% -checkout
+  if "%FLAG%" == "-skip-auth-repo-list" (
+    set FLAG_SKIP_AUTH_REPO_LIST=1
   ) else if "%FLAG%" == "-exit-on-error" (
     set FLAG_EXIT_ON_ERROR=1
   ) else if "%FLAG%" == "-from-cmd" (
@@ -159,28 +148,45 @@ mkdir "%EMPTY_DIR_TMP%" || (
   exit /b 255
 ) >&2
 
+if %FLAG_SKIP_AUTH_REPO_LIST% NEQ 0 goto SKIP_AUTH_REPO_LIST
+
+set HAS_AUTH_USER=0
+
+if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{USER}}" ^
+if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
+
 rem must be empty
 if defined FLAG_FROM_CMD (
   if not defined SKIPPING_CMD echo.Skipping commands:
   set SKIPPING_CMD=1
 )
 
-set REPO_LISTS="%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst"
+:SKIP_AUTH_REPO_LIST
 
-if %FLAG_SKIP_FORKS_LIST% EQU 0 (
-  set REPO_LISTS=%REPO_LISTS% "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos-forks.lst"
-)
-
-for /F "usebackq eol=# tokens=1,* delims=/" %%i in (%REPO_LISTS%) do (
+rem including private repos if authentication is declared
+for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-org.lst") do (
   set "REPO_OWNER=%%i"
-  set "REPO=%%j"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_bare_repo.bat" "%%REPO_OWNER%%" "%%REPO%%"
+  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_bare_repo.bat"%%BARE_FLAGS%% "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+    call :CMD "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
-  ) else call echo.* backup_bare_repo.bat "%%REPO_OWNER%%" "%%REPO%%"
+  ) else call echo.* backup_restapi_org_repos_list.bat "%%REPO_OWNER%%" sources
+
+  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all
+
+  if not defined SKIPPING_CMD (
+    call :CMD "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+    echo.---
+  ) else call echo.* backup_restapi_org_repos_list.bat "%%REPO_OWNER%%" all
+
+  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%"
+
+  if not defined SKIPPING_CMD (
+    call :CMD "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+    echo.---
+  ) else call echo.* backup_restapi_starred_repos_list.bat "%%REPO_OWNER%%"
 )
 
 exit /b 0

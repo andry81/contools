@@ -1,5 +1,22 @@
 @echo off
 
+rem USAGE:
+rem   backup_checkouted_auth_repo.bat [<Flags>] <OWNER> <REPO>
+
+rem Description:
+rem   Script to backup a private repository with credentials.
+rem   Backup excludes a bare repository backup and used only NOT bare variant
+rem   with submodules recursion.
+
+rem <Flags>:
+rem   --
+rem     Stop flags parse.
+
+rem <OWNER>:
+rem   Owner name of a repository.
+rem <REPO>:
+rem   Repository name.
+
 setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b
@@ -37,8 +54,10 @@ set LASTERROR=%ERRORLEVEL%
 if %NEST_LVL% EQU 0 (
   call "%%~dp0.impl/cleanup_log.bat"
 
-  rem copy log into backup directory
-  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/checkout/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  if %LASTERROR% EQU 0 (
+    rem copy log into backup directory
+    call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/checkout/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  )
 )
 
 pause

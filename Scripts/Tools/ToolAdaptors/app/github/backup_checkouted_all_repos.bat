@@ -1,5 +1,28 @@
 @echo off
 
+rem USAGE:
+rem   backup_checkouted_all_repos.bat [<Flags>]
+
+rem Description:
+rem   Script to backup all repositories include private repositories with
+rem   credentials.
+rem   Backup excludes a bare repository backup and used only NOT bare variant
+rem   with submodules recursion.
+
+rem <Flags>:
+rem   --
+rem     Stop flags parse.
+rem   -skip-forks-list
+rem     Skip backup forked repositories in the fork list file.
+rem     Note:
+rem       All forked repositories must be properly synchronized with the parent
+rem       repository before each new backup.
+rem   -exit-on-error
+rem     Don't continue on error.
+rem   -from-cmd
+rem     Continue from specific command with parameters.
+rem     Useful to continue after the last error after specific command.
+
 setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b
@@ -37,8 +60,10 @@ set LASTERROR=%ERRORLEVEL%
 if %NEST_LVL% EQU 0 (
   call "%%~dp0.impl/cleanup_log.bat"
 
-  rem copy log into backup directory
-  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/checkout/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  if %LASTERROR% EQU 0 (
+    rem copy log into backup directory
+    call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/checkout/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  )
 )
 
 pause
@@ -82,7 +107,7 @@ exit /b
 
 :MAIN_IMPL
 rem script flags
-set FLAG_SKIP_FORK_LISTS=0
+set FLAG_SKIP_FORKS_LIST=0
 set FLAG_EXIT_ON_ERROR=0
 set "FLAG_FROM_CMD_NAME="
 set "FLAG_FROM_CMD_PARAM0="
@@ -97,8 +122,8 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-skip-fork-lists" (
-    set FLAG_SKIP_FORK_LISTS=1
+  if "%FLAG%" == "-skip-forks-list" (
+    set FLAG_SKIP_FORKS_LIST=1
   ) else if "%FLAG%" == "-exit-on-error" (
     set FLAG_EXIT_ON_ERROR=1
   ) else if "%FLAG%" == "-from-cmd" (
@@ -136,7 +161,7 @@ if defined FLAG_FROM_CMD (
 
 set REPO_LISTS="%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst"
 
-if %FLAG_SKIP_FORK_LISTS% EQU 0 (
+if %FLAG_SKIP_FORKS_LIST% EQU 0 (
   set REPO_LISTS=%REPO_LISTS% "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos-forks.lst"
 )
 

@@ -1,3 +1,14 @@
+2023.03.21:
+* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: avoid log copy on error
+* fixed: Scripts/Tools/ToolAdaptors/app/github/print_*_repos_from_restapi_json.bat: redirect all side output into stderr
+* new: Scripts/Tools/ToolAdaptors/app/github/print_*_repos_from_restapi_json.bat: make alphabetic sort by default, added `-skip-sort` to skip alphabetic sort
+* new: Scripts/Tools/ToolAdaptors/vbs: update_shortcut_props_from_dir.bat: added `-reset-wd` flag as shorter version of `-reset-wd-from-target-path`
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all_user_repos_list.bat: added script to backup all repository lists from all user accounts
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all_org_repos_list.bat: added script to backup all repository lists from all user organization accounts
+* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all_exclude_repos_list.bat: added script to backup all except user and organization repository lists
+* changed: Scripts/Tools/ToolAdaptors: app/github/backup_*.bat, vbs/reset_shortcut_from_dir.bat: added usage description
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
 2023.03.16:
 * new: Scripts/Tools/ToolAdaptors/vbs: update_shortcut.vbs, reset_shortcut_from_dir.bat: added `-p[rint-assign]` flag to print all assignments
 * new: Scripts/Tools/ToolAdaptors/vbs: update_shortcut.vbs, reset_shortcut_from_dir.bat: added `-reset-wd` flag as shorter version of `-reset-wd-from-target-path`

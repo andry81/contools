@@ -55,6 +55,8 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-reset-wd-from-target-path" (
     set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
+  ) else if "%FLAG%" == "-reset-wd" (
+    set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255

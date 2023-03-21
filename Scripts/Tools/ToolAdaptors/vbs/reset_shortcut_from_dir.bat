@@ -1,5 +1,16 @@
 @echo off
 
+rem USAGE:
+rem   update_shortcut_props_from_dir.bat [<Flags>] <LINKS_DIR> [<PROPS_LIST> <REPLACE_FROM> [<REPLACE_TO>]]
+
+rem <Flags>:
+rem   -chcp <CodePage>
+rem     Set explicit code page.
+rem   -reset-wd[-from-target-path]
+rem     Reset WorkingDirectory property from TargetPath property.
+rem   -p[rint-assign]
+rem     Print assign.
+
 setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b

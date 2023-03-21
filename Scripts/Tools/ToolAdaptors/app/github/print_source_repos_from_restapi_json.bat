@@ -1,5 +1,20 @@
 @echo off
 
+rem USAGE:
+rem   print_source_repos_from_restapi_json.bat.bat [<Flags>] <JSON_FILE>
+
+rem Description:
+rem   Script prints source only repositories from the json file.
+
+rem <Flags>:
+rem   --
+rem     Stop flags parse.
+rem   -skip-sort
+rem     Skip repositories list alphabetic sort and print as is from the json
+rem     file.
+rem   -no-url-domain-remove
+rem     Don't remove url domain from the output.
+
 setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b
@@ -15,7 +30,7 @@ for %%i in (CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT) do (
   ) >&2
 )
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
+call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" >&2 || exit /b
 
 set "INIT_VARS_FILE=%PROJECT_LOG_DIR%\init.vars"
 
@@ -27,13 +42,16 @@ set "?~f0=%?~f0:{=\{%"
 set "COMSPECLNK=%COMSPEC:{=\{%"
 
 "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
-  /ret-child-exit /pause-on-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
+  /ret-child-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
   /no-subst-pos-vars ^
   /v IMPL_MODE 1 /v INIT_VARS_FILE "%INIT_VARS_FILE%" ^
   /ra "%%" "%%?01%%" /v "?01" "%%" ^
-  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %* || exit /b
+  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %*
+set LASTERROR=%ERRORLEVEL%
 
-exit /b 0
+pause >&2
+
+exit /b %LASTERROR%
 
 :IMPL
 
@@ -56,6 +74,40 @@ call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 exit /b %LASTERROR%
 
 :MAIN
+rem script flags
+set FLAG_SKIP_SORT=0
+set FLAG_NO_URL_DOMAIN_REMOVE=0
+
+:FLAGS_LOOP
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-skip-sort" (
+    set FLAG_SKIP_SORT=1
+  ) else if "%FLAG%" == "-no-url-domain-remove" (
+    set FLAG_NO_URL_DOMAIN_REMOVE=1
+  ) else if "%FLAG%" == "--" (
+    rem
+  ) else (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
+
+  shift
+
+  rem read until no flags
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
+)
+
+set "INOUT_LIST_FILE_TMP0=%SCRIPT_TEMP_CURRENT_DIR%\inout0.lst"
+set "INOUT_LIST_FILE_TMP1=%SCRIPT_TEMP_CURRENT_DIR%\inout1.lst"
+set "INOUT_LIST_FILE_TMP2=%SCRIPT_TEMP_CURRENT_DIR%\inout2.lst"
+
 set "JSON_FILE=%~1"
 
 if not defined JSON_FILE (
@@ -68,9 +120,38 @@ if not exist "%JSON_FILE%" (
   exit /b 255
 ) >&2
 
-"%JQ_EXECUTABLE%" -c -r ".[] | select(.fork == false).html_url" "%JSON_FILE%" || exit /b 255
+if %FLAG_SKIP_SORT% EQU 0 goto SORT_LIST
 
-exit /b 0
+"%JQ_EXECUTABLE%" -c -r ".[] | select(.fork == false).html_url" "%JSON_FILE%"
+exit /b
+
+:SORT_LIST
+"%JQ_EXECUTABLE%" -c -r ".[] | select(.fork == false).html_url" "%JSON_FILE%" > "%INOUT_LIST_FILE_TMP0%"
+set LASTERROR=%ERRORLEVEL%
+
+sort "%INOUT_LIST_FILE_TMP0%" /O "%INOUT_LIST_FILE_TMP1%"
+
+if %FLAG_NO_URL_DOMAIN_REMOVE% NEQ 0 goto NO_URL_DOMAIN_REMOVE
+
+for /F "usebackq eol= tokens=* delims=" %%i in ("%INOUT_LIST_FILE_TMP1%") do (
+  set "URL=%%i"
+  call :PROCESS_URL
+) >> "%INOUT_LIST_FILE_TMP2%"
+
+type "%INOUT_LIST_FILE_TMP2%"
+
+exit /b %LASTERROR%
+
+:PROCESS_URL
+set "URL=%URL:https:/=%"
+set "URL=%URL:/github.com/=%"
+echo.%URL%
+exit /b
+
+:NO_URL_DOMAIN_REMOVE
+type "%INOUT_LIST_FILE_TMP1%"
+
+exit /b %LASTERROR%
 
 :CMD
 echo.^>%*

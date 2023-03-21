@@ -1,5 +1,23 @@
 @echo off
 
+rem USAGE:
+rem   backup_restapi_org_repos_list.bat [<Flags>] <ORG> <TYPE>
+
+rem Description:
+rem   Script to request restapi responce of repository list from a user
+rem   organization account.
+
+rem <Flags>:
+rem   --
+rem     Stop flags parse.
+
+rem <ORG>:
+rem   User organization name.
+rem <TYPE>:
+rem   Type of user repository request:
+rem   - sources
+rem   - all
+
 setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b
@@ -37,8 +55,10 @@ set LASTERROR=%ERRORLEVEL%
 if %NEST_LVL% EQU 0 (
   call "%%~dp0.impl/cleanup_log.bat"
 
-  rem copy log into backup directory
-  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  if %LASTERROR% EQU 0 (
+    rem copy log into backup directory
+    call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  )
 )
 
 pause
