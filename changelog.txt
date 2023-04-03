@@ -1,3 +1,7 @@
+2023.04.03:
+* new: Scripts/Tools/std/echo_path_var.bat: print a path list variable used the `;` character as a separator
+* changed: Scripts/Tools/std/echo_var.bat: reimplemented to a simplified version
+
 2023.03.21:
 * fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: avoid log copy on error
 * fixed: Scripts/Tools/ToolAdaptors/app/github/print_*_repos_from_restapi_json.bat: redirect all side output into stderr
