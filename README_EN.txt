@@ -1,15 +1,17 @@
 * README_EN.txt
-* 2023.02.21
+* 2023.04.04
 * contools
 
 1. DESCRIPTION
 2. LICENSE
 3. REPOSITORIES
-4. PREREQUISITES
-5. CATALOG CONTENT DESCRIPTION
-6. DEPLOY
-7. TESTS
-8. AUTHOR
+4. CATALOG CONTENT DESCRIPTION
+5. PREREQUISITES
+6. DEPENDENCIES
+7. EXTERNALS
+8. DEPLOY
+9. TESTS
+10. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -40,36 +42,96 @@ Second mirror:
     https://bitbucket.org/andry81/contools.git
 
 -------------------------------------------------------------------------------
-4. PREREQUISITES
+4. CATALOG CONTENT DESCRIPTION
 -------------------------------------------------------------------------------
 
-Currently used these set of OS platforms, compilers, interpreters, modules,
-IDE's, applications and patches to run with or from:
+<root>
+ |
+ +- /`.log`
+ |    #
+ |    # Log files directory, where does store all log files from all scripts
+ |    # including all nested projects.
+ |
+ +- /`_externals`
+ |    #
+ |    # Immediate external projects catalog which could not be moved into the
+ |    # 3dparty dependencies catalog.
+ |
+ +- /`_config`
+ |  | #
+ |  | # Directory with build input configuration files.
+ |  |
+ |  +- `config.system.vars.in`
+ |  |   #
+ |  |   # Template file with system set of environment variables
+ |  |   # designed to be stored in a version control system.
+ |  |
+ |  +- `config.0.vars.in`
+ |      #
+ |      # Template file with user set of environment variables
+ |      # designed to be stored in a version control system.
+ |
+ +- /`Projects`
+ |    #
+ |    # Project files to build contools utilities.
+ |
+ +- /`Output`
+ |    #
+ |    # Temporary directory with build output.
+ |
+ +- /`Scripts`
+ |    #
+ |    # The root for all scripts and tools excluding external or standalone.
+ |
+ +- /`Utilities`
+    | #
+    | # Internal and external utilities and tools.
+    |
+    +- /`bin/contools`
+         #
+         # Internal utilities and tools built by the project.
+
+-------------------------------------------------------------------------------
+5. PREREQUISITES
+-------------------------------------------------------------------------------
+
+Currently used these set of OS platforms, externals, compilers, interpreters,
+modules, IDE's, applications and patches to run with or from:
 
 1. OS platforms:
 
-* Windows 7 (`.bat` only, minimal version for the cmake 3.14)
+* Windows 7+ (`.bat` only, minimal version for the cmake 3.14)
+
 * Cygwin 1.5+ or 3.0+ (`.sh` only):
   https://cygwin.com
   - to run scripts under cygwin
+
 * Msys2 20190524+ (`.sh` only):
   https://www.msys2.org
   - to run scripts under msys2
+
 * Linux Mint 18.3 x64 (`.sh` only)
 
-2. C++11 compilers:
+2. Externals:
+
+  * `gnuwin32`
+  * `msys`
+  * `tacklelib`
+
+3. C++11 compilers:
 
 * (primary) Microsoft Visual C++ 2015 Update 3 or Microsoft Visual C++ 2017
 * (secondary) GCC 5.4+
-* (experimental) Clang 3.8+
 
-3. Interpreters:
+4. Interpreters:
 
 * bash shell 3.2.48+
   - to run unix shell scripts
+
 * cmake 3.14+ :
   https://cmake.org/download/
   - to run cmake scripts and modules
+
 * python 3.7.3 or 3.7.5 (3.4+ or 3.5+)
   https://python.org
   - standard implementation to run python scripts
@@ -80,30 +142,36 @@ IDE's, applications and patches to run with or from:
   - 3.5+ is required for the direct import by a file path (with any extension)
     as noted in the documentation:
     https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
+
 * cmake 3.15.1 (3.14+):
   https://cmake.org/download/
   - to run cmake scripts and modules
   - 3.14+ does allow use generator expressions at install phase:
     https://cmake.org/cmake/help/v3.14/policy/CMP0087.html
+
 * Windows Script Host 5.8+
   - standard implementation to run vbs scripts
 
-4. Applications:
+5. Applications:
 
 * subversion 1.8+
   https://tortoisesvn.net
   - to run svn client
+
 * git 2.24+
   https://git-scm.com
   - to run git client
+
 * cygwin cygpath 1.42+
   - to run `bash_entry` script under cygwin
+
 * msys cygpath 3.0+
   - to run `bash_entry` script under msys2
+
 * cygwin readlink 6.10+
   - to run specific bash script functions with `readlink` calls
 
-5. IDE's.
+6. IDE's.
 
 * Microsoft Visual Studio 2015 Update 3
 * Microsoft Visual Studio 2017
@@ -132,34 +200,33 @@ https://cmake.org/cmake/help/v3.14/release/3.14.html#id13
   generator expressions. CMake 3.14 and later will evaluate generator
   expressions for install(CODE) and install(SCRIPT).
 
--------------------------------------------------------------------------------
-5. CATALOG CONTENT DESCRIPTION
--------------------------------------------------------------------------------
+7. Patches:
 
-<root>
- |
- +- /`_externals`
- |  #
- |  # Local 3dparty dependencies catalog.
- |
- +- /`Projects`
- |  #
- |  # Project files to build contools utilities.
- |
- +- /`Output`
- |  #
- |  # Temporary directory with build output.
- |
- +- /`Scripts`
- |  #
- |  # The root for all scripts and tools including external or standalone.
- |
- +- /`Utilities`
-    #
-    # External utilities and utilities built by the project.
+  Target repository with a 3dparty component sources must already contain all
+  patches and description with it.
 
 -------------------------------------------------------------------------------
-6. DEPLOY
+6. DEPENDENCIES
+-------------------------------------------------------------------------------
+
+Any project which is dependent on this project have has to contain the
+`README_EN.deps.txt` description file for the common dependencies in the
+Windows and in the Linux like platforms.
+
+-------------------------------------------------------------------------------
+7. EXTERNALS
+-------------------------------------------------------------------------------
+To checkout externals you must use the
+[vcstool](https://github.com/dirk-thomas/vcstool) python module.
+
+NOTE:
+  To install the module from the git repository:
+
+  >
+  python -m pip install git+https://github.com/dirk-thomas/vcstool
+
+-------------------------------------------------------------------------------
+8. DEPLOY
 -------------------------------------------------------------------------------
 To run bash shell scripts (`.sh` file extension) you should copy these scripts:
 
@@ -176,7 +243,7 @@ sudo chmod o+r  /bin/bash_entry
 sudo chmod a+r  /bin/bash_tacklelib
 
 -------------------------------------------------------------------------------
-7. TESTS
+9. TESTS
 -------------------------------------------------------------------------------
 * bat scripts tests:
 
@@ -189,6 +256,6 @@ sudo chmod a+r  /bin/bash_tacklelib
   ** Scripts/Tests/unit/traplib
 
 -------------------------------------------------------------------------------
-8. AUTHOR
+10. AUTHOR
 -------------------------------------------------------------------------------
 Andrey Dibrov (andry at inbox dot ru)

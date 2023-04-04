@@ -52,6 +52,7 @@ set LASTERROR=%ERRORLEVEL%
 
 if %NEST_LVL% EQU 0 (
   call "%%~dp0.impl/cleanup_log.bat"
+  call "%%~dp0.impl/cleanup_init_vars.bat"
 
   if %LASTERROR% EQU 0 (
     rem copy log into backup directory

@@ -1,3 +1,9 @@
+2023.04.04:
+* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: missed to cleanup `init.vars` file on exit
+* fixed: Scripts/Tools/ToolAdaptors/app/github/print_*.bat: execution fixup
+* new: Scripts/Tools/ToolAdaptors/app/github/README_EN.txt: added readme file
+* changed: README_EN.txt: readme update
+
 2023.04.03:
 * new: Scripts/Tools/std/echo_path_var.bat: print a path list variable used the `;` character as a separator
 * changed: Scripts/Tools/std/echo_var.bat: reimplemented to a simplified version
