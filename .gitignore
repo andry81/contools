@@ -1,4 +1,5 @@
 /.log
+/_externals
 /Output
 Scripts/Tests/unit/hashlib/_out
 Scripts/Tests/unit/traplib/_out
