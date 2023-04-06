@@ -1,3 +1,7 @@
+2023.04.06:
+* fixed: Scripts/Tools/std/echo_path_var.bat: `*`, `?` character parse workaround (left the globbing feature as is, use `^*` and `^?` instead to bypass the globbing)
+* fixed: Scripts/Tools/std/echo_*var.bat: unexisted variable returns code `255`, but empty one returns `1`
+
 2023.04.04:
 * fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: missed to cleanup `init.vars` file on exit
 * fixed: Scripts/Tools/ToolAdaptors/app/github/print_*.bat: execution fixup
