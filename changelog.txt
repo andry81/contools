@@ -1,3 +1,6 @@
+2023.04.07:
+* new: Scripts/Tools/admin/Telemetry/05_disable_telemetry_junk_win7.bat: added another disable script
+
 2023.04.06:
 * fixed: Scripts/Tools/std/echo_path_var.bat: `*`, `?` character parse workaround (left the globbing feature as is, use `^*` and `^?` instead to bypass the globbing)
 * fixed: Scripts/Tools/std/echo_*var.bat: unexisted variable returns code `255`, but empty one returns `1`
