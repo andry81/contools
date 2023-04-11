@@ -2,6 +2,10 @@
 
 setlocal
 
+rem prepare variables
+set "QBITTORRENT_EXECUTABLE=%QBITTORRENT_EXECUTABLE:/=\%"
+set "QBITTORRENT_EXECUTABLE=%QBITTORRENT_EXECUTABLE:\=\\%"
+
 rem remove upon reboot if still exists
 if defined TEMP_DIR if exist "%TEMP_DIR%\" (
   call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/sysinternals/movefile.exe" "%%TEMP_DIR:/=\%%" ""
