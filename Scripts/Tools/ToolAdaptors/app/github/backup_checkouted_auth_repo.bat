@@ -149,7 +149,7 @@ mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
 
 set HAS_AUTH_USER=0
 
-if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{USER}}" ^
+if defined GH_AUTH_USER if not "%GH_AUTH_USER%" == "{{USER}}" ^
 if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
 
 if %HAS_AUTH_USER% EQU 0 (

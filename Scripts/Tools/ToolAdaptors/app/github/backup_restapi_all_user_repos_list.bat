@@ -153,7 +153,7 @@ if %FLAG_SKIP_AUTH_REPO_LIST% NEQ 0 goto SKIP_AUTH_REPO_LIST
 
 set HAS_AUTH_USER=0
 
-if defined GH_AUTH_USER if not "%GH_AUTH_PASS%" == "{{USER}}" ^
+if defined GH_AUTH_USER if not "%GH_AUTH_USER%" == "{{USER}}" ^
 if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
 
 rem must be empty

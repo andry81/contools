@@ -1,8 +1,12 @@
 2023.04.18:
-* new: Scripts/Tools/ToolAdaptors/app/github/delete_resetapi_user_repo*.bat: added scripts to delete a single repository or list of repositories.
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: execution fixup
+* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: minor fixup
 
 2023.04.18:
-* new: Scripts/Tools/admin/Activation: added scripts for free Windows 8/8.1 activation using `msguides.com` site.
+* new: Scripts/Tools/ToolAdaptors/app/github/delete_resetapi_user_repo*.bat: added scripts to delete a single repository or list of repositories
+
+2023.04.18:
+* new: Scripts/Tools/admin/Activation: added scripts for free Windows 8/8.1 activation using `msguides.com` site
 
 2023.04.11:
 * changed: Scripts/Tools/ToolAdaptors/app/qbittorrent: .update_registry_to_run_as_user/update_registry_to_run_as_user.update.bat, _config/config.0.vars.in: `QBITTORRENT_EXECUTABLE` variable preprocess

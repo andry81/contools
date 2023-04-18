@@ -223,7 +223,8 @@ set "PROP_NAME=%PROP_NAME:﻿=%"
 call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
 
 rem skip on empty change
-if "%PROP_NEXT_VALUE%" == "%PROP_PREV_VALUE%" exit /b 0
+if "%PROP_NEXT_VALUE%" == "%PROP_PREV_VALUE%" ^
+if not "%PROP_NAME%" == "WorkingDirectoryFromTargetPath" exit /b 0
 
 set "PROP_LINE=%PROP_NAME%=%PROP_NEXT_VALUE%"
 
