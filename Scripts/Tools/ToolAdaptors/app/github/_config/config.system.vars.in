@@ -43,3 +43,6 @@ GH_RESTAPI_STARRED_REPOS_FILE     =repos-starred-{{PAGE}}.json
 
 GH_RESTAPI_REPO_RELEASES_URL      =https://api.github.com/repos/{{OWNER}}/{{REPO}}/releases
 GH_RESTAPI_REPO_RELEASES_FILE     =releases-{{PAGE}}.json
+
+# to delete repository
+GH_RESTAPI_DELETE_REPO_URL        =https://api.github.com/repos/{{OWNER}}/{{REPO}}

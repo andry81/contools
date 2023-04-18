@@ -16,4 +16,9 @@
 #
 
 GH_AUTH_USER                              ="{{USER}}"
+
+# to read a private repository
 GH_AUTH_PASS                              ="{{PASS}}"
+
+# to delete a repository
+GH_AUTH_PASS_TO_DELETE                    ="{{PASS-TO-DELETE}}"

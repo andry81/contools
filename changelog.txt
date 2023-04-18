@@ -1,4 +1,7 @@
 2023.04.18:
+* new: Scripts/Tools/ToolAdaptors/app/github/delete_resetapi_user_repo*.bat: added scripts to delete a single repository or list of repositories.
+
+2023.04.18:
 * new: Scripts/Tools/admin/Activation: added scripts for free Windows 8/8.1 activation using `msguides.com` site.
 
 2023.04.11:
