@@ -1,3 +1,6 @@
+2023.04.18:
+* new: Scripts/Tools/admin/Activation: added scripts for free Windows 8/8.1 activation using `msguides.com` site.
+
 2023.04.11:
 * changed: Scripts/Tools/ToolAdaptors/app/qbittorrent: .update_registry_to_run_as_user/update_registry_to_run_as_user.update.bat, _config/config.0.vars.in: `QBITTORRENT_EXECUTABLE` variable preprocess
 
