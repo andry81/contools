@@ -1,3 +1,6 @@
+2023.04.20:
+* fixed: README.md: static badges address change
+
 2023.04.18:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: execution fixup
 * fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: minor fixup

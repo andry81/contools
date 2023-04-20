@@ -59,15 +59,15 @@ mingw.<br/><br/>
   <a href="https://github.com/andry81/contools/blob/master/changelog.txt">Changelog</a>
 • <a href="https://github.com/andry81/contools/blob/master/README_EN.txt">Readme</a>
 • <a href="#dependecies">Dependencies</a>
-• <a href="#copyright-and-license"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/common/badges/license/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
+• <a href="#copyright-and-license"><img src="https://github.com/andry81-cache/gh-content-static-cache/raw/master/common/badges/license/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
 </p>
 
 <p align="center">
-  <a href="https://stackoverflow.com/search?q=contools"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/common/badges/board/stackoverflow-contools.svg" valign="middle" alt="stackoverflow search" /></a>
+  <a href="https://stackoverflow.com/search?q=contools"><img src="https://github.com/andry81-cache/gh-content-static-cache/raw/master/common/badges/board/stackoverflow-contools.svg" valign="middle" alt="stackoverflow search" /></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/andry81/donate"><img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/common/badges/donate/donate.svg" valign="middle" alt="donate" /></a>
+  <a href="https://github.com/andry81/donate"><img src="https://github.com/andry81-cache/gh-content-static-cache/raw/master/common/badges/donate/donate.svg" valign="middle" alt="donate" /></a>
 </p>
 
 ---
