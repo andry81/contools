@@ -1,3 +1,6 @@
+2023.04.22:
+* refactor: bin/7zip: 7zip utilities moved to external repository
+
 2023.03.21:
 * changed: bin/contools/TODO.txt: todo update
 
