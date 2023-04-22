@@ -1,4 +1,7 @@
 2023.04.22:
+* refactor: Utilities/bin/ss64.net: Frank P. Westlake utilities is removed as not required anymore
+
+2023.04.22:
 * refactor: Utilities/bin/sqlite, .externals, _config/config.system.vars.in: sqlite utilities moved to external repository
 
 2023.04.22:
