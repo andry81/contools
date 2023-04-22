@@ -61,8 +61,10 @@ exit /b
 
 :PROCESS_ARCHIVE_FILE
 
-call "%%CONTOOLS_ROOT%%/uuidgen.bat"
-set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%TEMP%\%?~n0%.%RETURN_VALUE%"
+call "%%CONTOOLS_ROOT%%\wmi\get_wmic_local_datetime.bat"
+set "TEMP_DIR_NAME_PREFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
+
+set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%TEMP%\%TEMP_DIR_NAME_PREFIX%.%?~n0%"
 
 mkdir "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%"
 rem safe all directory files remove except the directory

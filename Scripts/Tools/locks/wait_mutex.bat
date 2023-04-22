@@ -6,8 +6,6 @@ set "LOCK_NAME=%~1"
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/uuidgen.bat"
-
 set "RAND=%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
 
 set "LOCK_PATH=%TEMP%"

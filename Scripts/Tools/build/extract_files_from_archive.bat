@@ -44,8 +44,10 @@ rem   Explicitly use temporary directory for 7zip. This is required in some case
 rem   archive file around being updated archive file.
 rem   For example: pushd c:\ && ( 7z.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
 
-call "%%CONTOOLS_ROOT%%/uuidgen.bat"
-set "TEMP_DIR_PATH=%TEMP%\%~n0.%RETURN_VALUE%"
+call "%%CONTOOLS_ROOT%%\wmi\get_wmic_local_datetime.bat"
+set "TEMP_DIR_NAME_PREFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
+
+set "TEMP_DIR_PATH=%TEMP%\%TEMP_DIR_NAME_PREFIX%.%~n0"
 
 mkdir "%TEMP_DIR_PATH%" || (
   popd

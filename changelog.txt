@@ -1,4 +1,8 @@
 2023.04.22:
+* changed: Scripts/Tools: uuidgen utility usage replaced by wmic utility usage
+* refactor: Utilities/bin/Microsoft: uuidgen utility is removed as not required anymore
+
+2023.04.22:
 * refactor: Utilities/bin/pstools, Utilities/bin/sysinternals, .externals, _config/config.system.vars.in: sysinternals toolkit moved to external repository
 
 2023.04.22:
