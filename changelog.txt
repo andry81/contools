@@ -1,4 +1,7 @@
 2023.04.22:
+* refactor: Utilities/bin/wkhtmltopdf: wkhtmltox toolkit is moved to external repository
+
+2023.04.22:
 * refactor: Utilities/bin/thomaspolaert: Thomas Polaert cecho utility is moved to external repository
 
 2023.04.22:

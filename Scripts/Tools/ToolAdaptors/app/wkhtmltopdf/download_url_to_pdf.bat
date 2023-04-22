@@ -179,7 +179,7 @@ if exist "%OUT_FILE_PATH%" (
 )
 
 pushd "%OUT_FILE_DIR%" && (
-  call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/wkhtmltopdf/bin/wkhtmltopdf.exe" "%%URL%%" "%%OUT_FILE_PATH%%"
+  call :CMD "%%CONTOOLS_WKHTMLTOX_ROOT%%/bin/wkhtmltopdf.exe" "%%URL%%" "%%OUT_FILE_PATH%%"
   popd
   exit /b
 )
