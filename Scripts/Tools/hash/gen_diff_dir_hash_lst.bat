@@ -39,9 +39,9 @@ if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 goto X64
 
 :NOTX64
-"%CONTOOLS_UTILITIES_HASHDEEP_ROOT%/hashdeep.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
+"%CONTOOLS_HASHDEEP_ROOT%/hashdeep.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
 exit /b
 
 :X64
-"%CONTOOLS_UTILITIES_HASHDEEP_ROOT%/hashdeep64.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
+"%CONTOOLS_HASHDEEP_ROOT%/hashdeep64.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
 exit /b

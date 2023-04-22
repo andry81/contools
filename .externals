@@ -33,3 +33,8 @@ repositories:
     type:         git
     url:          https://github.com/andry81-3dparty/external-tools--7zip
     version:      22_01_release
+
+  _externals/hashdeep:
+    type:         git
+    url:          https://github.com/andry81-3dparty/external-tools--hashdeep
+    version:      4_4_release
