@@ -1,4 +1,7 @@
 2023.04.22:
+* refactor: Utilities/bin/thomaspolaert: Thomas Polaert cecho utility is moved to external repository
+
+2023.04.22:
 * changed: Scripts/Tools/touch.bat: minor change
 * refactor: Utilities/bin/stevemiller, .externals, _config/config.system.vars.in: Steve P. Miller console toolbox utilities is moved to external repository
 

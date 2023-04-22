@@ -334,8 +334,8 @@ rem Environment will be restored automatically here
 exit /b
 
 :cecho
-if exist "%CONTOOLS_UTILITIES_BIN_ROOT%/thomaspolaert/cecho.exe" (
-  "%CONTOOLS_UTILITIES_BIN_ROOT%/thomaspolaert/cecho.exe" %*{#}{\n}
+if exist "%CONTOOLS_TPOLAERT_CECHO_ROOT%/cecho.exe" (
+  "%CONTOOLS_TPOLAERT_CECHO_ROOT%/cecho.exe" %*{#}{\n}
 ) else (
   echo.%*
 )

@@ -1,4 +1,7 @@
 2023.04.22:
+* refactor: bin/thomaspolaert: Thomas Polaert cecho utility is moved to external repository
+
+2023.04.22:
 * refactor: bin/stevemiller: Steve P. Miller console toolbox utilities is moved to external repository
 
 2023.04.22:
