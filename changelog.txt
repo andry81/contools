@@ -1,4 +1,7 @@
 2023.04.22:
+* changed: Scripts/Tools/cmake: date/time as a directory name prefix instead of as a suffix
+
+2023.04.22:
 * changed: Scripts/Tools: uuidgen utility usage replaced by wmic utility usage
 * refactor: Utilities/bin/Microsoft: uuidgen utility is removed as not required anymore
 
