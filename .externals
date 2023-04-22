@@ -44,6 +44,11 @@ repositories:
     url:          https://github.com/andry81-3dparty/external-tools--sqlite3
     version:      3_15_0_release
 
+  _externals/stevemiller-console-toolbox:
+    type:         git
+    url:          https://github.com/andry81-3dparty/external-tools--stevemiller-console-toolbox
+    version:      1_1_release
+
   _externals/sysinternals:
     type:         git
     url:          https://github.com/andry81-3dparty/external-tools--sysinternals
