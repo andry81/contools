@@ -63,3 +63,8 @@ repositories:
     type:         git
     url:          https://github.com/andry81-3dparty/external-tools--wkhtmltox
     version:      0_12_6_release
+
+  _externals/xmlstarlet:
+    type:         git
+    url:          https://github.com/andry81-3dparty/external-tools--xmlstarlet
+    version:      1_6_1_release

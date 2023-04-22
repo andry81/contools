@@ -1,4 +1,7 @@
 2023.04.22:
+* refactor: bin/xmlstarlet: xmlstarlet toolkit is moved to external repository
+
+2023.04.22:
 * refactor: bin/wkhtmltopdf: wkhtmltox toolkit is moved to external repository
 
 2023.04.22:
