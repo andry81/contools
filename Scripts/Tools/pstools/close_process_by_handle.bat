@@ -56,12 +56,12 @@ if %FLAG_CLOSE_ALL% NEQ 0 (
   echo.Killing first "%PROC_NAME%" process holding "%OBJECT_NAME%" handle...
 )
 
-rem Add \ character to the of argument string if \ character already at the end,
+rem Add \ character to the end of argument string if \ character already at the end,
 rem otherwise handle.exe command line parser will fail because of trailing \" sequence.
 if "%PROC_NAME:~-1%" == "\" set "PROC_NAME=%PROC_NAME%\"
 if "%OBJECT_NAME:~-1%" == "\" set "OBJECT_NAME=%OBJECT_NAME%\"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_UTILITIES_BIN_ROOT%/pstools/handle.exe" -p "%PROC_NAME%" "%OBJECT_NAME%" ^| findstr.exe /R /C:"pid: .*type: "`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_SYSINTERNALS_ROOT%/handle.exe" -p "%PROC_NAME%" "%OBJECT_NAME%" ^| findstr.exe /R /C:"pid: .*type: "`) do (
   set "HANDLE_LINE=%%i"
   call :PROCESS_HANDLE_LINE
   if %FLAG_CLOSE_ALL% EQU 0 exit /b 0

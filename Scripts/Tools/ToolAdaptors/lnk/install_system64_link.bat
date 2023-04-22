@@ -46,5 +46,5 @@ if %WINDOWS_MAJOR_VER% GTR 5 (
   call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/mklink_system64.bat"
 ) else (
   rem Sysinternals junction utility
-  "%CONTOOLS_UTILITIES_BIN_ROOT%/sysinternals/junction.exe" -nobanner -accepteula "%SystemRoot%\System64" "%SystemRoot%\System32"
+  "%CONTOOLS_SYSINTERNALS_ROOT%/junction.exe" -nobanner -accepteula "%SystemRoot%\System64" "%SystemRoot%\System32"
 )

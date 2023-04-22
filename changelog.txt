@@ -1,4 +1,7 @@
 2023.04.22:
+* refactor: Utilities/bin/pstools, Utilities/bin/sysinternals, .externals, _config/config.system.vars.in: sysinternals toolkit moved to external repository
+
+2023.04.22:
 * refactor: Utilities/bin/hashdeep, .externals, _config/config.system.vars.in: hashdeep utilities moved to external repository
 
 2023.04.22:
