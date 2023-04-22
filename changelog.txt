@@ -1,4 +1,7 @@
 2023.04.22:
+* refactor: Utilities/bin/sqlite, .externals, _config/config.system.vars.in: sqlite utilities moved to external repository
+
+2023.04.22:
 * changed: Scripts/Tools/cmake: date/time as a directory name prefix instead of as a suffix
 
 2023.04.22:

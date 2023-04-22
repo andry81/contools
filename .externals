@@ -39,6 +39,11 @@ repositories:
     url:          https://github.com/andry81-3dparty/external-tools--hashdeep
     version:      4_4_release
 
+  _externals/sqlite:
+    type:         git
+    url:          https://github.com/andry81-3dparty/external-tools--sqlite3
+    version:      3_15_0_release
+
   _externals/sysinternals:
     type:         git
     url:          https://github.com/andry81-3dparty/external-tools--sysinternals
