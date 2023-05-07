@@ -1,3 +1,6 @@
+2023.05.08:
+* changed: bin/contools/TODO.txt: todo update
+
 2023.04.22:
 * refactor: bin/xmlstarlet: xmlstarlet toolkit is moved to external repository
 

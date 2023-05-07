@@ -137,3 +137,6 @@
   process itself into error output.
   For example, `/pause-on-*` flags does print into stdout and can be redirected
   with this flag.
+
+* Add `/cpu-affinity-mask <number>` option to execute child process on specific
+  CPU cores.
