@@ -196,6 +196,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /no-subst-vars
         Don't substitute all `{...}` variables (command line arguments).
+
         Additionally disables `\{` escape sequence expansion.
 
         Can not be used together with `/no-subst-pos-vars`,
@@ -291,7 +292,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         memory name (by default in the `callf` or `callfg` process).
         Intermediate processes can exist between an ancestor and this-process
         and does not affect on loading if did not allocate a shared memory
-        with internal name.
+        with the same internal name.
+
+        CAUTION:
+          A parent or ancestor process must exist on the moment of request to
+          the internal shared memory block by a child process, otherwise the
+          load will fail. In that case you must not use the `/no-wait` flag
+          in the parent or ancestor.
 
       /no-std-inherit
         Prevent all standard handles inheritance into child process.
@@ -613,7 +620,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         In case if `/unelevate*` flag or option is not used or is not
         executed, then does declare `<Flags>` for the this-process only.
 
-        The same flag can not be used together with `/deomote-parent{ ... }`
+        The same flag can not be used together with `/demote-parent{ ... }`
         option. Silently overrides the same regular flags.
 
         Can not be used together with `/elevate*` and `/promote*` options and
@@ -1171,13 +1178,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           \\ = backslash
 
       /set-env-var <name> <value>
-      /v
+      /v <name> <value>
         Set environment variable of name `<name>` to value `<value>`.
         If `<value>` is empty, the variable is deleted.
 
     Special flags:
       /disable-wow64-fs-redir
-        Disables file system redirection for the WOW64 process.
+        Disables file system redirection for the WOW64 process unconditionally.
 
       /disable-ctrl-signals
         Disable all control signals handling in this-process such as:
@@ -1441,6 +1448,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     Example #4 tries to create a not elevated child process if this-process is
     elevated, otherwise just executes the command line. The command line does
     create an elevated child `cmd.exe /k` process.
+    The `/D .` option make the current directory be inherited by a child
+    process through a process (un)elevation.
 
   Examples (CreateProcess, stdin+stdout+stderr redirection into single file
             within interactive input to console):
@@ -1448,7 +1457,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     2. callf.exe /tee-stdin inout.log /write-console-stdin-back /tee-conout-dup "${COMSPEC}" "/k"
 
     Example #1 creates stdin/stdout/stderr anonymous pipes into/from the child
-    `cmd.exe`process and writes them into the log file.
+    `cmd.exe` process and writes them into the log file.
 
     Example #2 creates only stdout and stderr anonymous pipes from child
     process and writes them into the log file. The stdin gets read through the
