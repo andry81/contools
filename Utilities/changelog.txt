@@ -1,3 +1,6 @@
+2023.05.10:
+* changed: src/callf/help.tpl: more details, added non yet implemented parameters description
+
 2023.05.08:
 * changed: bin/contools/TODO.txt: todo update
 

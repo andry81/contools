@@ -179,6 +179,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         This-process must be attached to a console, otherwise the pause would
         be skipped.
 
+      /print-to-stderr
+        Print all output from this-process to stderr instead of stdout.
+
+        Has no effect on the child process from the command line.
+
+        Has effect on the child this-process.
+
       /skip-pause-on-detached-console
         By default all `/pause*` flags does restore console if was detached
         before. The console window search of does the same way as like for the
@@ -196,6 +203,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
       /no-subst-vars
         Don't substitute all `{...}` variables (command line arguments).
+
         Additionally disables `\{` escape sequence expansion.
 
         Can not be used together with `/no-subst-pos-vars`,
@@ -224,6 +232,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Unexisted environment variables is not expanded by default, use the
         `/EE<N>` flag instead to specifically allow it.
 
+        NOTE:
+          In case of usage together with the same position `/S*<N>` option,
+          then the environment variables expansion does evaluate before the
+          argument variables substitution.
+
         Can not be used together with `/no-expand-env`, `/EE<N>` flags.
 
         Can be used together with `/allow-expand-unexisted-env` flag.
@@ -244,6 +257,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         rest of arguments if not specifically enabled.
         Empty arguments is not substituted by default, use `/SE<N>` flag
         instead to specifically allow it.
+
+        NOTE:
+          In case of usage together with the same position `/E*<N>` option,
+          then the environment variables expansion does evaluate before the
+          argument variables substitution.
 
         Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
         `/SE<N>` flags.
@@ -291,7 +309,13 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         memory name (by default in the `callf` or `callfg` process).
         Intermediate processes can exist between an ancestor and this-process
         and does not affect on loading if did not allocate a shared memory
-        with internal name.
+        with the same internal name.
+
+        CAUTION:
+          A parent or ancestor process must exist on the moment of request to
+          the internal shared memory block by a child process, otherwise the
+          load will fail. In that case you must not use the `/no-wait` flag
+          in the parent or ancestor.
 
       /no-std-inherit
         Prevent all standard handles inheritance into child process.
@@ -489,6 +513,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /detach-inherited-console-on-wait
           /attach-parent-console
           /disable-wow64-fs-redir
+          /disable-wow64-fs-redir-if-this-proc-x86
           /disable-ctrl-signals
           /disable-ctrl-c-signal
           /allow-gui-autoattach-to-parent-console
@@ -535,6 +560,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /detach-inherited-console-on-wait
           /attach-parent-console
           /disable-wow64-fs-redir
+          /disable-wow64-fs-redir-if-this-proc-x86
           /disable-ctrl-signals
           /disable-ctrl-c-signals
           /allow-gui-autoattach-to-parent-console
@@ -613,7 +639,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         In case if `/unelevate*` flag or option is not used or is not
         executed, then does declare `<Flags>` for the this-process only.
 
-        The same flag can not be used together with `/deomote-parent{ ... }`
+        The same flag can not be used together with `/demote-parent{ ... }`
         option. Silently overrides the same regular flags.
 
         Can not be used together with `/elevate*` and `/promote*` options and
@@ -1171,13 +1197,80 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           \\ = backslash
 
       /set-env-var <name> <value>
-      /v
+      /v <name> <value>
         Set environment variable of name `<name>` to value `<value>`.
+        The `<value>` does not expand or substitute by default, use the `/v-*`
+        options instead to specifically allow it.
         If `<value>` is empty, the variable is deleted.
+
+        Can not be used together with other `/v-*` options.
+
+      /v-E <name> <value>
+        Set environment variable of name `<name>` to value `<value>` with
+        allowed existed environment variables expansion.
+        Unexisted environment variables is not expanded by default, use the
+        `/v-EE` option instead to specifically allow it.
+        If `<value>` is empty, the variable is deleted.
+
+        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
+        options.
+
+      /v-EE <name> <value>
+        The same as `/v-E` but additionally allows expansion of unexisted
+        `${...}` environment variables.
+        If `<value>` is empty, the variable is deleted.
+
+        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
+        options.
+
+      /v-S <name> <value>
+        Set environment variable of name `<name>` to value `<value>` with
+        allowed existed argument variables substitution.
+        Empty argument variables is not substituted by default, use the
+        `/v-SE` option instead to specifically allow it.
+        If `<value>` is empty, the variable is deleted.
+
+        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
+        options.
+
+      /v-SE <name> <value>
+        The same as `/v-S` but additionally allows substitution of empty
+        `{...}` argument variables.
+        If `<value>` is empty, the variable is deleted.
+
+        Still can not apply to command line arguments which does not exist,
+        so to avoid that do use quotes without an argument.
+
+        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
+        options.
+
+      /v-E-S <name> <value>
+      /v-E-SE <name> <value>
+      /v-EE-S <name> <value>
+      /v-EE-SE <name> <value>
+        The same as respective `/v-E*` and `/v-S*` together.
+        If `<value>` is empty, the variable is deleted.
+
+        In case of `/v-*-SE` is still can not apply to command line arguments
+        which does not exist, so to avoid that do use quotes without an
+        argument.
+
+        NOTE:
+          The environment variables expansion does evaluate before the argument
+          variables substitution.
+
+        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
+        options.
 
     Special flags:
       /disable-wow64-fs-redir
-        Disables file system redirection for the WOW64 process.
+        Disables file system redirection for the WOW64 process unconditionally.
+
+      /disable-wow64-fs-redir-if-this-proc-x86
+        Disables file system redirection for the WOW64 process in case if
+        this-process is 32-bit process.
+
+        Has no effect on not WOW64 subsystem or in case of 64-bit this-process.
 
       /disable-ctrl-signals
         Disable all control signals handling in this-process such as:
@@ -1441,6 +1534,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     Example #4 tries to create a not elevated child process if this-process is
     elevated, otherwise just executes the command line. The command line does
     create an elevated child `cmd.exe /k` process.
+    The `/D .` option make the current directory be inherited by a child
+    process through a process (un)elevation.
 
   Examples (CreateProcess, stdin+stdout+stderr redirection into single file
             within interactive input to console):
@@ -1448,7 +1543,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     2. callf.exe /tee-stdin inout.log /write-console-stdin-back /tee-conout-dup "${COMSPEC}" "/k"
 
     Example #1 creates stdin/stdout/stderr anonymous pipes into/from the child
-    `cmd.exe`process and writes them into the log file.
+    `cmd.exe` process and writes them into the log file.
 
     Example #2 creates only stdout and stderr anonymous pipes from child
     process and writes them into the log file. The stdin gets read through the
