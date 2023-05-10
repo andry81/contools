@@ -34,14 +34,18 @@ call "%%__?~dp0%%.load_config_dir/load_config_dir.exit.bat"
 exit /b
 
 :MAIN
+if %__?FLAG_NO_LOAD_SYSTEM_CONFIG% NEQ 0 goto LOAD_SYSTEM_CONFIG_END
+
 call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_SYSTEM_FLAGS%% %%1 %%2 "config.system.vars%%__?SYSTEM_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
 
-if %__?FLAG_NO_LOAD_USER_CONFIG% NEQ 0 goto LOAD_CONFIG_END
+:LOAD_SYSTEM_CONFIG_END
+
+if %__?FLAG_NO_LOAD_USER_CONFIG% NEQ 0 goto LOAD_USER_CONFIG_END
 
 set __?CONFIG_INDEX=0
 
 :LOAD_CONFIG_LOOP
-if not exist "%~1/config.%__?CONFIG_INDEX%.vars.in" goto LOAD_CONFIG_END
+if not exist "%~1/config.%__?CONFIG_INDEX%.vars.in" goto LOAD_USER_CONFIG_END
 call :LOAD_CONFIG %%* || exit /b
 set /A __?CONFIG_INDEX+=1
 goto LOAD_CONFIG_LOOP
@@ -49,7 +53,7 @@ goto LOAD_CONFIG_LOOP
 :LOAD_CONFIG
 call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_USER_FLAGS%% %%1 %%2 "config.%%__?CONFIG_INDEX%%.vars%%__?USER_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
 
-:LOAD_CONFIG_END
+:LOAD_USER_CONFIG_END
 
 exit /b 0
 

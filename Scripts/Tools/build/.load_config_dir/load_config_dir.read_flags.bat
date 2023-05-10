@@ -5,6 +5,7 @@ set __?FLAG_GEN_SYSTEM_CONFIG=0
 set __?FLAG_GEN_USER_CONFIG=0
 set __?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG=0
 set __?FLAG_LOAD_USER_OUTPUT_CONFIG=0
+set __?FLAG_NO_LOAD_SYSTEM_CONFIG=0
 set __?FLAG_NO_LOAD_USER_CONFIG=0
 set "__?BARE_SYSTEM_FLAGS="
 set "__?BARE_USER_FLAGS="
@@ -35,6 +36,8 @@ if defined __?FLAG (
     set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% -load_output_config
   ) else if "%__?FLAG%" == "-gen_config" (
     rem ignore
+  ) else if "%__?FLAG%" == "-no_load_system_config" (
+    set __?FLAG_NO_LOAD_SYSTEM_CONFIG=1
   ) else if "%__?FLAG%" == "-no_load_user_config" (
     set __?FLAG_NO_LOAD_USER_CONFIG=1
   ) else (
