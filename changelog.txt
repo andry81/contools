@@ -1,4 +1,7 @@
 2023.05.10:
+* fixed: Scripts/Tools/build/load_config_dir.bat: keep load if `<config>.in` file is not found, but `<config>` is found
+
+2023.05.10:
 * new: Scripts/Tools/build/load_config_dir.bat: added `no_load_system_config` flag to ignore load of system config
 
 2023.05.08:

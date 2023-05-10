@@ -45,6 +45,7 @@ if %__?FLAG_NO_LOAD_USER_CONFIG% NEQ 0 goto LOAD_USER_CONFIG_END
 set __?CONFIG_INDEX=0
 
 :LOAD_CONFIG_LOOP
+if not exist "%~1/config.%__?CONFIG_INDEX%.vars%__?USER_CONFIG_FILE_EXT%" ^
 if not exist "%~1/config.%__?CONFIG_INDEX%.vars.in" goto LOAD_USER_CONFIG_END
 call :LOAD_CONFIG %%* || exit /b
 set /A __?CONFIG_INDEX+=1
