@@ -1,0 +1,81 @@
+#%% version: 1
+
+# CAUTION:
+#  This configuration file is designed to be portable between 3 interpreters: cmake, unix shell scripts, windows (cmd.exe) batch scripts,
+#  so it is made up to be simple as possible but not simplier as to support a single value or a values list
+#  together with an escape sequence, where the character `\` is not an escape sequence character.
+#  Use `$/<char>` to escape a `<char>` character which is a part of a configuration file format:
+#  `"` -> `$/"` or `(` -> `$/(` or `$/` -> `$/$/`
+#  Use `$/{` as a start sequence for a variable's value substitution: `$/{<variable>}`, where `<variable>`
+#  is already parsed variable from configuration file WITHOUT condition(s) or `:` characters. Otherwise a not yet parsed variable or
+#  invalid one will be replaced by the `*:$/{<variable>}` sequence to fail the most usage cases in a file path,
+#  where `*:` - is not valid character sequence in a windows path (`:` character additionally can block a relative path *after* the variable)
+#  and `/` is a character to block a file or directory creation with such a name on a Linux system (but not a block for `mkdir -p`!).
+#  In all other cases the `$/` sequence prints as is in all contexts: in a cmake script, in a unix shell script and in a
+#  windows batch script.
+
+# CAUTION:
+#  DO NOT USE `@` character pairs unescaped as a plain value as long as it is used as a placehoder in a replacement of `@<variable>@` sequence,
+#  where the `<variable>` is a cmake variable. For that case do replace all `@` characters by this escape sequence: `$/@`.
+#  It will avoid the substitution in case of an accidental match.
+
+# NOTE:
+#  In a unix shell script a variable name with `:` character is not permitted, so variables with not allowed characters
+#  won't be visible in a windows batch script too.
+
+# FORMAT:
+#   [<attributes>] <variable>[:[<os_name>][:[<compiler_name>][:[<config_name>][:[<arch_name>]]]]][=<value>]
+#   [<attributes>] <variable>[:[<os_name>][:[<compiler_name>][:[<config_name>][:[<arch_name>]]]]][=(<value0> [<value1> [... <valueN>]])]
+#
+# <attributes>:           Variable space separated attributes:
+#                           global | top | local | bool | path | exist | canonical | optional |
+#                           uncache | cache_only | cache | env_only | env | force_cache | force | override |
+#                           unset | (un)hide | package | final
+# <variable>:             Variable name corresponding to the regex: [_a-zA-Z][_a-zA-Z0-9]*
+# <os_name>:              OS variant name: WIN | UNIX | ...
+# <compiler_name>:        Compiler variant name with version support: <compiler_token_name>[.<compiler_version>]
+#   <compiler_token_name>: MSVC | GCC | CLANG | ...
+#   <compiler_version>:   <major_version>[*+] | <major_version>.<minor_version>[*+]
+#     <major_version>:    an integral value corresponding to the regex: [0-9]*
+#     <minor_version>:    an integral value corresponding to the regex: [0-9]*
+# <config_name>:          Configuration name: RELEASE | DEBUG | RELWITHDEBINFO | MINSIZEREL | ...
+# <arch_name>:            Architecture variant name: X86 | X64 | ...
+#
+# <value>:                Value with escaping and substitution support: `$/<escape_char>`, `$/{<variable>}`
+#
+
+# PREDEFINED BUILTIN VARIABLES ACCESIBLE FROM THIS FILE:
+#
+# CMAKE_CURRENT_LOAD_VARS_FILE_INDEX:           Index in a file paths list from which this file have has an ordered load.
+# CMAKE_CURRENT_LOAD_VARS_FILE_DIR:             Directory path from which this file being loaded from.
+# CMAKE_CURRENT_PACKAGE_NEST_LVL:               Current package nest level.
+# CMAKE_CURRENT_PACKAGE_NEST_LVL_PREFIX:        Current package nest level prefix string like `00` if level is `0`, or `01` if level is `1` and so on.
+# CMAKE_CURRENT_PACKAGE_NAME:                   Current package name this file being loaded from.
+# CMAKE_CURRENT_PACKAGE_SOURCE_DIR:             Current package source directory this file being loaded from.
+# CMAKE_TOP_PACKAGE_NAME:                       Top package name.
+# CMAKE_TOP_PACKAGE_SOURCE_DIR:                 Top package source directory.
+#
+
+# has to be here because the architecture value is not yet known in the system variables configuration file
+top CMAKE_GENERATOR_PLATFORM:WIN:::X86=Win32
+top CMAKE_GENERATOR_PLATFORM:WIN:::X64=x64
+
+# installer
+
+top path optional NSIS_INSTALL_ROOT:WIN="c:/builds/nsis3/rel1/nsis_install"
+
+# utility
+
+#top final CMAKE_CXX_STANDARD=11
+
+top final TACKLELIB_RUNTIME_LINK_TYPE="dynamic"
+top final TACKLELIB_ADDRESS_MODEL="any"
+
+#top final TACKLELIB_DEP_LIBS=(fmt)
+top final TACKLELIB_DEP_LIBS=(fmt)
+
+top final TACKLELIB_SKIP_TESTLIB=0
+top final TACKLELIB_SKIP_TESTS=0
+
+#
+#local Boost_DEBUG=ON

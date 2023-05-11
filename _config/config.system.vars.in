@@ -15,25 +15,48 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
-once CONTOOLS_BASH_ROOT                         ="%CONTOOLS_ROOT%/bash"
-once CONTOOLS_BUILD_TOOLS_ROOT                  ="%CONTOOLS_ROOT%/build"
-once CONTOOLS_SQLITE_TOOLS_ROOT                 ="%CONTOOLS_ROOT%/sqlite"
-once CONTOOLS_TESTLIB_ROOT                      ="%CONTOOLS_ROOT%/testlib"
-once CONTOOLS_XML_TOOLS_ROOT                    ="%CONTOOLS_ROOT%/xml"
-once CONTOOLS_VARS_ROOT                         ="%CONTOOLS_ROOT%/vars"
+upath CMAKE_SHELL:BAT                           =%COMSPEC%
+upath CMAKE_SHELL:SH                            =$/{SHELL}
 
-once CONTOOLS_TOOL_ADAPTORS_ROOT                ="%CONTOOLS_ROOT%/ToolAdaptors"
+upath CMAKE_PROJECT_ROOT                        ="%TACKLELIB_PROJECT_ROOT%"
 
-once CONTOOLS_UTILITIES_ROOT                    ="%CONTOOLS_PROJECT_ROOT%/Utilities"
-once CONTOOLS_UTILITIES_BIN_ROOT                ="%CONTOOLS_UTILITIES_ROOT%/bin"
+upath CONTOOLS_PROJECT_BUILD_ROOT               ="%TACKLELIB_PROJECT_ROOT%/_build"
 
-once CONTOOLS_7ZIP_ROOT                         ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/7zip"
-once CONTOOLS_GNUWIN32_ROOT                     ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/gnuwin32"
-once CONTOOLS_AUTOGEN_ROOT                      ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/msys"
-once CONTOOLS_HASHDEEP_ROOT                     ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/hashdeep"
-once CONTOOLS_SQLITE_ROOT                       ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/sqlite"
-once CONTOOLS_SPMILLER_CONSOLE_TOOLBOX_ROOT     ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/stevemiller-console-toolbox"
-once CONTOOLS_SYSINTERNALS_ROOT                 ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/sysinternals"
-once CONTOOLS_TPOLAERT_CECHO_ROOT               ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/thomaspolaert-cecho"
-once CONTOOLS_WKHTMLTOX_ROOT                    ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/wkhtmltox"
-once CONTOOLS_XMLSTARLET_ROOT                   ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/xmlstarlet"
+upath CONTOOLS_BASH_ROOT                        ="%CONTOOLS_ROOT%/bash"
+upath CONTOOLS_BUILD_TOOLS_ROOT                 ="%CONTOOLS_ROOT%/build"
+upath CONTOOLS_SQLITE_TOOLS_ROOT                ="%CONTOOLS_ROOT%/sqlite"
+upath CONTOOLS_TESTLIB_ROOT                     ="%CONTOOLS_ROOT%/testlib"
+upath CONTOOLS_XML_TOOLS_ROOT                   ="%CONTOOLS_ROOT%/xml"
+upath CONTOOLS_VARS_ROOT                        ="%CONTOOLS_ROOT%/vars"
+
+upath CONTOOLS_TOOL_ADAPTORS_ROOT               ="%CONTOOLS_ROOT%/ToolAdaptors"
+
+upath CONTOOLS_UTILITIES_ROOT                   ="%CONTOOLS_PROJECT_ROOT%/Utilities"
+upath CONTOOLS_UTILITIES_BIN_ROOT               ="%CONTOOLS_UTILITIES_ROOT%/bin"
+
+upath CONTOOLS_7ZIP_ROOT                        ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/7zip"
+upath CONTOOLS_GNUWIN32_ROOT                    ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/gnuwin32"
+upath CONTOOLS_AUTOGEN_ROOT                     ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/msys"
+upath CONTOOLS_HASHDEEP_ROOT                    ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/hashdeep"
+upath CONTOOLS_SQLITE_ROOT                      ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/sqlite"
+upath CONTOOLS_SPMILLER_CONSOLE_TOOLBOX_ROOT    ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/stevemiller-console-toolbox"
+upath CONTOOLS_SYSINTERNALS_ROOT                ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/sysinternals"
+upath CONTOOLS_TPOLAERT_CECHO_ROOT              ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/thomaspolaert-cecho"
+upath CONTOOLS_WKHTMLTOX_ROOT                   ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/wkhtmltox"
+upath CONTOOLS_XMLSTARLET_ROOT                  ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/xmlstarlet"
+
+upath CMAKE_PROJECT_INPUT_CONFIG_ROOT           ="%TACKLELIB_PROJECT_INPUT_CONFIG_ROOT%/cmake"
+upath CMAKE_PROJECT_OUTPUT_CONFIG_ROOT          ="%TACKLELIB_PROJECT_OUTPUT_CONFIG_ROOT%/cmake"
+
+upath CMAKE_CONFIG_VARS_SYSTEM_FILE_IN          ="%CMAKE_PROJECT_INPUT_CONFIG_ROOT%/config.system.vars.in"
+upath CMAKE_CONFIG_VARS_SYSTEM_FILE             ="%CMAKE_PROJECT_OUTPUT_CONFIG_ROOT%/config.system.vars"
+
+upath CMAKE_CONFIG_VARS_USER_0_FILE_IN          ="%CMAKE_PROJECT_INPUT_CONFIG_ROOT%/config.0.vars.in"
+upath CMAKE_CONFIG_VARS_USER_0_FILE             ="%CMAKE_PROJECT_OUTPUT_CONFIG_ROOT%/config.0.vars"
+
+# CAUTION:
+#
+#   Is required for `set_vars_from_locked_file_pair.bat` script which does called from `cmake/set_vars_from_files.bat` script
+#   to be able to create variables with UTF-8 values.
+#
+once CHCP                                       =65001

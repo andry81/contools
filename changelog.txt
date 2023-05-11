@@ -1,4 +1,7 @@
 2023.05.11:
+* new: _config: preparation of config files for cmake build
+
+2023.05.11:
 * new: Scripts/Tools/admin/RecentLists/cleanup_totalcmd.bat: added Total Commander recent lists cleanup
 * new: Scripts/Tools/admin/RecentLists/lists/README_EN.txt: lists format readme file
 * changed: Scripts/Tools/admin/RecentLists: minor improvements

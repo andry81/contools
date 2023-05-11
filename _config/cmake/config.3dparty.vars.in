@@ -1,0 +1,151 @@
+#%% version: 1
+
+# CAUTION:
+#  This configuration file is designed to be portable between 3 interpreters: cmake, unix shell scripts, windows (cmd.exe) batch scripts,
+#  so it is made up to be simple as possible but not simplier as to support a single value or a values list
+#  together with an escape sequence, where the character `\` is not an escape sequence character.
+#  Use `$/<char>` to escape a `<char>` character which is a part of a configuration file format:
+#  `"` -> `$/"` or `(` -> `$/(` or `$/` -> `$/$/`
+#  Use `$/{` as a start sequence for a variable's value substitution: `$/{<variable>}`, where `<variable>`
+#  is already parsed variable from configuration file WITHOUT condition(s) or `:` characters. Otherwise a not yet parsed variable or
+#  invalid one will be replaced by the `*:$/{<variable>}` sequence to fail the most usage cases in a file path,
+#  where `*:` - is not valid character sequence in a windows path (`:` character additionally can block a relative path *after* the variable)
+#  and `/` is a character to block a file or directory creation with such a name on a Linux system (but not a block for `mkdir -p`!).
+#  In all other cases the `$/` sequence prints as is in all contexts: in a cmake script, in a unix shell script and in a
+#  windows batch script.
+
+# CAUTION:
+#  DO NOT USE `@` character pairs unescaped as a plain value as long as it is used as a placehoder in a replacement of `@<variable>@` sequence,
+#  where the `<variable>` is a cmake variable. For that case do replace all `@` characters by this escape sequence: `$/@`.
+#  It will avoid the substitution in case of an accidental match.
+
+# NOTE:
+#  In a unix shell script a variable name with `:` character is not permitted, so variables with not allowed characters
+#  won't be visible in a windows batch script too.
+
+# FORMAT:
+#   [<attributes>] <variable>[:[<os_name>][:[<compiler_name>][:[<config_name>][:[<arch_name>]]]]][=<value>]
+#   [<attributes>] <variable>[:[<os_name>][:[<compiler_name>][:[<config_name>][:[<arch_name>]]]]][=(<value0> [<value1> [... <valueN>]])]
+#
+# <attributes>:           Variable space separated attributes:
+#                           global | top | local | bool | path | exist | canonical | optional |
+#                           uncache | cache_only | cache | env_only | env | force_cache | force | override |
+#                           unset | (un)hide | package | final
+# <variable>:             Variable name corresponding to the regex: [_a-zA-Z][_a-zA-Z0-9]*
+# <os_name>:              OS variant name: WIN | UNIX | ...
+# <compiler_name>:        Compiler variant name with version support: <compiler_token_name>[.<compiler_version>]
+#   <compiler_token_name>: MSVC | GCC | CLANG | ...
+#   <compiler_version>:   <major_version>[*+] | <major_version>.<minor_version>[*+]
+#     <major_version>:    an integral value corresponding to the regex: [0-9]*
+#     <minor_version>:    an integral value corresponding to the regex: [0-9]*
+# <config_name>:          Configuration name: RELEASE | DEBUG | RELWITHDEBINFO | MINSIZEREL | ...
+# <arch_name>:            Architecture variant name: X86 | X64 | ...
+#
+# <value>:                Value with escaping and substitution support: `$/<escape_char>`, `$/{<variable>}`
+#
+
+# PREDEFINED BUILTIN VARIABLES ACCESIBLE FROM THIS FILE:
+#
+# CMAKE_CURRENT_LOAD_VARS_FILE_INDEX:           Index in a file paths list from which this file have has an ordered load.
+# CMAKE_CURRENT_LOAD_VARS_FILE_DIR:             Directory path from which this file being loaded from.
+# CMAKE_CURRENT_PACKAGE_NEST_LVL:               Current package nest level.
+# CMAKE_CURRENT_PACKAGE_NEST_LVL_PREFIX:        Current package nest level prefix string like `00` if level is `0`, or `01` if level is `1` and so on.
+# CMAKE_CURRENT_PACKAGE_NAME:                   Current package name this file being loaded from.
+# CMAKE_CURRENT_PACKAGE_SOURCE_DIR:             Current package source directory this file being loaded from.
+# CMAKE_TOP_PACKAGE_NAME:                       Top package name.
+# CMAKE_TOP_PACKAGE_SOURCE_DIR:                 Top package source directory.
+#
+
+# Libraries with sources or/and binaries built externally.
+#
+# CAUTION:
+#   Variables must be defined externally, here is left as an example!
+#
+#global path exist _3DPARTY_ROOT:WIN="d:/_3dparty"
+#global path exist _3DPARTY_ROOT:UNIX="/home/opt/_3dparty"
+#
+#global path exist _3DPARTY_BUILD_SOURCES_ROOT="$/{_3DPARTY_ROOT}/src"
+#global path exist _3DPARTY_BUILD_OUTPUT_ROOT="$/{_3DPARTY_ROOT}/build"
+
+
+#global CMAKE_LIBRARY_PATH:UNIX="/usr/lib/i386-linux-gnu"
+
+# gui
+
+global path optional WXWIDGETS_ROOT:WIN:GCC::X86="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msys/gcc/x86/gui/wxwidgets/3_1_3_release"
+global path optional WXWIDGETS_ROOT:WIN:GCC::X64="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msys/gcc/x64/gui/wxwidgets/3_1_3_release"
+
+global path optional WXWIDGETS_ROOT:WIN:MSVC14.0::X86="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msvc/vc14/x86/gui/wxwidgets/3_1_3_release"
+global path optional WXWIDGETS_ROOT:WIN:MSVC14.0::X64="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msvc/vc14/x64/gui/wxwidgets/3_1_3_release"
+
+global path optional WXWIDGETS_ROOT:WIN:MSVC14.1*::X86="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msvc/vc2017/x86/gui/wxwidgets/3_1_3_release"
+global path optional WXWIDGETS_ROOT:WIN:MSVC14.1*::X64="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msvc/vc2017/x64/gui/wxwidgets/3_1_3_release"
+
+global path optional WXWIDGETS_ROOT:UNIX:GCC="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/src/gui/wxwidgets/3_1_3_release"
+
+# utility
+
+global path optional BOOST_ROOT:WIN:GCC::X86="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msys/gcc/x86/utility/boost/1_81_0_release"
+global path optional BOOST_ROOT:WIN:GCC::X64="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msys/gcc/x64/utility/boost/1_81_0_release"
+
+global path optional BOOST_ROOT:WIN:MSVC14.0::X86="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msvc/vc14/x86/utility/boost/1_81_0_release"
+global path optional BOOST_ROOT:WIN:MSVC14.0::X64="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msvc/vc14/x64/utility/boost/1_81_0_release"
+
+global path optional BOOST_ROOT:WIN:MSVC14.1*::X86="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msvc/vc2017/x86/utility/boost/1_81_0_release"
+global path optional BOOST_ROOT:WIN:MSVC14.1*::X64="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/msvc/vc2017/x64/utility/boost/1_81_0_release"
+
+global path optional BOOST_ROOT:UNIX="$/{_3DPARTY_BUILD_OUTPUT_ROOT}/src/utility/boost/1_81_0_release"
+
+global Boost_USE_SHARED_LIBS=ON
+global Boost_USE_STATIC_LIBS=OFF
+global Boost_USE_STATIC_RUNTIME=OFF
+global Boost_USE_MULTITHREADED=ON
+
+# associated with respective preprocessor definitions (must be changed together with build variables!)
+
+# Tells the config system not to automatically select which libraries to link against.
+# Normally if a compiler supports #pragma lib, then the correct library build variant will be
+# automatically selected and linked against, simply by the act of including one of that library's headers.
+# This macro turns that feature off.
+#
+global BOOST_ALL_NO_LIB=ON
+
+# Forces all libraries that have separate source, to be linked as dll's rather than static libraries
+# on Microsoft Windows (this macro is used to turn on __declspec(dllimport) modifiers, so that the compiler
+# knows which symbols to look for in a dll rather than in a static library).
+# Note that there may be some libraries that can only be statically linked (Boost.Test for example) and
+# others which may only be dynamically linked (Boost.Thread for example), in these cases this macro has no effect.
+#
+global BOOST_ALL_DYN_LINK=ON
+
+# Force to use C++11 lambda functions to implement scope exits
+#
+global BOOST_SCOPE_EXIT_CONFIG_USE_LAMBDAS=ON
+
+global path optional TACKLELIB_ROOT="$/{_3DPARTY_BUILD_SOURCES_ROOT}/utility/tacklelib/tacklelib"
+
+global path optional FMT_ROOT="$/{_3DPARTY_BUILD_SOURCES_ROOT}/utility/fmt/6_2_0_release"
+
+# CAUTION:
+#   CMake issues:
+#   * `Can not set externally Boost_LIB_PREFIX variable in the msys` : https://gitlab.kitware.com/cmake/cmake/issues/20372
+#
+
+# mingw
+#global Boost_COMPILER:WIN:GCC=-mgw
+
+# cygwin
+#global cache force_cache Boost_LIB_PREFIX:WIN:GCC=lib
+#global Boost_COMPILER:WIN:GCC=-gcc
+#global CMAKE_FIND_LIBRARY_SUFFIXES:WIN:GCC=.dll.a
+
+# msys
+#global cache force_cache Boost_LIB_PREFIX:WIN:GCC=lib
+#global Boost_COMPILER:WIN:GCC=-mgw74
+#global CMAKE_FIND_LIBRARY_SUFFIXES:WIN:GCC=.dll.a
+
+# required for boost 1.66 and higher: https://gitlab.kitware.com/cmake/cmake/merge_requests/2568
+global Boost_ARCHITECTURE::::X86="-x32"
+global Boost_ARCHITECTURE::::X64="-x64"
+
+global BOOST_COMPONENTS=(chrono filesystem iostreams system date_time)
