@@ -1,3 +1,12 @@
+2023.05.11:
+* new: Scripts/Tools/admin/RecentLists/cleanup_totalcmd.bat: added Total Commander recent lists cleanup
+* new: Scripts/Tools/admin/RecentLists/lists/README_EN.txt: lists format readme file
+* changed: Scripts/Tools/admin/RecentLists: minor improvements
+
+2023.05.10:
+* changed: Utilities/src/callf/help.tpl: more details
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
 2023.05.10:
 * fixed: Scripts/Tools/build/load_config_dir.bat: keep load if `<config>.in` file is not found, but `<config>` is found
 

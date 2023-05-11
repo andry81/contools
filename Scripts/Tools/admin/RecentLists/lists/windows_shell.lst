@@ -1,17 +1,21 @@
 # windows shell (limited control set)
 
-*|HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\AppCompatCache
-*|HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\Session Manager\AppCompatCache
-*|HKEY_LOCAL_MACHINE\SYSTEM\ControlSet002\Control\Session Manager\AppCompatCache
-*|HKEY_LOCAL_MACHINE\SYSTEM\ControlSet003\Control\Session Manager\AppCompatCache
-*|HKEY_LOCAL_MACHINE\SYSTEM\ControlSet004\Control\Session Manager\AppCompatCache
+# <Storage>|...
+# reg|<CleanupMode>|...
+# reg|*|<RegKeyPath>
 
-*|HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\BagMRU
-*|HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags
-*|HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache
+reg|*|HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\AppCompatCache
+reg|*|HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\Session Manager\AppCompatCache
+reg|*|HKEY_LOCAL_MACHINE\SYSTEM\ControlSet002\Control\Session Manager\AppCompatCache
+reg|*|HKEY_LOCAL_MACHINE\SYSTEM\ControlSet003\Control\Session Manager\AppCompatCache
+reg|*|HKEY_LOCAL_MACHINE\SYSTEM\ControlSet004\Control\Session Manager\AppCompatCache
 
-*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\CIDSizeMRU
-*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\FirstFolder
-*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\LastVisitedPidlMRU
-*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\LastVisitedPidlMRULegacy
-*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU
+reg|*|HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\BagMRU
+reg|*|HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags
+reg|*|HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache
+
+reg|*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\CIDSizeMRU
+reg|*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\FirstFolder
+reg|*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\LastVisitedPidlMRU
+reg|*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\LastVisitedPidlMRULegacy
+reg|*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ComDlg32\OpenSavePidlMRU

@@ -58,14 +58,6 @@
 * Optionally disable `\{` escape sequence expansion for the positional
   arguments in case of the `/no-subst-pos-vars` flag.
 
-* Add `/v-* <name> <value>` options to use additionally in the
-  `/elevate{ ... }` option to be able to expand and to substitute variables in
-  the `<value>`:
-
-  `/v-E`, `/v-EE`, `/v-S`, `/v-SE`, `/v-S-E`, `/v-SE-E`, `/v-S-EE`, `/v-SE-EE`
-
-  Use `\` escape sequence as in the generic command line expansion.
-
 * Add ability for variables late expansion in case of process elevation to
   expand after the elevation instead of before:
 
@@ -109,27 +101,6 @@
 
   Example: https://github.com/zodiacon/sysrun/blob/master/sysrun.cpp
 
-* Add 64-bit version of callf:
-
-  - callf64.exe
-  - callfg64.exe
-
-  Add `/runas-parent-bitness` to automatically choose 32-bit or 64-bit version
-  based on parent process bitness. If bitness is the same then, just ignore it.
-
-  If elevation is enabled, then run a different bitness callf executable before
-  the elevation.
-
-  Add batch scripts to automatically select 32-bit or 64-bit version of
-  callf executable:
-
-  - callf.bat
-  - callfg.bat
-
-  Add for all executables `/disable-wow64-fs-redir-if-this-proc-x86` to
-  additionally disable WOW64 file system redirection in case of 32-bit
-  this-process.
-
 * Add `/allow-subst-pos-vars-after-env-var-expand` and disable by default
   positional variables substitution after environment variables expansion.
 
@@ -140,3 +111,67 @@
 
 * Add `/cpu-affinity-mask <number>` option to execute child process on specific
   CPU cores.
+
+---
+
+`help.tpl` not yet implemented (description in the file):
+
+* /print-to-stderr
+
+* /disable-wow64-fs-redir-if-this-proc-x86
+  /promote{ /disable-wow64-fs-redir-if-this-proc-x86 }
+  /promote-parent{ /disable-wow64-fs-redir-if-this-proc-x86 }
+
+  Add 64-bit version of callf:
+
+  - callf64.exe
+  - callfg64.exe
+
+  Add for all executables `/disable-wow64-fs-redir-if-this-proc-x86` to
+  additionally disable WOW64 file system redirection in case of 32-bit
+  this-process.
+
+  Add `/runas-parent-bitness` to automatically choose 32-bit or 64-bit version
+  based on parent process bitness. If bitness is the same then, the flag has no
+  effect.
+
+  If (un)elevation is enabled and going to be executed, and the parent process
+  has a different bitness model, then run the same parent bitness callf
+  executable variant before the (un)elevation.
+
+  If (un)elevation is not enabled or not going to be executed, and the parent
+  process has a different bitness model, then:
+
+    If parent is 32-bit executable (this-process is 64-bit executable -
+    callf64.exe/callfg64.exe), then run 32-bit callf executable variant
+    - callf.exe/callfg.exe.
+
+    If parent is 64-bit executable (this-process is 32-bit executable -
+    callf.exe/callfg.exe), then the `/runas-parent-bitness` flag implies and
+    works as the `/disable-wow64-fs-redir-if-this-proc-x86` or
+    `/disable-wow64-fs-redir` flags, where the 64-bit callf this-process just
+    executes a child process without wow64 redirection (no need to run 32-bit
+    callf this-child).
+
+  Add batch scripts to automatically select 32-bit or 64-bit version of callf
+  executable:
+
+  - callf.bat
+  - callfg.bat
+
+* /v-E      <name> <value>
+  /v-EE     <name> <value>
+  /v-S      <name> <value>
+  /v-SE     <name> <value>
+  /v-E-S    <name> <value>
+  /v-E-SE   <name> <value>
+  /v-EE-S   <name> <value>
+  /v-EE-SE  <name> <value>
+
+  Add `/v-* <name> <value>` options to use additionally in the
+  `/elevate{ ... }` option to be able to expand and to substitute variables in
+  the `<value>`:
+
+  `/v-E`, `/v-EE`, `/v-S`, `/v-SE`, `/v-S-E`, `/v-SE-E`, `/v-S-EE`, `/v-SE-EE`
+
+  Use `\` escape sequence as in the generic command line expansion.

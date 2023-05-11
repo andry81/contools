@@ -9,6 +9,7 @@ repositories:
       - _config
       - bash/__init__
       - bash/tacklelib
+      - vbs
 
   _externals/svncmd:
     type:         git

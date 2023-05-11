@@ -1,4 +1,11 @@
 # araxis merge
 
-n|HKEY_CURRENT_USER\Software\Araxis\Merge\*|REG_SZ|FolderComparisonHistory
-n|HKEY_CURRENT_USER\Software\Araxis\Merge\*|REG_SZ|FileComparisonHistory
+# <Storage>|...
+# reg|<CleanupMode>|...
+# reg|n|<RegKeyPath>[\*]|<RegKeyType>|<RegKeyName>[*]
+
+# CAUTION: `<RegKeyName>` must be without whitespaces.
+# CAUTION: `n` pattern won't work if a value of the `<RegKeyName>` is too long.
+
+reg|n|HKEY_CURRENT_USER\Software\Araxis\Merge\*|REG_SZ|FolderComparisonHistory
+reg|n|HKEY_CURRENT_USER\Software\Araxis\Merge\*|REG_SZ|FileComparisonHistory

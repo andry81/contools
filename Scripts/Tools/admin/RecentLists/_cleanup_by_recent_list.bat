@@ -42,26 +42,48 @@ if not exist "%RECENT_LISTS_PTTN_FILE%" (
 set "CMD_INDENT_STR=  "
 
 for /F "usebackq eol=# tokens=1,* delims=|" %%i in ("%RECENT_LISTS_PTTN_FILE%") do (
-  set "RECENT_LIST_REG_KEY_RECORD=%%i|%%j"
+  set "RECENT_LIST_RECORD=%%i|%%j"
 
-  if "%%i" == "*" (
-    set "RECENT_LIST_REG_KEY_PATH=%%j"
-    call :CLEANUP_RECENT_LIST_REG_KEY_ALL
-  ) else if "%%i" == "." (
-    for /F "eol= tokens=1,2,* delims=|" %%k in ("%%j") do (
-      set "RECENT_LIST_REG_KEY_PATH=%%k"
-      set "RECENT_LIST_REG_KEY_TYPE=%%l"
-      set "RECENT_LIST_REG_KEY_NAME=%%m"
-      call :CLEANUP_RECENT_LIST_REG_KEY_NAME
+  if "%%i" == "reg" (
+    set "RECENT_LIST_REG_KEY_RECORD=%%j"
+
+    for /F "eol= tokens=1,* delims=|" %%k in ("%%j") do (
+      if "%%k" == "*" (
+        set "RECENT_LIST_REG_KEY_PATH=%%l"
+        call :CLEANUP_RECENT_LIST_REG_KEY_ALL
+      ) else if "%%k" == "." (
+        for /F "eol= tokens=1,2,* delims=|" %%m in ("%%l") do (
+          set "RECENT_LIST_REG_KEY_PATH=%%m"
+          set "RECENT_LIST_REG_KEY_TYPE=%%n"
+          set "RECENT_LIST_REG_KEY_NAME=%%o"
+          call :CLEANUP_RECENT_LIST_REG_KEY_NAME
+        )
+      ) else if "%%k" == "n" (
+        for /F "eol= tokens=1,2,* delims=|" %%m in ("%%l") do (
+          set "RECENT_LIST_REG_KEY_PATH_RE=%%m"
+          set "RECENT_LIST_REG_KEY_TYPE=%%n"
+          set "RECENT_LIST_REG_KEY_NAME_RE=%%o"
+          call :CLEANUP_RECENT_LIST_REG_KEY_NAME_RE
+        )
+      ) else call :CLEANUP_RECENT_LIST_REG_KEY_UNKNOWN
     )
-  ) else if "%%i" == "n" (
-    for /F "eol= tokens=1,2,* delims=|" %%k in ("%%j") do (
-      set "RECENT_LIST_REG_KEY_PATH_RE=%%k"
-      set "RECENT_LIST_REG_KEY_TYPE=%%l"
-      set "RECENT_LIST_REG_KEY_NAME_RE=%%m"
-      call :CLEANUP_RECENT_LIST_REG_KEY_NAME_RE
+  ) else if "%%i" == "file" (
+    set "RECENT_LIST_FILE_RECORD=%%j"
+
+    for /F "eol= tokens=1,* delims=|" %%k in ("%%j") do (
+      if "%%k" == "ini" (
+        for /F "eol= tokens=1,* delims=|" %%m in ("%%l") do (
+          if "%%m" == "*" (
+            for /F "eol= tokens=1,* delims=|" %%o in ("%%n") do (
+              set "RECENT_LIST_FILE_INI_EXPAND_PATH=%%o"
+              set "RECENT_LIST_FILE_INI_CLEANUP_INI_FILE=%%p"
+              call :CLEANUP_RECENT_LIST_FILE_INI_SECTIONS_ALL
+            )
+          ) else call :CLEANUP_RECENT_LIST_FILE_RECORD_UNKNOWN
+        )
+      ) else call :CLEANUP_RECENT_LIST_FILE_RECORD_UNKNOWN
     )
-  ) else call :CLEANUP_RECENT_LIST_REG_KEY_UNKNOWN
+  ) else call :CLEANUP_RECENT_LIST_UNKNOWN
   echo.---
 )
 
@@ -140,12 +162,41 @@ call :CMD_W_INDENT "%%SystemRoot%%\System32\reg.exe" query "%%RECENT_LIST_REG_KE
 
 exit /b
 
+rem delete existed ini file sections
+:CLEANUP_RECENT_LIST_FILE_INI_SECTIONS_ALL
+if not defined RECENT_LIST_FILE_INI_EXPAND_PATH goto CLEANUP_RECENT_LIST_FILE_RECORD_UNKNOWN
+if not defined RECENT_LIST_FILE_INI_CLEANUP_INI_FILE goto CLEANUP_RECENT_LIST_FILE_RECORD_UNKNOWN
+
+set "RECENT_LIST_FILE_INI_CLEANUP_INI_FILE=%~dp0lists\%RECENT_LIST_FILE_INI_CLEANUP_INI_FILE%"
+
+if not exist "%RECENT_LIST_FILE_INI_CLEANUP_INI_FILE%" goto CLEANUP_RECENT_LIST_FILE_RECORD_UNKNOWN
+
+rem expand path
+call set "RECENT_LIST_FILE_INI_PATH=%RECENT_LIST_FILE_INI_EXPAND_PATH%"
+
+echo."%RECENT_LIST_FILE_INI_PATH%"
+if not exist "%RECENT_LIST_FILE_INI_PATH%" exit /b 0
+
+"%SystemRoot%\System32\cscript.exe" /NOLOGO "%TACKLELIB_PROJECT_ROOT%/vbs/tacklelib/tools/totalcmd/uninstall_totalcmd_wincmd.vbs" "%RECENT_LIST_FILE_INI_PATH%" "%RECENT_LIST_FILE_INI_PATH%" "%RECENT_LIST_FILE_INI_CLEANUP_INI_FILE%" || (
+  echo.%~nx0: error: update of Total Commander main configuration file is aborted.
+  exit /b 255
+) >&2
+
+exit /b 0
+
 :CLEANUP_RECENT_LIST_REG_KEY_UNKNOWN
-echo.%~nx0: error: unknown registry record: "%RECENT_LIST_REG_KEY_RECORD%"
+echo.%~nx0: error: invalid registry record: "%RECENT_LIST_REG_KEY_RECORD%"
+exit /b 0
+
+:CLEANUP_RECENT_LIST_FILE_RECORD_UNKNOWN
+echo.%~nx0: error: invalid file record: "%RECENT_LIST_FILE_RECORD%"
+exit /b 0
+
+:CLEANUP_RECENT_LIST_UNKNOWN
+echo.%~nx0: error: invalid record: "%RECENT_LIST_RECORD%"
 exit /b 0
 
 :CMD
-call :CMD_ECHO %%*
 echo.^>%*
 (
   %*

@@ -1,5 +1,9 @@
 # windows internal apps
 
-*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\TypedPaths
+# <Storage>|...
+# reg|<CleanupMode>|...
+# reg|*|<RegKeyPath>
 
-*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Applets\Paint\Recent File List
+reg|*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\TypedPaths
+
+reg|*|HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Applets\Paint\Recent File List

@@ -1,7 +1,12 @@
 # 7-zip
 
-# CAUTION: n pattern won't work if a value is too long
-.|HKEY_CURRENT_USER\Software\7-Zip\Compression|REG_BINARY|ArcHistory
-.|HKEY_CURRENT_USER\Software\7-Zip\Extraction|REG_BINARY|PathHistory
-.|HKEY_CURRENT_USER\Software\7-Zip\FM|REG_BINARY|FolderHistory
-.|HKEY_CURRENT_USER\Software\7-Zip\FM|REG_BINARY|CopyHistory
+# <Storage>|...
+# reg|<CleanupMode>|...
+# reg|.|<RegKeyPath>|<RegKeyType>|<RegKeyName>
+
+# CAUTION: `n` pattern won't work if a value of the `<RegKeyName>` is too long.
+
+reg|.|HKEY_CURRENT_USER\Software\7-Zip\Compression|REG_BINARY|ArcHistory
+reg|.|HKEY_CURRENT_USER\Software\7-Zip\Extraction|REG_BINARY|PathHistory
+reg|.|HKEY_CURRENT_USER\Software\7-Zip\FM|REG_BINARY|FolderHistory
+reg|.|HKEY_CURRENT_USER\Software\7-Zip\FM|REG_BINARY|CopyHistory
