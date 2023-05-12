@@ -1,4 +1,8 @@
 2023.05.12:
+* new: Scripts/Tools/cleanup: cleanup scripts
+* new: Scripts/Tools/exec/exec_callf_prefix.bat: script to execute callf as a prefix and run cleanup scripts on exit
+
+2023.05.12:
 * changed: Scripts/Tools/ToolAdaptors: switched to use `set_vars_from_file.bat` script
 
 2023.05.12:
