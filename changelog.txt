@@ -1,3 +1,6 @@
+2023.05.12:
+* new: Scripts/Tools/std: set_vars_from_file.bat, set_vars_from_locked_file.bat: scripts to load variables from a file using exclusion list with builtin and specific custom variables
+
 2023.05.11:
 * new: _config: preparation of config files for cmake build
 
