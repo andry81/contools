@@ -33,16 +33,7 @@ call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%*
 
 call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
 
-rem variables escaping
-set "?~f0=%?~f0:{=\{%"
-set "COMSPECLNK=%COMSPEC:{=\{%"
-
-"%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
-  /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
-  /no-subst-pos-vars ^
-  /v IMPL_MODE 1 ^
-  /ra "%%" "%%?01%%" /v "?01" "%%" ^
-  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %*
+call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
 set LASTERROR=%ERRORLEVEL%
 
 rem ...

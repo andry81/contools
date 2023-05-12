@@ -40,26 +40,12 @@ set "INIT_VARS_FILE=%PROJECT_LOG_DIR%\init.vars"
 rem register all environment variables
 set 2>nul > "%INIT_VARS_FILE%"
 
-rem variables escaping
-set "?~f0=%?~f0:{=\{%"
-set "COMSPECLNK=%COMSPEC:{=\{%"
-
-"%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
-  /ret-child-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 ^
-  /no-subst-pos-vars ^
-  /v IMPL_MODE 1 /v INIT_VARS_FILE "%INIT_VARS_FILE%" ^
-  /ra "%%" "%%?01%%" /v "?01" "%%" ^
-  "${COMSPECLNK}" "/c \"@\"${?~f0}\" {*}\"" %*
+call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -init_vars_file -- %%*
 set LASTERROR=%ERRORLEVEL%
 
-if %NEST_LVL% EQU 0 (
-  call "%%~dp0.impl/cleanup_log.bat"
-  call "%%~dp0.impl/cleanup_init_vars.bat"
-
-  if %LASTERROR% EQU 0 (
-    rem copy log into backup directory
-    call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
-  )
+if %NEST_LVL% EQU 0 if %LASTERROR% EQU 0 (
+  rem copy log into backup directory
+  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
 )
 
 pause
