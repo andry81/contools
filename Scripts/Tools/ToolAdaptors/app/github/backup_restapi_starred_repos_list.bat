@@ -67,7 +67,7 @@ set /A NEST_LVL+=1
 
 if %NEST_LVL% EQU 1 (
   rem load initialization environment variables
-  if defined INIT_VARS_FILE for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%INIT_VARS_FILE%") do if /i not "%%i" == "NEST_LVL" set "%%i=%%j"
+  if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat" "%%INIT_VARS_FILE%%"
 )
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (

@@ -1,4 +1,7 @@
 2023.05.12:
+* changed: Scripts/Tools/ToolAdaptors: switched to use `set_vars_from_file.bat` script
+
+2023.05.12:
 * new: Scripts/Tools/std: set_vars_from_file.bat, set_vars_from_locked_file.bat: scripts to load variables from a file using exclusion list with builtin and specific custom variables
 
 2023.05.11:
