@@ -1,10 +1,10 @@
 > **Warning** FOR GIT USERS: To clone including all dependecies you must use [fork](https://github.com/plusone-robotics/vcstool) (has the sparse checkout feature) of the [vcstool](https://github.com/dirk-thomas/vcstool) python module (currently the sparse checkout feature is not merged).
 
-<h4 align="center">A wide range of scripts for Windows interpreter (cmd.exe) and other
+<p align="center">A wide range of scripts for Windows interpreter (cmd.exe) and other
 interpreters such as bash shell (.sh), visual basic (.vbs), jscript (.js),
 python (.py), perl (.pl) and so on. Plus some set of standalone console
 utilities and tools aside other utilities and tools from cygwin, msys and
-mingw.<br/><br/>
+mingw.</p>
 
 <p align="center">
   <a href="https://www.codefactor.io/repository/github/andry81/contools">
@@ -56,8 +56,8 @@ mingw.<br/><br/>
 </p>
 
 <p align="center">
-  <a href="https://github.com/andry81/contools/blob/master/changelog.txt">Changelog</a>
-• <a href="https://github.com/andry81/contools/blob/master/README_EN.txt">Readme</a>
+  <a href="https://github.com/andry81/contools/tree/HEAD/changelog.txt">Changelog</a>
+• <a href="https://github.com/andry81/contools/tree/HEAD/README_EN.txt">Readme</a>
 • <a href="#dependecies">Dependencies</a>
 • <a href="#copyright-and-license"><img src="https://github.com/andry81-cache/gh-content-static-cache/raw/master/common/badges/license/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
 </p>
@@ -78,4 +78,4 @@ mingw.<br/><br/>
 
 ## <a name="copyright-and-license">Copyright and License</a>
 
-Code and documentation copyright 2021 Andrey Dibrov. Code released under [MIT License](https://github.com/andry81/contools/blob/master/license.txt)
+Code and documentation copyright 2021 Andrey Dibrov. Code released under [MIT License](https://github.com/andry81/contools/tree/HEAD/license.txt)

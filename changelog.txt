@@ -1,4 +1,8 @@
 2023.05.20:
+* fixed: README.md: description minor fixup
+* refactor: README.md: replaced `blob/master` to `tree/HEAD` in all links as not dependent on specific branch name
+
+2023.05.20:
 * changed: Scripts/Tools/wmi: minor details
 
 2023.05.12:
