@@ -272,6 +272,8 @@ void Flags::clear()
 
 Options::Options()
 {
+    shift_args = 0;
+
     chcp_in = chcp_out = win_error_langid = 0;
 
     unelevate_method = UnelevationMethod_Default;
@@ -341,6 +343,8 @@ Options::Options()
 
 void Options::merge(const Options & options)
 {
+    MERGE_OPTION(options, shift_args, 0);
+
     MERGE_OPTION(options, shell_exec_verb, std::tstring{});
     MERGE_OPTION(options, change_current_dir, std::tstring{});
 

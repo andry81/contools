@@ -208,6 +208,8 @@ struct Options
     std::tstring    create_inbound_server_pipe_to_stdout;
     std::tstring    create_inbound_server_pipe_to_stderr;
 
+    uint_t          shift_args;
+
     uint_t          chcp_in;
     uint_t          chcp_out;
     uint_t          win_error_langid;

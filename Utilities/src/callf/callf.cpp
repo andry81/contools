@@ -149,6 +149,7 @@ const TCHAR * g_promote_or_demote_parent_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_flags_w_index_to_parse_arr[] = {
+    _T("/shift-"),
     _T("/EE"),
     _T("/expand-env-arg"), _T("/E"),
     _T("/SE"),
@@ -2641,6 +2642,21 @@ int ParseArgWithSuffixToOption(int & error, const TCHAR * arg, int argc, const T
     const TCHAR * start_arg = arg;
     const TCHAR * arg_suffix = nullptr;
 
+    if (IsArgWithSuffixEqualTo(arg, _T("/shift-"), arg_suffix)) {
+        const size_t arg_suffix_len = tstrlen(arg_suffix);
+        if (arg_suffix_len && tisdigit(*arg_suffix)) {
+            const int shift_args = _ttoi(arg_suffix);
+            if (shift_args >= 0) {
+                if (IsArgWithSuffixInFilter(start_arg, arg_suffix - start_arg, include_filter_arr)) {
+                    options.shift_args = shift_args;
+                    return 1;
+                }
+                return 0;
+            }
+            else error = invalid_format_flag(start_arg);
+        }
+        return -1;
+    }
     if (IsArgWithSuffixEqualTo(arg, _T("/EE"), arg_suffix)) {
         const size_t arg_suffix_len = tstrlen(arg_suffix);
         if (arg_suffix_len && tisdigit(*arg_suffix)) {
@@ -4129,7 +4145,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             // [0] = `{*}`
             // [1] = `{@}`
             //
-            size_t special_cmdline_arg_index_arr[2] = { size_t(arg_offset) + 2, size_t(arg_offset) + 3 };
+            size_t special_cmdline_arg_index_arr[2] = { size_t(arg_offset) + 2 + g_options.shift_args, size_t(arg_offset) + 3 + g_options.shift_args };
             ptrdiff_t special_cmdline_arg_offset_arr[2];
 
             _get_cmdline_arg_offsets(cmdline_str, special_cmdline_arg_index_arr, special_cmdline_arg_offset_arr);
@@ -4308,6 +4324,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         }
                     }
                 }
+            }
+
+            // `/shift-<N>`
+            if (in_args.args.begin() != in_args.args.end()) {
+                in_args.args.erase(in_args.args.begin(), in_args.args.begin() + (std::min)(g_options.shift_args, in_args.args.size()));
+            }
+            if (out_args.args.begin() != out_args.args.end()) {
+                out_args.args.erase(out_args.args.begin(), out_args.args.begin() + (std::min)(g_options.shift_args, out_args.args.size()));
             }
 
             // expand ${...} variables before {...} variables

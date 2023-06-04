@@ -12,6 +12,18 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     Character sequence to stop parse <Flags> command line parameters.
 
     <Flags>:
+      /shit-<N>
+        Shift positional arguments on `<N>` positions to left.
+        The `<FilePathFormatString>` and `<ParametersFormatString>` arguments
+        does not shift.
+
+        Has effect on `{...}` substitution in `<FilePathFormatString>` and
+        `<ParametersFormatString>` arguments.
+
+        Has effect on `{*}` and `{@}` variable values.
+
+        Has no effect on `{...}` substitution in positional arguments.
+
       /chcp-in <codepage>
         Console input code page.
 
