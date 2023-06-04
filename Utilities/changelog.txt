@@ -1,4 +1,7 @@
 2023.06.04:
+* new: bin/contools: binaries update
+
+2023.06.04:
 * new: src/callf: added `/shift-<N>` option to shift positional arguments
 
 2023.06.04:
