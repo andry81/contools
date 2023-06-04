@@ -1,1 +1,13 @@
-- rewrite setvarsfromfile.bat, tests.
+* Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat:
+
+  Recover broken directory shortcuts which were file shortcuts using
+  `Description` key, because it used by the system to save a shortcut file path
+  before auto convertion into a directory shortcut.
+
+  Add flag `-allow-recover-file-shortcuts` to detect and recover that case.
+
+  If a file path does not exist, then ignore recovery if path rename is not
+  requested.
+
+  Apply path rename to a path from the Description key and if exist continue
+  recover.
