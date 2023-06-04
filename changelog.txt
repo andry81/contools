@@ -1,3 +1,6 @@
+2023.06.04:
+* fixed: Utilities/Projects: build fixup
+
 2023.05.20:
 * fixed: README.md: description minor fixup
 * refactor: README.md: replaced `blob/master` to `tree/HEAD` in all links as not dependent on specific branch name
