@@ -1,4 +1,7 @@
 2023.06.04:
+* fixed: Scripts/Tools/exec/exec_callf_prefix.bat: use `/shift-<N>` option to shift positional arguments
+
+2023.06.04:
 * new: Utilities/bin/contools: binaries update
 
 2023.06.04:

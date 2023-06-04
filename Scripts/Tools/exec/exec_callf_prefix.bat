@@ -3,6 +3,7 @@
 setlocal
 
 rem script flags
+set FLAG_SHIFT=0
 set "CALLF_BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -19,9 +20,11 @@ if defined FLAG (
   ) else if "%FLAG%" == "-X" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %2
     shift
+    set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "--" (
     shift
     set "FLAG="
+    set /A FLAG_SHIFT+=1
     goto FLAGS_LOOP_END
   ) else (
     set "FLAG="
@@ -29,6 +32,7 @@ if defined FLAG (
   )
 
   shift
+  set /A FLAG_SHIFT+=1
 
   rem read until no flags
   goto FLAGS_LOOP
@@ -49,6 +53,7 @@ set "COMSPECLNK=%COMSPECLNK:{=\{%"
     /no-expand-env /no-subst-pos-vars ^
     /v IMPL_MODE 1 ^
     /ra "%%" "%%?01%%" /v "?01" "%%" ^
+    /shift-%FLAG_SHIFT% ^
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" %*
 )
 
