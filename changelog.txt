@@ -1,3 +1,11 @@
+2023.06.11:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: fixed case where `WorkingDirectory` property does reset from `TargetPath` when `TargetPath` is failed to assigned after string replace
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-ignore-unexist` flag to skip check `TargetPath` and `WorkingDirectory` property values on file existence
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: added `-ignore-unexist` flag to skip check `TargetPath` and `WorkingDirectory` property values on file existence
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: added `TargetPath` and `WorkingDirectory` property values auto unquote
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: now script always checks `TargetPath` and `WorkingDirectory` on existence if `-ignore-unexist` flag is not set
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: now script always checks `TargetPath` and `WorkingDirectory` on existence if `-ignore-unexist` flag is not set
+
 2023.06.04:
 * changed: TODO.txt: update todo
 

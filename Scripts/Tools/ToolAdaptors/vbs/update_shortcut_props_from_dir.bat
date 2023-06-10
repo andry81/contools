@@ -31,6 +31,7 @@ rem script flags
 set RESTORE_LOCALE=0
 set "FLAG_CHCP="
 set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=0
+set FLAG_IGNORE_UNEXIST=0
 
 :FLAGS_LOOP
 
@@ -48,6 +49,8 @@ if defined FLAG (
     set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
   ) else if "%FLAG%" == "-reset-wd" (
     set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
+  ) else if "%FLAG%" == "-ignore-unexist" (
+    set FLAG_IGNORE_UNEXIST=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -129,6 +132,7 @@ if "%PROPS_LIST%" == "." set "PROPS_LIST=TargetPath|WorkingDirectory"
 
 if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% EQU 0 goto RESET_WORKINGDIR_FROM_TARGET_PATH_END
 
+rem to replace WorkingDirectory by WorkingDirectoryFromTargetPath later
 set "PROPS_LIST=|%PROPS_LIST%|"
 set "PROPS_LIST=%PROPS_LIST:|WorkingDirectory|=|%"
 set "PROPS_LIST=%PROPS_LIST:~1,-1%"
@@ -168,6 +172,9 @@ rem ) else type nul > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
 rem 
 rem "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
 
+rem We must skip update WorkingDirectory from TargetPath if TargetPath is failed to update.
+set IS_TARGET_PATH_UPDATE_ERROR=0
+
 for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst") do (
   set "PROP_NAME=%%i"
   set "PROP_VALUE=%%j"
@@ -175,7 +182,11 @@ for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/s
 )
 
 if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% EQU 0 goto RESET_WORKINGDIR_FROM_TARGET_PATH_END
+if %IS_TARGET_PATH_UPDATE_ERROR% NEQ 0 goto RESET_WORKINGDIR_FROM_TARGET_PATH_END
 
+rem CAUTION:
+rem   We must reread TargetPath again, because can be changed from previous step.
+rem
 if "%CURRENT_CP%" == "65001" (
   type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
 
@@ -211,20 +222,39 @@ set "PROP_PREV_VALUE=%PROP_VALUE:"=%"
 rem remove BOM prefix (CAUTION: byte sequence might be not visible in an editor and not copyable in a text merger)
 set "PROP_NAME=%PROP_NAME:﻿=%"
 
-call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
+rem skip empty (again)
+if not defined PROP_VALUE exit /b 0
+
+rem Skip replace if WorkingDirectoryFromTargetPath mode
+if not "%PROP_NAME%" == "WorkingDirectoryFromTargetPath" (
+  call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
+) else set "PROP_NEXT_VALUE=%PROP_PREV_VALUE%"
 
 rem skip on empty change
 if "%PROP_NEXT_VALUE%" == "%PROP_PREV_VALUE%" ^
 if not "%PROP_NAME%" == "WorkingDirectoryFromTargetPath" exit /b 0
+
+rem check existence
+set "UPDATE_SHORTCUT_BARE_FLAGS="
+if %FLAG_IGNORE_UNEXIST% EQU 0 (
+  if /i "%PROP_NAME%" == "TargetPath" (
+    if not exist "\\?\%PROP_NEXT_VALUE%" (
+      set IS_TARGET_PATH_UPDATE_ERROR=1
+      exit /b 0
+    )
+  ) else if /i "%PROP_NAME%" == "WorkingDirectory" (
+    if not exist "\\?\%PROP_NEXT_VALUE%\" exit /b 0
+  )
+) else set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% -ignore-unexist
 
 set "PROP_LINE=%PROP_NAME%=%PROP_NEXT_VALUE%"
 
 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
 if /i "%PROP_NAME%" == "TargetPath" (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 ) else if /i "%PROP_NAME%" == "WorkingDirectory" (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -WD "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -WD "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 ) else if "%PROP_NAME%" == "WorkingDirectoryFromTargetPath" (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs" -reset-wd-from-target-path -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -reset-wd-from-target-path -- "%LINK_FILE_PATH%"
 )
