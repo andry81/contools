@@ -1,3 +1,8 @@
+2023.06.24:
+* new: Utilities/src/callf/help.tpl: added non yet implemented parameters description
+* changed: Utilities/bin/contools/TODO.txt: todo update
+* changed: Utilities/src/callf/help.tpl: cleanup
+
 2023.05.10:
 * changed: Utilities/src/callf/help.tpl: more details, added non yet implemented parameters description
 

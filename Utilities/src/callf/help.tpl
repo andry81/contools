@@ -237,7 +237,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           then the environment variables expansion does evaluate before the
           argument variables substitution.
 
-        Can not be used together with `/no-expand-env`, `/EE<N>` flags.
+        Can not be used together with `/no-expand-env`, `/EE<N>`, `/EE-[*|@]`
+        and other `/expand-env-arg-[*|@]`, `/E-[*|@]` flags.
 
         Can be used together with `/allow-expand-unexisted-env` flag.
 
@@ -248,7 +249,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         `${...}` environment variables.
 
         Can not be used together with `/no-expand-env`,
-        `/allow-expand-unexisted-env`, `/expand-env-arg<N>`, `/E<N>` flags.
+        `/allow-expand-unexisted-env`, `/expand-env-arg<N>`, `/E<N>`,
+        `/expand-env-arg-[*|@]`, `/E-[*|@]` and other `/EE-[*|@]` flags.
 
       /subst-vars-arg<N>
       /S<N>
@@ -264,7 +266,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           argument variables substitution.
 
         Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
-        `/SE<N>` flags.
+        `/SE<N>`, `/SE-[*|@]` and other `/subst-vars-arg-[*|@]`, `/S-[*|@]`
+        flags.
 
         Can be used together with `/allow-subst-empty-args` flag.
 
@@ -277,7 +280,25 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         so to avoid that do use quotes without an argument.
 
         Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
-        `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>` flags.
+        `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>`,
+        `/subst-vars-arg-[*|@]`, `/S-[*|@]` and other `/SE-[*|@]` flags.
+
+      /expand-env-arg-[*|@] /E-[*|@]
+      /EE-[*|@]
+      /subst-vars-arg-[*|@] /S-[*|@]
+      /SE-[*|@]
+        The same as respective flags and options without the `-*` and `-@`
+        suffix, but targeted for `{*}` and `{@}` variable command line
+        arguments:
+          `*` - first and tail arguments (all except first 2 positional
+                parameters).
+          `@` - tail arguments (all except first 3 positional parameters).
+
+        For the rest details see description below for the `{*}` and `{@}`
+        variables.
+
+        Can not be used respectively with other flags and options as described
+        before.
 
       /allow-throw-seh-except
         Allow to throw SEH exceptions out of process. By default all SEH
@@ -300,8 +321,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
         `/SE<N>` flags.
 
-        Has effect on `{*}` and `{@}` variable values, but not on the variable
-        placeholders, because they always substitutes.
+        Has effect on `{*}` and `{@}` variable values.
 
       /load-parent-proc-init-env-vars
         Loads environment variables existed on the moment of a process
@@ -1203,7 +1223,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         options instead to specifically allow it.
         If `<value>` is empty, the variable is deleted.
 
-        Can not be used together with other `/v-*` options.
+        Can not be used together with `/set-env-var`, `/v` and `/v-*` options
+        with the same `<name>`.
 
       /v-E <name> <value>
         Set environment variable of name `<name>` to value `<value>` with
@@ -1212,16 +1233,16 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         `/v-EE` option instead to specifically allow it.
         If `<value>` is empty, the variable is deleted.
 
-        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
-        options.
+        Can not be used together with `/set-env-var`, `/v` and `/v-*` options
+        with the same `<name>`.
 
       /v-EE <name> <value>
         The same as `/v-E` but additionally allows expansion of unexisted
         `${...}` environment variables.
         If `<value>` is empty, the variable is deleted.
 
-        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
-        options.
+        Can not be used together with `/set-env-var`, `/v` and `/v-*` options
+        with the same `<name>`.
 
       /v-S <name> <value>
         Set environment variable of name `<name>` to value `<value>` with
@@ -1230,8 +1251,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         `/v-SE` option instead to specifically allow it.
         If `<value>` is empty, the variable is deleted.
 
-        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
-        options.
+        Can not be used together with `/set-env-var`, `/v` and `/v-*` options
+        with the same `<name>`.
 
       /v-SE <name> <value>
         The same as `/v-S` but additionally allows substitution of empty
@@ -1241,8 +1262,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Still can not apply to command line arguments which does not exist,
         so to avoid that do use quotes without an argument.
 
-        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
-        options.
+        Can not be used together with `/set-env-var`, `/v` and `/v-*` options
+        with the same `<name>`.
 
       /v-E-S <name> <value>
       /v-E-SE <name> <value>
@@ -1259,8 +1280,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           The environment variables expansion does evaluate before the argument
           variables substitution.
 
-        Can not be used together with `/set-env-var`, `/v` and other `/v-*`
-        options.
+        Can not be used together with `/set-env-var`, `/v` and `/v-*` options
+        with the same `<name>`.
 
     Special flags:
       /disable-wow64-fs-redir
@@ -1340,8 +1361,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       ${<VarName>} - <VarName> environment variable value.
       {0}    - first argument value.
       {N}    - N'th argument value.
-      {@}    - tail arguments as raw string.
-      {*}    - first and tail arguments as raw string.
+      {@}    - tail arguments (all except first 3 positional parameters) as a
+               raw string.
+      {*}    - first and tail arguments (all except first 2 positional
+               parameters) as a raw string.
       {0hs}  - first argument hexidecimal string (00-FF per character).
       {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
       \{     - '{' character escape.
