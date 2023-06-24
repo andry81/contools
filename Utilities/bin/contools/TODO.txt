@@ -140,3 +140,15 @@
 
 * Add `/cpu-affinity-mask <number>` option to execute child process on specific
   CPU cores.
+
+* Add variants of `/E`, `/EE`, `/S`, `/SE` and etc for `{*}` and
+  `{@}` variable arguments:
+
+  /expand-env-arg-* /E-*
+  /expand-env-arg-@ /E-@
+  /EE-*
+  /EE-@
+  /subst-vars-arg-* /S-*
+  /subst-vars-arg-@ /S-@
+  /SE-*
+  /SE-@

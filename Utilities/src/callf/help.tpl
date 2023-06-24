@@ -283,8 +283,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
         `/SE<N>` flags.
 
-        Has effect on `{*}` and `{@}` variable values, but not on the variable
-        placeholders, because they always substitutes.
+        Has effect on `{*}` and `{@}` variable values.
 
       /load-parent-proc-init-env-vars
         Loads environment variables existed on the moment of a process
@@ -1254,8 +1253,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       ${<VarName>} - <VarName> environment variable value.
       {0}    - first argument value.
       {N}    - N'th argument value.
-      {@}    - tail arguments as raw string.
-      {*}    - first and tail arguments as raw string.
+      {@}    - tail arguments (all except first 3 positional parameters) as a
+               raw string.
+      {*}    - first and tail arguments (all except first 2 positional
+               parameters) as a raw string.
       {0hs}  - first argument hexidecimal string (00-FF per character).
       {Nhs}  - N'th arguments hexidecimal string (00-FF per character).
       \{     - '{' character escape.

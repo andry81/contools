@@ -1,3 +1,7 @@
+2023.06.24:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+* changed: Utilities/src/callf/help.tpl: cleanup
+
 2023.05.10:
 * changed: Utilities/src/callf/help.tpl: more details
 
