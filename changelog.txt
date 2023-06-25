@@ -1,3 +1,9 @@
+2023.06.25:
+* new: Scripts/Tools/exec/exec_terminal_prefix.bat: moved from `tacklebar` project
+* changed: Scripts/Tools/exec/exec_callf_prefix.bat: added `-elevate` option to execute under Administrator privileges with single console
+* changed: Scripts/Tools/exec/exec_terminal_prefix.bat: merge with `exec_callf_prefix.bat` script
+* changed: Scripts/Tools/exec: exec_callf_prefix.bat, exec_terminal_prefix.bat: `FLAG_SHIFT` does not reset if already defined
+
 2023.06.11:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: fixed case where `WorkingDirectory` property does reset from `TargetPath` when `TargetPath` is failed to assigned after string replace
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-ignore-unexist` flag to skip check `TargetPath` and `WorkingDirectory` property values on file existence
