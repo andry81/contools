@@ -9,6 +9,6 @@ AppName = "callf";
 #endif
 
 AppMajorVer = 1;
-AppMinorVer = 25;
+AppMinorVer = 26;
 AppRevision = 0;
-AppBuildNum = 64;
+AppBuildNum = 65;

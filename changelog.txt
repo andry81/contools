@@ -1,4 +1,8 @@
 2023.06.27:
+* new: Utilities/bin/contools: binaries update
+* changed: Utilities/src/callf/version.def: version increment
+
+2023.06.27:
 * new: Utilities/src/callf: added the regular `/disable-backslash-esc`, `/no-esc` flags to disable all backslash escapes, added the same flag into `<ParentFlags>` and `<ChildFlags>` options
 * changed: Utilities/src/callf: changed behaviour of the regular `/no-expand-env` flag to affect all this- processes by default, added the same flag into `<ParentFlags>` and `<ChildFlags>` options
 * changed: Utilities/src/callf: changed behaviour of the regular `/allow-expand-unexisted-env` flag to affect all this- processes by default, added the same flag into `<ParentFlags>` and `<ChildFlags>` options
