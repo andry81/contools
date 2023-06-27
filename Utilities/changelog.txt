@@ -1,3 +1,11 @@
+2023.06.27:
+* new: src/callf: added the regular `/disable-backslash-esc`, `/no-esc` flags to disable all backslash escapes, added the same flag into `<ParentFlags>` and `<ChildFlags>` options
+* changed: src/callf: changed behaviour of the regular `/no-expand-env` flag to affect all this- processes by default, added the same flag into `<ParentFlags>` and `<ChildFlags>` options
+* changed: src/callf: changed behaviour of the regular `/allow-expand-unexisted-env` flag to affect all this- processes by default, added the same flag into `<ParentFlags>` and `<ChildFlags>` options
+* changed: src/callf: flags and options validation messages refactor
+* changed: src/callf/help.tpl: more details, added terms section
+* refactor: Projects: cleanup
+
 2023.06.04:
 * new: bin/contools: binaries update
 

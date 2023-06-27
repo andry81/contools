@@ -1,1 +1,0 @@
-call "$(SolutionDir)..\BuildScripts\TargetProject.PreBuildStep.bat" "$(SolutionDir)\" "$(ProjectDir)\" "$(ProjectName)"

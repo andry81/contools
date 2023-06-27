@@ -255,6 +255,7 @@ void Flags::merge(const Flags & flags)
 
     MERGE_FLAG(flags, eval_backslash_esc);
     MERGE_FLAG(flags, eval_dbl_backslash_esc);
+    MERGE_FLAG(flags, disable_backslash_esc);
 
     MERGE_FLAG(flags, init_com);
 
@@ -6548,12 +6549,13 @@ void TranslateCommandLineToElevatedOrUnelevated(
     }
     regular_flags.no_window_console = false; // always reset
 
+    // don't disable expansion for this-child process by default, because it has different environment variables
     if (child_flags.no_expand_env) {
         if (cmd_out_str_ptr) {
             options_line += _T("/no-expand-env ");
         }
     }
-    regular_flags.no_expand_env = false; // always disable expansion for the parent process
+    //regular_flags.no_expand_env = false; // leave disabled for both this- processes
 
     // always disable substitution for a child process
     if (cmd_out_str_ptr) {
@@ -6608,7 +6610,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/allow-expand-unexisted-env ");
         }
     }
-    regular_flags.allow_expand_unexisted_env = false; // always reset
+    //regular_flags.allow_expand_unexisted_env = false; // leave allowed for both this- processes
 
     //allow_subst_empty_args
 
@@ -7526,6 +7528,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
 
     //child_flags.eval_backslash_esc
     //child_flags.eval_dbl_backslash_esc
+    //child_flags.disable_backslash_esc
 
 
     if (child_flags.disable_wow64_fs_redir) {

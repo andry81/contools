@@ -8,6 +8,26 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     /?
     This help.
 
+    Terms:
+      this-process
+        A `callf*.exe` process which is a parent and a child to another
+        `callf*.exe` process.
+      child this-process
+        A `callf*.exe` process which is a child to another `callf*.exe`
+        process.
+      this-parent
+        A parent `callf*.exe` elevated or not elevated process which is
+        implicitly has having to execute of another `callf*.exe` process with
+        different elevation and delegation to execute arbitrary child process.
+      this-child
+        A child `callf*.exe` process which is being executed implicitly as
+        elevated or not elevated process from another `callf*.exe` process with
+        different elevation and has having a delegation to execute arbitrary
+        child process.
+      child
+        Any arbitrary process being executed from `callf*.exe` process which is
+        passed into first 2 positional parameters.
+
     //:
     Character sequence to stop parse <Flags> command line parameters.
 
@@ -206,10 +226,21 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Has effect on `{*}` and `{@}` variable values.
 
+        Has effect on both this- processes. To disable expansion only for the
+        this- process, then you must use `<ParentFlags>` or `<ChildFlags>`.
+
+        Has effect on `/v <name> <value>` option and disables expansion in
+        the `<value>`.
+
       /no-subst-vars
         Don't substitute all `{...}` variables (command line arguments).
 
         Additionally disables `\{` escape sequence expansion.
+
+        NOTE:
+          In case of elevated/unelevated execution, this flag always implies
+          for the this-child process, because child command line is always
+          substituted for `{...}` variables in the this-parent process.
 
         Can not be used together with `/no-subst-pos-vars`,
         `/allow-subst-empty-args` flags.
@@ -295,6 +326,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Can not be used together with `/no-expand-env`, `/EE<N>` flags.
 
         Has effect on `{*}` and `{@}` variable values.
+
+        Has effect on both this- processes. To allow expansion only for the
+        this- process, then you must use `<ParentFlags>` or `<ChildFlags>`.
 
       /allow-subst-empty-args
         Allow substitution of empty `{...}` variables in all command line
@@ -447,6 +481,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /no-wait
           /no-window
           /no-window-console
+          /no-expand-env
+          /allow-expand-unexisted-env
           /init-com
           /showas
           /use-stdin-as-piped-from-conin
@@ -463,6 +499,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /no-stdin-echo
           /eval-backslash-esc or /e
           /eval-dbl-backslash-esc or /e\\
+          /disable-backslash-esc or /no-esc
 
         <ChildFlags>:
           Limited set of flags to pass exceptionally into the this-child
@@ -470,6 +507,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
           /no-expand-env
           /load-parent-proc-init-env-vars
+          /allow-expand-unexisted-env
           /use-stdin-as-piped-from-conin
           /reopen-std[in|out|err]*
           /std[in|out|err]-* (except std[out|err]-vt100)
@@ -480,6 +518,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /create-console-title
           /own-console-title
           /console-title
+          /disable-backslash-esc or /no-esc
 
         In that case you should use either regular flags and options or
         `/promote*{ ... }` option.
@@ -510,9 +549,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /pause-on-exit-if-error
           /pause-on-exit
           /skip-pause-on-detached-console
+          /no-expand-env
           /load-parent-proc-init-env-vars
           /wait-child-first-time-timeout
           /allow-throw-seh-except
+          /allow-expand-unexisted-env
           /create-console
           /detach-console
           /detach-inherited-console-on-wait
@@ -520,6 +561,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /disable-wow64-fs-redir
           /disable-ctrl-signals
           /disable-ctrl-c-signal
+          /disable-backslash-esc or /no-esc
           /allow-gui-autoattach-to-parent-console
           /disable-conout-reattach-to-visible-console
           /allow-conout-attach-to-invisible-parent-console
@@ -544,10 +586,12 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /pause-on-exit-if-error
           /pause-on-exit
           /skip-pause-on-detached-console
+          /no-expand-env
           /load-parent-proc-init-env-vars
           /no-std*-inherit
           /wait-child-first-time-timeout
           /allow-throw-seh-except
+          /allow-expand-unexisted-env
           /use-stdin-as-piped-from-conin
           /reopen-std[in|out|err]*
           /std[in|out|err]-*
@@ -566,6 +610,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /disable-wow64-fs-redir
           /disable-ctrl-signals
           /disable-ctrl-c-signals
+          /disable-backslash-esc or /no-esc
           /allow-gui-autoattach-to-parent-console
           /disable-conout-reattach-to-visible-console
           /allow-conout-attach-to-invisible-parent-console
@@ -1199,10 +1244,25 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Evaluate double backslash escape characters:
           \\ = backslash
 
+      /disable-backslash-esc
+      /no-esc
+        Disable all backslash escapes.
+        
+        Has effect on both this- processes. To disable escaping only for the
+        this- process, then you must use `<ParentFlags>` or `<ChildFlags>`.
+
+        Can not be used together with `/eval-backslash-esc*`, `/e*`,
+        `/eval-dbl-backslash-esc`, `/e\\` flags.
+
       /set-env-var <name> <value>
       /v <name> <value>
         Set environment variable of name `<name>` to value `<value>`.
         If `<value>` is empty, the variable is deleted.
+
+        NOTE:
+          By default ${...} environment variables does expand for the
+          `<value>`. To disable that you should use regular `/no-expand-env`
+          flag.
 
     Special flags:
       /disable-wow64-fs-redir

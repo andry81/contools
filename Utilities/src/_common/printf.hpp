@@ -86,15 +86,17 @@ namespace {
                 }
 
                 if (!no_subst_vars) {
-                    // process escapes
-                    if (p > last_offset_ptr && *(p - 1) == _T('\\')) {
-                        if (p > last_offset_ptr + 1) {
-                            parsed_str.append(last_offset_ptr, p - 1);
+                    if (!flags.disable_backslash_esc) {
+                        // process escapes
+                        if (p > last_offset_ptr && *(p - 1) == _T('\\')) {
+                            if (p > last_offset_ptr + 1) {
+                                parsed_str.append(last_offset_ptr, p - 1);
+                            }
+                            parsed_str.append(p, p + 1);
+                            last_offset_ptr = p + 1;
+                            if (*last_offset_ptr) found = true;
+                            break;
                         }
-                        parsed_str.append(p, p + 1);
-                        last_offset_ptr = p + 1;
-                        if (*last_offset_ptr) found = true;
-                        break;
                     }
 
                     if (arg_index == -1) {

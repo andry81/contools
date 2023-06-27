@@ -316,6 +316,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/replace-args-in-tail"), _T("/ra"),
     _T("/eval-backslash-esc"), _T("/e"),
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
+    _T("/disable-backslash-esc"), _T("/no-esc"),
     _T("/set-env-var"), _T("/v"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
@@ -334,6 +335,8 @@ const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
     _T("/no-wait"),
     _T("/no-window"),
     _T("/no-window-console"),
+    _T("/no-expand-env"),
+    _T("/allow-expand-unexisted-env"),
     _T("/init-com"),
     _T("/showas"),
     _T("/use-stdin-as-piped-from-conin"),
@@ -387,6 +390,7 @@ const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
     _T("/no-stdin-echo"),
     _T("/eval-backslash-esc"), _T("/e"),
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
+    _T("/disable-backslash-esc"), _T("/no-esc"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -399,7 +403,9 @@ const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_elevate_or_unelevate_child_flags_to_parse_arr[] = {
+    _T("/no-expand-env"),
     _T("/load-parent-proc-init-env-vars"),
+    _T("/allow-expand-unexisted-env"),
     _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
     _T("/reopen-stdin-as-server-pipe"),
@@ -436,6 +442,7 @@ const TCHAR * g_elevate_or_unelevate_child_flags_to_parse_arr[] = {
     _T("/detach-console"),
     _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
+    _T("/disable-backslash-esc"), _T("/no-esc"),
 };
 
 const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
@@ -449,10 +456,13 @@ const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
     _T("/skip-pause-on-detached-console"),
+    _T("/no-expand-env"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/wait-child-first-time-timeout"),
     _T("/allow-throw-seh-except"),
+    _T("/allow-expand-unexisted-env"),
     _T("/attach-parent-console"),
+    _T("/disable-backslash-esc"), _T("/no-esc"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -472,6 +482,7 @@ const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
     _T("/skip-pause-on-detached-console"),
+    _T("/no-expand-env"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/no-std-inherit"),
     _T("/no-stdin-inherit"),
@@ -479,6 +490,7 @@ const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/no-stderr-inherit"),
     _T("/wait-child-first-time-timeout"),
     _T("/allow-throw-seh-except"),
+    _T("/allow-expand-unexisted-env"),
     _T("/use-stdin-as-piped-from-conin"),
     _T("/reopen-stdin"),
     _T("/reopen-stdin-as-server-pipe"),
@@ -564,6 +576,7 @@ const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/detach-console"),
     _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
+    _T("/disable-backslash-esc"), _T("/no-esc"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -2535,6 +2548,14 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         return 0;
     }
+    if (IsArgEqualTo(arg, _T("/disable-backslash-esc")) || IsArgEqualTo(arg, _T("/no-esc"))) {
+        if (is_excluded) return 3;
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.disable_backslash_esc = true;
+            return 1;
+        }
+        return 0;
+    }
     if (IsArgEqualTo(arg, _T("/set-env-var")) || IsArgEqualTo(arg, _T("/v"))) {
         arg_offset += 1;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
@@ -3077,14 +3098,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             if (g_regular_flags.elevate && g_regular_flags.unelevate) {
                 return invalid_format_flag_message(_T("`/elevate*` option or flag is mixed with `/unelevate`\n"));
             }
+            if (is_promote && is_demote) {
+                return invalid_format_flag_message(_T("`/promote*` option is mixed with `/demote`\n"));
+            }
             if (is_promote && g_regular_flags.unelevate) {
                 return invalid_format_flag_message(_T("`/promote*` option is mixed with `/unelevate`\n"));
             }
             if (is_demote && g_regular_flags.elevate) {
                 return invalid_format_flag_message(_T("`/demote*` option is mixed with `/elevate`\n"));
-            }
-            if (is_promote && is_demote) {
-                return invalid_format_flag_message(_T("`/promote*` option is mixed with `/demote`\n"));
             }
 
             // load environment block from a parent process
@@ -3951,134 +3972,255 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("tee stdin duplication of not opened handle into conout\n"));
             }
 
-            // stdout-vt100, stderr-vt100 vs output-vt100
+            // stdout-vt100 or stderr-vt100 vs output-vt100
+
             if (g_flags.output_vt100) {
                 if (g_flags.stdout_vt100 || g_flags.stderr_vt100) {
-                    return invalid_format_flag_message(_T("vt100 flags are mixed: /output-vt100 <-> /std*-vt100\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /output-vt100 <-> /std*-vt100\n"));
                 }
             }
-
 
             // /pipe-*
 
             if (g_flags.pipe_stdin_to_stdout) {
                 if (g_flags.pipe_stdin_to_child_stdin) {
-                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-stdin-to-child-stdin <-> /pipe-stdin-to-stdout\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /pipe-stdin-to-child-stdin <-> /pipe-stdin-to-stdout\n"));
                 }
                 if (g_flags.pipe_child_stdout_to_stdout) {
-                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-child-stdout-to-stdout <-> /pipe-stdin-to-stdout\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /pipe-child-stdout-to-stdout <-> /pipe-stdin-to-stdout\n"));
                 }
                 if (g_flags.pipe_child_stderr_to_stderr) {
-                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-child-stderr-to-stderr <-> /pipe-stdin-to-stdout\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /pipe-child-stderr-to-stderr <-> /pipe-stdin-to-stdout\n"));
                 }
                 if (g_flags.pipe_inout_child) {
-                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-inout-child <-> /pipe-stdin-to-stdout\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /pipe-inout-child <-> /pipe-stdin-to-stdout\n"));
                 }
                 if (g_flags.pipe_out_child) {
-                    return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-out-child <-> /pipe-stdin-to-stdout\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /pipe-out-child <-> /pipe-stdin-to-stdout\n"));
                 }
             }
 
             if (g_flags.pipe_inout_child && g_flags.pipe_out_child) {
-                return invalid_format_flag_message(_T("pipe flags are mixed: /pipe-inout-child <-> /pipe-out-child\n"));
+                return invalid_format_flag_message(_T("regular options are mixed: /pipe-inout-child <-> /pipe-out-child\n"));
             }
 
             // /stdin-echo
 
             if (g_flags.stdin_echo && g_flags.no_stdin_echo) {
-                return invalid_format_flag_message(_T("stdin echo flags are mixed: /stdin-echo <-> /no-stdin-echo\n"));
+                return invalid_format_flag_message(_T("regular options are mixed: /stdin-echo <-> /no-stdin-echo\n"));
             }
 
-            // promote{ ... } vs promote-parent{ ... }
+            // /pause-on-exit-if-error-before-exec
 
             if (g_promote_or_demote_flags.pause_on_exit_if_error_before_exec && g_promote_or_demote_parent_flags.pause_on_exit_if_error_before_exec) {
-                return invalid_format_flag_message(_T("promote/deomote option mixed with promote-parent/demote-parent option: /pause-on-exit-if-error-before-exec\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /pause-on-exit-if-error-before-exec\n"));
             }
+
+            // /pause-on-exit-if-error
+
             if (g_promote_or_demote_flags.pause_on_exit_if_error && g_promote_or_demote_parent_flags.pause_on_exit_if_error) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /pause-on-exit-if-error\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /pause-on-exit-if-error\n"));
             }
+
+            // /pause-on-exit
+
             if (g_promote_or_demote_flags.pause_on_exit && g_promote_or_demote_parent_flags.pause_on_exit) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /pause-on-exit\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /pause-on-exit\n"));
             }
+
+            // /skip-pause-on-detached-console
 
             if (g_promote_or_demote_flags.skip_pause_on_detached_console && g_promote_or_demote_parent_flags.skip_pause_on_detached_console) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /skip-pause-on-detached-console\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /skip-pause-on-detached-console\n"));
             }
 
+            // /wait-child-first-time-timeout
+
             if (g_promote_or_demote_options.wait_child_first_time_timeout_ms && g_promote_or_demote_parent_options.wait_child_first_time_timeout_ms) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /wait-child-first-time-timeout\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /wait-child-first-time-timeout\n"));
             }
 
             //if (g_promote_or_demote_options.chcp_in != 0 && g_promote_or_demote_parent_options.chcp_in != 0) {
-            //    return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: *mote.chcp_in=%i *mote-parent.chcp_in=%i\n"),
+            //    return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: *mote.chcp_in=%i *mote-parent.chcp_in=%i\n"),
             //        g_promote_or_demote_options.chcp_in, g_promote_or_demote_parent_options.chcp_in);
             //}
             //if (g_promote_or_demote_options.chcp_out != 0 && g_promote_or_demote_parent_options.chcp_out != 0) {
-            //    return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: *mote.chcp_out=%i *mote-parent.chcp_out=%i\n"),
+            //    return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: *mote.chcp_out=%i *mote-parent.chcp_out=%i\n"),
             //        g_promote_or_demote_options.chcp_out, g_promote_or_demote_parent_options.chcp_out);
             //}
+
+            // /attach-parent-console
+
             if (g_promote_or_demote_flags.attach_parent_console && g_promote_or_demote_parent_flags.attach_parent_console) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /attach-parent-console\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /attach-parent-console\n"));
             }
 
-            if (g_promote_or_demote_flags.disable_wow64_fs_redir && g_promote_or_demote_parent_flags.disable_wow64_fs_redir) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-wow64-fs-redir\n"));
+            // /disable-backslash-esc
+
+            if (g_promote_or_demote_flags.disable_backslash_esc && g_promote_or_demote_parent_flags.disable_backslash_esc) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable_backslash_esc\n"));
             }
+
+            // /disable-wow64-fs-redir
+
+            if (g_promote_or_demote_flags.disable_wow64_fs_redir && g_promote_or_demote_parent_flags.disable_wow64_fs_redir) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-wow64-fs-redir\n"));
+            }
+
+            // /disable-ctrl-signals vs /disable-ctrl-c-signal
 
             if (g_flags.disable_ctrl_signals && g_flags.disable_ctrl_c_signal) {
                 return invalid_format_flag_message(_T("disable control signal flags is mixed: /disable-ctrl-signals <-> /disable-ctrl-c-signal\n"));
             }
 
+            // /disable-ctrl-signals
+
             if (g_promote_or_demote_flags.disable_ctrl_signals && g_promote_or_demote_parent_flags.disable_ctrl_signals) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-ctrl-signals\n"));
-            }
-            if (g_promote_or_demote_flags.disable_ctrl_c_signal && g_promote_or_demote_parent_flags.disable_ctrl_c_signal) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-ctrl-c-signal\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-ctrl-signals\n"));
             }
 
+            // /disable-ctrl-c-signal
+
+            if (g_promote_or_demote_flags.disable_ctrl_c_signal && g_promote_or_demote_parent_flags.disable_ctrl_c_signal) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-ctrl-c-signal\n"));
+            }
+
+            // /allow-gui-autoattach-to-parent-console
+
             if (g_promote_or_demote_flags.allow_gui_autoattach_to_parent_console && g_promote_or_demote_parent_flags.allow_gui_autoattach_to_parent_console) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /allow-gui-autoattach-to-parent-console\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /allow-gui-autoattach-to-parent-console\n"));
             }
+
+            // /disable-conout-reattach-to-visible-console
+
             if (g_promote_or_demote_flags.disable_conout_reattach_to_visible_console && g_promote_or_demote_parent_flags.disable_conout_reattach_to_visible_console) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-conout-reattach-to-visible-console\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-conout-reattach-to-visible-console\n"));
             }
+
+            // /allow-conout-attach-to-invisible-parent-console
+
             if (g_promote_or_demote_flags.allow_conout_attach_to_invisible_parent_console && g_promote_or_demote_parent_flags.allow_conout_attach_to_invisible_parent_console) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /allow-conout-attach-to-invisible-parent-console\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /allow-conout-attach-to-invisible-parent-console\n"));
             }
+
+            // /disable-conout-duplicate-to-parent-console-on-error
+
             if (g_promote_or_demote_flags.disable_conout_duplicate_to_parent_console_on_error && g_promote_or_demote_parent_flags.disable_conout_duplicate_to_parent_console_on_error) {
-                return invalid_format_flag_message(_T("promote/demote option mixed with promote-parent/demote-parent option: /disable-conout-duplicate-to-parent-console-on-error\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-conout-duplicate-to-parent-console-on-error\n"));
             }
 
             // /write-console-stdin-back vs /pipe-*
 
             if (g_flags.write_console_stdin_back) {
                 if (g_flags.pipe_stdin_to_child_stdin || g_flags.pipe_inout_child || g_flags.pipe_stdin_to_stdout) {
-                    return invalid_format_flag_message(_T("write console stdin back flag mixed with pipe flags: /write_console_stdin_back <-> /pipe-*\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /write_console_stdin_back <-> /pipe-*\n"));
                 }
             }
 
-            // `/no-expand-env` vs `/allow-expand-unexisted-env`
+            // /no-expand-env
+
+            if (g_promote_or_demote_flags.no_expand_env && g_promote_or_demote_parent_flags.no_expand_env) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /no-expand-env\n"));
+            }
+
+            // /allow-expand-unexisted-env
+
+            if (g_promote_or_demote_flags.allow_expand_unexisted_env && g_promote_or_demote_parent_flags.allow_expand_unexisted_env) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /allow-expand-unexisted-env\n"));
+            }
+
+            // /no-expand-env vs /allow-expand-unexisted-env
+
             if (g_flags.no_expand_env && g_flags.allow_expand_unexisted_env) {
-                return invalid_format_flag_message(_T("environment variables expansion flags are mixed: /no-expand-env <-> /allow-expand-unexisted-env\n"));
+                return invalid_format_flag_message(_T("regular options are mixed: /no-expand-env <-> /allow-expand-unexisted-env\n"));
             }
 
-            // `/expand-env-arg<N>`, `/E<N>`, `/EE<N>` vs `/no-expand-env`
+            if (g_elevate_or_unelevate_parent_flags.no_expand_env && g_elevate_or_unelevate_parent_flags.allow_expand_unexisted_env) {
+                return invalid_format_flag_message(_T("elevate/unelevate parent options are mixed: /no-expand-env <-> /allow-expand-unexisted-env\n"));
+            }
+
+            if (g_elevate_or_unelevate_child_flags.no_expand_env && g_elevate_or_unelevate_child_flags.allow_expand_unexisted_env) {
+                return invalid_format_flag_message(_T("elevate/unelevate child options are mixed: /no-expand-env <-> /allow-expand-unexisted-env\n"));
+            }
+
+            if (g_promote_or_demote_flags.no_expand_env && g_promote_or_demote_flags.allow_expand_unexisted_env) {
+                return invalid_format_flag_message(_T("promote/demote options are mixed: /no-expand-env <-> /allow-expand-unexisted-env\n"));
+            }
+
+            if (g_promote_or_demote_parent_flags.no_expand_env && g_promote_or_demote_parent_flags.allow_expand_unexisted_env) {
+                return invalid_format_flag_message(_T("promote-parent/demote-parent options are mixed: /no-expand-env <-> /allow-expand-unexisted-env\n"));
+            }
+
+            // /disable-backslash-esc
+
+            if (g_promote_or_demote_flags.disable_backslash_esc && g_promote_or_demote_parent_flags.disable_backslash_esc) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-backslash-esc\n"));
+            }
+
+            // /disable-backslash-esc vs /eval-backslash-esc*
+
+            if (g_flags.disable_backslash_esc && (g_flags.eval_backslash_esc || !g_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("regular options are mixed: /disable-backslash-esc <-> /eval-backslash-esc*\n"));
+            }
+
+            if (g_promote_or_demote_flags.disable_backslash_esc && (g_promote_or_demote_flags.eval_backslash_esc || !g_promote_or_demote_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("promote/demote options are mixed: /disable-backslash-esc <-> /eval-backslash-esc*\n"));
+            }
+
+            if (g_promote_or_demote_parent_flags.disable_backslash_esc && (g_promote_or_demote_parent_flags.eval_backslash_esc || !g_promote_or_demote_parent_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("promote/demote parent options are mixed: /disable-backslash-esc <-> /eval-backslash-esc*\n"));
+            }
+
+            if (g_elevate_or_unelevate_child_flags.disable_backslash_esc && (g_elevate_or_unelevate_child_flags.eval_backslash_esc || !g_elevate_or_unelevate_child_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("elevate/unelevate child options are mixed: /disable-backslash-esc <-> /eval-backslash-esc*\n"));
+            }
+
+            if (g_elevate_or_unelevate_parent_flags.disable_backslash_esc && (g_elevate_or_unelevate_parent_flags.eval_backslash_esc || !g_elevate_or_unelevate_parent_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("elevate/unelevate parent options are mixed: /disable-backslash-esc <-> /eval-backslash-esc*\n"));
+            }
+
+            // /disable-backslash-esc vs /eval-dbl-backslash-esc
+
+            if (g_flags.disable_backslash_esc && g_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("regular options are mixed: /disable-backslash-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            if (g_promote_or_demote_flags.disable_backslash_esc && g_promote_or_demote_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("promote/demote options are mixed: /disable-backslash-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            if (g_promote_or_demote_parent_flags.disable_backslash_esc && g_promote_or_demote_parent_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("promote/demote parent options are mixed: /disable-backslash-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            if (g_elevate_or_unelevate_child_flags.disable_backslash_esc && g_elevate_or_unelevate_child_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("elevate/unelevate child options are mixed: /disable-backslash-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            if (g_elevate_or_unelevate_parent_flags.disable_backslash_esc && g_elevate_or_unelevate_parent_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("elevate/unelevate parent options are mixed: /disable-backslash-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            // /expand-env-arg<N>, /E<N>, /EE<N> vs /no-expand-env
+
             if (g_flags.no_expand_env && !g_options.expand_env_args.empty()) {
-                return invalid_format_flag_message(_T("environment variables expansion flags are mixed: /no-expand-env <-> /expand-env-arg<N>, /E<N>, /EE<N>\n"));
+                return invalid_format_flag_message(_T("regular options are mixed: /no-expand-env <-> /expand-env-arg<N>, /E<N>, /EE<N>\n"));
             }
 
-            // `/EE<N>` vs `/allow-expand-unexisted-env`
+            // /EE<N> vs /allow-expand-unexisted-env
+
             if (g_flags.allow_expand_unexisted_env && !g_options.expand_env_args.empty()) {
                 for (auto it = g_options.expand_env_args.begin(); it != g_options.expand_env_args.end(); ++it) {
                     const int expand_env_arg_index = std::get<0>(*it);
                     const bool allow_expand_unexisted_env = std::get<1>(*it);
                     if (allow_expand_unexisted_env) {
-                        return invalid_format_flag_message(_T("environment variables expansion flags are mixed: /allow-expand-unexisted-env <-> /EE<N>\n"));
+                        return invalid_format_flag_message(_T("regular options are mixed: /allow-expand-unexisted-env <-> /EE<N>\n"));
                     }
                 }
             }
 
-            // `/expand-env-arg<N>`, `/E<N>`, `/EE<N>` vs `/expand-env-arg<N>`, `/E<N>`, `/EE<N>`
+            // /expand-env-arg<N>, /E<N>, /EE<N> vs /expand-env-arg<N>, /E<N>, /EE<N>
+
             if (g_options.expand_env_args.size() > 1) {
                 for (auto it = g_options.expand_env_args.begin(), next_it = it; it != g_options.expand_env_args.end(); it = next_it) {
                     ++next_it;
@@ -4086,49 +4228,54 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     for (auto it2 = next_it; it2 != g_options.expand_env_args.end(); ++it2) {
                         const int expand_env_arg_index2 = std::get<0>(*it2);
                         if (expand_env_arg_index == expand_env_arg_index2) {
-                            return invalid_format_flag_message(_T("environment variables expansion flags are mixed: /expand-env-arg<N>, /E<N> <-> /EE<N>: N=%i\n"), expand_env_arg_index);
+                            return invalid_format_flag_message(_T("regular options are mixed: /expand-env-arg<N>, /E<N> <-> /EE<N>: N=%i\n"), expand_env_arg_index);
                         }
                     }
                 }
             }
 
-            // `/no-subst-vars` vs `/no-subst-pos-vars`
+            // /no-subst-vars vs /no-subst-pos-vars
+
             if (g_flags.no_subst_vars && g_flags.no_subst_pos_vars) {
-                return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /no-subst-pos-vars\n"));
+                return invalid_format_flag_message(_T("regular options are mixed: /no-subst-vars <-> /no-subst-pos-vars\n"));
             }
 
-            // `/no-subst-vars`, `/no-subst-pos-vars` vs `/allow-subst-empty-args`
+            // /no-subst-vars, /no-subst-pos-vars vs /allow-subst-empty-args
+
             if (g_flags.allow_subst_empty_args) {
                 if (g_flags.no_subst_vars) {
-                    return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /allow-subst-empty-args\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /no-subst-vars <-> /allow-subst-empty-args\n"));
                 }
                 if (g_flags.no_subst_pos_vars) {
-                    return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-pos-vars <-> /allow-subst-empty-args\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /no-subst-pos-vars <-> /allow-subst-empty-args\n"));
                 }
             }
 
-            // `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` vs `/no-subst-vars`, `/no-subst-pos-vars`
+            // /subst-vars-arg<N>, /S<N>, /SE<N> vs /no-subst-vars, /no-subst-pos-vars
+
             if (!g_options.subst_vars_args.empty()) {
                 if (g_flags.no_subst_vars) {
-                    return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-vars <-> /subst-vars-arg<N>, /S<N>, /SE<N>\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /no-subst-vars <-> /subst-vars-arg<N>, /S<N>, /SE<N>\n"));
                 }
                 if (g_flags.no_subst_pos_vars) {
-                    return invalid_format_flag_message(_T("variables substitution flags are mixed: /no-subst-pos-vars <-> /subst-vars-arg<N>, /S<N>, /SE<N>\n"));
+                    return invalid_format_flag_message(_T("regular options are mixed: /no-subst-pos-vars <-> /subst-vars-arg<N>, /S<N>, /SE<N>\n"));
                 }
             }
 
-            // `/SE<N>` vs `/allow-subst-empty-args`
+            // /SE<N> vs /allow-subst-empty-args
+
             if (!g_options.subst_vars_args.empty() && g_flags.allow_subst_empty_args) {
                 for (auto it = g_options.subst_vars_args.begin(); it != g_options.subst_vars_args.end(); ++it) {
                     const int subst_vars_arg_index = std::get<0>(*it);
                     const bool allow_subst_empty_arg = std::get<1>(*it);
                     if (allow_subst_empty_arg) {
-                        return invalid_format_flag_message(_T("variables substitution flags are mixed: /allow-subst-empty-args <-> /SE<N>\n"));
+                        return invalid_format_flag_message(_T("regular options are mixed: /allow-subst-empty-args <-> /SE<N>\n"));
                     }
                 }
             }
 
-            // `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>` vs `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>`
+            // /subst-vars-arg<N>, /S<N>, /SE<N> vs /subst-vars-arg<N>, /S<N>, /SE<N>
+
             if (g_options.subst_vars_args.size() > 1) {
                 for (auto it = g_options.subst_vars_args.begin(), next_it = it; it != g_options.subst_vars_args.end(); it = next_it) {
                     ++next_it;
@@ -4136,7 +4283,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     for (auto it2 = next_it; it2 != g_options.subst_vars_args.end(); ++it2) {
                         const int subst_arg_index2 = std::get<0>(*it2);
                         if (subst_arg_index == subst_arg_index2) {
-                            return invalid_format_flag_message(_T("variables substitution flags are mixed: /subst-vars-arg<N>, /S<N> <-> /SE<N>: N=%i\n"), subst_arg_index);
+                            return invalid_format_flag_message(_T("regular options are mixed: /subst-vars-arg<N>, /S<N> <-> /SE<N>: N=%i\n"), subst_arg_index);
                         }
                     }
                 }
