@@ -1,4 +1,7 @@
 2023.06.28:
+* changed: *.bat: switched from explicit `{` character escape to `/no-esc` flag usage in all `callf*.exe` command lines
+
+2023.06.28:
 * new: ISSUES.txt: added issues text file
 * changed: TODO.txt: todo update
 

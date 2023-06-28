@@ -106,20 +106,15 @@ call :XCOPY_FILE "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools" callf.exe "%%CONTOOL
 rem NOTE: In the `callf.exe` the backslash character escaping requires only in case of conjunction with the double quote character escaping: `\\\"`.
 rem
 
-rem variables escaping specifically for `callf.exe`
-set "?~dp0=%?~dp0:{=\{%"
-set "?~n0=%?~n0:{=\{%"
-set "COMSPECLNK=%COMSPEC:{=\{%"
-
 call :CMD "%%CONTOOLS_DIR_TMP%%/callf.exe" ^
   /elevate{ /no-window }{ /attach-parent-console } ^
-  /ret-child-exit /no-subst-pos-vars ^
+  /ret-child-exit /no-subst-pos-vars /no-esc ^
   /ra "%%%%" "%%%%?01%%%%" /v "?01" "%%%%" ^
   /v FLAG_USE_CALLF_EXECUTABLE "%%FLAG_USE_CALLF_EXECUTABLE%%" ^
   /v CONTOOLS_UTILITIES_BIN_ROOT "%%CONTOOLS_UTILITIES_BIN_ROOT%%" ^
   /v TEMP_DIR "%%TEMP_DIR%%" ^
   /v QBITTORRENT_EXECUTABLE "%%QBITTORRENT_EXECUTABLE%%" ^
-  "${COMSPECLNK}" "/c \"@\"${?~dp0}.${?~n0}\${?~n0}.update.bat\" {*}\"" %%* || exit /b
+  "${COMSPEC}" "/c \"@\"${?~dp0}.${?~n0}\${?~n0}.update.bat\" {*}\"" %%* || exit /b
 
 rem ...
 

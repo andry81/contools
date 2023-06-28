@@ -63,14 +63,10 @@ set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
 
 if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 
-rem variables escaping
-set "?~f0=%?~f0:{=\{%"
-set "COMSPECLNK=%COMSPECLNK:{=\{%"
-
 (
   endlocal
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    /no-expand-env /no-subst-pos-vars ^
+    /no-expand-env /no-subst-pos-vars /no-esc ^
     /v IMPL_MODE 1 ^
     /ra "%%" "%%?01%%" /v "?01" "%%" ^
     /shift-%FLAG_SHIFT% ^
