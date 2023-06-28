@@ -1,3 +1,7 @@
+2023.06.28:
+* new: ISSUES.txt: added issues text file
+* changed: TODO.txt: todo update
+
 2023.06.27:
 * new: Utilities/bin/contools: binaries update
 * changed: Utilities/src/callf/version.def: version increment

@@ -1,0 +1,6 @@
+* Utilities/tests/manual/contools/callf:
+
+  00-test--01-cui--02-existing_console--01-print_help.bat,
+  00-test--02-gui--02-existing_console--01-print_help.bat:
+
+  fix slow print

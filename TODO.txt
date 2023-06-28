@@ -11,3 +11,7 @@
 
   Apply path rename to a path from the Description key and if exist continue
   recover.
+
+* Scripts/Tools/admin/RecentLists:
+
+  Add Notepad++ recent lists cleanup.
