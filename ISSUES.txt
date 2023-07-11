@@ -1,6 +1,35 @@
-* Utilities/tests/manual/contools/callf:
+Utilities/tests/manual/contools/callf:
 
-  00-test--01-cui--02-existing_console--01-print_help.bat,
-  00-test--02-gui--02-existing_console--01-print_help.bat:
+  * Fix the case where the
+    `callf /tee-stdin 0.log /pipe-stdin-to-child-stdin "" "cmd.exe /k"`
+    expression has broken/altered autocompletion feature in the `cmd.exe` process
+    and the `cmd.exe` treats all the tab characters as is.
 
-  fix slow print
+    The issue is attached to the stdin handle type inside the `cmd.exe` process.
+    If the stdin handle has not a character device type
+    (GetFileType(GetStdHandle(STD_INPUT_HANDLE)) != FILE_TYPE_CHAR), then the
+    autocompletion feature is turned off and all characters including a tab
+    character processes as is. Otherwise the tab button press triggers
+    the autocompletion feature.
+
+    The stdin handle changes its type from the `FILE_TYPE_CHAR`, for example, if
+    the process input is redirected.
+
+    The fix can be made portably between different Windows versions, for example,
+    through the code injection into a child process and interception of the
+    `ReadConsole`/`WriteConsole` calls.
+
+  * Fix `start "" /WAIT callfg.exe /attach-parent-console "" "unexisted.exe"`
+    invalid print in non 65001 code page.
+
+  * Fix `callf.exe /detach-console "" "unexisted.exe"` crash.
+
+  * Fix `callf.exe` long paths open.
+
+  * Fix `callf.exe /shell-exec-unelevate-from-explorer /D . "callf.exe" "/shell-exec runas \"${COMSPEC}\" \"/k\""`
+    current directory propagation.
+
+  * fix slow print:
+
+    - 00-test--01-cui--02-existing_console--01-print_help.bat
+    - 00-test--02-gui--02-existing_console--01-print_help.bat

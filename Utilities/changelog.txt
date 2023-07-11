@@ -1,3 +1,7 @@
+2023.07.11:
+* changed: bin/contools/TODO.txt: merged from the `dev` branch and extracted issues into `ISSUES.txt` file
+* changed: Utilities/src/callf/help.tpl: description update
+
 2023.06.27:
 * new: bin/contools: binaries update
 * changed: src/callf/version.def: version increment

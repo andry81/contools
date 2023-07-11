@@ -1,3 +1,8 @@
+2023.07.11:
+* changed: ISSUES.txt: extracted issues from the `Utilities/bin/contools/TODO.txt` file and updated
+* changed: Utilities/bin/contools/TODO.txt: merged from the `dev` branch and extracted issues into `ISSUES.txt` file
+* changed: Utilities/src/callf/help.tpl: description update
+
 2023.06.28:
 * changed: *.bat: switched from explicit `{` character escape to `/no-esc` flag usage in all `callf*.exe` command lines
 

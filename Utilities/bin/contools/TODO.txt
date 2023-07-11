@@ -1,22 +1,3 @@
-* Fix the case where the
-  `callf /tee-stdin 0.log /pipe-stdin-to-child-stdin "" "cmd.exe /k"`
-  expression has broken/altered autocompletion feature in the `cmd.exe` process
-  and the `cmd.exe` treats all the tab characters as is.
-
-  The issue is attached to the stdin handle type inside the `cmd.exe` process.
-  If the stdin handle has not a character device type
-  (GetFileType(GetStdHandle(STD_INPUT_HANDLE)) != FILE_TYPE_CHAR), then the
-  autocompletion feature is turned off and all characters including a tab
-  character processes as is. Otherwise the tab button press triggers
-  the autocompletion feature.
-
-  The stdin handle changes its type from the `FILE_TYPE_CHAR`, for example, if
-  the process input is redirected.
-
-  The fix can be made portably between different Windows versions, for example,
-  through the code injection into a child process and interception of the
-  `ReadConsole`/`WriteConsole` calls.
-
 * Hookup WriteFile on the stdout/stderr in a child process to force file buffer
   flush on each write. Can fix a progress stall based on stdout/stderr
   buffering.
@@ -37,11 +18,6 @@
   In `callf` by default show if hidden or create if detached/not attached the
   console on demand the same way as for the `callfg`.
 
-* Fix `start "" /WAIT callfg.exe /attach-parent-console "" "unexisted.exe"`
-  invalid print in non 65001 code page.
-
-* Fix `callf.exe /detach-console "" "unexisted.exe"` crash.
-
 * Implement `/disable-parent-ctrl-signals` and `/disable-parent-ctrl-c-signal`
   through a parent process injection to avoid a parent process to close when it
   can not avoid it by itself.
@@ -53,23 +29,58 @@
 * Implement process injection related to the partially implemented
   `/use-stdin-as-piped-from-conin` flag.
 
-* Fix `callf.exe` long paths open.
+* Implement options chaining additionally to options nesting
+  (`/parent-opt1{ child1-opt1 }{ child2-opt1}`):
+
+  /base-opt1:opt2:opt3
 
 * Optionally disable `\{` escape sequence expansion for the positional
-  arguments in case of the `/no-subst-pos-vars` flag.
+  arguments in case of the `/no-subst-pos-vars` flag:
+
+  /no-subst-pos-vars:/no-esc
+
+* Add regular `/v:* <name> <value>` options to use additionally in the
+  `/[un]elevate{ ... }[{ ... }]`, `/[pro|de]mote[-parent]{ ... }` options to
+  be able to expand and/or to substitute variables in the `<value>`:
+
+    /v:/E       <name> <value>
+    /v:/EE      <name> <value>
+    /v:/S       <name> <value>
+    /v:/SE      <name> <value>
+    /v:/E:/S    <name> <value>
+    /v:/E:/SE   <name> <value>
+    /v:/EE:/S   <name> <value>
+    /v:/EE:/SE  <name> <value>
+
+  Use `\` escape sequence as in the generic command line expansion.
+
+  If a chained `/S*` or `/E*` option is used, then this turns off the expansion
+  and/or substitution for the rest of `<name>` arguments if not specifically
+  enabled.
+
+* Change behaviour and disable by default variables substitution after an
+  environment variable expansion:
+
+    >
+    callf.exe /v AAA 1{0}1 "" "cmd.exe /c echo.${AAA}" "x"
+
+    Should print `1{0}1` instead of `1x1`.
+
+  Add `/allow-subst-after-expand[<N>]` to enable substitution after expansion
+  for all arguments or specifically for `<N>` argument.
+
+  Use `/v:/S*` to specifically enable substitution AFTER expansion of `${AAA}.
 
 * Add ability for variables late expansion in case of process elevation to
-  expand after the elevation instead of before:
+  expand after the elevation in a child process:
 
   >
-  callf /elevate{ }{ /E1 } "" "cmd.exe /k echo.$\{MY_ELEVATED_VAR}"
+  callf /elevate{ }{ /v MY_ELEVATED_VAR 123 } "" "cmd.exe /k echo.%MY_ELEVATED_VAR%"
 
-  In case of variables which can not pass the elevation barrier or does reset,
-  for example, - `COMSPEC`, do implement environment variables substitution
-  with the new option - `/v-* <name> <value>`:
+  or
 
   >
-  callf /elevate{ /v-E COMSPECLNK "${COMSPEC}" } "$\{COMSPECLNK}" "/k"
+  callf /v MY_ELEVATED_VAR 123 /elevate "" "cmd.exe /k echo.%MY_ELEVATED_VAR%"
 
   NOTE:
     Beause elevation does execute through the `ShellExecuteEx` Win32 API which
@@ -104,19 +115,13 @@
 * Add `/allow-subst-pos-vars-after-env-var-expand` and disable by default
   positional variables substitution after environment variables expansion.
 
-* Add `/print-to-stderr` to redirect all stdandard output from the `callf*.exe`
-  process itself into error output.
-  For example, `/pause-on-*` flags does print into stdout and can be redirected
-  with this flag.
-
 * Add `/cpu-affinity-mask <number>` option to execute child process on specific
   CPU cores.
 
----
 
-`help.tpl` not yet implemented (description in the file):
-
-* /print-to-stderr
+===============================================================================
+These flags already partially added into `help.tpl`, but still is not implemented:
+===============================================================================
 
 * /disable-wow64-fs-redir-if-this-proc-x86
   /promote{ /disable-wow64-fs-redir-if-this-proc-x86 }
@@ -159,19 +164,19 @@
   - callf.bat
   - callfg.bat
 
-* /v-E      <name> <value>
-  /v-EE     <name> <value>
-  /v-S      <name> <value>
-  /v-SE     <name> <value>
-  /v-E-S    <name> <value>
-  /v-E-SE   <name> <value>
-  /v-EE-S   <name> <value>
-  /v-EE-SE  <name> <value>
+* Add `/print-to-stderr` to redirect all stdandard output from the `callf*.exe`
+  process itself into error output.
+  For example, `/pause-on-*` flags does print into stdout and can be redirected
+  with this flag.
 
-  Add `/v-* <name> <value>` options to use additionally in the
-  `/elevate{ ... }` option to be able to expand and to substitute variables in
-  the `<value>`:
+* Add variants of `/E`, `/EE`, `/S`, `/SE` and etc for `{*}` and
+  `{@}` variable arguments:
 
-  `/v-E`, `/v-EE`, `/v-S`, `/v-SE`, `/v-S-E`, `/v-SE-E`, `/v-S-EE`, `/v-SE-EE`
-
-  Use `\` escape sequence as in the generic command line expansion.
+  /expand-env-arg:* /E:*
+  /expand-env-arg:@ /E:@
+  /EE:*
+  /EE:@
+  /subst-vars-arg:* /S:*
+  /subst-vars-arg:@ /S:@
+  /SE:*
+  /SE:@

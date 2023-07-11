@@ -4,34 +4,35 @@
 
 Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString> [<CommandLineFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
        [+ AppModuleName +].exe [/?] [<Flags>] /shell-exec <Verb> [//] <FilePathFormatString> [<ParametersFormatString> [<Arg1> [<Arg2> ... [<ArgN>]]]]
-  Description:
+
+  Terms:
+    this-process
+      A `callf*.exe` process which is a parent and a child to another
+      `callf*.exe` process.
+    child this-process
+      A `callf*.exe` process which is a child to another `callf*.exe`
+      process.
+    this-parent
+      A parent `callf*.exe` elevated or not elevated process which is
+      implicitly has having to execute of another `callf*.exe` process with
+      different elevation and delegation to execute arbitrary child process.
+    this-child
+      A child `callf*.exe` process which is being executed implicitly as
+      elevated or not elevated process from another `callf*.exe` process with
+      different elevation and has having a delegation to execute arbitrary
+      child process.
+    child
+      Any arbitrary process being executed from `callf*.exe` process which is
+      passed into first 2 positional parameters.
+
+  Command line description:
     /?
-    This help.
+      This help.
 
-    Terms:
-      this-process
-        A `callf*.exe` process which is a parent and a child to another
-        `callf*.exe` process.
-      child this-process
-        A `callf*.exe` process which is a child to another `callf*.exe`
-        process.
-      this-parent
-        A parent `callf*.exe` elevated or not elevated process which is
-        implicitly has having to execute of another `callf*.exe` process with
-        different elevation and delegation to execute arbitrary child process.
-      this-child
-        A child `callf*.exe` process which is being executed implicitly as
-        elevated or not elevated process from another `callf*.exe` process with
-        different elevation and has having a delegation to execute arbitrary
-        child process.
-      child
-        Any arbitrary process being executed from `callf*.exe` process which is
-        passed into first 2 positional parameters.
+    //
+      Character sequence to stop parse <Flags> command line parameters.
 
-    //:
-    Character sequence to stop parse <Flags> command line parameters.
-
-    <Flags>:
+    <Flags>
       /shit-<N>
         Shift positional arguments on `<N>` positions to left.
         The `<FilePathFormatString>` and `<ParametersFormatString>` arguments
@@ -1264,7 +1265,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           `<value>`. To disable that you should use regular `/no-expand-env`
           flag.
 
-    Special flags:
+    Special flags and options:
+
       /disable-wow64-fs-redir
         Disables file system redirection for the WOW64 process unconditionally.
 
@@ -1330,6 +1332,22 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Has no effect when a child process stdin is piped from this-process
         stdin.
 
+    Options nesting:
+      Several or specific options can have has an option nesting feature:
+
+      /parent-opt1{ child1-opt1 child1-opt2 }[...{ childN-opt1 childN-opt2 }]
+
+      These are has an effect only when the `/parent-opt1` has an effect.
+      Each child option has a group specific effect limited to a parent option.
+
+    Options chaining:
+      Several or specific options can have has an option chaining feature:
+
+      /base-opt1:opt2[...:optN]
+
+      These are has an effect only when the `/base-opt1` has an effect.
+      Each chained option has a group specific effect limited to a base option.
+
     <ApplicationNameFormatString>, <CommandLineFormatString>,
     <FilePathFormatString>, <ParametersFormatString>,
     <ArgN> placeholders:
@@ -1367,8 +1385,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       operations over it has no effect.
 
     Elevation:
-      If one of `/elevate*` or `/unelevate*` flags are used, then most of
-      regular flags does pass into child process command line. To use a flag
+      If one of `/elevate*` or `/unelevate*` flag or option is used, then most
+      of regular flags does pass into child process command line. To use a flag
       for the parent process or specifically for the elevation execution or
       irrelatively to the elevation execution you must use a nested version of
       regular flags and options inside these options:
@@ -1402,7 +1420,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
   Examples (CreateProcess, no recursion, `cmd.exe` different escaping rules):
     1. callf.exe "${WINDIR}\system32\cmd.exe" "{0} {1}" "/c" "echo.Hello World!"
     2. callf.exe "${COMSPEC}" "{0} {1}" "/c" "echo.Hello World!"
-    3. callf.exe "{0}" "\"{1}\" {2}" "${COMSPEC}" "/c" "echo.Hello World!"
+    3. callf.exe "{0}" "{1} {2}" "${COMSPEC}" "/c" "echo.Hello World!"
     4. callf.exe "" "\"{0}\" {1} {2}" "cmd.exe" "/c" "echo.Hello World!"
     5. callf.exe "" "\"{0}\" {1} {2}" "${WINDIR}\system32\cmd.exe" "/c" "echo.Hello World!"
     6. callf.exe "" "\"{0}\" {@}" "${WINDIR}\system32\cmd.exe" /c echo.Hello World!
