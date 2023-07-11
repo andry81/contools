@@ -1,3 +1,6 @@
+2023.07.11:
+* changed: bin/contools/TODO.txt: issues extracted into `ISSUES.txt` file
+
 2023.06.24:
 * changed: bin/contools/TODO.txt: todo update
 * changed: src/callf/help.tpl: cleanup
