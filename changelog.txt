@@ -1,3 +1,7 @@
+2023.07.11:
+* changed: Utilities/src/callf/help.tpl: description update
+* changed: Utilities/bin/contools/TODO.txt: issues extracted into `ISSUES.txt` file
+
 2023.06.24:
 * new: Utilities/src/callf/help.tpl: added non yet implemented parameters description
 * changed: Utilities/bin/contools/TODO.txt: todo update

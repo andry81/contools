@@ -237,8 +237,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           then the environment variables expansion does evaluate before the
           argument variables substitution.
 
-        Can not be used together with `/no-expand-env`, `/EE<N>`, `/EE-[*|@]`
-        and other `/expand-env-arg-[*|@]`, `/E-[*|@]` flags.
+        Can not be used together with `/no-expand-env`, `/EE<N>`, `/EE:[*|@]`
+        and other `/expand-env-arg:[*|@]`, `/E:[*|@]` flags.
 
         Can be used together with `/allow-expand-unexisted-env` flag.
 
@@ -250,7 +250,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Can not be used together with `/no-expand-env`,
         `/allow-expand-unexisted-env`, `/expand-env-arg<N>`, `/E<N>`,
-        `/expand-env-arg-[*|@]`, `/E-[*|@]` and other `/EE-[*|@]` flags.
+        `/expand-env-arg:[*|@]`, `/E:[*|@]` and other `/EE:[*|@]` flags.
 
       /subst-vars-arg<N>
       /S<N>
@@ -266,7 +266,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           argument variables substitution.
 
         Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
-        `/SE<N>`, `/SE-[*|@]` and other `/subst-vars-arg-[*|@]`, `/S-[*|@]`
+        `/SE<N>`, `/SE:[*|@]` and other `/subst-vars-arg:[*|@]`, `/S:[*|@]`
         flags.
 
         Can be used together with `/allow-subst-empty-args` flag.
@@ -281,12 +281,12 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Can not be used together with `/no-subst-vars`, `/no-subst-pos-vars`,
         `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>`,
-        `/subst-vars-arg-[*|@]`, `/S-[*|@]` and other `/SE-[*|@]` flags.
+        `/subst-vars-arg:[*|@]`, `/S:[*|@]` and other `/SE:[*|@]` flags.
 
-      /expand-env-arg-[*|@] /E-[*|@]
-      /EE-[*|@]
-      /subst-vars-arg-[*|@] /S-[*|@]
-      /SE-[*|@]
+      /expand-env-arg:[*|@] /E:[*|@]
+      /EE:[*|@]
+      /subst-vars-arg:[*|@] /S:[*|@]
+      /SE:[*|@]
         The same as respective flags and options without the `-*` and `-@`
         suffix, but targeted for `{*}` and `{@}` variable command line
         arguments:
