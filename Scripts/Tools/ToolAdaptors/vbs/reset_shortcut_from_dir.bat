@@ -1,15 +1,16 @@
 @echo off
 
 rem USAGE:
-rem   update_shortcut_props_from_dir.bat [<Flags>] <LINKS_DIR> [<PROPS_LIST> <REPLACE_FROM> [<REPLACE_TO>]]
+rem   reset_shortcut_from_dir.bat [<Flags>] <LINKS_DIR> [<PROPS_LIST> <REPLACE_FROM> [<REPLACE_TO>]]
 
 rem <Flags>:
 rem   -chcp <CodePage>
 rem     Set explicit code page.
 rem   -reset-wd[-from-target-path]
-rem     Reset WorkingDirectory property from TargetPath property.
+rem     Reset WorkingDirectory property from TargetPath property using parent
+rem     directory path of a file path.
 rem   -p[rint-assign]
-rem     Print assign.
+rem     Print property assignment.
 
 setlocal
 

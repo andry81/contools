@@ -1,3 +1,12 @@
+2023.07.13:
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-m[atch] <MATCH_STRING>` option to explicitly match a property value
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-d[elete]` flag to explicitly delete a property value
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-ignore-unexist` flag to ignore unexisted property file path
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-no-skip-on-empty-assign` flag to not skip on property empty value assign
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-use-case-compare` flag to use case sensitive compare
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-p[rint-assign]` flag to print property assignment
+* changed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: minor changes
+
 2023.07.11:
 * changed: ISSUES.txt: extracted issues from the `Utilities/bin/contools/TODO.txt` file and updated
 * changed: Utilities/bin/contools/TODO.txt: merged from the `dev` branch and extracted issues into `ISSUES.txt` file
