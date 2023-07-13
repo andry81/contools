@@ -1,4 +1,7 @@
 2023.07.13:
+* new: Scripts/Tools/ToolAdaptors/sh/detect_find.sh: standalone script to detect `find.exe` in Windows behind `$SYSTEMROOT\System32\find.exe`
+
+2023.07.13:
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-m[atch] <MATCH_STRING>` option to explicitly match a property value
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-d[elete]` flag to explicitly delete a property value
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-ignore-unexist` flag to ignore unexisted property file path

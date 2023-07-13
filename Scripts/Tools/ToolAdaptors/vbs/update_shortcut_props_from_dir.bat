@@ -378,14 +378,16 @@ call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
 
 rem skip on empty assign
 if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 (
-  if not defined PROP_NEXT_VALUE exit /b 0
+  if not defined PROP_NEXT_VALUE (
+    echo.%?~nx0%: warning: property empty value assignment: "%PROP_NAME%"
+    exit /b 0
+  ) >&2
 ) else (
   rem skip on empty change
   if %FLAG_USE_CASE_COMPARE% NEQ 0 (
     if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" exit /b 0
   ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" exit /b 0
 )
-
 
 set "PROP_LINE=%PROP_NAME%=%PROP_NEXT_VALUE%"
 
