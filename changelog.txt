@@ -1,3 +1,6 @@
+2023.07.14:
+* fixed: Scripts/Tools/ToolAdaptors/lnk/install_system64_link.bat: missed `CONTOOLS_SYSINTERNALS_ROOT` variable existence check
+
 2023.07.13:
 * new: Scripts/Tools/ToolAdaptors/sh/detect_find.sh: standalone script to detect `find.exe` in Windows behind `$SYSTEMROOT\System32\find.exe`
 

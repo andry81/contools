@@ -14,7 +14,7 @@ setlocal
 rem drop last error
 call;
 
-for %%i in (CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT) do (
+for %%i in (CONTOOLS_ROOT CONTOOLS_SYSINTERNALS_ROOT) do (
   if not defined %%i (
     echo.%~nx0: error: `%%i` variable is not defined.
     exit /b 1
@@ -26,8 +26,8 @@ if not exist "%CONTOOLS_ROOT%\" (
   exit /b 2
 ) >&2
 
-if not exist "%CONTOOLS_UTILITIES_BIN_ROOT%\" (
-  echo.%~nx0: error: CONTOOLS_UTILITIES_BIN_ROOT directory does not exist: "%CONTOOLS_UTILITIES_BIN_ROOT%"
+if not exist "%CONTOOLS_SYSINTERNALS_ROOT%\" (
+  echo.%~nx0: error: CONTOOLS_SYSINTERNALS_ROOT directory does not exist: "%CONTOOLS_SYSINTERNALS_ROOT%"
   exit /b 3
 ) >&2
 
