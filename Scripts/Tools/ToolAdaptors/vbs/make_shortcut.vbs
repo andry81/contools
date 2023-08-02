@@ -5,13 +5,16 @@
 '''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
 
 ''' USAGE:
-'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-u] [-q] [-E[0 | t | a]] [--] <ShortcutFilePath> <ShortcutTarget> <ShortcutArgs>
-'''
+'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>]
+'''     [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-u]
+'''     [-q] [-E[0 | t | a]] [--]
+'''     <ShortcutFilePath> <ShortcutTarget> [<ShortcutArgs>]
+
 ''' DESCRIPTION:
 '''   --
 '''     Separator between flags and positional arguments to explicitly stop the
 '''     flags parser.
-'''   -D <CurrentDirectoryPath>
+'''   -CD <CurrentDirectoryPath>
 '''     Changes current directory to <CurrentDirectoryPath> before the
 '''     execution.
 '''   -WD <ShortcutWorkingDirectory>
@@ -65,14 +68,10 @@
 '''
 '''      See detailed documentation in MSDN for the function `ShowWindow`.
 '''
-'''   -reassign-target-path
-'''     Reassign target path property which does trigger the shell to validate
-'''     the path and rewrite the shortcut file even if nothing is changed
-'''     reducing the shortcut content.
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
 '''   -q
-'''     Always quote CMD argument (if has no quote characters).
+'''     Always quote target path argument if has no quote characters.
 '''   -E
 '''     Expand environment variables in all arguments.
 '''   -E0
@@ -93,30 +92,24 @@
 '''   3. Update of a shortcut immediately after it's creation does cleanup
 '''      shortcut from redundant data.
 
-''' CAUTION:
-'''   You should remove shortcut file BEFORE creation otherwise the shortcut
-'''   would be updated instead of recreated.
-
 ''' Example to create a minimalistic and clean version of a shortcut:
 '''   >
 '''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
 '''   make_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk ^%SystemRoot^%\System32\cmd.exe
-'''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
+'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
 ''' Or
 '''   >
 '''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
 '''   make_shortcut.bat -CD "%WINDIR%\System32" -u cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
-'''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
+'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
 '''
 ''' Note:
 '''   A difference in above examples between call to `make_shortcut.vbs` and
 '''   call to `make_shortcut.vbs`+`update_shortcut.vbs` has first found in the
 '''   `Windows XP x64 Pro SP2` and `Windows XP x86 Pro SP3`.
-'''
-''' Note:
 '''   The single call in above example to `make_shortcut.vbs` instead of
-'''   `make_shortcut.vbs`+`update_shortcut.vbs` does generate a cleaner
-''    shortcut, but in other cases is vice versa.
+'''   `make_shortcut.vbs`+`reset_shortcut.vbs` can generate a cleaner shortcut,
+'''   but in other cases is vice versa.
 
 ''' Example to create MyComputer shortcut:
 '''   >
@@ -176,21 +169,20 @@ ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
 
-Dim ReassignTargetPath : ReassignTargetPath = False
-
 Dim UnescapeAllArgs : UnescapeAllArgs = False
 
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ChangeCurrentDirectoryExist : ChangeCurrentDirectoryExist = False
 
-Dim ShortcutWorkingDirectory : ShortcutWorkingDirectory = ""
-Dim ShortcutWorkingDirectoryExist : ShortcutWorkingDirectoryExist = False
+Dim ShortcutFilePath : ShortcutFilePath = ""
 
 Dim ShortcutTarget : ShortcutTarget = ""
-Dim ShortcutTargetExist : ShortcutTargetExist = False
 
 Dim ShortcutArgs : ShortcutArgs = ""
 Dim ShortcutArgsExist : ShortcutArgstExist = False
+
+Dim ShortcutWorkingDirectory : ShortcutWorkingDirectory = ""
+Dim ShortcutWorkingDirectoryExist : ShortcutWorkingDirectoryExist = False
 
 Dim ShowAs : ShowAs = 1
 Dim ShowAsExist : ShowAsExist = False
@@ -210,10 +202,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
   arg = WScript.Arguments(i)
 
   If ExpectFlags Then
-    If arg <> "--" And Mid(arg, 1, 1) = "-" Then
-      If arg = "-reassign-target-path" Then
-        ReassignTargetPath = True
-      ElseIf arg = "-u" Then ' Unescape %xx or %uxxxx
+    If arg <> "--" And Left(arg, 1) = "-" Then
+      If arg = "-u" Then ' Unescape %xx or %uxxxx
         UnescapeAllArgs = True
       ElseIf arg = "-CD" Then ' Change current directory
         i = i + 1
@@ -227,7 +217,7 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ShowAs = CInt(WScript.Arguments(i))
         ShowAsExist = True
-      ElseIf arg = "-q" Then ' Always quote CMD argument (if has no quote characters)
+      ElseIf arg = "-q" Then ' Always quote target path argument if has no quote characters
         AlwaysQuote = True
       ElseIf arg = "-E" Then ' Expand environment variables in all arguments
         ExpandAllArgs = True
@@ -263,15 +253,7 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
       arg = objShell.ExpandEnvironmentStrings(arg)
     End If
 
-    If j > 0 And InStr(arg, Chr(34)) = 0 Then
-      If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
-        cmd_args(j) = Chr(34) & arg & Chr(34)
-      Else
-        cmd_args(j) = arg
-      End If
-    Else
-      cmd_args(j) = arg
-    End If
+    cmd_args(j) = arg
 
     j = j + 1
   End If
@@ -284,14 +266,28 @@ ReDim Preserve cmd_args(j - 1)
 Dim cmd_args_ubound : cmd_args_ubound = UBound(cmd_args)
 
 If cmd_args_ubound < 0 Then
-  WScript.Echo WScript.ScriptName & ": error: FILE_NAME argument is not defined."
+  WScript.Echo WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
+  WScript.Quit 255
+End If
+
+If cmd_args_ubound < 1 Then
+  WScript.Echo WScript.ScriptName & ": error: <ShortcutTarget> argument is not defined."
+  WScript.Quit 255
+End If
+
+ShortcutFilePath = cmd_args(0)
+
+Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
+
+Dim IsShortcutFileExist : IsShortcutFileExist = objFS.FileExists(ShortcutFilePath)
+If IsShortcutFileExist Then
+  WScript.Echo _
+    WScript.ScriptName & ": error: shortcut path must not exist:" & vbCrLf & _
+    WScript.ScriptName & ": info: ShortcutFilePath=`" & ShortcutFilePath & "`"
   WScript.Quit 1
 End If
 
-If cmd_args_ubound >= 1 Then
-  ShortcutTarget = cmd_args(1)
-  ShortcutTargetExist = True
-End If
+ShortcutTarget = cmd_args(1)
 
 If cmd_args_ubound >= 2 Then
   ShortcutArgs = cmd_args(2)
@@ -302,20 +298,13 @@ If ChangeCurrentDirectoryExist Then
   objShell.CurrentDirectory = ChangeCurrentDirectory
 End If
 
-Set objSC = objShell.CreateShortcut(cmd_args(0))
+Dim objSC : Set objSC = objShell.CreateShortcut(ShortcutFilePath)
 
-If ShortcutTargetExist Then
-  If AlwaysQuote And InStr(ShortcutTarget, Chr(34)) = 0 Then
-    ShortcutTarget = Chr(34) & ShortcutTarget & Chr(34)
-  End If
-ElseIf ReassignTargetPath Then
-  ShortcutTarget = objSC.TargetPath
-  ShortcutTargetExist = True
+If AlwaysQuote And InStr(ShortcutTarget, Chr(34)) = 0 Then
+  ShortcutTarget = Chr(34) & ShortcutTarget & Chr(34)
 End If
 
-If ShortcutTargetExist Then
-  objSC.TargetPath = ShortcutTarget
-End If
+objSC.TargetPath = ShortcutTarget
 
 If ShortcutArgsExist Then
   objSC.Arguments = ShortcutArgs

@@ -1,3 +1,20 @@
+2023.08.14:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: TargetPath proper unquotation before quotation reapply
+* fixed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: shortcut target path reassign must not apply if TargetPath does not exist and `-ignore-unexist` flag is not used
+* fixed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: WorkingDirectory reset from TargetPath in case if TargetPath is a directory
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: `-reset-*` flags and a reset logic is extracted from `update_shortcut.vbs` script
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-reset-target-path-from-wd` flag to reset TargetPath from WorkingDirectory property
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-reset-target-path-from-desc` flag to reset TargetPath from Description property
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-reset-target-name-from-file` flag to reset TargetPath from shortcut file name
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-reset-target-drive-from-file-path` flag to reset TargetPath from shortcut file drive
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-allow-auto-recover` flag to allow auto detect and recover broken shortcut
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-allow-target-path-reassign` flag to allow TargetPath reassign if not been assigned
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-allow-wd-reassign` flag to allow WorkingDirectory reassign if not been assigned
+* changed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: check if shortcut file does not exist
+* changed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: removed `-reassign-target-path` flag because implemented as `-allow-target-path-reassign` in `reset_shortcut.vbs` script and so is not required anymore
+* changed: Scripts/Tools/ToolAdaptors/vbs: update_shortcut.vbs, reset_shortcut.vbs: check if shortcut file does exist
+* changed: Scripts/Tools/ToolAdaptors/vbs: update_shortcut_props_from_dir.bat, reset_shortcut_from_dir.bat: `-reset-*` flags and reset logic moved into `reset_shortcut_from_dir.bat` script
+
 2023.08.13:
 * new: Scripts/Tools/exec/exec_callf_prefix.bat: added `-no-log` to turn off the logging
 

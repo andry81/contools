@@ -6,7 +6,8 @@
 '''
 
 ''' USAGE:
-'''   read_shortcut.vbs [-u] [-q] [-E[0 | t | a]] [-p <PropertyPattern>] [--] <ShortcutFilePath>
+'''   read_shortcut.vbs [-u] [-q] [-E[0 | t | a]] [-p <PropertyPattern>] [--]
+'''     <ShortcutFilePath>
 
 ''' DESCRIPTION:
 '''   --
@@ -20,6 +21,9 @@
 '''     Expand environment variables only in the first argument.
 '''   -Ep
 '''     Expand environment variables only in the property object.
+'''
+'''   -p <PropertyPattern>
+'''     List of shortcut property names to read, separated by `|` character.
 
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
@@ -90,7 +94,7 @@ ReDim Preserve cmd_args(j - 1)
 Dim cmd_args_ubound : cmd_args_ubound = UBound(cmd_args)
 
 If cmd_args_ubound < 0 Then
-  WScript.Echo WScript.ScriptName & ": error: FILE_NAME argument is not defined."
+  WScript.Echo WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
   WScript.Quit 1
 End If
 

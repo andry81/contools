@@ -1,11 +1,13 @@
 @echo off
 
 rem USAGE:
-rem   update_shortcut_props_from_dir.bat [<Flags>] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO>
-rem   update_shortcut_props_from_dir.bat [<Flags>] -m[atch] <MATCH_STRING> <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO>
-rem   update_shortcut_props_from_dir.bat [<Flags>] -d[elete] [-m[atch] <MATCH_STRING>] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM>
+rem   update_shortcut_props_from_dir.bat [<Flags>] [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO>
+rem   update_shortcut_props_from_dir.bat [<Flags>] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO>
+rem   update_shortcut_props_from_dir.bat [<Flags>] -d[elete] [-m[atch] <MATCH_STRING>] [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM>
 
 rem <Flags>:
+rem   --
+rem     Stop flags parse.
 rem   -m[atch] <MATCH_STRING>
 rem     String to case sensitive match a portion of property value before the
 rem     replace. If not defined, then does match all.
@@ -14,9 +16,6 @@ rem     Remove `<REPLACE_FROM>` string from a property value.
 rem     The `<REPLACE_TO>` must be not defined.
 rem   -chcp <CodePage>
 rem     Set explicit code page.
-rem   -reset-wd[-from-target-path]
-rem     Reset WorkingDirectory property from TargetPath property using parent
-rem     directory path of a file path.
 rem   -ignore-unexist
 rem     By default TargetPath and WorkingDirectory does check on existence.
 rem     Use this flag to skip the check.
@@ -32,6 +31,9 @@ rem     Has effect only for a replaced value to test on empty change.
 rem   -p[rint-assign]
 rem     Print assign.
 
+rem <LINKS_DIR>:
+rem   Directory to search shortcut files from.
+
 rem <PROPS_LIST>:
 rem   TargetPath|Arguments|WorkingDirectory
 rem   If equals `.`, then `TargetPath|WorkingDirectory` is used.
@@ -41,6 +43,9 @@ rem   String to replace from.
 
 rem <REPLACE_TO>:
 rem   String to replace by.
+
+rem NOTE:
+rem   For detailed parameters description see `update_shortcut.vbs` script.
 
 rem CAUTION:
 rem   <MATCH_STRING> and <REPLACE_FROM> must not contain invalid characters
@@ -97,7 +102,6 @@ set FLAG_MATCH_STRING=0
 set FLAG_DELETE=0
 set "FLAG_MATCH_STRING_VALUE="
 set "FLAG_CHCP="
-set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=0
 set FLAG_IGNORE_UNEXIST=0
 set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=0
 set FLAG_USE_CASE_COMPARE=0
@@ -128,10 +132,6 @@ if defined FLAG (
   ) else if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
-  ) else if "%FLAG%" == "-reset-wd-from-target-path" (
-    set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
-  ) else if "%FLAG%" == "-reset-wd" (
-    set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
   ) else if "%FLAG%" == "-ignore-unexist" (
     set BARE_FLAGS=%BARE_FLAGS% -ignore-unexist
     set FLAG_IGNORE_UNEXIST=1
@@ -145,6 +145,10 @@ if defined FLAG (
   ) else if "%FLAG%" == "-p" (
     if %FLAG_PRINT_ASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -p
     set FLAG_PRINT_ASSIGN=1
+  ) else if "%FLAG%" == "--" (
+    shift
+    set "FLAG="
+    goto FLAGS_LOOP_END
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -155,6 +159,8 @@ if defined FLAG (
   rem read until no flags
   goto FLAGS_LOOP
 )
+
+:FLAGS_LOOP_END
 
 if %FLAG_MATCH_STRING% NEQ 0 ^
 if not defined FLAG_MATCH_STRING_VALUE (
@@ -234,26 +240,13 @@ call "%%CONTOOLS_ROOT%%/std/getcp.bat"
 rem default props list
 if "%PROPS_LIST%" == "." set "PROPS_LIST=TargetPath|WorkingDirectory"
 
-if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% EQU 0 goto SKIP_RESET_WORKINGDIR_FROM_TARGET_PATH
-
-rem to replace WorkingDirectory by WorkingDirectoryFromTargetPath later
-set "PROPS_LIST=|%PROPS_LIST%|"
-set "PROPS_LIST=%PROPS_LIST:|WorkingDirectory|=|%"
-set "PROPS_LIST=%PROPS_LIST:~1,-1%"
-
-:SKIP_RESET_WORKINGDIR_FROM_TARGET_PATH
-
 set "PROPS_LIST_FILTERED="
 if defined PROPS_LIST set "PROPS_LIST_FILTERED=%PROPS_LIST:|=%"
-
-if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% NEQ 0 goto SKIP_PROP_LIST_APPLY_CHECK
 
 if not defined PROPS_LIST_FILTERED (
   echo.%~nx0: error: PROPS_LIST is empty or not applied: PROPS_LIST="%PROPS_LIST%".
   exit /b 255
 ) >&2
-
-:SKIP_PROP_LIST_APPLY_CHECK
 
 for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
@@ -343,19 +336,6 @@ for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/s
   call :UPDATE_SHORTCUT_TO_REPLACE
 )
 
-if %IS_TARGET_PATH_UPDATE_ERROR% NEQ 0 goto SKIP_RESET_WORKINGDIR_FROM_TARGET_PATH
-
-:SKIP_PROP_LIST_REPLACE
-
-rem reset WorkingDirectory from TargetPath
-
-if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% NEQ 0 goto SKIP_RESET_WORKINGDIR_FROM_TARGET_PATH
-
-"%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -reset-wd-from-target-path -- "%LINK_FILE_PATH%"
-set LASTERROR=%ERRORLEVEL%
-
-:SKIP_RESET_WORKINGDIR_FROM_TARGET_PATH
-
 echo.
 
 exit /b %LASTERROR%
@@ -395,6 +375,8 @@ call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
 if /i "%PROP_NAME%" == "TargetPath" (
   "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+) else if /i "%PROP_NAME%" == "Arguments" (
+  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -args "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 ) else if /i "%PROP_NAME%" == "WorkingDirectory" (
   "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -WD "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 )

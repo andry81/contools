@@ -6,13 +6,25 @@
 '''
 
 ''' USAGE:
-'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>] [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-reassign-target-path] [-ignore-unexist] [-reset-wd[-from-target-path]] [-p[rint-assing]] [-u] [-q] [-E[0 | t | a]] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--] <ShortcutFilePath>
+'''   update_shortcut.vbs [-CD <CurrentDirectoryPath>]
+'''     [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>]
+'''     [-ignore-unexist] [-allow-auto-recover] [-p[rint-assing]] [-u] [-q]
+'''     [-E[0 | t | a]] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--]
+'''     <ShortcutFilePath>
 
 ''' DESCRIPTION:
+'''   By default resaves shortcut which does trigger the Windows Shell
+'''   component to validate the path and rewrites the shortcut file even if
+'''   nothing is changed reducing the shortcut content.
+'''   Does not apply if TargetPath does not exist and `-ignore-unexist`
+'''   option is not used, to avoid a shortcut accident corruption by the
+'''   Windows Shell component internal guess logic (see `-ignore-unexist`
+'''   option description).
+'''
 '''   --
 '''     Separator between flags and positional arguments to explicitly stop the
 '''     flags parser.
-'''   -D <CurrentDirectoryPath>
+'''   -CD <CurrentDirectoryPath>
 '''     Changes current directory to <CurrentDirectoryPath> before the
 '''     execution.
 '''   -WD <ShortcutWorkingDirectory>
@@ -67,20 +79,39 @@
 '''      See detailed documentation in MSDN for the function `ShowWindow`.
 '''
 '''   -ignore-unexist
-'''     By default TargetPath and WorkingDirectory does check on existence.
-'''     Use this flag to skip the check.
-'''   -reassign-target-path
-'''     Reassign target path property which does trigger the shell to validate
-'''     the path and rewrite the shortcut file even if nothing is changed
-'''     reducing the shortcut content.
-'''   -reset-wd[-from-target-path]
-'''     Reset WorkingDirectory from TargetPath.
+'''     By default TargetPath and WorkingDirectory does check on existence
+'''     before assign. Use this flag to skip the check.
+'''
+'''     CAUTION:
+'''       The Windows Shell component does use a guess logic to restore
+'''       unexisted or invalid target path or/and working directory properties.
+'''       In some cases or OS versions it may lead to a path property
+'''       corruption or even an entire shortcut corruption.
+'''
+'''       Details:
+'''         https://learn.microsoft.com/en-us/windows/win32/shell/links#link-resolution
+'''         https://github.com/libyal/liblnk/tree/HEAD/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc#8-corruption-scenarios
+'''         https://stackoverflow.com/questions/22382010/what-options-are-available-for-shell32-folder-getdetailsof/37061433#37061433
+'''
+'''       In the wild has been catched several cases of a shortcut corruption:
+'''       - Shortcut path can change length from long path to short DOS path.
+'''       - Shortcut path can change language characters localization from
+'''         Unicode to ANSI with wrong code page.
+'''       - Shortcut path can be vandalized like path end truncation or even
+'''         the space characters replacement by the underscore character.
+'''       - Shortcut can change type from a file shortcut to a directory
+'''         shortcut with old path save into Description property.
+'''       - Shortcut can be completely rewritten losing other properties and
+'''         data.
+'''
+'''     Use this option with the caution.
+'''
 '''   -p[rint-assign]
-''      Print assign.
+'''     Print assign.
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
 '''   -q
-'''     Always quote CMD argument (if has no quote characters).
+'''     Always quote target path argument if has no quote characters.
 '''   -E
 '''     Expand environment variables in all arguments.
 '''   -E0
@@ -89,6 +120,11 @@
 '''     Expand environment variables only in the shortcut target object.
 '''   -Ea
 '''     Expand environment variables only in the shortcut arguments.
+'''
+'''   -t <ShortcutTarget>
+'''     Shortcut target value to assign.
+'''   -args <ShortcutArgs>
+'''     Shortcut arguments value to assign.
 
 ''' Note:
 '''   1. Creation of a shortcut under ealier version of the Windows makes
@@ -101,30 +137,24 @@
 '''   3. Update of a shortcut immediately after it's creation does cleanup
 '''      shortcut from redundant data.
 
-''' CAUTION:
-'''   You should remove shortcut file BEFORE creation otherwise the shortcut
-'''   would be updated instead of recreated.
-
 ''' Example to create a minimalistic and clean version of a shortcut:
 '''   >
 '''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
 '''   make_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk ^%SystemRoot^%\System32\cmd.exe
-'''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
+'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
 ''' Or
 '''   >
 '''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
 '''   make_shortcut.bat -CD "%WINDIR%\System32" -u cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
-'''   update_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk
+'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
 '''
 ''' Note:
 '''   A difference in above examples between call to `make_shortcut.vbs` and
-'''   call to `make_shortcut.vbs`+`update_shortcut.vbs` has first found in the
+'''   call to `make_shortcut.vbs`+`reset_shortcut.vbs` has first found in the
 '''   `Windows XP x64 Pro SP2` and `Windows XP x86 Pro SP3`.
-'''
-''' Note:
 '''   The single call in above example to `make_shortcut.vbs` instead of
-'''   `make_shortcut.vbs`+`update_shortcut.vbs` does generate a cleaner
-''    shortcut, but in other cases is vice versa.
+'''   `make_shortcut.vbs`+`reset_shortcut.vbs` can generate a cleaner shortcut,
+'''   but in other cases is vice versa.
 
 ''' Example to create MyComputer shortcut:
 '''   >
@@ -188,17 +218,12 @@ Dim PrintAssign : PrintAssign = False
 
 Dim IgnoreUnexist : IgnoreUnexist = False
 
-Dim ReassignTargetPath : ReassignTargetPath = False
-Dim ResetWorkingDirFromTargetPath : ResetWorkingDirFromTargetPath = False
-
 Dim UnescapeAllArgs : UnescapeAllArgs = False
 
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ChangeCurrentDirectoryExist : ChangeCurrentDirectoryExist = False
 
-Dim ShortcutWorkingDirectory : ShortcutWorkingDirectory = ""
-Dim ShortcutWorkingDirectoryUnquoted : ShortcutWorkingDirectoryUnquoted = ""
-Dim ShortcutWorkingDirectoryExist : ShortcutWorkingDirectoryExist = False
+Dim ShortcutFilePath : ShortcutFilePath = ""
 
 Dim ShortcutTarget : ShortcutTarget = ""
 Dim ShortcutTargetUnquoted : ShortcutTargetUnquoted = ""
@@ -206,6 +231,10 @@ Dim ShortcutTargetExist : ShortcutTargetExist = False
 
 Dim ShortcutArgs : ShortcutArgs = ""
 Dim ShortcutArgsExist : ShortcutArgstExist = False
+
+Dim ShortcutWorkingDirectory : ShortcutWorkingDirectory = ""
+Dim ShortcutWorkingDirectoryUnquoted : ShortcutWorkingDirectoryUnquoted = ""
+Dim ShortcutWorkingDirectoryExist : ShortcutWorkingDirectoryExist = False
 
 Dim ShowAs : ShowAs = 1
 Dim ShowAsExist : ShowAsExist = False
@@ -228,10 +257,6 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
     If arg <> "--" And Left(arg, 1) = "-" Then
       If arg = "-ignore-unexist" Then
        IgnoreUnexist = True
-      ElseIf arg = "-reassign-target-path" Then
-        ReassignTargetPath = True
-      ElseIf arg = "-reset-wd-from-target-path" Or arg = "-reset-wd" Then
-        ResetWorkingDirFromTargetPath = True
       ElseIf arg = "-print-assign" Or arg = "-p" Then ' Print assign
         PrintAssign = True
       ElseIf arg = "-u" Then ' Unescape %xx or %uxxxx
@@ -256,7 +281,7 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ShowAs = CInt(WScript.Arguments(i))
         ShowAsExist = True
-      ElseIf arg = "-q" Then ' Always quote CMD argument (if has no quote characters)
+      ElseIf arg = "-q" Then ' Always quote target path argument if has no quote characters
         AlwaysQuote = True
       ElseIf arg = "-E" Then ' Expand environment variables in all arguments
         ExpandAllArgs = True
@@ -288,15 +313,7 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
       arg = objShell.ExpandEnvironmentStrings(arg)
     End If
 
-    If j > 0 And InStr(arg, Chr(34)) = 0 Then
-      If AlwaysQuote Or Len(arg & "") = 0 Or InStr(arg, Space(1)) <> 0 Or InStr(arg, vbTab) <> 0 Then
-        cmd_args(j) = Chr(34) & arg & Chr(34)
-      Else
-        cmd_args(j) = arg
-      End If
-    Else
-      cmd_args(j) = arg
-    End If
+    cmd_args(j) = arg
 
     j = j + 1
   End If
@@ -310,19 +327,22 @@ Dim cmd_args_ubound : cmd_args_ubound = UBound(cmd_args)
 
 If cmd_args_ubound < 0 Then
   WScript.Echo WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
+  WScript.Quit 255
+End If
+
+ShortcutFilePath = cmd_args(0)
+
+Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
+
+Dim IsShortcutFileExist : IsShortcutFileExist = objFS.FileExists(ShortcutFilePath)
+If Not IsShortcutFileExist Then
+  WScript.Echo WScript.ScriptName & ": error: shortcut path does not exist:"
+  WScript.Echo WScript.ScriptName & ": info: ShortcutFilePath=`" & ShortcutFilePath & "`"
   WScript.Quit 1
 End If
 
 If ChangeCurrentDirectoryExist Then
   objShell.CurrentDirectory = ChangeCurrentDirectory
-End If
-
-Set objSC = objShell.CreateShortcut(cmd_args(0))
-
-Dim objFS
-
-If Not IgnoreUnexist Then
-  Set objFS = CreateObject("Scripting.FileSystemObject")
 End If
 
 If ShortcutTargetExist Then
@@ -334,31 +354,36 @@ If ShortcutTargetExist Then
     ShortcutTarget = Unescape(ShortcutTarget)
   End If
 
-  If AlwaysQuote And InStr(ShortcutTarget, Chr(34)) = 0 Then
-    ShortcutTarget = Chr(34) & ShortcutTarget & Chr(34)
-  End If
-ElseIf ReassignTargetPath Or ResetWorkingDirFromTargetPath Then
-  ShortcutTarget = objSC.TargetPath
-  ShortcutTargetExist = True
-End If
-
-If ShortcutTargetExist Then
   If Len(ShortcutTarget) > 1 And Left(ShortcutTarget, 1) = Chr(34) And Right(ShortcutTarget, 1) = Chr(34) Then
     ShortcutTargetUnquoted = Mid(ShortcutTarget, 2, Len(ShortcutTarget) - 2)
   Else
     ShortcutTargetUnquoted = ShortcutTarget
   End If
-End If
 
-If ShortcutTargetExist Then
   If Not IgnoreUnexist Then
-    Dim IsShortcutTargetExistedFile : IsShortcutTargetExistedFile = objFS.FileExists(ShortcutTargetUnquoted)
-    If Not IsShortcutTargetExistedFile Then
-      WScript.Echo WScript.ScriptName & ": error: shortcut target path does not exist: `" & ShortcutTargetUnquoted & "`"
-      WScript.Quit 2
+    Dim IsShortcutTargetPathExist : IsShortcutTargetPathExist = False
+
+    If objFS.FileExists(ShortcutTargetUnquoted) Then
+      IsShortcutTargetPathExist = True
+    ElseIf objFS.FolderExists(ShortcutTargetUnquoted) Then
+      IsShortcutTargetPathExist = True
+    End If
+
+    If Not IsShortcutTargetPathExist Then
+      WScript.Echo WScript.ScriptName & ": error: shortcut target path does not exist:"
+      WScript.Echo WScript.ScriptName & ": info: TargetPath=`" & ShortcutTargetUnquoted & "`"
+      WScript.Quit 10
     End If
   End If
 
+  If AlwaysQuote And InStr(ShortcutTargetUnquoted, Chr(34)) = 0 Then
+    ShortcutTarget = Chr(34) & ShortcutTargetUnquoted & Chr(34)
+  End If
+End If
+
+Dim objSC : Set objSC = objShell.CreateShortcut(ShortcutFilePath)
+
+If ShortcutTargetExist Then
   ' MsgBox "TargetPath=" & ShortcutTarget
   If PrintAssign Then
     WScript.Echo "TargetPath=" & ShortcutTarget
@@ -379,60 +404,32 @@ If ShortcutArgsExist Then
   objSC.Arguments = ShortcutArgs
 End If
 
-' ignore shortcut working directory set on reset
-If Not ResetWorkingDirFromTargetPath Then
-  If ShortcutWorkingDirectoryExist Then
-    If UnescapeAllArgs Then
-      ShortcutWorkingDirectory = Unescape(ShortcutWorkingDirectory)
-    End If
-
-    If Len(ShortcutWorkingDirectory) > 1 And Left(ShortcutWorkingDirectory, 1) = Chr(34) And Right(ShortcutWorkingDirectory, 1) = Chr(34) Then
-      ShortcutWorkingDirectoryUnquoted = Mid(ShortcutWorkingDirectory, 2, Len(ShortcutWorkingDirectory) - 2)
-    Else
-      ShortcutWorkingDirectoryUnquoted = ShortcutWorkingDirectory
-    End If
-
-    ' MsgBox "WorkingDirectory=" & ShortcutWorkingDirectory
-    If PrintAssign Then
-      WScript.Echo "WorkingDirectory=" & ShortcutWorkingDirectory
-    End If
-
-    If Not IgnoreUnexist Then
-      Dim IsShortcutWorkingDirectoryExistedDir : IsShortcutWorkingDirectoryExistedDir = objFS.FolderExists(ShortcutWorkingDirectoryUnquoted)
-      If Not IsShortcutWorkingDirectoryExistedDir Then
-        WScript.Echo WScript.ScriptName & ": error: shortcut working directory does not exist: `" & ShortcutWorkingDirectoryUnquoted & "`"
-        WScript.Quit 3
-      End If
-    End If
-
-    objSC.WorkingDirectory = ShortcutWorkingDirectory
-  End If
-Else
-  If IsEmpty(objFS) Then
-    Set objFS = CreateObject("Scripting.FileSystemObject")
+If ShortcutWorkingDirectoryExist Then
+  If UnescapeAllArgs Then
+    ShortcutWorkingDirectory = Unescape(ShortcutWorkingDirectory)
   End If
 
-  ' NOTE:
-  '   Shortcut target must not be an existed directory path, otherwise WorkingDirectory must be not empty, otherwise - ignore.
-  '   Meaning:
-  '     A directory shortcut basically does not use the WorkingDirectory property, but if does, then
-  '     the WorkingDirectory property must be not empty to initiate a change.
-  '     If a directory does not exist by the target path, then the target path is treated as a file path.
-  '
-  Dim IsShortcutTargetExistedDir : IsShortcutTargetExistedDir = objFS.FolderExists(ShortcutTargetUnquoted)
+  If Len(ShortcutWorkingDirectory) > 1 And Left(ShortcutWorkingDirectory, 1) = Chr(34) And Right(ShortcutWorkingDirectory, 1) = Chr(34) Then
+    ShortcutWorkingDirectoryUnquoted = Mid(ShortcutWorkingDirectory, 2, Len(ShortcutWorkingDirectory) - 2)
+  Else
+    ShortcutWorkingDirectoryUnquoted = ShortcutWorkingDirectory
+  End If
 
-  If (Not objFS.FolderExists(ShortcutTargetUnquoted)) Or Len(objSC.WorkingDirectory) > 0 Then
-    Dim ShortcutParentDir : ShortcutParentDir = objFS.GetParentFolderName(ShortcutTargetUnquoted)
+  ' MsgBox "WorkingDirectory=" & ShortcutWorkingDirectory
+  If PrintAssign Then
+    WScript.Echo "WorkingDirectory=" & ShortcutWorkingDirectory
+  End If
 
-    If Len(ShortcutParentDir) > 0 Then
-      ' MsgBox "WorkingDirectory=" & ShortcutParentDir
-      If PrintAssign Then
-        WScript.Echo "WorkingDirectory=" & ShortcutParentDir
-      End If
-
-      objSC.WorkingDirectory = ShortcutParentDir
+  If Not IgnoreUnexist Then
+    Dim IsShortcutWorkingDirectoryExistedDir : IsShortcutWorkingDirectoryExistedDir = objFS.FolderExists(ShortcutWorkingDirectoryUnquoted)
+    If Not IsShortcutWorkingDirectoryExistedDir Then
+      WScript.Echo WScript.ScriptName & ": error: shortcut working directory does not exist:"
+      WScript.Echo WScript.ScriptName & ": info: WorkingDirectory=`" & ShortcutWorkingDirectoryUnquoted & "`"
+      WScript.Quit 20
     End If
   End If
+
+  objSC.WorkingDirectory = ShortcutWorkingDirectory
 End If
 
 If ShowAsExist Then
