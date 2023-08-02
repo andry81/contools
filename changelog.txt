@@ -1,3 +1,7 @@
+2023.08.02:
+* new: Scripts/Tools/ToolAdaptors/gitextensions/plink-agent.bat: added script to use in the GitExtensions to enable usage of the Putty ssh agent with the Pageant
+* new: Scripts/Tools/ToolAdaptors/gitextensions/README_EN.txt: readme for usage details
+
 2023.07.14:
 * fixed: Scripts/Tools/ToolAdaptors/lnk/install_system64_link.bat: missed `CONTOOLS_SYSINTERNALS_ROOT` variable existence check
 
