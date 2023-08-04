@@ -103,7 +103,9 @@ if defined FLAG (
     shift
     shift
   ) else if "%FLAG%" == "--" (
-    rem
+    shift
+    set "FLAG="
+    goto FLAGS_LOOP_END
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -112,8 +114,10 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  if not "%FLAG%" == "--" goto FLAGS_LOOP
+  goto FLAGS_LOOP
 )
+
+:FLAGS_LOOP_END
 
 set "TYPE=%~1"
 

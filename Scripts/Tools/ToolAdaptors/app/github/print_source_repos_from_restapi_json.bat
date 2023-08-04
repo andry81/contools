@@ -83,7 +83,9 @@ if defined FLAG (
   ) else if "%FLAG%" == "-no-url-domain-remove" (
     set FLAG_NO_URL_DOMAIN_REMOVE=1
   ) else if "%FLAG%" == "--" (
-    rem
+    shift
+    set "FLAG="
+    goto FLAGS_LOOP_END
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -92,8 +94,10 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  if not "%FLAG%" == "--" goto FLAGS_LOOP
+  goto FLAGS_LOOP
 )
+
+:FLAGS_LOOP_END
 
 set "INOUT_LIST_FILE_TMP0=%SCRIPT_TEMP_CURRENT_DIR%\inout0.lst"
 set "INOUT_LIST_FILE_TMP1=%SCRIPT_TEMP_CURRENT_DIR%\inout1.lst"
