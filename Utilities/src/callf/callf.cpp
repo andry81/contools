@@ -316,7 +316,8 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/replace-args-in-tail"), _T("/ra"),
     _T("/eval-backslash-esc"), _T("/e"),
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
-    _T("/disable-backslash-esc"), _T("/no-esc"),
+    _T("/disable-backslash-esc"),
+    _T("/no-esc"),
     _T("/set-env-var"), _T("/v"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
@@ -390,7 +391,8 @@ const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
     _T("/no-stdin-echo"),
     _T("/eval-backslash-esc"), _T("/e"),
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
-    _T("/disable-backslash-esc"), _T("/no-esc"),
+    _T("/disable-backslash-esc"),
+    _T("/no-esc"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -442,7 +444,8 @@ const TCHAR * g_elevate_or_unelevate_child_flags_to_parse_arr[] = {
     _T("/detach-console"),
     _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
-    _T("/disable-backslash-esc"), _T("/no-esc"),
+    _T("/disable-backslash-esc"),
+    _T("/no-esc"),
 };
 
 const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
@@ -462,7 +465,8 @@ const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
     _T("/allow-throw-seh-except"),
     _T("/allow-expand-unexisted-env"),
     _T("/attach-parent-console"),
-    _T("/disable-backslash-esc"), _T("/no-esc"),
+    _T("/disable-backslash-esc"),
+    _T("/no-esc"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -576,7 +580,8 @@ const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/detach-console"),
     _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
-    _T("/disable-backslash-esc"), _T("/no-esc"),
+    _T("/disable-backslash-esc"),
+    _T("/no-esc"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -2548,10 +2553,18 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         return 0;
     }
-    if (IsArgEqualTo(arg, _T("/disable-backslash-esc")) || IsArgEqualTo(arg, _T("/no-esc"))) {
+    if (IsArgEqualTo(arg, _T("/disable-backslash-esc"))) {
         if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.disable_backslash_esc = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/no-esc"))) {
+        if (is_excluded) return 3;
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.no_esc = true;
             return 1;
         }
         return 0;
@@ -4058,7 +4071,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             // /disable-backslash-esc
 
             if (g_promote_or_demote_flags.disable_backslash_esc && g_promote_or_demote_parent_flags.disable_backslash_esc) {
-                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable_backslash_esc\n"));
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-backslash-esc\n"));
+            }
+
+            // /no-esc
+
+            if (g_promote_or_demote_flags.no_esc && g_promote_or_demote_parent_flags.no_esc) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /no-esc\n"));
             }
 
             // /disable-wow64-fs-redir
@@ -4157,6 +4176,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-backslash-esc\n"));
             }
 
+            // /no-esc
+
+            if (g_promote_or_demote_flags.no_esc && g_promote_or_demote_parent_flags.no_esc) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /no-esc\n"));
+            }
+
             // /disable-backslash-esc vs /eval-backslash-esc*
 
             if (g_flags.disable_backslash_esc && (g_flags.eval_backslash_esc || !g_options.eval_backslash_esc.empty())) {
@@ -4179,6 +4204,28 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("elevate/unelevate parent options are mixed: /disable-backslash-esc <-> /eval-backslash-esc*\n"));
             }
 
+            // /no-esc vs /eval-backslash-esc*
+
+            if (g_flags.no_esc && (g_flags.eval_backslash_esc || !g_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("regular options are mixed: /no-esc <-> /eval-backslash-esc*\n"));
+            }
+
+            if (g_promote_or_demote_flags.no_esc && (g_promote_or_demote_flags.eval_backslash_esc || !g_promote_or_demote_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("promote/demote options are mixed: /no-esc <-> /eval-backslash-esc*\n"));
+            }
+
+            if (g_promote_or_demote_parent_flags.no_esc && (g_promote_or_demote_parent_flags.eval_backslash_esc || !g_promote_or_demote_parent_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("promote/demote parent options are mixed: /no-esc <-> /eval-backslash-esc*\n"));
+            }
+
+            if (g_elevate_or_unelevate_child_flags.no_esc && (g_elevate_or_unelevate_child_flags.eval_backslash_esc || !g_elevate_or_unelevate_child_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("elevate/unelevate child options are mixed: /no-esc <-> /eval-backslash-esc*\n"));
+            }
+
+            if (g_elevate_or_unelevate_parent_flags.no_esc && (g_elevate_or_unelevate_parent_flags.eval_backslash_esc || !g_elevate_or_unelevate_parent_options.eval_backslash_esc.empty())) {
+                return invalid_format_flag_message(_T("elevate/unelevate parent options are mixed: /no-esc <-> /eval-backslash-esc*\n"));
+            }
+
             // /disable-backslash-esc vs /eval-dbl-backslash-esc
 
             if (g_flags.disable_backslash_esc && g_flags.eval_dbl_backslash_esc) {
@@ -4199,6 +4246,28 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             if (g_elevate_or_unelevate_parent_flags.disable_backslash_esc && g_elevate_or_unelevate_parent_flags.eval_dbl_backslash_esc) {
                 return invalid_format_flag_message(_T("elevate/unelevate parent options are mixed: /disable-backslash-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            // /no-esc vs /eval-dbl-backslash-esc
+
+            if (g_flags.no_esc && g_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("regular options are mixed: /no-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            if (g_promote_or_demote_flags.no_esc && g_promote_or_demote_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("promote/demote options are mixed: /no-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            if (g_promote_or_demote_parent_flags.no_esc && g_promote_or_demote_parent_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("promote/demote parent options are mixed: /no-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            if (g_elevate_or_unelevate_child_flags.no_esc && g_elevate_or_unelevate_child_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("elevate/unelevate child options are mixed: /no-esc <-> /eval-dbl-backslash-esc\n"));
+            }
+
+            if (g_elevate_or_unelevate_parent_flags.no_esc && g_elevate_or_unelevate_parent_flags.eval_dbl_backslash_esc) {
+                return invalid_format_flag_message(_T("elevate/unelevate parent options are mixed: /no-esc <-> /eval-dbl-backslash-esc\n"));
             }
 
             // /expand-env-arg<N>, /E<N>, /EE<N> vs /no-expand-env

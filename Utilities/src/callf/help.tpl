@@ -500,7 +500,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /no-stdin-echo
           /eval-backslash-esc or /e
           /eval-dbl-backslash-esc or /e\\
-          /disable-backslash-esc or /no-esc
+          /disable-backslash-esc
+          /no-esc
 
         <ChildFlags>:
           Limited set of flags to pass exceptionally into the this-child
@@ -519,7 +520,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /create-console-title
           /own-console-title
           /console-title
-          /disable-backslash-esc or /no-esc
+          /disable-backslash-esc
+          /no-esc
 
         In that case you should use either regular flags and options or
         `/promote*{ ... }` option.
@@ -562,7 +564,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /disable-wow64-fs-redir
           /disable-ctrl-signals
           /disable-ctrl-c-signal
-          /disable-backslash-esc or /no-esc
+          /disable-backslash-esc
+          /no-esc
           /allow-gui-autoattach-to-parent-console
           /disable-conout-reattach-to-visible-console
           /allow-conout-attach-to-invisible-parent-console
@@ -611,7 +614,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /disable-wow64-fs-redir
           /disable-ctrl-signals
           /disable-ctrl-c-signals
-          /disable-backslash-esc or /no-esc
+          /disable-backslash-esc
+          /no-esc
           /allow-gui-autoattach-to-parent-console
           /disable-conout-reattach-to-visible-console
           /allow-conout-attach-to-invisible-parent-console
@@ -1246,11 +1250,24 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           \\ = backslash
 
       /disable-backslash-esc
-      /no-esc
         Disable all backslash escapes.
-        
+
         Has effect on both this- processes. To disable escaping only for the
         this- process, then you must use `<ParentFlags>` or `<ChildFlags>`.
+
+        Can not be used together with `/eval-backslash-esc*`, `/e*`,
+        `/eval-dbl-backslash-esc`, `/e\\` flags.
+
+      /no-esc
+        Disable all escapes.
+
+        Has effect on both this- processes. To disable escaping only for the
+        this- process, then you must use `<ParentFlags>` or `<ChildFlags>`.
+
+        NOTE:
+          In case of elevated/unelevated execution, this flag always implies
+          for the this-child process, because child command line is always
+          substituted for `{...}` variables in the this-parent process.
 
         Can not be used together with `/eval-backslash-esc*`, `/e*`,
         `/eval-dbl-backslash-esc`, `/e\\` flags.

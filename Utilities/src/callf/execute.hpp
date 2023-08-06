@@ -147,6 +147,7 @@ struct Flags
     bool            eval_backslash_esc;             // evaluate backslash escape characters
     bool            eval_dbl_backslash_esc;         // evaluate double backslash escape characters (`\\`)
     bool            disable_backslash_esc;          // disable backslash escape characters
+    bool            no_esc;                         // disable all escape characters
 
     bool            init_com;
 

@@ -256,6 +256,7 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, eval_backslash_esc);
     MERGE_FLAG(flags, eval_dbl_backslash_esc);
     MERGE_FLAG(flags, disable_backslash_esc);
+    MERGE_FLAG(flags, no_esc);
 
     MERGE_FLAG(flags, init_com);
 
@@ -6557,9 +6558,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
     }
     //regular_flags.no_expand_env = false; // leave disabled for both this- processes
 
-    // always disable substitution for a child process
+    // always disable substitution for this-child process
     if (cmd_out_str_ptr) {
         options_line += _T("/no-subst-vars ");
+    }
+
+    // always disable all escapes for this-child process
+    if (cmd_out_str_ptr) {
+        options_line += _T("/no-esc ");
     }
 
     if (child_flags.no_subst_empty_tail_vars) {

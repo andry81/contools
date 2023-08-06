@@ -86,7 +86,7 @@ namespace {
                 }
 
                 if (!no_subst_vars) {
-                    if (!flags.disable_backslash_esc) {
+                    if (!flags.no_esc && !flags.disable_backslash_esc) {
                         // process escapes
                         if (p > last_offset_ptr && *(p - 1) == _T('\\')) {
                             if (p > last_offset_ptr + 1) {
