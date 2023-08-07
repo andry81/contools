@@ -33,3 +33,11 @@ Utilities/tests/manual/contools/callf:
 
     - 00-test--01-cui--02-existing_console--01-print_help.bat
     - 00-test--02-gui--02-existing_console--01-print_help.bat
+
+Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat:
+
+  * Does not accept not english characters in files names/paths.
+
+Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat:
+
+  * Does not accept not english characters in files names/paths.
