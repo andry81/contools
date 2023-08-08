@@ -1,6 +1,9 @@
 2023.08.07:
 * changed: ISSUES.txt: issues update
 
+2023.08.07:
+* changed: Utilities/src/callf: use `/no-esc` as standalone flag and always use it in case of elevation/unelevation
+
 2023.08.04:
 * refactor: Scripts/Tools/ToolAdaptors/app/github: uniform flags parse
 
