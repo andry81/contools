@@ -23,6 +23,8 @@ if defined FLAG (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdin "%PROJECT_LOG_FILE%" %?09%pipe-stdin-to-child-stdin
   ) else if "%FLAG%" == "-log-conout" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdout "%PROJECT_LOG_FILE%" %?09%tee-stderr-dup 1
+  ) else if "%FLAG%" == "-init_vars_file" (
+    set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%v INIT_VARS_FILE "%INIT_VARS_FILE%"
   ) else if "%FLAG%" == "-X" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %2
     shift
@@ -57,7 +59,7 @@ if %USE_MINTTY%0 EQU 0 goto SKIP_USE_MINTTY
   endlocal
   start "" /I /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
     %?09%disable-ctrl-signals %?09%detach-inherited-console-on-wait %?09%ret-child-exit %?09%no-expand-env %?09%no-subst-pos-vars %?09%no-esc ^
-    %?09%v IMPL_MODE 1 %?09%v INIT_VARS_FILE "%INIT_VARS_FILE%" ^
+    %?09%v IMPL_MODE 1 ^
     %?09%ra "%%" "%%?01%%" %?09%v "?01" "%%" ^
     %?09%shift-%FLAG_SHIFT% ^
     "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*}\"" %*
@@ -87,7 +89,7 @@ if /i not "%CONEMU_INTERACT_MODE%" == "run" goto SKIP_USE_CONEMU
   %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
     /load-parent-proc-init-env-vars /detach-inherited-console-on-wait ^
     /disable-ctrl-signals /attach-parent-console /ret-child-exit /no-expand-env /no-subst-pos-vars /no-esc ^
-    /v IMPL_MODE 1 /v INIT_VARS_FILE "%INIT_VARS_FILE%" ^
+    /v IMPL_MODE 1 ^
     /ra "%%" "%%?01%%" /v "?01" "%%" ^
     /shift-%FLAG_SHIFT% ^
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@}\"" -cur_console:n %*
@@ -111,7 +113,7 @@ exit /b %LASTERROR%
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
     /load-parent-proc-init-env-vars /detach-inherited-console-on-wait /wait-child-first-time-timeout 300 ^
     /disable-ctrl-signals /attach-parent-console /ret-child-exit /no-expand-env /no-subst-pos-vars /no-esc ^
-    /v IMPL_MODE 1 /v INIT_VARS_FILE "%INIT_VARS_FILE%" ^
+    /v IMPL_MODE 1 ^
     /ra "%%" "%%?01%%" /v "?01" "%%" ^
     /shift-%FLAG_SHIFT% ^
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" %*

@@ -1,4 +1,7 @@
 2023.08.10:
+* new: Scripts/Tools/exec/exec_terminal_prefix.bat: added `-init_vars_file` flag to pass variable `INIT_VARS_FILE` into `callf` utility
+
+2023.08.10:
 * fixed: Scripts/Tools/exec/exec_callf_prefix.bat: execution fixup in case of elevation/unelevation
 
 2023.08.07:
