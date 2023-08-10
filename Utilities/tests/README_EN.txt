@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2022.01.09
+* 2023.08.10
 * contools--utilities--tests
 
 1. DESCRIPTION
@@ -81,7 +81,7 @@ All these affect test results. All runs must produce the same results.
 
 Several tests still fails under specific conditions:
 
-* `03-test--01-elevate--04-new_console_for_all--01-pause_on_exit_if_error.bat`
+* `03-test--02-elevate--03-new_console_for_all--01-pause_on_exit_if_error.bat`
   `70-test--01-gui_to_gui--02-elevate--03-new_console--01-pause_on_exit.bat`
 
   Windows 7:
