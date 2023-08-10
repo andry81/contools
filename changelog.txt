@@ -1,3 +1,8 @@
+2023.08.11:
+* fixed: Scripts/Tools/exec/exec_terminal_prefix.bat: avoid use `/detach-inherited-console-on-wait` flag on Windows 8+ as not stable
+* changed: Scripts/Tools/exec/exec_*_prefix.bat: always print win32 error system description string
+* changed: Utilities/src/callf: minor fixup
+
 2023.08.10:
 * new: Scripts/Tools/exec/exec_terminal_prefix.bat: added `-init_vars_file` flag to pass variable `INIT_VARS_FILE` into `callf` utility
 

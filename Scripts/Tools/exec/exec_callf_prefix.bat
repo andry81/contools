@@ -20,7 +20,7 @@ if defined FLAG (
   if "%FLAG%" == "-elevate" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
 /v CONTOOLS_ROOT "%CONTOOLS_ROOT%" ^
-/promote{ /load-parent-proc-init-env-vars /ret-child-exit } /promote-parent{%CALLF_PROMOTE_PARENT_FLAGS% /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 } ^
+/promote{ /load-parent-proc-init-env-vars /ret-child-exit /print-win-error-string } /promote-parent{%CALLF_PROMOTE_PARENT_FLAGS% /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 } ^
 /elevate{ /no-window /create-inbound-server-pipe-to-stdout "%~2_stdout_{pid}" /create-inbound-server-pipe-to-stderr "%~2_stderr_{pid}" ^
 }{ /attach-parent-console /reopen-stdout-as-client-pipe "%~2_stdout_{ppid}" /reopen-stderr-as-client-pipe "%~2_stderr_{ppid}" }
     set FLAG_ELEVATED=1
@@ -58,7 +58,7 @@ if defined FLAG (
 if %FLAG_ELEVATED% NEQ 0 goto SKIP_REGULAR_SETUP
 
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
-/ret-child-exit /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1
+/ret-child-exit /print-win-error-string /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1
 
 :SKIP_REGULAR_SETUP
 

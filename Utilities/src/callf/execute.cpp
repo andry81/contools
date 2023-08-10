@@ -665,6 +665,7 @@ extern inline bool RestoreConsole(HANDLE * console_access_mutex_ptr, int & ret, 
 
             if (ancestor_console_window_owner_proc.console_window && ancestor_console_window_owner_proc.proc_id != (DWORD)-1) {
                 g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
+                g_owned_console_window = NULL; // not owned after attach
             }
             else if (alloc_if_not_attached) {
                 g_owned_console_window = g_inherited_console_window = _alloc_console_nolock();
@@ -672,8 +673,6 @@ extern inline bool RestoreConsole(HANDLE * console_access_mutex_ptr, int & ret, 
 
             if (g_inherited_console_window) {
                 is_restored = true;
-
-                g_owned_console_window = NULL; // not owned after attach
 
                 std_handles.save_handles(std_handles_ptr);
 

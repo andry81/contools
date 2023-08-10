@@ -1160,8 +1160,16 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Has no effect if console is already detached or owned.
 
-        May has meaning in particular cases where attachment to the same
+        Has meaning in particular cases where the attachment to the same
         console can alter execution in a child process.
+
+        CAUTION:
+          Beginning from Windows 8+ leads to console handles lose
+          because of handles close and console detach.
+          Followed by these errors:
+            `error: stdin character device read error: win_error=...`
+            `error: stdout write error: win_error=...`
+            `error: stderr write error: win_error=...`
 
       /attach-parent-console
         Attach console from a parent process or it's ancestors. If
