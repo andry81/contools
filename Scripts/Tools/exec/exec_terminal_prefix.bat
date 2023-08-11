@@ -3,10 +3,13 @@
 setlocal
 
 set "?09=/"
+if %USE_MINTTY%0 NEQ 0 set "?09=//"
 
 rem script flags
 if not defined FLAG_SHIFT set FLAG_SHIFT=0
 set "CALLF_BARE_FLAGS="
+
+if defined INIT_VARS_FILE set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%v INIT_VARS_FILE "%INIT_VARS_FILE%"
 
 :FLAGS_LOOP
 
@@ -17,14 +20,10 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-enable_msys_slash_escape" (
-    if %USE_MINTTY%0 NEQ 0 if %USE_MINTTY_ROOT_AS_MSYS_ROOT%0 NEQ 0 set "?09=//"
-  ) else if "%FLAG%" == "-log-stdin" (
+  if "%FLAG%" == "-log-stdin" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdin "%PROJECT_LOG_FILE%" %?09%pipe-stdin-to-child-stdin
   ) else if "%FLAG%" == "-log-conout" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdout "%PROJECT_LOG_FILE%" %?09%tee-stderr-dup 1
-  ) else if "%FLAG%" == "-init_vars_file" (
-    set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%v INIT_VARS_FILE "%INIT_VARS_FILE%"
   ) else if "%FLAG%" == "-X" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %2
     shift

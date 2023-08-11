@@ -8,6 +8,8 @@ set FLAG_ELEVATED=0
 set "CALLF_BARE_FLAGS="
 set "CALLF_PROMOTE_PARENT_FLAGS="
 
+if defined INIT_VARS_FILE set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v INIT_VARS_FILE "%INIT_VARS_FILE%"
+
 :FLAGS_LOOP
 
 rem flags always at first
@@ -26,8 +28,6 @@ if defined FLAG (
     set FLAG_ELEVATED=1
     shift
     set /A FLAG_SHIFT+=1
-  ) else if "%FLAG%" == "-init_vars_file" (
-    set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v INIT_VARS_FILE "%INIT_VARS_FILE%"
   ) else if "%FLAG%" == "-X" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %2
     shift
