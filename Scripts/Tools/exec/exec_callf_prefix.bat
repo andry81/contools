@@ -4,6 +4,7 @@ setlocal
 
 rem script flags
 if not defined FLAG_SHIFT set FLAG_SHIFT=0
+set FLAG_NO_LOG=0
 set FLAG_ELEVATED=0
 set "CALLF_BARE_FLAGS="
 set "CALLF_PROMOTE_PARENT_FLAGS="
@@ -19,7 +20,9 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-elevate" (
+  if "%FLAG%" == "-no-log" (
+    set FLAG_NO_LOG=1
+  ) else if "%FLAG%" == "-elevate" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
 /v CONTOOLS_ROOT "%CONTOOLS_ROOT%" ^
 /promote{ /load-parent-proc-init-env-vars /ret-child-exit /print-win-error-string } /promote-parent{%CALLF_PROMOTE_PARENT_FLAGS% /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 } ^
@@ -57,10 +60,15 @@ if defined FLAG (
 
 if %FLAG_ELEVATED% NEQ 0 goto SKIP_REGULAR_SETUP
 
-set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
-/ret-child-exit /print-win-error-string /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /ret-child-exit /print-win-error-string
 
 :SKIP_REGULAR_SETUP
+
+if %FLAG_NO_LOG% NEQ 0 goto SKIP_LOG_SETUP
+
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1
+
+:SKIP_LOG_SETUP
 
 if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 
