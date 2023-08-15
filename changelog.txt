@@ -1,3 +1,6 @@
+2023.08.15:
+* fixed: Scripts/Tools/exec/exec_*_prefix.bat: accidental last exit code reset
+
 2023.08.14:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: TargetPath proper unquotation before quotation reapply
 * fixed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: shortcut target path reassign must not apply if TargetPath does not exist and `-ignore-unexist` flag is not used

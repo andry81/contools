@@ -82,8 +82,6 @@ if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" %*
 )
 
-setlocal
-
 set LASTERROR=%ERRORLEVEL%
 
 if %NEST_LVL%0 EQU 0 (
@@ -92,6 +90,7 @@ if %NEST_LVL%0 EQU 0 (
 )
 
 (
-  endlocal
+  rem drop local variables
+  set "LASTERROR="
   exit /b %LASTERROR%
 )

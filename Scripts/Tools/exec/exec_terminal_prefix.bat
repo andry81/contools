@@ -69,8 +69,6 @@ if %USE_MINTTY%0 EQU 0 goto SKIP_USE_MINTTY
     "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*}\"" %*
 )
 
-setlocal
-
 set LASTERROR=%ERRORLEVEL%
 
 if %NEST_LVL% EQU 0 (
@@ -78,7 +76,11 @@ if %NEST_LVL% EQU 0 (
   call "%%CONTOOLS_ROOT%%/cleanup/cleanup_init_vars.bat"
 )
 
-exit /b %LASTERROR%
+(
+  rem drop local variables
+  set "LASTERROR="
+  exit /b %LASTERROR%
+)
 
 :SKIP_USE_MINTTY
 
@@ -99,8 +101,6 @@ if /i not "%CONEMU_INTERACT_MODE%" == "run" goto SKIP_USE_CONEMU
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@}\"" -cur_console:n %*
 )
 
-setlocal
-
 set LASTERROR=%ERRORLEVEL%
 
 if %NEST_LVL% EQU 0 (
@@ -108,7 +108,11 @@ if %NEST_LVL% EQU 0 (
   call "%%CONTOOLS_ROOT%%/cleanup/cleanup_init_vars.bat"
 )
 
-exit /b %LASTERROR%
+(
+  rem drop local variables
+  set "LASTERROR="
+  exit /b %LASTERROR%
+)
 
 :SKIP_USE_CONEMU
 
@@ -123,8 +127,6 @@ exit /b %LASTERROR%
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" %*
 )
 
-setlocal
-
 set LASTERROR=%ERRORLEVEL%
 
 if %NEST_LVL% EQU 0 (
@@ -133,6 +135,7 @@ if %NEST_LVL% EQU 0 (
 )
 
 (
-  endlocal
-  exit /b %LASTERROR%
+  rem drop local variables
+  set "LASTERROR="
+  exit /b
 )
