@@ -623,6 +623,11 @@ const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/write-console-stdin-back")
 };
 
+// not_preparse = parse - preparse
+
+const TCHAR * g_flags_to_not_preparse_arr[sizeof(g_flags_to_parse_arr) / sizeof(g_flags_to_parse_arr[0]) - sizeof(g_flags_to_preparse_arr) / sizeof(g_flags_to_preparse_arr[0])] = { nullptr };
+
+const TCHAR * g_flags_w_index_to_not_preparse_arr[sizeof(g_flags_w_index_to_parse_arr) / sizeof(g_flags_w_index_to_parse_arr[0])] = { nullptr };
 
 BOOL WINAPI DisabledCtrlHandler(DWORD ctrl_type)
 {
@@ -2958,6 +2963,24 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     HANDLE env_strs_shmem_handle = INVALID_HANDLE_VALUE;
 
+    // not_preparse = parse - preparse
+
+    for (size_t i = 0, j = 0; i < sizeof(g_flags_to_not_preparse_arr) / sizeof(g_flags_to_not_preparse_arr[0]); i++) {
+        for (; j < sizeof(g_flags_to_parse_arr) / sizeof(g_flags_to_parse_arr[0]); j++) {
+            bool is_found = false;
+            for (size_t k = 0; k < sizeof(g_flags_to_preparse_arr) / sizeof(g_flags_to_preparse_arr[0]); k++) {
+                if (!tstrcmp(g_flags_to_parse_arr[j], g_flags_to_preparse_arr[k])) {
+                    is_found = true;
+                    break;
+                }
+            }
+            if (!is_found) {
+                g_flags_to_not_preparse_arr[i] = g_flags_to_parse_arr[j++];
+                break;
+            }
+        }
+    }
+
     // NOTE:
     //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
     //
@@ -3017,7 +3040,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
 
                 if ((parse_result = ParseArgToOption(parse_error, arg, argc, argv, arg_offset,
-                    g_regular_flags, g_regular_options, g_flags_to_preparse_arr, g_empty_flags_arr)) >= 0) {
+                    g_regular_flags, g_regular_options, g_flags_to_preparse_arr, g_flags_to_not_preparse_arr)) >= 0) {
+                    if (parse_error != err_none) {
+                        return parse_error;
+                    }
+                }
+                else if ((parse_result = ParseArgWithSuffixToOption(parse_error, arg, argc, argv, arg_offset,
+                    g_regular_flags, g_regular_options, g_flags_w_index_to_parse_arr, g_flags_w_index_to_not_preparse_arr)) >= 0) {
                     if (parse_error != err_none) {
                         return parse_error;
                     }
