@@ -2,8 +2,17 @@
 
 setlocal
 
-if %NO_LOG%0 NEQ 0 exit /b 0
+rem Do not make a file or a directory
+if defined NO_GEN set /A NO_GEN+=0
+
+rem Do not make a log directory or a log file
+if defined NO_LOG set /A NO_LOG+=0
+
+rem Do not make a log output or stdio duplication into files
+if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
+
 if %NO_GEN%0 NEQ 0 exit /b 0
+if %NO_LOG%0 NEQ 0 exit /b 0
 
 set "SUFFIX_NAME=%~1"
 
@@ -22,12 +31,19 @@ call "%%CONTOOLS_ROOT%%\wmi\get_wmic_local_datetime.bat"
 set "PROJECT_LOG_FILE_NAME_SUFFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
 
 set "PROJECT_LOG_DIR_NAME=%PROJECT_LOG_FILE_NAME_SUFFIX%.%SUFFIX_NAME%"
-set "PROJECT_LOG_FILE_NAME=%PROJECT_LOG_FILE_NAME_SUFFIX%.%SUFFIX_NAME%.log"
-
 set "PROJECT_LOG_DIR=%PROJECT_LOG_ROOT%\%PROJECT_LOG_DIR_NAME%"
-set "PROJECT_LOG_FILE=%PROJECT_LOG_DIR%\%PROJECT_LOG_FILE_NAME%"
 
-call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%PROJECT_LOG_DIR%%" || exit /b
+set "PROJECT_LOG_FILE_NAME="
+set "PROJECT_LOG_FILE="
+
+if %NO_LOG_OUTPUT%0 EQU 0 set "PROJECT_LOG_FILE_NAME=%PROJECT_LOG_FILE_NAME_SUFFIX%.%SUFFIX_NAME%.log"
+if %NO_LOG_OUTPUT%0 EQU 0 (
+  set "PROJECT_LOG_FILE=%PROJECT_LOG_DIR%\%PROJECT_LOG_FILE_NAME%"
+
+  call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%PROJECT_LOG_DIR%%" || exit /b 255
+) else (
+  call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%PROJECT_LOG_ROOT%%" || exit /b 255
+)
 
 (
   endlocal

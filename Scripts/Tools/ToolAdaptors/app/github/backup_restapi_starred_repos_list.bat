@@ -30,10 +30,7 @@ for %%i in (CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT) do (
 
 call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
 
-set "INIT_VARS_FILE=%PROJECT_LOG_DIR%\init.vars"
-
-rem register all environment variables
-set 2>nul > "%INIT_VARS_FILE%"
+call "%%CONTOOLS_ROOT%%/build/init_vars_file.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
 set LASTERROR=%ERRORLEVEL%

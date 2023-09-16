@@ -2,14 +2,22 @@
 
 setlocal
 
+rem Do not make a file or a directory
+if defined NO_GEN set /A NO_GEN+=0
+
+rem Do not make a log directory or a log file
+if defined NO_LOG set /A NO_LOG+=0
+
+rem Do not make a log output or stdio duplication into files
+if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
+
 set "?09=/"
 if %USE_MINTTY%0 NEQ 0 set "?09=//"
 
 rem script flags
+set FLAG_LOG_STDIN=0
 if not defined FLAG_SHIFT set FLAG_SHIFT=0
 set "CALLF_BARE_FLAGS="
-
-if defined INIT_VARS_FILE set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%v INIT_VARS_FILE "%INIT_VARS_FILE%"
 
 :FLAGS_LOOP
 
@@ -21,9 +29,7 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
   if "%FLAG%" == "-log-stdin" (
-    set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdin "%PROJECT_LOG_FILE%" %?09%pipe-stdin-to-child-stdin
-  ) else if "%FLAG%" == "-log-conout" (
-    set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdout "%PROJECT_LOG_FILE%" %?09%tee-stderr-dup 1
+    set FLAG_LOG_STDIN=1
   ) else if "%FLAG%" == "-X" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %2
     shift
@@ -47,6 +53,32 @@ if defined FLAG (
 
 :FLAGS_LOOP_END
 
+set FLAG_NO_LOG=0
+
+if %NO_GEN%0 NEQ 0 set FLAG_NO_LOG=1
+if %NO_LOG%0 NEQ 0 set FLAG_NO_LOG=1
+if %NO_LOG_OUTPUT%0 NEQ 0 set FLAG_NO_LOG=1
+
+if not exist "%PROJECT_LOG_DIR%\" if %FLAG_NO_LOG% EQU 0 (
+  echo.%~nx0%: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
+  exit /b 255
+) >&2
+
+if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
+  echo.%~nx0%: error: can not use initial variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
+  exit /b 255
+) >&2
+
+if defined INIT_VARS_FILE set CALLF_BARE_FLAGS= %?09%v INIT_VARS_FILE "%INIT_VARS_FILE%"%CALLF_BARE_FLAGS%
+
+if %FLAG_NO_LOG% EQU 0 if %FLAG_LOG_STDIN% NEQ 0 (
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdin "%PROJECT_LOG_FILE%" %?09%pipe-stdin-to-child-stdin
+)
+
+if %FLAG_NO_LOG% EQU 0 (
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdout "%PROJECT_LOG_FILE%" %?09%tee-stderr-dup 1
+)
+
 rem Windows 7 and less check
 call "%%CONTOOLS_ROOT%%/std/check_windows_version.bat" 6 2 || (
   rem reattach works on Windows 7 only
@@ -62,7 +94,8 @@ if %USE_MINTTY%0 EQU 0 goto SKIP_USE_MINTTY
 (
   endlocal
   start "" /I /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    %?09%disable-ctrl-signals %?09%ret-child-exit %?09%print-win-error-string %?09%no-expand-env %?09%no-subst-pos-vars %?09%no-esc ^
+    %?09%load-parent-proc-init-env-vars ^
+    %?09%disable-ctrl-signals %?09%attach-parent-console %?09%print-win-error-string %?09%no-expand-env %?09%no-subst-pos-vars %?09%no-esc %?09%ret-child-exit ^
     %?09%v IMPL_MODE 1 ^
     %?09%ra "%%" "%%?01%%" %?09%v "?01" "%%" ^
     %?09%shift-%FLAG_SHIFT% ^
@@ -94,7 +127,7 @@ if /i not "%CONEMU_INTERACT_MODE%" == "run" goto SKIP_USE_CONEMU
   endlocal
   %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
     /load-parent-proc-init-env-vars ^
-    /disable-ctrl-signals /attach-parent-console /ret-child-exit /print-win-error-string /no-expand-env /no-subst-pos-vars /no-esc ^
+    /disable-ctrl-signals /attach-parent-console /print-win-error-string /no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit ^
     /v IMPL_MODE 1 ^
     /ra "%%" "%%?01%%" /v "?01" "%%" ^
     /shift-%FLAG_SHIFT% ^
@@ -120,7 +153,7 @@ if %NEST_LVL% EQU 0 (
   endlocal
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
     /load-parent-proc-init-env-vars ^
-    /disable-ctrl-signals /attach-parent-console /ret-child-exit /print-win-error-string /no-expand-env /no-subst-pos-vars /no-esc ^
+    /disable-ctrl-signals /attach-parent-console /print-win-error-string /no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit ^
     /v IMPL_MODE 1 ^
     /ra "%%" "%%?01%%" /v "?01" "%%" ^
     /shift-%FLAG_SHIFT% ^

@@ -4,6 +4,8 @@ set "__?~dp0=%~dp0"
 set "__?~n0=%~n0"
 set "__?~nx0=%~nx0"
 
+if defined NO_GEN set /A NO_GEN+=0
+
 call "%%__?~dp0%%.load_config_dir/load_config_dir.read_flags.bat" %%* || exit /b
 
 if %__?FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%__?FLAG_SHIFT%) do shift

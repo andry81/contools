@@ -2,14 +2,20 @@
 
 setlocal
 
+rem Do not make a file or a directory
+if defined NO_GEN set /A NO_GEN+=0
+
+rem Do not make a log directory or a log file
+if defined NO_LOG set /A NO_LOG+=0
+
+rem Do not make a log output or stdio duplication into files
+if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
+
 rem script flags
 if not defined FLAG_SHIFT set FLAG_SHIFT=0
-set FLAG_NO_LOG=0
-set FLAG_ELEVATED=0
+set FLAG_ELEVATE=0
 set "CALLF_BARE_FLAGS="
 set "CALLF_PROMOTE_PARENT_FLAGS="
-
-if defined INIT_VARS_FILE set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v INIT_VARS_FILE "%INIT_VARS_FILE%"
 
 :FLAGS_LOOP
 
@@ -20,15 +26,8 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-no-log" (
-    set FLAG_NO_LOG=1
-  ) else if "%FLAG%" == "-elevate" (
-    set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
-/v CONTOOLS_ROOT "%CONTOOLS_ROOT%" ^
-/promote{ /load-parent-proc-init-env-vars /ret-child-exit /print-win-error-string } /promote-parent{%CALLF_PROMOTE_PARENT_FLAGS% /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1 } ^
-/elevate{ /no-window /create-inbound-server-pipe-to-stdout "%~2_stdout_{pid}" /create-inbound-server-pipe-to-stderr "%~2_stderr_{pid}" ^
-}{ /attach-parent-console /reopen-stdout-as-client-pipe "%~2_stdout_{ppid}" /reopen-stderr-as-client-pipe "%~2_stderr_{ppid}" }
-    set FLAG_ELEVATED=1
+  if "%FLAG%" == "-elevate" (
+    set FLAG_ELEVATE=1
     shift
     set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-X" (
@@ -58,17 +57,54 @@ if defined FLAG (
 
 :FLAGS_LOOP_END
 
-if %FLAG_ELEVATED% NEQ 0 goto SKIP_REGULAR_SETUP
+set FLAG_NO_LOG=0
 
-set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /ret-child-exit /print-win-error-string
+if %NO_GEN%0 NEQ 0 set FLAG_NO_LOG=1
+if %NO_LOG%0 NEQ 0 set FLAG_NO_LOG=1
+if %NO_LOG_OUTPUT%0 NEQ 0 set FLAG_NO_LOG=1
 
-:SKIP_REGULAR_SETUP
+if not exist "%PROJECT_LOG_DIR%\" if %FLAG_NO_LOG% EQU 0 (
+  echo.%~nx0%: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
+  exit /b 255
+) >&2
 
-if %FLAG_NO_LOG% NEQ 0 goto SKIP_LOG_SETUP
+if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
+  echo.%~nx0%: error: can not use initial variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
+  exit /b 255
+) >&2
 
-set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1
+if defined INIT_VARS_FILE set CALLF_BARE_FLAGS= /v INIT_VARS_FILE "%INIT_VARS_FILE%"%CALLF_BARE_FLAGS%
 
-:SKIP_LOG_SETUP
+if %FLAG_ELEVATE% EQU 0 (
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /print-win-error-string /ret-child-exit
+) else (
+  if defined CONTOOLS_ROOT set CALLF_BARE_FLAGS= /v CONTOOLS_ROOT "%CONTOOLS_ROOT%"%CALLF_BARE_FLAGS%
+)
+
+if %FLAG_NO_LOG% EQU 0 (
+  if %FLAG_ELEVATE% EQU 0 (
+    set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1
+  ) else (
+    set CALLF_PROMOTE_PARENT_FLAGS=%CALLF_PROMOTE_PARENT_FLAGS% /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1
+  )
+)
+
+if defined CALLF_PROMOTE_PARENT_FLAGS set CALLF_PROMOTE_PARENT_FLAGS= /promote-parent{%CALLF_PROMOTE_PARENT_FLAGS% }
+
+if %FLAG_NO_LOG% EQU 0 (
+  if %FLAG_ELEVATE% NEQ 0 (
+    set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
+/promote{ /load-parent-proc-init-env-vars /print-win-error-string /ret-child-exit }%CALLF_PROMOTE_PARENT_FLAGS% ^
+/elevate{ /no-window /create-inbound-server-pipe-to-stdout "%~2_stdout_{pid}" /create-inbound-server-pipe-to-stderr "%~2_stderr_{pid}" ^
+}{ /attach-parent-console /reopen-stdout-as-client-pipe "%~2_stdout_{ppid}" /reopen-stderr-as-client-pipe "%~2_stderr_{ppid}" }
+  )
+) else (
+  if %FLAG_ELEVATE% NEQ 0 (
+    set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
+/promote{ /load-parent-proc-init-env-vars /print-win-error-string /ret-child-exit }%CALLF_PROMOTE_PARENT_FLAGS% ^
+/elevate{ /no-window }{ /attach-parent-console }
+  )
+)
 
 if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 

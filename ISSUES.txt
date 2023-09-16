@@ -29,7 +29,7 @@ Utilities/tests/manual/contools/callf:
   * Fix `callf.exe /shell-exec-unelevate-from-explorer /D . "callf.exe" "/shell-exec runas \"${COMSPEC}\" \"/k\""`
     current directory propagation.
 
-  * fix slow print:
+  * Fix slow print:
 
     - 00-test--01-cui--02-existing_console--01-print_help.bat
     - 00-test--02-gui--02-existing_console--01-print_help.bat
