@@ -57,8 +57,6 @@ exit /b %LASTERROR%
 :MAIN
 call "%%?~dp0%%.extract_files_from_archives_by_pttn/extract_files_from_archives_by_pttn.read_flags.bat" %%* || exit /b
 
-if FLAG_SHIFT GTR 0 for /L %%i in (1,1,%FLAG_SHIFT%) do shift
-
 set "SEARCH_FROM_DIR=%~1"
 set "UNPACK_TO_DIR=%~2"
 set "_7ZIP_SWITCHES=%~3"

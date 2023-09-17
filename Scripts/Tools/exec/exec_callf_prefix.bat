@@ -73,10 +73,14 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
   exit /b 255
 ) >&2
 
+rem common flags for all terminals
+
 if defined INIT_VARS_FILE set CALLF_BARE_FLAGS= /v INIT_VARS_FILE "%INIT_VARS_FILE%"%CALLF_BARE_FLAGS%
 
+set CALLF_BARE_FLAGS= /v IMPL_MODE 1%CALLF_BARE_FLAGS%
+
 if %FLAG_ELEVATE% EQU 0 (
-  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /print-win-error-string /ret-child-exit
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /print-win-error-string
 ) else (
   if defined CONTOOLS_ROOT set CALLF_BARE_FLAGS= /v CONTOOLS_ROOT "%CONTOOLS_ROOT%"%CALLF_BARE_FLAGS%
 )
@@ -106,15 +110,22 @@ if %FLAG_NO_LOG% EQU 0 (
   )
 )
 
+if %FLAG_ELEVATE% EQU 0 (
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit
+)
+
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
+/ra "%%" "%%?01%%" /v "?01" "%%" ^
+/shift-%FLAG_SHIFT%
+
+rem drop FLAG_SHIFT because already processed by `/shift-%FLAG_SHIFT%`
+set FLAG_SHIFT=0
+
 if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 
 (
   endlocal
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    /no-expand-env /no-subst-pos-vars /no-esc ^
-    /v IMPL_MODE 1 ^
-    /ra "%%" "%%?01%%" /v "?01" "%%" ^
-    /shift-%FLAG_SHIFT% ^
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" %*
 )
 

@@ -69,7 +69,22 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
   exit /b 255
 ) >&2
 
+rem common flags for all terminals
+
 if defined INIT_VARS_FILE set CALLF_BARE_FLAGS= %?09%v INIT_VARS_FILE "%INIT_VARS_FILE%"%CALLF_BARE_FLAGS%
+
+set CALLF_BARE_FLAGS= %?09%v IMPL_MODE 1%CALLF_BARE_FLAGS%
+
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%load-parent-proc-init-env-vars ^
+%?09%disable-ctrl-signals %?09%attach-parent-console %?09%print-win-error-string
+
+if %FLAG_USE_X64%0 NEQ 0 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%disable-wow64-fs-redir
+
+rem Windows 7 and less check
+call "%%CONTOOLS_ROOT%%/std/check_windows_version.bat" 6 2 || (
+  rem reattach works on Windows 7 only
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%detach-inherited-console-on-wait %?09%wait-child-first-time-timeout 300 
+)
 
 if %FLAG_NO_LOG% EQU 0 if %FLAG_LOG_STDIN% NEQ 0 (
   set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdin "%PROJECT_LOG_FILE%" %?09%pipe-stdin-to-child-stdin
@@ -79,13 +94,12 @@ if %FLAG_NO_LOG% EQU 0 (
   set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdout "%PROJECT_LOG_FILE%" %?09%tee-stderr-dup 1
 )
 
-rem Windows 7 and less check
-call "%%CONTOOLS_ROOT%%/std/check_windows_version.bat" 6 2 || (
-  rem reattach works on Windows 7 only
-  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%detach-inherited-console-on-wait %?09%wait-child-first-time-timeout 300 
-)
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
+%?09%no-expand-env %?09%no-subst-pos-vars %?09%no-esc %?09%ret-child-exit ^
+%?09%ra "%%" "%%?01%%" %?09%v "?01" "%%" %?09%shift-%FLAG_SHIFT%
 
-if %FLAG_USE_X64%0 NEQ 0 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%disable-wow64-fs-redir
+rem drop FLAG_SHIFT because already processed by `/shift-%FLAG_SHIFT%`
+set FLAG_SHIFT=0
 
 if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 
@@ -94,11 +108,6 @@ if %USE_MINTTY%0 EQU 0 goto SKIP_USE_MINTTY
 (
   endlocal
   start "" /I /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    %?09%load-parent-proc-init-env-vars ^
-    %?09%disable-ctrl-signals %?09%attach-parent-console %?09%print-win-error-string %?09%no-expand-env %?09%no-subst-pos-vars %?09%no-esc %?09%ret-child-exit ^
-    %?09%v IMPL_MODE 1 ^
-    %?09%ra "%%" "%%?01%%" %?09%v "?01" "%%" ^
-    %?09%shift-%FLAG_SHIFT% ^
     "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*}\"" %*
 )
 
@@ -126,11 +135,6 @@ if /i not "%CONEMU_INTERACT_MODE%" == "run" goto SKIP_USE_CONEMU
 (
   endlocal
   %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    /load-parent-proc-init-env-vars ^
-    /disable-ctrl-signals /attach-parent-console /print-win-error-string /no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit ^
-    /v IMPL_MODE 1 ^
-    /ra "%%" "%%?01%%" /v "?01" "%%" ^
-    /shift-%FLAG_SHIFT% ^
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@}\"" -cur_console:n %*
 )
 
@@ -152,11 +156,6 @@ if %NEST_LVL% EQU 0 (
 (
   endlocal
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    /load-parent-proc-init-env-vars ^
-    /disable-ctrl-signals /attach-parent-console /print-win-error-string /no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit ^
-    /v IMPL_MODE 1 ^
-    /ra "%%" "%%?01%%" /v "?01" "%%" ^
-    /shift-%FLAG_SHIFT% ^
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" %*
 )
 

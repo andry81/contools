@@ -1,3 +1,8 @@
+2023.09.17:
+* fixed: Scripts/Tools: `FLAG_SHIFT` usage
+* fixed: Scripts/Tools/build/init_project_log.bat: `NO_LOG_OUTPUT` usage
+* changed: Scripts/Tools/exec: command line rearrange
+
 2023.09.16:
 * changed: Scripts/Tools: usage of `NO_GEN`, `NO_LOG` and `NO_LOG_OUTPUT` environment variables to disable files and directories generation and logging
 
