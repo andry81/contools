@@ -17,3 +17,7 @@
     repositories
   - add script(s) to backup github issues and discussions after page scroll
     with clicks on all expand buttons and links
+
+* Utilities/src/callf:
+  - rewrite _sanitize_std_handles_nolock to call Win32 DuplicateHandle
+    on GetStdHandle at first and call to _detach_crt_*_nolock at second.
