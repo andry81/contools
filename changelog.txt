@@ -1,4 +1,7 @@
 2023.09.19:
+* changed: Scripts/Tools/exec/exec_*_prefix.bat: execution fixup
+
+2023.09.19:
 * changed: TODO.txt: todo update
 
 2023.09.17:

@@ -71,14 +71,7 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 
 rem common flags for all terminals
 
-if defined INIT_VARS_FILE set CALLF_BARE_FLAGS= %?09%v INIT_VARS_FILE "%INIT_VARS_FILE%"%CALLF_BARE_FLAGS%
-
-set CALLF_BARE_FLAGS= %?09%v IMPL_MODE 1%CALLF_BARE_FLAGS%
-
-set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%load-parent-proc-init-env-vars ^
-%?09%disable-ctrl-signals %?09%attach-parent-console %?09%print-win-error-string
-
-if %FLAG_USE_X64%0 NEQ 0 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%disable-wow64-fs-redir
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%load-parent-proc-init-env-vars %?09%disable-ctrl-signals %?09%print-win-error-string
 
 rem Windows 7 and less check
 call "%%CONTOOLS_ROOT%%/std/check_windows_version.bat" 6 2 || (
@@ -107,13 +100,15 @@ if %USE_MINTTY%0 EQU 0 goto SKIP_USE_MINTTY
 
 (
   endlocal
+  set IMPL_MODE=1
   start "" /I /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*}\"" %*
+    "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*}\"" ^
+    %*
 )
 
 set LASTERROR=%ERRORLEVEL%
 
-if %NEST_LVL% EQU 0 (
+if %NEST_LVL%0 EQU 0 (
   call "%%CONTOOLS_ROOT%%/cleanup/cleanup_log.bat"
   call "%%CONTOOLS_ROOT%%/cleanup/cleanup_init_vars.bat"
 )
@@ -134,13 +129,15 @@ if /i not "%CONEMU_INTERACT_MODE%" == "run" goto SKIP_USE_CONEMU
 
 (
   endlocal
+  set IMPL_MODE=1
   %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@}\"" -cur_console:n %*
+    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@}\"" -cur_console:n ^
+    %*
 )
 
 set LASTERROR=%ERRORLEVEL%
 
-if %NEST_LVL% EQU 0 (
+if %NEST_LVL%0 EQU 0 (
   call "%%CONTOOLS_ROOT%%/cleanup/cleanup_log.bat"
   call "%%CONTOOLS_ROOT%%/cleanup/cleanup_init_vars.bat"
 )
@@ -155,13 +152,15 @@ if %NEST_LVL% EQU 0 (
 
 (
   endlocal
+  set IMPL_MODE=1
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" %*
+    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" ^
+    %*
 )
 
 set LASTERROR=%ERRORLEVEL%
 
-if %NEST_LVL% EQU 0 (
+if %NEST_LVL%0 EQU 0 (
   call "%%CONTOOLS_ROOT%%/cleanup/cleanup_log.bat"
   call "%%CONTOOLS_ROOT%%/cleanup/cleanup_init_vars.bat"
 )
@@ -169,5 +168,5 @@ if %NEST_LVL% EQU 0 (
 (
   rem drop local variables
   set "LASTERROR="
-  exit /b
+  exit /b %LASTERROR%
 )

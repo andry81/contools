@@ -75,15 +75,15 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 
 rem common flags for all terminals
 
-if defined INIT_VARS_FILE set CALLF_BARE_FLAGS= /v INIT_VARS_FILE "%INIT_VARS_FILE%"%CALLF_BARE_FLAGS%
-
-set CALLF_BARE_FLAGS= /v IMPL_MODE 1%CALLF_BARE_FLAGS%
-
 if %FLAG_ELEVATE% EQU 0 (
-  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /print-win-error-string
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string
 ) else (
   if defined CONTOOLS_ROOT set CALLF_BARE_FLAGS= /v CONTOOLS_ROOT "%CONTOOLS_ROOT%"%CALLF_BARE_FLAGS%
 )
+
+if %FLAG_ELEVATE% NEQ 0 if defined INIT_VARS_FILE set CALLF_BARE_FLAGS= /v INIT_VARS_FILE "%INIT_VARS_FILE%"%CALLF_BARE_FLAGS%
+
+if %FLAG_ELEVATE% NEQ 0 set CALLF_BARE_FLAGS= /v IMPL_MODE 1%CALLF_BARE_FLAGS%
 
 if %FLAG_NO_LOG% EQU 0 (
   if %FLAG_ELEVATE% EQU 0 (
@@ -125,8 +125,10 @@ if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 
 (
   endlocal
+  if %FLAG_ELEVATE% EQU 0 set IMPL_MODE=1
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" %*
+    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" ^
+    %*
 )
 
 set LASTERROR=%ERRORLEVEL%
