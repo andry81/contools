@@ -20,18 +20,4 @@
 
 * Utilities/src/callf:
 
-  - rewrite _sanitize_std_handles_nolock to call Win32 DuplicateHandle
-    on GetStdHandle at first and call to _detach_crt_*_nolock at second.
-
-  - avoid redundant `{` character escaping in expressions like:
-
-    >
-    callf.exe /no-expand-env /S1 "" "\"{0}\bin\bash.exe\" -c \"\{ \\\"{1}/bin/env.exe\\\" }\"" "%CYGWIN_ROOT:/=\%" "%CYGWIN_ROOT:\=/%"
-
-    by using an inner text check on a number with or without `/no-esc` flag:
-
-    >
-    callf.exe /no-expand-env /S1 "" "\"{0}\bin\bash.exe\" -c \"{ \\\"{1}/bin/env.exe\\\" }\"" "%CYGWIN_ROOT:/=\%" "%CYGWIN_ROOT:\=/%"
-
-    The `{ ` treated as a part of a variable substitution even if start by not
-    a number character, so the following `{1}` expression does not substitute.
+  See details in `Utilities/bin/contools/TODO.txt`.
