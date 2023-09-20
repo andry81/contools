@@ -16,7 +16,7 @@ if %USE_MINTTY%0 NEQ 0 set "?09=//"
 
 rem script flags
 set FLAG_LOG_STDIN=0
-if not defined FLAG_SHIFT set FLAG_SHIFT=0
+set FLAG_SHIFT=0
 set "CALLF_BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -98,11 +98,15 @@ if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 
 if %USE_MINTTY%0 EQU 0 goto SKIP_USE_MINTTY
 
+rem CAUTION:
+rem   The `& call exit /b %%%%ERRORLEVEL%%%%` is required to workaround `cmd.exe` not zero exit code issue.
+rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
+rem
 (
   endlocal
   set IMPL_MODE=1
-  start "" /I /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*}\"" ^
+  start "" /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
+    "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*} ^& call exit /b %%%%ERRORLEVEL%%%%\"" ^
     %*
 )
 
@@ -127,11 +131,15 @@ if /i "%CONEMU_INTERACT_MODE%" == "attach" %CONEMU_CMDLINE_ATTACH_PREFIX%
 
 if /i not "%CONEMU_INTERACT_MODE%" == "run" goto SKIP_USE_CONEMU
 
+rem CAUTION:
+rem   The `& call exit /b %%%%ERRORLEVEL%%%%` is required to workaround `cmd.exe` not zero exit code issue.
+rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
+rem
 (
   endlocal
   set IMPL_MODE=1
   %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@}\"" -cur_console:n ^
+    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& call exit /b %%%%ERRORLEVEL%%%%\"" -cur_console:n ^
     %*
 )
 
@@ -150,11 +158,15 @@ if %NEST_LVL%0 EQU 0 (
 
 :SKIP_USE_CONEMU
 
+rem CAUTION:
+rem   The `& call exit /b %%%%ERRORLEVEL%%%%` is required to workaround `cmd.exe` not zero exit code issue.
+rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
+rem
 (
   endlocal
   set IMPL_MODE=1
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" ^
+    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& call exit /b %%%%ERRORLEVEL%%%%\"" ^
     %*
 )
 

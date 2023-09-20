@@ -1,4 +1,8 @@
 2023.09.20:
+* fixed: Scripts/Tools/exec/exec_*_prefix.bat: rare issue when a script returns not zero return code but `callf /pause-on-exit-if-error /ret-child-exit "" "cmd.exe /c @myscript.bat ..."` does not pause on exit, returns zero exit code and the console window closes up on script exit
+* changed: Scripts/Tools/exec/exec_*_prefix.bat: code cleanup
+
+2023.09.20:
 * changed: Utilities/bin/contools/README_EN.txt: readme update
 
 2023.09.20:

@@ -12,7 +12,7 @@ rem Do not make a log output or stdio duplication into files
 if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 
 rem script flags
-if not defined FLAG_SHIFT set FLAG_SHIFT=0
+set FLAG_SHIFT=0
 set FLAG_ELEVATE=0
 set "CALLF_BARE_FLAGS="
 set "CALLF_PROMOTE_PARENT_FLAGS="
@@ -123,11 +123,15 @@ set FLAG_SHIFT=0
 
 if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 
+rem CAUTION:
+rem   The `& call exit /b %%%%ERRORLEVEL%%%%` is required to workaround `cmd.exe` not zero exit code issue.
+rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
+rem
 (
   endlocal
   if %FLAG_ELEVATE% EQU 0 set IMPL_MODE=1
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}\"" ^
+    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& call exit /b %%%%ERRORLEVEL%%%%\"" ^
     %*
 )
 
