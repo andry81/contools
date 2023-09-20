@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.02.21
+* 2023.09.20
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -28,6 +28,8 @@
 4.2.3. The `callf /tee-stdin 0.log /pipe-child-stdout-to-stdout "" "cmd.exe /k"`
        command is blocked on input while a child process is terminated
        externally.
+4.2.4. The `callf /ret-child-exit "" "cmd.exe /c @1.bat"` always returns 0 exit
+       code even if `1.bat` script is not.
 
 4.3. With `callf.exe`/`callfg.exe` under VirtualBox
 4.3.1. The `callf /elevate ...` shows system dialog
@@ -402,6 +404,52 @@ entered.
 To reproduce do execute the command and terminate the `cmd.exe` child process.
 The parent process will not exit until the line return character would be
 entered.
+
+-------------------------------------------------------------------------------
+4.2.4. The `callf /ret-child-exit "" "cmd.exe /c @1.bat"` always returns 0 exit
+       code even if `1.bat` script is not.
+-------------------------------------------------------------------------------
+
+`1.bat`:
+
+```bat
+@echo off
+
+setlocal
+
+call :TEST || exit /b
+exit /b 0
+
+:TEST
+exit /b 123
+```
+
+To fix #1:
+
+  >
+  callf /ret-child-exit "" "cmd.exe /c @call 1.bat"
+
+CAUTION:
+  The `call` operator will expand environment variables twice:
+
+  >
+  callf /v B x /v A %B% /ret-child-exit "" "cmd.exe /c call echo %A%"
+
+  Prints `x` instead of `%B%`.
+
+To fix #2:
+
+  >
+  callf /ret-child-exit "" "cmd.exe /c @1.bat & call exit /b %%ERRORLEVEL%%"
+
+  Or
+
+  >
+  callf /ret-child-exit "" "cmd.exe /c \"@1.bat ^& call exit /b %%ERRORLEVEL%%\""
+
+NOTE:
+  Second workaround requires to correctly escape control characters:
+  & | ^ etc
 
 -------------------------------------------------------------------------------
 4.3. With `callf.exe`/`callfg.exe` under VirtualBox

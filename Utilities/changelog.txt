@@ -1,4 +1,7 @@
 2023.09.20:
+* changed: bin/contools/README_EN.txt: readme update
+
+2023.09.20:
 * changed: bin/contools/TODO.txt: todo update
 
 2023.08.11:
