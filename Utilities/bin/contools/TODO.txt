@@ -165,6 +165,9 @@
 
   `{*:2}` is equivalent to `{@:1}`
 
+  `/shift-N` option has no effect on the range operator and shifts only `{*}`
+  and `{@}` variables.
+
 * add `{*}` and `{@}` variables range operator to other options:
 
   Single option with arguments range operator:

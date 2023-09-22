@@ -1,4 +1,7 @@
 2023.09.22:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
+2023.09.22:
 * changed: Scripts/Tools/std/errlvl.bat: reimplemented with the not zero exit code issue workaround
 * changed: Utilities/bin/contools/README_EN.txt: readme update
 * refactor: Scripts/Tools/std/errlvl.bat: moved to the `std` subdirectory
