@@ -99,14 +99,14 @@ if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 if %USE_MINTTY%0 EQU 0 goto SKIP_USE_MINTTY
 
 rem CAUTION:
-rem   The `& call exit /b %%%%ERRORLEVEL%%%%` is required to workaround `cmd.exe` not zero exit code issue.
+rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
 (
   endlocal
   set IMPL_MODE=1
   start "" /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*} ^& call exit /b %%%%ERRORLEVEL%%%%\"" ^
+    "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
     %*
 )
 
@@ -132,14 +132,14 @@ if /i "%CONEMU_INTERACT_MODE%" == "attach" %CONEMU_CMDLINE_ATTACH_PREFIX%
 if /i not "%CONEMU_INTERACT_MODE%" == "run" goto SKIP_USE_CONEMU
 
 rem CAUTION:
-rem   The `& call exit /b %%%%ERRORLEVEL%%%%` is required to workaround `cmd.exe` not zero exit code issue.
+rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
 (
   endlocal
   set IMPL_MODE=1
   %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& call exit /b %%%%ERRORLEVEL%%%%\"" -cur_console:n ^
+    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" -cur_console:n ^
     %*
 )
 
@@ -159,14 +159,14 @@ if %NEST_LVL%0 EQU 0 (
 :SKIP_USE_CONEMU
 
 rem CAUTION:
-rem   The `& call exit /b %%%%ERRORLEVEL%%%%` is required to workaround `cmd.exe` not zero exit code issue.
+rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
 (
   endlocal
   set IMPL_MODE=1
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& call exit /b %%%%ERRORLEVEL%%%%\"" ^
+    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
     %*
 )
 

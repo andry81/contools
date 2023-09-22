@@ -124,14 +124,14 @@ set FLAG_SHIFT=0
 if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 
 rem CAUTION:
-rem   The `& call exit /b %%%%ERRORLEVEL%%%%` is required to workaround `cmd.exe` not zero exit code issue.
+rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
 (
   endlocal
   if %FLAG_ELEVATE% EQU 0 set IMPL_MODE=1
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& call exit /b %%%%ERRORLEVEL%%%%\"" ^
+    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
     %*
 )
 
