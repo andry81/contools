@@ -30,7 +30,7 @@
   `/use-stdin-as-piped-from-conin` flag.
 
 * Implement options chaining additionally to options nesting
-  (`/parent-opt1{ child1-opt1 }{ child2-opt1}`):
+  (`/parent-opt1{ child1-opt1 }{ child2-opt1 }`):
 
   /base-opt1:opt2:opt3
 
@@ -66,10 +66,12 @@
 
     Should print `1{0}1` instead of `1x1`.
 
-  Add `/allow-subst-after-expand[<N>]` to enable substitution after expansion
-  for all arguments or specifically for `<N>` argument.
+  Add `/allow-subst-after-expand` to specifically enable it for all arguments.
 
-  Use `/v:/S*` to specifically enable substitution AFTER expansion of `${AAA}.
+  Add `/allow-subst-after-expand[<N>]` to enable it only for `<N>` argument.
+
+  Use `/v:/S*` to specifically enable substitution AFTER expansion of `${AAA}
+  for all arguments.
 
 * Add ability for variables late expansion in case of process elevation to
   expand after the elevation in a child process:
@@ -112,9 +114,6 @@
 
   Example: https://github.com/zodiacon/sysrun/blob/master/sysrun.cpp
 
-* Add `/allow-subst-pos-vars-after-env-var-expand` and disable by default
-  positional variables substitution after environment variables expansion.
-
 * Add `/cpu-affinity-mask <number>` option to execute child process on specific
   CPU cores.
 
@@ -126,13 +125,22 @@
   >
   callf.exe /no-expand-env /S1 "" "\"{0}\bin\bash.exe\" -c \"\{ \\\"{1}/bin/env.exe\\\" }\"" "%CYGWIN_ROOT:/=\%" "%CYGWIN_ROOT:\=/%"
 
-  by using an inner text check on a number with or without `/no-esc` flag:
+  The `{ ` treated as a part of a variable substitution even if start by not
+  a number character, so the following `{1}` expression does not substitute.
+
+  Use instead:
 
   >
   callf.exe /no-expand-env /S1 "" "\"{0}\bin\bash.exe\" -c \"{ \\\"{1}/bin/env.exe\\\" }\"" "%CYGWIN_ROOT:/=\%" "%CYGWIN_ROOT:\=/%"
 
-  The `{ ` treated as a part of a variable substitution even if start by not
-  a number character, so the following `{1}` expression does not substitute.
+  by using an inner text format check with or without `/no-esc` flag:
+
+  {<number>}
+  {*[:<number>[:<number>]]}
+  {@[:<number>[:<number>]]}
+
+  In all other cases - skip substitution. This will leave an argument variable
+  placeholder with a random inner text as the above `{ \\\"{1}` - as is.
 
 * add `/no-expand-env` flag to this-child process command line by default in
   case of `/elevate` usage to avoid accidental environment variable value
@@ -144,6 +152,54 @@
 
   Add flag `/elevate{ ... }{ /allow-expand-env }` to specifically remove
   default `/no-expand-env` flag from this-child process command line.
+
+* add `/r:* <from> <to>` and `/r:@ <from> <to>` for `{*}` and `{@}` variable
+  arguments respectively.
+
+* add ability to use `{*}` and `{@}` variables with the range operator:
+
+  Format:
+
+    {*[:<from>[:<len>]]}
+    {@[:<from>[:<len>]]}
+
+  `{*:2}` is equivalent to `{@:1}`
+
+* add `{*}` and `{@}` variables range operator to other options:
+
+  Single option with arguments range operator:
+
+  /r:*:2:2 <from> <to>
+  /r:@:1:2 <from> <to>
+
+  /expand-env-arg:*:2:2 /E:*:2:2
+  /expand-env-arg:@:1:2 /E:@:1:2
+  /EE:*:2:2
+  /EE:@:1:2
+  /subst-vars-arg:*:2:2 /S:*:2:2
+  /subst-vars-arg:@:1:2 /S:@:1:2
+  /SE:*:2:2
+  /SE:@:1:2
+
+  Chained options with arguments range operator:
+
+  /v:/E:*:2:2       <name> <value>
+  /v:/EE:*:2:2      <name> <value>
+  /v:/S:*:2:2       <name> <value>
+  /v:/SE:*:2:2      <name> <value>
+  /v:/E:/S:*:2:2    <name> <value>
+  /v:/E:/SE:*:2:2   <name> <value>
+  /v:/EE:/S:*:2:2   <name> <value>
+  /v:/EE:/SE:*:2:2  <name> <value>
+
+  /v:/E:@:1:2       <name> <value>
+  /v:/EE:@:1:2      <name> <value>
+  /v:/S:@:1:2       <name> <value>
+  /v:/SE:@:1:2      <name> <value>
+  /v:/E:/S:@:1:2    <name> <value>
+  /v:/E:/SE:@:1:2   <name> <value>
+  /v:/EE:/S:@:1:2   <name> <value>
+  /v:/EE:/SE:@:1:2  <name> <value>
 
 ===============================================================================
 These flags already partially added into `help.tpl`, but still is not implemented:
