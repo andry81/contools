@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.09.20
+* 2023.09.22
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -10,14 +10,16 @@
 4. KNOWN ISSUES
 
 4.1. With `cmd.exe`
-4.1.1. Interactive input autocompletion disable.
-4.1.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
+4.1.1. The `cmd.exe /c 1.bat` always returns 0 exit code even if `1.bat` script
+       is not.
+4.1.2. Interactive input autocompletion disable.
+4.1.3. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
        call.
-4.1.3. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
+4.1.4. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
        behind waiting the last input while the neighbor `callf.exe` process is
        already exited.
-4.1.4. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
-4.1.5. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
+4.1.5. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
+4.1.6. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
        arrows key interactive input (command history traverse).
 
 4.2. With `callf.exe`/`callfg.exe`
@@ -28,8 +30,6 @@
 4.2.3. The `callf /tee-stdin 0.log /pipe-child-stdout-to-stdout "" "cmd.exe /k"`
        command is blocked on input while a child process is terminated
        externally.
-4.2.4. The `callf /ret-child-exit "" "cmd.exe /c @1.bat"` always returns 0 exit
-       code even if `1.bat` script is not.
 
 4.3. With `callf.exe`/`callfg.exe` under VirtualBox
 4.3.1. The `callf /elevate ...` shows system dialog
@@ -239,7 +239,65 @@ To test:
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
-4.1.1. Interactive input autocompletion disable.
+4.1.1. The `cmd.exe /c 1.bat` always returns 0 exit code even if `1.bat` script
+       is not.
+-------------------------------------------------------------------------------
+
+`1.bat`:
+
+```bat
+@echo off
+
+setlocal
+
+call :TEST || exit /b
+exit /b 0
+
+:TEST
+exit /b 123
+```
+
+To fix #1:
+
+  >
+  cmd.exe /c call 1.bat
+
+CAUTION:
+  The `call` operator will expand environment variables twice:
+
+  >
+  callf /v B x /v A %B% /ret-child-exit "" "cmd.exe /c call echo %A%"
+
+  Prints `x` instead of `%B%`.
+
+To fix #2:
+
+  >
+  callf /ret-child-exit "" "cmd.exe /c 1.bat & call exit /b %%ERRORLEVEL%%"
+
+  Or
+
+  >
+  callf /ret-child-exit "" "cmd.exe /c \"1.bat ^& call exit /b %%ERRORLEVEL%%\""
+
+  NOTE:
+    Second workaround requires to correctly escape control characters:
+    & | ^ etc
+
+  Or
+
+  Use "errlvl.bat" from `contools` scripts:
+
+  >
+  callf /ret-child-exit "" "cmd.exe /c 1.bat & \"%%CONTOOLS_ROOT%%/Scripts/Tools/std/errlvl.bat\""
+
+  and you can use a different environment variables expansion:
+
+  >
+  callf /ret-child-exit "" "cmd.exe /c 1.bat & \"${CONTOOLS_ROOT}/Scripts/Tools/std/errlvl.bat\""
+
+-------------------------------------------------------------------------------
+4.1.2. Interactive input autocompletion disable.
 -------------------------------------------------------------------------------
 
 If at least stdin or stdout (but not stderr) is redirected, then the
@@ -271,7 +329,7 @@ through the code injection into a child process and interception of the
 `ReadConsole`/`WriteConsole` calls.
 
 -------------------------------------------------------------------------------
-4.1.2. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
+4.1.3. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
        call.
 -------------------------------------------------------------------------------
 
@@ -311,7 +369,7 @@ set /P X=DDD
 To fix that use the `workarounded` call example line.
 
 -------------------------------------------------------------------------------
-4.1.3. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
+4.1.4. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
        behind waiting the last input while the neighbor `callf.exe` process is
        already exited.
 -------------------------------------------------------------------------------
@@ -322,7 +380,7 @@ The neighbor `cmd.exe` process to already exited `callf.exe` process will not
 exit until the line return character would be entered.
 
 -------------------------------------------------------------------------------
-4.1.4. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
+4.1.5. The `start "" /WAIT /B cmd.exe /k` does not wait a child process.
 -------------------------------------------------------------------------------
 
 The command does not wait the `cmd.exe` child process.
@@ -343,7 +401,7 @@ To fix:
   start "" /B /WAIT cmd.exe /k
 
 -------------------------------------------------------------------------------
-4.1.5. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
+4.1.6. The `callf "" "cmd.exe /c callf \"\" \"cmd.exe /k\""` command losing
        arrows key interactive input (command history traverse).
 -------------------------------------------------------------------------------
 
@@ -404,52 +462,6 @@ entered.
 To reproduce do execute the command and terminate the `cmd.exe` child process.
 The parent process will not exit until the line return character would be
 entered.
-
--------------------------------------------------------------------------------
-4.2.4. The `callf /ret-child-exit "" "cmd.exe /c @1.bat"` always returns 0 exit
-       code even if `1.bat` script is not.
--------------------------------------------------------------------------------
-
-`1.bat`:
-
-```bat
-@echo off
-
-setlocal
-
-call :TEST || exit /b
-exit /b 0
-
-:TEST
-exit /b 123
-```
-
-To fix #1:
-
-  >
-  callf /ret-child-exit "" "cmd.exe /c @call 1.bat"
-
-CAUTION:
-  The `call` operator will expand environment variables twice:
-
-  >
-  callf /v B x /v A %B% /ret-child-exit "" "cmd.exe /c call echo %A%"
-
-  Prints `x` instead of `%B%`.
-
-To fix #2:
-
-  >
-  callf /ret-child-exit "" "cmd.exe /c @1.bat & call exit /b %%ERRORLEVEL%%"
-
-  Or
-
-  >
-  callf /ret-child-exit "" "cmd.exe /c \"@1.bat ^& call exit /b %%ERRORLEVEL%%\""
-
-NOTE:
-  Second workaround requires to correctly escape control characters:
-  & | ^ etc
 
 -------------------------------------------------------------------------------
 4.3. With `callf.exe`/`callfg.exe` under VirtualBox
