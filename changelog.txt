@@ -1,3 +1,6 @@
+2023.09.23:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
 2023.09.22:
 * fixed: Scripts/Tools/exec/exec_*_prefix.bat: execution fixup, not zero return code issue workaround reimplementation by `errlvl.bat` script
 

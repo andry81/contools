@@ -153,8 +153,32 @@
   Add flag `/elevate{ ... }{ /allow-expand-env }` to specifically remove
   default `/no-expand-env` flag from this-child process command line.
 
-* add `/r:* <from> <to>` and `/r:@ <from> <to>` for `{*}` and `{@}` variable
-  arguments respectively.
+* add `/rr <from> <to>` and `/rra <from> <to>` variants to replace after
+  environment variables expansion and argument variables substitution:
+
+  /replace-late-args-in-tail <from> <to>
+  /rra <from> <to>
+    Replace `<from>` string by `<to>` string after expansion and substitution
+    in tail command line arguments (arguments arter the first one).
+
+  /replace-late-args <from> <to>
+  /replace-late-arg<N> <from> <to>
+  /rr <from> <to>
+  /rr<N> <from> <to>
+    Replace `<from>` string by `<to>` string after expansion and substitution
+    for either all command line arguments or `<N>` command line argument, where
+    `<N>` >= 0.
+    If `<N>` is used and `<N>` >= 2, then the replace happens before
+    substitution in first 2 fixed arguments.
+
+* add arguments range operator for `{*}` and `{@}` variable arguments into
+  replace options:
+
+  /r:* <from> <to>
+  /r:@ <from> <to>
+
+  /rr:* <from> <to>
+  /rr:@ <from> <to>
 
 * add ability to use `{*}` and `{@}` variables with the range operator:
 
@@ -162,6 +186,8 @@
 
     {*[:<from>[:<len>]]}
     {@[:<from>[:<len>]]}
+
+    , where: `<from>` >= 1 (as in unix shell)
 
   `{*:2}` is equivalent to `{@:1}`
 
@@ -174,6 +200,9 @@
 
   /r:*:2:2 <from> <to>
   /r:@:1:2 <from> <to>
+
+  /rr:*:2:2 <from> <to>
+  /rr:@:1:2 <from> <to>
 
   /expand-env-arg:*:2:2 /E:*:2:2
   /expand-env-arg:@:1:2 /E:@:1:2
@@ -203,6 +232,12 @@
   /v:/E:/SE:@:1:2   <name> <value>
   /v:/EE:/S:@:1:2   <name> <value>
   /v:/EE:/SE:@:1:2  <name> <value>
+
+* add `/create-console-hidden` flag to create a hidden console and use it
+  together with the `/pause-on-exit*`.
+
+  If a child process will exit with not zero exit code, then show the console
+  window and pause.
 
 ===============================================================================
 These flags already partially added into `help.tpl`, but still is not implemented:
