@@ -1,4 +1,10 @@
 2023.09.23:
+* fixed: Scripts/Tools/exec/exec_terminal_prefix.bat: MinTTY execution fixup
+* new: Scripts/Tools/exec/exec_terminal_cleanup.bat: standalone terminal cleanup script
+* new: Scripts/Tools/exec/exec_mintty_prefix.bat: standalone mintty terminal startup script
+* changed: Scripts/Tools/exec/exec_terminal_prefix.bat: reimplemented MinTTY startup to workaround weird and broken MSys2 command line escape rules
+
+2023.09.23:
 * fixed: Scripts/Tools/exec/exec_*_prefix.bat: execution fixup, reverted change
 
 2023.09.23:

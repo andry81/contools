@@ -11,9 +11,6 @@ if defined NO_LOG set /A NO_LOG+=0
 rem Do not make a log output or stdio duplication into files
 if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 
-set "?09=/"
-if %USE_MINTTY%0 NEQ 0 set "?09=//"
-
 rem script flags
 set FLAG_LOG_STDIN=0
 if not defined FLAG_SHIFT set FLAG_SHIFT=0
@@ -71,25 +68,25 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 
 rem common flags for all terminals
 
-set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%load-parent-proc-init-env-vars %?09%disable-ctrl-signals %?09%print-win-error-string
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string
 
 rem Windows 7 and less check
 call "%%CONTOOLS_ROOT%%/std/check_windows_version.bat" 6 2 || (
   rem reattach works on Windows 7 only
-  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%detach-inherited-console-on-wait %?09%wait-child-first-time-timeout 300 
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /detach-inherited-console-on-wait /wait-child-first-time-timeout 300 
 )
 
 if %FLAG_NO_LOG% EQU 0 if %FLAG_LOG_STDIN% NEQ 0 (
-  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdin "%PROJECT_LOG_FILE%" %?09%pipe-stdin-to-child-stdin
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /tee-stdin "%PROJECT_LOG_FILE%" /pipe-stdin-to-child-stdin
 )
 
 if %FLAG_NO_LOG% EQU 0 (
-  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %?09%tee-stdout "%PROJECT_LOG_FILE%" %?09%tee-stderr-dup 1
+  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /tee-stdout "%PROJECT_LOG_FILE%" /tee-stderr-dup 1
 )
 
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
-%?09%no-expand-env %?09%no-subst-pos-vars %?09%no-esc %?09%ret-child-exit ^
-%?09%ra "%%" "%%?01%%" %?09%v "?01" "%%" %?09%shift-%FLAG_SHIFT%
+/no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit ^
+/ra "%%" "%%?01%%" /v "?01" "%%" /shift-%FLAG_SHIFT%
 
 rem drop FLAG_SHIFT because already processed by `/shift-%FLAG_SHIFT%`
 set FLAG_SHIFT=0
@@ -98,24 +95,27 @@ if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 
 if %USE_MINTTY%0 EQU 0 goto SKIP_USE_MINTTY
 
+set MINTTY_CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS%
+
 rem CAUTION:
 rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
+rem CAUTION:
+rem   The MinTTY must call to `cmd.exe` script at first, not to `callf.exe`, to bypass weird MinTTY escape rules over backslash - `\`.
 (
-  endlocal
-  set IMPL_MODE=1
-  start "" /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "%?09%c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
-    %*
+  rem The `start` exists here just in case the MinTTY would not close immediately after the start.
+  start "" /B /WAIT %MINTTY_TERMINAL_PREFIX% -e ^
+    "%CONTOOLS_ROOT:/=\%/exec/exec_mintty_prefix.bat" %* & "%CONTOOLS_ROOT:/=\%/std/errlvl.bat"
 )
 
 set LASTERROR=%ERRORLEVEL%
 
-if %NEST_LVL%0 EQU 0 (
-  call "%%CONTOOLS_ROOT%%/cleanup/cleanup_log.bat"
-  call "%%CONTOOLS_ROOT%%/cleanup/cleanup_init_vars.bat"
-)
+rem CAUTION:
+rem   DO NOT CLEANUP because mintty restarts itself and mintty parent process does exit immediately!
+rem   Instead do cleap in a child process.
+rem
+rem call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
 (
   rem drop local variables
@@ -145,10 +145,7 @@ rem
 
 set LASTERROR=%ERRORLEVEL%
 
-if %NEST_LVL%0 EQU 0 (
-  call "%%CONTOOLS_ROOT%%/cleanup/cleanup_log.bat"
-  call "%%CONTOOLS_ROOT%%/cleanup/cleanup_init_vars.bat"
-)
+call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
 (
   rem drop local variables
@@ -172,10 +169,7 @@ rem
 
 set LASTERROR=%ERRORLEVEL%
 
-if %NEST_LVL%0 EQU 0 (
-  call "%%CONTOOLS_ROOT%%/cleanup/cleanup_log.bat"
-  call "%%CONTOOLS_ROOT%%/cleanup/cleanup_init_vars.bat"
-)
+call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
 (
   rem drop local variables
