@@ -16,7 +16,7 @@ if %USE_MINTTY%0 NEQ 0 set "?09=//"
 
 rem script flags
 set FLAG_LOG_STDIN=0
-set FLAG_SHIFT=0
+if not defined FLAG_SHIFT set FLAG_SHIFT=0
 set "CALLF_BARE_FLAGS="
 
 :FLAGS_LOOP

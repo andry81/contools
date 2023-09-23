@@ -12,7 +12,7 @@ rem Do not make a log output or stdio duplication into files
 if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 
 rem script flags
-set FLAG_SHIFT=0
+if not defined FLAG_SHIFT set FLAG_SHIFT=0
 set FLAG_ELEVATE=0
 set "CALLF_BARE_FLAGS="
 set "CALLF_PROMOTE_PARENT_FLAGS="
