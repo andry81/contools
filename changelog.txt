@@ -1,3 +1,6 @@
+2023.09.26:
+* changed: ISSUES.txt: issues update
+
 2023.09.23:
 * fixed: Scripts/Tools/exec/exec_terminal_prefix.bat: MinTTY execution fixup
 * new: Scripts/Tools/exec/exec_terminal_cleanup.bat: standalone terminal cleanup script

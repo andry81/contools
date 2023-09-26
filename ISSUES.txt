@@ -34,6 +34,20 @@ Utilities/tests/manual/contools/callf:
     - 00-test--01-cui--02-existing_console--01-print_help.bat
     - 00-test--02-gui--02-existing_console--01-print_help.bat
 
+  * The `/r* ...` options does not execute for variable arguments
+
+  * Windows XP issues:
+
+    - Load Windows 7+ Win32 API like Wow64DisableWow64FsRedirection
+      dynamically.
+
+    - Link versus `Visual Studio 2017 - Windows XP (v141_xp)` throws
+      `utilities\src\callf\help_inl.hpp(1574): fatal error C1091: compiler limit: string exceeds 65535 bytes in length`
+      which is fixed in a Platform Toolset 2019 but XP support is dropped from
+      there.
+      To fix the `-txt2c` option in the `thlibautocfg.exe` must support the
+      output file splitting into files less than 64Kb.
+
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat:
 
   * Does not accept not english characters in files names/paths.
