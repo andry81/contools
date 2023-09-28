@@ -3,7 +3,7 @@
 #ifndef __COMMON_HPP__
 #define __COMMON_HPP__
 
-#include "version.hpp"
+#include "gen/version.hpp"
 
 #include <WinBase.h>
 #include <WinNT.h>
@@ -170,26 +170,8 @@ struct StdHandlesState
 };
 
 
-namespace {
-    enum _error
-    {
-        err_none = 0,
-
-        err_unspecified = -255,
-
-        err_seh_exception = -254,
-
-        err_help_output = -128,
-
-        err_named_pipe_connect_timeout = -7,
-        err_named_pipe_connect_error = -6,
-        err_io_error = -5,
-        err_win32_error = -4,
-        err_invalid_params = -3,
-        err_invalid_format = -2,
-        err_format_empty = -1
-    };
-
+namespace
+{
     using uint_t = unsigned int;
 
     using const_tchar_ptr_vector_t = std::vector<const TCHAR *>;
@@ -391,12 +373,12 @@ namespace {
     }
 
     template <typename T>
-    inline T(&make_singular_array(T & ref))[1]
+    inline T (&make_singular_array(T & ref))[1]
     {
         return reinterpret_cast<T(&)[1]>(ref);
     }
 
-        template <typename T, typename... Args>
+    template <typename T, typename... Args>
     inline void _construct(T & ref, Args &&... args)
     {
         ::new (utility::addressof(ref)) T(std::forward<Args>(args)...);
@@ -2709,7 +2691,12 @@ namespace {
         _print_stderr_message(_T("COM: 0x%08X: %s\n"), hr, err.ErrorMessage());
     }
 
-    inline std::tstring _replace_strings(std::tstring str, const std::tstring & from, std::tstring to)
+    template <class t_char, class _Traits = std::char_traits<t_char>, class _Alloc = std::allocator<t_char> >
+    inline std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> >
+        _replace_strings(
+            std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> > str,
+            const std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> > & from,
+            std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> > to)
     {
         size_t start_pos = 0;
 
@@ -2721,8 +2708,12 @@ namespace {
         return str;
     }
 
-    template <typename Functor>
-    inline std::tstring _replace_strings(std::tstring str, const std::tstring & from, Functor && to_functor)
+    template <typename Functor, class t_char, class _Traits = std::char_traits<t_char>, class _Alloc = std::allocator<t_char> >
+    inline std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> >
+        _replace_strings(
+            std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> > str,
+            const std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> > & from,
+            Functor && to_functor)
     {
         size_t index = 0;
         size_t start_pos = 0;
@@ -2737,14 +2728,74 @@ namespace {
         return str;
     }
 
-    inline std::tstring _eval_escape_chars(const std::tstring & str, bool eval_backslash_esc, bool eval_dbl_backslash_esc)
+    // overload with `const char *` exists to resolve ambiguity with `template Functor &&`
+    inline std::string _replace_strings(std::string str, const std::string & from, std::string to)
     {
+        return _replace_strings<char>(str, from, to);
+    }
+
+    inline std::string _replace_strings(std::string str, const std::string & from, const char * to)
+    {
+        return _replace_strings<char>(str, from, to);
+    }
+
+    inline std::string _replace_strings(std::string str, const char * from, std::string to)
+    {
+        return _replace_strings<char>(str, from, to);
+    }
+
+    inline std::string _replace_strings(std::string str, const char * from, const char * to)
+    {
+        return _replace_strings<char>(str, from, to);
+    }
+
+    template <typename Functor>
+    inline std::string _replace_strings(std::string str, const std::string & from, Functor && to_functor)
+    {
+        return _replace_strings<Functor, char>(str, from, to_functor);
+    }
+
+    // overload with `const wchar_t *` exists to resolve ambiguity with `template Functor &&`
+    inline std::wstring _replace_strings(std::wstring str, const std::wstring & from, std::wstring to)
+    {
+        return _replace_strings<wchar_t>(str, from, to);
+    }
+
+    inline std::wstring _replace_strings(std::wstring str, const std::wstring & from, const wchar_t * to)
+    {
+        return _replace_strings<wchar_t>(str, from, to);
+    }
+
+    inline std::wstring _replace_strings(std::wstring str, const wchar_t * from, std::wstring to)
+    {
+        return _replace_strings<wchar_t>(str, from, to);
+    }
+
+    inline std::wstring _replace_strings(std::wstring str, const wchar_t * from, const wchar_t * to)
+    {
+        return _replace_strings<wchar_t>(str, from, to);
+    }
+
+    template <typename Functor>
+    inline std::wstring _replace_strings(std::wstring str, const std::wstring & from, Functor && to_functor)
+    {
+        return _replace_strings<Functor, wchar_t>(str, from, to_functor);
+    }
+
+    template <class t_char, class _Traits = std::char_traits<t_char>, class _Alloc = std::allocator<t_char> >
+    inline std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> >
+        _eval_escape_chars(
+            const std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> > & str,
+            bool eval_backslash_esc, bool eval_dbl_backslash_esc)
+    {
+        using string_t = std::basic_string<t_char, std::char_traits<t_char>, std::allocator<t_char> >;
+
         assert(eval_backslash_esc || eval_dbl_backslash_esc);
 
-        std::vector<TCHAR> str_eval_buf;
-        std::vector<TCHAR> digits_buf;
-        std::vector<TCHAR> digits_eval_buf;
-        TCHAR * stop_scan_char_ptr;
+        std::vector<t_char> str_eval_buf;
+        std::vector<t_char> digits_buf;
+        std::vector<t_char> digits_eval_buf;
+        t_char * stop_scan_char_ptr;
         size_t str_size = 0;
         size_t digit_index = 0;
         bool is_escape_char = false;
@@ -2971,14 +3022,14 @@ namespace {
                                 digits_buf[digit_index] = _T('\0');
 
                                 _set_errno(0); // just in case
-                                const auto decimal_value = tstrtoul(digits_buf.data(), &stop_scan_char_ptr, 16);
+                                const auto decimal_value = strtoul(digits_buf.data(), &stop_scan_char_ptr, 16);
                                 if (errno != ERANGE) {
                                     digits_eval_buf.resize(10 + 1); // max decimal digits
                                     digits_eval_buf[0] = _T('\0');
-                                    ultot(decimal_value, digits_eval_buf.data(), 10);
-                                    const size_t digits_num = tstrlen(digits_eval_buf.data());
+                                    ultostr(decimal_value, digits_eval_buf.data(), 10);
+                                    const size_t digits_num = strlen(digits_eval_buf.data());
                                     str_eval_buf.resize(str_size + digits_num);
-                                    tstrcat(&str_eval_buf[str_size], digits_eval_buf.data());
+                                    strcat(&str_eval_buf[str_size], digits_eval_buf.data());
                                     str_size += digits_num;
                                 }
 
@@ -3018,14 +3069,14 @@ namespace {
                                 digits_buf[digit_index] = _T('\0');
 
                                 _set_errno(0); // just in case
-                                const auto decimal_value = tstrtoul(digits_buf.data(), &stop_scan_char_ptr, 8);
+                                const auto decimal_value = strtoul(digits_buf.data(), &stop_scan_char_ptr, 8);
                                 if (errno != ERANGE) {
                                     digits_eval_buf.resize(10 + 1); // max decimal digits
                                     digits_eval_buf[0] = _T('\0');
-                                    ultot(decimal_value, digits_eval_buf.data(), 10);
-                                    const size_t digits_num = tstrlen(digits_eval_buf.data());
+                                    ultostr(decimal_value, digits_eval_buf.data(), 10);
+                                    const size_t digits_num = strlen(digits_eval_buf.data());
                                     str_eval_buf.resize(str_size + digits_num);
-                                    tstrcat(&str_eval_buf[str_size], digits_eval_buf.data());
+                                    strcat(&str_eval_buf[str_size], digits_eval_buf.data());
                                     str_size += digits_num;
                                 }
 
@@ -3052,14 +3103,14 @@ namespace {
             digits_buf[digit_index] = _T('\0');
 
             _set_errno(0); // just in case
-            const auto decimal_value = tstrtoul(digits_buf.data(), &stop_scan_char_ptr, 16);
+            const auto decimal_value = strtoul(digits_buf.data(), &stop_scan_char_ptr, 16);
             if (errno != ERANGE) {
                 digits_eval_buf.resize(10 + 1); // max decimal digits
                 digits_eval_buf[0] = _T('\0');
-                ultot(decimal_value, digits_eval_buf.data(), 10);
-                const size_t digits_num = tstrlen(digits_eval_buf.data());
+                ultostr(decimal_value, digits_eval_buf.data(), 10);
+                const size_t digits_num = strlen(digits_eval_buf.data());
                 str_eval_buf.resize(str_size + digits_num);
-                tstrcat(&str_eval_buf[str_size], digits_eval_buf.data());
+                strcat(&str_eval_buf[str_size], digits_eval_buf.data());
                 str_size += digits_num;
             }
         }
@@ -3072,14 +3123,14 @@ namespace {
             digits_buf[digit_index] = _T('\0');
 
             _set_errno(0); // just in case
-            const auto decimal_value = tstrtoul(digits_buf.data(), &stop_scan_char_ptr, 8);
+            const auto decimal_value = strtoul(digits_buf.data(), &stop_scan_char_ptr, 8);
             if (errno != ERANGE) {
                 digits_eval_buf.resize(10 + 1); // max decimal digits
                 digits_eval_buf[0] = _T('\0');
-                ultot(decimal_value, digits_eval_buf.data(), 10);
-                const size_t digits_num = tstrlen(digits_eval_buf.data());
+                ultostr(decimal_value, digits_eval_buf.data(), 10);
+                const size_t digits_num = strlen(digits_eval_buf.data());
                 str_eval_buf.resize(str_size + digits_num);
-                tstrcat(&str_eval_buf[str_size], digits_eval_buf.data());
+                strcat(&str_eval_buf[str_size], digits_eval_buf.data());
                 str_size += digits_num;
             }
         }
@@ -3091,7 +3142,7 @@ namespace {
 
         str_eval_buf[str_size] = _T('\0');
 
-        return std::tstring(str_eval_buf.data(), &str_eval_buf[str_size]);
+        return string_t(str_eval_buf.data(), &str_eval_buf[str_size]);
     }
 
     template <typename Flags, typename Options>

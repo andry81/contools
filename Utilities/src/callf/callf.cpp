@@ -3561,9 +3561,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             arg_offset = arg_offset_begin;
 
             if (print_help) {
-                _put_raw_message_impl(0, STDOUT_FILENO,
-#include "help_inl.hpp"
-                    );
+
+#define INCLUDE_HELP_INL_EPILOG(N) _put_raw_message_impl(0, STDOUT_FILENO,
+#define INCLUDE_HELP_INL_PROLOG(N) );
+#include "gen/help_inl.hpp"
 
                 return err_help_output;
             }
@@ -4402,7 +4403,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     _print_stderr_message(_T("format arguments are empty\n"));
                 }
                 if (!g_flags.ret_win_error) {
-                    return err_format_empty;
+                    return err_invalid_format;
                 }
                 else {
                     return GetLastError();

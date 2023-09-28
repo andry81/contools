@@ -12,7 +12,19 @@
 //#error Unicode is not supported.
 //#endif
 
-namespace {
+
+namespace
+{
+    enum _error
+    {
+        err_help_output     = -1,
+        err_none            = 0,
+        err_invalid_format  = 1,
+        err_invalid_params  = 2,
+        err_io_error        = 16,
+        err_unspecified     = 255
+    };
+
     struct _Flags
     {
         _Flags()
@@ -235,9 +247,9 @@ int _tmain(int argc, const TCHAR * argv[])
     if (argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
         if (argc >= arg_offset + 2) return err_invalid_format;
 
-        ::puts(
-#include "help_inl.hpp"
-        );
+#define INCLUDE_HELP_INL_EPILOG(N) ::puts(
+#define INCLUDE_HELP_INL_PROLOG(N) );    
+#include "gen/help_inl.hpp"
 
         return err_help_output;
     }

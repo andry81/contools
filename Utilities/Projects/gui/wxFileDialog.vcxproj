@@ -198,10 +198,6 @@
     <ClCompile Include="..\..\src\_gui\wxFileDialog\wxFileDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\_gui\wxFileDialog\help_inl.hpp" />
-    <ClInclude Include="..\..\src\_gui\wxFileDialog\version.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\src\_gui\wxFileDialog\help.def" />
     <None Include="..\..\src\_gui\wxFileDialog\help.tpl" />
     <None Include="..\..\src\_gui\wxFileDialog\version.def" />

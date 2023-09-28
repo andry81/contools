@@ -195,8 +195,6 @@
   <ItemGroup>
     <ClInclude Include="..\src\callf\callf.hpp" />
     <ClInclude Include="..\src\callf\execute.hpp" />
-    <ClInclude Include="..\src\callf\help_inl.hpp" />
-    <ClInclude Include="..\src\callf\version.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\callf\help.def" />

@@ -193,10 +193,6 @@
     <ClCompile Include="..\src\chcp\chcp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\chcp\help_inl.hpp" />
-    <ClInclude Include="..\src\chcp\version.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\src\chcp\help.def" />
     <None Include="..\src\chcp\help.tpl" />
     <None Include="..\src\chcp\version.def" />

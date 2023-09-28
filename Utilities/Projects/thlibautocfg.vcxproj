@@ -215,10 +215,6 @@
     <ClCompile Include="..\src\thlibautocfg\thlibautocfg.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\thlibautocfg\help_inl.hpp" />
-    <ClInclude Include="..\src\thlibautocfg\version.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\src\thlibautocfg\help.def" />
     <None Include="..\src\thlibautocfg\help.tpl" />
     <None Include="..\src\thlibautocfg\version.def" />

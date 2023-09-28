@@ -192,10 +192,6 @@
     <ClCompile Include="..\src\clearcache\clearcache.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\clearcache\help_inl.hpp" />
-    <ClInclude Include="..\src\clearcache\version.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\src\clearcache\help.def" />
     <None Include="..\src\clearcache\help.tpl" />
     <None Include="..\src\clearcache\version.def" />

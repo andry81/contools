@@ -38,12 +38,26 @@
 
 #include "common.hpp"
 
-#define USE_NATIVE_IMPLEMENTATION 1
-#define REOPEN_HANDLE_INSTEAD_UPDATE 0
+#define USE_NATIVE_IMPLEMENTATION       1
+#define REOPEN_HANDLE_INSTEAD_UPDATE    0
 
 #ifdef _UNICODE
 #error Unicode is not supported.
 #endif
+
+
+namespace
+{
+    enum _error
+    {
+        err_help_output     = -1,
+        err_none            = 0,
+        err_invalid_format  = 1,
+        err_invalid_params  = 2,
+        err_io_error        = 16,
+        err_unspecified     = 255
+    };
+}
 
 template <int v>
 struct int_identity
@@ -190,9 +204,10 @@ int main(int argc,const char* argv[])
 
     if(do_show_help)
     {
-        ::puts(
-#include "help_inl.hpp"
-            );
+
+#define INCLUDE_HELP_INL_EPILOG(N) ::puts(
+#define INCLUDE_HELP_INL_PROLOG(N) );    
+#include "gen/help_inl.hpp"
 
         return err_help_output;
     }

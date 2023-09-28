@@ -192,10 +192,6 @@
     <ClCompile Include="..\src\printf\printf.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\printf\help_inl.hpp" />
-    <ClInclude Include="..\src\printf\version.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\src\printf\help.def" />
     <None Include="..\src\printf\help.tpl" />
     <None Include="..\src\printf\version.def" />

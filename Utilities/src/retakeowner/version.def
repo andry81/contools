@@ -3,5 +3,5 @@ autogen definitions version;
 AppName = "retakeowner";
 AppMajorVer = 1;
 AppMinorVer = 1;
-AppRevision = 2;
-AppBuildNum = 5;
+AppRevision = 3;
+AppBuildNum = 6;

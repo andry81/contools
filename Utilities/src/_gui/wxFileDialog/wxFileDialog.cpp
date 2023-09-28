@@ -121,9 +121,10 @@ int wmain(int argc, wchar_t * argv[])
         }
 
         if(do_show_help) {
-            ::puts(
+
+#define INCLUDE_HELP_INL_EPILOG(N) ::puts(
+#define INCLUDE_HELP_INL_PROLOG(N) );
 #include "help_inl.hpp"
-            );
 
             ret = 1;
             break;

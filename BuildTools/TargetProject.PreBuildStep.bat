@@ -13,8 +13,6 @@ set "UNICODE_ENABLED=%~3"
 
 if not defined UNICODE_ENABLED set UNICODE_ENABLED=0
 
-set "CONSOLE_HELP_FILE=%SOURCES_DIR%\help"
-
 set "AUTOGEN_BARE_FLAGS="
 
 if not defined AUTOGEN_DEFINITIONS goto AUTOGEN_DEFINITIONS_END
@@ -36,21 +34,28 @@ goto AUTOGEN_DEFINITIONS_LOOP
 
 if not defined APP_MODULE_NAME set "APP_MODULE_NAME=%PROJECT_NAME%"
 
-pushd "%SOURCES_DIR%" && (
-  if exist "%SOURCES_DIR%\help.def" call :CMD "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" help.def
-  call :CMD "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" version.def
+if not exist "%SOURCES_DIR%\gen\" ( mkdir "%SOURCES_DIR%\gen" || exit /b 255 )
+
+pushd "%SOURCES_DIR%\gen" && (
+  if exist "%SOURCES_DIR%\help.def" (
+    call :CMD "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" "%%SOURCES_DIR:\=/%%/help.def" || exit /b 255
+  )
+  call :CMD "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" "%%SOURCES_DIR:\=/%%/version.def" || exit /b 255
   popd
 ) || exit /b 255
 
 set "THLIBAUTOCFG_BARE_FLAGS= -txt2c"
 if %UNICODE_ENABLED% NEQ 0 set THLIBAUTOCFG_BARE_FLAGS=%THLIBAUTOCFG_BARE_FLAGS% -u
 
-if exist "%CONSOLE_HELP_FILE%.txt" call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools/thlibautocfg.exe"%%THLIBAUTOCFG_BARE_FLAGS%% "%%CONSOLE_HELP_FILE%%.txt" "%%CONSOLE_HELP_FILE%%_inl.hpp"
+if exist "%SOURCES_DIR%\gen\help.txt" (
+  if not exist "%SOURCES_DIR%\gen\help\" ( mkdir "%SOURCES_DIR%\gen\help" || exit /b 255 )
+  pushd "%SOURCES_DIR%\gen" && (
+    call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools/thlibautocfg.exe"%%THLIBAUTOCFG_BARE_FLAGS%% -h "help/{N}.hpp" -m "INCLUDE_HELP_INL_EPILOG({N})\n#include """help/{N}.hpp"""\nINCLUDE_HELP_INL_PROLOG({N})" "%%SOURCES_DIR%%\gen\help.txt" "%%SOURCES_DIR%%\gen\help_inl.hpp" || exit /b 255
+    popd
+  ) || exit /b 255
+)
 
-rem avoid output of this sequence: "error:"
-echo Last return code: %ERRORLEVEL%
-
-exit /b %ERRORLEVEL%
+exit /b 0
 
 :CMD
 echo.^>%*

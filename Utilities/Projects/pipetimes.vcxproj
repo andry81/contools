@@ -192,10 +192,6 @@
     <ClCompile Include="..\src\pipetimes\pipetimes.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\pipetimes\help_inl.hpp" />
-    <ClInclude Include="..\src\pipetimes\version.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\src\pipetimes\help.def" />
     <None Include="..\src\pipetimes\help.tpl" />
     <None Include="..\src\pipetimes\version.def" />

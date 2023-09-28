@@ -192,10 +192,6 @@
     <ClCompile Include="..\src\retakeowner\retakeowner.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\retakeowner\help_inl.hpp" />
-    <ClInclude Include="..\src\retakeowner\version.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\src\retakeowner\help.def" />
     <None Include="..\src\retakeowner\help.tpl" />
     <None Include="..\src\retakeowner\version.def" />

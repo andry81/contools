@@ -192,10 +192,6 @@
     <ClCompile Include="..\src\envvarcmp\envvarcmp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\envvarcmp\help_inl.hpp" />
-    <ClInclude Include="..\src\envvarcmp\version.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\src\envvarcmp\help.def" />
     <None Include="..\src\envvarcmp\help.tpl" />
     <None Include="..\src\envvarcmp\version.def" />
