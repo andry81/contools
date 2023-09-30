@@ -103,11 +103,14 @@ rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
 rem CAUTION:
 rem   The MinTTY must call to `cmd.exe` script at first, not to `callf.exe`, to bypass weird MinTTY escape rules over backslash - `\`.
-(
-  rem The `start` exists here just in case the MinTTY would not close immediately after the start.
-  start "" /B /WAIT %MINTTY_TERMINAL_PREFIX% -e ^
-    "%CONTOOLS_ROOT:/=\%/exec/exec_mintty_prefix.bat" %* & "%CONTOOLS_ROOT:/=\%/std/errlvl.bat"
-)
+
+rem The `callfg` exists here to avoid attachment to the hidden parent console.
+rem In such case a child process after the MinTTY won't close on MinTTY terminal close and will wait on input into different console window.
+"%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callfg.exe" ^
+/disable-ctrl-signals /print-win-error-string ^
+/no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit ^
+/create-child-console ^
+  "" "{*}" %MINTTY_TERMINAL_PREFIX% -e "%COMSPECLNK:/=\%" //c "%CONTOOLS_ROOT:/=\%/exec/exec_mintty_prefix.bat" %* ^^^& "%CONTOOLS_ROOT:/=\%/std/errlvl.bat"
 
 set LASTERROR=%ERRORLEVEL%
 
@@ -139,7 +142,7 @@ rem
   endlocal
   set IMPL_MODE=1
   %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" -cur_console:n ^
+     \"@\"%?~f0%\" {@} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" -cur_console:n ^
     %*
 )
 
