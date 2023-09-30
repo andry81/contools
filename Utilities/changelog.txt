@@ -1,4 +1,7 @@
 2023.09.30:
+* changed: bin/contools/TODO.txt: todo update
+
+2023.09.30:
 * new: bin/contools: binaries update
 
 2023.09.30:
