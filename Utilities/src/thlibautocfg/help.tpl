@@ -49,13 +49,12 @@ Usage: [+ AppName +].exe [/?] <Mode> [<Flags>] <InputFile> <OutputFile>
       Path to the output file to write.
 
   Return codes:
-   -255 - unspecified error
-   -128 - help output
-   -3   - invalid parameters
+    255 - unspecified error
+    128 - help output
+    16  - input/output error
+    2   - invalid parameters
+    1   - invalid format
     0   - succeded
-    1   - <InputFile> or <OutputFile> is empty
-    2   - can't open input file
-    3   - can't open output file
 
   Examples:
     1. thlibautocfg.exe -cfg2c MyProject.cfg MyProject.hpp

@@ -99,7 +99,7 @@ Usage: printf.exe [/?] [<Flags>] [//] <FormatString> [<Arg1> [<Arg2> ... [<ArgN>
    -255 - unspecified error
    -128 - help output
    -2   - invalid format
-   -1   - <FormatString> is empty.
+   -1   - invalid parameters
     0   - succeded
 
   Examples:

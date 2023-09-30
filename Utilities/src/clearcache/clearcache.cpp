@@ -16,12 +16,10 @@ namespace
 {
     enum _error
     {
+        err_unspecified     = -255,
+        err_invalid_format  = -2,
         err_help_output     = -1,
-        err_none            = 0,
-        err_invalid_format  = 1,
-        err_invalid_params  = 2,
-        err_io_error        = 16,
-        err_unspecified     = 255
+        err_none            = 0
     };
 }
 
@@ -32,14 +30,18 @@ int _tmain(int argc, LPTSTR argv[])
     //
 
     if (!argc || !argv[0]) {
-        return err_unspecified;
+        ::fputs("error: invalid command line format", stderr);
+        return err_invalid_format;
     }
 
     //const TCHAR * arg;
     int arg_offset = argv[0][0] != _T('/') ? 1 : 0; // arguments shift detection
 
     if (argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
-        if (argc >= arg_offset + 2) return err_invalid_format;
+        if (argc >= arg_offset + 2) {
+            ::fputs("error: invalid command line format", stderr);
+            return err_invalid_format;
+        }
 
 #define INCLUDE_HELP_INL_EPILOG(N) ::puts(
 #define INCLUDE_HELP_INL_PROLOG(N) );    

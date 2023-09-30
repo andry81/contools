@@ -16,12 +16,11 @@ namespace
 {
     enum _error
     {
-        err_help_output     = -1,
-        err_none            = 0,
-        err_invalid_format  = 1,
-        err_invalid_params  = 2,
-        err_io_error        = 16,
-        err_unspecified     = 255
+        err_unspecified     = -255,
+        err_help_output     = -128,
+        err_invalid_format  = -2,
+        err_invalid_params  = -1,
+        err_none            = 0
     };
 
     struct InArgs : InBaseArgs
@@ -59,6 +58,8 @@ namespace
 
         bool            eval_backslash_esc;             // evaluate backslash escape characters
         bool            eval_dbl_backslash_esc;         // evaluate double backslash escape characters (`\\`)
+        bool            disable_backslash_esc;          // not implemented
+        bool            no_esc;                         // not implemented
     };
 
     struct _Options
@@ -114,14 +115,18 @@ int _tmain(int argc, const TCHAR * argv[])
     //
 
     if (!argc || !argv[0]) {
-        return err_unspecified;
+        ::fputs("error: invalid command line format", stderr);
+        return err_invalid_format;
     }
 
     const TCHAR * arg;
     int arg_offset = arg_offset_begin;
 
     if (argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
-        if (argc >= arg_offset + 2) return err_invalid_format;
+        if (argc >= arg_offset + 2) {
+            ::fputs("error: invalid command line format", stderr);
+            return err_invalid_format;
+        }
 
 #define INCLUDE_HELP_INL_EPILOG(N) ::puts(
 #define INCLUDE_HELP_INL_PROLOG(N) );    

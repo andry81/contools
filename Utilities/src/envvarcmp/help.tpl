@@ -66,7 +66,7 @@ Usage: envvarcmp.exe [/? | <VarName1> <VarName2> [<PrintPrefix> [<EqualString> [
   Return codes:
    -255   - unspecified error
    -128   - help output
-   -2     - invalid format.
+   -2     - invalid format
    -1     - not equal, first variable is less than second.
     0     - equal.
     1     - not equal, first variable is greater or equal than second.

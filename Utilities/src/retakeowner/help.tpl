@@ -13,7 +13,8 @@ Usage: retakeowner.exe [/?] <File>|<Directory> <User>|<Group>
   Return codes:
    -255   - unspecified error
    -128   - help output
-   -3     - invalid parameters
+   -2     - invalid format
+   -1     - invalid parameters
     0     - succeded
     >0    - Win32 errors
 

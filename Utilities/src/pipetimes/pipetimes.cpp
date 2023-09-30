@@ -50,12 +50,10 @@ namespace
 {
     enum _error
     {
-        err_help_output     = -1,
+        err_unspecified     = -255,
+        err_help_output     = -128,
+        err_invalid_format  = -2,
         err_none            = 0,
-        err_invalid_format  = 1,
-        err_invalid_params  = 2,
-        err_io_error        = 16,
-        err_unspecified     = 255
     };
 }
 
@@ -183,10 +181,8 @@ int main(int argc,const char* argv[])
     //  In Windows if you call `CreateProcess` like this: `CreateProcess("a.exe", "/b", ...)`, then the `argv[0]` would be `/b`, not `a.exe`!
     //
 
-    if(!argc || !argv[0])
-        return err_unspecified;
-
-    if(argc < 2 || !argv[1] || !strlen(argv[1])) {
+    if (!argc || !argv[0] || argc < 2 || !argv[1] || !strlen(argv[1])) {
+        ::fputs("error: invalid command line format", stderr);
         return err_invalid_format;
     }
 
@@ -194,7 +190,10 @@ int main(int argc,const char* argv[])
     bool do_append = false;
 
     if(argc >= 2 && argv[1] && !::strcmp(argv[1], "/?")) {
-        if (argc >= 3) return err_invalid_format;
+        if (argc >= 3) {
+            ::fputs("error: invalid command line format", stderr);
+            return err_invalid_format;
+        }
         do_show_help = true; // /?
     }
     else if(!strcmp(argv[1], "/a") || !strcmp(argv[1], "-a"))

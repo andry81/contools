@@ -4579,10 +4579,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
     if ((!app || !app_len) && (!cmd || !cmd_len)) {
         // just in case
-        ret = err_format_empty;
+        ret = err_invalid_format;
+
         if (!g_flags.no_print_gen_error_string) {
-            _print_stderr_message(_T("format arguments are empty\n"));
+            _print_stderr_message(_T("error: invalid command line format\n"));
         }
+
         return ret;
     }
 

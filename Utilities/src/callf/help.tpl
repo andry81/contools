@@ -1432,15 +1432,15 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
   Return codes if `/ret-*` option is not defined:
    -255 - unspecified error
    -254 - SEH exception
-   -128 - help output
    -7   - named pipe connection timeout
    -6   - named pipe connection error
    -5   - input/output error
    -4   - Win32 or COM error
+   -3   - invalid parameters
    -2   - invalid format
-   -1   - both <ApplicationNameFormatString> and <CommandLineFormatString>
-          are empty or <FilePathFormatString> is empty.
+   -1   - help output
     0   - succeded
+   >0   - subprocess exit code
 
   Examples (CreateProcess, no recursion, `cmd.exe` different escaping rules):
     1. callf.exe "${WINDIR}\system32\cmd.exe" "{0} {1}" "/c" "echo.Hello World!"

@@ -2,7 +2,8 @@
 #include "execute.hpp"
 
 
-namespace {
+namespace
+{
     struct InArgs : InBaseArgs
     {
         const TCHAR *       app_fmt_str;
@@ -2881,7 +2882,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             //
 
             if (!argc || !argv[0]) {
-                return err_unspecified;
+                _print_stderr_message(_T("error: invalid command line format"));
+                return err_invalid_format;
             }
 
             int arg_offset = arg_offset_begin;
@@ -4748,7 +4750,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     _put_raw_message_impl(0, STDOUT_FILENO, "Press any key to continue . . . \n");
                 }
 
-                getch();
+                _getch();
             }
 
 

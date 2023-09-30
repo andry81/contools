@@ -11,8 +11,8 @@ Usage: clearcache.exe [/?] <DriveRoot1> [<DriveRoot2> ... [<DriveRootN>]]
 
   Return codes:
    -255 - unspecified error
-   -128 - help output
-   -2   - invalid format.
+   -2   - invalid format
+   -1   - help output
     0   - succeded
    >0   - Win32 errors
 

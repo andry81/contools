@@ -25,8 +25,9 @@ Usage: chcp.exe [/?] [<Flags>] [//] [<InputOutputCodePage>]
       <OutputCodePage>:<InputCodePage>
 
   Return codes:
-   -255 - unspecified error
-   -128 - help output
-   -127 - conversion error
-   -3   - invalid params
+    255 - unspecified error
+    127 - conversion error
+    2   - invalid parameters
+    1   - invalid format
+   -1   - help output
     0   - succeded

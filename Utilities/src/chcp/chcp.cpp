@@ -22,7 +22,7 @@ namespace
         err_none            = 0,
         err_invalid_format  = 1,
         err_invalid_params  = 2,
-        err_io_error        = 16,
+        err_conversion      = 127,
         err_unspecified     = 255
     };
 
@@ -54,7 +54,8 @@ int _tmain(int argc, const TCHAR * argv[])
     //
 
     if (!argc || !argv[0]) {
-        return err_unspecified;
+        ::fputs("error: invalid command line format", stderr);
+        return err_invalid_format;
     }
 
     size_t arg_len = 0;
@@ -62,7 +63,10 @@ int _tmain(int argc, const TCHAR * argv[])
     int arg_offset = argv[0][0] != _T('/') ? 1 : 0; // arguments shift detection
 
     if (argc >= arg_offset + 1 && argv[arg_offset] && !tstrcmp(argv[arg_offset], _T("/?"))) {
-        if (argc >= arg_offset + 2) return err_invalid_format;
+        if (argc >= arg_offset + 2) {
+            ::fputs("error: invalid command line format", stderr);
+            return err_invalid_format;
+        }
 
 #define INCLUDE_HELP_INL_EPILOG(N) ::puts(
 #define INCLUDE_HELP_INL_PROLOG(N) );        
@@ -77,7 +81,7 @@ int _tmain(int argc, const TCHAR * argv[])
         arg = argv[arg_offset];
         if (!arg) {
             if (!g_flags.no_print_gen_error_string) {
-                fputs("error: flag is invalid", stderr);
+                ::fputs("error: flag is invalid", stderr);
             }
             return err_invalid_format;
         }
@@ -98,7 +102,7 @@ int _tmain(int argc, const TCHAR * argv[])
             }
             else {
                 if (!g_flags.no_print_gen_error_string) {
-                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\""), arg);
+                    ::_ftprintf(stderr, _T("error: flag format is invalid: \"%s\""), arg);
                 }
                 return err_invalid_format;
             }
@@ -110,7 +114,7 @@ int _tmain(int argc, const TCHAR * argv[])
             }
             else {
                 if (!g_flags.no_print_gen_error_string) {
-                    _ftprintf(stderr, _T("error: flag format is invalid: \"%s\""), arg);
+                    ::_ftprintf(stderr, _T("error: flag format is invalid: \"%s\""), arg);
                 }
                 return err_invalid_format;
             }
@@ -139,7 +143,7 @@ int _tmain(int argc, const TCHAR * argv[])
 
     if (chcp_inout && (g_options.chcp_in || g_options.chcp_out)) {
         if (!g_flags.no_print_gen_error_string) {
-            fputs("error: invalid parameters", stderr);
+            ::fputs("error: invalid parameters", stderr);
         }
         return err_invalid_params;
     }
@@ -201,7 +205,7 @@ int _tmain(int argc, const TCHAR * argv[])
                 WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), byte_buf.data(), (std::min)((size_t)num_chars, byte_buf.size()), &num_bytes_written, NULL);
             }
             else {
-                return -127;
+                return err_conversion;
             }
 #else
             WriteFile(GetStdHandle(STD_OUTPUT_HANDLE), tchar_buf.data(), tchar_buf.size() * sizeof(tchar_buf[0]), &num_bytes_written, NULL);

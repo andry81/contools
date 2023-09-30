@@ -36,4 +36,6 @@ Usage: pipetimes.exe [/? | [-a] <IndexFile>] [<PipeFile>]
    -128 - help output
    -2   - invalid format
     0   - succeded
-   >0   - errors
+    1   - invalid stdin
+    2   - stdin is a console
+    7   - invalid <IndexFile>

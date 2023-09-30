@@ -1,3 +1,16 @@
+2023.09.30:
+* fixed: src/printf: execution fixup
+* changed: src: exit codes reworked
+
+2023.09.29
+* new: src/thlibautocfg: added `-h <file-path-template>` option to split output into files with less than 64K length (or at least 1 line) included into the main output file
+* new: src/thlibautocfg: added `-m <output-file-line-template>` option to insert into the main output file a custom template lines (`-h ...` option must be used)
+* new: src/_common/std: c++ template and overload functions over std c functions
+* changed: src, BuildTools: switched to use recent version of `thlibautocfg tool`
+* chnaged: src/_common/std: reimplemented functions with `std::tstring` type into templated functions
+* refactor: src/thlibautocfg: code refactor
+* refactor: src: moved files generation into `gen` subdirectory
+
 2023.09.23:
 * changed: bin/contools/TODO.txt: todo update
 

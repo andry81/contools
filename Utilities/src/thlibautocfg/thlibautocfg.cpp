@@ -511,11 +511,6 @@ int main(int argc, char * argv[])
         return err_invalid_format;
     }
 
-    if (argc < 4) {
-        ::fputs("error: invalid parameters format", stderr);
-        return err_invalid_format;
-    }
-
     bool do_show_help = false;
 
     int arg_offset = 0;
@@ -543,9 +538,14 @@ int main(int argc, char * argv[])
             mode = mode_txt2c; // -txt2c
         }
         else {
-            ::fputs("error: invalid parameters: mode", stderr);
+            ::fputs("error: invalid parameter: mode", stderr);
             return err_invalid_params;
         }
+    }
+
+    if (!do_show_help && argc < 4) {
+        ::fputs("error: invalid parameters format", stderr);
+        return err_invalid_format;
     }
 
     const char * h_file_path_tmpl_str;
