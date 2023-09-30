@@ -1,4 +1,7 @@
 2023.09.30:
+* new: bin/contools: binaries update
+
+2023.09.30:
 * fixed: src/printf: execution fixup
 * changed: src: exit codes reworked
 
@@ -8,6 +11,7 @@
 * new: src/_common/std: c++ template and overload functions over std c functions
 * changed: src, BuildTools: switched to use recent version of `thlibautocfg tool`
 * chnaged: src/_common/std: reimplemented functions with `std::tstring` type into templated functions
+* changed: src/*/version.def: versions increment
 * refactor: src/thlibautocfg: code refactor
 * refactor: src: moved files generation into `gen` subdirectory
 
