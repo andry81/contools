@@ -1,4 +1,7 @@
 2023.10.01:
+* new: Scripts/Tools/ToolAdaptors/lnk/chcp.com.lnk: example of minimalistic shortcut file to `.com` extension executable (not `.pif` extension)
+
+2023.10.01:
 * fixed: Utilities/src/callf: Win32 API functions dynamic load because of compatability with Windows XP
 * fixed: Utilities/src/callf: missed to collect early printed messages
 * changed: Utilities/src/callf: store size of allocated shared memory block in the beginning of a block (`/load-parent-proc-init-env-vars` flag implementation)
