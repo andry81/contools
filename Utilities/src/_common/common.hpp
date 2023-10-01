@@ -43,6 +43,7 @@
 #include "std/tstdio.hpp"
 #include "std/ttime.hpp"
 
+#include "tacklelib/utility/preprocessor.hpp"
 #include "tacklelib/utility/platform.hpp"
 #include "tacklelib/utility/type_identity.hpp"
 #include "tacklelib/utility/string_identity.hpp"
@@ -82,6 +83,16 @@
 #else
 #   define IF_CONSOLE_APP(t, f) f
 #endif
+
+#define CALL_IF(func_ptr) if (!(func_ptr)); else func_ptr
+#define CALL_IF_EXPR(func_ptr) (func_ptr) ? func_ptr
+
+#define DECLARE_DYN_DLL_FUNC(func_name, func_sig) \
+    using UTILITY_PP_CONCAT(func_name, _t) = func_sig; \
+    extern UTILITY_PP_CONCAT(func_name, _t) UTILITY_PP_CONCAT3(g_, func_name, _ptr);
+
+#define DEFINE_DYN_DLL_FUNC(func_name) \
+    UTILITY_PP_CONCAT(func_name, _t) UTILITY_PP_CONCAT3(g_, func_name, _ptr) = nullptr
 
 #ifndef _WIN32_WINNT_WIN8
 #   define _WIN32_WINNT_WIN8                   0x0602
@@ -169,153 +180,155 @@ struct StdHandlesState
     mutable DWORD stderr_last_error;
 };
 
+using uint_t = unsigned int;
+
+using const_tchar_ptr_vector_t = std::vector<const TCHAR *>;
+using tstring_vector_t = std::vector<std::tstring>;
+
+struct _WinVer
+{
+    uint_t major;
+    uint_t minor;
+    uint_t build;
+};
+
+struct _FileId
+{
+    enum {
+        fileid_unknown,
+        fileid_index64,
+        fileid_index128
+    } fileid_type;
+
+    union {
+        struct {
+            DWORD dwVolumeSerialNumber;
+            DWORD nFileIndexHigh;
+            DWORD nFileIndexLow;
+        } index64;
+
+        struct {
+            ULONGLONG   VolumeSerialNumber;
+            FILE_ID_128 FileId;
+        } index128;
+    };
+
+    _FileId() :
+        fileid_type(fileid_unknown)
+    {
+    }
+
+    _FileId(DWORD dwVolumeSerialNumber, DWORD nFileIndexHigh, DWORD nFileIndexLow) :
+        fileid_type(fileid_index64)
+    {
+        index64.dwVolumeSerialNumber = dwVolumeSerialNumber;
+        index64.nFileIndexHigh = nFileIndexHigh;
+        index64.nFileIndexLow = nFileIndexLow;
+    }
+
+    _FileId(ULONGLONG VolumeSerialNumber, const FILE_ID_128 & FileId) :
+        fileid_type(fileid_index128)
+    {
+        index128.VolumeSerialNumber = VolumeSerialNumber;
+        index128.FileId = FileId;
+    }
+
+    ~_FileId()
+    {
+    }
+
+    std::tstring to_tstring(TCHAR separator = _T('-')) const;
+};
+
+struct _AnyString
+{
+    _AnyString(const std::string & astr_) :
+        astr(astr_), is_wstr(false)
+    {
+    }
+
+    _AnyString(std::string && astr_) :
+        astr(std::move(astr_)), is_wstr(false)
+    {
+    }
+
+    _AnyString(const std::wstring & wstr_) :
+        wstr(wstr_), is_wstr(true)
+    {
+    }
+
+    _AnyString(std::wstring && wstr_) :
+        wstr(std::move(wstr_)), is_wstr(true)
+    {
+    }
+
+    _AnyString(const _AnyString & anystr);
+    _AnyString(_AnyString && anystr);
+
+    ~_AnyString();
+
+    union {
+        std::string     astr;
+        std::wstring    wstr;
+    };
+    bool                is_wstr;
+};
+
+struct _ConsoleOutput
+{
+    int         stream_type;
+    _AnyString  any_str;
+};
+
+struct _EnumConsoleWindowsProcData
+{
+    TCHAR tchar_buf[256];
+    std::vector<HWND> console_window_handles_arr;
+};
+
+struct _ConsoleWindowOwnerProc
+{
+    DWORD proc_id;
+    HWND  console_window;   // NULL if not owned
+
+    _ConsoleWindowOwnerProc() :
+        proc_id(-1), console_window()
+    {
+    }
+
+    _ConsoleWindowOwnerProc(DWORD proc_id_, HWND console_window_) :
+        proc_id(proc_id_), console_window(console_window_)
+    {
+    }
+
+    _ConsoleWindowOwnerProc(const _ConsoleWindowOwnerProc &) = default;
+    _ConsoleWindowOwnerProc(_ConsoleWindowOwnerProc &&) = default;
+
+    _ConsoleWindowOwnerProc & operator =(const _ConsoleWindowOwnerProc &) = default;
+    _ConsoleWindowOwnerProc & operator =(_ConsoleWindowOwnerProc &&) = default;
+};
+
+//struct _to_lower_with_codepage
+//{
+//    _to_lower_with_codepage(unsigned int code_page_) :
+//        code_page(code_page_)
+//    {
+//    }
+
+//    std::tstring::value_type operator()(std::tstring::value_type ch_)
+//    {
+//        return _to_lower(ch_, code_page);
+//    }
+
+//    unsigned int code_page;
+//};
+
+DECLARE_DYN_DLL_FUNC(GetFileInformationByHandleEx,      WINBASEAPI BOOL (WINAPI *)(HANDLE, FILE_INFO_BY_HANDLE_CLASS, LPVOID, DWORD));  // Windows 7+
+DECLARE_DYN_DLL_FUNC(SetEnvironmentStringsW,            WINBASEAPI BOOL (WINAPI *)(LPWCH));         // Windows XP x64 SP2+
+
 
 namespace
 {
-    using uint_t = unsigned int;
-
-    using const_tchar_ptr_vector_t = std::vector<const TCHAR *>;
-    using tstring_vector_t = std::vector<std::tstring>;
-
-    struct _WinVer
-    {
-        uint_t major;
-        uint_t minor;
-        uint_t build;
-    };
-
-    struct _FileId
-    {
-        enum {
-            fileid_unknown,
-            fileid_index64,
-            fileid_index128
-        } fileid_type;
-
-        union {
-            struct {
-                DWORD dwVolumeSerialNumber;
-                DWORD nFileIndexHigh;
-                DWORD nFileIndexLow;
-            } index64;
-
-            struct {
-                ULONGLONG   VolumeSerialNumber;
-                FILE_ID_128 FileId;
-            } index128;
-        };
-
-        _FileId() :
-            fileid_type(fileid_unknown)
-        {
-        }
-
-        _FileId(DWORD dwVolumeSerialNumber, DWORD nFileIndexHigh, DWORD nFileIndexLow) :
-            fileid_type(fileid_index64)
-        {
-            index64.dwVolumeSerialNumber = dwVolumeSerialNumber;
-            index64.nFileIndexHigh = nFileIndexHigh;
-            index64.nFileIndexLow = nFileIndexLow;
-        }
-
-        _FileId(ULONGLONG VolumeSerialNumber, const FILE_ID_128 & FileId) :
-            fileid_type(fileid_index128)
-        {
-            index128.VolumeSerialNumber = VolumeSerialNumber;
-            index128.FileId = FileId;
-        }
-
-        ~_FileId()
-        {
-        }
-
-        std::tstring to_tstring(TCHAR separator = _T('-')) const;
-    };
-
-    struct _AnyString
-    {
-        _AnyString(const std::string & astr_) :
-            astr(astr_), is_wstr(false)
-        {
-        }
-
-        _AnyString(std::string && astr_) :
-            astr(std::move(astr_)), is_wstr(false)
-        {
-        }
-
-        _AnyString(const std::wstring & wstr_) :
-            wstr(wstr_), is_wstr(true)
-        {
-        }
-
-        _AnyString(std::wstring && wstr_) :
-            wstr(std::move(wstr_)), is_wstr(true)
-        {
-        }
-
-        _AnyString(const _AnyString & anystr);
-        _AnyString(_AnyString && anystr);
-
-        ~_AnyString();
-
-        union {
-            std::string     astr;
-            std::wstring    wstr;
-        };
-        bool                is_wstr;
-    };
-
-    struct _ConsoleOutput
-    {
-        int         stream_type;
-        _AnyString  any_str;
-    };
-
-    struct _EnumConsoleWindowsProcData
-    {
-        TCHAR tchar_buf[256];
-        std::vector<HWND> console_window_handles_arr;
-    };
-
-    struct _ConsoleWindowOwnerProc
-    {
-        DWORD proc_id;
-        HWND  console_window;   // NULL if not owned
-
-        _ConsoleWindowOwnerProc() :
-            proc_id(-1), console_window()
-        {
-        }
-
-        _ConsoleWindowOwnerProc(DWORD proc_id_, HWND console_window_) :
-            proc_id(proc_id_), console_window(console_window_)
-        {
-        }
-
-        _ConsoleWindowOwnerProc(const _ConsoleWindowOwnerProc &) = default;
-        _ConsoleWindowOwnerProc(_ConsoleWindowOwnerProc &&) = default;
-
-        _ConsoleWindowOwnerProc & operator =(const _ConsoleWindowOwnerProc &) = default;
-        _ConsoleWindowOwnerProc & operator =(_ConsoleWindowOwnerProc &&) = default;
-    };
-
-    //struct _to_lower_with_codepage
-    //{
-    //    _to_lower_with_codepage(unsigned int code_page_) :
-    //        code_page(code_page_)
-    //    {
-    //    }
-
-    //    std::tstring::value_type operator()(std::tstring::value_type ch_)
-    //    {
-    //        return _to_lower(ch_, code_page);
-    //    }
-
-    //    unsigned int code_page;
-    //};
-
-
     const TCHAR * g_hextbl[] = {
         _T("00"), _T("01"), _T("02"), _T("03"), _T("04"), _T("05"), _T("06"), _T("07"), _T("08"), _T("09"), _T("0A"), _T("0B"), _T("0C"), _T("0D"), _T("0E"), _T("0F"),
         _T("10"), _T("11"), _T("12"), _T("13"), _T("14"), _T("15"), _T("16"), _T("17"), _T("18"), _T("19"), _T("1A"), _T("1B"), _T("1C"), _T("1D"), _T("1E"), _T("1F"),
@@ -334,44 +347,49 @@ namespace
         _T("E0"), _T("E1"), _T("E2"), _T("E3"), _T("E4"), _T("E5"), _T("E6"), _T("E7"), _T("E8"), _T("E9"), _T("EA"), _T("EB"), _T("EC"), _T("ED"), _T("EE"), _T("EF"),
         _T("F0"), _T("F1"), _T("F2"), _T("F3"), _T("F4"), _T("F5"), _T("F6"), _T("F7"), _T("F8"), _T("F9"), _T("FA"), _T("FB"), _T("FC"), _T("FD"), _T("FE"), _T("FF"),
     };
-
-    std::deque<_ConsoleOutput>  g_conout_prints_buf;
-    bool                        g_enable_conout_prints_buffering;
+}
 
 
-    inline std::tstring _FileId::to_tstring(TCHAR separator) const
+extern std::deque<_ConsoleOutput>  g_conout_prints_buf;
+extern bool                        g_enable_conout_prints_buffering;    // buffer to print AGAIN later
+
+
+inline std::tstring _FileId::to_tstring(TCHAR separator) const
+{
+    std::tstring ret;
+
+    switch (fileid_type)
     {
-        std::tstring ret;
-
-        switch (fileid_type)
-        {
-        case fileid_index128:
-            for (int i = 0; i < sizeof(index128.VolumeSerialNumber); i++) {
-                ret += g_hextbl[((uint8_t*)&index128.VolumeSerialNumber)[i]];
-            }
-            ret += separator;
-            for (int i = 0; i < sizeof(index128.FileId); i++) {
-                ret += g_hextbl[((uint8_t*)&index128.FileId)[i]];
-            }
-            break;
-        case fileid_index64:
-            for (int i = 0; i < sizeof(index64.dwVolumeSerialNumber); i++) {
-                ret += g_hextbl[((uint8_t*)&index64.dwVolumeSerialNumber)[i]];
-            }
-            ret += separator;
-            for (int i = 0; i < sizeof(index64.nFileIndexHigh); i++) {
-                ret += g_hextbl[((uint8_t*)&index64.nFileIndexHigh)[i]];
-            }
-            ret += separator;
-            for (int i = 0; i < sizeof(index64.nFileIndexLow); i++) {
-                ret += g_hextbl[((uint8_t*)&index64.nFileIndexLow)[i]];
-            }
-            break;
+    case fileid_index128:
+        for (int i = 0; i < sizeof(index128.VolumeSerialNumber); i++) {
+            ret += g_hextbl[((uint8_t*)&index128.VolumeSerialNumber)[i]];
         }
-
-        return ret;
+        ret += separator;
+        for (int i = 0; i < sizeof(index128.FileId); i++) {
+            ret += g_hextbl[((uint8_t*)&index128.FileId)[i]];
+        }
+        break;
+    case fileid_index64:
+        for (int i = 0; i < sizeof(index64.dwVolumeSerialNumber); i++) {
+            ret += g_hextbl[((uint8_t*)&index64.dwVolumeSerialNumber)[i]];
+        }
+        ret += separator;
+        for (int i = 0; i < sizeof(index64.nFileIndexHigh); i++) {
+            ret += g_hextbl[((uint8_t*)&index64.nFileIndexHigh)[i]];
+        }
+        ret += separator;
+        for (int i = 0; i < sizeof(index64.nFileIndexLow); i++) {
+            ret += g_hextbl[((uint8_t*)&index64.nFileIndexLow)[i]];
+        }
+        break;
     }
 
+    return ret;
+}
+
+
+namespace
+{
     template <typename T>
     inline T (&make_singular_array(T & ref))[1]
     {
@@ -580,40 +598,41 @@ inline void StdHandlesState::restore_stderr_state(HANDLE stderr_handle, bool res
 }
 
 
-namespace {
-    inline _AnyString::_AnyString(const _AnyString & anystr) :
-        is_wstr(anystr.is_wstr)
-    {
-        if (is_wstr) {
-            _construct(wstr, anystr.wstr);
-        }
-        else {
-            _construct(astr, anystr.astr);
-        }
+inline _AnyString::_AnyString(const _AnyString & anystr) :
+    is_wstr(anystr.is_wstr)
+{
+    if (is_wstr) {
+        _construct(wstr, anystr.wstr);
     }
-
-    inline _AnyString::_AnyString(_AnyString && anystr) :
-        is_wstr(anystr.is_wstr)
-    {
-        if (is_wstr) {
-            _construct(wstr, std::move(anystr.wstr));
-        }
-        else {
-            _construct(astr, std::move(anystr.astr));
-        }
+    else {
+        _construct(astr, anystr.astr);
     }
+}
 
-    inline _AnyString::~_AnyString()
-    {
-        if (is_wstr) {
-            _destruct(&wstr);
-        }
-        else {
-            _destruct(&astr);
-        }
+inline _AnyString::_AnyString(_AnyString && anystr) :
+    is_wstr(anystr.is_wstr)
+{
+    if (is_wstr) {
+        _construct(wstr, std::move(anystr.wstr));
     }
+    else {
+        _construct(astr, std::move(anystr.astr));
+    }
+}
+
+inline _AnyString::~_AnyString()
+{
+    if (is_wstr) {
+        _destruct(&wstr);
+    }
+    else {
+        _destruct(&astr);
+    }
+}
 
 
+namespace
+{
     inline bool _is_equal_fileid(const _FileId & fileid0, const _FileId & fileid1)
     {
         switch (fileid0.fileid_type)
@@ -729,11 +748,11 @@ namespace {
         return res;
     }
 
-    _FileId _get_fileid_by_file_handle(HANDLE file_handle, const _WinVer & win_ver)
+    _FileId _get_fileid_by_file_handle(HANDLE file_handle)
     {
-        if (win_ver.major > 6 || win_ver.major == 6 && win_ver.minor >= 2) {
+        if (g_GetFileInformationByHandleEx_ptr) {
             FILE_ID_INFO fileid_info{};
-            if (GetFileInformationByHandleEx(file_handle, FileIdInfo, &fileid_info, sizeof(fileid_info))) {
+            if (g_GetFileInformationByHandleEx_ptr(file_handle, FileIdInfo, &fileid_info, sizeof(fileid_info))) {
                 return _FileId{ fileid_info.VolumeSerialNumber, fileid_info.FileId };
             }
         }
@@ -1359,6 +1378,42 @@ namespace {
         return TRUE;
     }
 
+    inline int _wide_char_to_multi_byte(UINT code_page, LPCWSTR in_str, int num_in_chars, std::vector<char> & out_buf)
+    {
+        int num_translated_bytes = WideCharToMultiByte(code_page, 0, in_str, num_in_chars, NULL, 0, NULL, NULL);
+        if (num_translated_bytes) {
+            out_buf.resize(size_t(num_translated_bytes) + (num_in_chars > 0 ? 1U : 0U));
+            num_translated_bytes = WideCharToMultiByte(code_page, 0, in_str, num_in_chars, out_buf.data(), num_translated_bytes, NULL, NULL);
+            if (num_in_chars > 0) {
+                out_buf[size_t(num_translated_bytes)] = '\0';
+            }
+
+            return num_translated_bytes;
+        }
+
+        out_buf.clear();
+
+        return 0;
+    }
+
+    inline int _multi_byte_to_wide_char(UINT code_page, LPCSTR in_str, int num_in_chars, std::vector<wchar_t> & out_buf)
+    {
+        int num_translated_chars = MultiByteToWideChar(code_page, 0, in_str, num_in_chars, NULL, 0);
+        if (num_translated_chars) {
+            out_buf.resize(size_t(num_translated_chars) + (num_in_chars > 0 ? 1U : 0U));
+            num_translated_chars = MultiByteToWideChar(code_page, 0, in_str, num_in_chars, out_buf.data(), num_translated_chars);
+            if (num_in_chars > 0) {
+                out_buf[size_t(num_translated_chars)] = L'\0';
+            }
+
+            return num_translated_chars;
+        }
+
+        out_buf.clear();
+
+        return 0;
+    }
+
     inline DWORD _load_ancestor_proc_env_strs_from_shmem(std::tstring shmem_global_name_prefix_str)
     {
         DWORD ancestor_proc_id;
@@ -1367,7 +1422,7 @@ namespace {
         DWORD current_proc_id = GetCurrentProcessId();
 
         HANDLE env_strs_shmem_handle = INVALID_HANDLE_VALUE;
-        LPCWSTR env_strs_buf = NULL;
+        LPVOID env_strs_shmem_buf = NULL;
 
         [&]() { __try {
             [&]() {
@@ -1394,7 +1449,7 @@ namespace {
                             );
 
                             if (env_strs_shmem_handle) {
-                                env_strs_buf = (LPWSTR)MapViewOfFile(
+                                env_strs_shmem_buf = MapViewOfFile(
                                     env_strs_shmem_handle,
                                     FILE_MAP_READ,
                                     0,
@@ -1402,8 +1457,33 @@ namespace {
                                     0
                                 );
 
-                                if (env_strs_buf) {
-                                    SetEnvironmentStringsW((LPWCH)env_strs_buf);
+                                if (env_strs_shmem_buf) {
+                                    const size_t env_strs_shmem_buf_size = *(uint32_t *)env_strs_shmem_buf;
+                                    LPCWSTR env_strs_buf = (LPCWSTR)((uint8_t *)env_strs_shmem_buf + sizeof(uint32_t));
+
+                                    if (g_SetEnvironmentStringsW_ptr) {
+                                        // TODO: just in case zeroing last 2 characters
+                                        g_SetEnvironmentStringsW_ptr((LPWCH)env_strs_buf);
+                                    }
+                                    else
+                                    {
+                                        if (env_strs_shmem_buf_size > sizeof(uint32_t)) {
+                                            std::vector<char> char_buf;
+
+                                            if (_wide_char_to_multi_byte(CP_UTF8, env_strs_buf,
+                                                (env_strs_shmem_buf_size - sizeof(uint32_t)) / sizeof(env_strs_buf[0]), char_buf)) {
+                                                // just in case zeroing last 2 characters
+                                                const size_t char_buf_size = char_buf.size();
+                                                if (char_buf_size > 1) {
+                                                    *(uint16_t *)((uint8_t *)&char_buf[0] + char_buf_size - 2) = 0;
+                                                }
+                                                else if (char_buf_size > 0) {
+                                                    *((uint8_t *)&char_buf[0] + char_buf_size - 1) = 0;
+                                                }
+                                                SetEnvironmentStringsA(&char_buf[0]);
+                                            }
+                                        }
+                                    }
                                 }
 
                                 break;
@@ -1422,9 +1502,9 @@ namespace {
         __finally {
             _close_handle(env_strs_shmem_handle);
 
-            if (env_strs_buf) {
-                UnmapViewOfFile(env_strs_buf);
-                env_strs_buf = NULL; // just in case
+            if (env_strs_shmem_buf) {
+                UnmapViewOfFile(env_strs_shmem_buf);
+                env_strs_shmem_buf = NULL; // just in case
             }
         } }();
 
@@ -1642,42 +1722,6 @@ namespace {
                 last_offset_ptr = 0; // just in case
             }
         } while (!done);
-    }
-
-    inline int _wide_char_to_multi_byte(UINT code_page, LPCWSTR in_str, int num_in_chars, std::vector<char> & out_buf)
-    {
-        int num_translated_bytes = WideCharToMultiByte(code_page, 0, in_str, num_in_chars, NULL, 0, NULL, NULL);
-        if (num_translated_bytes) {
-            out_buf.resize(size_t(num_translated_bytes) + (num_in_chars > 0 ? 1U : 0U));
-            num_translated_bytes = WideCharToMultiByte(code_page, 0, in_str, num_in_chars, out_buf.data(), num_translated_bytes, NULL, NULL);
-            if (num_in_chars > 0) {
-                out_buf[size_t(num_translated_bytes)] = '\0';
-            }
-
-            return num_translated_bytes;
-        }
-
-        out_buf.clear();
-
-        return 0;
-    }
-
-    inline int _multi_byte_to_wide_char(UINT code_page, LPCSTR in_str, int num_in_chars, std::vector<wchar_t> & out_buf)
-    {
-        int num_translated_chars = MultiByteToWideChar(code_page, 0, in_str, num_in_chars, NULL, 0);
-        if (num_translated_chars) {
-            out_buf.resize(size_t(num_translated_chars) + (num_in_chars > 0 ? 1U : 0U));
-            num_translated_chars = MultiByteToWideChar(code_page, 0, in_str, num_in_chars, out_buf.data(), num_translated_chars);
-            if (num_in_chars > 0) {
-                out_buf[size_t(num_translated_chars)] = L'\0';
-            }
-
-            return num_translated_chars;
-        }
-
-        out_buf.clear();
-
-        return 0;
     }
 
     // flags:

@@ -1,3 +1,12 @@
+2023.10.01:
+* fixed: src/callf: Win32 API functions dynamic load because of compatability with Windows XP
+* fixed: src/callf: missed to collect early printed messages
+* changed: src/callf: store size of allocated shared memory block in the beginning of a block (`/load-parent-proc-init-env-vars` flag implementation)
+* changed: bin/contools/README_EN.txt: readme update
+* changed: src/contools/version.def: version increment
+* new: src/callf: added `/enable-wow64-fs-redir` as opposite to `/disable-wow64-fs-redir`
+* new: src/callf: added `/print-dyn-dll-load-errors` to explicitly print dynamic DLL load errors
+
 2023.09.30:
 * changed: bin/contools/TODO.txt: todo update
 

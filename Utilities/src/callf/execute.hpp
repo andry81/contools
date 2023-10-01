@@ -48,6 +48,8 @@ struct Flags
     // NOTE: the `tee` applies only to the child process here!
     //
 
+    bool            print_dyn_dll_load_errors;
+    bool            enable_wow64_fs_redir;
     bool            disable_wow64_fs_redir;
     bool            disable_ctrl_signals;
     bool            disable_ctrl_c_signal;
@@ -668,7 +670,7 @@ inline void WaitForWorkerThreads(T (& locals)[N], bool cancel_io, bool wait_all 
             if (cancel_io) {
                 // cancel I/O before wait on a thread
                 local.thread_data.cancel_io = true;
-                CancelSynchronousIo(local.thread_handle);
+                CALL_IF(g_CancelSynchronousIo_ptr)(local.thread_handle);
                 DisconnectNamedPipeThreadLocal(local);
             }
 

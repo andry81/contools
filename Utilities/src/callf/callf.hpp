@@ -12,6 +12,15 @@
 #include "common.hpp"
 #include "printf.hpp"
 
+
+DECLARE_DYN_DLL_FUNC(Wow64EnableWow64FsRedirection,     WINBASEAPI BOOLEAN (WINAPI *)(BOOLEAN));    // Windows XP x64 SP2+
+DECLARE_DYN_DLL_FUNC(Wow64DisableWow64FsRedirection,    WINBASEAPI BOOL (WINAPI *)(PVOID*));        // Windows XP x64 SP2+
+DECLARE_DYN_DLL_FUNC(Wow64RevertWow64FsRedirection,     WINBASEAPI BOOL (WINAPI *)(PVOID));         // Windows XP x64 SP2+
+DECLARE_DYN_DLL_FUNC(CancelSynchronousIo,               WINBASEAPI BOOL (WINAPI *)(HANDLE));        // Windows 7+
+DECLARE_DYN_DLL_FUNC(GetTickCount64,                    WINBASEAPI ULONGLONG (WINAPI *)(VOID));     // Windows 7+
+DECLARE_DYN_DLL_FUNC(GetFileInformationByHandleEx,      WINBASEAPI BOOL (WINAPI *)(HANDLE, FILE_INFO_BY_HANDLE_CLASS, LPVOID, DWORD));  // Windows 7+
+DECLARE_DYN_DLL_FUNC(SetEnvironmentStringsW,            WINBASEAPI BOOL (WINAPI *)(LPWCH));         // Windows XP x64 SP2+
+
 extern bool g_is_process_executed;
 extern bool g_is_process_self_elevation;
 extern bool g_is_process_elevating;

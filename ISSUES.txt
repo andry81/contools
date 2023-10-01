@@ -36,17 +36,12 @@ Utilities/tests/manual/contools/callf:
 
   * The `/r* ...` options does not execute for variable arguments
 
-  * Windows XP issues:
+  * Fix `/load-parent-proc-init-env-vars`
 
-    - Load Windows 7+ Win32 API like Wow64DisableWow64FsRedirection
-      dynamically.
+    test in Windows XP x86 SP3
 
-    - Link versus `Visual Studio 2017 - Windows XP (v141_xp)` throws
-      `utilities\src\callf\help_inl.hpp(1574): fatal error C1091: compiler limit: string exceeds 65535 bytes in length`
-      which is fixed in a Platform Toolset 2019 but XP support is dropped from
-      there.
-      To fix the `-txt2c` option in the `thlibautocfg.exe` must support the
-      output file splitting into files less than 64Kb.
+  * Fix leak behind `/load-parent-proc-init-env-vars` before this-process exit
+    (call UnMapViewOfFile and CloseHandle)
 
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat:
 

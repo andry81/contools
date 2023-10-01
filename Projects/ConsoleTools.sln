@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.34031.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConsoleTools", "ConsoleTools", "{D5783557-7EFF-4CA6-A13C-D6A17BA6B8DE}"
 EndProject
@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utility", "utility", "{F186
 	ProjectSection(SolutionItems) = preProject
 		..\Utilities\src\_common\tacklelib\utility\addressof.hpp = ..\Utilities\src\_common\tacklelib\utility\addressof.hpp
 		..\Utilities\src\_common\tacklelib\utility\platform.hpp = ..\Utilities\src\_common\tacklelib\utility\platform.hpp
+		..\Utilities\src\_common\tacklelib\utility\preprocessor.hpp = ..\Utilities\src\_common\tacklelib\utility\preprocessor.hpp
 		..\Utilities\src\_common\tacklelib\utility\string_identity.hpp = ..\Utilities\src\_common\tacklelib\utility\string_identity.hpp
 		..\Utilities\src\_common\tacklelib\utility\type_identity.hpp = ..\Utilities\src\_common\tacklelib\utility\type_identity.hpp
 		..\Utilities\src\_common\tacklelib\utility\type_traits.hpp = ..\Utilities\src\_common\tacklelib\utility\type_traits.hpp
@@ -218,6 +219,9 @@ Global
 		{E17B910A-9CF1-4739-B4F0-D10034CA11FE} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{6163FDF1-845E-4C24-8A88-B99DC955CA2D} = {F07D205C-DA64-4448-B3ED-735FC7EA4B21}
 		{10338F80-0138-4ADE-A891-091A17DC35A8} = {2909C0F5-E8D4-4975-A49C-2B246EE0DE17}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {66B5330E-325F-4709-8747-1847404CB656}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}

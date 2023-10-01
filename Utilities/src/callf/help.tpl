@@ -561,6 +561,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /detach-console
           /detach-inherited-console-on-wait
           /attach-parent-console
+          /print-dyn-dll-load-errors
+          /enable-wow64-fs-redir
           /disable-wow64-fs-redir
           /disable-ctrl-signals
           /disable-ctrl-c-signal
@@ -611,6 +613,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /detach-console
           /detach-inherited-console-on-wait
           /attach-parent-console
+          /print-dyn-dll-load-errors
+          /enable-wow64-fs-redir
           /disable-wow64-fs-redir
           /disable-ctrl-signals
           /disable-ctrl-c-signals
@@ -1292,8 +1296,20 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
     Special flags and options:
 
+      /print-dyn-dll-load-errors
+        Print dynamic DLL load errors.
+
+      /enable-wow64-fs-redir
       /disable-wow64-fs-redir
-        Disables file system redirection for the WOW64 process unconditionally.
+        Enables/Disables file system redirection for the WOW64 process
+        unconditionally.
+
+        Has effect only for a 32-bit executable this-process module on a 64-bit
+        Windows system with functional 32-bit subsystem.
+
+        Has no effect on a 32-bit Windows system without 64-bit support.
+
+        Can not be used together with respective `/*-wow64-fs-redir` flags.
 
       /disable-ctrl-signals
         Disable all control signals handling in this-process such as:

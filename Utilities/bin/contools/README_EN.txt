@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.09.22
+* 2023.10.01
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -148,6 +148,24 @@ Create process or Shell execute in style of c-function printf.
   Examples:
   >
   callf /reopen-stdin 0.in .
+
+* Wow64 redirection control
+
+  Examples:
+  >
+  callf /enable-wow64-fs-redir "" "${SystemRoot}\system32\cmd.exe /c set PROCESSOR_ARCHITE"
+
+  ```cmd
+  PROCESSOR_ARCHITECTURE=x86
+  PROCESSOR_ARCHITEW6432=AMD64
+  ```
+
+  >
+  callf /disable-wow64-fs-redir "" "${SystemRoot}\system32\cmd.exe /c set PROCESSOR_ARCHITE"
+
+  ```cmd
+  PROCESSOR_ARCHITECTURE=AMD64
+  ```
 
 * Process input redirection.
 

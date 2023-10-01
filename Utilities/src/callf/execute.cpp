@@ -155,6 +155,8 @@ Flags::Flags()
 
 void Flags::merge(const Flags & flags)
 {
+    MERGE_FLAG(flags, print_dyn_dll_load_errors);
+    MERGE_FLAG(flags, enable_wow64_fs_redir);
     MERGE_FLAG(flags, disable_wow64_fs_redir);
     MERGE_FLAG(flags, disable_ctrl_signals);
     MERGE_FLAG(flags, disable_ctrl_c_signal);
@@ -2063,7 +2065,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2079,7 +2081,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2110,7 +2112,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2126,7 +2128,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2165,7 +2167,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2181,7 +2183,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2212,7 +2214,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2228,7 +2230,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2267,7 +2269,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2283,7 +2285,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2314,7 +2316,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                     }
 
                     // server named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2330,7 +2332,7 @@ DWORD WINAPI ConnectServerNamedPipeThread(LPVOID lpParam)
                             break;
                         }
 
-                        const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                        const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                         const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2488,7 +2490,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stdin_as_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2543,7 +2545,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2563,7 +2565,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2581,7 +2583,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stdin_to_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2636,7 +2638,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2656,7 +2658,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2682,7 +2684,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stdout_as_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2737,7 +2739,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2757,7 +2759,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2775,7 +2777,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stdout_to_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2830,7 +2832,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2850,7 +2852,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2876,7 +2878,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.reopen_stderr_as_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -2931,7 +2933,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2951,7 +2953,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -2969,7 +2971,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                     const auto pipe_name_str = std::tstring(_T("\\\\.\\pipe\\")) + g_options.tee_stderr_to_client_pipe;
 
                     // client named pipe end wait loop
-                    const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     while (true) {
                         if (thread_data.cancel_io) return -1;
@@ -3024,7 +3026,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
                         }
 
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -3044,7 +3046,7 @@ DWORD WINAPI ConnectClientNamedPipeThread(LPVOID lpParam)
 
                         // check for timeout again
                         {
-                            const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                            const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                             const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -3326,7 +3328,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                 SetFilePointer(g_reopen_std_handles.stdout_handle, 0, NULL, FILE_END);
             }
 
-            g_reopen_stdout_fileid = _get_fileid_by_file_handle(g_reopen_std_handles.stdout_handle, g_options.win_ver);
+            g_reopen_stdout_fileid = _get_fileid_by_file_handle(g_reopen_std_handles.stdout_handle);
 
             // create associated write mutex
             if (g_flags.mutex_std_writes) {
@@ -3534,7 +3536,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                 }
             }
 
-            g_reopen_stderr_fileid = _get_fileid_by_file_handle(g_reopen_std_handles.stderr_handle, g_options.win_ver);
+            g_reopen_stderr_fileid = _get_fileid_by_file_handle(g_reopen_std_handles.stderr_handle);
 
             // check opened handles on equality
 
@@ -4021,7 +4023,7 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
                     }
                 }
 
-                const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                 // server named pipe end wait loop
                 while (true) {
@@ -4038,7 +4040,7 @@ DWORD WINAPI ConnectOutboundServerPipeFromConsoleInputThread(LPVOID lpParam)
                         break;
                     }
 
-                    const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -4121,7 +4123,7 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
                 }
 
                 // server named pipe end wait loop
-                const auto start_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                const auto start_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                 while (true) {
                     if (thread_data.cancel_io) return -1;
@@ -4137,7 +4139,7 @@ DWORD WINAPI ConnectInboundServerPipeToConsoleOutputThread(LPVOID lpParam)
                         break;
                     }
 
-                    const auto end_time_ms = g_options.win_ver.major >= 6 ? GetTickCount64() : GetTickCount();
+                    const auto end_time_ms = CALL_IF_EXPR(g_GetTickCount64_ptr)() : GetTickCount();
 
                     const auto time_delta_ms = end_time_ms >= start_time_ms ? end_time_ms - start_time_ms : 0;
 
@@ -4190,7 +4192,7 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
                 SetFilePointer(g_tee_file_std_handles.stdin_handle, 0, NULL, FILE_END);
             }
 
-            g_tee_file_stdin_fileid = _get_fileid_by_file_handle(g_tee_file_std_handles.stdin_handle, g_options.win_ver);
+            g_tee_file_stdin_fileid = _get_fileid_by_file_handle(g_tee_file_std_handles.stdin_handle);
 
             // create associated write mutex
             if (g_flags.mutex_tee_file_writes) {
@@ -4292,7 +4294,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
                 SetFilePointer(g_tee_file_std_handles.stdout_handle, 0, NULL, FILE_END);
             }
 
-            g_tee_file_stdout_fileid = _get_fileid_by_file_handle(g_tee_file_std_handles.stdout_handle, g_options.win_ver);
+            g_tee_file_stdout_fileid = _get_fileid_by_file_handle(g_tee_file_std_handles.stdout_handle);
         }
         else {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -4425,7 +4427,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
                 SetFilePointer(g_tee_file_std_handles.stderr_handle, 0, NULL, FILE_END);
             }
 
-            g_tee_file_stderr_fileid = _get_fileid_by_file_handle(g_tee_file_std_handles.stderr_handle, g_options.win_ver);
+            g_tee_file_stderr_fileid = _get_fileid_by_file_handle(g_tee_file_std_handles.stderr_handle);
         }
         else {
             if (g_flags.ret_win_error || g_flags.print_win_error_string || !g_flags.no_print_gen_error_string) {
@@ -6621,7 +6623,12 @@ void TranslateCommandLineToElevatedOrUnelevated(
 
     //allow_subst_empty_args
 
-    //load_parent_proc_init_env_vars
+    if (child_flags.load_parent_proc_init_env_vars) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/load-parent-proc-init-env-vars ");
+        }
+    }
+    //regular_flags.load_parent_proc_init_env_vars = false; // leave allowed for both this- processes
 
     if (child_flags.pipe_stdin_to_child_stdin) {
         if (cmd_out_str_ptr) {
@@ -7537,6 +7544,20 @@ void TranslateCommandLineToElevatedOrUnelevated(
     //child_flags.eval_dbl_backslash_esc
     //child_flags.disable_backslash_esc
 
+
+    if (child_flags.print_dyn_dll_load_errors) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/print-dyn-dll-load-errors ");
+        }
+    }
+    regular_flags.enable_wow64_fs_redir = false; // always reset
+
+    if (child_flags.enable_wow64_fs_redir) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/enable-wow64-fs-redir ");
+        }
+    }
+    regular_flags.enable_wow64_fs_redir = false; // always reset
 
     if (child_flags.disable_wow64_fs_redir) {
         if (cmd_out_str_ptr) {

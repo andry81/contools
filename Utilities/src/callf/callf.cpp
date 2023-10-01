@@ -17,9 +17,23 @@ namespace
     };
 }
 
+// Dynamic DLL functions
+
+DEFINE_DYN_DLL_FUNC(Wow64EnableWow64FsRedirection);     // Windows XP x64 SP2+
+DEFINE_DYN_DLL_FUNC(Wow64DisableWow64FsRedirection);    // Windows XP x64 SP2+
+DEFINE_DYN_DLL_FUNC(Wow64RevertWow64FsRedirection);     // Windows XP x64 SP2+
+DEFINE_DYN_DLL_FUNC(CancelSynchronousIo);               // Windows 7+
+DEFINE_DYN_DLL_FUNC(GetTickCount64);                    // Windows 7+
+DEFINE_DYN_DLL_FUNC(GetFileInformationByHandleEx);      // Windows 7+
+DEFINE_DYN_DLL_FUNC(SetEnvironmentStringsW);            // Windows XP x64 SP2+
+
+// globals
+
+std::deque<_ConsoleOutput>  g_conout_prints_buf;
+bool                        g_enable_conout_prints_buffering = true; // enable buffering immediately to collect print messages from very beginning
 
 // WOW64 FileSystem redirection data
-PVOID g_disable_wow64_fs_redir_ptr = NULL;
+PVOID g_disable_wow64_fs_redir_ptr = nullptr;
 
 // sets true just after the CreateProcess or ShellExecute success execute
 bool g_is_process_executed = false;
@@ -70,6 +84,8 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/create-console-title"),
     _T("/own-console-title"),
     _T("/console-title"),
+    _T("/print-dyn-dll-load-errors"),
+    _T("/enable-wow64-fs-redir"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -113,6 +129,8 @@ const TCHAR * g_promote_or_demote_flags_to_preparse_arr[] = {
     _T("/detach-console"),
     _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
+    _T("/print-dyn-dll-load-errors"),
+    _T("/enable-wow64-fs-redir"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -138,6 +156,8 @@ const TCHAR * g_promote_or_demote_parent_flags_to_preparse_arr[] = {
     _T("/detach-console"),
     _T("/detach-inherited-console-on-wait"),
     _T("/attach-parent-console"),
+    _T("/print-dyn-dll-load-errors"),
+    _T("/enable-wow64-fs-redir"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -320,6 +340,8 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/disable-backslash-esc"),
     _T("/no-esc"),
     _T("/set-env-var"), _T("/v"),
+    _T("/print-dyn-dll-load-errors"),
+    _T("/enable-wow64-fs-redir"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -394,6 +416,8 @@ const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
     _T("/eval-dbl-backslash-esc"), _T("/e\\\\"),
     _T("/disable-backslash-esc"),
     _T("/no-esc"),
+    _T("/print-dyn-dll-load-errors"),
+    _T("/enable-wow64-fs-redir"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -468,6 +492,8 @@ const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
     _T("/attach-parent-console"),
     _T("/disable-backslash-esc"),
     _T("/no-esc"),
+    _T("/print-dyn-dll-load-errors"),
+    _T("/enable-wow64-fs-redir"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -583,6 +609,8 @@ const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/attach-parent-console"),
     _T("/disable-backslash-esc"),
     _T("/no-esc"),
+    _T("/print-dyn-dll-load-errors"),
+    _T("/enable-wow64-fs-redir"),
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
@@ -2593,6 +2621,22 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         else error = invalid_format_flag(start_arg);
         return 2;
     }
+    if (IsArgEqualTo(arg, _T("/print-dyn-dll-load-errors"))) {
+        if (is_excluded) return 3;
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.print_dyn_dll_load_errors = true;
+            return 1;
+        }
+        return 0;
+    }
+    if (IsArgEqualTo(arg, _T("/enable-wow64-fs-redir"))) {
+        if (is_excluded) return 3;
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.enable_wow64_fs_redir = true;
+            return 1;
+        }
+        return 0;
+    }
     if (IsArgEqualTo(arg, _T("/disable-wow64-fs-redir"))) {
         if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
@@ -2647,6 +2691,9 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
             flags.disable_conout_duplicate_to_parent_console_on_error = true;
+            // disable print buffering immediately and clear the buffer
+            g_enable_conout_prints_buffering = false;
+            g_conout_prints_buf.clear();
             return 1;
         }
         return 0;
@@ -2799,6 +2846,51 @@ int ParseArgWithSuffixToOption(int & error, const TCHAR * arg, int argc, const T
     return -1;
 }
 
+#define LOAD_DYN_DLL_FUNC(dll_name, func) \
+    UTILITY_PP_CONCAT3(g_, func, _ptr) = (UTILITY_PP_CONCAT(func, _t)) \
+        GetProcAddress( \
+            GetModuleHandleW(UTILITY_PP_STRINGIZE_WIDE(dll_name) L".dll"), \
+            UTILITY_PP_STRINGIZE(func)); \
+    if (!win_error_) { \
+        win_error_ = GetLastError(); \
+    } \
+    if (!UTILITY_PP_CONCAT3(g_, func, _ptr)) { \
+        if (functions_list_str_ptr) { \
+            if (!functions_list_str_ptr->empty()) { \
+                *functions_list_str_ptr += _T(" | "); \
+            } \
+            *functions_list_str_ptr += _T(UTILITY_PP_STRINGIZE(func)); \
+        } \
+        ret = false; \
+    } \
+    ((void)0)
+
+inline bool LoadDynamicDLLFunctions(std::tstring * functions_list_str_ptr, DWORD * win_error_ptr)
+{
+    bool ret = true;
+    DWORD win_error_ = 0;
+
+    if (win_error_ptr) {
+        SetLastError(0); // just in case
+    }
+
+    // Windows XP x64 SP2
+
+    LOAD_DYN_DLL_FUNC(kernel32, Wow64EnableWow64FsRedirection);     // Windows XP x64 SP2+
+    LOAD_DYN_DLL_FUNC(kernel32, Wow64DisableWow64FsRedirection);    // Windows XP x64 SP2+
+    LOAD_DYN_DLL_FUNC(kernel32, Wow64RevertWow64FsRedirection);     // Windows XP x64 SP2+
+    LOAD_DYN_DLL_FUNC(kernel32, CancelSynchronousIo);               // Windows 7+
+    LOAD_DYN_DLL_FUNC(kernel32, GetTickCount64);                    // Windows 7+
+    LOAD_DYN_DLL_FUNC(kernel32, GetFileInformationByHandleEx);      // Windows 7+
+    LOAD_DYN_DLL_FUNC(kernel32, SetEnvironmentStringsW);            // Windows XP x64 SP2+
+
+    if (win_error_ptr) {
+        *win_error_ptr = win_error_;
+    }
+
+    return ret;
+}
+
 int main_seh_except_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep)
 {
     if (g_flags.allow_throw_seh_except) {
@@ -2818,7 +2910,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 {
 #ifndef _CONSOLE
     int argc = 0;
-    LPCWSTR * argv = NULL;
+    LPCWSTR * argv = nullptr;
 
     PWSTR cmdline_str = GetCommandLine();
     argv = const_cast<LPCWSTR *>(CommandLineToArgvW(cmdline_str, &argc));
@@ -2861,7 +2953,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
     HANDLE initial_stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
 
-    LPWCH env_strs = NULL;
+    LPWCH env_strs = nullptr;
     size_t env_strs_len = 0; // excluding last null character
 
     HANDLE env_strs_shmem_handle = INVALID_HANDLE_VALUE;
@@ -3143,7 +3235,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                 const DWORD current_proc_id = GetCurrentProcessId();
 
-                const size_t env_strs_shmem_size = (env_strs_len + 1) * sizeof(WCHAR);
+                // use first 4 bytes to store the memory block size
+                const size_t env_strs_shmem_size = (env_strs_len + 1) * sizeof(WCHAR) + sizeof(uint32_t);
                 
                 HANDLE current_process_token = INVALID_HANDLE_VALUE;
                 
@@ -3173,7 +3266,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                             );
                 
                             if (env_strs_shmem_buf) {
-                                CopyMemory((PVOID)env_strs_shmem_buf, env_strs, env_strs_shmem_size);
+                                *(uint32_t *)env_strs_shmem_buf = env_strs_shmem_size; // allocated shared memory size
+                                CopyMemory((PVOID)((uint8_t *)env_strs_shmem_buf + sizeof(uint32_t)), env_strs, env_strs_shmem_size - sizeof(uint32_t));
                             }
                         }
                     }();
@@ -3244,15 +3338,26 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("`/detach-child-console` flag mixed with `/create-child-console` or `/no-window-console`\n"));
             }
 
-            if (!g_flags.disable_conout_duplicate_to_parent_console_on_error) {
-                // enable console output buffering by default
-                g_enable_conout_prints_buffering = true;
+            // load dynamic call functions
+
+            std::tstring dyn_function_list_str;
+
+            if (!LoadDynamicDLLFunctions(
+                g_flags.print_dyn_dll_load_errors ? &dyn_function_list_str : nullptr,
+                g_flags.print_dyn_dll_load_errors ? &win_error : nullptr)) {
+                if (g_flags.print_dyn_dll_load_errors) {
+                    _print_stderr_message(_T("could not load dynamic functions: win_error=0x%08X (%d) functions=[ %s ]\n"),
+                        win_error, win_error, dyn_function_list_str.c_str());
+                }
             }
 
-            // disable WOW64 FileSystem redirection
+            // enable/disable WOW64 FileSystem redirection
 
-            if (g_flags.disable_wow64_fs_redir) {
-                Wow64DisableWow64FsRedirection(&g_disable_wow64_fs_redir_ptr);
+            if (g_flags.enable_wow64_fs_redir) {
+                CALL_IF(g_Wow64EnableWow64FsRedirection_ptr)(TRUE);
+            }
+            else if (g_flags.disable_wow64_fs_redir) {
+                CALL_IF(g_Wow64DisableWow64FsRedirection_ptr)(&g_disable_wow64_fs_redir_ptr);
             }
 
             // disable control signals
@@ -3281,7 +3386,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     _detach_all_crt_std_handles_nolock();
 
                     _free_console_nolock();
-                    g_owned_console_window = NULL; // not owned after detach
+                    g_owned_console_window = nullptr; // not owned after detach
 
                     g_inherited_console_window = GetConsoleWindow();
                 }
@@ -3322,7 +3427,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                         g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
 
                         if (g_inherited_console_window) {
-                            g_owned_console_window = NULL; // not owned after attach
+                            g_owned_console_window = nullptr; // not owned after attach
                             _reinit_crt_std_handles_nolock(nullptr);
                         }
 
@@ -3354,7 +3459,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                             if (g_inherited_console_window) {
                                 _free_console_nolock();
-                                g_owned_console_window = NULL; // not owned after detach
+                                g_owned_console_window = nullptr; // not owned after detach
                             }
                             g_inherited_console_window = _alloc_console_nolock();
 
@@ -3410,12 +3515,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                             if (g_inherited_console_window) {
                                 _free_console_nolock();
-                                g_owned_console_window = NULL; // not owned after detach
+                                g_owned_console_window = nullptr; // not owned after detach
                             }
                             g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
 
                             if (g_inherited_console_window) {
-                                g_owned_console_window = NULL; // not owned after attach
+                                g_owned_console_window = nullptr; // not owned after attach
                                 _reinit_crt_std_handles_nolock(&g_detached_std_handles);
                             }
 
@@ -3443,7 +3548,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         if (g_inherited_console_window) {
                             _free_console_nolock();
-                            g_owned_console_window = NULL; // not owned after detach
+                            g_owned_console_window = nullptr; // not owned after detach
                         }
                         g_inherited_console_window = _alloc_console_nolock();
 
@@ -3499,12 +3604,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         if (g_inherited_console_window) {
                             _free_console_nolock();
-                            g_owned_console_window = NULL; // not owned after detach
+                            g_owned_console_window = nullptr; // not owned after detach
                         }
                         g_inherited_console_window = _attach_console_nolock(ancestor_console_window_owner_proc.proc_id);
 
                         if (g_inherited_console_window) {
-                            g_owned_console_window = NULL; // not owned after attach
+                            g_owned_console_window = nullptr; // not owned after attach
                             _reinit_crt_std_handles_nolock(&g_detached_std_handles);
                         }
 
@@ -4083,7 +4188,28 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /no-esc\n"));
             }
 
+            // /enable-wow64-fs-redir vs /disable-wow64-fs-redir
+
+            if (g_flags.enable_wow64_fs_redir && g_flags.disable_wow64_fs_redir) {
+                return invalid_format_flag_message(_T("regular options are mixed: /enable-wow64-fs-redir <-> /disable-wow64-fs-redir\n"));
+            }
+
+            if (g_promote_or_demote_flags.enable_wow64_fs_redir && g_promote_or_demote_parent_flags.disable_wow64_fs_redir) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /enable-wow64-fs-redir <-> /disable-wow64-fs-redir\n"));
+            }
+
+            if (g_promote_or_demote_flags.disable_wow64_fs_redir && g_promote_or_demote_parent_flags.enable_wow64_fs_redir) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-wow64-fs-redir <-> /enable-wow64-fs-redir\n"));
+            }
+
+            // /enable-wow64-fs-redir
+
+            if (g_promote_or_demote_flags.enable_wow64_fs_redir && g_promote_or_demote_parent_flags.enable_wow64_fs_redir) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /enable-wow64-fs-redir\n"));
+            }
+
             // /disable-wow64-fs-redir
+
 
             if (g_promote_or_demote_flags.disable_wow64_fs_redir && g_promote_or_demote_parent_flags.disable_wow64_fs_redir) {
                 return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-wow64-fs-redir\n"));
@@ -4408,7 +4534,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     return err_invalid_format;
                 }
                 else {
-                    return GetLastError();
+                    return ret; // GetLastError(); // no need to return random last Win32 error
                 }
             }
 
@@ -4717,6 +4843,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     }
     }
     __finally {
+        // NOTE:
+        //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+        //
         [&]() {
             int ret_ = 0;
             DWORD win_error_ = 0;
@@ -4734,7 +4863,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             if (env_strs) {
                 FreeEnvironmentStringsW(env_strs);
-                env_strs = NULL; // just in case
+                env_strs = nullptr; // just in case
             }
 
             // always reget console window handle
@@ -4791,7 +4920,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
                         if (g_inherited_console_window) {
                             _free_console_nolock();
-                            g_owned_console_window = NULL; // not owned after detach
+                            g_owned_console_window = nullptr; // not owned after detach
 
                             g_inherited_console_window = GetConsoleWindow();
                         }
@@ -4822,7 +4951,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                             // pause again for debugging purposes
                             if (pause_on_exit) {
                                 _put_raw_message_impl(0, STDOUT_FILENO, "[DEBUG] Press any key to continue . . . \n");
-                                getch();
+                                _getch();
                             }
 #endif
                         }
@@ -4831,8 +4960,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
             if (g_flags.disable_wow64_fs_redir) {
-                Wow64RevertWow64FsRedirection(g_disable_wow64_fs_redir_ptr);
-                g_disable_wow64_fs_redir_ptr = NULL; // just in case
+                CALL_IF(g_Wow64RevertWow64FsRedirection_ptr)(g_disable_wow64_fs_redir_ptr);
+                g_disable_wow64_fs_redir_ptr = nullptr; // just in case
             }
 
 #ifndef _CONSOLE
