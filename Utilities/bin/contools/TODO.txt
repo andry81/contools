@@ -254,6 +254,9 @@
   If a child process will exit with not zero exit code, then show the console
   window and pause.
 
+* add `/use-winxp-api` flag to fallback onto Windows XP Win32 API utilization
+  in case of a higher Windows version.
+
 ===============================================================================
 These flags already partially added into `help.tpl`, but still is not implemented:
 ===============================================================================

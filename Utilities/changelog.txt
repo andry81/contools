@@ -1,3 +1,6 @@
+2023.10.02:
+* changed: bin/contools/TODO.txt: todo update
+
 2023.10.01:
 * fixed: src/callf: Win32 API functions dynamic load because of compatability with Windows XP
 * fixed: src/callf: missed to collect early printed messages
