@@ -43,6 +43,14 @@ Utilities/tests/manual/contools/callf:
   * Fix leak behind `/load-parent-proc-init-env-vars` before this-process exit
     (call UnMapViewOfFile and CloseHandle)
 
+  * Fix `callf /D "<long-path>` ...` by using `SetCurrentDirectory` with `\\?\`
+    prefix.
+
+    Add `/CD ...` option to change current directory before a child process
+    creation.
+
+    Update `KNOWN ISSUES` section.
+
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat:
 
   * Does not accept not english characters in files names/paths.
