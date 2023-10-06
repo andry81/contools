@@ -1,4 +1,7 @@
 2023.10.06:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
+2023.10.06:
 * changed: ISSUES.txt: issues update
 
 2023.10.02:

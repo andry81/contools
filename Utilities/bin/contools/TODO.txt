@@ -257,6 +257,11 @@
 * add `/use-winxp-api` flag to fallback onto Windows XP Win32 API utilization
   in case of a higher Windows version.
 
+* rearrange evaluated command line for the `/elevate*` and `/unelevate*`
+  options.
+  For example, group `/v ...` options together and move them to the beginning
+  of the translated command line.
+
 ===============================================================================
 These flags already partially added into `help.tpl`, but still is not implemented:
 ===============================================================================
