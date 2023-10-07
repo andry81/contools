@@ -9,7 +9,8 @@
 '''   update_shortcut.vbs [-CD <CurrentDirectoryPath>]
 '''     [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>]
 '''     [-ignore-unexist] [-allow-auto-recover] [-p[rint-assing]] [-u] [-q]
-'''     [-E[0 | t | a]] [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--]
+'''     [-E[0 | t | a]] [-allow-dos-target-path]
+'''     [-t <ShortcutTarget>] [-args <ShortcutArgs>] [--]
 '''     <ShortcutFilePath>
 
 ''' DESCRIPTION:
@@ -120,6 +121,14 @@
 '''     Expand environment variables only in the shortcut target object.
 '''   -Ea
 '''     Expand environment variables only in the shortcut arguments.
+'''
+'''   -allow-dos-target-path
+'''     Reread target path and if it is truncated, then reset it by a reduced
+'''     DOS path version.
+'''     It is useful when you want to create not truncated shortcut target file
+'''     path to open it by an old version application which does not support
+'''     long paths or UNC paths, but supports open target paths by a shortcut
+'''     file.
 '''
 '''   -t <ShortcutTarget>
 '''     Shortcut target value to assign.
@@ -245,6 +254,8 @@ Dim ExpandShortcutTarget : ExpandShortcutTarget = False
 Dim ExpandShortcutArgs : ExpandShortcutArgs = False
 Dim AlwaysQuote : AlwaysQuote = False
 
+Dim AllowDOSTargetPath : AllowDOSTargetPath = False
+
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
 
 Dim arg
@@ -291,6 +302,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         ExpandShortcutTarget = True
       ElseIf arg = "-Ea" Then ' Expand environment variables only in the shortcut arguments
         ExpandShortcutArgs = True
+      ElseIf arg = "-allow-dos-target-path" Then ' Allow target path reset by a reduced DOS path version
+        AllowDOSTargetPath = True
       Else
         WScript.Echo WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
         WScript.Quit 255
@@ -390,6 +403,22 @@ If ShortcutTargetExist Then
   End If
 
   objSC.TargetPath = ShortcutTarget
+
+  If AllowDOSTargetPath Then
+    Dim ShortcutTargetAbs : ShortcutTargetAbs = objFS.GetAbsolutePathName(ShortcutTarget)
+
+    If Not LCase(objSC.TargetPath) = LCase(ShortcutTargetAbs) Then
+      ' WORKAROUND:
+      '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+      Dim ShortcutTargetFile : Set ShortcutTargetFile = objFS.GetFile("\\?\" & ShortcutTargetAbs)
+      Dim ShortcutTargetShortPath : ShortcutTargetShortPath = ShortcutTargetFile.ShortPath
+      If Left(ShortcutTargetShortPath, 4) = "\\?\" Then
+        ShortcutTargetShortPath = Mid(ShortcutTargetShortPath, 5)
+      End If
+
+      objSC.TargetPath = ShortcutTargetShortPath
+    End If
+  End If
 End If
 
 If ShortcutArgsExist Then

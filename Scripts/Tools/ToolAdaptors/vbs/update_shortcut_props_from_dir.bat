@@ -24,6 +24,8 @@ rem     Do not skip on property empty value assignment.
 rem     By default skips any property assignment by an empty value.
 rem     Has effect only if a value become empty after the replace.
 rem     Has no effect if a value was already empty.
+rem   -no-allow-dos-target-path
+rem     Do not allow target path reset by a reduced DOS path version.
 rem   -use-case-compare
 rem     Use case sensitive compare instead of the case insensitive as by
 rem     default.
@@ -101,6 +103,7 @@ set "FLAG_MATCH_STRING_VALUE="
 set "FLAG_CHCP="
 set FLAG_IGNORE_UNEXIST=0
 set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=0
+set FLAG_NO_ALLOW_DOS_TARGET_PATH=0
 set FLAG_USE_CASE_COMPARE=0
 set FLAG_PRINT_ASSIGN=0
 set "BARE_FLAGS="
@@ -134,6 +137,8 @@ if defined FLAG (
     set FLAG_IGNORE_UNEXIST=1
   ) else if "%FLAG%" == "-no-skip-on-empty-assign" (
     set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=1
+  ) else if "%FLAG%" == "-no-allow-dos-target-path" (
+    set FLAG_NO_ALLOW_DOS_TARGET_PATH=1
   ) else if "%FLAG%" == "-use-case-compare" (
     set FLAG_USE_CASE_COMPARE=1
   ) else if "%FLAG%" == "-print-assign" (
@@ -244,6 +249,8 @@ if not defined PROPS_LIST_FILTERED (
   echo.%~nx0: error: PROPS_LIST is empty or not applied: PROPS_LIST="%PROPS_LIST%".
   exit /b 255
 ) >&2
+
+if %FLAG_NO_ALLOW_DOS_TARGET_PATH% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -allow-dos-target-path
 
 for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 

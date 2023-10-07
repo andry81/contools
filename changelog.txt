@@ -1,3 +1,7 @@
+2023.10.07:
+* new: Scripts/Tools/ToolAdaptors/vbs: *_shortcut.vbs, reset_shortcut_from_dir.bat: added `-allow-dos-target-path` flag to allow target path reset by a reduced DOS path version
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-no-allow-dos-target-path` flag to not allow target path reset by a reduced DOS path version as by default
+
 2023.10.06:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 

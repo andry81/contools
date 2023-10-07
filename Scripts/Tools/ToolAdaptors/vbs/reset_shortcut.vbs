@@ -16,6 +16,7 @@
 '''     [-allow-auto-recover]
 '''     [-allow-target-path-reassign]
 '''     [-allow-wd-reassign]
+'''     [-allow-dos-target-path]
 '''     [-p[rint-assing]] [-q] [--]
 '''     <ShortcutFilePath>
 
@@ -106,6 +107,14 @@
 '''   -allow-wd-reassign
 '''     Allow WorkingDirectory reassign if not been assigned.
 '''     Has no effect if WorkingDirectory is already resetted.
+'''
+'''   -allow-dos-target-path
+'''     Reread target path and if it is truncated, then reset it by a reduced
+'''     DOS path version.
+'''     It is useful when you want to create not truncated shortcut target file
+'''     path to open it by an old version application which does not support
+'''     long paths or UNC paths, but supports open target paths by a shortcut
+'''     file.
 '''
 '''   -p[rint-assign]
 '''     Print assign.
@@ -242,6 +251,8 @@ Dim ShortcutDescExist : ShortcutDescExist = False ' not empty and exists
 
 Dim AlwaysQuote : AlwaysQuote = False
 
+Dim AllowDOSTargetPath : AllowDOSTargetPath = False
+
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
 
 Dim arg
@@ -270,6 +281,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         AllowTargetPathReassign = True
       ElseIf arg = "-allow-wd-reassign" Then
         AllowWorkingDirectoryReassign = True
+      ElseIf arg = "-allow-dos-target-path" Then ' Allow target path reset by a reduced DOS path version
+        AllowDOSTargetPath = True
       ElseIf arg = "-print-assign" Or arg = "-p" Then ' Print assign
         PrintAssign = True
       ElseIf arg = "-CD" Then ' Change current directory
@@ -681,6 +694,23 @@ ElseIf AllowTargetPathReassign Then
     End If
 
     objSC.TargetPath = ShortcutTarget ' reassign
+    ShortcutTargetAssigned = True
+  End If
+End If
+
+If ShortcutTargetAssigned And AllowDOSTargetPath Then
+  Dim ShortcutTargetAbs : ShortcutTargetAbs = objFS.GetAbsolutePathName(ShortcutTarget)
+
+  If Not LCase(objSC.TargetPath) = LCase(ShortcutTargetAbs) Then
+    ' WORKAROUND:
+    '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+    Dim ShortcutTargetFile : Set ShortcutTargetFile = objFS.GetFile("\\?\" & ShortcutTargetAbs)
+    Dim ShortcutTargetShortPath : ShortcutTargetShortPath = ShortcutTargetFile.ShortPath
+    If Left(ShortcutTargetShortPath, 4) = "\\?\" Then
+      ShortcutTargetShortPath = Mid(ShortcutTargetShortPath, 5)
+    End If
+
+    objSC.TargetPath = ShortcutTargetShortPath
   End If
 End If
 
