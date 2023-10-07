@@ -2,7 +2,7 @@
 Thrust library auto configuration utility, version [+ AppMajorVer +].[+ AppMinorVer +].[+ AppRevision +], build [+ AppBuildNum +].
   Console utility for auto generate files from configuration/text files.
 
-Usage: [+ AppName +].exe [/?] <Mode> [<Flags>] <InputFile> <OutputFile>
+Usage: [+ AppName +].exe [/?] <Mode> [<Flags>] [--] <InputFile> <OutputFile>
   Description:
     /?:
       This help.
@@ -11,6 +11,9 @@ Usage: [+ AppName +].exe [/?] <Mode> [<Flags>] <InputFile> <OutputFile>
       cfg2c - Generate header file from configuration file to c/c++
               translation unit.
       txt2c - Generate text file to quoted and commented c-file.
+
+    --
+      Character sequence to stop parse <Flags> command line parameters.
 
     -<Flags>: -<p | a | u | h <file-path-template | m <output-file-line-template>>:
       Uses ONLY in "txt2c" mode.
