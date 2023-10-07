@@ -1,3 +1,7 @@
+2023.10.08:
+* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `--open_short_path_if_gt_limit <max-path-len>` to workaround long paths open by short path open
+* refactor: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: minor refactor
+
 2023.10.07:
 * new: Scripts/Tools/ToolAdaptors/vbs: *_shortcut.vbs, reset_shortcut_from_dir.bat: added `-allow-dos-target-path` flag to allow target path reset by a reduced DOS path version
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-no-allow-dos-target-path` flag to not allow target path reset by a reduced DOS path version as by default
