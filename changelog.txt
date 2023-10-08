@@ -1,5 +1,12 @@
+2023.10.10:
+* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z -append` command line options to append files from a list file to existing instance instead of open a new instance
+* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z -restore_single_instance` command line options to restore instance window show state after files append
+* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z --child_cmdline_len_limit -z <limit>` command line options to limit maximum child instance command line length to append files
+* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z -no_exit_after_append` command line options to not exit the instance after files append
+* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
+
 2023.10.08:
-* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `--open_short_path_if_gt_limit <max-path-len>` to workaround long paths open by short path open
+* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z --open_short_path_if_gt_limit -z <max-path-len>` command line options to workaround long paths open by short path open
 * refactor: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: minor refactor
 
 2023.10.07:
