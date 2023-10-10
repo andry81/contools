@@ -262,6 +262,22 @@
   For example, group `/v ...` options together and move them to the beginning
   of the translated command line.
 
+* add `/subst-short-path-if-gt-limit <limit>` to automatically scan command
+  line for long paths longer than the <limit> and substitute them by a shot
+  path (path must exist).
+
+  Has effect only on absolute paths in format of `<drive>:\...`.
+
+  Can not be used together with `/subst-unc-path-if-gt-limit` option.
+
+* add `/subst-unc-path-if-gt-limit <limit>` to automatically scan command
+  line for long paths longer than the <limit> and substitute them by a UNC
+  path (path must exist) in format `\\?\<drive>:\...`.
+
+  Has effect only on absolute paths in format of `<drive>:\...`.
+
+  Can not be used together with `/subst-short-path-if-gt-limit` option.
+
 ===============================================================================
 These flags already partially added into `help.tpl`, but still is not implemented:
 ===============================================================================
