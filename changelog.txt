@@ -1,3 +1,8 @@
+2023.10.11:
+* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: application hang in append mode
+* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: long file path as short path open instability
+* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: improved tabs order stability in append mode
+
 2023.10.10:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 

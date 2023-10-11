@@ -7,9 +7,11 @@ def toggle_readonly_flag_for_all_tabs():
   active_file = notepad.getCurrentFilename()
 
   num_toggled = 0
+  file_index = len(all_files)
 
   for f in reversed(all_files):
-    print("  - " + f)
+    file_index -= 1
+    print('  [{}] {}'.format(file_index, f))
     notepad.activateFile(f[0])
     notepad.menuCommand(MENUCOMMAND.EDIT_SETREADONLY)
     num_toggled += 1
@@ -75,11 +77,27 @@ def process_notepadpp_windows(restore_single_instance, out_params):
   class InParams:
     current_pid = 0
 
-  user32 = ctypes.windll.user32
   kernel32 = ctypes.windll.kernel32
+  user32 = ctypes.windll.user32
 
   WNDENUMPROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
   SW_RESTORE = wintypes.DWORD(9)
+
+  kernel32.GetCurrentProcessId.restype = wintypes.DWORD
+  kernel32.GetCurrentProcessId.argtypes = []
+
+  user32.EnumWindows.restype = wintypes.BOOL
+  user32.EnumWindows.argtypes = [
+    WNDENUMPROC,      # [in] WNDENUMPROC lpEnumFunc,
+    wintypes.LPARAM   # [in] LPARAM      lParam
+  ]
+
+  user32.GetClassNameW.restype = wintypes.c_int
+  user32.GetClassNameW.argtypes = [
+    wintypes.HWND,    # [in]  HWND   hWnd,
+    wintypes.LPWSTR,  # [out] LPWSTR lpClassName,
+    ctypes.c_int      # [in]  int    nMaxCount
+  ]
 
   in_params = InParams()
 
@@ -143,6 +161,11 @@ def process_extra_command_line():
 
   no_exit_after_append = False
 
+  is_launcher = False
+
+  # to debug purposes
+  is_debug = False
+
   for arg in cmdline_list:
     if arg == '-z':
       continue
@@ -190,6 +213,16 @@ def process_extra_command_line():
         is_multi_instance = True
       elif arg == '-no_exit_after_append':
         no_exit_after_append = True
+      elif arg == '-launcher':
+        is_launcher = True
+      elif arg == '-debug':
+        is_debug = True
+
+  #if is_debug:
+  #  pass
+
+  #if is_launcher:
+  #  pass
 
   # append and restore has meaning ONLY in multi-instance mode
   if not is_multi_instance:
@@ -213,6 +246,7 @@ def process_extra_command_line():
   if open_from_file_list_path:
     if do_append or open_path_len_limit > 0:
       import ctypes
+      from ctypes import wintypes
 
     # construct child command line
     if do_append:
@@ -321,9 +355,17 @@ def process_extra_command_line():
     #     >     Another thought: try using ctypes.
     #     >
 
-    file_path_unc_prefix_utf16le = u'\\\\?\\'.encode('utf-16-le', errors = 'ignore') # a constant
+    file_path_unc_prefix = u'\\\\?\\' # a constant
 
-    kernel32 = ctypes.windll.kernel32
+    if open_path_len_limit > 0:
+      kernel32 = ctypes.windll.kernel32
+
+      kernel32.GetShortPathNameW.restype = wintypes.DWORD
+      kernel32.GetShortPathNameW.argtypes = [
+          wintypes.LPCWSTR,# [in]  LPCWSTR lpszLongPath,
+          wintypes.LPWSTR, # [out] LPWSTR  lpszShortPath,
+          wintypes.DWORD   # [in]  DWORD   cchBuffer
+      ]
 
     for line in file_strings:
       file_path = line.strip()
@@ -333,8 +375,10 @@ def process_extra_command_line():
           file_path = file_path_decoded.encode('utf-8', errors = 'ignore')
         print('  [{}] ({}) {}'.format(num_processed_paths, len(file_path), file_path))
 
-        # 255 is builtin minimum
-        if open_path_len_limit <= 255 or open_path_len_limit >= len(file_path):
+        # 0 or >= 255 - builtin minimum
+        do_open_as_is = True if not open_path_len_limit or open_path_len_limit >= len(file_path) else False
+
+        if do_open_as_is:
           if do_open_inplace:
             notepad.open(file_path)
           else:
@@ -342,22 +386,21 @@ def process_extra_command_line():
 
           num_success_paths += 1
         else:
-          file_path_unc_utf16le = file_path_unc_prefix_utf16le + file_path_decoded.encode('utf-16-le', errors = 'ignore')
-          file_path_buf_size = len(file_path_unc_utf16le) + 1 # in characters
-          file_path_buf = ctypes.create_unicode_buffer(file_path_buf_size) # plus terminator character
+          file_path_unc = file_path_unc_prefix + file_path_decoded
+          file_path_unc_buf = ctypes.create_unicode_buffer(file_path_unc)
 
-          # ISSUE:
-          #   Tests showed `ctypes.windll.kernel32.GetShortPathNameW` can return 0 time to time on a long path file for no reason.
-          #
-          if kernel32.GetShortPathNameW(file_path_unc_utf16le, file_path_buf, file_path_buf_size):
-            file_path = str(file_path_buf.value)
+          file_path_short_buf_size = len(file_path_unc) + 1 # in characters
+          file_path_short_buf = ctypes.create_unicode_buffer(file_path_short_buf_size) # plus terminator character
+
+          if kernel32.GetShortPathNameW(file_path_unc, file_path_short_buf, file_path_short_buf_size):
+            file_path = str(file_path_short_buf.value)
 
             print('    - ({}) {}'.format(len(file_path), file_path))
 
             if do_open_inplace:
-              notepad.open(str(file_path_buf.value))
+              notepad.open(str(file_path_short_buf.value))
             else:
-              child_cmdline_file_list.append(str(file_path_buf.value))
+              child_cmdline_file_list.append(str(file_path_short_buf.value))
 
             num_success_paths += 1
           else:
@@ -370,10 +413,15 @@ def process_extra_command_line():
             #   We have to skip append into a child command line, because in that case Notepad++ does not open the entire command line
             #   including not long file path arguments if at least one argument is a long file path!
             #
+            #   OS:           Windows 8 x64
+            #   Notepad++:    8.5.7 32-bit
+            #   PythonScript: 1.5.4.0 32-bit
+            #   Python:       2.7.18 32-bit
+            #
             #else:
             #  child_cmdline_file_list.append(file_path)
 
-          #file_path_buf = None
+          #file_path_short_buf = None
 
         num_processed_paths += 1
 
@@ -387,7 +435,7 @@ def process_extra_command_line():
     print('executing child subprocess:')
 
     if len(child_cmdline_file_list):
-      import subprocess
+      import subprocess, time
 
       # each command line must be not longer than a command line length limit
       cmdline_len_max = child_cmdline_len_limit
@@ -395,7 +443,7 @@ def process_extra_command_line():
       # count accumulated command line length respective to white space characters
       white_space_chars = ' \t'
 
-      child_subprocess_prefix_cmdline_list = [sys.argv[0]] + child_cmdline_prefix_list[1:]
+      child_subprocess_prefix_cmdline_list = [sys.argv[0]] + child_cmdline_prefix_list[1:] + ['-noPlugin', '-z', '-launcher']
       child_subprocess_prefix_cmdline_len = 0
 
       def cmdline_len(arg_list):
@@ -456,7 +504,24 @@ def process_extra_command_line():
           print('    [{}] ({}) {}'.format(file_index, len(file_path), file_path))
           file_index += 1
 
-        subprocess.call(child_subprocess_prev_cmdline_list, stdin = None, stdout = None, stderr = None, shell = False)
+        # ISSUE:
+        #   Tests showed stable application hang in this place under Python 2.7.18 in Windows 8.
+        #
+        #   OS:           Windows 8 x64
+        #   Notepad++:    8.5.7 32-bit
+        #   PythonScript: 1.5.4.0 32-bit
+        #   Python:       2.7.18 32-bit
+        #
+        #   Suggestion:
+        #     Child Notepad++ process use SendMessage to the parent instance, when the parent instance blocked in the main thread
+        #     by this function call.
+        #
+        #   Workaround:
+        #     Use asynchronous subprocess call from here (use `subprocess.popen` instead of `subprocess.call`).
+        #
+        subprocess.Popen(child_subprocess_prev_cmdline_list, stdin = None, stdout = None, stderr = None, shell = False)
+
+        time.sleep(0.100) # pause to partially sync order of opening
     else:
       print('  - None')
 
