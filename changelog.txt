@@ -1,3 +1,9 @@
+2023.10.13:
+* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: files open instability in append mode by switching to new default implementation
+* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: new default append mode implementation through the WM_COPYDATA message usage and better instances filter out to send message, added `-z -append_by_child_instance` command line options to fall back to previous implementation
+* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
+* refactor: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: `-z -restore_single_instance` options renamed to `-z -restore_if_open_inplace`
+
 2023.10.11:
 * fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: application hang in append mode
 * fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: long file path as short path open instability

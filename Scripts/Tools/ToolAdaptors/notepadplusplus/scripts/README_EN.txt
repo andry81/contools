@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.10.10
+* 2023.10.13
 * contools/notepadplusplus
 
 1. DESCRIPTION
@@ -81,32 +81,49 @@ Additionsl command line arguments:
 `-z -append`
 
   Append mode.
-  Runs Notepad++ as a launcher instance to delegate files opening to child
-  Notepad++ process(es). If a Notepad++ instance already has been running, then
-  appends files to existing Notepad++ instance, otherwise opens a new window
-  instance. If files has appended to existing Notepad++ instance, then after
-  that the launcher does by default auto close.
+  Runs Notepad++ instance to either open the files from a list inplace or
+  delegate files to open them in an already running Notepad++ process.
+  If a Notepad++ instance already has been running and has no `-multiInst`
+  parameter on the command line (shared instance), then the files delegates to
+  open into that instance. After that the launched instance does auto close.
+  If there is no Notepad++ instance without `-multiInst` parameter on the
+  command line (not shared instance), then the files does open inplace.
 
-`-z -restore_single_instance`
+`-z -restore_if_open_inplace`
 
-  Has meaning in the append mode, when the Notepad++ instance does auto close
-  at the end. If there were no other instances, then the Notepad++ does restore
-  the window show state (for example, unminimizes).
-  Useful in case when user want to hide the window blinking.
+  Has meaning in the append mode.
+  If there were no shared instance without `-multiInst` on the command line,
+  then the Notepad++ does restore the window show state (for example,
+  unminimizes) before open inplace.
+  Useful in case when the user want to hide the window blinking.
 
 `-z --child_cmdline_len_limit -z 4096`
 
-  Has meaning in the append mode.
+  Has meaning in the append mode and if `-z -append_by_child_instance` is used.
   Reduces maximum command line length limit which is 32767 as by default.
-  The launcher Notepad++ instance builds each command line until this limit and
-  only after runs it.
+  In case of a delegated open the launched Notepad++ instance builds each
+  command line until this limit and only after runs it.
   To append each file by a separate child Notepad++ process you can set it to
   1.
 
+`-z -append_by_child_instance`
+
+  Has meaning in the append mode.
+  By default file open delegation made through the `NPPM_DOOPEN` Notepad++
+  message as a most reliable. To replace it by a child process method use this
+  options.
+
+`-z -no_activate_after_append`
+
+  Do not activate the Notepad++ instance main window in case of delegated open
+  in the append mode.
+  Useful to avoid window focus change after append.
+
 `-z -no_exit_after_append`
 
-  Do not auto close the launcher Notepad++ instance in case of append mode.
-  Useful to debug the launcher on Python errors from the console.
+  Do not auto close the launched Notepad++ instance in case of delegated open
+  in the append mode.
+  Useful to debug the launched instance on the Python errors from the console.
 
 For the rest options see the `npplib.py` script file.
 
