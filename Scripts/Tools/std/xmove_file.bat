@@ -3,16 +3,22 @@
 rem Author:   Andrey Dibrov (andry at inbox dot ru)
 
 rem Description:
-rem   The `xcopy.exe`/`robocopy.exe` seemless wrapper script with xcopy
+rem   The `move`/`robocopy.exe` seemless wrapper script with xcopy
 rem   compatible command line flags/excludes, echo and some conditions check
-rem   before call to copy a directory to a directory.
+rem   before call to move a file or file pattern in a directory to another
+rem   directory.
 
 rem CAUTION:
-rem   `xcopy.exe` has a file path limit up to 260 characters in a path. To
+rem   `move` has a file path limit up to 260 characters in a path. To
 rem   bypass that limitation we have to use `robocopy.exe` instead
 rem   (Windows Vista and higher ONLY).
 rem
-rem   `robocopy.exe` will copy hidden and archive files by default.
+rem   `move` has less limit for long paths as, for example, for the `if`
+rem    statement, so the `robocopy.exe` is unconditional fall back after the
+rem   `move`.
+rem
+rem   In case of default command line the `robocopy.exe` will move files with
+rem   all attributes and timestamps (`/COPY:DAT /DCOPY:DAT /MOV`).
 
 echo.^>%~nx0 %*
 
@@ -24,8 +30,11 @@ set "?~nx0=%~nx0"
 
 rem script flags
 set "FLAG_CHCP="
-set FLAG_USE_XCOPY=0
-rem Ignore unexisted target directory. Has meaning only in case of `robocopy.exe` usage.
+rem Force `move` instead of `robocopy.exe` usage.
+rem CAUTION: Movement can fail with that flag in case of a long path.
+set FLAG_USE_BUILTIN_MOVE=0
+rem Force `robocopy.exe` instead of `move` usage.
+rem CAUTION: Movement is emulated by copy+delete `robocopy.exe` internal sequence.
 set FLAG_IGNORE_UNEXIST=0
 
 :FLAGS_LOOP
@@ -40,8 +49,8 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
-  ) else if "%FLAG%" == "-use_xcopy" (
-    set FLAG_USE_XCOPY=1
+  ) else if "%FLAG%" == "-use_builtin_move" (
+    set FLAG_USE_BUILTIN_MOVE=1
   ) else if "%FLAG%" == "-ignore_unexist" (
     set FLAG_IGNORE_UNEXIST=1
   ) else (
@@ -56,11 +65,17 @@ if defined FLAG (
 )
 
 set "FROM_PATH=%~1"
-set "TO_PATH=%~2"
+set "FROM_FILE=%~2"
+set "TO_PATH=%~3"
 
 if not defined FROM_PATH (
   echo.%?~nx0%: error: input directory path argument must be defined.
   exit /b -255
+) >&2
+
+if not defined FROM_FILE (
+  echo.%?~nx0%: error: input file argument must be defined.
+  exit /b -254
 ) >&2
 
 if not defined TO_PATH (
@@ -69,6 +84,7 @@ if not defined TO_PATH (
 ) >&2
 
 set "FROM_PATH=%FROM_PATH:/=\%"
+set "FROM_FILE=%FROM_FILE:/=\%"
 set "TO_PATH=%TO_PATH:/=\%"
 
 rem check on missed components...
@@ -90,11 +106,26 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%?~nx0%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+  echo.%?~nx0%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
   exit /b -248
 ) >&2
 
 :FROM_PATH_OK
+
+rem check on missed components...
+
+rem check on invalid characters in file pattern
+if not "%FROM_FILE%" == "%FROM_FILE:\=%" goto FROM_FILE_ERROR
+
+goto FROM_FILE_OK
+
+:FROM_FILE_ERROR
+(
+  echo.%?~n0%: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  exit /b -248
+) >&2
+
+:FROM_FILE_OK
 
 rem check on missed components...
 
@@ -117,26 +148,46 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%?~nx0%: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+  echo.%?~nx0%: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
   exit /b -249
 ) >&2
 
 :TO_PATH_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%~f1\.") do set "FROM_PATH_ABS=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%~f2\.") do set "TO_PATH_ABS=%%~fi"
+for /F "eol= tokens=* delims=" %%i in ("%~f1\.") do set "FROM_DIR_PATH_ABS=%%~fi"
+for /F "eol= tokens=* delims=" %%i in ("%~f3\.") do set "TO_PATH_ABS=%%~fi"
 for /F "eol= tokens=* delims=" %%i in ("%TO_PATH_ABS%") do for /F "eol= tokens=* delims=" %%j in ("%%~dpi\.") do set "TO_PARENT_DIR_ABS=%%~fj"
 
-if not exist "\\?\%FROM_PATH_ABS%\*" (
+if not exist "\\?\%FROM_DIR_PATH_ABS%\*" (
   echo.%?~n0%: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -248
 ) >&2
+
+set "FROM_FILE_PATH_ABS=%FROM_DIR_PATH_ABS%\%FROM_FILE%"
+
+rem check on glob characters in file name
+if not "%FROM_FILE%" == "%FROM_FILE:**=%" goto SKIP_FROM_FILE_CHECK
+if not "%FROM_FILE%" == "%FROM_FILE:?=%" goto SKIP_FROM_FILE_CHECK
+
+rem check on input file existence
+if not exist "\\?\%FROM_FILE_PATH_ABS%" (
+  echo.%?~nx0%: error: input file path does not exist: "%FROM_PATH%\%FROM_FILE%".
+  exit /b -248
+) >&2
+
+rem check on input file as directory existence
+if exist "\\?\%FROM_FILE_PATH_ABS%\*" (
+  echo.%?~nx0%: error: input file is a directory: "%FROM_PATH%\%FROM_FILE%\".
+  exit /b -248
+) >&2
+
+:SKIP_FROM_FILE_CHECK
 
 if %FLAG_IGNORE_UNEXIST% NEQ 0 goto IGNORE_TO_PATH_UNEXIST
 
 if not exist "\\?\%TO_PATH_ABS%\*" (
   echo.%?~n0%: error: output directory does not exist: "%TO_PATH%\"
-  exit /b -247
+  exit /b -249
 ) >&2
 
 goto INIT
@@ -151,52 +202,40 @@ if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
 :INIT
 call "%%?~dp0%%__init__.bat" || exit /b
 
-set XCOPY_FLAGS_=%3 %4 %5 %6 %7 %8 %9
+set XMOVE_FLAGS_=%4 %5 %6 %7 %8 %9
 
-if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
-if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
+set XMOVE_DIR_RECUR=0
 
-:USE_XCOPY
-set "XCOPY_FLAGS="
-for %%i in (%XCOPY_FLAGS_%) do (
-  set XCOPY_FLAG=%%i
-  call :ROBOCOPY_FLAGS_CONVERT %%XCOPY_FLAG%% || exit /b -250
+set "XMOVE_FLAGS="
+for %%i in (%XMOVE_FLAGS_%) do (
+  set XMOVE_FLAG=%%i
+  call :ROBOCOPY_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
 )
+
+if %XMOVE_DIR_RECUR% EQU 0 set XMOVE_DIR_BARE_FLAGS=%XMOVE_DIR_BARE_FLAGS% /A:-D
 
 rem CAUTION:
 rem   You must switch code page into english compatible locale.
 rem
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 
-set "XCOPY_EXCLUDES_CMD="
-set "XCOPY_EXCLUDES_LIST_TMP="
+if %FLAG_USE_BUILTIN_MOVE% EQU 0 ^
+if not exist "%SystemRoot%\system32\robocopy.exe" set FLAG_USE_BUILTIN_MOVE=1
 
-if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_XCOPY_EXCLUDES
+if %FLAG_USE_BUILTIN_MOVE% NEQ 0 call :PARSE_ROBOCOPY_FLAGS
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
-
-set "XCOPY_EXCLUDES_LIST_TMP=%SCRIPT_TEMP_CURRENT_DIR%\$xcopy_excludes.lst"
-
-call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_xcopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" "%%XCOPY_EXCLUDES_LIST_TMP%%" || (
-  echo.%?~n0%: error: xcopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
-  set LASTERROR=-250
-  goto EXIT
-) >&2
-if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%"
-
-:IGNORE_XCOPY_EXCLUDES
-
-rem echo.D will ONLY work if locale is compatible with english !!!
-echo.^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
-echo.D|"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir%XMOVE_DIR_BARE_FLAGS% /B /O:N "%FROM_FILE_PATH_ABS%"`) do (
+  set "FROM_FILE=%%i"
+  echo.^>^>move%XMOVE_FLAGS% "%FROM_DIR_PATH_ABS%\%%i" "%TO_PATH_ABS%"
+  if %FLAG_USE_BUILTIN_MOVE% EQU 0 (
+    move%XMOVE_FLAGS% "%FROM_DIR_PATH_ABS%\%%i" "%TO_PATH_ABS%" || goto BREAK
+  ) else move%XMOVE_FLAGS% "%FROM_DIR_PATH_ABS%\%%i" "%TO_PATH_ABS%" || (
+    call :EXEC_ROBOCOPY || goto BREAK
+  )
+)
+:BREAK
 
 set LASTERROR=%ERRORLEVEL%
-
-:EXIT
-if defined XCOPY_EXCLUDES_LIST_TMP (
-  rem cleanup temporary files
-  call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
-)
 
 rem restore locale
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
@@ -204,24 +243,34 @@ if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 exit /b %LASTERROR%
 
 :ROBOCOPY_FLAGS_CONVERT
-set "XCOPY_FLAG=%~1"
-if not defined XCOPY_FLAG exit /b 0
-set XCOPY_FLAG_PARSED=0
-if "%XCOPY_FLAG:~0,4%" == "/MOV" (
-  echo.%?~n0%: error: /MOV and /MOVE parameters is not accepted to copy a directory.
+set "XMOVE_FLAG=%~1"
+if not defined XMOVE_FLAG exit /b 0
+set XMOVE_FLAG_PARSED=0
+if "%XMOVE_FLAG%" == "/E" (
+  set XMOVE_DIR_RECUR=1
+  exit /b 0
+)
+if "%XMOVE_FLAG:~0,4%" == "/MOV" (
+  echo.%?~n0%: error: /MOV and /MOVE parameters is not accepted to copy a file.
   exit /b 1
 ) >&2
-if %XCOPY_FLAG_PARSED% EQU 0 set "XCOPY_FLAGS=%XCOPY_FLAGS% %XCOPY_FLAG%"
+if %XMOVE_FLAG_PARSED% EQU 0 set "XMOVE_FLAGS=%XMOVE_FLAGS% %XMOVE_FLAG%"
 exit /b 0
 
-:USE_ROBOCOPY
+:EXEC_ROBOCOPY
+echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /MOVE%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
+"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /MOVE%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
+if %ERRORLEVEL% LSS 8 exit /b 0
+exit /b
+
+:PARSE_ROBOCOPY_FLAGS
 set "ROBOCOPY_FLAGS="
 set "ROBOCOPY_ATTR_COPY=0"
 if not defined ROBOCOPY_COPY_FLAGS set "ROBOCOPY_COPY_FLAGS=DAT"
 if not defined ROBOCOPY_DCOPY_FLAGS set "ROBOCOPY_DCOPY_FLAGS=DAT"
-for %%i in (%XCOPY_FLAGS_%) do (
-  set XCOPY_FLAG=%%i
-  call :XCOPY_FLAGS_CONVERT %%XCOPY_FLAG%% || exit /b -250
+for %%i in (%XMOVE_FLAGS_%) do (
+  set XMOVE_FLAG=%%i
+  call :XMOVE_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
 )
 
 set "ROBOCOPY_EXCLUDES_CMD="
@@ -242,30 +291,27 @@ if "%ROBOCOPY_FLAGS:/DCOPY=%" == "%ROBOCOPY_FLAGS%"  set "ROBOCOPY_FLAGS=%ROBOCO
 
 :SKIP_ROBOCOPY_FLAGS
 
-echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
-"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
-if %ERRORLEVEL% LSS 8 exit /b 0
-exit /b
+exit /b 0
 
-:XCOPY_FLAGS_CONVERT
-set "XCOPY_FLAG=%~1"
-if not defined XCOPY_FLAG exit /b 0
-set XCOPY_FLAG_PARSED=0
-if "%XCOPY_FLAG%" == "/Y" exit /b 0
-if "%XCOPY_FLAG%" == "/R" exit /b 0
-if "%XCOPY_FLAG%" == "/D" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /XO" & set XCOPY_FLAG_PARSED=1
+:XMOVE_FLAGS_CONVERT
+set "XMOVE_FLAG=%~1"
+if not defined XMOVE_FLAG exit /b 0
+set XMOVE_FLAG_PARSED=0
+if "%XMOVE_FLAG%" == "/Y" exit /b 0
+if "%XMOVE_FLAG%" == "/R" exit /b 0
+if "%XMOVE_FLAG%" == "/D" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /XO" & set XMOVE_FLAG_PARSED=1
 rem CAUTION:
 rem   DO NOT USE "/IA" flag because:
 rem   1. It does implicitly exclude those files which were not included (implicit exclude).
 rem   2. It does ignore files without any attribute even if all attribute set is used: `/IA:RASHCNETO`.
 rem
-rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/H" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
-rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/K" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
-if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/H" ( set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
-if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/K" ( set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
-if "%XCOPY_FLAG%" == "/O" call :SET_ROBOCOPY_SO_FLAGS
-if "%XCOPY_FLAG%" == "/X" call :SET_ROBOCOPY_U_FLAG
-if %XCOPY_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% %XCOPY_FLAG%"
+rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/H" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
+rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/K" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
+if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/H" ( set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
+if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/K" ( set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
+if "%XMOVE_FLAG%" == "/O" call :SET_ROBOCOPY_SO_FLAGS
+if "%XMOVE_FLAG%" == "/X" call :SET_ROBOCOPY_U_FLAG
+if %XMOVE_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% %XMOVE_FLAG%"
 exit /b 0
 
 :SET_ROBOCOPY_SO_FLAGS
@@ -278,7 +324,7 @@ if not defined ROBOCOPY_DCOPY_FLAGS ( set "ROBOCOPY_DCOPY_FLAGS=SO" & exit /b 0 
 set "ROBOCOPY_DCOPY_FLAGS=%ROBOCOPY_DCOPY_FLAGS:S=%"
 set "ROBOCOPY_DCOPY_FLAGS=%ROBOCOPY_DCOPY_FLAGS:O=%"
 set "ROBOCOPY_DCOPY_FLAGS=%ROBOCOPY_DCOPY_FLAGS%SO"
-set XCOPY_FLAG_PARSED=1
+set XMOVE_FLAG_PARSED=1
 exit /b 0
 
 :SET_ROBOCOPY_U_FLAG
@@ -289,5 +335,5 @@ set "ROBOCOPY_COPY_FLAGS=%ROBOCOPY_COPY_FLAGS%U"
 if not defined ROBOCOPY_DCOPY_FLAGS ( set "ROBOCOPY_DCOPY_FLAGS=U" & exit /b 0 )
 set "ROBOCOPY_DCOPY_FLAGS=%ROBOCOPY_DCOPY_FLAGS:U=%"
 set "ROBOCOPY_DCOPY_FLAGS=%ROBOCOPY_DCOPY_FLAGS%U"
-set XCOPY_FLAG_PARSED=1
+set XMOVE_FLAG_PARSED=1
 exit /b 0
