@@ -1,3 +1,6 @@
+2023.10.15:
+* new: Scripts/Tools/admin/Junction: scripts to list, read and recreate junction points
+
 2023.10.13:
 * fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: files open instability in append mode by switching to new default implementation
 * new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: new default append mode implementation through the WM_COPYDATA message usage and better instances filter out to send message, added `-z -append_by_child_instance` command line options to fall back to previous implementation
