@@ -1,4 +1,7 @@
 2023.10.17:
+* fixed: Scripts/Tools/build/extract_files_from_archive.bat: execution fixup
+
+2023.10.17:
 * fixed: *.bat: workarounded issue around `if exist "...\"` by `if exist "...\*"`
 
 2023.10.16:
