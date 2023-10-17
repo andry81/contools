@@ -56,7 +56,7 @@ if %NO_GEN%0 NEQ 0 set FLAG_NO_LOG=1
 if %NO_LOG%0 NEQ 0 set FLAG_NO_LOG=1
 if %NO_LOG_OUTPUT%0 NEQ 0 set FLAG_NO_LOG=1
 
-if not exist "%PROJECT_LOG_DIR%\" if %FLAG_NO_LOG% EQU 0 (
+if not exist "%PROJECT_LOG_DIR%\*" if %FLAG_NO_LOG% EQU 0 (
   echo.%~nx0%: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
   exit /b 255
 ) >&2

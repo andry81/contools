@@ -47,7 +47,7 @@ goto FROM_PATH_OK
 if not exist "%FROM_PATH%" (
   echo.%~nx0: error: input file path does not exist: "%FROM_PATH%"
   exit /b -253
-) >&2 else if exist "%FROM_PATH%\" (
+) >&2 else if exist "%FROM_PATH%\*" (
   echo.%~nx0: error: input path is a directory path: "%FROM_PATH%"
   exit /b -252
 ) >&2

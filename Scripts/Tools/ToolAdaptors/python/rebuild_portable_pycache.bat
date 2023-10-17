@@ -82,7 +82,7 @@ if not exist "%PYTHON_EXE%" (
 ) >&2
 
 if defined DESTDIR ^
-if exist "%DESTDIR_ABS%\" goto DESTDIR_OK
+if exist "%DESTDIR_ABS%\*" goto DESTDIR_OK
 
 (
   echo.%~nx0: error: DESTDIR is invalid: "%DESTDIR_ABS%"

@@ -14,7 +14,7 @@ rem   Doesn't wait started process.
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
-if exist "%SystemRoot%\Syswow64\" (
+if exist "%SystemRoot%\Syswow64\*" (
   rem Call cmd.exe explicitly with /K paramater.
   if "%~1" == "" (
     "%SystemRoot%\Syswow64\cmd.exe" /K

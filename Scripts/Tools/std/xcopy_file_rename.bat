@@ -165,12 +165,12 @@ goto TO_FILE_OK
 set "FROM_ROOT=%~f1"
 set "TO_ROOT=%~f2"
 
-if not exist "\\?\%FROM_ROOT%\" (
+if not exist "\\?\%FROM_ROOT%\*" (
   echo.%?~nx0%: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -246
 ) >&2
 
-if not exist "\\?\%TO_ROOT%\" (
+if not exist "\\?\%TO_ROOT%\*" (
   echo.%?~nx0%: error: output directory does not exist: "%TO_PATH%\"
   exit /b -245
 ) >&2

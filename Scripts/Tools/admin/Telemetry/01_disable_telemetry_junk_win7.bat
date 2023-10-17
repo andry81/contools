@@ -18,7 +18,7 @@ if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
 if not defined PROCESSOR_ARCHITEW6432 goto X32
 
 rem restart in x64
-if exist "%SystemRoot%\Sysnative\" (
+if exist "%SystemRoot%\Sysnative\*" (
   call :CMD "%%SystemRoot%%\Sysnative\cmd.exe" /C %%0 %%*
   exit /b
 )
@@ -32,7 +32,7 @@ if exist "%SystemRoot%\Sysnative\" (
 rem WORKAROUND:
 rem   Under pure Windows x64 create system64 directory to bypass sysnative directory permissions
 
-if exist "%SystemRoot%\System64\" goto IGNORE_SYSTEM64_CREATE
+if exist "%SystemRoot%\System64\*" goto IGNORE_SYSTEM64_CREATE
 
 call :CMD mklink /D "%%SystemRoot%%\System64" "%%SystemRoot%%\System32"
 if %ERRORLEVEL% NEQ 0 (

@@ -202,7 +202,7 @@ set "PROPS_LIST=%~2"
 set "REPLACE_FROM=%~3"
 set "REPLACE_TO=%~4"
 
-if defined LINKS_DIR if exist "%LINKS_DIR%\" goto LINKS_DIR_EXIST
+if defined LINKS_DIR if exist "%LINKS_DIR%\*" goto LINKS_DIR_EXIST
 
 (
   echo.%~nx0: error: LINKS_DIR does not exist: `%LINKS_DIR%`.

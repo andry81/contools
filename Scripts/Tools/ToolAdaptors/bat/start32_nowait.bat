@@ -13,7 +13,7 @@ rem   Doesn't wait started process.
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
-if not exist "%SystemRoot%\Syswow64\" exit /b -256
+if not exist "%SystemRoot%\Syswow64\*" exit /b -256
 
 rem Workaround:
 rem   The "start" calls cmd.exe with /K parameter, so call cmd.exe explicitly with /C paramater.

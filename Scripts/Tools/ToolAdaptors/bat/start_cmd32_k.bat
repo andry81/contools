@@ -13,7 +13,7 @@ rem   Waits started process.
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
-if not exist "%SystemRoot%\Syswow64\" exit /b -256
+if not exist "%SystemRoot%\Syswow64\*" exit /b -256
 
 "%SystemRoot%\Syswow64\cmd.exe" /K %*
 exit /b

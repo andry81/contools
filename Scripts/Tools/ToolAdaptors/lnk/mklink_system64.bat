@@ -30,7 +30,7 @@ if not defined CONTOOLS_ROOT (
   exit /b 1
 ) >&2
 
-if not exist "%CONTOOLS_ROOT%\" (
+if not exist "%CONTOOLS_ROOT%\*" (
   echo.%~nx0: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%"
   exit /b 2
 ) >&2
@@ -50,7 +50,7 @@ if exist "linkd.exe" goto LINKD
 
 
 :MKLINK
-if not exist "%SYSTEMROOT%\System64\" (
+if not exist "%SYSTEMROOT%\System64\*" (
   if /i "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
     rem already in the 64-bit mode
     call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @mklink /D "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
@@ -63,7 +63,7 @@ if not exist "%SYSTEMROOT%\System64\" (
 exit /b 0
 
 :LINKD
-if not exist "%SYSTEMROOT%\System64\" (
+if not exist "%SYSTEMROOT%\System64\*" (
   if /i "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
     rem already in the 64-bit mode
     call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @linkd.exe "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b

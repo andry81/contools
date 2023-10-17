@@ -111,7 +111,7 @@ exit /b
 
 :CREATE_FILES_DIR
 if defined FILE_DIR_PATH ^
-if not exist "%DIR_PATH%\" (
+if not exist "%DIR_PATH%\*" (
   echo.%?~nx0%: error: found directory does not exist: "%DIR_PATH%"
   exit /b 2
 ) >&2

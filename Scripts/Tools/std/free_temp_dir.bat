@@ -42,7 +42,7 @@ set "SCRIPT_TEMP_PARENT_PATH_DIR_DECORATED=%SCRIPT_TEMP_PARENT_PATH_DIR_DECORATE
 
 if not defined SCRIPT_TEMP_PARENT_PATH_DIR (
   rem remove current dir
-  if exist "\\?\%SCRIPT_TEMP_CURRENT_DIR%\" rmdir /S /Q "%SCRIPT_TEMP_CURRENT_DIR%"
+  if exist "\\?\%SCRIPT_TEMP_CURRENT_DIR%\*" rmdir /S /Q "%SCRIPT_TEMP_CURRENT_DIR%"
   goto IGNORE_REMOVE_PARENT_PATH
 )
 
@@ -53,7 +53,7 @@ rem echo =%SCRIPT_TEMP_BASE_DIR%=%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_N
 
 rem remove parent directory
 for /F "eol= tokens=1,* delims=\" %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_NAME_TOKEN%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%") do (
-  if exist "\\?\%SCRIPT_TEMP_BASE_DIR%\%%i\" rmdir /S /Q "%SCRIPT_TEMP_BASE_DIR%\%%i"
+  if exist "\\?\%SCRIPT_TEMP_BASE_DIR%\%%i\*" rmdir /S /Q "%SCRIPT_TEMP_BASE_DIR%\%%i"
 )
 
 :IGNORE_REMOVE_PARENT_PATH

@@ -69,7 +69,7 @@ rem remove arguments trailing back slashes to avoid exe command line parse old b
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"
 if "%REL_PATH:~-1%" == "\" set "REL_PATH=%REL_PATH:~0,-1%"
 
-if exist "%ARCHIVE_PATH%\" (
+if exist "%ARCHIVE_PATH%\*" (
   call :EXTRACT_FROM_DIR || exit /b 4
 ) else (
   call :EXTRACT_FROM_FILE || exit /b 5

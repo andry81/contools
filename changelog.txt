@@ -1,3 +1,6 @@
+2023.10.17:
+* fixed: *.bat: workarounded issue around `if exist "...\"` by `if exist "...\*"`
+
 2023.10.16:
 * fixed: Scripts/Tools/std/xcopy_*.bat: `/COPY:DAT` and `/DCOPY:DAT` now used by default in case of `robocopy.exe` usage to avoid alter of files and directories modification date and time
 * new: Scripts/Tools/std/xmove_*.bat: move/rename only version of `xcopy_*.bat` scripts to avoid alter of files and directories modification date and time

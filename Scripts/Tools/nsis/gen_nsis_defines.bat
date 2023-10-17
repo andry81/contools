@@ -7,7 +7,7 @@ if not defined PROJECT_ROOT (
   exit /b 1
 ) >&2
 
-if not exist "%PROJECT_ROOT%\" (
+if not exist "%PROJECT_ROOT%\*" (
   echo.%~nx0: error: path does not exist: PROJECT_ROOT="%PROJECT_ROOT%\".
   exit /b 2
 ) >&2

@@ -20,7 +20,7 @@ setlocal
 set "DIR_PATH_FROM=%~f1"
 set "HASH_LIST_FILE=%~f2"
 
-if not exist "%DIR_PATH_FROM%\" (
+if not exist "%DIR_PATH_FROM%\*" (
   echo.%~nx0: error: hashing directory does not exist: "%DIR_PATH_FROM%"
   exit /b 1
 ) >&2

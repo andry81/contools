@@ -115,7 +115,7 @@ mkdir "%CURL_ADAPTOR_DOWNLOAD_TEMP_DIR%" || (
   exit /b 255
 ) >&2
 
-if not exist "%CURL_ADAPTOR_DOWNLOAD_DIR%\" mkdir "%CURL_ADAPTOR_DOWNLOAD_DIR%"
+if not exist "%CURL_ADAPTOR_DOWNLOAD_DIR%\*" mkdir "%CURL_ADAPTOR_DOWNLOAD_DIR%"
 
 rem convert string to integer
 if defined FROM_PAGE set /A "FROM_PAGE*=1"

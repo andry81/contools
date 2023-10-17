@@ -34,7 +34,7 @@ goto AUTOGEN_DEFINITIONS_LOOP
 
 if not defined APP_MODULE_NAME set "APP_MODULE_NAME=%PROJECT_NAME%"
 
-if not exist "%SOURCES_DIR%\gen\" ( mkdir "%SOURCES_DIR%\gen" || exit /b 255 )
+if not exist "%SOURCES_DIR%\gen\*" ( mkdir "%SOURCES_DIR%\gen" || exit /b 255 )
 
 pushd "%SOURCES_DIR%\gen" && (
   if exist "%SOURCES_DIR%\help.def" (
@@ -48,7 +48,7 @@ set "THLIBAUTOCFG_BARE_FLAGS= -txt2c"
 if %UNICODE_ENABLED% NEQ 0 set THLIBAUTOCFG_BARE_FLAGS=%THLIBAUTOCFG_BARE_FLAGS% -u
 
 if exist "%SOURCES_DIR%\gen\help.txt" (
-  if not exist "%SOURCES_DIR%\gen\help\" ( mkdir "%SOURCES_DIR%\gen\help" || exit /b 255 )
+  if not exist "%SOURCES_DIR%\gen\help\*" ( mkdir "%SOURCES_DIR%\gen\help" || exit /b 255 )
   pushd "%SOURCES_DIR%\gen" && (
     call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools/thlibautocfg.exe"%%THLIBAUTOCFG_BARE_FLAGS%% -h "help/{N}.hpp" -m "INCLUDE_HELP_INL_EPILOG({N})\n#include """help/{N}.hpp"""\nINCLUDE_HELP_INL_PROLOG({N})" "%%SOURCES_DIR%%\gen\help.txt" "%%SOURCES_DIR%%\gen\help_inl.hpp" || exit /b 255
     popd

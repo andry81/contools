@@ -70,7 +70,7 @@ set "TARGET_DIR=%~2"
 set "TARGET_DIR_ABS=%~f2"
 
 if not defined SOURCE_DIR goto NO_SOURCE_DIR
-if not exist "%SOURCE_DIR%\" goto NO_SOURCE_DIR
+if not exist "%SOURCE_DIR%\*" goto NO_SOURCE_DIR
 
 goto NO_SOURCE_DIR_END
 :NO_SOURCE_DIR
@@ -81,7 +81,7 @@ goto NO_SOURCE_DIR_END
 :NO_SOURCE_DIR_END
 
 if not defined TARGET_DIR goto NO_TARGET_DIR
-if not exist "%TARGET_DIR%\" goto NO_TARGET_DIR
+if not exist "%TARGET_DIR%\*" goto NO_TARGET_DIR
 
 goto NO_TARGET_DIR_END
 :NO_TARGET_DIR

@@ -23,7 +23,7 @@ if not defined PRINTARGS_EXE_PATH                 call :CANONICAL_PATH PRINTARGS
 if not defined CALLF_EXE_PATH                     call :CANONICAL_PATH CALLF_EXE_PATH       "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools/%%CALLF_EXECUTABLE%%"
 if not defined CALLFG_EXE_PATH                    call :CANONICAL_PATH CALLFG_EXE_PATH      "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools/%%CALLFG_EXECUTABLE%%"
 
-if not exist "%TEST_DATA_OUT_DIR%\" mkdir "%TEST_DATA_OUT_DIR%"
+if not exist "%TEST_DATA_OUT_DIR%\*" mkdir "%TEST_DATA_OUT_DIR%"
 
 set "CONTOOLS_UTILITIES_TESTS_ROOT_INIT0_DIR=%~dp0"
 

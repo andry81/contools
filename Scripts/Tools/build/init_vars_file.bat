@@ -13,7 +13,7 @@ set "INIT_VARS_FILE="
 if %NO_GEN%0 NEQ 0 exit /b 0
 if %NO_LOG%0 NEQ 0 exit /b 0
 
-if not exist "%PROJECT_LOG_DIR%\" (
+if not exist "%PROJECT_LOG_DIR%\*" (
   echo.%~nx0%: error: can not use initial variables file while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
   exit /b 255
 ) >&2

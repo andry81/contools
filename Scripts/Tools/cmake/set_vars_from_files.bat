@@ -27,7 +27,7 @@ set "TEMP_TIME=%DATETIME_VALUE:~8,2%_%DATETIME_VALUE:~10,2%_%DATETIME_VALUE:~12,
 
 set "TEMP_OUTPUT_DIR=%TEMP%\%TEMP_DATE%.%TEMP_TIME%.%~n0"
 
-if exist "%TEMP_OUTPUT_DIR%\" (
+if exist "%TEMP_OUTPUT_DIR%\*" (
   echo.%~nx0: error: temporary generated directory TEMP_OUTPUT_DIR is already exist: "%TEMP_OUTPUT_DIR%"
   exit /b -255
 ) >&2

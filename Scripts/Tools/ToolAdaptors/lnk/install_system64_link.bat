@@ -7,7 +7,7 @@ rem   Installation script to create `System64` directory through the
 rem   `mklink_system64.bat` or `juntion.exe` utility.
 rem
 
-if exist "%SystemRoot%\System64\" exit /b 0
+if exist "%SystemRoot%\System64\*" exit /b 0
 
 setlocal
 
@@ -21,12 +21,12 @@ for %%i in (CONTOOLS_ROOT CONTOOLS_SYSINTERNALS_ROOT) do (
   ) >&2
 )
 
-if not exist "%CONTOOLS_ROOT%\" (
+if not exist "%CONTOOLS_ROOT%\*" (
   echo.%~nx0: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%"
   exit /b 2
 ) >&2
 
-if not exist "%CONTOOLS_SYSINTERNALS_ROOT%\" (
+if not exist "%CONTOOLS_SYSINTERNALS_ROOT%\*" (
   echo.%~nx0: error: CONTOOLS_SYSINTERNALS_ROOT directory does not exist: "%CONTOOLS_SYSINTERNALS_ROOT%"
   exit /b 3
 ) >&2

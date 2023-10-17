@@ -64,12 +64,12 @@ if not defined CONFIG_OUT_DIR (
 for /F "eol= tokens=* delims=" %%i in ("%CONFIG_IN_DIR%\.") do set "CONFIG_IN_DIR=%%~fi"
 for /F "eol= tokens=* delims=" %%i in ("%CONFIG_OUT_DIR%\.") do set "CONFIG_OUT_DIR=%%~fi"
 
-if not exist "%CONFIG_IN_DIR%\" (
+if not exist "%CONFIG_IN_DIR%\*" (
   echo.%?~nx0%: error: input config directory does not exist: "%CONFIG_IN_DIR%".
   exit /b 10
 ) >&2
 
-if not exist "%CONFIG_OUT_DIR%\" (
+if not exist "%CONFIG_OUT_DIR%\*" (
   echo.%?~nx0%: error: output config directory does not exist: "%CONFIG_OUT_DIR%".
   exit /b 11
 ) >&2

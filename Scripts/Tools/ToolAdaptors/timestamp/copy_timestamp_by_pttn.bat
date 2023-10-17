@@ -22,7 +22,7 @@ if not defined OUTPUT_DIR (
   exit /b 2
 ) >&2
 
-if not exist "%OUTPUT_DIR%\" (
+if not exist "%OUTPUT_DIR%\*" (
   echo.%~nx0: error: OUTPUT_DIR output directory path does not exist: "%OUTPUT_DIR%".
   exit /b 3
 ) >&2

@@ -12,7 +12,7 @@ if not defined VDI_DIR (
   exit /b 255
 ) >&2
 
-if not exist "%VDI_DIR%\" (
+if not exist "%VDI_DIR%\*" (
   echo.%~nx0: error: VDI_DIR not exist: VDI_DIR="%VDI_DIR%"
   exit /b 254
 ) >&2

@@ -53,7 +53,7 @@ if not exist "%FILES_PATH%" (
 ) >&2
 
 rem check on file path
-if exist "%FILES_PATH%\" (
+if exist "%FILES_PATH%\*" (
   call :FILES_PATH_AS_DIR
 ) else call :FILES_PATH_AS_FILE "%%FILES_PATH%%"
 

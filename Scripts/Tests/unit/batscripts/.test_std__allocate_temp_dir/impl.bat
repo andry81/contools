@@ -35,7 +35,7 @@ exit /b 0
 :PROCESS_DIR
 call set "TEST_DATA_OUTPUT_FILE_NAME=%%TEST_DATA_OUTPUT_FILE_NAME_PTTN:{{INDEX}}=%DIR_INDEX%%%"
 
-if not exist "%DIR_PATH%\" exit /b 2
+if not exist "%DIR_PATH%\*" exit /b 2
 if not exist "%DIR_PATH%\%DIR_NAME_PTTN%" exit /b 3
 
 set "DIR_NAME="

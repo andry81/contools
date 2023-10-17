@@ -123,7 +123,7 @@ call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
 if defined FILE_DIR_PATH set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
 if defined FILE_DIR_PATH ^
-if not exist "%DIR_PATH%\" (
+if not exist "%DIR_PATH%\*" (
   echo.%?~nx0%: error: found directory does not exist: "%DIR_PATH%"
   exit /b 2
 ) >&2

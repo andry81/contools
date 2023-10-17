@@ -19,7 +19,7 @@ if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
 if not defined PROCESSOR_ARCHITEW6432 goto X32
 
 rem restart in x64
-if exist "%SystemRoot%\Sysnative\" (
+if exist "%SystemRoot%\Sysnative\*" (
   call :CMD "%%SystemRoot%%\Sysnative\cmd.exe" /C @%%0 %%*
   exit /b
 )

@@ -15,7 +15,7 @@ if "%~1" == "" exit /b -1
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
-if exist "%SystemRoot%\Syswow64\" (
+if exist "%SystemRoot%\Syswow64\*" (
   "%SystemRoot%\Syswow64\cmd.exe" /C %*
   exit /b
 )

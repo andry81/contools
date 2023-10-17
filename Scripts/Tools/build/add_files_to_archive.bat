@@ -89,7 +89,7 @@ mkdir "%EMPTY_DIR_TMP%" || (
   exit /b 255
 ) >&2
 
-if not exist "%ARCHIVE_DIR%\" ( call :MAKE_DIR "%%ARCHIVE_DIR%%" || exit /b 2 )
+if not exist "%ARCHIVE_DIR%\*" ( call :MAKE_DIR "%%ARCHIVE_DIR%%" || exit /b 2 )
 
 rem remove arguments trailing back slashes to avoid exe command line parse old bug
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"

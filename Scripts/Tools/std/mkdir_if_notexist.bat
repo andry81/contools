@@ -65,7 +65,7 @@ rem   report existences of a directory without the trailing back slash:
 rem     `x:\<path-to-dir-without-trailing-back-slash>`
 rem   So we must test the path with the trailing back slash to check existence of the link AND it's connection state.
 rem
-if not exist "\\?\%DIR_PATH%" if not exist "\\?\%DIR_PATH%\" set DIR_PATHS=%DIR_PATHS% "%DIR_PATH%"
+if not exist "\\?\%DIR_PATH%" if not exist "\\?\%DIR_PATH%\*" set DIR_PATHS=%DIR_PATHS% "%DIR_PATH%"
 
 shift
 

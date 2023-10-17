@@ -67,7 +67,7 @@ rem   So we must test the path with the trailing back slash to check existence o
 rem
 if not exist "\\?\%DIR_PATH%" (
   set DIR_PATHS=%DIR_PATHS% "%DIR_PATH%"
-) else if not exist "\\?\%DIR_PATH%\" (
+) else if not exist "\\?\%DIR_PATH%\*" (
   echo.%~nx0: error: directory path exist but is not a directory: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
 ) >&2
