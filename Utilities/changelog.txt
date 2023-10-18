@@ -76,6 +76,10 @@
 * changed: src/callf/help.tpl: more details, added terms section
 * refactor: Projects: cleanup
 
+2023.06.24:
+* changed: bin/contools/TODO.txt: todo update
+* changed: src/callf/help.tpl: cleanup
+
 2023.06.04:
 * new: bin/contools: binaries update
 

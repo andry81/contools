@@ -237,6 +237,10 @@
 * changed: Scripts/Tools/exec/exec_terminal_prefix.bat: merge with `exec_callf_prefix.bat` script
 * changed: Scripts/Tools/exec: exec_callf_prefix.bat, exec_terminal_prefix.bat: `FLAG_SHIFT` does not reset if already defined
 
+2023.06.24:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+* changed: Utilities/src/callf/help.tpl: cleanup
+
 2023.06.11:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: fixed case where `WorkingDirectory` property does reset from `TargetPath` when `TargetPath` is failed to assigned after string replace
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-ignore-unexist` flag to skip check `TargetPath` and `WorkingDirectory` property values on file existence
