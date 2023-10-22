@@ -1,3 +1,8 @@
+2023.10.22:
+* new: Scripts/Tools/ToolAdaptors/gitextensions/plink-agent.vbs.cmdline: command line for vbs variant of the `plink-agent.bat` script
+* changed: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline.vbs: added executable variant for a path relative to the script directory (`/executable`)
+* changed: Scripts/Tools/ToolAdaptors/gitextensions/README_EN.txt: readme update
+
 2023.10.17:
 * fixed: Scripts/Tools/build/extract_files_from_archive.bat: execution fixup
 

@@ -1,0 +1,3 @@
+cmd.exe
+/c
+echo 123 & pause

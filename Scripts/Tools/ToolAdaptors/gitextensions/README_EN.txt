@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.08.02
+* 2023.10.22
 * contools--gitextensions
 
 1. DESCRIPTION
@@ -54,6 +54,14 @@ type con | "%~dp0plink.exe" -agent %*
 ```
 
 Then input into the console, revert back to first variant and run again.
+
+Another variant is to use a vbs script with the command line in a standalone
+file:
+
+> **Path to plink**: `<path-to-putty>\plink-agent.vbs`
+
+Put `plink-agent.vbs` and `plink-agent.vbs.cmdline` to the same directory with
+the `plink.exe`.
 
 -------------------------------------------------------------------------------
 3. KNOWN ISSUES
@@ -142,6 +150,17 @@ login as:
 ```
 
 **You must run the Putty authentication agent (Pageant) and add the ssh key.**
+
+As an additional measure add these git configuration variables:
+
+>
+git config --global --replace-all core.sshcommand "path-to-putty\plink-agent.bat"
+
+>
+git config --global --replace-all ssh.variant plink
+
+This will force the git to use plink ssh method and the script with the plink
+variant of the command line.
 
 -------------------------------------------------------------------------------
 3.4. GitExtensions hangs on Pull/Push and Ok button is not enabled.

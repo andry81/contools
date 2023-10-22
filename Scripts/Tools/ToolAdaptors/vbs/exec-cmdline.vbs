@@ -27,6 +27,7 @@ If fso_obj.FileExists(cmdline_file) Then
   Do Until cmdline_file_obj.AtEndOfStream
     line = cmdline_file_obj.Readline
 
+    QuoteArg = False
     If InStr(line, Chr(34)) = 0 Then
       If Len(line & "") = 0 Then
         QuoteArg = True
@@ -45,10 +46,17 @@ If fso_obj.FileExists(cmdline_file) Then
           End If
         Next
       End If
+    End If
 
-      If QuoteArg Or IsCmdArg Then
-        line = Chr(34) & line & Chr(34)
+    If IsCmdArg Then
+      If "/" = Left(line, 1) Then
+        ' is relative to the script directory
+        line = fso_obj.GetAbsolutePathName(script_dir & line)
       End If
+    End If
+
+    If QuoteArg Or IsCmdArg Then
+      line = Chr(34) & line & Chr(34)
     End If
 
     If Len(cmdline) > 0 Then
