@@ -1,3 +1,6 @@
+2023.10.24:
+* new: Scripts/Tools/std/cast_to_int.bat: added script to cast string variables to integer value
+
 2023.10.22:
 * new: Scripts/Tools/ToolAdaptors/gitextensions/plink-agent.vbs.cmdline: command line for vbs variant of the `plink-agent.bat` script
 * changed: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline.vbs: added executable variant for a path relative to the script directory (`/executable`)
