@@ -1,13 +1,19 @@
-''' Creates the Windows shortcut file.
+''' Creates new Windows shortcut file.
 
 ''' CAUTION:
-'''   WScript.Shell can not handle all Unicode characters.
+'''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
 '''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
+'''
 
 ''' USAGE:
-'''   make_shortcut.vbs [-CD <CurrentDirectoryPath>]
-'''     [-WD <ShortcutWorkingDirectory>] [-showas <ShowWindowAsNumber>] [-u]
-'''     [-q] [-E[0 | t | a]] [-allow-dos-target-path] [--]
+'''   make_shortcut.vbs
+'''     [-CD <CurrentDirectoryPath>]
+'''     [-WD <ShortcutWorkingDirectory>]
+'''     [-showas <ShowWindowAsNumber>]
+'''     [-allow-dos-target-path]
+'''     [-u] [-q]
+'''     [-E[0 | t | a]]
+'''     [--]
 '''     <ShortcutFilePath> <ShortcutTarget> [<ShortcutArgs>]
 
 ''' DESCRIPTION:
@@ -86,10 +92,10 @@
 '''     DOS path version.
 '''     It is useful when you want to create not truncated shortcut target file
 '''     path to open it by an old version application which does not support
-'''     long paths or UNC paths, but supports open target paths by a shortcut
-'''     file.
+'''     long paths or Win32 Namespace paths, but supports open target paths by
+'''     a shortcut file.
 '''
-''' Note:
+''' NOTE:
 '''   1. Creation of a shortcut under ealier version of the Windows makes
 '''      shortcut cleaner. For example, do use Windows XP instead of the
 '''      Windows 7 and x86 instead of x64 to make a cleaner shortcut without
@@ -111,9 +117,9 @@
 '''   make_shortcut.bat -CD "%WINDIR%\System32" -u cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
 '''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
 '''
-''' Note:
+''' NOTE:
 '''   A difference in above examples between call to `make_shortcut.vbs` and
-'''   call to `make_shortcut.vbs`+`update_shortcut.vbs` has first found in the
+'''   call to `make_shortcut.vbs`+`reset_shortcut.vbs` has first found in the
 '''   `Windows XP x64 Pro SP2` and `Windows XP x86 Pro SP3`.
 '''   The single call in above example to `make_shortcut.vbs` instead of
 '''   `make_shortcut.vbs`+`reset_shortcut.vbs` can generate a cleaner shortcut,
@@ -172,6 +178,24 @@
 '''       the registry (HKCU\Console) at second. If try to change and save
 '''       parameters, then it will be saved ONLY into the shortcut, which
 '''       brings the shortcut file overwrite.
+
+Sub PrintOrEchoLine(str)
+  On Error Resume Next
+  WScript.stdout.WriteLine str
+  If err = &h80070006& Then
+    WScript.Echo str
+  End If
+  On Error Goto 0
+End Sub
+
+Sub PrintOrEchoErrorLine(str)
+  On Error Resume Next
+  WScript.stderr.WriteLine str
+  If err = &h80070006& Then
+    WScript.Echo str
+  End If
+  On Error Goto 0
+End Sub
 
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
@@ -240,7 +264,7 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
       ElseIf arg = "-allow-dos-target-path" Then ' Allow target path reset by a reduced DOS path version
         AllowDOSTargetPath = True
       Else
-        WScript.Echo WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
+        PrintOrEchoErrorLine WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
         WScript.Quit 255
       End If
     Else
@@ -278,12 +302,12 @@ ReDim Preserve cmd_args(j - 1)
 Dim cmd_args_ubound : cmd_args_ubound = UBound(cmd_args)
 
 If cmd_args_ubound < 0 Then
-  WScript.Echo WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
   WScript.Quit 255
 End If
 
 If cmd_args_ubound < 1 Then
-  WScript.Echo WScript.ScriptName & ": error: <ShortcutTarget> argument is not defined."
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutTarget> argument is not defined."
   WScript.Quit 255
 End If
 
@@ -293,7 +317,7 @@ Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
 Dim IsShortcutFileExist : IsShortcutFileExist = objFS.FileExists(ShortcutFilePath)
 If IsShortcutFileExist Then
-  WScript.Echo _
+  PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: shortcut path must not exist:" & vbCrLf & _
     WScript.ScriptName & ": info: ShortcutFilePath=`" & ShortcutFilePath & "`"
   WScript.Quit 1
@@ -310,11 +334,19 @@ If ChangeCurrentDirectoryExist Then
   objShell.CurrentDirectory = ChangeCurrentDirectory
 End If
 
-Dim objSC : Set objSC = objShell.CreateShortcut(ShortcutFilePath)
+If ExpandAllArgs Or ExpandShortcutTarget Then
+  ShortcutTarget = objShell.ExpandEnvironmentStrings(ShortcutTarget)
+End If
+
+If UnescapeAllArgs Then
+  ShortcutTarget = Unescape(ShortcutTarget)
+End If
 
 If AlwaysQuote And InStr(ShortcutTarget, Chr(34)) = 0 Then
   ShortcutTarget = Chr(34) & ShortcutTarget & Chr(34)
 End If
+
+Dim objSC : Set objSC = objShell.CreateShortcut(ShortcutFilePath)
 
 objSC.TargetPath = ShortcutTarget
 
@@ -335,6 +367,14 @@ If AllowDOSTargetPath Then
 End If
 
 If ShortcutArgsExist Then
+  If ExpandAllArgs Or ExpandShortcutArgs Then
+    ShortcutArgs = objShell.ExpandEnvironmentStrings(ShortcutArgs)
+  End If
+
+  If UnescapeAllArgs Then
+    ShortcutArgs = Unescape(ShortcutArgs)
+  End If
+
   objSC.Arguments = ShortcutArgs
 End If
 

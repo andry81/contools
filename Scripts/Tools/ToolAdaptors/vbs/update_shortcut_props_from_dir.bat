@@ -26,12 +26,17 @@ rem     Has effect only if a value become empty after the replace.
 rem     Has no effect if a value was already empty.
 rem   -no-allow-dos-target-path
 rem     Do not allow target path reset by a reduced DOS path version.
+rem   -allow-target-path-reassign
+rem     Allow TargetPath reassign if has the same path.
 rem   -use-case-compare
 rem     Use case sensitive compare instead of the case insensitive as by
 rem     default.
 rem     Has effect only for a replaced value to test on empty change.
 rem   -p[rint-assign]
 rem     Print assign.
+rem   -t-suffix <ShortcutTargetSuffix>
+rem     Shortcut target suffix value to append if <ShortcutTarget> does not
+rem     exist. Has no effect if `-ignore-unexist` is used.
 
 rem <LINKS_DIR>:
 rem   Directory to search shortcut files from.
@@ -101,7 +106,6 @@ set FLAG_MATCH_STRING=0
 set FLAG_DELETE=0
 set "FLAG_MATCH_STRING_VALUE="
 set "FLAG_CHCP="
-set FLAG_IGNORE_UNEXIST=0
 set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=0
 set FLAG_NO_ALLOW_DOS_TARGET_PATH=0
 set FLAG_USE_CASE_COMPARE=0
@@ -133,20 +137,24 @@ if defined FLAG (
     set "FLAG_CHCP=%~2"
     shift
   ) else if "%FLAG%" == "-ignore-unexist" (
-    set BARE_FLAGS=%BARE_FLAGS% -ignore-unexist
-    set FLAG_IGNORE_UNEXIST=1
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-no-skip-on-empty-assign" (
     set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=1
   ) else if "%FLAG%" == "-no-allow-dos-target-path" (
     set FLAG_NO_ALLOW_DOS_TARGET_PATH=1
+  ) else if "%FLAG%" == "-allow-target-path-reassign" (
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-use-case-compare" (
     set FLAG_USE_CASE_COMPARE=1
   ) else if "%FLAG%" == "-print-assign" (
-    if %FLAG_PRINT_ASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -p
     set FLAG_PRINT_ASSIGN=1
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-p" (
-    if %FLAG_PRINT_ASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -p
     set FLAG_PRINT_ASSIGN=1
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-t-suffix" (
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG% %2
+    shift
   ) else if "%FLAG%" == "--" (
     shift
     set "FLAG="
@@ -375,7 +383,7 @@ if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 (
 
 set "PROP_LINE=%PROP_NAME%=%PROP_NEXT_VALUE%"
 
-call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
+if %FLAG_PRINT_ASSIGN% EQU 0 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
 if /i "%PROP_NAME%" == "TargetPath" (
   "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"

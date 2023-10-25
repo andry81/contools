@@ -1,3 +1,13 @@
+2023.10.26:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, update_shortcut.vbs: missed changes, execution fixup
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: added `-allow-target-path-reassign` flag to assign target path if has the same path
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: added `-t-suffix <ShortcutTargetSuffix>` option to append a shortcut target suffix value if <ShortcutTarget> does not exist
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: usage of `update_shortcut.vbs` new flags and options
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: redirect all message prints into stdout and stderr respectively
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: skip shortcut save if nothing is changed
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: code cleanup
+* refactor: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: code refactor
+
 2023.10.24:
 * new: Scripts/Tools/std/cast_to_int.bat: added script to cast string variables to integer value
 

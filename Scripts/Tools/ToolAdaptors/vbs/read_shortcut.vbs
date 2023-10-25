@@ -1,4 +1,4 @@
-''' Read the Windows shortcut file property.
+''' Read a Windows shortcut file property.
 
 ''' CAUTION:
 '''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
@@ -6,13 +6,17 @@
 '''
 
 ''' USAGE:
-'''   read_shortcut.vbs [-u] [-q] [-E[0 | t | a]] [-p <PropertyPattern>] [--]
+'''   read_shortcut.vbs
+'''     [-u] [-q]
+'''     [-E[0 | t | a]]
+'''     [-p <PropertyPattern>]
+'''     [--]
 '''     <ShortcutFilePath>
 
 ''' DESCRIPTION:
 '''   --
-'''     Separator between flags and positional arguments to explicitly stop the flags parser.
-'''
+'''     Separator between flags and positional arguments to explicitly stop the
+'''     flags parser.
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
 '''   -E
@@ -24,6 +28,24 @@
 '''
 '''   -p <PropertyPattern>
 '''     List of shortcut property names to read, separated by `|` character.
+
+Sub PrintOrEchoLine(str)
+  On Error Resume Next
+  WScript.stdout.WriteLine str
+  If err = &h80070006& Then
+    WScript.Echo str
+  End If
+  On Error Goto 0
+End Sub
+
+Sub PrintOrEchoErrorLine(str)
+  On Error Resume Next
+  WScript.stderr.WriteLine str
+  If err = &h80070006& Then
+    WScript.Echo str
+  End If
+  On Error Goto 0
+End Sub
 
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
@@ -60,7 +82,7 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         PropertyPattern = WScript.Arguments(i)
       Else
-        WScript.Echo WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
+        PrintOrEchoErrorLine WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
         WScript.Quit 255
       End If
     Else
@@ -94,7 +116,7 @@ ReDim Preserve cmd_args(j - 1)
 Dim cmd_args_ubound : cmd_args_ubound = UBound(cmd_args)
 
 If cmd_args_ubound < 0 Then
-  WScript.Echo WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
   WScript.Quit 1
 End If
 
@@ -119,5 +141,5 @@ For i = 0 To PropertyArrUbound
     PropertyValue = objShell.ExpandEnvironmentStrings(PropertyValue)
   End If
 
-  WScript.Echo PropertyName & "=" & PropertyValue
+  PrintOrEchoLine PropertyName & "=" & PropertyValue
 Next
