@@ -7,6 +7,11 @@
 
   Add Notepad++ recent lists cleanup.
 
+  c:\Users\User\AppData\Roaming\Notepad++\config.xml
+
+  NotepadPlus/FindHistory
+  NotepadPlus/History
+
 * Scripts/Tools/ToolAdaptors/app/github:
 
   - generate and backup list file of forked repositories from repo-info github

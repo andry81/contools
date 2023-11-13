@@ -1,3 +1,6 @@
+2023.11.13:
+* changed: TODO.txt: todo update
+
 2023.10.26:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, update_shortcut.vbs: missed changes, execution fixup
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: added `-allow-target-path-reassign` flag to assign target path if has the same path
