@@ -362,7 +362,7 @@ def process_extra_command_line():
 
     # CAUTION:
     #   The `win32api.GetShortPathName` awaits ascii format and unicode variant is not implemented in Python 2.7.
-    #   So we must use `ctype` module to directly call `GetShowrtPathNameW` instead.
+    #   So we must use `ctype` module to directly call `GetShortPathNameW` instead.
     #
     #   For details:
     #     https://mail.python.org/pipermail/python-win32/2006-May/004697.html
@@ -608,15 +608,17 @@ def process_extra_command_line():
           #
           #   Suggestion:
           #     Child Notepad++ process use SendMessage to a random Notepad++ instance excluding itself,
-          #     when the parent instance blocked in the main thread by this function call.
+          #     when the parent instance is blocked in the main thread by this function call to the parent process.
           #
           #   Workaround:
-          #     The asynchronous subprocess call from here as `subprocess.popen` instead of `subprocess.call` is used.
+          #     The asynchronous subprocess call from here as `subprocess.popen` instead of `subprocess.call` is used
+          #     to unblock the parent process to handle a child process call and the rest of messages.
           #
           # CAUTION:
-          #   DO NOT USE this implementation because of a dead lock and other issues.
+          #   DO NOT USE this implementation because of this issue and other issues like wrong
+          #   order of messages to process because of an asynchronous child call.
           #   Use direct notification to another instance which does not have has the `-multiInst` in the command line.
-          #   This implementation is left as an aternative method.
+          #   This implementation is left as an aternative and the last method.
           #
           subprocess.Popen(child_subprocess_prefix_cmdline_list + child_cmdline_file_path_list, stdin = None, stdout = None, stderr = None, shell = False)
 

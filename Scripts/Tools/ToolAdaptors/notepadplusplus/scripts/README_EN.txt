@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.10.13
+* 2023.11.14
 * contools/notepadplusplus
 
 1. DESCRIPTION
@@ -109,9 +109,9 @@ Additionsl command line arguments:
 `-z -append_by_child_instance`
 
   Has meaning in the append mode.
-  By default file open delegation made through the `NPPM_DOOPEN` Notepad++
-  message as a most reliable. To replace it by a child process method use this
-  options.
+  By default file open delegation made through the `WM_COPYDATA` +
+  `COPYDATA_FILENAMESW` message as a most reliable. To replace it by a child
+  process method use this option.
 
 `-z -no_activate_after_append`
 
