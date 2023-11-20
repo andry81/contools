@@ -41,6 +41,8 @@ set "FLAG_CHCP="
 rem Force `move` instead of `robocopy.exe` usage.
 rem CAUTION: Movement can fail with that flag in case of a long path.
 set FLAG_USE_BUILTIN_MOVE=0
+rem Ignore existed target directory and use only `robocopy.exe` if existed.
+set FLAG_IGNORE_EXISTED=0
 
 :FLAGS_LOOP
 
@@ -56,6 +58,8 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-use_builtin_move" (
     set FLAG_USE_BUILTIN_MOVE=1
+  ) else if "%FLAG%" == "-ignore_existed" (
+    set FLAG_IGNORE_EXISTED=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -140,28 +144,34 @@ for /F "eol= tokens=* delims=" %%i in ("%~f2\.") do set "TO_PATH_ABS=%%~fi"
 for /F "eol= tokens=* delims=" %%i in ("%TO_PATH_ABS%") do for /F "eol= tokens=* delims=" %%j in ("%%~dpi\.") do set "TO_PARENT_DIR_ABS=%%~fj"
 
 if not exist "\\?\%FROM_PATH_ABS%\*" (
-  echo.%?~n0%: error: input directory does not exist: "%FROM_PATH%\"
+  echo.%?~nx0%: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -248
 ) >&2
+
+set TO_PATH_AS_DIR_EXISTS=0
+if exist "\\?\%TO_PATH_ABS%\*" set TO_PATH_AS_DIR_EXISTS=1
 
 rem CAUTION:
 rem   We must always check on target path existence, because:
 rem   1. Difference between `move` and `robocopy.exe` in case of existed path.
 rem   2. To be able to rename the input directory.
 rem
-if exist "\\?\%TO_PATH_ABS%\*" (
-  echo.%?~n0%: error: output directory does exist: "%TO_PATH%\"
+if %FLAG_IGNORE_EXISTED% EQU 0 if %TO_PATH_AS_DIR_EXISTS% NEQ 0 (
+  echo.%?~nx0%: error: output directory does exist: "%TO_PATH%\"
   exit /b -247
 ) >&2
 
 if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
-  echo.%?~n0%: error: output parent directory does not exist: "%TO_PARENT_DIR_ABS%"
+  echo.%?~nx0%: error: output parent directory does not exist: "%TO_PARENT_DIR_ABS%"
   exit /b -249
 ) >&2
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
 set XMOVE_FLAGS_=%3 %4 %5 %6 %7 %8 %9
+
+rem use `robocopy.exe` in case of a directory move-to-merge
+if %FLAG_IGNORE_EXISTED% NEQ 0 if %TO_PATH_AS_DIR_EXISTS% NEQ 0 goto USE_ROBOCOPY
 
 set "XMOVE_FLAGS="
 for %%i in (%XMOVE_FLAGS_%) do (
@@ -196,8 +206,9 @@ exit /b 0
 set "XMOVE_FLAG=%~1"
 if not defined XMOVE_FLAG exit /b 0
 set XMOVE_FLAG_PARSED=0
+if "%XMOVE_FLAG%" == "/E" exit /b 0
 if "%XMOVE_FLAG:~0,4%" == "/MOV" (
-  echo.%?~n0%: error: /MOV and /MOVE parameters is not accepted to copy a directory.
+  echo.%?~nx0%: error: /MOV and /MOVE parameters is not accepted to move a directory.
   exit /b 1
 ) >&2
 if %XMOVE_FLAG_PARSED% EQU 0 set "XMOVE_FLAGS=%XMOVE_FLAGS% %XMOVE_FLAG%"
@@ -218,7 +229,7 @@ set "ROBOCOPY_EXCLUDES_CMD="
 if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_ROBOCOPY_EXCLUDES
 
 call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_robocopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" || (
-  echo.%?~n0%: error: robocopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
+  echo.%?~nx0%: error: robocopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
   exit /b -246
 ) >&2
 if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
@@ -231,8 +242,8 @@ if "%ROBOCOPY_FLAGS:/DCOPY=%" == "%ROBOCOPY_FLAGS%"  set "ROBOCOPY_FLAGS=%ROBOCO
 
 :SKIP_ROBOCOPY_FLAGS
 
-echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /E /MOVE%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
-"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /E /MOVE%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /MOVE%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /MOVE%ROBOCOPY_FLAGS% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 

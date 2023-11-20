@@ -109,7 +109,7 @@ goto FROM_FILE_OK
 
 :FROM_FILE_ERROR
 (
-  echo.%?~n0%: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  echo.%?~nx0%: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
   exit /b -248
 ) >&2
 
@@ -146,7 +146,7 @@ for /F "eol= tokens=* delims=" %%i in ("%~f1\.") do set "FROM_DIR_PATH_ABS=%%~f
 for /F "eol= tokens=* delims=" %%i in ("%~f3\.") do set "TO_PATH_ABS=%%~fi"
 
 if not exist "\\?\%FROM_DIR_PATH_ABS%\*" (
-  echo.%?~n0%: error: input directory does not exist: "%FROM_PATH%\"
+  echo.%?~nx0%: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -248
 ) >&2
 
@@ -171,7 +171,7 @@ if exist "\\?\%FROM_FILE_PATH_ABS%\*" (
 :SKIP_FROM_FILE_CHECK
 
 if not exist "\\?\%TO_PATH_ABS%\*" (
-  echo.%?~n0%: error: output directory does not exist: "%TO_PATH%\"
+  echo.%?~nx0%: error: output directory does not exist: "%TO_PATH%\"
   exit /b -249
 ) >&2
 
@@ -204,7 +204,7 @@ call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
 set "XCOPY_EXCLUDES_LIST_TMP=%SCRIPT_TEMP_CURRENT_DIR%\$xcopy_excludes.lst"
 
 call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_xcopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" "%%XCOPY_EXCLUDES_LIST_TMP%%" || (
-  echo.%?~n0%: error: xcopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
+  echo.%?~nx0%: error: xcopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
   set LASTERROR=-247
   goto EXIT
 ) >&2
@@ -234,7 +234,7 @@ set "XCOPY_FLAG=%~1"
 if not defined XCOPY_FLAG exit /b 0
 set XCOPY_FLAG_PARSED=0
 if "%XCOPY_FLAG:~0,4%" == "/MOV" (
-  echo.%?~n0%: error: /MOV and /MOVE parameters is not accepted to copy a file.
+  echo.%?~nx0%: error: /MOV and /MOVE parameters is not accepted to copy a file.
   exit /b 1
 ) >&2
 if %XCOPY_FLAG_PARSED% EQU 0 set "XCOPY_FLAGS=%XCOPY_FLAGS% %XCOPY_FLAG%"
@@ -255,7 +255,7 @@ set "ROBOCOPY_EXCLUDES_CMD="
 if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_ROBOCOPY_EXCLUDES
 
 call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_robocopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" || (
-  echo.%?~n0%: error: robocopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
+  echo.%?~nx0%: error: robocopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
   exit /b -246
 ) >&2
 if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%

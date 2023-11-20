@@ -1,3 +1,9 @@
+2023.11.20:
+* fixed: Scripts/Tools/std/xmove_dir.bat: ignore `/E` for builin `move` command
+* fixed: Scripts/Tools/std/xmove_*.bat: execution fixup
+* new: Scripts/Tools/std/xmove_dir.bat: added `-ignore_existed` flag to enable move-to-merge mode
+* changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: minor improvements
+
 2023.11.14:
 * changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
 

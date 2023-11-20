@@ -121,7 +121,7 @@ goto FROM_FILE_OK
 
 :FROM_FILE_ERROR
 (
-  echo.%?~n0%: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  echo.%?~nx0%: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
   exit /b -248
 ) >&2
 
@@ -159,7 +159,7 @@ for /F "eol= tokens=* delims=" %%i in ("%~f3\.") do set "TO_PATH_ABS=%%~fi"
 for /F "eol= tokens=* delims=" %%i in ("%TO_PATH_ABS%") do for /F "eol= tokens=* delims=" %%j in ("%%~dpi\.") do set "TO_PARENT_DIR_ABS=%%~fj"
 
 if not exist "\\?\%FROM_DIR_PATH_ABS%\*" (
-  echo.%?~n0%: error: input directory does not exist: "%FROM_PATH%\"
+  echo.%?~nx0%: error: input directory does not exist: "%FROM_PATH%\"
   exit /b -248
 ) >&2
 
@@ -186,7 +186,7 @@ if exist "\\?\%FROM_FILE_PATH_ABS%\*" (
 if %FLAG_IGNORE_UNEXIST% NEQ 0 goto IGNORE_TO_PATH_UNEXIST
 
 if not exist "\\?\%TO_PATH_ABS%\*" (
-  echo.%?~n0%: error: output directory does not exist: "%TO_PATH%\"
+  echo.%?~nx0%: error: output directory does not exist: "%TO_PATH%\"
   exit /b -249
 ) >&2
 
@@ -195,7 +195,7 @@ goto INIT
 :IGNORE_TO_PATH_UNEXIST
 
 if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
-  echo.%?~n0%: error: output parent directory does not exist: "%TO_PARENT_DIR_ABS%"
+  echo.%?~nx0%: error: output parent directory does not exist: "%TO_PARENT_DIR_ABS%"
   exit /b -249
 ) >&2
 
@@ -246,12 +246,13 @@ exit /b %LASTERROR%
 set "XMOVE_FLAG=%~1"
 if not defined XMOVE_FLAG exit /b 0
 set XMOVE_FLAG_PARSED=0
+rem CAUTION: /E must be used in case of file globbing including directories
 if "%XMOVE_FLAG%" == "/E" (
   set XMOVE_DIR_RECUR=1
   exit /b 0
 )
 if "%XMOVE_FLAG:~0,4%" == "/MOV" (
-  echo.%?~n0%: error: /MOV and /MOVE parameters is not accepted to copy a file.
+  echo.%?~nx0%: error: /MOV and /MOVE parameters is not accepted to move a file.
   exit /b 1
 ) >&2
 if %XMOVE_FLAG_PARSED% EQU 0 set "XMOVE_FLAGS=%XMOVE_FLAGS% %XMOVE_FLAG%"
@@ -278,7 +279,7 @@ set "ROBOCOPY_EXCLUDES_CMD="
 if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_ROBOCOPY_EXCLUDES
 
 call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_robocopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" || (
-  echo.%?~n0%: error: robocopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
+  echo.%?~nx0%: error: robocopy excludes list is invalid: XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%" XCOPY_EXCLUDES_LIST_TMP="%XCOPY_EXCLUDES_LIST_TMP%"
   exit /b -246
 ) >&2
 if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
