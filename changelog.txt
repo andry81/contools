@@ -1,3 +1,9 @@
+2023.11.21:
+* new: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: translated `/Y` flag from builtin `move` and `xmove.exe` command line into `robocopy.exe` command line
+* changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: removed `ROBOCOPY_COPY_FLAGS` and `ROBOCOPY_DCOPY_FLAGS` variables explicit user definition, use `ROBOCOPY_FLAGS` environment variable to explicitly declare the rest `robocopy.exe` flags
+* changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: minor improvements
+* refactor: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: code refactor
+
 2023.11.20:
 * fixed: Scripts/Tools/std/xmove_dir.bat: ignore `/E` for builin `move` command
 * fixed: Scripts/Tools/std/xmove_*.bat: execution fixup
