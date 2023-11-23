@@ -1,4 +1,7 @@
 2023.11.23:
+* changed: Scripts/Tools/build/extract_files_from_archives.bat: code cleanup
+
+2023.11.23:
 * fixed: __init__: check externals directory existence before externals initialization
 
 2023.11.23:

@@ -182,14 +182,14 @@ if not exist "\\?\%EXTRACT_TO_FILE_DIR%\*" (
 
 if %SKIP_ARCHIVES_WITH_EXISTED_EXTRACTED_PREFIX_PATH% NEQ 0 if exist "\\?\%EXTRACT_TO_FILE_DIR_W_NAME%\*" exit /b 0
 
-call :CMD "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x%%_7ZIP_SWITCHES%% "%%ARC_FILE_PATH%%" "%%EXTRACT_PTTN%%" "-w%%TEMP_DIR_PATH%%" "-o%%EXTRACT_TO_FILE_DIR%%"
+call "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x%%_7ZIP_SWITCHES%% "%%ARC_FILE_PATH%%" "%%EXTRACT_PTTN%%" "-w%%TEMP_DIR_PATH%%" "-o%%EXTRACT_TO_FILE_DIR%%"
 exit /b
 
 :PROCESS_FILE
 if not "%EXTRACT_PTTN:**=%" == "%EXTRACT_PTTN%" goto EXTRACT_PTTN_ERROR
 if not "%EXTRACT_PTTN:?=%" == "%EXTRACT_PTTN%" goto EXTRACT_PTTN_ERROR
 
-call :CMD "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x%%_7ZIP_SWITCHES%% "%%ARC_FILE_PATH%%" "%%EXTRACT_PTTN%%" "-w%%TEMP_DIR_PATH%%"
+call "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x%%_7ZIP_SWITCHES%% "%%ARC_FILE_PATH%%" "%%EXTRACT_PTTN%%" "-w%%TEMP_DIR_PATH%%"
 exit /b
 
 :EXTRACT_PTTN_ERROR
@@ -198,9 +198,3 @@ exit /b
   exit /b 255
 ) >&2
 exit /b 255
-
-:CMD
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%*
-(
-  %*
-)
