@@ -165,7 +165,7 @@ call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
 if defined FLAG_CHCP (
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
   set RESTORE_LOCALE=1
-)
+) else call "%%CONTOOLS_ROOT%%/std/getcp.bat"
 
 call :MAIN %%1 %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9
 set LASTERROR=%ERRORLEVEL%

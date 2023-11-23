@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.10.01
+* 2023.11.23
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -14,7 +14,7 @@
        is not.
 4.1.2. Interactive input autocompletion disable.
 4.1.3. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
-       call.
+       call (Windows XP/7).
 4.1.4. The `type con | callf "" "cmd.exe /k"` command makes `cmd.exe` left
        behind waiting the last input while the neighbor `callf.exe` process is
        already exited.
@@ -348,7 +348,7 @@ through the code injection into a child process and interception of the
 
 -------------------------------------------------------------------------------
 4.1.3. The `set /p DUMMY=` cmd.exe command ignores the input after the `callf`
-       call.
+       call (Windows XP/7).
 -------------------------------------------------------------------------------
 
 NOTE:

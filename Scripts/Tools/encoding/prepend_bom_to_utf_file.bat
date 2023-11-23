@@ -87,7 +87,7 @@ set "INPUT_FILE_BOM_PREFIX_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_bom_prefix.b
 if defined FLAG_CHCP (
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
   set RESTORE_LOCALE=1
-)
+) else call "%%CONTOOLS_ROOT%%/std/getcp.bat"
 
 rem an UTF16LE file automatically checked for the BOM by the copy utility
 if /i "%BOM_FILE_TOKEN%" == "fffe" goto COPY_AS_TEXT_FILES
