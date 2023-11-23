@@ -18,6 +18,11 @@ if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 if not defined CONTOOLS_PROJECT_ROOT                call "%%~dp0canonical_path.bat" CONTOOLS_PROJECT_ROOT                "%%~dp0.."
 if not defined CONTOOLS_PROJECT_EXTERNALS_ROOT      call "%%~dp0canonical_path.bat" CONTOOLS_PROJECT_EXTERNALS_ROOT      "%%CONTOOLS_PROJECT_ROOT%%/_externals"
 
+if not exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%\*" (
+  echo.%~nx0: error: CONTOOLS_PROJECT_EXTERNALS_ROOT directory does not exist: "%CONTOOLS_PROJECT_EXTERNALS_ROOT%".
+  exit /b 255
+) >&2
+
 if not defined PROJECT_OUTPUT_ROOT                  call "%%~dp0canonical_path.bat" PROJECT_OUTPUT_ROOT                  "%%CONTOOLS_PROJECT_ROOT%%/_out"
 if not defined PROJECT_LOG_ROOT                     call "%%~dp0canonical_path.bat" PROJECT_LOG_ROOT                     "%%CONTOOLS_PROJECT_ROOT%%/.log"
 

@@ -1,4 +1,7 @@
 2023.11.23:
+* fixed: __init__: check externals directory existence before externals initialization
+
+2023.11.23:
 * fixed: Scripts/Tools/cleanup/cleanup_log.bat: execution fixup
 * new: Scripts/Tools/build/extract_files_from_archives.bat: merged `extract_files_from_archive.bat` and `extract_files_from_archives_by_pttn.bat` scripts into `extract_files_from_archives.bat` script
 * changed: Scripts/Tools: minor improvements
