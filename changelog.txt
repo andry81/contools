@@ -1,4 +1,14 @@
 2023.12.04:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: execution fixup
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: added shortcut auto backup and `-no-backup` flag to disable shortcut backup before save
+* new: Scripts/Tools/ToolAdaptors/vbs/read_shortcut.vbs: read long path shortcut through short path
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: create long path shortcut through short path
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: long path WorkingDirectory conversion to short path
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: update long path shortcut through short path
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: long path WorkingDirectory conversion to short path
+* refactor: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: code refactor
+
+2023.12.04:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/*.bat: use `cscript.exe //nologo` prefix to bypass the case where `*.vbs` extension is registered to open an editor
 * new: Scripts/Tools/ToolAdaptors/vbs/read_shortcut.bat: missed script
 
@@ -3053,7 +3063,7 @@
 * new: Scripts/Tools/ToolAdaptors/totalcmd: shell only rename/move to speed up pure shell tasks
 
 2018.10.23:
-* new: Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat script for batch convertion
+* new: Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat script for batch conversion
 
 2018.10.23:
 * new: Scripts/Tools/trapliblite.sh: lightweight trap stack implementation

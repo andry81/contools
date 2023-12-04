@@ -8,7 +8,7 @@
 ''' USAGE:
 '''   read_shortcut.vbs
 '''     [-u] [-q]
-'''     [-E[0 | t | a]]
+'''     [-E[0 | p]]
 '''     [-p <PropertyPattern>]
 '''     [--]
 '''     <ShortcutFilePath>
@@ -20,7 +20,7 @@
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
 '''   -E
-'''     Expand environment variables in all arguments.
+'''     Expand environment variables in all shortcut arguments.
 '''   -E0
 '''     Expand environment variables only in the first argument.
 '''   -Ep
@@ -58,7 +58,6 @@ Dim ExpandArg0 : ExpandArg0 = False
 Dim ExpandShortcutProperty : ExpandShortcutProperty = False
 
 Dim PropertyPattern
-Dim PropertyArr
 
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
 
@@ -120,11 +119,49 @@ If cmd_args_ubound < 0 Then
   WScript.Quit 1
 End If
 
-PropertyArr = Split(PropertyPattern, "|", -1, vbTextCompare)
-
 Dim ShortcutFilePath : ShortcutFilePath = cmd_args(0)
 
-Set objSC = objShell.CreateShortcut(ShortcutFilePath)
+Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
+
+Dim ShortcutFilePathAbs : ShortcutFilePathAbs = objFS.GetAbsolutePathName(ShortcutFilePath) ' CAUTION: can alter a path character case if path exists
+
+' remove `\\?\` prefix
+If Left(ShortcutFilePathAbs, 4) = "\\?\" Then
+  ShortcutFilePathAbs = Mid(ShortcutFilePathAbs, 5)
+End If
+
+' test on path existence including long path
+Dim IsShortcutFileExist : IsShortcutFileExist = objFS.FileExists("\\?\" & ShortcutFilePathAbs)
+If Not IsShortcutFileExist Then
+  PrintOrEchoErrorLine _
+    WScript.ScriptName & ": error: shortcut file does not exist:" & vbCrLf & _
+    WScript.ScriptName & ": info: ShortcutFilePath=`" & ShortcutFilePathAbs & "`"
+  WScript.Quit 1
+End If
+
+Dim ShortcutFilePathToOpen
+
+' test on long path existence
+If objFS.FileExists(ShortcutFilePathAbs) Then
+  ' is not long path
+  ShortcutFilePathToOpen = ShortcutFilePathAbs
+Else
+  ' translate into short path
+
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+  Dim ShortcutFile : Set ShortcutFile = objFS.GetFile("\\?\" & ShortcutFilePathAbs)
+  Dim ShortcutFileShortPath : ShortcutFileShortPath = ShortcutFile.ShortPath
+  If Left(ShortcutFileShortPath, 4) = "\\?\" Then
+    ShortcutFileShortPath = Mid(ShortcutFileShortPath, 5)
+  End If
+
+  ShortcutFilePathToOpen = ShortcutFileShortPath
+End If
+
+Dim objSC : Set objSC = objShell.CreateShortcut(ShortcutFilePathToOpen)
+
+Dim PropertyArr : PropertyArr = Split(PropertyPattern, "|", -1, vbTextCompare)
 
 Dim PropertyArrUbound : PropertyArrUbound = UBound(PropertyArr)
 
