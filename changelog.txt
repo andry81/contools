@@ -1,4 +1,8 @@
 2023.12.04:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/*.bat: use `cscript.exe //nologo` prefix to bypass the case where `*.vbs` extension is registered to open an editor
+* new: Scripts/Tools/ToolAdaptors/vbs/read_shortcut.bat: missed script
+
+2023.12.04:
 * fixed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: execution fixup
 
 2023.11.28:
