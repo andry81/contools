@@ -1,3 +1,6 @@
+2023.12.04:
+* fixed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: execution fixup
+
 2023.11.28:
 * new: Scripts/Tools/ToolAdaptors/hta/Samples/cmd_admin.bat: example of a batch script to use `mshta` to self execute a batch script in elevated environment if started in not elevated environment
 
