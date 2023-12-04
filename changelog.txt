@@ -1,3 +1,15 @@
+2023.YY.XX:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: execution fixup
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-reset-target-path-by-rebase-to` flag to reset TargetPath and rebase it to `<BasePath>` directory
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-allow-auto-recover-by-rebase-to` flag to allow auto detect and recover broken shortcut by TargetPath rebase
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added `-no-backup` flag to disable shortcut backup before save
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: more recover combinations for `-allow-auto-recover` flag
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: `-reset-*` and `-allow-auto-recover*` flags and options now can form a sequence and has a call order
+* changed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: usage of `reset_shortcut.vbs` new flags and options
+* changed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: redirect all message prints into stdout and stderr respectively
+* changed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: code cleanup
+* refactor: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: code refactor
+
 2023.12.09:
 * fixed: __init__, Scripts/Tools: execution fixup for Windows XP
 * fixed: Scripts/Tools/build/load_config.bat: execution fixup

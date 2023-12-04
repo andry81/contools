@@ -106,26 +106,7 @@
 '''     before assign. Use this flag to skip the check.
 '''
 '''     CAUTION:
-'''       The Windows Shell component does use a guess logic to restore
-'''       unexisted or invalid target path or/and working directory properties.
-'''       In some cases or OS versions it may lead to a path property
-'''       corruption or even an entire shortcut corruption.
-'''
-'''       Details:
-'''         https://learn.microsoft.com/en-us/windows/win32/shell/links#link-resolution
-'''         https://github.com/libyal/liblnk/tree/HEAD/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc#8-corruption-scenarios
-'''         https://stackoverflow.com/questions/22382010/what-options-are-available-for-shell32-folder-getdetailsof/37061433#37061433
-'''
-'''       In the wild has been catched several cases of a shortcut corruption:
-'''       - Shortcut path can change length from long path to short DOS path.
-'''       - Shortcut path can change language characters localization from
-'''         Unicode to ANSI with wrong code page.
-'''       - Shortcut path can be vandalized like path end truncation or even
-'''         the space characters replacement by the underscore character.
-'''       - Shortcut can change type from a file shortcut to a directory
-'''         shortcut with or without old path save into Description property.
-'''       - Shortcut can be completely rewritten losing other properties and
-'''         data.
+'''       Has issues described below.
 '''
 '''     Use this option with the caution.
 '''
@@ -151,6 +132,9 @@
 '''     Reread working directory after assign and if it does not exist, then
 '''     reassign it by a reduced DOS path version.
 '''     Has effect only if path does exist.
+'''     CAUTION:
+'''       Because of implementation works through the double save, which
+'''       involves a shortcut content regeneration with issues described below.
 '''   -allow-dos-paths
 '''     Implies all `-allow-dos-*` flags.
 '''
@@ -182,6 +166,28 @@
 '''     Shortcut arguments value to assign.
 '''   -wd <ShortcutWorkingDirectory>
 '''     Working directory value to assign.
+
+''' CAUTION:
+'''   The Windows Shell component does use a guess logic to restore
+'''   unexisted or invalid target path or/and working directory properties.
+'''   In some cases or OS versions it may lead to a path property
+'''   corruption or even an entire shortcut corruption.
+'''
+'''   Details:
+'''     https://learn.microsoft.com/en-us/windows/win32/shell/links#link-resolution
+'''     https://github.com/libyal/liblnk/tree/HEAD/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc#8-corruption-scenarios
+'''     https://stackoverflow.com/questions/22382010/what-options-are-available-for-shell32-folder-getdetailsof/37061433#37061433
+'''
+'''   In the wild has been catched several cases of a shortcut corruption:
+'''   - Shortcut path can change length from long path to short DOS path.
+'''   - Shortcut path can change language characters localization from
+'''     Unicode to ANSI with wrong code page.
+'''   - Shortcut path can be vandalized like path end truncation or even
+'''     the space characters replacement by the underscore character.
+'''   - Shortcut can change type from a file shortcut to a directory
+'''     shortcut with or without old path save into Description property.
+'''   - Shortcut can be completely rewritten losing other properties and
+'''     data.
 
 ''' NOTE:
 '''   1. Creation of a shortcut under ealier version of the Windows makes
@@ -429,6 +435,7 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
   End If
 Loop While False : Next
 
+' upper bound instead of reserve size
 ReDim Preserve cmd_args(j - 1)
 
 ' MsgBox Join(cmd_args, " ")

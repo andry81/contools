@@ -3,51 +3,38 @@
 rem USAGE:
 rem   reset_shortcut_from_dir.bat [<Flags>] [--] <LINKS_DIR>
 
+rem DESCRIPTION:
+rem   Script to reset shortcuts in a directory recursively without any
+rem   standalone property value input.
+rem
+rem   To specifically update a shortcut property field with a value do use
+rem   `update_shortcut.*` script instead.
+rem
+rem   By default without any flags does NOT save a shortcut to avoid trigger
+rem   the Windows Shell component to validate all properties and rewrites the
+rem   shortcut file even if nothing is changed reducing the shortcut content.
+rem   This additionally avoids a shortcut accident corruption by the Windows
+rem   Shell component internal guess logic (see `-ignore-unexist` option
+rem   description).
+rem
+rem   The save does not apply if at least one property is changed.
+rem   A path property assign does not apply if a path property does not exist
+rem   and `-ignore-unexist` option is not used or a new not empty path property
+rem   value already equal case insensitively to an old path property value.
+
 rem <Flags>:
 rem   --
-rem     Stop flags parse.
+rem     Separator between flags and positional arguments to explicitly stop the
+rem     flags parser.
 rem   -chcp <CodePage>
 rem     Set explicit code page.
-rem   -reset-wd[-from-target-path]
-rem     Reset WorkingDirectory from TargetPath.
-rem     Does not apply if TargetPath is empty.
-rem   -reset-target-path-from-wd
-rem     Reset TargetPath from WorkingDirectory leaving the file name as is.
-rem     Does not apply if WorkingDirectory or TargetPath is empty.
-rem   -reset-target-path-from-desc
-rem     Reset TargetPath from Description.
-rem     Does not apply if Description is empty or not a path.
-rem     Has no effect if TargetPath is already resetted.
-rem   -reset-target-name-from-file-path
-rem     Reset TargetPath name from shortcut file name without `.lnk` extension.
-rem   -reset-target-drive-from-file-path
-rem     Reset TargetPath drive from shortcut file drive.
-rem   -allow-auto-recover
-rem     Allow to auto detect and recover broken shortcuts.
-rem     Can not be used together with `-ignore-unexist` flag.
-rem   -allow-target-path-reassign
-rem     Allow TargetPath reassign if not been assigned.
-rem     Has no effect if TargetPath is already resetted.
-rem   -allow-wd-reassign
-rem     Allow WorkingDirectory reassign if not been assigned.
-rem     Has no effect if WorkingDirectory is already resetted.
 rem
-rem   -allow-dos-target-path
-rem     Reread target path and if it is truncated, then reset it by a reduced
-rem     DOS path version.
-rem     It is useful when you want to create not truncated shortcut target file
-rem     path to open it by an old version application which does not support
-rem     long paths or UNC paths, but supports open target paths by a shortcut
-rem     file.
-rem
-rem   -p[rint-assign]
-rem     Print property assignment.
 
 rem <LINKS_DIR>:
 rem   Directory to search shortcut files from.
 
 rem NOTE:
-rem   For detailed parameters description see `reset_shortcut.vbs` script.
+rem   For other parameters description see `reset_shortcut.vbs` script.
 
 setlocal
 
@@ -76,16 +63,6 @@ exit /b 0
 rem script flags
 set RESTORE_LOCALE=0
 set "FLAG_CHCP="
-set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=0
-set FLAG_RESET_TARGET_PATH_FROM_WORKINGDIR=0
-set FLAG_RESET_TARGET_PATH_FROM_DESC=0
-set FLAG_RESET_TARGET_NAME_FROM_FILE_PATH=0
-set FLAG_RESET_TARGET_DRIVE_FROM_FILE_PATH=0
-set FLAG_ALLOW_AUTO_RECOVER=0
-set FLAG_ALLOW_TARGET_PATH_REASSIGN=0
-set FLAG_ALLOW_WORKINGDIR_REASSIGN=0
-set FLAG_ALLOW_DOS_TARGET_PATH=0
-set FLAG_PRINT_ASSIGN=0
 set "BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -100,42 +77,24 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
-  ) else if "%FLAG%" == "-reset-wd-from-target-path" (
-    if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -reset-wd-from-target-path
-    set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
-  ) else if "%FLAG%" == "-reset-wd" (
-    if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -reset-wd-from-target-path
-    set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
-  ) else if "%FLAG%" == "-reset-target-path-from-wd" (
-    if %FLAG_RESET_TARGET_PATH_FROM_WORKINGDIR% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -reset-target-path-from-wd
-    set FLAG_RESET_TARGET_PATH_FROM_WORKINGDIR=1
-  ) else if "%FLAG%" == "-reset-target-path-from-desc" (
-    if %FLAG_RESET_TARGET_PATH_FROM_DESC% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -reset-target-path-from-desc
-    set FLAG_RESET_TARGET_PATH_FROM_DESC=1
-  ) else if "%FLAG%" == "-reset-target-name-from-file" (
-    if %FLAG_RESET_TARGET_NAME_FROM_FILE_PATH% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -reset-target-name-from-file
-    set FLAG_RESET_TARGET_NAME_FROM_FILE_PATH=1
-  ) else if "%FLAG%" == "-reset-target-drive-from-file-path" (
-    if %FLAG_RESET_TARGET_DRIVE_FROM_FILE_PATH% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -reset-target-drive-from-file-path
-    set FLAG_RESET_TARGET_DRIVE_FROM_FILE_PATH=1
-  ) else if "%FLAG%" == "-allow-auto-recover" (
-    if %FLAG_ALLOW_AUTO_RECOVER% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -allow-auto-recover
-    set FLAG_ALLOW_AUTO_RECOVER=1
-  ) else if "%FLAG%" == "-allow-target-path-reassign" (
-    if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -allow-target-path-reassign
-    set FLAG_ALLOW_TARGET_PATH_REASSIGN=1
-  ) else if "%FLAG%" == "-allow-wd-reassign" (
-    if %FLAG_ALLOW_WORKINGDIR_REASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -allow-wd-reassign
-    set FLAG_ALLOW_WORKINGDIR_REASSIGN=1
-  ) else if "%FLAG%" == "-allow-dos-target-path" (
-    set BARE_FLAGS=%BARE_FLAGS% -allow-dos-target-path
-    set FLAG_ALLOW_DOS_TARGET_PATH=1
+  ) else if "%FLAG%" == "-no-backup" (
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-reset-target-path-by-rebase-to" (
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG% %2
+    shift
+  ) else if "%FLAG%" == "-allow-auto-recover-by-rebase-to" (
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG% %2
+    shift
+  ) else if "%FLAG:~0,7%" == "-reset-" (
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+  ) else if "%FLAG:~0,7%" == "-allow-" (
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-print-assign" (
-    if %FLAG_PRINT_ASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -p
-    set FLAG_PRINT_ASSIGN=1
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-p" (
-    if %FLAG_PRINT_ASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -p
-    set FLAG_PRINT_ASSIGN=1
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-q" (
+    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "--" (
     shift
     set "FLAG="
