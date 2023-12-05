@@ -1,3 +1,11 @@
+2023.12.05:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: short paths equality comparison fixup
+* fixed: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: a directory shortcut make and update fixup
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: equality detection fixup in case of disallowed paths reassign (`-allow-target-path-reassign` and `-allow-wd-reassign` is not used)
+* new: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: change current directory for long paths through short path
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: added `-p[rint-assing]` flag to print before property assignment
+* changed: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: code improvements
+
 2023.12.04:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: execution fixup
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: added shortcut auto backup and `-no-backup` flag to disable shortcut backup before save

@@ -9,7 +9,8 @@
 '''   make_shortcut.vbs
 '''     [-CD <CurrentDirectoryPath>]
 '''     [-showas <ShowWindowAsNumber>]
-'''     [-allow-dos-target-path] [-allow-dos-wd] [-allow-dos-paths]
+'''     [-allow-dos-current-dir] [-allow-dos-target-path] [-allow-dos-wd] [-allow-dos-paths]
+'''     [-p[rint-assing]]
 '''     [-u] [-q]
 '''     [-E[0 | t | a | wd]]
 '''     [-wd <ShortcutWorkingDirectory>]
@@ -73,6 +74,9 @@
 '''
 '''      See detailed documentation in MSDN for the function `ShowWindow`.
 '''
+'''   -allow-dos-current-dir
+'''     Allow long path conversion into DOS path for the current directory.
+'''     Has effect only if path does exist.
 '''   -allow-dos-target-path
 '''     Reread target path after assign and if it does not exist, then reassign
 '''     it by a reduced DOS path version.
@@ -80,13 +84,16 @@
 '''     path to open it by an old version application which does not support
 '''     long paths or Win32 Namespace paths, but supports open target paths by
 '''     a shortcut file.
+'''     Has effect only if path does exist.
 '''   -allow-dos-wd
 '''     Reread working directory after assign and if it does not exist, then
 '''     reassign it by a reduced DOS path version.
+'''     Has effect only if path does exist.
 '''   -allow-dos-paths
-'''     Reread a property with a path after assign and if it does not exist,
-'''     then reassign it by a reduced DOS path version.
+'''     Implies all `-allow-dos-*` flags.
 '''
+'''   -p[rint-assign]
+'''     Print assign.
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
 '''   -q
@@ -106,7 +113,7 @@
 '''
 '''   -wd <ShortcutWorkingDirectory>
 '''     Working directory value to assign.
-'''
+
 ''' NOTE:
 '''   1. Creation of a shortcut under ealier version of the Windows makes
 '''      shortcut cleaner. For example, do use Windows XP instead of the
@@ -213,12 +220,12 @@ ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
 
+Dim PrintAssign : PrintAssign = False
+
 Dim UnescapeAllArgs : UnescapeAllArgs = False
 
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ChangeCurrentDirectoryExist : ChangeCurrentDirectoryExist = False
-
-Dim ShortcutFilePath : ShortcutFilePath = ""
 
 Dim ShortcutTarget : ShortcutTarget = ""
 Dim ShortcutTargetUnquoted : ShortcutTargetUnquoted = ""
@@ -241,6 +248,7 @@ Dim ExpandShortcutWorkingDirectory : ExpandShortcutWorkingDirectory = False
 
 Dim AlwaysQuote : AlwaysQuote = False
 
+Dim AllowDOSCurrentDirectory : AllowDOSCurrentDirectory = False
 Dim AllowDOSTargetPath : AllowDOSTargetPath = False
 Dim AllowDOSWorkingDirectory : AllowDOSWorkingDirectory = False
 Dim AllowDOSPaths : AllowDOSPaths = False
@@ -259,6 +267,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ChangeCurrentDirectory = WScript.Arguments(i)
         ChangeCurrentDirectoryExist = True
+      ElseIf arg = "-print-assign" Or arg = "-p" Then ' Print assign
+        PrintAssign = True
       ElseIf arg = "-u" Then ' Unescape %xx or %uxxxx
         UnescapeAllArgs = True
       ElseIf arg = "-wd" Then ' Shortcut working directory
@@ -281,6 +291,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         ExpandShortcutTargetArgs = True
       ElseIf arg = "-Ewd" Then ' Expand environment variables only in the shortcut working directory argument
         ExpandShortcutWorkingDirectory = True
+      ElseIf arg = "-allow-dos-current-dir" Then ' Allow long path conversion into DOS path for the current directory
+        AllowDOSCurrentDirectory = True
       ElseIf arg = "-allow-dos-target-path" Then ' Allow target path reset by a reduced DOS path version
         AllowDOSTargetPath = True
       ElseIf arg = "-allow-dos-wd" Then ' Allow working directory reset by a reduced DOS path version
@@ -335,14 +347,73 @@ If cmd_args_ubound < 1 Then
   WScript.Quit 255
 End If
 
-' change current directory before any file system request because of relative paths
-If ChangeCurrentDirectoryExist Then
-  objShell.CurrentDirectory = ChangeCurrentDirectory
+If AllowDOSPaths Then
+  AllowDOSCurrentDirectory = AllowDOSPaths
+  AllowDOSTargetPath = AllowDOSPaths
+  AllowDOSWorkingDirectory = AllowDOSPaths
 End If
 
-ShortcutFilePath = cmd_args(0)
+' functions
+
+Function GetFileShortPath(FilePathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+  Dim File : Set File = objFS.GetFile("\\?\" & FilePathAbs)
+  GetFileShortPath = File.ShortPath
+  If Left(GetFileShortPath, 4) = "\\?\" Then
+    GetFileShortPath = Mid(GetFileShortPath, 5)
+  End If
+End Function
+
+Function GetFolderShortPath(FolderPathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+  Dim Folder : Set Folder = objFS.GetFolder("\\?\" & FolderPathAbs & "\")
+  GetFolderShortPath = Folder.ShortPath
+  If Left(GetFolderShortPath, 4) = "\\?\" Then
+    GetFolderShortPath = Mid(GetFolderShortPath, 5)
+  End If
+End Function
+
+Function GetShortPath(PathAbs)
+  If objFS.FileExists("\\?\" & PathAbs) Then
+    GetShortPath = GetFileShortPath(PathAbs)
+  ElseIf objFS.FolderExists("\\?\" & PathAbs) Then
+    GetShortPath = GetFolderShortPath(PathAbs)
+  End If
+End Function
 
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
+
+' change current directory before any file system request because of relative paths
+If ChangeCurrentDirectoryExist Then
+  Dim ChangeCurrentDirectoryAbs : ChangeCurrentDirectoryAbs = objFS.GetAbsolutePathName(ChangeCurrentDirectory) ' CAUTION: can alter a path character case if path exists
+
+  ' remove `\\?\` prefix
+  If Left(ChangeCurrentDirectoryAbs, 4) = "\\?\" Then
+    ChangeCurrentDirectoryAbs = Mid(ChangeCurrentDirectoryAbs, 5)
+  End If
+
+  ' test on path existence including long path
+  Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = objFS.FileExists("\\?\" & ChangeCurrentDirectoryAbs)
+  If IsCurrentDirectoryExist Then
+    PrintOrEchoErrorLine _
+      WScript.ScriptName & ": error: could not change current directory:" & vbCrLf & _
+      WScript.ScriptName & ": info: CurrentDirectory=`" & ChangeCurrentDirectoryAbs & "`"
+    WScript.Quit 1
+  End If
+
+  ' test on long path existence
+  If (Not AllowDOSCurrentDirectory) Or objFS.FolderExists(ChangeCurrentDirectoryAbs) Then
+    ' is not long path
+    objShell.CurrentDirectory = ChangeCurrentDirectoryAbs
+  ElseIf AllowDOSCurrentDirectory Then
+    ' translate into short path
+    objShell.CurrentDirectory = GetFolderShortPath(ChangeCurrentDirectoryAbs)
+  End If
+End If
+
+Dim ShortcutFilePath : ShortcutFilePath = cmd_args(0)
 
 Dim ShortcutFilePathAbs : ShortcutFilePathAbs = objFS.GetAbsolutePathName(ShortcutFilePath) ' CAUTION: can alter a path character case if path exists
 
@@ -357,7 +428,7 @@ If IsShortcutFileExist Then
   PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: shortcut file must not exist:" & vbCrLf & _
     WScript.ScriptName & ": info: ShortcutFilePath=`" & ShortcutFilePathAbs & "`"
-  WScript.Quit 1
+  WScript.Quit 10
 End If
 
 Dim ShortcutFileDir : ShortcutFileDir = objFS.GetParentFolderName(ShortcutFilePathAbs)
@@ -366,7 +437,7 @@ If Not IsShortcutFileDirExist Then
   PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: shortcut file directory must exist:" & vbCrLf & _
     WScript.ScriptName & ": info: ShortcutFileDir=`" & ShortcutFileDir & "`"
-  WScript.Quit 2
+  WScript.Quit 20
 End If
 
 ShortcutTarget = cmd_args(1)
@@ -374,11 +445,6 @@ ShortcutTarget = cmd_args(1)
 If cmd_args_ubound >= 2 Then
   ShortcutTargetArgs = cmd_args(2)
   ShortcutTargetArgsExist = True
-End If
-
-If AllowDOSPaths Then
-  AllowDOSTargetPath = AllowDOSPaths
-  AllowDOSWorkingDirectory = AllowDOSPaths
 End If
 
 ' ShortcutTarget
@@ -417,7 +483,7 @@ If Not IsShortcutTargetPathExist Then
   PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: shortcut target path does not exist:" & vbCrLf & _
     WScript.ScriptName & ": info: ShortcutTarget=`" & ShortcutTargetUnquotedAbs & "`"
-  WScript.Quit 10
+  WScript.Quit 30
 End If
 
 If Not AlwaysQuote Then
@@ -440,14 +506,7 @@ If objFS.FileExists(ShortcutFilePathAbs) Then
   ShortcutFilePathToOpen = ShortcutFilePathAbs
 Else
   ' translate into short path
-
-  ' WORKAROUND:
-  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
-  Dim ShortcutFile : Set ShortcutFile = objFS.GetFile("\\?\" & ShortcutFilePathAbs)
-  Dim ShortcutFileShortPath : ShortcutFileShortPath = ShortcutFile.ShortPath
-  If Left(ShortcutFileShortPath, 4) = "\\?\" Then
-    ShortcutFileShortPath = Mid(ShortcutFileShortPath, 5)
-  End If
+  Dim ShortcutFileShortPath : ShortcutFileShortPath = GetFileShortPath(ShortcutFilePathAbs)
 
   objFS.DeleteFile("\\?\" & ShortcutFilePathAbs)
 
@@ -457,16 +516,23 @@ End If
 
 Dim objSC : Set objSC = objShell.CreateShortcut(ShortcutFilePathToOpen)
 
+If PrintAssign Then
+  PrintOrEchoLine "TargetPath=" & ShortcutTargetUnquotedAbs
+End If
+
 objSC.TargetPath = ShortcutTarget
 
 If AllowDOSTargetPath Then
-  If Not LCase(objSC.TargetPath) = LCase(ShortcutTargetUnquotedAbs) Then
-    ' WORKAROUND:
-    '   We use `\\?\` to bypass `GetFile` error: `File not found`.
-    Dim ShortcutTargetFile : Set ShortcutTargetFile = objFS.GetFile("\\?\" & ShortcutTargetUnquotedAbs)
-    Dim ShortcutTargetShortPath : ShortcutTargetShortPath = ShortcutTargetFile.ShortPath
-    If Left(ShortcutTargetShortPath, 4) = "\\?\" Then
-      ShortcutTargetShortPath = Mid(ShortcutTargetShortPath, 5)
+  ' WORKAROUND:
+  '   Because objSC.TargetPath can contain a mixed path (half short and half long), then
+  '   we have to convert it too.
+  Dim ShortcutPrevTargetShortPath : ShortcutPrevTargetShortPath = GetShortPath(objSC.TargetPath)
+
+  If Not LCase(ShortcutPrevTargetShortPath) = LCase(ShortcutTargetUnquotedAbs) Then
+    Dim ShortcutTargetShortPath : ShortcutTargetShortPath = GetShortPath(ShortcutTargetUnquotedAbs)
+
+    If PrintAssign Then
+      PrintOrEchoLine "TargetPath(short)=" & ShortcutTargetShortPath
     End If
 
     objSC.TargetPath = ShortcutTargetShortPath
@@ -482,6 +548,10 @@ If ShortcutTargetArgsExist Then
 
   If UnescapeAllArgs Then
     ShortcutTargetArgs = Unescape(ShortcutTargetArgs)
+  End If
+
+  If PrintAssign Then
+    PrintOrEchoLine "TargetArgs=" & ShortcutTargetArgs
   End If
 
   objSC.Arguments = ShortcutTargetArgs
@@ -516,7 +586,11 @@ If ShortcutWorkingDirectoryExist Then
     PrintOrEchoErrorLine _
       WScript.ScriptName & ": error: shortcut working directory does not exist:" & vbCrLf & _
       WScript.ScriptName & ": info: ShortcutWorkingDirectory=`" & ShortcutWorkingDirectoryAbs & "`"
-    WScript.Quit 20
+    WScript.Quit 40
+  End If
+
+  If PrintAssign Then
+    PrintOrEchoLine "WorkingDirectory=" & ShortcutWorkingDirectoryAbs
   End If
 
   objSC.WorkingDirectory = ShortcutWorkingDirectoryAbs
@@ -538,12 +612,10 @@ If AllowDOSWorkingDirectory Then
   Set objSC = objShell.CreateShortcut(ShortcutFilePathToOpen)
 
   If Not LCase(objSC.WorkingDirectory) = LCase(ShortcutWorkingDirectoryAbs) Then
-    ' WORKAROUND:
-    '   We use `\\?\` to bypass `GetFolder` error: `Path not found`.
-    Dim ShortcutWorkingDirectoryFolder : Set ShortcutWorkingDirectoryFolder = objFS.GetFolder("\\?\" & ShortcutWorkingDirectoryAbs & "\")
-    Dim ShortcutWorkingDirectoryShortPath : ShortcutWorkingDirectoryShortPath = ShortcutWorkingDirectoryFolder.ShortPath
-    If Left(ShortcutWorkingDirectoryShortPath, 4) = "\\?\" Then
-      ShortcutWorkingDirectoryShortPath = Mid(ShortcutWorkingDirectoryShortPath, 5)
+    Dim ShortcutWorkingDirectoryShortPath : ShortcutWorkingDirectoryShortPath = GetFolderShortPath(ShortcutWorkingDirectoryAbs)
+
+    If PrintAssign Then
+      PrintOrEchoLine "WorkingDirectory(short)=" & ShortcutWorkingDirectoryShortPath
     End If
 
     objSC.WorkingDirectory = ShortcutWorkingDirectoryShortPath
