@@ -1,4 +1,7 @@
 2023.12.07:
+* changed: _config/config.system.vars.in, Scripts/Tools: added `CONTOOLS_WMI_ROOT` variable to address WMI scripts directly
+
+2023.12.07:
 * fixed: Scripts/Tools/wmi: execution fixup
 * new: Scripts/Tools/wmi/get_wmic_local_datetime_z.bat: added script to request local datetime including zone offset
 * new: Scripts/Tools/wmi/get_wmic_file_lastmodifiedtime.bat: added script to request a file last modification time

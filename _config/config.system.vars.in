@@ -26,8 +26,9 @@ upath CONTOOLS_BASH_ROOT                        ="%CONTOOLS_ROOT%/bash"
 upath CONTOOLS_BUILD_TOOLS_ROOT                 ="%CONTOOLS_ROOT%/build"
 upath CONTOOLS_SQLITE_TOOLS_ROOT                ="%CONTOOLS_ROOT%/sqlite"
 upath CONTOOLS_TESTLIB_ROOT                     ="%CONTOOLS_ROOT%/testlib"
-upath CONTOOLS_XML_TOOLS_ROOT                   ="%CONTOOLS_ROOT%/xml"
 upath CONTOOLS_VARS_ROOT                        ="%CONTOOLS_ROOT%/vars"
+upath CONTOOLS_XML_TOOLS_ROOT                   ="%CONTOOLS_ROOT%/xml"
+upath CONTOOLS_WMI_ROOT                         ="%CONTOOLS_ROOT%/wmi"
 
 upath CONTOOLS_TOOL_ADAPTORS_ROOT               ="%CONTOOLS_ROOT%/ToolAdaptors"
 

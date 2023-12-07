@@ -9,7 +9,7 @@ rem   then the call just ignores and the script returns negative error code.
 
 setlocal
 
-call "%%CONTOOLS_ROOT%%\wmi\get_wmic_local_datetime.bat" || exit 255
+call "%%CONTOOLS_WMI_ROOT%%\get_wmic_local_datetime.bat" || exit 255
 
 set "LOCK_DIR_NAME_SUFFIX=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%.%RETURN_VALUE:~8,2%_%RETURN_VALUE:~10,2%_%RETURN_VALUE:~12,2%_%RETURN_VALUE:~15,3%"
 set LASTERROR=0

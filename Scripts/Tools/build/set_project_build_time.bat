@@ -9,7 +9,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%\wmi\get_wmic_local_datetime.bat"
+call "%%CONTOOLS_WMI_ROOT%%\get_wmic_local_datetime.bat"
 (
   endlocal
   set "PROJECT_BUILD_DATE=%RETURN_VALUE:~0,4%_%RETURN_VALUE:~4,2%_%RETURN_VALUE:~6,2%"
