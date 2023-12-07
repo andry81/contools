@@ -1,4 +1,8 @@
 2023.12.07:
+* new: Scripts/Tools/build/load_config.bat: added check on configuration files expiration between input and output using file last modification time and exact comparison of first `#%% version: ...` lines to avoid load of expired configuration files
+* changed: Scripts/Tools/build/load_config_dir.bat: minor improvements
+
+2023.12.07:
 * changed: _config/config.system.vars.in, Scripts/Tools: added `CONTOOLS_WMI_ROOT` variable to address WMI scripts directly
 
 2023.12.07:
