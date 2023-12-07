@@ -1,3 +1,8 @@
+2023.12.07:
+* fixed: Scripts/Tools/wmi: execution fixup
+* new: Scripts/Tools/wmi/get_wmic_local_datetime_z.bat: added script to request local datetime including zone offset
+* new: Scripts/Tools/wmi/get_wmic_file_lastmodifiedtime.bat: added script to request a file last modification time
+
 2023.12.05:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: short paths equality comparison fixup
 * fixed: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: a directory shortcut make and update fixup

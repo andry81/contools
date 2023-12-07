@@ -1,7 +1,7 @@
 @echo off
 
 rem Description:
-rem   Independent to Windows first display resolution request.
+rem   A file last modified time request.
 
 rem CAUTION:
 rem   In Windowx XP an elevated call under data protection flag will block the wmic tool!
@@ -22,18 +22,20 @@ rem
 rem Drop last error level
 call;
 
+set "FILE=%~1"
+
+if not exist "%FILE%" (
+  echo.%~nx0: error: FILE does not exist: "%FILE%".
+  exit /b 1
+) >&2
+
 rem drop return value
 set "RETURN_VALUE="
 
-set "CurrentHorizontalResolution="
-set "CurrentVerticalResolution="
+for /F "eol= tokens=* delims=" %%i in ("%FILE%\.") do set "FILE=%%~fi"
 
-for /F "usebackq eol= tokens=1,2 delims==" %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_VideoController get CurrentHorizontalResolution^,CurrentVerticalResolution /VALUE 2^>nul`) do (
-  if "%%i" == "CurrentHorizontalResolution" set "CurrentHorizontalResolution=%%j"
-  if "%%i" == "CurrentVerticalResolution" set "CurrentVerticalResolution=%%j"
-)
-if defined CurrentHorizontalResolution if defined CurrentVerticalResolution set "RETURN_VALUE=%CurrentHorizontalResolution%|%CurrentVerticalResolution%"
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" DataFile where "Name='%%FILE:\=\\%%'" get LastModified /VALUE`) do if "%%i" == "LastModified" set "RETURN_VALUE=%%j"
 
-if defined RETURN_VALUE ( set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0 )
+if defined RETURN_VALUE exit /b 0
 
 exit /b 1
