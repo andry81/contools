@@ -1,3 +1,9 @@
+2023.12.09:
+* fixed: __init__, Scripts/Tools: execution fixup for Windows XP
+* fixed: Scripts/Tools/build/load_config.bat: execution fixup
+* new: Scripts/Tools/build: gen_config.bat, load_config*.bat: scripts description
+* changed: Scripts/Tools/build/.load_config/load_config.lite_parse.bat: code cleanup
+
 2023.12.07:
 * new: Scripts/Tools/build/load_config.bat: added check on configuration files expiration between input and output using file last modification time and exact comparison of first `#%% version: ...` lines to avoid load of expired configuration files
 * changed: Scripts/Tools/build/load_config_dir.bat: minor improvements

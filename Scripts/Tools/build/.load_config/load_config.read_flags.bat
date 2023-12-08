@@ -1,3 +1,4 @@
+@echo off
 
 rem script flags
 set __?FLAG_SHIFT=0
@@ -40,3 +41,5 @@ if defined __?FLAG (
   rem read until no flags
   goto FLAGS_LOOP
 )
+
+exit /b 0

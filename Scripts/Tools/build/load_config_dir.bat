@@ -1,5 +1,44 @@
 @echo off
 
+rem USAGE:
+rem   load_config_dir.bat [<Flags>] <InputDir> <OutputDir> [<Param0> [<Param1>]]
+
+rem Description:
+rem   Script to load input and output directory with configuration files using
+rem   the `load_Config.bat` script.
+rem   A directory can contain a set of configuration files which loads in this
+rem   order if exist:
+rem     * config.system.vars[.in]
+rem     * config.0.vars[.in]
+rem     * ...
+rem     * config.N.vars[.in]
+rem   The `.in` suffix basically related to the configuration files in the
+rem   input directory.
+rem   By default the script does load the system and the user configuration
+rem   files from the input directory.
+rem
+rem   NOTE:
+rem     All the rest description is in the `load_config.bat` script.
+
+rem <Flags>:
+rem   -gen_system_config
+rem     Generate the system configuration file.
+rem     Implies `-load_system_output_config` flag.
+rem   -gen_user_config
+rem     Generate the user configuration file.
+rem     Implies `-load_user_output_config` flag.
+rem   -load_system_output_config
+rem     Loads the system configuration file from output directory.
+rem   -load_user_output_config
+rem     Loads the user configuration file(s) from output directory.
+rem   -no_load_system_config
+rem     Do not load the system configuration file.
+rem   -no_load_user_config
+rem     Do not load the user configuration file(s).
+rem
+rem NOTE:
+rem   All the rest parameters is in the `load_config.bat` script.
+
 set "__?~dp0=%~dp0"
 set "__?~n0=%~n0"
 set "__?~nx0=%~nx0"

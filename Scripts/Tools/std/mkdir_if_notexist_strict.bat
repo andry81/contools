@@ -68,7 +68,7 @@ rem
 if not exist "\\?\%DIR_PATH%" (
   set DIR_PATHS=%DIR_PATHS% "%DIR_PATH%"
 ) else if not exist "\\?\%DIR_PATH%\*" (
-  echo.%~nx0: error: directory path exist but is not a directory: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo.%~nx0: error: path does exist but is not a directory: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -81,7 +81,7 @@ set /A DIR_COUNT+=1
 goto MKDIR_LOOP
 
 :MKDIR_LOOP_END
-if not defined DIR_PATHS exit /b
+if not defined DIR_PATHS exit /b 0
 
 echo.^>^>mkdir%DIR_PATHS%
 mkdir%DIR_PATHS%

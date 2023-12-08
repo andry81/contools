@@ -12,7 +12,7 @@ set "__?VAR_EXPR=%~4"
 if not "%~5" == "" ( set "__?ATTR=%__?ATTR%%~4|" & set "__?VAR_EXPR=%~5" )
 set "__?VAR_EXPR=%__?VAR_EXPR:::=:.:%"
 
-for /F "eol= tokens=1,2,* delims=:" %%i in ("%__?VAR_EXPR%") do ( call :PARSE_EXPR "%%~4" "%%~i" "%%~j" "%%~k" "%%~1" "%%~2" "%%~3" )
+for /F "eol= tokens=1,2,* delims=:" %%i in ("%__?VAR_EXPR%") do ( call :PARSE_EXPR "" "%%~i" "%%~j" "%%~k" "%%~1" "%%~2" "%%~3" )
 exit /b
 
 :PARSE_EXPR
@@ -27,12 +27,9 @@ if ^/ == ^%__?VALUE:~0,1%/ if ^/ == ^%__?VALUE:~-1%/ call set "__?VALUE=%__?VA
 :PARSE_VAR
 if not "%~3" =="." ( set "__?PARAM0=%~3" ) else set "__?PARAM0="
 if not "%~4" =="." ( set "__?PARAM1=%~4" ) else set "__?PARAM1="
-if "%__?PARAM0%" == "" if "%__?PARAM1%" == "" goto PARSE_VALUE
-set "%~1="
-if not "%__?PARAM0%" == "" ( if "%__?PARAM0%" == "%~6" (
-  if not "%__?PARAM1%" == "" ( if "%__?PARAM1%" == "%~7" goto PARSE_VALUE ) else goto PARSE_VALUE
-) ) else if not "%__?PARAM1%" == "" ( if "%__?PARAM1%" == "%~7" goto PARSE_VALUE ) else goto PARSE_VALUE
-exit /b
+
+if defined __?PARAM0 if not "%~6" == "" if not "%__?PARAM0%" == "%~6" exit /b
+if defined __?PARAM1 if not "%~7" == "" if not "%__?PARAM1%" == "%~7" exit /b
 
 :PARSE_VALUE
 set "__?VAR=%~2"
