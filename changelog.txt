@@ -1,3 +1,6 @@
+2023.12.10:
+* refactor: Scripts/Tools/admin: `__init__.bat` scripts moved into `__init__` subdirectory
+
 2023.12.09:
 * fixed: __init__, Scripts/Tools: execution fixup for Windows XP
 * fixed: Scripts/Tools/build/load_config.bat: execution fixup
