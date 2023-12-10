@@ -1,4 +1,7 @@
 2023.12.10:
+* fixed: Scripts/Tools/exec/exec_callf_prefix.bat: execution fixup
+
+2023.12.10:
 * fixed: __init__: missed to retarget externals of externals
 
 2023.12.10:

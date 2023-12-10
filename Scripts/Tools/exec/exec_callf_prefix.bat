@@ -14,6 +14,7 @@ if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 rem script flags
 if not defined FLAG_SHIFT set FLAG_SHIFT=0
 set FLAG_ELEVATE=0
+set "ELEVATE_PREFIX_NAME="
 set "CALLF_BARE_FLAGS="
 set "CALLF_PROMOTE_PARENT_FLAGS="
 
@@ -28,6 +29,7 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-elevate" (
     set FLAG_ELEVATE=1
+    set "ELEVATE_PREFIX_NAME=%~2"
     shift
     set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-X" (
@@ -99,8 +101,8 @@ if %FLAG_NO_LOG% EQU 0 (
   if %FLAG_ELEVATE% NEQ 0 (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
 /promote{ /load-parent-proc-init-env-vars /print-win-error-string /ret-child-exit }%CALLF_PROMOTE_PARENT_FLAGS% ^
-/elevate{ /no-window /create-inbound-server-pipe-to-stdout "%~2_stdout_{pid}" /create-inbound-server-pipe-to-stderr "%~2_stderr_{pid}" ^
-}{ /attach-parent-console /reopen-stdout-as-client-pipe "%~2_stdout_{ppid}" /reopen-stderr-as-client-pipe "%~2_stderr_{ppid}" }
+/elevate{ /no-window /create-inbound-server-pipe-to-stdout "%ELEVATE_PREFIX_NAME%_stdout_{pid}" /create-inbound-server-pipe-to-stderr "%ELEVATE_PREFIX_NAME%_stderr_{pid}" ^
+}{ /attach-parent-console /reopen-stdout-as-client-pipe "%ELEVATE_PREFIX_NAME%_stdout_{ppid}" /reopen-stderr-as-client-pipe "%ELEVATE_PREFIX_NAME%_stderr_{ppid}" }
   )
 ) else (
   if %FLAG_ELEVATE% NEQ 0 (
