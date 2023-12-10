@@ -1,4 +1,7 @@
 2023.12.10:
+* fixed: __init__: missed to retarget externals of externals
+
+2023.12.10:
 * refactor: Scripts/Tools/admin: `__init__.bat` scripts moved into `__init__` subdirectory
 
 2023.12.09:

@@ -32,6 +32,11 @@ if not defined PROJECT_LOG_ROOT                     call "%%~dp0canonical_path.b
 if not defined CONTOOLS_PROJECT_INPUT_CONFIG_ROOT   call "%%~dp0canonical_path.bat" CONTOOLS_PROJECT_INPUT_CONFIG_ROOT   "%%CONTOOLS_PROJECT_ROOT%%/_config"
 if not defined CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT  call "%%~dp0canonical_path.bat" CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT  "%%PROJECT_OUTPUT_ROOT%%/config/contools"
 
+rem retarget externals of an external project
+
+if not defined TACKLELIB_PROJECT_EXTERNALS_ROOT     call "%%~dp0canonical_path.bat" TACKLELIB_PROJECT_EXTERNALS_ROOT     "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
+if not defined SVNCMD_PROJECT_EXTERNALS_ROOT        call "%%~dp0canonical_path.bat" SVNCMD_PROJECT_EXTERNALS_ROOT        "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
+
 if not defined CONTOOLS_ROOT                        call "%%~dp0canonical_path.bat" CONTOOLS_ROOT                        "%%CONTOOLS_PROJECT_ROOT%%/Scripts/Tools"
 
 if %NO_GEN%0 EQU 0 (
