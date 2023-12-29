@@ -43,13 +43,10 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "?0=^"
-set "?2=|"
-call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" "%%~2\bin\cygcheck.exe" -c "%%~1" %%%%?2%%%% findstr.exe /I /R /C:"%%?0%%%%~1  *[0-9][0-9]*."
-
-for /F "tokens=1,2,* delims= " %%i in ("%STDOUT_VALUE%") do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@"%~2\bin\cygcheck.exe" -cd "%~1" ^^^| "%SystemRoot%\system32\findstr.exe" /I /R /C:"^%~1  *[0-9][0-9]*."`) do ^
+for /F "tokens=1,* delims= " %%j in ("%%i") do (
   set CYGWIN_VER_STR=0
-  set "CYGWIN_VER_STR=%%j"
+  set "CYGWIN_VER_STR=%%k"
 )
 
 if not defined CYGWIN_VER_STR set "CYGWIN_VER_STR=%STDOUT_VALUE%"

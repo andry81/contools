@@ -1,3 +1,7 @@
+2023.12.29:
+* changed: Scripts/Tools: msys/msysver.bat, cygwin/cygver.bat: removed `setvarfromstd.bat` usage
+* refactor: Scripts/Tools: msys/msysver.bat, cygwin/cygver.bat: moved scripts to standalone directories
+
 2023.12.10:
 * fixed: Scripts/Tools/exec/exec_callf_prefix.bat: execution fixup
 

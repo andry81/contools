@@ -41,12 +41,10 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "?0=^"
-set "?2=|"
-call "%%CONTOOLS_ROOT%%/setvarfromstd.bat" "%%~2\bin\uname.exe" -r
-for /F "tokens=1,* delims= " %%i in ("%STDOUT_VALUE%") do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@"%~2\bin\uname.exe" -r`) do ^
+for /F "tokens=1,* delims= " %%j in ("%%i") do (
   set MSYS_VER_STR=0
-  set "MSYS_VER_STR=%%i"
+  set "MSYS_VER_STR=%%j"
 )
 
 if not defined MSYS_VER_STR set "MSYS_VER_STR=%STDOUT_VALUE%"
