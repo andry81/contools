@@ -19,12 +19,14 @@ rem     * If you send the output to the console or to a pipe, wmic will use OEM
 rem       codepage
 rem
 
-rem Drop last error level
-call;
-
 rem drop return value
 set "RETURN_VALUE="
 
+rem Drop last error level
+call;
+
+rem CAUTION:
+rem   `for /F` does not return a command error code
 for /F "usebackq eol= tokens=1,2 delims==" %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_OperatingSystem get ServicePackMajorVersion /VALUE 2^>nul`) do if "%%i" == "ServicePackMajorVersion" set "RETURN_VALUE=%%j"
 
 if defined RETURN_VALUE ( set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0 )

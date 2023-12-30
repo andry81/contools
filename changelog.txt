@@ -1,3 +1,7 @@
+2023.12.30:
+* fixed: Scripts/Tools/wmi: minor fixup
+* new: Scripts/Tools: filesys/read_pe_header_bitness.bat, ToolAdaptors/vbs/read_pe_header_bitness.*: added scripts to read PE header bitness from binary files
+
 2023.12.29:
 * changed: Scripts/Tools: msys/msysver.bat, cygwin/cygver.bat: removed `setvarfromstd.bat` usage
 * refactor: Scripts/Tools: msys/msysver.bat, cygwin/cygver.bat: moved scripts to standalone directories
