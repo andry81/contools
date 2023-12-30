@@ -1,4 +1,7 @@
 2023.12.30:
+* changed: Scripts/Tools/ToolAdaptors/app/git/git_unmirror_refs.bat: moved to `gitcmd` project
+
+2023.12.30:
 * fixed: Scripts/Tools/wmi: minor fixup
 * new: Scripts/Tools: filesys/read_pe_header_bitness.bat, ToolAdaptors/vbs/read_pe_header_bitness.*: added scripts to read PE header bitness from binary files
 
@@ -512,9 +515,6 @@
 
 2023.03.01:
 * new: Scripts/Tools/admin/VirtualBox/README_EN.txt: VirtualBox shared VPN setup
-
-2023.02.26:
-* new: Scripts/Tools/ToolAdaptors/app/git/git_unmirror_refs.bat: added `git_unmirror_refs.bat` script to unmirror mirrored remote repositories
 
 2023.02.21:
 * changed: Scripts/Tools/admin: KnownIssues/admin_*.txt, ProductKey/admin_*.txt, Steam/README_EN.txt, Telemetry/admin_*.txt, VisualStudio/README_EN.txt, README_EN.txt: readme cleanup
