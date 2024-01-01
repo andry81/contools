@@ -1,3 +1,6 @@
+2023.01.02:
+* changed: Scripts/Tools/std/errlvl.bat: more examples and details
+
 2023.12.30:
 * changed: Scripts/Tools/ToolAdaptors/app/git/git_unmirror_refs.bat: moved to `gitcmd` project
 

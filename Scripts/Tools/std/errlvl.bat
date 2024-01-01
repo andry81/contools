@@ -51,6 +51,7 @@ rem     cmd.exe /c "1.bat & "%%CONTOOLS_ROOT%%/std/errlvl.bat""
 rem
 rem     Or
 rem
+rem     NOTE: The `1.bat` is not quoted here, because `cmd.exe` will remove first and last quotes after the `/c`.
 rem     >
 rem     "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe /c 1.bat & \"${CONTOOLS_ROOT}/std/errlvl.bat\""
 rem
@@ -63,6 +64,23 @@ rem     Or
 rem
 rem     >
 rem     "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe \"/c \"1.bat ^& \"${CONTOOLS_ROOT}/std/errlvl.bat\"\"\""
+rem
+rem     Or
+rem
+rem     NOTE: The best variant, with multiple issues workaround.
+rem
+rem     Pros:
+rem       1. The `call` prefix is not used, so there is no the double expansion issue (see below).
+rem       2. The `@` prefix prevents the `cmd.exe` to strip the quotes from the begin and the end of a command line.
+rem       3. Special control character `&` does not need to be quoted or escaped.
+rem
+rem     Cons:
+rem       1. The part of a command line after the `cmd.exe` still does expand by the `cmd.exe` itself.
+rem          To bypass that you can use additional `callf` options: `/ra "%%" "%%?01%%" /v "?01" "%%"`
+rem       2. To disable the rest `callf` features: `/no-subst-pos-vars /no-esc`
+rem
+rem     >
+rem     "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe /c @\"1.bat\" & \"${CONTOOLS_ROOT}/std/errlvl.bat\"\""
 
 rem CAUTION:
 rem   The `call` operator will expand environment variables twice:
