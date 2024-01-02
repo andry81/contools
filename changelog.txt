@@ -1,4 +1,7 @@
 2023.01.02:
+* fixed: Scripts/Tools/build/extract_files_from_archives.bat: execution fixup
+
+2023.01.02:
 * new: Scripts/Tools/std/callshift.bat: added script to call a command on shifted arguments as an alternative variant to shift the `%*` parameter in scripts
 * changed: Scripts/Tools: callargs.bat, callshift.bat: removed previous implementation as new implementation is more reliable and universal
 

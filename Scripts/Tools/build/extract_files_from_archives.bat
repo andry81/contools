@@ -62,7 +62,7 @@ call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 exit /b %LASTERROR%
 
 :MAIN
-call "%%?~dp0%%.extract_files_from_archives/extract_files_from_archives.read_flags.bat" %%* || exit /b
+call "%%~dp0.extract_files_from_archives/extract_files_from_archives.read_flags.bat" %%* || exit /b
 
 if FLAG_SHIFT GTR 0 for /L %%i in (1,1,%FLAG_SHIFT%) do shift
 
