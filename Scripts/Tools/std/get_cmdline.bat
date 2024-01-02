@@ -19,10 +19,10 @@ if %?__FLAG_ALLOCATE_TEMP_DIR% NEQ 0 (
 
 rem redirect command line into temporary file to print it correcly
 for %%i in (1) do (
-    set "PROMPT=$_"
-    echo on
-    for %%b in (1) do rem * #%*#
-    @echo off
+  set "PROMPT=$_"
+  echo on
+  for %%b in (1) do rem * #%*#
+  @echo off
 ) > "%SCRIPT_TEMP_CURRENT_DIR%\cmdline.txt"
 
 for /F "usebackq eol= tokens=* delims=" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%\cmdline.txt") do set "RETURN_VALUE=%%i"

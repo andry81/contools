@@ -1,3 +1,6 @@
+2023.01.03:
+* new: Scripts/Tools/std/callshift.bat: implemented negative shift as skip of first N used arguments from the `%*` variable (ex: `call callshift.bat -3 command %%3 %%2 %%1 %%*`)
+
 2023.01.02:
 * fixed: Scripts/Tools/std/set_vars_from_file.bat: execution fixup, additional drop `?` prefixed variables
 
