@@ -1,4 +1,8 @@
 2023.01.02:
+* new: Scripts/Tools/std/callshift.bat: added script to call a command on shifted arguments as an alternative variant to shift the `%*` parameter in scripts
+* changed: Scripts/Tools: callargs.bat, callshift.bat: removed previous implementation as new implementation is more reliable and universal
+
+2023.01.02:
 * changed: Scripts/Tools/std/errlvl.bat: more examples and details
 
 2023.12.30:
