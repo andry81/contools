@@ -1,4 +1,7 @@
 2023.01.02:
+* fixed: Scripts/Tools/std/set_vars_from_file.bat: execution fixup, additional drop `?` prefixed variables
+
+2023.01.02:
 * fixed: Scripts/Tools/build/extract_files_from_archives.bat: execution fixup
 
 2023.01.02:
