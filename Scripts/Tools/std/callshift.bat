@@ -6,20 +6,25 @@ rem   from %3 plus index from %1. Script can skip first N arguments after %2
 rem   before shift the rest.
 
 rem USAGE:
-rem   callshift.bat <shift> <command> [<cmdline>]
+rem   callshift.bat [<flags>] <shift> <command> [<cmdline>]
 
-rem   <shift>
-rem     Number of arguments in <cmdline> to skip and shift.
-rem     If >=0, then only shifts <cmdline> after %2 argument.
-rem     If < 0, then skips first <shift> arguments after %2 argument and
-rem     shifts the rest <cmdline>.
+rem   <flags>:
+rem     -skip <skip-num>
+rem       Additional number of skip arguments after %2 argument.
+rem       If not defined, then 0.
 rem
-rem   <command>
+rem   <shift>:
+rem     Number of arguments in <cmdline> to skip and shift.
+rem     If >=0, then only shifts <cmdline> after %2 argument plus <skip-num>.
+rem     If < 0, then skips first <shift> arguments after %2 argument plus
+rem     <skip-num> and shifts the rest <cmdline>.
+rem
+rem   <command>:
 rem     Command to call with skipped and shifted arguments from <cmdline>.
 
 rem Examples:
-rem   1. >callshift.bat 0 echo "1 2" ! ^^? ^^* ^& ^| , ; = 3
-rem      "1 2" ! ? * & | , ; 3
+rem   1. >callshift.bat 0 echo "1 2" ! ^^? ^^* ^& ^| , ; = "=" 3
+rem      "1 2" ! ? * & | , ; "=" 3
 rem   2. >callshift.bat 2 echo."1 2" 3 4 5
 rem      "1 2" 5
 rem   3. >callshift.bat . set | sort
@@ -29,9 +34,14 @@ rem      >callshift.bat 0 echo.
 rem      >callshift.bat 0 echo 1 2 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
-rem   5. >call callshift.bat -3 echo 1 2 3 4 5 6 7
+rem   5. >callshift.bat -3 echo 1 2 3 4 5 6 7
 rem      1 2 3 7
+rem      rem in a script
 rem      >call callshift.bat -3 command %%3 %%2 %%1 %%*
+rem   6. >callshift.bat -skip 2 -3 echo a b 1 2 3 4 5 6 7
+rem      a b 1 2 3 7
+rem      rem in a script
+rem      >call callshift.bat -skip 2 -3 command param0 param1 %%3 %%2 %%1 %%*
 
 rem Pros:
 rem
@@ -39,7 +49,8 @@ rem   * Can handle `!`, `?`, `*`, `&`, `|`, `,`, `;` characters.
 rem   * Can call builtin commands.
 rem   * Does restore previous ERRORLEVEL variable before call a command.
 rem   * Does not leak variables outside.
-rem   * Can skip first N used arguments from the `%*` variable.
+rem   * Can skip first N used arguments from the `%*` variable including
+rem     additional command line arguments.
 rem
 rem Cons:
 rem
@@ -68,20 +79,43 @@ for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "
 
 del /F /Q "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
+rem script flags
+if not defined FLAG_SHIFT set FLAG_SHIFT=0
+set FLAG_SKIP=0
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-skip" (
+    set "FLAG_SKIP=%~2"
+    shift
+    shift
+    set /A FLAG_SHIFT+=2
+  )
+)
+
 set "SHIFT=%~1"
 set "COMMAND="
 set "CMDLINE="
 
 rem cast to integer
+set /A FLAG_SKIP+=0
 set /A SHIFT+=0
 
-set SKIP=2
+set /A COMMAND_INDEX=FLAG_SHIFT+1
+set /A ARG0_INDEX=FLAG_SHIFT+2
+
+set /A SKIP=FLAG_SHIFT+2+FLAG_SKIP
 
 if %SHIFT% GEQ 0 (
-  set /A SHIFT+=2
+  set /A SHIFT+=FLAG_SHIFT+2+FLAG_SKIP
 ) else (
   set /A SKIP+=-SHIFT
-  set /A SHIFT=-SHIFT*2+2
+  set /A SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2
 )
 
 rem Escape specific separator characters by sequence of `$NN` characters:
@@ -95,9 +129,10 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE
 
 set INDEX=-1
 
-for /F "eol= tokens=* delims=" %%i in ("%LINE%") do for %%j in (%%i) do (
+setlocal ENABLEDELAYEDEXPANSION
+for /F "eol= tokens=* delims=" %%i in ("!LINE!") do endlocal & for %%j in (%%i) do (
   setlocal ENABLEDELAYEDEXPANSION
-  if !INDEX! GEQ 2 (
+  if !INDEX! GEQ !ARG0_INDEX! (
     if !INDEX! LSS !SKIP! (
       if defined CMDLINE (
         for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
@@ -106,8 +141,8 @@ for /F "eol= tokens=* delims=" %%i in ("%LINE%") do for %%j in (%%i) do (
       if defined CMDLINE (
         for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
       ) else endlocal & set "CMDLINE=%%j"
-    )
-  ) else if !INDEX! EQU 1 (
+    ) else endlocal
+  ) else if !INDEX! EQU !COMMAND_INDEX! (
     endlocal & set "COMMAND=%%j"
   ) else endlocal
   set /A INDEX+=1

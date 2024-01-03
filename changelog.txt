@@ -1,4 +1,8 @@
 2023.01.03:
+* fixed: Scripts/Tools/std/callshift.bat: execution fixup, case with disappear of quoted equal sign (`"="`)
+* new: Scripts/Tools/std/callshift.bat: implemented `-skip <skip-num>` option to skip additional arguments
+
+2023.01.03:
 * fixed: Scripts/Tools: missed to call `declare_builtins.bat` script if IMPL_MODE=1
 * changed: Scripts/Tools: remove call to `__init__.bat` if IMPL_MODE=1 (the initialization must be called from the script which did set IMPL_MODE)
 * changed: Scripts/Tools/build/extract_files_from_archive.bat: added usage of `callshift.bat` to pass mixed arguments from the `%*` variable
