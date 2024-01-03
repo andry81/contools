@@ -27,7 +27,7 @@ if not defined PROJECT_LOG_ROOT set PROJECT_LOG_ROOT=.log
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%*
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
 
@@ -39,4 +39,7 @@ rem ...
 exit /b %LASTERROR%
 
 :IMPL
-call "%%~dp0extract_files_from_archives.bat" %%3 %%2 %%1 %%4 %%5 %%6 %%7 %%8 %%9
+rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
+
+call "%%CONTOOLS_ROOT%%/std/callshift.bat" -3 "%%~dp0extract_files_from_archives.bat" %%3 %%2 %%1 %%*

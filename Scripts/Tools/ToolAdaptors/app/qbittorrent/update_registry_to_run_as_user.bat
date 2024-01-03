@@ -2,11 +2,11 @@
 
 setlocal
 
-call "%%~dp0__init__\__init__.bat" || exit /b
-
 if %IMPL_MODE%0 NEQ 0 goto IMPL
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
+call "%%~dp0__init__\__init__.bat" || exit /b
+
+call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
 
 for %%i in (CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT) do (
   if not defined %%i (
@@ -24,6 +24,9 @@ call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -X /pause-on-exit -- %%* || 
 exit /b 0
 
 :IMPL
+rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
+
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
   echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
   set LASTERROR=255

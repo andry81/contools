@@ -15,7 +15,7 @@ set NO_GEN=1
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%*
+call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
 
 set "CALLF_ELEVATE_EXECUTABLE=%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"
 set "CALLF_UNELEVATE_EXECUTABLE=%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"

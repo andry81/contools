@@ -36,7 +36,7 @@ if not defined PROJECT_LOG_ROOT set PROJECT_LOG_ROOT=.log
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%*
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
 
@@ -47,7 +47,9 @@ rem ...
 
 exit /b %LASTERROR%
 
-:IMPL
+:IMPLrem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
+
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
   echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
   exit /b 255
@@ -62,7 +64,7 @@ call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 exit /b %LASTERROR%
 
 :MAIN
-call "%%~dp0.extract_files_from_archives/extract_files_from_archives.read_flags.bat" %%* || exit /b
+call "%%?~dp0%%.extract_files_from_archives/extract_files_from_archives.read_flags.bat" %%* || exit /b
 
 if FLAG_SHIFT GTR 0 for /L %%i in (1,1,%FLAG_SHIFT%) do shift
 
