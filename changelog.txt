@@ -1,3 +1,6 @@
+2023.01.04:
+* fixed: Scripts/Tools/std/callshift.bat: `FLAG_SHIFT` variable must not be accepted from outside, because in case of `callshift.bat` script, it must not be affected by external value
+
 2023.01.03:
 * fixed: Scripts/Tools/std/callshift.bat: execution fixup, case with disappear of quoted equal sign (`"="`)
 * new: Scripts/Tools/std/callshift.bat: implemented `-skip <skip-num>` option to skip additional arguments

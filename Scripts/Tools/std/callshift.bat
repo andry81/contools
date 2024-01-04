@@ -80,7 +80,7 @@ for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "
 del /F /Q "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
 rem script flags
-if not defined FLAG_SHIFT set FLAG_SHIFT=0
+set FLAG_SHIFT=0
 set FLAG_SKIP=0
 
 rem flags always at first
