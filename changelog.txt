@@ -1,3 +1,6 @@
+2023.01.05:
+* changed: Scripts/Tools/std/callshift.bat: minor details
+
 2023.01.04:
 * fixed: Scripts/Tools/std/callshift.bat: `FLAG_SHIFT` variable must not be accepted from outside, because in case of `callshift.bat` script, it must not be affected by external value
 

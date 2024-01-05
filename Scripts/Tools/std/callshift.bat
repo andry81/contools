@@ -23,7 +23,7 @@ rem   <command>:
 rem     Command to call with skipped and shifted arguments from <cmdline>.
 
 rem Examples:
-rem   1. >callshift.bat 0 echo "1 2" ! ^^? ^^* ^& ^| , ; = "=" 3
+rem   1. >callshift.bat 0 echo "1 2" ! ^^? ^^* ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | , ; "=" 3
 rem   2. >callshift.bat 2 echo."1 2" 3 4 5
 rem      "1 2" 5
@@ -45,7 +45,7 @@ rem      >call callshift.bat -skip 2 -3 command param0 param1 %%3 %%2 %%1 %%*
 
 rem Pros:
 rem
-rem   * Can handle `!`, `?`, `*`, `&`, `|`, `,`, `;` characters.
+rem   * Can handle `!`, `?`, `*`, `&`, `|`, `,`, `;`, `=` characters.
 rem   * Can call builtin commands.
 rem   * Does restore previous ERRORLEVEL variable before call a command.
 rem   * Does not leak variables outside.
@@ -55,8 +55,8 @@ rem
 rem Cons:
 rem
 rem   * The control characters like `&` and `|` still must be escaped.
-rem   * To handle `?` and `*` characters you must prefix them additionally to the escape: `^?`, `^*`.
-rem   * Can not handle `=` character.
+rem   * To handle `?` and `*` characters you must prefix them additionally to escape: `^?`, `^*`.
+rem   * Can not handle `=` character without quotes.
 rem   * Does write to a temporary file to save the command line as is.
 
 rem with save of previous error level
