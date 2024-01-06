@@ -1,3 +1,6 @@
+2023.01.06:
+* new: Scripts/Tools/filesys/is_dir_exist.bat: script can check a directory existence in case of Read permissions deny on a directory.
+
 2023.01.05:
 * changed: Scripts/Tools/std/callshift.bat: minor details
 
