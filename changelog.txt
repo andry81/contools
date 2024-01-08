@@ -1,4 +1,7 @@
 2023.01.08:
+* changed: Scripts/Tools/hash/gen_file_hash_cvs.bat: code cleanup
+
+2023.01.08:
 * fixed: Scripts/Tools/filesys/reduce_relative_path.bat: execution fixup
 
 2023.01.06:
