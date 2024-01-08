@@ -35,8 +35,13 @@ call :ABS_PATH "%%REL_PATH%%"
 
 call "%%CONTOOLS_ROOT%%/filesys/subtract_path.bat" "%%CD%%" "%%ABS_PATH%%"
 
-rem use absolute path on error
-if %ERRORLEVEL% NEQ 0 set "RETURN_VALUE=%ABS_PATH%"
+if %ERRORLEVEL% EQU 0 (
+  rem must be not empty
+  if not defined RETURN_VALUE set RETURN_VALUE=.
+) else (
+  rem use absolute path on error
+  set "RETURN_VALUE=%ABS_PATH%"
+)
 
 (
   endlocal
