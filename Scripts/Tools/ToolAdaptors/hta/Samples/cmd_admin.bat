@@ -11,7 +11,7 @@ net session >nul 2>&1 && goto IMPL
 :ELEVATE
 set IMPL=1
 rem CAUTION: ShellExecute does not wait a child process close!
-start /WAIT /B "" mshta vbscript:Close(CreateObject("Shell.Application").ShellExecute("%COMSPEC%","/c @call ""%~f0""","","runas",True))
+start /B /WAIT "" mshta vbscript:Close(CreateObject("Shell.Application").ShellExecute("%COMSPEC%","/c @call ""%~f0""","","runas",True))
 pause
 exit /b
 

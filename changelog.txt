@@ -1,41 +1,44 @@
-2023.01.08:
+2024.01.11:
+* fixed: wrong order of `start` parameters which does ignore the `/WAIT`
+
+2024.01.08:
 * changed: Scripts/Tools/hash/gen_file_hash_cvs.bat: code cleanup
 
-2023.01.08:
+2024.01.08:
 * fixed: Scripts/Tools/filesys/reduce_relative_path.bat: execution fixup
 
-2023.01.06:
+2024.01.06:
 * new: Scripts/Tools/filesys/is_dir_exist.bat: script can check a directory existence in case of Read permissions deny on a directory.
 
-2023.01.05:
+2024.01.05:
 * changed: Scripts/Tools/std/callshift.bat: minor details
 
-2023.01.04:
+2024.01.04:
 * fixed: Scripts/Tools/std/callshift.bat: `FLAG_SHIFT` variable must not be accepted from outside, because in case of `callshift.bat` script, it must not be affected by external value
 
-2023.01.03:
+2024.01.03:
 * fixed: Scripts/Tools/std/callshift.bat: execution fixup, case with disappear of quoted equal sign (`"="`)
 * new: Scripts/Tools/std/callshift.bat: implemented `-skip <skip-num>` option to skip additional arguments
 
-2023.01.03:
+2024.01.03:
 * fixed: Scripts/Tools: missed to call `declare_builtins.bat` script if IMPL_MODE=1
 * changed: Scripts/Tools: remove call to `__init__.bat` if IMPL_MODE=1 (the initialization must be called from the script which did set IMPL_MODE)
 * changed: Scripts/Tools/build/extract_files_from_archive.bat: added usage of `callshift.bat` to pass mixed arguments from the `%*` variable
 
-2023.01.03:
+2024.01.03:
 * new: Scripts/Tools/std/callshift.bat: implemented negative shift as skip of first N used arguments from the `%*` variable (ex: `call callshift.bat -3 command %%3 %%2 %%1 %%*`)
 
-2023.01.02:
+2024.01.02:
 * fixed: Scripts/Tools/std/set_vars_from_file.bat: execution fixup, additional drop `?` prefixed variables
 
-2023.01.02:
+2024.01.02:
 * fixed: Scripts/Tools/build/extract_files_from_archives.bat: execution fixup
 
-2023.01.02:
+2024.01.02:
 * new: Scripts/Tools/std/callshift.bat: added script to call a command on shifted arguments as an alternative variant to shift the `%*` parameter in scripts
 * changed: Scripts/Tools: callargs.bat, callshift.bat: removed previous implementation as new implementation is more reliable and universal
 
-2023.01.02:
+2024.01.02:
 * changed: Scripts/Tools/std/errlvl.bat: more examples and details
 
 2023.12.30:

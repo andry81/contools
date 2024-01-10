@@ -4,4 +4,4 @@ setlocal
 
 echo.ssh agent command line: %*>&2
 
-start "" /WAIT /B "%~dp0plink.exe" -agent %*
+start "" /B /WAIT "%~dp0plink.exe" -agent %*
