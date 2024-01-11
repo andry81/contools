@@ -51,7 +51,7 @@ set "XCOPY_TO_DIR=%~2"
 set "XCOPY_SWITCHES=%~3"
 
 rem read archive file pattern list
-call "%%CONTOOLS_ROOT%%/std/read_args_to_var.bat" 3 FILE_PTTN_LIST %%*
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" 3 FILE_PTTN_LIST %%*
 
 if not defined XCOPY_FROM_DIR (
   echo.%~nx0: error: XCOPY_FROM_DIR is not defined.

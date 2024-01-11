@@ -1,4 +1,7 @@
 2024.01.11:
+* changed: `read_args_to_var.bat` script is replaced by more reliable `setshift.bat` script
+
+2024.01.11:
 * fixed: Scripts/Tools/std/callshift.bat: minor fixup
 * new: Scripts/Tools/std/setshift.bat: added script to set a variable to a command line formed from shifted arguments as an alternative variant to shift the `%*` parameter in scripts
 

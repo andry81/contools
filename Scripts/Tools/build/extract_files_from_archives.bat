@@ -76,7 +76,7 @@ set "_7ZIP_SWITCHES=%~4"
 set /A FLAG_SHIFT+=4
 
 rem read archive file pattern list
-call "%%CONTOOLS_ROOT%%/std/read_args_to_var.bat" %%FLAG_SHIFT%% ARC_FILE_PTTN_LIST %%*
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" %%FLAG_SHIFT%% ARC_FILE_PTTN_LIST %%*
 
 if not defined SEARCH_FROM (
   echo.%?~nx0%: error: SEARCH_FROM is not defined.
