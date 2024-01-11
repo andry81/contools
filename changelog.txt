@@ -1,4 +1,8 @@
 2024.01.11:
+* fixed: Scripts/Tools/std/callshift.bat: minor fixup
+* new: Scripts/Tools/std/setshift.bat: added script to set a variable to a command line formed from shifted arguments as an alternative variant to shift the `%*` parameter in scripts
+
+2024.01.11:
 * new: Scripts/Tools: filesys/read_msi_summary_bitness.bat, ToolAdaptors/vbs/read_msi_summary_template.*: added scripts to read MSI package bitness from a binary file
 
 2024.01.11:

@@ -1,12 +1,12 @@
 @echo off
 
 rem Description:
-rem   Script calls second argument and passes to it all arguments beginning
-rem   from %3 plus index from %1. Script can skip first N arguments after %2
-rem   before shift the rest.
+rem   Script sets variable from second argument to a command line formed from
+rem   arguments beginning from %3 plus index from %1.
+rem   Script can skip first N arguments after %2 before shift the rest.
 
 rem USAGE:
-rem   callshift.bat [<flags>] <shift> <command> [<cmdline>]
+rem   setshift.bat [<flags>] <shift> <var> [<cmdline>]
 
 rem   <flags>:
 rem     -skip <skip-num>
@@ -19,41 +19,36 @@ rem     If >=0, then only shifts <cmdline> after %2 argument plus <skip-num>.
 rem     If < 0, then skips first <shift> arguments after %2 argument plus
 rem     <skip-num> and shifts the rest <cmdline>.
 rem
-rem   <command>:
-rem     Command to call with skipped and shifted arguments from <cmdline>.
+rem   <var>:
+rem     Variable to set with skipped and shifted arguments from <cmdline>.
 
 rem Examples:
-rem   1. >callshift.bat 0 echo "1 2" ! ^^? ^^* ^& ^| , ; = ^= "=" 3
-rem      "1 2" ! ? * & | , ; "=" 3
-rem   2. >callshift.bat 2 echo."1 2" 3 4 5
-rem      "1 2" 5
-rem   3. >callshift.bat . set | sort
-rem   4. >errlvl.bat 123
-rem      >callshift.bat
-rem      >callshift.bat 0 echo.
-rem      >callshift.bat 0 echo 1 2 3
+rem   1. >setshift.bat 0 x "1 2" ! ^^? ^^* ^& ^| , ; = ^= "=" 3
+rem      >set x
+rem      x="1 2" ! ? * & | , ; "=" 3
+rem   2. >setshift.bat 2 x "1 2" 3 4 5
+rem      >set x
+rem      x=4 5
+rem   3. >errlvl.bat 123
+rem      >setshift.bat
+rem      >setshift.bat 0 x
+rem      >setshift.bat 0 x 1 2 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
-rem   5. >callshift.bat -3 echo 1 2 3 4 5 6 7
-rem      1 2 3 7
+rem   4. >setshift.bat -3 x 1 2 3 4 5 6 7
+rem      >set x
+rem      x=1 2 3 7
 rem      rem in a script
-rem      >call callshift.bat -3 command %%3 %%2 %%1 %%*
-rem   6. >callshift.bat -skip 2 -3 echo a b 1 2 3 4 5 6 7
-rem      a b 1 2 3 7
+rem      >call setshift.bat -3 x %%3 %%2 %%1 %%*
+rem   5. >setshift.bat -skip 2 -3 x a b 1 2 3 4 5 6 7
+rem      >set x
+rem      x=a b 1 2 3 7
 rem      rem in a script
-rem      >call callshift.bat -skip 2 -3 command param0 param1 %%3 %%2 %%1 %%*
-rem   7. >callshift.bat 0 exit /b 123
-rem      >echo ERRORLEVEL=%ERRORLEVEL%
-rem      ERRORLEVEL=321
-rem   8. >errlvl.bat 123
-rem      >callshift.bat 0 call errlvl.bat 321
-rem      >echo ERRORLEVEL=%ERRORLEVEL%
-rem      ERRORLEVEL=321
+rem      >call setshift.bat -skip 2 -3 x param0 param1 %%3 %%2 %%1 %%*
 
 rem Pros:
 rem
 rem   * Can handle `!`, `?`, `*`, `&`, `|`, `,`, `;`, `=` characters.
-rem   * Can call builtin commands.
 rem   * Does restore previous ERRORLEVEL variable before call a command.
 rem   * Does not leak variables outside.
 rem   * Can skip first N used arguments from the `%*` variable including
@@ -72,7 +67,7 @@ setlocal & set LAST_ERROR=%ERRORLEVEL%
 rem drop last error level
 call;
 
-set "CMDLINE_TEMP_FILE=%TEMP%\callshift.%RANDOM%-%RANDOM%.txt"
+set "CMDLINE_TEMP_FILE=%TEMP%\setshift.%RANDOM%-%RANDOM%.txt"
 
 rem redirect command line into temporary file to print it correcly
 for %%i in (1) do (
@@ -106,14 +101,14 @@ if defined FLAG (
 )
 
 set "SHIFT=%~1"
-set "COMMAND="
+set "VAR="
 set "CMDLINE="
 
 rem cast to integer
 set /A FLAG_SKIP+=0
 set /A SHIFT+=0
 
-set /A COMMAND_INDEX=FLAG_SHIFT+1
+set /A VAR_INDEX=FLAG_SHIFT+1
 set /A ARG0_INDEX=FLAG_SHIFT+2
 
 set /A SKIP=FLAG_SHIFT+2+FLAG_SKIP
@@ -149,27 +144,23 @@ for /F "eol= tokens=* delims=" %%i in ("!LINE!") do endlocal & for %%j in (%%i)
         for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
       ) else endlocal & set "CMDLINE=%%j"
     ) else endlocal
-  ) else if !INDEX! EQU !COMMAND_INDEX! (
-    endlocal & set "COMMAND=%%j"
+  ) else if !INDEX! EQU !VAR_INDEX! (
+    endlocal & set "VAR=%%j"
   ) else endlocal
   set /A INDEX+=1
 )
 
 (
   setlocal ENABLEDELAYEDEXPANSION
-  for /F "eol= tokens=* delims=" %%i in ("!COMMAND!") do (
+  for /F "eol= tokens=* delims=" %%i in ("!VAR!") do (
     if defined CMDLINE (
       for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$04=;!") do endlocal & set "CMDLINE=%%v"
       setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$03=,!") do endlocal & set "CMDLINE=%%v"
       setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$02=?!") do endlocal & set "CMDLINE=%%v"
       setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$01=*!") do endlocal & set "CMDLINE=%%v"
       setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$00=$!") do endlocal & set "CMDLINE=%%v"
-      setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & endlocal & call :SETERRORLEVEL %LAST_ERROR% & %%i %%v
-    ) else endlocal & endlocal & call :SETERRORLEVEL %LAST_ERROR% & %%i
-    exit /b
+      setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & endlocal & set "%%i=%%v"
+    ) else endlocal & endlocal & set "%%i="
   )
   exit /b %LAST_ERROR%
 )
-
-:SETERRORLEVEL
-exit /b %*
