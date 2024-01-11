@@ -1,4 +1,7 @@
 2024.01.11:
+* new: Scripts/Tools: filesys/read_msi_summary_bitness.bat, ToolAdaptors/vbs/read_msi_summary_template.*: added scripts to read MSI package bitness from a binary file
+
+2024.01.11:
 * fixed: wrong order of `start` parameters which does ignore the `/WAIT`
 
 2024.01.08:
