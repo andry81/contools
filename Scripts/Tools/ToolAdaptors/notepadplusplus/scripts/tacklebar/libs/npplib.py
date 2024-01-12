@@ -93,7 +93,7 @@ def process_notepadpp_windows(restore_if_open_inplace, out_params):
     wintypes.LPARAM   # [in] LPARAM      lParam
   ]
 
-  user32.GetClassNameW.restype = wintypes.c_int
+  user32.GetClassNameW.restype = ctypes.c_int
   user32.GetClassNameW.argtypes = [
     wintypes.HWND,    # [in]  HWND   hWnd,
     wintypes.LPWSTR,  # [out] LPWSTR lpClassName,

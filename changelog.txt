@@ -1,4 +1,7 @@
 2024.01.12:
+* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: execution fixup for python 3.12.1
+
+2024.01.12:
 * changed: Scripts/Tools/std/get_cmdline.bat: reimplementation based on `setshift.bat` script
 
 2024.01.12:
