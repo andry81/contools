@@ -1,49 +1,51 @@
 @echo off
 
-setlocal
+rem Description:
+rem   Script sets RETURN_VALUE variable to a command line without skip or shift
+rem   the arguments.
 
-call "%%~dp0__init__.bat" || exit /b
+rem USAGE:
+rem   get_cmdline.bat <cmdline>
 
-set "RETURN_VALUE="
+rem NOTE:
+rem   To skip or shift the arguments do use the `setshift.bat` script instead.
+rem   To call a command with skipped or shifted arguments do use
+rem   `callshift.bat` script.
 
-set ?__FLAG_ALLOCATE_TEMP_DIR=0
+rem Examples:
+rem   1. >get_cmdline.bat "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+rem      >set RETURN_VALUE
+rem      RETURN_VALUE="1 2" ! ? * & | , ; = = "=" 3
+rem   2. >errlvl.bat 123
+rem      >get_cmdline.bat
+rem      >get_cmdline.bat 1
+rem      >echo ERRORLEVEL=%ERRORLEVEL%
+rem      ERRORLEVEL=123
 
-if not defined SCRIPT_TEMP_CURRENT_DIR set ?__FLAG_ALLOCATE_TEMP_DIR=1
+rem with save of previous error level
+setlocal & set LAST_ERROR=%ERRORLEVEL%
 
-if %?__FLAG_ALLOCATE_TEMP_DIR% NEQ 0 (
-  call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
-    echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
-    exit /b 255
-  ) >&2
-)
+rem drop last error level
+call;
+
+set "CMDLINE_TEMP_FILE=%TEMP%\get_cmdline.%RANDOM%-%RANDOM%.txt"
 
 rem redirect command line into temporary file to print it correcly
 for %%i in (1) do (
   set "PROMPT=$_"
   echo on
-  for %%b in (1) do rem * #%*#
+  for %%b in (1) do rem %*
   @echo off
-) > "%SCRIPT_TEMP_CURRENT_DIR%\cmdline.txt"
+) > "%CMDLINE_TEMP_FILE%"
 
-for /F "usebackq eol= tokens=* delims=" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%\cmdline.txt") do set "RETURN_VALUE=%%i"
-setlocal ENABLEDELAYEDEXPANSION
-set "RETURN_VALUE=!RETURN_VALUE:*#=!"
-set "RETURN_VALUE=!RETURN_VALUE:~0,-2!"
-for /F "eol= tokens=* delims=" %%j in ("!RETURN_VALUE!") do (
-  endlocal
-  set "RETURN_VALUE=%%j"
+for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "RETURN_VALUE=%%i"
+
+del /F /Q "%CMDLINE_TEMP_FILE%" >nul 2>nul
+
+(
+  setlocal ENABLEDELAYEDEXPANSION
+  if not "!RETURN_VALUE:~4,-1!" == "" (
+    for /F "eol= tokens=* delims=" %%i in ("!RETURN_VALUE:~4,-1!") do endlocal & endlocal & set "RETURN_VALUE=%%i"
+  ) else endlocal & endlocal & set "RETURN_VALUE="
+  exit /b %LAST_ERROR%
 )
-
-rem cleanup temporary files
-if %?__FLAG_ALLOCATE_TEMP_DIR% NEQ 0 (
-  call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
-)
-
-setlocal ENABLEDELAYEDEXPANSION
-for /F "eol= tokens=* delims=" %%i in ("!RETURN_VALUE!") do (
-  endlocal
-  endlocal
-  set "RETURN_VALUE=%%i"
-)
-
-exit /b 0
