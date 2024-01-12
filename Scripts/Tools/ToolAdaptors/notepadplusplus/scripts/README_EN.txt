@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.11.14
+* 2024.01.12
 * contools/notepadplusplus
 
 1. DESCRIPTION
@@ -19,8 +19,8 @@ Set of scripts for the Notepad++ Python Scripts plugin.
 
 1. Install `PythonScript` plugin within the Notepad++ `Plugins` menu item.
    Note:
-    Use the 32 bit Notepad++ version because of the 64 bit still is not
-    ready on a moment.
+    Use the 32 bit Notepad++ version because the 64 bit still is not ready on
+    the moment.
 
 2. Copy scripts into `scripts` subdirectory inside the Notepad++ directory:
    `../plugins/Config/PythonScript`.
@@ -77,6 +77,10 @@ Additionsl command line arguments:
 
   Translates each path into a short DOS path if greater than the limit.
   Can workaround long path files open, which Notepad++ does not support.
+
+  See the related long path issue:
+    `Can not open long path files` :
+    https://github.com/notepad-plus-plus/notepad-plus-plus/issues/9181
 
 `-z -append`
 

@@ -1,3 +1,7 @@
+2024.01.12:
+* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: execution fixup for python 3.12.1
+* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
+
 2024.01.11:
 * changed: `read_args_to_var.bat` script is replaced by more reliable `setshift.bat` script
 

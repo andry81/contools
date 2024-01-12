@@ -155,7 +155,7 @@ def process_notepadpp_windows(restore_if_open_inplace, out_params):
       print('  - instance NOT restored')
 
 def process_extra_command_line():
-  import os, io, shlex
+  import sys, os, io, shlex
 
   print('process_extra_command_line:')
 
@@ -402,8 +402,10 @@ def process_extra_command_line():
       file_path = line.strip()
       if file_path:
         file_path_decoded = file_path
-        if recode_to_utf8:
-          file_path = file_path_decoded.encode('utf-8', errors = 'ignore')
+        # python 2 only
+        if sys.version_info[0] < 3:
+          if recode_to_utf8:
+            file_path = file_path_decoded.encode('utf-8', errors = 'ignore')
         print('  [{}] ({}) {}'.format(num_processed_paths, len(file_path), file_path))
 
         # 0 or >= 255 - builtin minimum
@@ -460,8 +462,6 @@ def process_extra_command_line():
   print()
 
   if not do_open_inplace:
-    import sys
-
     if not do_append_by_child_instance:
       print('sending WM_COPYDATA messages to pid={}:'.format(out_params.not_multiinst_pid_list[0]))
     else:
