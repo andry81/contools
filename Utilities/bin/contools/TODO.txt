@@ -345,3 +345,13 @@ These flags already partially added into `help.tpl`, but still is not implemente
   /subst-vars-arg:@ /S:@
   /SE:*
   /SE:@
+
+* Improve child wait functionality even if the first child process does close
+  after run another child processes.
+
+  Add flag `/wait-child-tree` to inject and wait to close all the children
+  processes, not only the first child process.
+
+  Add flag `/retain-child-tree` to inject and hold for exit all the children
+  processes until the last child would close. When the last child process does
+  exit, then does unlock all the children processes for exit.

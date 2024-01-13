@@ -1,3 +1,6 @@
+2024.01.13:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
 2024.01.12:
 * fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: execution fixup for python 3.12.1
 
