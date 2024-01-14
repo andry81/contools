@@ -1,3 +1,6 @@
+2024.01.14:
+* new: Scripts/Tools/ToolAdaptors/hta/call.hta: script to execute a command line through the `WScript.Shell.Run` using `mshta`
+
 2024.01.13:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 

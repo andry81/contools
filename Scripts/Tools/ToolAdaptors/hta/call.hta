@@ -1,0 +1,196 @@
+<!-- - ->
+Call an executable through the `WScript.Shell.Run` function.
+
+USAGE:
+
+  mshta.exe call.hta [-showas <ShowWindowAsNumber>] [-s] [-nowait] [-nowindow] [--] <CommandLine>
+
+DESCRIPTION:
+  --
+    Separator between flags and positional arguments to explicitly stop the
+    flags parser.
+
+  -showas <ShowWindowAsNumber>
+     Handles a child process window show state.
+
+     CreateProcess or ShellExecute
+       0 = SW_HIDE
+         Don't show window.
+       1 = SW_SHOWNORMAL
+         Activates and displays a window. If the window is minimized or
+         maximized, the system restores it to its original size and
+         position. An application should specify this flag when displaying
+         the window for the first time.
+       2 = SW_SHOWMINIMIZED
+         Activates the window and displays it as a minimized window.
+       3 = SW_SHOWMAXIMIZED
+         Activates the window and displays it as a maximized window.
+       4 = SW_SHOWNOACTIVATE
+         Displays a window in its most recent size and position. This value
+         is similar to SW_SHOWNORMAL, except that the window is not
+         activated.
+       5 = SW_SHOW
+         Activates the window and displays it in its current size and
+         position.
+       6 = SW_MINIMIZE
+         Minimizes the specified window and activates the next top-level
+         window in the Z order.
+       7 = SW_SHOWMINNOACTIVE
+         Displays the window as a minimized window. This value is similar
+         to SW_SHOWMINIMIZED, except the window is not activated.
+       8 = SW_SHOWNA
+         Displays the window in its current size and position. This value
+         is similar to SW_SHOW, except that the window is not activated.
+       9 = SW_RESTORE
+         Activates and displays the window. If the window is minimized or
+         maximized, the system restores it to its original size and
+         position. An application should specify this flag when restoring
+         a minimized window.
+       11 = SW_FORCEMINIMIZE
+         Minimizes a window, even if the thread that owns the window is not
+         responding. This flag should only be used when minimizing windows
+         from a different thread.
+
+     The flags that specify how an application is to be displayed when it
+     is opened. If the first argument of <CommandLine> specifies a document
+     file, the flag is simply passed to the associated application. It is
+     up to the application to decide how to handle it.
+
+     See detailed documentation in MSDN for the function `ShowWindow`.
+
+  -s
+    Enable variables substitution in the `WScript.Shell.Run` function, by
+    default is disabled through the `?.` environment variable usage.
+
+  -nowait
+    Does not wait child process exit.
+
+  -nowindow
+    Hide child process window upon child process creation.
+    Overrides `-showas` option.
+<!-- -->
+
+<html><head>
+<HTA:APPLICATION ID="HScript"/>
+<!-- <object id="dyncall" classid="clsid:202774D1-D479-11d1-ACD1-00A024BBB05E" /> -->
+<script language="VBScript">
+Dim CommandLine : CommandLine = HScript.CommandLine
+Dim CommandLineLen : CommandLineLen = Len(CommandLine)
+
+Dim PrevArgOffset : PrevArgOffset = 0
+Dim NextArgOffset : NextArgOffset = 0
+
+' Parser:
+'   * does support quoted strings.
+'   * does not support character escaping.
+Function ReadNextArg()
+  Dim arg, char, i
+  Dim IsQuoted : IsQuoted = False
+  Dim IsSkip ' skip first white characters
+
+  PrevArgOffset = NextArgOffset
+
+  For i = NextArgOffset To CommandLineLen - 1 : Do ' empty `Do-Loop` to emulate `Continue`
+    char = Mid(CommandLine, i + 1, 1)
+
+    IsSkip = False
+    If char = " " Or char = chr(9) Then
+      If Not IsQuoted Then
+        If Len(arg) > 0 Then
+          Exit For ' Break
+        Else
+          IsSkip = True
+        End If
+      End If
+    ElseIf char = chr(34) Then
+      IsQuoted = Not IsQuoted
+      Exit Do ' Continue
+    End If
+
+    If not IsSkip Then arg = arg & char
+  Loop While False : Next
+
+  If char = chr(34) Then i = i + 1 ' skip trailing quote
+
+  NextArgOffset = i
+
+  ReadNextArg = arg
+End Function
+
+Dim args : args = Array()
+
+Dim ExpectFlags : ExpectFlags = True
+
+Dim ShowAs : ShowAs = 1
+Dim RunSubst : RunSubst = False
+Dim NoWait : NoWait = False
+Dim NoWindow : NoWindow = False
+
+Dim arg
+Dim PosArgIndex : PosArgIndex = 0
+
+Do
+  arg = ReadNextArg
+
+  ' MsgBox "index=" & NextArgOffset & " arg=`" & arg & "`"
+
+  If ExpectFlags Then
+    If arg <> "--" And Mid(arg, 1, 1) = "-" Then
+      If arg = "-s" Then ' Enable variables substitution
+        RunSubst = True
+      ElseIf arg = "-showas" Then ' Show window as
+        arg = ReadNextArg
+        If Len(arg) > 0 Then
+          ShowAs = CInt(arg)
+        End If
+      ElseIf arg = "-nowait" Then
+        NoWait = True
+      ElseIf arg = "-nowindow" Then
+        NoWindow = True
+      End If
+    Else
+      If PosArgIndex Then
+        If arg <> "--" Then PosArgIndex = PosArgIndex + 1
+        ExpectFlags = False
+      Else
+        PosArgIndex = PosArgIndex + 1
+      End If
+    End If
+  Else
+    PosArgIndex = PosArgIndex + 1
+  End If
+
+  ' skip first positional argument
+Loop While ExpectFlags And NextArgOffset < CommandLineLen - 1
+
+Dim ExecCommandLineOffset
+If PosArgIndex > 1 Then
+  ExecCommandLineOffset = PrevArgOffset
+Else
+  ExecCommandLineOffset = NextArgOffset
+End If
+
+Dim objShell : Set objShell = CreateObject("WScript.Shell")
+
+Dim ExecCommandLine : ExecCommandLine = Mid(CommandLine, ExecCommandLineOffset + 1)
+
+ExecCommandLine = Trim(ExecCommandLine)
+
+If NoWindow Then ShowAs = 0
+
+' MsgBox "`" & ExecCommandLine & "`"
+
+If Len(ExecCommandLine) > 0 Then
+  If RunSubst Then
+    Close objShell.Run(ExecCommandLine, ShowAs, Not NoWait)
+  Else
+    Dim objEnv : Set objEnv = objShell.Environment("Process")
+
+    objEnv("?.") = ExecCommandLine ' a kind of unique or internal variable name
+
+    Close objShell.Run("%?.%", ShowAs, Not NoWait)
+  End If
+Else
+  Close
+End If
+</script></head></html>
