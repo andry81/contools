@@ -51,6 +51,10 @@ Utilities/tests/manual/contools/callf:
 
     Update `KNOWN ISSUES` section.
 
+Utilities/src/wshbazaar/wshdynacall:
+
+  * component registration error under Windows XP 32-bit SP3
+
 Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat:
 
   * Does not accept not english characters in files names/paths.
