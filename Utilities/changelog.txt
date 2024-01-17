@@ -1,3 +1,6 @@
+2024.01.17:
+* new: bin/wshbazaar/wshdynacall/*register.bat: register/unregister scripts
+
 2024.01.13:
 * changed: bin/contools/TODO.txt: todo update
 
