@@ -1,4 +1,7 @@
 2024.01.18:
+* new: Scripts/Tools/filesys/read_path_props.bat: script wrapper to read a path property values
+
+2024.01.18:
 * new: Scripts/Tools/ToolAdaptors/vbs/read_path_*.*: scripts to read a path properties
 
 2024.01.17:
