@@ -1,3 +1,6 @@
+2024.01.18:
+* new: Scripts/Tools/ToolAdaptors/vbs/read_path_*.*: scripts to read a path properties
+
 2024.01.17:
 * new: Utilities/bin/wshbazaar/wshdynacall/*register.bat: register/unregister scripts
 
