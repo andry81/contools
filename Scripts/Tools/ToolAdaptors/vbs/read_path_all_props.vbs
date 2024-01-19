@@ -1,30 +1,84 @@
 ''' Read a path all property values.
 
 ''' USAGE:
-'''   read_path_all_props.vbs [-n] [-e] [--] <Path>
+'''   read_path_all_props.vbs
+'''     [-v[al-only]]
+'''     [-v[al-decor-only] | -vd]
+'''     [-val-null | -vnull]
+'''     [-val-notempty | -n]
+'''     [-i[gnore-unexist]]
+'''     [-u[rl-encode]]
+'''     [-line-return | -lr]
+'''     [--]
+'''       <Path>
 
 ''' DESCRIPTION:
 '''   --
 '''     Separator between flags and positional arguments to explicitly stop the
 '''     flags parser.
 '''
-'''   -n
-'''     Print only not empty properties.
+'''   -v[al-only]
+'''     Print only undecorated property value instead of decorated assignment
+'''     expression.
+'''     Has no effect if `-val-null` is used.
+'''     Has effect if `-val-notempty` is used.
+'''     Has no effect if `-val-decor-only` is used.
 '''
-'''   -url-encode
+'''   -v[al-decor-only] | -vd
+'''     Print only decorated property value instead of decorated assignment
+'''     expression.
+'''     Has effect if `-val-null` is used.
+'''     Has effect if `-val-notempty` is used.
+'''
+'''   -val-null | -vnull
+'''     Print Null values as part of decorated assignment expression:
+'''       ...=<null>
+'''     By default Null values does skip to print.
+'''
+'''   -val-notempty | -n
+'''     Print only not empty property values.
+'''     Has effect only for not Null values.
+'''
+'''   -i[gnore-unexist]
+'''     Ignores unexisted path.
+'''     Useful in case of an unlinked or unresolved path with partial property
+'''     list.
+'''
+'''   -u[rl-encode]
 '''     URL encode property value characters in form of `%NN` in case if
 '''     ASCII value < 32 OR > 127 OR = &H25 OR = &H3F, where:
-'''       `&H3F` - is not printable character which can not pass through the
+'''       `&H3F` - is not printable character which may not pass through the
 '''                stdout redirection.
 '''       `&H25` - `%`.
 '''
+'''   -line-return | -lr
+'''     Return on first line print.
+'''     Usefule to skip iteration over property list.
+'''
 '''   <Path>
 '''     Path to read.
+
+''' Error codes:
+'''   255 - unspecified error
+'''   128 - <Path> is not convertible to ShellFolderItem
+'''   1   - <Path> is not defined or not exist
+'''   0   - Success
+
+''' NOTE:
+'''   Script can read unlinked or unresolvable paths. In that case you must use
+'''   `-ignore-unexist` flag.
+
+''' CAUTION:
+'''   Script may return a lozalized name of a property. To read a particular
+'''   not lozalized property name you must use another script -
+'''   `read_path_props.vbs` with `-x` flag.
 
 ''' Examples:
 '''   1. >
 '''      cscript //nologo read_path_all_props.vbs -n "c:\windows\system32\cmd.exe"
 '''   2. >
+'''      cscript //nologo read_path_all_props.vbs -n "...\shortcut.lnk"
+'''   3. >
 '''      cscript //nologo read_path_all_props.vbs -n "c:\Windows\System32\MSDRM\MsoIrmProtector.doc"
 
 Sub PrintOrEchoLine(str)
@@ -49,8 +103,13 @@ ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
 
-Dim PrintNotEmpty : PrintNotEmpty = False
+Dim PrintValueOnly : PrintValueOnly = False
+Dim PrintDecorValueOnly : PrintDecorValueOnly = False
+Dim PrintValueNull : PrintValueNull = False
+Dim PrintValueNotEmptyOnly : PrintValueNotEmptyOnly = False
+Dim IgnoreUnexist : IgnoreUnexist = False
 Dim UrlEncode : UrlEncode = False
+Dim LineReturn : LineReturn = False
 
 Dim arg
 Dim j : j = 0
@@ -60,10 +119,23 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
 
   If ExpectFlags Then
     If arg <> "--" And Mid(arg, 1, 1) = "-" Then
-      If arg = "-n" Then
-        PrintNotEmpty = True
-      ElseIf arg = "-url-encode" Then
+      If arg = "-val-only" Or arg = "-v" Then
+        If Not PrintValueNull Then ' "has no effect"
+          PrintValueOnly = True
+        End If
+      ElseIf arg = "-val-decor-only" Or arg = "-vd" Then
+        PrintDecorValueOnly = True
+      ElseIf arg = "-val-null" Or arg = "-vnull" Then
+        PrintValueOnly = False ' "has no effect"
+        PrintValueNull = True
+      ElseIf arg = "-val-notempty" Or arg = "-n" Then
+        PrintValueNotEmptyOnly = True
+      ElseIf arg = "-ignore-unexist" Or arg = "-i" Then
+        IgnoreUnexist = True
+      ElseIf arg = "-url-encode" Or arg = "-u" Then
         UrlEncode = True
+      ElseIf arg = "-line-return" Or arg = "-lr" Then
+        LineReturn = True
       Else
         PrintOrEchoErrorLine WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
         WScript.Quit 255
@@ -110,7 +182,7 @@ Dim IsFolderExist : IsFolderExist = False
 If Not IsFileExist Then
   IsFolderExist = objFS.FolderExists("\\?\" & PathAbs)
 End If
-If (Not IsFileExist) And (Not IsFolderExist) Then
+If (Not IgnoreUnexist) And (Not IsFileExist) And (Not IsFolderExist) Then
   PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: path does not exist:" & vbCrLf & _
     WScript.ScriptName & ": info: Path=`" & PathAbs & "`"
@@ -144,6 +216,8 @@ Else
       FolderShortPath = Mid(FolderShortPath, 5)
     End If
     PathToOpen = FolderShortPath
+  ElseIf IgnoreUnexist Then
+    PathToOpen = PathAbs
   End If
 End If
 
@@ -152,44 +226,68 @@ Dim objShell : Set objShell = CreateObject("Shell.Application")
 Dim objNamespace : Set objNamespace = objShell.Namespace(objFS.GetFolder(objFS.GetParentFolderName(PathToOpen)).Path)
 Dim objFile : Set objFile = objNamespace.ParseName(objFS.GetFileName(PathToOpen))
 
-If Not (objFile Is Nothing) Then
-  Dim FilePropName, FilePropValue, FilePropEncodedValue, Char, CharAsc, CharHex
-  Dim FilePropIndex : FilePropIndex = 0
-  Dim FilePropIndexStr
-
-  ' 65535 - maximum
-  For FilePropIndex = 0 To 65535 : Do ' empty `Do-Loop` to emulate `Continue`
-    FilePropName = objNamespace.GetDetailsOf(objFile.Name, FilePropIndex)
-
-    If Not (Len(FilePropName) > 0) Then Exit For
-
-    FilePropValue = objNamespace.GetDetailsOf(objFile, FilePropIndex)
-
-    If (Not IsNull(FilePropValue)) And ((Not PrintNotEmpty) Or Len(FilePropValue)) Then
-      FilePropIndexStr = CStr(FilePropIndex)
-
-      If UrlEncode Then
-        FilePropEncodedValue = ""
-
-        For i = 1 To Len(FilePropValue)
-          Char = Mid(FilePropValue, i, 1)
-          CharAsc = Asc(Char)
-
-          ' NOTE:
-          '   `&H3F` - is not printable character which can not pass through the stdout redirection.
-          '   `&H25` - `%`.
-          If CharAsc < 32 Or CharAsc > 127 Or CharAsc = &H25 Or CharAsc = &H3F Then
-            CharHex = Hex(CharAsc)
-            FilePropEncodedValue = FilePropEncodedValue & "%" & Left("00", 2 - Len(CStr(CharHex))) & CStr(CharHex)
-          Else
-            FilePropEncodedValue = FilePropEncodedValue & Char
-          End If
-        Next
-
-        FilePropValue = FilePropEncodedValue
-      End If
-
-      PrintOrEchoLine "[" & Left("000", 3 - Len(FilePropIndexStr)) & FilePropIndexStr & "] " & FilePropName & "=`" & FilePropValue & "`"
-    End If
-  Loop While False : Next
+If objFile Is Nothing Then
+  WScript.Quit 128
 End If
+
+Dim FilePropName, FilePropValue, FilePropEncodedValue, Char, CharAsc, CharHex
+Dim FilePropIndex : FilePropIndex = 0
+Dim FilePropIndexStr
+
+' 65535 - maximum
+For FilePropIndex = 0 To 65535 : Do ' empty `Do-Loop` to emulate `Continue`
+  FilePropName = objNamespace.GetDetailsOf(objFile.Name, FilePropIndex)
+
+  If Not (Len(FilePropName) > 0) Then Exit For
+
+  FilePropValue = objNamespace.GetDetailsOf(objFile, FilePropIndex)
+
+  ' CAUTION:
+  '   `Len(...) > 0` is not equal here to `Not IsEmpty(...)`:
+  '   https://stackoverflow.com/questions/40600276/using-empty-vs-to-define-or-test-a-variable-in-vbscript/40600539#40600539
+  '
+  If (PrintValueNull Or Not IsNull(FilePropValue)) And ((Not PrintValueNotEmptyOnly) Or Len(FilePropValue) > 0) Then
+    FilePropIndexStr = CStr(FilePropIndex)
+
+    If UrlEncode And Len(FilePropValue) > 0 Then
+      FilePropEncodedValue = ""
+
+      For i = 1 To Len(FilePropValue)
+        Char = Mid(FilePropValue, i, 1)
+        CharAsc = Asc(Char)
+
+        ' NOTE:
+        '   `&H3F` - is not printable character which may not pass through the stdout redirection.
+        '   `&H25` - `%`.
+        If CharAsc < 32 Or CharAsc > 127 Or CharAsc = &H25 Or CharAsc = &H3F Then
+          CharHex = Hex(CharAsc)
+          FilePropEncodedValue = FilePropEncodedValue & "%" & Left("00", 2 - Len(CStr(CharHex))) & CStr(CharHex)
+        Else
+          FilePropEncodedValue = FilePropEncodedValue & Char
+        End If
+      Next
+
+      FilePropValue = FilePropEncodedValue
+    End If
+
+    If (Not PrintValueOnly) And (Not PrintDecorValueOnly) Then
+      If Not IsNull(FilePropValue) Then
+        PrintOrEchoLine "[" & Left("000", 3 - Len(FilePropIndexStr)) & FilePropIndexStr & "] " & FilePropName & "=`" & FilePropValue & "`"
+      Else
+        PrintOrEchoLine "[" & Left("000", 3 - Len(FilePropIndexStr)) & FilePropIndexStr & "] " & FilePropName & "=<null>"
+      End If
+    Else
+      If PrintDecorValueOnly Then
+        If Not IsNull(FilePropValue) Then
+          PrintOrEchoLine "`" & FilePropValue & "`"
+        Else
+          PrintOrEchoLine "<null>"
+        End If
+      Else
+        PrintOrEchoLine "" & FilePropValue
+      End If
+    End If
+
+    If LineReturn Then Exit For
+  End If
+Loop While False : Next

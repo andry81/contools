@@ -1,3 +1,7 @@
+2024.01.19:
+* new: Scripts/Tools/ToolAdaptors/vbs/read_path_*.vbs: added `-val-only`, `-val-decor-only`, `-val-null`, `-val-notempty`, `-ignore-unexist`, `-line-return` and other flags
+* changed: Scripts/Tools/ToolAdaptors/vbs/read_path_*.vbs: script flags behavior
+
 2024.01.18:
 * new: Scripts/Tools/filesys/read_path_props.bat: script wrapper to read a path property values
 
