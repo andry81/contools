@@ -1,3 +1,6 @@
+2024.01.21:
+* new: Scripts/Tools/filesys/read_shortcut_target_path.bat: script wrapper to read a Windows shortcut file target path property value
+
 2024.01.19:
 * new: Scripts/Tools/ToolAdaptors/vbs/read_path_*.vbs: added `-val-only`, `-val-decor-only`, `-val-null`, `-val-notempty`, `-ignore-unexist`, `-line-return` and other flags
 * changed: Scripts/Tools/ToolAdaptors/vbs/read_path_*.vbs: script flags behavior
