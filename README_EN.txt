@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.04.04
+* 2024.01.23
 * contools
 
 1. DESCRIPTION
@@ -38,8 +38,8 @@ First mirror:
   * https://sf.net/p/contools/contools/ci/master/tree
     https://git.code.sf.net/p/contools/contools
 Second mirror:
-  * https://bitbucket.org/andry81/contools/branches
-    https://bitbucket.org/andry81/contools.git
+  * https://gitlab.com/andry81/contools/-/branches
+  * https://gitlab.com/andry81/contools.git
 
 -------------------------------------------------------------------------------
 4. CATALOG CONTENT DESCRIPTION

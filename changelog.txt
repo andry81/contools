@@ -1,6 +1,6 @@
 2024.01.23:
-* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: execution fixup for python 3.12.1
-* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
+* changed: Scripts/Tools/ToolAdaptors/notepadplusplus: moved to `contools--notepadplusplus` project
+* changed: README_EN.txt: readme update
 
 2024.01.21:
 * new: Scripts/Tools/filesys/read_shortcut_target_path.bat: script wrapper to read a Windows shortcut file target path property value
@@ -31,14 +31,7 @@
 * changed: Utilities/bin/contools/TODO.txt: todo update
 
 2024.01.12:
-* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: execution fixup for python 3.12.1
-
-2024.01.12:
 * changed: Scripts/Tools/std/get_cmdline.bat: reimplementation based on `setshift.bat` script
-
-2024.01.12:
-* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: execution fixup for python 3.12.1
-* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
 
 2024.01.11:
 * changed: `read_args_to_var.bat` script is replaced by more reliable `setshift.bat` script
@@ -183,9 +176,6 @@
 * new: Scripts/Tools/std/xmove_dir.bat: added `-ignore_existed` flag to enable move-to-merge mode
 * changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: minor improvements
 
-2023.11.14:
-* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
-
 2023.11.13:
 * changed: TODO.txt: todo update
 
@@ -221,30 +211,8 @@
 2023.10.15:
 * new: Scripts/Tools/admin/Junction: scripts to list, read and recreate junction points
 
-2023.10.13:
-* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: files open instability in append mode by switching to new default implementation
-* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: new default append mode implementation through the WM_COPYDATA message usage and better instances filter out to send message, added `-z -append_by_child_instance` command line options to fall back to previous implementation
-* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
-* refactor: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: `-z -restore_single_instance` options renamed to `-z -restore_if_open_inplace`
-
-2023.10.11:
-* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: application hang in append mode
-* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: long file path as short path open instability
-* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: improved tabs order stability in append mode
-
 2023.10.10:
 * changed: Utilities/bin/contools/TODO.txt: todo update
-
-2023.10.10:
-* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z -append` command line options to append files from a list file to existing instance instead of open a new instance
-* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z -restore_single_instance` command line options to restore instance window show state after files append
-* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z --child_cmdline_len_limit -z <limit>` command line options to limit maximum child instance command line length to append files
-* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z -no_exit_after_append` command line options to not exit the instance after files append
-* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
-
-2023.10.08:
-* new: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/tacklebar/libs/npplib.py: added `-z --open_short_path_if_gt_limit -z <max-path-len>` command line options to workaround long paths open by short path open
-* refactor: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: minor refactor
 
 2023.10.07:
 * new: Scripts/Tools/ToolAdaptors/vbs: *_shortcut.vbs, reset_shortcut_from_dir.bat: added `-allow-dos-target-path` flag to allow target path reset by a reduced DOS path version
@@ -1821,10 +1789,6 @@
 2021.06.16:
 * changed: Utilities/src/callf: now only the main thread prints info/errors to stdout/stderr, all worker threads only postpone info/errors to the main thread (excluding traffic between stdin and stdout/stderr)
 
-2021.06.12:
-* new: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: `--chdir` extra command line option
-* changed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: minor refactor
-
 2021.06.11:
 * new: Utilities/src/callf: Now by default if the process console window is not owned and the process is going to close by an error before execute a child process, then the output does duplicate into a parent process console. To disable that behaviour the `/disable-conout-duplicate-to-parent-console-on-error` flag is added.
 
@@ -2277,16 +2241,6 @@
 * new: Scripts/Tools/std: xcopy*.bat: support flags for attributes/ACL/owner/audit copy additionally to a file/directory content
 * changed: Scripts/Tools/std: xcopy*.bat: call all executables by absolute paths
 
-2020.11.24:
-* changed: Scripts/Tools/ToolAdapters/notepadplusplus: readme update
-
-2020.11.24:
-* changed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: execution fixup
-
-2020.11.24:
-* changed: Scripts/Tools/ToolAdapters/notepadplusplus: most of scripts moved into tacklebar subdirectory to avoid mix with other user scripts in the PythonScript plugin
-* changed: Scripts/Tools/ToolAdapters/notepadplusplus: readme update
-
 2020.11.23:
 * fixed: Scripts/Tools/registry: regquery.bat: invalid case handle where a registry variable is empty
 
@@ -2314,10 +2268,6 @@
 * fixed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: check before a variable expansion (must be after)
 * changed: Scripts/Tools/ToolAdaptors/vbs: call.vbs: removed arguments quoting by default, added the `-q` flag to enable it explicitly
 
-2020.11.05:
-* fixed: Scripts/Tools/ToolAdapters/notepadplusplus: minor fixup
-* changed: Scripts/Tools/ToolAdapters/notepadplusplus: more logging
-
 2020.11.03:
 * changed: __init__ scripts minor speedup
 
@@ -2336,10 +2286,6 @@
 2020.10.25:
 * new: Utilities: ritchielawrence tee implementation (mtee)
 * changed: Scripts/Tools/ToolAdapters/download: switched to ritchielawrence tee implementation
-
-2020.10.24:
-* new: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: `process_extra_command_line` to directly open file list or reopen all opened files using notepad++ extra command line
-* changed: Scripts/Tools/ToolAdapters/notepadplusplus: startup.py: use `process_extra_command_line` function by default instead of the `reopen_all_files` function
 
 2020.10.23:
 * refactor: minor refactor
@@ -2432,19 +2378,12 @@
 * refactor: Scripts/Tools/std: temp directory allocation/free scripts refactor
 
 2020.08.31:
-* fixed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: reverse activation order before restore last active tab to retain selection order reverse to activation order
-
-2020.08.31:
 * changed: `eol=	` replaced by `eol=` in the rest for loops
 
 2020.08.31:
 * changed: moved `eol=` instructions in for loops back to the begin of the parameter string because `delims=` parameter is sensitive to the space characters and accepts space characters ONLY at the end of the parameter string
 
 2020.08.31:
-* fixed: Scripts/Tools/ToolAdapters/notepadplusplus: npplib.py: restore first active tab at the end of each tab manipulation script
-
-2020.08.31:
-* new: Scripts/Tools/ToolAdapters/notepadplusplus: notepad++ python scripts for PythonScript plugin
 * new: Scripts/Tools/std: allocate_temp_dir.bat: `SCRIPT_TEMP_DIR_NAME` variable to reuse last generated temporary directory name
 
 2020.08.29:
