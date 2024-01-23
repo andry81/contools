@@ -1,3 +1,7 @@
+2024.01.23:
+* fixed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts: execution fixup for python 3.12.1
+* changed: Scripts/Tools/ToolAdaptors/notepadplusplus/scripts/README_EN.txt: readme update
+
 2024.01.21:
 * new: Scripts/Tools/filesys/read_shortcut_target_path.bat: script wrapper to read a Windows shortcut file target path property value
 
