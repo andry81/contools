@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.02.21
+* 2024.01.23
 * contools/admin/VisualStudio
 
 1. DESCRIPTION
@@ -40,11 +40,15 @@ installation package.
    +- /`layout`
    |  #
    |  # Visual Studio layout root directory (`VS_LAYOUT_CACHE_ROOT`).
+   |  #
+   |  # NOTE: Can be on a network drive.
    |
    +- /`packages`
          #
          # Visual Studio packages root directory
          # (`VS_PACKAGES_CACHE_ROOT`).
+         #
+         # CAUTION: Must be on a local drive only.
 
 -------------------------------------------------------------------------------
 3. PREREQUISITES

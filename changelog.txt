@@ -1,4 +1,9 @@
 2024.01.23:
+* changed: Scripts/Tools/admin/VirtualBox/compact_vdi.bat: improvements
+* changed: Scripts/Tools/admin/VisualStudio/README_EN.txt: readme update
+* refactor: Scripts/Tools/admin: minor refactor
+
+2024.01.23:
 * changed: Scripts/Tools/ToolAdaptors/notepadplusplus: moved to `contools--notepadplusplus` project
 * changed: README_EN.txt: readme update
 
