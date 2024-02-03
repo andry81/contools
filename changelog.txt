@@ -1,4 +1,7 @@
 2024.02.03:
+* new: Scripts/Tools/build/check_vars.bat: script to check variable existence
+
+2024.02.03:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: execution fixup
 
 2024.02.03:
