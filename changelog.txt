@@ -1,3 +1,6 @@
+2024.02.03:
+* changed: Scripts/Tools/ToolAdaptors/javascript: moved from `tacklelib` project
+
 2024.02.02:
 * fixed: Scripts/Tools/ToolAdaptors/sh/detect_find.sh: missed trim of trailing line feed characters
 * fixed: Scripts/Tools/ToolAdaptors/sh/detect_find.sh: paths insensitive comparison
