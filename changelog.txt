@@ -1,4 +1,7 @@
 2024.02.03:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: execution fixup
+
+2024.02.03:
 * changed: Scripts/Tools/ToolAdaptors/javascript: moved from `tacklelib` project
 
 2024.02.02:
