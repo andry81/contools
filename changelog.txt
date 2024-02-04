@@ -1,4 +1,9 @@
 2024.02.04:
+* new: Scripts/Tools/build/check_config_expiration.bat: configuration files expiration check script
+* changed: Scripts/Tools/cmake/check_config_version.bat: moved into `check_config_expiration.bat` script
+* changed: Scripts/Tools/build/load_config.bat: `check_config_expiration.bat` script usage
+
+2024.02.04:
 * new: __init__/check_vars.bat: variables existence check from `__init__` directory
 * changed: Scripts/Tools: `check_vars.bat` script usage
 
