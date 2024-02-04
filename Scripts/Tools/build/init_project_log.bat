@@ -14,14 +14,11 @@ if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 if %NO_GEN%0 NEQ 0 exit /b 0
 if %NO_LOG%0 NEQ 0 exit /b 0
 
+call "%%~dp0__init__.bat" || exit /b
+
 set "SUFFIX_NAME=%~1"
 
-for %%i in (CONTOOLS_ROOT) do (
-  if not defined %%i (
-    echo.%~nx0: error: `%%i` variable is not defined.
-    exit /b 255
-  ) >&2
-)
+call "%%CONTOOLS_PROJECT_ROOT%%/__init__/check_vars.bat" CONTOOLS_ROOT || exit /b
 
 if defined PROJECT_LOG_DIR exit /b 0
 if defined PROJECT_LOG_FILE exit /b 0

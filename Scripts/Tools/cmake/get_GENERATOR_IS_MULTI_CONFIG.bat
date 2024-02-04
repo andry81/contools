@@ -5,14 +5,11 @@ set "GENERATOR_IS_MULTI_CONFIG="
 
 setlocal
 
+call "%%~dp0__init__.bat" || exit /b
+
 set "CMAKE_GENERATOR=%~1"
 
-for %%i in (CMAKE_GENERATOR CONTOOLS_ROOT TACKLELIB_CMAKE_ROOT) do (
-  if not defined %%i (
-    echo.%~nx0: error: `%%i` variable is not defined.
-    exit /b 255
-  ) >&2
-)
+call "%%CONTOOLS_PROJECT_ROOT%%/__init__/check_vars.bat" CMAKE_GENERATOR CONTOOLS_ROOT TACKLELIB_CMAKE_ROOT || exit /b
 
 rem create temporary directory
 call "%%CONTOOLS_WMI_ROOT%%\get_wmic_local_datetime.bat"

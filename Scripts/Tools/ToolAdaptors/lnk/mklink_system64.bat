@@ -26,12 +26,12 @@ rem drop last error
 call;
 
 if not defined CONTOOLS_ROOT (
-  echo.%~nx0: error: CONTOOLS_ROOT variable is not defined
+  echo.%~nx0: error: CONTOOLS_ROOT variable is not defined.
   exit /b 1
 ) >&2
 
 if not exist "%CONTOOLS_ROOT%\*" (
-  echo.%~nx0: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%"
+  echo.%~nx0: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%".
   exit /b 2
 ) >&2
 

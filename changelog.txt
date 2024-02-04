@@ -1,3 +1,7 @@
+2024.02.04:
+* new: __init__/check_vars.bat: variables existence check from `__init__` directory
+* changed: Scripts/Tools: `check_vars.bat` script usage
+
 2024.02.03:
 * new: Scripts/Tools/build/check_vars.bat: script to check variable existence
 
