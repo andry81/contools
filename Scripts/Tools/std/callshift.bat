@@ -44,7 +44,7 @@ rem      rem in a script
 rem      >call callshift.bat -skip 2 -3 command param0 param1 %%3 %%2 %%1 %%*
 rem   7. >callshift.bat 0 exit /b 123
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
-rem      ERRORLEVEL=321
+rem      ERRORLEVEL=123
 rem   8. >errlvl.bat 123
 rem      >callshift.bat 0 call errlvl.bat 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
