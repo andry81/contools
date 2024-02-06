@@ -198,6 +198,10 @@
 '''       parameters, then it will be saved ONLY into the shortcut, which
 '''       brings the shortcut file overwrite.
 
+''' Related resources:
+'''   https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink
+'''   https://github.com/libyal/liblnk/blob/main/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc
+
 Sub PrintOrEchoLine(str)
   On Error Resume Next
   WScript.stdout.WriteLine str

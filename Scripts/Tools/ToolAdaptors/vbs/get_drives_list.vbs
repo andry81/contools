@@ -10,7 +10,8 @@
 ''' Documentation:
 '''   https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/drive-object
 
-''' Another resources:
+''' Related resources:
+'''   https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink
 '''   https://github.com/libyal/liblnk/blob/main/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc
 
 Sub PrintOrEchoLine(str)

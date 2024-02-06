@@ -29,6 +29,10 @@
 '''   -p <PropertyPattern>
 '''     List of shortcut property names to read, separated by `|` character.
 
+''' Related resources:
+'''   https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink
+'''   https://github.com/libyal/liblnk/blob/main/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc
+
 Sub PrintOrEchoLine(str)
   On Error Resume Next
   WScript.stdout.WriteLine str

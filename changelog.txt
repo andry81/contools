@@ -1,4 +1,7 @@
 2024.02.06:
+* refactor: Scripts/Tools/ToolAdaptors/vbs: added related resources urls
+
+2024.02.06:
 * new: Scripts/Tools/ToolAdaptors/vbs/get_drives_list.*: scripts to get list of drives and drive properties
 * refactor: Scripts/Tools/ToolAdaptors/vbs: comments cleanup
 
