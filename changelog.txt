@@ -1,4 +1,7 @@
 2024.02.06:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
+2024.02.06:
 * refactor: Scripts/Tools/ToolAdaptors/vbs: added related resources urls
 
 2024.02.06:

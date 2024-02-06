@@ -355,3 +355,12 @@ These flags already partially added into `help.tpl`, but still is not implemente
   Add flag `/retain-child-tree` to inject and hold for exit all the children
   processes until the last child would close. When the last child process does
   exit, then does unlock all the children processes for exit.
+
+* Add optional flag - `/+` to await ONLY not positional parameters until the
+  `//` flag.
+  Return an error if `//` is not found after `/+` or found more than once.
+  Return an error if `/+` is found before `//` more than once.
+  Return an error if not a flag parameter is found between `/+` and `//`
+  arguments.
+  This is useful to accept not positional parameters in the command line as an
+  external (expandable) string.
