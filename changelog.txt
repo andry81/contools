@@ -1,3 +1,7 @@
+2024.02.06:
+* new: Scripts/Tools/ToolAdaptors/vbs/get_drives_list.*: scripts to get list of drives and drive properties
+* refactor: Scripts/Tools/ToolAdaptors/vbs: comments cleanup
+
 2024.02.04:
 * new: Scripts/Tools/build/check_config_expiration.bat: configuration files expiration check script
 * changed: Scripts/Tools/cmake/check_config_version.bat: moved into `check_config_expiration.bat` script

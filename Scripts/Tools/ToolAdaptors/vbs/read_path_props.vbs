@@ -57,7 +57,7 @@
 '''
 '''   -line-return | -lr
 '''     Return on first line print.
-'''     Usefule to skip iteration over property list.
+'''     Useful to skip iteration over property list.
 '''
 '''   <PropertyPattern>
 '''     List of property names or property indexes to read, separated by `|`

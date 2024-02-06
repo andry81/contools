@@ -53,7 +53,7 @@
 '''
 '''   -line-return | -lr
 '''     Return on first line print.
-'''     Usefule to skip iteration over property list.
+'''     Useful to skip iteration over property list.
 '''
 '''   <Path>
 '''     Path to read.

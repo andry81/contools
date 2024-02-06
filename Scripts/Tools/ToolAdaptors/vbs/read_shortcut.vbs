@@ -1,4 +1,4 @@
-''' Read a Windows shortcut file property.
+''' Reads a Windows shortcut file property.
 
 ''' CAUTION:
 '''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
