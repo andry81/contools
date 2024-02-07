@@ -1,3 +1,6 @@
+2024.02.07:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/read_pe_header_bitness.vbs: errors handle
+
 2024.02.06:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 

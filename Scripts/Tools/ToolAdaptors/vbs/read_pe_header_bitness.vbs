@@ -9,6 +9,17 @@
 
 ' Check if a binary (EXE or DLL) is 32 bit (x86) or 64 bit (x64)
 
+' INFO:
+'   Workaround to avoid error `runtime error: Type mismatch: 'UBound'` around invalid `Or` condition parse: `If (Not IsArray(arr)) Or UBound(arr) <> ... Then`, where
+'   the `UBound(arr)` expression DOES evaluate even if the `arr` expression is not an array object.
+Function GetArraySize(arr_obj)
+  If IsArray(arr_obj) Then
+    GetArraySize = UBound(arr_obj) + 1
+  Else
+    GetArraySize = 0
+  End If
+End Function
+
 Sub PrintOrEchoLine(str)
   On Error Resume Next
   WScript.stdout.WriteLine str
@@ -71,7 +82,7 @@ Dim IsFileExist : IsFileExist = objFS.FileExists("\\?\" & FilePathAbs)
 If Not IsFileExist Then
   PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: file does not exist:" & vbCrLf & _
-    WScript.ScriptName & ": info: FilePath=`" & FilePathAbs & "`"
+    WScript.ScriptName & ": info: Path=`" & FilePathAbs & "`"
   WScript.Quit 2
 End If
 
@@ -110,44 +121,103 @@ Function ByteToHex(byte_)
   ByteToHex = str
 End Function
 
+Dim PositionHexStr
+Dim Position : Position = 0
+
 Dim PeSignature : PeSignature = BinaryStream.Read(3)
 
 Dim ByteCode
 Dim PeHexStr
 
-For i = 0 to UBound(PeSignature)
-  ByteCode = Ascb(Midb(PeSignature, i + 1, 1))
-  PeHexStr = PeHexStr & ByteToHex(ByteCode)
-Next
+If IsArray(PeSignature) Then
+  For i = 0 to UBound(PeSignature)
+    ByteCode = Ascb(Midb(PeSignature, i + 1, 1))
+    PeHexStr = PeHexStr & ByteToHex(ByteCode)
+  Next
+Else
+  PeHexStr = ""
+End If
 
 rem compare on `MZђ` sequence
 If PeHexStr <> "4D5A90" Then
+  PositionHexStr = Hex(Position)
   PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: file has no PE header:" & vbCrLf & _
-    WScript.ScriptName & ": info: FilePath=`" & FilePath & "`"
+    WScript.ScriptName & ": error: invalid PE header (1):" & vbCrLf & _
+    WScript.ScriptName & ": info: Path=`" & FilePath & "`" & vbCrLf & _
+    WScript.ScriptName & ": info: Position=`" & Position & "` (0x" & PositionHexStr & ")" & vbCrLf & _
+    WScript.ScriptName & ": info: Bytes=`" & PeHexStr & "`"
   WScript.Quit 3
 End If
 
-BinaryStream.Position = &H3C
+PositionHexStr = "3C"
+
+On Error Resume Next
+Position = CInt("&H" & PositionHexStr)
+BinaryStream.Position = Position
+If err = &h80070057& Then
+  PrintOrEchoErrorLine _
+    WScript.ScriptName & ": error: invalid PE header (2):" & vbCrLf & _
+    WScript.ScriptName & ": info: Path=`" & FilePath & "`" & vbCrLf & _
+    WScript.ScriptName & ": info: Position=`" & Position & "` (0x" & PositionHexStr & ")"
+  WScript.Quit 4
+End If
+On Error Goto 0
+
+Dim NextPositionHexStr
+
 Dim PositionSignature : PositionSignature = BinaryStream.Read(4)
 
-Dim PositionHexStr
-
-For i = 0 to UBound(PositionSignature)
+If IsArray(PositionSignature) Then
+  For i = 0 to UBound(PositionSignature)
     ByteCode = Ascb(Midb(PositionSignature, i + 1, 1))
-    PositionHexStr = ByteToHex(ByteCode) & PositionHexStr
-Next
+    NextPositionHexStr = ByteToHex(ByteCode) & NextPositionHexStr
+  Next
+'Else
+'  NextPositionHexStr = PositionHexStr ' just in case
+End If
 
-BinaryStream.Position = CInt("&H" & PositionHexStr)
+If (Not IsArray(PositionSignature)) Or GetArraySize(PositionSignature) <> 4 Then
+  PrintOrEchoErrorLine _
+    WScript.ScriptName & ": error: invalid PE header (3):" & vbCrLf & _
+    WScript.ScriptName & ": info: Path=`" & FilePath & "`" & vbCrLf & _
+    WScript.ScriptName & ": info: Position=`" & Position & "` (0x" & PositionHexStr & ")" & vbCrLf & _
+    WScript.ScriptName & ": info: Bytes=`" & NextPositionHexStr & "`"
+  WScript.Quit 4
+End If
+
+PositionHexStr = NextPositionHexStr
+
+On Error Resume Next
+Position = CInt("&H" & PositionHexStr)
+BinaryStream.Position = Position
+If err = &h80070057& Then
+  PrintOrEchoErrorLine _
+    WScript.ScriptName & ": error: invalid PE header (4):" & vbCrLf & _
+    WScript.ScriptName & ": info: Path=`" & FilePath & "`" & vbCrLf & _
+    WScript.ScriptName & ": info: Position=`" & Position & "` (0x" & PositionHexStr & ")"
+  WScript.Quit 4
+End If
+On Error Goto 0
 
 Dim BitnessSignature : BitnessSignature = BinaryStream.Read(6)
 
 Dim BitnessHexStr
 
-For i = 0 to UBound(BitnessSignature)
+If IsArray(BitnessSignature) Then
+  For i = 0 to UBound(BitnessSignature)
     ByteCode = Ascb(Midb(BitnessSignature, i + 1, 1))
     BitnessHexStr = BitnessHexStr & ByteToHex(ByteCode)
-Next
+  Next
+End If
+
+If (Not IsArray(BitnessSignature)) Or GetArraySize(BitnessSignature) <> 6 Then
+  PrintOrEchoErrorLine _
+    WScript.ScriptName & ": error: invalid PE header (5):" & vbCrLf & _
+    WScript.ScriptName & ": info: Path=`" & FilePath & "`" & vbCrLf & _
+    WScript.ScriptName & ": info: Position=`" & Position & "` (0x" & PositionHexStr & ")" & vbCrLf & _
+    WScript.ScriptName & ": info: Bytes=`" & BitnessHexStr & "`"
+  WScript.Quit 4
+End If
 
 BinaryStream.Close
 
