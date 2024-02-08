@@ -15,9 +15,9 @@ fi
 
 [[ -n "$NEST_LVL" ]] || tkl_declare_global NEST_LVL 0
 
-[[ -n "${NO_GEN+x}" ]] || tkl_cast_to_int NO_GEN
-[[ -n "${NO_LOG+x}" ]] || tkl_cast_to_int NO_LOG
-[[ -n "${NO_LOG_OUTPUT+x}" ]] || tkl_cast_to_int NO_OUTPUT
+[[ -z "${NO_GEN+x}" ]] || tkl_cast_to_int NO_GEN
+[[ -z "${NO_LOG+x}" ]] || tkl_cast_to_int NO_LOG
+[[ -z "${NO_LOG_OUTPUT+x}" ]] || tkl_cast_to_int NO_OUTPUT
 
 [[ -n "$CONTOOLS_PROJECT_ROOT" ]] ||                tkl_export_path -a -s CONTOOLS_PROJECT_ROOT               "$BASH_SOURCE_DIR/.."
 [[ -n "$CONTOOLS_PROJECT_EXTERNALS_ROOT" ]] ||      tkl_export_path -a -s CONTOOLS_PROJECT_EXTERNALS_ROOT     "$CONTOOLS_PROJECT_ROOT/_externals"

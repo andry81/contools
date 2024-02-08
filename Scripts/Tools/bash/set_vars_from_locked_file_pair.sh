@@ -7,7 +7,7 @@
 # 3. path where to read a file with variable values (each per line, must be the same quantity of lines with the variable names file)
 
 # Script can be ONLY included by "source" command.
-[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) ]] && return
+[[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) ]] || return 0 || exit 0 # exit to avoid continue if the return can not be called
 
 function set_vars_from_locked_file_pair()
 {

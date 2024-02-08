@@ -6,7 +6,7 @@
 # for the build scripts.
 
 # Script can be ONLY included by "source" command.
-[[ -z "$BASH" || (-n "$BASH_LINENO" && BASH_LINENO[0] -le 0) || (-n "$SOURCE_CONTOOLS_BUILDLIBCOMPONENTS_SH" && SOURCE_CONTOOLS_BUILDLIBCOMPONENTS_SH -ne 0) ]] && return
+[[ -n "$BASH" && (-z "$BASH_LINENO" || BASH_LINENO[0] -gt 0) && (-z "$SOURCE_CONTOOLS_BUILDLIBCOMPONENTS_SH" || SOURCE_CONTOOLS_BUILDLIBCOMPONENTS_SH -eq 0) ]] || return 0 || exit 0 # exit to avoid continue if the return can not be called
 
 SOURCE_CONTOOLS_BUILDLIBCOMPONENTS_SH=1 # including guard
 

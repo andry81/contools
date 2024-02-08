@@ -1,4 +1,8 @@
 2024.02.25:
+* fixed: __init__/__init__.sh: minor fixup
+* changed: *.sh: removed all negations to avoid return not zero return code on success
+
+2024.02.25:
 * fixed: __init__/__init__.sh: execution fixup
 * changed: __init__/__init__.sh: removed all negations to avoid return not zero return code on success
 * changed: __init__/__init__.sh: moved inclusion guard to the end
