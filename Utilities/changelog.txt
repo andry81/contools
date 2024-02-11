@@ -1,3 +1,7 @@
+2024.02.12:
+* fixed: src/callf: `/load-parent-proc-init-env-vars` flag fixup
+* fixed: src/callf: `SetEnvironmentStrings*` functions existence check and usage
+
 2024.02.06:
 * changed: bin/contools/TODO.txt: todo update
 

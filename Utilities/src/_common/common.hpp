@@ -119,6 +119,15 @@ static constexpr FILE_INFO_BY_HANDLE_CLASS FileIdInfo = FILE_INFO_BY_HANDLE_CLAS
 #endif
 
 
+enum MsgType
+{
+    msgt_unknown    = -1,
+    msgt_info       = 1,
+    msgt_warning    = 2,
+    msgt_error      = 3,
+    msgt_debug      = 4
+};
+
 struct StdHandles
 {
     StdHandles() :
@@ -325,6 +334,7 @@ struct _ConsoleWindowOwnerProc
 
 DECLARE_DYN_DLL_FUNC(GetFileInformationByHandleEx,      WINBASEAPI BOOL (WINAPI *)(HANDLE, FILE_INFO_BY_HANDLE_CLASS, LPVOID, DWORD));  // Windows 7+
 DECLARE_DYN_DLL_FUNC(SetEnvironmentStringsW,            WINBASEAPI BOOL (WINAPI *)(LPWCH));         // Windows XP x64 SP2+
+DECLARE_DYN_DLL_FUNC(SetEnvironmentStringsA,            WINBASEAPI BOOL (WINAPI *)(LPCH));          // Windows XP x64 SP2+
 
 
 namespace
@@ -347,6 +357,25 @@ namespace
         _T("E0"), _T("E1"), _T("E2"), _T("E3"), _T("E4"), _T("E5"), _T("E6"), _T("E7"), _T("E8"), _T("E9"), _T("EA"), _T("EB"), _T("EC"), _T("ED"), _T("EE"), _T("EF"),
         _T("F0"), _T("F1"), _T("F2"), _T("F3"), _T("F4"), _T("F5"), _T("F6"), _T("F7"), _T("F8"), _T("F9"), _T("FA"), _T("FB"), _T("FC"), _T("FD"), _T("FE"), _T("FF"),
     };
+
+    template<typename char_t>
+    struct _Msg;
+
+    template<>
+    struct _Msg<char>
+    {
+        static const char * s_type_arr[5];
+    };
+
+    template<>
+    struct _Msg<wchar_t>
+    {
+        static const wchar_t* s_type_arr[5];
+    };
+
+    const char * _Msg<char>::s_type_arr[5] = { "", "info", "warning", "error", "debug" };
+
+    const wchar_t * _Msg<wchar_t>::s_type_arr[5] = { L"", L"info", L"warning", L"error", L"debug" };
 }
 
 
@@ -1465,7 +1494,7 @@ namespace
                                         // TODO: just in case zeroing last 2 characters
                                         g_SetEnvironmentStringsW_ptr((LPWCH)env_strs_buf);
                                     }
-                                    else
+                                    else if (g_SetEnvironmentStringsA_ptr)
                                     {
                                         if (env_strs_shmem_buf_size > sizeof(uint32_t)) {
                                             std::vector<char> char_buf;
@@ -1480,7 +1509,7 @@ namespace
                                                 else if (char_buf_size > 0) {
                                                     *((uint8_t *)&char_buf[0] + char_buf_size - 1) = 0;
                                                 }
-                                                SetEnvironmentStringsA(&char_buf[0]);
+                                                g_SetEnvironmentStringsA_ptr(&char_buf[0]);
                                             }
                                         }
                                     }
@@ -2274,7 +2303,7 @@ namespace
         return buffer;
     }
 
-    inline std::string _format_stderr_message_va(const char * fmt, va_list vl)
+    inline std::string _format_stderr_message_va(MsgType msg_type, const char * fmt, va_list vl)
     {
         char module_char_buf[256];
         char fixed_message_char_buf[256];
@@ -2340,14 +2369,14 @@ namespace
 
             const int num_written_chars2 =
                 _snprintf(NULL, 0,
-                    "[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+                    "[%s] [%u] [%s] %s: %s",
+                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<char>::s_type_arr[msg_type], char_buf.data());
 
             char_buf2.resize(num_written_chars2 + 1);
 
             _snprintf(char_buf2.data(), char_buf2.size(),
-                "[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+                "[%s] [%u] [%s] %s: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<char>::s_type_arr[msg_type], char_buf.data());
 
             return std::string{ char_buf2.data(), char_buf2.size() > 0 ? char_buf2.size() - 1 : 0 };
         }
@@ -2356,20 +2385,20 @@ namespace
 
             const int num_written_chars2 =
                 _snprintf(NULL, 0,
-                    "[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (char *)NULL);
+                    "[%s] [%u] [%s] %s: %s",
+                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<char>::s_type_arr[msg_type], (char *)NULL);
 
             char_buf.resize(num_written_chars2 + 1);
 
             _snprintf(char_buf.data(), char_buf.size(),
-                "[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (char *)NULL);
+                "[%s] [%u] [%s] %s: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<char>::s_type_arr[msg_type], (char *)NULL);
 
             return std::string{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 };
         }
     }
 
-    inline std::wstring _format_stderr_message_va(const wchar_t * fmt, va_list vl)
+    inline std::wstring _format_stderr_message_va(MsgType msg_type, const wchar_t * fmt, va_list vl)
     {
         wchar_t module_char_buf[256];
         wchar_t fixed_message_char_buf[256];
@@ -2402,14 +2431,14 @@ namespace
 
             const int num_written_chars2 =
                 _snwprintf(NULL, 0,
-                    L"[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
+                    L"[%s] [%u] [%s] %s: %s",
+                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<wchar_t>::s_type_arr[msg_type], fixed_message_char_buf);
 
             char_buf.resize(num_written_chars2 + 1);
 
             _snwprintf(char_buf.data(), char_buf.size(),
-                L"[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
+                L"[%s] [%u] [%s] %s: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<wchar_t>::s_type_arr[msg_type], fixed_message_char_buf);
 
             return std::wstring{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 };
         }
@@ -2423,14 +2452,14 @@ namespace
 
             const int num_written_chars2 =
                 _snwprintf(NULL, 0,
-                    L"[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+                    L"[%s] [%u] [%s] %s: %s",
+                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<wchar_t>::s_type_arr[msg_type], char_buf.data());
 
             char_buf2.resize(num_written_chars2 + 1);
 
             _snwprintf(char_buf2.data(), char_buf2.size(),
-                L"[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+                L"[%s] [%u] [%s] %s: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<wchar_t>::s_type_arr[msg_type], char_buf.data());
 
             return std::wstring{ char_buf2.data(), char_buf2.size() > 0 ? char_buf2.size() - 1 : 0 };
         }
@@ -2439,38 +2468,38 @@ namespace
 
             const int num_written_chars2 =
                 _snwprintf(NULL, 0,
-                    L"[%s] [%u] [%s] error: %s",
-                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (wchar_t *)NULL);
+                    L"[%s] [%u] [%s] %s: %s",
+                    local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<wchar_t>::s_type_arr[msg_type], (wchar_t *)NULL);
 
             char_buf.resize(num_written_chars2 + 1);
 
             _snwprintf(char_buf.data(), char_buf.size(),
-                L"[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (wchar_t *)NULL);
+                L"[%s] [%u] [%s] %s: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<wchar_t>::s_type_arr[msg_type], (wchar_t *)NULL);
 
             return std::wstring{ char_buf.data(), char_buf.size() > 0 ? char_buf.size() - 1 : 0 };
         }
     }
 
-    inline std::string _format_stderr_message(const char * fmt, ...)
+    inline std::string _format_stderr_message(MsgType msg_type, const char * fmt, ...)
     {
         va_list vl;
         va_start(vl, fmt);
-        const auto ret = _format_stderr_message_va(fmt, vl);
+        const auto ret = _format_stderr_message_va(msg_type, fmt, vl);
         va_end(vl);
         return ret;
     }
 
-    inline std::wstring _format_stderr_message(const wchar_t * fmt, ...)
+    inline std::wstring _format_stderr_message(MsgType msg_type, const wchar_t * fmt, ...)
     {
         va_list vl;
         va_start(vl, fmt);
-        const auto ret = _format_stderr_message_va(fmt, vl);
+        const auto ret = _format_stderr_message_va(msg_type, fmt, vl);
         va_end(vl);
         return ret;
     }
 
-    inline void _print_stderr_message_va(const char * fmt, va_list vl)
+    inline void _print_stderr_message_va(MsgType msg_type, const char * fmt, va_list vl)
     {
         char module_char_buf[256];
         char fixed_message_char_buf[256];
@@ -2500,8 +2529,8 @@ namespace
         //
 
         if (num_written_chars > 0 && num_written_chars < fixed_message_char_buf_size) {
-            _print_raw_message(STDERR_FILENO, "[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, fixed_message_char_buf);
+            _print_raw_message(STDERR_FILENO, "[%s] [%u] [%s] %s: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<char>::s_type_arr[msg_type], fixed_message_char_buf);
         }
         else if (num_written_chars >= -1) {
             std::vector<char> char_buf;
@@ -2510,16 +2539,16 @@ namespace
 
             vsnprintf(char_buf.data(), char_buf.size(), fmt, vl);
 
-            _print_raw_message(STDERR_FILENO, "[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+            _print_raw_message(STDERR_FILENO, "[%s] [%u] [%s] %s: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<char>::s_type_arr[msg_type], char_buf.data());
         }
         else {
-            _print_raw_message(STDERR_FILENO, "[%s] [%u] [%s] error: %s",
-                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, (char *)NULL); // encoding error
+            _print_raw_message(STDERR_FILENO, "[%s] [%u] [%s] %s: %s",
+                local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<char>::s_type_arr[msg_type], (char *)NULL); // encoding error
         }
     }
 
-    inline void _print_stderr_message_va(const wchar_t * fmt, va_list vl)
+    inline void _print_stderr_message_va(MsgType msg_type, const wchar_t * fmt, va_list vl)
     {
         wchar_t module_char_buf[256];
         wchar_t fixed_message_char_buf[256];
@@ -2552,23 +2581,23 @@ namespace
 
         _vsnwprintf(char_buf.data(), char_buf.size(), fmt, vl);
 
-        _print_raw_message(STDERR_FILENO, L"[%s] [%u] [%s] error: %s",
-            local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, char_buf.data());
+        _print_raw_message(STDERR_FILENO, L"[%s] [%u] [%s] %s: %s",
+            local_time_str.c_str(), GetCurrentProcessId(), module_char_buf, _Msg<wchar_t>::s_type_arr[msg_type], char_buf.data());
     }
 
-    inline void _print_stderr_message(const char * fmt, ...)
+    inline void _print_stderr_message(MsgType msg_type, const char * fmt, ...)
     {
         va_list vl;
         va_start(vl, fmt);
-        _print_stderr_message_va(fmt, vl);
+        _print_stderr_message_va(msg_type, fmt, vl);
         va_end(vl);
     }
 
-    inline void _print_stderr_message(const wchar_t * fmt, ...)
+    inline void _print_stderr_message(MsgType msg_type, const wchar_t * fmt, ...)
     {
         va_list vl;
         va_start(vl, fmt);
-        _print_stderr_message_va(fmt, vl);
+        _print_stderr_message_va(msg_type, fmt, vl);
         va_end(vl);
     }
 
@@ -2594,12 +2623,12 @@ namespace
                     FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                         NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPWSTR)&win_error_msg_buf_w, 0, NULL);
 #ifdef _UNICODE
-                    ret = _format_stderr_message(L"win32: \"%s\"\n", win_error_msg_buf_w);
+                    ret = _format_stderr_message(msgt_error, L"win32: \"%s\"\n", win_error_msg_buf_w);
 #else
                     std::vector<char> char_buf;
 
                     if (_wide_char_to_multi_byte(cp_out, win_error_msg_buf_w, -1, char_buf)) {
-                        ret = _format_stderr_message("win32: \"%s\"\n", char_buf.data());
+                        ret = _format_stderr_message(msgt_error, "win32: \"%s\"\n", char_buf.data());
                     }
 #endif
                 } break;
@@ -2612,10 +2641,10 @@ namespace
                     std::vector<wchar_t> char_buf;
 
                     if (_multi_byte_to_wide_char(cp_out, win_error_msg_buf_a, -1, char_buf)) {
-                        ret = _format_stderr_message(L"win32: \"%s\"\n", char_buf.data());
+                        ret = _format_stderr_message(msgt_error, L"win32: \"%s\"\n", char_buf.data());
                     }
 #else
-                    ret = _format_stderr_message("win32: \"%s\"\n", win_error_msg_buf_a);
+                    ret = _format_stderr_message(msgt_error, "win32: \"%s\"\n", win_error_msg_buf_a);
 #endif
                 } break;
                 }
@@ -2651,14 +2680,14 @@ namespace
             {
                 FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                     NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPWSTR)&win_error_msg_buf_w, 0, NULL);
-                _print_stderr_message(L"win32: \"%s\"\n", win_error_msg_buf_w);
+                _print_stderr_message(msgt_error, L"win32: \"%s\"\n", win_error_msg_buf_w);
             } break;
 
             default:
             {
                 FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                     NULL, win_error, MAKELANGID(langid, SUBLANG_DEFAULT), (LPSTR)&win_error_msg_buf_a, 0, NULL);
-                _print_stderr_message("win32: \"%s\"\n", win_error_msg_buf_a);
+                _print_stderr_message(msgt_error, "win32: \"%s\"\n", win_error_msg_buf_a);
             } break;
             }
         }
@@ -2676,55 +2705,55 @@ namespace
     {
         switch (shell_error) {
         case 0:
-            _print_stderr_message(_T("ShellExecute: operating system is out of memory or resources: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: operating system is out of memory or resources: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_FNF:
-            _print_stderr_message(_T("ShellExecute: file is not found: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: file is not found: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_PNF:
-            _print_stderr_message(_T("ShellExecute: path is not found: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: path is not found: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_ACCESSDENIED:
-            _print_stderr_message(_T("ShellExecute: access denied: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: access denied: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_OOM:
-            _print_stderr_message(_T("ShellExecute: out of memory: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: out of memory: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_DLLNOTFOUND:
-            _print_stderr_message(_T("ShellExecute: dynamic-link library is not found: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: dynamic-link library is not found: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_SHARE:
-            _print_stderr_message(_T("ShellExecute: cannot share an open file: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: cannot share an open file: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_ASSOCINCOMPLETE:
-            _print_stderr_message(_T("ShellExecute: file association information is not complete: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: file association information is not complete: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_DDETIMEOUT:
-            _print_stderr_message(_T("ShellExecute: DDE operation is timed out: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: DDE operation is timed out: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_DDEFAIL:
-            _print_stderr_message(_T("ShellExecute: DDE operation is failed: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: DDE operation is failed: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_DDEBUSY:
-            _print_stderr_message(_T("ShellExecute: DDE operation is busy: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: DDE operation is busy: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         case SE_ERR_NOASSOC:
-            _print_stderr_message(_T("ShellExecute: file association is not available: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: file association is not available: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
             break;
         default:
-            _print_stderr_message(_T("ShellExecute: unknown error: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+            _print_stderr_message(msgt_error, _T("ShellExecute: unknown error: error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                 shell_error, shell_error, sei.lpFile, sei.lpParameters);
         }
     }
@@ -2732,7 +2761,7 @@ namespace
     inline void _print_com_error_message(HRESULT hr)
     {
         _com_error err(hr);
-        _print_stderr_message(_T("COM: 0x%08X: %s\n"), hr, err.ErrorMessage());
+        _print_stderr_message(msgt_error, _T("COM: 0x%08X: %s\n"), hr, err.ErrorMessage());
     }
 
     template <class t_char, class _Traits = std::char_traits<t_char>, class _Alloc = std::allocator<t_char> >
@@ -3207,7 +3236,7 @@ namespace
             std_handles.stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
             if (!read_std_handles_iter) {
                 if (!std_handles_state.has_stdin_console_mode && _is_valid_handle(std_handles.stdin_handle)) {
-                    // save console mode if not done yet
+                    // save console mode if not done yet    
                     std_handles_state.save_stdin_state(std_handles.stdin_handle);
                 }
             }
@@ -3223,7 +3252,7 @@ namespace
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("stdin handle is invalid: win_error=0x%08X (%d)\n"),
+                        _print_stderr_message(msgt_error, _T("stdin handle is invalid: win_error=0x%08X (%d)\n"),
                             win_error, win_error);
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -3254,7 +3283,7 @@ namespace
                         ret = win_error;
                     }
                     if (!flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("stdout handle is invalid: win_error=0x%08X (%d)\n"),
+                        _print_stderr_message(msgt_error, _T("stdout handle is invalid: win_error=0x%08X (%d)\n"),
                             win_error, win_error);
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -3290,7 +3319,7 @@ namespace
                     //
 
                     if (!flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("stderr handle is invalid: win_error=0x%08X (%d)\n"),
+                        _print_stderr_message(msgt_error, _T("stderr handle is invalid: win_error=0x%08X (%d)\n"),
                             win_error, win_error);
                     }
                     if (flags.print_win_error_string && win_error) {
@@ -3335,7 +3364,7 @@ namespace
 
                     if (stderr_handle_type != FILE_TYPE_UNKNOWN) {
                         if (!flags.no_print_gen_error_string) {
-                            _print_stderr_message(_T("stdin handle type is unknown: win_error=0x%08X (%d)\n"),
+                            _print_stderr_message(msgt_error, _T("stdin handle type is unknown: win_error=0x%08X (%d)\n"),
                                 win_error, win_error);
                         }
                         if (flags.print_win_error_string && win_error) {
@@ -3373,7 +3402,7 @@ namespace
 
                     if (stderr_handle_type != FILE_TYPE_UNKNOWN) {
                         if (!flags.no_print_gen_error_string) {
-                            _print_stderr_message(_T("stdout handle type is unknown: win_error=0x%08X (%d)\n"),
+                            _print_stderr_message(msgt_error, _T("stdout handle type is unknown: win_error=0x%08X (%d)\n"),
                                 win_error, win_error);
                         }
                         if (flags.print_win_error_string && win_error) {
@@ -3412,7 +3441,7 @@ namespace
 
                     if (stderr_handle_type != FILE_TYPE_UNKNOWN) {
                         if (!flags.no_print_gen_error_string) {
-                            _print_stderr_message(_T("stderr handle type is unknown: win_error=0x%08X (%d)\n"),
+                            _print_stderr_message(msgt_error, _T("stderr handle type is unknown: win_error=0x%08X (%d)\n"),
                                 win_error, win_error);
                         }
                         if (flags.print_win_error_string && win_error) {
@@ -3555,7 +3584,7 @@ namespace
                 ret = win_error;
             }
             if (!flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("stdin handle is invalid: win_error=0x%08X (%d)\n"),
+                _print_stderr_message(msgt_error, _T("stdin handle is invalid: win_error=0x%08X (%d)\n"),
                     win_error, win_error);
             }
             if (flags.print_win_error_string && win_error) {
@@ -3587,7 +3616,7 @@ namespace
                 ret = win_error;
             }
             if (!flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("stdout handle is invalid: win_error=0x%08X (%d)\n"),
+                _print_stderr_message(msgt_error, _T("stdout handle is invalid: win_error=0x%08X (%d)\n"),
                     win_error, win_error);
             }
             if (flags.print_win_error_string && win_error) {
@@ -3624,7 +3653,7 @@ namespace
             //
 
             if (!flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("stderr handle is invalid: win_error=0x%08X (%d)\n"),
+                _print_stderr_message(msgt_error, _T("stderr handle is invalid: win_error=0x%08X (%d)\n"),
                     win_error, win_error);
             }
             if (flags.print_win_error_string && win_error) {

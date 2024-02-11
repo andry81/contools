@@ -26,6 +26,7 @@ DEFINE_DYN_DLL_FUNC(CancelSynchronousIo);               // Windows 7+
 DEFINE_DYN_DLL_FUNC(GetTickCount64);                    // Windows 7+
 DEFINE_DYN_DLL_FUNC(GetFileInformationByHandleEx);      // Windows 7+
 DEFINE_DYN_DLL_FUNC(SetEnvironmentStringsW);            // Windows XP x64 SP2+
+DEFINE_DYN_DLL_FUNC(SetEnvironmentStringsA);            // Windows XP x64 SP2+
 
 // globals
 
@@ -632,7 +633,7 @@ BOOL WINAPI DisabledCtrlHandler(DWORD ctrl_type)
 inline int invalid_format_flag(const TCHAR * arg)
 {
     if (!g_flags.no_print_gen_error_string) {
-        _print_stderr_message(_T("flag format is invalid: \"%s\"\n"), arg);
+        _print_stderr_message(msgt_error, _T("flag format is invalid: \"%s\"\n"), arg);
     }
     return err_invalid_format;
 }
@@ -642,7 +643,7 @@ inline int invalid_format_flag_message(const TCHAR * fmt, ...)
     if (!g_flags.no_print_gen_error_string) {
         va_list vl;
         va_start(vl, fmt);
-        _print_stderr_message_va(fmt, vl);
+        _print_stderr_message_va(msgt_error, fmt, vl);
         va_end(vl);
     }
     return err_invalid_format;
@@ -2874,8 +2875,6 @@ inline bool LoadDynamicDLLFunctions(std::tstring * functions_list_str_ptr, DWORD
         SetLastError(0); // just in case
     }
 
-    // Windows XP x64 SP2
-
     LOAD_DYN_DLL_FUNC(kernel32, Wow64EnableWow64FsRedirection);     // Windows XP x64 SP2+
     LOAD_DYN_DLL_FUNC(kernel32, Wow64DisableWow64FsRedirection);    // Windows XP x64 SP2+
     LOAD_DYN_DLL_FUNC(kernel32, Wow64RevertWow64FsRedirection);     // Windows XP x64 SP2+
@@ -2883,6 +2882,7 @@ inline bool LoadDynamicDLLFunctions(std::tstring * functions_list_str_ptr, DWORD
     LOAD_DYN_DLL_FUNC(kernel32, GetTickCount64);                    // Windows 7+
     LOAD_DYN_DLL_FUNC(kernel32, GetFileInformationByHandleEx);      // Windows 7+
     LOAD_DYN_DLL_FUNC(kernel32, SetEnvironmentStringsW);            // Windows XP x64 SP2+
+    LOAD_DYN_DLL_FUNC(kernel32, SetEnvironmentStringsA);            // Windows XP x64 SP2+
 
     if (win_error_ptr) {
         *win_error_ptr = win_error_;
@@ -2974,7 +2974,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             //
 
             if (!argc || !argv[0]) {
-                _print_stderr_message(_T("error: invalid command line format"));
+                _print_stderr_message(msgt_error, _T("error: invalid command line format"));
                 return err_invalid_format;
             }
 
@@ -3215,69 +3215,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("`/demote*` option is mixed with `/elevate`\n"));
             }
 
-            // load environment block from a parent process
-
-            if (g_flags.load_parent_proc_init_env_vars) {
-                _load_ancestor_proc_env_strs_from_shmem(std::tstring{ _T("Local\\") _T(PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX) _T("--") });
-            }
-
-            // save environment block for a process
-
-            env_strs = GetEnvironmentStringsW();
-            if (env_strs) {
-                // count until double null
-                TCHAR * p = env_strs;
-                while (*p || *(p + 1)) {
-                    env_strs_len++;
-                    p++;
-                }
-                env_strs_len++;
-
-                const DWORD current_proc_id = GetCurrentProcessId();
-
-                // use first 4 bytes to store the memory block size
-                const size_t env_strs_shmem_size = (env_strs_len + 1) * sizeof(WCHAR) + sizeof(uint32_t);
-                
-                HANDLE current_process_token = INVALID_HANDLE_VALUE;
-                
-                // NOTE:
-                //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
-                //
-                [&]() { __try {
-                    [&]() {
-                        //if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &current_process_token)) {
-                        //if (_set_privilege(current_process_token, SE_CREATE_GLOBAL_NAME, TRUE)) {
-                        env_strs_shmem_handle = CreateFileMapping(
-                            INVALID_HANDLE_VALUE,
-                            NULL,
-                            PAGE_READWRITE,
-                            0,
-                            env_strs_shmem_size,
-                            (std::tstring(_T("Local\\") _T(PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX) _T("--")) + std::to_tstring(current_proc_id)).c_str()
-                        );
-                
-                        if (env_strs_shmem_handle) {
-                            const LPCTSTR env_strs_shmem_buf = (LPTSTR)MapViewOfFile(
-                                env_strs_shmem_handle,
-                                FILE_MAP_ALL_ACCESS,
-                                0,
-                                0,
-                                env_strs_shmem_size
-                            );
-                
-                            if (env_strs_shmem_buf) {
-                                *(uint32_t *)env_strs_shmem_buf = env_strs_shmem_size; // allocated shared memory size
-                                CopyMemory((PVOID)((uint8_t *)env_strs_shmem_buf + sizeof(uint32_t)), env_strs, env_strs_shmem_size - sizeof(uint32_t));
-                            }
-                        }
-                    }();
-                }
-                __finally {
-                    _close_handle(current_process_token);
-                }
-                }();
-            }
-
             // update elevation state
             if (g_regular_flags.elevate || g_regular_flags.unelevate) {
                 g_is_process_self_elevation = true;
@@ -3346,9 +3283,74 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 g_flags.print_dyn_dll_load_errors ? &dyn_function_list_str : nullptr,
                 g_flags.print_dyn_dll_load_errors ? &win_error : nullptr)) {
                 if (g_flags.print_dyn_dll_load_errors) {
-                    _print_stderr_message(_T("could not load dynamic functions: win_error=0x%08X (%d) functions=[ %s ]\n"),
+                    _print_stderr_message(msgt_error, _T("could not load dynamic functions: win_error=0x%08X (%d) functions=[ %s ]\n"),
                         win_error, win_error, dyn_function_list_str.c_str());
                 }
+            }
+
+            // load environment block from a parent process
+
+            if (g_flags.load_parent_proc_init_env_vars) {
+                if (g_SetEnvironmentStringsW_ptr || g_SetEnvironmentStringsA_ptr) {
+                    _load_ancestor_proc_env_strs_from_shmem(std::tstring{ _T("Local\\") _T(PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX) _T("--") });
+                }
+            }
+
+            // save environment block for a process
+
+            env_strs = GetEnvironmentStringsW();
+            if (env_strs) {
+                // count until double null
+                TCHAR * p = env_strs;
+                while (*p || *(p + 1)) {
+                    env_strs_len++;
+                    p++;
+                }
+                env_strs_len++;
+
+                const DWORD current_proc_id = GetCurrentProcessId();
+
+                // use first 4 bytes to store the memory block size
+                const size_t env_strs_shmem_size = (env_strs_len + 1) * sizeof(WCHAR) + sizeof(uint32_t);
+                
+                HANDLE current_process_token = INVALID_HANDLE_VALUE;
+                
+                // NOTE:
+                //  lambda to bypass msvc error: `error C2712: Cannot use __try in functions that require object unwinding`
+                //
+                [&]() { __try {
+                    [&]() {
+                        //if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &current_process_token)) {
+                        //if (_set_privilege(current_process_token, SE_CREATE_GLOBAL_NAME, TRUE)) {
+                        env_strs_shmem_handle = CreateFileMapping(
+                            INVALID_HANDLE_VALUE,
+                            NULL,
+                            PAGE_READWRITE,
+                            0,
+                            env_strs_shmem_size,
+                            (std::tstring(_T("Local\\") _T(PROC_ENV_BLOCK_SHMEM_TOKEN_PREFIX) _T("--")) + std::to_tstring(current_proc_id)).c_str()
+                        );
+                
+                        if (env_strs_shmem_handle) {
+                            const LPCTSTR env_strs_shmem_buf = (LPTSTR)MapViewOfFile(
+                                env_strs_shmem_handle,
+                                FILE_MAP_ALL_ACCESS,
+                                0,
+                                0,
+                                env_strs_shmem_size
+                            );
+                
+                            if (env_strs_shmem_buf) {
+                                *(uint32_t *)env_strs_shmem_buf = env_strs_shmem_size; // allocated shared memory size
+                                CopyMemory((PVOID)((uint8_t *)env_strs_shmem_buf + sizeof(uint32_t)), env_strs, env_strs_shmem_size - sizeof(uint32_t));
+                            }
+                        }
+                    }();
+                }
+                __finally {
+                    _close_handle(current_process_token);
+                }
+                }();
             }
 
             // enable/disable WOW64 FileSystem redirection
@@ -4265,6 +4267,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 }
             }
 
+            // /load-parent-proc-init-env-vars vs SetEnvironmentStrings (Windows XP x86)
+
+            if (g_flags.load_parent_proc_init_env_vars && !g_SetEnvironmentStringsW_ptr && !g_SetEnvironmentStringsA_ptr) {
+                _print_stderr_message(msgt_warning, _T("flag is not implemented and skipped: /load-parent-proc-init-env-vars\n"));
+            }
+
             // /no-expand-env
 
             if (g_promote_or_demote_flags.no_expand_env && g_promote_or_demote_parent_flags.no_expand_env) {
@@ -4528,7 +4536,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             if (!in_args.app_fmt_str && !in_args.cmd_fmt_str) {
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("format arguments are empty\n"));
+                    _print_stderr_message(msgt_error, _T("format arguments are empty\n"));
                 }
                 if (!g_flags.ret_win_error) {
                     return err_invalid_format;

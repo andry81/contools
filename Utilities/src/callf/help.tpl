@@ -356,6 +356,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           load will fail. In that case you must not use the `/no-wait` flag
           in the parent or ancestor.
 
+        CAUTION:
+          Minimum supported OS: Windows XP x64 (not Windows XP x86).
+
       /no-std-inherit
         Prevent all standard handles inheritance into child process.
 

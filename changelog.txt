@@ -1,4 +1,8 @@
 2024.02.12:
+* fixed: Utilities/src/callf: `/load-parent-proc-init-env-vars` flag fixup
+* fixed: Utilities/src/callf: `SetEnvironmentStrings*` functions existence check and usage
+
+2024.02.12:
 * changed: Utilities/Projects: switched to `Visual Studio 2017 - Windows XP (v141_xp)` Platform Toolset
 
 2024.02.07:

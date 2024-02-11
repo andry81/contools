@@ -617,7 +617,7 @@ inline void FormatThreadDataOutput(ThreadReturnData & thread_data, int ret, DWOR
             if (!g_flags.no_print_gen_error_string) {
                 va_list vl;
                 va_start(vl, fmt_);
-                thread_data.msg = _format_stderr_message_va(fmt_, vl);
+                thread_data.msg = _format_stderr_message_va(msgt_error, fmt_, vl);
                 va_end(vl);
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3102,7 +3102,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not reopen stdin as file to read: win_error=0x%08X (%d) file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not reopen stdin as file to read: win_error=0x%08X (%d) file=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stdin_as_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3136,7 +3136,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not %s handle inheritance of reopened stdin as file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not %s handle inheritance of reopened stdin as file: win_error=0x%08X (%d) file=\"%s\"\n"),
                             reset_handle_to_inherit ? _T("enable") : _T("disable"), win_error, win_error, g_options.reopen_stdin_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -3158,7 +3158,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not duplicate reopened stdin as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not duplicate reopened stdin as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stdin_as_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3187,7 +3187,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not reopen stdin as server named pipe end to read: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not reopen stdin as server named pipe end to read: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3216,7 +3216,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not disable handle inheritance of reopened stdin as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                    _print_stderr_message(msgt_error, _T("could not disable handle inheritance of reopened stdin as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                         win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
@@ -3237,7 +3237,7 @@ bool ReopenStdin(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not duplicate reopened stdin as server named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not duplicate reopened stdin as server named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3313,7 +3313,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                             ret = win_error;
                         }
                         if (!g_flags.no_print_gen_error_string) {
-                            _print_stderr_message(_T("could not %s handle inheritance of reopened stdout as file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not %s handle inheritance of reopened stdout as file: win_error=0x%08X (%d) file=\"%s\"\n"),
                                 reset_handle_to_inherit ? _T("enable") : _T("disable"), win_error, win_error, g_options.reopen_stdout_as_file.c_str());
                         }
                         if (g_flags.print_win_error_string && win_error) {
@@ -3347,7 +3347,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not duplicate reopened stdout as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
+                    _print_stderr_message(msgt_error, _T("could not duplicate reopened stdout as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
                         win_error, win_error, g_options.reopen_stdout_as_file.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
@@ -3369,7 +3369,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not reopen stdout as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not reopen stdout as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stdout_as_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3396,7 +3396,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not reopen stdout as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not reopen stdout as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3425,7 +3425,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not disable handle inheritance of reopened stdout as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                    _print_stderr_message(msgt_error, _T("could not disable handle inheritance of reopened stdout as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                         win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
@@ -3446,7 +3446,7 @@ bool ReopenStdout(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not duplicate reopened stdout as server named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not duplicate reopened stdout as server named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3525,7 +3525,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                             ret = win_error;
                         }
                         if (!g_flags.no_print_gen_error_string) {
-                            _print_stderr_message(_T("could not %s handle inheritance of reopened stderr as file: win_error=0x%08X (%d) file=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not %s handle inheritance of reopened stderr as file: win_error=0x%08X (%d) file=\"%s\"\n"),
                                 reset_handle_to_inherit ? _T("enable") : _T("disable"), win_error, win_error, g_options.reopen_stderr_as_file.c_str());
                         }
                         if (g_flags.print_win_error_string && win_error) {
@@ -3556,7 +3556,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not auto duplicate (merge) stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not auto duplicate (merge) stdout into stderr: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, g_options.reopen_stdout_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -3586,7 +3586,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not duplicate reopened stderr as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
+                    _print_stderr_message(msgt_error, _T("could not duplicate reopened stderr as file before transfer handle ownership to CRT: win_error=0x%08X (%d) file=\"%s\"\n"),
                         win_error, win_error, g_options.reopen_stderr_as_file.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
@@ -3608,7 +3608,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not reopen stderr as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not reopen stderr as file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stderr_as_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3635,7 +3635,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not reopen stderr as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not reopen stderr as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3664,7 +3664,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not disable handle inheritance of reopened stderr as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                    _print_stderr_message(msgt_error, _T("could not disable handle inheritance of reopened stderr as server named pipe end: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                         win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
@@ -3685,7 +3685,7 @@ bool ReopenStderr(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not duplicate reopened stderr as server named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not duplicate reopened stderr as server named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3751,7 +3751,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not create outbound anonymous pipe from stdin: win_error=0x%08X (%d)\n"),
+                _print_stderr_message(msgt_error, _T("could not create outbound anonymous pipe from stdin: win_error=0x%08X (%d)\n"),
                     win_error, win_error);
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3772,7 +3772,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not disable handle inheritance of stdin outbound anonymous pipe end: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not disable handle inheritance of stdin outbound anonymous pipe end: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                     win_error, win_error, g_stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3802,7 +3802,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not create outbound server named pipe from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not create outbound server named pipe from stdin: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.create_outbound_server_pipe_from_stdin.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3823,7 +3823,7 @@ bool CreateOutboundPipeFromConsoleInput(int & ret, DWORD & win_error)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not disable handle inheritance of stdin outbound server named pipe end: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not disable handle inheritance of stdin outbound server named pipe end: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                     win_error, win_error, g_stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3891,7 +3891,7 @@ bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not create inbound anonymous pipe to %s: win_error=0x%08X (%d)\n"),
+                _print_stderr_message(msgt_error, _T("could not create inbound anonymous pipe to %s: win_error=0x%08X (%d)\n"),
                     conout_name_token_str, win_error, win_error);
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3912,7 +3912,7 @@ bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not disable handle inheritance of %s inbound anonymous pipe end: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not disable handle inheritance of %s inbound anonymous pipe end: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                     conout_name_token_str, win_error, win_error, conout_handle_type, reopen_conout_as_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3947,7 +3947,7 @@ bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not create inbound server named pipe end to %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not create inbound server named pipe end to %s: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     conout_name_token_str, win_error, win_error, create_inbound_server_pipe_to_conout.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -3968,7 +3968,7 @@ bool CreateInboundPipeToConsoleOutput(int & ret, DWORD & win_error)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not disable handle inheritance of %s inbound server named pipe end: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not disable handle inheritance of %s inbound server named pipe end: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                     conout_name_token_str, win_error, win_error, conout_handle_type, reopen_conout_as_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -4211,7 +4211,7 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not open stdin tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not open stdin tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                     win_error, win_error, g_options.tee_stdin_to_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -4240,7 +4240,7 @@ bool CreateTeeOutputFromStdin(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not open stdin tee as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not open stdin tee as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.tee_stdin_to_server_pipe.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -4307,7 +4307,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not open stdout tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not open stdout tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                     win_error, win_error, g_options.tee_stdout_to_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -4336,7 +4336,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not auto duplicate (merge) stdin tee into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                    _print_stderr_message(msgt_error, _T("could not auto duplicate (merge) stdin tee into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
                         win_error, win_error, g_options.tee_stdin_to_file.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
@@ -4373,7 +4373,7 @@ bool CreateTeeOutputFromStdout(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not open stdout tee as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not open stdout tee as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.tee_stdout_to_server_pipe.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -4440,7 +4440,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not open stderr tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not open stderr tee file to write: win_error=0x%08X (%d) file=\"%s\"\n"),
                     win_error, win_error, g_options.tee_stderr_to_file.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -4469,7 +4469,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not auto duplicate (merge) stdout tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                    _print_stderr_message(msgt_error, _T("could not auto duplicate (merge) stdout tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
                         win_error, win_error, g_options.tee_stdout_to_file.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
@@ -4496,7 +4496,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
                     ret = win_error;
                 }
                 if (!g_flags.no_print_gen_error_string) {
-                    _print_stderr_message(_T("could not auto duplicate (merge) stdin tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                    _print_stderr_message(msgt_error, _T("could not auto duplicate (merge) stdin tee into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
                         win_error, win_error, g_options.tee_stdin_to_file.c_str());
                 }
                 if (g_flags.print_win_error_string && win_error) {
@@ -4533,7 +4533,7 @@ bool CreateTeeOutputFromStderr(int & ret, DWORD & win_error, UINT cp_in)
                 ret = win_error;
             }
             if (!g_flags.no_print_gen_error_string) {
-                _print_stderr_message(_T("could not open stderr tee as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                _print_stderr_message(msgt_error, _T("could not open stderr tee as server named pipe end to write: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                     win_error, win_error, g_options.tee_stderr_to_server_pipe.c_str());
             }
             if (g_flags.print_win_error_string && win_error) {
@@ -4584,7 +4584,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         ret = err_invalid_format;
 
         if (!g_flags.no_print_gen_error_string) {
-            _print_stderr_message(_T("error: invalid command line format\n"));
+            _print_stderr_message(msgt_error, _T("error: invalid command line format\n"));
         }
 
         return ret;
@@ -4777,7 +4777,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate reopened stdin as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate reopened stdin as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                             win_error, win_error, g_options.reopen_stdin_as_server_pipe.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -4803,7 +4803,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate reopened stdout as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate reopened stdout as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                             win_error, win_error, g_options.reopen_stdout_as_server_pipe.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -4829,7 +4829,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate reopened stderr as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate reopened stderr as client named pipe end before transfer handle ownership to CRT: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                             win_error, win_error, g_options.reopen_stderr_as_server_pipe.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -4917,7 +4917,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                                 ret = win_error;
                             }
                             if (!g_flags.no_print_gen_error_string) {
-                                _print_stderr_message(_T("could not disable handle inheritance of stdin: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                                _print_stderr_message(msgt_error, _T("could not disable handle inheritance of stdin: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                                     win_error, win_error, g_stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -4948,7 +4948,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                                 ret = win_error;
                             }
                             if (!g_flags.no_print_gen_error_string) {
-                                _print_stderr_message(_T("could not enable handle inheritance of stdin: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                                _print_stderr_message(msgt_error, _T("could not enable handle inheritance of stdin: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                                     win_error, win_error, g_stdin_handle_type, g_options.reopen_stdin_as_file.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -4986,7 +4986,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                                 ret = win_error;
                             }
                             if (!g_flags.no_print_gen_error_string) {
-                                _print_stderr_message(_T("could not disable handle inheritance of stdout: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                                _print_stderr_message(msgt_error, _T("could not disable handle inheritance of stdout: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                                     win_error, win_error, g_stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -5017,7 +5017,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                                 ret = win_error;
                             }
                             if (!g_flags.no_print_gen_error_string) {
-                                _print_stderr_message(_T("could not enable handle inheritance of stdout: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                                _print_stderr_message(msgt_error, _T("could not enable handle inheritance of stdout: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                                     win_error, win_error, g_stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -5055,7 +5055,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                                 ret = win_error;
                             }
                             if (!g_flags.no_print_gen_error_string) {
-                                _print_stderr_message(_T("could not disable handle inheritance of stderr: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                                _print_stderr_message(msgt_error, _T("could not disable handle inheritance of stderr: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                                     win_error, win_error, g_stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -5086,7 +5086,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                                 ret = win_error;
                             }
                             if (!g_flags.no_print_gen_error_string) {
-                                _print_stderr_message(_T("could not enable handle inheritance of stderr: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                                _print_stderr_message(msgt_error, _T("could not enable handle inheritance of stderr: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                                     win_error, win_error, g_stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
                             }
                             if (g_flags.print_win_error_string && win_error) {
@@ -5114,7 +5114,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stderr into stdout: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stderr into stdout: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                             win_error, win_error, g_stderr_handle_type, g_options.tee_stderr_to_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5135,7 +5135,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stderr as stdout before transfer handle ownership to CRT: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stderr as stdout before transfer handle ownership to CRT: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                             win_error, win_error, g_stderr_handle_type, g_options.reopen_stderr_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5172,7 +5172,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stdout into stderr: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stdout into stderr: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                             win_error, win_error, g_stdout_handle_type, g_options.tee_stdout_to_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5193,7 +5193,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stderr as stdout before transfer handle ownership to CRT: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stderr as stdout before transfer handle ownership to CRT: win_error=0x%08X (%d) type=%u file=\"%s\"\n"),
                             win_error, win_error, g_stdout_handle_type, g_options.reopen_stdout_as_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5245,7 +5245,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stdout tee as file into stdin tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stdout tee as file into stdin tee: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, g_options.tee_stdout_to_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5268,7 +5268,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stderr tee as file into stdin tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stderr tee as file into stdin tee: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, g_options.tee_stderr_to_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5295,7 +5295,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stdin tee as file into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stdin tee as file into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, g_options.tee_stdin_to_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5318,7 +5318,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stderr tee as file into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stderr tee as file into stdout tee: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, g_options.tee_stderr_to_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5345,7 +5345,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stdin tee as file into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stdin tee as file into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, g_options.tee_stdin_to_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5368,7 +5368,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = win_error;
                     }
                     if (!g_flags.no_print_gen_error_string) {
-                        _print_stderr_message(_T("could not duplicate stdout tee as file into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not duplicate stdout tee as file into stderr tee: win_error=0x%08X (%d) file=\"%s\"\n"),
                             win_error, win_error, g_options.tee_stdout_to_file.c_str());
                     }
                     if (g_flags.print_win_error_string && win_error) {
@@ -5398,11 +5398,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     if (!g_flags.no_print_gen_error_string) {
                         if (!g_options.tee_stdout_to_server_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stdout tee as server named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stdout tee as server named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stdout_to_server_pipe.c_str());
                         }
                         else if (!g_options.tee_stdout_to_client_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stdout tee as client named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stdout tee as client named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stdout_to_client_pipe.c_str());
                         }
                     }
@@ -5427,11 +5427,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     if (!g_flags.no_print_gen_error_string) {
                         if (!g_options.tee_stderr_to_server_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stderr tee as server named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stderr tee as server named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stderr_to_server_pipe.c_str());
                         }
                         else if (!g_options.tee_stderr_to_client_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stderr tee as client named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stderr tee as client named pipe end into stdin tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stderr_to_client_pipe.c_str());
                         }
                     }
@@ -5460,11 +5460,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     if (!g_flags.no_print_gen_error_string) {
                         if (!g_options.tee_stdin_to_server_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stdin tee as server named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stdin tee as server named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stdin_to_server_pipe.c_str());
                         }
                         else if (!g_options.tee_stdin_to_client_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stdin tee as client named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stdin tee as client named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stdin_to_client_pipe.c_str());
                         }
                     }
@@ -5489,11 +5489,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     if (!g_flags.no_print_gen_error_string) {
                         if (!g_options.tee_stderr_to_server_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stderr tee as server named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stderr tee as server named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stderr_to_server_pipe.c_str());
                         }
                         else if (!g_options.tee_stderr_to_client_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stderr tee as client named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stderr tee as client named pipe end into stdout tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stderr_to_client_pipe.c_str());
                         }
                     }
@@ -5522,11 +5522,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     if (!g_flags.no_print_gen_error_string) {
                         if (!g_options.tee_stdin_to_server_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stdin tee as server named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stdin tee as server named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stdin_to_server_pipe.c_str());
                         }
                         else if (!g_options.tee_stdin_to_client_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stdin tee as client named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stdin tee as client named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stdin_to_client_pipe.c_str());
                         }
                     }
@@ -5551,11 +5551,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     }
                     if (!g_flags.no_print_gen_error_string) {
                         if (!g_options.tee_stdout_to_server_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stdout tee as server named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stdout tee as server named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stdout_to_server_pipe.c_str());
                         }
                         else if (!g_options.tee_stdout_to_client_pipe.empty()) {
-                            _print_stderr_message(_T("could not duplicate stdout tee as client named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
+                            _print_stderr_message(msgt_error, _T("could not duplicate stdout tee as client named pipe end into stderr tee: win_error=0x%08X (%d) pipe=\"%s\"\n"),
                                 win_error, win_error, g_options.tee_stdout_to_client_pipe.c_str());
                         }
                     }
@@ -5932,11 +5932,11 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             else {
                 if (!g_flags.no_print_gen_error_string) {
                     if (g_options.shell_exec_verb.empty()) {
-                        _print_stderr_message(_T("could not create child process: win_error=0x%08X (%d) app=\"%s\" cmd=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not create child process: win_error=0x%08X (%d) app=\"%s\" cmd=\"%s\"\n"),
                             win_error, win_error, app, cmd_buf.size() ? (TCHAR *)cmd_buf.data() : _T(""));
                     }
                     else {
-                        _print_stderr_message(_T("could not shell execute child process: win_error=0x%08X (%d) shell_error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
+                        _print_stderr_message(msgt_error, _T("could not shell execute child process: win_error=0x%08X (%d) shell_error=0x%08X (%d) file=\"%s\" params=\"%s\"\n"),
                             win_error, win_error, shell_error, shell_error, app, cmd);
                     }
                 }
@@ -6124,7 +6124,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         ret = err_win32_error;
                         win_error = GetLastError();
                         if (!g_flags.no_print_gen_error_string) {
-                            _print_stderr_message(_T("could not get child process exit code: win_error=0x%08X (%u)\n"),
+                            _print_stderr_message(msgt_error, _T("could not get child process exit code: win_error=0x%08X (%u)\n"),
                                 win_error, win_error);
                         }
                         if (g_flags.print_win_error_string && win_error) {
