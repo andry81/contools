@@ -1,4 +1,7 @@
 2024.02.12:
+* new: Utilities/bin/contools: binaries update
+
+2024.02.12:
 * fixed: Utilities/src/callf: missed messages reprint into attached and new console
 
 2024.02.12:
