@@ -3376,6 +3376,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             g_inherited_console_window = GetConsoleWindow();
 
+            // remember messages what were printed without console to print them just after console attachment
+
+            const bool was_console_inherited = !!g_inherited_console_window;
+            bool is_console_created = false;
+
+            decltype(g_conout_prints_buf) no_console_print_buf;
+
+            if (!was_console_inherited) {
+                no_console_print_buf = g_conout_prints_buf;
+                g_conout_prints_buf.clear(); // avoid messages duplication
+            }
+
             if (g_flags.detach_console) {
                 // check if console can be detached
 
@@ -3464,6 +3476,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                                 g_owned_console_window = nullptr; // not owned after detach
                             }
                             g_inherited_console_window = _alloc_console_nolock();
+                            is_console_created = true;
 
                             if (g_inherited_console_window) {
                                 g_owned_console_window = g_inherited_console_window; // owned after alloc
@@ -3553,6 +3566,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                             g_owned_console_window = nullptr; // not owned after detach
                         }
                         g_inherited_console_window = _alloc_console_nolock();
+                        is_console_created = true;
 
                         if (g_inherited_console_window) {
                             g_owned_console_window = g_inherited_console_window; // owned after alloc
@@ -3666,6 +3680,42 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             _debug_print_win32_std_handles(nullptr, 3);
             _debug_print_crt_std_handles(nullptr, 3);
 #endif
+
+            if (g_inherited_console_window) {
+                if (!was_console_inherited) {
+                    // reprint messages what were printed without console
+
+                    for (const auto & conout : no_console_print_buf) {
+                        if (conout.any_str.is_wstr) {
+                            _put_raw_message_impl(0, conout.stream_type, conout.any_str.wstr);
+                        }
+                        else {
+                            _put_raw_message_impl(0, conout.stream_type, conout.any_str.astr);
+                        }
+                    }
+                }
+                else if (is_console_created) {
+                    // reprint into new console and cleanup
+
+                    for (const auto & conout : g_conout_prints_buf) {
+                        if (conout.any_str.is_wstr) {
+                            _put_raw_message_impl(0, conout.stream_type, conout.any_str.wstr);
+                        }
+                        else {
+                            _put_raw_message_impl(0, conout.stream_type, conout.any_str.astr);
+                        }
+                    }
+
+                    g_conout_prints_buf.clear();
+                }
+            }
+            else if (!no_console_print_buf.empty()) {
+                // restore messages to reprint later
+                g_conout_prints_buf.insert(g_conout_prints_buf.begin(), no_console_print_buf.begin(), no_console_print_buf.end());
+            }
+
+            // cleanup
+            no_console_print_buf.clear();
 
             arg_offset = arg_offset_begin;
 

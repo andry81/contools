@@ -276,6 +276,9 @@ struct _AnyString
 
     ~_AnyString();
 
+    _AnyString & operator =(const _AnyString& anystr);
+    _AnyString & operator =(_AnyString && anystr);
+
     union {
         std::string     astr;
         std::wstring    wstr;
@@ -657,6 +660,62 @@ inline _AnyString::~_AnyString()
     else {
         _destruct(&astr);
     }
+}
+
+inline _AnyString & _AnyString::operator =(const _AnyString & anystr)
+{
+    if (is_wstr) {
+        if (anystr.is_wstr) {
+            wstr = anystr.wstr;
+        }
+        else {
+            // reconstruct
+            _destruct(this);
+            is_wstr = false;
+            _construct(astr, std::move(anystr.astr));
+        }
+    }
+    else {
+        if (!anystr.is_wstr) {
+            astr = anystr.astr;
+        }
+        else {
+            // reconstruct
+            _destruct(this);
+            is_wstr = true;
+            _construct(wstr, std::move(anystr.wstr));
+        }
+    }
+
+    return *this;
+}
+
+inline _AnyString & _AnyString::operator =(_AnyString && anystr)
+{
+    if (is_wstr) {
+        if (anystr.is_wstr) {
+            wstr = anystr.wstr;
+        }
+        else {
+            // reconstruct
+            _destruct(this);
+            is_wstr = false;
+            _construct(astr, anystr.astr);
+        }
+    }
+    else {
+        if (!anystr.is_wstr) {
+            astr = anystr.astr;
+        }
+        else {
+            // reconstruct
+            _destruct(this);
+            is_wstr = true;
+            _construct(wstr, anystr.wstr);
+        }
+    }
+
+    return *this;
 }
 
 
