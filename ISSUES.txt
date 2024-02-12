@@ -36,10 +36,6 @@ Utilities/tests/manual/contools/callf:
 
   * The `/r* ...` options does not execute for variable arguments
 
-  * Fix `/load-parent-proc-init-env-vars`
-
-    test in Windows XP x86 SP3
-
   * Fix leak behind `/load-parent-proc-init-env-vars` before this-process exit
     (call UnMapViewOfFile and CloseHandle)
 
@@ -50,6 +46,10 @@ Utilities/tests/manual/contools/callf:
     creation.
 
     Update `KNOWN ISSUES` section.
+
+  * Fix `callf "" "callf /create-console /invalid-flag \"\" \"cmd.exe /c echo 123\""`
+    error message around `/invalid-flag` which is not always reprint in the
+    first callf process console window.
 
 Utilities/src/wshbazaar/wshdynacall:
 

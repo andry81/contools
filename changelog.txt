@@ -1,4 +1,7 @@
 2024.02.12:
+* changed: ISSUES.txt: issues update
+
+2024.02.12:
 * new: Utilities/bin/contools: binaries update
 
 2024.02.12:
