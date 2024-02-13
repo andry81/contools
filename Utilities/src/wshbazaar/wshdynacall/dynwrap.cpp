@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <malloc.h>
 #include <tchar.h>
+#include <Shlwapi.h>
 
 // Using non-DLL version of DynaCall, so don't need to have the
 // methods imported.
@@ -552,8 +553,17 @@ STDAPI DllRegisterServer(void)
 
 STDAPI DllUnregisterServer(void)
 {
-    RegDeleteTree(HKEY_CLASSES_ROOT, CLASSKEY0);
-    RegDeleteTree(HKEY_CLASSES_ROOT, PRODIDKEY0);
+    // Based on:
+    //   https://stackoverflow.com/questions/33207470/what-is-the-difference-between-shdeletekey-and-regdeletetree
+
+    // Windows Vista+
+    //RegDeleteTree(HKEY_CLASSES_ROOT, CLASSKEY0);
+    //RegDeleteTree(HKEY_CLASSES_ROOT, PRODIDKEY0);
+
+    // Windows XP+
+    SHDeleteKey(HKEY_CLASSES_ROOT, CLASSKEY0);
+    SHDeleteKey(HKEY_CLASSES_ROOT, PRODIDKEY0);
+
     return S_OK;
 }
 

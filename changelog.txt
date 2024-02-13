@@ -1,4 +1,7 @@
 2024.02.13:
+* fixed: Utilities/src/wshbazaar/wshdynacall: Windows XP execution fixup, replaced `RegDeleteTree` function as existed only in Windows Vista+ by `SHDeleteKey` function as supported by Windows XP+
+
+2024.02.13:
 * fixed: Utilities/Projects/wshdynacall.vcxproj: post build fixup
 * fixed: Utilities/bin/wshbazaar/wshdynacall/*register.bat: missed to pass arguments in case of register/unregister from 32-bit cmd.exe process
 * new: Scripts/Tools/ToolAdaptors/vbs: set_fileshortname.vbs, set_fileshortname_*.bat: scripts to set a file short name
