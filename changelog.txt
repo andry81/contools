@@ -1,4 +1,7 @@
 2024.02.13:
+* new: Utilities/bin/wshbazaar/wshdynacall: binaries update
+
+2024.02.13:
 * fixed: Utilities/src/wshbazaar/wshdynacall: Windows XP execution fixup, replaced `RegDeleteTree` function as existed only in Windows Vista+ by `SHDeleteKey` function as supported by Windows XP+
 
 2024.02.13:
