@@ -21,7 +21,7 @@ exit /b
 
 :X86
 rem CAUTION: ShellExecute does not wait a child process close!
-start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:Close^(CreateObject^("Shell.Application").ShellExecute^("%COMSPEC%"^,"/c @call ""%~f0"""^,""^,"runas"^,True))
+start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:Close^(CreateObject^("Shell.Application").ShellExecute^("%COMSPEC%"^,"/c @call ""%~f0"" %*"^,""^,"runas"^,True))
 exit /b
 
 :ELEVATED

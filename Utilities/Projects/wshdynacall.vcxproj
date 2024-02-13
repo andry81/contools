@@ -26,7 +26,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
@@ -38,7 +38,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140_xp</PlatformToolset>
+    <PlatformToolset>v141_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -113,7 +113,7 @@
       <ModuleDefinitionFile>../src/wshbazaar/wshdynacall/dynwrap.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\contools\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\wshbazaar\wshdynacall\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -165,7 +165,7 @@
       <ModuleDefinitionFile>../src/wshbazaar/wshdynacall/dynwrap.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\contools\"</Command>
+      <Command>call "$(SolutionDir)..\BuildTools\TargetProject.PostBuildStep.bat" "$(TargetPath)" "$(SolutionDir)..\Utilities\bin\wshbazaar\wshdynacall\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

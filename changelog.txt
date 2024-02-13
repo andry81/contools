@@ -1,3 +1,15 @@
+2024.02.13:
+* fixed: Utilities/Projects/wshdynacall.vcxproj: post build fixup
+* fixed: Utilities/bin/wshbazaar/wshdynacall/*register.bat: missed to pass arguments in case of register/unregister from 32-bit cmd.exe process
+* new: Scripts/Tools/ToolAdaptors/vbs: set_fileshortname.vbs, set_fileshortname_*.bat: scripts to set a file short name
+* new: Scripts/Tools/ToolAdaptors/vbs: get_fileshortpath.*: scripts to get a file short path
+* new: Utilities/bin/wshbazaar/README_EN.txt: readme file
+* new: Utilities/bin/wshbazaar/wshdynacall/dynwrap.dll: original binary component
+* new: Utilities/doc: site and related pages
+* changed: Utilities/Projects/wshdynacall.vcxproj: switched to `Visual Studio 2017 - Windows XP (v141_xp)` Platform Toolset
+* changed: Utilities/src/wshbazaar/wshdynacall/version.def: version increment
+* changed: Utilities/bin/contools/README_EN.txt: readme update
+
 2024.02.12:
 * changed: ISSUES.txt: issues update
 

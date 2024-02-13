@@ -1,0 +1,149 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="keywords"
+content="Born Günter, Windows, G. Born, WSH, Windows Scripting Host, VBscript, JScript, Programming, Intranet,Windows Scripting Host Bazaar, WSH books">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<title>WSH Page 1</title>
+</head>
+
+<body bgcolor="#FCFFE1" link="#0000FF" vlink="#800080">
+
+<h2><a href="ActiveX.htm"><img src="BTurtle.gif" border="0"
+width="32" height="32"></a><a name="top"></a>Born's Windows
+Scripting Host </h2>
+
+<h2>The DynaCall page</h2>
+
+<p>Thanks to Ton Plooy and Jeff Stong and their articles published in the August and November issues of the Windows Developers
+Journal (see the Archive part in <a href="http://www.wdj.com">www.wdj.com</a>
+for the articles and the original code) the WSH script
+programmers has now the possibility to call Win 32 API functions.
+There is a routine <em>dynacall.dll</em> that provides something like a &quot;Declare statement&quot; in VBScript. Basically it
+will allow you to call functions in other dlls (like any of the
+win32 API function). </p>
+
+<h4>The history</h4>
+
+<p>Months ago I noticed a posting from Michael Hines about the <em>Dynacall.dll</em>
+in the WSH newsgroup. He mentioned also that the original code
+comes from a Windows Developers Journal article. But my (first) attempts to find these articles and the code wasn't successful. So
+I asked several people to send me the parts. But then I get
+confused about the different versions and so on. To let the WSH
+scripters participate in the <em>Dynacall.dll</em> I decided to
+create this page. </p>
+
+<p>Because there was a bit confusion about the different versions
+of the <em>Dynacall.dll</em>, I like to get a brief overview (as
+far as I can estimate it from here). The original code published
+by Ton Plooy was written for Windows 9x (he published the code in
+an article in the August issue of the Windows Developer Journal <a
+href="http://www.wdj.com/archive/0908/feature.html">www.wdj.com</a>,
+describing the technique to call an external function without an
+Declare statement). Then Jeff Stong published an article (<a
+href="http://www.wdj.com/archive/0911/index.html">An Automation
+Object for Dynamic DLL Calls</a>) with the code for <em>Dynacall.dll</em>
+in the November 1998 issue of the Windows Developer Journal. </p>
+
+<p>William Epp extended the component and Michael Hines undertook
+the task to bring the whole distribution with a few comments and
+modifications to the WSH newsgroups. During writing the WSH book
+I experimented a little bit with the dll, and I found out that
+the original <em>Dynacall.dll</em> published from Jeff Stong was
+written only for Windows NT. So Michael Hines was so kind to
+create also a version for Windows 9x. Both ZIP-Archives are
+offered below for download.</p>
+
+<h4>Using the Dynacall.dll</h4>
+
+<p>Download the ZIP-Archive and unpack the archive into a
+separate folder. The archive contains the source code, a few
+samples Michael Hines and other provides and the already compiled
+<em>Dynacall.dll</em>. Take care to get the Win 9x or the Win NT
+version. The register the DLL using the program <em>RegSvr32.dll </em>with
+the following command:</p>
+
+<pre>RegSvr32.exe &lt;path&gt;dynacall.dll</pre>
+
+<p>where &lt;path&gt; is the path to your folder containing the
+dll. Unregistering the dll may be done with the /u switch for
+RegSvr32.exe (although I got an error message for the Win 9x
+version during this step).</p>
+
+<p>After you have registered the dll, you can use an automation
+object to call your external functions.</p>
+
+<pre><font color="#0000FF">' Create the wrapper object for dynamic DLL function calling
+Dim UserWrap 
+Set UserWrap = CreateObject(&quot;DynamicWrapper&quot;)
+' GetProcAddress for GetPrivateProfileStringA()
+UserWrap.Register &quot;kernel32.DLL&quot;, &quot;GetPrivateProfileString&quot;, &quot;i=ssssls&quot;, &quot;f=s&quot;, &quot;r=l&quot;</font></pre>
+
+<p>The input parameters are:</p>
+
+<p>i=describes the number and data type of the functions
+parameters</p>
+
+<p>f=type of call _stdcall or _cdecl. So it can work with both MS
+C++ and Borland C++. Default to _stdcall. If that doesn't work
+use _cdecl. If that doesn't work good luck!</p>
+
+<p>r=return data type.</p>
+
+<p>Data types are:</p>
+
+<pre><font color="#0000FF">const ARGTYPEINFO ArgInfo[] = 
+{
+{'a', sizeof(IDispatch*), VT_DISPATCH}, // a IDispatch*
+{'c', sizeof(unsigned char), VT_I4}, // c signed char 
+{'d', sizeof(double), VT_R8}, // d 8 byte real 
+{'f', sizeof(float), VT_R4}, // f 4 byte real 
+{'k', sizeof(IUnknown*), VT_UNKNOWN}, // k IUnknown* 
+{'h', sizeof(long), VT_I4}, // h HANDLE 
+{'l', sizeof(long), VT_I4}, // l long 
+{'p', sizeof(void*), VT_PTR}, // p pointer 
+{'s', sizeof(BSTR), VT_LPSTR}, // s string 
+{'t', sizeof(short), VT_I2}, // t short 
+{'u', sizeof(UINT), VT_UINT}, // u unsigned int 
+{'w', sizeof(BSTR), VT_LPWSTR}, // w wide string 
+}</font></pre>
+
+<p>William Epp added anr 'r' for VT_BYREF (pass by reference) but
+is for strings only. This made the GETPROFILESTRING function to
+work. But it didn't work for the GETPROFILESECTION. </p>
+
+<p>For Windows 9x there a some specialties. If you intend to call
+different API functions you need to declare for each function
+your own object variable. Also some parameters submitted to the
+API must be converted from <em>Variants</em> to the required data
+type using CString or equivalent functions. </p>
+
+<p><strong>Note:</strong> Due to the difficulty of all these
+issues, I prefer to use an ActiveX control to pass my WSH script
+calls to an external API function. But
+for some tests, and if you haven't an ActiveX control handy, the <em>dynacall.dll</em>
+comes handy. But keep in mind that all the code comes without any
+support. The original articles and code may be downloaded from
+the archive pages of the Windows Developers Journal (<a
+href="http://www.wdj.com">www.wdj.com</a>). Because it is
+sometimes difficult to get the articles, because we have now
+modified versions of the code, because Ton Plony and Michael
+Hines doesn't run own homepages, I have decided to offer the
+least recent ZIP archives provided from Michael Hines for
+download. But keep in mind that I can't support the files nor I
+will be responsible for any consequences resulting from the use
+of the code.</p>
+
+<ul>
+    <li><a href="dynawrap95.zip">The Windows 9x version
+        dynawrap95.zip (43 KB)</a></li>
+    <li><a href="dynawrapNt.zip">The Windows NT version
+        dynawrapnt.zip (44 KB)</a></li>
+</ul>
+
+<p><a href="#top">Back</a> </p>
+<p>(c) by Günter Born </p>
+</body>
+</html>

@@ -1,0 +1,353 @@
+<html><head>
+<meta http-equiv="Content-Language" content="ru">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<title>Dynwrap.dll</title>
+<meta name="keywords" content="библиотека Dynwrap.dll скрипты OpenConf 1С:Предприятие">
+<meta name="description" content="Объектная модель библиотеки Dynwrap.dll">
+<style type="text/css">
+	.paragraph {text-align:justify; text-indent:2em; margin-top:0; margin-bottom:0}
+</style>
+</head>
+<body bgcolor=#E0E0E0>
+
+<p><a href="index.html">Перейти на главную страничку сайта (список статей, файлы для скачивания)</a></p>
+<p><a href="http://forum.script-coding.com">ФОРУМ (здесь можно обсудить эту статью, а также любые
+проблемы программирования на различных макроязыках и в скриптовых средах)</a></p>
+
+<h1>Библиотека dynwrap.dll и вызов функций Win 32 API</h1>
+
+<h2 style="text-indent:1.3em">Назначение и установка</h2>
+
+<p class="paragraph">
+Библиотека dynwrap.dll - небольшой ActiveX, который может быть использован в любых средах, которые в состоянии
+выступить в роли OLE-клиента, например, в MS Office (VBA), 1C:Предприятии, административных скриптах Windows
+(.vbs и .js) и т.д. Библиотека является результатом труда нескольких разработчиков. Библиотека dynwrap.dll
+распространяется свободно. Вы можете скачать библиотеку <a href="dynwrap95.zip">здесь</a> (версия для Windows 9x от
+09.02.1999г., архив 13 369 байт) и <a href="dynwrapNT.zip">здесь</a> (версия для Windows NT от 13.01.1999г., архив
+13 314 байт). Ссылка на первоисточник
+<a href="http://ourworld.compuserve.com/homepages/Guenter_Born/WSHBazaar/WSHDynaCall.htm">здесь</a>. Примеры кода в
+настоящей статье приводятся на языке VBScript для административных сценариев Windows.
+</p>
+
+<p class="paragraph">
+Библиотека обеспечивает подобие инструкции "Declare" в VBScript. Это позволяет вызывать произвольные функции из
+DLL-библиотек (например, win32 функции API).
+</p>
+
+<p class="paragraph">
+Порядок установки:
+</p>
+
+<UL style="text-indent:0em; margin-top:5; margin-bottom:5;">
+<LI>Скопируйте библиотеку на жёсткий диск вашего компьютера, например в такой каталог:
+<br><br>
+<span style="color:navy; font-weight:bold;">
+C:\WINDOWS\system32\
+</span>
+<br><br>
+</LI>
+<LI>Зарегистрируйте библиотеку с помощью <b>regsvr32.exe</b>.  Командная строка регистрации библиотеки может
+выглядеть, например, так:
+<br><br>
+<span style="color:navy; font-weight:bold;">
+regsvr32.exe "C:\WINDOWS\system32\dynwrap.dll"
+</span>
+<br><br>
+</LI>
+</UL>
+
+<p class="paragraph">
+ProgID единственного объекта, предоставляемого библиотекой - "DynamicWrapper".
+</p>
+
+<h2 style="text-indent:1.3em">Использование</h2>
+
+<p class="paragraph">
+Объект библиотеки создаётся следующим образом:
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+Set UserWrap = CreateObject("DynamicWrapper")
+</pre>
+</span>
+
+<p class="paragraph">
+Объявление функции производится примерно следующим образом: 
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+UserWrap.Register "USER32.DLL", "FindWindowExA", "i=llsl", "f=s", "r=l"
+</pre>
+</span>
+
+<p class="paragraph">
+Параметры при объявлении содержат имя библиотеки, имя функции, а также:
+</p>
+
+<UL style="text-indent:0em; margin-top:5; margin-bottom:5;">
+<LI>i - описывает количество и тип данных параметров функции. Если функция не принимает параметры, этот параметр
+можно опустить. Параметр i является строкой, количество букв в которой равно количеству параметров объявляемой функции. Первая буква задаёт тип первого параметра, вторая - втрого и т.д.</LI>
+<LI>f - тип вызова: _stdcall, _cdecl и т.д. Значение по умолчанию - _stdcall. Возможные значения параметра:
+<UL style="text-indent:0em; margin-top:5; margin-bottom:5">
+<LI>'m' - DC_MICROSOFT 0x0000, Default</LI>
+<LI>'b' - DC_BORLAND 0x0001, Borland compat</LI>
+<LI>'s' - DC_CALL_STD 0x0020, __stdcall</LI>
+<LI>'c' - DC_CALL_CDECL 0x0010, __cdecl</LI>
+<LI>'4' - DC_RETVAL_MATH4 0x0100, Return value in ST</LI>
+<LI>'8' - DC_RETVAL_MATH8 0x0200, Return value in ST</LI>
+</UL>
+</LI>
+<LI>r - тип возвращаемых данных.</LI>
+</UL>
+
+<p class="paragraph">
+Возможные типы данных:
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+const ARGTYPEINFO ArgInfo[] =
+{
+{'a', sizeof(IDispatch*), VT_DISPATCH}, // a IDispatch*
+{'c', sizeof(unsigned char), VT_I4}, // c signed char
+{'d', sizeof(double), VT_R8}, // d 8 byte real
+{'f', sizeof(float), VT_R4}, // f 4 byte real
+{'k', sizeof(IUnknown*), VT_UNKNOWN}, // k IUnknown*
+{'h', sizeof(long), VT_I4}, // h HANDLE
+{'l', sizeof(long), VT_I4}, // l long
+{'p', sizeof(void*), VT_PTR}, // p pointer
+{'s', sizeof(BSTR), VT_LPSTR}, // s string
+{'t', sizeof(short), VT_I2}, // t short
+{'u', sizeof(UINT), VT_UINT}, // u unsigned int
+{'w', sizeof(BSTR), VT_LPWSTR}, // w wide string
+}
+</pre>
+</span>
+
+<p class="paragraph">
+Примечание: для строк в некоторых случаях работает тип 'r' VT_BYREF (передача по ссылке).
+</p>
+
+<p class="paragraph">
+Вызов функции производится примерно следующим образом: 
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+ResHandle = UserWrap.FindWindowExA(Hwnd, 0, "ListBox", 0)
+</pre>
+</span>
+
+<p class="paragraph">
+Для Windows 9x есть некоторые особенности. Если вы намереваетесь вызвать несколько различных функций API, вы должны
+объявить для каждой функции свою собственную объектную переменную. Кроме того, некоторые параметры, передающиеся
+API, должны быть преобразованы из Variant к требуемому типу данных с использованием CString или аналогичных функций.
+</p>
+
+<h2 style="text-indent:1.3em">Примеры кода</h2>
+
+<p class="paragraph">
+Тщательно тестируйте любой код, связанный с вызовом API, для всех возможных ситуаций и условий исполнения.
+</p>
+
+<h3 style="text-indent:1.3em">Подача звукового сигнала с помощью системного динамика</h3>
+
+<p class="paragraph">
+Функция <b>Beep</b> (библиотека <b>kernel32</b>) генерирует звуковой сигнал:
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+Beep (ByVal dwFreq As Long, ByVal dwDuration As Long) As Long
+</pre>
+</span>
+
+<p class="paragraph">
+Параметры:
+</p>
+
+<UL style="text-indent:0em; margin-top:5; margin-bottom:5;">
+<LI><b>dwFreq</b> - частота звука от 37 до 32767 Гц.</LI>
+<LI><b>dwDuration</b> - продолжительность сигнала в миллисекундах.</LI>
+</UL>
+
+<p class="paragraph">
+В Windows 95 функция просто выдаёт звуковой сигнал по умолчанию, а переданные параметры игнорируются.
+</p>
+
+<p class="paragraph">
+Пример кода:
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+Set Wrap = CreateObject("DynamicWrapper")
+Wrap.Register "KERNEL32.DLL", "Beep", "i=ll", "f=s", "r=l"
+res = Wrap.Beep(500, 100)
+res = Wrap.Beep(550, 100)
+res = Wrap.Beep(600, 100)
+res = Wrap.Beep(650, 100)
+res = Wrap.Beep(700, 700)
+WScript.Sleep 200
+res = Wrap.Beep(700, 100)
+res = Wrap.Beep(650, 100)
+res = Wrap.Beep(600, 100)
+res = Wrap.Beep(550, 100)
+res = Wrap.Beep(500, 700)
+</pre>
+</span>
+
+<h3 style="text-indent:1.3em">Получение заголовка активного окна</h3>
+
+<TABLE border="1" width="100%" cellspacing="0">
+<TR><TH>Функция</TH><TH>Библиотека</TH><TH>Описание</TH></TR>
+
+<TR>
+<TD>GetForegroundWindow() As Long</TD>
+<TD>user32</TD>
+<TD>Функция возвращает хэндл активного окна активного приложения.</TD>
+</TR>
+
+<TR>
+<TD>SendMessage(ByVal hwnd As Long, ByVal wMsg As Long, ByVal wParam As Long, ByVal lParam As Any) As Long</TD>
+<TD>user32</TD>
+<TD>Функция отправляет указанное сообщение указанному окну. Возвращаемое значение зависит от сообщения. Параметры:
+<UL style="text-indent:0em; margin-top:5; margin-bottom:5;">
+<LI>hwnd - хэндл окна, получающего сообщение.</LI>
+<LI>wMsg - идентификатор сообщения.</LI>
+<LI>wParam - зависит от сообщения.</LI>
+<LI>lParam - зависит от сообщения.</LI>
+</UL>
+</TD>
+</TR>
+
+</TABLE>
+<br>
+
+<p class="paragraph">
+Сообщение <b>WM_GETTEXT</b> отправляется окну для получения текста окна. Параметр <b>wParam</b> должен содержать
+размер получаемой строки, параметр <b>lParam</b> - ссылку на переменную, которая будет заполнена текстом окна.
+</p>
+
+<p class="paragraph">
+Пример кода:
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+Const WM_GETTEXT = &HD
+Set Wrap = CreateObject("DynamicWrapper")
+Wrap.Register "USER32.DLL", "GetForegroundWindow", "f=s", "r=l"
+Wrap.Register "USER32.DLL", "SendMessage", "i=lllr", "f=s", "r=l"
+Title = Space(100)
+res = Wrap.SendMessage(Wrap.GetForegroundWindow(), WM_GETTEXT , 100, Title)
+MsgBox Title
+</pre>
+</span>
+
+<h3 style="text-indent:1.3em">Определение состояния NumLock</h3>
+
+<p class="paragraph">
+Функция <b>GetKeyState</b> (библиотека <b>user32</b>) получает состояние заданной виртуальной клавиши на момент
+получения от неё последнего сообщения о вводе.
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+GetKeyState (ByVal nVirtKey As Long) As Integer
+</pre>
+</span>
+
+<p class="paragraph">
+Возвращаемое значение: бит 0 равен 1 для клавиш-переключателей (CapsLock, NumLock и ScrollLock), если клавиша
+находится во включённом состоянии. Бит 15 равен 1, если клавиша нажата, и 0, если клавиша отпущена.
+</p>
+
+<p class="paragraph">
+Приведённый ниже скрипт включает NumLock, если он выключен. Если пользователь удерживает клавишу в момент запуска
+скрипта, скрипт не производит никаких действий.
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+Const VK_NUMLOCK = &H90
+Set Wrap = CreateObject("DynamicWrapper")
+Wrap.Register "USER32.DLL", "GetKeyState", "i=l", "f=s", "r=l"
+res = Wrap.GetKeyState(VK_NUMLOCK)
+If res = 0 Then
+	Set WshShell = CreateObject("WScript.Shell")
+	WshShell.SendKeys "{NUMLOCK}"
+End If
+</pre>
+</span>
+
+<h3 style="text-indent:1.3em">Смена раскладки клавиатуры для текущей нити (процесса)</h3>
+
+<TABLE border="1" width="100%" cellspacing="0">
+<TR><TH>Функция</TH><TH>Библиотека</TH><TH>Описание</TH></TR>
+
+<TR>
+<TD>ActivateKeyboardLayout(ByVal HKL As Long, ByVal flags As Long) As Long</TD>
+<TD>user32</TD>
+<TD>Функция активизирует заданную раскладку клавиатуры. Параметры:
+<UL style="text-indent:0em; margin-top:5; margin-bottom:5;">
+<LI>HKL - манипулятор нужной раскладки клавиатуры.</LI>
+<LI>flags - опции, комбинация констант (подробнее - см. MSDN).</LI>
+</UL>
+</TD>
+</TR>
+
+<TR>
+<TD>LoadKeyboardLayout(ByVal pwszKLID As String, ByVal flags As Long) As Long</TD>
+<TD>user32</TD>
+<TD>Функция загружает указанную раскладку клавиатуры и возвращает манипулятор раскладки или 0 в случае неудачи.
+Параметры:
+<UL style="text-indent:0em; margin-top:5; margin-bottom:5;">
+<LI>pwszKLID - строка из 8 символов, описывающая имя раскладки клавиатуры.</LI>
+<LI>flags - опции, комбинация констант (подробнее - см. MSDN).</LI>
+</UL>
+</TD>
+</TR>
+
+</TABLE>
+<br>
+
+<p class="paragraph">
+Пример кода на встроеннном языке 1С:Предприятия v7.7 (этот код устанавливает русскую раскладку клавиатуры):
+</p>
+
+<br>
+<span style="color:navy; font-weight:bold;">
+<pre>
+Wrapper = CreateObject("DynamicWrapper");
+Wrapper.Register("USER32.DLL", "ActivateKeyboardLayout", "i=ll", "f=s", "r=l");
+Wrapper.Register("USER32.DLL", "LoadKeyboardLayout", "i=sl", "f=s", "r=l");
+rus = Wrapper.LoadKeyboardLayout("00000419", 0);
+//eng = Wrapper.LoadKeyboardLayout("00000409", 0);
+Wrapper.ActivateKeyboardLayout(rus, 0);
+</pre>
+</span>
+
+<p style="text-align:right">
+<small>Составление - Людоговский Александр</small>
+</p>
+
+<p><a href="index.html">Перейти на главную страничку сайта (список статей, файлы для скачивания)</a></p>
+
+<p><small>&copy; 2007 <A HREF='http://www.script-coding.com/'>http://www.script-coding.com</A> При любом использовании материалов сайта обязательна <b>ссылка</b> на него как на источник информации, а также сохранение <b>целостности</b> и <b>авторства</b> материалов.</small>
+
+
+
+</body></html>

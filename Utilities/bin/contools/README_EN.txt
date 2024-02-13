@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.11.23
+* 2024.02.13
 * contools--utilities--contools
 
 1. DESCRIPTION
@@ -46,10 +46,6 @@
 -------------------------------------------------------------------------------
 Set of Windows command line (console) utilites.
 
-WARNING:
-  Use the SVN access to find out latest functionality and bug fixes.
-  See the REPOSITORIES section.
-
 -------------------------------------------------------------------------------
 2. PREREQUISITES
 -------------------------------------------------------------------------------
@@ -59,16 +55,16 @@ IDE's, applications and patches to run with or from:
 
 1. OS platforms:
 
-* Windows 7
+* Windows XP
+* Windows 7+
 
 2. C++11 compilers:
 
-* (primary) Microsoft Visual C++ 2015 Update 3 or Microsoft Visual C++ 2017
+* (primary) Microsoft Visual C++ 2019
 
 3. IDE's.
 
-* Microsoft Visual Studio 2015 Update 3
-* Microsoft Visual Studio 2017
+* Microsoft Visual Studio 2019
 
 To build GUI utilities is required the wxWidgets library at least of version
 3.1.3.
@@ -83,8 +79,13 @@ CAUTION:
 -------------------------------------------------------------------------------
 3.1. callf
 -------------------------------------------------------------------------------
-
 Create process or Shell execute in style of c-function printf.
+
+Use `callf /?` to print more examples or see the same in the
+`src/callf/help.tpl` file.
+
+NOTE:
+  Here is described examples not included in the executable help output.
 
 * Command line variadic variables substitution in style of c-function printf
   with the python placeholders.

@@ -1,3 +1,13 @@
+2024.02.13:
+* fixed: Projects/wshdynacall.vcxproj: post build fixup
+* fixed: bin/wshbazaar/wshdynacall/*register.bat: missed to pass arguments in case of register/unregister from 32-bit cmd.exe process
+* new: bin/wshbazaar/README_EN.txt: readme file
+* new: bin/wshbazaar/wshdynacall/dynwrap.dll: original binary component
+* new: doc: site and related pages
+* changed: Projects/wshdynacall.vcxproj: switched to `Visual Studio 2017 - Windows XP (v141_xp)` Platform Toolset
+* changed: src/wshbazaar/wshdynacall/version.def: version increment
+* changed: bin/contools/README_EN.txt: readme update
+
 2024.02.12:
 * new: bin/contools: binaries update
 
@@ -7,6 +17,9 @@
 2024.02.12:
 * fixed: src/callf: `/load-parent-proc-init-env-vars` flag fixup
 * fixed: src/callf: `SetEnvironmentStrings*` functions existence check and usage
+
+2024.02.12:
+* changed: Projects: switched to `Visual Studio 2017 - Windows XP (v141_xp)` Platform Toolset
 
 2024.02.06:
 * changed: bin/contools/TODO.txt: todo update
