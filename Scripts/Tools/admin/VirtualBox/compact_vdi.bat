@@ -3,7 +3,12 @@
 setlocal
 
 set "VDI_DIR=%~1"
+
 if not defined VBOX_MANAGE_EXE set "VBOX_MANAGE_EXE=%~2"
+
+if not defined VBOX_MANAGE_EXE for /f "usebackq tokens=1,2,* delims=	 " %%i in (`@"%SystemRoot%\System32\reg.exe" query "HKEY_LOCAL_MACHINE\SOFTWARE\Oracle\VirtualBox" /v "InstallDir"`) do (
+  if "%%i" == "InstallDir" set "VBOX_MANAGE_EXE=%%kVBoxManage.exe"
+)
 
 if not defined VBOX_MANAGE_EXE set "VBOX_MANAGE_EXE=c:\Program Files\VirtualBox\VBoxManage.exe"
 

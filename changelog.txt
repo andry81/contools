@@ -1,4 +1,7 @@
 2024.02.13:
+* new: Scripts/Tools/admin/VirtualBox/compact_vdi.bat: read the installation directory from the registry
+
+2024.02.13:
 * new: Utilities/bin/wshbazaar/wshdynacall: binaries update
 
 2024.02.13:
