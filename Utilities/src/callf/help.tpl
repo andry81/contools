@@ -244,7 +244,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           substituted for `{...}` variables in the this-parent process.
 
         Can not be used together with `/no-subst-pos-vars`,
-        `/allow-subst-empty-args` flags.
+        `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>`
+        flags.
 
       /no-subst-pos-vars
         Don't substitute positional `{...}` variables (command line arguments).
@@ -252,7 +253,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Does not disable `\{` escape sequence expansion.
 
         Can not be used together with `/no-subst-vars`,
-        `/allow-subst-empty-args` flags.
+        `/allow-subst-empty-args`, `/subst-vars-arg<N>`, `/S<N>`, `/SE<N>`
+        flags.
 
         Has no effect on `{*}` and `{@}` variables (not positional).
 
