@@ -1,4 +1,4 @@
-Utilities/tests/manual/contools/callf:
+Utilities/src/callf:
 
   * Fix the case where the
     `callf /tee-stdin 0.log /pipe-stdin-to-child-stdin "" "cmd.exe /k"`
@@ -29,11 +29,6 @@ Utilities/tests/manual/contools/callf:
   * Fix `callf.exe /shell-exec-unelevate-from-explorer /D . "callf.exe" "/shell-exec runas \"${COMSPEC}\" \"/k\""`
     current directory propagation.
 
-  * Fix slow print:
-
-    - 00-test--01-cui--02-existing_console--01-print_help.bat
-    - 00-test--02-gui--02-existing_console--01-print_help.bat
-
   * The `/r* ...` options does not execute for variable arguments
 
   * Fix leak behind `/load-parent-proc-init-env-vars` before this-process exit
@@ -51,6 +46,13 @@ Utilities/tests/manual/contools/callf:
     error message around `/invalid-flag` which is not always reprint in the
     first callf process console window.
 
+Utilities/tests/manual/contools/callf:
+
+  * Fix slow print:
+
+    - 00-test--01-cui--02-existing_console--01-print_help.bat
+    - 00-test--02-gui--02-existing_console--01-print_help.bat
+
 Utilities/src/wshbazaar/wshdynacall:
 
   * component registration error under Windows XP 32-bit SP3
@@ -62,3 +64,7 @@ Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat:
 Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat:
 
   * Does not accept not english characters in files names/paths.
+
+Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat:
+
+  * Fix infinite recursion because of builtin backup in `update_shortcut.vbs`.
