@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2024.01.23
+* 2024.02.14
 * contools
 
 1. DESCRIPTION
@@ -94,13 +94,13 @@ Second mirror:
 -------------------------------------------------------------------------------
 5. PREREQUISITES
 -------------------------------------------------------------------------------
-
-Currently used these set of OS platforms, externals, compilers, interpreters,
-modules, IDE's, applications and patches to run with or from:
+Currently used these set of OS platforms, compilers, interpreters, modules,
+IDE's, applications and patches to run with or from:
 
 1. OS platforms:
 
-* Windows 7+ (`.bat` only, minimal version for the cmake 3.14)
+* Windows XP x86 SP3/x64 SP2
+* Windows 7+
 
 * Cygwin 1.5+ or 3.0+ (`.sh` only):
   https://cygwin.com
@@ -112,18 +112,12 @@ modules, IDE's, applications and patches to run with or from:
 
 * Linux Mint 18.3 x64 (`.sh` only)
 
-2. Externals:
-
-  * `gnuwin32`
-  * `msys`
-  * `tacklelib`
-
-3. C++11 compilers:
+2. C++11 compilers:
 
 * (primary) Microsoft Visual C++ 2015 Update 3 or Microsoft Visual C++ 2017
 * (secondary) GCC 5.4+
 
-4. Interpreters:
+3. Interpreters:
 
 * bash shell 3.2.48+
   - to run unix shell scripts
@@ -152,7 +146,7 @@ modules, IDE's, applications and patches to run with or from:
 * Windows Script Host 5.8+
   - standard implementation to run vbs scripts
 
-5. Applications:
+4. Applications:
 
 * subversion 1.8+
   https://tortoisesvn.net
@@ -171,7 +165,7 @@ modules, IDE's, applications and patches to run with or from:
 * cygwin readlink 6.10+
   - to run specific bash script functions with `readlink` calls
 
-6. IDE's.
+5. IDE's.
 
 * Microsoft Visual Studio 2015 Update 3
 * Microsoft Visual Studio 2017
@@ -200,7 +194,7 @@ https://cmake.org/cmake/help/v3.14/release/3.14.html#id13
   generator expressions. CMake 3.14 and later will evaluate generator
   expressions for install(CODE) and install(SCRIPT).
 
-7. Patches:
+6. Patches:
 
   Target repository with a 3dparty component sources must already contain all
   patches and description with it.
@@ -208,7 +202,6 @@ https://cmake.org/cmake/help/v3.14/release/3.14.html#id13
 -------------------------------------------------------------------------------
 6. DEPENDENCIES
 -------------------------------------------------------------------------------
-
 Any project which is dependent on this project have has to contain the
 `README_EN.deps.txt` description file for the common dependencies in the
 Windows and in the Linux like platforms.
@@ -216,6 +209,8 @@ Windows and in the Linux like platforms.
 -------------------------------------------------------------------------------
 7. EXTERNALS
 -------------------------------------------------------------------------------
+All project externals are declared in `.externals*` files.
+
 To checkout externals you must use the
 [vcstool](https://github.com/dirk-thomas/vcstool) python module.
 

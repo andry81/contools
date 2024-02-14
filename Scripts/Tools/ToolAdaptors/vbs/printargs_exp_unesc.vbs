@@ -1,5 +1,3 @@
-ReDim args(WScript.Arguments.Count - 1)
-
 Dim args_str : args_str = ""
 
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")

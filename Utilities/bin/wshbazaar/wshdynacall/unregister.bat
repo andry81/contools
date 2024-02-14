@@ -16,12 +16,12 @@ if not exist "%SystemRoot%\Syswow64\*" (
 ) >&2
 
 rem CAUTION: ShellExecute does not wait a child process close!
-start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:Close^(CreateObject^("Shell.Application").ShellExecute^("%SystemRoot%\Syswow64\cmd.exe"^,"/c @call ""%~f0"" %*"^,""^,"runas"^,True))
+start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:Close^(CreateObject^("Shell.Application").ShellExecute^("%SystemRoot%\Syswow64\cmd.exe"^,"/c @call ""%~f0"" %* & pause"^,""^,"runas"^,True))
 exit /b
 
 :X86
 rem CAUTION: ShellExecute does not wait a child process close!
-start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:Close^(CreateObject^("Shell.Application").ShellExecute^("%COMSPEC%"^,"/c @call ""%~f0"" %*"^,""^,"runas"^,True))
+start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:Close^(CreateObject^("Shell.Application").ShellExecute^("%COMSPEC%"^,"/c @call ""%~f0"" %* & pause"^,""^,"runas"^,True))
 exit /b
 
 :ELEVATED
@@ -45,5 +45,3 @@ exit /b
 ) >&2
 
 "%SystemRoot%\System32\regsvr32.exe" /u "%~dp0wshdynacall32.dll"
-
-pause

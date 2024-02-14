@@ -4,7 +4,7 @@
 '''   set_shortfilename.vbs <path> <short-file-name>
 
 ''' CAUTION:
-'''   This script requires the Adminitrator privileges to request below priviliges.
+'''   This script requires the Adminitrator privileges to request below privileges.
 
 ''' CAUTION:
 '''   The script process must be a 32-bit process to create `jcb.tools` object.
@@ -169,5 +169,5 @@ PrintOrEchoErrorLine _
   WScript.ScriptName & ": error: CreateFileW is failed:" & vbCrLf & _
   WScript.ScriptName & ": info: LastError=`" & CStr(dwLastError) & "` (0x" & Hex(dwLastError) & ")" & vbCrLf & _
   WScript.ScriptName & ": info: Path=`" & PathAbs & "`" & vbCrLf & _
-  WScript.ScriptName & ": note: the process must have has Adminitrator previliges.`"
+  WScript.ScriptName & ": note: the process must have has Adminitrator privileges.`"
 WScript.Quit -1
