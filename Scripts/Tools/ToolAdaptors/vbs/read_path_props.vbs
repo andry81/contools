@@ -96,6 +96,18 @@
 '''      >
 '''      cscript //nologo read_path_props.vbs -x "{F29F85E0-4FF9-1068-AB91-08002B27B3D9} 2|{F29F85E0-4FF9-1068-AB91-08002B27B3D9} 8" "c:\Windows\System32\MSDRM\MsoIrmProtector.doc"
 
+Function IsNothing(obj)
+  If IsEmpty(obj) Then
+    IsNothing = True
+    Exit Function
+  End If
+  If obj Is Nothing Then
+    IsNothing = True
+  Else
+    IsNothing = False
+  End If
+End Function
+
 Sub PrintOrEchoLine(str)
   On Error Resume Next
   WScript.stdout.WriteLine str
@@ -247,10 +259,19 @@ End If
 
 Dim objShell : Set objShell = CreateObject("Shell.Application")
 
-Dim objNamespace : Set objNamespace = objShell.Namespace(objFS.GetFolder(objFS.GetParentFolderName(PathToOpen)).Path)
-Dim objFile : Set objFile = objNamespace.ParseName(objFS.GetFileName(PathToOpen))
+Dim ParentPath : ParentPath = objFS.GetParentFolderName(PathToOpen)
 
-If objFile Is Nothing Then
+Dim objNamespace, objFile
+
+If Len(ParentPath) > 0 Then
+  Set objNamespace = objShell.Namespace(ParentPath)
+  Set objFile = objNamespace.ParseName(objFS.GetFileName(PathToOpen))
+End if
+
+If IsNothing(objFile) Then
+  PrintOrEchoErrorLine _
+    WScript.ScriptName & ": error: path has no parent namespace." & vbCrLf & _
+    WScript.ScriptName & ": info: Path=`" & PathAbs & "`"
   WScript.Quit 128
 End If
 

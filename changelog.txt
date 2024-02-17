@@ -1,3 +1,6 @@
+2024.02.17:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: read_path*_props.vbs: handle case without parent path
+
 2024.02.14:
 * fixed: Utilities/bin/wshbazaar/wshdynacall/*register.bat: pause skip in case of script early exit
 * changed: Scripts/Tools/admin/WindowsServices/*.bat: added request of Administrative privileges and pause
