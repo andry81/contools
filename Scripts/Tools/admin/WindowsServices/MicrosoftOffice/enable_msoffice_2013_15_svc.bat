@@ -22,3 +22,6 @@ sc config osppsvc start= demand
 
 rem Microsoft Office ClickToRun
 sc config ClickToRunSvc start= demand
+
+rem Microsoft Office Service
+sc config OfficeSvc start= demand

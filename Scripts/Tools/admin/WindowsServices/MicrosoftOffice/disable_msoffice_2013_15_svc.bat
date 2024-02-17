@@ -17,6 +17,10 @@ net session >nul 2>&1 || (
   exit /b 255
 ) >&2
 
+rem Microsoft Office Service
+sc stop OfficeSvc
+sc config OfficeSvc start= disabled
+
 rem Microsoft Office ClickToRun
 sc stop ClickToRunSvc
 sc config ClickToRunSvc start= disabled
