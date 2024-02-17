@@ -242,11 +242,14 @@ Dim objNamespace, objFile
 If Len(ParentPath) > 0 Then
   Set objNamespace = objShell.Namespace(ParentPath)
   Set objFile = objNamespace.ParseName(objFS.GetFileName(PathToOpen))
+Else
+  Set objNamespace = objShell.Namespace(PathToOpen)
+  Set objFile = objNamespace.Self
 End if
 
 If IsNothing(objFile) Then
   PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: path has no parent namespace." & vbCrLf & _
+    WScript.ScriptName & ": error: path is not parsed." & vbCrLf & _
     WScript.ScriptName & ": info: Path=`" & PathAbs & "`"
   WScript.Quit 128
 End If

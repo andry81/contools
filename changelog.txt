@@ -1,4 +1,7 @@
 2024.02.17:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: read_path*.vbs: drive root path case
+
+2024.02.17:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/read_path_all_verbs.vbs: script to read a path all verb values
 
 2024.02.17:
