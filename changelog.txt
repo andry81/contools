@@ -1,3 +1,6 @@
+2024.02.18:
+* changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: code cleanup
+
 2024.02.17:
 * changed: Scripts/Tools/admin/WindowsServices/MicrosoftOffice: another service
 
