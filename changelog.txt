@@ -1,3 +1,8 @@
+2024.02.19:
+* fixed: Scripts/Tools/exec/exec_*_prefix.bat: infinite recursion around unsetted `IMPL_MODE` variable
+* fixed: Scripts/Tools/exec/exec_terminal_prefix.bat: missed to pass `CONTOOLS_ROOT` variable if `/load-parent-proc-init-env-vars` flag is used
+* changed: Scripts/Tools/exec/exec_*_prefix.bat: code cleanup
+
 2024.02.18:
 * changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: code cleanup
 

@@ -2,6 +2,14 @@
 
 setlocal
 
+rem Do not continue if already in Impl Mode
+if defined IMPL_MODE set /A IMPL_MODE+=0
+
+if %IMPL_MODE%0 NEQ 0 (
+  echo.%~nx0: error: Impl Mode already used.
+  exit /b 255
+) >&2
+
 rem Do not make a file or a directory
 if defined NO_GEN set /A NO_GEN+=0
 
@@ -57,16 +65,24 @@ if %NO_LOG%0 NEQ 0 set FLAG_NO_LOG=1
 if %NO_LOG_OUTPUT%0 NEQ 0 set FLAG_NO_LOG=1
 
 if not exist "%PROJECT_LOG_DIR%\*" if %FLAG_NO_LOG% EQU 0 (
-  echo.%~nx0%: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
+  echo.%~nx0: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
   exit /b 255
 ) >&2
 
 if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
-  echo.%~nx0%: error: can not use initial variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
+  echo.%~nx0: error: can not use initial variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
   exit /b 255
 ) >&2
 
 rem common flags for all terminals
+
+rem CAUTION:
+rem Because `callf.exe` does use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` variable in the command line.
+rem Otherwise we can fall into infinite recursion because of the unset of the `IMPL_MODE` variable.
+rem
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v IMPL_MODE 1
+
+if defined CONTOOLS_ROOT set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v CONTOOLS_ROOT "%CONTOOLS_ROOT%"
 
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string
 
@@ -137,7 +153,6 @@ rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
 (
   endlocal
-  set IMPL_MODE=1
   %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" -cur_console:n ^
     %*
@@ -161,7 +176,6 @@ rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
 (
   endlocal
-  set IMPL_MODE=1
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
     %*
