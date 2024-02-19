@@ -1,4 +1,7 @@
 2024.02.19:
+* fixed: Scripts/Tools/exec/exec_terminal_prefix.bat: missed to pass `INIT_VARS_FILE` variable if `/load-parent-proc-init-env-vars` flag is used
+
+2024.02.19:
 * fixed: Scripts/Tools/exec/exec_*_prefix.bat: infinite recursion around unsetted `IMPL_MODE` variable
 * fixed: Scripts/Tools/exec/exec_terminal_prefix.bat: missed to pass `CONTOOLS_ROOT` variable if `/load-parent-proc-init-env-vars` flag is used
 * changed: Scripts/Tools/exec/exec_*_prefix.bat: code cleanup
