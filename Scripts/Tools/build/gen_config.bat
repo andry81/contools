@@ -51,6 +51,10 @@ if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:|=\|%"
 if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:{=\{%"
 if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:}=\}%"
 
+rem special `$/<char>` sequence to pass `<char>` character as is (ex: `$/\x22` translates into `\x22` - a quote character)
+if defined SED_REPLACE_FROM set "SED_REPLACE_FROM=%SED_REPLACE_FROM:$/\\=\%"
+if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:$/\\=\%"
+
 if defined SED_REPLACE_FROM if defined SED_REPLACE_TO set SED_BARE_FLAGS=%SED_BARE_FLAGS% -e "s|%SED_REPLACE_FROM%|%SED_REPLACE_TO%|mg"
 
 rem flags always at first

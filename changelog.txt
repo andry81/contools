@@ -1,3 +1,6 @@
+2024.02.23:
+* new: Scripts/Tools/build/gen_config.bat: special `$/<char>` sequence to pass `<char>` character as is (ex: `$/\x22` translates into `\x22` - a quote character)
+
 2024.02.19:
 * fixed: Scripts/Tools/exec/exec_terminal_prefix.bat: missed to pass `INIT_VARS_FILE` variable if `/load-parent-proc-init-env-vars` flag is used
 
