@@ -106,7 +106,6 @@ if not exist "%CONFIG_OUT_DIR%\*" (
   exit /b 11
 ) >&2
 
-if not exist "%CONFIG_OUT_DIR%\%CONFIG_FILE%" ^
 if exist "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" (
   echo."%CONFIG_IN_DIR%\%CONFIG_FILE%.in" -^> "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
   if defined SED_BARE_FLAGS (

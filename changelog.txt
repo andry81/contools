@@ -1,4 +1,7 @@
 2024.02.23:
+* changed: Scripts/Tools/build/gen_config.bat: by default always generate even if output file does exist
+
+2024.02.23:
 * new: Scripts/Tools/build/gen_config.bat: special `$/<char>` sequence to pass `<char>` character as is (ex: `$/\x22` translates into `\x22` - a quote character)
 
 2024.02.19:
