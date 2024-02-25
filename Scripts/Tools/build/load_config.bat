@@ -1,23 +1,30 @@
 @echo off
 
 rem USAGE:
-rem   load_config.bat [<Flags>] <InputDir> <OutputDir> <ConfigFileName> [<Param0> [<Param1>]]
+rem   load_config.bat [<Flags>] [--] <InputDir> <OutputDir> <ConfigFileName> [<Param0> [<Param1>]]
 
 rem Description:
 rem   Script to load a configuration file which can consist of an input and
 rem   output parts.
-rem   The input configuration file is deteminded by the `.in` suffix in the
+rem
+rem   The input configuration file is determinded by the `.in` suffix in the
 rem   file name and basically stores in a version control system.
 rem   The output configuration file must not contain the `.in` suffix in the
 rem   file name and is used as a local storage for a user values.
+rem
 rem   The script detects the input file change before the output file change
 rem   and interrupts the load with an error.
+rem
 rem   Additionally the `#%% version: ...` line is used to force the user to
 rem   manually update the output confuguration file from the input
 rem   configuration file in case if are not equal.
+rem
 rem   By default the script does load the input configuration from the
-rem   `<ConfigFileName>` file. If `-load_output_config` flag is used, then the
+rem   `<ConfigFileName>` file.
+rem
+rem   If `-gen_config` or `-load_output_config` flag is used, then the
 rem   input configuration file name is used as `<ConfigFileName>.in`.
+rem
 rem   The fast parse logic is used by default.
 
 rem <Flags>:
@@ -26,20 +33,28 @@ rem     Generates the output configuration file from the input configuration
 rem     file if the output configuration file does not exist, otherwise skips
 rem     the generation.
 rem     Implies `-load_output_config` flag.
+rem
 rem   -load_output_config
 rem     Loads the output configuration file instead of the input configuration
 rem     file as by default.
+rem
 rem   -lite_parse
 rem     Uses the lite parse logic (fastest).
+rem
 rem   -full_parse
 rem     Uses the full parse logic (slowest).
+rem
 rem   -noexpand
 rem     Disables expansion of %-variables.
 rem     Has effect only if `-lite_parse` is used.
+rem
 rem   -allow_not_known_class_as_var_name
 rem     Allows to set a variable together with the class name in case if not
 rem     known class name.
 rem     Has effect only for Fast/Full parse.
+
+rem --:
+rem   Separator to stop parse flags.
 
 rem <InputDir>:
 rem   Input configuration file directory.
@@ -84,8 +99,8 @@ rem   export
 rem     (Unix shell only)
 rem     Exports the variable additionally to the set.
 rem   upath
-rem     Treats a variable value as a path and converts it to a uniform absolute
-rem     path (use forward slashes only).
+rem     Treats a variable value as a path and converts it to a uniform path
+rem     (use forward slashes only).
 
 rem Parse logic:
 rem  Lite parse:

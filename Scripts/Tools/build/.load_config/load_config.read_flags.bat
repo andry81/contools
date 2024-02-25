@@ -30,7 +30,7 @@ if defined __?FLAG (
     set __?FLAG_FULL_PARSE=1
   ) else if "%__?FLAG%" == "-allow_not_known_class_as_var_name" (
     set __?FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME=1
-  ) else (
+  ) else if not "%__?FLAG%" == "--" (
     echo.%__?~nx0%: error: invalid flag: %__?FLAG%
     exit /b -255
   ) >&2
@@ -39,7 +39,7 @@ if defined __?FLAG (
   set /A __?FLAG_SHIFT+=1
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%__?FLAG%" == "--" goto FLAGS_LOOP
 )
 
 exit /b 0

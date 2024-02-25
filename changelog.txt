@@ -1,3 +1,9 @@
+2024.02.25:
+* fixed: __init__/__init__.sh: execution fixup
+* changed: __init__/__init__.sh: removed all negations to avoid return not zero return code on success
+* changed: __init__/__init__.sh: moved inclusion guard to the end
+* changed: Scripts/Tools/build/load_config.bat: minor improvement
+
 2024.02.23:
 * changed: Scripts/Tools/build/gen_config.bat: by default always generate even if output file does exist
 
