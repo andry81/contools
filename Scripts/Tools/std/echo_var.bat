@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   echo_var.bat <VAR> [<PREFIX> [<SUFFIX>]]
+rem   echo_var.bat <Var> [<Prefix> [<Suffix>]]
 
 setlocal DISABLEDELAYEDEXPANSION
 
@@ -13,5 +13,5 @@ if not defined __?VAR__ exit /b 255
 if not defined %__?VAR__% exit /b 1
 
 rem safe echo
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?PREFIX__!!%__?VAR__%!!__?SUFFIX__!") do ( endlocal & echo.%%i)
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?PREFIX__!!%__?VAR__%!!__?SUFFIX__!") do endlocal & echo.%%i
 exit /b 0
