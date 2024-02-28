@@ -1,3 +1,6 @@
+2024.02.28:
+* changed: Scripts/Tools/build/load_config_dir.bat: code improvements
+
 2024.02.26:
 * new: Scripts/Tools/build/load_cmdline.bat: script to load command line from file
 * changed: Scripts/Tools: minor code cleanup

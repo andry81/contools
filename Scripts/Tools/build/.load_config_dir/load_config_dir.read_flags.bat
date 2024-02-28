@@ -11,9 +11,6 @@ set __?FLAG_NO_LOAD_USER_CONFIG=0
 set "__?BARE_SYSTEM_FLAGS="
 set "__?BARE_USER_FLAGS="
 
-set "__?SYSTEM_CONFIG_FILE_EXT="
-set "__?USER_CONFIG_FILE_EXT="
-
 :FLAGS_LOOP
 
 rem flags always at first

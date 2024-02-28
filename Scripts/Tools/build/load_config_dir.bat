@@ -22,20 +22,33 @@ rem     All the rest description is in the `load_config.bat` script.
 
 rem <Flags>:
 rem   -gen_system_config
-rem     Generate the system configuration file.
+rem     Generates the system configuration file.
 rem     Implies `-load_system_output_config` flag.
+rem
 rem   -gen_user_config
-rem     Generate the user configuration file.
+rem     Generates the user configuration file.
 rem     Implies `-load_user_output_config` flag.
+rem
 rem   -load_system_output_config
 rem     Loads the system configuration file from output directory.
+rem
 rem   -load_user_output_config
 rem     Loads the user configuration file(s) from output directory.
-rem   -no_load_system_config
-rem     Do not load the system configuration file.
-rem   -no_load_user_config
-rem     Do not load the user configuration file(s).
 rem
+rem   -no_load_system_config
+rem     Skips load the system configuration file.
+rem
+rem   -no_load_user_config
+rem     Skips load the user configuration file(s).
+
+rem <InputDir>:
+rem   Input configuration file directory.
+rem   Must be not empty and exist.
+
+rem <OutputDir>:
+rem   Output configuration file directory.
+rem   Can be empty, then `<InputDir>` is used instead.
+
 rem NOTE:
 rem   All the rest parameters is in the `load_config.bat` script.
 
@@ -60,8 +73,15 @@ if %NO_GEN%0 NEQ 0 (
   ) >&2
 )
 
+set __?LOAD_USER_CONFIG_IN=0
+set "__?SYSTEM_CONFIG_FILE_EXT="
+set "__?USER_CONFIG_FILE_EXT="
+
 if %__?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_SYSTEM_CONFIG% EQU 0 set "__?SYSTEM_CONFIG_FILE_EXT=.in"
-if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_USER_CONFIG% EQU 0 set "__?USER_CONFIG_FILE_EXT=.in"
+if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_USER_CONFIG% EQU 0 (
+  set __?LOAD_USER_CONFIG_IN=1
+  set "__?USER_CONFIG_FILE_EXT=.in"
+)
 
 if "%~2" == "" (
   call :MAIN "%%~1" "%%~1" "%%~3" "%%~4"
@@ -82,11 +102,19 @@ if %__?FLAG_NO_LOAD_USER_CONFIG% NEQ 0 goto LOAD_USER_CONFIG_END
 
 set __?CONFIG_INDEX=0
 
+rem CAUTION:
+rem   We must stop loading only when both input and output user config does not exist.
+rem
+
 :LOAD_CONFIG_LOOP
-if not exist "%~1/config.%__?CONFIG_INDEX%.vars%__?USER_CONFIG_FILE_EXT%" ^
-if not exist "%~1/config.%__?CONFIG_INDEX%.vars.in" goto LOAD_USER_CONFIG_END
+if %__?LOAD_USER_CONFIG_IN% NEQ 0 (
+  if not exist "%~1/config.%__?CONFIG_INDEX%.vars%__?USER_CONFIG_FILE_EXT%" if not exist "%~1/config.%__?CONFIG_INDEX%.vars.in" goto LOAD_USER_CONFIG_END
+) else if not exist "%~2/config.%__?CONFIG_INDEX%.vars%__?USER_CONFIG_FILE_EXT%" if not exist "%~1/config.%__?CONFIG_INDEX%.vars.in" goto LOAD_USER_CONFIG_END
+
 call :LOAD_CONFIG %%* || exit /b
+
 set /A __?CONFIG_INDEX+=1
+
 goto LOAD_CONFIG_LOOP
 
 :LOAD_CONFIG
