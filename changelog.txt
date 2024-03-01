@@ -1,3 +1,9 @@
+2024.03.01:
+* new: Scripts/Tools/build/load_config*.bat: reimplemented config files loader in favor of uniform and fast parser
+* changed: Scripts/Tools/build/load_config*.bat: removed the fast and full parser implementations
+* changed: Scripts/Tests: removed tests for the fast and full parser implementations
+* changed: switched all scripts to use uniform config files loader
+
 2024.02.28:
 * changed: Scripts/Tools/build/load_config_dir.bat: code improvements
 

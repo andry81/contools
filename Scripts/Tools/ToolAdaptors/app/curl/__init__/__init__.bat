@@ -15,7 +15,7 @@ if not defined CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT          call "%%CONTOOLS
 
 call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b 10
 
-call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -lite_parse -gen_user_config "%%CURL_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
+call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -gen_user_config "%%CURL_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%CURL_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
 call :IF_DEFINED_AND_FILE_EXIST CURL_EXECUTABLE || (
   echo.%~nx0: error: CURL_EXECUTABLE file path is not found: "%CURL_EXECUTABLE%"

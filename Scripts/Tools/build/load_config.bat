@@ -24,8 +24,6 @@ rem   `<ConfigFileName>` file.
 rem
 rem   If `-gen_config` or `-load_output_config` flag is used, then the
 rem   input configuration file name is used as `<ConfigFileName>.in`.
-rem
-rem   The fast parse logic is used by default.
 
 rem <Flags>:
 rem   -gen_config
@@ -38,20 +36,8 @@ rem   -load_output_config
 rem     Loads the output configuration file instead of the input configuration
 rem     file as by default.
 rem
-rem   -lite_parse
-rem     Uses the lite parse logic (fastest).
-rem
-rem   -full_parse
-rem     Uses the full parse logic (slowest).
-rem
 rem   -noexpand
 rem     Disables expansion of %-variables.
-rem     Has effect only if `-lite_parse` is used.
-rem
-rem   -allow_not_known_class_as_var_name
-rem     Allows to set a variable together with the class name in case if not
-rem     known class name.
-rem     Has effect only for Fast/Full parse.
 
 rem --:
 rem   Separator to stop parse flags.
@@ -71,25 +57,32 @@ rem   May contain `.in` suffix if the script does load the input configuration
 rem   file only. In all other cases - must not.
 
 rem <Param0>, <Param1>:
-rem   Custom parameters to load a parameterized variable.
-rem   Has no effect for Fast/Full parse logics.
+rem   Parameterizes the loader to load additionally custom variables.
+rem   If not defined, then custom variables does ignore.
 
 rem CONFIGURATION FILE FORMAT:
-rem   [<attributes>] <variable>[:[[<class_name>][:[<param0>][:[<param1>]]]]]=<value>
+rem   [<attributes>] <variable>[:<class_name>]=<value>
+rem   [<attributes>] <variable>[:[<param0>][:[<param1>]]]=<value>
 rem
 rem <attributes>:           Variable space separated attributes: once | export | upath
 rem <variable>:             Variable name corresponding to the regex: [_a-zA-Z][_a-zA-Z0-9]*
-rem <class_name>:           class variant name: OSWIN | OSUNIX | BAT | SH
+rem <class_name>:           Builtin class variant names: OSWIN | OSUNIX | BAT | SH
 rem   OSWIN:                Apply on Windows system including cygwin/mingw/msys subsystems.
 rem   OSUNIX:               Apply on Unix/Linux systems excluding cygwin/mingw/msys subsystems.
 rem   BAT:                  Apply on Windows system when this file has loaded from the Windows batch script loader.
 rem   SH:                   Apply on any system when this file has loaded from the Bash shell script loader.
 rem
-rem <param0>, <param1>:     Ex: MyVar:OSWIN:XP:32=...
+rem <param0>, <param1>:     Custom variable parameters.
+rem                         Example:
+rem                           <Param0>=OSWINXP
+rem                           <Param1>=OS32
 rem
-rem <value>:                Value with substitution support:
-rem                         * Lite parse:       `%<variable>%`.
-rem                         * Fast/Full parse:  `$/{<variable>}`.
+rem                           Loads besides the builtin variable classes, these:
+rem                           A:OSWINXP=...
+rem                           B:OSWINXP:OS32=...
+rem                           C::OS32=...
+rem
+rem <value>:                Value with substitution support: `%<variable>%`
 rem                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 rem
 rem <attributes>:
@@ -103,19 +96,8 @@ rem     Treats a variable value as a path and converts it to a uniform path
 rem     (use forward slashes only).
 
 rem Parse logic:
-rem  Lite parse:
-rem   Use builtin variable's value replacer and %-variables expansion.
+rem   Uses %-variables expansion.
 rem   The only `%<variable>%` placeholders can be expanded in a variable value.
-rem
-rem Fast parse:
-rem   Use builtin variable's value replacer and !-variables expansion.
-rem   The only `$/{<variable>}` placeholders can be expanded in a variable
-rem   value.
-rem
-rem Full parse:
-rem   Use char by char parse logic as most precise but even more slower.
-rem   The only `$/{<variable>}` placeholders can be expanded in a variable
-rem   value.
 
 setlocal DISABLEDELAYEDEXPANSION
 
@@ -195,8 +177,48 @@ call "%%__?~dp0%%check_config_expiration.bat" ^
 
 :SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 
-if %__?FLAG_LITE_PARSE% NEQ 0 (
-  "%__?~dp0%/.load_config/load_config.lite_parse.bat" "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%"
-) else if %__?FLAG_FULL_PARSE% EQU 0 (
-  "%__?~dp0%/.load_config/load_config.fast_parse.bat" %__?FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME%
-) else "%__?~dp0%.load_config/load_config.full_parse.bat" %__?FLAG_ALLOW_NOT_KNOWN_CLASS_AS_VAR_NAME%
+(
+  endlocal
+  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_DIR%/%__?CONFIG_FILE%") do ( set "__?VALUE=%%j" & call :PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" %%i )
+  set "__?VALUE=" & set "__?ATTR=" & set "__?UPATH=" & set "__?VAR_EXPR=" & set "__?P0=" & set "__?P1=" & set "__?QUOT__=" & set "__?EXCL__=" & set "__?ESC__="
+)
+exit /b 0
+
+:PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" [ATTRS] VAR[:PARAM0[:PARAM1]]
+set "__?ATTR=|" & set "__?VAR_EXPR=%~4"
+if not "%~5" == "" set "__?ATTR=%__?ATTR%%__?VAR_EXPR%|" & set "__?VAR_EXPR=%~5"
+set "__?VAR_EXPR=%__?VAR_EXPR:::=:.:%"
+if "%__?VAR_EXPR:~0,1%" == ":" set "__?VAR_EXPR=.%__?VAR_EXPR%"
+
+for /F "eol= tokens=1,2,* delims=:" %%i in ("%__?VAR_EXPR%") do call :PARSE_EXPR "%%~i" "%%~j" "%%~k" "%%~1" "%%~2" "%%~3"
+exit /b 0
+
+:PARSE_EXPR VAR PARAM0 PARAM1 "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%"
+if "%~1" == "." exit /b 1
+if not defined __?VALUE goto PARSE_VAR
+
+if %~4 EQU 0 ^
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do endlocal & call set "__?VALUE=%%i" & ^
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%j in ("!__?VALUE:^^=^!") do endlocal & set "__?VALUE=%%j"
+
+if ^"/ == ^%__?VALUE:~0,1%/ if ^"/ == ^%__?VALUE:~-1%/ ^
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:~1,-1!") do endlocal & set "__?VALUE=%%i"
+
+:PARSE_VAR
+set "__?P0=" & set "__?P1="
+if not "%~2" == "" if not "%~2" == "." set "__?P0=%~2"
+if not "%~3" == "" if not "%~3" == "." set "__?P1=%~3"
+
+if "%__?P0%" == "BAT" ( goto PARSE_P1 ) else if "%__?P0%" == "OSWIN" ( goto PARSE_P1 ) else if "%__?P0%" == "SH" ( exit /b 1 ) else if "%__?P0%" == "OSUNIX" exit /b 1
+
+if defined __?P0 if not "%~5" == "" ( if not "%__?P0%" == "%~5" exit /b 1 ) else exit /b 1
+:PARSE_P1
+if defined __?P1 if not "%~6" == "" ( if not "%__?P1%" == "%~6" exit /b 1 ) else exit /b 1
+
+:PARSE_VALUE
+if not "%__?ATTR:|once|=%" == "%__?ATTR%" if defined %~1 exit /b 0
+if not defined __?VALUE set "%~1=" & exit /b 0
+set "__?UPATH=0" & if defined __?ATTR if not "%__?ATTR:|upath|=%" == "%__?ATTR%" set __?UPATH=1
+
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do endlocal & set "%~1=%%i"
+if !__?UPATH! NEQ 0 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!%~1:\=/!") do endlocal & set "%~1=%%i"

@@ -88,7 +88,8 @@ if "%~2" == "" (
 ) else call :MAIN "%%~1" "%%~2" "%%~3" "%%~4"
 set __?LASTERROR=%ERRORLEVEL%
 
-call "%%__?~dp0%%.load_config_dir/load_config_dir.exit.bat"
+rem drop all locals
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set __? 2^>nul`) do set "%%i="
 exit /b
 
 :MAIN
