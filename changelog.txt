@@ -1,4 +1,7 @@
 2024.03.01:
+* changed: Scripts/Tools/ToolAdaptors/vbs/read_pe_header_bitness.vbs: minor cleanup
+
+2024.03.01:
 * new: Scripts/Tools/build/load_config*.bat: reimplemented config files loader in favor of uniform and fast parser
 * changed: Scripts/Tools/build/load_config*.bat: removed the fast and full parser implementations
 * changed: Scripts/Tests: removed tests for the fast and full parser implementations

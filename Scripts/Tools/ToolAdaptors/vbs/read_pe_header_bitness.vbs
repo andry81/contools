@@ -138,7 +138,7 @@ Else
   PeHexStr = ""
 End If
 
-rem compare on `MZђ` sequence
+' compare on `MZђ` sequence
 If PeHexStr <> "4D5A90" Then
   PositionHexStr = Hex(Position)
   PrintOrEchoErrorLine _
