@@ -1,3 +1,7 @@
+2024.03.06:
+* fixed: Scripts/Tools/build/load_config.bat: variable's attributes read fixup
+* fixed: Scripts/Tools/build/load_config*.bat: execution fixup
+
 2024.03.01:
 * changed: _config: switched all configs to use uniform config files loader
 

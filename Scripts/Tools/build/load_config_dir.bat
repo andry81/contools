@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   load_config_dir.bat [<Flags>] <InputDir> <OutputDir> [<Param0> [<Param1>]]
+rem   load_config_dir.bat [<Flags>] [--] <InputDir> <OutputDir> [<Param0> [<Param1>]]
 
 rem Description:
 rem   Script to load input and output directory with configuration files using
@@ -40,6 +40,9 @@ rem     Skips load the system configuration file.
 rem
 rem   -no_load_user_config
 rem     Skips load the user configuration file(s).
+
+rem --:
+rem   Separator to stop parse flags.
 
 rem <InputDir>:
 rem   Input configuration file directory.

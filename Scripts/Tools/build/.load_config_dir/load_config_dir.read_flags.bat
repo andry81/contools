@@ -38,7 +38,7 @@ if defined __?FLAG (
     set __?FLAG_NO_LOAD_SYSTEM_CONFIG=1
   ) else if "%__?FLAG%" == "-no_load_user_config" (
     set __?FLAG_NO_LOAD_USER_CONFIG=1
-  ) else (
+  ) else if not "%__?FLAG%" == "--" (
     set __?BARE_SYSTEM_FLAGS=%__?BARE_SYSTEM_FLAGS% %__?FLAG%
     set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% %__?FLAG%
   )
@@ -47,7 +47,7 @@ if defined __?FLAG (
   set /A __?FLAG_SHIFT+=1
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%__?FLAG%" == "--" goto FLAGS_LOOP
 )
 
 exit /b 0

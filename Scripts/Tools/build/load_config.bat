@@ -118,7 +118,7 @@ if %__?FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%__?FLAG_SHIFT%) do shift
 
 set "__?CONFIG_IN_DIR=%~1"
 set "__?CONFIG_OUT_DIR=%~2"
-set "__?CONFIG_FILE=%~3"
+set "__?CONFIG_FILE_NAME=%~3"
 set "__?PARAM0=%~4"
 set "__?PARAM1=%~5"
 
@@ -149,44 +149,54 @@ if not exist "%__?CONFIG_OUT_DIR%\*" (
 
 :SKIP_CONFIG_OUT_DIR_CHECK
 
-set __?CONFIG_FILE_GENERATED=0
+set __?CONFIG_FILE_NAME_GENERATED=0
 
-set "__?CONFIG_FILE_DIR=%__?CONFIG_OUT_DIR%"
+set "__?CONFIG_FILE_NAME_DIR=%__?CONFIG_OUT_DIR%"
 if %__?FLAG_GEN_CONFIG% EQU 0 (
-  if %__?FLAG_LOAD_OUTPUT_CONFIG% EQU 0 set "__?CONFIG_FILE_DIR=%__?CONFIG_IN_DIR%"
+  if %__?FLAG_LOAD_OUTPUT_CONFIG% EQU 0 set "__?CONFIG_FILE_NAME_DIR=%__?CONFIG_IN_DIR%"
 ) else (
-  if not exist "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE%" if exist "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE%.in" (
-    echo."%__?CONFIG_IN_DIR%\%__?CONFIG_FILE%.in" -^> "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE%"
-    type "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE%.in" > "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE%"
-    set __?CONFIG_FILE_GENERATED=1
+  if not exist "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE_NAME%" if exist "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" (
+    echo."%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" -^> "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE_NAME%"
+    type "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" > "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE_NAME%"
+    set __?CONFIG_FILE_NAME_GENERATED=1
   )
 )
 
 rem load configuration files
-if not exist "%__?CONFIG_FILE_DIR%\%__?CONFIG_FILE%" (
-  echo.%__?~nx0%: error: config file is not found: "%__?CONFIG_FILE_DIR%\%__?CONFIG_FILE%".
+if not exist "%__?CONFIG_FILE_NAME_DIR%\%__?CONFIG_FILE_NAME%" (
+  echo.%__?~nx0%: error: config file is not found: "%__?CONFIG_FILE_NAME_DIR%\%__?CONFIG_FILE_NAME%".
   exit /b 20
 ) >&2
 
 if %__?FLAG_GEN_CONFIG% EQU 0 if %__?FLAG_LOAD_OUTPUT_CONFIG% EQU 0 goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
-if %__?CONFIG_FILE_GENERATED% NEQ 0 goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
-if not exist "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE%.in" goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
+if %__?CONFIG_FILE_NAME_GENERATED% NEQ 0 goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
+if not exist "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 
 call "%%__?~dp0%%check_config_expiration.bat" ^
-  "%%__?CONFIG_IN_DIR%%\%%__?CONFIG_FILE%%.in" "%%__?CONFIG_FILE_DIR%%\%%__?CONFIG_FILE%%" || exit /b
+  "%%__?CONFIG_IN_DIR%%\%%__?CONFIG_FILE_NAME%%.in" "%%__?CONFIG_FILE_NAME_DIR%%\%%__?CONFIG_FILE_NAME%%" || exit /b
 
 :SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 
 (
   endlocal
-  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_DIR%/%__?CONFIG_FILE%") do ( set "__?VALUE=%%j" & call :PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" %%i )
-  set "__?VALUE=" & set "__?ATTR=" & set "__?UPATH=" & set "__?VAR_EXPR=" & set "__?P0=" & set "__?P1=" & set "__?QUOT__=" & set "__?EXCL__=" & set "__?ESC__="
+  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_NAME_DIR%/%__?CONFIG_FILE_NAME%") do ( set "__?VALUE=%%j" & call :PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" %%i )
+  set "__?VALUE=" & set "__?ATTR=" & set "__?UPATH=" & set "__?VAR_EXPR=" & set "__?P0=" & set "__?P1=" & set "__?COUNT="
 )
 exit /b 0
 
 :PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" [ATTRS] VAR[:PARAM0[:PARAM1]]
-set "__?ATTR=|" & set "__?VAR_EXPR=%~4"
-if not "%~5" == "" set "__?ATTR=%__?ATTR%%__?VAR_EXPR%|" & set "__?VAR_EXPR=%~5"
+set "__?ATTR=|" & set "__?VAR_EXPR=" & set "__?COUNT=0" & for %%i in (%*) do (
+  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%j in ("!__?COUNT!") do for /F "eol= tokens=* delims=" %%k in ("!__?ATTR!") do (
+    endlocal & if %%j GTR 2 (
+      if defined __?VAR_EXPR setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%l in ("!__?VAR_EXPR!") do endlocal & set "__?ATTR=%%k%%l|"
+      set "__?VAR_EXPR=%%i"
+    )
+  )
+  set /A __?COUNT+=1
+)
+
+set "__?ATTR=%__?ATTR:"=%"
+set "__?VAR_EXPR=%__?VAR_EXPR:"=%"
 set "__?VAR_EXPR=%__?VAR_EXPR:::=:.:%"
 if "%__?VAR_EXPR:~0,1%" == ":" set "__?VAR_EXPR=.%__?VAR_EXPR%"
 
@@ -199,7 +209,9 @@ if not defined __?VALUE goto PARSE_VAR
 
 if %~4 EQU 0 ^
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do endlocal & call set "__?VALUE=%%i" & ^
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%j in ("!__?VALUE:^^=^!") do endlocal & set "__?VALUE=%%j"
+if defined __?VALUE setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%j in ("!__?VALUE:^^=^!") do endlocal & set "__?VALUE=%%j"
+
+if not defined __?VALUE goto PARSE_VAR
 
 if ^"/ == ^%__?VALUE:~0,1%/ if ^"/ == ^%__?VALUE:~-1%/ ^
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:~1,-1!") do endlocal & set "__?VALUE=%%i"
