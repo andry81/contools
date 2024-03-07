@@ -172,8 +172,7 @@ if %__?FLAG_GEN_CONFIG% EQU 0 if %__?FLAG_LOAD_OUTPUT_CONFIG% EQU 0 goto SKIP_OU
 if %__?CONFIG_FILE_NAME_GENERATED% NEQ 0 goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 if not exist "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 
-call "%%__?~dp0%%check_config_expiration.bat" ^
-  "%%__?CONFIG_IN_DIR%%\%%__?CONFIG_FILE_NAME%%.in" "%%__?CONFIG_FILE_NAME_DIR%%\%%__?CONFIG_FILE_NAME%%" || exit /b
+call "%%__?~dp0%%check_config_expiration.bat" -- "%%__?CONFIG_IN_DIR%%\%%__?CONFIG_FILE_NAME%%.in" "%%__?CONFIG_FILE_NAME_DIR%%\%%__?CONFIG_FILE_NAME%%" || exit /b
 
 :SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 

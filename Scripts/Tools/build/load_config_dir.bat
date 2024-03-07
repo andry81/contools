@@ -98,7 +98,7 @@ exit /b
 :MAIN
 if %__?FLAG_NO_LOAD_SYSTEM_CONFIG% NEQ 0 goto LOAD_SYSTEM_CONFIG_END
 
-call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_SYSTEM_FLAGS%% %%1 %%2 "config.system.vars%%__?SYSTEM_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
+call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_SYSTEM_FLAGS%% -- %%1 %%2 "config.system.vars%%__?SYSTEM_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
 
 :LOAD_SYSTEM_CONFIG_END
 
@@ -122,7 +122,7 @@ set /A __?CONFIG_INDEX+=1
 goto LOAD_CONFIG_LOOP
 
 :LOAD_CONFIG
-call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_USER_FLAGS%% %%1 %%2 "config.%%__?CONFIG_INDEX%%.vars%%__?USER_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
+call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_USER_FLAGS%% -- %%1 %%2 "config.%%__?CONFIG_INDEX%%.vars%%__?USER_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
 
 :LOAD_USER_CONFIG_END
 

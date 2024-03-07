@@ -1,5 +1,27 @@
 @echo off
 
+rem USAGE:
+rem   check_config_expiration.bat [<flags>] [--] <InputFile> <OutputFile>
+
+rem Description:
+rem   Script to check <OutputFile> expiration versus <InputFile> to prevent
+rem   <OutputFile> accidental overwrite.
+
+rem <flags>:
+rem   -optional_compare
+rem     Does not require <OutputFile> existence.
+
+rem --:
+rem   Separator to stop parse flags.
+rem
+
+rem <InputFile>:
+rem   Input configuration file path.
+
+rem <OutputFile>:
+rem   Output configuration file path.
+rem   Must exist if `-optional_compare` is not defined.
+
 setlocal
 
 set "?~n0=%~n0"
@@ -19,7 +41,7 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-optional_compare" (
     set FLAG_OPTIONAL_COMPARE=1
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -27,7 +49,7 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
 set "VARS_FILE_IN=%~1"

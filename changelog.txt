@@ -1,3 +1,7 @@
+2024.03.07:
+* changed: __init__: minor improvements
+* changed: Scripts/Tools/build: check_config_expiration.bat, load_config*.bat: minor improvements
+
 2024.03.06:
 * fixed: Scripts/Tools/build/load_config.bat: variable's attributes read fixup
 * fixed: Scripts/Tools/build/load_config*.bat: execution fixup
