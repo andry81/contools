@@ -1,4 +1,7 @@
 2024.03.12:
+* changed: Scripts/Tools/std/trim_var.bat: execution fixup
+
+2024.03.12:
 * changed: README_EN.txt: readme update
 
 2024.03.12:
