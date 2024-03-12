@@ -178,8 +178,12 @@ call "%%__?~dp0%%check_config_expiration.bat" -- "%%__?CONFIG_IN_DIR%%\%%__?CONF
 
 (
   endlocal
-  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_NAME_DIR%/%__?CONFIG_FILE_NAME%") do ( set "__?VALUE=%%j" & call :PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" %%i )
-  set "__?VALUE=" & set "__?ATTR=" & set "__?UPATH=" & set "__?VAR_EXPR=" & set "__?P0=" & set "__?P1=" & set "__?COUNT="
+  rem recode quote and exclamation characters
+  set "__?ESC__=^"
+  set __?QUOT__=^"
+  set "__?EXCL__=!"
+  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_NAME_DIR%/%__?CONFIG_FILE_NAME%") do set "__?VALUE=%%j" & call :PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" %%i
+  set "__?VALUE=" & set "__?ATTR=" & set "__?UPATH=" & set "__?VAR_EXPR=" & set "__?P0=" & set "__?P1=" & set "__?COUNT=" & set "__?ESC__=" & set "__?QUOT__=" & set "__?EXCL__="
 )
 exit /b 0
 
@@ -206,19 +210,23 @@ exit /b 0
 if "%~1" == "." exit /b 1
 if not defined __?VALUE goto PARSE_VAR
 
-if %~4 EQU 0 ^
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do endlocal & call set "__?VALUE=%%i" & ^
-if defined __?VALUE setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%j in ("!__?VALUE:^^=^!") do endlocal & set "__?VALUE=%%j"
+setlocal ENABLEDELAYEDEXPANSION & if not "!__?VALUE:~1,-1!" == "" (
+  for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:~1,-1!") do endlocal & if ^"/ == ^%__?VALUE:~0,1%/ if ^"/ == ^%__?VALUE:~-1%/ set "__?VALUE=%%i"
+) else if "!__?VALUE!" == """" ( endlocal & set "__?VALUE=" ) else endlocal
+if not defined __?VALUE goto PARSE_VAR 
 
-if not defined __?VALUE goto PARSE_VAR
+rem replace a value quote characters by the \x01 character
+set "__?VALUE=%__?VALUE:"=%"
 
-if ^"/ == ^%__?VALUE:~0,1%/ if ^"/ == ^%__?VALUE:~-1%/ ^
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:~1,-1!") do endlocal & set "__?VALUE=%%i"
+rem recode quote and exclamation characters
+set "__?VALUE=%__?VALUE:!=!__?EXCL__!%"
+set "__?VALUE=%__?VALUE:^=!__?ESC__!%"
+set "__?VALUE=%__?VALUE:=!__?QUOT__!%"
+
+if %~4 EQU 0 call set "__?VALUE=%__?VALUE%"
 
 :PARSE_VAR
-set "__?P0=" & set "__?P1="
-if not "%~2" == "" if not "%~2" == "." set "__?P0=%~2"
-if not "%~3" == "" if not "%~3" == "." set "__?P1=%~3"
+set "__?P0=" & set "__?P1=" & ( if not "%~2" == "" if not "%~2" == "." set "__?P0=%~2" ) & ( if not "%~3" == "" if not "%~3" == "." set "__?P1=%~3" )
 
 if "%__?P0%" == "BAT" ( goto PARSE_P1 ) else if "%__?P0%" == "OSWIN" ( goto PARSE_P1 ) else if "%__?P0%" == "SH" ( exit /b 1 ) else if "%__?P0%" == "OSUNIX" exit /b 1
 
@@ -231,5 +239,6 @@ if not "%__?ATTR:|once|=%" == "%__?ATTR%" if defined %~1 exit /b 0
 if not defined __?VALUE set "%~1=" & exit /b 0
 set "__?UPATH=0" & if defined __?ATTR if not "%__?ATTR:|upath|=%" == "%__?ATTR%" set __?UPATH=1
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do endlocal & set "%~1=%%i"
-if !__?UPATH! NEQ 0 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!%~1:\=/!") do endlocal & set "%~1=%%i"
+rem safe set
+setlocal ENABLEDELAYEDEXPANSION & if %__?UPATH% NEQ 0 ( for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:\=/!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do endlocal & endlocal & set "%~1=%%j" ) else ^
+for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do endlocal & endlocal & set "%~1=%%j"
