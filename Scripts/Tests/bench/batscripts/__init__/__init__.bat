@@ -6,7 +6,7 @@ call "%%~dp0..\..\__init__\__init__.bat" || exit /b
 
 set "CONTOOLS_PROJECT_TESTS_INIT0_DIR=%~dp0"
 
-call :CANONICAL_PATH TESTS_PROJECT_ROOT "%%~dp0.."
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TESTS_PROJECT_ROOT "%%~dp0.."
 
 call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" "%%TESTS_PROJECT_ROOT%%/_config" || exit /b
 
@@ -18,12 +18,3 @@ call "%%CONTOOLS_ROOT%%/testlib/__init__.bat" || exit /b
 
 exit /b 0
 
-:CANONICAL_PATH
-setlocal DISABLEDELAYEDEXPANSION
-for /F "eol= tokens=* delims=" %%i in ("%~2\.") do set "RETURN_VALUE=%%~fi"
-rem set "RETURN_VALUE=%RETURN_VALUE:\=/%"
-(
-  endlocal
-  set "%~1=%RETURN_VALUE%"
-)
-exit /b 0
