@@ -1,4 +1,7 @@
 2024.03.12:
+* changed: Scripts/Tools/std/trim_var.bat: reverted to previous implementation as ~x2 faster
+
+2024.03.12:
 * changed: Scripts/Tools/std/trim_var.bat: execution fixup
 
 2024.03.12:
