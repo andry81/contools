@@ -1,4 +1,7 @@
 2024.03.12:
+* changed: README_EN.txt: readme update
+
+2024.03.12:
 * new: Scripts/Tests/manual/batscripts/test_std__trim_var.bat: `trim_var.bat` script manual tests
 * new: Scripts/Tests/bench/batscripts/test_std__trim_var.bat: `trim_var.bat` script bench tests
 * changed: Scripts/Tools/std/trim_var.bat: revised implementation for faster and less error prone execution

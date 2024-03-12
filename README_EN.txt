@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2024.02.14
+* 2024.03.12
 * contools
 
 1. DESCRIPTION
@@ -39,7 +39,7 @@ First mirror:
     https://git.code.sf.net/p/contools/contools
 Second mirror:
   * https://gitlab.com/andry81/contools/-/branches
-  * https://gitlab.com/andry81/contools.git
+    https://gitlab.com/andry81/contools.git
 
 -------------------------------------------------------------------------------
 4. CATALOG CONTENT DESCRIPTION
@@ -242,6 +242,7 @@ sudo chmod a+r  /bin/bash_tacklelib
 -------------------------------------------------------------------------------
 * bat scripts tests:
 
+  ** Scripts/Tests/manual/batscripts
   ** Scripts/Tests/unit/batscripts
   ** Scripts/Tests/bench/batscripts
 
