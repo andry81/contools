@@ -1,3 +1,6 @@
+2024.03.14:
+* changed: ISSUES.txt: issues update
+
 2024.03.13:
 * new: Scripts/Tools/std/choice.bat: the choice utility wrapper, falls back to `set /P ...` if the utility does not exist (Windows XP 32-bit SP3)
 

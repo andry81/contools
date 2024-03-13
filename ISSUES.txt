@@ -46,6 +46,9 @@ Utilities/src/callf:
     error message around `/invalid-flag` which is not always reprint in the
     first callf process console window.
 
+  * callf crash on too long wait for UAC promotion with error message:
+    `server connection timeout of inbound server named pipe end to (null): pipe="(null)" timeout=0 ms`
+
 Utilities/tests/manual/contools/callf:
 
   * Fix slow print:
