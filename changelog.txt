@@ -1,4 +1,7 @@
 2024.03.13:
+* new: Scripts/Tools/std/choice.bat: the choice utility wrapper, falls back to `set /P ...` if the utility does not exist (Windows XP 32-bit SP3)
+
+2024.03.13:
 * new: Scripts/Tools/std: callshift.bat, setshift.bat: added `-no_trim` flag to avoid shifted command line trim
 * new: Scripts/Tests/manual/batscripts: `callshift.bat` and `setshift.bat` script manual tests
 * changed: Scripts/Tools/std: callshift.bat, setshift.bat: minor improvements
