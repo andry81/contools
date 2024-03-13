@@ -1,4 +1,7 @@
 2024.03.13:
+* refactor: `PROJECT_LOG_FILE_NAME_SUFFIX` rename to `PROJECT_LOG_FILE_NAME_DATE_TIME`
+
+2024.03.13:
 * fixed: Scripts/Tools/build/load_config.bat: execution fixup
 * new: Scripts/Tests/unit/batscripts/test_build__load_config.bat: `load_config.bat` script unit tests
 * new: Scripts/Tests/bench/batscripts/test_build__load_config_01.bat: `load_config.bat` script bench test

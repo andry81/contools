@@ -29,7 +29,7 @@ call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
 ) >&2
 
 rem allocate system original temporary directory to bypass TEMP variable access pointing a potential Network Drive directory
-set "TEMP_DIR=%LOCALAPPDATA%/Temp/%PROJECT_LOG_FILE_NAME_SUFFIX%.%?~n0%"
+set "TEMP_DIR=%LOCALAPPDATA%/Temp/%PROJECT_LOG_FILE_NAME_DATE_TIME%.%?~n0%"
 
 mkdir "%TEMP_DIR%" || exit /b 255
 

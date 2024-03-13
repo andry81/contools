@@ -50,14 +50,14 @@ mkdir "%EMPTY_DIR_TMP%" || (
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`@dir /A:-D /B /O:N "%FLYLINKDC_SETTINGS_PATH%\*.sqlite"`) do (
   set "FILE_NAME=%%i"
-  call :XCOPY_FILE "%%FLYLINKDC_SETTINGS_PATH%%" "%%FILE_NAME%%"  "%%FLYLINK_ADAPTOR_BACKUP_DIR%%/flylink--%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+  call :XCOPY_FILE "%%FLYLINKDC_SETTINGS_PATH%%" "%%FILE_NAME%%"  "%%FLYLINK_ADAPTOR_BACKUP_DIR%%/flylink--%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H || exit /b 10
 )
 
 echo.Archiving backup directory...
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%FLYLINK_ADAPTOR_BACKUP_DIR%%" "flylink--%%PROJECT_LOG_FILE_NAME_SUFFIX%%/*.*" "%%FLYLINK_ADAPTOR_BACKUP_DIR%%/flylink--%%PROJECT_LOG_FILE_NAME_SUFFIX%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%FLYLINK_ADAPTOR_BACKUP_DIR%%" "flylink--%%PROJECT_LOG_FILE_NAME_DATE_TIME%%/*.*" "%%FLYLINK_ADAPTOR_BACKUP_DIR%%/flylink--%%PROJECT_LOG_FILE_NAME_DATE_TIME%%.7z" -sdel || exit /b 20
 echo.
 
-call :CMD rmdir /S /Q "%%FLYLINK_ADAPTOR_BACKUP_DIR%%/flylink--%%PROJECT_LOG_FILE_NAME_SUFFIX%%"
+call :CMD rmdir /S /Q "%%FLYLINK_ADAPTOR_BACKUP_DIR%%/flylink--%%PROJECT_LOG_FILE_NAME_DATE_TIME%%"
 
 exit /b 0
 

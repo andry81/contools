@@ -146,7 +146,7 @@ call :PROCESS_URL %%5 %%6 %%7 %%8 %%9 || goto MAIN_EXIT
 :ARCHIVE_DOWNLOAD_DIR
 
 echo.Archiving backup directory...
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%CURL_ADAPTOR_DOWNLOAD_TEMP_DIR%%" "*" "%%CURL_ADAPTOR_DOWNLOAD_DIR%%/%%PROJECT_LOG_FILE_NAME_SUFFIX%%--%%OUT_FILE_NAME_TMPL%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%CURL_ADAPTOR_DOWNLOAD_TEMP_DIR%%" "*" "%%CURL_ADAPTOR_DOWNLOAD_DIR%%/%%PROJECT_LOG_FILE_NAME_DATE_TIME%%--%%OUT_FILE_NAME_TMPL%%.7z" -sdel || exit /b 20
 echo.
 
 :SKIP_ARCHIVE
@@ -196,7 +196,7 @@ call set "OUT_FILE_NAME=%%OUT_FILE_NAME_TMPL:{PAGENUM}=%PAGE_NUM%%%"
 
 call :CMD "%%CURL_EXECUTABLE%%" -v %%* "%%URL%%" -o "%%CURL_ADAPTOR_DOWNLOAD_TEMP_DIR%%/%%OUT_FILE_NAME%%" || exit /b
 
-call :XCOPY_DIR  "%%PROJECT_LOG_DIR%%"    "%%CURL_ADAPTOR_DOWNLOAD_TEMP_DIR%%/%%PROJECT_LOG_FILE_NAME_SUFFIX%%" /Y /D /H || exit /b 10
+call :XCOPY_DIR  "%%PROJECT_LOG_DIR%%"    "%%CURL_ADAPTOR_DOWNLOAD_TEMP_DIR%%/%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H || exit /b 10
 
 exit /b 0
 
