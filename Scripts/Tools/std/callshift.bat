@@ -141,7 +141,7 @@ if %SHIFT% GEQ 0 (
 
 rem Escape specific separator characters by sequence of `$NN` characters:
 rem  1. `?` and `*` - globbing characters in the `for %%i in (...)` expression
-rem  2. `,`, `;`    - separator characters in the `for %%i in (...)` expression
+rem  2. `,`, `;`, <space> - separator characters in the `for %%i in (...)` expression
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE:$=$00!") do endlocal & set "LINE=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE:^*=$01!") do endlocal & set "LINE=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE:^?=$02!") do endlocal & set "LINE=%%i"
