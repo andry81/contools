@@ -1,26 +1,28 @@
 @echo off
 
+rem USAGE:
+rem   callshift.bat [-no_trim] [-skip <skip-num>] <shift> <command> [<cmdline>...]
+
 rem Description:
 rem   Script calls second argument and passes to it all arguments beginning
 rem   from %3 plus index from %1. Script can skip first N arguments after %2
 rem   before shift the rest.
 
-rem USAGE:
-rem   callshift.bat [<flags>] <shift> <command> [<cmdline>]
+rem -no_trim
+rem   Avoids spaces trim in the shifted command line.
 
-rem   <flags>:
-rem     -skip <skip-num>
-rem       Additional number of skip arguments after %2 argument.
-rem       If not defined, then 0.
-rem
-rem   <shift>:
-rem     Number of arguments in <cmdline> to skip and shift.
-rem     If >=0, then only shifts <cmdline> after %2 argument plus <skip-num>.
-rem     If < 0, then skips first <shift> arguments after %2 argument plus
-rem     <skip-num> and shifts the rest <cmdline>.
-rem
-rem   <command>:
-rem     Command to call with skipped and shifted arguments from <cmdline>.
+rem -skip <skip-num>
+rem   Additional number of skip arguments after %2 argument.
+rem   If not defined, then 0.
+
+rem <shift>:
+rem   Number of arguments in <cmdline> to skip and shift.
+rem   If >=0, then only shifts <cmdline> after %2 argument plus <skip-num>.
+rem   If < 0, then skips first <shift> arguments after %2 argument plus
+rem   <skip-num> and shifts the rest <cmdline>.
+
+rem <command>:
+rem   Command to call with skipped and shifted arguments from <cmdline>.
 
 rem Examples:
 rem   1. >callshift.bat 0 echo "1 2" ! ^^? ^^* ^& ^| , ; = ^= "=" 3
@@ -49,6 +51,8 @@ rem   8. >errlvl.bat 123
 rem      >callshift.bat 0 call errlvl.bat 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
+rem   9. >callshift.bat -no_trim 1 echo  a  b  c  d
+rem       b  c  d
 
 rem Pros:
 rem
@@ -58,6 +62,7 @@ rem   * Does restore previous ERRORLEVEL variable before call a command.
 rem   * Does not leak variables outside.
 rem   * Can skip first N used arguments from the `%*` variable including
 rem     additional command line arguments.
+rem   * Can avoid spaces trim in the shifted command line.
 rem
 rem Cons:
 rem
@@ -89,12 +94,21 @@ del /F /Q "%CMDLINE_TEMP_FILE%" >nul 2>nul
 rem script flags
 set FLAG_SHIFT=0
 set FLAG_SKIP=0
+set FLAG_NO_TRIM=0
 
 rem flags always at first
 set "FLAG=%~1"
 
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG (
+  if "%FLAG%" == "-no_trim" (
+    set FLAG_NO_TRIM=1
+    shift
+    set /A FLAG_SHIFT+=1
+  )
+)
 
 if defined FLAG (
   if "%FLAG%" == "-skip" (
@@ -133,6 +147,10 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE:^?=$02!") do endlocal & set "LINE=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE:,=$03!") do endlocal & set "LINE=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE:;=$04!") do endlocal & set "LINE=%%i"
+if %FLAG_NO_TRIM% NEQ 0 (
+  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE:  = $05!") do endlocal & set "LINE=%%i"
+  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!LINE:$05 =$05$05!") do endlocal & set "LINE=%%i"
+)
 
 set INDEX=-1
 
@@ -155,11 +173,12 @@ for /F "eol= tokens=* delims=" %%i in ("!LINE!") do endlocal & for %%j in (%%i)
   set /A INDEX+=1
 )
 
-(
+if defined COMMAND (
   setlocal ENABLEDELAYEDEXPANSION
   for /F "eol= tokens=* delims=" %%i in ("!COMMAND!") do (
     if defined CMDLINE (
       for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$04=;!") do endlocal & set "CMDLINE=%%v"
+      if %FLAG_NO_TRIM% NEQ 0 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$05= !") do endlocal & set "CMDLINE=%%v"
       setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$03=,!") do endlocal & set "CMDLINE=%%v"
       setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$02=?!") do endlocal & set "CMDLINE=%%v"
       setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!CMDLINE:$01=*!") do endlocal & set "CMDLINE=%%v"
@@ -168,6 +187,11 @@ for /F "eol= tokens=* delims=" %%i in ("!LINE!") do endlocal & for %%j in (%%i)
     ) else endlocal & endlocal & call :SETERRORLEVEL %LAST_ERROR% & %%i
     exit /b
   )
+  exit /b %LAST_ERROR%
+)
+
+(
+  endlocal
   exit /b %LAST_ERROR%
 )
 

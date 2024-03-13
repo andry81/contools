@@ -1,4 +1,9 @@
 2024.03.13:
+* new: Scripts/Tools/std: callshift.bat, setshift.bat: added `-no_trim` flag to avoid shifted command line trim
+* new: Scripts/Tests/manual/batscripts: `callshift.bat` and `setshift.bat` script manual tests
+* changed: Scripts/Tools/std: callshift.bat, setshift.bat: minor improvements
+
+2024.03.13:
 * refactor: `PROJECT_LOG_FILE_NAME_SUFFIX` rename to `PROJECT_LOG_FILE_NAME_DATE_TIME`
 
 2024.03.13:
