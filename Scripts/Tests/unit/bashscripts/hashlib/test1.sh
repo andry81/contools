@@ -12,7 +12,7 @@ if [[ -z "$SOURCE_TACKLELIB_BASH_TACKLELIB_SH" || SOURCE_TACKLELIB_BASH_TACKLELI
   done
 fi
 
-tkl_include_or_abort '__init__.sh'
+tkl_include_or_abort '__init__/__init__.sh'
 tkl_include_or_abort 'testlib.sh'
 tkl_include_or_abort "$CONTOOLS_ROOT/bash/funclib.sh"
 

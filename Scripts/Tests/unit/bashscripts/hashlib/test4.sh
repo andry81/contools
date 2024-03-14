@@ -12,7 +12,7 @@ if [[ -z "$SOURCE_TACKLELIB_BASH_TACKLELIB_SH" || SOURCE_TACKLELIB_BASH_TACKLELI
   done
 fi
 
-tkl_include_or_abort '__init__.sh'
+tkl_include_or_abort '__init__/__init__.sh'
 tkl_include_or_abort 'testlib.sh'
 
 if [[ -n "$BASH_LINENO" ]] && (( ${BASH_LINENO[0]} > 0 )); then
@@ -33,42 +33,27 @@ TestScriptBaseFileName="${TestScriptFileName%.*}"
 
 TestModuleInit
 
-# test speed of PushTrap/PopTrap
-echo "Tests: traplib/$TestScriptFileName"
-echo "Desc: test speed of PushTrap/PopTrap"
+# create and read hash map
+echo "Tests: hashlib/$TestScriptFileName"
+echo "Desc: create and read hash map"
 echo
 
 function RunAllTests()
 {
-  RunTest Test_1 '' 200
+  RunTest Test_1
 }
 
 function Test_1()
 {
-  function BenchTrapPushPop()
-  {
-    local num=$1
-    local i
-    echo "Desc: $num iterations of PushTrap function"
-    time {
-      for (( i=0; i<num; i++ )); do
-        PushTrap test '' RETURN
-        (( !(i%10) )) && echo "$i"
-      done
-    }
-    echo
-    echo "Desc: $num iterations of PopTrap function"
-    time {
-      for (( i=0; i<num; i++ )); do
-        PopTrap test RETURN
-        (( !(i%10) )) && echo "$i"
-      done
-    }
-    tkl_unset num
-    tkl_unset i
-  }
-  BenchTrapPushPop "${TEST_SCRIPT_ARGS[@]}"
-  TestAssertHasNoExtraVariables
+  echo "Test #1"
+  echo "Desc: 10000 iterations of SetHashMapItem function on sequenced key collection"
+  time GenerateHashMap Test || exit 1
+  echo
+
+  echo "Test #2"
+  echo "Desc: 10000 iterations of GetHashMapItem function on sequenced key collection"
+  time ReadHashMap Test || exit 2
+  echo
 }
 
 RunAllTests

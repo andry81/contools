@@ -1,4 +1,7 @@
 2024.03.14:
+* refactor: Scripts/Tests/unit: bash scripts moved into `bashscripts` subdirectory
+
+2024.03.14:
 * fixed: Scripts/Tools/std/choice.bat: missed to return `choice.exe` exit code
 
 2024.03.14:
