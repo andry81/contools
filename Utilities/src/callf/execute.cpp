@@ -115,9 +115,6 @@ bool g_has_tee_stdin                            = false;
 bool g_has_tee_stdout                           = false;
 bool g_has_tee_stderr                           = false;
 
-bool g_enable_child_ctrl_handler                = false;
-std::atomic_bool g_ctrl_handler                 = false;
-
 // console attach/alloc/detach together with console handle close synchronization
 HANDLE g_console_access_mutex                   = INVALID_HANDLE_VALUE;
 
@@ -160,6 +157,7 @@ void Flags::merge(const Flags & flags)
     MERGE_FLAG(flags, disable_wow64_fs_redir);
     MERGE_FLAG(flags, disable_ctrl_signals);
     MERGE_FLAG(flags, disable_ctrl_c_signal);
+    MERGE_FLAG(flags, disable_ctrl_c_signal_no_inherit);
 #ifndef _CONSOLE
     MERGE_FLAG(flags, allow_gui_autoattach_to_parent_console);
 #endif
@@ -471,24 +469,6 @@ void Options::clear()
     *this = Options{};
 }
 
-
-BOOL WINAPI ChildCtrlHandler(DWORD ctrl_type)
-{
-    if (g_ctrl_handler) {
-        // CTRL_C_EVENT         = 0
-        // CTRL_BREAK_EVENT     = 1
-        // CTRL_CLOSE_EVENT     = 2
-        // CTRL_LOGOFF_EVENT    = 5
-        // CTRL_SHUTDOWN_EVENT  = 6
-        if (g_child_process_group_id != -1) {
-            GenerateConsoleCtrlEvent(ctrl_type, g_child_process_group_id);
-        }
-
-        return TRUE; // ignore
-    }
-
-    return FALSE;
-}
 
 DWORD WINAPI WriteOutputWatchThread(LPVOID lpParam)
 {
@@ -4676,8 +4656,6 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     g_tee_stdout_dup_stdin = g_options.tee_stdout_dup == STDIN_FILENO || g_flags.tee_conout_dup;
     g_tee_stderr_dup_stdin = g_options.tee_stderr_dup == STDIN_FILENO || g_flags.tee_conout_dup;
 
-    g_enable_child_ctrl_handler = !g_flags.disable_ctrl_signals && !g_flags.disable_ctrl_c_signal;
-
     // update child show state
     si.wShowWindow = g_options.show_as;
 
@@ -5766,9 +5744,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     g_is_child_stdin_char_type = true;
                 }
 
-                if (g_enable_child_ctrl_handler) {
-                    g_ctrl_handler = true;
-                    SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                // prevent control signal inheritance
+
+                if (g_flags.disable_ctrl_c_signal_no_inherit) {
+                  SetConsoleCtrlHandler(NULL, FALSE);
                 }
 
                 SetLastError(0); // just in case
@@ -5782,6 +5761,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     !current_dir.empty() ? current_dir.c_str() : NULL,
                     &si, &pi);
                 win_error = GetLastError();
+
+                // restore control signal
+
+                if (g_flags.disable_ctrl_c_signal_no_inherit) {
+                  SetConsoleCtrlHandler(NULL, TRUE);
+                }
 
                 if (_is_valid_handle(pi.hProcess)) {
                     g_child_process_handle = pi.hProcess;       // to check the process status from stream pipe threads
@@ -5829,15 +5814,22 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
                     }
 
-                    if (g_enable_child_ctrl_handler) {
-                        g_ctrl_handler = true;
-                        SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                    // prevent control signal inheritance
+
+                    if (g_flags.disable_ctrl_c_signal_no_inherit) {
+                      SetConsoleCtrlHandler(NULL, FALSE);
                     }
 
                     SetLastError(0); // just in case
                     ret_create_proc = ::ShellExecuteEx(&sei);
 
                     win_error = GetLastError();
+
+                    // restore control signal
+
+                    if (g_flags.disable_ctrl_c_signal_no_inherit) {
+                      SetConsoleCtrlHandler(NULL, TRUE);
+                    }
 
                     shell_error = (INT)sei.hInstApp;
 
@@ -5874,9 +5866,10 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                         // always initialize
                         CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 
-                        if (g_enable_child_ctrl_handler) {
-                            g_ctrl_handler = true;
-                            SetConsoleCtrlHandler(ChildCtrlHandler, TRUE);   // update console signal handler
+                        // prevent control signal inheritance
+
+                        if (g_flags.disable_ctrl_c_signal_no_inherit) {
+                          SetConsoleCtrlHandler(NULL, FALSE);
                         }
 
                         SetLastError(0); // just in case
@@ -5887,6 +5880,12 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                             NULL, g_options.show_as);
 
                         win_error = GetLastError();
+
+                        // restore control signal
+
+                        if (g_flags.disable_ctrl_c_signal_no_inherit) {
+                          SetConsoleCtrlHandler(NULL, TRUE);
+                        }
                     }
                     break;
 
@@ -6154,9 +6153,16 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     }
     __finally {
         [&]() {
-            g_ctrl_handler = false;
+          // disable control signals on cleanup
 
-            // release worker threads
+          if (!g_flags.disable_ctrl_signals) {
+            SetConsoleCtrlHandler(DisabledAllCtrlHandler, TRUE);
+          }
+          if (!g_flags.disable_ctrl_c_signal && !g_flags.disable_ctrl_c_signal_no_inherit) {
+            SetConsoleCtrlHandler(NULL, TRUE);
+          }
+          
+          // release worker threads
 
             if (!is_console_access_ready_thread_lock_event_signaled && _is_valid_handle(g_console_access_ready_thread_lock_event)) {
                 SetEvent(g_console_access_ready_thread_lock_event);
@@ -7579,6 +7585,13 @@ void TranslateCommandLineToElevatedOrUnelevated(
         }
     }
     regular_flags.disable_ctrl_c_signal = false; // always reset
+
+    if (child_flags.disable_ctrl_c_signal_no_inherit) {
+        if (cmd_out_str_ptr) {
+            options_line += _T("/disable-ctrl-c-signal-no-inherit ");
+        }
+    }
+    regular_flags.disable_ctrl_c_signal_no_inherit = false; // always reset
 
 #ifndef _CONSOLE
     if (child_flags.allow_gui_autoattach_to_parent_console) {

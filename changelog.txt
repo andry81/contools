@@ -1,4 +1,9 @@
 2024.03.14:
+* fixed: Utilities/src/callf: revised control signals handling
+* new: Utilities/src/callf: added `/disable-ctrl-c-signal-no-inherit` to avoid a child process attribute inheritance
+* changed: Utilities/src/callf/version.def: version increment
+
+2024.03.14:
 * changed: ISSUES.txt: issues update
 
 2024.03.13:

@@ -568,6 +568,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /disable-wow64-fs-redir
           /disable-ctrl-signals
           /disable-ctrl-c-signal
+          /disable-ctrl-c-signal-no-inherit
           /disable-backslash-esc
           /no-esc
           /allow-gui-autoattach-to-parent-console
@@ -620,6 +621,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           /disable-wow64-fs-redir
           /disable-ctrl-signals
           /disable-ctrl-c-signals
+          /disable-ctrl-c-signal-no-inherit
           /disable-backslash-esc
           /no-esc
           /allow-gui-autoattach-to-parent-console
@@ -1314,16 +1316,30 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         Can not be used together with respective `/*-wow64-fs-redir` flags.
 
       /disable-ctrl-signals
-        Disable all control signals handling in this-process such as:
+        Disables all control signals handling in this-process such as:
           CTRL_C_EVENT         = 0
           CTRL_BREAK_EVENT     = 1
           CTRL_CLOSE_EVENT     = 2
           CTRL_LOGOFF_EVENT    = 5
           CTRL_SHUTDOWN_EVENT  = 6
 
+        Can be used together with respective `/disable-ctrl-c-signal*` flags.
+
       /disable-ctrl-c-signal
-        Disable only CTRL-C signal handling in this-process.
-        All other control signals will be passed into child process.
+        Disables only CTRL-C signal handling in this-process and in a child
+        process.
+
+        Can not be used together with `/disable-ctrl-c-signal-no-inherit` flag.
+        Can be used together with `/disable-ctrl-signals` flag.
+
+      /disable-ctrl-c-signal-no-inherit
+        The same as for `/disable-ctrl-c-signal`, but prevents the attribute
+        inheritance by a child process.
+
+        Basically has no effect if `/disable-ctrl-signals` flag is used.
+
+        Can not be used together with `/disable-ctrl-c-signal` flag.
+        Can be used together with `/disable-ctrl-signals` flag.
 
       /allow-gui-autoattach-to-parent-console
         In case if this-process console is not attached, then this-process
@@ -1441,6 +1457,34 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     Pipe name placeholders:
       {pid}     - this-process identifier as decimal number
       {ppid}    - parent process identifier as decimal number
+
+    Control signals handling.
+      Flag combinations and child `cmd.exe` process reaction while waiting on
+      `choice.exe` call:
+
+        <none>
+          CTRL+C      Terminate batch job (Y/N)?Terminate batch job (Y/N)?
+          CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
+
+        /disable-ctrl-c-signal-no-inherit
+          CTRL+C      Terminate batch job (Y/N)?
+          CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
+
+        /disable-ctrl-c-signal
+          CTRL+C      -
+          CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
+
+        /disable-ctrl-signals
+          CTRL+C      Terminate batch job (Y/N)?
+          CTRL+BREAK  Terminate batch job (Y/N)?
+
+        /disable-ctrl-signals /disable-ctrl-c-signal-no-inherit
+          CTRL+C      Terminate batch job (Y/N)?
+          CTRL+BREAK  Terminate batch job (Y/N)?
+
+        /disable-ctrl-signals /disable-ctrl-c-signal
+          CTRL+C      -
+          CTRL+BREAK  Terminate batch job (Y/N)?
 
     In case of ShellExecute the <ParametersFormatString> must contain only a
     command line arguments, but not the path to the executable (or document)

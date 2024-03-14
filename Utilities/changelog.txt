@@ -1,3 +1,8 @@
+2024.03.14:
+* fixed: src/callf: revised control signals handling
+* new: src/callf: added `/disable-ctrl-c-signal-no-inherit` to avoid a child process attribute inheritance
+* changed: src/callf/version.def: version increment
+
 2024.02.14:
 * fixed: bin/wshbazaar/wshdynacall/*register.bat: pause skip in case of script early exit
 

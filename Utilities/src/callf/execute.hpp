@@ -52,7 +52,9 @@ struct Flags
     bool            enable_wow64_fs_redir;
     bool            disable_wow64_fs_redir;
     bool            disable_ctrl_signals;
+    bool            disable_ctrl_signals_no_inherit;
     bool            disable_ctrl_c_signal;
+    bool            disable_ctrl_c_signal_no_inherit;
     bool            allow_gui_autoattach_to_parent_console;
     bool            disable_conout_reattach_to_visible_console;
     bool            allow_conout_attach_to_invisible_parent_console;
@@ -482,7 +484,7 @@ extern HWND   g_inherited_console_window;
 extern HWND   g_owned_console_window;
 extern bool   g_is_console_window_owner_proc_searched;
 
-BOOL WINAPI CtrlHandler(DWORD ctrl_type);
+BOOL WINAPI DisabledAllCtrlHandler(DWORD ctrl_type);
 
 DWORD WINAPI WriteOutputWatchThread(LPVOID lpParam);
 

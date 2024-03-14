@@ -90,6 +90,7 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
+    _T("/disable-ctrl-c-signal-no-inherit"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -135,6 +136,7 @@ const TCHAR * g_promote_or_demote_flags_to_preparse_arr[] = {
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
+    _T("/disable-ctrl-c-signal-no-inherit"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -162,6 +164,7 @@ const TCHAR * g_promote_or_demote_parent_flags_to_preparse_arr[] = {
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
+    _T("/disable-ctrl-c-signal-no-inherit"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -346,6 +349,7 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
+    _T("/disable-ctrl-c-signal-no-inherit"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -422,6 +426,7 @@ const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
+    _T("/disable-ctrl-c-signal-no-inherit"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -498,6 +503,7 @@ const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
+    _T("/disable-ctrl-c-signal-no-inherit"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -615,6 +621,7 @@ const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/disable-wow64-fs-redir"),
     _T("/disable-ctrl-signals"),
     _T("/disable-ctrl-c-signal"),
+    _T("/disable-ctrl-c-signal-no-inherit"),
 #ifndef _CONSOLE
     _T("/allow-gui-autoattach-to-parent-console"),
 #endif
@@ -625,7 +632,7 @@ const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
 };
 
 
-BOOL WINAPI DisabledCtrlHandler(DWORD ctrl_type)
+BOOL WINAPI DisabledAllCtrlHandler(DWORD ctrl_type)
 {
     return TRUE; // ignore
 }
@@ -2662,6 +2669,14 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         }
         return 0;
     }
+    if (IsArgEqualTo(arg, _T("/disable-ctrl-c-signal-no-inherit"))) {
+        if (is_excluded) return 3;
+        if (IsArgInFilter(start_arg, include_filter_arr)) {
+            flags.disable_ctrl_c_signal_no_inherit = true;
+            return 1;
+        }
+        return 0;
+    }
 #ifndef _CONSOLE
     if (IsArgEqualTo(arg, _T("/allow-gui-autoattach-to-parent-console"))) {
         if (is_excluded) return 3;
@@ -3365,10 +3380,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             // disable control signals
 
             if (g_flags.disable_ctrl_signals) {
-                SetConsoleCtrlHandler(DisabledCtrlHandler, TRUE);
-                SetConsoleCtrlHandler(NULL, TRUE);  // must be, otherwise CTRL-C still will be processed
+                SetConsoleCtrlHandler(DisabledAllCtrlHandler, TRUE);
             }
-            else if (g_flags.disable_ctrl_c_signal) {
+            if (g_flags.disable_ctrl_c_signal || g_flags.disable_ctrl_c_signal_no_inherit) {
                 SetConsoleCtrlHandler(NULL, TRUE);
             }
 
@@ -4267,10 +4281,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-wow64-fs-redir\n"));
             }
 
-            // /disable-ctrl-signals vs /disable-ctrl-c-signal
+            // /disable-ctrl-c-signal vs /disable-ctrl-c-signal-no-inherit
 
-            if (g_flags.disable_ctrl_signals && g_flags.disable_ctrl_c_signal) {
-                return invalid_format_flag_message(_T("disable control signal flags is mixed: /disable-ctrl-signals <-> /disable-ctrl-c-signal\n"));
+            if (g_flags.disable_ctrl_c_signal && g_flags.disable_ctrl_c_signal_no_inherit) {
+              return invalid_format_flag_message(_T("disable control signal flags is mixed: /disable-ctrl-c-signal <-> /disable-ctrl-c-signal-no-inherit\n"));
             }
 
             // /disable-ctrl-signals
@@ -4279,10 +4293,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-ctrl-signals\n"));
             }
 
-            // /disable-ctrl-c-signal
+            // /disable-ctrl-c-signal*
 
-            if (g_promote_or_demote_flags.disable_ctrl_c_signal && g_promote_or_demote_parent_flags.disable_ctrl_c_signal) {
-                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-ctrl-c-signal\n"));
+            if (g_promote_or_demote_flags.disable_ctrl_c_signal && g_promote_or_demote_parent_flags.disable_ctrl_c_signal ||
+                g_promote_or_demote_flags.disable_ctrl_c_signal_no_inherit && g_promote_or_demote_parent_flags.disable_ctrl_c_signal_no_inherit ||
+                g_promote_or_demote_flags.disable_ctrl_c_signal && g_promote_or_demote_parent_flags.disable_ctrl_c_signal_no_inherit ||
+                g_promote_or_demote_flags.disable_ctrl_c_signal_no_inherit && g_promote_or_demote_parent_flags.disable_ctrl_c_signal) {
+                return invalid_format_flag_message(_T("promote/demote option is mixed with promote-parent/demote-parent option: /disable-ctrl-c-signal*\n"));
             }
 
             // /allow-gui-autoattach-to-parent-console
