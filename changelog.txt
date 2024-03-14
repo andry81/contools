@@ -1,4 +1,7 @@
 2024.03.14:
+* fixed: Scripts/Tools/exec: exec_callf_prefix.bat, exec_terminal_prefix.bat: control signal handling
+
+2024.03.14:
 * new: Utilities/bin/contools: binaries update
 
 2024.03.14:

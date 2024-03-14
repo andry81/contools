@@ -77,14 +77,43 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 rem common flags for all terminals
 
 rem CAUTION:
-rem Because `callf.exe` does use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` variable in the command line.
-rem Otherwise we can fall into infinite recursion because of the unset of the `IMPL_MODE` variable.
+rem   Because `callf.exe` does use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` variable in the command line.
+rem   Otherwise we can fall into infinite recursion because of the unset of the `IMPL_MODE` variable.
 rem
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v IMPL_MODE 1
 
 if defined CONTOOLS_ROOT set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v CONTOOLS_ROOT "%CONTOOLS_ROOT%"
 
 if defined INIT_VARS_FILE set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v INIT_VARS_FILE "%INIT_VARS_FILE%"
+
+rem CAUTION:
+rem   We must always disable handling of signals to prevent `cmd.exe` double termination request.
+rem
+rem   Flag combinations and child `cmd.exe` process reaction while waiting on `choice.exe` call:
+rem
+rem     <none>
+rem       CTRL+C      Terminate batch job (Y/N)?Terminate batch job (Y/N)?
+rem       CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
+rem
+rem     /disable-ctrl-c-signal-no-inherit
+rem       CTRL+C      Terminate batch job (Y/N)?
+rem       CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
+rem
+rem     /disable-ctrl-c-signal
+rem       CTRL+C      -
+rem       CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
+rem
+rem     /disable-ctrl-signals
+rem       CTRL+C      Terminate batch job (Y/N)?
+rem       CTRL+BREAK  Terminate batch job (Y/N)?
+rem
+rem     /disable-ctrl-signals /disable-ctrl-c-signal-no-inherit
+rem       CTRL+C      Terminate batch job (Y/N)?
+rem       CTRL+BREAK  Terminate batch job (Y/N)?
+rem
+rem     /disable-ctrl-signals /disable-ctrl-c-signal
+rem       CTRL+C      -
+rem       CTRL+BREAK  Terminate batch job (Y/N)?
 
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string
 
