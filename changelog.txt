@@ -1,4 +1,7 @@
 2024.03.14:
+* fixed: Scripts/Tools/std/choice.bat: missed to return `choice.exe` exit code
+
+2024.03.14:
 * fixed: Scripts/Tools/exec: exec_callf_prefix.bat, exec_terminal_prefix.bat: control signal handling
 
 2024.03.14:

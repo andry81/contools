@@ -129,7 +129,7 @@ if defined MESSAGE (
   setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!MESSAGE!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do endlocal & "%SystemRoot%\System32\choice.exe" /C "%FLAG_INPUT_CHARS%"%BARE_FLAGS% /M "%%j"
 ) else "%SystemRoot%\System32\choice.exe" /C "%FLAG_INPUT_CHARS%"%BARE_FLAGS%
 
-exit /b 0
+exit /b
 
 :USE_SET_COMMAND_LOOP
 if defined MESSAGE (
