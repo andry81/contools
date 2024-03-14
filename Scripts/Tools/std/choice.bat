@@ -123,13 +123,31 @@ if not exist "%SystemRoot%\System32\choice.exe" goto USE_SET_COMMAND_LOOP
 rem default flags
 if not defined BARE_FLAGS set "BARE_FLAGS= /N"
 
+:USE_CHOICE_COMMAND_LOOP
+
 if defined MESSAGE (
   rem special escape sequence for the choice utility
   set "MESSAGE=%MESSAGE:!__?QUOT__!=\!__?QUOT__!%"
   setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!MESSAGE!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do endlocal & "%SystemRoot%\System32\choice.exe" /C "%FLAG_INPUT_CHARS%"%BARE_FLAGS% /M "%%j"
 ) else "%SystemRoot%\System32\choice.exe" /C "%FLAG_INPUT_CHARS%"%BARE_FLAGS%
 
-exit /b
+set LAST_ERROR=%ERRORLEVEL%
+
+rem not defined choice
+if not %LAST_ERROR% GTR 0 (
+  if %FLAG_EXIT_ON_UNDEFINED_KEY% EQU 0 goto USE_CHOICE_COMMAND_LOOP
+  exit /b 0
+)
+
+set /A COUNT=LAST_ERROR-1
+
+call set "INPUT_CHAR=%%FLAG_INPUT_CHARS:~%COUNT%,1%%"
+
+(
+  endlocal
+  set "%VARIABLE%=%INPUT_CHAR%"
+  exit /b %LAST_ERROR%
+)
 
 :USE_SET_COMMAND_LOOP
 if defined MESSAGE (
@@ -148,7 +166,7 @@ call set "INPUT_CHAR=%%%VARIABLE%%%"
 :SET_VARIABLE_CHARS_LOOP
 
 call set "INPUT_CHAR_VARIANT=%%FLAG_INPUT_CHARS:~%COUNT%,1%%"
-set /A EXIT_CODE=COUNT+1
+set /A LAST_ERROR=COUNT+1
 
 if not defined INPUT_CHAR_VARIANT (
   if %FLAG_EXIT_ON_UNDEFINED_KEY% EQU 0 goto USE_SET_COMMAND_LOOP
@@ -158,7 +176,7 @@ if not defined INPUT_CHAR_VARIANT (
 ) else if /i "%INPUT_CHAR_VARIANT%" == "%INPUT_CHAR%" (
   endlocal
   set "%VARIABLE%=%INPUT_CHAR%"
-  exit /b %EXIT_CODE%
+  exit /b %LAST_ERROR%
 )
 
 set /A COUNT+=1

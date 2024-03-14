@@ -1,4 +1,9 @@
 2024.03.14:
+* fixed: Scripts/Tools/std/choice.bat: missed to restore the choice variable
+* new: Scripts/Tests/manual/utilities: `callf` utility manual tests
+* changed: Scripts/Tools/exec: exec_callf_prefix.bat, exec_terminal_prefix.bat: code cleanup
+
+2024.03.14:
 * changed: Scripts/Tests: code cleanup
 
 2024.03.14:

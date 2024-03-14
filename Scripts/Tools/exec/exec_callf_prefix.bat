@@ -97,32 +97,7 @@ if %FLAG_ELEVATE% NEQ 0 if defined INIT_VARS_FILE set CALLF_BARE_FLAGS=%CALLF_BA
 
 rem CAUTION:
 rem   We must always disable handling of signals to prevent `cmd.exe` double termination request.
-rem
-rem   Flag combinations and child `cmd.exe` process reaction while waiting on `choice.exe` call:
-rem
-rem     <none>
-rem       CTRL+C      Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-rem       CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-rem
-rem     /disable-ctrl-c-signal-no-inherit
-rem       CTRL+C      Terminate batch job (Y/N)?
-rem       CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-rem
-rem     /disable-ctrl-c-signal
-rem       CTRL+C      -
-rem       CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-rem
-rem     /disable-ctrl-signals
-rem       CTRL+C      Terminate batch job (Y/N)?
-rem       CTRL+BREAK  Terminate batch job (Y/N)?
-rem
-rem     /disable-ctrl-signals /disable-ctrl-c-signal-no-inherit
-rem       CTRL+C      Terminate batch job (Y/N)?
-rem       CTRL+BREAK  Terminate batch job (Y/N)?
-rem
-rem     /disable-ctrl-signals /disable-ctrl-c-signal
-rem       CTRL+C      -
-rem       CTRL+BREAK  Terminate batch job (Y/N)?
+rem   For details see `callf` tests.
 
 if %FLAG_ELEVATE% EQU 0 (
   set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string
