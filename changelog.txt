@@ -1,3 +1,6 @@
+2024.03.15:
+* refactor: Scripts/Tests/manual/utilities/contools/callf: tests refactor
+
 2024.03.14:
 * fixed: Scripts/Tools/std/choice.bat: missed to restore the choice variable
 * new: Scripts/Tests/manual/utilities: `callf` utility manual tests
