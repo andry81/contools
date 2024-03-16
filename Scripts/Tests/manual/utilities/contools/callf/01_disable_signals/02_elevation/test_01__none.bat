@@ -10,8 +10,10 @@ call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
   /v IMPL_MODE 1 /no-expand-env /no-subst-pos-vars /no-esc ^
+  /promote{ /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string /ret-child-exit }%CALLF_PROMOTE_PARENT_FLAGS% ^
+  /elevate{ /no-window /create-inbound-server-pipe-to-stdout "callf_test_stdout_{pid}" /create-inbound-server-pipe-to-stderr "callf_test_stderr_{pid}" ^
+  }{ /attach-parent-console /reopen-stdout-as-client-pipe "callf_test_stdout_{ppid}" /reopen-stderr-as-client-pipe "callf_test_stderr_{ppid}" }
   /print-win-error-string /ret-child-exit /pause-on-exit ^
-  /disable-ctrl-signals /disable-ctrl-c-signal-no-inherit ^
   "%COMSPEC%" "/c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
   %*
 
