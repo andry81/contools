@@ -39,16 +39,16 @@ PVOID g_disable_wow64_fs_redir_ptr = nullptr;
 // sets true just after the CreateProcess or ShellExecute success execute
 bool g_is_process_executed = false;
 
-// sets true in case if process is on self elevation
-bool g_is_process_self_elevation = false;
+// sets true in case if this-process is on self elevation or unelevation
+bool g_is_this_process_self_elevating = false;
 
-// sets true in case if process is not elevated and requested for self elevation
-bool g_is_process_elevating = false;
+// sets true in case if this-process is not elevated and is requested for self elevation
+bool g_is_child_process_elevating = false;
 
-// sets true in case if process is elevated and requested for self unelevation
-bool g_is_process_unelevating = false;
+// sets true in case if this-process is elevated and is requested for self unelevation
+bool g_is_child_process_unelevating = false;
 
-bool g_is_process_elevated = false;
+bool g_is_this_process_elevated = false;
 
 
 const TCHAR * g_empty_flags_arr[] = {
@@ -63,13 +63,13 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/print-win-error-string"),
     _T("/print-shell-error-string"),
     _T("/no-print-gen-error-string"),
+    _T("/shell-exec"),
+    _T("/shell-exec-unelevate-from-explorer"),
     _T("/no-windows-console"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
     _T("/skip-pause-on-detached-console"),
-    _T("/shell-exec"),
-    _T("/shell-exec-unelevate-from-explorer"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/elevate"),
@@ -116,11 +116,6 @@ const TCHAR * g_elevate_or_unelevate_child_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_promote_or_demote_flags_to_preparse_arr[] = {
-    _T("/ret-create-proc"),
-    _T("/ret-win-error"),
-    _T("/ret-child-exit"),
-    _T("/print-win-error-string"),
-    _T("/no-print-gen-error-string"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -148,7 +143,6 @@ const TCHAR * g_promote_or_demote_flags_to_preparse_arr[] = {
 const TCHAR * g_promote_or_demote_parent_flags_to_preparse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
-    _T("/ret-child-exit"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -194,10 +188,6 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/print-shell-error-string"),
     _T("/no-print-gen-error-string"),
     _T("/no-sys-dialog-ui"),
-    _T("/pause-on-exit-if-error-before-exec"),
-    _T("/pause-on-exit-if-error"),
-    _T("/pause-on-exit"),
-    _T("/skip-pause-on-detached-console"),
     _T("/shell-exec"),
     _T("/shell-exec-unelevate-from-explorer"),
     _T("/shell-exec-expand-env"),
@@ -209,11 +199,15 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/no-subst-vars"),
     _T("/no-subst-pos-vars"),
     _T("/no-subst-empty-tail-vars"),
-    _T("/load-parent-proc-init-env-vars"),
     _T("/no-std-inherit"),
     _T("/no-stdin-inherit"),
     _T("/no-stdout-inherit"),
     _T("/no-stderr-inherit"),
+    _T("/load-parent-proc-init-env-vars"),
+    _T("/pause-on-exit-if-error-before-exec"),
+    _T("/pause-on-exit-if-error"),
+    _T("/pause-on-exit"),
+    _T("/skip-pause-on-detached-console"),
     _T("/allow-throw-seh-except"),
     _T("/allow-expand-unexisted-env"),
     _T("/allow-subst-empty-args"),
@@ -360,8 +354,6 @@ const TCHAR * g_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
-    _T("/no-sys-dialog-ui"),
-    _T("/no-wait"),
     _T("/no-window"),
     _T("/no-window-console"),
     _T("/no-expand-env"),
@@ -436,6 +428,7 @@ const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_elevate_or_unelevate_child_flags_to_parse_arr[] = {
+    _T("/D"),
     _T("/no-expand-env"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/allow-expand-unexisted-env"),
@@ -480,12 +473,7 @@ const TCHAR * g_elevate_or_unelevate_child_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
-    _T("/ret-create-proc"),
-    _T("/ret-win-error"),
-    _T("/ret-child-exit"),
-    _T("/print-win-error-string"),
-    _T("/print-shell-error-string"),
-    _T("/no-print-gen-error-string"),
+    _T("/no-wait"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -515,7 +503,7 @@ const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
 const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
-    _T("/ret-child-exit"),
+    _T("/no-wait"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -670,7 +658,7 @@ inline void MergeOptions(Flags & out_flags, Options & out_options,
 
     // merge all except child flags and options
 
-    if (g_is_process_self_elevation) {
+    if (g_is_this_process_self_elevating) {
         out_flags.merge(elevate_or_unelevate_parent_flags);
         out_options.merge(elevate_or_unelevate_parent_options);
     }
@@ -862,8 +850,8 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
         if (is_excluded) return 3;
         if (argc >= arg_offset + 1 && (arg = argv[arg_offset])) {
             if (IsArgInFilter(start_arg, include_filter_arr)) {
-                if (flags.shell_exec_unelevate) {
-                    return invalid_format_flag_message(_T("`/shell-exec` option is mixed with another `/shell-exec-unelevate*`\n"));
+                if (flags.shell_exec) {
+                    return invalid_format_flag_message(_T("`/shell-exec` option or flag is mixed with another `/shell-exec`\n"));
                 }
 
                 flags.shell_exec = true;
@@ -878,11 +866,8 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/shell-exec-unelevate-from-explorer"))) {
         if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
-            if (flags.shell_exec) {
-                return invalid_format_flag_message(_T("`/shell-exec-unelevate-from-explorer` option is mixed with `/shell-exec`\n"));
-            }
-            if (flags.unelevate && options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer) {
-                return invalid_format_flag_message(_T("`/shell-exec-unelevate-from-explorer` option is mixed with `/unelevate-by-shell-exec-from-explorer`\n"));
+            if (flags.shell_exec_unelevate) {
+                return invalid_format_flag_message(_T("`/shell-exec-unelevate-from-explorer` option or flag is mixed with another `/shell-exec-unelevate*`\n"));
             }
 
             flags.shell_exec_unelevate = true;
@@ -1147,6 +1132,10 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/elevate"))) {
         if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
+            if (flags.elevate) {
+              return invalid_format_flag_message(_T("`/elevate` option or flag is mixed with another `/elevate*`\n"));
+            }
+          
             flags.elevate = true;
             return 1;
         }
@@ -1155,19 +1144,12 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/unelevate"))) {
         if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
-            if (!flags.shell_exec) {
-                if (flags.unelevate && options.unelevate_method != UnelevationMethod_Default) {
-                    return invalid_format_flag_message(_T("`/unelevate` option or flag is mixed with another `/unelevate*`\n"));
-                }
-            }
-            else if (UnelevationMethod_Default == UnelevationMethod_ShellExecuteFromExplorer) {
-                if (flags.unelevate && options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer) {
-                    return invalid_format_flag_message(_T("`/unelevate-by-shell-exec-from-explorer` option is mixed with `/shell-exec-unelevate-from-explorer`\n"));
-                }
+            if (flags.unelevate) {
+                return invalid_format_flag_message(_T("`/unelevate` option or flag is mixed with another `/unelevate*`\n"));
             }
 
             flags.unelevate = true;
-            options.unelevate_method = UnelevationMethod_Default; // just in case
+            options.unelevate_method = UnelevationMethod_Default;
             return 1;
         }
         return 0;
@@ -1175,7 +1157,7 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/unelevate-1")) || IsArgEqualTo(arg, _T("/unelevate-by-search-proc-to-adjust-token"))) {
         if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
-            if (flags.unelevate && options.unelevate_method != UnelevationMethod_SearchProcToAdjustToken) {
+            if (flags.unelevate) {
                 return invalid_format_flag_message(_T("`/unelevate-1` option or flag is mixed with another `/unelevate*`\n"));
             }
 
@@ -1188,13 +1170,8 @@ int ParseArgToOption(int & error, const TCHAR * arg, int argc, const TCHAR * arg
     if (IsArgEqualTo(arg, _T("/unelevate-2")) || IsArgEqualTo(arg, _T("/unelevate-by-shell-exec-from-explorer"))) {
         if (is_excluded) return 3;
         if (IsArgInFilter(start_arg, include_filter_arr)) {
-            if (!flags.shell_exec) {
-                if (flags.unelevate && options.unelevate_method != UnelevationMethod_ShellExecuteFromExplorer) {
-                    return invalid_format_flag_message(_T("`/unelevate-2` option or flag is mixed with another `/unelevate*`\n"));
-                }
-            }
-            else if (flags.unelevate && options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer) {
-                return invalid_format_flag_message(_T("`/unelevate-by-shell-exec-from-explorer` option is mixed with `/shell-exec-unelevate-from-explorer`\n"));
+            if (flags.unelevate) {
+                return invalid_format_flag_message(_T("`/unelevate-2` option or flag is mixed with another `/unelevate*`\n"));
             }
 
             flags.unelevate = true;
@@ -3216,7 +3193,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 arg_offset += 1;
             }
 
+            // /shell-exec vs /shell-exec-unelevate*
+
+            if (g_regular_flags.shell_exec && g_regular_flags.shell_exec_unelevate) {
+                return invalid_format_flag_message(_T("`/shell-exec` option is mixed with another `/shell-exec-unelevate*`\n"));
+            }
+            if (g_regular_flags.shell_exec_unelevate && g_regular_options.shell_exec_method == ShellExecMethod_UnelevateFromExplorer &&
+                g_regular_flags.unelevate && g_regular_options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer) {
+                return invalid_format_flag_message(_T("`/shell-exec-unelevate-from-explorer` option is mixed with `/unelevate-by-shell-exec-from-explorer`\n"));
+            }
+
             // elevate*, promote* vs unelevate*, demote*
+
             if (g_regular_flags.elevate && g_regular_flags.unelevate) {
                 return invalid_format_flag_message(_T("`/elevate*` option or flag is mixed with `/unelevate`\n"));
             }
@@ -3232,22 +3220,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             // update elevation state
             if (g_regular_flags.elevate || g_regular_flags.unelevate) {
-                g_is_process_self_elevation = true;
+                g_is_this_process_self_elevating = true;
             }
 
             if (g_regular_flags.elevate || g_regular_flags.shell_exec && g_regular_options.shell_exec_verb == _T("runas")) {
-                const bool is_process_elevated = g_is_process_elevated = _is_process_elevated() ? 1 : 0;
+                const bool is_process_elevated = g_is_this_process_elevated = _is_process_elevated() ? 1 : 0;
                 if (!is_process_elevated) {
-                    g_is_process_elevating = true;
+                    g_is_child_process_elevating = true;
                 }
 
                 // we must drop this flag immediately to avoid potential accidental recursion in child process
                 g_regular_flags.elevate = false;
             }
             else if (g_regular_flags.unelevate || g_regular_flags.shell_exec_unelevate) {
-                const bool is_process_elevated = g_is_process_elevated = _is_process_elevated() ? 1 : 0;
+                const bool is_process_elevated = g_is_this_process_elevated = _is_process_elevated() ? 1 : 0;
                 if (is_process_elevated) {
-                    g_is_process_unelevating = true;
+                    g_is_child_process_unelevating = true;
                 }
 
                 // we must drop this flag immediately to avoid potential accidental recursion in child process
@@ -3255,9 +3243,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
             // reset if no need self elevation
-            if (g_is_process_self_elevation) {
-                if (!g_is_process_elevating && !g_is_process_unelevating) {
-                    g_is_process_self_elevation = false;
+            if (g_is_this_process_self_elevating) {
+                if (!g_is_child_process_elevating && !g_is_child_process_unelevating) {
+                    g_is_this_process_self_elevating = false;
                 }
             }
 
@@ -3265,7 +3253,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_self_elevation) {
+            if (g_is_this_process_self_elevating) {
                 TranslateCommandLineToElevatedOrUnelevated(
                     nullptr, nullptr, nullptr,
                     g_flags, g_options,
@@ -3987,7 +3975,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_self_elevation) {
+            if (g_is_this_process_self_elevating) {
                 TranslateCommandLineToElevatedOrUnelevated(
                     nullptr, nullptr, nullptr,
                     g_flags, g_options,
@@ -4857,7 +4845,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_self_elevation) {
+            if (g_is_this_process_self_elevating) {
                 std::tstring elevated_cmd_out_str;
 
                 TranslateCommandLineToElevatedOrUnelevated(
@@ -4877,7 +4865,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 SubstOptionsPlaceholders(g_options);
 
                 // update options
-                if (g_is_process_elevating) {
+                if (g_is_child_process_elevating) {
                     if (g_options.shell_exec_verb != _T("runas")) {
                         g_options.shell_exec_verb = _T("runas");
                     }

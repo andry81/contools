@@ -62,6 +62,7 @@ struct Flags
     bool            write_console_stdin_back;
 
     bool            shell_exec;
+    bool            shell_exec_expand_env;
     bool            shell_exec_unelevate;
     bool            elevate;
     bool            unelevate;
@@ -136,7 +137,6 @@ struct Flags
     bool            pipe_inout_child;
     bool            pipe_out_child;
     bool            pipe_stdin_to_stdout;
-    bool            shell_exec_expand_env;
 
     bool            stdin_echo;
     bool            no_stdin_echo;
@@ -222,6 +222,7 @@ struct Options
 
     uint_t          wait_child_first_time_timeout_ms;
 
+    ShellExecMethod   shell_exec_method;
     UnelevationMethod unelevate_method;
 
     int             stdout_dup;

@@ -99,9 +99,7 @@ rem CAUTION:
 rem   We must always disable handling of signals to prevent `cmd.exe` double termination request.
 rem   For details see `callf` tests.
 
-if %FLAG_ELEVATE% EQU 0 (
-  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string
-)
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string
 
 if %FLAG_NO_LOG% EQU 0 (
   if %FLAG_ELEVATE% EQU 0 (
@@ -111,28 +109,23 @@ if %FLAG_NO_LOG% EQU 0 (
   )
 )
 
-if defined CALLF_PROMOTE_PARENT_FLAGS set CALLF_PROMOTE_PARENT_FLAGS= /promote-parent{%CALLF_PROMOTE_PARENT_FLAGS% }
-
 if %FLAG_NO_LOG% EQU 0 (
   if %FLAG_ELEVATE% NEQ 0 (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
-/promote{ /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string /ret-child-exit }%CALLF_PROMOTE_PARENT_FLAGS% ^
+/promote-parent{%CALLF_PROMOTE_PARENT_FLAGS% } ^
 /elevate{ /no-window /create-inbound-server-pipe-to-stdout "%ELEVATE_PREFIX_NAME%_stdout_{pid}" /create-inbound-server-pipe-to-stderr "%ELEVATE_PREFIX_NAME%_stderr_{pid}" ^
 }{ /attach-parent-console /reopen-stdout-as-client-pipe "%ELEVATE_PREFIX_NAME%_stdout_{ppid}" /reopen-stderr-as-client-pipe "%ELEVATE_PREFIX_NAME%_stderr_{ppid}" }
   )
 ) else (
   if %FLAG_ELEVATE% NEQ 0 (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
-/promote{ /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string /ret-child-exit }%CALLF_PROMOTE_PARENT_FLAGS% ^
+/promote-parent{%CALLF_PROMOTE_PARENT_FLAGS% } ^
 /elevate{ /no-window }{ /attach-parent-console }
   )
 )
 
-if %FLAG_ELEVATE% EQU 0 (
-  set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit
-)
-
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
+/no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit ^
 /ra "%%" "%%?01%%" /v "?01" "%%" ^
 /shift-%FLAG_SHIFT%
 

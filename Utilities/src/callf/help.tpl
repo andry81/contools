@@ -7,7 +7,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
   Terms:
     this-process
-      A `callf*.exe` process which is a parent and a child to another
+      A `callf*.exe` process. Can be a parent or a child to another
       `callf*.exe` process.
     child this-process
       A `callf*.exe` process which is a child to another `callf*.exe`
@@ -48,31 +48,64 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /chcp-in <codepage>
         Console input code page.
 
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
+
       /chcp-out <codepage>
         Console output code page.
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
 
       /ret-create-proc
         Return CreateProcess or ShellExecute return code.
 
         Has priority over all others `/ret-*` flags.
 
+        Has no effect if `/no-wait` flag is defined.
+
+        /[un]elevate*
+          If applied, then has effect only for this-child process and
+          this-parent automatically implies `/ret-child-exit`.
+
+          Can be applied for this-parent process only.
+
       /ret-win-error
         Return Win32 error code.
 
         Has priority over `/ret-child-exit` flag.
 
+        Has no effect if `/no-wait` or flag is defined.
         Has no effect if `/ret-create-proc` flag is defined.
+
+        /[un]elevate*
+          If applied, then has effect only for this-child process and
+          this-parent automatically implies `/ret-child-exit`.
+
+          Can be applied for this-parent process only.
 
       /win-error-langid <LANGID>
         Language ID to format Win32 error messages.
 
-      /ret-child-exit
-        Return child process exit code (if has no `/no-wait` flag).
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
 
+      /ret-child-exit
+        Return child process exit code.
+
+        Has no effect if `/no-wait` flag is defined.
         Has no effect if any other `/ret-*` flag is defined.
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
+
+          Can NOT be applied for this-parent process only.
 
       /print-win-error-string
         Print Win32 error string (even if `/ret-win-error` flag is not set).
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
 
       /print-shell-error-string
         CreateProcess
@@ -83,8 +116,14 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         /unelevate-by-shell-exec-from-explorer
           Print related COM error string.
 
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
+
       /no-print-gen-error-string
         Don't print generic error string.
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
 
       /no-sys-dialog-ui
         CreateProcess
@@ -93,10 +132,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           Uses SEE_MASK_FLAG_NO_UI flag.
           Do not display an error message box if an error occurs.
 
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
+
       /shell-exec <Verb>
         Call to ShellExecute instead of CreateProcess.
-
-        Has no effect if idle execution is used.
 
         <Verb>:
           edit
@@ -123,6 +163,18 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
             elevated or enter the credentials of an administrator account used
             to run the application.
 
+        Has no effect if idle execution is used.
+
+        Can not be used together with another `/shell-exec-*` option or flag.
+
+        Can be used together with respective `/elevate*` and `/unelevate*`
+        option or flag.
+
+        /[un]elevate*
+          If applied, then has effect only for this-child process.
+
+          Can not be applied for this-parent process only.
+
       /shell-exec-unelevate-from-explorer
         Call to IShellDispatch2::ShellExecute instead of CreateProcess to
         unelevate the child process.
@@ -134,10 +186,15 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           process of a child will be the Windows Shell process instead of the
           this-process.
 
+        Has no effect if idle execution is used.
+
         Can not be used together with another `/shell-exec*` and
         `/unelevate-by-shell-exec-from-explorer` options.
 
-        Has no effect if idle execution is used.
+        /[un]elevate*
+          If applied, then has effect only for this-child process.
+
+          Can not be applied for this-parent process only.
 
       /shell-exec-expand-env
         CreateProcess
@@ -147,6 +204,14 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           Expand any environment variables specified in the string given by
           the <CurrentDirectory> or <FilePathFormatString> parameter.
 
+        Has no effect if idle execution is used.
+        Has no effect if `/shell-exec` is not defined.
+
+        /[un]elevate*
+          If applied, then has effect only for this-child process.
+
+          Can not be applied for this-parent process only.
+
       /D <CurrentDirectory>
         CreateProcess
           Uses <CurrentDirectory> as parameter in call to CreateProcess.
@@ -155,6 +220,16 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         If `<CurrentDirectory>` is `.`, then it has special meaning to pass
         current directory into child process.
+
+        /[un]elevate*
+          If applied, then has effect only for this-parent process.
+
+          By default does not pass into the this-child process command line
+          because it must inherit the current directory.
+
+          Can be passed into the this-child process command line separately to
+          propagate the current directory directly into the child process over
+          the privileges isolation.
 
       /no-wait
         CreateProcess
@@ -170,47 +245,98 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Overrides `/wait-child-start` flag.
 
+        /[un]elevate*
+          If applied, then has effect only for this-child process.
+
+          By default does not apply for this-parent process because the
+          execution functionality is relied on the end function call in the
+          this-child process.
+
+          Can be applied for this-parent only or both this- process.
+
       /no-window
-        Hide a child process window including console window.
+        Hides a child process window including console window.
 
         CreateProcess
-          Overrides `/showas` option with `SW_HIDE` value.
+          Inherits the parent's console window.
         ShellExecute
-          By default uses the SEE_MASK_NO_CONSOLE flag.
+          Uses SEE_MASK_NO_CONSOLE flag.
+          Use to inherit the parent's console for the new process instead of
+          having it create a new console. It is the opposite of using a
+          CREATE_NEW_CONSOLE flag with CreateProcess.
 
-        Overrides `/showas` flag.
+        Overrides `/showas` option with `SW_HIDE` value.
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
+
+          Can be applied for this-parent process only.
 
       /no-window-console
-        Create child process with hidden console window.
+        Creates a child process without console window or with hidden console
+        window.
 
         CreateProcess
           Uses CREATE_NO_WINDOW flag.
+          The process is a console application that is being run without a
+          console window. Therefore, the console handle for the application is
+          not set.
+          This flag is ignored if the application is not a console application,
+          or if it is used with either CREATE_NEW_CONSOLE or DETACHED_PROCESS.
         ShellExecute
-          Removes usage of the SEE_MASK_NO_CONSOLE flag.
-          Implies `/no-window` flag.
+          Has no usage of SEE_MASK_NO_CONSOLE flag.
+          Overrides `/showas` option with `SW_HIDE` value.
 
-        Can not be used together with `/detach-child-console` flag.
+        Overrides `/no-window` flag.
 
         Has no effect if `/create-child-console` flag is used.
 
+        Can not be used together with `/detach-child-console` flag.
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
+
+          Can be applied for this-parent process only.
+
       /pause-on-exit-if-error-before-exec
-        Pause on exit if an error happened before a command line application
-        execution. By default it prints "Press any key to continue . . ."
-        message to the stdout.
+        Single pause on exit if an error happened before a command line
+        application execution.
+        By default it prints "Press any key to continue . . ." message to the
+        stdout.
+
         This-process must be attached to a console, otherwise the pause would
         be skipped.
+
+        /[un]elevate*
+          If applied, then has effect only for this-child process.
+          Can not be applied to both this- processes because it is a single
+          pause.
 
       /pause-on-exit-if-error
-        Pause on exit if an error happened. By default it prints
-        "Press any key to continue . . ." message to the stdout.
+        Single pause on exit if an error happened.
+        By default it prints "Press any key to continue . . ." message to the
+        stdout.
+
         This-process must be attached to a console, otherwise the pause would
         be skipped.
 
+        /[un]elevate*
+          If applied, then has effect only for this-child process.
+          Can not be applied to both this- processes because it is a single
+          pause.
+
       /pause-on-exit
-        Pause on exit. By default it prints "Press any key to continue . . ."
-        message to the stdout.
+        Single pause on exit.
+        By default it prints "Press any key to continue . . ." message to the
+        stdout.
+
         This-process must be attached to a console, otherwise the pause would
         be skipped.
+
+        /[un]elevate*
+          If applied, then has effect only for this-child process.
+          Can not be applied to both this- processes because it is a single
+          pause.
 
       /skip-pause-on-detached-console
         By default all `/pause*` flags does restore console if was detached
@@ -480,10 +606,6 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           Limited set of flags to pass exceptionally into the this-parent
           (not elevated) process.
 
-          /no-sys-dialog-ui
-          /no-wait
-          /no-window
-          /no-window-console
           /no-expand-env
           /allow-expand-unexisted-env
           /init-com
@@ -509,6 +631,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           Limited set of flags to pass exceptionally into the this-child
           (elevated) process.
 
+          /D <CurrentDirectory>
+          /no-window
+          /no-window-console
           /no-expand-env
           /load-parent-proc-init-env-vars
           /allow-expand-unexisted-env
@@ -537,6 +662,11 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         In case if `/elevate*` flag or option is not used or is not executed,
         then does declare `<Flags>` for the this-process only.
 
+        NOTE:
+          Basically excludes options and flags which by default applies to both
+          this- processes and has meaning only for those options and flags
+          which by default applies either to this-child or this-parent process.
+
         The same flag can not be used together with `/promote-parent{ ... }`
         option. Silently overrides the same regular flags.
 
@@ -544,12 +674,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         flags.
 
         <Flags>:
-          /ret-create-proc
-          /ret-win-error
-          /ret-child-exit
-          /print-win-error-string
-          /print-shell-error-string
-          /no-print-gen-error-string
+          /no-wait
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
@@ -590,7 +715,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         <Flags>:
           /ret-create-proc
           /ret-win-error
-          /ret-child-exit
+          /no-wait
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
@@ -1123,6 +1248,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         CreateProcess
           Uses CREATE_NEW_CONSOLE flag.
+          The new process has a new console, instead of inheriting its parent's
+          console (the default).
+          This flag cannot be used with DETACHED_PROCESS.
         ShellExecute
           Removes usage of the SEE_MASK_NO_CONSOLE flag.
 
@@ -1134,6 +1262,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         CreateProcess
           Uses DETACHED_PROCESS flag.
+          For console processes, the new process does not inherit its parent's
+          console (the default). The new process can call the AllocConsole
+          function at a later time to create a console.
+          This flag cannot be used with CREATE_NEW_CONSOLE.
         ShellExecute
           Has no effect, just uses SEE_MASK_NO_CONSOLE flag.
 
@@ -1460,31 +1592,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
     Control signals handling.
       Flag combinations and child `cmd.exe` process reaction while waiting on
-      `choice.exe` call:
-
-        <none>
-          CTRL+C      Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-          CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-
-        /disable-ctrl-c-signal-no-inherit
-          CTRL+C      Terminate batch job (Y/N)?
-          CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-
-        /disable-ctrl-c-signal
-          CTRL+C      -
-          CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-
-        /disable-ctrl-signals
-          CTRL+C      Terminate batch job (Y/N)?
-          CTRL+BREAK  Terminate batch job (Y/N)?
-
-        /disable-ctrl-signals /disable-ctrl-c-signal-no-inherit
-          CTRL+C      Terminate batch job (Y/N)?
-          CTRL+BREAK  Terminate batch job (Y/N)?
-
-        /disable-ctrl-signals /disable-ctrl-c-signal
-          CTRL+C      -
-          CTRL+BREAK  Terminate batch job (Y/N)?
+      the user input see in the readme file from the `callf` tests directory.
 
     In case of ShellExecute the <ParametersFormatString> must contain only a
     command line arguments, but not the path to the executable (or document)
@@ -1493,7 +1601,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     If <CurrentDirectory> is not defined, then the current working directory
     is used.
 
-  Return codes if `/ret-*` option is not defined:
+  Return codes if one of these is applied:
+    * `/ret-*` option is not defined;
+    * `ret-child-exit` is defined, but child process is not executed.
    -255 - unspecified error
    -254 - SEH exception
    -7   - named pipe connection timeout

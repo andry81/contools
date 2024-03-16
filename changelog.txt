@@ -1,3 +1,8 @@
+2024.03.XX:
+* changed: Utilities/src/callf: revised all flags and options for elevation support, reimplemented most regular flags and options to be used by default for both this-parent and this-child
+* changed: Utilities/src/callf: reimplemented `/shell-exec-unelevate-from-explorer` flag to be used separately from elevation
+* changed: Utilities/src/callf/help.tpl: revised usage of all options and flags between each other on composition and on collisions
+
 2024.03.15:
 * refactor: Scripts/Tests/manual/utilities/contools/callf: tests refactor
 

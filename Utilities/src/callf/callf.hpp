@@ -22,10 +22,10 @@ DECLARE_DYN_DLL_FUNC(GetFileInformationByHandleEx,      WINBASEAPI BOOL (WINAPI 
 DECLARE_DYN_DLL_FUNC(SetEnvironmentStringsW,            WINBASEAPI BOOL (WINAPI *)(LPWCH));         // Windows XP x64 SP2+
 
 extern bool g_is_process_executed;
-extern bool g_is_process_self_elevation;
-extern bool g_is_process_elevating;
-extern bool g_is_process_unelevating;
-extern bool g_is_process_elevated;
+extern bool g_is_this_process_self_elevating;
+extern bool g_is_child_process_elevating;
+extern bool g_is_child_process_unelevating;
+extern bool g_is_this_process_elevated;
 
 extern struct StdHandles      g_detached_std_handles;
 extern struct StdHandlesState g_detached_std_handles_state;

@@ -14,8 +14,22 @@
 #include <atlbase.h>
 #include <stdlib.h>
 
+// /shell-exec*
+enum ShellExecMethod
+{
+    ShellExecMethod_None                            = 0,
+
+    ShellExecMethod_ElevateFromExplorer             = 1,    // ShellExecute
+    ShellExecMethod_UnelevateFromExplorer           = 2,    // same as UnelevationMethod_ShellExecuteFromExplorer
+
+    ShellExecMethod_Default                         = ShellExecMethod_ElevateFromExplorer
+};
+
+// /unelevate*
 enum UnelevationMethod
 {
+    UnelevationMethod_None                          = 0,
+
     UnelevationMethod_SearchProcToAdjustToken       = 1,    // based on: https://stackoverflow.com/questions/45915599/how-can-i-unelevate-a-process/45921237#45921237
     UnelevationMethod_ShellExecuteFromExplorer      = 2,    // based on: https://stackoverflow.com/questions/37948064/how-to-launch-non-elevated-administrator-process-from-elevated-administrator-con/37949303#37949303
 
