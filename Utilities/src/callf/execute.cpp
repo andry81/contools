@@ -4635,7 +4635,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         }
     }
 
-    g_no_std_inherit = g_is_process_elevating || g_flags.no_std_inherit || is_idle_execute;
+    g_no_std_inherit = g_is_this_process_elevating || g_flags.no_std_inherit || is_idle_execute;
 
     g_no_stdin_inherit = g_no_std_inherit || g_flags.no_stdin_inherit || g_flags.pipe_stdin_to_child_stdin;
     g_no_stdout_inherit = g_no_std_inherit || g_flags.no_stdout_inherit || g_flags.pipe_stdin_to_child_stdin;
@@ -4651,7 +4651,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
     //g_pipe_out_child = !is_idle_execute && g_flags.pipe_out_child;
 
     // on idle execution always pipe stdin to stdout
-    g_pipe_stdin_to_stdout = !g_is_process_elevating && (g_flags.pipe_stdin_to_stdout || is_idle_execute);
+    g_pipe_stdin_to_stdout = !g_is_this_process_elevating && (g_flags.pipe_stdin_to_stdout || is_idle_execute);
 
     g_tee_stdout_dup_stdin = g_options.tee_stdout_dup == STDIN_FILENO || g_flags.tee_conout_dup;
     g_tee_stderr_dup_stdin = g_options.tee_stderr_dup == STDIN_FILENO || g_flags.tee_conout_dup;
@@ -5649,7 +5649,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
 
-        const bool is_shell_exec_unelevate_from_explorer = g_is_process_unelevating && g_options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer;
+        const bool is_shell_exec_unelevate_from_explorer = g_is_this_process_unelevating && g_options.unelevate_method == UnelevationMethod_ShellExecuteFromExplorer;
 
         if (g_options.change_current_dir != _T(".")) {
             current_dir = g_options.change_current_dir;
@@ -5729,7 +5729,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 memcpy(cmd_buf.data(), cmd, cmd_buf.size());
             }
 
-            if (!is_shell_exec && !g_is_process_self_elevation) {
+            if (!is_shell_exec && !g_is_this_process_self_elevation) {
                 if (si.dwFlags & STARTF_USESTDHANDLES) {
                     if (_is_valid_handle(si.hStdInput)) {
                         if (_get_file_type(si.hStdInput) == FILE_TYPE_CHAR) {
@@ -5760,6 +5760,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                     NULL,
                     !current_dir.empty() ? current_dir.c_str() : NULL,
                     &si, &pi);
+
                 win_error = GetLastError();
 
                 // restore control signal
@@ -5774,7 +5775,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                 }
             }
             else {
-                if (!g_is_process_unelevating) {
+                if (!g_is_this_process_unelevating) {
                     sei.cbSize = sizeof(sei);
                     sei.fMask = SEE_MASK_NOCLOSEPROCESS; // use hProcess and sei.hInstApp
 
@@ -5852,6 +5853,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
                             NULL,
                             !current_dir.empty() ? current_dir.c_str() : NULL,
                             &si, &pi);
+
                         win_error = GetLastError();
 
                         if (_is_valid_handle(pi.hProcess)) {
@@ -5926,7 +5928,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
 
         if (!is_idle_execute) {
             if (is_child_executed) {
-                g_is_process_executed = true;
+                g_is_child_process_executed = true;
             }
             else {
                 if (!g_flags.no_print_gen_error_string) {
@@ -5964,7 +5966,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
             }
         }
         else {
-            g_is_process_executed = true; // NOP execution is a success
+            g_is_child_process_executed = true; // NOP execution is a success
         }
 
         // CAUTION:
@@ -5977,7 +5979,7 @@ int ExecuteProcess(LPCTSTR app, size_t app_len, LPCTSTR cmd, size_t cmd_len)
         _close_handle(g_pipe_write_std_handles.stdout_handle);
         _close_handle(g_pipe_write_std_handles.stderr_handle);
 
-        if (g_is_process_executed) {
+        if (g_is_child_process_executed) {
             if (!g_pipe_stdin_to_stdout) {
                 if (_is_valid_handle(g_std_handles.stdin_handle) && (g_has_tee_stdin || _is_valid_handle(g_pipe_write_std_handles.stdin_handle))) {
                     g_stream_pipe_thread_locals[0].thread_handle = CreateThread(
@@ -6420,7 +6422,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
     Flags child_flags = regular_flags;
     Options child_options = regular_options;
 
-    if (g_is_process_elevating) { // just in case
+    if (g_is_this_process_elevating) { // just in case
         child_flags.merge(elevate_or_unelevate_child_flags);
         child_options.merge(elevate_or_unelevate_child_options);
     }
@@ -6448,15 +6450,17 @@ void TranslateCommandLineToElevatedOrUnelevated(
         if (cmd_out_str_ptr) {
             options_line += _T("/ret-create-proc ");
         }
+        regular_flags.ret_create_proc = false; // regular flag or option applies only for this-child process
+        regular_flags.ret_child_exit = true;   // enable for this-parent process
     }
-    regular_flags.ret_create_proc = false; // always reset
 
     if (child_flags.ret_win_error) {
         if (cmd_out_str_ptr) {
             options_line += _T("/ret-win-error ");
         }
+        regular_flags.ret_win_error = false; // regular flag or option applies only for this-child process
+        regular_flags.ret_child_exit = true; // enable for this-parent process
     }
-    regular_flags.ret_win_error = false; // always reset
 
     if (child_options.win_error_langid) {
         if (cmd_out_str_ptr) {
@@ -6468,96 +6472,101 @@ void TranslateCommandLineToElevatedOrUnelevated(
         if (cmd_out_str_ptr) {
             options_line += _T("/ret-child-exit ");
         }
+        regular_flags.ret_child_exit = true; // enable for this-parent process
     }
-    regular_flags.ret_child_exit = true; // always return elevated/unelevated child exit code
 
     if (child_flags.print_win_error_string) {
         if (cmd_out_str_ptr) {
-            options_line += _T("/print-win-error-string /print-shell-error-string "); // always print shell error if win32 error is flagged
+            options_line += _T("/print-win-error-string ");
         }
+        //regular_flags.print_win_error_string = false; // regular flag or option applies for both this- processes
     }
-    regular_flags.print_win_error_string = false; // always reset
+
+    if (child_flags.print_shell_error_string) {
+      if (cmd_out_str_ptr) {
+        options_line += _T("/print-shell-error-string ");
+      }
+      //regular_flags.print_shell_error_string = false; // regular flag or option applies for both this- processes
+    }
 
     if (child_flags.no_print_gen_error_string) {
         if (cmd_out_str_ptr) {
             options_line += _T("/no-print-gen-error-string ");
         }
+        //regular_flags.no_print_gen_error_string = false; // regular flag or option applies for both this- processes
     }
-    regular_flags.no_print_gen_error_string = false; // always reset
 
     if (child_flags.no_sys_dialog_ui) {
         if (cmd_out_str_ptr) {
             options_line += _T("/no-sys-dialog-ui ");
         }
+        //regular_flags.no_sys_dialog_ui = false; // regular flag or option applies for both this- processes
     }
-    regular_flags.no_sys_dialog_ui = false; // always reset
+
+    if (!child_options.shell_exec_verb.empty()) {
+      if (cmd_out_str_ptr) {
+        options_line += std::tstring{ _T("/shell-exec \"") } + child_options.shell_exec_verb + _T("\" ");
+      }
+      regular_options.shell_exec_verb.clear(); // regular flag or option applies only for this-child process
+    }
+
+    if (child_flags.shell_exec_expand_env) {
+      if (cmd_out_str_ptr) {
+        options_line += _T("/shell-exec-expand-env ");
+      }
+    }
+    regular_flags.shell_exec_expand_env = false; // regular flag or option applies for both this- processes
+
+    //change_current_dir
+
+    if (child_flags.no_wait) {
+      if (cmd_out_str_ptr) {
+        options_line += _T("/no-wait ");
+      }
+    }
+    regular_flags.no_wait = false; // regular flag or option applies for both this- processes
+
+    if (child_flags.no_window) {
+      if (cmd_out_str_ptr) {
+        options_line += _T("/no-window ");
+      }
+    }
+    regular_flags.no_window = false; // regular flag or option applies for both this- processes
+
+    if (child_flags.no_window_console) {
+      if (cmd_out_str_ptr) {
+        options_line += _T("/no-window-console ");
+      }
+    }
+    regular_flags.no_window_console = false; // regular flag or option applies for both this- processes
 
     if (child_flags.pause_on_exit_if_error_before_exec) {
         if (cmd_out_str_ptr) {
             options_line += _T("/pause-on-exit-if-error-before-exec ");
         }
+        regular_flags.pause_on_exit_if_error_before_exec = false; // regular flag or option applies only for this-child process
     }
-    regular_flags.pause_on_exit_if_error_before_exec = false; // always reset
 
     if (child_flags.pause_on_exit_if_error) {
         if (cmd_out_str_ptr) {
             options_line += _T("/pause-on-exit-if-error ");
         }
     }
-    regular_flags.pause_on_exit_if_error = false; // always reset
+    regular_flags.pause_on_exit_if_error = false; // regular flag or option applies for both this- processes
 
     if (child_flags.pause_on_exit) {
         if (cmd_out_str_ptr) {
             options_line += _T("/pause-on-exit ");
         }
     }
-    regular_flags.pause_on_exit = false; // always reset
+    regular_flags.pause_on_exit = false; // regular flag or option applies for both this- processes
 
     if (child_flags.skip_pause_on_detached_console) {
         if (cmd_out_str_ptr) {
             options_line += _T("/skip-pause-on-detached-console ");
         }
     }
-    regular_flags.skip_pause_on_detached_console = false; // always reset
-
-    if (!child_options.shell_exec_verb.empty()) {
-        if (cmd_out_str_ptr) {
-            options_line += std::tstring{ _T("/shell-exec \"") } + child_options.shell_exec_verb + _T("\" ");
-        }
-    }
-    regular_options.shell_exec_verb.clear(); // always reset
-
-    if (child_flags.shell_exec_expand_env) {
-        if (cmd_out_str_ptr) {
-            options_line += _T("/shell-exec-expand-env ");
-        }
-    }
-    regular_flags.shell_exec_expand_env = false; // always reset
-
-
-    //change_current_dir
-
-
-    if (child_flags.no_wait) {
-        if (cmd_out_str_ptr) {
-            options_line += _T("/no-wait ");
-        }
-    }
-    regular_flags.no_wait = false; // always reset
-
-    if (child_flags.no_window) {
-        if (cmd_out_str_ptr) {
-            options_line += _T("/no-window ");
-        }
-    }
-    regular_flags.no_window = false; // always reset
-
-    if (child_flags.no_window_console) {
-        if (cmd_out_str_ptr) {
-            options_line += _T("/no-window-console ");
-        }
-    }
-    regular_flags.no_window_console = false; // always reset
+    regular_flags.skip_pause_on_detached_console = false; // regular flag or option applies for both this- processes
 
     // don't disable expansion for this-child process by default, because it has different environment variables
     if (child_flags.no_expand_env) {
@@ -6565,7 +6574,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/no-expand-env ");
         }
     }
-    //regular_flags.no_expand_env = false; // leave disabled for both this- processes
+    //regular_flags.no_expand_env = false; // regular flag or option applies for both this- processes
 
     // always disable substitution for this-child process
     if (cmd_out_str_ptr) {
@@ -6582,35 +6591,35 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/no-subst-empty-tail-vars ");
         }
     }
-    regular_flags.no_subst_empty_tail_vars = false; // always reset
+    regular_flags.no_subst_empty_tail_vars = false; // regular flag or option applies for both this- processes
 
     if (child_flags.no_std_inherit) {
         if (cmd_out_str_ptr) {
             options_line += _T("/no-std-inherit ");
         }
     }
-    regular_flags.no_std_inherit = false; // always reset
+    regular_flags.no_std_inherit = false; // regular flag or option applies for both this- processes
 
     if (child_flags.no_stdin_inherit) {
         if (cmd_out_str_ptr) {
             options_line += _T("/no-stdin-inherit ");
         }
     }
-    regular_flags.no_stdin_inherit = false; // always reset
+    regular_flags.no_stdin_inherit = false; // regular flag or option applies for both this- processes
 
     if (child_flags.no_stdout_inherit) {
         if (cmd_out_str_ptr) {
             options_line += _T("/no-stdout-inherit ");
         }
     }
-    regular_flags.no_stdout_inherit = false; // always reset
+    regular_flags.no_stdout_inherit = false; // regular flag or option applies only for this-child process
 
     if (child_flags.no_stderr_inherit) {
         if (cmd_out_str_ptr) {
             options_line += _T("/no-stderr-inherit ");
         }
     }
-    regular_flags.no_stderr_inherit = false; // always reset
+    regular_flags.no_stderr_inherit = false; // regular flag or option applies for both this- processes
 
 
     if (child_flags.allow_throw_seh_except) {
@@ -6618,14 +6627,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/allow-throw-seh-except ");
         }
     }
-    regular_flags.allow_throw_seh_except = false; // always reset
+    //regular_flags.allow_throw_seh_except = false; // regular flag or option applies for both this- processes
 
     if (child_flags.allow_expand_unexisted_env) {
         if (cmd_out_str_ptr) {
             options_line += _T("/allow-expand-unexisted-env ");
         }
     }
-    //regular_flags.allow_expand_unexisted_env = false; // leave allowed for both this- processes
+    //regular_flags.allow_expand_unexisted_env = false; // regular flag or option applies for both this- processes
 
     //allow_subst_empty_args
 
@@ -6634,70 +6643,70 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/load-parent-proc-init-env-vars ");
         }
     }
-    //regular_flags.load_parent_proc_init_env_vars = false; // leave allowed for both this- processes
+    //regular_flags.load_parent_proc_init_env_vars = false; // regular flag or option applies for both this- processes
 
     if (child_flags.pipe_stdin_to_child_stdin) {
         if (cmd_out_str_ptr) {
             options_line += _T("/pipe-stdin-to-child-stdin ");
         }
     }
-    regular_flags.pipe_stdin_to_child_stdin = false; // always reset
+    regular_flags.pipe_stdin_to_child_stdin = false; // regular flag or option applies for both this- processes
 
     if (child_flags.pipe_child_stdout_to_stdout) {
         if (cmd_out_str_ptr) {
             options_line += _T("/pipe-child-stdout-to-stdout ");
         }
     }
-    regular_flags.pipe_child_stdout_to_stdout = false; // always reset
+    regular_flags.pipe_child_stdout_to_stdout = false; // regular flag or option applies for both this- processes
 
     if (child_flags.pipe_child_stderr_to_stderr) {
         if (cmd_out_str_ptr) {
             options_line += _T("/pipe-child-stderr-to-stderr ");
         }
     }
-    regular_flags.pipe_child_stderr_to_stderr = false; // always reset
+    regular_flags.pipe_child_stderr_to_stderr = false; // regular flag or option applies for both this- processes
 
     if (child_flags.pipe_inout_child) {
         if (cmd_out_str_ptr) {
             options_line += _T("/pipe-inout-child ");
         }
     }
-    regular_flags.pipe_inout_child = false; // always reset
+    regular_flags.pipe_inout_child = false; // regular flag or option applies for both this- processes
 
     if (child_flags.pipe_out_child) {
         if (cmd_out_str_ptr) {
             options_line += _T("/pipe-out-child ");
         }
     }
-    regular_flags.pipe_out_child = false; // always reset
+    regular_flags.pipe_out_child = false; // regular flag or option applies for both this- processes
 
     if (child_flags.pipe_stdin_to_stdout) {
         if (cmd_out_str_ptr) {
             options_line += _T("/pipe-stdin-to-stdout ");
         }
     }
-    regular_flags.pipe_stdin_to_stdout = false; // always reset
+    regular_flags.pipe_stdin_to_stdout = false; // regular flag or option applies for both this- processes
 
     if (child_flags.init_com) {
         if (cmd_out_str_ptr) {
             options_line += _T("/init-com ");
         }
     }
-    regular_flags.init_com = false; // always reset
+    regular_flags.init_com = false; // regular flag or option applies for both this- processes
 
     if (child_flags.wait_child_start) {
         if (cmd_out_str_ptr) {
             options_line += _T("/wait-child-start ");
         }
     }
-    regular_flags.wait_child_start = false; // always reset
+    regular_flags.wait_child_start = false; // regular flag or option applies for both this- processes
 
     if (child_options.wait_child_first_time_timeout_ms) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/wait-child-first-time-timeout ") } +std::to_tstring(child_options.wait_child_first_time_timeout_ms) + _T(" ");
         }
     }
-    regular_options.wait_child_first_time_timeout_ms = 0; // always reset
+    regular_options.wait_child_first_time_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     //child_flags.elevate
     //child_flags.unelevate
@@ -6707,7 +6716,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/showas ") } + std::to_tstring(child_options.show_as);
         }
     }
-    regular_options.show_as = SW_SHOWNORMAL; // always reset
+    regular_options.show_as = SW_SHOWNORMAL; // regular flag or option applies for both this- processes
 
 
     if (child_flags.use_stdin_as_piped_from_conin) {
@@ -6715,7 +6724,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/use-stdin-as-piped-from-conin ");
         }
     }
-    regular_flags.use_stdin_as_piped_from_conin = false; // always reset
+    regular_flags.use_stdin_as_piped_from_conin = false; // regular flag or option applies for both this- processes
 
 
     if (!child_options.reopen_stdin_as_file.empty()) {
@@ -6725,7 +6734,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/reopen-stdin ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.reopen_stdin_as_file.clear(); // always reset
+    regular_options.reopen_stdin_as_file.clear(); // regular flag or option applies for both this- processes
 
     if (!child_options.reopen_stdout_as_file.empty()) {
         if (cmd_out_str_ptr) {
@@ -6734,7 +6743,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/reopen-stdout ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.reopen_stdout_as_file.clear(); // always reset
+    regular_options.reopen_stdout_as_file.clear(); // regular flag or option applies for both this- processes
 
     if (!child_options.reopen_stderr_as_file.empty()) {
         if (cmd_out_str_ptr) {
@@ -6743,7 +6752,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/reopen-stderr ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.reopen_stderr_as_file.clear(); // always reset
+    regular_options.reopen_stderr_as_file.clear(); // regular flag or option applies for both this- processes
 
 
     if (!child_options.reopen_stdin_as_server_pipe.empty()) {
@@ -6753,28 +6762,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/reopen-stdin-as-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.reopen_stdin_as_server_pipe.clear(); // always reset
+    regular_options.reopen_stdin_as_server_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stdin_as_server_pipe_connect_timeout_ms && child_options.reopen_stdin_as_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stdin-as-server-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stdin_as_server_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.reopen_stdin_as_server_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.reopen_stdin_as_server_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stdin_as_server_pipe_in_buf_size && child_options.reopen_stdin_as_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stdin-as-server-pipe-in-buf-size ") } + std::to_tstring(child_options.reopen_stdin_as_server_pipe_in_buf_size) + _T(" ");
         }
     }
-    regular_options.reopen_stdin_as_server_pipe_in_buf_size = 0; // always reset
+    regular_options.reopen_stdin_as_server_pipe_in_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stdin_as_server_pipe_out_buf_size && child_options.reopen_stdin_as_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stdin-as-server-pipe-out-buf-size ") } + std::to_tstring(child_options.reopen_stdin_as_server_pipe_out_buf_size) + _T(" ");
         }
     }
-    regular_options.reopen_stdin_as_server_pipe_out_buf_size = 0; // always reset
+    regular_options.reopen_stdin_as_server_pipe_out_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (!child_options.reopen_stdin_as_client_pipe.empty()) {
         if (cmd_out_str_ptr) {
@@ -6783,14 +6792,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/reopen-stdin-as-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.reopen_stdin_as_client_pipe.clear(); // always reset
+    regular_options.reopen_stdin_as_client_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stdin_as_client_pipe_connect_timeout_ms && child_options.reopen_stdin_as_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stdin-as-client-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stdin_as_client_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.reopen_stdin_as_client_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.reopen_stdin_as_client_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
 
     if (!child_options.reopen_stdout_as_server_pipe.empty()) {
@@ -6800,28 +6809,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/reopen-stdout-as-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.reopen_stdout_as_server_pipe.clear(); // always reset
+    regular_options.reopen_stdout_as_server_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stdout_as_server_pipe_connect_timeout_ms && child_options.reopen_stdout_as_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stdout-as-server-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stdout_as_server_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.reopen_stdout_as_server_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.reopen_stdout_as_server_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stdout_as_server_pipe_in_buf_size && child_options.reopen_stdout_as_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stdout-as-server-pipe-in-buf-size ") } + std::to_tstring(child_options.reopen_stdout_as_server_pipe_in_buf_size) + _T(" ");
         }
     }
-    regular_options.reopen_stdout_as_server_pipe_in_buf_size = 0; // always reset
+    regular_options.reopen_stdout_as_server_pipe_in_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stdout_as_server_pipe_out_buf_size && child_options.reopen_stdout_as_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stdout-as-server-pipe-out-buf-size ") } + std::to_tstring(child_options.reopen_stdout_as_server_pipe_out_buf_size) + _T(" ");
         }
     }
-    regular_options.reopen_stdout_as_server_pipe_out_buf_size = 0; // always reset
+    regular_options.reopen_stdout_as_server_pipe_out_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (!child_options.reopen_stdout_as_client_pipe.empty()) {
         if (cmd_out_str_ptr) {
@@ -6830,14 +6839,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/reopen-stdout-as-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.reopen_stdout_as_client_pipe.clear(); // always reset
+    regular_options.reopen_stdout_as_client_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stdout_as_client_pipe_connect_timeout_ms && child_options.reopen_stdout_as_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stdout-as-client-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stdout_as_client_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.reopen_stdout_as_client_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.reopen_stdout_as_client_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
 
     if (!child_options.reopen_stderr_as_server_pipe.empty()) {
@@ -6847,28 +6856,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/reopen-stderr-as-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.reopen_stderr_as_server_pipe.clear(); // always reset
+    regular_options.reopen_stderr_as_server_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stderr_as_server_pipe_connect_timeout_ms && child_options.reopen_stderr_as_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stderr-as-server-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stderr_as_server_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.reopen_stderr_as_server_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.reopen_stderr_as_server_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stderr_as_server_pipe_in_buf_size && child_options.reopen_stderr_as_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stderr-as-server-pipe-in-buf-size ") } + std::to_tstring(child_options.reopen_stderr_as_server_pipe_in_buf_size) + _T(" ");
         }
     }
-    regular_options.reopen_stderr_as_server_pipe_in_buf_size = 0; // always reset
+    regular_options.reopen_stderr_as_server_pipe_in_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stderr_as_server_pipe_out_buf_size && child_options.reopen_stderr_as_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stderr-as-server-pipe-out-buf-size ") } + std::to_tstring(child_options.reopen_stderr_as_server_pipe_out_buf_size) + _T(" ");
         }
     }
-    regular_options.reopen_stderr_as_server_pipe_out_buf_size = 0; // always reset
+    regular_options.reopen_stderr_as_server_pipe_out_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (!child_options.reopen_stderr_as_client_pipe.empty()) {
         if (cmd_out_str_ptr) {
@@ -6877,14 +6886,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/reopen-stderr-as-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.reopen_stderr_as_client_pipe.clear(); // always reset
+    regular_options.reopen_stderr_as_client_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.reopen_stderr_as_client_pipe_connect_timeout_ms && child_options.reopen_stderr_as_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/reopen-stderr-as-client-pipe-connect-timeout ") } + std::to_tstring(child_options.reopen_stderr_as_client_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.reopen_stderr_as_client_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.reopen_stderr_as_client_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
 
     if (child_flags.reopen_stdout_file_truncate) {
@@ -6892,14 +6901,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/reopen-stdout-file-truncate ");
         }
     }
-    regular_flags.reopen_stdout_file_truncate = false; // always reset
+    regular_flags.reopen_stdout_file_truncate = false; // regular flag or option applies for both this- processes
 
     if (child_flags.reopen_stderr_file_truncate) {
         if (cmd_out_str_ptr) {
             options_line += _T("/reopen-stderr-file-truncate ");
         }
     }
-    regular_flags.reopen_stderr_file_truncate = false; // always reset
+    regular_flags.reopen_stderr_file_truncate = false; // regular flag or option applies for both this- processes
 
 
     if (child_options.stdout_dup >= 0) {
@@ -6907,14 +6916,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/stdout-dup ") } + std::to_tstring(child_options.stdout_dup) + _T(" ");
         }
     }
-    regular_options.stdout_dup = -1; // always reset
+    regular_options.stdout_dup = -1; // regular flag or option applies for both this- processes
 
     if (child_options.stderr_dup >= 0) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/stderr-dup ") } + std::to_tstring(child_options.stderr_dup) + _T(" ");
         }
     }
-    regular_options.stderr_dup = -1; // always reset
+    regular_options.stderr_dup = -1; // regular flag or option applies for both this- processes
 
 
     if (child_flags.stdin_output_flush) {
@@ -6922,35 +6931,35 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/stdin-output-flush ");
         }
     }
-    regular_flags.stdin_output_flush = false; // always reset
+    regular_flags.stdin_output_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.stdout_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/stdout-flush ");
         }
     }
-    regular_flags.stdout_flush = false; // always reset
+    regular_flags.stdout_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.stderr_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/stderr-flush ");
         }
     }
-    regular_flags.stderr_flush = false; // always reset
+    regular_flags.stderr_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.output_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/output-flush ");
         }
     }
-    regular_flags.output_flush = false; // always reset
+    regular_flags.output_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.inout_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/inout-flush ");
         }
     }
-    regular_flags.inout_flush = false; // always reset
+    regular_flags.inout_flush = false; // regular flag or option applies for both this- processes
 
 
     if (child_flags.stdout_vt100) {
@@ -6977,28 +6986,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/create-outbound-server-pipe-from-stdin ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.create_outbound_server_pipe_from_stdin.clear(); // always reset
+    regular_options.create_outbound_server_pipe_from_stdin.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms && child_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-outbound-server-pipe-from-stdin-connect-timeout ") } + std::to_tstring(child_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms = 0; // always reset
+    regular_options.create_outbound_server_pipe_from_stdin_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     if (child_options.create_outbound_server_pipe_from_stdin_in_buf_size && child_options.create_outbound_server_pipe_from_stdin_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-outbound-server-pipe-from-stdin-in-buf-size ") } + std::to_tstring(child_options.create_outbound_server_pipe_from_stdin_in_buf_size) + _T(" ");
         }
     }
-    regular_options.create_outbound_server_pipe_from_stdin_in_buf_size = 0; // always reset
+    regular_options.create_outbound_server_pipe_from_stdin_in_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.create_outbound_server_pipe_from_stdin_out_buf_size && child_options.create_outbound_server_pipe_from_stdin_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-outbound-server-pipe-from-stdin-out-buf-size ") } + std::to_tstring(child_options.create_outbound_server_pipe_from_stdin_out_buf_size) + _T(" ");
         }
     }
-    regular_options.create_outbound_server_pipe_from_stdin_out_buf_size = 0; // always reset
+    regular_options.create_outbound_server_pipe_from_stdin_out_buf_size = 0; // regular flag or option applies for both this- processes
 
 
     if (!child_options.create_inbound_server_pipe_to_stdout.empty()) {
@@ -7008,28 +7017,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stdout ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.create_inbound_server_pipe_to_stdout.clear(); // always reset
+    regular_options.create_inbound_server_pipe_to_stdout.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms && child_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stdout-connect-timeout ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms = 0; // always reset
+    regular_options.create_inbound_server_pipe_to_stdout_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     if (child_options.create_inbound_server_pipe_to_stdout_in_buf_size && child_options.create_inbound_server_pipe_to_stdout_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stdout-in-buf-size ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stdout_in_buf_size) + _T(" ");
         }
     }
-    regular_options.create_inbound_server_pipe_to_stdout_in_buf_size = 0; // always reset
+    regular_options.create_inbound_server_pipe_to_stdout_in_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.create_inbound_server_pipe_to_stdout_out_buf_size && child_options.create_inbound_server_pipe_to_stdout_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stdout-out-buf-size ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stdout_out_buf_size) + _T(" ");
         }
     }
-    regular_options.create_inbound_server_pipe_to_stdout_out_buf_size = 0; // always reset
+    regular_options.create_inbound_server_pipe_to_stdout_out_buf_size = 0; // regular flag or option applies for both this- processes
 
 
     if (!child_options.create_inbound_server_pipe_to_stderr.empty()) {
@@ -7039,28 +7048,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stderr ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.create_inbound_server_pipe_to_stderr.clear(); // always reset
+    regular_options.create_inbound_server_pipe_to_stderr.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms && child_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stderr-connect-timeout ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms = 0; // always reset
+    regular_options.create_inbound_server_pipe_to_stderr_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     if (child_options.create_inbound_server_pipe_to_stderr_in_buf_size && child_options.create_inbound_server_pipe_to_stderr_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stderr-in-buf-size ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stderr_in_buf_size) + _T(" ");
         }
     }
-    regular_options.create_inbound_server_pipe_to_stderr_in_buf_size = 0; // always reset
+    regular_options.create_inbound_server_pipe_to_stderr_in_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.create_inbound_server_pipe_to_stderr_out_buf_size && child_options.create_inbound_server_pipe_to_stderr_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-inbound-server-pipe-to-stderr-out-buf-size ") } + std::to_tstring(child_options.create_inbound_server_pipe_to_stderr_out_buf_size) + _T(" ");
         }
     }
-    regular_options.create_inbound_server_pipe_to_stderr_out_buf_size = 0; // always reset
+    regular_options.create_inbound_server_pipe_to_stderr_out_buf_size = 0; // regular flag or option applies for both this- processes
 
 
     if (!child_options.tee_stdin_to_file.empty()) {
@@ -7070,7 +7079,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stdin ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.tee_stdin_to_file.clear(); // always reset
+    regular_options.tee_stdin_to_file.clear(); // regular flag or option applies for both this- processes
 
     if (!child_options.tee_stdout_to_file.empty()) {
         if (cmd_out_str_ptr) {
@@ -7079,7 +7088,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stdout ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.tee_stdout_to_file.clear(); // always reset
+    regular_options.tee_stdout_to_file.clear(); // regular flag or option applies for both this- processes
 
     if (!child_options.tee_stderr_to_file.empty()) {
         if (cmd_out_str_ptr) {
@@ -7088,7 +7097,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stderr ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.tee_stderr_to_file.clear(); // always reset
+    regular_options.tee_stderr_to_file.clear(); // regular flag or option applies for both this- processes
 
 
     if (!child_options.tee_stdin_to_server_pipe.empty()) {
@@ -7098,28 +7107,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stdin-to-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.tee_stdin_to_server_pipe.clear(); // always reset
+    regular_options.tee_stdin_to_server_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdin_to_server_pipe_connect_timeout_ms && child_options.tee_stdin_to_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdin-to-server-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stdin_to_server_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.tee_stdin_to_server_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.tee_stdin_to_server_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdin_to_server_pipe_in_buf_size && child_options.tee_stdin_to_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdin-to-server-pipe-in-buf-size ") } + std::to_tstring(child_options.tee_stdin_to_server_pipe_in_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stdin_to_server_pipe_in_buf_size = 0; // always reset
+    regular_options.tee_stdin_to_server_pipe_in_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdin_to_server_pipe_out_buf_size && child_options.tee_stdin_to_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdin-to-server-pipe-out-buf-size ") } + std::to_tstring(child_options.tee_stdin_to_server_pipe_out_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stdin_to_server_pipe_out_buf_size = 0; // always reset
+    regular_options.tee_stdin_to_server_pipe_out_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (!child_options.tee_stdin_to_client_pipe.empty()) {
         if (cmd_out_str_ptr) {
@@ -7128,14 +7137,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stdin-to-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.tee_stdin_to_client_pipe.clear(); // always reset
+    regular_options.tee_stdin_to_client_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdin_to_client_pipe_connect_timeout_ms && child_options.tee_stdin_to_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdin-to-client-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stdin_to_client_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.tee_stdin_to_client_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.tee_stdin_to_client_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
 
     if (!child_options.tee_stdout_to_server_pipe.empty()) {
@@ -7145,28 +7154,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stdout-to-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.tee_stdout_to_server_pipe.clear(); // always reset
+    regular_options.tee_stdout_to_server_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdout_to_server_pipe_connect_timeout_ms && child_options.tee_stdout_to_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdout-to-server-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stdout_to_server_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.tee_stdout_to_server_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.tee_stdout_to_server_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdout_to_server_pipe_in_buf_size && child_options.tee_stdout_to_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdout-to-server-pipe-in-buf-size ") } + std::to_tstring(child_options.tee_stdout_to_server_pipe_in_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stdout_to_server_pipe_in_buf_size = 0; // always reset
+    regular_options.tee_stdout_to_server_pipe_in_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdout_to_server_pipe_out_buf_size && child_options.tee_stdout_to_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdout-to-server-pipe-out-buf-size ") } + std::to_tstring(child_options.tee_stdout_to_server_pipe_out_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stdout_to_server_pipe_out_buf_size = 0; // always reset
+    regular_options.tee_stdout_to_server_pipe_out_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (!child_options.tee_stdout_to_client_pipe.empty()) {
         if (cmd_out_str_ptr) {
@@ -7175,14 +7184,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stdout-to-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.tee_stdout_to_client_pipe.clear(); // always reset
+    regular_options.tee_stdout_to_client_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdout_to_client_pipe_connect_timeout_ms && child_options.tee_stdout_to_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdout-to-client-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stdout_to_client_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.tee_stdout_to_client_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.tee_stdout_to_client_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
 
     if (!child_options.tee_stderr_to_server_pipe.empty()) {
@@ -7192,28 +7201,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stderr-to-server-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.tee_stderr_to_server_pipe.clear(); // always reset
+    regular_options.tee_stderr_to_server_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.tee_stderr_to_server_pipe_connect_timeout_ms && child_options.tee_stderr_to_server_pipe_connect_timeout_ms != DEFAULT_SERVER_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stderr-to-server-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stderr_to_server_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.tee_stderr_to_server_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.tee_stderr_to_server_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stderr_to_server_pipe_in_buf_size && child_options.tee_stderr_to_server_pipe_in_buf_size != DEFAULT_NAMED_PIPE_IN_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stderr-to-server-pipe-in-buf-size ") } + std::to_tstring(child_options.tee_stderr_to_server_pipe_in_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stderr_to_server_pipe_in_buf_size = 0; // always reset
+    regular_options.tee_stderr_to_server_pipe_in_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stderr_to_server_pipe_out_buf_size && child_options.tee_stderr_to_server_pipe_out_buf_size != DEFAULT_NAMED_PIPE_OUT_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stderr-to-server-pipe-out-buf-size ") } + std::to_tstring(child_options.tee_stderr_to_server_pipe_out_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stderr_to_server_pipe_out_buf_size = 0; // always reset
+    regular_options.tee_stderr_to_server_pipe_out_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (!child_options.tee_stderr_to_client_pipe.empty()) {
         if (cmd_out_str_ptr) {
@@ -7222,14 +7231,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stderr-to-client-pipe ") } + std::tstring{ _T("\"") } + _replace_strings(tmp_str, _T("\""), std::tstring{ _T("\\\"") }) + _T("\" ");
         }
     }
-    regular_options.tee_stderr_to_client_pipe.clear(); // always reset
+    regular_options.tee_stderr_to_client_pipe.clear(); // regular flag or option applies for both this- processes
 
     if (child_options.tee_stderr_to_client_pipe_connect_timeout_ms && child_options.tee_stderr_to_client_pipe_connect_timeout_ms != DEFAULT_CLIENT_NAMED_PIPE_CONNECT_TIMEOUT_MS) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stderr-to-client-pipe-connect-timeout ") } + std::to_tstring(child_options.tee_stderr_to_client_pipe_connect_timeout_ms) + _T(" ");
         }
     }
-    regular_options.tee_stderr_to_client_pipe_connect_timeout_ms = 0; // always reset
+    regular_options.tee_stderr_to_client_pipe_connect_timeout_ms = 0; // regular flag or option applies for both this- processes
 
 
     if (child_flags.tee_stdout_file_truncate) {
@@ -7237,14 +7246,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/tee-stdout-file-truncate ");
         }
     }
-    regular_flags.tee_stdout_file_truncate = false; // always reset
+    regular_flags.tee_stdout_file_truncate = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_stderr_file_truncate) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-stderr-file-truncate ");
         }
     }
-    regular_flags.tee_stderr_file_truncate = false; // always reset
+    regular_flags.tee_stderr_file_truncate = false; // regular flag or option applies for both this- processes
 
 
     if (child_options.tee_stdin_dup >= 0) {
@@ -7252,28 +7261,28 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stdin-dup ") } + std::to_tstring(child_options.tee_stdin_dup) + _T(" ");
         }
     }
-    regular_options.tee_stdin_dup = -1; // always reset
+    regular_options.tee_stdin_dup = -1; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdout_dup >= 0) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdout-dup ") } + std::to_tstring(child_options.tee_stdout_dup) + _T(" ");
         }
     }
-    regular_options.tee_stdout_dup = -1; // always reset
+    regular_options.tee_stdout_dup = -1; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stderr_dup >= 0) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stderr-dup ") } + std::to_tstring(child_options.tee_stderr_dup) + _T(" ");
         }
     }
-    regular_options.tee_stderr_dup = -1; // always reset
+    regular_options.tee_stderr_dup = -1; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_conout_dup) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-conout-dup ");
         }
     }
-    regular_flags.tee_conout_dup = false; // always reset
+    regular_flags.tee_conout_dup = false; // regular flag or option applies for both this- processes
 
 
     if (child_flags.tee_stdin_file_truncate) {
@@ -7281,21 +7290,21 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/tee-stdin-file-truncate ");
         }
     }
-    regular_flags.tee_stdin_file_truncate = false; // always reset
+    regular_flags.tee_stdin_file_truncate = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_stdout_file_truncate) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-stdout-file-truncate ");
         }
     }
-    regular_flags.tee_stdout_file_truncate = false; // always reset
+    regular_flags.tee_stdout_file_truncate = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_stderr_file_truncate) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-stderr-file-truncate ");
         }
     }
-    regular_flags.tee_stderr_file_truncate = false; // always reset
+    regular_flags.tee_stderr_file_truncate = false; // regular flag or option applies for both this- processes
 
 
     if (child_flags.tee_stdin_file_flush) {
@@ -7303,21 +7312,21 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/tee-stdin-file-flush ");
         }
     }
-    regular_flags.tee_stdin_file_flush = false; // always reset
+    regular_flags.tee_stdin_file_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_stdout_file_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-stdout-file-flush ");
         }
     }
-    regular_flags.tee_stdout_file_flush = false; // always reset
+    regular_flags.tee_stdout_file_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_stderr_file_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-stderr-file-flush ");
         }
     }
-    regular_flags.tee_stderr_file_flush = false; // always reset
+    regular_flags.tee_stderr_file_flush = false; // regular flag or option applies for both this- processes
 
 
     if (child_flags.tee_stdin_pipe_flush) {
@@ -7325,21 +7334,21 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/tee-stdin-pipe-flush ");
         }
     }
-    regular_flags.tee_stdin_pipe_flush = false; // always reset
+    regular_flags.tee_stdin_pipe_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_stdout_pipe_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-stdout-pipe-flush ");
         }
     }
-    regular_flags.tee_stdout_pipe_flush = false; // always reset
+    regular_flags.tee_stdout_pipe_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_stderr_pipe_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-stderr-pipe-flush ");
         }
     }
-    regular_flags.tee_stderr_pipe_flush = false; // always reset
+    regular_flags.tee_stderr_pipe_flush = false; // regular flag or option applies for both this- processes
 
 
     if (child_flags.tee_stdin_flush) {
@@ -7347,21 +7356,21 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/tee-stdin-flush ");
         }
     }
-    regular_flags.tee_stdin_flush = false; // always reset
+    regular_flags.tee_stdin_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_stdout_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-stdout-flush ");
         }
     }
-    regular_flags.tee_stdout_flush = false; // always reset
+    regular_flags.tee_stdout_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_stderr_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-stderr-flush ");
         }
     }
-    regular_flags.tee_stderr_flush = false; // always reset
+    regular_flags.tee_stderr_flush = false; // regular flag or option applies for both this- processes
 
 
     if (child_flags.tee_output_flush) {
@@ -7369,14 +7378,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/tee-output-flush ");
         }
     }
-    regular_flags.tee_output_flush = false; // always reset
+    regular_flags.tee_output_flush = false; // regular flag or option applies for both this- processes
 
     if (child_flags.tee_inout_flush) {
         if (cmd_out_str_ptr) {
             options_line += _T("/tee-inout-flush ");
         }
     }
-    regular_flags.tee_inout_flush = false; // always reset
+    regular_flags.tee_inout_flush = false; // regular flag or option applies for both this- processes
 
 
     if (child_options.tee_stdin_pipe_buf_size && child_options.tee_stdin_pipe_buf_size != DEFAULT_ANONYMOUS_PIPE_BUF_SIZE) {
@@ -7384,21 +7393,21 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stdin-pipe-buf-size ") } + std::to_tstring(child_options.tee_stdin_pipe_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stdin_pipe_buf_size = 0; // always reset
+    regular_options.tee_stdin_pipe_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdout_pipe_buf_size && child_options.tee_stdout_pipe_buf_size != DEFAULT_ANONYMOUS_PIPE_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdout-pipe-buf-size ") } + std::to_tstring(child_options.tee_stdout_pipe_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stdout_pipe_buf_size = 0; // always reset
+    regular_options.tee_stdout_pipe_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stderr_pipe_buf_size && child_options.tee_stderr_pipe_buf_size != DEFAULT_ANONYMOUS_PIPE_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stderr-pipe-buf-size ") } + std::to_tstring(child_options.tee_stderr_pipe_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stderr_pipe_buf_size = 0; // always reset
+    regular_options.tee_stderr_pipe_buf_size = 0; // regular flag or option applies for both this- processes
 
 
     if (child_options.tee_stdin_read_buf_size && child_options.tee_stdin_read_buf_size != DEFAULT_READ_BUF_SIZE) {
@@ -7406,21 +7415,21 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/tee-stdin-read-buf-size ") } + std::to_tstring(child_options.tee_stdin_read_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stdin_read_buf_size = 0; // always reset
+    regular_options.tee_stdin_read_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stdout_read_buf_size && child_options.tee_stdout_read_buf_size != DEFAULT_READ_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stdout-read-buf-size ") } + std::to_tstring(child_options.tee_stdout_read_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stdout_read_buf_size = 0; // always reset
+    regular_options.tee_stdout_read_buf_size = 0; // regular flag or option applies for both this- processes
 
     if (child_options.tee_stderr_read_buf_size && child_options.tee_stderr_read_buf_size != DEFAULT_READ_BUF_SIZE) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/tee-stderr-read-buf-size ") } + std::to_tstring(child_options.tee_stderr_read_buf_size) + _T(" ");
         }
     }
-    regular_options.tee_stderr_read_buf_size = 0; // always reset
+    regular_options.tee_stderr_read_buf_size = 0; // regular flag or option applies for both this- processes
 
 
     if (child_flags.mutex_std_writes) {
@@ -7428,14 +7437,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/mutex-std-writes ");
         }
     }
-    regular_flags.mutex_std_writes = false; // always reset
+    regular_flags.mutex_std_writes = false; // regular flag or option applies for both this- processes
 
     if (child_flags.mutex_tee_file_writes) {
         if (cmd_out_str_ptr) {
             options_line += _T("/mutex-tee-file-writes ");
         }
     }
-    regular_flags.mutex_tee_file_writes = false; // always reset
+    regular_flags.mutex_tee_file_writes = false; // regular flag or option applies for both this- processes
 
     // leave generic console flags and options as is, to manipulate elevated/unelevated process console you should use the `/elevate{ ... }` or `/unelevate{ ... }` option
 
@@ -7444,49 +7453,49 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/create-child-console ");
         }
     }
-    regular_flags.create_child_console = false; // always reset
+    regular_flags.create_child_console = false; // regular flag or option applies for both this- processes
 
     if (child_flags.detach_child_console) {
         if (cmd_out_str_ptr) {
             options_line += _T("/detach-child-console ");
         }
     }
-    regular_flags.detach_child_console = false; // always reset
+    regular_flags.detach_child_console = false; // regular flag or option applies for both this- processes
 
     if (child_flags.create_console) {
         if (cmd_out_str_ptr) {
             options_line += _T("/create-console ");
         }
     }
-    regular_flags.create_console = false; // always reset
+    regular_flags.create_console = false; // regular flag or option applies for both this- processes
 
     if (child_flags.detach_console) {
         if (cmd_out_str_ptr) {
             options_line += _T("/detach-console ");
         }
     }
-    regular_flags.detach_console = false; // always reset
+    regular_flags.detach_console = false; // regular flag or option applies for both this- processes
 
     if (child_flags.detach_inherited_console_on_wait) {
         if (cmd_out_str_ptr) {
             options_line += _T("/detach-inherited-console-on-wait ");
         }
     }
-    regular_flags.detach_inherited_console_on_wait = false; // always reset
+    regular_flags.detach_inherited_console_on_wait = false; // regular flag or option applies for both this- processes
 
     if (child_flags.attach_parent_console) {
         if (cmd_out_str_ptr) {
             options_line += _T("/attach-parent-console ");
         }
     }
-    regular_flags.attach_parent_console = false; // always reset
+    regular_flags.attach_parent_console = false; // regular flag or option applies for both this- processes
 
     if (child_options.has.create_console_title) {
         if (cmd_out_str_ptr) {
             options_line += std::tstring{ _T("/create-console-title \"") } + child_options.create_console_title + _T("\" ");
         }
     }
-    regular_options.has.create_console_title = false; // always reset
+    regular_options.has.create_console_title = false; // regular flag or option applies for both this- processes
     regular_options.create_console_title.clear();
 
     if (child_options.has.own_console_title) {
@@ -7494,7 +7503,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/own-console-title \"") } + child_options.own_console_title + _T("\" ");
         }
     }
-    regular_options.has.own_console_title = false; // always reset
+    regular_options.has.own_console_title = false; // regular flag or option applies for both this- processes
     regular_options.own_console_title.clear();
 
     if (child_options.has.console_title) {
@@ -7502,7 +7511,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += std::tstring{ _T("/console-title \"") } + child_options.console_title + _T("\" ");
         }
     }
-    regular_options.has.console_title = false; // always reset
+    regular_options.has.console_title = false; // regular flag or option applies for both this- processes
     regular_options.console_title.clear();
 
 
@@ -7511,14 +7520,14 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/stdin-echo ");
         }
     }
-    regular_flags.stdin_echo = false; // always reset
+    regular_flags.stdin_echo = false; // regular flag or option applies for both this- processes
 
     if (child_flags.no_stdin_echo) {
         if (cmd_out_str_ptr) {
             options_line += _T("/no-stdin-echo ");
         }
     }
-    regular_flags.no_stdin_echo = false; // always reset
+    regular_flags.no_stdin_echo = false; // regular flag or option applies for both this- processes
 
 
     if (cmd_out_str_ptr) {
@@ -7556,42 +7565,42 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/print-dyn-dll-load-errors ");
         }
     }
-    regular_flags.enable_wow64_fs_redir = false; // always reset
+    // regular_flags.enable_wow64_fs_redir = false; // regular flag or option applies for both this- processes
 
     if (child_flags.enable_wow64_fs_redir) {
         if (cmd_out_str_ptr) {
             options_line += _T("/enable-wow64-fs-redir ");
         }
     }
-    regular_flags.enable_wow64_fs_redir = false; // always reset
+    //regular_flags.enable_wow64_fs_redir = false; // regular flag or option applies for both this- processes
 
     if (child_flags.disable_wow64_fs_redir) {
         if (cmd_out_str_ptr) {
             options_line += _T("/disable-wow64-fs-redir ");
         }
     }
-    regular_flags.disable_wow64_fs_redir = false; // always reset
+    //regular_flags.disable_wow64_fs_redir = false; // regular flag or option applies for both this- processes
 
     if (child_flags.disable_ctrl_signals) {
         if (cmd_out_str_ptr) {
             options_line += _T("/disable-ctrl-signals ");
         }
     }
-    regular_flags.disable_ctrl_signals = false; // always reset
+    //regular_flags.disable_ctrl_signals = false; // regular flag or option applies for both this- processes
 
     if (child_flags.disable_ctrl_c_signal) {
         if (cmd_out_str_ptr) {
             options_line += _T("/disable-ctrl-c-signal ");
         }
     }
-    regular_flags.disable_ctrl_c_signal = false; // always reset
+    //regular_flags.disable_ctrl_c_signal = false; // regular flag or option applies for both this- processes
 
     if (child_flags.disable_ctrl_c_signal_no_inherit) {
         if (cmd_out_str_ptr) {
             options_line += _T("/disable-ctrl-c-signal-no-inherit ");
         }
     }
-    regular_flags.disable_ctrl_c_signal_no_inherit = false; // always reset
+    //regular_flags.disable_ctrl_c_signal_no_inherit = false; // regular flag or option applies for both this- processes
 
 #ifndef _CONSOLE
     if (child_flags.allow_gui_autoattach_to_parent_console) {
@@ -7599,7 +7608,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/allow-gui-autoattach-to-parent-console ");
         }
     }
-    regular_flags.allow_gui_autoattach_to_parent_console = false; // always reset
+    regular_flags.allow_gui_autoattach_to_parent_console = false; // regular flag or option applies for both this- processes
 #endif
 
     if (child_flags.disable_conout_reattach_to_visible_console) {
@@ -7607,21 +7616,21 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/disable-conout-reattach-to-visible-console ");
         }
     }
-    regular_flags.disable_conout_reattach_to_visible_console = false; // always reset
+    regular_flags.disable_conout_reattach_to_visible_console = false; // regular flag or option applies for both this- processes
 
     if (child_flags.allow_conout_attach_to_invisible_parent_console) {
         if (cmd_out_str_ptr) {
             options_line += _T("/allow-conout-attach-to-invisible-parent-console ");
         }
     }
-    regular_flags.allow_conout_attach_to_invisible_parent_console = false; // always reset
+    regular_flags.allow_conout_attach_to_invisible_parent_console = false; // regular flag or option applies for both this- processes
 
     if (child_flags.disable_conout_duplicate_to_parent_console_on_error) {
         if (cmd_out_str_ptr) {
             options_line += _T("/disable-conout-duplicate-to-parent-console-on-error ");
         }
     }
-    regular_flags.disable_conout_duplicate_to_parent_console_on_error = false; // always reset
+    regular_flags.disable_conout_duplicate_to_parent_console_on_error = false; // regular flag or option applies for both this- processes
 
 
     if (child_flags.write_console_stdin_back) {
@@ -7629,7 +7638,7 @@ void TranslateCommandLineToElevatedOrUnelevated(
             options_line += _T("/write-console-stdin-back ");
         }
     }
-    regular_flags.write_console_stdin_back = false; // always reset
+    regular_flags.write_console_stdin_back = false; // regular flag or option applies for both this- processes
 
 
     if (cmd_out_str_ptr) {

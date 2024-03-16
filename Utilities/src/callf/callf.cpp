@@ -36,19 +36,21 @@ bool                        g_enable_conout_prints_buffering = true; // enable b
 // WOW64 FileSystem redirection data
 PVOID g_disable_wow64_fs_redir_ptr = nullptr;
 
+#error to be continued...
+
 // sets true just after the CreateProcess or ShellExecute success execute
-bool g_is_process_executed = false;
+bool g_is_child_process_executed = false;
 
-// sets true in case if process is on self elevation
-bool g_is_process_self_elevation = false;
+// sets true in case if this-process is on self elevation
+bool g_is_this_process_self_elevation = false;
 
-// sets true in case if process is not elevated and requested for self elevation
-bool g_is_process_elevating = false;
+// sets true in case if this-process is not elevated and is requested for self elevation
+bool g_is_this_process_elevating = false;
 
-// sets true in case if process is elevated and requested for self unelevation
-bool g_is_process_unelevating = false;
+// sets true in case if this-process is elevated and is requested for self unelevation
+bool g_is_this_process_unelevating = false;
 
-bool g_is_process_elevated = false;
+bool g_is_this_process_elevated = false;
 
 
 const TCHAR * g_empty_flags_arr[] = {
@@ -63,13 +65,13 @@ const TCHAR * g_flags_to_preparse_arr[] = {
     _T("/print-win-error-string"),
     _T("/print-shell-error-string"),
     _T("/no-print-gen-error-string"),
+    _T("/shell-exec"),
+    _T("/shell-exec-unelevate-from-explorer"),
     _T("/no-windows-console"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
     _T("/skip-pause-on-detached-console"),
-    _T("/shell-exec"),
-    _T("/shell-exec-unelevate-from-explorer"),
     _T("/load-parent-proc-init-env-vars"),
     _T("/allow-throw-seh-except"),
     _T("/elevate"),
@@ -116,11 +118,6 @@ const TCHAR * g_elevate_or_unelevate_child_flags_to_preparse_arr[] = {
 };
 
 const TCHAR * g_promote_or_demote_flags_to_preparse_arr[] = {
-    _T("/ret-create-proc"),
-    _T("/ret-win-error"),
-    _T("/ret-child-exit"),
-    _T("/print-win-error-string"),
-    _T("/no-print-gen-error-string"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -148,7 +145,6 @@ const TCHAR * g_promote_or_demote_flags_to_preparse_arr[] = {
 const TCHAR * g_promote_or_demote_parent_flags_to_preparse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
-    _T("/ret-child-exit"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -194,14 +190,14 @@ const TCHAR * g_flags_to_parse_arr[] = {
     _T("/print-shell-error-string"),
     _T("/no-print-gen-error-string"),
     _T("/no-sys-dialog-ui"),
-    _T("/pause-on-exit-if-error-before-exec"),
-    _T("/pause-on-exit-if-error"),
-    _T("/pause-on-exit"),
-    _T("/skip-pause-on-detached-console"),
     _T("/shell-exec"),
     _T("/shell-exec-unelevate-from-explorer"),
     _T("/shell-exec-expand-env"),
     _T("/D"),
+    _T("/pause-on-exit-if-error-before-exec"),
+    _T("/pause-on-exit-if-error"),
+    _T("/pause-on-exit"),
+    _T("/skip-pause-on-detached-console"),
     _T("/no-wait"),
     _T("/no-window"),
     _T("/no-window-console"),
@@ -360,7 +356,6 @@ const TCHAR * g_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_elevate_or_unelevate_parent_flags_to_parse_arr[] = {
-    _T("/no-sys-dialog-ui"),
     _T("/no-wait"),
     _T("/no-window"),
     _T("/no-window-console"),
@@ -480,12 +475,6 @@ const TCHAR * g_elevate_or_unelevate_child_flags_to_parse_arr[] = {
 };
 
 const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
-    _T("/ret-create-proc"),
-    _T("/ret-win-error"),
-    _T("/ret-child-exit"),
-    _T("/print-win-error-string"),
-    _T("/print-shell-error-string"),
-    _T("/no-print-gen-error-string"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -515,7 +504,6 @@ const TCHAR * g_promote_or_demote_flags_to_parse_arr[] = {
 const TCHAR * g_promote_or_demote_parent_flags_to_parse_arr[] = {
     _T("/ret-create-proc"),
     _T("/ret-win-error"),
-    _T("/ret-child-exit"),
     _T("/pause-on-exit-if-error-before-exec"),
     _T("/pause-on-exit-if-error"),
     _T("/pause-on-exit"),
@@ -670,7 +658,7 @@ inline void MergeOptions(Flags & out_flags, Options & out_options,
 
     // merge all except child flags and options
 
-    if (g_is_process_self_elevation) {
+    if (g_is_this_process_self_elevation) {
         out_flags.merge(elevate_or_unelevate_parent_flags);
         out_options.merge(elevate_or_unelevate_parent_options);
     }
@@ -3232,22 +3220,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 
             // update elevation state
             if (g_regular_flags.elevate || g_regular_flags.unelevate) {
-                g_is_process_self_elevation = true;
+                g_is_this_process_self_elevation = true;
             }
 
             if (g_regular_flags.elevate || g_regular_flags.shell_exec && g_regular_options.shell_exec_verb == _T("runas")) {
-                const bool is_process_elevated = g_is_process_elevated = _is_process_elevated() ? 1 : 0;
+                const bool is_process_elevated = g_is_this_process_elevated = _is_process_elevated() ? 1 : 0;
                 if (!is_process_elevated) {
-                    g_is_process_elevating = true;
+                    g_is_this_process_elevating = true;
                 }
 
                 // we must drop this flag immediately to avoid potential accidental recursion in child process
                 g_regular_flags.elevate = false;
             }
             else if (g_regular_flags.unelevate || g_regular_flags.shell_exec_unelevate) {
-                const bool is_process_elevated = g_is_process_elevated = _is_process_elevated() ? 1 : 0;
+                const bool is_process_elevated = g_is_this_process_elevated = _is_process_elevated() ? 1 : 0;
                 if (is_process_elevated) {
-                    g_is_process_unelevating = true;
+                    g_is_this_process_unelevating = true;
                 }
 
                 // we must drop this flag immediately to avoid potential accidental recursion in child process
@@ -3255,9 +3243,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             }
 
             // reset if no need self elevation
-            if (g_is_process_self_elevation) {
-                if (!g_is_process_elevating && !g_is_process_unelevating) {
-                    g_is_process_self_elevation = false;
+            if (g_is_this_process_self_elevation) {
+                if (!g_is_this_process_elevating && !g_is_this_process_unelevating) {
+                    g_is_this_process_self_elevation = false;
                 }
             }
 
@@ -3265,7 +3253,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_self_elevation) {
+            if (g_is_this_process_self_elevation) {
                 TranslateCommandLineToElevatedOrUnelevated(
                     nullptr, nullptr, nullptr,
                     g_flags, g_options,
@@ -3987,7 +3975,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_self_elevation) {
+            if (g_is_this_process_self_elevation) {
                 TranslateCommandLineToElevatedOrUnelevated(
                     nullptr, nullptr, nullptr,
                     g_flags, g_options,
@@ -4857,7 +4845,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             g_flags = g_regular_flags;
             g_options = g_regular_options;
 
-            if (g_is_process_self_elevation) {
+            if (g_is_this_process_self_elevation) {
                 std::tstring elevated_cmd_out_str;
 
                 TranslateCommandLineToElevatedOrUnelevated(
@@ -4877,7 +4865,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 SubstOptionsPlaceholders(g_options);
 
                 // update options
-                if (g_is_process_elevating) {
+                if (g_is_this_process_elevating) {
                     if (g_options.shell_exec_verb != _T("runas")) {
                         g_options.shell_exec_verb = _T("runas");
                     }
@@ -4944,7 +4932,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             // always reget console window handle
             g_inherited_console_window = GetConsoleWindow();
 
-            const bool pause_on_exit = g_flags.pause_on_exit || g_flags.pause_on_exit_if_error && ret != err_none || g_flags.pause_on_exit_if_error_before_exec && !g_is_process_executed && ret != err_none;
+            const bool pause_on_exit = g_flags.pause_on_exit || g_flags.pause_on_exit_if_error && ret != err_none || g_flags.pause_on_exit_if_error_before_exec && !g_is_child_process_executed && ret != err_none;
             const bool skip_pause_on_exit = !g_inherited_console_window && g_flags.skip_pause_on_detached_console;
 
             if (pause_on_exit && !skip_pause_on_exit) {

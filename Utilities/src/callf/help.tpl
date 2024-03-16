@@ -7,7 +7,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
   Terms:
     this-process
-      A `callf*.exe` process which is a parent and a child to another
+      A `callf*.exe` process. Can be a parent or a child to another
       `callf*.exe` process.
     child this-process
       A `callf*.exe` process which is a child to another `callf*.exe`
@@ -48,13 +48,25 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
       /chcp-in <codepage>
         Console input code page.
 
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
+
       /chcp-out <codepage>
         Console output code page.
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
 
       /ret-create-proc
         Return CreateProcess or ShellExecute return code.
 
         Has priority over all others `/ret-*` flags.
+
+        /[un]elevate*
+          If applied, then has effect only for this-child process and
+          this-parent automatically implies `/ret-child-exit`.
+
+          Can be applied for this-parent process only.
 
       /ret-win-error
         Return Win32 error code.
@@ -63,16 +75,33 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
         Has no effect if `/ret-create-proc` flag is defined.
 
+        /[un]elevate*
+          If applied, then has effect only for this-child process and
+          this-parent automatically implies `/ret-child-exit`.
+
+          Can be applied for this-parent process only.
+
       /win-error-langid <LANGID>
         Language ID to format Win32 error messages.
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
 
       /ret-child-exit
         Return child process exit code (if has no `/no-wait` flag).
 
         Has no effect if any other `/ret-*` flag is defined.
 
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
+
+          Can NOT be applied for this-parent process only.
+
       /print-win-error-string
         Print Win32 error string (even if `/ret-win-error` flag is not set).
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
 
       /print-shell-error-string
         CreateProcess
@@ -83,8 +112,14 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         /unelevate-by-shell-exec-from-explorer
           Print related COM error string.
 
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
+
       /no-print-gen-error-string
         Don't print generic error string.
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
 
       /no-sys-dialog-ui
         CreateProcess
@@ -92,6 +127,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         ShellExecute
           Uses SEE_MASK_FLAG_NO_UI flag.
           Do not display an error message box if an error occurs.
+
+        /[un]elevate*
+          If applied, then has effect for both this- processes.
 
       /shell-exec <Verb>
         Call to ShellExecute instead of CreateProcess.
@@ -123,6 +161,12 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
             elevated or enter the credentials of an administrator account used
             to run the application.
 
+        Can not be used together with respective `/shell-exec-*` options and
+        flags.
+
+        Can be used together with respective `/elevate*` and `/unelevate*`
+        options and flags.
+
       /shell-exec-unelevate-from-explorer
         Call to IShellDispatch2::ShellExecute instead of CreateProcess to
         unelevate the child process.
@@ -146,6 +190,8 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           Uses SEE_MASK_DOENVSUBST flag.
           Expand any environment variables specified in the string given by
           the <CurrentDirectory> or <FilePathFormatString> parameter.
+
+        Has no effect if idle execution is used.
 
       /D <CurrentDirectory>
         CreateProcess
@@ -199,6 +245,10 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         message to the stdout.
         This-process must be attached to a console, otherwise the pause would
         be skipped.
+
+        /[un]elevate*
+          If applied, then has effect only for this-child process and
+          this-parent automatically implies `/ret-child-exit`.
 
       /pause-on-exit-if-error
         Pause on exit if an error happened. By default it prints
@@ -480,7 +530,6 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
           Limited set of flags to pass exceptionally into the this-parent
           (not elevated) process.
 
-          /no-sys-dialog-ui
           /no-wait
           /no-window
           /no-window-console
@@ -544,12 +593,6 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         flags.
 
         <Flags>:
-          /ret-create-proc
-          /ret-win-error
-          /ret-child-exit
-          /print-win-error-string
-          /print-shell-error-string
-          /no-print-gen-error-string
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
@@ -590,7 +633,6 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
         <Flags>:
           /ret-create-proc
           /ret-win-error
-          /ret-child-exit
           /pause-on-exit-if-error-before-exec
           /pause-on-exit-if-error
           /pause-on-exit
@@ -1460,31 +1502,7 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
 
     Control signals handling.
       Flag combinations and child `cmd.exe` process reaction while waiting on
-      `choice.exe` call:
-
-        <none>
-          CTRL+C      Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-          CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-
-        /disable-ctrl-c-signal-no-inherit
-          CTRL+C      Terminate batch job (Y/N)?
-          CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-
-        /disable-ctrl-c-signal
-          CTRL+C      -
-          CTRL+BREAK  Terminate batch job (Y/N)?Terminate batch job (Y/N)?
-
-        /disable-ctrl-signals
-          CTRL+C      Terminate batch job (Y/N)?
-          CTRL+BREAK  Terminate batch job (Y/N)?
-
-        /disable-ctrl-signals /disable-ctrl-c-signal-no-inherit
-          CTRL+C      Terminate batch job (Y/N)?
-          CTRL+BREAK  Terminate batch job (Y/N)?
-
-        /disable-ctrl-signals /disable-ctrl-c-signal
-          CTRL+C      -
-          CTRL+BREAK  Terminate batch job (Y/N)?
+      the user input see in the readme file from the `callf` tests directory.
 
     In case of ShellExecute the <ParametersFormatString> must contain only a
     command line arguments, but not the path to the executable (or document)
@@ -1493,7 +1511,9 @@ Usage: [+ AppModuleName +].exe [/?] [<Flags>] [//] <ApplicationNameFormatString>
     If <CurrentDirectory> is not defined, then the current working directory
     is used.
 
-  Return codes if `/ret-*` option is not defined:
+  Return codes if one of these is applied:
+    * `/ret-*` option is not defined;
+    * `ret-child-exit` is defined, but child process is not executed.
    -255 - unspecified error
    -254 - SEH exception
    -7   - named pipe connection timeout
