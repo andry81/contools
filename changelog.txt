@@ -1,3 +1,6 @@
+2024.03.20:
+* fixed: Scripts/Tools/filesys/read_shortcut_target_path.bat: unicode shortcut paths read
+
 2024.03.15:
 * refactor: Scripts/Tests/manual/utilities/contools/callf: tests refactor
 
