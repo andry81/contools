@@ -1,4 +1,7 @@
 2024.03.20:
+* fixed: Scripts/Tools/filesys/read_shortcut_target_path.bat: missed UTF-16LE stderr output
+
+2024.03.20:
 * fixed: Scripts/Tools/filesys/read_shortcut_target_path.bat: unicode shortcut paths read
 
 2024.03.15:
