@@ -1,4 +1,7 @@
 2024.03.20:
+* new: Scripts/Tools/filesys/read_shortcut_target_path.bat: added `TARGET_PATH_STDOUT_FILE` and `TARGET_PATH_STDERR_FILE` variables usage to avoid files creation/deletion
+
+2024.03.20:
 * fixed: Scripts/Tools/filesys/read_shortcut_target_path.bat: missed UTF-16LE stderr output
 
 2024.03.20:
