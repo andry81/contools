@@ -11,9 +11,14 @@ rem <Flags>:
 rem   --
 rem     Stop flags parse.
 rem
-rem   -extended_property
+rem   -use_extended_property
 rem     Use `ExtendedProperty` method through the `read_path_props.vbs` script
 rem     instead of `read_shortcut.vbs` script.
+rem
+rem   -retry_extended_property
+rem     Retry on `ExtendedProperty` method through the `read_path_props.vbs`
+rem     script if `read_shortcut.vbs` script is returted empty result or an
+rem     error.
 
 rem <ShortcutFile>:
 rem   Path to shortcut file.
@@ -32,7 +37,8 @@ call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /
 
 rem script flags
 set FLAG_SHIFT=0
-set FLAG_EXTENDED_PROPERTY=0
+set FLAG_USE_EXTENDED_PROPERTY=0
+set FLAG_RETRY_EXTENDED_PROPERTY=0
 
 :FLAGS_LOOP
 
@@ -43,8 +49,10 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-extended_property" (
-    set FLAG_EXTENDED_PROPERTY=1
+  if "%FLAG%" == "-use_extended_property" (
+    set FLAG_USE_EXTENDED_PROPERTY=1
+  ) else if "%FLAG%" == "-retry_extended_property" (
+    set FLAG_RETRY_EXTENDED_PROPERTY=1
   ) else if "%FLAG%" == "--" (
     shift
     set "FLAG="
@@ -92,14 +100,33 @@ rem UTF-8 BOM
 rem set /P =﻿<nul > "%TARGET_PATH_STDOUT_FILE%"
 
 (
-  if %FLAG_EXTENDED_PROPERTY% EQU 0 (
-    call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 5 "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_shortcut.vbs" -p TargetPath -- %%* || exit /b
-  ) else call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 7 "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_path_props.vbs" -v -x -lr -- LinkTarget %%* || exit /b
+  if %FLAG_USE_EXTENDED_PROPERTY% EQU 0 (
+    call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 6 "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_shortcut.vbs" -p TargetPath -- %%* || if %FLAG_RETRY_EXTENDED_PROPERTY% EQU 0 exit /b
+  ) else call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 8 "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_path_props.vbs" -v -x -lr -- LinkTarget %%* || exit /b
 ) >> "%TARGET_PATH_STDOUT_FILE%" 2>> "%TARGET_PATH_STDERR_FILE%"
 
 rem NOTE: `type` respects UTF-16LE file with BOM header
 type "%TARGET_PATH_STDERR_FILE%" >&2
 
-if %FLAG_EXTENDED_PROPERTY% EQU 0 (
+if %FLAG_USE_EXTENDED_PROPERTY% EQU 0 (
   for /F "usebackq eol= tokens=1,* delims==" %%i in (`@type "%TARGET_PATH_STDOUT_FILE%"`) do set "RETURN_VALUE=%%j"
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%TARGET_PATH_TEMP_STDOUT_FILE%"`) do set "RETURN_VALUE=%%i"
+) else for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%TARGET_PATH_STDOUT_FILE%"`) do set "RETURN_VALUE=%%i"
+
+if %FLAG_USE_EXTENDED_PROPERTY% NEQ 0 exit /b
+if %FLAG_RETRY_EXTENDED_PROPERTY% EQU 0 exit /b
+if defined RETURN_VALUE exit /b
+
+rem Retry on `ExtendedProperty` method.
+
+rem UTF-16LE BOM
+copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%TARGET_PATH_STDOUT_FILE%" /B /Y >nul 2>nul
+copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%TARGET_PATH_STDERR_FILE%" /B /Y >nul 2>nul
+
+(
+  call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 8 "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_path_props.vbs" -v -x -lr -- LinkTarget %%* || exit /b
+) >> "%TARGET_PATH_STDOUT_FILE%" 2>> "%TARGET_PATH_STDERR_FILE%"
+
+rem NOTE: `type` respects UTF-16LE file with BOM header
+type "%TARGET_PATH_STDERR_FILE%" >&2
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%TARGET_PATH_STDOUT_FILE%"`) do set "RETURN_VALUE=%%i"
