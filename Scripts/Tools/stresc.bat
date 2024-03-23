@@ -50,9 +50,6 @@ if "%~3" == "" exit /b 1
 rem Drop output variable
 set "%~3="
 
-rem Drop last error level
-call;
-
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion
 

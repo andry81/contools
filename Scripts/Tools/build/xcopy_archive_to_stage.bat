@@ -31,14 +31,11 @@ shift
 set "ARCHIVE_EXCLUDE_FILES_LIST=%~8"
 set "ARCHIVE_EXCLUDE_DIRS_LIST=%~9"
 
-rem Drop last error level
-call;
-
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-set LASTERROR=0
+set LAST_ERROR=0
 
 if not exist "%COPY_FROM_STAGE_ROOT%" (
   echo.%?~nx0%: error: COPY_FROM_STAGE_ROOT path does not exist: "%COPY_FROM_STAGE_ROOT%"
@@ -103,10 +100,9 @@ rem <ARCHIVE_DIR_PREFIX_PATH> = <COPY_FROM_STAGE_ROOT> - <ARCHIVE_FROM_STAGE_DIR
 call "%%CONTOOLS_ROOT%%/filesys/subtract_path.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%COPY_FROM_STAGE_ROOT%%"
 set "ARCHIVE_DIR_PREFIX_PATH=%RETURN_VALUE%"
 
-call "%%CONTOOLS_WMI_ROOT%%\get_wmic_local_datetime.bat"
-set "TEMP_DIR_NAME_PREFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
-
-set "XCOPY_ARCHIVE_EXCLUDES_FILE=%TEMP%\%TEMP_DIR_NAME_PREFIX%.%?~n0%.txt"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "XCOPY_ARCHIVE_EXCLUDES_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%.txt"
+) else set "XCOPY_ARCHIVE_EXCLUDES_FILE=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%.txt"
 
 call :DEL_XCOPY_ARCHIVE_EXCLUDES_FILE || exit /b 10
 
@@ -144,8 +140,6 @@ call "%%CONTOOLS_ROOT%%/has_dir_files.bat" /S %%ARCHIVE_STAGE_FILE_PATH_LIST%% |
 
 echo.Archiving %MSG_TOKEN% files into %STAGE_NAME%...
 
-if not exist "%COPY_TO_STAGE_ROOT%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%COPY_TO_STAGE_ROOT%%"
-
 set FROM_FILE_INDEX=1
 
 :ARCHIVE_FILE_LIST
@@ -156,9 +150,9 @@ if not defined TO_FILE goto ARCHIVE_FILE_LIST_END
 set /A FROM_FILE_INDEX+=1
 
 if defined ARCHIVE_DIR_PREFIX_PATH (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%ARCHIVE_DIR_PREFIX_PATH%%/%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_EXCLUDES_CMD%% || ( set LASTERROR=11 & goto EXIT )
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%ARCHIVE_DIR_PREFIX_PATH%%/%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_EXCLUDES_CMD%% || ( set LAST_ERROR=11 & goto EXIT )
 ) else (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_EXCLUDES_CMD%% || ( set LASTERROR=11 & goto EXIT )
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%ARCHIVE_FROM_STAGE_DIR_ROOT%%" "%%TO_FILE%%" "%%ARCHIVE_FILE_PATH%%"%%ARCHIVE_7ZIP_EXCLUDES_CMD%% || ( set LAST_ERROR=11 & goto EXIT )
 )
 
 goto ARCHIVE_FILE_LIST
@@ -170,10 +164,10 @@ echo.
 :COPY_STAGE
 if exist "%XCOPY_ARCHIVE_EXCLUDES_FILE%" (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "%%MSG_TOKEN%%" "%%STAGE_NAME%%" "%%COPY_FROM_STAGE_ROOT%%" "%%COPY_TO_STAGE_ROOT%%" "%%COPY_FILE_LIST%%" ^
-    "%%XCOPY_FILE_FLAGS%%" "@%%XCOPY_ARCHIVE_EXCLUDES_FILE%%" || ( set LASTERROR=12 & goto EXIT )
+    "%%XCOPY_FILE_FLAGS%%" "@%%XCOPY_ARCHIVE_EXCLUDES_FILE%%" || ( set LAST_ERROR=12 & goto EXIT )
 ) else (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_to_stage.bat" "%%MSG_TOKEN%%" "%%STAGE_NAME%%" "%%COPY_FROM_STAGE_ROOT%%" "%%COPY_TO_STAGE_ROOT%%" "%%COPY_FILE_LIST%%" ^
-    "%%XCOPY_FILE_FLAGS%%" || ( set LASTERROR=12 & goto EXIT )
+    "%%XCOPY_FILE_FLAGS%%" || ( set LAST_ERROR=12 & goto EXIT )
 )
 
 goto :EXIT
@@ -202,8 +196,8 @@ exit /b
 
 :EXIT
 call :DEL_XCOPY_ARCHIVE_EXCLUDES_FILE
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :DEL_XCOPY_ARCHIVE_EXCLUDES_FILE
-if exist "%XCOPY_ARCHIVE_EXCLUDES_FILE%" ( call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%XCOPY_ARCHIVE_EXCLUDES_FILE%%" /A:-D /F /Q >nul || exit /b 1 )
+call "%%CONTOOLS_ROOT%%/std/del_file_if_exist.bat" "%%XCOPY_ARCHIVE_EXCLUDES_FILE%%" /F /Q >nul || exit /b 1
 exit /b 0

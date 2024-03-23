@@ -14,12 +14,12 @@ rem   >   root_key=(HKCR|HKLM|HKCU|HKU|HKCC|HKDD|HKPD|SHCTX)
 rem   Solution: Print all next lines after, until EOF or until first printable character in a line
 
 rem print debug NSIS messages at first
-findstr.exe /R /I /N /A:05 ^
+"%SystemRoot%\System32\findstr.exe" /R /I /N /A:05 ^
 /C:" (macro:!debug_echo:" ^
 "%NSIS_LOG_FILE%"
 
 rem print critical NSIS warnings as errors at second
-findstr.exe /R /I /N /A:04 ^
+"%SystemRoot%\System32\findstr.exe" /R /I /N /A:04 ^
 /C:"^error:" ^
 /C:"^error -" ^
 /C:"^!error:" ^
@@ -56,7 +56,7 @@ findstr.exe /R /I /N /A:04 ^
 if %ERRORLEVEL% EQU 0 set FIND_ERRORS=1
 
 rem print not critical warnings
-findstr.exe /R /I /N /A:06 ^
+"%SystemRoot%\System32\findstr.exe" /R /I /N /A:06 ^
 /C:"^warning:" ^
 /C:"not referenced" ^
 /C:"^Usage:" ^

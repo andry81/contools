@@ -71,35 +71,35 @@ if defined PROJECT_LOCK_TOKEN (
 
 if %FLAGS_REBUILD%0 EQU 10 (
   echo Deleting PROJECT_STAGE_BUILD_ROOT.BUILD_DIR: "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%"
-  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" > nul
+  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" >nul
   echo Deleting PROJECT_STAGE_BUILD_ROOT.CACHE_DIR: "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%"
-  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" > nul
+  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" >nul
   echo Deleting PROJECT_STAGE_BUILD_ROOT.BIN_DIR: "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%"
-  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%" > nul
+  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%" >nul
   echo Deleting PROJECT_STAGE_BUILD_ROOT.PDB_DIR: "%PROJECT_STAGE_BUILD_ROOT.PDB_DIR%"
-  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.PDB_DIR%" > nul
+  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.PDB_DIR%" >nul
   echo Deleting PROJECT_STAGE_BUILD_ROOT.LIB_DIR: "%PROJECT_STAGE_BUILD_ROOT.LIB_DIR%"
-  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.LIB_DIR%" > nul
+  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.LIB_DIR%" >nul
   echo Deleting PROJECT_STAGE_BUILD_ROOT.GEN_DIR: "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%"
-  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" > nul
+  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" >nul
   echo Deleting PROJECT_STAGE_BUILD_ROOT.VAR_DIR: "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%"
-  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" > nul
+  rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" >nul
 
   rem delete only if declared, because not all projects may has cmake as nested builder
   if defined PROJECT_CMAKE_BUILD_ROOT (
     echo Deleting PROJECT_CMAKE_BUILD_ROOT: "%PROJECT_CMAKE_BUILD_ROOT%"
-    rmdir /S /Q "%PROJECT_CMAKE_BUILD_ROOT%" > nul
+    rmdir /S /Q "%PROJECT_CMAKE_BUILD_ROOT%" >nul
   )
   if defined PROJECT_STAGE_BUILD_ROOT.INSTALL_DIR (
     echo Deleting PROJECT_STAGE_BUILD_ROOT.INSTALL_DIR: "%PROJECT_STAGE_BUILD_ROOT.INSTALL_DIR%"
-    rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.INSTALL_DIR%" > nul
+    rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.INSTALL_DIR%" >nul
   )
 )
 
-if not exist "%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%%" || exit /b 20 )
-if not exist "%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%%" || exit /b 21 )
-if not exist "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" || exit /b 22 )
-if not exist "%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%" ( call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" || exit /b 23 )
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%PROJECT_STAGE_BUILD_ROOT.BUILD_DIR%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%PROJECT_STAGE_BUILD_ROOT.CACHE_DIR%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%PROJECT_STAGE_BUILD_ROOT.VAR_DIR%%" || exit /b
 
 echo.
 
@@ -288,14 +288,15 @@ if exist "%BUILD_SCRIPTS_ROOT%\gen_scm_branch_workingset.bat" (
 echo.Building setup executable...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%/%APP_SETUP_FILE_NAME%.exe"
 
-if not exist "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%"
-call :CMD "%%NSIS_ROOT%%/bin/makensis.exe" %%MAKENSIS_CMD_LINE.COMPILE%%
-set LASTERROR=%ERRORLEVEL%
-echo.Return code: %LASTERROR%
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%" || exit /b
+
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callln.bat" "%%NSIS_ROOT%%/bin/makensis.exe" %%MAKENSIS_CMD_LINE.COMPILE%%
+set LAST_ERROR=%ERRORLEVEL%
+echo.Return code: %LAST_ERROR%
 
 echo.
 
-if %LASTERROR% NEQ 0 (
+if %LAST_ERROR% NEQ 0 (
   call "%%CONTOOLS_ROOT%%/nsis/find_errors_nsis_log.bat" "%%MAKENSIS_LOG_FILE_NAME%%"
   echo.
   echo.%~nx0: error: Build stopped because of previous errors.>&2
@@ -303,23 +304,23 @@ if %LASTERROR% NEQ 0 (
 )
 
 call "%%CONTOOLS_ROOT%%/nsis/find_errors_nsis_log.bat" "%%MAKENSIS_LOG_FILE_NAME%%"
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 echo.
 
-if %LASTERROR% NEQ 0 (
+if %LAST_ERROR% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
   exit /b 71
 )
 
 rem copy makensis detailed log file into /gen directory
 echo.Copying setup log files...
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" . "%%MAKENSIS_LOG_FILE_NAME%%" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" /Y /D
-set LASTERROR=%ERRORLEVEL%
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" . "%%MAKENSIS_LOG_FILE_NAME%%" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" /Y /D
+set LAST_ERROR=%ERRORLEVEL%
 
 echo.
 
-if %LASTERROR% NEQ 0 (
+if %LAST_ERROR% NEQ 0 (
   echo.%~nx0: error: Build stopped because of previous errors.>&2
   exit /b 72
 )
@@ -338,9 +339,3 @@ if defined PROJECT_LOCK_TOKEN (
 if %F_DISABLE_POST_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/post_build.bat" || exit /b )
 
 exit /b 0
-
-:CMD
-echo.^>%*
-echo.
-(%*)
-exit /b

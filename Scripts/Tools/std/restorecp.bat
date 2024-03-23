@@ -48,7 +48,9 @@ if not defined __?CHCP_FILE (
   exit /b 255
 ) >&2
 
-set "__?CHCP_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "__?CHCP_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%.txt"
+) else set "__?CHCP_TEMP_FILE=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%.txt"
 
 rem CAUTION:
 rem   Windows XP/7 implementation has an issue with stdin+stdout/stderr double redirection:
@@ -62,7 +64,7 @@ set "LAST_CP=%CURRENT_CP%"
 if not defined LAST_CP (
   "%__?CHCP_FILE%" 2>nul > "%__?CHCP_TEMP_FILE%"
   for /F "usebackq eol= tokens=1,* delims=:" %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
-  del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>&1
+  del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>nul
 ) <nul
 
 set "__?CHCP_TEMP_FILE="

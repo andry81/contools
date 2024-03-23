@@ -26,14 +26,11 @@ rem   Path to shortcut file.
 rem drop return value
 set "RETURN_VALUE="
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
 set FLAG_SHIFT=0
@@ -77,16 +74,21 @@ set "TARGET_PATH_TEMP_STDERR_FILE="
 rem CAUTION:
 rem   We must use temporary file with BOM header to retain the Unicode encoding.
 rem
-if not defined TARGET_PATH_STDOUT_FILE set "TARGET_PATH_TEMP_STDOUT_FILE=%TEMP%\read_shortcut_target_path.stdout.%RANDOM%-%RANDOM%.txt"
-if not defined TARGET_PATH_STDERR_FILE set "TARGET_PATH_TEMP_STDERR_FILE=%TEMP%\read_shortcut_target_path.stderr.%RANDOM%-%RANDOM%.txt"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  if not defined TARGET_PATH_STDOUT_FILE set "TARGET_PATH_TEMP_STDOUT_FILE=%SCRIPT_TEMP_CURRENT_DIR%\read_shortcut_target_path.stdout.%RANDOM%-%RANDOM%.txt"
+  if not defined TARGET_PATH_STDERR_FILE set "TARGET_PATH_TEMP_STDERR_FILE=%SCRIPT_TEMP_CURRENT_DIR%\read_shortcut_target_path.stderr.%RANDOM%-%RANDOM%.txt"
+) else (
+  if not defined TARGET_PATH_STDOUT_FILE set "TARGET_PATH_TEMP_STDOUT_FILE=%TEMP%\read_shortcut_target_path.stdout.%RANDOM%-%RANDOM%.txt"
+  if not defined TARGET_PATH_STDERR_FILE set "TARGET_PATH_TEMP_STDERR_FILE=%TEMP%\read_shortcut_target_path.stderr.%RANDOM%-%RANDOM%.txt"
+)
 
 if not defined TARGET_PATH_STDOUT_FILE set "TARGET_PATH_STDOUT_FILE=%TARGET_PATH_TEMP_STDOUT_FILE%"
 if not defined TARGET_PATH_STDERR_FILE set "TARGET_PATH_STDERR_FILE=%TARGET_PATH_TEMP_STDERR_FILE%"
 
 call :MAIN %%*
 
-if defined TARGET_PATH_TEMP_STDOUT_FILE del /F /Q "%TARGET_PATH_TEMP_STDOUT_FILE%" >nul 2>nul
-if defined TARGET_PATH_TEMP_STDERR_FILE del /F /Q "%TARGET_PATH_TEMP_STDERR_FILE%" >nul 2>nul
+if defined TARGET_PATH_TEMP_STDOUT_FILE del /F /Q /A:-D "%TARGET_PATH_TEMP_STDOUT_FILE%" >nul 2>nul
+if defined TARGET_PATH_TEMP_STDERR_FILE del /F /Q /A:-D "%TARGET_PATH_TEMP_STDERR_FILE%" >nul 2>nul
 
 if defined RETURN_VALUE ( endlocal & set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0 )
 

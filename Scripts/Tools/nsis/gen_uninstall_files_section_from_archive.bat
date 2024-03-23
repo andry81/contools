@@ -10,10 +10,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
-
-rem drop last error level
-call;
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="
@@ -52,7 +49,7 @@ exit /b 0
 :PROCESS_DIR_PATH
 set "BASE_DIR_PATH=%~f1"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%BASE_DIR_PATH%%FILE_FILTER_SUFFIX%" /A:-D /B /S /O:N`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%BASE_DIR_PATH%%%%FILE_FILTER_SUFFIX%%" /A:-D /B /O:N /S`) do (
   set "ARCHIVE_FILE_PATH=%%i"
   call :PROCESS_ARCHIVE_FILE || exit /b
 )
@@ -61,10 +58,9 @@ exit /b
 
 :PROCESS_ARCHIVE_FILE
 
-call "%%CONTOOLS_WMI_ROOT%%\get_wmic_local_datetime.bat"
-set "TEMP_DIR_NAME_PREFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
-
-set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%TEMP%\%TEMP_DIR_NAME_PREFIX%.%?~n0%"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%"
+) else set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%"
 
 mkdir "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%"
 rem safe all directory files remove except the directory
@@ -74,12 +70,12 @@ pushd "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%" && (
 )
 
 call :PROCESS_ARCHIVE_FILE_IMPL
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem cleanup temporary files
 rmdir /S /Q "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :PROCESS_ARCHIVE_FILE_IMPL
 set ARCHIVE_LIST_FILTER=0

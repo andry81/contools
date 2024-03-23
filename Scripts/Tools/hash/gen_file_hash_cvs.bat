@@ -9,9 +9,6 @@ rem Example:
 rem 1. call get_file_hash_cvs.bat -c md5 -b -s <file>
 rem    rem RETURN_VALUE=<size>,<md5>,<file>
 
-rem Drop last error level
-call;
-
 rem drop return value
 set "RETURN_VALUE="
 

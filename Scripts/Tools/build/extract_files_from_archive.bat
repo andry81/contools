@@ -29,14 +29,14 @@ call "%%~dp0__init__.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 
 call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem ...
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :IMPL
 rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.

@@ -4,9 +4,6 @@ rem CAUTION:
 rem  DO NOT kill cmd.exe processes by this script because it can kill
 rem  self cmd.exe host before kill other cmd.exe processes.
 
-rem Drop last error level
-call;
-
 setlocal
 
 set "?~nx0=%~nx0"
@@ -61,7 +58,7 @@ rem otherwise handle.exe command line parser will fail because of trailing \" se
 if "%PROC_NAME:~-1%" == "\" set "PROC_NAME=%PROC_NAME%\"
 if "%OBJECT_NAME:~-1%" == "\" set "OBJECT_NAME=%OBJECT_NAME%\"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_SYSINTERNALS_ROOT%/handle.exe" -p "%PROC_NAME%" "%OBJECT_NAME%" ^| findstr.exe /R /C:"pid: .*type: "`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_SYSINTERNALS_ROOT%/handle.exe" -p "%PROC_NAME%" "%OBJECT_NAME%" ^| "%%SystemRoot%%\System32\findstr.exe" /R /C:"pid: .*type: "`) do (
   set "HANDLE_LINE=%%i"
   call :PROCESS_HANDLE_LINE
   if %FLAG_CLOSE_ALL% EQU 0 exit /b 0

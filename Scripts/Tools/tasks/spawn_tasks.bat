@@ -39,8 +39,14 @@ set PREV_RUNNING_TASKS_COUNTER=0
 set IS_TASK_SPAWN_LOCKED=0
 
 set RND=%RANDOM%.%RANDOM%
-set "RUNNING_TASKS_COUNTER_FILE=%TEMP%\spawn_tasks.counter.%RND%.var"
-set "LOCK_FILE0=%TEMP%\spawn_tasks.lock.%RND%.var"
+
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "RUNNING_TASKS_COUNTER_FILE=%SCRIPT_TEMP_CURRENT_DIR%\spawn_tasks.counter.%RND%.var"
+  set "LOCK_FILE0=%SCRIPT_TEMP_CURRENT_DIR%\spawn_tasks.lock.%RND%.var"
+) else (
+  set "RUNNING_TASKS_COUNTER_FILE=%TEMP%\spawn_tasks.counter.%RND%.var"
+  set "LOCK_FILE0=%TEMP%\spawn_tasks.lock.%RND%.var"
+)
 
 :REPEAT_READ_LOOP
 
@@ -85,7 +91,7 @@ goto REPEAT_READ_LOOP
 
 :SPAWN_TASK
 rem the task spawner CAN decrement the counter to the negative value, this is not critical here
-start /B "" "%COMSPEC%" /c call "%~dp0task_spawner.bat" %4 %5 %6 %7 %8 %9
+start /B "" "%COMSPEC%" /c call "%%%%CONTOOLS_ROOT%%%%/std/callshift.bat" 3 "%~dp0task_spawner.bat" %*
 
 set /A SPAWN_TASK_INDEX+=1
 
@@ -165,8 +171,8 @@ if %LOCK_FILE0_ACQUIRE% EQU 0 (
 if %RUNNING_TASKS_COUNTER% GTR 0 goto REPEAT_WAIT_EXIT
 
 rem cleanup files
-del /F /Q /A:-D "%LOCK_FILE0%" >nul 2>&1
-del /F /Q /A:-D "%RUNNING_TASKS_COUNTER_FILE%" >nul 2>&1
+del /F /Q /A:-D "%LOCK_FILE0%" >nul 2>nul
+del /F /Q /A:-D "%RUNNING_TASKS_COUNTER_FILE%" >nul 2>nul
 
 exit /b 0
 

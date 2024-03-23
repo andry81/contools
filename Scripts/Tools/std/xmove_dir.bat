@@ -1,6 +1,7 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
+rem USAGE:
+rem   xmove_dir.bat [<flags>] <from-path> <to-path> [<xmove-flags>...]
 
 rem Description:
 rem   The `move`/`robocopy.exe` seemless wrapper script with xcopy
@@ -26,7 +27,26 @@ rem
 rem   But we need to preserve timestamps and move all directories without
 rem   any timestamp modification. So we use `move` command by default and if it
 rem   has failed, then fall back to the `robocopy.exe` to copy and then delete.
+
+rem <flags>:
+rem   -chcp <CodePage>
+rem     Set explicit code page.
 rem
+rem   -use_builtin_move
+rem     Use builtin `move` command.
+rem
+rem   -ignore-unexist
+rem     By default `<to-path>` does check on directory existence.
+rem     Use this flag to skip the check.
+
+rem <from-path>:
+rem   From directory path.
+
+rem <to-path>:
+rem   To directory path.
+
+rem <xmove-flags>:
+rem   Command line flags to pass into subsequent commands and utilities.
 
 echo.^>%~nx0 %*
 
@@ -175,7 +195,7 @@ if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
-set XMOVE_FLAGS_=%3 %4 %5 %6 %7 %8 %9
+call "%%?~dp0%%setshift.bat" 2 XMOVE_FLAGS_ %%*
 
 rem use `robocopy.exe` in case of a directory move-to-merge
 if %FLAG_IGNORE_EXISTED% NEQ 0 if %TO_PATH_AS_DIR_EXISTS% NEQ 0 goto USE_ROBOCOPY
@@ -198,15 +218,15 @@ if not exist "%SystemRoot%\system32\robocopy.exe" set FLAG_USE_BUILTIN_MOVE=1
 echo.^>^>move%XMOVE_FLAGS% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
 move%XMOVE_FLAGS% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
 
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem restore locale
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
-if %FLAG_USE_BUILTIN_MOVE% NEQ 0 exit /b %LASTERROR%
+if %FLAG_USE_BUILTIN_MOVE% NEQ 0 exit /b %LAST_ERROR%
 
 rem fall back to `robocopy.exe` usage
-if %LASTERROR% NEQ 0 goto USE_ROBOCOPY
+if %LAST_ERROR% NEQ 0 goto USE_ROBOCOPY
 
 exit /b 0
 

@@ -20,9 +20,6 @@ set "FROM_BASE_ROOT=%~2"
 set "TO_APP_DIR_ROOT=%~3"
 set "XCOPY_FLAGS=%~4"
 
-rem Drop last error level
-call;
-
 call "%%?~dp0%%__init__.bat" || exit /b
 
 set PATH_INDEX=1
@@ -55,13 +52,11 @@ set "XCOPY_SUFFIX_PATH=%RETURN_VALUE:\=/%"
 
 if defined XCOPY_SUFFIX_PATH (
   if exist "%FROM_DIR_ROOT%" (
-    call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%TO_APP_DIR_ROOT%%/%%XCOPY_SUFFIX_PATH%%"
-    call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%/%%XCOPY_SUFFIX_PATH%%" %%XCOPY_FLAGS%% || exit /b 1
+    call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_dir.bat" "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%/%%XCOPY_SUFFIX_PATH%%" %%XCOPY_FLAGS%% || exit /b 1
   )
 ) else (
   if exist "%FROM_DIR_ROOT%" (
-    call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%TO_APP_DIR_ROOT%%"
-    call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%" %%XCOPY_FLAGS%% || exit /b 2
+    call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_dir.bat" "%%FROM_DIR_ROOT%%" "%%TO_APP_DIR_ROOT%%" %%XCOPY_FLAGS%% || exit /b 2
   )
 )
 

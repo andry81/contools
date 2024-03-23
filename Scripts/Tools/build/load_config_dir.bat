@@ -89,7 +89,7 @@ if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_USER_CONFIG% EQU 0 (
 if "%~2" == "" (
   call :MAIN "%%~1" "%%~1" "%%~3" "%%~4"
 ) else call :MAIN "%%~1" "%%~2" "%%~3" "%%~4"
-set __?LASTERROR=%ERRORLEVEL%
+set __?LAST_ERROR=%ERRORLEVEL%
 
 rem drop all locals
 for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set __? 2^>nul`) do set "%%i="

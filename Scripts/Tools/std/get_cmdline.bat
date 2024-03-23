@@ -28,7 +28,9 @@ setlocal & set LAST_ERROR=%ERRORLEVEL%
 rem drop last error level
 call;
 
-set "CMDLINE_TEMP_FILE=%TEMP%\get_cmdline.%RANDOM%-%RANDOM%.txt"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\get_cmdline.%RANDOM%-%RANDOM%.txt"
+) else set "CMDLINE_TEMP_FILE=%TEMP%\get_cmdline.%RANDOM%-%RANDOM%.txt"
 
 rem redirect command line into temporary file to print it correcly
 for %%i in (1) do (
@@ -40,7 +42,7 @@ for %%i in (1) do (
 
 for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "RETURN_VALUE=%%i"
 
-del /F /Q "%CMDLINE_TEMP_FILE%" >nul 2>nul
+del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
 (
   setlocal ENABLEDELAYEDEXPANSION

@@ -11,9 +11,6 @@ rem  See xml_to_xpath_list.bat for details.
 rem Examples:
 rem 1. call xml_to_xpath_list_for_files.bat -lnodes 1251 *.xml *.xml.tmpl
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b
@@ -49,7 +46,7 @@ set "CMD_VA_ARGS="
 :PROCESS_FILES_LOOP
 if "%~1" == "" goto PROCESS_FILES_LOOP_END
 
-set CMD_VA_ARGS=%CMD_VA_ARGS%%1 
+set CMD_VA_ARGS=%CMD_VA_ARGS% %1
 shift
 
 goto PROCESS_FILES_LOOP
@@ -59,7 +56,7 @@ goto PROCESS_FILES_LOOP
 rem get and set code page
 call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CODE_PAGE%%
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /O:N /S %CMD_VA_ARGS%`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir%%CMD_VA_ARGS%% /A:-D /B /O:N /S`) do (
   echo.# ------------------------------------------------------------------------------
   echo # File: "%%i"
   echo.# ------------------------------------------------------------------------------

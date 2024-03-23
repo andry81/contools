@@ -6,7 +6,9 @@ set "LOCK_NAMES=%~1"
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "LOCK_PATH=%TEMP%"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "LOCK_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
+) else set "LOCK_PATH=%TEMP%"
 set "UNLOCK_DIR=unlock0"
 set "UNLOCK_FILE=unlock0"
 set "WAITERS_DIR=waiters"
@@ -48,10 +50,10 @@ rem prelock via redirection to file
 set PRE_LOCK_ACQUIRE=0
 (
   (
-    rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>&1 && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>&1
+    rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
 
-    pushd "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%" >nul 2>&1 || (
-      set LASTERROR=0
+    pushd "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%" >nul 2>nul || (
+      set LAST_ERROR=0
       set /A NUM_WAITERS_UNEXISTED+=1
       echo.Waiter [ %LOCK_NAME%\%WAITER_FILE% ] already unlocked
       goto EXIT_FROM_PRELOCK
@@ -112,7 +114,7 @@ rem prelock via redirection to file
 (
   (
     rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
-    rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>&1 && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>&1
+    rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
   ) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%"
 ) 2>nul
 
@@ -127,7 +129,7 @@ if not exist "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%\%WAITER_FILE%" (
   (
     (
       rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
-      rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>&1 && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>&1
+      rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
     ) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%"
   ) 2>nul
 
@@ -145,8 +147,8 @@ exit /b 1
 
 :EXIT_FROM_PRELOCK
 call :CLEANUP_PRELOCK
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :CLEANUP_PRELOCK
-del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>&1
+del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>nul
 exit /b

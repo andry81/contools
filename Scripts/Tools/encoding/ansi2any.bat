@@ -10,13 +10,12 @@ rem script flags
 set RESTORE_LOCALE=0
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
-:EXIT_MAIN
 rem restore locale
 if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 rem script flags

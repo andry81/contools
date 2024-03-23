@@ -13,9 +13,6 @@ setlocal
 
 set "EXPORT_VARS_FILE=%~1"
 
-rem Drop last error level
-call;
-
 call "%%~dp0__init__.bat" || exit /b
 
 call :WRITE_VAR_FILE SOLUTION_BRANCH_ROOT           "%%EXPORT_VARS_FILE%%" || exit /b

@@ -21,9 +21,6 @@ set "%~1="
 
 if "%~2" == "" exit /b 2
 
-rem Drop last error level
-call;
-
 rem Create local variable's stack
 setlocal
 

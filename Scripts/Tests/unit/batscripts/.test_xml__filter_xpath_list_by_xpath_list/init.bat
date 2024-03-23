@@ -16,22 +16,12 @@ goto TEST_DATA_CMD_LINE_LOOP
 
 :TEST_DATA_CMD_LINE_LOOP_END
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%" "" "%%TEST_TEMP_BASE_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%" "" "%%TEST_TEMP_BASE_DIR%%" || exit /b
 
 set "TEST_TEMP_DIR_NAME=%SCRIPT_TEMP_DIR_NAME%"
 set "TEST_TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
 rem initialize setup parameters
-call :CANONICAL_PATH TEST_DATA_OUT_FILE "%%TEST_TEMP_DIR_PATH%%\output.txt"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_OUT_FILE "%%TEST_TEMP_DIR_PATH%%\output.txt"
 
-exit /b 0
-
-:CANONICAL_PATH
-setlocal DISABLEDELAYEDEXPANSION
-for /F "eol= tokens=* delims=" %%i in ("%~2\.") do set "RETURN_VALUE=%%~fi"
-rem set "RETURN_VALUE=%RETURN_VALUE:\=/%"
-(
-  endlocal
-  set "%~1=%RETURN_VALUE%"
-)
 exit /b 0

@@ -25,25 +25,25 @@ if %IMPL_MODE%0 NEQ 0 goto IMPL
 
 call "%%~dp0__init__\__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_vars_file.bat" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_vars_file.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
-if %NEST_LVL% EQU 0 if %LASTERROR% EQU 0 (
+if %NEST_LVL% EQU 0 if %LAST_ERROR% EQU 0 (
   rem copy log into backup directory
-  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_dir.bat" "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
 )
 
 pause
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :IMPL
 rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
@@ -56,14 +56,10 @@ if %NEST_LVL% EQU 1 (
   if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat" "%%INIT_VARS_FILE%%"
 )
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
-  echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
-  set LASTERROR=255
-  goto FREE_TEMP_DIR
-) >&2
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 :FREE_TEMP_DIR
 rem cleanup temporary files
@@ -71,7 +67,7 @@ call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
 set /A NEST_LVL-=1
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 rem script flags
@@ -116,27 +112,18 @@ if defined FLAG (
 set "TYPE=%~1"
 
 if not defined TYPE (
-  echo.%?~n0%: error: TYPE is not defined.
+  echo.%?~nx0%: error: TYPE is not defined.
   exit /b 255
 ) >&2
 
-set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\emptydir"
 set "QUERY_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\query.txt"
-
-mkdir "%EMPTY_DIR_TMP%" || (
-  echo.%?~n0%: error: could not create a directory: "%EMPTY_DIR_TMP%".
-  exit /b 255
-) >&2
 
 set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup\restapi"
 
 set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/repos/user/%GH_AUTH_USER%"
 set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/restapi/repos/user/%GH_AUTH_USER%"
 
-mkdir "%GH_REPOS_BACKUP_TEMP_DIR%" || (
-  echo.%?~n0%: error: could not create a directory: "%GH_REPOS_BACKUP_TEMP_DIR%".
-  exit /b 255
-) >&2
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%GH_REPOS_BACKUP_TEMP_DIR%%" >nul || exit /b 255
 
 set HAS_AUTH_USER=0
 
@@ -173,7 +160,7 @@ if "%QUERY_LEN%" == "null" set QUERY_LEN=0
 
 rem just in case
 if %PAGE% GEQ 100 (
-  echo.%?~n0%: error: too many pages, skip processing.
+  echo.%?~nx0%: error: too many pages, skip processing.
   goto PAGE_LOOP_END
 ) >&2
 
@@ -182,67 +169,27 @@ if %QUERY_LEN% GEQ %GH_RESTAPI_PARAM_PER_PAGE% ( set /A "PAGE+=1" & goto PAGE_LO
 :PAGE_LOOP_END
 
 if %PAGE% LSS 2 if %QUERY_LEN% EQU 0 (
-  echo.%?~n0%: warning: query response is empty.
+  echo.%?~nx0%: warning: query response is empty.
   goto SKIP_ARCHIVE
 ) >&2
 
 echo.Archiving backup directory...
-if not exist "%GH_REPOS_BACKUP_DIR%\*" mkdir "%GH_REPOS_BACKUP_DIR%"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%GH_REPOS_BACKUP_DIR%%" && ^
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/auth-user-repos--[%%GH_AUTH_USER%%][%%TYPE%%]--%%PROJECT_LOG_FILE_NAME_DATE_TIME%%.7z" -sdel || exit /b 20
 echo.
 
 :SKIP_ARCHIVE
 
 :MAIN_EXIT
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 echo.
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :CURL
 echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
 (
   %CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
 ) > "%CURL_OUTPUT_FILE%"
-exit /b
-
-:CMD
-echo.^>%*
-(
-  %*
-)
-exit /b
-
-:XCOPY_FILE
-if not exist "\\?\%~f3" (
-  echo.^>mkdir "%~3"
-  call :MAKE_DIR "%%~3" || (
-    echo.%?~nx0%: error: could not create a target file directory: "%~3".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%*
-exit /b
-
-:XCOPY_DIR
-if not exist "\\?\%~f2" (
-  echo.^>mkdir "%~2"
-  call :MAKE_DIR "%%~2" || (
-    echo.%?~nx0%: error: could not create a target directory: "%~2".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%*
-exit /b
-
-:MAKE_DIR
-for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
-
-mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
-  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
-  exit /b 1
-) >&2
 exit /b

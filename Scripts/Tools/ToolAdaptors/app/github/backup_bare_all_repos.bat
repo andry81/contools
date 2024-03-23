@@ -30,25 +30,25 @@ if %IMPL_MODE%0 NEQ 0 goto IMPL
 
 call "%%~dp0__init__\__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_vars_file.bat" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_vars_file.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
-if %NEST_LVL% EQU 0 if %LASTERROR% EQU 0 (
+if %NEST_LVL% EQU 0 if %LAST_ERROR% EQU 0 (
   rem copy log into backup directory
-  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/bare/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_dir.bat" "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/bare/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
 )
 
 pause
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :IMPL
 rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
@@ -61,14 +61,10 @@ if %NEST_LVL% EQU 1 (
   if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat" "%%INIT_VARS_FILE%%"
 )
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
-  echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
-  set LASTERROR=255
-  goto FREE_TEMP_DIR
-) >&2
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 :FREE_TEMP_DIR
 rem cleanup temporary files
@@ -76,7 +72,7 @@ call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
 set /A NEST_LVL-=1
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 pushd "%?~dp0%" && (
@@ -137,13 +133,6 @@ if defined FLAG (
 
 :FLAGS_LOOP_END
 
-set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\emptydir"
-
-mkdir "%EMPTY_DIR_TMP%" || (
-  echo.%?~n0%: error: could not create a directory: "%EMPTY_DIR_TMP%".
-  exit /b 255
-) >&2
-
 rem must be empty
 if defined FLAG_FROM_CMD (
   if not defined SKIPPING_CMD echo.Skipping commands:
@@ -163,49 +152,9 @@ for /F "usebackq eol=# tokens=1,* delims=/" %%i in (%REPO_LISTS%) do (
   call "%%~dp0.impl/update_skip_state.bat" "backup_bare_repo.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_bare_repo.bat"%%BARE_FLAGS%% "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+    call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_bare_repo.bat"%%BARE_FLAGS%% "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
   ) else call echo.* backup_bare_repo.bat "%%REPO_OWNER%%" "%%REPO%%"
 )
 
 exit /b 0
-
-:CMD
-echo.^>%*
-(
-  %*
-)
-exit /b
-
-:XCOPY_FILE
-if not exist "\\?\%~f3" (
-  echo.^>mkdir "%~3"
-  call :MAKE_DIR "%%~3" || (
-    echo.%?~nx0%: error: could not create a target file directory: "%~3".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%*
-exit /b
-
-:XCOPY_DIR
-if not exist "\\?\%~f2" (
-  echo.^>mkdir "%~2"
-  call :MAKE_DIR "%%~2" || (
-    echo.%?~nx0%: error: could not create a target directory: "%~2".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%*
-exit /b
-
-:MAKE_DIR
-for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
-
-mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
-  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
-  exit /b 1
-) >&2
-exit /b

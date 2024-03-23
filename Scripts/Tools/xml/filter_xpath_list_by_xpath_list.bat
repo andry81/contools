@@ -25,14 +25,11 @@ rem      If filter is "/tag1/tag2[@val=VALUE]", then exactly 4th
 rem      line will be filtered no matter does flag set or not.
 rem  -ignore-props - ignore `[@...]' suffix while matching xpaths.
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
 set FLAG_EXACT=0
@@ -86,18 +83,18 @@ if not exist "%XPATH_LIST_FILE_FILTER%" (
 ) >&2
 
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 set "XPATH_LIST_FILE_IN_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\xpath_in.lst"
 set "XPATH_LIST_FILE_FILTER_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\xpath_filter.lst"
 
 call :MAIN
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 rem create filter list, append "/" to end of each xpath for exact/subdir match
@@ -119,4 +116,4 @@ set SED_SEARCH_PREFIX_CMD_LINE=-e "/^#/ !{ /[^\/]\[@/ { s/\([^\/]\)\[@/\1\/[@/; 
 
 rem apply filter list to search list and remove flat list prefixes, convert empty lines to special comments to save them in output, remove "/" from end of each xpath
 set SED_CLEANUP_LAST_CMD_LINE=-e "/^#/ { s/^# :EOL$//; }; /^#/ !{ /./ { s/.*|//; } }; /\/\[@/ { s/\/\[@/[@/; }; /\/\[@/ !{ s/\/$//; }"
-"%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" -e "/./ !{ s/^$/# :EOL/ }" "%XPATH_LIST_FILE_IN_TEMP_FILE%" | findstr.exe /R /B /G:"%XPATH_LIST_FILE_FILTER_TEMP_FILE%" /C:"#" | "%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" %SED_CLEANUP_LAST_CMD_LINE%
+"%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" -e "/./ !{ s/^$/# :EOL/ }" "%XPATH_LIST_FILE_IN_TEMP_FILE%" | "%SystemRoot%\System32\findstr.exe" /R /B /G:"%XPATH_LIST_FILE_FILTER_TEMP_FILE%" /C:"#" | "%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" %SED_CLEANUP_LAST_CMD_LINE%

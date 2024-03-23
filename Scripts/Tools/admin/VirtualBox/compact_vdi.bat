@@ -29,7 +29,7 @@ if not exist "%VBOX_MANAGE_EXE%" (
   exit /b 255
 ) >&2
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /O:N /S "%VDI_DIR%\*.vdi"`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%VDI_DIR%%\*.vdi" /A:-D /B /O:N /S`) do (
   set "VDI_FILE=%%i"
   call :COMPACT_VDI_FILE
 )

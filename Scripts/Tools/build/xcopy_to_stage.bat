@@ -32,9 +32,6 @@ if not exist "%FROM_STAGE_DIR_ROOT%" (
   exit /b 1
 ) >&2
 
-rem Drop last error level
-call;
-
 call "%%?~dp0%%__init__.bat" || exit /b
 
 call :FILE_PATH "%%TO_STAGE_DIR_ROOT%%"
@@ -70,9 +67,7 @@ if %MSG_PRINTED% EQU 0 (
   set MSG_PRINTED=1
 )
 
-if not exist "%TO_STAGE_DIR_ROOT%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%TO_STAGE_DIR_ROOT%%"
-
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_STAGE_DIR_ROOT%%" "%%FROM_FILE%%" "%%TO_STAGE_DIR_ROOT%%" %%XCOPY_FILE_FLAGS%% || exit /b 127
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%FROM_STAGE_DIR_ROOT%%" "%%FROM_FILE%%" "%%TO_STAGE_DIR_ROOT%%" %%XCOPY_FILE_FLAGS%% || exit /b 127
 
 goto FROM_FILE_LOOP
 

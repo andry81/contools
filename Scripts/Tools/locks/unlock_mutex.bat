@@ -6,7 +6,9 @@ set "LOCK_NAME=%~1"
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "LOCK_PATH=%TEMP%"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "LOCK_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
+) else set "LOCK_PATH=%TEMP%"
 set "PRE_LOCK_FILE=prelock_mutex0.%LOCK_NAME%"
 set "LOCK_DIR=lock_mutex0.%LOCK_NAME%"
 set "UNLOCK_DIR=unlock0"
@@ -20,10 +22,10 @@ set PRE_LOCK_ACQUIRE=0
 (
   (
     rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
-    rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>&1 && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>&1
+    rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
 
-    pushd "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%" >nul 2>&1 || (
-      set LASTERROR=-1
+    pushd "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%" >nul 2>nul || (
+      set LAST_ERROR=-1
       goto EXIT_FROM_PRELOCK
     )
     echo.%UNLOCK_DIR%_%LOCK_NAME% > "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%\%UNLOCK_FILE%"
@@ -49,8 +51,8 @@ goto PRE_LOCK_LOOP
 
 :EXIT_FROM_PRELOCK
 call :CLEANUP_PRELOCK
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :CLEANUP_PRELOCK
-del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>&1
+del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>nul
 exit /b

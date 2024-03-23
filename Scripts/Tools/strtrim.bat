@@ -15,9 +15,6 @@ if "%~2" == "" exit /b 1
 rem Create local variable's stack
 setlocal
 
-rem Drop last error level
-call;
-
 for /f "tokens=* delims=	 " %%i in ("%~1") do set "__STRING__=%%i"
 
 call :TRIM_RIGHT "%%__STRING__%%

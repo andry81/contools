@@ -21,15 +21,12 @@ rem    echo ERRORLEVEL=%ERRORLEVEL%
 
 if "%~1" == "" exit /b -1
 
-rem Drop last error level
-call;
-
 rem Create local variable's stack
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/strlen.bat" "%%~2"
+call "%%CONTOOLS_ROOT%%/std/strlen.bat" "" "%%~2"
 set __STRLEN=%ERRORLEVEL%
 if %__STRLEN% EQU 0 exit /b -1
 

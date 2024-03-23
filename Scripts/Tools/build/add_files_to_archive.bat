@@ -45,14 +45,11 @@ goto SWITCHES_LOOP
 
 :SWITCHES_LOOP_END
 
-rem Drop last error level
-call;
-
 call "%%?~dp0%%__init__.bat" || exit /b
 
 pushd "%DIR%" || (
   echo.%?~nx0%: error: could not switch current directory: "%DIR%".
-  set LASTERROR=1
+  set LAST_ERROR=1
   goto EXIT
 )
 
@@ -63,14 +60,10 @@ rem   Explicitly use temporary directory for 7zip. This is required in some case
 rem   archive file around being updated archive file.
 rem   For example: pushd c:\ && ( 7z.exe a -r <PathToArchive> "<SomeRelativePath>" & popd )
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
-  echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
-  set LASTERROR=255
-  goto FREE_TEMP_DIR
-) >&2
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || ( set "LAST_ERROR=255" & goto FREE_TEMP_DIR )
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 :FREE_TEMP_DIR
 rem cleanup temporary files
@@ -79,37 +72,15 @@ call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 popd
 
 :EXIT
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
-set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\emptydir"
-
-mkdir "%EMPTY_DIR_TMP%" || (
-  echo.%?~n0%: error: could not create a directory: "%EMPTY_DIR_TMP%".
-  exit /b 255
-) >&2
-
-if not exist "%ARCHIVE_DIR%\*" ( call :MAKE_DIR "%%ARCHIVE_DIR%%" || exit /b 2 )
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%ARCHIVE_DIR%%" || exit /b 2
 
 rem remove arguments trailing back slashes to avoid exe command line parse old bug
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"
 if "%REL_PATH:~-1%" == "\" set "REL_PATH=%REL_PATH:~0,-1%"
 
-call :CMD "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" a -r%%_7ZIP_SWITCHES%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%" "-w%%SCRIPT_TEMP_CURRENT_DIR%%"
-exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" a -r%%_7ZIP_SWITCHES%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%" "-w%%SCRIPT_TEMP_CURRENT_DIR%%"
 
-:CMD
-echo.^>%*
-(
-  %*
-)
-exit /b
-
-:MAKE_DIR
-for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
-
-mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
-  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
-  exit /b 1
-) >&2
 exit /b

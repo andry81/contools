@@ -55,13 +55,13 @@ if %IMPL_MODE%0 NEQ 0 goto IMPL
 
 call "%%~dp0__init__\__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_vars_file.bat" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_vars_file.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -X /pause-on-exit -- %%* || exit /b
 
@@ -72,6 +72,7 @@ rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was 
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
+set FLAG_SHIFT=0
 set RESTORE_LOCALE=0
 set "FLAG_CHCP="
 set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=0
@@ -98,6 +99,7 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
+    set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-reset-wd-from-target-path" (
     if %FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -reset-wd-from-target-path
     set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=1
@@ -134,19 +136,16 @@ if defined FLAG (
   ) else if "%FLAG%" == "-p" (
     if %FLAG_PRINT_ASSIGN% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -p
     set FLAG_PRINT_ASSIGN=1
-  ) else if "%FLAG%" == "--" (
-    shift
-    set "FLAG="
-    goto FLAGS_LOOP_END
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
   shift
+  set /A FLAG_SHIFT+=1
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
 :FLAGS_LOOP_END
@@ -154,19 +153,15 @@ if defined FLAG (
 rem load initialization environment variables
 if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat" "%%INIT_VARS_FILE%%"
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
-  echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
-  set LASTERROR=255
-  goto FREE_TEMP_DIR
-) >&2
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 if defined FLAG_CHCP (
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
   set RESTORE_LOCALE=1
 ) else call "%%CONTOOLS_ROOT%%/std/getcp.bat"
 
-call :MAIN %%1 %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9
-set LASTERROR=%ERRORLEVEL%
+call :MAIN %%*
+set LAST_ERROR=%ERRORLEVEL%
 
 rem restore locale
 if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
@@ -175,9 +170,11 @@ if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
+if FLAG_SHIFT GTR 0 for /L %%i in (1,1,%FLAG_SHIFT%) do shift
+
 set "LINKS_DIR=%~1"
 
 if defined LINKS_DIR (
@@ -193,7 +190,7 @@ for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi
 
 if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S /O:N "%LINKS_DIR%*.lnk"`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%LINKS_DIR%%*.lnk" /A:-D /B /O:N /S`) do (
   set "LINK_FILE_PATH=%%i"
   call :UPDATE_LINK
 )

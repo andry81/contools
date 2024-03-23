@@ -1,6 +1,8 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
+rem USAGE:
+rem   strlen.bat "" <string>
+rem   strlen.bat /v <var>
 
 rem Description:
 rem   Script reads the length of a string in first argument.

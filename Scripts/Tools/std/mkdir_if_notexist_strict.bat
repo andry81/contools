@@ -1,26 +1,41 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
+rem USAGE:
+rem   mkdir_if_notexist_strict.bat <path>...
 
 rem Description:
-rem   The `mkdir` if not exist wrapper script with echo and some conditions
-rem   check before call.
+rem   The `mkdir` if-not-exist wrapper script with echo and some conditions
+rem   check before call. Does not support long paths.
+rem
+rem   Strict version, reports an error in case of unexisted drive or
+rem   disconnected symbolic reference to a directory.
+
+rem <path>...
+rem   Directory path list.
 
 if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 
 setlocal
 
+if not defined ?~nx0 (
+  set "?~=%~nx0"
+) else set "?~=%?~nx0%: %~nx0"
+
+set "DIR_PATH=%~1"
+
+if not defined DIR_PATH (
+  echo.%?~%: error: at least one directory path argument must be defined.
+  exit /b -255
+) >&2
+
+set DIR_COUNT=1
+set DIR_COUNT_MAX=0
+
+for %%i in (%*) do set /A DIR_COUNT_MAX+=1
+
 set "DIR_PATHS="
 
 :MKDIR_LOOP
-
-set "DIR_PATH=%~1"
-set DIR_COUNT=1
-
-if not defined DIR_PATH (
-  echo.%~nx0: error: at least one directory path argument must be defined.
-  exit /b -255
-) >&2
 
 set "DIR_PATH=%DIR_PATH:/=\%"
 
@@ -43,7 +58,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_ERROR
 (
-  echo.%~nx0: error: the directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo.%?~%: error: directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -52,10 +67,10 @@ goto DIR_PATH_OK
 for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do ( set "DIR_PATH=%%~fi" && set "DIR_DRIVE=%%~di" )
 
 rem CAUTION:
-rem   The directory can or can not exist on the disconnected drive.
+rem   The drive still must exist even if the path is not. If path exists, the path directory still can be in a disconnected state.
 rem
 if not exist "%DIR_DRIVE%" (
-  echo.%~nx0: error: the directory path drive is not exist: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo.%?~%: error: the directory path drive is not exist: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -66,21 +81,28 @@ rem     `x:\<path-to-dir-without-trailing-back-slash>`
 rem   So we must test the path with the trailing back slash to check existence of the link AND it's connection state.
 rem
 if not exist "\\?\%DIR_PATH%" (
-  set DIR_PATHS=%DIR_PATHS% "%DIR_PATH%"
+  set DIR_PATHS=%DIR_PATHS% %1
 ) else if not exist "\\?\%DIR_PATH%\*" (
-  echo.%~nx0: error: path does exist but is not a directory: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo.%?~%: error: path does exist but is not a directory: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
 ) >&2
 
 shift
 
-if "%~1" == "" goto MKDIR_LOOP_END
-
 set /A DIR_COUNT+=1
+
+if %DIR_COUNT_MAX% LSS %DIR_COUNT% goto EXEC
+
+set "DIR_PATH=%~1"
+
+if not defined DIR_PATH (
+  echo.%?~%: error: directory path argument is not defined: ARG=%DIR_COUNT%
+  exit /b -255
+) >&2
 
 goto MKDIR_LOOP
 
-:MKDIR_LOOP_END
+:EXEC
 if not defined DIR_PATHS exit /b 0
 
 echo.^>^>mkdir%DIR_PATHS%

@@ -8,7 +8,7 @@ rem inactive Network Adapters to uninstall them.
 setlocal
 
 rem scripts must run in administrator mode
-net session >nul 2>&1
+net session >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: run script in administrator mode!
   exit /b -255

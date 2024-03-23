@@ -1,6 +1,7 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
+rem USAGE:
+rem   xcopy_dir.bat [<flags>] <from-path> <to-path> [<xcopy-flags>...]
 
 rem Description:
 rem   The `xcopy.exe`/`robocopy.exe` seemless wrapper script with xcopy
@@ -13,6 +14,26 @@ rem   bypass that limitation we have to use `robocopy.exe` instead
 rem   (Windows Vista and higher ONLY).
 rem
 rem   `robocopy.exe` will copy hidden and archive files by default.
+
+rem <flags>:
+rem   -chcp <CodePage>
+rem     Set explicit code page.
+rem
+rem   -use_xcopy
+rem     Use `xcopy` executable utility.
+rem
+rem   -ignore-unexist
+rem     By default `<to-path>` does check on directory existence.
+rem     Use this flag to skip the check.
+
+rem <from-path>:
+rem   From directory path.
+
+rem <to-path>:
+rem   To directory path.
+
+rem <xcopy-flags>:
+rem   Command line flags to pass into subsequent utilities.
 
 echo.^>%~nx0 %*
 
@@ -160,7 +181,7 @@ if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
 :INIT
 call "%%?~dp0%%__init__.bat" || exit /b
 
-set XCOPY_FLAGS_=%3 %4 %5 %6 %7 %8 %9
+call "%%?~dp0%%setshift.bat" 2 XCOPY_FLAGS_ %%*
 
 if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
 if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
@@ -182,7 +203,7 @@ set "XCOPY_EXCLUDES_LIST_TMP="
 
 if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_XCOPY_EXCLUDES
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%"
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || ( set "LAST_ERROR=255" & goto EXIT )
 
 set "XCOPY_EXCLUDES_LIST_TMP=%SCRIPT_TEMP_CURRENT_DIR%\$xcopy_excludes.lst"
 
@@ -190,7 +211,7 @@ call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_xcopy.bat" "%%XCOPY_EXCLUDE_FI
   echo.%?~nx0%: error: xcopy excludes list is invalid:
   echo.  XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%"
   echo.  XCOPY_EXCLUDES_LIST_TMP ="%XCOPY_EXCLUDES_LIST_TMP%"
-  set LASTERROR=-250
+  set LAST_ERROR=-250
   goto EXIT
 ) >&2
 if %ERRORLEVEL% EQU 0 set "XCOPY_EXCLUDES_CMD=/EXCLUDE:%XCOPY_EXCLUDES_LIST_TMP%"
@@ -201,7 +222,7 @@ rem echo.D will ONLY work if locale is compatible with english !!!
 echo.^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
 echo.D|"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
 
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 :EXIT
 if defined XCOPY_EXCLUDES_LIST_TMP (
@@ -212,7 +233,7 @@ if defined XCOPY_EXCLUDES_LIST_TMP (
 rem restore locale
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :ROBOCOPY_FLAGS_CONVERT
 set "XCOPY_FLAG=%~1"

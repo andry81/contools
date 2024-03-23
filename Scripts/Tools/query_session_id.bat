@@ -20,7 +20,7 @@ set SESSION_ID=0
 set SESSION_FOUND=0
 
 call :PROCESS_QUERY_FOR_LOOP %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem echo RETURN_VALUE=%RETURN_VALUE%
 
@@ -32,7 +32,7 @@ call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
   set "RETURN_VALUE=%RETURN_VALUE%"
 )
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :PROCESS_QUERY_FOR_LOOP
 for /F "usebackq eol= tokens=* delims=" %%i in (`query session 2^>nul`) do (

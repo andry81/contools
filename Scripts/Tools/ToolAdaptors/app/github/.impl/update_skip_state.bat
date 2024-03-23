@@ -11,7 +11,7 @@ if not defined SKIPPING_CMD exit /b 0
 set HAD_SKIPPING_CMD=%SKIPPING_CMD%
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 if defined HAD_SKIPPING_CMD if not defined SKIPPING_CMD (
   echo.---
@@ -26,7 +26,7 @@ if defined HAD_SKIPPING_CMD if not defined SKIPPING_CMD (
     set SKIPPING_CMD=1
   ) else set "SKIPPING_CMD="
 
-  exit /b %LASTERROR%
+  exit /b %LAST_ERROR%
 )
 
 :MAIN

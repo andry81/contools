@@ -41,7 +41,7 @@ set "INPUT_DIR_PATH=%~dp1"
 
 chcp 1251
 
-for /F "usebackq eol=| tokens=* delims=" %%i in (`dir /A:-D /B /O:N "%INPUT_PATH_PTTN%"`) do (
+for /F "usebackq eol=| tokens=* delims=" %%i in (`@dir "%%INPUT_PATH_PTTN%%" /A:-D /B /O:N`) do (
   set "INPUT_FILE_NAME=%%i"
   call :PROCESS_INPUT_FILE_PATH "%%INPUT_FILE_NAME%%" || exit /b
 )

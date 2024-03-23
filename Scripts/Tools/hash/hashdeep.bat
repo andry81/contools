@@ -5,9 +5,6 @@ rem Author:   Andrey Dibrov (andry at inbox dot ru)
 rem Description:
 rem   Hashdeep wrapper script.
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b

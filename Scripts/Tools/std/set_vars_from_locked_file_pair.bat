@@ -42,18 +42,18 @@ rem exclusive acquire of the lock file
   (
     rem if lock is acquired, then we are in...
     call :MAIN "%%~2" "%%~3" "%%~4"
-    call set "LASTERROR=%%ERRORLEVEL%%"
+    call set "LAST_ERROR=%%ERRORLEVEL%%"
 
     rem exit with return code from the MAIN
   ) 9> "%~1" && (del /F /Q /A:-D "%~1" & goto EXIT)
 ) 2>nul
 
 rem Busy wait: with external call significantly reduces CPU consumption while in a waiting state
-pathping localhost -n -q 1 -p 20 >nul 2>&1
+"%SystemRoot%\System32\pathping.exe" localhost -n -q 1 -p 20 >nul 2>nul
 goto REPEAT_LOCK_LOOP
 
 :EXIT
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 rem drop last error

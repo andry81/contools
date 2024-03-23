@@ -15,8 +15,8 @@ set TESTLIB__TEST_TEARDOWN=0
 
 rem negative return code to indicate no error in the teardown
 if %TESTLIB__CURRENT_PASSED_TESTS% LSS %TESTLIB__CURRENT_TESTS% (
-  set /A LASTERROR=TESTLIB__CURRENT_PASSED_TESTS-TESTLIB__CURRENT_TESTS
-) else set LASTERROR=0
+  set /A LAST_ERROR=TESTLIB__CURRENT_PASSED_TESTS-TESTLIB__CURRENT_TESTS
+) else set LAST_ERROR=0
 
 set /A TESTLIB__NEST_LVL-=1
 
@@ -28,7 +28,7 @@ if %TESTLIB__NEST_LVL%0 EQU 0 (
   if defined OEMCP ( call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
 )
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :TEST_TEARDOWN
 set "TESTLIB__TEST_DO_TEARDOWN="

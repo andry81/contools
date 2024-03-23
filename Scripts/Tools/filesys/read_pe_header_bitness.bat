@@ -7,9 +7,6 @@ rem   OS: Windows XP+
 rem drop return value
 set "RETURN_VALUE="
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b

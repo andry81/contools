@@ -35,15 +35,12 @@ if "%~1" == "" exit /b 65
 if "%~2" == "" exit /b 66
 if not exist "%~2\bin\cygcheck.exe" exit /b 67
 
-rem Drop last error level
-call;
-
 rem Create local variable's stack
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%~2\bin\cygcheck.exe" -cd "%~1" ^^^| "%SystemRoot%\system32\findstr.exe" /I /R /C:"^%~1  *[0-9][0-9]*."`) do ^
+for /F "usebackq eol= tokens=* delims=" %%i in (`@"%~2\bin\cygcheck.exe" -cd "%~1" ^^^| "%%SystemRoot%%\system32\findstr.exe" /I /R /C:"^%~1  *[0-9][0-9]*."`) do ^
 for /F "tokens=1,* delims= " %%j in ("%%i") do (
   set CYGWIN_VER_STR=0
   set "CYGWIN_VER_STR=%%k"

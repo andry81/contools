@@ -42,30 +42,24 @@ if "%TEST_SCRIPT_FILE_PATH:~1,1%" == ":" goto TEST_SCRIPT_FILE_PATH_OK
 :TEST_SCRIPT_FILE_PATH_OK
 
 rem shortcuts to the user test script file name
-set "?~n0=%~n1"
-set "?~x0=%~x1"
-set "?~nx0=%~nx1"
-set "?~f0=%~f1"
-set "?~dp0=%~dp1"
-set "?~d0=%~d1"
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem make builtin canonical user script path variables
-call :CANONICAL_PATH TEST_SCRIPT_FILE_PATH "%%?~f0%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_PATH "%%?~f0%%"
 
 set "TEST_SCRIPT_FILE_NAME=%?~n0%"
 set "TEST_SCRIPT_FILE_EXT=%?~x0%"
-
 set "TEST_SCRIPT_FILE=%?~nx0%"
 
-call :CANONICAL_PATH TEST_SCRIPT_FILE_DIR "%%?~dp0%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_DIR "%%?~dp0%%"
 
-if not defined TEST_SCRIPT_OUTPUT_DIR     call :CANONICAL_PATH TEST_SCRIPT_OUTPUT_DIR       "%%TEST_SCRIPT_FILE_DIR%%/_out"
-if not defined TEST_SCRIPT_LOCAL_TEMP_DIR call :CANONICAL_PATH TEST_SCRIPT_LOCAL_TEMP_DIR   "%%TEST_SCRIPT_OUTPUT_DIR%%/_temp"
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_OUTPUT_DIR       "%%TEST_SCRIPT_FILE_DIR%%/_out"
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_LOCAL_TEMP_DIR   "%%TEST_SCRIPT_OUTPUT_DIR%%/_temp"
 
-call :CANONICAL_PATH TEST_SCRIPT_RETURN_VARS_DIR          "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%/test_return_vars"
-call :CANONICAL_PATH TEST_SCRIPT_RETURN_VARS_FILE_PATH    "%%TEST_SCRIPT_RETURN_VARS_DIR%%/vars.txt"
-call :CANONICAL_PATH TEST_SCRIPT_RETURN_VALUES_FILE_PATH  "%%TEST_SCRIPT_RETURN_VARS_DIR%%/names.txt"
-call :CANONICAL_PATH TEST_SCRIPT_RETURN_LOCK_FILE_PATH    "%%TEST_SCRIPT_RETURN_VARS_DIR%%/.lock"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VARS_DIR          "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%/test_return_vars"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VARS_FILE_PATH    "%%TEST_SCRIPT_RETURN_VARS_DIR%%/vars.txt"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VALUES_FILE_PATH  "%%TEST_SCRIPT_RETURN_VARS_DIR%%/names.txt"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_LOCK_FILE_PATH    "%%TEST_SCRIPT_RETURN_VARS_DIR%%/.lock"
 
 set "TEST_SCRIPT_HANDLERS_DIR=%~2"
 
@@ -73,17 +67,17 @@ if not defined TEST_SCRIPT_HANDLERS_DIR (
   set "TEST_SCRIPT_HANDLERS_DIR=%TEST_SCRIPT_FILE_DIR%"
 ) else if not ":" == "%TEST_SCRIPT_HANDLERS_DIR:~1,1%" (
   rem relative to the script directory path
-  call :CANONICAL_PATH TEST_SCRIPT_HANDLERS_DIR "%%TEST_SCRIPT_FILE_DIR%%/%%TEST_SCRIPT_HANDLERS_DIR%%"
+  call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_HANDLERS_DIR "%%TEST_SCRIPT_FILE_DIR%%/%%TEST_SCRIPT_HANDLERS_DIR%%"
 )
 
 if not defined TESTLIB__NEST_LVL set TESTLIB__NEST_LVL=0
 if not defined TESTLIB__TEST_DO_TEARDOWN set TESTLIB__TEST_DO_TEARDOWN=0
 
 if %TESTLIB__NEST_LVL%0 EQU 0 (
-  if exist "%TEST_SCRIPT_RETURN_VARS_DIR%\*" rmdir /S /Q "%TEST_SCRIPT_RETURN_VARS_DIR%"
-  if not exist "%TEST_SCRIPT_OUTPUT_DIR%\*" mkdir "%TEST_SCRIPT_OUTPUT_DIR%"
-  if not exist "%TEST_SCRIPT_LOCAL_TEMP_DIR%\*" mkdir "%TEST_SCRIPT_LOCAL_TEMP_DIR%"
-  if not exist "%TEST_SCRIPT_RETURN_VARS_DIR%\*" mkdir "%TEST_SCRIPT_RETURN_VARS_DIR%"
+  call "%%CONTOOLS_ROOT%%/std/rmdir_if_exist.bat" "%%TEST_SCRIPT_RETURN_VARS_DIR%%" /S /Q
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_OUTPUT_DIR%%" || exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%" || exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_RETURN_VARS_DIR%%" || exit /b
   set TESTLIB__OVERALL_PASSED_TESTS=0
   set TESTLIB__OVERALL_TESTS=0
 ) else call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat"
@@ -96,28 +90,15 @@ set /A TESTLIB__NEST_LVL%?5%=1
 call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
 
 rem return code from user test script
-set LASTERROR=0
+set LAST_ERROR=0
 
 rem return code from user test script implementation
 set INTERRORLEVEL=0
 
 echo Running %?~nx0%...
+echo.
 
-rem safe title call
-setlocal DISABLEDELAYEDEXPANSION
-for /F "eol= tokens=* delims=" %%i in ("%?~nx0% %2 %3 %4 %5 %6 %7 %8 %9") do (
-  endlocal
-  title %%i
-)
+call "%%CONTOOLS_TOOLS%%/std/setshift.bat" -skip 1 1 TEST_TITLE %%?~nx0%% %%*
 
-exit /b 0
-
-:CANONICAL_PATH
-setlocal DISABLEDELAYEDEXPANSION
-for /F "eol= tokens=* delims=" %%i in ("%~2\.") do set "RETURN_VALUE=%%~fi"
-rem set "RETURN_VALUE=%RETURN_VALUE:\=/%"
-(
-  endlocal
-  set "%~1=%RETURN_VALUE%"
-)
+setlocal DISABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!TEST_TITLE!") do endlocal & title %%i
 exit /b 0

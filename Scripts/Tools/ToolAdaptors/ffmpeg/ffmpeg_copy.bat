@@ -26,7 +26,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
 set NO_DEFAULT_FLAGS=0
@@ -90,12 +90,9 @@ if exist "%FILE_OUT%" (
 ) >&2
 
 if %NO_DEFAULT_FLAGS% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -i "%%FILE_IN%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -i "%%FILE_IN%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
 ) else if %ENABLE_REENCODE% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -err_detect ignore_err -i "%%FILE_IN%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
-) else call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -err_detect ignore_err -i "%%FILE_IN%%" -c copy%%BARE_FLAGS%% "%%FILE_OUT%%"
-exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -err_detect ignore_err -i "%%FILE_IN%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
+) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -err_detect ignore_err -i "%%FILE_IN%%" -c copy%%BARE_FLAGS%% "%%FILE_OUT%%"
 
-:CMD
-echo.^>%*
-(%*)
+exit /b

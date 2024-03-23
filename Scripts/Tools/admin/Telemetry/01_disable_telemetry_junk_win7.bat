@@ -7,7 +7,7 @@ rem
 setlocal
 
 rem scripts must run in administrator mode
-net session >nul 2>&1
+net session >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
   echo.%~nx0: error: run script in administrator mode!
   exit /b -255
@@ -70,7 +70,7 @@ call :CMD reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersi
 echo.
 
 echo Updating CompatTelRunner.exe permissions...
-for /F "usebackq eol=; tokens=* delims=" %%i in (`dir "%SystemRoot%\CompatTelRunner.exe" /A:-D /S /B`) do (
+for /F "usebackq eol=; tokens=* delims=" %%i in (`@dir "%%SystemRoot%%\CompatTelRunner.exe" /A:-D /B /O:N /S`) do (
   set "FILE=%%i"
   call :UPDATE_PERMISSIONS
 )
@@ -103,4 +103,6 @@ exit /b
 
 :CMD
 echo.^>%*
-%*
+(
+  %*
+)

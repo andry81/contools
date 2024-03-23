@@ -34,7 +34,7 @@ if "%__REG_PATH:~-1%" == "\" (
 )
 
 rem test if key is exist
-reg.exe query "%__REG_PATH%" 2>&1 >nul || exit /b 1
+"%SystemRoot%\System32\reg.exe" query "%__REG_PATH%" >nul 2>nul || exit /b 1
 
 rem call "%%~dp0__init__.bat" || exit /b
 
@@ -46,10 +46,16 @@ set "__KEYPATH=%__KEYPATH:$=\$%"
 set "__KEYPATH=%__KEYPATH:[=\[%"
 set "__KEYPATH=%__KEYPATH:]=\]%"
 
+if /i "%__KEYPATH:~0,5%" == "HKLM\" set "__KEYPATH=HKEY_LOCAL_MACHINE\%__KEYPATH:~5%"
+if /i "%__KEYPATH:~0,5%" == "HKCU\" set "__KEYPATH=HKEY_CURRENT_USER\%__KEYPATH:~5%"
+if /i "%__KEYPATH:~0,5%" == "HKCR\" set "__KEYPATH=HKEY_CLASSES_ROOT\%__KEYPATH:~5%"
+if /i "%__KEYPATH:~0,5%" == "HKU\" set "__KEYPATH=HKEY_USERS\%__KEYPATH:~5%"
+if /i "%__KEYPATH:~0,5%" == "HKCC\" set "__KEYPATH=HKEY_CURRENT_CONFIG\%__KEYPATH:~5%"
+
 if %__REG_PATH_LAST_SLASH% EQU 0 (
-  reg.exe query "%__REG_PATH%" 2>nul | findstr.exe /I /R /C:"%__KEYPATH%"
+  "%SystemRoot%\System32\reg.exe" query "%__REG_PATH%" 2>nul | "%SystemRoot%\System32\findstr.exe" /I /R /C:"%__KEYPATH%"
 ) else (
-  reg.exe query "%__REG_PATH%" 2>nul | findstr.exe /I /R /C:"^%__KEYPATH%\\\\"
+  "%SystemRoot%\System32\reg.exe" query "%__REG_PATH%" 2>nul | "%SystemRoot%\System32\findstr.exe" /I /R /C:"^%__KEYPATH%\\\\"
 )
 
 exit /b 0

@@ -48,7 +48,7 @@ if "%__REG_VAR:~-1%" == "\" set "__REG_VAR=%__REG_VAR%\"
 
 :IGNORE_REG_VAR
 rem test if key is exist
-reg.exe query "%__REG_PATH%" /v "%__REG_VAR%" 2>&1 >nul || exit /b 1
+"%SystemRoot%\System32\reg.exe" query "%__REG_PATH%" /v "%__REG_VAR%" >nul 2>nul || exit /b 1
 
 if "%~2" == "" if "%~3" == "-t" exit /b 0
 
@@ -69,6 +69,13 @@ set "__KEYVAR=%__KEYVAR:^=\^%"
 set "__KEYVAR=%__KEYVAR:$=\$%"
 set "__KEYVAR=%__KEYVAR:[=\[%"
 set "__KEYVAR=%__KEYVAR:]=\]%"
+
+if /i "%__KEYVAR:~0,5%" == "HKLM\" set "__KEYVAR=HKEY_LOCAL_MACHINE\%__KEYVAR:~5%"
+if /i "%__KEYVAR:~0,5%" == "HKCU\" set "__KEYVAR=HKEY_CURRENT_USER\%__KEYVAR:~5%"
+if /i "%__KEYVAR:~0,5%" == "HKCR\" set "__KEYVAR=HKEY_CLASSES_ROOT\%__KEYVAR:~5%"
+if /i "%__KEYVAR:~0,5%" == "HKU\" set "__KEYVAR=HKEY_USERS\%__KEYVAR:~5%"
+if /i "%__KEYVAR:~0,5%" == "HKCC\" set "__KEYVAR=HKEY_CURRENT_CONFIG\%__KEYVAR:~5%"
+
 exit /b 0
 
 :QUERY_KEY_ESCAPE_END
@@ -79,7 +86,7 @@ for %%i in (%__REG_VAR%) do set /A __KEYVAR_WORDS+=1
 
 rem Read reg.exe output.
 rem BUG: Too long values would be empty!
-for /F "usebackq tokens=* delims=" %%i in (`reg.exe query "%__REG_PATH%" /v "%__REG_VAR%" ^| findstr.exe /I /R /C:"%__KEYVAR%[^a-zA-Z0-9\\/][^a-zA-Z0-9\\/]*REG_[A-Z][A-Z]*" 2^>nul`) do set "STDOUT_VALUE=%%i"
+for /F "usebackq tokens=* delims=" %%i in (`@"%%SystemRoot%%\System32\reg.exe" query "%%__REG_PATH%%" /v "%%__REG_VAR%%" ^| "%%SystemRoot%%\System32\findstr.exe" /I /R /C:"%%__KEYVAR%%[^a-zA-Z0-9\\/][^a-zA-Z0-9\\/]*REG_[A-Z][A-Z]*" 2^>nul`) do set "STDOUT_VALUE=%%i"
 
 rem count words in name of empty value (language independent parse)
 if not defined __REG_VAR call :EMPTY_KEYNAME_PARSE

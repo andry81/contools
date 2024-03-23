@@ -6,7 +6,7 @@ rem  Example of a batch script to use `mshta` to self execute a batch script in 
 setlocal
 
 if %IMPL_MODE%0 NEQ 0 goto IMPL
-net session >nul 2>&1 && goto IMPL
+net session >nul 2>nul && goto IMPL
 
 :ELEVATE
 set IMPL=1
@@ -15,7 +15,7 @@ start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:Close^(CreateObject
 exit /b
 
 :IMPL
-net session >nul 2>&1 || (
+net session >nul 2>nul || (
   echo.%~nx0: error: process must be elevated before continue.
   exit /b 255
 ) >&2

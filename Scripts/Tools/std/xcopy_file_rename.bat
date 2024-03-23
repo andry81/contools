@@ -1,6 +1,7 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
+rem USAGE:
+rem   xcopy_file_rename.bat [<flags>] <from-path> <to-path> <from-file> <to-file>
 
 rem Description:
 rem   Script to copy file(s) from one directory to another with rename option
@@ -9,9 +10,40 @@ rem   one then the script will copy the file into output directory w/o renaming
 rem   it and only after that will try to rename the file. If the file would be
 rem   somehow locked on a moment of rename then the original file will be left
 rem   unrenamed in the output directory to manual rename later.
+rem
+rem   Can use command bare flags from `XCOPY_FILE_CMD_BARE_FLAGS` and
+rem   `COPY_CMD_BARE_FLAGS` variables.
+rem
+rem   Can use utility flags from `XCOPY_FILE_FLAGS` and `COPY_FLAGS` variables.
 
-rem Examples:
-rem 1. call xcopy_file_rename.bat "%%FROM_PATH%%" "%%TO_PATH%%" "%%FROM_FILE%%" "%%TO_FILE%%" || exit /b
+rem <flags>:
+rem   -chcp <CodePage>
+rem     Set explicit code page.
+rem
+rem   -if_not_exist
+rem     Copy if `<to-path>/<to-file>` does not exist.
+rem
+rem   -use_xcopy
+rem     Use `xcopy` executable utility.
+rem
+rem   -use_cmd_bare_flags
+rem     Use command bare flags from `XCOPY_FILE_CMD_BARE_FLAGS` and
+rem     `COPY_CMD_BARE_FLAGS` variables.
+rem
+rem   -use_utility_flags
+rem     Use utility flags from `XCOPY_FLAGS` and `COPY_FLAGS` variables.
+
+rem <from-path>:
+rem   From directory path.
+
+rem <to-path>:
+rem   To directory path.
+
+rem <from-file>:
+rem   From file name.
+
+rem <to-file>:
+rem   To file name.
 
 echo.^>%~nx0 %*
 
@@ -23,7 +55,10 @@ set "?~nx0=%~nx0"
 
 rem script flags
 set "FLAG_CHCP="
+set FLAG_IF_NOT_EXIST=0
 set FLAG_USE_XCOPY=0
+set FLAG_USE_CMD_BARE_FLAGS=0
+set FLAG_USE_UTILITY_FLAGS=0
 
 :FLAGS_LOOP
 
@@ -37,8 +72,14 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
+  ) else if "%FLAG%" == "-if_not_exist" (
+    set FLAG_IF_NOT_EXIST=1
   ) else if "%FLAG%" == "-use_xcopy" (
     set FLAG_USE_XCOPY=1
+  ) else if "%FLAG%" == "-use_cmd_bare_flags" (
+    set FLAG_USE_CMD_BARE_FLAGS=1
+  ) else if "%FLAG%" == "-use_utility_flags" (
+    set FLAG_USE_UTILITY_FLAGS=1
   ) else (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -162,40 +203,51 @@ goto TO_FILE_OK
 
 :TO_FILE_OK
 
-set "FROM_ROOT=%~f1"
-set "TO_ROOT=%~f2"
+for /F "eol= tokens=* delims=" %%i in ("%FROM_PATH%\.") do set "FROM_DIR=%%~fi"
+for /F "eol= tokens=* delims=" %%i in ("%TO_PATH%\.") do set "TO_DIR=%%~fi"
 
-if not exist "\\?\%FROM_ROOT%\*" (
-  echo.%?~nx0%: error: input directory does not exist: "%FROM_PATH%\"
+if not exist "\\?\%FROM_DIR%\*" (
+  echo.%?~nx0%: error: input directory does not exist: "%FROM_DIR%\"
   exit /b -246
 ) >&2
 
-if not exist "\\?\%TO_ROOT%\*" (
-  echo.%?~nx0%: error: output directory does not exist: "%TO_PATH%\"
+if not exist "\\?\%TO_DIR%\*" (
+  echo.%?~nx0%: error: output directory does not exist: "%TO_DIR%\"
   exit /b -245
 ) >&2
 
+if %FLAG_IF_NOT_EXIST% NEQ 0 if exist "\\?\%TO_DIR%\%TO_FILE%" exit /b 0
+
 call "%%?~dp0%%__init__.bat" || exit /b
 
-set "XCOPY_BARE_FLAGS="
-set "COPY_BARE_FLAGS="
-if defined FLAG_CHCP set XCOPY_BARE_FLAGS= -chcp "%FLAG_CHCP%"
-if defined FLAG_CHCP set COPY_BARE_FLAGS= -chcp "%FLAG_CHCP%"
+if %FLAG_USE_CMD_BARE_FLAGS% EQU 0 set "XCOPY_FILE_CMD_BARE_FLAGS="
+if %FLAG_USE_CMD_BARE_FLAGS% EQU 0 set "COPY_CMD_BARE_FLAGS="
+if defined FLAG_CHCP set XCOPY_FILE_CMD_BARE_FLAGS=%XCOPY_FILE_CMD_BARE_FLAGS% -chcp "%FLAG_CHCP%"
+if defined FLAG_CHCP set COPY_CMD_BARE_FLAGS=%COPY_CMD_BARE_FLAGS% -chcp "%FLAG_CHCP%"
 
-if /i not "%FROM_ROOT%" == "%TO_ROOT%" (
-  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat"%%XCOPY_BARE_FLAGS%% "%%FROM_ROOT%%" "%%FROM_FILE%%" "%%TO_ROOT%%" /Y /D || exit /b ) && if /i not ^
+if %FLAG_USE_UTILITY_FLAGS% EQU 0 set "XCOPY_FILE_FLAGS="
+if %FLAG_USE_UTILITY_FLAGS% EQU 0 set "COPY_FLAGS="
+if not defined XCOPY_FILE_FLAGS set "XCOPY_FILE_FLAGS=/Y /D /H"
+if not defined COPY_FLAGS set "COPY_FLAGS=/B /Y"
+
+rem reset direct non command flags
+set "XCOPY_FILE_BARE_FLAGS="
+set "ROBOCOPY_FILE_BARE_FLAGS="
+
+if /i not "%FROM_DIR%" == "%TO_DIR%" (
+  ( call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat"%%XCOPY_FILE_CMD_BARE_FLAGS%% "%%FROM_DIR%%" "%%FROM_FILE%%" "%%TO_DIR%%" %%XCOPY_FILE_FLAGS%% || exit /b ) && if /i not ^
       "%FROM_FILE%" == "%TO_FILE%" (
     (
-      call "%%CONTOOLS_ROOT%%/std/copy.bat"%%COPY_BARE_FLAGS%% "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
+      call "%%CONTOOLS_ROOT%%/std/copy.bat"%%COPY_CMD_BARE_FLAGS%% "%%TO_DIR%%/%%FROM_FILE%%" "%%TO_DIR%%/%%TO_FILE%%" %%COPY_FLAGS%% || exit /b
     ) && (
-      call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || exit /b
+      call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_DIR%%/%%FROM_FILE%%" /F /Q || exit /b
     )
   )
 ) else if /i not "%FROM_FILE%" == "%TO_FILE%" (
   (
-    call "%%CONTOOLS_ROOT%%/std/copy.bat"%%COPY_BARE_FLAGS%% "%%TO_ROOT%%/%%FROM_FILE%%" "%%TO_ROOT%%/%%TO_FILE%%" /B /Y || exit /b
+    call "%%CONTOOLS_ROOT%%/std/copy.bat"%%COPY_CMD_BARE_FLAGS%% "%%TO_DIR%%/%%FROM_FILE%%" "%%TO_DIR%%/%%TO_FILE%%" %%COPY_FLAGS%% || exit /b
   ) && (
-    call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_ROOT%%/%%FROM_FILE%%" /F /Q || exit /b
+    call "%%CONTOOLS_ROOT%%/std/del_file.bat" "%%TO_DIR%%/%%FROM_FILE%%" /F /Q || exit /b
   )
 )
 

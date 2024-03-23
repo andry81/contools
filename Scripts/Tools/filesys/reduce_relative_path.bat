@@ -21,9 +21,6 @@ rem    rem RETURN_VALUE=bbb
 rem Drop return value
 set "RETURN_VALUE=%~1"
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b

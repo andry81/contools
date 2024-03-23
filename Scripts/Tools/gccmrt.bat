@@ -24,8 +24,8 @@ if "%__GCC_MSVCRT_VER%" == "80" goto doit
 goto usage
 
 :doit
-copy "%__GCC_LIB_DIR%\libmsvcr%__GCC_MSVCRT_VER%.a" "%__GCC_LIB_DIR%\libmsvcrt.a" > nul 2>&1
-copy "%__GCC_LIB_DIR%\libmsvcr%__GCC_MSVCRT_VER%d.a" "%__GCC_LIB_DIR%\libmsvcrtd.a" > nul 2>&1
+copy "%__GCC_LIB_DIR%\libmsvcr%__GCC_MSVCRT_VER%.a" "%__GCC_LIB_DIR%\libmsvcrt.a" >nul 2>nul
+copy "%__GCC_LIB_DIR%\libmsvcr%__GCC_MSVCRT_VER%d.a" "%__GCC_LIB_DIR%\libmsvcrtd.a" >nul 2>nul
 echo %~n0: set GCC to link executables by default with libmsvc%__GCC_MSVCRT_VER%*.a dynamic libraries.
 exit /b
 

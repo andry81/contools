@@ -9,31 +9,16 @@ call "%%~dp0__init__.bat" || exit /b
 
 set "CMAKE_GENERATOR=%~1"
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/check_vars.bat" CMAKE_GENERATOR CONTOOLS_ROOT TACKLELIB_CMAKE_ROOT || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CMAKE_GENERATOR CONTOOLS_ROOT TACKLELIB_CMAKE_ROOT || exit /b
 
 rem create temporary directory
-call "%%CONTOOLS_WMI_ROOT%%\get_wmic_local_datetime.bat"
-set "DATETIME_VALUE=%RETURN_VALUE%"
-
-if not defined DATETIME_VALUE (
-  echo.%~nx0: error: could not retrieve a date time value to create unique temporary directory.
-  exit /b -128
-) >&2
-
-set "DATETIME_VALUE=%DATETIME_VALUE:~0,18%"
-
-set "TEMP_DATE=%DATETIME_VALUE:~0,4%_%DATETIME_VALUE:~4,2%_%DATETIME_VALUE:~6,2%"
-set "TEMP_TIME=%DATETIME_VALUE:~8,2%_%DATETIME_VALUE:~10,2%_%DATETIME_VALUE:~12,2%_%DATETIME_VALUE:~15,3%"
-
-set "TEMP_OUTPUT_DIR=%TEMP%\%TEMP_DATE%.%TEMP_TIME%.%~n0"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "TEMP_OUTPUT_DIR=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%"
+) else set "TEMP_OUTPUT_DIR=%TEMP%\%~n0.%RANDOM%-%RANDOM%"
 
 rem create temporary files to store local context output
-if exist "%TEMP_OUTPUT_DIR%\*" (
-  echo.%~nx0: error: temporary generated directory TEMP_OUTPUT_DIR is already exist: "%TEMP_OUTPUT_DIR%"
-  exit /b -255
-) >&2
 
-mkdir "%TEMP_OUTPUT_DIR%"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%TEMP_OUTPUT_DIR%%" >nul || exit /b -255
 
 rem drop rest variables
 (
@@ -42,21 +27,21 @@ rem drop rest variables
 )
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem cleanup temporary files
 rmdir /S /Q "%TEMP_OUTPUT_DIR%"
 
 (
-  set "LASTERROR="
+  set "LAST_ERROR="
   set "TEMP_OUTPUT_DIR="
-  exit /b %LASTERROR%
+  exit /b %LAST_ERROR%
 )
 
 :MAIN
 rem arguments: <out_file_file>
 
-call :CMD cmake -G "%%~1" "-DCMAKE_MODULE_PATH=%%TACKLELIB_CMAKE_ROOT%%" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" cmake -G "%%~1" "-DCMAKE_MODULE_PATH=%%TACKLELIB_CMAKE_ROOT%%" ^
   -P "%%TACKLELIB_CMAKE_ROOT%%/tacklelib/tools/GeneratorIsMulticonfig.cmd.cmake" ^
   --flock "%%TEMP_OUTPUT_DIR%%/lock" "%%TEMP_OUTPUT_DIR%%/var_values.lst" || exit /b
 
@@ -64,18 +49,8 @@ call :CMD cmake -G "%%~1" "-DCMAKE_MODULE_PATH=%%TACKLELIB_CMAKE_ROOT%%" ^
   echo.GENERATOR_IS_MULTI_CONFIG
 ) > "%TEMP_OUTPUT_DIR%/var_names.lst" || exit /b
 
-call :CMD "%%CONTOOLS_ROOT%%/std/set_vars_from_locked_file_pair.bat" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" "%%CONTOOLS_ROOT%%/std/set_vars_from_locked_file_pair.bat" ^
   "%%TEMP_OUTPUT_DIR%%/lock" "%%TEMP_OUTPUT_DIR%%/var_names.lst" "%%TEMP_OUTPUT_DIR%%/var_values.lst" ^
   "%%PRINT_VARS_SET%%" || exit /b
 
 exit /b 0
-
-:CMD
-if %TOOLS_VERBOSE%0 NEQ 0 (
-  echo.^>^>%*
-  echo.
-)
-(
-  %*
-)
-exit /b

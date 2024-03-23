@@ -22,7 +22,7 @@ set "STR_SUFFIX=%~3"
 
 set LINE_INDEX=0
 
-for /F "usebackq delims=" %%i in (`findstr.exe /B /N /R /C:".*" 2^>nul`) do (
+for /F "usebackq delims=" %%i in (`@"%%SystemRoot%%\System32\findstr.exe" /B /N /R /C:".*" 2^>nul`) do (
   set LINE_STR=%%i
   call :IF_OR_PRINT %%NUM%% NEQ 0 if %%LINE_INDEX%% GEQ %%NUM%% && exit /b 0
   set /A LINE_INDEX+=1

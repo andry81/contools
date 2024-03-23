@@ -26,7 +26,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
 set NO_DEFAULT_FLAGS=0
@@ -90,18 +90,16 @@ if exist "%FILE_OUT%" (
 ) >&2
 
 rem temporary list
-if not defined SCRIPT_TEMP_CURRENT_DIR (
-  set "TEMP_FILE_LIST=%TEMP%\tmp_list.%RANDOM%.txt"
-) else (
-  set "TEMP_FILE_LIST=%SCRIPT_TEMP_CURRENT_DIR%\tmp_list.%RANDOM%.txt"
-)
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "TEMP_FILE_LIST=%SCRIPT_TEMP_CURRENT_DIR%\tmp_list.%RANDOM%-%RANDOM%.txt"
+) else set "TEMP_FILE_LIST=%TEMP%\tmp_list.%RANDOM%-%RANDOM%.txt"
 
 type nul > "%TEMP_FILE_LIST%"
 
 rem check on all files existance at first
 for /f "usebackq eol=# tokens=* delims=" %%i in ("%FILE_LIST_IN:/=\%") do (
   set "FILE_PATH=%%i"
-  if defined FILE_PATH ( call :CHECK_PATH || exit /b )
+  if defined FILE_PATH call :CHECK_PATH || exit /b
 )
 
 call :ENCODE
@@ -130,12 +128,9 @@ exit /b
 
 :ENCODE
 if %NO_DEFAULT_FLAGS% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -i "%%TEMP_FILE_LIST%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -i "%%TEMP_FILE_LIST%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
 ) else if %ENABLE_REENCODE% NEQ 0 (
-  call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
-) else call :CMD start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
-exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
+) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
 
-:CMD
-echo.^>%*
-(%*)
+exit /b

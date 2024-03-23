@@ -72,13 +72,15 @@ type nul >> "\\?\%DIR_PATH_TEMP_FILE%"
 rem check on long file path and if long file path, then move the file to a temporary directory to delete it
 if not exist "%FILE_PATH%" if exist "%SystemRoot%\System32\robocopy.exe" goto MOVE_TO_TMP
 
-del /F /Q "\\?\%DIR_PATH_TEMP_FILE%" >nul 2>nul
+del /F /Q /A:-D "\\?\%DIR_PATH_TEMP_FILE%" >nul 2>nul
 
 goto CONTINUE
 
 :MOVE_TO_TMP
 
-set "FILE_PATH_TEMP_DIR=%TEMP%\touch_dir.%RANDOM%-%RANDOM%"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "FILE_PATH_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\touch_dir.%RANDOM%-%RANDOM%"
+) else set "FILE_PATH_TEMP_DIR=%TEMP%\touch_dir.%RANDOM%-%RANDOM%"
 
 "%SystemRoot%\System32\robocopy.exe" "%DIR_PATH%" "%FILE_PATH_TEMP_DIR%" "%DIR_PATH_TEMP_FILE_NAME%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
 

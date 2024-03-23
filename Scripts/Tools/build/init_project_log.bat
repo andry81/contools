@@ -18,7 +18,7 @@ call "%%~dp0__init__.bat" || exit /b
 
 set "SUFFIX_NAME=%~1"
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/check_vars.bat" CONTOOLS_ROOT || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT || exit /b
 
 if defined PROJECT_LOG_DIR exit /b 0
 if defined PROJECT_LOG_FILE exit /b 0
@@ -41,7 +41,7 @@ set "PROJECT_LOG_FILE=%PROJECT_LOG_DIR%\%PROJECT_LOG_FILE_NAME%"
 :SKIP_LOG_OUTPUT
 
 if %NO_LOG%0 EQU 0 (
-  call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%PROJECT_LOG_DIR%%" || exit /b 255
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%PROJECT_LOG_DIR%%" || exit /b 255
 )
 
 (

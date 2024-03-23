@@ -131,7 +131,7 @@ rem   The MinTTY must call to `cmd.exe` script at first, not to `callf.exe`, to 
     "%CONTOOLS_ROOT:/=\%/exec/exec_mintty_prefix.bat" %* & "%CONTOOLS_ROOT:/=\%/std/errlvl.bat"
 )
 
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem CAUTION:
 rem   DO NOT CLEANUP because mintty restarts itself and mintty parent process does exit immediately!
@@ -141,8 +141,8 @@ rem call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
 (
   rem drop local variables
-  set "LASTERROR="
-  exit /b %LASTERROR%
+  set "LAST_ERROR="
+  exit /b %LAST_ERROR%
 )
 
 :SKIP_USE_MINTTY
@@ -164,14 +164,14 @@ rem
     %*
 )
 
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
 (
   rem drop local variables
-  set "LASTERROR="
-  exit /b %LASTERROR%
+  set "LAST_ERROR="
+  exit /b %LAST_ERROR%
 )
 
 :SKIP_USE_CONEMU
@@ -187,12 +187,12 @@ rem
     %*
 )
 
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
 (
   rem drop local variables
-  set "LASTERROR="
-  exit /b %LASTERROR%
+  set "LAST_ERROR="
+  exit /b %LAST_ERROR%
 )

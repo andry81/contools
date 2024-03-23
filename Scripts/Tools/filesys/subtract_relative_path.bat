@@ -5,9 +5,6 @@ rem <TO_PATH_SUFFIX> = <TO_PATH> - <FROM_PATH>
 rem drop return value
 set "RETURN_VALUE="
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b

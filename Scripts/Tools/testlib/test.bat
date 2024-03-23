@@ -43,7 +43,7 @@ if "%CURRENT_CP%" == "65000" (
   chcp 65000 >nul
 )
 
-set LASTERROR=0
+set LAST_ERROR=0
 set INTERRORLEVEL=0
 set "TEST_DATA_REF_FILE="
 
@@ -54,26 +54,26 @@ set /A TESTLIB__OVERALL_TESTS%?5%=1
 
 if %TESTLIB__TEST_SETUP%0 EQU 0 (
   set TESTLIB__TEST_DO_TEARDOWN=1
-  call :TEST_SETUP || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT ) )
+  call :TEST_SETUP || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT ) )
   set TESTLIB__TEST_SETUP=0
 )
 
 rem call user initialization script
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.init%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/init%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/init%TEST_SCRIPT_FILE_EXT%" (
-    call "%%TEST_SCRIPT_HANDLERS_DIR%%/init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+    call "%%TEST_SCRIPT_HANDLERS_DIR%%/init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
   )
 )
 
 rem call user implementation script
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.impl%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.impl%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.impl%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/impl%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/impl%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/impl%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
 ) else (
   rem the one big IF+AND operator
   (
@@ -81,27 +81,27 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.impl%TEST_SCRIPT_FI
   ) && (
     if exist "%TEST_SCRIPT_HANDLERS_DIR%/impl%TEST_SCRIPT_FILE_EXT%" ( call; ) else type 2>nul
   ) && (
-    ( call "%%TEST_SCRIPT_HANDLERS_DIR%%/impl%%TEST_SCRIPT_FILE_EXT%%" ) || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+    ( call "%%TEST_SCRIPT_HANDLERS_DIR%%/impl%%TEST_SCRIPT_FILE_EXT%%" ) || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
   )
 ) || (
   echo.%?~nx0%: error: test script implementation is not found: "%TEST_SCRIPT_FILE_NAME%".
-  set "LASTERROR=-255"
+  set "LAST_ERROR=-255"
 ) >&2
 
 :TEST_EXIT
 rem call user exit script
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.exit%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/exit%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/exit%TEST_SCRIPT_FILE_EXT%" (
-    call "%%TEST_SCRIPT_HANDLERS_DIR%%/exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LASTERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
+    call "%%TEST_SCRIPT_HANDLERS_DIR%%/exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
   )
 )
 
 :TEST_REPORT
-if %LASTERROR% EQU 0 (
+if %LAST_ERROR% EQU 0 (
   set /A TESTLIB__CURRENT_PASSED_TESTS%?5%=1
   set /A TESTLIB__OVERALL_PASSED_TESTS%?5%=1
 )
@@ -129,7 +129,7 @@ if %TESTLIB__TEST_SETUP%0 NEQ 0 exit /b -1
 set TESTLIB__TEST_SETUP=1
 set "TESTLIB__TEST_TEARDOWN="
 
-set LASTERROR=0
+set LAST_ERROR=0
 set INTERRORLEVEL=0
 
 rem call user setup script
@@ -190,7 +190,7 @@ rem Drop internal variables but use some changed value(s) for the return
 (
   endlocal
 
-  set "LASTERROR=%LASTERROR%"
+  set "LAST_ERROR=%LAST_ERROR%"
   set "TESTLIB__OVERALL_PASSED_TESTS=%TESTLIB__OVERALL_PASSED_TESTS%"
   set "TESTLIB__OVERALL_TESTS=%TESTLIB__OVERALL_TESTS%"
   set "TESTLIB__CURRENT_PASSED_TESTS=%TESTLIB__CURRENT_PASSED_TESTS%"
@@ -201,4 +201,4 @@ rem Drop internal variables but use some changed value(s) for the return
   %TESTLIB__EXEC_ON_ENDLOCAL%
 )
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%

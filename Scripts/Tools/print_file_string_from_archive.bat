@@ -16,23 +16,21 @@ call "%%~dp0__init__.bat" || exit /b
 rem add EULA acception into registry to avoid EULA acception GUI dialog in the build process
 reg add HKCU\Software\Sysinternals\Strings /v EulaAccepted /t REG_DWORD /d 0x00000001 /f >nul 2>nul
 
-call "%%CONTOOLS_WMI_ROOT%%\get_wmic_local_datetime.bat"
-set "TEMP_DIR_NAME_PREFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "TEMP_EXTRACT_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%"
+) else set "TEMP_EXTRACT_DIR_PATH=%TEMP%\%~n0.%RANDOM%-%RANDOM%"
 
-set "TEMP_EXTRACT_DIR_PATH=%TEMP%\%TEMP_DIR_NAME_PREFIX%.%~n0"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%TEMP_EXTRACT_DIR_PATH%%" >nul || exit /b 2
 
-mkdir "%TEMP_EXTRACT_DIR_PATH%" || (
-  echo.%~nx0: error: could not create temporary extraction directory: "%TEMP_EXTRACT_DIR_PATH%".
-  exit /b 2
-) >&2
+set LAST_ERROR=0
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/extract_files_from_archive.bat" "%%TEMP_EXTRACT_DIR_PATH%%" "%%FILE_PATH%%" "%%ARCHIVE_PATH%%" -y >nul || ( set LASTERROR=3 & goto EXIT )
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/extract_files_from_archive.bat" "%%TEMP_EXTRACT_DIR_PATH%%" "%%FILE_PATH%%" "%%ARCHIVE_PATH%%" -y >nul || ( set LAST_ERROR=3 & goto EXIT )
 
 call "%%CONTOOLS_ROOT%%/filesys/get_newest_file.bat" "%%TEMP_EXTRACT_DIR_PATH%%\%%FILE_PATH%%"
 
-"%CONTOOLS_SYSINTERNALS_ROOT%/strings.exe" "%FOUND_PATH%" | findstr.exe "%STRING_PREFIX%"
+"%CONTOOLS_SYSINTERNALS_ROOT%/strings.exe" "%FOUND_PATH%" | "%SystemRoot%\System32\findstr.exe" "%STRING_PREFIX%"
 
 :EXIT
 rmdir /S /Q "%TEMP_EXTRACT_DIR_PATH%" 2>nul
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%

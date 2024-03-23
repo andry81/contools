@@ -4,10 +4,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
-
-rem drop last error level
-call;
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="
@@ -68,7 +65,7 @@ exit /b 0
 :PROCESS_FILE_PATH
 set "FILE_PATH=%~f1"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir "%FILE_PATH%" /A:-D /B /S /O:N`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%FILE_PATH%%" /A:-D /B /O:N /S`) do (
   set "ARCHIVE_FILE_PATH=%%i"
   call :PROCESS_ARCHIVE_FILE || exit /b
 )
@@ -77,10 +74,9 @@ exit /b
 
 :PROCESS_ARCHIVE_FILE
 
-call "%%CONTOOLS_WMI_ROOT%%\get_wmic_local_datetime.bat"
-set "TEMP_DIR_NAME_PREFIX=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
-
-set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%TEMP%\%TEMP_DIR_NAME_PREFIX%.%?~n0%"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%"
+) else set "ARCHIVE_LIST_TEMP_FILE_TREE_DIR=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%"
 
 mkdir "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%"
 rem safe all directory files remove except the directory
@@ -90,12 +86,12 @@ pushd "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%" && (
 )
 
 call :PROCESS_ARCHIVE_FILE_IMPL
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem cleanup temporary files
 rmdir /S /Q "%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :PROCESS_ARCHIVE_FILE_IMPL
 set ARCHIVE_LIST_FILTER=0
@@ -149,14 +145,10 @@ if not defined ARCHIVE_LIST_FILE_PATH exit /b 0
 
 rem use attributes to determine directory path from file path
 set "ARCHIVE_LIST_LINE_ATTR="
-for /F "eol= tokens=3" %%i in ("%ARCHIVE_LIST_LINE%") do (
-  set "ARCHIVE_LIST_LINE_ATTR=%%i"
-)
+for /F "eol= tokens=3" %%i in ("%ARCHIVE_LIST_LINE%") do set "ARCHIVE_LIST_LINE_ATTR=%%i"
 
 set "ARCHIVE_LIST_FILE_PATH_ATTR0="
-if defined ARCHIVE_LIST_LINE_ATTR (
-  set "ARCHIVE_LIST_FILE_PATH_ATTR0=%ARCHIVE_LIST_LINE_ATTR:~0,1%"
-)
+if defined ARCHIVE_LIST_LINE_ATTR set "ARCHIVE_LIST_FILE_PATH_ATTR0=%ARCHIVE_LIST_LINE_ATTR:~0,1%"
 
 rem create empty files tree in temporary directory to retrieve later a sorted file paths list by `dir` command
 call :CREATE_TEMP_TREE_OF_EMPTY_FILES "%%ARCHIVE_LIST_FILE_PATH_ATTR0%%" "%%ARCHIVE_LIST_TEMP_FILE_TREE_DIR%%\%%ARCHIVE_LIST_FILE_PATH%%" || exit /b
@@ -179,11 +171,9 @@ if %TEMP_FILE_PATH_IS_DIR_PATH% EQU 0 (
 )
 
 rem echo."%FILES_PATH_PREFIX%%INSTDIR_SUBDIR_SUFFIX%/%ARCHIVE_LIST_FILE_PATH:\=/%" >&2
-if not exist "%TEMP_FILE_DIR%" ( mkdir "%TEMP_FILE_DIR%" || exit /b 1 )
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEMP_FILE_DIR%%" >nul || exit /b 1
 
 rem create empty file
-if defined TEMP_FILE_PATH (
-  type nul > "%TEMP_FILE_PATH%"
-)
+if defined TEMP_FILE_PATH type nul > "%TEMP_FILE_PATH%"
 
 exit /b

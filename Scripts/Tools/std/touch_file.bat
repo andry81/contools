@@ -100,7 +100,9 @@ goto CONTINUE
 
 :MOVE_TO_TMP
 
-set "FILE_PATH_TEMP_DIR=%TEMP%\touch_file.%RANDOM%-%RANDOM%"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "FILE_PATH_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\touch_file.%RANDOM%-%RANDOM%"
+) else set "FILE_PATH_TEMP_DIR=%TEMP%\touch_file.%RANDOM%-%RANDOM%"
 
 "%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
 

@@ -33,7 +33,7 @@ if defined BUILD_USER_VARS_ROOT (
 
 rem SVN
 rmdir /S /Q "%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%/scm/svn"
-call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn" || exit /b
 
 call "%%SVNCMD_TOOLS_ROOT%%/gen_branch_workingset_time.bat" -offline -relfpaths -R -ad -ls -stat "%%PROJECT_BRANCH_ROOT%%" ^
   "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%/scm/svn/svn_project_branch_root_info.txt" ^

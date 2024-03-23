@@ -18,9 +18,6 @@ call "%%~dp0__init__.bat" || exit /b
 
 set "?~nx0=%~nx0"
 
-rem drop last error level
-call;
-
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="
 set CODE_PAGE=%~1
@@ -68,7 +65,7 @@ goto PROCESS_FILE_EXT_LIST_LOOP
 set FILE_INDEX=0
 set "LAST_FILE_PATH="
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\)/\1\\/" "%FILE_PATH_LIST_FILE%" ^| sort ^| "%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" "s/\(.*\).$/\1/" ^| findstr.exe %FINDSTR_CMD_LINE%`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@"%%CONTOOLS_GNUWIN32_ROOT%%/bin/sed.exe" "s/\(.*\)/\1\\/" "%%FILE_PATH_LIST_FILE%%" ^| "%%SystemRoot%%\System32\sort.exe" ^| "%%CONTOOLS_GNUWIN32_ROOT%%/bin/sed.exe" "s/\(.*\).$/\1/" ^| "%%SystemRoot%%\System32\findstr.exe" %%FINDSTR_CMD_LINE%%`) do (
   set "FILE_PATH=%%i"
   call :PROCESS_FILE_PATH || exit /b
 )

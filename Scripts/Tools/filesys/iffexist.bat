@@ -46,9 +46,6 @@ if "%~3" == "-f" (
 
 :BEGIN10
 
-rem Drop last error level
-call;
-
 rem Create local variable's stack
 setlocal
 

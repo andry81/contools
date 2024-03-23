@@ -1,21 +1,38 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
+rem USAGE:
+rem   del_file_pttn.bat <dir> <name-pttn> <ext-pttn> [<del-flags>...]
 
 rem Description:
 rem   The `del` wrapper script with echo and some conditions check before call.
 rem   Can remove a file by extended and separated patterns: dir+file+extention.
 
+rem <dir>
+rem   Directory path.
+
+rem <name-pttn>
+rem   File name pattern.
+
+rem <ext-pttn>
+rem   File name extension pattern.
+
+rem <del-flags>:
+rem   Command line flags to pass into builtin `del` command.
+
 echo.^>%~nx0 %*
 
 setlocal
+
+if not defined ?~nx0 (
+  set "?~=%~nx0"
+) else set "?~=%?~nx0%: %~nx0"
 
 set "FILE_DIR=%~1"
 set "FILE_NAME_PTTN=%~2"
 set "FILE_EXT_PTTN=%~3"
 
 if not defined FILE_DIR (
-  echo.%~nx0: error: file directory argument must be defined.
+  echo.%?~%: error: file directory argument must be defined.
   exit /b -255
 ) >&2
 
@@ -40,22 +57,22 @@ goto FILE_DIR_OK
 
 :FILE_DIR_ERROR
 (
-  echo.%~nx0: error: file directory path is invalid: "%FILE_DIR%".
+  echo.%?~%: error: file directory path is invalid: "%FILE_DIR%".
   exit /b -254
 ) >&2
 
 :FILE_DIR_OK
 
-set "FILE_DIR=%FILE_DIR%\"
+for /F "eol= tokens=* delims=" %%i in ("%FILE_DIR%\.") do set "FILE_DIR=%%~fi"
 
-if not exist "%FILE_DIR%" (
-  echo.%~nx0: error: file directory does not exist: "%FILE_DIR%"
+if not exist "%FILE_DIR%\*" (
+  echo.%?~%: error: file directory does not exist: "%FILE_DIR%"
   exit /b -253
 ) >&2
 
 if defined FILE_EXT_PTTN if not "%FILE_EXT_PTTN:~0,1%" == "." set "FILE_EXT_PTTN=.%FILE_EXT_PTTN%"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /B /A:-D /S "%FILE_DIR%%FILE_NAME_PTTN%%FILE_EXT_PTTN%" 2^>nul`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%FILE_DIR%%\%%FILE_NAME_PTTN%%%%FILE_EXT_PTTN%%" /A:-D /B /O:N /S 2^>nul`) do (
   set "FILE_PATH=%%i"
   call :DEL_FILE %%*
 )
@@ -65,8 +82,18 @@ exit /b
 call :GET_FILE_EXT "%%FILE_PATH%%"
 if defined FILE_EXT_PTTN if "%FILE_EXT_PTTN:~-1%" == "." if not "%FILE_EXT%" == "%FILE_EXT_PTTN:~0,-1%" exit /b
 
-echo.^>del %4 %5 %6 %7 %8 %9 "%FILE_PATH%"
-del %4 %5 %6 %7 %8 %9 "%FILE_PATH%"
+for /F "eol= tokens=* delims=" %%i in ("%FILE_PATH%\.") do set "FILE_PATH=%%~fi"
+
+if not exist "\\?\%FILE_PATH%" (
+  echo.%?~%: error: path does not exist: "%FILE_PATH%"
+  exit /b 1
+) >&2
+
+rem CAUTION: we must override `/A` flag for a file removement ONLY
+call "%%~dp0setshift.bat" 3 DEL_FLAGS_ %%* /A:-D
+
+echo.^>^>del %DEL_FLAGS_% "%FILE_PATH%"
+del %DEL_FLAGS_% "%FILE_PATH%"
 
 exit /b
 

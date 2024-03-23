@@ -15,20 +15,17 @@ exit /b
 
 :NOTX64
 
-rem Drom last error level
-call;
-
 rem Save all variables to stack
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
 rem make all paths canonical
-call :CANONICAL_PATH CONTOOLS_ROOT  "%%CONTOOLS_ROOT%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" CONTOOLS_ROOT  "%%CONTOOLS_ROOT%%"
 set "CONTOOLS_ROOT_NATIVE=%CONTOOLS_ROOT%"
-call :CANONICAL_PATH CONFIG_PATH    "%%~dp0..\Config"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" CONFIG_PATH    "%%~dp0..\Config"
 rem Update variables pointing temporary directories
-call :CANONICAL_PATH TEMP           "%%~dp0..\Temp"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEMP           "%%~dp0..\Temp"
 set "TMP=%TEMP%"
 
 rem Save all variables to stack
@@ -132,7 +129,7 @@ for /F "usebackq eol= tokens=*" %%i in (`call "%%CONTOOLS_ROOT%%/registry/regenu
 
 echo.  %__REMOUNTED_PATHS% of %__OVERALL_PATHS% paths is remounted.
 
-goto EXIT
+exit /b 0
 
 :PROCESS_CYGWIN_MOUNT_REGKEY
 rem Ignore root path, because it is path to registry key.
@@ -162,7 +159,7 @@ set "__VALUE2_2_1=%__VALUE2_2:\=/%"
 if defined __VALUE2_2 if not "%__VALUE2_2_1:~0,1%" == "/" exit /b
 
 rem Write new value to registry.
-reg.exe add "%CYGWIN_REGKEY_PATH%\%__VALUE%" /v "native" /d "%CYGWIN_PATH%%__VALUE2_2%" /f >nul 2>&1
+"%SystemRoot%\System32\reg.exe" add "%CYGWIN_REGKEY_PATH%\%__VALUE%" /v "native" /d "%CYGWIN_PATH%%__VALUE2_2%" /f >nul 2>nul
 echo %__VALUE% -^> "%CYGWIN_PATH%%__VALUE2_2%"
 set /A __REMOUNTED_PATHS+=1
 
@@ -173,16 +170,3 @@ rem Make remount in the local /etc/fstab file.
 echo %~nx0: warning: /etc/fstab should be manually remounted.>&2
 
 exit /b
-
-:CANONICAL_PATH
-setlocal DISABLEDELAYEDEXPANSION
-for /F "eol= tokens=* delims=" %%i in ("%~2\.") do set "RETURN_VALUE=%%~fi"
-rem set "RETURN_VALUE=%RETURN_VALUE:\=/%"
-(
-  endlocal
-  set "%~1=%RETURN_VALUE%"
-)
-exit /b 0
-
-:EXIT
-exit /b 0

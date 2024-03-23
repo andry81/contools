@@ -10,23 +10,24 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
 set RESTORE_LOCALE=0
 
-set "SCRIPT_TEMP_CURRENT_DIR=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%"
+) else set "TEMP_DIR=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%"
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
-if exist "%SCRIPT_TEMP_CURRENT_DIR%\*" rmdir /S /Q "%SCRIPT_TEMP_CURRENT_DIR%" >nul 2>nul
+if exist "%TEMP_DIR%\*" rmdir /S /Q "%TEMP_DIR%" >nul 2>nul
 
-:EXIT_MAIN
 rem restore locale
 if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 rem script flags
@@ -100,9 +101,9 @@ if /i "%INPUT_FILE_PATH%" == "%OUTPUT_FILE_PATH%" (
   exit /b 1
 ) >&2
 
-set "INPUT_FILE_BOM_PREFIX_TMP=%SCRIPT_TEMP_CURRENT_DIR%\input_file_bom_prefix.bin"
+set "INPUT_FILE_BOM_PREFIX_TMP=%TEMP_DIR%\input_file_bom_prefix.bin"
 
-mkdir "%SCRIPT_TEMP_CURRENT_DIR%" >nul 2>nul
+mkdir "%TEMP_DIR%" >nul 2>nul
 
 if defined FLAG_CHCP (
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
@@ -142,7 +143,7 @@ if defined INPUT_FILE_BOM_STR call set "INPUT_FILE_BOM_STR=%%INPUT_FILE_BOM_STR:
 if not defined INPUT_FILE_BOM_STR goto IGNORE_BOM_CHECK
 
 for /F "eol= tokens=* delims=" %%i in ("%INPUT_FILE_BOM_STR%") do set /P =%%i<nul > "%INPUT_FILE_BOM_PREFIX_TMP%"
-"%SystemRoot%\System32\fc.exe" "%INPUT_FILE_BOM_PREFIX_TMP%" "%BOM_FILE_PATH%" > nul
+"%SystemRoot%\System32\fc.exe" "%INPUT_FILE_BOM_PREFIX_TMP%" "%BOM_FILE_PATH%" >nul
 if %ERRORLEVEL% NEQ 0 goto IGNORE_BOM_CHECK
 
 if %RESTORE_LOCALE% GTR 1 (

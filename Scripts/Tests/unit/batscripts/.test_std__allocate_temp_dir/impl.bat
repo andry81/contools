@@ -39,13 +39,13 @@ if not exist "%DIR_PATH%\*" exit /b 2
 if not exist "%DIR_PATH%\%DIR_NAME_PTTN%" exit /b 3
 
 set "DIR_NAME="
-for /F "usebackq tokens=* delims=" %%i in (`dir /A:D /B /O:N "%DIR_PATH%\%DIR_NAME_PTTN%"`) do set "DIR_NAME=%%i"
+for /F "usebackq tokens=* delims=" %%i in (`@dir "%%DIR_PATH%%\%%DIR_NAME_PTTN%%" /A:D /B /O:N`) do set "DIR_NAME=%%i"
 
 if not defined DIR_NAME exit /b 4
 
 call "%%CONTOOLS_ROOT%%/gen_dir_files_list.bat" 65001 "%DIR_PATH%\%DIR_NAME%" > "%TEST_DATA_OUTPUT_FILE_NAME%"
 
-"%SystemRoot%\System32\fc.exe" "%TEST_DATA_OUTPUT_FILE_NAME%" "%TEST_DATA_REF_DIR_ROOT%\%TEST_DATA_OUTPUT_FILE_NAME%" > nul
+"%SystemRoot%\System32\fc.exe" "%TEST_DATA_OUTPUT_FILE_NAME%" "%TEST_DATA_REF_DIR_ROOT%\%TEST_DATA_OUTPUT_FILE_NAME%" >nul
 if %ERRORLEVEL% NEQ 0 exit /b 5
 
 set /A DIR_INDEX+=1

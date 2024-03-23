@@ -16,20 +16,17 @@ exit /b
 
 :NOTX64
 
-rem Drop last error level
-call;
-
 rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
 setlocal DisableDelayedExpansion
 
 call "%%~dp0__init__.bat" || exit /b
 
 rem make all paths canonical
-call :CANONICAL_PATH CONTOOLS_ROOT  "%%CONTOOLS_ROOT%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" CONTOOLS_ROOT  "%%CONTOOLS_ROOT%%"
 set "CONTOOLS_ROOT_NATIVE=%CONTOOLS_ROOT%"
-call :CANONICAL_PATH CONFIG_PATH    "%%~dp0..\Config"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" CONFIG_PATH    "%%~dp0..\Config"
 rem Update variables pointing temporary directories
-call :CANONICAL_PATH TEMP           "%%~dp0..\Temp"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEMP           "%%~dp0..\Temp"
 set "TMP=%TEMP%"
 
 rem Save all variables to stack again
@@ -256,13 +253,3 @@ if exist "%CONTOOLS_TPOLAERT_CECHO_ROOT%/cecho.exe" (
   echo.%*
 )
 exit /b
-
-:CANONICAL_PATH
-setlocal DISABLEDELAYEDEXPANSION
-for /F "eol= tokens=* delims=" %%i in ("%~2\.") do set "RETURN_VALUE=%%~fi"
-rem set "RETURN_VALUE=%RETURN_VALUE:\=/%"
-(
-  endlocal
-  set "%~1=%RETURN_VALUE%"
-)
-exit /b 0

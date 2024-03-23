@@ -40,9 +40,6 @@ set "PROJECT_VAR_ROOT=%~7"
 set "PROJECT_STAGE_VAR_ROOT=%~8"
 set "PROJECT_BIN_ROOT_EXCLUDES_FILE_LIST=%~9"
 
-rem Drop last error level
-call;
-
 call "%%?~dp0%%__init__.bat" || exit /b
 
 :BIN_STAGE

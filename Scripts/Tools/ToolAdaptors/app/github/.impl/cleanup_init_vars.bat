@@ -8,7 +8,7 @@ pushd "%PROJECT_LOG_DIR%" && (
     "%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" -E -i "s/ghp_[0-9a-zA-Z]{16,}/ghp_*/g" "%INIT_VARS_FILE%"
 
     rem delete GnuWin32 sed inplace backups
-    del /F /Q "sed*" 2> nul
+    del /F /Q /A:-D "sed*" 2>nul
   )
 
   popd

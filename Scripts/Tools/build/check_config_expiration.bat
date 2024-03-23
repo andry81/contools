@@ -92,14 +92,16 @@ rem
 
 rem compare versions
 
-set "VERSION_LINE_TEMP_FILE=%TEMP%\%?~n0%.version.%RANDOM%-%RANDOM%.txt"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "VERSION_LINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.version.%RANDOM%-%RANDOM%.txt"
+) else set "VERSION_LINE_TEMP_FILE=%TEMP%\%?~n0%.version.%RANDOM%-%RANDOM%.txt"
 
 "%SystemRoot%\System32\findstr.exe" /B /C:"#%%%% version:" "%VARS_FILE_IN%" > "%VERSION_LINE_TEMP_FILE%"
 
 set /P CONFIG_IN_FILE_VERSION_LINE=<"%VERSION_LINE_TEMP_FILE%"
 
 if not defined CONFIG_IN_FILE_VERSION_LINE (
-  del /F /Q /A:-D "%VERSION_LINE_TEMP_FILE%" >nul 2>&1
+  del /F /Q /A:-D "%VERSION_LINE_TEMP_FILE%" >nul 2>nul
   goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 )
 
@@ -115,7 +117,7 @@ if %CONFIG_OUT_FILE_VERSION_EQUAL% EQU 0 (
   set /P CONFIG_OUT_FILE_VERSION_LINE=<"%VERSION_LINE_TEMP_FILE%"
 )
 
-del /F /Q /A:-D "%VERSION_LINE_TEMP_FILE%" >nul 2>&1
+del /F /Q /A:-D "%VERSION_LINE_TEMP_FILE%" >nul 2>nul
 
 if %CONFIG_OUT_FILE_VERSION_EQUAL% EQU 0 (
   echo.%?~nx0%: error: input config version line is not found in the output config file, either merge it with or regenerate it from the input config file:

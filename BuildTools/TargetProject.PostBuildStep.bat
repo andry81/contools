@@ -2,9 +2,6 @@
 
 setlocal
 
-rem Drop last error code
-call;
-
 call "%%~dp0__init__\__init__.bat" || exit /b
 
 set "TARGET_PATH=%~1"
@@ -20,18 +17,14 @@ rem sanitize trailing slash character
 if "%TARGET_DIR:~-1%" == "\" set "TARGET_DIR=%TARGET_DIR:~0,-1%"
 if "%BINARY_DIR:~-1%" == "\" set "BINARY_DIR=%BINARY_DIR:~0,-1%"
 
-call :XCOPY_FILE "%%TARGET_DIR%%" "%%TARGET_FILE%%" "%%BINARY_DIR%%" /Y /H /R
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%TARGET_DIR%%" "%%TARGET_FILE%%" "%%BINARY_DIR%%" /Y /H /R
 
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem restore code page
 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 rem avoid output of this sequence: "error:"
-echo Last return code: %LASTERROR%
+echo Last return code: %LAST_ERROR%
 
-exit /b %LASTERROR%
-
-:XCOPY_FILE
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%* || exit /b
-exit /b 0
+exit /b %LAST_ERROR%

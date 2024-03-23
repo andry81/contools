@@ -152,7 +152,7 @@ rem
     %*
 )
 
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 if %NEST_LVL%0 EQU 0 (
   call "%%CONTOOLS_ROOT%%/cleanup/cleanup_log.bat"
@@ -161,6 +161,6 @@ if %NEST_LVL%0 EQU 0 (
 
 (
   rem drop local variables
-  set "LASTERROR="
-  exit /b %LASTERROR%
+  set "LAST_ERROR="
+  exit /b %LAST_ERROR%
 )

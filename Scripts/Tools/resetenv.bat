@@ -29,7 +29,7 @@ call;
 
 set "?~nx0=%~nx0"
 
-set ?LASTERROR=0
+set ?LAST_ERROR=0
 
 rem script flags
 set ?FLAG_PRINT=0
@@ -64,7 +64,7 @@ if defined ?FLAG (
 )
 
 if "%~1" == "" (
-  set ?LASTERROR=1
+  set ?LAST_ERROR=1
   echo.%?~nx0%: error: no input files
   goto CLEANUP_AND_EXIT
 ) >&2
@@ -76,7 +76,7 @@ set "?RESET_ENV_FILES="
 if "%~1" == "" goto RESET_ENV_FILES_LOOP_END
 
 if not exist "%~1" (
-  set ?LASTERROR=2
+  set ?LAST_ERROR=2
   echo.%?~nx0%: error: file does not exist: "%~1"
   goto CLEANUP_AND_EXIT
 ) >&2
@@ -160,5 +160,5 @@ exit /b 0
 rem Cleanup all ? variables
 (
   for /F "usebackq eol=# tokens=1,* delims==" %%i in (`set ? 2^>nul`) do set "%%i="
-  exit /b %?LASTERROR%
+  exit /b %?LAST_ERROR%
 )

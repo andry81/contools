@@ -1,10 +1,29 @@
+2024.04.09:
+* fixed: global scripts fixup
+* fixed: Scripts/Tools/registry: reg*.bat: invalid filter for abbrivated registry hive classes
+* new: __init__/canonical_path_if_ndef.bat, Scripts/Tools/std/canonical_path_if_ndef.bat: `canonical_path.bat` script variant
+* new: Scripts/Tools/cmake: canonical_path.bat, canonical_path_if_ndef.bat: `canonical_path.bat` script variants for cmake
+* new: Scripts/Tools/build: call.bat, callln.bat, callsub.bat: call with command line print scripts
+* new: Scripts/Tools/build: mkdir.bat, mkdir_if_notexist.bat, mkdir_if_notexist_strict.bat: `mkdir` command replacement as more reliable user script variant
+* new: Scripts/Tools/build: xcopy_dir.bat, xcopy_file.bat, xmove_dir.bat, xmove_file.bat: build pipeline script variants
+* new: Scripts/Tools/std: mkdir.bat, mkdir_if_notexist.bat, mkdir_if_notexist_strict.bat: `mkdir` command replacement as more reliable build script variant
+* new: Scripts/Tools/std/call_if_exist.bat: call command line if first argument exists
+* new: Scripts/Tools/std/del_file_if_exist.bat: `del_file.bat` script variant
+* new: Scripts/Tools/std: if_defined.bat, if_var_defined*.bat: `if_.bat` script variants
+* new: Scripts/Tools/std: rmdir.bat, rmdir_if_exist.bat, rmdir_if_exist_strict.bat: `rmdir` command replacement as more reliable script variant
+* changed: __init__/canonical_path.bat, Scripts/Tools/std/canonical_path.bat: added parameters checks
+* changed: use `SCRIPT_TEMP_CURRENT_DIR` variable instead of `TEMP` if defined
+* changed: reduced `get_wmic_local_datetime.bat` script usage
+* changed: global scripts rework, optimization and code cleanup
+* refactor: global scripts refactor
+
 2024.03.25:
 * fixed: Scripts/Tools/std: touch_file.bat, touch_dir.bat: scripts execution fixup
 
 2024.03.24:
 * new: Scripts/Tools/std: touch_file.bat, touch_dir.bat: `touch` command scripts
 
-2024.03.20:
+2024.03.21:
 * fixed: Scripts/Tools/filesys/read_shortcut_target_path.bat: execution fixup
 * new: Scripts/Tools/filesys/read_shortcut_target_path.bat: added `-retry_extended_property` flag to use second method to request target path with unicode characters
 

@@ -38,30 +38,27 @@ call "%%~dp0__init__.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 
 call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem ...
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :IMPLrem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
-  echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
-  exit /b 255
-) >&2
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 call "%%?~dp0%%.extract_files_from_archives/extract_files_from_archives.read_flags.bat" %%* || exit /b
@@ -125,7 +122,7 @@ set "TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
 echo.  "%EXTRACT_PTTN%" -^> "%EXTRACT_TO_DIR_IN%"
 
-if %CREATE_EXTRACT_TO_DIR% NEQ 0 if not exist "\\?\%EXTRACT_TO_DIR%\*" mkdir "%EXTRACT_TO_DIR%"
+if %CREATE_EXTRACT_TO_DIR% NEQ 0 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%EXTRACT_TO_DIR%%" >nul || exit /b
 
 pushd "%EXTRACT_TO_DIR%" && (
   if exist "\\?\%SEARCH_FROM%\*" (
@@ -155,7 +152,7 @@ goto ARC_FILE_PTTN_LOOP
 
 :ARC_FILE_PTTN_LOOP_END
 
-if defined SEARCH_FROM_FILES for /F "usebackq eol= tokens=* delims=" %%i in (`@dir%SEARCH_FROM_FILES% /A:-D /B /S /O:N`) do ( set "ARC_FILE_PATH=%%i" & call :PROCESS_DIR )
+if defined SEARCH_FROM_FILES for /F "usebackq eol= tokens=* delims=" %%i in (`@dir%SEARCH_FROM_FILES% /A:-D /B /O:N /S`) do ( set "ARC_FILE_PATH=%%i" & call :PROCESS_DIR )
 exit /b
 
 :EXTRACT_FROM_FILE
@@ -178,9 +175,7 @@ if %CREATE_DIR_FROM_ARCHIVE_FILE_NAME% NEQ 0 set "EXTRACT_TO_FILE_DIR=%EXTRACT_T
 
 echo."%ARC_FILE_REL_PATH%"
 
-if not exist "\\?\%EXTRACT_TO_FILE_DIR%\*" (
-  mkdir "%EXTRACT_TO_FILE_DIR%"
-)
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%EXTRACT_TO_FILE_DIR%%" >nul || exit /b
 
 if %SKIP_ARCHIVES_WITH_EXISTED_EXTRACTED_PREFIX_PATH% NEQ 0 if exist "\\?\%EXTRACT_TO_FILE_DIR_W_NAME%\*" exit /b 0
 

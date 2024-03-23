@@ -2,4 +2,4 @@
 
 popd
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%

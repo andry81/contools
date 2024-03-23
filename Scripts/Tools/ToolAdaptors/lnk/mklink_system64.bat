@@ -39,7 +39,7 @@ rem Because we have to attempt to create a directory in the system directory, th
 rem Because the `System32` directory should not be redirected at the moment of creation (linkage), then we have to do it in the 64-bit mode only.
 
 rem test mklink command existence
-mklink /? >nul 2>&1
+mklink /? >nul 2>nul
 if %ERRORLEVEL% EQU 0 goto MKLINK
 if exist "linkd.exe" goto LINKD
 

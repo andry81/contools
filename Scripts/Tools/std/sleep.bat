@@ -8,7 +8,7 @@ if not defined TIME_SLEEP_MSEC exit /b -1
 
 rem use pingpath to wait longer than 500 msec
 if %TIME_SLEEP_MSEC% GEQ 500 (
-  pathping localhost -n -q 1 -p %TIME_SLEEP_MSEC% >nul 2>&1
+  "%SystemRoot%\System32\pathping.exe" localhost -n -q 1 -p %TIME_SLEEP_MSEC% >nul 2>nul
   exit /b 0
 ) else if %TIME_SLEEP_MSEC% LEQ 0 exit /b 0
 

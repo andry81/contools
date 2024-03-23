@@ -1,6 +1,7 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
+rem USAGE:
+rem   xmove_file.bat [<flags>] <from-path> <from-file-pttn> <to-path> [<xmove-flags>...]
 
 rem Description:
 rem   The `move`/`robocopy.exe` seemless wrapper script with xcopy
@@ -19,6 +20,29 @@ rem   `move`.
 rem
 rem   In case of default command line the `robocopy.exe` will move files with
 rem   all attributes and timestamps (`/COPY:DAT /DCOPY:DAT /MOV`).
+
+rem <flags>:
+rem   -chcp <CodePage>
+rem     Set explicit code page.
+rem
+rem   -use_builtin_move
+rem     Use builtin `move` command.
+rem
+rem   -ignore-unexist
+rem     By default `<to-path>` does check on directory existence.
+rem     Use this flag to skip the check.
+
+rem <from-path>:
+rem   From directory path.
+
+rem <from-file-pttn>:
+rem   From file pattern.
+
+rem <to-path>:
+rem   To directory path.
+
+rem <xmove-flags>:
+rem   Command line flags to pass into subsequent commands and utilities.
 
 echo.^>%~nx0 %*
 
@@ -212,7 +236,7 @@ if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
 :INIT
 call "%%?~dp0%%__init__.bat" || exit /b
 
-set XMOVE_FLAGS_=%4 %5 %6 %7 %8 %9
+call "%%?~dp0%%setshift.bat" 3 XMOVE_FLAGS_ %%*
 
 :USE_BUILTIN_MOVE
 set XMOVE_DIR_RECUR=0
@@ -223,7 +247,8 @@ for %%i in (%XMOVE_FLAGS_%) do (
   call :ROBOCOPY_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
 )
 
-if %XMOVE_DIR_RECUR% EQU 0 set XMOVE_DIR_BARE_FLAGS=%XMOVE_DIR_BARE_FLAGS% /A:-D
+set "BUILTIN_DIR_CMD_BARE_FLAGS="
+if %XMOVE_DIR_RECUR% EQU 0 set BUILTIN_DIR_CMD_BARE_FLAGS=%BUILTIN_DIR_CMD_BARE_FLAGS% /A:-D
 
 rem CAUTION:
 rem   You must switch code page into english compatible locale.
@@ -235,7 +260,7 @@ if not exist "%SystemRoot%\system32\robocopy.exe" set FLAG_USE_BUILTIN_MOVE=1
 
 if %FLAG_USE_BUILTIN_MOVE% NEQ 0 call :PARSE_ROBOCOPY_FLAGS
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@dir%XMOVE_DIR_BARE_FLAGS% /B /O:N "%FROM_FILE_PATH_ABS%"`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%FROM_FILE_PATH_ABS%%"%%BUILTIN_DIR_CMD_BARE_FLAGS%% /B /O:N`) do (
   set "FROM_FILE=%%i"
   echo.^>^>move%XMOVE_FLAGS% "%FROM_DIR_PATH_ABS%\%%i" "%TO_PATH_ABS%"
   if %FLAG_USE_BUILTIN_MOVE% EQU 0 (
@@ -246,12 +271,12 @@ for /F "usebackq eol= tokens=* delims=" %%i in (`@dir%XMOVE_DIR_BARE_FLAGS% /B 
 )
 :BREAK
 
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem restore locale
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :ROBOCOPY_FLAGS_CONVERT
 set "XMOVE_FLAG=%~1"

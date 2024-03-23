@@ -33,13 +33,13 @@ rem cleanup nested directories recursively before exit
 set CLEANUP_UNLOCK_DIR=0
 set CLEANUP_WAITERS_DIR=0
 
-rename "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%" "%OLD_UNLOCK_DIR%" >nul 2>&1 && rmdir /S /Q "%LOCK_PATH%\%LOCK_DIR%\%OLD_UNLOCK_DIR%" >nul 2>&1
+rename "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%" "%OLD_UNLOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%LOCK_DIR%\%OLD_UNLOCK_DIR%" >nul 2>nul
 if not exist "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%" (
   rem the lock directory will be unlocked at exit
   set CLEANUP_UNLOCK_DIR=1
 )
 
-rename "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%" "%OLD_WAITERS_DIR%" >nul 2>&1 && rmdir /S /Q "%LOCK_PATH%\%LOCK_DIR%\%OLD_WAITERS_DIR%" >nul 2>&1
+rename "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%" "%OLD_WAITERS_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%LOCK_DIR%\%OLD_WAITERS_DIR%" >nul 2>nul
 if not exist "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%" (
   rem the lock directory will be unlocked at exit
   set CLEANUP_WAITERS_DIR=1
@@ -69,7 +69,7 @@ set PRE_LOCK_ACQUIRE=0
 rem if could not prelock operations over the lock directory - somebody is already proccessing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% NEQ 0 (
   rem directory lock is released and cleanuped under the prelock, now is safe to remove the prelock file
-  del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>&1
+  del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>nul
 
   exit /b 0
 )
@@ -84,7 +84,7 @@ cd "%LOCK_PATH%"
 
 :RELEASE_AND_CLEANUP_LOCK_LOOP
 rem cleanup the lock directory
-rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>&1 && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>&1
+rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
 
 if not exist "%LOCK_PATH%\%LOCK_DIR%" exit /b 0
 

@@ -9,6 +9,10 @@ setlocal
 
 set "TEMP_FILE_SUFFIX=%RANDOM%-%RANDOM%"
 
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%"
+) else set "TEMP_DIR=%TEMP%"
+
 echo.^
  4C 00 00 00 01 14 02 00 00 00 00 00 C0 00 00 00 00 00 00 46 81 22 00 00 00 00 00 00 00 00 00 00 ^
  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 ^
@@ -48,17 +52,17 @@ echo.^
  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ^
  00 00 00 00 00 00 00 00 00 00 00 10 00 00 00 05 00 00 A0 24 00 00 00 7F 00 00 00 1C 00 00 00 0B ^
  00 00 A0 04 F4 8B F3 43 1D F2 42 93 05 67 DE 0B 28 FC 23 7F 00 00 00 00 00 00 00 ^
- > "%TEMP%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk.bin" || exit /b 255
+ > "%TEMP_DIR%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk.bin" || exit /b 255
 
-certutil -f -decodeHex "%TEMP%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk.bin" "%TEMP%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk" 2>&1 >nul || (
-  del /f /q "%TEMP%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk.bin" "%TEMP%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk" 2>&1 >nul
+"%SystemRoot%\System32\certutil.exe" -f -decodeHex "%TEMP_DIR%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk.bin" "%TEMP_DIR%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk" >nul 2>nul || (
+  del /F /Q /A:-D "%TEMP_DIR%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk.bin" "%TEMP_DIR%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk" >nul 2>nul
   exit /b 255
 )
 
-call "%%TEMP%%\cmd-system64-admin-%%TEMP_FILE_SUFFIX%%.lnk" %%*
+call "%%TEMP_DIR%%\cmd-system64-admin-%%TEMP_FILE_SUFFIX%%.lnk" %%*
 
 set LAST_ERROR=%ERRORLEVEL%
 
-del /f /q "%TEMP%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk.bin" "%TEMP%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk" 2>&1 >nul
+del /F /Q /A:-D "%TEMP_DIR%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk.bin" "%TEMP_DIR%\cmd-system64-admin-%TEMP_FILE_SUFFIX%.lnk" >nul 2>nul
 
 exit /b %LAST_ERROR%

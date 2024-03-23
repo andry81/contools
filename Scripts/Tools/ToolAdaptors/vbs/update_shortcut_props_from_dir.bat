@@ -82,13 +82,13 @@ if %IMPL_MODE%0 NEQ 0 goto IMPL
 
 call "%%~dp0__init__\__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_vars_file.bat" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_vars_file.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -X /pause-on-exit -- %%* || exit /b
 
@@ -99,6 +99,7 @@ rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was 
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
+set FLAG_SHIFT=0
 set RESTORE_LOCALE=0
 set FLAG_MATCH_STRING=0
 set FLAG_DELETE=0
@@ -123,10 +124,12 @@ if defined FLAG (
     set "FLAG_MATCH_STRING_VALUE=%~2"
     set FLAG_MATCH_STRING=1
     shift
+    set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-m" (
     set "FLAG_MATCH_STRING_VALUE=%~2"
     set FLAG_MATCH_STRING=1
     shift
+    set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-delete" (
     set FLAG_DELETE=1
   ) else if "%FLAG%" == "-d" (
@@ -134,6 +137,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
+    set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-no-backup" (
     set BARE_FLAGS=%BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-ignore-unexist" (
@@ -155,19 +159,17 @@ if defined FLAG (
   ) else if "%FLAG%" == "-t-suffix" (
     set BARE_FLAGS=%BARE_FLAGS% %FLAG% %2
     shift
-  ) else if "%FLAG%" == "--" (
-    shift
-    set "FLAG="
-    goto FLAGS_LOOP_END
-  ) else (
+    set /A FLAG_SHIFT+=1
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
   shift
+  set /A FLAG_SHIFT+=1
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
 :FLAGS_LOOP_END
@@ -181,19 +183,15 @@ if not defined FLAG_MATCH_STRING_VALUE (
 rem load initialization environment variables
 if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat" "%%INIT_VARS_FILE%%"
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
-  echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
-  set LASTERROR=255
-  goto FREE_TEMP_DIR
-) >&2
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 if defined FLAG_CHCP (
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
   set RESTORE_LOCALE=1
 ) else call "%%CONTOOLS_ROOT%%/std/getcp.bat"
 
-call :MAIN %%1 %%2 %%3 %%4 %%5 %%6 %%7 %%8 %%9
-set LASTERROR=%ERRORLEVEL%
+call :MAIN %%*
+set LAST_ERROR=%ERRORLEVEL%
 
 rem restore locale
 if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
@@ -202,9 +200,11 @@ if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
+if FLAG_SHIFT GTR 0 for /L %%i in (1,1,%FLAG_SHIFT%) do shift
+
 set "LINKS_DIR=%~1"
 set "PROPS_LIST=%~2"
 set "REPLACE_FROM=%~3"
@@ -264,7 +264,7 @@ for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi
 
 if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /S /O:N "%LINKS_DIR%*.lnk"`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%LINKS_DIR%%*.lnk" /A:-D /B /O:N /S`) do (
   set "LINK_FILE_PATH=%%i"
   call :UPDATE_LINK
 )
@@ -274,7 +274,7 @@ exit /b 0
 :UPDATE_LINK
 echo."%LINK_FILE_PATH%"
 
-set LASTERROR=0
+set LAST_ERROR=0
 
 if not defined PROPS_LIST_FILTERED goto SKIP_PROP_LIST_REPLACE
 
@@ -306,7 +306,7 @@ if %FLAG_MATCH_STRING% NEQ 0 (
     call :MATCH_SHORTCUT
   )
 ) else (
-  del /F /Q /A:-D "%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props.lst" 2> nul
+  del /F /Q /A:-D "%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props.lst" 2>nul
   rename "%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props_to_match.lst" "shortcut_props.lst"
 )
 
@@ -350,7 +350,7 @@ for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/s
 
 echo.
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :UPDATE_SHORTCUT_TO_REPLACE
 

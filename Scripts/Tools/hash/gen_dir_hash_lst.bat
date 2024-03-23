@@ -11,9 +11,6 @@ rem     <size>,<Hash1>,<Hash2>,...,<HashN>,<path>
 rem Examples:
 rem 1. call gen_dir_hash_lst.bat -c "md5,sha256" -l -r . > dir_hash_list.lst
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b

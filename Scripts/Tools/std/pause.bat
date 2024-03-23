@@ -10,7 +10,7 @@ rem NOTE:
 rem   Script does not change the error level because restores it internally
 rem
 
-setlocal & set "LASTERROR=%ERRORLEVEL%"
+setlocal & set "LAST_ERROR=%ERRORLEVEL%"
 
 set "CHCP_FILE="
 if exist "%SystemRoot%\System32\chcp.com" set "CHCP_FILE=%SystemRoot%\System32\chcp.com"
@@ -18,7 +18,7 @@ if not defined CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "CHCP_FIL
 
 if not defined CHCP_FILE (
   if exist "%SystemRoot%\System32\timeout.exe" ( "%SystemRoot%\System32\timeout.exe" /T -1 ) else pause
-  exit /b %LASTERROR%
+  exit /b %LAST_ERROR%
 )
 
 set "?~dp0=%~dp0"
@@ -54,18 +54,18 @@ if defined FLAG_CHCP (
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
   if exist "%SystemRoot%\System32\timeout.exe" ( "%SystemRoot%\System32\timeout.exe" /T -1 ) else pause
   call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
-  exit /b %LASTERROR%
+  exit /b %LAST_ERROR%
 )
 
 for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" ^<nul 2^>nul`) do set "CURRENT_CP=%%j"
 if defined CURRENT_CP set "CURRENT_CP=%CURRENT_CP: =%"
 
 if exist "%SystemRoot%\System32\timeout.exe" (
-  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% <nul >nul & "%SystemRoot%\System32\timeout.exe" /T -1 & "%CHCP_FILE%" %CURRENT_CP% <nul >nul & exit /b %LASTERROR% )
+  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% <nul >nul & "%SystemRoot%\System32\timeout.exe" /T -1 & "%CHCP_FILE%" %CURRENT_CP% <nul >nul & exit /b %LAST_ERROR% )
   "%SystemRoot%\System32\timeout.exe" /T -1
 ) else (
-  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% <nul >nul & pause & "%CHCP_FILE%" %CURRENT_CP% <nul >nul & exit /b %LASTERROR% )
+  if defined LAST_CP if not "%CURRENT_CP%" == "%LAST_CP%" ( "%CHCP_FILE%" %LAST_CP% <nul >nul & pause & "%CHCP_FILE%" %CURRENT_CP% <nul >nul & exit /b %LAST_ERROR% )
   pause
 )
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%

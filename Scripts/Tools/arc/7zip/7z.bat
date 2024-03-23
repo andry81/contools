@@ -5,9 +5,6 @@ rem Author:   Andrey Dibrov (andry at inbox dot ru)
 rem Description:
 rem   7zip wrapper script.
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b
@@ -24,7 +21,7 @@ if %TOOLS_VERBOSE%0 NEQ 0 (
   echo.^>^>"%CONTOOLS_7ZIP_ROOT%\x86\7z.exe" %*
   echo.
 )
-"%CONTOOLS_7ZIP_ROOT%\x86\7z.exe" %* > nul
+"%CONTOOLS_7ZIP_ROOT%\x86\7z.exe" %* >nul
 
 exit /b
 
@@ -34,6 +31,6 @@ if %TOOLS_VERBOSE%0 NEQ 0 (
   echo.^>^>"%CONTOOLS_7ZIP_ROOT%\x64\7z.exe" %*
   echo.
 )
-"%CONTOOLS_7ZIP_ROOT%\x64\7z.exe" %* > nul
+"%CONTOOLS_7ZIP_ROOT%\x64\7z.exe" %* >nul
 
 exit /b

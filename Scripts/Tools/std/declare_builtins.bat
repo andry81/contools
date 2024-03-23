@@ -3,6 +3,7 @@
 set ?0=%1
 set "?~0=%~1"
 set "?~f0=%~f1"
+set "?~d0=%~d1"
 set "?~dp0=%~dp1"
 set "?~n0=%~n1"
 set "?~nx0=%~nx1"

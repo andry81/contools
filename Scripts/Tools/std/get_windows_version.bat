@@ -2,7 +2,9 @@
 
 setlocal
 
-set "__?VER_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "__?VER_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%.txt"
+) else set "__?VER_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
 
 ver 2>nul > "%__?VER_TEMP_FILE%"
 
@@ -12,7 +14,7 @@ rem
 set "WINDOWS_VER_STR="
 for /F "usebackq tokens=1,2,* delims=[]" %%i in ("%__?VER_TEMP_FILE%") do for /F "tokens=1,2,* delims= " %%l in ("%%j") do set "WINDOWS_VER_STR=%%m"
 
-del /F /Q /A:-D "%__?VER_TEMP_FILE%" >nul 2>&1
+del /F /Q /A:-D "%__?VER_TEMP_FILE%" >nul 2>nul
 
 set "__?VER_TEMP_FILE="
 

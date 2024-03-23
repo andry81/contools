@@ -6,13 +6,13 @@ if %IMPL_MODE%0 NEQ 0 goto IMPL
 
 call "%%~dp0__init__\__init__.bat" || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-call "%%CONTOOLS_PROJECT_ROOT%%/__init__/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_vars_file.bat" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_vars_file.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -X /pause-on-exit -- %%* || exit /b
 
@@ -25,20 +25,16 @@ call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 rem load initialization environment variables
 if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat" "%%INIT_VARS_FILE%%"
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || (
-  echo.%?~nx0%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%"
-  set LASTERROR=255
-  goto FREE_TEMP_DIR
-) >&2
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 :FREE_TEMP_DIR
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 
@@ -46,13 +42,13 @@ set "LOG_FILE=%~1"
 
 if not defined LOG_FILE goto USE_EMULE_LOG_DIR
 
-set "LOG_FILE=%~f1"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" LOG_FILE "%%LOG_FILE%%"
 
 goto USE_EMULE_LOG_DIR_END
 
 :USE_EMULE_LOG_DIR
 
-set "LOG_FILE=%EMULE_LOG_DIR%\eMule.log"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" LOG_FILE "%%EMULE_LOG_DIR%%\eMule.log"
 
 :USE_EMULE_LOG_DIR_END
 

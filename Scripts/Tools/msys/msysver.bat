@@ -33,9 +33,6 @@ if "%~1" == "" exit /b 65
 if "%~2" == "" exit /b 66
 if not exist "%~2\bin\uname.exe" exit /b 67
 
-rem Drop last error level
-call;
-
 rem Create local variable's stack
 setlocal
 

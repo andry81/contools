@@ -25,25 +25,25 @@ call "%%~dp0__init__.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/init_project_log.bat" "%%?~n0%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 
 call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem ...
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :IMPL
 rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 call :MAIN %%*
-set LASTERROR=%ERRORLEVEL%
+set LAST_ERROR=%ERRORLEVEL%
 
 rem ...
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 set "XCOPY_FROM_DIR=%~1"
@@ -58,7 +58,7 @@ if not defined XCOPY_FROM_DIR (
   exit /b 255
 ) >&2
 
-if not exist "%XCOPY_FROM_DIR%" (
+if not exist "%XCOPY_FROM_DIR%\*" (
   echo.%~nx0: error: XCOPY_FROM_DIR does not exist: "%XCOPY_FROM_DIR%".
   exit /b 255
 ) >&2
@@ -68,7 +68,7 @@ if not defined XCOPY_TO_DIR (
   exit /b 255
 ) >&2
 
-if not exist "%XCOPY_TO_DIR%" (
+if not exist "%XCOPY_TO_DIR%\*" (
   echo.%~nx0: error: XCOPY_TO_DIR does not exist: "%XCOPY_TO_DIR%".
   exit /b 255
 ) >&2
@@ -82,9 +82,6 @@ rem default values
 
 if not defined XCOPY_SWITCHES set XCOPY_SWITCHES=/Y /D /H
 
-rem Drop last error level
-call;
-
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" XCOPY_FROM_DIR  "%XCOPY_FROM_DIR%"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" XCOPY_TO_DIR    "%XCOPY_TO_DIR%"
 
@@ -92,7 +89,7 @@ call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v XCOPY_FROM_DIR
 set /A XCOPY_FROM_DIR_OFFSET=%ERRORLEVEL%+1
 
 pushd "%XCOPY_FROM_DIR%" && (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`@dir %FILE_PTTN_LIST% /A:-D /B /S /O:N`) do ( set "FILE_PATH=%%i" & call :PROCESS )
+  for /F "usebackq eol= tokens=* delims=" %%i in (`@dir %%FILE_PTTN_LIST%% /A:-D /B /O:N /S`) do ( set "FILE_PATH=%%i" & call :PROCESS )
   popd
 )
 exit /b 0
@@ -106,6 +103,4 @@ for /F "eol= tokens=* delims=" %%i in ("%XCOPY_FROM_DIR%\%FILE_REL_PATH%\..") d
 for /F "eol= tokens=* delims=" %%i in ("%XCOPY_TO_DIR%\%FILE_REL_PATH%\..") do set "XCOPY_TO_FILE_DIR=%%~fi"
 for /F "eol= tokens=* delims=" %%i in ("%FILE_REL_PATH%") do set "XCOPY_FILE_NAME=%%~nxi"
 
-if not exist "%XCOPY_TO_FILE_DIR%\*" mkdir "%XCOPY_TO_FILE_DIR%"
-
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%XCOPY_FROM_FILE_DIR%%" "%%XCOPY_FILE_NAME%%" "%%XCOPY_TO_FILE_DIR%%" %%XCOPY_SWITCHES%%
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%XCOPY_FROM_FILE_DIR%%" "%%XCOPY_FILE_NAME%%" "%%XCOPY_TO_FILE_DIR%%" %%XCOPY_SWITCHES%%

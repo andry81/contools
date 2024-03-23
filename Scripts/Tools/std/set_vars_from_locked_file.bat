@@ -39,18 +39,18 @@ rem exclusive acquire of the lock file
   (
     rem if lock is acquired, then we are in...
     call :MAIN "%%~2" "%%~3"
-    call set "LASTERROR=%%ERRORLEVEL%%"
+    call set "LAST_ERROR=%%ERRORLEVEL%%"
 
     rem exit with return code from the MAIN
   ) 9> "%~1" && (del /F /Q /A:-D "%~1" & goto EXIT)
 ) 2>nul
 
 rem Busy wait: with external call significantly reduces CPU consumption while in a waiting state
-pathping localhost -n -q 1 -p 20 >nul 2>&1
+"%SystemRoot%\System32\pathping.exe" localhost -n -q 1 -p 20 >nul 2>nul
 goto REPEAT_LOCK_LOOP
 
 :EXIT
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 rem drop last error
@@ -66,5 +66,5 @@ for /f "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do ( call :FILTER && 
 exit /b 0
 
 :FILTER
-for /F "usebackq eol=# tokens=* delims=" %%k in ("%~dp0.set_vars_from_file\exclusion.vars") do ( if /i "%%i" == "%%k" exit /b 1 )
+for /F "usebackq eol=# tokens=* delims=" %%k in ("%~dp0.set_vars_from_file\exclusion.vars") do if /i "%%i" == "%%k" exit /b 1
 exit /b 0

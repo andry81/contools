@@ -56,4 +56,4 @@ exit /b 0
 
 :EXIT
 rem cleanup files
-del /F /Q /A:-D "%__LOCK_FILE0%" >nul 2>&1
+del /F /Q /A:-D "%__LOCK_FILE0%" >nul 2>nul

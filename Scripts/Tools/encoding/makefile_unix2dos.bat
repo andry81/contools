@@ -7,9 +7,6 @@ rem   Script converts all files in directory with script by wildcards
 rem   "*.*sh.;configure.*.;makefile.*." from the Unix text format to the Dos
 rem   text format using the unix2dos utility.
 
-rem Drop last error level
-call;
-
 rem Create local variable's stack
 setlocal
 

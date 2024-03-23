@@ -14,9 +14,6 @@ rem  See vbs/xml_preformat.vbs for details.
 rem Examples:
 rem 1. call xml_vbs_preformat_for_files.bat *.xml *.xml.tmpl
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b
@@ -50,7 +47,7 @@ set "CMD_VA_ARGS="
 :PROCESS_FILES_LOOP
 if "%~1" == "" goto PROCESS_FILES_LOOP_END
 
-set CMD_VA_ARGS=%CMD_VA_ARGS%%1 
+set CMD_VA_ARGS=%CMD_VA_ARGS% %1
 set /A NUM_CMD_VA_ARGS+=1
 shift
 
@@ -63,7 +60,7 @@ if %NUM_CMD_VA_ARGS% EQU 0 (
   exit /b 255
 ) >&2
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /O:N /S %CMD_VA_ARGS%`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`@dir%%CMD_VA_ARGS%% /A:-D /B /O:N /S`) do (
   echo.%%i
   call "%%CONTOOLS_XML_TOOLS_ROOT%%/vbs/xml_preformat.vbs" %%CMD_FLAG_ARGS%% "%%i" "%%i"
 )

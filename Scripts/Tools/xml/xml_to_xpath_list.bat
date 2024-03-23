@@ -9,9 +9,6 @@ rem Flags:
 rem  -noprops - do not print properties
 rem  -lnodes - print leaf ancestor XPATHs (leaf nodes) before a leaf
 
-rem Drop last error level
-call;
-
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b

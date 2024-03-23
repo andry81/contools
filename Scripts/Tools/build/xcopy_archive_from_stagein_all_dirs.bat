@@ -31,9 +31,6 @@ set "PROJECT_STAGE_GEN_ROOT=%~6"
 set "PROJECT_VAR_ROOT=%~7"
 set "PROJECT_STAGE_VAR_ROOT=%~8"
 
-rem Drop last error level
-call;
-
 call "%%?~dp0%%__init__.bat" || exit /b
 
 :PDB_STAGE

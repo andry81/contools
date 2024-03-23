@@ -4,6 +4,10 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
+if not defined ?~nx0 (
+  set "?~=%~nx0"
+) else set "?~=%?~nx0%: %~nx0"
+
 set "TASK_NAME=%~1"
 set "TEMP_DIR_NAME_TOKEN=%~2"
 set "TEMP_PARENT_PATH=%~3"
@@ -76,8 +80,8 @@ set "SCRIPT_TEMP_CURRENT_DIR_LIST=%SCRIPT_TEMP_CURRENT_DIR%|%SCRIPT_TEMP_CURRENT
 set "SCRIPT_TEMP_PARENT_PATH_DIR_LIST=%TEMP_PARENT_PATH_DIR%|%SCRIPT_TEMP_PARENT_PATH_DIR_LIST%"
 set "SCRIPT_TEMP_DIR_NAME_TOKEN_LIST=%TEMP_DIR_NAME_TOKEN%|%SCRIPT_TEMP_DIR_NAME_TOKEN_LIST%"
 
-mkdir "%SCRIPT_TEMP_CURRENT_DIR%"
-set LASTERROR=%ERRORLEVEL%
+mkdir "%SCRIPT_TEMP_CURRENT_DIR%" 2>nul
+set LAST_ERROR=%ERRORLEVEL%
 
 rem return values
 (
@@ -99,5 +103,12 @@ rem return values
   set "SCRIPT_TEMP_DIR_NAME_TOKEN_LIST=%SCRIPT_TEMP_DIR_NAME_TOKEN_LIST%"
   set "SCRIPT_TEMP_TASK_COUNT_LIST=%SCRIPT_TEMP_TASK_COUNT_LIST%"
 
-  exit /b %LASTERROR%
+  if %LAST_ERROR% NEQ 0 (
+    echo.%?~%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%".
+    rem just in case
+    if exist "\\?\%SCRIPT_TEMP_CURRENT_DIR%\*" rmdir /S /Q "%SCRIPT_TEMP_CURRENT_DIR%"
+    exit /b 255
+  ) >&2
 )
+
+exit /b 0

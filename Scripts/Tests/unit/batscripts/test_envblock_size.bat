@@ -1,8 +1,5 @@
 @echo off
 
-rem Drop last error level
-call;
-
 rem Create local variable's stack
 setlocal
 

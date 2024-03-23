@@ -3,7 +3,7 @@
 setlocal
 
 if %IMPL_MODE%0 NEQ 0 goto IMPL
-"%SystemRoot%\System32\net.exe" session >nul 2>&1 && goto ELEVATED
+"%SystemRoot%\System32\net.exe" session >nul 2>nul && goto ELEVATED
 
 :ELEVATE
 set IMPL=1
@@ -39,7 +39,7 @@ rem CAUTION: ShellExecute does not wait a child process close!
 exit /b
 
 :IMPL
-"%SystemRoot%\System32\net.exe" session >nul 2>&1 || (
+"%SystemRoot%\System32\net.exe" session >nul 2>nul || (
   echo.%~nx0: error: process must be elevated before continue.
   exit /b 255
 ) >&2

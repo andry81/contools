@@ -36,7 +36,7 @@ shift
 goto LOOP
 
 :DIR
-dir /A:-D /B /O:N %__ARGS__% >nul 2>&1
+dir /A:-D /B /O:N %__ARGS__% >nul 2>nul
 if %ERRORLEVEL% NEQ 0 exit /b 1
 
 exit /b 0

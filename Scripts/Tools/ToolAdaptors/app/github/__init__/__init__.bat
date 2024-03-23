@@ -8,53 +8,35 @@ set "GITHUB_ADAPTOR_PROJECT_ROOT_INIT0_DIR=%~dp0"
 
 if not defined NEST_LVL set NEST_LVL=0
 
-if not defined GITHUB_ADAPTOR_PROJECT_ROOT                call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" GITHUB_ADAPTOR_PROJECT_ROOT                 "%%~dp0.."
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" GITHUB_ADAPTOR_PROJECT_ROOT                 "%%~dp0.."
 
-if not defined GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT   call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT    "%%GITHUB_ADAPTOR_PROJECT_ROOT%%/_config"
-if not defined GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT  call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT   "%%PROJECT_OUTPUT_ROOT%%/config/contools/tool_adaptors/github"
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT    "%%GITHUB_ADAPTOR_PROJECT_ROOT%%/_config"
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT   "%%PROJECT_OUTPUT_ROOT%%/config/contools/tool_adaptors/github"
 
-call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b 10
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
-call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -gen_user_config "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config_dir.bat" %%* -gen_user_config "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
-if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-user.lst"  call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" accounts-user.lst.in    accounts-user.lst || exit /b
-if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-org.lst"   call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" accounts-org.lst.in     accounts-org.lst || exit /b
-if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst"          call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos.lst.in            repos.lst || exit /b
-if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos-auth.lst"     call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos-auth.lst.in       repos-auth.lst || exit /b
-if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos-forks.lst"    call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos-forks.lst.in      repos-forks.lst || exit /b
+call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" -if_not_exist "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" accounts-user.lst.in    accounts-user.lst || exit /b
+call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" -if_not_exist "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" accounts-org.lst.in     accounts-org.lst || exit /b
+call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" -if_not_exist "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos.lst.in            repos.lst || exit /b
+call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" -if_not_exist "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos-auth.lst.in       repos-auth.lst || exit /b
+call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" -if_not_exist "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos-forks.lst.in      repos-forks.lst || exit /b
 
-if not exist "%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/repos.lst"          call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos-to-delete.lst.in  repos-to-delete.lst || exit /b
+call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" -if_not_exist "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos-to-delete.lst.in  repos-to-delete.lst || exit /b
 
-call :IF_DEFINED_AND_FILE_EXIST CURL_EXECUTABLE || (
+call "%%CONTOOLS_ROOT%%/std/if_var_defined_and_file_exist.bat" CURL_EXECUTABLE || (
   echo.%~nx0: error: CURL_EXECUTABLE file path is not found: "%EMULE_EXECUTABLE%"
   exit /b 255
 ) >&2
 
-call :IF_DEFINED_AND_FILE_EXIST JQ_EXECUTABLE || (
+call "%%CONTOOLS_ROOT%%/std/if_var_defined_and_file_exist.bat" JQ_EXECUTABLE || (
   echo.%~nx0: error: JQ_EXECUTABLE file path is not found: "%JQ_EXECUTABLE%"
   exit /b 255
 ) >&2
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" GH_ADAPTOR_BACKUP_DIR   "%%GH_ADAPTOR_BACKUP_DIR%%"
 
-call "%%CONTOOLS_ROOT%%/std/mkdir_if_notexist.bat" "%%GH_ADAPTOR_BACKUP_DIR%%" || exit /b 11
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%GH_ADAPTOR_BACKUP_DIR%%" || exit /b
 
-exit /b 0
-
-:IF_DEFINED_AND_FILE_EXIST
-setlocal
-if "%~1" == "" exit /b 1
-if not defined %~1 exit /b 1
-call set "FILE_PATH=%%%~1%%"
-if not defined FILE_PATH exit /b 1
-if not exist "%FILE_PATH%" exit /b 1
-exit /b 0
-
-:IF_DEFINED_AND_DIR_EXIST
-setlocal
-if "%~1" == "" exit /b 1
-if not defined %~1 exit /b 1
-call set "DIR_PATH=%%%~1%%"
-if not defined DIR_PATH exit /b 1
-if not exist "%DIR_PATH%\*" exit /b 1
 exit /b 0
