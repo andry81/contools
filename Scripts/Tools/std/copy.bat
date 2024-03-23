@@ -1,10 +1,24 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
+rem USAGE:
+rem   copy.bat [<flags>] <from-path> <to-path> [<copy-flags>...]
 
 rem Description:
-rem   The `copy` wrapper script with echo and some conditions check before
-rem   call.
+rem   The builtin `copy` command wrapper script with echo and some conditions
+rem   check before call.
+
+rem <flags>:
+rem   -chcp <CodePage>
+rem     Set explicit code page.
+
+rem <from-path>:
+rem   From path.
+
+rem <to-path>:
+rem   To path.
+
+rem <copy-flags>:
+rem   Command line flags to pass into builtin `copy` command.
 
 echo.^>%~nx0 %*
 
@@ -108,16 +122,24 @@ goto TO_PATH_OK
 
 :TO_PATH_OK
 
-if not exist "%FROM_PATH%" (
-  echo.%?~nx0%: error: input path does not exist: "%FROM_PATH%"
+for /F "eol= tokens=* delims=" %%i in ("%FROM_PATH%\.") do set "FROM_PATH_ABS=%%~fi"
+for /F "eol= tokens=* delims=" %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
+
+if not exist "\\?\%FROM_PATH_ABS%" (
+  echo.%?~nx0%: error: input path does not exist: "%FROM_PATH_ABS%"
   exit /b -251
 ) >&2
 
-set "FROM_PATH=%~f1"
-set "TO_PATH=%~f2"
-
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 
-copy %3 %4 %5 %6 %7 %8 %9 "%FROM_PATH%" "%TO_PATH%"
+call "%%?~dp0%%setshift.bat" 2 COPY_FLAGS_ %%*
 
-if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+if defined COPY_FLAGS_ (
+  echo.^>^>copy %COPY_FLAGS_% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
+  copy %COPY_FLAGS_% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
+) else (
+  echo.^>^>copy "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
+  copy "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
+)
+
+if defined FLAG_CHCP call "%%?~dp0%%restorecp.bat"

@@ -1,18 +1,23 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
+rem USAGE:
+rem   mkdir_if_notexist_strict.bat <path>...
 
 rem Description:
-rem   The `mkdir` if not exist wrapper script with echo and some conditions
+rem   The `mkdir` if-not-exist wrapper script with echo and some conditions
 rem   check before call.
+rem
+rem   Strict version, reports an error in case of disconnected symbolic
+rem   reference to a directory. Does not support long paths.
+
+rem <path>...
+rem   Directory path list.
 
 if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 
 setlocal
 
 set "DIR_PATHS="
-
-:MKDIR_LOOP
 
 set "DIR_PATH=%~1"
 set DIR_COUNT=1
@@ -21,6 +26,8 @@ if not defined DIR_PATH (
   echo.%~nx0: error: at least one directory path argument must be defined.
   exit /b -255
 ) >&2
+
+:MKDIR_LOOP
 
 set "DIR_PATH=%DIR_PATH:/=\%"
 
@@ -43,7 +50,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_ERROR
 (
-  echo.%~nx0: error: the directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo.%~nx0: error: directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -74,7 +81,9 @@ if not exist "\\?\%DIR_PATH%" (
 
 shift
 
-if "%~1" == "" goto MKDIR_LOOP_END
+set "DIR_PATH=%~1"
+
+if "%DIR_PATH%" == "" goto MKDIR_LOOP_END
 
 set /A DIR_COUNT+=1
 

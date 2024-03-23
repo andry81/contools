@@ -72,7 +72,7 @@ if %MSG_PRINTED% EQU 0 (
 
 if not exist "%TO_STAGE_DIR_ROOT%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%TO_STAGE_DIR_ROOT%%"
 
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%FROM_STAGE_DIR_ROOT%%" "%%FROM_FILE%%" "%%TO_STAGE_DIR_ROOT%%" %%XCOPY_FILE_FLAGS%% || exit /b 127
+call "%%CONTOOLS_ROOT%%/build/xcopy_file.bat" "%%FROM_STAGE_DIR_ROOT%%" "%%FROM_FILE%%" "%%TO_STAGE_DIR_ROOT%%" %%XCOPY_FILE_FLAGS%% || exit /b 127
 
 goto FROM_FILE_LOOP
 

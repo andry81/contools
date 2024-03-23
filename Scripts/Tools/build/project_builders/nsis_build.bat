@@ -289,7 +289,7 @@ echo.Building setup executable...
 echo.  "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%/%APP_SETUP_FILE_NAME%.exe"
 
 if not exist "%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%" call "%%CONTOOLS_ROOT%%/std/mkdir.bat" "%%PROJECT_STAGE_BUILD_ROOT.BIN_DIR%%"
-call :CMD "%%NSIS_ROOT%%/bin/makensis.exe" %%MAKENSIS_CMD_LINE.COMPILE%%
+call "%%CONTOOLS_ROOT%%/build/callln.bat" "%%NSIS_ROOT%%/bin/makensis.exe" %%MAKENSIS_CMD_LINE.COMPILE%%
 set LASTERROR=%ERRORLEVEL%
 echo.Return code: %LASTERROR%
 
@@ -314,7 +314,7 @@ if %LASTERROR% NEQ 0 (
 
 rem copy makensis detailed log file into /gen directory
 echo.Copying setup log files...
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" . "%%MAKENSIS_LOG_FILE_NAME%%" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" /Y /D
+call "%%CONTOOLS_ROOT%%/build/xcopy_file.bat" . "%%MAKENSIS_LOG_FILE_NAME%%" "%%PROJECT_STAGE_BUILD_ROOT.GEN_DIR%%" /Y /D
 set LASTERROR=%ERRORLEVEL%
 
 echo.
@@ -338,9 +338,3 @@ if defined PROJECT_LOCK_TOKEN (
 if %F_DISABLE_POST_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/post_build.bat" || exit /b )
 
 exit /b 0
-
-:CMD
-echo.^>%*
-echo.
-(%*)
-exit /b

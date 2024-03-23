@@ -141,10 +141,3 @@ exit /b
 type "%INOUT_LIST_FILE_TMP1%"
 
 exit /b %LASTERROR%
-
-:CMD
-echo.^>%*
-(
-  %*
-)
-exit /b

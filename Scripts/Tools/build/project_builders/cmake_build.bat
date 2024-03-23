@@ -105,7 +105,7 @@ echo.
 pushd "%PROJECT_CMAKE_BUILD_ROOT%" || exit /b 30
 
 rem cmake configure
-call :CMD cmake "%%PROJECT_CMAKE_LIST_ROOT%%" %%CMAKE_CMD_LINE.CONFIGURE%%
+call "%%CONTOOLS_ROOT%%/build/callln.bat" cmake "%%PROJECT_CMAKE_LIST_ROOT%%" %%CMAKE_CMD_LINE.CONFIGURE%%
 set LASTERROR=%ERRORLEVEL%
 popd
 
@@ -122,12 +122,12 @@ if exist "%BUILD_SCRIPTS_ROOT%\gen_scm_branch_workingset.bat" (
 )
 
 rem cmake make
-call :CMD cmake %%CMAKE_CMD_LINE.MAKE%% || exit /b
+call "%%CONTOOLS_ROOT%%/build/callln.bat" cmake %%CMAKE_CMD_LINE.MAKE%% || exit /b
 
 if not defined CMAKE_CMD_LINE.INSTALL goto IGNORE_CMAKE_INSTALL
 
 rem cmake install
-call :CMD cmake %%CMAKE_CMD_LINE.INSTALL%% || exit /b
+call "%%CONTOOLS_ROOT%%/build/callln.bat" cmake %%CMAKE_CMD_LINE.INSTALL%% || exit /b
 
 :IGNORE_CMAKE_INSTALL
 
@@ -145,9 +145,3 @@ if defined PROJECT_LOCK_TOKEN (
 if %F_DISABLE_POST_BUILD%0 EQU 0 ( call "%%BUILD_SCRIPTS_ROOT%%/post_build.bat" || exit /b )
 
 exit /b 0
-
-:CMD
-echo.^>%*
-echo.
-(%*)
-exit /b

@@ -1,28 +1,28 @@
 @echo off
 
 rem USAGE:
-rem   mkdir.bat <path>...
+rem   rmdir.bat <path> [<rmdir-flags>...]
 
 rem Description:
-rem   The `mkdir` wrapper script with echo and some conditions check before
-rem   call. Does not support long paths.
+rem   The `rmdir` wrapper script with echo and some conditions check before
+rem   call.
 
-rem <path>...
-rem   Directory path list.
+rem <path>
+rem   Single directory path.
+
+rem <rmdir-flags>:
+rem   Command line flags to pass into builtin `rmdir` command.
 
 if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 
 setlocal
 
 set "DIR_PATH=%~1"
-set DIR_COUNT=1
 
 if not defined DIR_PATH (
-  echo.%~nx0: error: at least one directory path argument must be defined.
+  echo.%~nx0: error: directory path is not defined.
   exit /b -255
 ) >&2
-
-:MKDIR_LOOP
 
 set "DIR_PATH=%DIR_PATH:/=\%"
 
@@ -45,24 +45,15 @@ goto DIR_PATH_OK
 
 :DIR_PATH_ERROR
 (
-  echo.%~nx0: error: directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo.%~nx0: error: directory path is invalid: "%DIR_PATH%".
   exit /b -254
 ) >&2
 
 :DIR_PATH_OK
 
-rem for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
+for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
 
-shift
+call "%%~dp0setshift.bat" 1 RMDIR_FLAGS_ %%*
 
-set "DIR_PATH=%~1"
-
-if "%DIR_PATH%" == "" goto MKDIR_LOOP_END
-
-set /A DIR_COUNT+=1
-
-goto MKDIR_LOOP
-
-:MKDIR_LOOP_END
-echo.^>^>mkdir %*
-mkdir %*
+echo.^>^>rmdir "%DIR_PATH%" %RMDIR_FLAGS_%
+rmdir "%DIR_PATH%" %RMDIR_FLAGS_%

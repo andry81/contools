@@ -108,4 +108,4 @@ for /F "eol= tokens=* delims=" %%i in ("%FILE_REL_PATH%") do set "XCOPY_FILE_NA
 
 if not exist "%XCOPY_TO_FILE_DIR%\*" mkdir "%XCOPY_TO_FILE_DIR%"
 
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" "%%XCOPY_FROM_FILE_DIR%%" "%%XCOPY_FILE_NAME%%" "%%XCOPY_TO_FILE_DIR%%" %%XCOPY_SWITCHES%%
+call "%%CONTOOLS_ROOT%%/build/xcopy_file.bat" "%%XCOPY_FROM_FILE_DIR%%" "%%XCOPY_FILE_NAME%%" "%%XCOPY_TO_FILE_DIR%%" %%XCOPY_SWITCHES%%

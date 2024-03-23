@@ -34,13 +34,13 @@ goto AUTOGEN_DEFINITIONS_LOOP
 
 if not defined APP_MODULE_NAME set "APP_MODULE_NAME=%PROJECT_NAME%"
 
-if not exist "%SOURCES_DIR%\gen\*" ( mkdir "%SOURCES_DIR%\gen" || exit /b 255 )
+call "%%CONTOOLS_ROOT%%/build/mkdir_if_notexist.bat" "%%SOURCES_DIR%%\gen" || exit /b 255
 
 pushd "%SOURCES_DIR%\gen" && (
   if exist "%SOURCES_DIR%\help.def" (
-    call :CMD "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" "%%SOURCES_DIR:\=/%%/help.def" || exit /b 255
+    call "%%CONTOOLS_ROOT%%/build/call.bat" "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" "%%SOURCES_DIR:\=/%%/help.def" || exit /b 255
   )
-  call :CMD "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" "%%SOURCES_DIR:\=/%%/version.def" || exit /b 255
+  call "%%CONTOOLS_ROOT%%/build/call.bat" "%%CONTOOLS_AUTOGEN_ROOT%%\bin\autogen.exe"%%AUTOGEN_BARE_FLAGS%% -L "%%SOURCES_DIR%%" "%%SOURCES_DIR:\=/%%/version.def" || exit /b 255
   popd
 ) || exit /b 255
 
@@ -50,16 +50,9 @@ if %UNICODE_ENABLED% NEQ 0 set THLIBAUTOCFG_BARE_FLAGS=%THLIBAUTOCFG_BARE_FLAGS%
 if exist "%SOURCES_DIR%\gen\help.txt" (
   if not exist "%SOURCES_DIR%\gen\help\*" ( mkdir "%SOURCES_DIR%\gen\help" || exit /b 255 )
   pushd "%SOURCES_DIR%\gen" && (
-    call :CMD "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools/thlibautocfg.exe"%%THLIBAUTOCFG_BARE_FLAGS%% -h "help/{N}.hpp" -m "INCLUDE_HELP_INL_EPILOG({N})\n#include """help/{N}.hpp"""\nINCLUDE_HELP_INL_PROLOG({N})" "%%SOURCES_DIR%%\gen\help.txt" "%%SOURCES_DIR%%\gen\help_inl.hpp" || exit /b 255
+    call "%%CONTOOLS_ROOT%%/build/call.bat" "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools/thlibautocfg.exe"%%THLIBAUTOCFG_BARE_FLAGS%% -h "help/{N}.hpp" -m "INCLUDE_HELP_INL_EPILOG({N})\n#include """help/{N}.hpp"""\nINCLUDE_HELP_INL_PROLOG({N})" "%%SOURCES_DIR%%\gen\help.txt" "%%SOURCES_DIR%%\gen\help_inl.hpp" || exit /b 255
     popd
   ) || exit /b 255
 )
 
-exit /b 0
-
-:CMD
-echo.^>%*
-(
-  %*
-)
 exit /b 0

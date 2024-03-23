@@ -56,7 +56,7 @@ rmdir /S /Q "%TEMP_OUTPUT_DIR%"
 :MAIN
 rem arguments: <out_file_file>
 
-call :CMD cmake -G "%%~1" "-DCMAKE_MODULE_PATH=%%TACKLELIB_CMAKE_ROOT%%" ^
+call "%%CONTOOLS_ROOT%%/build/callsub.bat" cmake -G "%%~1" "-DCMAKE_MODULE_PATH=%%TACKLELIB_CMAKE_ROOT%%" ^
   -P "%%TACKLELIB_CMAKE_ROOT%%/tacklelib/tools/GeneratorIsMulticonfig.cmd.cmake" ^
   --flock "%%TEMP_OUTPUT_DIR%%/lock" "%%TEMP_OUTPUT_DIR%%/var_values.lst" || exit /b
 
@@ -64,18 +64,8 @@ call :CMD cmake -G "%%~1" "-DCMAKE_MODULE_PATH=%%TACKLELIB_CMAKE_ROOT%%" ^
   echo.GENERATOR_IS_MULTI_CONFIG
 ) > "%TEMP_OUTPUT_DIR%/var_names.lst" || exit /b
 
-call :CMD "%%CONTOOLS_ROOT%%/std/set_vars_from_locked_file_pair.bat" ^
+call "%%CONTOOLS_ROOT%%/build/callsub.bat" "%%CONTOOLS_ROOT%%/std/set_vars_from_locked_file_pair.bat" ^
   "%%TEMP_OUTPUT_DIR%%/lock" "%%TEMP_OUTPUT_DIR%%/var_names.lst" "%%TEMP_OUTPUT_DIR%%/var_values.lst" ^
   "%%PRINT_VARS_SET%%" || exit /b
 
 exit /b 0
-
-:CMD
-if %TOOLS_VERBOSE%0 NEQ 0 (
-  echo.^>^>%*
-  echo.
-)
-(
-  %*
-)
-exit /b

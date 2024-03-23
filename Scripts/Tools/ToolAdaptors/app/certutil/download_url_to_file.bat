@@ -164,13 +164,7 @@ if exist "%OUT_FILE_PATH%" (
 )
 
 pushd "%OUT_FILE_DIR%" && (
-  call :CMD certutil -urlcache -split -f "%%URL%%" "%%OUT_FILE_PATH%%"
+  call "%%CONTOOLS_ROOT%%/build/call.bat" certutil -urlcache -split -f "%%URL%%" "%%OUT_FILE_PATH%%"
   popd
   exit /b
-)
-
-:CMD
-echo.^>%*
-(
-  %*
 )

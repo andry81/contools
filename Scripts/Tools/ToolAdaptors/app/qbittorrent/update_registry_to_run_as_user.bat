@@ -96,12 +96,12 @@ mkdir "%CONTOOLS_DIR_TMP%" || (
 ) >&2
 
 rem copy `callf.exe` into temporary directory to be able to run elevated from a Network Drive
-call :XCOPY_FILE "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools" callf.exe "%%CONTOOLS_DIR_TMP%%" || exit /b 255
+call "%%CONTOOLS_ROOT%%/build/xcopy_file.bat" "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools" callf.exe "%%CONTOOLS_DIR_TMP%%" || exit /b 255
 
 rem NOTE: In the `callf.exe` the backslash character escaping requires only in case of conjunction with the double quote character escaping: `\\\"`.
 rem
 
-call :CMD "%%CONTOOLS_DIR_TMP%%/callf.exe" ^
+call "%%CONTOOLS_ROOT%%/build/call.bat" "%%CONTOOLS_DIR_TMP%%/callf.exe" ^
   /elevate{ /no-window }{ /attach-parent-console } ^
   /ret-child-exit /no-subst-pos-vars /no-esc ^
   /ra "%%%%" "%%%%?01%%%%" /v "?01" "%%%%" ^
@@ -114,43 +114,3 @@ call :CMD "%%CONTOOLS_DIR_TMP%%/callf.exe" ^
 rem ...
 
 exit /b 0
-
-:CMD
-echo.^>%*
-(
-  %*
-)
-exit /b
-
-:XCOPY_FILE
-if not exist "\\?\%~f3" (
-  echo.^>mkdir "%~3"
-  call :MAKE_DIR "%%~3" || (
-    echo.%?~nx0%: error: could not create a target file directory: "%~3".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%*
-exit /b
-
-:XCOPY_DIR
-if not exist "\\?\%~f2" (
-  echo.^>mkdir "%~2"
-  call :MAKE_DIR "%%~2" || (
-    echo.%?~nx0%: error: could not create a target directory: "%~2".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%*
-exit /b
-
-:MAKE_DIR
-for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
-
-mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
-  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
-  exit /b 1
-) >&2
-exit /b

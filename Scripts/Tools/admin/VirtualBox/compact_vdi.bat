@@ -37,13 +37,5 @@ for /F "usebackq eol= tokens=* delims=" %%i in (`dir /A:-D /B /O:N /S "%VDI_DIR
 exit /b
 
 :COMPACT_VDI_FILE
-call :CMD "%%VBOX_MANAGE_EXE%%" modifymedium --compact "%%VDI_FILE%%"
-echo.
-exit /b
-
-:CMD
-echo.^>%*
-(
-  %*
-)
+call "%%CONTOOLS_ROOT%%/build/call.bat" "%%VBOX_MANAGE_EXE%%" modifymedium --compact "%%VDI_FILE%%"
 exit /b

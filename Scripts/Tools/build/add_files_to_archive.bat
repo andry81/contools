@@ -89,27 +89,12 @@ mkdir "%EMPTY_DIR_TMP%" || (
   exit /b 255
 ) >&2
 
-if not exist "%ARCHIVE_DIR%\*" ( call :MAKE_DIR "%%ARCHIVE_DIR%%" || exit /b 2 )
+if not exist "%ARCHIVE_DIR%\*" ( call "%%CONTOOLS_ROOT%%/build/mkdir.bat" "%%ARCHIVE_DIR%%" || exit /b 2 )
 
 rem remove arguments trailing back slashes to avoid exe command line parse old bug
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"
 if "%REL_PATH:~-1%" == "\" set "REL_PATH=%REL_PATH:~0,-1%"
 
-call :CMD "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" a -r%%_7ZIP_SWITCHES%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%" "-w%%SCRIPT_TEMP_CURRENT_DIR%%"
-exit /b
+call "%%CONTOOLS_ROOT%%/build/call.bat" "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" a -r%%_7ZIP_SWITCHES%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%" "-w%%SCRIPT_TEMP_CURRENT_DIR%%"
 
-:CMD
-echo.^>%*
-(
-  %*
-)
-exit /b
-
-:MAKE_DIR
-for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
-
-mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
-  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
-  exit /b 1
-) >&2
 exit /b

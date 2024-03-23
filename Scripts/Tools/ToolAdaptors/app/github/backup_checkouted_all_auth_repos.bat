@@ -36,7 +36,7 @@ set LASTERROR=%ERRORLEVEL%
 
 if %NEST_LVL% EQU 0 if %LASTERROR% EQU 0 (
   rem copy log into backup directory
-  call :XCOPY_DIR "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/checkout/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  call "%%CONTOOLS_ROOT%%/build/xcopy_dir.bat" "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/checkout/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
 )
 
 pause
@@ -152,49 +152,9 @@ for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUT
   call "%%~dp0.impl/update_skip_state.bat" "backup_checkouted_repo.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
   if not defined SKIPPING_CMD (
-    call :CMD "backup_checkouted_auth_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+    call "%%CONTOOLS_ROOT%%/build/call.bat" "backup_checkouted_auth_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
   ) else call echo.* backup_checkouted_auth_repo.bat "%%REPO_OWNER%%" "%%REPO%%"
 )
 
 exit /b 0
-
-:CMD
-echo.^>%*
-(
-  %*
-)
-exit /b
-
-:XCOPY_FILE
-if not exist "\\?\%~f3" (
-  echo.^>mkdir "%~3"
-  call :MAKE_DIR "%%~3" || (
-    echo.%?~nx0%: error: could not create a target file directory: "%~3".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%*
-exit /b
-
-:XCOPY_DIR
-if not exist "\\?\%~f2" (
-  echo.^>mkdir "%~2"
-  call :MAKE_DIR "%%~2" || (
-    echo.%?~nx0%: error: could not create a target directory: "%~2".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%*
-exit /b
-
-:MAKE_DIR
-for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
-
-mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
-  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
-  exit /b 1
-) >&2
-exit /b

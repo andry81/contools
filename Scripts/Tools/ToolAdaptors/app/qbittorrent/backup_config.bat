@@ -47,53 +47,13 @@ mkdir "%EMPTY_DIR_TMP%" || (
 
 set "QBITTORRENT_ADAPTOR_BACKUP_FILE_NAME_PREFIX=qbittorrent--config-"
 
-call :XCOPY_FILE "%%QBITTORRENT_ROAMING_CONFIG_DIR%%"           qBittorrent.ini         "%%QBITTORRENT_ADAPTOR_BACKUP_DIR%%/%%QBITTORRENT_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H || exit /b 10
-call :XCOPY_FILE "%%QBITTORRENT_ROAMING_CONFIG_DIR%%"           qBittorrent-data.ini    "%%QBITTORRENT_ADAPTOR_BACKUP_DIR%%/%%QBITTORRENT_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H || exit /b 10
+call "%%CONTOOLS_ROOT%%/build/xcopy_file.bat" "%%QBITTORRENT_ROAMING_CONFIG_DIR%%"           qBittorrent.ini         "%%QBITTORRENT_ADAPTOR_BACKUP_DIR%%/%%QBITTORRENT_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H || exit /b 10
+call "%%CONTOOLS_ROOT%%/build/xcopy_file.bat" "%%QBITTORRENT_ROAMING_CONFIG_DIR%%"           qBittorrent-data.ini    "%%QBITTORRENT_ADAPTOR_BACKUP_DIR%%/%%QBITTORRENT_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H || exit /b 10
 
 echo.Archiving backup directory...
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%QBITTORRENT_ADAPTOR_BACKUP_DIR%%" "%%QBITTORRENT_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%/*.*" "%%QBITTORRENT_ADAPTOR_BACKUP_DIR%%/%%QBITTORRENT_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%.7z" -sdel || exit /b 20
 echo.
 
-call :CMD rmdir /S /Q "%%QBITTORRENT_ADAPTOR_BACKUP_DIR%%/%%QBITTORRENT_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%"
+call "%%CONTOOLS_ROOT%%/build/call.bat" rmdir /S /Q "%%QBITTORRENT_ADAPTOR_BACKUP_DIR%%/%%QBITTORRENT_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%"
 
 exit /b 0
-
-:CMD
-echo.^>%*
-(
-  %*
-)
-exit /b
-
-:XCOPY_FILE
-if not exist "\\?\%~f3" (
-  echo.^>mkdir "%~3"
-  call :MAKE_DIR "%%~3" || (
-    echo.%?~nx0%: error: could not create a target file directory: "%~3".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat" %%*
-exit /b
-
-:XCOPY_DIR
-if not exist "\\?\%~f2" (
-  echo.^>mkdir "%~2"
-  call :MAKE_DIR "%%~2" || (
-    echo.%?~nx0%: error: could not create a target directory: "%~2".
-    exit /b 255
-  ) >&2
-  echo.
-)
-call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" %%*
-exit /b
-
-:MAKE_DIR
-for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
-
-mkdir "%FILE_PATH%" 2>nul || if exist "%SystemRoot%\System32\robocopy.exe" ( "%SystemRoot%\System32\robocopy.exe" /CREATE "%EMPTY_DIR_TMP%" "%FILE_PATH%" >nul ) else type 2>nul || (
-  echo.%?~nx0%: error: could not create a target file directory: "%FILE_PATH%".
-  exit /b 1
-) >&2
-exit /b
