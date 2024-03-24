@@ -1,3 +1,6 @@
+2024.03.24:
+* new: Scripts/Tools/std: touch_file.bat, touch_dir.bat: `touch` command scripts
+
 2024.03.20:
 * fixed: Scripts/Tools/filesys/read_shortcut_target_path.bat: execution fixup
 * new: Scripts/Tools/filesys/read_shortcut_target_path.bat: added `-retry_extended_property` flag to use second method to request target path with unicode characters
