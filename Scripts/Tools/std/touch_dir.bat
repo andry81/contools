@@ -4,8 +4,9 @@ rem USAGE:
 rem   touch_dir.bat <path>...
 
 rem Description:
-rem   The `touch` command analog for directories.
-
+rem   The `touch` command analog for directories, with echo and some conditions
+rem   check before call. Does support long paths.
+rem
 rem <path>...
 rem   Directory path list.
 
@@ -15,8 +16,6 @@ setlocal
 
 set "?~nx0=%~nx0%"
 
-:TOUCH_DIR_LOOP
-
 set "DIR_PATH=%~1"
 set DIR_COUNT=1
 
@@ -24,6 +23,8 @@ if not defined DIR_PATH (
   echo.%?~nx0%: error: at least one directory path argument must be defined.
   exit /b -255
 ) >&2
+
+:TOUCH_DIR_LOOP
 
 set "DIR_PATH=%DIR_PATH:/=\%"
 
@@ -54,24 +55,42 @@ goto DIR_PATH_OK
 
 for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
 
+if "%DIR_PATH:~0,4%" == "\\?\" set "DIR_PATH=%DIR_PATH:~4%"
+
 if %TOOLS_VERBOSE%0 NEQ 0 echo.^>^>touch "%DIR_PATH%"
 
-if not exist "%DIR_PATH%\*" (
+if not exist "\\?\%DIR_PATH%\*" (
   echo.%?~nx0%: error: directory does not exist: "%DIR_PATH%".
   goto CONTINUE
 ) >&2
 
-set "DIR_PATH_TEMP_FILE=%DIR_PATH%\~.%RANDOM%-%RANDOM%.~"
+set "DIR_PATH_TEMP_FILE_NAME=touch_dir.%RANDOM%-%RANDOM%.tmp"
+set "DIR_PATH_TEMP_FILE=%DIR_PATH%\%DIR_PATH_TEMP_FILE_NAME%"
 
-type nul >> "%DIR_PATH_TEMP_FILE%"
+type nul >> "\\?\%DIR_PATH_TEMP_FILE%"
 
-del /F /Q "%DIR_PATH_TEMP_FILE%" >nul 2>nul
+rem check on long file path and if long file path, then move the file to a temporary directory to delete it
+if not exist "%FILE_PATH%" if exist "%SystemRoot%\System32\robocopy.exe" goto MOVE_TO_TMP
+
+del /F /Q "\\?\%DIR_PATH_TEMP_FILE%" >nul 2>nul
+
+goto CONTINUE
+
+:MOVE_TO_TMP
+
+set "FILE_PATH_TEMP_DIR=%TEMP%\touch_dir.%RANDOM%-%RANDOM%"
+
+"%SystemRoot%\System32\robocopy.exe" "%DIR_PATH%" "%FILE_PATH_TEMP_DIR%" "%DIR_PATH_TEMP_FILE_NAME%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
+
+rmdir /S /Q "%FILE_PATH_TEMP_DIR%" >nul 2>nul
 
 :CONTINUE
 
 shift
 
-if "%~1" == "" exit /b 0
+set "DIR_PATH=%~1"
+
+if "%DIR_PATH%" == "" exit /b 0
 
 set /A DIR_COUNT+=1
 

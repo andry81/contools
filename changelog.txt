@@ -1,3 +1,6 @@
+2024.03.25:
+* fixed: Scripts/Tools/std: touch_file.bat, touch_dir.bat: scripts execution fixup
+
 2024.03.24:
 * new: Scripts/Tools/std: touch_file.bat, touch_dir.bat: `touch` command scripts
 
