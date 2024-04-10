@@ -79,8 +79,10 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.impl%TEST_SCRIPT_FI
   (
     if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" ( call; ) else type 2>nul
   ) && (
+    echo 2
     if exist "%TEST_SCRIPT_HANDLERS_DIR%/impl%TEST_SCRIPT_FILE_EXT%" ( call; ) else type 2>nul
   ) && (
+    echo 1
     ( call "%%TEST_SCRIPT_HANDLERS_DIR%%/impl%%TEST_SCRIPT_FILE_EXT%%" ) || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
   )
 ) || (

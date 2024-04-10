@@ -21,36 +21,23 @@ rem      which stores string if /v flag is used.
 rem Examples:
 rem 1. call strlen.bat "" "Hello world!"
 rem    echo ERRORLEVEL=%ERRORLEVEL%
+rem 2. set "__STRING__=Hello world!"
+rem    call strlen.bat /v
+rem    echo ERRORLEVEL=%ERRORLEVEL%
 
-rem Drop last error level
-call;
+setlocal DISABLEDELAYEDEXPANSION
 
-rem Create local variable's stack with disabled of delayed expansion (to avoid ! characters expansion)
-setlocal DisableDelayedExpansion
-
-set __STRING_VAR__=__STRING__
+set "__VAR__=__STRING__"
 if not "%~1" == "/v" (
   rem Unsafe strings assign, values can has control characters!
   set "__STRING__=%~2"
-) else if not "%~2" == "" (
-  set "__STRING_VAR__=%~2"
-)
+) else if not "%~2" == "" set "__VAR__=%~2"
 
-rem Create local variable's stack with enabled of delayed expansion (to workaround the script slowdown)
-setlocal EnableDelayedExpansion
+setlocal ENABLEDELAYEDEXPANSION
 
-if "%~1" == "/v" set "__STRING__=!%__STRING_VAR__%!"
+if "%~1" == "/v" set "__STRING__=!%__VAR__%!"
 
 if not defined __STRING__ exit /b 0
-if "!__STRING__:~0,1!" == "" exit /b 0
 
-set __LEN__=0
-
-for %%i in (65536 32768 16384 8192 4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do if not "!__STRING__:~%%i,1!" == "" ( set /A "__LEN__+=%%i" & set "__STRING__=!__STRING__:~%%i!" )
-
-set /A __LEN__+=1
-
-(
-  endlocal
-  exit /b %__LEN__%
-)
+set "__LEN__=1" & for %%i in (65536 32768 16384 8192 4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do if not "!__STRING__:~%%i,1!" == "" set /A "__LEN__+=%%i" & set "__STRING__=!__STRING__:~%%i!"
+endlocal & exit /b %__LEN__%

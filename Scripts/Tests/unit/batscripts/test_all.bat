@@ -6,12 +6,12 @@ setlocal
 call "%%~dp0__init__/__init__.bat" || exit /b
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
+call "%%TESTS_PROJECT_ROOT%%/test_std_encode.bat"
 call "%%TESTS_PROJECT_ROOT%%/test_std__strlen.bat"
 call "%%TESTS_PROJECT_ROOT%%/test_std__allocate_temp_dir.bat"
 call "%%TESTS_PROJECT_ROOT%%/test_std__chcp.bat"
 call "%%TESTS_PROJECT_ROOT%%/test_std__trim_var.bat"
-call "%%TESTS_PROJECT_ROOT%%/test_build__load_config_full.bat"
-call "%%TESTS_PROJECT_ROOT%%/test_build__load_config_fast.bat"
+call "%%TESTS_PROJECT_ROOT%%/test_build__load_config.bat"
 
 call "%%TESTS_PROJECT_ROOT%%/test_strchr.bat"
 call "%%TESTS_PROJECT_ROOT%%/test_strrep.bat"

@@ -4,11 +4,27 @@ setlocal DISABLEDELAYEDEXPANSION
 
 call "%%~dp0__init__/__init__.bat" || exit /b
 
-set "?01=^|"
-set "?02=^&"
+setlocal
+set ARGS="1 2" ! ? * ^^^& ^^^| , ; = ^^= "=" 3
+call "%%CONTOOLS_ROOT%%/std/callshift.bat" 0 echo %%ARGS%%
+endlocal
+echo.---
 
 setlocal
-call "%%CONTOOLS_ROOT%%/std/callshift.bat" 0 echo "1 2" ! ^^? ^^* %%?02%% %%?01%% , ; = ^= "=" 3
+set ARGS="1 2" ! ? * ^^^& ^^^| , ; = ^^= "=" 3
+call "%%CONTOOLS_ROOT%%/std/callshift.bat" -exe 0 echo %%ARGS%%
+endlocal
+echo.---
+
+setlocal
+set ARGS=$*^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+?** ,;=
+call "%%CONTOOLS_ROOT%%/std/callshift.bat" 0 echo %%ARGS%%
+endlocal
+echo.---
+
+setlocal
+set ARGS=$*^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+?** ,;=
+call "%%CONTOOLS_ROOT%%/std/callshift.bat" -exe 0 echo %%ARGS%%
 endlocal
 echo.---
 

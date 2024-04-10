@@ -42,7 +42,7 @@ if "%TEST_SCRIPT_FILE_PATH:~1,1%" == ":" goto TEST_SCRIPT_FILE_PATH_OK
 :TEST_SCRIPT_FILE_PATH_OK
 
 rem shortcuts to the user test script file name
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%* || exit /b
 
 rem make builtin canonical user script path variables
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_PATH "%%?~f0%%"
@@ -98,7 +98,8 @@ set INTERRORLEVEL=0
 echo Running %?~nx0%...
 echo.
 
-call "%%CONTOOLS_TOOLS%%/std/setshift.bat" -skip 1 1 TEST_TITLE %%?~nx0%% %%*
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" -skip 1 1 TEST_TITLE %%?~nx0%% %%*
 
-setlocal DISABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!TEST_TITLE!") do endlocal & title %%i
+setlocal DISABLEDELAYEDEXPANSION & ^
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!TEST_TITLE!") do endlocal & title %%i
 exit /b 0

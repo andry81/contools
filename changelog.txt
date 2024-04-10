@@ -1,3 +1,16 @@
+2024.04.11:
+* fixed: Scripts/Tools/std: callshift.bat, setshift.bat: accident space character at the end of the command line
+* fixed: Scripts/Tools/std/trim_var.bat: execution fixup
+* fixed: Scripts/Tools/testlib, Scripts/Tests/unit/batscripts, Scripts/Tests/manual/batscripts, Scripts/Tests/bench/batscripts: execution fixup
+* new: Scripts/Tools/std/encode: encode_*.bat, decode_*.bat: characters encoder and decoder scripts to bypass control characters interference in certain conditions
+* new: Scripts/Tools/std: callshift.bat, setshift.bat: support all control characters handle using the characters encoder and decoder scripts
+* new: Scripts/Tools/std: callshift.bat, setshift.bat: `-exe` flag to use the executable command line encoder instead of the batch as by default
+* new: Scripts/Tests/unit/batscripts/test_std_encode.bat: unit tests for characters encoder and decoder scripts
+* new: Scripts/Tests/manual/batscripts/test_std_encode__*.bat: manual tests for characters encoder and decoder scripts
+* new: Scripts/Tests/bench/batscripts/test_std_encode__*.bat: bench tests for characters encoder and decoder scripts
+* changed: Scripts/Tools/std/trim_var.bat: reimplemented
+* changed: Scripts/Tools/std/strlen.bat: code optimization
+
 2024.04.09:
 * fixed: global scripts fixup
 * fixed: Scripts/Tools/registry: reg*.bat: invalid filter for abbrivated registry hive classes
