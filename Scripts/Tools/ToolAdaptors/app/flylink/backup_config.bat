@@ -37,7 +37,13 @@ call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 exit /b %LAST_ERROR%
 
 :MAIN
-for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%FLYLINKDC_SETTINGS_PATH%%\*.sqlite" /A:-D /B /O:N`) do (
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir "%FLYLINKDC_SETTINGS_PATH%\*.sqlite" /A:-D /B /O:N
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "FILE_NAME=%%i"
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%FLYLINKDC_SETTINGS_PATH%%" "%%FILE_NAME%%"  "%%FLYLINK_ADAPTOR_BACKUP_DIR%%/flylink--%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H || exit /b 10
 )

@@ -1,3 +1,6 @@
+2024.04.12:
+* fixed: Scripts: `@dir %...%` incorrect expansion in the `for /F ... (`...`) do ...` expression
+
 2024.04.11:
 * fixed: Scripts/Tools/std: callshift.bat, setshift.bat: accident space character at the end of the command line
 * fixed: Scripts/Tools/std/trim_var.bat: execution fixup

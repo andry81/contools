@@ -152,7 +152,13 @@ goto ARC_FILE_PTTN_LOOP
 
 :ARC_FILE_PTTN_LOOP_END
 
-if defined SEARCH_FROM_FILES for /F "usebackq eol= tokens=* delims=" %%i in (`@dir%SEARCH_FROM_FILES% /A:-D /B /O:N /S`) do ( set "ARC_FILE_PATH=%%i" & call :PROCESS_DIR )
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir%SEARCH_FROM_FILES% /A:-D /B /O:N /S
+
+if defined SEARCH_FROM_FILES for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do set "ARC_FILE_PATH=%%i" & call :PROCESS_DIR
 exit /b
 
 :EXTRACT_FROM_FILE

@@ -29,7 +29,13 @@ if not exist "%VBOX_MANAGE_EXE%" (
   exit /b 255
 ) >&2
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%VDI_DIR%%\*.vdi" /A:-D /B /O:N /S`) do (
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir "%VDI_DIR%\*.vdi" /A:-D /B /O:N /S
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "VDI_FILE=%%i"
   call :COMPACT_VDI_FILE
 )

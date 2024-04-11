@@ -190,7 +190,13 @@ for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi
 
 if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%LINKS_DIR%%*.lnk" /A:-D /B /O:N /S`) do (
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "LINK_FILE_PATH=%%i"
   call :UPDATE_LINK
 )

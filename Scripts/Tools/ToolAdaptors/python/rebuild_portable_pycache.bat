@@ -94,7 +94,13 @@ if exist "%DESTDIR_ABS%\*" goto DESTDIR_OK
 rem process the root explicitly
 call :CMD "%%PYTHON_EXE%%" -m compileall -f -d "" "%%DESTDIR_ABS%%" -r 0
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%DESTDIR_ABS%%" /A:D /B /O:N /S`) do (
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir "%DESTDIR_ABS%" /A:D /B /O:N /S
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set FILE_PATH=%%i
   call :REBUILD_FILE_PATH || exit /b
 )

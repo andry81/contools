@@ -69,8 +69,14 @@ call :CMD reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCo
 call :CMD reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\CompatTelRunner.exe" /v Debugger /t REG_SZ /d "systray.exe" /f
 echo.
 
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir "%SystemRoot%\CompatTelRunner.exe" /A:-D /B /O:N /S
+
 echo Updating CompatTelRunner.exe permissions...
-for /F "usebackq eol=; tokens=* delims=" %%i in (`@dir "%%SystemRoot%%\CompatTelRunner.exe" /A:-D /B /O:N /S`) do (
+for /F "usebackq eol=; tokens=* delims=" %%i in (`%%?.%%`) do (
   set "FILE=%%i"
   call :UPDATE_PERMISSIONS
 )

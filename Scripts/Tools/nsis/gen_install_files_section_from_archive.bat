@@ -83,8 +83,14 @@ set /A BASE_DIR_PATH_LEN=%ERRORLEVEL%
 set "DIR_PATH=%BASE_DIR_PATH%"
 call :PROCESS_DIR_FILES || ( popd & exit /b )
 
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir . /A:D /B /O:N /S
+
 pushd "%BASE_DIR_PATH%" && (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`@dir . /A:D /B /O:N /S`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "DIR_PATH=%%i"
     call :PROCESS_DIR_FILES || ( popd & exit /b )
   )
@@ -98,8 +104,14 @@ call set "FILE_DIR_PATH=%%DIR_PATH:~%BASE_DIR_PATH_LEN%%%"
 
 if defined FILE_DIR_PATH set "FILE_DIR_PATH=%FILE_DIR_PATH:~1%"
 
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir "%DIR_PATH%%FILE_FILTER_SUFFIX%" /A:-D /B /O:N
+
 set FILE_INDEX=0
-for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%DIR_PATH%%%%FILE_FILTER_SUFFIX%%" /A:-D /B /O:N`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   if not "%%i" == "" ( call :PROCESS_FILE "%%i" || exit /b )
 )
 

@@ -56,7 +56,13 @@ goto PROCESS_FILES_LOOP
 rem get and set code page
 call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CODE_PAGE%%
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@dir%%CMD_VA_ARGS%% /A:-D /B /O:N /S`) do (
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir%CMD_VA_ARGS% /A:-D /B /O:N /S
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   echo.# ------------------------------------------------------------------------------
   echo # File: "%%i"
   echo.# ------------------------------------------------------------------------------

@@ -41,7 +41,13 @@ set "INPUT_DIR_PATH=%~dp1"
 
 chcp 1251
 
-for /F "usebackq eol=| tokens=* delims=" %%i in (`@dir "%%INPUT_PATH_PTTN%%" /A:-D /B /O:N`) do (
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir "%INPUT_PATH_PTTN%" /A:-D /B /O:N
+
+for /F "usebackq eol=| tokens=* delims=" %%i in (`%%?.%%`) do (
   set "INPUT_FILE_NAME=%%i"
   call :PROCESS_INPUT_FILE_PATH "%%INPUT_FILE_NAME%%" || exit /b
 )

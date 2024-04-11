@@ -88,8 +88,14 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" XCOPY_TO_DIR    "%XCOPY_TO_DIR%"
 call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v XCOPY_FROM_DIR
 set /A XCOPY_FROM_DIR_OFFSET=%ERRORLEVEL%+1
 
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir %FILE_PTTN_LIST% /A:-D /B /O:N /S
+
 pushd "%XCOPY_FROM_DIR%" && (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`@dir %%FILE_PTTN_LIST%% /A:-D /B /O:N /S`) do ( set "FILE_PATH=%%i" & call :PROCESS )
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do set "FILE_PATH=%%i" & call :PROCESS
   popd
 )
 exit /b 0

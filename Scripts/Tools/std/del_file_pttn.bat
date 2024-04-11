@@ -72,7 +72,13 @@ if not exist "%FILE_DIR%\*" (
 
 if defined FILE_EXT_PTTN if not "%FILE_EXT_PTTN:~0,1%" == "." set "FILE_EXT_PTTN=.%FILE_EXT_PTTN%"
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@dir "%%FILE_DIR%%\%%FILE_NAME_PTTN%%%%FILE_EXT_PTTN%%" /A:-D /B /O:N /S 2^>nul`) do (
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir "%FILE_DIR%\%FILE_NAME_PTTN%%FILE_EXT_PTTN%" /A:-D /B /O:N /S 2^>nul
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "FILE_PATH=%%i"
   call :DEL_FILE %%*
 )

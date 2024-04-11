@@ -38,8 +38,14 @@ call set "TEST_DATA_OUTPUT_FILE_NAME=%%TEST_DATA_OUTPUT_FILE_NAME_PTTN:{{INDEX}}
 if not exist "%DIR_PATH%\*" exit /b 2
 if not exist "%DIR_PATH%\%DIR_NAME_PTTN%" exit /b 3
 
+rem CAUTION:
+rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
+rem   We must expand the command line into a variable.
+rem
+set ?.=@dir "%DIR_PATH%\%DIR_NAME_PTTN%" /A:D /B /O:N
+
 set "DIR_NAME="
-for /F "usebackq tokens=* delims=" %%i in (`@dir "%%DIR_PATH%%\%%DIR_NAME_PTTN%%" /A:D /B /O:N`) do set "DIR_NAME=%%i"
+for /F "usebackq tokens=* delims=" %%i in (`%%?.%%`) do set "DIR_NAME=%%i"
 
 if not defined DIR_NAME exit /b 4
 
