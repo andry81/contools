@@ -1,4 +1,7 @@
 2024.04.14:
+* fixed: Scripts/Tools/exec/exec_callf_prefix.bat: infinite recursion
+
+2024.04.14:
 * changed: Scripts/Tools/std/trim_var.bat: minor improvement
 
 2024.04.14:

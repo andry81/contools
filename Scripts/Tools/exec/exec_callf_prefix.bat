@@ -89,7 +89,7 @@ rem CAUTION:
 rem   Because `callf.exe` does use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` variable in the command line.
 rem   Otherwise we can fall into infinite recursion because of the unset of the `IMPL_MODE` variable.
 rem
-if %FLAG_ELEVATE% NEQ 0 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v IMPL_MODE 1
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v IMPL_MODE 1
 
 if %FLAG_ELEVATE% NEQ 0 if defined CONTOOLS_ROOT set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v CONTOOLS_ROOT "%CONTOOLS_ROOT%"
 
