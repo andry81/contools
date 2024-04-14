@@ -24,7 +24,6 @@ set "?~dp0=%~dp0"
 set "DIR=%~f1"
 set "REL_PATH=%~2"
 set "ARCHIVE_PATH=%~f3"
-set "ARCHIVE_DIR=%~dp3"
 
 shift
 shift
@@ -75,8 +74,6 @@ popd
 exit /b %LAST_ERROR%
 
 :MAIN
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%ARCHIVE_DIR%%" || exit /b 2
-
 rem remove arguments trailing back slashes to avoid exe command line parse old bug
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"
 if "%REL_PATH:~-1%" == "\" set "REL_PATH=%REL_PATH:~0,-1%"
