@@ -3,6 +3,12 @@
 rem USAGE:
 rem   load_config.bat [<Flags>] [--] <InputDir> <OutputDir> <ConfigFileName> [<Param0> [<Param1>]]
 
+rem CAUTION:
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
+rem
+
 rem Description:
 rem   Script to load a configuration file which can consist of an input and
 rem   output parts.
@@ -176,54 +182,49 @@ call "%%__?~dp0%%check_config_expiration.bat" -- "%%__?CONFIG_IN_DIR%%\%%__?CONF
 
 :SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 
-(
-  endlocal
-  rem recode quote and exclamation characters
-  set "__?ESC__=^"
-  set __?QUOT__=^"
-  set "__?EXCL__=!"
-  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_NAME_DIR%/%__?CONFIG_FILE_NAME%") do set "__?VALUE=%%j" & call :PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" %%i
-  set "__?VALUE=" & set "__?ATTR=" & set "__?UPATH=" & set "__?VAR_EXPR=" & set "__?P0=" & set "__?P1=" & set "__?COUNT=" & set "__?ESC__=" & set "__?QUOT__=" & set "__?EXCL__="
-)
+set "__?VAR_PREFIX=__?:%RANDOM%-%RANDOM%:"
+
+for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_NAME_DIR%/%__?CONFIG_FILE_NAME%") do set "__?VALUE=%%j" & call :PARSE "%%__?FLAG_NO_EXPAND%%" "%%__?PARAM0%%" "%%__?PARAM1%%" %%i
+
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set "%%__?VAR_PREFIX%%" 2^>nul`) do ^
+for /F "eol= tokens=3 delims=:" %%k in ("%%i") do endlocal & set "__?VALUE=%%j" & setlocal ENABLEDELAYEDEXPANSION & ^
+set "__?VALUE=!__?VALUE:~1!" & if defined __?VALUE (
+  set "__?VALUE=!__?VALUE:="!"
+  for /F "eol= tokens=* delims=" %%l in ("!__?VALUE!") do endlocal & set "%%k=%%l"
+) else set "%%k="
+
+set "__?VALUE="
+
 exit /b 0
 
 :PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" [ATTRS] VAR[:PARAM0[:PARAM1]]
-set "__?ATTR=|" & set "__?VAR_EXPR=" & set "__?COUNT=0" & for %%i in (%*) do (
-  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%j in ("!__?COUNT!") do for /F "eol= tokens=* delims=" %%k in ("!__?ATTR!") do (
-    endlocal & if %%j GTR 2 (
-      if defined __?VAR_EXPR setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%l in ("!__?VAR_EXPR!") do endlocal & set "__?ATTR=%%k%%l|"
-      set "__?VAR_EXPR=%%i"
-    )
-  )
-  set /A __?COUNT+=1
-)
+setlocal ENABLEDELAYEDEXPANSION & ^
+set "__?ATTR=|" & set "__?VAR_EXPR=" & set "__?COUNT=-1" & for %%i in (%*) do ^
+set /A "__?COUNT+=1" & if !__?COUNT! GTR 2 set "__?ATTR=!__?ATTR!!__?VAR_EXPR!|" & set "__?VAR_EXPR=%%i"
+if not defined __?VAR_EXPR exit /b 1
 
-set "__?ATTR=%__?ATTR:"=%"
-set "__?VAR_EXPR=%__?VAR_EXPR:"=%"
-set "__?VAR_EXPR=%__?VAR_EXPR:::=:.:%"
-if "%__?VAR_EXPR:~0,1%" == ":" set "__?VAR_EXPR=.%__?VAR_EXPR%"
+set "__?ATTR=!__?ATTR:"=!"
+set "__?VAR_EXPR=!__?VAR_EXPR:"=!"
+set "__?VAR_EXPR=!__?VAR_EXPR:::=:.:!"
+if "!__?VAR_EXPR:~0,1!" == ":" set "__?VAR_EXPR=.!__?VAR_EXPR!"
 
-for /F "eol= tokens=1,2,* delims=:" %%i in ("%__?VAR_EXPR%") do call :PARSE_EXPR "%%~i" "%%~j" "%%~k" "%%~1" "%%~2" "%%~3"
+for /F "eol= tokens=1,2,* delims=:" %%i in ("!__?VAR_EXPR!") do for /F "eol= tokens=* delims=" %%l in ("!__?ATTR!") do endlocal & ^
+call :PARSE_EXPR "%%~i" "%%~j" "%%~k" "%%~1" "%%~2" "%%~3" "%%l"
 exit /b 0
 
-:PARSE_EXPR VAR PARAM0 PARAM1 "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%"
+:PARSE_EXPR VAR PARAM0 PARAM1 "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" "[ATTRS]"
 if "%~1" == "." exit /b 1
+setlocal ENABLEDELAYEDEXPANSION & if not defined __?VALUE goto PARSE_VAR
+
+if not "!__?VALUE:~1,-1!" == "" (
+  if "!__?VALUE:~0,1!!__?VALUE:~-1!" == """" set "__?VALUE=!__?VALUE:~1,-1!"
+) else if "!__?VALUE!" == """" set "__?VALUE="
 if not defined __?VALUE goto PARSE_VAR
+if %~4 NEQ 0 goto PARSE_VAR
 
-setlocal ENABLEDELAYEDEXPANSION & if not "!__?VALUE:~1,-1!" == "" (
-  for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:~1,-1!") do endlocal & if ^"/ == ^%__?VALUE:~0,1%/ if ^"/ == ^%__?VALUE:~-1%/ set "__?VALUE=%%i"
-) else if "!__?VALUE!" == """" ( endlocal & set "__?VALUE=" ) else endlocal
-if not defined __?VALUE goto PARSE_VAR 
-
-rem replace a value quote characters by the \x01 character
-set "__?VALUE=%__?VALUE:"=%"
-
-rem recode quote and exclamation characters
-set "__?VALUE=%__?VALUE:!=!__?EXCL__!%"
-set "__?VALUE=%__?VALUE:^=!__?ESC__!%"
-set "__?VALUE=%__?VALUE:=!__?QUOT__!%"
-
-if %~4 EQU 0 call set "__?VALUE=%__?VALUE%"
+rem encode `"` character to avoid `^` character partial duplication
+set "__?VALUE=!__?VALUE:"=!"
+call set "__?VALUE=!__?VALUE!" & if defined __?VALUE set "__?VALUE=!__?VALUE:^^=^!"
 
 :PARSE_VAR
 set "__?P0=" & set "__?P1=" & ( if not "%~2" == "" if not "%~2" == "." set "__?P0=%~2" ) & ( if not "%~3" == "" if not "%~3" == "." set "__?P1=%~3" )
@@ -235,10 +236,87 @@ if defined __?P0 if not "%~5" == "" ( if not "%__?P0%" == "%~5" exit /b 1 ) else
 if defined __?P1 if not "%~6" == "" ( if not "%__?P1%" == "%~6" exit /b 1 ) else exit /b 1
 
 :PARSE_VALUE
-if not "%__?ATTR:|once|=%" == "%__?ATTR%" if defined %~1 exit /b 0
-if not defined __?VALUE set "%~1=" & exit /b 0
-set "__?UPATH=0" & if defined __?ATTR if not "%__?ATTR:|upath|=%" == "%__?ATTR%" set __?UPATH=1
+set "__?ATTR=%~7"
+if not "!__?ATTR:|once|=!" == "!__?ATTR!" if defined %~1 exit /b 0
+if not defined __?VALUE endlocal & set "%~1=" & exit /b 0
 
 rem safe set
-setlocal ENABLEDELAYEDEXPANSION & if %__?UPATH% NEQ 0 ( for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:\=/!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do endlocal & endlocal & set "%~1=%%j" ) else ^
-for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do endlocal & endlocal & set "%~1=%%j"
+if not "!__?ATTR:|upath|=!" == "!__?ATTR!" ( for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:\=/!") do endlocal & set "%__?VAR_PREFIX%%~1=.%%i" & set "%~1=%%i"
+) else for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do endlocal & set "%__?VAR_PREFIX%%~1=.%%i" & set "%~1=%%i"
+exit /b 0
+
+rem Another implementation, ~30% slower
+
+rem for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_NAME_DIR%/%__?CONFIG_FILE_NAME%") do (
+rem   set "__?VAR_EXPR=%%i" & set "__?VAR=" & set "__?VALUE=%%j" & set "__?PARAM0=%__?PARAM0%" & set "__?PARAM1=%__?PARAM1%" & set "__?~dp0=%__?~dp0%"
+rem
+rem   if defined __?VAR_EXPR (
+rem     rem __?VAR_EXPR=[once] [export] [upath] VAR[:PARAM0[:PARAM1]]
+rem     setlocal ENABLEDELAYEDEXPANSION & set "__?VAR_EXPR=!__?VAR_EXPR:::=:.:!" & for /F "eol= tokens=1,2,* delims=:" %%i in ("!__?VAR_EXPR!") do endlocal & (
+rem       set "__?VAR_EXPR=%%i" & set "__?VAR_PARAM0=%%j" & set "__?VAR_PARAM1=%%k" & if "%%j" == "." set "__?VAR_PARAM0="
+rem     )
+rem
+rem     if defined __?VAR_EXPR (
+rem       setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=1,2,3,* delims= " %%i in ("!__?VAR_EXPR!") do endlocal & (
+rem         if "%%j" == "" ( set "__?VAR=%%i" & set "__?ATTR=." ) else if "%%k" == "" ( set "__?VAR=%%j" & set "__?ATTR=|%%i|"
+rem         ) else if "%%l" == "" ( set "__?VAR=%%k" & set "__?ATTR=|%%i|%%j|" ) else set "__?VAR=%%l" & set "__?ATTR=|%%i|%%j|%%k|"
+rem       )
+rem
+rem       setlocal ENABLEDELAYEDEXPANSION & if defined __?VALUE if not "!__?VALUE:~1,-1!" == "" (
+rem         if "!__?VALUE:~0,1!!__?VALUE:~-1!" == """" set "__?VALUE=!__?VALUE:~1,-1!"
+rem       ) else if "!__?VALUE!" == """" set "__?VALUE="
+rem
+rem       if defined __?VALUE (
+rem         if defined __?VAR_PARAM0 call "%%__?~dp0%%.load_config/load_config.trim_left.bat" __?VAR_PARAM0 ) & (
+rem           if defined __?VAR_PARAM0 call "%%__?~dp0%%.load_config/load_config.trim_right.bat" __?VAR_PARAM0 ) & (
+rem           if defined __?VAR_PARAM1 call "%%__?~dp0%%.load_config/load_config.trim_left.bat" __?VAR_PARAM1 ) & (
+rem           if defined __?VAR_PARAM1 call "%%__?~dp0%%.load_config/load_config.trim_right.bat" __?VAR_PARAM1 )
+rem       )
+rem
+rem       set "__?P0=" & set "__?P1=" & ( if defined __?VAR_PARAM0 set "__?P0=!__?VAR_PARAM0!" ) & ( if defined __?VAR_PARAM1 set "__?P1=!__?VAR_PARAM1!" )
+rem       if "!__?P0!" == "SH" ( set "__?CONTINUE=1" ) else if "!__?P0!" == "OSUNIX" ( set "__?CONTINUE=1" ) else set "__?CONTINUE=0"
+rem       if !__?CONTINUE! EQU 0 (
+rem         if not "!__?P0!" == "BAT" if not "!__?P0!" == "OSWIN" (
+rem           if defined __?P0 if defined __?PARAM0 ( if not "!__?P0!" == "!__?PARAM0!" set "__?CONTINUE=1" ) else set "__?CONTINUE=1"
+rem         )
+rem         if !__?CONTINUE! EQU 0 (
+rem           if defined __?P1 if defined __?PARAM1 ( if not "!__?P1!" == "!__?PARAM1!" set "__?CONTINUE=1" ) else set "__?CONTINUE=1"
+rem         )
+rem         if !__?CONTINUE! EQU 0 (
+rem           call "%%__?~dp0%%.load_config/load_config.trim_left.bat" __?VAR & if defined __?VAR call "%%__?~dp0%%.load_config/load_config.trim_right.bat" __?VAR
+rem
+rem           if not "!__?ATTR:|once|=!" == "!__?ATTR!" if defined !__?VAR! set "__?CONTINUE=1"
+rem
+rem           if !__?CONTINUE! EQU 0 if defined __?VALUE if !__?FLAG_NO_EXPAND! EQU 0 (
+rem             rem recode characters
+rem             set "__?VALUE=!__?VALUE:$=$24!" & set "__?VALUE=!__?VALUE:"=$22!"
+rem             setlocal DISABLEDELAYEDEXPANSION & call set "__?VALUE=%%__?VALUE:!=$21%%"
+rem             for /F "eol= tokens=* delims=" %%j in ("!__?VALUE:^=$5E!") do endlocal & set "__?VALUE=%%j"
+rem             call set "__?VALUE=!__?VALUE!"
+rem             if defined __?VALUE (
+rem               setlocal DISABLEDELAYEDEXPANSION & call set "__?VALUE=%%__?VALUE:!=$21%%"
+rem               for /F "eol= tokens=* delims=" %%j in ("!__?VALUE:$5E=^!") do endlocal & set "__?VALUE=%%j"
+rem               set "__?VALUE=!__?VALUE:$22="!"
+rem               set "__?VALUE=!__?VALUE:$24=$!"
+rem             )
+rem           )
+rem         )
+rem       )
+rem
+rem       if !__?CONTINUE! EQU 0 (
+rem         if defined __?VAR (
+rem           for /F "eol= tokens=* delims=" %%j in ("!__?VAR!") do if defined __?VALUE (
+rem             if not "!__?ATTR:|upath|=!" == "!__?ATTR!" (
+rem               for /F "eol= tokens=* delims=" %%k in ("!__?VALUE:\=/!") do endlocal & endlocal & set "%%j=%%k"
+rem             ) else for /F "eol= tokens=* delims=" %%k in ("!__?VALUE!") do endlocal & endlocal & set "%%j=%%k"
+rem           ) else endlocal & endlocal & set "%%j="
+rem         ) else endlocal & endlocal
+rem       ) else endlocal & endlocal
+rem
+rem       setlocal DISABLEDELAYEDEXPANSION
+rem     )
+rem   )
+rem )
+rem
+rem exit /b 0
+rem

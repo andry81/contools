@@ -1,3 +1,12 @@
+2024.04.14:
+* fixed: Scripts/Tools/build/load_config.bat: variables expansion
+* fixed: Scripts/Tests/manual/betscripts/*.bat: tests run in case of broken `load_config.bat` script
+* fixed: Scripts/Tests/unit/betscripts/test_build__load_config.bat: tests pass for variable expansion with `!` and `^` characters mixed with `"` characters
+* new: Scripts/Tests/manual/betscripts/test_build__load_config_01.bat: `load_config.bat` script manual test
+* new: Scripts/Tests/unit/betscripts/test_build__load_config.bat: more test cases for variable expansion with `!`, `^` and `"` characters
+* changed: Scripts/Tests/manual/betscripts/*.bat: must function without `__init__.bat` call now
+* changed: Scripts/Tools/build/load_config.bat: reimplemented and optimized
+
 2024.04.12:
 * fixed: Scripts: `@dir %...%` incorrect expansion in the `for /F ... (`...`) do ...` expression
 

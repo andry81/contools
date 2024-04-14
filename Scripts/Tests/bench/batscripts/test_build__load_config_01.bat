@@ -7,7 +7,7 @@ call "%%~dp0__init__/__init__.bat" || exit /b
 setlocal
 
 set "BEGIN_TIME=%TIME%"
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config.bat" "%%TEST_DATA_BASE_DIR%%/test_build__load_config" . test_01.vars || (
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config.bat" "%%TEST_DATA_BASE_DIR%%/test_build__load_config" . test_01.vars "" OS64 || (
   echo.%~nx0: error: failed to execute `load_config.bat`
   exit /b 255
 ) >&2
