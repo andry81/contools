@@ -4,8 +4,9 @@ rem USAGE:
 rem   trim_var.bat <Var> [<OutVar>]
 
 rem CAUTION:
-rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
-rem   the `!` character will be expanded.
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
 rem
 
 rem drop the output variable value
@@ -24,12 +25,15 @@ for /F "eol= tokens=* delims=" %%i in ("!RETURN_VALUE!") do endlocal & set "RET
 
 set "RETURN_VALUE=%RETURN_VALUE:!=$21%"
 
-call "%%~dp0.trim_var/trim_var.trim_value_left.bat" || exit /b
+setlocal ENABLEDELAYEDEXPANSION & call "%%~dp0.trim_var/trim_var.trim_value_left.bat" & ^
 if not defined RETURN_VALUE endlocal & ( if "%~2" == "" ( set "%~1=" ) else set "%~2=" ) & exit /b 0
-call "%%~dp0.trim_var/trim_var.trim_value_right.bat" || exit /b
+call "%%~dp0.trim_var/trim_var.trim_value_right.bat" & ^
 if not defined RETURN_VALUE endlocal & ( if "%~2" == "" ( set "%~1=" ) else set "%~2=" ) & exit /b 0
 
+for /F "eol= tokens=* delims=" %%i in ("!RETURN_VALUE!") do endlocal & set "RETURN_VALUE=%%i"
+
 rem decode characters
+
 set "RETURN_VALUE=%RETURN_VALUE:$21=!%"
 
 setlocal ENABLEDELAYEDEXPANSION & set "RETURN_VALUE=!RETURN_VALUE:$22="!"

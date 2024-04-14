@@ -1,8 +1,3 @@
 @echo off
-
-setlocal ENABLEDELAYEDEXPANSION
 :TRIM_RIGHT_LOOP
-( if not defined RETURN_VALUE goto EXIT ) & ( if not "!RETURN_VALUE:~-1!" == " " if not "!RETURN_VALUE:~-1!" == "	" goto EXIT ) & set "RETURN_VALUE=%RETURN_VALUE:~0,-1%" & goto TRIM_RIGHT_LOOP
-
-:EXIT
-if defined RETURN_VALUE ( for /F "eol= tokens=* delims=" %%i in ("!RETURN_VALUE!") do endlocal & set "RETURN_VALUE=%%i" ) else endlocal & set "RETURN_VALUE="
+( if not defined RETURN_VALUE exit /b 0 ) & ( if not "!RETURN_VALUE:~-1!" == " " if not "!RETURN_VALUE:~-1!" == "	" exit /b 0 ) & set "RETURN_VALUE=!RETURN_VALUE:~0,-1!" & goto TRIM_RIGHT_LOOP

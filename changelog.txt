@@ -1,4 +1,7 @@
 2024.04.14:
+* changed: Scripts/Tools/std/trim_var.bat: minor improvement
+
+2024.04.14:
 * fixed: Scripts/Tools/build/load_config.bat: variables expansion
 * fixed: Scripts/Tests/manual/betscripts/*.bat: tests run in case of broken `load_config.bat` script
 * fixed: Scripts/Tests/unit/betscripts/test_build__load_config.bat: tests pass for variable expansion with `!` and `^` characters mixed with `"` characters
