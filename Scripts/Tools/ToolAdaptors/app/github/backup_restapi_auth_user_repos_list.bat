@@ -4,7 +4,7 @@ rem USAGE:
 rem   backup_restapi_auth_user_repos_list.bat [<Flags>] <TYPE>
 
 rem Description:
-rem   Script to request restapi responce of repository list from user accounts
+rem   Script to request restapi response of repository list from user accounts
 rem   in the authenticated user accounts file.
 
 rem <Flags>:

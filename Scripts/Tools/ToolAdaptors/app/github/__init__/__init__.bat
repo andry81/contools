@@ -25,6 +25,8 @@ call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" -if_not_exist "%%GITHUB_ADAPT
 
 call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" -if_not_exist "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" repos-to-delete.lst.in  repos-to-delete.lst || exit /b
 
+call "%%CONTOOLS_ROOT%%/std/xcopy_file_rename.bat" -if_not_exist "%%GITHUB_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" workflows.lst.in        workflows.lst || exit /b
+
 call "%%CONTOOLS_ROOT%%/std/if_var_defined_and_file_exist.bat" CURL_EXECUTABLE || (
   echo.%~nx0: error: CURL_EXECUTABLE file path is not found: "%EMULE_EXECUTABLE%"
   exit /b 255
@@ -36,7 +38,9 @@ call "%%CONTOOLS_ROOT%%/std/if_var_defined_and_file_exist.bat" JQ_EXECUTABLE || 
 ) >&2
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" GH_ADAPTOR_BACKUP_DIR   "%%GH_ADAPTOR_BACKUP_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" GH_ADAPTOR_WORKFLOW_DIR "%%GH_ADAPTOR_WORKFLOW_DIR%%"
 
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%GH_ADAPTOR_BACKUP_DIR%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%GH_ADAPTOR_WORKFLOW_DIR%%" || exit /b
 
 exit /b 0

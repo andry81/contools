@@ -4,7 +4,7 @@ rem USAGE:
 rem   backup_restapi_starred_repos_list.bat [<Flags>] <OWNER>
 
 rem Description:
-rem   Script to request restapi responce of starred repository list for a user.
+rem   Script to request restapi response of starred repository list for a user.
 
 rem <Flags>:
 rem   --

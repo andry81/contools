@@ -1,4 +1,8 @@
 2024.04.14:
+* new: Scripts/Tools/ToolAdaptors/app/github/enable_restapi_*.bat: GitHub restapi workflow enabler scripts
+* changed: Scripts/Tools/ToolAdaptors/app/github: code cleanup
+
+2024.04.14:
 * fixed: Scripts/Tools/build/add_files_to_archive.bat: execution fixup
 
 2024.04.14:

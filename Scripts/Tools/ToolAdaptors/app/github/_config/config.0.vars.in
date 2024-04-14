@@ -30,11 +30,12 @@ once CURL_EXECUTABLE                            ="c:\cygwin\bin\curl.exe"
 once JQ_EXECUTABLE                              ="c:\cygwin\bin\jq.exe"
 
 once GH_ADAPTOR_BACKUP_DIR                      ="%PROJECT_OUTPUT_ROOT%/github/backup"
+once GH_ADAPTOR_WORKFLOW_DIR                    ="%PROJECT_OUTPUT_ROOT%/github/workflow"
 
 # 100 is a maximum
 once GH_RESTAPI_PARAM_PER_PAGE                  =100
 
-once CURL_BARE_FLAGS                            =-H "Accept: application/vnd.github.v3+json"
+once CURL_BARE_FLAGS                            =-H "Accept: application/vnd.github+json"
 
 # timeout between restapi backups
 once GH_RESTAPI_BACKUP_USE_TIMEOUT_MS           =5000
@@ -44,5 +45,8 @@ once GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS        =5000
 
 # timeout between checkouted repo backups
 once GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS  =%GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS%
+
+# timeout between restapi workflow enable
+once GH_RESTAPI_WORKFLOW_ENABLE_USE_TIMEOUT_MS  =5000
 
 once CHCP                                       =65001

@@ -4,15 +4,15 @@ rem USAGE:
 rem   backup_restapi_user_repos_list.bat [<Flags>] <OWNER> <TYPE>
 
 rem Description:
-rem   Script to request restapi responce of repository list from a user
+rem   Script to request restapi response of repository list from a user
 rem   account.
 
 rem <Flags>:
 rem   --
 rem     Stop flags parse.
 
-rem <ORG>:
-rem   User organization name.
+rem <OWNER>:
+rem   Owner name of a repository.
 rem <TYPE>:
 rem   Type of user repository request:
 rem   - owner

@@ -4,7 +4,7 @@ rem USAGE:
 rem   backup_restapi_all_user_repos_list.bat [<Flags>]
 
 rem Description:
-rem   Script to request all restapi responces from all user accounts in
+rem   Script to request all restapi responses from all user accounts in
 rem   the user accounts file.
 
 rem <Flags>:

@@ -1,11 +1,10 @@
 @echo off
 
 rem USAGE:
-rem   backup_restapi_repo_stargazers_list.bat [<Flags>] <OWNER> <REPO>
+rem   enable_restapi_user_repo_workflow.bat [<Flags>] <OWNER> <REPO> <WORKFLOW_ID>
 
 rem Description:
-rem   Script to request restapi response of stargazers list from a user
-rem   repository.
+rem   Script to enable a user repository workflow using restapi request.
 
 rem <Flags>:
 rem   --
@@ -15,6 +14,12 @@ rem <OWNER>:
 rem   Owner name of a repository.
 rem <REPO>:
 rem   Repository name.
+rem <WORKFLOW_ID>:
+rem   The ID of the workflow. You can also pass the workflow file name as a
+rem   string.
+
+rem GitHub Workflow documentation:
+rem   https://docs.github.com/en/rest/actions/workflows
 
 setlocal
 
@@ -34,8 +39,8 @@ call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
 set LAST_ERROR=%ERRORLEVEL%
 
 if %NEST_LVL% EQU 0 if %LAST_ERROR% EQU 0 (
-  rem copy log into backup directory
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_dir.bat" "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  rem copy log into workflow directory
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_dir.bat" "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_WORKFLOW_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
 )
 
 pause
@@ -97,6 +102,7 @@ if defined FLAG (
 
 set "OWNER=%~1"
 set "REPO=%~2"
+set "WORKFLOW_ID=%~3"
 
 if not defined OWNER (
   echo.%?~nx0%: error: OWNER is not defined.
@@ -108,30 +114,35 @@ if not defined REPO (
   exit /b 255
 ) >&2
 
+if not defined WORKFLOW_ID (
+  echo.%?~nx0%: error: WORKFLOW_ID is not defined.
+  exit /b 255
+) >&2
+
+set CURL_BARE_FLAGS=-X PUT %CURL_BARE_FLAGS%
+
 set "QUERY_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\query.txt"
 
-set "GH_ADAPTOR_BACKUP_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\backup\restapi"
+set "GH_ADAPTOR_WORKFLOW_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\workflow\restapi"
 
-set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/stargazers/%OWNER%/%REPO%"
-set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/restapi/stargazers/%OWNER%/%REPO%"
+set "GH_REPOS_WORKFLOW_TEMP_DIR=%GH_ADAPTOR_WORKFLOW_TEMP_DIR%/repo/%OWNER%/%REPO%/%WORKFLOW_ID%"
+set "GH_REPOS_WORKFLOW_DIR=%GH_ADAPTOR_WORKFLOW_DIR%/restapi/repo/%OWNER%/%REPO%/%WORKFLOW_ID%"
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%GH_REPOS_BACKUP_TEMP_DIR%%" >nul || exit /b 255
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%GH_REPOS_WORKFLOW_TEMP_DIR%%" >nul || exit /b 255
 
-if defined GH_RESTAPI_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_BACKUP_USE_TIMEOUT_MS%%"
+if defined GH_RESTAPI_WORKFLOW_ENABLE_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GH_RESTAPI_WORKFLOW_ENABLE_USE_TIMEOUT_MS%%"
 
-set PAGE=1
+call set "GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL_PATH=%%GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL:{{OWNER}}=%OWNER%%%"
+call set "GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL_PATH=%%GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL_PATH:{{REPO}}=%REPO%%%"
+call set "GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL_PATH=%%GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL_PATH:{{WORKFLOW_ID}}=%WORKFLOW_ID%%%"
 
-:PAGE_LOOP
-call set "GH_RESTAPI_REPO_STARGAZERS_URL_PATH=%%GH_RESTAPI_REPO_STARGAZERS_URL:{{OWNER}}=%OWNER%%%"
-call set "GH_RESTAPI_REPO_STARGAZERS_URL_PATH=%%GH_RESTAPI_REPO_STARGAZERS_URL_PATH:{{REPO}}=%REPO%%%"
+set "GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL_PATH=%GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL_PATH%"
 
-set "GH_RESTAPI_REPO_STARGAZERS_URL_PATH=%GH_RESTAPI_REPO_STARGAZERS_URL_PATH%?per_page=%GH_RESTAPI_PARAM_PER_PAGE%&page=%PAGE%"
-
-set "CURL_OUTPUT_FILE=%GH_REPOS_BACKUP_TEMP_DIR%/%GH_RESTAPI_REPO_STARGAZERS_FILE%"
+set "CURL_OUTPUT_FILE=%GH_REPOS_WORKFLOW_TEMP_DIR%/%GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_FILE%"
 
 call set "CURL_OUTPUT_FILE=%%CURL_OUTPUT_FILE:{{PAGE}}=%PAGE%%%"
 
-call :CURL "%%GH_RESTAPI_REPO_STARGAZERS_URL_PATH%%" || goto MAIN_EXIT
+call :CURL "%%GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL_PATH%%" || goto MAIN_EXIT
 echo.
 
 "%JQ_EXECUTABLE%" "length" "%CURL_OUTPUT_FILE%" 2>nul > "%QUERY_TEMP_FILE%"
@@ -142,24 +153,14 @@ for /F "usebackq eol= tokens=* delims=" %%i in ("%QUERY_TEMP_FILE%") do set QUE
 if not defined QUERY_LEN set QUERY_LEN=0
 if "%QUERY_LEN%" == "null" set QUERY_LEN=0
 
-rem just in case
-if %PAGE% GEQ 100 (
-  echo.%?~nx0%: error: too many pages, skip processing.
-  goto PAGE_LOOP_END
-) >&2
-
-if %QUERY_LEN% GEQ %GH_RESTAPI_PARAM_PER_PAGE% ( set /A "PAGE+=1" & goto PAGE_LOOP )
-
-:PAGE_LOOP_END
-
-if %PAGE% LSS 2 if %QUERY_LEN% EQU 0 (
+if %QUERY_LEN% EQU 0 (
   echo.%?~nx0%: warning: query response is empty.
   goto SKIP_ARCHIVE
 ) >&2
 
 echo.Archiving backup directory...
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%GH_REPOS_BACKUP_DIR%%" && ^
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_BACKUP_TEMP_DIR%%" "*" "%%GH_REPOS_BACKUP_DIR%%/stargazers--[%%OWNER%%][%%REPO%%]--%%PROJECT_LOG_FILE_NAME_DATE_TIME%%.7z" -sdel || exit /b 20
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%GH_REPOS_WORKFLOW_DIR%%" && ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%GH_ADAPTOR_WORKFLOW_TEMP_DIR%%" "*" "%%GH_REPOS_WORKFLOW_DIR%%/repo-enable-workflow--[%%OWNER%%][%%REPO%%][%%WORKFLOW_ID%%]--%%PROJECT_LOG_FILE_NAME_DATE_TIME%%.7z" -sdel || exit /b 20
 echo.
 
 :SKIP_ARCHIVE
@@ -181,8 +182,8 @@ echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% %*
 exit /b
 
 :CURL_WITH_USER
-echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
+echo.^>%CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_WORKFLOW_WRITE_PASS%" %*
 (
-  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_PASS%" %*
+  %CURL_EXECUTABLE% %CURL_BARE_FLAGS% --user "%GH_AUTH_USER%:%GH_AUTH_WORKFLOW_WRITE_PASS%" %*
 ) > "%CURL_OUTPUT_FILE%"
 exit /b

@@ -4,7 +4,7 @@ rem USAGE:
 rem   backup_restapi_org_repos_list.bat [<Flags>] <ORG> <TYPE>
 
 rem Description:
-rem   Script to request restapi responce of repository list from a user
+rem   Script to request restapi response of repository list from a user
 rem   organization account.
 
 rem <Flags>:

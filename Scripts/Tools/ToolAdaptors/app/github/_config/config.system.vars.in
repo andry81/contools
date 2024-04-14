@@ -57,3 +57,7 @@ GH_RESTAPI_REPO_RELEASES_FILE     =releases-{{PAGE}}.json
 
 # to delete repository
 GH_RESTAPI_DELETE_REPO_URL        =https://api.github.com/repos/{{OWNER}}/{{REPO}}
+
+# to request user repo workflow enable
+GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_URL  =https://api.github.com/repos/{{OWNER}}/{{REPO}}/actions/workflows/{{WORKFLOW_ID}}/enable
+GH_RESTAPI_USER_REPO_ENABLE_WORKFLOW_FILE =repo-enable-workflow-{{PAGE}}.json

@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2023.04.04
+* 2024.04.12
 * contools--github
 
 1. DESCRIPTION
@@ -9,12 +9,16 @@
 3.2. Edit generated config files
 3.3. Run restapi responce backup scripts
 3.4. Run repositories backup
+3.5. Run workflows enabler
 4. AUTHOR
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
 -------------------------------------------------------------------------------
-Github local backup scripts.
+Github local scripts to:
+* Backup rest API responces.
+* Backup bare or/and checkouted repositories.
+* Workflow enable.
 
 -------------------------------------------------------------------------------
 2. CATALOG CONTENT DESCRIPTION
@@ -31,6 +35,11 @@ Github local backup scripts.
      # Backup scripts.
 
 <root>
+ |
+ +- /`.log`
+ |    #
+ |    # Log files directory, where does store all log files from all scripts
+ |    # including all nested projects.
  |
  +- /`_out`
     | #
@@ -63,6 +72,10 @@ Github local backup scripts.
     |     +- `repos-forks.lst`
     |     |   #
     |     |   # User forked repositories list.
+    |     |
+    |     +- `workflows.lst`
+    |     |   #
+    |     |   # User workflows.
     |     |
     |     +- `config.0.vars`
     |     |   #
@@ -111,6 +124,7 @@ accounts-user.lst
 repos.lst
 repos-auth.lst
 repos-forks.lst
+workflows.lst
 config.0.vars
 config.1.vars
 
@@ -118,12 +132,12 @@ config.1.vars
 3.3. Run restapi responce backup scripts
 -------------------------------------------------------------------------------
 
-To backup only restapi respoces for user accounts:
+To backup only restapi responces for user accounts:
 
   >
   backup_restapi_all_user_repos_list.bat
 
-To backup only restapi respoces for user organization accounts:
+To backup only restapi responces for user organization accounts:
 
   >
   backup_restapi_all_org_repos_list.bat
@@ -146,17 +160,31 @@ To backup all restapi responces (all above):
 To backup only bare repositories:
 
   >
-  backup_bare_*.bat
+  backup_bare_*.bat ...
 
 To backup only recursively checkouted repositories:
 
   >
-  backup_checkouted_*.bat
+  backup_checkouted_*.bat ...
 
 To backup all repositories as bare plus with recursed checkout:
 
   >
-  backup_bared_checkout_all_repos.bat
+  backup_bared_checkout_all_repos.bat ...
+
+-------------------------------------------------------------------------------
+3.5. Run workflows enabler
+-------------------------------------------------------------------------------
+
+To enable a user repository workflow:
+
+  >
+  enable_restapi_user_repo_workflow.bat ...
+
+To enable workflows:
+
+  >
+  enable_restapi_workflows.bat ...
 
 -------------------------------------------------------------------------------
 4. AUTHOR

@@ -4,7 +4,7 @@ rem USAGE:
 rem   backup_restapi_all.bat [<Flags>]
 
 rem Description:
-rem   Script to request all restapi responces including request of private
+rem   Script to request all restapi responses including request of private
 rem   repositories with credentials.
 
 rem <Flags>:

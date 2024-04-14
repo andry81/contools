@@ -4,7 +4,7 @@ rem USAGE:
 rem   backup_restapi_repo_releases_list.bat [<Flags>] <OWNER> <REPO>
 
 rem Description:
-rem   Script to request restapi responce of releases list from a user
+rem   Script to request restapi response of releases list from a user
 rem   repository.
 
 rem <Flags>:

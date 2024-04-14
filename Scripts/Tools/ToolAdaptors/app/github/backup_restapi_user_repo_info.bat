@@ -4,7 +4,7 @@ rem USAGE:
 rem   backup_restapi_user_repo_info.bat [<Flags>] <OWNER> <REPO>
 
 rem Description:
-rem   Script to request restapi responce of repository information (including
+rem   Script to request restapi response of repository information (including
 rem   parent repository address) from a user repository.
 
 rem <Flags>:

@@ -4,7 +4,7 @@ rem USAGE:
 rem   backup_restapi_repo_forks_list.bat [<Flags>] <OWNER> <REPO>
 
 rem Description:
-rem   Script to request restapi responce of forked repository list from a user
+rem   Script to request restapi response of forked repository list from a user
 rem   repository.
 
 rem <Flags>:

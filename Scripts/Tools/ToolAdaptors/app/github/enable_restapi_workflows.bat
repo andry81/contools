@@ -1,17 +1,14 @@
 @echo off
 
 rem USAGE:
-rem   backup_restapi_all_org_repos_list.bat [<Flags>]
+rem   enable_restapi_workflows.bat [<Flags>]
 
 rem Description:
-rem   Script to request all restapi responses from all organization accounts in
-rem   the user organization accounts file.
+rem   Script to enable workflows using restapi request.
 
 rem <Flags>:
 rem   --
 rem     Stop flags parse.
-rem   -skip-auth-repo-list
-rem     Skip request to private repositories in the auth repo list file.
 rem   -exit-on-error
 rem     Don't continue on error.
 rem   -from-cmd
@@ -37,7 +34,7 @@ set LAST_ERROR=%ERRORLEVEL%
 
 if %NEST_LVL% EQU 0 if %LAST_ERROR% EQU 0 (
   rem copy log into backup directory
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_dir.bat" "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_dir.bat" "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_WORKFLOW_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
 )
 
 pause
@@ -79,7 +76,6 @@ exit /b
 
 :MAIN_IMPL
 rem script flags
-set FLAG_SKIP_AUTH_REPO_LIST=0
 set FLAG_EXIT_ON_ERROR=0
 set "FLAG_FROM_CMD_NAME="
 set "FLAG_FROM_CMD_PARAM0="
@@ -94,9 +90,7 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-skip-auth-repo-list" (
-    set FLAG_SKIP_AUTH_REPO_LIST=1
-  ) else if "%FLAG%" == "-exit-on-error" (
+  if "%FLAG%" == "-exit-on-error" (
     set FLAG_EXIT_ON_ERROR=1
   ) else if "%FLAG%" == "-from-cmd" (
     set "FLAG_FROM_CMD=%~2"
@@ -122,45 +116,25 @@ if defined FLAG (
 
 :FLAGS_LOOP_END
 
-if %FLAG_SKIP_AUTH_REPO_LIST% NEQ 0 goto SKIP_AUTH_REPO_LIST
-
-set HAS_AUTH_USER=0
-
-if defined GH_AUTH_USER if not "%GH_AUTH_USER%" == "{{USER}}" ^
-if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
-
 rem must be empty
 if defined FLAG_FROM_CMD (
   if not defined SKIPPING_CMD echo.Skipping commands:
   set SKIPPING_CMD=1
 )
 
-:SKIP_AUTH_REPO_LIST
+set WORKFLOW_LISTS="%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/workflows.lst"
 
-rem including private repos if authentication is declared
-for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-org.lst") do (
-  set "REPO_OWNER=%%i"
+for /F "usebackq eol=# tokens=1,* delims=:" %%i in (%WORKFLOW_LISTS%) do for /F "eol=# tokens=1,* delims=/" %%k in ("%%i") do (
+  set "REPO_OWNER=%%k"
+  set "REPO=%%l"
+  set "WORKFLOW_ID=%%j"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources
-
-  if not defined SKIPPING_CMD (
-    call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
-    echo.---
-  ) else call echo.* backup_restapi_org_repos_list.bat "%%REPO_OWNER%%" sources
-
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all
+  call "%%~dp0.impl/update_skip_state.bat" "enable_restapi_user_repo_workflow.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
   if not defined SKIPPING_CMD (
-    call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
+    call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%enable_restapi_user_repo_workflow.bat" "%%REPO_OWNER%%" "%%REPO%%" "%%WORKFLOW_ID%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
-  ) else call echo.* backup_restapi_org_repos_list.bat "%%REPO_OWNER%%" all
-
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%"
-
-  if not defined SKIPPING_CMD (
-    call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
-    echo.---
-  ) else call echo.* backup_restapi_starred_repos_list.bat "%%REPO_OWNER%%"
+  ) else call echo.* enable_restapi_user_repo_workflow.bat "%%REPO_OWNER%%" "%%REPO%%" "%%WORKFLOW_ID%%"
 )
 
 exit /b 0
