@@ -21,25 +21,9 @@ rem 1. call extract_files_from_archive.bat c:\path_for_unpack\app release\x86\ap
 
 setlocal
 
-if %IMPL_MODE%0 NEQ 0 goto IMPL
-
 if not defined PROJECT_LOG_ROOT set PROJECT_LOG_ROOT=.log
 
-call "%%~dp0__init__.bat" || exit /b
-
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
-
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
-
-call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
-set LAST_ERROR=%ERRORLEVEL%
-
-rem ...
-
-exit /b %LAST_ERROR%
-
-:IMPL
-rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
+call "%%~dp0../__init__/script_init.bat" %%0 %%* || exit /b
+if %IMPL_MODE%0 EQU 0 exit /b
 
 call "%%CONTOOLS_ROOT%%/std/callshift.bat" -3 "%%~dp0extract_files_from_archives.bat" %%3 %%2 %%1 %%*

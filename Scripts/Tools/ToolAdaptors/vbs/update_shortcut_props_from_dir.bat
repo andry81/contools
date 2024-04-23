@@ -78,25 +78,8 @@ rem
 
 setlocal
 
-if %IMPL_MODE%0 NEQ 0 goto IMPL
-
-call "%%~dp0__init__\__init__.bat" || exit /b
-
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
-
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
-
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
-
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_vars_file.bat" || exit /b
-
-call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -X /pause-on-exit -- %%* || exit /b
-
-exit /b 0
-
-:IMPL
-rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
+call "%%~dp0__init__/script_init.bat" %%0 %%* || exit /b
+if %IMPL_MODE%0 EQU 0 exit /b
 
 rem script flags
 set FLAG_SHIFT=0
@@ -179,9 +162,6 @@ if not defined FLAG_MATCH_STRING_VALUE (
   echo.%~nx0: error: MATCH_STRING must be defined.
   exit /b 255
 ) >&2
-
-rem load initialization environment variables
-if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat" "%%INIT_VARS_FILE%%"
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 

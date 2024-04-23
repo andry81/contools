@@ -15,40 +15,8 @@ rem   Owner name of a repository.
 
 setlocal
 
-if %IMPL_MODE%0 NEQ 0 goto IMPL
-
-call "%%~dp0__init__\__init__.bat" || exit /b
-
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
-
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT CONTOOLS_UTILITIES_BIN_ROOT || exit /b
-
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
-
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_vars_file.bat" || exit /b
-
-call "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%*
-set LAST_ERROR=%ERRORLEVEL%
-
-if %NEST_LVL% EQU 0 if %LAST_ERROR% EQU 0 (
-  rem copy log into backup directory
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_dir.bat" "%%PROJECT_LOG_DIR%%" "%%GH_ADAPTOR_BACKUP_DIR%%/restapi/.log/%%PROJECT_LOG_DIR_NAME%%" /E /Y /D
-)
-
-pause
-
-exit /b %LAST_ERROR%
-
-:IMPL
-rem CAUTION: We must to reinit the builtin variables in case if `IMPL_MODE` was already setup outside.
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
-
-set /A NEST_LVL+=1
-
-if %NEST_LVL% EQU 1 (
-  rem load initialization environment variables
-  if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat" "%%INIT_VARS_FILE%%"
-)
+call "%%~dp0__init__/script_init.bat" backup restapi %%0 %%* || exit /b
+if %IMPL_MODE%0 EQU 0 exit /b
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 

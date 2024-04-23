@@ -1,3 +1,6 @@
+2024.04.23:
+* changed: Scripts/Tools: moved initialization code duplication into `script_init.bat` scripts
+
 2024.04.14:
 * new: Scripts/Tools/ToolAdaptors/app/github/enable_restapi_*.bat: GitHub restapi workflow enabler scripts
 * changed: Scripts/Tools/ToolAdaptors/app/github: code cleanup
