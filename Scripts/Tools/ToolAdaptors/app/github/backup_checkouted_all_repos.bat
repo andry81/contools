@@ -111,7 +111,7 @@ for /F "usebackq eol=# tokens=1,* delims=/" %%i in (%REPO_LISTS%) do (
   set "REPO_OWNER=%%i"
   set "REPO=%%j"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_checkouted_repo.bat" "%%REPO_OWNER%%" "%%REPO%%"
+  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_checkouted_repo.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_checkouted_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255

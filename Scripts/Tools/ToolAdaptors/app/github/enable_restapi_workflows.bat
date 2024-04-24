@@ -97,7 +97,7 @@ for /F "usebackq eol=# tokens=1,* delims=:" %%i in (%WORKFLOW_LISTS%) do for /F 
   set "REPO=%%l"
   set "WORKFLOW_ID=%%j"
 
-  call "%%~dp0.impl/update_skip_state.bat" "enable_restapi_user_repo_workflow.bat" "%%REPO_OWNER%%" "%%REPO%%"
+  call "%%?~dp0%%.impl/update_skip_state.bat" "enable_restapi_user_repo_workflow.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%enable_restapi_user_repo_workflow.bat" "%%REPO_OWNER%%" "%%REPO%%" "%%WORKFLOW_ID%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255

@@ -127,14 +127,14 @@ if %HAS_AUTH_USER% EQU 0 goto SKIP_AUTH_USER
 
 rem including private repos
 
-call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_auth_user_repos_list.bat" owner
+call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_auth_user_repos_list.bat" owner
 
 if not defined SKIPPING_CMD (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_auth_user_repos_list.bat" owner || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
   echo.---
 ) else call echo.* backup_restapi_auth_user_repos_list.bat owner
 
-call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_auth_user_repos_list.bat" all
+call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_auth_user_repos_list.bat" all
 
 if not defined SKIPPING_CMD (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_auth_user_repos_list.bat" all || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
@@ -150,21 +150,21 @@ rem including private repos if authentication is declared
 for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-user.lst") do (
   set "REPO_OWNER=%%i"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" owner
+  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" owner
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" owner || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
   ) else call echo.* backup_restapi_user_repos_list.bat "%%REPO_OWNER%%" owner
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" all
+  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" all
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_user_repos_list.bat" "%%REPO_OWNER%%" all || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
   ) else call echo.* backup_restapi_user_repos_list.bat "%%REPO_OWNER%%" all
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%"
+  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%"
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
@@ -175,21 +175,21 @@ for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT
 for /F "usebackq eol=# tokens=* delims=" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%/accounts-org.lst") do (
   set "REPO_OWNER=%%i"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources
+  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" sources || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
   ) else call echo.* backup_restapi_org_repos_list.bat "%%REPO_OWNER%%" sources
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all
+  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_org_repos_list.bat" "%%REPO_OWNER%%" all || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
     echo.---
   ) else call echo.* backup_restapi_org_repos_list.bat "%%REPO_OWNER%%" all
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%"
+  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%"
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_starred_repos_list.bat" "%%REPO_OWNER%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
@@ -209,7 +209,7 @@ for /F "usebackq eol=# tokens=1,* delims=/" %%i in (%REPO_LISTS%) do (
   set "REPO_OWNER=%%i"
   set "REPO=%%j"
 
-  call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_user_repo_info.bat" "%%REPO_OWNER%%" "%%REPO%%"
+  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_user_repo_info.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_user_repo_info.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
@@ -217,28 +217,28 @@ for /F "usebackq eol=# tokens=1,* delims=/" %%i in (%REPO_LISTS%) do (
   ) else call echo.* backup_restapi_user_repo_info.bat "%%REPO_OWNER%%" "%%REPO%%"
 
   if %FLAG_QUERY_REPO_INFO_ONLY% EQU 0 (
-    call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_stargazers_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
+    call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_repo_stargazers_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
     if not defined SKIPPING_CMD (
       call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_repo_stargazers_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
       echo.---
     ) else call echo.* backup_restapi_repo_stargazers_list.bat "%%REPO_OWNER%%" "%%REPO%%"
 
-    call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_subscribers_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
+    call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_repo_subscribers_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
     if not defined SKIPPING_CMD (
       call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_repo_subscribers_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
       echo.---
     ) else call echo.* backup_restapi_repo_subscribers_list.bat "%%REPO_OWNER%%" "%%REPO%%"
 
-    call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_forks_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
+    call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_repo_forks_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
     if not defined SKIPPING_CMD (
       call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_repo_forks_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255
       echo.---
     ) else call echo.* backup_restapi_repo_forks_list.bat "%%REPO_OWNER%%" "%%REPO%%"
 
-    call "%%~dp0.impl/update_skip_state.bat" "backup_restapi_repo_releases_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
+    call "%%?~dp0%%.impl/update_skip_state.bat" "backup_restapi_repo_releases_list.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
     if not defined SKIPPING_CMD (
       call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_restapi_repo_releases_list.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255

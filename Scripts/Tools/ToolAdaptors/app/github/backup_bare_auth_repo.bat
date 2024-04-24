@@ -120,7 +120,7 @@ if %HAS_AUTH_USER% EQU 0 (
 
 if defined GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS%%"
 
-call :GIT clone -v --bare --mirror --recurse-submodules --progress "https://%%GH_AUTH_PASS%%@github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%/db" || goto MAIN_EXIT
+call :GIT clone --config core.longpaths=true -v --bare --mirror --recurse-submodules --progress "https://%%GH_AUTH_PASS%%@github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%/db" || goto MAIN_EXIT
 echo.
 
 if %FLAG_CHECKOUT% EQU 0 goto SKIP_CHECKOUT
@@ -129,7 +129,7 @@ pushd "%GH_REPOS_BACKUP_TEMP_DIR%/db" && (
   call :GIT config --bool core.bare false
   echo.
 
-  call :GIT clone -v --recurse-submodules --progress "%%GH_REPOS_BACKUP_TEMP_DIR%%/db" "%%GH_REPOS_BACKUP_TEMP_DIR%%/wc" || goto MAIN_EXIT
+  call :GIT clone --config core.longpaths=true -v --recurse-submodules --progress "%%GH_REPOS_BACKUP_TEMP_DIR%%/db" "%%GH_REPOS_BACKUP_TEMP_DIR%%/wc" || goto MAIN_EXIT
   echo.
 
   popd
