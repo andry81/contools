@@ -1,3 +1,6 @@
+2024.04.24:
+* changed: Scripts/Tools/std/xcopy_file_rename.bat: avoid excessive prints without an operation from the script
+
 2024.04.23:
 * changed: Scripts/Tools: moved initialization code duplication into `script_init.bat` scripts
 

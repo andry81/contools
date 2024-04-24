@@ -45,8 +45,6 @@ rem   From file name.
 rem <to-file>:
 rem   To file name.
 
-echo.^>%~nx0 %*
-
 setlocal
 
 set "?~dp0=%~dp0"
@@ -217,6 +215,8 @@ if not exist "\\?\%TO_DIR%\*" (
 ) >&2
 
 if %FLAG_IF_NOT_EXIST% NEQ 0 if exist "\\?\%TO_DIR%\%TO_FILE%" exit /b 0
+
+echo.^>%~nx0 %*
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
