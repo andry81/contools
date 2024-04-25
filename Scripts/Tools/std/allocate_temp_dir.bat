@@ -68,7 +68,7 @@ set /A SCRIPT_TEMP_NEST_LVL+=1
 set "SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX=%SCRIPT_TEMP_TASK_COUNT%"
 if "%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX:~1,1%" == "" set "SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX=0%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%"
 
-set "SCRIPT_TEMP_CURRENT_DIR=%SCRIPT_TEMP_BASE_DIR%\%TEMP_PARENT_PATH_DIR%%TEMP_DIR_NAME_TOKEN%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%"
+set "SCRIPT_TEMP_CURRENT_DIR=%SCRIPT_TEMP_BASE_DIR%\%TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%.%TEMP_DIR_NAME_TOKEN%"
 
 set "SCRIPT_TEMP_TASK_COUNT_LIST=%SCRIPT_TEMP_TASK_COUNT%|%SCRIPT_TEMP_TASK_COUNT_LIST%"
 set /A SCRIPT_TEMP_TASK_COUNT+=1
@@ -94,8 +94,16 @@ rem   In case of nested call, the last diretory may be locked from the remove in
 rem   We must randomize the directory name and try to allocate again!
 rem
 (
-  echo.%?~%: warning: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%", attempting to allocate a randomized directory...
+  echo.%?~%: warning: could not allocate nested temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%", attempting to reallocate...
   echo.
+  rmdir /S /Q "%SCRIPT_TEMP_CURRENT_DIR%" 2>nul
+  (
+    set LAST_ERROR=0
+    mkdir "%SCRIPT_TEMP_CURRENT_DIR%" 2>nul && goto EXIT
+  ) || (
+    echo.%?~%: error: could not reallocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%", attempting to allocate unique directory...
+    echo.
+  )
 ) >&2
 
 set "SCRIPT_TEMP_CURRENT_DIR=%SCRIPT_TEMP_CURRENT_DIR%.%RANDOM%-%RANDOM%"

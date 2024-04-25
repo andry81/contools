@@ -1,4 +1,8 @@
 2024.04.25:
+* fixed: Scripts/Tools/std/allocate_temp_dir.bat: try to reallocate temporary directory before allocate a unique one
+* changed: Scripts/Tools/std/allocate_temp_dir.bat: minor improvement
+
+2024.04.25:
 * fixed: Scripts/Tools/ToolAdaptors/app/github: scripts execution fixup
 * changed: Scripts/Tools/ToolAdaptors/app/github: code cleanup
 * changed: Scripts/Tools/ToolAdaptors/app/github/README_EN.txt: readme update
