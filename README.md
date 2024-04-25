@@ -59,6 +59,7 @@ mingw.</p>
   <a href="https://github.com/andry81/contools/tree/HEAD/changelog.txt">Changelog</a>
 • <a href="https://github.com/andry81/contools/tree/HEAD/README_EN.txt">Readme</a>
 • <a href="#dependecies">Dependencies</a>
+• <a href="#related-projects">Related projects</a>
 • <a href="#copyright-and-license"><img src="https://github.com/andry81-cache/gh-content-static-cache/raw/master/common/badges/license/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
 </p>
 
@@ -74,7 +75,11 @@ mingw.</p>
 
 ## <a name="dependecies">Dependencies</a>
 
-* https://github.com/andry81/contools--3dparty--wxwidgets
+* https://github.com/andry81-3dparty/wxwidgets
+
+## <a name="related-projects">Related projects</a>
+
+https://github.com/andry81?tab=repositories&q=contools
 
 ## <a name="copyright-and-license">Copyright and License</a>
 

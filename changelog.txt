@@ -1,3 +1,6 @@
+2024.04.25:
+* changed: README_EN.txt, README.md: readmes update
+
 2024.04.24:
 * fixed: Scripts/Tools/ToolAdaptors/app/github/*.bat: scripts execution fixup
 * changed: ISSUES.txt: issues update

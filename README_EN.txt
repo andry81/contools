@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2024.03.12
+* 2024.04.25
 * contools
 
 1. DESCRIPTION
@@ -21,6 +21,12 @@ interpreters such as bash shell (.sh), visual basic (.vbs), jscript (.js),
 python (.py), perl (.pl) and so on. Plus some set of standalone console
 utilities and tools aside other utilities and tools from cygwin, msys and
 mingw.
+
+The rest is extracted into standalone repositories beginning by `contools--`.
+
+To search on the GitHub:
+
+  https://github.com/andry81?tab=repositories&q=contools
 
 -------------------------------------------------------------------------------
 2. LICENSE
