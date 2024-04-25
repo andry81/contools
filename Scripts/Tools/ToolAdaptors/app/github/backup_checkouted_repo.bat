@@ -25,6 +25,8 @@ setlocal
 call "%%~dp0__init__/script_init.bat" backup checkout %%0 %%* || exit /b
 if %IMPL_MODE%0 EQU 0 exit /b
 
+if defined GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS%%"
+
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 call :MAIN %%*
@@ -82,8 +84,6 @@ set "GH_REPOS_BACKUP_TEMP_DIR=%GH_ADAPTOR_BACKUP_TEMP_DIR%/repo/user/%OWNER%/%RE
 set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/checkout/repo/user/%OWNER%/%REPO%"
 
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%GH_REPOS_BACKUP_TEMP_DIR%%" >nul || exit /b 255
-
-if defined GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS%%"
 
 call :GIT clone --config core.longpaths=true -v --recurse-submodules --progress "https://github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%" || goto MAIN_EXIT
 echo.

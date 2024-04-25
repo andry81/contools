@@ -22,6 +22,8 @@ setlocal
 call "%%~dp0__init__/script_init.bat" backup checkout %%0 %%* || exit /b
 if %IMPL_MODE%0 EQU 0 exit /b
 
+if defined GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS%%"
+
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 call :MAIN %%*
@@ -89,8 +91,6 @@ if %HAS_AUTH_USER% EQU 0 (
   echo.%~nx0: error: GH_AUTH_USER or GH_AUTH_PASS is not defined.
   exit /b 255
 ) >&2
-
-if defined GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GIT_CHECKOUTED_REPO_BACKUP_USE_TIMEOUT_MS%%"
 
 call :GIT clone --config core.longpaths=true -v --recurse-submodules --progress "https://%%GH_AUTH_PASS%%@github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%" || goto MAIN_EXIT
 echo.

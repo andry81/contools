@@ -1,4 +1,8 @@
 2024.04.25:
+* fixed: Scripts/Tools/ToolAdaptors/app/github: backup_bare_auth_repo.bat, backup_bare_repo.bat: missed to call `popd` on `git clone` error
+* changed: Scripts/Tools/ToolAdaptors/app/github: moved `sleep.bat` call in every script closer to the beginning to leave less artifacts in the temporary directory on CTRL+C while waiting
+
+2024.04.25:
 * fixed: Scripts/Tools/std/allocate_temp_dir.bat: try to reallocate temporary directory before allocate a unique one
 * changed: Scripts/Tools/std/allocate_temp_dir.bat: minor improvement
 

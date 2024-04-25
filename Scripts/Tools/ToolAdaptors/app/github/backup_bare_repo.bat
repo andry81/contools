@@ -24,6 +24,8 @@ setlocal
 call "%%~dp0__init__/script_init.bat" backup bare %%0 %%* || exit /b
 if %IMPL_MODE%0 EQU 0 exit /b
 
+if defined GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS%%"
+
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 call :MAIN %%*
@@ -85,8 +87,6 @@ set "GH_REPOS_BACKUP_DIR=%GH_ADAPTOR_BACKUP_DIR%/bare/repo/user/%OWNER%/%REPO%"
 
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%GH_REPOS_BACKUP_TEMP_DIR%%" >nul || exit /b 255
 
-if defined GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS call "%%CONTOOLS_ROOT%%/std/sleep.bat" "%%GIT_BARE_REPO_BACKUP_USE_TIMEOUT_MS%%"
-
 call :GIT clone --config core.longpaths=true -v --bare --mirror --recurse-submodules --progress "https://github.com/%%OWNER%%/%%REPO%%" "%%GH_REPOS_BACKUP_TEMP_DIR%%/db" || goto MAIN_EXIT
 echo.
 
@@ -96,7 +96,7 @@ pushd "%GH_REPOS_BACKUP_TEMP_DIR%/db" && (
   call :GIT config --bool core.bare false
   echo.
 
-  call :GIT clone --config core.longpaths=true -v --recurse-submodules --progress "%%GH_REPOS_BACKUP_TEMP_DIR%%/db" "%%GH_REPOS_BACKUP_TEMP_DIR%%/wc" || goto MAIN_EXIT
+  call :GIT clone --config core.longpaths=true -v --recurse-submodules --progress "%%GH_REPOS_BACKUP_TEMP_DIR%%/db" "%%GH_REPOS_BACKUP_TEMP_DIR%%/wc" || ( popd & goto MAIN_EXIT )
   echo.
 
   popd
