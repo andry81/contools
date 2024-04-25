@@ -131,8 +131,6 @@ if defined FLAG (
   if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
-:FLAGS_LOOP_END
-
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 if defined FLAG_CHCP (

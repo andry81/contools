@@ -1,4 +1,7 @@
 2024.04.25:
+* changed: Scripts/Tools: flags parse code cleanup
+
+2024.04.25:
 * fixed: Scripts/Tools/std: allocate_temp_dir.bat, free_temp_dir.bat: locked temporary directory workaround through the directory name randomization
 * changed: ISSUES.txt: issues update
 

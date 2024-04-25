@@ -39,24 +39,17 @@ if defined FLAG (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %2
     shift
     set /A FLAG_SHIFT+=1
-  ) else if "%FLAG%" == "--" (
-    shift
-    set "FLAG="
-    set /A FLAG_SHIFT+=1
-    goto FLAGS_LOOP_END
-  ) else (
-    set "FLAG="
-    goto FLAGS_LOOP_END
-  )
+  ) else if not "%FLAG%" == "--" (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
 
   shift
   set /A FLAG_SHIFT+=1
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
-
-:FLAGS_LOOP_END
 
 set FLAG_NO_LOG=0
 

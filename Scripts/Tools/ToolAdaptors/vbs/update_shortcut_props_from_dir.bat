@@ -155,8 +155,6 @@ if defined FLAG (
   if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
-:FLAGS_LOOP_END
-
 if %FLAG_MATCH_STRING% NEQ 0 ^
 if not defined FLAG_MATCH_STRING_VALUE (
   echo.%~nx0: error: MATCH_STRING must be defined.

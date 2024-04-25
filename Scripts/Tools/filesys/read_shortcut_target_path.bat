@@ -50,11 +50,7 @@ if defined FLAG (
     set FLAG_USE_EXTENDED_PROPERTY=1
   ) else if "%FLAG%" == "-retry_extended_property" (
     set FLAG_RETRY_EXTENDED_PROPERTY=1
-  ) else if "%FLAG%" == "--" (
-    shift
-    set "FLAG="
-    goto FLAGS_LOOP_END
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -63,10 +59,8 @@ if defined FLAG (
   set /A FLAG_SHIFT+=1
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
-
-:FLAGS_LOOP_END
 
 set "TARGET_PATH_TEMP_STDOUT_FILE="
 set "TARGET_PATH_TEMP_STDERR_FILE="

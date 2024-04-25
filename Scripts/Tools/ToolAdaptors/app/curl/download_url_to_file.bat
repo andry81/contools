@@ -32,18 +32,16 @@ if defined FLAG (
   if "%FLAG%" == "-zeropad" (
     set "FLAG_ZERO_PAD=%~2"
     shift
-  ) else (
-    rem process only known flags
-    goto FLAGS_LOOP_END
-  )
+  ) else if not "%FLAG%" == "--" (
+    echo.%?~nx0%: error: invalid flag: %FLAG%
+    exit /b -255
+  ) >&2
 
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
-
-:FLAGS_LOOP_END
 
 rem Use {PAGENUM} as placeholder
 set "URL_TMPL=%~1"
