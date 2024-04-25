@@ -1,6 +1,11 @@
 @echo off
 
-if not defined SCRIPT_TEMP_NEST_LVL set SCRIPT_TEMP_NEST_LVL=0
+if not defined ?~nx0 (
+  set "?~=%~nx0"
+) else set "?~=%?~nx0%: %~nx0"
+
+rem cast to ingeter
+set /A SCRIPT_TEMP_NEST_LVL+=0
 
 if %SCRIPT_TEMP_NEST_LVL% EQU 0 goto NEST_LVL_0
 
@@ -31,6 +36,7 @@ for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_TASK_COUNT_LIST%") do (
 
 set /A SCRIPT_TEMP_NEST_LVL-=1
 
+:NEST_LVL_0
 rem remove \.\ occurences
 setlocal
 set "SCRIPT_TEMP_PARENT_PATH_DIR_DECORATED=\%SCRIPT_TEMP_PARENT_PATH_DIR%\"
@@ -53,7 +59,10 @@ rem echo =%SCRIPT_TEMP_BASE_DIR%=%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_N
 
 rem remove parent directory
 for /F "eol= tokens=1,* delims=\" %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_NAME_TOKEN%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%") do (
-  if exist "\\?\%SCRIPT_TEMP_BASE_DIR%\%%i\*" rmdir /S /Q "%SCRIPT_TEMP_BASE_DIR%\%%i"
+  if exist "\\?\%SCRIPT_TEMP_BASE_DIR%\%%i\*" rmdir /S /Q "%SCRIPT_TEMP_BASE_DIR%\%%i" || (
+    echo.%?~%: error: could not free temporary directory: "%SCRIPT_TEMP_BASE_DIR%\%%i".
+    echo.
+  ) >&2
 )
 
 :IGNORE_REMOVE_PARENT_PATH

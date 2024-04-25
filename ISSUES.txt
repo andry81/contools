@@ -71,9 +71,3 @@ Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat:
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat:
 
   * Fix infinite recursion because of builtin backup in `update_shortcut.vbs`.
-
-Scripts/Tools/std/allocate_temp_dir.bat:
-
-  * Fix case with previous created directory lock. We need to create a unique
-    directory each time a nested call happens when the directory is locked
-    between the script calls.

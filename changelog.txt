@@ -1,4 +1,8 @@
 2024.04.25:
+* fixed: Scripts/Tools/std: allocate_temp_dir.bat, free_temp_dir.bat: locked temporary directory workaround through the directory name randomization
+* changed: ISSUES.txt: issues update
+
+2024.04.25:
 * changed: README_EN.txt, README.md: readmes update
 
 2024.04.24:

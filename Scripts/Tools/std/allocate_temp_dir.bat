@@ -24,7 +24,8 @@ if defined TEMP_PARENT_PATH set "TEMP_PARENT_PATH_DIR=%TEMP_PARENT_PATH%\"
 set "TEMP_PARENT_PATH=%TEMP_PARENT_PATH:/=\%"
 set "TEMP_BASE_PATH=%TEMP_BASE_PATH:/=\%"
 
-if not defined SCRIPT_TEMP_NEST_LVL set SCRIPT_TEMP_NEST_LVL=0
+rem cast to integer
+set /A SCRIPT_TEMP_NEST_LVL+=0
 
 if %SCRIPT_TEMP_NEST_LVL% NEQ 0 if defined SCRIPT_TEMP_CURRENT_DIR if exist "\\?\%SCRIPT_TEMP_CURRENT_DIR%\*" goto ALLOC_NESTED_TEMP
 
@@ -75,14 +76,41 @@ set /A SCRIPT_TEMP_TASK_COUNT+=1
 :ALLOC_NESTED_TEMP_END
 rem echo --%SCRIPT_TEMP_BASE_DIR%--%TEMP_PARENT_PATH_DIR%%TEMP_DIR_NAME_TOKEN%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%--
 
+set "SCRIPT_TEMP_PREV_DIR_LIST=%SCRIPT_TEMP_CURRENT_DIR_LIST%"
+
 set "SCRIPT_TEMP_CURRENT_TASK_NAME_LIST=%SCRIPT_TEMP_CURRENT_TASK_NAME%|%SCRIPT_TEMP_CURRENT_TASK_NAME_LIST%"
 set "SCRIPT_TEMP_CURRENT_DIR_LIST=%SCRIPT_TEMP_CURRENT_DIR%|%SCRIPT_TEMP_CURRENT_DIR_LIST%"
 set "SCRIPT_TEMP_PARENT_PATH_DIR_LIST=%TEMP_PARENT_PATH_DIR%|%SCRIPT_TEMP_PARENT_PATH_DIR_LIST%"
 set "SCRIPT_TEMP_DIR_NAME_TOKEN_LIST=%TEMP_DIR_NAME_TOKEN%|%SCRIPT_TEMP_DIR_NAME_TOKEN_LIST%"
 
-mkdir "%SCRIPT_TEMP_CURRENT_DIR%" 2>nul
+set LAST_ERROR=0
+mkdir "%SCRIPT_TEMP_CURRENT_DIR%" 2>nul && goto EXIT
 set LAST_ERROR=%ERRORLEVEL%
 
+if %SCRIPT_TEMP_NEST_LVL% EQU 0 goto SKIP_REALLOCATE
+
+rem CAUTION:
+rem   In case of nested call, the last diretory may be locked from the remove in the previous `free_temp_dir.bat` call.
+rem   We must randomize the directory name and try to allocate again!
+rem
+(
+  echo.%?~%: warning: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%", attempting to allocate a randomized directory...
+  echo.
+) >&2
+
+set "SCRIPT_TEMP_CURRENT_DIR=%SCRIPT_TEMP_CURRENT_DIR%.%RANDOM%-%RANDOM%"
+set "SCRIPT_TEMP_CURRENT_DIR_LIST=%SCRIPT_TEMP_CURRENT_DIR%|%SCRIPT_TEMP_PREV_DIR_LIST%"
+
+mkdir "%SCRIPT_TEMP_CURRENT_DIR%" 2>nul && goto EXIT
+set LAST_ERROR=%ERRORLEVEL%
+
+:SKIP_REALLOCATE
+(
+  echo.%?~%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%".
+  echo.
+) >&2
+
+:EXIT
 rem return values
 (
   endlocal
@@ -104,11 +132,13 @@ rem return values
   set "SCRIPT_TEMP_TASK_COUNT_LIST=%SCRIPT_TEMP_TASK_COUNT_LIST%"
 
   if %LAST_ERROR% NEQ 0 (
-    echo.%?~%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%".
     rem just in case
-    if exist "\\?\%SCRIPT_TEMP_CURRENT_DIR%\*" rmdir /S /Q "%SCRIPT_TEMP_CURRENT_DIR%"
-    exit /b 255
-  ) >&2
+    if exist "\\?\%SCRIPT_TEMP_CURRENT_DIR%\*" rmdir /S /Q "%SCRIPT_TEMP_CURRENT_DIR%" || (
+      echo.%?~%: error: could not free temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%".
+      echo.
+      exit /b 255
+    ) >&2
+  )
 )
 
 exit /b 0
