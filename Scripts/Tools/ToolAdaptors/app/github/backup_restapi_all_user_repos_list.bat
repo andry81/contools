@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   backup_restapi_all_user_repos_list.bat [<Flags>]
+rem   backup_restapi_all_user_repos_list.bat [<Flags>] [--] [<cmd> [<param0> [<param1>]]]
 
 rem Description:
 rem   Script to request all restapi responses from all user accounts in
@@ -14,9 +14,10 @@ rem   -skip-auth-repo-list
 rem     Skip request to private repositories in the auth repo list file.
 rem   -exit-on-error
 rem     Don't continue on error.
-rem   -from-cmd
-rem     Continue from specific command with parameters.
-rem     Useful to continue after the last error after specific command.
+
+rem <cmd> [<param0> [<param1>]]
+rem   Continue from specific command with parameters.
+rem   Useful to continue after the last error after specific command.
 
 setlocal
 
@@ -49,9 +50,6 @@ exit /b
 rem script flags
 set FLAG_SKIP_AUTH_REPO_LIST=0
 set FLAG_EXIT_ON_ERROR=0
-set "FLAG_FROM_CMD_NAME="
-set "FLAG_FROM_CMD_PARAM0="
-set "FLAG_FROM_CMD_PARAM1="
 
 :FLAGS_LOOP
 
@@ -66,18 +64,7 @@ if defined FLAG (
     set FLAG_SKIP_AUTH_REPO_LIST=1
   ) else if "%FLAG%" == "-exit-on-error" (
     set FLAG_EXIT_ON_ERROR=1
-  ) else if "%FLAG%" == "-from-cmd" (
-    set "FLAG_FROM_CMD=%~2"
-    set "FLAG_FROM_CMD_PARAM0=%~3"
-    set "FLAG_FROM_CMD_PARAM1=%~4"
-    shift
-    shift
-    shift
-  ) else if "%FLAG%" == "--" (
-    shift
-    set "FLAG="
-    goto FLAGS_LOOP_END
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -85,10 +72,12 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
-:FLAGS_LOOP_END
+set "FROM_CMD=%~1"
+set "FROM_CMD_PARAM0=%~2"
+set "FROM_CMD_PARAM1=%~3"
 
 if %FLAG_SKIP_AUTH_REPO_LIST% NEQ 0 goto SKIP_AUTH_REPO_LIST
 
@@ -98,7 +87,7 @@ if defined GH_AUTH_USER if not "%GH_AUTH_USER%" == "{{USER}}" ^
 if defined GH_AUTH_PASS if not "%GH_AUTH_PASS%" == "{{PASS}}" set HAS_AUTH_USER=1
 
 rem must be empty
-if defined FLAG_FROM_CMD (
+if defined FROM_CMD (
   if not defined SKIPPING_CMD echo.Skipping commands:
   set SKIPPING_CMD=1
 )

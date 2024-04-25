@@ -1,4 +1,9 @@
 2024.04.25:
+* fixed: Scripts/Tools/ToolAdaptors/app/github: scripts execution fixup
+* changed: Scripts/Tools/ToolAdaptors/app/github: code cleanup
+* changed: Scripts/Tools/ToolAdaptors/app/github/README_EN.txt: readme update
+
+2024.04.25:
 * changed: Scripts/Tools: flags parse code cleanup
 
 2024.04.25:
@@ -9,7 +14,7 @@
 * changed: README_EN.txt, README.md: readmes update
 
 2024.04.24:
-* fixed: Scripts/Tools/ToolAdaptors/app/github/*.bat: scripts execution fixup
+* fixed: Scripts/Tools/ToolAdaptors/app/github: scripts execution fixup
 * changed: ISSUES.txt: issues update
 
 2024.04.24:

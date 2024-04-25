@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   backup_bare_auth_repo.bat [<Flags>] <OWNER> <REPO>
+rem   backup_bare_auth_repo.bat [<Flags>] [--] <OWNER> <REPO>
 
 rem Description:
 rem   Script to backup a private repository with credentials.
@@ -14,9 +14,6 @@ rem   -checkout
 rem     Additionally execute git checkout with recursion to backup submodules.
 rem   -exit-on-error
 rem     Don't continue on error.
-rem   -from-cmd
-rem     Continue from specific command with parameters.
-rem     Useful to continue after the last error after specific command.
 
 rem <OWNER>:
 rem   Owner name of a repository.
@@ -45,9 +42,6 @@ exit /b %LAST_ERROR%
 rem script flags
 set FLAG_CHECKOUT=0
 set FLAG_EXIT_ON_ERROR=0
-set "FLAG_FROM_CMD_NAME="
-set "FLAG_FROM_CMD_PARAM0="
-set "FLAG_FROM_CMD_PARAM1="
 
 :FLAGS_LOOP
 
@@ -62,18 +56,7 @@ if defined FLAG (
     set FLAG_CHECKOUT=1
   ) else if "%FLAG%" == "-exit-on-error" (
     set FLAG_EXIT_ON_ERROR=1
-  ) else if "%FLAG%" == "-from-cmd" (
-    set "FLAG_FROM_CMD=%~2"
-    set "FLAG_FROM_CMD_PARAM0=%~3"
-    set "FLAG_FROM_CMD_PARAM1=%~4"
-    shift
-    shift
-    shift
-  ) else if "%FLAG%" == "--" (
-    shift
-    set "FLAG="
-    goto FLAGS_LOOP_END
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -81,10 +64,8 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
-
-:FLAGS_LOOP_END
 
 set "OWNER=%~1"
 set "REPO=%~2"

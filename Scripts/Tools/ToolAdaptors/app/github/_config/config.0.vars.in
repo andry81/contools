@@ -30,7 +30,6 @@ once CURL_EXECUTABLE                            ="c:\cygwin\bin\curl.exe"
 once JQ_EXECUTABLE                              ="c:\cygwin\bin\jq.exe"
 
 once GH_ADAPTOR_BACKUP_DIR                      ="%PROJECT_OUTPUT_ROOT%/github/backup"
-once GH_ADAPTOR_DELETE_DIR                      ="%PROJECT_OUTPUT_ROOT%/github/delete"
 once GH_ADAPTOR_WORKFLOW_DIR                    ="%PROJECT_OUTPUT_ROOT%/github/workflow"
 
 # 100 is a maximum

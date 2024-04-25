@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   backup_checkouted_all_auth_repos.bat [<Flags>]
+rem   backup_checkouted_all_auth_repos.bat [<Flags>] [--] [<cmd> [<param0> [<param1>]]]
 
 rem Description:
 rem   Script to backup all private repositories with credentials.
@@ -13,9 +13,10 @@ rem   --
 rem     Stop flags parse.
 rem   -exit-on-error
 rem     Don't continue on error.
-rem   -from-cmd
-rem     Continue from specific command with parameters.
-rem     Useful to continue after the last error after specific command.
+
+rem <cmd> [<param0> [<param1>]]
+rem   Continue from specific command with parameters.
+rem   Useful to continue after the last error after specific command.
 
 setlocal
 
@@ -47,9 +48,6 @@ exit /b
 :MAIN_IMPL
 rem script flags
 set FLAG_EXIT_ON_ERROR=0
-set "FLAG_FROM_CMD_NAME="
-set "FLAG_FROM_CMD_PARAM0="
-set "FLAG_FROM_CMD_PARAM1="
 
 :FLAGS_LOOP
 
@@ -62,18 +60,7 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-exit-on-error" (
     set FLAG_EXIT_ON_ERROR=1
-  ) else if "%FLAG%" == "-from-cmd" (
-    set "FLAG_FROM_CMD=%~2"
-    set "FLAG_FROM_CMD_PARAM0=%~3"
-    set "FLAG_FROM_CMD_PARAM1=%~4"
-    shift
-    shift
-    shift
-  ) else if "%FLAG%" == "--" (
-    shift
-    set "FLAG="
-    goto FLAGS_LOOP_END
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -81,10 +68,12 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
-:FLAGS_LOOP_END
+set "FROM_CMD=%~1"
+set "FROM_CMD_PARAM0=%~2"
+set "FROM_CMD_PARAM1=%~3"
 
 set HAS_AUTH_USER=0
 
@@ -97,7 +86,7 @@ if %HAS_AUTH_USER% EQU 0 (
 ) >&2
 
 rem must be empty
-if defined FLAG_FROM_CMD (
+if defined FROM_CMD (
   if not defined SKIPPING_CMD echo.Skipping commands:
   set SKIPPING_CMD=1
 )
@@ -106,7 +95,7 @@ for /F "usebackq eol=# tokens=1,* delims=/" %%i in ("%GITHUB_ADAPTOR_PROJECT_OUT
   set "REPO_OWNER=%%i"
   set "REPO=%%j"
 
-  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_checkouted_repo.bat" "%%REPO_OWNER%%" "%%REPO%%"
+  call "%%?~dp0%%.impl/update_skip_state.bat" "backup_checkouted_auth_repo.bat" "%%REPO_OWNER%%" "%%REPO%%"
 
   if not defined SKIPPING_CMD (
     call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%?~dp0%%backup_checkouted_auth_repo.bat" "%%REPO_OWNER%%" "%%REPO%%" || if %FLAG_EXIT_ON_ERROR% NEQ 0 exit /b 255

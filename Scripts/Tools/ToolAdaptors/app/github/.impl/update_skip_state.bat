@@ -32,26 +32,26 @@ if defined HAD_SKIPPING_CMD if not defined SKIPPING_CMD (
 :MAIN
 set SKIPPING_CMD=1
 
-if not "%FLAG_FROM_CMD%" == "*" if not "%FLAG_FROM_CMD%" == "%CMD%" exit /b 255
+if not "%FROM_CMD%" == "*" if not "%FROM_CMD%" == "%CMD%" exit /b 255
 
 set "MATCH_PARAM0="
 set "MATCH_PARAM1="
 
-if defined FLAG_FROM_CMD_PARAM0 (
-  if "%FLAG_FROM_CMD_PARAM0%" == "*" (
+if defined FROM_CMD_PARAM0 (
+  if "%FROM_CMD_PARAM0%" == "*" (
     set MATCH_PARAM0=1
   ) else if defined PARAM0 (
-    if "%FLAG_FROM_CMD_PARAM0%" == "%PARAM0%" set MATCH_PARAM0=1
+    if "%FROM_CMD_PARAM0%" == "%PARAM0%" set MATCH_PARAM0=1
   )
 ) else if not defined PARAM0 set MATCH_PARAM0=1
 
 if not defined MATCH_PARAM0 exit /b 255
 
-if defined FLAG_FROM_CMD_PARAM1 (
-  if "%FLAG_FROM_CMD_PARAM1%" == "*" (
+if defined FROM_CMD_PARAM1 (
+  if "%FROM_CMD_PARAM1%" == "*" (
     set MATCH_PARAM1=1
   ) else if defined PARAM1 (
-    if "%FLAG_FROM_CMD_PARAM1%" == "%PARAM1%" set MATCH_PARAM1=1
+    if "%FROM_CMD_PARAM1%" == "%PARAM1%" set MATCH_PARAM1=1
   )
 ) else if not defined PARAM1 set MATCH_PARAM1=1
 
