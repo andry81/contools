@@ -4,7 +4,8 @@ if /i "%CONTOOLS_PROJECT_ROOT_INIT0_DIR%" == "%~dp0" exit /b 0
 
 set "CONTOOLS_PROJECT_ROOT_INIT0_DIR=%~dp0"
 
-if not defined NEST_LVL set NEST_LVL=0
+rem cast to integer
+set /A NEST_LVL+=0
 
 rem Do not make a file or a directory
 if defined NO_GEN set /A NO_GEN+=0

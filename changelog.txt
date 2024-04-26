@@ -1,3 +1,7 @@
+2024.04.26:
+* changed: Scripts/Tools/build/gen_config.bat: improved implementation, added `-if_notexist` flag to generate only if the output config does not exist
+* changed: __init__: minor improvement
+
 2024.04.25:
 * fixed: Scripts/Tools/ToolAdaptors/app/github: backup_bare_auth_repo.bat, backup_bare_repo.bat: missed to call `popd` on `git clone` error
 * changed: Scripts/Tools/ToolAdaptors/app/github: moved `sleep.bat` call in every script closer to the beginning to leave less artifacts in the temporary directory on CTRL+C while waiting

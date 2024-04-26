@@ -13,7 +13,7 @@ if [[ -z "$SOURCE_TACKLELIB_BASH_TACKLELIB_SH" || SOURCE_TACKLELIB_BASH_TACKLELI
   done
 fi
 
-[[ -n "$NEST_LVL" ]] || tkl_declare_global NEST_LVL 0
+tkl_cast_to_int NEST_LVL
 
 [[ -z "${NO_GEN+x}" ]] || tkl_cast_to_int NO_GEN
 [[ -z "${NO_LOG+x}" ]] || tkl_cast_to_int NO_LOG
