@@ -1,19 +1,13 @@
 2024.04.26:
+* changed: Scripts/Tools/ToolAdaptors/app/github: moved to `contools--github` project
+
+2024.04.26:
 * changed: Scripts/Tools/build/gen_config.bat: improved implementation, added `-if_notexist` flag to generate only if the output config does not exist
 * changed: __init__: minor improvement
 
 2024.04.25:
-* fixed: Scripts/Tools/ToolAdaptors/app/github: backup_bare_auth_repo.bat, backup_bare_repo.bat: missed to call `popd` on `git clone` error
-* changed: Scripts/Tools/ToolAdaptors/app/github: moved `sleep.bat` call in every script closer to the beginning to leave less artifacts in the temporary directory on CTRL+C while waiting
-
-2024.04.25:
 * fixed: Scripts/Tools/std/allocate_temp_dir.bat: try to reallocate temporary directory before allocate a unique one
 * changed: Scripts/Tools/std/allocate_temp_dir.bat: minor improvement
-
-2024.04.25:
-* fixed: Scripts/Tools/ToolAdaptors/app/github: scripts execution fixup
-* changed: Scripts/Tools/ToolAdaptors/app/github: code cleanup
-* changed: Scripts/Tools/ToolAdaptors/app/github/README_EN.txt: readme update
 
 2024.04.25:
 * changed: Scripts/Tools: flags parse code cleanup
@@ -26,7 +20,6 @@
 * changed: README_EN.txt, README.md: readmes update
 
 2024.04.24:
-* fixed: Scripts/Tools/ToolAdaptors/app/github: scripts execution fixup
 * changed: ISSUES.txt: issues update
 
 2024.04.24:
@@ -34,10 +27,6 @@
 
 2024.04.23:
 * changed: Scripts/Tools: moved initialization code duplication into `script_init.bat` scripts
-
-2024.04.14:
-* new: Scripts/Tools/ToolAdaptors/app/github/enable_restapi_*.bat: GitHub restapi workflow enabler scripts
-* changed: Scripts/Tools/ToolAdaptors/app/github: code cleanup
 
 2024.04.14:
 * fixed: Scripts/Tools/build/add_files_to_archive.bat: execution fixup
@@ -693,9 +682,6 @@
 * changed: Utilities/src/callf: use `/no-esc` as standalone flag and always use it in case of elevation/unelevation
 
 2023.08.04:
-* refactor: Scripts/Tools/ToolAdaptors/app/github: uniform flags parse
-
-2023.08.04:
 * changed: TODO.txt: todo update
 
 2023.08.02:
@@ -858,10 +844,6 @@
 
 2023.04.18:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: execution fixup
-* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: minor fixup
-
-2023.04.18:
-* new: Scripts/Tools/ToolAdaptors/app/github/delete_resetapi_user_repo*.bat: added scripts to delete a single repository or list of repositories
 
 2023.04.18:
 * new: Scripts/Tools/admin/Activation: added scripts for free Windows 8/8.1 activation using `msguides.com` site
@@ -877,9 +859,6 @@
 * fixed: Scripts/Tools/std/echo_*var.bat: unexisted variable returns code `255`, but empty one returns `1`
 
 2023.04.04:
-* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: missed to cleanup `init.vars` file on exit
-* fixed: Scripts/Tools/ToolAdaptors/app/github/print_*.bat: execution fixup
-* new: Scripts/Tools/ToolAdaptors/app/github/README_EN.txt: added readme file
 * changed: README_EN.txt: readme update
 
 2023.04.03:
@@ -887,13 +866,7 @@
 * changed: Scripts/Tools/std/echo_var.bat: reimplemented to a simplified version
 
 2023.03.21:
-* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: avoid log copy on error
-* fixed: Scripts/Tools/ToolAdaptors/app/github/print_*_repos_from_restapi_json.bat: redirect all side output into stderr
-* new: Scripts/Tools/ToolAdaptors/app/github/print_*_repos_from_restapi_json.bat: make alphabetic sort by default, added `-skip-sort` to skip alphabetic sort
 * new: Scripts/Tools/ToolAdaptors/vbs: update_shortcut_props_from_dir.bat: added `-reset-wd` flag as shorter version of `-reset-wd-from-target-path`
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all_user_repos_list.bat: added script to backup all repository lists from all user accounts
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all_org_repos_list.bat: added script to backup all repository lists from all user organization accounts
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all_exclude_repos_list.bat: added script to backup all except user and organization repository lists
 * changed: Scripts/Tools/ToolAdaptors: app/github/backup_*.bat, vbs/reset_shortcut_from_dir.bat: added usage description
 * changed: Utilities/bin/contools/TODO.txt: todo update
 
@@ -924,7 +897,6 @@
 * new: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline.vbs: script to run command line from `<ScriptName>.cmdline` file
 
 2023.02.13:
-* fixed: Scripts/Tools/ToolAdaptors/app/github/__init__/__init__.bat: missed output files generation
 * changed: README_EN.txt: changed primary and secondary repository source
 * changed: README.md: readme update
 
@@ -944,20 +916,7 @@
 * changed: Scripts: *.bat: don't suppress stderr on directory list command
 
 2023.02.01:
-* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: environment variables single initialization and single log cleanup between nested script calls
 * new: Scripts/Tools/build/init_project_log.bat: added `PROJECT_LOG_DIR_NAME`, `PROJECT_LOG_FILE_NAME` variables to address currently logging file and directory names
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_bare_*.bat: added bared checkout backup with submodules recursion through the `-checkout` flag
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_bared_checkout_*.bat: added script wrappers for bared checkout backup with submodules recursion
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: copy log directory into backup directory at exit
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_*_all*.bat: added `repos-forks.lst` as a standalone list for forked repositories and added `-skip-fork-lists` flag to skip this list
-* changed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: moved pause before a call instead of after
-
-2023.01.31:
-* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: cleanup log file from GitHub private tokens
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_checkouted_*.bat: added scripts for checkouted (not bare) backup with submodules recursion
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_all.bat: added `-skip-auth-repo-list`, `-skip-account-lists`, `-query-repo-info-only` flags
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_user_repo_info.bat: to query only repo information from repos list
-* changed: Scripts/Tools/ToolAdaptors/app/github/backup_*_all*.bat: changed default behaviour to skip all errors to continue query and added `-exit-on-error` flag to exit on first error
 
 2023.01.15:
 * changed: Utilities/bin/contools/TODO.txt: todo update
@@ -985,9 +944,6 @@
 
 2022.12.20:
 * changed: Utilities/bin/contools/TODO.txt: todo update
-
-2022.12.13:
-* changed: Scripts/Tools/ToolAdaptors/app/github/backup_bare_*.bat: missed `--mirror` parameter for a bare backup to backaup all references
 
 2022.11.06:
 * changed: Scripts/Tools/ToolAdaptors/app/emule/backup_part_met_files.bat: added `*.met.bak` files into backup together with `*.met` files
@@ -1067,18 +1023,12 @@
 2022.09.03:
 * fixed: Scripts/Tools/build/extract_files_from_archives_by_pttn.bat: missed change
 
-2022.08.31:
-* fixed: Scripts/Tools/ToolAdaptors/app/github: `-from-cmd` parameter usage fixup, now `*` is used as `all` or `any`
-
 2022.08.23:
 * new: Scripts/Tools: admin/WindowsServices, ToolAdaptors/vbs: added Window Master Control Panel feature
 
 2022.08.12:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: reset_shortcut_from_dir.bat: execution fixup in case of `)` characters in arguments
 * new: Scripts/Tools/ToolAdaptors/vbs: call.vbs, winshell_call.vbs: `-re*` options for early replace additionally to `-r*` options for late replace
-
-2022.08.10:
-* new: Scripts/Tools/ToolAdaptors/app/github: `-from-cmd` parameter to resume from specific command with parameters
 
 2022.08.06:
 * new: Scripts/Tools: mkdir_if_notexist_strict.bat: added scripts to check for a directory existence including disconnected directory links, return an error on a directory link disconnection state, return an error on a directory link drive unexistence/disconnection
@@ -1126,10 +1076,6 @@
 2022.06.19:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: execution fixup
 
-2022.05.21:
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_repo_stargazers_list.bat` repos stargazers list backup script
-* new: Scripts/Tools/ToolAdaptors/app/github/backup_bare_all_repos.bat: added stargazers list backup
-
 2022.05.20:
 * changed: README.md: readme update
 
@@ -1141,9 +1087,6 @@
 
 2022.05.07:
 * changed: README.md: readme cleanup
-
-2022.05.05:
-* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_user_repos_list.bat: execution fixup
 
 2022.05.04:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: added `-chcp` parameter to be able to explicitly change unicode or non unicode shortcut parameters
@@ -1158,26 +1101,11 @@
 * changed: Scripts/Tools/ToolAdaptors/app/qbittorrent: extracted database files backup from the config backup
 * refactor: Scripts/Tools/ToolAdaptors/app: amule, emula, qbittorrent: code refactor
 
-2022.04.21:
-* fixed: Scripts/Tools/ToolAdaptors/app/github: minor fixup
-* new: Scripts/Tools/ToolAdaptors/app/github: added `GH_RESTAPI_BACKUP_USE_TIMEOUT_MS` and `GH_BARE_REPO_BACKUP_USE_TIMEOUT_MS` for timeouts between calls
-* changed: Scripts/Tools/ToolAdaptors/app/github/backup_bare_all_repos.bat: removed backup repositories required authentication, left it for `backup_bare_all_auth_repos.bat` script
-
 2022.04.20:
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_bare_*.bat` scripts to back bare remote repositories
-* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_*.bat: minor fixup
-* refactor: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_*.bat: minor refactor
-
-2022.04.20:
-* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_restapi_auth_user_repos_list.bat: incorrect user name usage
-* fixed: Scripts/Tools/ToolAdaptors/app/github/backup_*.bat: avoid creation empty directories
 * changed: backup_restapi_all.bat: use logged used name if not empty to backup by an authenticated user url (`backup_restapi_auth_user_repos_list.bat`)
 
 2022.04.18:
 * changed: .github/badges, README.md: content moved into `andry81-cache/andry81--gh-content-cache` repository
-
-2022.04.18:
-* new: Scripts/Tools/ToolAdaptors/app/github: `print_*_repos_from_restapi_json.bat` print script to print `html_url` only parameter from restapi json file with repositories list
 
 2022.04.09:
 * new: Scripts/Tools/ToolAdaptors/app/emule: `backup_part_met_files.bat` script
@@ -1198,11 +1126,7 @@
 * changed: README.md: readme update
 
 2022.03.29:
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_all.bat` backup script to backup all restapi resources for all accounts and repositories
 * new: _config: `accounts-org.lst.in`, `accounts-user.lst.in`, `repos.lst.in` template list files to store organization/user accounts and repositories list
-
-2022.03.28:
-* changed: Scripts/Tools/ToolAdaptors/app/github: scripts initialization order change
 
 2022.03.22:
 * new: Utilities/bin/contools: binaries update
@@ -1238,20 +1162,6 @@
 2022.03.19:
 * new: Utilities/src/callf: `unelevate*` options opposite to `/elevate*` options to execute command line from unelevated original account
 * refactor: Utilities/src/callf: code refactor
-
-2022.03.17:
-* fixed: Scripts/Tools/ToolAdaptors/app/github: execution fixup
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_auth_user_repos_list.bat` authenticated user repos list backup script
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_repo_forks_list.bat` repos forks list backup script
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_repo_releases_list.bat` repos releases list backup script
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_repo_subscribers_list.bat` repos subscribers list backup script
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_starred_repos_list.bat` starred repos list backup script
-
-2022.03.17:
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_org_repos_list.bat` org repos list backup script
-
-2022.03.16:
-* new: Scripts/Tools/ToolAdaptors/app/github: `backup_restapi_user_repos_list.bat` user repos list backup script
 
 2022.03.16:
 * changed: Scripts/Tools/ToolAdaptors/app: cleanup
