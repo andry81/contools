@@ -2,10 +2,7 @@
 /_externals
 /Output
 /Projects
-Scripts/Tests/unit/hashlib/_out
-Scripts/Tests/unit/traplib/_out
 Scripts/Tools/admin/ProductKey/__pycache__
-/Temp
 Utilities/Projects/*.user
 Utilities/src/_gui/wxFileDialog/gen
 Utilities/src/callf/gen

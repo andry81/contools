@@ -1,10 +1,8 @@
 > **Warning** FOR GIT USERS: To clone including all dependecies you must use [fork](https://github.com/plusone-robotics/vcstool) (has the sparse checkout feature) of the [vcstool](https://github.com/dirk-thomas/vcstool) python module (currently the sparse checkout feature is not merged).
 
 <p align="center">A wide range of scripts for Windows interpreter (cmd.exe) and other
-interpreters such as bash shell (.sh), visual basic (.vbs), jscript (.js),
-python (.py), perl (.pl) and so on. Plus some set of standalone console
-utilities and tools aside other utilities and tools from cygwin, msys and
-mingw.</p>
+interpreters such as bash shell (.sh), visual basic (.vbs), python (.py) and so on.
+Plus some set of standalone console utilities and tools aside other utilities and tools from cygwin, msys and mingw.</p>
 
 <p align="center">
   <a href="https://www.codefactor.io/repository/github/andry81/contools">
@@ -83,4 +81,4 @@ https://github.com/andry81?tab=repositories&q=contools
 
 ## <a name="copyright-and-license">Copyright and License</a>
 
-Code and documentation copyright 2021 Andrey Dibrov. Code released under [MIT License](https://github.com/andry81/contools/tree/HEAD/license.txt)
+Code and documentation copyright 2017 Andrey Dibrov. Code released under [MIT License](https://github.com/andry81/contools/tree/HEAD/license.txt)
