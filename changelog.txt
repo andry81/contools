@@ -1,4 +1,7 @@
 2024.04.30:
+* changed: _config\config.system.vars.in: config update
+
+2024.04.30:
 * fixed: __init__/__init__.sh: execution fixup
 
 2024.04.29:
