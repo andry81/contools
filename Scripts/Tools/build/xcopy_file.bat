@@ -15,7 +15,6 @@ call "%%~dp0__init__.bat" || exit /b
 
 if "%~3" == "" (
   echo.%~nx0%: error: target directory is not defined.
-  echo.
   exit /b 255
 ) >&2
 
@@ -28,6 +27,6 @@ call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat"%%XCOPY_FILE_CMD_BARE_FLAGS%% %%*
 set LAST_ERROR=%ERRORLEVEL%
 
 :EXIT
-echo.
+if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
 
 exit /b %LAST_ERROR%

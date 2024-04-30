@@ -26,7 +26,6 @@ set "DIR_PATH=%~1"
 
 if not defined DIR_PATH (
   echo.%?~%: error: directory path is not defined.
-  echo.
   exit /b -255
 ) >&2
 
@@ -83,13 +82,13 @@ if exist "\\?\%DIR_PATH%\*" (
 echo.^>mkdir "%DIR_PATH%"
 
 mkdir "%DIR_PATH%" 2>nul && (
-  echo.
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
   exit /b 0
 )
 
 if not exist "\\?\%SystemRoot%\System32\robocopy.exe" (
   echo.%?~%: error: could not create a target file directory: "%DIR_PATH%".
-  echo.
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
   exit /b 255
 ) >&2
 
@@ -114,4 +113,4 @@ rem updates the modification file time if exists
 
 if %REMOVE_EMPTY_DIR_TMP% NEQ 0 rmdir /S /Q "%EMPTY_DIR_TMP%" >nul
 
-echo.
+if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.

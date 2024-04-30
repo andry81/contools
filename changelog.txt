@@ -1,4 +1,7 @@
 2024.04.30:
+* new: Scripts/Tools/build: `NO_PRINT_LAST_BLANK_LINE` environment variable to externally control print of the last blank line
+
+2024.04.30:
 * fixed: replaced `net session` admin privileges check with more reliable variant
 
 2024.04.30:

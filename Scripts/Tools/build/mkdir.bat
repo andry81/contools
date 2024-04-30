@@ -26,7 +26,6 @@ set "DIR_PATH=%~1"
 
 if not defined DIR_PATH (
   echo.%?~%: error: directory path is not defined.
-  echo.
   exit /b -255
 ) >&2
 
@@ -75,24 +74,22 @@ rem   So we must test the path with the trailing back slash to check existence o
 rem
 if exist "\\?\%DIR_PATH%\*" (
   echo.%?~%: error: directory already exists: "%DIR_PATH%".
-  echo.
   exit /b 1
 ) >&2 else if exist "\\?\%DIR_PATH%" (
   echo.%?~%: error: path does exist and is not a directory: "%DIR_PATH%".
-  echo.
   exit /b -254
 ) >&2
 
 echo.^>mkdir "%DIR_PATH%"
 
 mkdir "%DIR_PATH%" 2>nul && (
-  echo.
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
   exit /b 0
 )
 
 if not exist "\\?\%SystemRoot%\System32\robocopy.exe" (
   echo.%?~%: error: could not create a target file directory: "%DIR_PATH%".
-  echo.
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
   exit /b 255
 ) >&2
 
@@ -117,4 +114,4 @@ rem updates the modification file time if exists
 
 if %REMOVE_EMPTY_DIR_TMP% NEQ 0 rmdir /S /Q "%EMPTY_DIR_TMP%" >nul
 
-echo.
+if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
