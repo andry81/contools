@@ -44,11 +44,17 @@ if [[ -z "$SOURCE_TACKLELIB_TOOLS_LOAD_CONFIG_SH" || SOURCE_TACKLELIB_TOOLS_LOAD
   tkl_include_or_abort "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/tools/load_config.sh"
 fi
 
-[[ -e "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" ]] || mkdir -p "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" || tkl_abort
+if (( ! NO_GEN )); then
+  [[ -e "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" ]] || mkdir -p "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" || tkl_abort
+fi
 
 [[ -n "$LOAD_CONFIG_VERBOSE" ]] || (( ! INIT_VERBOSE )) || tkl_export_path LOAD_CONFIG_VERBOSE 1
 
-tkl_load_config_dir -- "$CONTOOLS_PROJECT_INPUT_CONFIG_ROOT" "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" || tkl_abort
+if (( ! NO_GEN )); then
+  tkl_load_config_dir --gen-user-config --expand-all-configs-bat-vars -- "$CONTOOLS_PROJECT_INPUT_CONFIG_ROOT" "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" || tkl_abort
+else
+  tkl_load_config_dir --expand-all-configs-bat-vars -- "$CONTOOLS_PROJECT_INPUT_CONFIG_ROOT" "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" || tkl_abort
+fi
 
 # init external projects
 
@@ -62,8 +68,10 @@ fi
 
 tkl_include_or_abort "$TACKLELIB_BASH_ROOT/tacklelib/buildlib.sh"
 
-[[ -e "$PROJECT_OUTPUT_ROOT" ]] || mkdir -p "$PROJECT_OUTPUT_ROOT" || tkl_abort
-[[ -e "$PROJECT_LOG_ROOT" ]] || mkdir -p "$PROJECT_LOG_ROOT" || tkl_abort
+if (( ! NO_GEN )); then
+  [[ -e "$PROJECT_OUTPUT_ROOT" ]] || mkdir -p "$PROJECT_OUTPUT_ROOT" || tkl_abort
+  [[ -e "$PROJECT_LOG_ROOT" ]] || mkdir -p "$PROJECT_LOG_ROOT" || tkl_abort
+fi
 
 tkl_export_path CONTOOLS_PROJECT_ROOT_INIT0_DIR "$CONTOOLS_PROJECT_ROOT" # including guard
 
