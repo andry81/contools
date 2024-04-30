@@ -23,12 +23,22 @@ rem
 setlocal
 
 rem scripts must run in administrator mode
-net session >nul 2>nul
-if %ERRORLEVEL% NEQ 0 (
+call :IS_ADMIN_ELEVATED || (
   echo.%~nx0: error: run script in administrator mode!
-  exit /b 255
+  exit /b -255
 ) >&2
 
+goto MAIN
+
+:IS_ADMIN_ELEVATED
+if exist "%SystemRoot%\System32\whoami.exe" "%SystemRoot%\System32\whoami.exe" /groups | "%SystemRoot%\System32\find.exe" "S-1-16-12288" >nul 2>nul && exit /b
+if exist "%SystemRoot%\System32\fltmc.exe" "%SystemRoot%\System32\fltmc.exe" >nul 2>nul && exit /b
+if exist "%SystemRoot%\System64\openfiles.exe" "%SystemRoot%\System64\openfiles.exe" >nul 2>nul && exit /b
+if exist "%SystemRoot%\System32\openfiles.exe" "%SystemRoot%\System32\openfiles.exe" >nul 2>nul && exit /b
+if exist "%SystemRoot%\system32\config\system" exit /b 0
+exit /b 255
+
+:MAIN
 echo.Windows 8/8.1 key will be reinstalled.
 echo.
 
