@@ -1,3 +1,7 @@
+2024.05.02:
+* changed: Scripts/Tools/std/trim_var.bat: improved left trim performance
+* changed: Scripts/Tests/*/batscripts/test_std__trim_var.bat: improved `trim_var.bat` script tests
+
 2024.04.30:
 * new: Scripts/Tools/build: `NO_PRINT_LAST_BLANK_LINE` environment variable to externally control print of the last blank line
 
