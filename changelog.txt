@@ -1,3 +1,7 @@
+2024.05.06:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: scripts execution fixup
+* changed: Scripts/Tools/ToolAdaptors/app/__init__/script_init.bat: script reuse
+
 2024.05.02:
 * changed: Scripts/Tools/std/trim_var.bat: improved left trim performance
 * changed: Scripts/Tests/*/batscripts/test_std__trim_var.bat: improved `trim_var.bat` script tests
@@ -9,7 +13,7 @@
 * fixed: replaced `net session` admin privileges check with more reliable variant
 
 2024.04.30:
-* changed: _config\config.system.vars.in: config update
+* changed: _config/config.system.vars.in: config update
 
 2024.04.30:
 * fixed: __init__/__init__.sh: execution fixup
