@@ -49,6 +49,21 @@ Utilities/src/callf:
   * callf crash on too long wait for UAC promotion with error message:
     `server connection timeout of inbound server named pipe end to (null): pipe="(null)" timeout=0 ms`
 
+  * Fix nested quotes escape skip in case of `{*}` variable substitution:
+
+    >
+    callf.exe /pause-on-exit /no-esc /elevate{ /no-window }{ /attach-parent-console } "${SystemRoot}\System32\runas.exe" "/user:user {*}" "\"${SystemRoot}\System32\explorer.exe\" \"...\.\""
+
+    Result:
+
+    >
+    callf.exe /pause-on-exit /no-subst-vars /no-esc /attach-parent-console "C:\WINDOWS\System32\runas.exe" "/user:user \"\\"C:\WINDOWS\System32\explorer.exe\\" \\"...\\.\\"\""
+
+    Must be:
+
+    >
+    callf.exe /pause-on-exit /no-subst-vars /no-esc /attach-parent-console "C:\WINDOWS\System32\runas.exe" "/user:user \"\\\"C:\WINDOWS\System32\explorer.exe\\\" \\\"...\\.\\\"\""
+
 Utilities/tests/manual/contools/callf:
 
   * Fix slow print:

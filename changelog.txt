@@ -1,3 +1,6 @@
+2024.05.13:
+* changed: ISSUES.txt: issues update
+
 2024.05.06:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: scripts execution fixup
 * changed: Scripts/Tools/ToolAdaptors/app/__init__/script_init.bat: script reuse
