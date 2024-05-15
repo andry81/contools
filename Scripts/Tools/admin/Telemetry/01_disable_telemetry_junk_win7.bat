@@ -19,7 +19,7 @@ if exist "%SystemRoot%\System32\whoami.exe" "%SystemRoot%\System32\whoami.exe" /
 if exist "%SystemRoot%\System32\fltmc.exe" "%SystemRoot%\System32\fltmc.exe" >nul 2>nul && exit /b
 if exist "%SystemRoot%\System64\openfiles.exe" "%SystemRoot%\System64\openfiles.exe" >nul 2>nul && exit /b
 if exist "%SystemRoot%\System32\openfiles.exe" "%SystemRoot%\System32\openfiles.exe" >nul 2>nul && exit /b
-if exist "%SystemRoot%\system32\config\system" exit /b 0
+if exist "%SystemRoot%\System32\config\system" exit /b 0
 exit /b 255
 
 :MAIN

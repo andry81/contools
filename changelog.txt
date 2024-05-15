@@ -1,4 +1,7 @@
 2024.05.15:
+* refactor: minor code cleanup
+
+2024.05.15:
 * fixed: Scripts/Tools/exec: exec_callf_prefix.bat, exec_terminal_prefix.bat: missed to pass `NEST_LVL` environment variable
 
 2024.05.15:

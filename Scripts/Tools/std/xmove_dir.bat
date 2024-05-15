@@ -213,7 +213,7 @@ rem
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 
 if %FLAG_USE_BUILTIN_MOVE% EQU 0 ^
-if not exist "%SystemRoot%\system32\robocopy.exe" set FLAG_USE_BUILTIN_MOVE=1
+if not exist "%SystemRoot%\System32\robocopy.exe" set FLAG_USE_BUILTIN_MOVE=1
 
 echo.^>^>move%XMOVE_FLAGS% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
 move%XMOVE_FLAGS% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"

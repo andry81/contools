@@ -212,7 +212,7 @@ call "%%?~dp0%%__init__.bat" || exit /b
 call "%%?~dp0%%setshift.bat" 3 XCOPY_FLAGS_ %%*
 
 if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
-if exist "%SystemRoot%\system32\robocopy.exe" goto USE_ROBOCOPY
+if exist "%SystemRoot%\System32\robocopy.exe" goto USE_ROBOCOPY
 
 :USE_XCOPY
 set "XCOPY_FLAGS="
