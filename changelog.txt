@@ -1,3 +1,6 @@
+2024.05.15:
+* fixed: Scripts/Tools/std/set_vars_from_file.bat: exclude variables in case of WOW64 applications
+
 2024.05.13:
 * changed: ISSUES.txt: issues update
 
