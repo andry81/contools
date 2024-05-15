@@ -10,6 +10,9 @@ if %IMPL_MODE%0 NEQ 0 (
   exit /b 255
 ) >&2
 
+rem cast to integer
+if defined NEST_LVL set /A NEST_LVL+=0
+
 rem Do not make a file or a directory
 if defined NO_GEN set /A NO_GEN+=0
 
@@ -79,10 +82,12 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 rem common flags for all terminals
 
 rem CAUTION:
-rem   Because `callf.exe` does use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` variable in the command line.
+rem   Because `callf.exe` does use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` and `NEST_LVL` variables into the command line.
 rem   Otherwise we can fall into infinite recursion because of the unset of the `IMPL_MODE` variable.
 rem
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v IMPL_MODE 1
+
+if defined NEST_LVL set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v NEST_LVL %NEST_LVL%
 
 if %FLAG_ELEVATE% NEQ 0 if defined CONTOOLS_ROOT set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v CONTOOLS_ROOT "%CONTOOLS_ROOT%"
 
