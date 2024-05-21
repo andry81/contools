@@ -1,4 +1,7 @@
 2024.05.21:
+* changed: Script/Tools/build: use `--` separator to split flags from positional command line
+
+2024.05.21:
 * changed: Scripts/Tools/std: `--` separator to stop parse flags
 * refactor: Scripts/Tools: code cleanup
 

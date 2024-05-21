@@ -23,7 +23,7 @@ set LAST_ERROR=%ERRORLEVEL%
 
 if %LAST_ERROR% NEQ 0 goto EXIT
 
-call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat"%%XCOPY_DIR_CMD_BARE_FLAGS%% %%*
+call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat"%%XCOPY_DIR_CMD_BARE_FLAGS%% -- %%*
 set LAST_ERROR=%ERRORLEVEL%
 
 :EXIT
