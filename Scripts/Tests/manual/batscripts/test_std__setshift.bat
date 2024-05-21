@@ -65,3 +65,10 @@ call "%%~dp0..\..\..\Tools\std\setshift.bat" -no_trim 1 x  a  b  c  d
 set x
 endlocal
 echo.---
+
+setlocal
+set "$5E$3E=^>"
+call "%%~dp0..\..\..\Tools\std\setshift.bat" 0 x %%$5E$3E%%cmd param0 param1
+set x
+endlocal
+echo.---

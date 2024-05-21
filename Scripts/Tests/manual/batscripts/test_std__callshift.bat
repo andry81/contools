@@ -74,3 +74,9 @@ setlocal
 call "%%~dp0..\..\..\Tools\std\callshift.bat" -no_trim 1 echo  a  b  c  d
 endlocal
 echo.---
+
+setlocal
+set "$5E$3E=^>"
+call "%%~dp0..\..\..\Tools\std\callshift.bat" 0 echo.%%$5E$3E%%cmd param0 param1
+endlocal
+echo.---
