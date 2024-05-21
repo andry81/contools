@@ -1,4 +1,8 @@
 2024.05.21:
+* changed: Scripts/Tools/std: `--` separator to stop parse flags
+* refactor: Scripts/Tools: code cleanup
+
+2024.05.21:
 * changed: Scripts/Tests/manual/batscripts/test_std__*shift.bat: manual tests update
 
 2024.05.21:

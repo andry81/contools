@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   copy.bat [<flags>] <from-path> <to-path> [<copy-flags>...]
+rem   copy.bat [<flags>] [--] <from-path> <to-path> [<copy-flags>...]
 
 rem Description:
 rem   The builtin `copy` command wrapper script with echo and some conditions
@@ -10,6 +10,9 @@ rem   check before call.
 rem <flags>:
 rem   -chcp <CodePage>
 rem     Set explicit code page.
+
+rem --:
+rem   Separator to stop parse flags.
 
 rem <from-path>:
 rem   From path.
@@ -43,7 +46,7 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -51,7 +54,7 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
 set "FROM_PATH=%~1"

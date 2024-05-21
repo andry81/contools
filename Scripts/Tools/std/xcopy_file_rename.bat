@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   xcopy_file_rename.bat [<flags>] <from-path> <to-path> <from-file> <to-file>
+rem   xcopy_file_rename.bat [<flags>] [--] <from-path> <to-path> <from-file> <to-file>
 
 rem Description:
 rem   Script to copy file(s) from one directory to another with rename option
@@ -32,6 +32,9 @@ rem     `COPY_CMD_BARE_FLAGS` variables.
 rem
 rem   -use_utility_flags
 rem     Use utility flags from `XCOPY_FLAGS` and `COPY_FLAGS` variables.
+
+rem --:
+rem   Separator to stop parse flags.
 
 rem <from-path>:
 rem   From directory path.
@@ -78,7 +81,7 @@ if defined FLAG (
     set FLAG_USE_CMD_BARE_FLAGS=1
   ) else if "%FLAG%" == "-use_utility_flags" (
     set FLAG_USE_UTILITY_FLAGS=1
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -86,7 +89,7 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
 set "FROM_PATH=%~1"

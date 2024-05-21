@@ -12,13 +12,14 @@ rem   The output configuration file must not contain the `.in` suffix in the
 rem   file name and is used as a local storage for a user values.
 
 rem <Flags>:
-rem   --
-rem     Stop flags parse.
 rem   -r <sed_replace_from> <sed_replace_to>
 rem     The expression to replace for the sed in form:
 rem       `s|<sed_replace_from>|<sed_replace_to>}mg`
 rem   -if_notexist
 rem     Generate if output config does not exist.
+
+rem --:
+rem   Separator to stop parse flags.
 
 rem <InputDir>:
 rem   Input configuration file directory.

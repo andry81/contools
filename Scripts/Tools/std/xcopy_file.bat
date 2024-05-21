@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   xcopy_file.bat [<flags>] <from-path> <from-file-pttn> <to-path> [<xcopy-flags>...]
+rem   xcopy_file.bat [<flags>] [--] <from-path> <from-file-pttn> <to-path> [<xcopy-flags>...]
 
 rem Description:
 rem   The `xcopy.exe`/`robocopy.exe` seemless wrapper script with xcopy
@@ -22,6 +22,9 @@ rem     Set explicit code page.
 rem
 rem   -use_xcopy
 rem     Use `xcopy` executable utility.
+
+rem --:
+rem   Separator to stop parse flags.
 
 rem <from-path>:
 rem   From directory path.
@@ -63,7 +66,7 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-use_xcopy" (
     set FLAG_USE_XCOPY=1
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -71,7 +74,7 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
 set "FROM_PATH=%~1"

@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   xcopy_dir.bat [<flags>] <from-path> <to-path> [<xcopy-flags>...]
+rem   xcopy_dir.bat [<flags>] [--] <from-path> <to-path> [<xcopy-flags>...]
 
 rem Description:
 rem   The `xcopy.exe`/`robocopy.exe` seemless wrapper script with xcopy
@@ -25,6 +25,9 @@ rem
 rem   -ignore-unexist
 rem     By default `<to-path>` does check on directory existence.
 rem     Use this flag to skip the check.
+
+rem --:
+rem   Separator to stop parse flags.
 
 rem <from-path>:
 rem   From directory path.
@@ -67,7 +70,7 @@ if defined FLAG (
     set FLAG_USE_XCOPY=1
   ) else if "%FLAG%" == "-ignore_unexist" (
     set FLAG_IGNORE_UNEXIST=1
-  ) else (
+  ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -75,7 +78,7 @@ if defined FLAG (
   shift
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
 set "FROM_PATH=%~1"
