@@ -1,7 +1,7 @@
 @echo off
 
 rem Create local variable's stack
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 if 0%__CTRL_SETLOCAL% EQU 1 (
   echo.%~nx0: error: cmd.exe is broken, please restart it!>&2

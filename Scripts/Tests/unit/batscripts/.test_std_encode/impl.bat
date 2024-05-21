@@ -18,7 +18,7 @@ if %TESTLIB__OVERALL_TESTS% GTR %TESTLIB__CURRENT_TESTS% (
 
 setlocal ENABLEDELAYEDEXPANSION
 
-rem print strings can contain  batch control characters
+rem print strings can contain batch control characters
 
 if "!STRING_INPUT!" EQU "!STRING_OUTPUT!" (
   "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/printf.exe" "PASSED: %TEST_REPORT_PREFIX_STR%: ${TEST_FUNC}: STRING_INPUT=`${STRING_INPUT}`"

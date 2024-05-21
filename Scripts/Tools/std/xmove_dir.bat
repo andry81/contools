@@ -60,6 +60,7 @@ set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
 rem script flags
+set FLAG_SHIFT=0
 set "FLAG_CHCP="
 rem Force `move` instead of `robocopy.exe` usage.
 rem CAUTION: Movement can fail with that flag in case of a long path.
@@ -79,6 +80,7 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
+    set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-use_builtin_move" (
     set FLAG_USE_BUILTIN_MOVE=1
   ) else if "%FLAG%" == "-ignore_existed" (
@@ -89,6 +91,7 @@ if defined FLAG (
   ) >&2
 
   shift
+  set /A FLAG_SHIFT+=1
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
@@ -198,7 +201,9 @@ if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
 
 call "%%?~dp0%%__init__.bat" || exit /b
 
-call "%%?~dp0%%setshift.bat" 2 XMOVE_FLAGS_ %%*
+set /A FLAG_SHIFT+=2
+
+call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XMOVE_FLAGS_ %%*
 
 rem use `robocopy.exe` in case of a directory move-to-merge
 if %FLAG_IGNORE_EXISTED% NEQ 0 if %TO_PATH_AS_DIR_EXISTS% NEQ 0 goto USE_ROBOCOPY

@@ -56,6 +56,7 @@ set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
 rem script flags
+set FLAG_SHIFT=0
 set "FLAG_CHCP="
 rem Force `move` instead of `robocopy.exe` usage.
 rem CAUTION: Movement can fail with that flag in case of a long path.
@@ -76,6 +77,7 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
+    set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-use_builtin_move" (
     set FLAG_USE_BUILTIN_MOVE=1
   ) else if "%FLAG%" == "-ignore_unexist" (
@@ -86,6 +88,7 @@ if defined FLAG (
   ) >&2
 
   shift
+  set /A FLAG_SHIFT+=1
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
@@ -239,7 +242,9 @@ if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
 :INIT
 call "%%?~dp0%%__init__.bat" || exit /b
 
-call "%%?~dp0%%setshift.bat" 3 XMOVE_FLAGS_ %%*
+set /A FLAG_SHIFT+=3
+
+call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XMOVE_FLAGS_ %%*
 
 :USE_BUILTIN_MOVE
 set XMOVE_DIR_RECUR=0

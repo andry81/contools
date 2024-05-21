@@ -1,0 +1,105 @@
+@echo off
+
+rem USAGE:
+rem   get_cmdline_len.bat [<flags>] [--] <cmdline>...
+
+rem Description:
+rem   Script counts the number of a command line arguments based on flags and
+rem   returns the count.
+
+rem <flags>:
+rem   -exe
+rem     Use exe command line encoder instead of the batch as by default.
+rem     An executable command line does not use `,;=` characters as command
+rem     line arguments separator.
+
+rem --:
+rem   Separator to stop parse flags.
+
+rem <cmdline>:
+rem   Command line to count.
+
+rem CAUTION:
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
+rem
+
+rem Examples:
+rem   1. >callshift.bat 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+rem      "1 2" ! ? * & | "=" 3
+rem      >get_cmdline_len.bat -- "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+rem      >echo ERRORLEVEL=%ERRORLEVEL%
+rem      ERRORLEVEL=8
+rem   2. >callshift.bat -exe 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+rem      "1 2" ! ? * & | , ; = = "=" 3
+rem      >get_cmdline_len.bat -exe -- "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+rem      >echo ERRORLEVEL=%ERRORLEVEL%
+rem      ERRORLEVEL=12
+
+rem with save of previous error level
+setlocal DISABLEDELAYEDEXPANSION
+
+rem drop last error level
+call;
+
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\get_cmdline_len.%RANDOM%-%RANDOM%.txt"
+) else set "CMDLINE_TEMP_FILE=%TEMP%\get_cmdline_len.%RANDOM%-%RANDOM%.txt"
+
+rem redirect command line into temporary file to print it correcly
+for %%i in (1) do (
+  set "PROMPT=$_"
+  echo on
+  for %%b in (1) do rem %*
+  @echo off
+) > "%CMDLINE_TEMP_FILE%"
+
+for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
+
+del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
+
+(
+  setlocal ENABLEDELAYEDEXPANSION
+  if not "!__STRING__:~4,-1!" == "" (
+    for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~4,-1!") do endlocal & set "__STRING__=%%i"
+  ) else endlocal & endlocal & exit /b 0
+)
+
+set "?~dp0=%~dp0"
+
+rem script flags
+set FLAG_SHIFT=0
+set FLAG_EXE=0
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG if "%FLAG%" == "-exe" (
+  set FLAG_EXE=1
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=1
+)
+
+if defined FLAG if "%FLAG%" == "--" (
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=1
+)
+
+rem encode specific command line characters
+if %FLAG_EXE% EQU 0 (
+  call "%%?~dp0%%encode\encode_sys_chars_bat_cmdline.bat"
+) else call "%%?~dp0%%encode\encode_sys_chars_exe_cmdline.bat"
+
+set COUNT=0
+
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do set /A COUNT+=1
+
+set /A COUNT-=FLAG_SHIFT
+
+endlocal & exit /b %COUNT%

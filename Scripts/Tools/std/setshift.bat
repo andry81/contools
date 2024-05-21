@@ -29,6 +29,12 @@ rem   <skip-num> and shifts the rest <cmdline>.
 rem <var>:
 rem   Variable to set with skipped and shifted arguments from <cmdline>.
 
+rem CAUTION:
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
+rem
+
 rem Examples:
 rem   1. >setshift.bat 0 x "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      >set x
@@ -122,29 +128,26 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if defined FLAG (
-  if "%FLAG%" == "-exe" (
-    set FLAG_EXE=1
-    shift
-    set /A FLAG_SHIFT+=1
-  )
+if defined FLAG if "%FLAG%" == "-exe" (
+  set FLAG_EXE=1
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=1
 )
 
-if defined FLAG (
-  if "%FLAG%" == "-no_trim" (
-    set FLAG_NO_TRIM=1
-    shift
-    set /A FLAG_SHIFT+=1
-  )
+if defined FLAG if "%FLAG%" == "-no_trim" (
+  set FLAG_NO_TRIM=1
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=1
 )
 
-if defined FLAG (
-  if "%FLAG%" == "-skip" (
-    set "FLAG_SKIP=%~2"
-    shift
-    shift
-    set /A FLAG_SHIFT+=2
-  )
+if defined FLAG if "%FLAG%" == "-skip" (
+  set "FLAG_SKIP=%~2"
+  shift
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=2
 )
 
 set "SHIFT=%~1"

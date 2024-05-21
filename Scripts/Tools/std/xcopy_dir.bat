@@ -47,6 +47,7 @@ set "?~n0=%~n0"
 set "?~nx0=%~nx0"
 
 rem script flags
+set FLAG_SHIFT=0
 set "FLAG_CHCP="
 rem Force `xcopy.exe` instead of `robocopy.exe` usage.
 rem CAUTION: Copy can fail with that flag in case of a long path.
@@ -66,6 +67,7 @@ if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
+    set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-use_xcopy" (
     set FLAG_USE_XCOPY=1
   ) else if "%FLAG%" == "-ignore_unexist" (
@@ -76,6 +78,7 @@ if defined FLAG (
   ) >&2
 
   shift
+  set /A FLAG_SHIFT+=1
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
@@ -184,7 +187,9 @@ if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
 :INIT
 call "%%?~dp0%%__init__.bat" || exit /b
 
-call "%%?~dp0%%setshift.bat" 2 XCOPY_FLAGS_ %%*
+set /A FLAG_SHIFT+=2
+
+call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XCOPY_FLAGS_ %%*
 
 if %FLAG_USE_XCOPY% NEQ 0 goto USE_XCOPY
 if exist "%SystemRoot%\System32\robocopy.exe" goto USE_ROBOCOPY

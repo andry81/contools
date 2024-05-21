@@ -1,5 +1,14 @@
 2024.05.21:
-* changed: Script/Tools/build: use `--` separator to split flags from positional command line
+* fixed: Scripts/Tools/std: callshift.bat, setshift.bat, xcopy_dir.bat, xcopy_file.bat, xmove_dir.bat, xmove_file.bat: flags parse
+* fixed: Scripts/Tests: execution fixup
+* new: Scripts/Tools/filesys/gen_dir_files_list*.bat: restore files from `contools.old` project
+* new: Scripts/Tests/manual/batscripts/test_std__get_cmdline*.bat: `get_cmdline.bat` and `get_cmdline_len.bat` script tests
+* new: Scripts/Tests/unit/batscripts/test_std__get_cmdline_var_len.bat: `get_cmdline_var_len.bat` script tests
+* changed: Scripts/Tests/unit/batscripts/test_std__trim_var.bat: more tests
+* refactor: Scripts/Tools, Scripts/Tests: code cleanup
+
+2024.05.21:
+* changed: Scripts/Tools/build: use `--` separator to split flags from positional command line
 
 2024.05.21:
 * changed: Scripts/Tools/std: `--` separator to stop parse flags

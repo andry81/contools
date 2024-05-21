@@ -1,11 +1,20 @@
 @echo off
 
+rem USAGE:
+rem   get_cmdline.bat <cmdline>...
+
 rem Description:
 rem   Script sets RETURN_VALUE variable to a command line without skip or shift
-rem   the arguments.
+rem   the arguments and returns a previous error code.
 
-rem USAGE:
-rem   get_cmdline.bat <cmdline>
+rem <cmdline>:
+rem   Command line to get.
+
+rem CAUTION:
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
+rem
 
 rem NOTE:
 rem   To skip or shift the arguments do use the `setshift.bat` script instead.

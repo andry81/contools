@@ -11,6 +11,7 @@ call "%%TESTS_PROJECT_ROOT%%/test_std__strlen.bat"
 call "%%TESTS_PROJECT_ROOT%%/test_std__allocate_temp_dir.bat"
 call "%%TESTS_PROJECT_ROOT%%/test_std__chcp.bat"
 call "%%TESTS_PROJECT_ROOT%%/test_std__trim_var.bat"
+call "%%TESTS_PROJECT_ROOT%%/test_std__get_cmdline_var_len.bat"
 
 call "%%TESTS_PROJECT_ROOT%%/test_build__load_config.bat"
 
