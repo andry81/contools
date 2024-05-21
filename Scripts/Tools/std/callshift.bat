@@ -60,6 +60,9 @@ rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
 rem  10. >callshift.bat -no_trim 1 echo  a  b  c  d
 rem       b  c  d
+rem  11. >set "$5E$3E=^>"
+rem      >callshift.bat 0 echo.%$5E$3E%cmd param0 param1
+rem      >cmd param0 param1
 
 rem Pros:
 rem
@@ -158,7 +161,7 @@ set /A ARG0_INDEX=FLAG_SHIFT+2
 set /A SKIP=FLAG_SHIFT+2+FLAG_SKIP
 
 if %SHIFT% GEQ 0 (
-  set /A SHIFT+=FLAG_SHIFT+2+FLAG_SKIP
+  set /A SHIFT+=SKIP
 ) else (
   set /A SKIP+=-SHIFT
   set /A SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2

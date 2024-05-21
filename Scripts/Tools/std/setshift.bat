@@ -60,6 +60,10 @@ rem      >call setshift.bat -skip 2 -3 x param0 param1 %%3 %%2 %%1 %%*
 rem   7. >setshift.bat -no_trim 1 x  a  b  c  d
 rem      >set x
 rem      x= b  c  d
+rem   8. >set "$5E$3E=^>"
+rem      >setshift.bat 0 x %$5E$3E%cmd param0 param1
+rem      >set x
+rem      x=>cmd param0 param1
 
 rem Pros:
 rem
@@ -157,7 +161,7 @@ set /A ARG0_INDEX=FLAG_SHIFT+2
 set /A SKIP=FLAG_SHIFT+2+FLAG_SKIP
 
 if %SHIFT% GEQ 0 (
-  set /A SHIFT+=FLAG_SHIFT+2+FLAG_SKIP
+  set /A SHIFT+=SKIP
 ) else (
   set /A SKIP+=-SHIFT
   set /A SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2
