@@ -27,6 +27,7 @@ rem Examples:
 rem 1. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives
 rem 2. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives "" "*.7z"
 rem 3. call extract_files_from_archives.bat c:\path_with_archives\app_release_x86.7z release\x86\app.exe c:\path_for_unpack\app
+rem 4. call extract_files_from_archives.bat c:\path_with_archives\app_release_x86.7z * c:\path_for_unpack\app
 
 setlocal
 
@@ -73,8 +74,6 @@ if not exist "\\?\%SEARCH_FROM%" (
   echo.%?~nx0%: error: SEARCH_FROM does not exist: "%SEARCH_FROM%".
   exit /b 255
 ) >&2
-
-if not defined EXTRACT_PTTN set EXTRACT_PTTN=*
 
 if not defined EXTRACT_TO_DIR (
   echo.%?~nx0%: error: EXTRACT_TO_DIR is not defined.
@@ -170,14 +169,11 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%EXTRACT_TO_FILE_DI
 
 if %SKIP_ARCHIVES_WITH_EXISTED_EXTRACTED_PREFIX_PATH% NEQ 0 if exist "\\?\%EXTRACT_TO_FILE_DIR_W_NAME%\*" exit /b 0
 
-call "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x%%_7ZIP_SWITCHES%% "%%ARC_FILE_PATH%%" "%%EXTRACT_PTTN%%" "-w%%TEMP_DIR_PATH%%" "-o%%EXTRACT_TO_FILE_DIR%%"
+call "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x%%_7ZIP_SWITCHES%% "-w%%TEMP_DIR_PATH%%" "-o%%EXTRACT_TO_FILE_DIR%%" "%%ARC_FILE_PATH%%" "%%EXTRACT_PTTN%%"
 exit /b
 
 :PROCESS_FILE
-if not "%EXTRACT_PTTN:**=%" == "%EXTRACT_PTTN%" goto EXTRACT_PTTN_ERROR
-if not "%EXTRACT_PTTN:?=%" == "%EXTRACT_PTTN%" goto EXTRACT_PTTN_ERROR
-
-call "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x%%_7ZIP_SWITCHES%% "%%ARC_FILE_PATH%%" "%%EXTRACT_PTTN%%" "-w%%TEMP_DIR_PATH%%"
+call "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" x%%_7ZIP_SWITCHES%% "-w%%TEMP_DIR_PATH%%" "%%ARC_FILE_PATH%%" "%%EXTRACT_PTTN%%"
 exit /b
 
 :EXTRACT_PTTN_ERROR

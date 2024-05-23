@@ -1,3 +1,8 @@
+2024.05.24:
+* fixed: Scripts/Tools/build/extract_files_from_archives.bat: use `*` pattern to extract all files from an archive file
+* changed: Scripts/Tools/build/extract_files_from_archives.bat: 7zip parameters reorder
+* changed: Scripts/Tools/build/extract_files_from_archives.bat: allow globbing characters in a pattern parameter
+
 2024.05.21:
 * fixed: Scripts/Tools/std: callshift.bat, setshift.bat, xcopy_dir.bat, xcopy_file.bat, xmove_dir.bat, xmove_file.bat: flags parse
 * fixed: Scripts/Tests: execution fixup
