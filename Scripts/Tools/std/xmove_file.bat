@@ -269,8 +269,15 @@ if not exist "%SystemRoot%\System32\robocopy.exe" set FLAG_USE_BUILTIN_MOVE=1
 if %FLAG_USE_BUILTIN_MOVE% NEQ 0 call :PARSE_ROBOCOPY_FLAGS
 
 rem CAUTION:
-rem   If a variable is empty, then it would not be expanded in the `cmd.exe` command line or in case of `for /F ...`!
-rem   We must expand the command line into a variable.
+rem   1. If a variable is empty, then it would not be expanded in the `cmd.exe`
+rem      command line or in the inner expression of the
+rem      `for /F "usebackq ..." %%i in (`<inner-expression>`) do ...`
+rem      statement.
+rem   2. The `cmd.exe` command line or the inner expression of the
+rem      `for /F "usebackq ..." %%i in (`<inner-expression>`) do ...`
+rem      statement does expand twice.
+rem
+rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%FROM_FILE_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N
 

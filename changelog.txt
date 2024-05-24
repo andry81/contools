@@ -1,4 +1,7 @@
 2024.05.24:
+* refactor: Scripts/Tools: minor refactor
+
+2024.05.24:
 * fixed: Scripts/Tools/build/extract_files_from_archives.bat: use `*` pattern to extract all files from an archive file
 * changed: Scripts/Tools/build/extract_files_from_archives.bat: 7zip parameters reorder
 * changed: Scripts/Tools/build/extract_files_from_archives.bat: allow globbing characters in a pattern parameter
