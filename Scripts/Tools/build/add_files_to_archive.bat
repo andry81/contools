@@ -29,14 +29,17 @@ shift
 shift
 shift
 
-set "_7ZIP_SWITCHES="
+set _7ZIP_BARE_FLAGS_HAS_TEMP_DIR=0
+set "_7ZIP_BARE_FLAGS="
 
 :SWITCHES_LOOP
-set _7ZIP_SWITCH=%1
+set _7ZIP_FLAG=%1
 
-if not defined _7ZIP_SWITCH goto SWITCHES_LOOP_END
+if not defined _7ZIP_FLAG goto SWITCHES_LOOP_END
 
-set _7ZIP_SWITCHES=%_7ZIP_SWITCHES% %_7ZIP_SWITCH%
+if "%_7ZIP_FLAG:~0,2%" == "-w" set _7ZIP_BARE_FLAGS_HAS_TEMP_DIR=1
+
+set _7ZIP_BARE_FLAGS=%_7ZIP_BARE_FLAGS% %_7ZIP_FLAG%
 
 shift
 
@@ -61,6 +64,8 @@ rem   For example: pushd c:\ && ( 7z.exe a -r <PathToArchive> "<SomeRelativePath
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || ( set "LAST_ERROR=255" & goto FREE_TEMP_DIR )
 
+if %_7ZIP_BARE_FLAGS_HAS_TEMP_DIR% EQU 0 set _7ZIP_BARE_FLAGS=%_7ZIP_BARE_FLAGS% "-w%SCRIPT_TEMP_CURRENT_DIR%"
+
 call :MAIN %%*
 set LAST_ERROR=%ERRORLEVEL%
 
@@ -78,6 +83,6 @@ rem remove arguments trailing back slashes to avoid exe command line parse old b
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"
 if "%REL_PATH:~-1%" == "\" set "REL_PATH=%REL_PATH:~0,-1%"
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" a -r%%_7ZIP_SWITCHES%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%" "-w%%SCRIPT_TEMP_CURRENT_DIR%%"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" a -r%%_7ZIP_BARE_FLAGS%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%"
 
 exit /b

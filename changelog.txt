@@ -1,3 +1,6 @@
+2024.06.03:
+* changed: Scripts/Tools/build/add_files_to_archive.bat: ability to directly use flag `-w`
+
 2024.05.24:
 * refactor: Scripts/Tools: minor refactor
 
