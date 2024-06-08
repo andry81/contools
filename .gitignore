@@ -1,5 +1,5 @@
 /.log
-/_externals
+/_out
 /Output
 /Projects
 Scripts/Tools/admin/ProductKey/__pycache__
@@ -16,4 +16,3 @@ Utilities/src/retakeowner/gen
 Utilities/src/thlibautocfg/gen
 Utilities/src/wshbazaar/wshdynacall/gen
 Utilities/tests/manual/contools/callf/_out
-/_out
