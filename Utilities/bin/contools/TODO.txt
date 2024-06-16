@@ -364,3 +364,20 @@ These flags already partially added into `help.tpl`, but still is not implemente
   arguments.
   This is useful to accept not positional parameters in the command line as an
   external (expandable) string.
+
+* If run as `callfg.exe ... /pause-on-exit-if-error ... "" "cmd.exe ..."`, when
+  there were no console before the `callfg.exe` call, then the `conhost.exe`
+  does close when closes the child `cmd.exe` process and `callfg.exe` skips the
+  pause because there is no inherited console to attach with.
+
+  To be able to keep use of the pause in the parent process, we can inject into
+  child process and intercept the owned console detach to reattach it to parent
+  `callfg.exe` process. This will let the pause works as expected even in the
+  `callfg.exe` process without the owned or attached console window before the
+  child execution.
+
+  Add `/allow-child-console-ownership-reaquire` flag to enable this.
+
+  Add `/allow-child-console-ownership-reaquire-recursively` flag to enable this
+  for all children processes (recursive injection including all `callf*.exe`
+  child processes in process inheritance chain).

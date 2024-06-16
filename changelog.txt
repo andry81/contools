@@ -1,3 +1,6 @@
+2024.06.17:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
 2024.06.16:
 * changed: Scripts/Tools: code cleanup, removed redundant `RESTORE_LOCALE` variable usage
 
