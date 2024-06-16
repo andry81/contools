@@ -7,19 +7,18 @@ set "?~nx0=%~nx0"
 call "%%~dp0__init__.bat" || exit /b
 
 rem script flags
-set RESTORE_LOCALE=0
+set "FLAG_CHCP="
 
 call :MAIN %%*
 set LAST_ERROR=%ERRORLEVEL%
 
 rem restore locale
-if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 exit /b %LAST_ERROR%
 
 :MAIN
 rem script flags
-set "FLAG_CHCP="
 set FLAG_USE_BOM=0
 
 :FLAGS_LOOP
@@ -63,7 +62,6 @@ if not exist "%INPUT_FILE%" (
 
 if defined FLAG_CHCP (
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
-  set RESTORE_LOCALE=1
   if not defined INPUT_CHARSET set "INPUT_CHARSET=CP%FLAG_CHCP%"
 ) else if not defined INPUT_CHARSET call :GET_CURRENT_CODE_PAGE
 

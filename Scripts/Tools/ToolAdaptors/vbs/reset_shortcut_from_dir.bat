@@ -56,7 +56,6 @@ if %IMPL_MODE%0 EQU 0 exit /b
 
 rem script flags
 set FLAG_SHIFT=0
-set RESTORE_LOCALE=0
 set "FLAG_CHCP="
 set FLAG_RESET_WORKINGDIR_FROM_TARGET_PATH=0
 set FLAG_RESET_TARGET_PATH_FROM_WORKINGDIR=0
@@ -135,14 +134,13 @@ call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
 if defined FLAG_CHCP (
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
-  set RESTORE_LOCALE=1
 ) else call "%%CONTOOLS_ROOT%%/std/getcp.bat"
 
 call :MAIN %%*
 set LAST_ERROR=%ERRORLEVEL%
 
 rem restore locale
-if %RESTORE_LOCALE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
+if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 :FREE_TEMP_DIR
 rem cleanup temporary files
