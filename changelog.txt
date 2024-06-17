@@ -1,4 +1,8 @@
 2024.06.17:
+* changed: Scripts/Tests/manual/batscripts: test_std__echo_path*_var.bat, test_std_encode__pathlist_chars*.bat: manual tests improvement
+* changed: Scripts/Tests/bench/batscripts: test_std__echo_path*_var.bat, test_std_encode__pathlist_chars*.bat: bench tests improvement
+
+2024.06.17:
 * new: Scripts/Tools/std/echo_pathglob_var.bat: print a globbing path list variable used the `;` character as a separator
 * new: Scripts/Tests/manual/batscripts/test_std__echo_pathglob_var.bat: manual tests for `echo_pathglob_var.bat` script
 * new: Scripts/Tests/bench/batscripts/test_std__echo_pathglob_var.bat: bench tests for `echo_pathglob_var.bat` script

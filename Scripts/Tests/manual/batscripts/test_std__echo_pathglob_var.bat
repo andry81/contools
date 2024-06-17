@@ -19,3 +19,19 @@ set __STRING__
 call "%%~dp0..\..\..\Tools\std\echo_pathglob_var.bat" __STRING__ " " "|"
 endlocal
 echo.---
+
+setlocal
+rem CAUTION: in case of globbing the result is dependent on the file system
+set __LIST__="?a/b/%%c%%!" ^;	 "!d! ^; e ; f" ; ; ; !AAA! ^^; g,g ;;; h h
+set __LIST__
+call "%%~dp0..\..\..\Tools\std\echo_pathglob_var.bat" __LIST__ " " "|"
+endlocal
+echo.---
+
+setlocal
+rem CAUTION: in case of globbing the result is dependent on the file system
+set __STRING__="?a/b/%%c%%!" ^;	 "!d! ^; e ; f" ; ; ; !AAA! ^^; g,g ;;; h h
+set __STRING__
+call "%%~dp0..\..\..\Tools\std\echo_pathglob_var.bat" __STRING__ " " "|"
+endlocal
+echo.---
