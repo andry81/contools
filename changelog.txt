@@ -1,4 +1,11 @@
 2024.06.17:
+* new: Scripts/Tools/std/encode: encode_pathlist_chars.bat, decode_pathlist_chars.bat: characters encoder and decoder scripts to bypass control characters interference in path lists
+* new: Scripts/Tests/manual/batscripts/test_std_encode__pathlist_chars.bat: manual tests for `encode_pathlist_chars.bat` and `decode_pathlist_chars.bat` scripts
+* new: Scripts/Tests/bench/batscripts/test_std_encode__pathlist_chars.bat: bench tests for `encode_pathlist_chars.bat` and `decode_pathlist_chars.bat` scripts
+* changed: Scripts/Tests/unit/batscripts/test_std_encode.bat: unit tests for `encode_pathlist_chars.bat` and `decode_pathlist_chars.bat` scripts
+* refactor: Scripts/Tools/std/encode: minor refactor
+
+2024.06.17:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 
 2024.06.16:

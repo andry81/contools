@@ -28,10 +28,10 @@ setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!__STRING__:$22="!"
 for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & set "__STRING__=%%i"
 
 setlocal ENABLEDELAYEDEXPANSION & ^
-set "__STRING__=!__STRING__:$7C=|!" & set "__STRING__=!__STRING__:$26=&!" & set "__STRING__=!__STRING__:$28=(!"  & ^
-set "__STRING__=!__STRING__:$29=)!" & set "__STRING__=!__STRING__:$3C=<!" & set "__STRING__=!__STRING__:$3E=>!"  & set "__STRING__=!__STRING__:$27='!" & ^
-set "__STRING__=!__STRING__:$60=`!" & set "__STRING__=!__STRING__:$5E=^!" & set "__STRING__=!__STRING__:$25=%%!" & set "__STRING__=!__STRING__:$2B=+!" & ^
-set "__STRING__=!__STRING__:$3F=?!"                                       & set "__STRING__=!__STRING__:$2C=,!"  & set "__STRING__=!__STRING__:$3B=;!" & ^
-set "__STRING__=!__STRING__:$2A=*!" & set "__STRING__=!__STRING__:$3D==!" & set "__STRING__=!__STRING__:$24=$!" & ^
+set "__STRING__=!__STRING__:$7C=|!" & set "__STRING__=!__STRING__:$26=&!"  & set "__STRING__=!__STRING__:$28=(!" & set "__STRING__=!__STRING__:$29=)!" & ^
+set "__STRING__=!__STRING__:$3C=<!" & set "__STRING__=!__STRING__:$3E=>!"  & set "__STRING__=!__STRING__:$27='!" & set "__STRING__=!__STRING__:$60=`!" & ^
+set "__STRING__=!__STRING__:$5E=^!" & set "__STRING__=!__STRING__:$25=%%!" & set "__STRING__=!__STRING__:$2B=+!" & ^
+set "__STRING__=!__STRING__:$3F=?!" & set "__STRING__=!__STRING__:$2A=*!"  & ^
+set "__STRING__=!__STRING__:$2C=,!" & set "__STRING__=!__STRING__:$3B=;!"  & set "__STRING__=!__STRING__:$3D==!" & set "__STRING__=!__STRING__:$24=$!"  & ^
 for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & endlocal & set "__STRING__=%%i"
 exit /b 0

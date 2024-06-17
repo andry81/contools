@@ -42,6 +42,12 @@ call :TEST sys_chars_exe_cmdline
 set __STRING__=$*^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+?** ,;=
 call :TEST sys_chars_exe_cmdline
 
+set __STRING__="1 2" ! ? * ^^^& ^^^| , ; = ^^= "=" 3
+call :TEST pathlist_chars
+
+set __STRING__=$*^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+?** ,;=
+call :TEST pathlist_chars
+
 echo.
 
 rem WARNING: must be called without the call prefix!
