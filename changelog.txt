@@ -1,4 +1,10 @@
 2024.06.17:
+* new: Scripts/Tools/std/encode: encode_pathlist_chars_glob.bat, decode_pathlist_chars_glob.bat: characters encoder and decoder scripts to bypass control characters interference in path lists with globbing
+* new: Scripts/Tests/manual/batscripts/test_std_encode__pathlist_chars_glob.bat: manual tests for `encode_pathlist_chars_glob.bat` and `decode_pathlist_chars_glob.bat` scripts
+* new: Scripts/Tests/bench/batscripts/test_std_encode__pathlist_chars_glob.bat: bench tests for `encode_pathlist_chars_glob.bat` and `decode_pathlist_chars_glob.bat` scripts
+* changed: Scripts/Tests/manual/batscripts/test_std_encode__pathlist_chars.bat: minor improvement
+
+2024.06.17:
 * new: Scripts/Tests/manual/batscripts/test_std__echo_path_var.bat: manual tests for `echo_path_var.bat` script
 * new: Scripts/Tests/bench/batscripts/test_std__echo_path_var.bat: bench tests for `echo_path_var.bat` script
 * changed: Scripts/Tests/manual/batscripts/test_std_encode__pathlist_chars.bat: minor improvement
