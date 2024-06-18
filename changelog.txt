@@ -1,4 +1,7 @@
 2024.06.18:
+* new: Scripts/Tools/std/set_var.bat: script to set variable from another variable without error level change
+
+2024.06.18:
 * changed: ISSUES.txt: issues update
 
 2024.06.18:
