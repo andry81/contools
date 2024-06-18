@@ -11,7 +11,12 @@ rem   into xcopy preformatted command line of excludes stored as a list of
 rem   strings in a file.
 
 rem Examples:
-rem   1. call convert_excludes_to_xcopy.bat "@excludes_file_list.lst|*.pdb|*.ilk|*.map" "@excludes_dir_list.lst|dir1|dir2" "xcopy_excludes.lst"
+rem   1. >
+rem      call convert_excludes_to_xcopy.bat "@excludes_file_list.lst|*.pdb|*.ilk|*.map" "@excludes_dir_list.lst|dir1|dir2" "xcopy_excludes.lst"
+rem
+rem   2. # NEW FORMAT: to exclude wildcards beginning by `@` or use exclude list file name beginning by `@`
+rem      >
+rem      call convert_excludes_to_xcopy.bat "/@excludes_file_list.lst|:@file|:@file*" "/@excludes_dir_list.lst|:@dir|:@dir*" "xcopy_excludes.lst"
 
 rem CAUTION:
 rem   1. The excludes directory list does NOT differ to the excludes file list because
@@ -46,12 +51,19 @@ set "FILE="
 for /F "eol= tokens=%INDEX% delims=|" %%i in ("%XCOPY_EXCLUDES_LIST%") do set "FILE=%%i"
 if not defined FILE exit /b 0
 
-if "%FILE:~0,1%" == "@" (
-  set "FILE=%FILE:~1%"
-  call :PROCESS_EXCLUDES_LIST_FILE
-) else (
-  call :PROCESS_WILDCARD
-)
+if "%FILE:~0,1%" == "@" set "FILE=%FILE:~1%" & goto EXCLUDE_LIST_FILE
+if "%FILE:~0,1%" == "/" set "FILE=%FILE:~1%" & goto EXCLUDE_LIST_FILE
+if "%FILE:~0,1%" == ":" set "FILE=%FILE:~1%" & goto EXCLUDE_WILDCARD
+goto EXCLUDE_WILDCARD
+
+:EXCLUDE_LIST_FILE
+call :PROCESS_EXCLUDES_LIST_FILE
+goto EXCLUDE_END
+
+:EXCLUDE_WILDCARD
+call :PROCESS_WILDCARD
+
+:EXCLUDE_END
 
 set /A INDEX+=1
 
@@ -68,4 +80,5 @@ exit /b 0
 rem convert `*suffix.ext` into `suffix.ext`
 if "%FILE:~0,1%" == "*" set "FILE=%FILE:~1%"
 for /F "eol= tokens=* delims=" %%i in ("%FILE%") do (echo.%%i) >> "%XCOPY_EXCLUDES_LIST_FILE%"
+
 exit /b 0

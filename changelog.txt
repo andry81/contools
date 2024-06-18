@@ -1,3 +1,6 @@
+2024.06.18:
+* new: Scripts/Tools/xcopy/convert_excludes_*.bat: new format for excludes conversion
+
 2024.06.17:
 * changed: Scripts/Tests/manual/batscripts: test_std__echo_path*_var.bat, test_std_encode__pathlist_chars*.bat: manual tests improvement
 * changed: Scripts/Tests/bench/batscripts: test_std__echo_path*_var.bat, test_std_encode__pathlist_chars*.bat: bench tests improvement

@@ -10,7 +10,12 @@ rem       text file with list of file name wildcards.
 rem   into robocopy preformatted command line of excludes.
 
 rem Examples:
-rem   1. call convert_excludes_to_robocopy.bat "@excludes_file_list.lst|*.pdb|*.ilk|*.map" "@excludes_dir_list.lst|dir1|dir2"
+rem   1. >
+rem      call convert_excludes_to_robocopy.bat "@excludes_file_list.lst|*.pdb|*.ilk|*.map" "@excludes_dir_list.lst|dir1|dir2"
+rem
+rem   2. # NEW FORMAT: to exclude wildcards beginning by `@` or use exclude list file name beginning by `@`
+rem      >
+rem      call convert_excludes_to_robocopy.bat "/@excludes_file_list.lst|:@file|:@file*" "/@excludes_dir_list.lst|:@dir|:@dir*"
 
 rem Drop return value
 set "RETURN_VALUE="
@@ -45,12 +50,19 @@ set "FILE="
 for /F "eol= tokens=%INDEX% delims=|" %%i in ("%ROBOCOPY_EXCLUDES_LIST%") do set "FILE=%%i"
 if not defined FILE exit /b 0
 
-if "%FILE:~0,1%" == "@" (
-  set "FILE=%FILE:~1%"
-  call :PROCESS_EXCLUDES_LIST_FILE
-) else (
-  call :PROCESS_WILDCARD
-)
+if "%FILE:~0,1%" == "@" set "FILE=%FILE:~1%" & goto EXCLUDE_LIST_FILE
+if "%FILE:~0,1%" == "/" set "FILE=%FILE:~1%" & goto EXCLUDE_LIST_FILE
+if "%FILE:~0,1%" == ":" set "FILE=%FILE:~1%" & goto EXCLUDE_WILDCARD
+goto EXCLUDE_WILDCARD
+
+:EXCLUDE_LIST_FILE
+call :PROCESS_EXCLUDES_LIST_FILE
+goto EXCLUDE_END
+
+:EXCLUDE_WILDCARD
+call :PROCESS_WILDCARD
+
+:EXCLUDE_END
 
 set /A INDEX+=1
 
@@ -64,7 +76,7 @@ for /F "usebackq eol= tokens=* delims=" %%i in ("%FILE%") do (
 exit /b 0
 
 :PROCESS_WILDCARD
-for /F "eol= tokens=* delims=" %%i in ("%FILE%") do (
-  set RETURN_VALUE=%RETURN_VALUE% %ROBOCOPY_EXCLUDES_FLAG_PREFIX% "%%i"
-)
+for /F "eol= tokens=* delims=" %%i in ("%FILE%") do ^
+set RETURN_VALUE=%RETURN_VALUE% %ROBOCOPY_EXCLUDES_FLAG_PREFIX% "%%i"
+
 exit /b 0
