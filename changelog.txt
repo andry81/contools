@@ -1,4 +1,7 @@
 2024.06.18:
+* changed: Scripts/Tools/std/if_.bat: comment line of the expression to print the if expression as is
+
+2024.06.18:
 * new: Scripts/Tools/std/assert.bat: assertion script with an outter script execution stop
 
 2024.06.18:
