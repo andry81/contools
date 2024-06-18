@@ -86,3 +86,7 @@ Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat:
 Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat:
 
   * Fix infinite recursion because of builtin backup in `update_shortcut.vbs`.
+
+Scripts/Tools/xmove_dir.bat:
+
+  Does not move nested directories in case of the robocopy.

@@ -1,4 +1,7 @@
 2024.06.18:
+* changed: ISSUES.txt: issues update
+
+2024.06.18:
 * new: Scripts/Tools/std/expand_var*.bat: scripts for variable expansion without error level change
 
 2024.06.18:
