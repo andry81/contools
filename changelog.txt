@@ -1,4 +1,7 @@
 2024.06.19:
+* fixed: Scripts/Tools/std/xmove_dir.bat: always imply flag `/E` in case of `robocopy`, because we always move an entire directory
+
+2024.06.19:
 * changed: Scripts/Tools/std/xmove_*.bat: check on accidental `/S` flag usage (applicable only in `xcopy_*.bat` scripts)
 
 2024.06.18:
