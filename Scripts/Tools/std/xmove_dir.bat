@@ -242,6 +242,10 @@ exit /b 0
 set "XMOVE_FLAG=%~1"
 if not defined XMOVE_FLAG exit /b 0
 set XMOVE_FLAG_PARSED=0
+if "%XMOVE_FLAG%" == "/S" (
+  echo.%?~nx0%: error: /S flag is not supported.
+  exit /b 1
+) >&2
 if "%XMOVE_FLAG%" == "/E" exit /b 0
 if "%XMOVE_FLAG:~0,4%" == "/MOV" (
   echo.%?~nx0%: error: /MOV and /MOVE parameters is not accepted to move a directory.

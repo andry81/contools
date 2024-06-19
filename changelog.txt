@@ -1,3 +1,6 @@
+2024.06.19:
+* changed: Scripts/Tools/std/xmove_*.bat: check on accidental `/S` flag usage (applicable only in `xcopy_*.bat` scripts)
+
 2024.06.18:
 * new: Scripts/Tools/std/set_var.bat: script to set variable from another variable without error level change
 

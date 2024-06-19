@@ -303,6 +303,10 @@ exit /b %LAST_ERROR%
 set "XMOVE_FLAG=%~1"
 if not defined XMOVE_FLAG exit /b 0
 set XMOVE_FLAG_PARSED=0
+if "%XMOVE_FLAG%" == "/S" (
+  echo.%?~nx0%: error: /S flag is not applicable.
+  exit /b 1
+) >&2
 rem CAUTION: /E must be used in case of file globbing including directories
 if "%XMOVE_FLAG%" == "/E" (
   set XMOVE_DIR_RECUR=1
