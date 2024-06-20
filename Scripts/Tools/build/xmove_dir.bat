@@ -11,6 +11,14 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
+if not defined XMOVE_DIR_CMD_BARE_FLAGS goto SKIP_XMOVE_DIR_CMD_BARE_FLAGS
+
+set "XMOVE_DIR_CMD_BARE_FLAGS=%XMOVE_DIR_CMD_BARE_FLAGS:"=%"
+
+if not "%XMOVE_DIR_CMD_BARE_FLAGS:~0,1%" == " " set "XMOVE_DIR_CMD_BARE_FLAGS= %XMOVE_DIR_CMD_BARE_FLAGS%"
+
+:SKIP_XMOVE_DIR_CMD_BARE_FLAGS
+
 call "%%CONTOOLS_ROOT%%/std/xmove_dir.bat"%%XMOVE_DIR_CMD_BARE_FLAGS%% -- %%*
 set LAST_ERROR=%ERRORLEVEL%
 

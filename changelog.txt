@@ -1,3 +1,14 @@
+2024.06.20:
+* fixed: Scripts/Tools/build: xcopy_*.bat, xmove_*.bat: execution fixup
+* fixed: Scripts/Tools/build: xcopy_*.bat, xmove_*.bat: `/Y` flag into `robocopy` flags conversion
+* fixed: Scripts/Tools/build/xmove_file.bat: avoid remove empty source directory in case of `robocopy` usage
+* new: Scripts/Tools/build: xcopy_*.bat, xmove_*.bat: `-touch_dir`, `-touch_file` flags to touch target directories and/or files before move/copy
+* new: Scripts/Tools/build: xcopy_*.bat, xmove_*.bat: `-use_robocopy` to exclusively use `robocopy`
+* changed: Scripts/Tools/build: xcopy_*.bat, xmove_*.bat: always apply `-chcp` option before any command
+* changed: Scripts/Tools/std: touch_*.bat, xcopy_*.bat, xmove_*.bat: removed `TEE` flag from all `robocopy` command lines, print cleanup
+* changed: Scripts/Tools/build: xcopy_*.bat, xmove_*.bat: bare flags space prepend
+* changed: ISSUES.txt: issues update
+
 2024.06.19:
 * fixed: Scripts/Tools/std/xmove_dir.bat: always imply flag `/E` in case of `robocopy`, because we always move an entire directory
 

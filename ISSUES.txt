@@ -87,6 +87,6 @@ Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat:
 
   * Fix infinite recursion because of builtin backup in `update_shortcut.vbs`.
 
-Scripts/Tools/xmove_dir.bat:
+Scripts/Tools/std/xcopy_*.bat, Scripts/Tools/std/xmove_*.bat:
 
-  Does not move nested directories in case of the robocopy.
+  * Fix output touching in case of `/Y` flag absence (no overwrite).

@@ -65,8 +65,6 @@ if "%FILE_DIR:~0,4%" == "\\?\" set "FILE_DIR=%FILE_DIR:~4%"
 rem CAUTION: must be with `\\?\` prefix to workaround a long path
 for /F "eol= tokens=* delims=" %%i in ("\\?\%FILE_PATH%") do set "FILE_ATTR=%%~ai"
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>^>touch "%FILE_PATH%"
-
 if exist "\\?\%FILE_PATH%\*" (
   echo.%?~nx0%: error: file path is a directory: "%FILE_PATH%".
   goto CONTINUE
@@ -104,7 +102,7 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
   set "FILE_PATH_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\touch_file.%RANDOM%-%RANDOM%"
 ) else set "FILE_PATH_TEMP_DIR=%TEMP%\touch_file.%RANDOM%-%RANDOM%"
 
-"%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
+"%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
 
 if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
   copy /B "%FILE_PATH_TEMP_DIR%\%FILE_NAME%"+,, "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul
@@ -112,7 +110,7 @@ if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
   "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & copy /B "%FILE_PATH_TEMP_DIR%\%FILE_NAME%"+,, "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul
 )
 
-"%SystemRoot%\System32\robocopy.exe" "%FILE_PATH_TEMP_DIR%" "%FILE_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
+"%SystemRoot%\System32\robocopy.exe" "%FILE_PATH_TEMP_DIR%" "%FILE_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
 
 rmdir /S /Q "%FILE_PATH_TEMP_DIR%" >nul 2>nul
 

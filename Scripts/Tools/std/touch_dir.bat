@@ -57,8 +57,6 @@ for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
 
 if "%DIR_PATH:~0,4%" == "\\?\" set "DIR_PATH=%DIR_PATH:~4%"
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>^>touch "%DIR_PATH%"
-
 if not exist "\\?\%DIR_PATH%\*" (
   echo.%?~nx0%: error: directory does not exist: "%DIR_PATH%".
   goto CONTINUE
@@ -82,7 +80,7 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
   set "FILE_PATH_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\touch_dir.%RANDOM%-%RANDOM%"
 ) else set "FILE_PATH_TEMP_DIR=%TEMP%\touch_dir.%RANDOM%-%RANDOM%"
 
-"%SystemRoot%\System32\robocopy.exe" "%DIR_PATH%" "%FILE_PATH_TEMP_DIR%" "%DIR_PATH_TEMP_FILE_NAME%" /R:0 /W:0 /NP /TEE /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
+"%SystemRoot%\System32\robocopy.exe" "%DIR_PATH%" "%FILE_PATH_TEMP_DIR%" "%DIR_PATH_TEMP_FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
 
 rmdir /S /Q "%FILE_PATH_TEMP_DIR%" >nul 2>nul
 
