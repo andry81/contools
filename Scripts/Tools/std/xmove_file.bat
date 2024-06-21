@@ -338,19 +338,19 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S
+set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%~dp0touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %XMOVE_DIR_RECUR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%~dp0touch_file.bat" "%%TO_PATH%%"
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (
@@ -381,9 +381,9 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%FROM_FILE_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N
+set ?.=@dir "%FROM_FILE_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "FROM_FILE=%%~nxi"
   echo.^>^>move%XMOVE_FLAGS:~1% "%FROM_DIR_PATH_ABS%\%%~nxi" "%TO_PATH_ABS%"
   if %FLAG_USE_BUILTIN_MOVE% EQU 0 (
@@ -459,19 +459,19 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S
+set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%~dp0touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %XMOVE_DIR_RECUR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%~dp0touch_file.bat" "%%TO_PATH%%"
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (
@@ -506,14 +506,14 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%FROM_FILE_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N
+set ?.=@dir "%FROM_FILE_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N 2^>nul
 
 if %XMOVE_DIR_RECUR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "FROM_FILE=%%~nxi"
     call :EXEC_ROBOCOPY_NO_DIR_REMOVE || goto BREAK
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "FROM_FILE=%%~nxi"
   if exist "\\?\%FROM_DIR_PATH_ABS%\%%~nxi\*" (
     call :EXEC_ROBOCOPY_FILE_AS_DIR || goto BREAK

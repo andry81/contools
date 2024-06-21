@@ -1,3 +1,6 @@
+2024.06.21:
+* refactor: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: minor refactor
+
 2024.06.20:
 * fixed: Scripts/Tools/build: xcopy_*.bat, xmove_*.bat: execution fixup
 * fixed: Scripts/Tools/build: xcopy_*.bat, xmove_*.bat: `/Y` flag into `robocopy` flags conversion

@@ -310,19 +310,19 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S
+set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%~dp0touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %FLAG_TOUCH_FILE% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%~dp0touch_dir.bat" "%%TO_PATH%%"
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (
@@ -426,19 +426,19 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S
+set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%~dp0touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %FLAG_TOUCH_FILE% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%~dp0touch_dir.bat" "%%TO_PATH%%"
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%% 2^>nul`) do (
+) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (
