@@ -1,3 +1,6 @@
+2024.06.28:
+* fixed: Scripts/Tools/ToolAdaptors/sh/detect_find.sh: `unset` in a function does unset a local variable and exposes an outer variable with the same name
+
 2024.06.21:
 * refactor: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: minor refactor
 
