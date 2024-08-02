@@ -1,3 +1,6 @@
+2024.08.02:
+* fixed: **/__init__.sh: wrong parameters line for `tkl_include*` function call
+
 2024.06.28:
 * fixed: Scripts/Tools/ToolAdaptors/sh/detect_find.sh: `unset` in a function does unset a local variable and exposes an outer variable with the same name
 
