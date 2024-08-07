@@ -1,4 +1,7 @@
 2024.08.08:
+* changed: Scripts/Tests/bench/batscripts: added test groups, improved time print
+
+2024.08.08:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: must skip all backed up shortcuts including from old directories
 
 2024.08.07:
