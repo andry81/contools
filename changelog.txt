@@ -1,3 +1,6 @@
+2024.08.08:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: must skip all backed up shortcuts including from old directories
+
 2024.08.07:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: must skip shortcuts from a directory with backed up shortcuts
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: `-backup-dir <dir-path>` option to explicitly set directory to store backed up shortcuts

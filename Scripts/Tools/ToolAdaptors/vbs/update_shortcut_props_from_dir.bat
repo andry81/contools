@@ -246,9 +246,17 @@ set "BACKUP_DIR="
 
 if %FLAG_NO_BACKUP% NEQ 0 SKIP_BACKUP_DIR
 
-call "%%CONTOOLS_WMI_ROOT%%/get_wmic_local_datetime.bat"
+set "BACKUP_DIR=%LINKS_DIR%"
 
-set "BACKUP_DIR=%LINKS_DIR%%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%.backup"
+rem escape for `findstr.exe`
+set "BACKUP_DIR=%BACKUP_DIR:\=\\%"
+set "BACKUP_DIR=%BACKUP_DIR:^=\^%"
+set "BACKUP_DIR=%BACKUP_DIR:$=\$%"
+set "BACKUP_DIR=%BACKUP_DIR:.=\.%"
+set "BACKUP_DIR=%BACKUP_DIR:[=\[%"
+set "BACKUP_DIR=%BACKUP_DIR:]=\]%"
+
+set "BACKUP_DIR=%BACKUP_DIR%[0-9][0-9][0-9][0-9]'[0-9][0-9]'[0-9][0-9]\.backup\\"
 
 set BARE_FLAGS=%BARE_FLAGS% -backup-dir "%BACKUP_DIR%"
 
@@ -266,7 +274,7 @@ rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
 if defined BACKUP_DIR (
-  set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S ^| "%SystemRoot%\System32\findstr.exe" /B /L /I /V /C:"%BACKUP_DIR%\\"
+  set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S ^| "%SystemRoot%\System32\findstr.exe" /B /R /I /V /C:"%BACKUP_DIR%\\"
 ) else set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
