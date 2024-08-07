@@ -4,6 +4,8 @@ setlocal
 
 call "%%~dp0__init__/__init__.bat" || exit /b
 
+echo.^>%~nx0
+
 set __STRING__=a
 
 set "BEGIN_TIME=%TIME%"
@@ -29,5 +31,6 @@ if "%TIME_MSECS:~2,1%" == "" set "TIME_MSECS=0%TIME_MSECS%"
 if "%TIME_MSECS:~1,1%" == "" set "TIME_MSECS=0%TIME_MSECS%"
 
 echo Time spent: %TIME_SECS%.%TIME_MSECS% secs
+echo.
 
 exit /b 0
