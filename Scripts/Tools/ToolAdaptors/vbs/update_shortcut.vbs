@@ -101,6 +101,12 @@
 '''     This form will reduce quantity of generated directories per each backup
 '''     file and in the same time does backup of each shortcut for each call.
 '''
+'''   -backup-dir
+'''     Path to the directory to store backed up shortcuts. Used instead of
+'''     generated one, for example, in case of an external script call from a
+'''     loop.
+'''     Has no effect if directory does not exist.
+'''
 '''   -ignore-unexist
 '''     By default TargetPath and WorkingDirectory does check on existence
 '''     before assign. Use this flag to skip the check.
@@ -296,6 +302,7 @@ Dim ExpectFlags : ExpectFlags = True
 Dim PrintAssign : PrintAssign = False
 
 Dim BackupShortcut : BackupShortcut = True
+Dim BackupDir : BackupDir = ""
 
 Dim IgnoreUnexist : IgnoreUnexist = False
 
@@ -352,6 +359,9 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         ChangeCurrentDirectoryExist = True
       ElseIf arg = "-no-backup" Then
         BackupShortcut = False
+      ElseIf arg = "-backup-dir" Then
+        i = i + 1
+        BackupDir = WScript.Arguments(i)
       ElseIf arg = "-ignore-unexist" Then
        IgnoreUnexist = True
       ElseIf arg = "-print-assign" Or arg = "-p" Then ' Print assign
@@ -485,6 +495,14 @@ Function IsPathExists(Path)
     IsPathExists = True
   Else
     IsPathExists = False
+  End If
+End Function
+
+Function IsPathAbsolute(Path)
+  If Left(Path, 1) = "\" Or Mid(Path, 2, 2) = ":\" Then
+    IsPathAbsolute = True
+  Else
+    IsPathAbsolute = False
   End If
 End Function
 
@@ -798,12 +816,6 @@ If ShortcutUpdated Then
     Dim NowDateTime : NowDateTime = Now ' copy
     Dim t : t = Timer ' copy for milliseconds resolution
 
-    Dim YYYY : YYYY = DatePart("yyyy", NowDateTime)
-    Dim MM : MM = Right("0" & DatePart("m", NowDateTime), 2)
-    Dim DD : DD = Right("0" & DatePart("d", NowDateTime), 2)
-
-    Dim BackupDateName : BackupDateName = YYYY & "'" & MM & "'" & DD
-
     Dim HH : HH = Right("0" & DatePart("h", NowDateTime), 2)
     Dim mm_ : mm_ = Right("0" & DatePart("n", NowDateTime), 2)
     Dim ss : ss = Right("0" & DatePart("s", NowDateTime), 2)
@@ -813,8 +825,42 @@ If ShortcutUpdated Then
 
     Dim ShortcutFileDir : ShortcutFileDir = objFS.GetParentFolderName(ShortcutFilePathToOpen)
 
-    ' YYYY'MM'DD.backup
-    Dim ShortcutFileBackupDir : ShortcutFileBackupDir = ShortcutFileDir & "\" & BackupDateName & ".backup"
+    Dim ShortcutFileBackupDir
+    Dim backup_dir_path_abs
+
+    ' NOTE:
+    '   The `*Exists` methods will return False on a long path without `\\?\`
+    '   prefix.
+    '
+
+    If Len(BackupDir) > 0 Then
+      backup_dir_path_abs = objFS.GetAbsolutePathName(BackupDir)
+
+      ' remove `\\?\` prefix
+      If Left(backup_dir_path_abs, 4) = "\\?\" Then
+        backup_dir_path_abs = Mid(backup_dir_path_abs, 5)
+      End If
+
+      If objFS.FolderExists("\\?\" & backup_dir_path_abs) Then
+        ' check on absolute path
+        If IsPathAbsolute(BackupDir) Then
+          ShortcutFileBackupDir = backup_dir_path_abs
+        Else
+          ShortcutFileBackupDir = ShortcutFileDir & "\" & backup_dir_path_abs
+        End If
+      End If
+    End If
+
+    If Not (Len(ShortcutFileBackupDir) > 0) Then
+      ' YYYY'MM'DD.backup
+      Dim YYYY : YYYY = DatePart("yyyy", NowDateTime)
+      Dim MM : MM = Right("0" & DatePart("m", NowDateTime), 2)
+      Dim DD : DD = Right("0" & DatePart("d", NowDateTime), 2)
+
+      Dim BackupDateName : BackupDateName = YYYY & "'" & MM & "'" & DD
+
+      ShortcutFileBackupDir = ShortcutFileDir & "\" & BackupDateName & ".backup"
+    End If
 
     If Not objFS.FolderExists(ShortcutFileBackupDir) Then
       objFS.CreateFolder ShortcutFileBackupDir
@@ -854,7 +900,7 @@ If ShortcutUpdated Then
           WScript.ScriptName & ": error: input file path does not exist:" & vbCrLf & _
           WScript.ScriptName & ": info: InputPath=`" & from_file_path_abs & "`"
         WScript.Quit 1
-      End IF
+      End If
 
       ' remove `\\?\` prefix
       If Left(to_file_path_abs, 4) = "\\?\" Then
@@ -879,7 +925,7 @@ If ShortcutUpdated Then
           WScript.ScriptName & ": error: output parent directory path does not exist:" & vbCrLf & _
           WScript.ScriptName & ": info: OutputPath=`" & to_file_path_abs & "`"
         WScript.Quit 2
-      End IF
+      End If
 
       ' test on long path existence
       If Not objFS.FileExists(from_file_path_abs) Then

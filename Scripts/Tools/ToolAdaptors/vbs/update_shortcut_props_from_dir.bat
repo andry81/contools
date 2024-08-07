@@ -87,6 +87,7 @@ set FLAG_MATCH_STRING=0
 set FLAG_DELETE=0
 set "FLAG_MATCH_STRING_VALUE="
 set "FLAG_CHCP="
+set FLAG_NO_BACKUP=0
 set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=0
 set FLAG_NO_ALLOW_DOS_TARGET_PATH=0
 set FLAG_USE_CASE_COMPARE=0
@@ -122,6 +123,7 @@ if defined FLAG (
     set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-no-backup" (
     set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+    set FLAG_NO_BACKUP=1
   ) else if "%FLAG%" == "-ignore-unexist" (
     set BARE_FLAGS=%BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-no-skip-on-empty-assign" (
@@ -240,6 +242,18 @@ for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi
 
 if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
 
+set "BACKUP_DIR="
+
+if %FLAG_NO_BACKUP% NEQ 0 SKIP_BACKUP_DIR
+
+call "%%CONTOOLS_WMI_ROOT%%/get_wmic_local_datetime.bat"
+
+set "BACKUP_DIR=%LINKS_DIR%%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%.backup"
+
+set BARE_FLAGS=%BARE_FLAGS% -backup-dir "%BACKUP_DIR%"
+
+:SKIP_BACKUP_DIR
+
 rem CAUTION:
 rem   1. If a variable is empty, then it would not be expanded in the `cmd.exe`
 rem      command line or in the inner expression of the
@@ -251,7 +265,9 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S
+if defined BACKUP_DIR (
+  set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S ^| "%SystemRoot%\System32\findstr.exe" /B /L /I /V /C:"%BACKUP_DIR%\\"
+) else set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "LINK_FILE_PATH=%%i"
