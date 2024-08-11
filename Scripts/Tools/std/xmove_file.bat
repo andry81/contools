@@ -343,22 +343,22 @@ set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 if %FLAG_TOUCH_DIR% EQU 0 (
   for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
-    call "%%~dp0touch_file.bat" "%%TO_PATH%%"
+    call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %XMOVE_DIR_RECUR% EQU 0 (
   for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
-    call "%%~dp0touch_file.bat" "%%TO_PATH%%"
+    call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
 ) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (
-      call "%%~dp0touch_dir.bat" "%%TO_PATH%%"
+      call "%%?~dp0%%touch_dir.bat" "%%TO_PATH%%"
     )
   ) else (
     if %FLAG_TOUCH_FILE% NEQ 0 (
-      call "%%~dp0touch_file.bat" "%%TO_PATH%%"
+      call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
     )
   )
 )
@@ -464,22 +464,22 @@ set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 if %FLAG_TOUCH_DIR% EQU 0 (
   for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
-    call "%%~dp0touch_file.bat" "%%TO_PATH%%"
+    call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %XMOVE_DIR_RECUR% EQU 0 (
   for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
-    call "%%~dp0touch_file.bat" "%%TO_PATH%%"
+    call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
 ) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (
-      call "%%~dp0touch_dir.bat" "%%TO_PATH%%"
+      call "%%?~dp0%%touch_dir.bat" "%%TO_PATH%%"
     )
   ) else (
     if %FLAG_TOUCH_FILE% NEQ 0 (
-      call "%%~dp0touch_file.bat" "%%TO_PATH%%"
+      call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
     )
   )
 )

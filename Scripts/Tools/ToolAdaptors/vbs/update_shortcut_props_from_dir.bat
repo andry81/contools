@@ -158,7 +158,7 @@ if defined FLAG (
 
 if %FLAG_MATCH_STRING% NEQ 0 ^
 if not defined FLAG_MATCH_STRING_VALUE (
-  echo.%~nx0: error: MATCH_STRING must be defined.
+  echo.%?~nx0%: error: MATCH_STRING must be defined.
   exit /b 255
 ) >&2
 
@@ -191,34 +191,34 @@ set "REPLACE_TO=%~4"
 if defined LINKS_DIR if exist "%LINKS_DIR%\*" goto LINKS_DIR_EXIST
 
 (
-  echo.%~nx0: error: LINKS_DIR does not exist: `%LINKS_DIR%`.
+  echo.%?~nx0%: error: LINKS_DIR does not exist: `%LINKS_DIR%`.
   exit /b 255
 ) >&2
 
 :LINKS_DIR_EXIST
 
 if not defined PROPS_LIST (
-  echo.%~nx0: error: PROPS_LIST is not defined.
+  echo.%?~nx0%: error: PROPS_LIST is not defined.
   exit /b 255
 ) >&2
 
 if not defined REPLACE_FROM (
-  echo.%~nx0: error: REPLACE_FROM is not defined.
+  echo.%?~nx0%: error: REPLACE_FROM is not defined.
   exit /b 255
 ) >&2
 
 if %FLAG_DELETE% EQU 0 (
   if not defined REPLACE_TO (
-    echo.%~nx0: error: REPLACE_TO is not defined.
+    echo.%?~nx0%: error: REPLACE_TO is not defined.
     exit /b 255
   ) >&2
 
   if "%REPLACE_FROM%" == "%REPLACE_TO%" (
-    echo.%~nx0: error: REPLACE_FROM must be not equal to REPLACE_TO: REPLACE_FROM="%REPLACE_FROM%".
+    echo.%?~nx0%: error: REPLACE_FROM must be not equal to REPLACE_TO: REPLACE_FROM="%REPLACE_FROM%".
     exit /b 255
   ) >&2
 ) else if defined REPLACE_TO (
-  echo.%~nx0: error: REPLACE_TO must be not defined.
+  echo.%?~nx0%: error: REPLACE_TO must be not defined.
   exit /b 255
 ) >&2
 
@@ -232,7 +232,7 @@ set "PROPS_LIST_FILTERED="
 if defined PROPS_LIST set "PROPS_LIST_FILTERED=%PROPS_LIST:|=%"
 
 if not defined PROPS_LIST_FILTERED (
-  echo.%~nx0: error: PROPS_LIST is empty or not applied: PROPS_LIST="%PROPS_LIST%".
+  echo.%?~nx0%: error: PROPS_LIST is empty or not applied: PROPS_LIST="%PROPS_LIST%".
   exit /b 255
 ) >&2
 

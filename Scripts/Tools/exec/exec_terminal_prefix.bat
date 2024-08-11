@@ -22,6 +22,8 @@ if defined NO_LOG set /A NO_LOG+=0
 rem Do not make a log output or stdio duplication into files
 if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 
+set "?~nx0=%~nx0"
+
 rem script flags
 set FLAG_LOG_STDIN=0
 if not defined FLAG_SHIFT set FLAG_SHIFT=0
@@ -61,12 +63,12 @@ if %NO_LOG%0 NEQ 0 set FLAG_NO_LOG=1
 if %NO_LOG_OUTPUT%0 NEQ 0 set FLAG_NO_LOG=1
 
 if not exist "%PROJECT_LOG_DIR%\*" if %FLAG_NO_LOG% EQU 0 (
-  echo.%~nx0: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
+  echo.%?~nx0%: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
   exit /b 255
 ) >&2
 
 if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
-  echo.%~nx0: error: can not use initial variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
+  echo.%?~nx0%: error: can not use initial variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
   exit /b 255
 ) >&2
 

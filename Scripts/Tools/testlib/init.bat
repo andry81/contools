@@ -58,7 +58,7 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_LOCAL_TEMP_D
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VARS_DIR          "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%/test_return_vars"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VARS_FILE_PATH    "%%TEST_SCRIPT_RETURN_VARS_DIR%%/vars.txt"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VALUES_FILE_PATH  "%%TEST_SCRIPT_RETURN_VARS_DIR%%/names.txt"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VALUES_FILE_PATH  "%%TEST_SCRIPT_RETURN_VARS_DIR%%/values.txt"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_LOCK_FILE_PATH    "%%TEST_SCRIPT_RETURN_VARS_DIR%%/.lock"
 
 set "TEST_SCRIPT_HANDLERS_DIR=%~2"

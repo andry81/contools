@@ -77,7 +77,7 @@ set "DESTDIR_ABS=%~f2"
 set "PYTHON_EXE=%PYTHON_DIR%\python.exe"
 
 if not exist "%PYTHON_EXE%" (
-  echo.%~nx0: error: python.exe is not found: "%PYTHON_EXE%"
+  echo.%?~nx0%: error: python.exe is not found: "%PYTHON_EXE%"
   exit /b 255
 ) >&2
 
@@ -85,7 +85,7 @@ if defined DESTDIR ^
 if exist "%DESTDIR_ABS%\*" goto DESTDIR_OK
 
 (
-  echo.%~nx0: error: DESTDIR is invalid: "%DESTDIR_ABS%"
+  echo.%?~nx0%: error: DESTDIR is invalid: "%DESTDIR_ABS%"
   exit /b 254
 ) >&2
 

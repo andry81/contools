@@ -1,4 +1,8 @@
 2024.08.11:
+* fixed: builtins usage
+* fixed: code cleanup, casual fixup
+
+2024.08.11:
 * new: Deploy/notepad++/plugins/MultiReplace/Lists/contools/replace_builtins.csv: builtin variables replacer in `contools` sources
 * new: Deploy/notepad++/plugins/MultiReplace/Lists/README_EN.txt: readme
 

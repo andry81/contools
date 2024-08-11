@@ -61,17 +61,17 @@ set "BOM_FILE_TOKEN=%~2"
 set "OUTPUT_FILE_PATH=%~3"
 
 if not defined INPUT_FILE_PATH (
-  echo.%~nx0%: error: INPUT_FILE_PATH is not defined.
+  echo.%?~nx0%%: error: INPUT_FILE_PATH is not defined.
   exit /b 255
 ) >&2
 
 if not defined BOM_FILE_TOKEN (
-  echo.%~nx0%: error: BOM_FILE_TOKEN is not defined.
+  echo.%?~nx0%%: error: BOM_FILE_TOKEN is not defined.
   exit /b 255
 ) >&2
 
 if not defined OUTPUT_FILE_PATH (
-  echo.%~nx0%: error: OUTPUT_FILE_PATH is not defined.
+  echo.%?~nx0%%: error: OUTPUT_FILE_PATH is not defined.
   exit /b 255
 ) >&2
 
@@ -82,22 +82,22 @@ for /f "eol= tokens=* delims=" %%i in ("%BOM_FILE_PATH%\.") do ( set "BOM_FILE_
 for /f "eol= tokens=* delims=" %%i in ("%OUTPUT_FILE_PATH%\.") do ( set "OUTPUT_FILE_DIR=%%~dpi" & set "OUTPUT_FILE_PATH=%%~fi" )
 
 if not exist "%INPUT_FILE_PATH%" (
-  echo.%~nx0%: error: INPUT_FILE_PATH does not exist: "%INPUT_FILE_PATH%".
+  echo.%?~nx0%%: error: INPUT_FILE_PATH does not exist: "%INPUT_FILE_PATH%".
   exit /b 255
 ) >&2
 
 if not exist "%BOM_FILE_PATH%" (
-  echo.%~nx0%: error: BOM_FILE_TOKEN token file does not exist: "%BOM_FILE_PATH%".
+  echo.%?~nx0%%: error: BOM_FILE_TOKEN token file does not exist: "%BOM_FILE_PATH%".
   exit /b 255
 ) >&2
 
 if not exist "%OUTPUT_FILE_DIR%\*" (
-  echo.%~nx0%: error: OUTPUT_FILE_DIR does not exist: "%OUTPUT_FILE_DIR%".
+  echo.%?~nx0%%: error: OUTPUT_FILE_DIR does not exist: "%OUTPUT_FILE_DIR%".
   exit /b 255
 ) >&2
 
 if /i "%INPUT_FILE_PATH%" == "%OUTPUT_FILE_PATH%" (
-  echo.%~nx0%: error: INPUT_FILE_PATH and OUTPUT_FILE_PATH must be different: "%INPUT_FILE_PATH%".
+  echo.%?~nx0%%: error: INPUT_FILE_PATH and OUTPUT_FILE_PATH must be different: "%INPUT_FILE_PATH%".
   exit /b 1
 ) >&2
 
@@ -114,7 +114,7 @@ rem an UTF16LE file automatically checked for the BOM by the copy utility
 if /i "%BOM_FILE_TOKEN%" == "fffe" (
   rem copy as text files
   copy "%BOM_FILE_PATH%" /A + "%INPUT_FILE_PATH%" /A "%OUTPUT_FILE_PATH%" /B /Y >nul 2>nul || (
-    echo.%~nx0%: error: could not copy to the output file (1^): "%OUTPUT_FILE_PATH%".
+    echo.%?~nx0%%: error: could not copy to the output file (1^): "%OUTPUT_FILE_PATH%".
     exit /b 2
   ) >&2
 
@@ -152,7 +152,7 @@ if %RESTORE_LOCALE% GTR 1 (
 )
 
 copy "%INPUT_FILE_PATH%" "%OUTPUT_FILE_PATH%" /B /Y >nul 2>nul || (
-  echo.%~nx0%: error: could not copy to the output file (2^): "%OUTPUT_FILE_PATH%".
+  echo.%?~nx0%%: error: could not copy to the output file (2^): "%OUTPUT_FILE_PATH%".
   exit /b 2
 ) >&2
 
@@ -167,7 +167,7 @@ if %RESTORE_LOCALE% GTR 1 (
 
 rem copy as binary files
 copy "%BOM_FILE_PATH%" /B + "%INPUT_FILE_PATH%" /B "%OUTPUT_FILE_PATH%" /B /Y >nul 2>nul || (
-  echo.%~nx0%: error: could not copy to the output file (3^): "%OUTPUT_FILE_PATH%".
+  echo.%?~nx0%%: error: could not copy to the output file (3^): "%OUTPUT_FILE_PATH%".
   exit /b 2
 ) >&2
 
