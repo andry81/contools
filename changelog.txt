@@ -1,3 +1,7 @@
+2024.08.11:
+* new: Deploy/notepad++/plugins/MultiReplace/Lists/contools/replace_builtins.csv: builtin variables replacer in `contools` sources
+* new: Deploy/notepad++/plugins/MultiReplace/Lists/README_EN.txt: readme
+
 2024.08.08:
 * changed: Scripts/Tests/bench/batscripts: added test groups, improved time print
 
@@ -229,9 +233,9 @@
 * new: __init__/canonical_path_if_ndef.bat, Scripts/Tools/std/canonical_path_if_ndef.bat: `canonical_path.bat` script variant
 * new: Scripts/Tools/cmake: canonical_path.bat, canonical_path_if_ndef.bat: `canonical_path.bat` script variants for cmake
 * new: Scripts/Tools/build: call.bat, callln.bat, callsub.bat: call with command line print scripts
-* new: Scripts/Tools/build: mkdir.bat, mkdir_if_notexist.bat, mkdir_if_notexist_strict.bat: `mkdir` command replacement as more reliable user script variant
+* new: Scripts/Tools/build: mkdir.bat, mkdir_if_notexist.bat, mkdir_if_notexist_strict.bat: `mkdir` command replacement as more reliable build script variant
 * new: Scripts/Tools/build: xcopy_dir.bat, xcopy_file.bat, xmove_dir.bat, xmove_file.bat: build pipeline script variants
-* new: Scripts/Tools/std: mkdir.bat, mkdir_if_notexist.bat, mkdir_if_notexist_strict.bat: `mkdir` command replacement as more reliable build script variant
+* new: Scripts/Tools/std: mkdir.bat, mkdir_if_notexist.bat, mkdir_if_notexist_strict.bat: `mkdir` command replacement as more reliable user script variant
 * new: Scripts/Tools/std/call_if_exist.bat: call command line if first argument exists
 * new: Scripts/Tools/std/del_file_if_exist.bat: `del_file.bat` script variant
 * new: Scripts/Tools/std: if_defined.bat, if_var_defined*.bat: `if_.bat` script variants

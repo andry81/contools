@@ -1,0 +1,2 @@
+Selected,Find,Replace,WholeWord,MatchCase,UseVariables,Regex,Extended
+1,"(^|[^a-zA-Z0-9])(%|%%|%%%%)(~?(?:f|d|dp|n|nx|x)?0)","$1$2?$3$2",0,0,0,0,1
