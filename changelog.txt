@@ -1,3 +1,6 @@
+2024.08.12:
+* changed: Scripts/Tools/admin/ProductKey/WinReg.py: code cleanup
+
 2024.08.11:
 * fixed: builtins usage
 * fixed: code cleanup, casual fixup

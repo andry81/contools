@@ -31,11 +31,11 @@ class WinRegStatics:
 class WinReg:
   @staticmethod
   def static_init():
-    return WinRegStatics.static_init();
+    return WinRegStatics.static_init()
 
   @staticmethod
   def static_uninit():
-    return WinRegStatics.static_uninit();
+    return WinRegStatics.static_uninit()
 
   def __init__(self):
     pass
