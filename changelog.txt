@@ -1,3 +1,7 @@
+2024.08.14:
+* changed: Scripts/Tools/std/is_dir_exist.bat: improved to work with long paths
+* refactor: Scripts/Tools/std/is_dir_exist.bat: moved from `filesys` subdirectory
+
 2024.08.12:
 * changed: Scripts/Tools/admin/ProductKey/WinReg.py: code cleanup
 
