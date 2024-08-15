@@ -49,7 +49,7 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%DIR_PATH%\%DIR_NAME_PTTN%" /A:D /B /O:N
+set ?.=@dir "%DIR_PATH%\%DIR_NAME_PTTN%" /A:D /B /O:N 2^>nul
 
 set "DIR_NAME="
 for /F "usebackq tokens=* delims=" %%i in (`%%?.%%`) do set "DIR_NAME=%%i"

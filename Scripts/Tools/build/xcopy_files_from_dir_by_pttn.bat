@@ -83,7 +83,7 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir %FILE_PTTN_LIST% /A:-D /B /O:N /S
+set ?.=@dir %FILE_PTTN_LIST% /A:-D /B /O:N /S 2^>nul
 
 pushd "%XCOPY_FROM_DIR%" && (
   for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do set "FILE_PATH=%%i" & call :PROCESS

@@ -35,11 +35,11 @@
 '''   `-ignore-unexist` flag.
 
 ''' NOTE:
-'''   Script may return a lozalized name of a verb.
+'''   Script may return a localized name of a verb.
 
 ''' Examples:
 '''   1. >
-'''      cscript //nologo read_path_all_verbs.vbs -"c:\windows\system32\cmd.exe"
+'''      cscript //nologo read_path_all_verbs.vbs "c:\windows\system32\cmd.exe"
 '''   2. >
 '''      cscript //nologo read_path_all_verbs.vbs "...\shortcut.lnk"
 '''   3. >

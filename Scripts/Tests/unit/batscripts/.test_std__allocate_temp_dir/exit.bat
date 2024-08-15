@@ -21,7 +21,7 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%TEST_TEMP_DIR%" /B /O:-N
+set ?.=@dir "%TEST_TEMP_DIR%" /B /O:-N 2^>nul
 
 rem cleanup empty temporary directory
 set "TEST_TEMP_DIR_PATH_ITEM="

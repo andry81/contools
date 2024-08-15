@@ -28,7 +28,7 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%FLYLINKDC_SETTINGS_PATH%\*.sqlite" /A:-D /B /O:N
+set ?.=@dir "%FLYLINKDC_SETTINGS_PATH%\*.sqlite" /A:-D /B /O:N 2^>nul
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "FILE_NAME=%%i"

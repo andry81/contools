@@ -102,7 +102,7 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%SOURCE_DIR%\*.pyc." /A:-D /B /O:N /S
+set ?.=@dir "%SOURCE_DIR%\*.pyc." /A:-D /B /O:N /S 2^>nul
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set FILE_PATH=%%i

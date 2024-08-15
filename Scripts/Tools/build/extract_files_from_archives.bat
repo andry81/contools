@@ -147,7 +147,7 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir%SEARCH_FROM_FILES% /A:-D /B /O:N /S
+set ?.=@dir%SEARCH_FROM_FILES% /A:-D /B /O:N /S 2^>nul
 
 if defined SEARCH_FROM_FILES for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do set "ARC_FILE_PATH=%%i" & call :PROCESS_DIR
 exit /b

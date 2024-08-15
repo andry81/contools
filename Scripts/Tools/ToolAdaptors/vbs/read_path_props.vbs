@@ -3,7 +3,7 @@
 ''' USAGE:
 '''   read_path_props.vbs
 '''     [-v[al-only]]
-'''     [-v[al-decor-only] | -vd]
+'''     [-val-decor-only | -vd]
 '''     [-val-null | -vnull]
 '''     [-val-notempty | -n]
 '''     [-x] [-i[gnore-unexist]]
@@ -24,7 +24,7 @@
 '''     Has effect if `-val-notempty` is used.
 '''     Has no effect if `-val-decor-only` is used.
 '''
-'''   -v[al-decor-only] | -vd
+'''   -val-decor-only | -vd
 '''     Print only decorated property value instead of decorated assignment
 '''     expression.
 '''     Has effect if `-val-null` is used.
@@ -62,7 +62,8 @@
 '''   <PropertyPattern>
 '''     List of property names or property indexes to read, separated by `|`
 '''     character.
-'''     Property indexes has effect only when `-extended-prop` is not used.
+'''     Property indexes has effect only when `-x` flag is not used
+'''     (`ExtendedProperty` method).
 '''
 '''   <Path>
 '''     Path to read.

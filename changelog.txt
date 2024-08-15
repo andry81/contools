@@ -1,3 +1,7 @@
+2024.08.15:
+* fixed: Scripts: `File Not Found` error message from `dir` command
+* refactor: Scripts/Tools/ToolAdaptors/vbs: code cleanup
+
 2024.08.14:
 * changed: Scripts/Tools/std/is_dir_exist.bat: improved to work with long paths
 * refactor: Scripts/Tools/std/is_dir_exist.bat: moved from `filesys` subdirectory

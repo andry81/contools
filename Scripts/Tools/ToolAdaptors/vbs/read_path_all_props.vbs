@@ -3,7 +3,7 @@
 ''' USAGE:
 '''   read_path_all_props.vbs
 '''     [-v[al-only]]
-'''     [-v[al-decor-only] | -vd]
+'''     [-val-decor-only | -vd]
 '''     [-val-null | -vnull]
 '''     [-val-notempty | -n]
 '''     [-i[gnore-unexist]]
@@ -24,7 +24,7 @@
 '''     Has effect if `-val-notempty` is used.
 '''     Has no effect if `-val-decor-only` is used.
 '''
-'''   -v[al-decor-only] | -vd
+'''   -val-decor-only | -vd
 '''     Print only decorated property value instead of decorated assignment
 '''     expression.
 '''     Has effect if `-val-null` is used.
@@ -69,8 +69,8 @@
 '''   `-ignore-unexist` flag.
 
 ''' CAUTION:
-'''   Script may return a lozalized name of a property. To read a particular
-'''   not lozalized property name you must use another script -
+'''   Script may return a localized name of a property. To read a particular
+'''   not localized property name you must use another script -
 '''   `read_path_props.vbs` with `-x` flag.
 
 ''' Examples:
