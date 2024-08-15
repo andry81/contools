@@ -1,4 +1,8 @@
 2024.08.15:
+* new: Scripts/Tests/bench/batscripts: test__type_nul_tempfile.bat, test__copy_nul_tempfile.bat: tests to compare empty file creation over `type` and `copy` commands
+* changed: Scripts/Tests/bench/batscripts: tests performance minor improvement
+
+2024.08.15:
 * fixed: Scripts: `File Not Found` error message from `dir` command
 * refactor: Scripts/Tools/ToolAdaptors/vbs: code cleanup
 

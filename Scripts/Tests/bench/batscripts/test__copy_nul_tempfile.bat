@@ -6,14 +6,14 @@ call "%%~dp0__init__/__init__.bat" || exit /b
 
 echo.^>%~nx0
 
-set __LIST__=$*^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+?** ,;=
+set "TEMP_FILE=%TEMP%\@copy-%RANDOM%-%RANDOM%.txt"
 
 setlocal DISABLEDELAYEDEXPANSION
 
 set "BEGIN_TIME=%TIME%"
 
-for /L %%i in (1,1,10) do (
-  call "%%CONTOOLS_ROOT%%/std/echo_path_var.bat" __LIST__ >nul
+for /L %%i in (1,1,10000) do (
+  copy nul "%TEMP_FILE%" /B /Y >nul 2>nul
 )
 
 call "%%CONTOOLS_ROOT%%/timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"
@@ -33,5 +33,7 @@ if "%TIME_MSECS:~1,1%" == "" set "TIME_MSECS=0%TIME_MSECS%"
 
 echo Time spent: %TIME_SECS%.%TIME_MSECS% secs
 echo.
+
+del /F /Q /A:-D "%TEMP_FILE%" >nul 2>nul
 
 exit /b 0

@@ -9,18 +9,21 @@ echo.^>%~nx0
 rem CAUTION: no globbing characters here, because the result is dependent on the file system
 set __STRING__=$^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+ ,;=
 
-set "BEGIN_TIME=%TIME%"
-
 setlocal DISABLEDELAYEDEXPANSION
+
+set "BEGIN_TIME=%TIME%"
 
 for /L %%i in (1,1,10) do (
   call "%%CONTOOLS_ROOT%%/std/encode/encode_pathlist_chars_glob.bat"
   call "%%CONTOOLS_ROOT%%/std/encode/decode_pathlist_chars_glob.bat"
 )
 
-endlocal
-
 call "%%CONTOOLS_ROOT%%/timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"
+
+(
+  endlocal
+  set "TIMEDIFF=%TIMEDIFF%"
+)
 
 set /A TIMEDIFF/=10
 

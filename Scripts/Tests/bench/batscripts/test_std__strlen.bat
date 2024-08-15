@@ -8,9 +8,9 @@ echo.^>%~nx0
 
 set __STRING__=a
 
-set "BEGIN_TIME=%TIME%"
+setlocal DISABLEDELAYEDEXPANSION
 
-setlocal ENABLEDELAYEDEXPANSION
+set "BEGIN_TIME=%TIME%"
 
 for /L %%i in (1,1,13) do (
   call "%%CONTOOLS_ROOT%%/std/strlen.bat" /v
@@ -18,9 +18,12 @@ for /L %%i in (1,1,13) do (
   set __STRING__=!__STRING__!!__STRING__!
 )
 
-endlocal
-
 call "%%CONTOOLS_ROOT%%/timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"
+
+(
+  endlocal
+  set "TIMEDIFF=%TIMEDIFF%"
+)
 
 set /A TIMEDIFF/=13
 

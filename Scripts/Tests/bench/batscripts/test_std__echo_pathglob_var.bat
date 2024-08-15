@@ -9,17 +9,20 @@ echo.^>%~nx0
 rem CAUTION: no globbing characters here, because the result is dependent on the file system
 set __LIST__=$^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+ ,;=
 
-set "BEGIN_TIME=%TIME%"
-
 setlocal DISABLEDELAYEDEXPANSION
+
+set "BEGIN_TIME=%TIME%"
 
 for /L %%i in (1,1,10) do (
   call "%%CONTOOLS_ROOT%%/std/echo_pathglob_var.bat" __LIST__ >nul
 )
 
-endlocal
-
 call "%%CONTOOLS_ROOT%%/timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"
+
+(
+  endlocal
+  set "TIMEDIFF=%TIMEDIFF%"
+)
 
 set /A TIMEDIFF/=10
 

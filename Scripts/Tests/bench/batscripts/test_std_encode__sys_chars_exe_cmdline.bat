@@ -8,18 +8,21 @@ echo.^>%~nx0
 
 set __STRING__=$*^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+?** ,;=
 
-set "BEGIN_TIME=%TIME%"
-
 setlocal DISABLEDELAYEDEXPANSION
+
+set "BEGIN_TIME=%TIME%"
 
 for /L %%i in (1,1,10) do (
   call "%%CONTOOLS_ROOT%%/std/encode/encode_sys_chars_exe_cmdline.bat"
   call "%%CONTOOLS_ROOT%%/std/encode/decode_sys_chars_exe_cmdline.bat"
 )
 
-endlocal
-
 call "%%CONTOOLS_ROOT%%/timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"
+
+(
+  endlocal
+  set "TIMEDIFF=%TIMEDIFF%"
+)
 
 set /A TIMEDIFF/=10
 

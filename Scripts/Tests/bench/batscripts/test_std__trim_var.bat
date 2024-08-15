@@ -8,15 +8,18 @@ echo.^>%~nx0
 
 set myvar1= 	 	 	 1 ! 2 ^| 3 ^& 4 ^^ 5 = 6 , 7 ; 8 * 9 # 0 %% 1 / 2 \ 3 ? 4 ^> 5 ^< 6 " 7 	 	 	 
 
-set "BEGIN_TIME=%TIME%"
-
 setlocal DISABLEDELAYEDEXPANSION
+
+set "BEGIN_TIME=%TIME%"
 
 for /L %%i in (1,1,10) do call "%%CONTOOLS_ROOT%%/std/trim_var.bat" myvar1 myvar2
 
-endlocal
-
 call "%%CONTOOLS_ROOT%%/timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"
+
+(
+  endlocal
+  set "TIMEDIFF=%TIMEDIFF%"
+)
 
 set /A TIMEDIFF/=10
 
