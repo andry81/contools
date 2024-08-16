@@ -62,6 +62,11 @@ if defined FLAG (
   if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
+rem CAUTION:
+rem   Below lines of code has a copy in the `update_shortcut_props_from_dir.bat` script.
+rem   In case of change must be merged between copies.
+rem
+
 set "TARGET_PATH_TEMP_STDOUT_FILE="
 set "TARGET_PATH_TEMP_STDERR_FILE="
 
@@ -105,8 +110,8 @@ rem NOTE: `type` respects UTF-16LE file with BOM header
 type "%TARGET_PATH_STDERR_FILE%" >&2
 
 if %FLAG_USE_EXTENDED_PROPERTY% EQU 0 (
-  for /F "usebackq eol= tokens=1,* delims==" %%i in (`@type "%TARGET_PATH_STDOUT_FILE%"`) do set "RETURN_VALUE=%%j"
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%TARGET_PATH_STDOUT_FILE%"`) do set "RETURN_VALUE=%%i"
+  for /F "usebackq eol= tokens=1,* delims==" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%j"
+) else for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%i"
 
 if %FLAG_USE_EXTENDED_PROPERTY% NEQ 0 exit /b
 if %FLAG_RETRY_EXTENDED_PROPERTY% EQU 0 exit /b

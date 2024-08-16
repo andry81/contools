@@ -1,3 +1,9 @@
+2024.08.16:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: reimplemented using code base from `read_shortcut_target_path.bat` script as most reliable
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: `File Not Found` error message from `dir` command
+* fixed: **/*.vbs: stdout and stderr write fail in case of not printable unicode origin character (`&H3F`)
+* changed: Scripts/Tools: filesys/read_shortcut_target_path.bat, ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: code cleanup
+
 2024.08.15:
 * new: Scripts/Tests/bench/batscripts: test__type_nul_tempfile.bat, test__copy_nul_tempfile.bat: tests to compare empty file creation over `type` and `copy` commands
 * changed: Scripts/Tests/bench/batscripts: tests performance minor improvement

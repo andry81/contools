@@ -47,8 +47,8 @@
 '''   -u[rl-encode]
 '''     URL encode property value characters in form of `%NN` in case if
 '''     ASCII value < 32 OR > 127 OR = &H25 OR = &H3F, where:
-'''       `&H3F` - is not printable character which may not pass through the
-'''                stdout redirection.
+'''       `&H3F` - is not printable unicode origin character which may not pass
+'''                through the stdout redirection.
 '''       `&H25` - `%`.
 '''
 '''   -line-return | -lr
@@ -93,10 +93,32 @@ Function IsNothing(obj)
   End If
 End Function
 
+Function FixStrToPrint(str)
+  Dim new_str : new_str = ""
+  Dim i, Char, CharAsc
+
+  For i = 1 To Len(str)
+    Char = Mid(str, i, 1)
+    CharAsc = Asc(Char)
+
+    ' NOTE:
+    '   `&H3F` - is not printable unicode origin character which can not pass through the stdout redirection.
+    If CharAsc <> &H3F Then
+      new_str = new_str & Char
+    Else
+      new_str = new_str & "?"
+    End If
+  Next
+
+  FixStrToPrint = new_str
+End Function
+
 Sub PrintOrEchoLine(str)
   On Error Resume Next
   WScript.stdout.WriteLine str
-  If err = &h80070006& Then
+  If err = 5 Then ' Access is denied
+    WScript.stdout.WriteLine FixStrToPrint(str)
+  ElseIf err = &h80070006& Then
     WScript.Echo str
   End If
   On Error Goto 0
@@ -105,7 +127,9 @@ End Sub
 Sub PrintOrEchoErrorLine(str)
   On Error Resume Next
   WScript.stderr.WriteLine str
-  If err = &h80070006& Then
+  If err = 5 Then ' Access is denied
+    WScript.stderr.WriteLine FixStrToPrint(str)
+  ElseIf err = &h80070006& Then
     WScript.Echo str
   End If
   On Error Goto 0
@@ -281,7 +305,7 @@ For FilePropIndex = 0 To 65535 : Do ' empty `Do-Loop` to emulate `Continue`
         CharAsc = Asc(Char)
 
         ' NOTE:
-        '   `&H3F` - is not printable character which may not pass through the stdout redirection.
+        '   `&H3F` - is not printable unicode origin character which may not pass through the stdout redirection.
         '   `&H25` - `%`.
         If CharAsc < 32 Or CharAsc > 127 Or CharAsc = &H25 Or CharAsc = &H3F Then
           CharHex = Hex(CharAsc)

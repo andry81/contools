@@ -16,10 +16,32 @@
 ''
 'Dim objWMIService  : Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate, (Restore,Backup)}")
 
+Function FixStrToPrint(str)
+  Dim new_str : new_str = ""
+  Dim i, Char, CharAsc
+
+  For i = 1 To Len(str)
+    Char = Mid(str, i, 1)
+    CharAsc = Asc(Char)
+
+    ' NOTE:
+    '   `&H3F` - is not printable unicode origin character which can not pass through the stdout redirection.
+    If CharAsc <> &H3F Then
+      new_str = new_str & Char
+    Else
+      new_str = new_str & "?"
+    End If
+  Next
+
+  FixStrToPrint = new_str
+End Function
+
 Sub PrintOrEchoLine(str)
   On Error Resume Next
   WScript.stdout.WriteLine str
-  If err = &h80070006& Then
+  If err = 5 Then ' Access is denied
+    WScript.stdout.WriteLine FixStrToPrint(str)
+  ElseIf err = &h80070006& Then
     WScript.Echo str
   End If
   On Error Goto 0
@@ -28,7 +50,9 @@ End Sub
 Sub PrintOrEchoErrorLine(str)
   On Error Resume Next
   WScript.stderr.WriteLine str
-  If err = &h80070006& Then
+  If err = 5 Then ' Access is denied
+    WScript.stderr.WriteLine FixStrToPrint(str)
+  ElseIf err = &h80070006& Then
     WScript.Echo str
   End If
   On Error Goto 0

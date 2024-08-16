@@ -28,6 +28,7 @@ rem   -no-allow-dos-target-path
 rem     Do not allow target path reset by a reduced DOS path version.
 rem   -allow-target-path-reassign
 rem     Allow TargetPath reassign if has the same path.
+rem     Path comparison depends on `-use-case-compare` flag.
 rem   -use-case-compare
 rem     Use case sensitive compare instead of the case insensitive as by
 rem     default.
@@ -90,6 +91,7 @@ set "FLAG_CHCP="
 set FLAG_NO_BACKUP=0
 set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=0
 set FLAG_NO_ALLOW_DOS_TARGET_PATH=0
+set FLAG_ALLOW_TARGET_PATH_REASSIGN=0
 set FLAG_USE_CASE_COMPARE=0
 set FLAG_PRINT_ASSIGN=0
 set "BARE_FLAGS="
@@ -131,6 +133,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-no-allow-dos-target-path" (
     set FLAG_NO_ALLOW_DOS_TARGET_PATH=1
   ) else if "%FLAG%" == "-allow-target-path-reassign" (
+    set FLAG_ALLOW_TARGET_PATH_REASSIGN=1
     set BARE_FLAGS=%BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-use-case-compare" (
     set FLAG_USE_CASE_COMPARE=1
@@ -244,7 +247,7 @@ if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
 
 set "BACKUP_DIR="
 
-if %FLAG_NO_BACKUP% NEQ 0 SKIP_BACKUP_DIR
+if %FLAG_NO_BACKUP% NEQ 0 goto SKIP_BACKUP_DIR
 
 set "BACKUP_DIR=%LINKS_DIR%"
 
@@ -262,6 +265,9 @@ set BARE_FLAGS=%BARE_FLAGS% -backup-dir "%BACKUP_DIR%"
 
 :SKIP_BACKUP_DIR
 
+set "READ_SHORTCUT_PROP_TEMP_STDOUT_FILE=%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props_to_match-utf-16le.lst"
+set "READ_SHORTCUT_PROP_TEMP_STDERR_FILE=%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props_to_match-utf-16le.stderr.txt"
+
 rem CAUTION:
 rem   1. If a variable is empty, then it would not be expanded in the `cmd.exe`
 rem      command line or in the inner expression of the
@@ -274,8 +280,8 @@ rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
 if defined BACKUP_DIR (
-  set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S ^| "%SystemRoot%\System32\findstr.exe" /B /R /I /V /C:"%BACKUP_DIR%\\"
-) else set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S
+  set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul ^| "%SystemRoot%\System32\findstr.exe" /B /R /I /V /C:"%BACKUP_DIR%\\"
+) else set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul
 
 for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   set "LINK_FILE_PATH=%%i"
@@ -287,24 +293,23 @@ exit /b 0
 :UPDATE_LINK
 echo."%LINK_FILE_PATH%"
 
-set LAST_ERROR=0
-
-if not defined PROPS_LIST_FILTERED goto SKIP_PROP_LIST_REPLACE
-
 rem Read shortcut PROPS_LIST to match
 
-if "%CURRENT_CP%" == "65001" (
-  type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props_to_match.lst"
+rem CAUTION:
+rem   Below lines of code has a copy in the `read_shortcut_target_path.bat` script.
+rem   In case of change must be merged between copies.
+rem
 
-  rem CAUTION:
-  rem   Print in UTF-16LE to save Unicode characters which does print in the vbs script.
-  rem
-  "%SystemRoot%\System32\cscript.exe" //U //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props_to_match-utf-16le.lst"
+rem UTF-16LE BOM
+copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%" /B /Y >nul 2>nul
+copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" /B /Y >nul 2>nul
+rem UTF-8 BOM
+rem set /P =﻿<nul > "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%"
 
-  call "%%CONTOOLS_ROOT%%/encoding/ansi2any.bat" UTF-16LE UTF-8 "%%SCRIPT_TEMP_CURRENT_DIR%%/shortcut_props_to_match-utf-16le.lst" >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props_to_match.lst"
-) else (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props_to_match.lst"
-)
+"%SystemRoot%\System32\cscript.exe" //NOLOGO //U "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" >> "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%" 2>> "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%"
+
+rem NOTE: `type` respects UTF-16LE file with BOM header
+type "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" >&2
 
 if %FLAG_MATCH_STRING% NEQ 0 (
   if "%CURRENT_CP%" == "65001" (
@@ -313,22 +318,41 @@ if %FLAG_MATCH_STRING% NEQ 0 (
     type nul > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
   )
 
-  for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props_to_match.lst") do (
+  for /F "usebackq eol= tokens=1,* delims==" %%i in (`@type "%%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%%"`) do (
     set "PROP_NAME=%%i"
     set "PROP_VALUE=%%j"
     call :MATCH_SHORTCUT
   )
 ) else (
-  del /F /Q /A:-D "%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props.lst" 2>nul
-  rename "%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props_to_match.lst" "shortcut_props.lst"
+  rem NOTE: `type` respects UTF-16LE file with BOM header
+  type "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
 )
 
 goto MATCH_SHORTCUT_END
 
 :MATCH_SHORTCUT
 
+rem skip on empty value, except for `TargetPath` property to retry using an alternative method
+if defined PROP_VALUE goto SKIP_PROP_VALUE_RETRY
+if not "%PROP_NAME%" == "TargetPath" exit /b 0
+
+rem Retry on `ExtendedProperty` method.
+
+rem UTF-16LE BOM
+copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%" /B /Y >nul 2>nul
+copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" /B /Y >nul 2>nul
+
+"%SystemRoot%\System32\cscript.exe" //NOLOGO //U "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_path_props.vbs" -v -x -lr -- LinkTarget "%LINK_FILE_PATH%" >> "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%" 2>> "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%"
+
+rem NOTE: `type` respects UTF-16LE file with BOM header
+type "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" >&2
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%"`) do set "PROP_VALUE=%%i"
+
 rem skip on empty value
 if not defined PROP_VALUE exit /b 0
+
+:SKIP_PROP_VALUE_RETRY
 
 rem remove quotes at first
 set "PROP_PREV_VALUE=%PROP_VALUE:"=%"
@@ -338,7 +362,7 @@ if not defined PROP_PREV_VALUE exit /b 0
 
 call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%FLAG_MATCH_STRING_VALUE%="
 
-rem skip on not match
+rem skip on no match
 if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" exit /b 0
 
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=1,* delims==" %%i in ("!PROP_NAME!=!PROP_VALUE!") do (
@@ -352,9 +376,6 @@ exit /b 0
 
 rem Read shortcut PROPS_LIST to replace
 
-rem We must skip update WorkingDirectory from TargetPath if TargetPath is failed to update.
-set IS_TARGET_PATH_UPDATE_ERROR=0
-
 for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst") do (
   set "PROP_NAME=%%i"
   set "PROP_VALUE=%%j"
@@ -363,21 +384,40 @@ for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/s
 
 echo.
 
-exit /b %LAST_ERROR%
+exit /b
 
 :UPDATE_SHORTCUT_TO_REPLACE
 
+rem skip on empty value, except for `TargetPath` property to retry by `ShellFolderItem::ExtendedProperty` method
+if defined PROP_VALUE goto SKIP_PROP_VALUE_RETRY
+if not "%PROP_NAME%" == "TargetPath" exit /b 0
+
+rem the match variant already has a builtin retry
+if %FLAG_MATCH_STRING% NEQ 0 goto SKIP_PROP_VALUE_RETRY
+
+rem Retry on `ExtendedProperty` method.
+
+rem UTF-16LE BOM
+copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%" /B /Y >nul 2>nul
+copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" /B /Y >nul 2>nul
+
+"%SystemRoot%\System32\cscript.exe" //NOLOGO //U "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_path_props.vbs" -v -x -lr -- LinkTarget "%LINK_FILE_PATH%" >> "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%" 2>> "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%"
+
+rem NOTE: `type` respects UTF-16LE file with BOM header
+type "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" >&2
+
+for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%"`) do set "PROP_VALUE=%%i"
+
 rem skip on empty value
 if not defined PROP_VALUE exit /b 0
+
+:SKIP_PROP_VALUE_RETRY
 
 rem remove quotes at first
 set "PROP_PREV_VALUE=%PROP_VALUE:"=%"
 
 rem skip on empty value again
 if not defined PROP_PREV_VALUE exit /b 0
-
-rem remove BOM prefix (CAUTION: byte sequence here might be not visible in an editor and not copyable in a text merger)
-set "PROP_NAME=%PROP_NAME:﻿=%"
 
 call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
 
@@ -387,21 +427,21 @@ if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 (
     echo.%?~nx0%: warning: property empty value assignment: "%PROP_NAME%"
     exit /b 0
   ) >&2
-) else (
-  rem skip on empty change
-  if %FLAG_USE_CASE_COMPARE% NEQ 0 (
-    if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" exit /b 0
-  ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" exit /b 0
 )
+
+rem skip on empty change
+if %FLAG_USE_CASE_COMPARE% NEQ 0 (
+  if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 exit /b 0
+) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 exit /b 0
 
 set "PROP_LINE=%PROP_NAME%=%PROP_NEXT_VALUE%"
 
 if %FLAG_PRINT_ASSIGN% EQU 0 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
 if /i "%PROP_NAME%" == "TargetPath" (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 ) else if /i "%PROP_NAME%" == "Arguments" (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -args "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -args "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 ) else if /i "%PROP_NAME%" == "WorkingDirectory" (
-  "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -wd "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -wd "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 )
