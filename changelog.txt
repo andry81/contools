@@ -1,4 +1,7 @@
 2024.08.16:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: read_shortcut.vbs, update_shortcut.vbs: execution fixup, `WindowStyle` property map onto `ShowCommand` in case of `GetLink` property usage
+
+2024.08.16:
 * new: Scripts/Tools/ToolAdaptors/vbs/read_shortcut.vbs: `-use-getlink` and `-print-remapped-names` flags to use `GetLink` property instead of `CreateShortcut` method to read shortcut properties
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: `-use-getlink` and `-print-remapped-names` flags to use `GetLink` property instead of `CreateShortcut` method to read and update shortcut properties
 * new: Scripts/Tools/filesys/read_shortcut_target_path.bat: `-use_getlink` flag to use `GetLink` property instead of `CreateShortcut` method to read shortcut properties

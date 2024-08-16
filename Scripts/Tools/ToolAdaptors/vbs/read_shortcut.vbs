@@ -211,27 +211,33 @@ Function MakeShortcut(ShortcutFilePathToOpen)
 End Function
 
 Function GetShortcutProperty(PropertyName)
-  Dim PropertyMapName : PropertyMapName = PropertyName
+  Dim PropertyName_ : PropertyName_ = PropertyName
 
   If UseGetLink Then
     ' remap property name
     If PropertyName = "TargetPath" Then
-      PropertyMapName = "Path"
+      PropertyName_ = "Path"
+    ElseIf PropertyName = "WindowStyle" Then
+      PropertyName_ = "ShowCommand"
     End If
   End If
 
-  GetShortcutProperty = Eval("objSC." & PropertyMapName)
+  GetShortcutProperty = Eval("objSC." & PropertyName_)
 End Function
 
 Function GetShortcutPropertyName(PropertyName)
+  Dim PropertyName_ : PropertyName_ = PropertyName
+
   If UseGetLink And PrintRemappedNames Then
     ' remap property name
     If PropertyName = "TargetPath" Then
-      PropertyName = "Path"
+      PropertyName_ = "Path"
+    ElseIf PropertyName = "WindowStyle" Then
+      PropertyName_ = "ShowCommand"
     End If
   End If
 
-  GetShortcutPropertyName = PropertyName
+  GetShortcutPropertyName = PropertyName_
 End Function
 
 Dim ShortcutFilePath : ShortcutFilePath = cmd_args(0)
