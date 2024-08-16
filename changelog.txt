@@ -1,4 +1,12 @@
 2024.08.16:
+* new: Scripts/Tools/ToolAdaptors/vbs/read_shortcut.vbs: `-use-getlink` and `-print-remapped-names` flags to use `GetLink` property instead of `CreateShortcut` method to read shortcut properties
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: `-use-getlink` and `-print-remapped-names` flags to use `GetLink` property instead of `CreateShortcut` method to read and update shortcut properties
+* new: Scripts/Tools/filesys/read_shortcut_target_path.bat: `-use_getlink` flag to use `GetLink` property instead of `CreateShortcut` method to read shortcut properties
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: `-use-getlink` flag to use `GetLink` property instead of `CreateShortcut` method to read and update shortcut properties
+* changed: Scripts/Tools/ToolAdaptors/vbs/read_path_props.vbs: added `-use-extprop` flag to use `ExtendedProperty` method instead of `CreateShortcut` method to read shortcut `TargetPath` property
+* refactor: Scripts/Tools:/filesys/read_shortcut_target_path.bat: `-use_extended_property` flag renamed into `-use_extprop`
+
+2024.08.16:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: reimplemented using code base from `read_shortcut_target_path.bat` script as most reliable
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: `File Not Found` error message from `dir` command
 * fixed: **/*.vbs: stdout and stderr write fail in case of not printable unicode origin character (`&H3F`)

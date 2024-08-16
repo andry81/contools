@@ -26,12 +26,36 @@
 '''   -Ep
 '''     Expand environment variables only in the property object.
 '''
+'''   -use-getlink | -g
+'''     Use `GetLink` property instead of `CreateShortcut` method.
+'''     Alternative interface to assign path properties with Unicode characters.
+'''   -print-remapped-names | -k
+'''     Print remapped key names instead of `CreateShortcut` method object
+'''     names.
+'''     Has effect if `-use-getlink` flag is used.
+'''
 '''   -p <PropertyPattern>
 '''     List of shortcut property names to read, separated by `|` character.
 
 ''' Related resources:
 '''   https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink
 '''   https://github.com/libyal/liblnk/blob/main/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc
+
+''' CAUTION:
+'''   Base `CreateShortcut` method does not support all Unicode characters.
+'''   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
+
+Function IsNothing(obj)
+  If IsEmpty(obj) Then
+    IsNothing = True
+    Exit Function
+  End If
+  If obj Is Nothing Then
+    IsNothing = True
+  Else
+    IsNothing = False
+  End If
+End Function
 
 Function FixStrToPrint(str)
   Dim new_str : new_str = ""
@@ -85,6 +109,9 @@ Dim ExpandAllArgs : ExpandAllArgs = False
 Dim ExpandArg0 : ExpandArg0 = False
 Dim ExpandShortcutProperty : ExpandShortcutProperty = False
 
+Dim UseGetLink : UseGetLink = False
+Dim PrintRemappedNames : PrintRemappedNames = False
+
 Dim PropertyPattern
 
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
@@ -105,6 +132,10 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         ExpandArg0 = True
       ElseIf arg = "-Ep" Then ' Expand environment variables only in the property object
         ExpandShortcutProperty = True
+      ElseIf arg = "-use-getlink" Or arg = "-g" Then
+        UseGetLink = True
+      ElseIf arg = "-print-remapped-names" Or arg = "-k" Then
+        PrintRemappedNames = True
       ElseIf arg = "-p" Then
         i = i + 1
         PropertyPattern = WScript.Arguments(i)
@@ -147,6 +178,62 @@ If cmd_args_ubound < 0 Then
   WScript.Quit 1
 End If
 
+' functions
+
+Function MakeShortcut(ShortcutFilePathToOpen)
+  If Not UseGetLink Then
+    ' CAUTION:
+    '   Base `CreateShortcut` method does not support all Unicode characters.
+    '   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
+    '
+    Set MakeShortcut = objShell.CreateShortcut(ShortcutFilePathToOpen)
+  Else
+    Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
+    Dim ShortcutParentPath : ShortcutParentPath = objFS.GetParentFolderName(ShortcutFilePathToOpen)
+    Dim objNamespace, objFile
+    If Len(ShortcutParentPath) > 0 Then
+      Set objNamespace = objShellApp.Namespace(ShortcutParentPath)
+      Set objFile = objNamespace.ParseName(objFS.GetFileName(ShortcutFilePathToOpen))
+    Else
+      Set objNamespace = objShellApp.Namespace(ShortcutFilePathToOpen)
+      Set objFile = objNamespace.Self
+    End if
+
+    If IsNothing(objFile) Then
+      PrintOrEchoErrorLine _
+        WScript.ScriptName & ": error: path is not parsed." & vbCrLf & _
+        WScript.ScriptName & ": info: Path=`" & ShortcutFilePathAbs & "`"
+      WScript.Quit 128
+    End If
+
+    Set MakeShortcut = objFile.GetLink
+  End If
+End Function
+
+Function GetShortcutProperty(PropertyName)
+  Dim PropertyMapName : PropertyMapName = PropertyName
+
+  If UseGetLink Then
+    ' remap property name
+    If PropertyName = "TargetPath" Then
+      PropertyMapName = "Path"
+    End If
+  End If
+
+  GetShortcutProperty = Eval("objSC." & PropertyMapName)
+End Function
+
+Function GetShortcutPropertyName(PropertyName)
+  If UseGetLink And PrintRemappedNames Then
+    ' remap property name
+    If PropertyName = "TargetPath" Then
+      PropertyName = "Path"
+    End If
+  End If
+
+  GetShortcutPropertyName = PropertyName
+End Function
+
 Dim ShortcutFilePath : ShortcutFilePath = cmd_args(0)
 
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
@@ -187,24 +274,23 @@ Else
   ShortcutFilePathToOpen = ShortcutFileShortPath
 End If
 
-Dim objSC : Set objSC = objShell.CreateShortcut(ShortcutFilePathToOpen)
+Dim objSC : Set objSC = MakeShortcut(ShortcutFilePathToOpen)
 
 Dim PropertyArr : PropertyArr = Split(PropertyPattern, "|", -1, vbTextCompare)
 
 Dim PropertyArrUbound : PropertyArrUbound = UBound(PropertyArr)
 
-Dim PropertyName
-Dim PropertyValue
+Dim PropertyName, PropertyValue
 
 ' MsgBox "Link=" & ShortcutFilePath & vbCrLf & "TargetPath=" & objSC.TargetPath & vbCrLf & "WorkingDirectory=" & objSC.WorkingDirectory
 
 For i = 0 To PropertyArrUbound
   PropertyName = PropertyArr(i)
-  PropertyValue = Eval("objSC." & PropertyName)
+  PropertyValue = GetShortcutProperty(PropertyName)
 
   If ExpandShortcutProperty Then
     PropertyValue = objShell.ExpandEnvironmentStrings(PropertyValue)
   End If
 
-  PrintOrEchoLine PropertyName & "=" & PropertyValue
+  PrintOrEchoLine GetShortcutPropertyName(PropertyName) & "=" & PropertyValue
 Next

@@ -39,7 +39,7 @@
 '''     Print only not empty property values.
 '''     Has effect only for not Null values.
 '''
-'''   -x
+'''   --use-extprop | -x
 '''     Use `ExtendedProperty` method (O(1)) instead of enumeration with
 '''     `GetDetailsOf` (O(N)).
 '''
@@ -62,7 +62,7 @@
 '''   <PropertyPattern>
 '''     List of property names or property indexes to read, separated by `|`
 '''     character.
-'''     Property indexes has effect only when `-x` flag is not used
+'''     Property indexes has effect only when `-use-extprop` flag is not used
 '''     (`ExtendedProperty` method).
 '''
 '''   <Path>
@@ -183,7 +183,7 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         PrintValueNull = True
       ElseIf arg = "-val-notempty" Or arg = "-n" Then
         PrintValueNotEmptyOnly = True
-      ElseIf arg = "-x" Then
+      ElseIf arg = "-use-extprop" Or arg = "-x" Then
         UseExtendedProperty = True
       ElseIf arg = "-ignore-unexist" Or arg = "-i" Then
         IgnoreUnexist = True
@@ -282,17 +282,17 @@ Else
   End If
 End If
 
-Dim objShell : Set objShell = CreateObject("Shell.Application")
+Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
 
 Dim ParentPath : ParentPath = objFS.GetParentFolderName(PathToOpen)
 
 Dim objNamespace, objFile
 
 If Len(ParentPath) > 0 Then
-  Set objNamespace = objShell.Namespace(ParentPath)
+  Set objNamespace = objShellApp.Namespace(ParentPath)
   Set objFile = objNamespace.ParseName(objFS.GetFileName(PathToOpen))
 Else
-  Set objNamespace = objShell.Namespace(PathToOpen)
+  Set objNamespace = objShellApp.Namespace(PathToOpen)
   Set objFile = objNamespace.Self
 End if
 

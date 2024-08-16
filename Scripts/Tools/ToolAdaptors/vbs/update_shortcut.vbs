@@ -99,7 +99,7 @@
 '''     the shortcut in form:
 '''     `YYYY'MM'DD.backup/HH'mm'ss''NNN-<ShortcutName>`
 '''     This form will reduce quantity of generated directories per each backup
-'''     file and in the same time does backup of each shortcut for each call.
+'''     file and in the same time does backup each shortcut in each call.
 '''
 '''   -backup-dir
 '''     Path to the directory to store backed up shortcuts. Used instead of
@@ -178,6 +178,14 @@
 '''   -Ewd
 '''     Expand environment variables only in the shortcut working directory
 '''     argument.
+'''
+'''   -use-getlink | -g
+'''     Use `GetLink` property instead of `CreateShortcut` method.
+'''     Alternative interface to assign path properties with Unicode characters.
+'''   -print-remapped-names | -k
+'''     Print remapped key names instead of `CreateShortcut` method object
+'''     names.
+'''     Has effect if `-use-getlink` flag is used.
 '''
 '''   -t <ShortcutTarget>
 '''     Shortcut target value to assign.
@@ -277,6 +285,22 @@
 '''   https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink
 '''   https://github.com/libyal/liblnk/blob/main/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc
 
+''' CAUTION:
+'''   Base `CreateShortcut` method does not support all Unicode characters.
+'''   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
+
+Function IsNothing(obj)
+  If IsEmpty(obj) Then
+    IsNothing = True
+    Exit Function
+  End If
+  If obj Is Nothing Then
+    IsNothing = True
+  Else
+    IsNothing = False
+  End If
+End Function
+
 Function FixStrToPrint(str)
   Dim new_str : new_str = ""
   Dim i, Char, CharAsc
@@ -367,6 +391,9 @@ Dim AllowDOSTargetPath : AllowDOSTargetPath = False
 Dim AllowDOSWorkingDirectory : AllowDOSWorkingDirectory = False
 Dim AllowDOSPaths : AllowDOSPaths = False
 
+Dim UseGetLink : UseGetLink = False
+Dim PrintRemappedNames : PrintRemappedNames = False
+
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
 
 Dim arg
@@ -407,6 +434,10 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ShortcutWorkingDirectory = WScript.Arguments(i)
         ShortcutWorkingDirectoryExist = True
+      ElseIf arg = "-use-getlink" Or arg = "-g" Then
+        UseGetLink = True
+      ElseIf arg = "-print-remapped-names" Or arg = "-k" Then
+        PrintRemappedNames = True
       ElseIf arg = "-showas" Then ' Show window as
         i = i + 1
         ShowAs = CInt(WScript.Arguments(i))
@@ -485,6 +516,71 @@ If AllowDOSPaths Then
 End If
 
 ' functions
+
+Function MakeShortcut(ShortcutFilePathToOpen)
+  If Not UseGetLink Then
+    ' CAUTION:
+    '   Base `CreateShortcut` method does not support all Unicode characters.
+    '   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
+    '
+    Set MakeShortcut = objShell.CreateShortcut(ShortcutFilePathToOpen)
+  Else
+    Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
+    Dim ShortcutParentPath : ShortcutParentPath = objFS.GetParentFolderName(ShortcutFilePathToOpen)
+    Dim objNamespace, objFile
+    If Len(ShortcutParentPath) > 0 Then
+      Set objNamespace = objShellApp.Namespace(ShortcutParentPath)
+      Set objFile = objNamespace.ParseName(objFS.GetFileName(ShortcutFilePathToOpen))
+    Else
+      Set objNamespace = objShellApp.Namespace(ShortcutFilePathToOpen)
+      Set objFile = objNamespace.Self
+    End if
+
+    If IsNothing(objFile) Then
+      PrintOrEchoErrorLine _
+        WScript.ScriptName & ": error: path is not parsed." & vbCrLf & _
+        WScript.ScriptName & ": info: Path=`" & ShortcutFilePathAbs & "`"
+      WScript.Quit 128
+    End If
+
+    Set MakeShortcut = objFile.GetLink
+  End If
+End Function
+
+Function GetShortcutProperty(PropertyName)
+  Dim PropertyMapName : PropertyMapName = PropertyName
+
+  If UseGetLink Then
+    ' remap property name
+    If PropertyName = "TargetPath" Then
+      PropertyMapName = "Path"
+    End If
+  End If
+
+  GetShortcutProperty = Eval("objSC." & PropertyMapName)
+End Function
+
+Function GetShortcutPropertyName(PropertyName)
+  If UseGetLink And PrintRemappedNames Then
+    ' remap property name
+    If PropertyName = "TargetPath" Then
+      PropertyName = "Path"
+    End If
+  End If
+
+  GetShortcutPropertyName = PropertyName
+End Function
+
+Sub SetShortcutProperty(PropertyName, PropertyValue)
+  If UseGetLink Then
+    ' remap property name
+    If PropertyName = "TargetPath" Then
+      PropertyName = "Path"
+    End If
+  End If
+
+  Eval("objSC." & PropertyName & " = PropertyValue")
+End Sub
 
 Function GetFileShortPath(FilePathAbs)
   ' WORKAROUND:
@@ -678,12 +774,14 @@ Else
   ShortcutFilePathToOpen = GetFileShortPath(ShortcutFilePathAbs)
 End If
 
-Dim objSC : Set objSC = objShell.CreateShortcut(ShortcutFilePathToOpen)
+Dim objSC : Set objSC = MakeShortcut(ShortcutFilePathToOpen)
 
 Dim ShortcutUpdated : ShortcutUpdated = False
 Dim ShortcutWorkingDirectoryUpdated : ShortcutWorkingDirectoryUpdated = False
 
 ' ShortcutTarget
+
+Dim ShortcutTargetPrev : ShortcutTargetPrev = GetShortcutProperty("TargetPath")
 
 If ShortcutTargetExist Then
 Do ' empty `Do-Loop` to emulate `Break`
@@ -696,19 +794,19 @@ Do ' empty `Do-Loop` to emulate `Break`
 
   If Not AllowTargetPathReassign Then
     ' WORKAROUND:
-    '   Because objSC.TargetPath can contain a mixed path (half short and half long), then
-    '   we have to convert it too.
-    Dim IsShortcutPrevTargetPathExists : IsShortcutPrevTargetPathExists = IsPathExists(objSC.TargetPath)
+    '   Because `TargetPath` can contain a mixed path (half short and half long), then we have to convert it too.
+    '
+    Dim IsShortcutPrevTargetPathExists : IsShortcutPrevTargetPathExists = IsPathExists(ShortcutTargetPrev)
     Dim ShortcutPrevTargetShortPath
 
     If IsShortcutPrevTargetPathExists Then
-      ShortcutPrevTargetShortPath = GetShortPath(objSC.TargetPath)
+      ShortcutPrevTargetShortPath = GetShortPath(ShortcutTargetPrev)
 
       If LCase(ShortcutPrevTargetShortPath) = ShortcutTargetUnquotedAbsLCase Then
         Exit Do
       End If
     Else
-      If LCase(objSC.TargetPath) = ShortcutTargetUnquotedAbsLCase Then
+      If LCase(ShortcutTargetPrev) = ShortcutTargetUnquotedAbsLCase Then
         Exit Do
       End If
     End If
@@ -726,14 +824,14 @@ Do ' empty `Do-Loop` to emulate `Break`
         ShortcutTargetShortPath = GetShortPath(ShortcutTargetUnquotedAbs)
 
         ' WORKAROUND:
-        '   Because objSC.TargetPath can contain a mixed path (half short and half long), then
-        '   we have to convert it too.
+        '   Because `TargetPath` can contain a mixed path (half short and half long), then we have to convert it too.
+        '
         If IsShortcutPrevTargetPathExists Then
           If LCase(ShortcutPrevTargetShortPath) = LCase(ShortcutTargetShortPath) Then
             Exit Do
           End If
         Else
-          If LCase(objSC.TargetPath) = LCase(ShortcutTargetShortPath) Then
+          If LCase(ShortcutTargetPrev) = LCase(ShortcutTargetShortPath) Then
             Exit Do
           End If
         End If
@@ -742,20 +840,23 @@ Do ' empty `Do-Loop` to emulate `Break`
   End If
 
   If PrintAssign Then
-    PrintOrEchoLine "TargetPath=" & ShortcutTargetUnquotedAbs
+    PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "=" & ShortcutTargetUnquotedAbs
   End If
 
-  objSC.TargetPath = ShortcutTarget
+  SetShortcutProperty "TargetPath", ShortcutTarget
   ShortcutUpdated = True
 
+  ' reread `TargetPath`
+  ShortcutTarget = GetShortcutProperty("TargetPath")
+
   If AllowDOSTargetPath Then
-    If Not LCase(objSC.TargetPath) = ShortcutTargetUnquotedAbsLCase Then
+    If Not LCase(ShortcutTarget) = ShortcutTargetUnquotedAbsLCase Then
       If IsEmpty(ShortcutTargetShortPath) Then
         ShortcutTargetShortPath = GetShortPath(ShortcutTargetUnquotedAbs)
       End If
 
       If PrintAssign Then
-        PrintOrEchoLine "TargetPath(short)=" & ShortcutTargetShortPath
+        PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(short)=" & ShortcutTargetShortPath
       End If
 
       If Not AlwaysQuote Then
@@ -764,7 +865,7 @@ Do ' empty `Do-Loop` to emulate `Break`
         ShortcutTarget = Chr(34) & ShortcutTargetShortPath & Chr(34)
       End If
 
-      objSC.TargetPath = ShortcutTarget
+      SetShortcutProperty "TargetPath", ShortcutTarget
     End If
   End If
 Loop While False
@@ -781,11 +882,17 @@ If ShortcutTargetArgsExist Then
     ShortcutTargetArgs = Unescape(ShortcutTargetArgs)
   End If
 
-  objSC.Arguments = ShortcutTargetArgs
+  If PrintAssign Then
+    PrintOrEchoLine GetShortcutPropertyName("Arguments") & "=" & ShortcutTargetArgs
+  End If
+
+  SetShortcutProperty "Arguments", ShortcutTargetArgs
   ShortcutUpdated = True
 End If
 
 ' ShortcutWorkingDirectory
+
+Dim ShortcutWorkingDirectoryPrev : ShortcutWorkingDirectoryPrev = GetShortcutProperty("WorkingDirectory")
 
 Dim ShortcutWorkingDirectoryAbsLCase
 Dim ShortcutWorkingDirectoryShortPath
@@ -797,7 +904,7 @@ Do ' empty `Do-Loop` to emulate `Break`
   End If
 
   If Not AllowWorkingDirectoryReassign Then
-    If LCase(objSC.WorkingDirectory) = ShortcutWorkingDirectoryAbsLCase Then
+    If LCase(ShortcutWorkingDirectoryPrev) = ShortcutWorkingDirectoryAbsLCase Then
       Exit Do
     End If
 
@@ -813,7 +920,7 @@ Do ' empty `Do-Loop` to emulate `Break`
         ' an existen long path, check on short path case insensitive equality
         ShortcutWorkingDirectoryShortPath = GetFolderShortPath(ShortcutWorkingDirectoryAbs)
 
-        If LCase(objSC.WorkingDirectory) = LCase(ShortcutWorkingDirectoryShortPath) Then
+        If LCase(ShortcutWorkingDirectoryPrev) = LCase(ShortcutWorkingDirectoryShortPath) Then
           Exit Do
         End If
       End If
@@ -821,17 +928,21 @@ Do ' empty `Do-Loop` to emulate `Break`
   End If
 
   If PrintAssign Then
-    PrintOrEchoLine "WorkingDirectory=" & ShortcutWorkingDirectoryAbs
+    PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "=" & ShortcutWorkingDirectoryAbs
   End If
 
-  objSC.WorkingDirectory = ShortcutWorkingDirectoryAbs
+  SetShortcutProperty "WorkingDirectory", ShortcutWorkingDirectoryAbs
   ShortcutWorkingDirectoryUpdated = True
   ShortcutUpdated = True
 Loop While False
 End If
 
 If ShowAsExist Then
-  objSC.WindowStyle = CInt(ShowAs)
+  If PrintAssign Then
+    PrintOrEchoLine GetShortcutPropertyName("WindowStyle") & "=" & CInt(ShowAs)
+  End If
+
+  SetShortcutProperty "WindowStyle", CInt(ShowAs)
   ShortcutUpdated = True
 End If
 
@@ -853,8 +964,7 @@ If ShortcutUpdated Then
     Dim backup_dir_path_abs
 
     ' NOTE:
-    '   The `*Exists` methods will return False on a long path without `\\?\`
-    '   prefix.
+    '   The `*Exists` methods will return False on a long path without `\\?\` prefix.
     '
 
     If Len(BackupDir) > 0 Then
@@ -910,8 +1020,7 @@ If ShortcutUpdated Then
       Dim to_file_path_abs : to_file_path_abs = objFS.GetAbsolutePathName(to_file_str)
 
       ' NOTE:
-      '   The `*Exists` methods will return False on a long path without `\\?\`
-      '   prefix.
+      '   The `*Exists` methods will return False on a long path without `\\?\` prefix.
       '
 
       ' remove `\\?\` prefix
@@ -990,18 +1099,20 @@ If ShortcutUpdated Then
     '
     If AllowDOSWorkingDirectory Then
       ' Set objSC = Nothing
-      Set objSC = objShell.CreateShortcut(ShortcutFilePathToOpen)
+      Set objSC = MakeShortcut(ShortcutFilePathToOpen)
 
-      If Not LCase(objSC.WorkingDirectory) = ShortcutWorkingDirectoryAbsLCase Then
+      ShortcutWorkingDirectoryPrev = GetShortcutProperty("WorkingDirectory")
+
+      If Not LCase(ShortcutWorkingDirectoryPrev) = ShortcutWorkingDirectoryAbsLCase Then
         If IsEmpty(ShortcutWorkingDirectoryShortPath) Then
           ShortcutWorkingDirectoryShortPath = GetFolderShortPath(ShortcutWorkingDirectoryAbs)
         End If
 
         If PrintAssign Then
-          PrintOrEchoLine "WorkingDirectory(short)=" & ShortcutWorkingDirectoryShortPath
+          PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "(short)=" & ShortcutWorkingDirectoryShortPath
         End If
 
-        objSC.WorkingDirectory = ShortcutWorkingDirectoryShortPath
+        SetShortcutProperty "WorkingDirectory", ShortcutWorkingDirectoryShortPath
 
         objSC.Save
       End If

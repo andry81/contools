@@ -29,10 +29,17 @@ rem     Do not allow target path reset by a reduced DOS path version.
 rem   -allow-target-path-reassign
 rem     Allow TargetPath reassign if has the same path.
 rem     Path comparison depends on `-use-case-compare` flag.
+rem
 rem   -use-case-compare
 rem     Use case sensitive compare instead of the case insensitive as by
 rem     default.
 rem     Has effect only for a replaced value to test on empty change.
+rem   -use-getlink
+rem     Use `GetLink` property through the `read_shortcut.vbs` script instead
+rem     of `CreateShortcut` method (same script).
+rem     Use `GetLink` property to update property using
+rem     `update_shortcut.vbs` script.
+rem
 rem   -p[rint-assign]
 rem     Print assign.
 rem   -t-suffix <ShortcutTargetSuffix>
@@ -77,6 +84,10 @@ rem   You can use `-delete` together with `-match` to update only matched
 rem   property values.
 rem
 
+rem CAUTION:
+rem   Base `CreateShortcut` method does not support all Unicode characters.
+rem   Use `GetLink` property (`-use_getlink` flag) instead to workaround that.
+
 setlocal
 
 call "%%~dp0__init__/script_init.bat" %%0 %%* || exit /b
@@ -93,8 +104,10 @@ set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=0
 set FLAG_NO_ALLOW_DOS_TARGET_PATH=0
 set FLAG_ALLOW_TARGET_PATH_REASSIGN=0
 set FLAG_USE_CASE_COMPARE=0
+set FLAG_USE_GETLINK=0
 set FLAG_PRINT_ASSIGN=0
-set "BARE_FLAGS="
+set "READ_SHORTCUT_BARE_FLAGS="
+set "UPDATE_SHORTCUT_BARE_FLAGS="
 
 :FLAGS_LOOP
 
@@ -124,27 +137,31 @@ if defined FLAG (
     shift
     set /A FLAG_SHIFT+=1
   ) else if "%FLAG%" == "-no-backup" (
-    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
     set FLAG_NO_BACKUP=1
   ) else if "%FLAG%" == "-ignore-unexist" (
-    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-no-skip-on-empty-assign" (
     set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=1
   ) else if "%FLAG%" == "-no-allow-dos-target-path" (
     set FLAG_NO_ALLOW_DOS_TARGET_PATH=1
   ) else if "%FLAG%" == "-allow-target-path-reassign" (
     set FLAG_ALLOW_TARGET_PATH_REASSIGN=1
-    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-use-case-compare" (
     set FLAG_USE_CASE_COMPARE=1
+  ) else if "%FLAG%" == "-use-getlink" (
+    set FLAG_USE_GETLINK=1
+    set READ_SHORTCUT_BARE_FLAGS=%READ_SHORTCUT_BARE_FLAGS% %FLAG%
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-print-assign" (
     set FLAG_PRINT_ASSIGN=1
-    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-p" (
     set FLAG_PRINT_ASSIGN=1
-    set BARE_FLAGS=%BARE_FLAGS% %FLAG%
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-t-suffix" (
-    set BARE_FLAGS=%BARE_FLAGS% %FLAG% %2
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG% %2
     shift
     set /A FLAG_SHIFT+=1
   ) else if not "%FLAG%" == "--" (
@@ -239,7 +256,7 @@ if not defined PROPS_LIST_FILTERED (
   exit /b 255
 ) >&2
 
-if %FLAG_NO_ALLOW_DOS_TARGET_PATH% EQU 0 set BARE_FLAGS=%BARE_FLAGS% -allow-dos-target-path
+if %FLAG_NO_ALLOW_DOS_TARGET_PATH% EQU 0 set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% -allow-dos-target-path
 
 for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
@@ -261,7 +278,7 @@ set "BACKUP_DIR=%BACKUP_DIR:]=\]%"
 
 set "BACKUP_DIR=%BACKUP_DIR%[0-9][0-9][0-9][0-9]'[0-9][0-9]'[0-9][0-9]\.backup\\"
 
-set BARE_FLAGS=%BARE_FLAGS% -backup-dir "%BACKUP_DIR%"
+set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% -backup-dir "%BACKUP_DIR%"
 
 :SKIP_BACKUP_DIR
 
@@ -306,7 +323,7 @@ copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDERR_F
 rem UTF-8 BOM
 rem set /P =﻿<nul > "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%"
 
-"%SystemRoot%\System32\cscript.exe" //NOLOGO //U "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs" -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" >> "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%" 2>> "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%"
+"%SystemRoot%\System32\cscript.exe" //NOLOGO //U "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/read_shortcut.vbs"%READ_SHORTCUT_BARE_FLAGS% -p "%PROPS_LIST%" -- "%LINK_FILE_PATH%" >> "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%" 2>> "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%"
 
 rem NOTE: `type` respects UTF-16LE file with BOM header
 type "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" >&2
@@ -439,9 +456,9 @@ set "PROP_LINE=%PROP_NAME%=%PROP_NEXT_VALUE%"
 if %FLAG_PRINT_ASSIGN% EQU 0 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
 if /i "%PROP_NAME%" == "TargetPath" (
-  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 ) else if /i "%PROP_NAME%" == "Arguments" (
-  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -args "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -args "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 ) else if /i "%PROP_NAME%" == "WorkingDirectory" (
-  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%BARE_FLAGS% -wd "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -wd "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
 )
