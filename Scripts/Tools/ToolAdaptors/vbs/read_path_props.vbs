@@ -6,7 +6,8 @@
 '''     [-val-decor-only | -vd]
 '''     [-val-null | -vnull]
 '''     [-val-notempty | -n]
-'''     [-x] [-i[gnore-unexist]]
+'''     [-use-extprop | -x]
+'''     [-i[gnore-unexist]]
 '''     [-u[rl-encode]]
 '''     [-line-return | -lr]
 '''     [--]
@@ -37,9 +38,9 @@
 '''
 '''   -val-notempty | -n
 '''     Print only not empty property values.
-'''     Has effect only for not Null values.
+'''     Has no effect for Null values (a Null value treated as not empty).
 '''
-'''   --use-extprop | -x
+'''   -use-extprop | -x
 '''     Use `ExtendedProperty` method (O(1)) instead of enumeration with
 '''     `GetDetailsOf` (O(N)).
 '''
@@ -370,11 +371,11 @@ For j = 0 To PropertyArrUbound
   Else
     IsPropNameNum = IsNumeric(PropertyName)
 
-    ' 65535 - maximum
-    For FilePropIndex = 0 To 65535 : Do ' empty `Do-Loop` to emulate `Continue`
+    ' 999 - maximum
+    For FilePropIndex = 0 To 999 : Do ' empty `Do-Loop` to emulate `Continue`
       FilePropName = objNamespace.GetDetailsOf(objFile.Name, FilePropIndex)
 
-      If Not (Len(FilePropName) > 0) Then Exit For
+      If Not (Len(FilePropName) > 0) Then Exit Do ' continue on empty property name
 
       If IsPropNameNum Then
         If Int(PropertyName) <> FilePropIndex Then Exit Do ' Continue

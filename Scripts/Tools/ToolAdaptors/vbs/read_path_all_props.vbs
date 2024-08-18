@@ -282,11 +282,13 @@ Dim FilePropName, FilePropValue, FilePropEncodedValue, Char, CharAsc, CharHex
 Dim FilePropIndex : FilePropIndex = 0
 Dim FilePropIndexStr
 
-' 65535 - maximum
-For FilePropIndex = 0 To 65535 : Do ' empty `Do-Loop` to emulate `Continue`
+Dim objNamespaceItems : Set objNamespaceItems = objNamespace.Items()
+
+' 999 - maximum
+For FilePropIndex = 0 To 999 : Do ' empty `Do-Loop` to emulate `Continue`
   FilePropName = objNamespace.GetDetailsOf(objFile.Name, FilePropIndex)
 
-  If Not (Len(FilePropName) > 0) Then Exit For
+  If Not (Len(FilePropName) > 0) Then Exit Do ' continue on empty property name
 
   FilePropValue = objNamespace.GetDetailsOf(objFile, FilePropIndex)
 
