@@ -1,4 +1,8 @@
 2024.08.18:
+* fixed: Scripts/Tools/std: callshift.bat, setshift.bat: tabulation characters workaround for `-no_trim` flag
+* changed: Scripts/Tools/std/encode/*.bat: tabulation character encode/decode support
+
+2024.08.18:
 * new: Scripts/Tests/bench/batscripts: test__type_nul_tempfile_single_redir.bat, test__copy_nul_tempfile_single_redir.bat: tests to compare stdout/stderr redirection slowdown for `type` and `copy` commands
 * new: Scripts/Tests/bench/batscripts/test__all.bat: all `test__*.bat` tests
 

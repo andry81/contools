@@ -71,13 +71,18 @@ rem      >setshift.bat 0 x %$5E$3E%cmd param0 param1
 rem      >set x
 rem      x=>cmd param0 param1
 
+rem Examples (in script):
+rem   1. set "TAB=	"
+rem      call setshift.bat -no_trim 0 x cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+rem      set x
+
 rem Pros:
 rem
 rem   * Can handle almost all control characters.
 rem   * Does restore previous ERRORLEVEL variable before call a command.
 rem   * Can skip first N used arguments from the `%*` variable including
 rem     additional command line arguments.
-rem   * Can avoid spaces trim in the shifted command line.
+rem   * Can avoid spaces and tabulation characters trim in the shifted command line.
 rem
 rem Cons:
 rem
@@ -89,6 +94,9 @@ rem     `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem     expanded.
 rem   * A batch script command line and an executable command line has
 rem     different encoders.
+rem   * In case of tabulation and space characters mix between command line
+rem     arguments, you must entail each argument at least with one space,
+rem     otherwise arguments would be concatenated.
 
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
@@ -175,8 +183,15 @@ if %FLAG_EXE% EQU 0 (
   call "%%?~dp0%%encode\encode_sys_chars_bat_cmdline.bat"
 ) else call "%%?~dp0%%encode\encode_sys_chars_exe_cmdline.bat"
 
+rem CAUTION:
+rem   Encode ALL tabulation characters.
+rem   To split arguments with tabulation characters mix you must to entail each argument with at least one SPACE character!
+rem
 if %FLAG_NO_TRIM% NEQ 0 setlocal ENABLEDELAYEDEXPANSION & ^
-set "__STRING__=!__STRING__:  = $20!" & for /F "eol= tokens=* delims=" %%i in ("!__STRING__:$20 =$20$20!") do endlocal & set "__STRING__=%%i"
+set "__STRING__=!__STRING__:  = $20!" & set "__STRING__=!__STRING__:$20 =$20$20!" & ^
+set "__STRING__=!__STRING__:		=	$09!" & set "__STRING__=!__STRING__:$09	=$09$09!" & ^
+set "__STRING__=!__STRING__:	 =$09$20!" & set "__STRING__=!__STRING__:$09 =$09$20!" & ^
+for /F "eol= tokens=* delims=" %%i in ("!__STRING__:	=$09!") do endlocal & set "__STRING__=%%i"
 
 set INDEX=-1
 
@@ -199,7 +214,7 @@ for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in
 )
 
 if not defined VAR endlocal & exit /b %LAST_ERROR%
-setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!CMDLINE!" & if %FLAG_NO_TRIM% NEQ 0 set "__STRING__=!__STRING__:$20= !"
+setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!CMDLINE!" & if %FLAG_NO_TRIM% NEQ 0 set "__STRING__=!__STRING__:$20= !" & set "__STRING__=!__STRING__:$09=	!"
 if not defined __STRING__ for /F "eol= tokens=* delims=" %%i in ("!VAR!") do endlocal & endlocal & set "%%i=" & exit /b %LAST_ERROR%
 
 for /F "eol= tokens=* delims=" %%i in ("!VAR!") do (
