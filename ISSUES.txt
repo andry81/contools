@@ -64,6 +64,12 @@ Utilities/src/callf:
     >
     callf.exe /pause-on-exit /no-subst-vars /no-esc /attach-parent-console "C:\WINDOWS\System32\runas.exe" "/user:user \"\\\"C:\WINDOWS\System32\explorer.exe\\\" \\\"...\\.\\\"\""
 
+  * Unknown unicode characters prints as `?` in case of tee redirection options:
+
+    `/tee-stdout <stdout-file>`
+
+    Replace by unicode print function variant.
+
 Utilities/tests/manual/contools/callf:
 
   * Fix slow print:

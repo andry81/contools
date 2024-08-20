@@ -1,3 +1,26 @@
+2024.08.23:
+* fixed: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, update_shortcut.vbs: case where `TargetPath` is set to a DOS path variant, `WorkingDirectory` does not exist and `Save` function fails to create/update a shortcut because of unexisted `WorkingDirectory` path
+* fixed: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, update_shortcut.vbs: circumvented unknown unicode characters conversion in paths into character `?`
+* new: Scripts/Tools/ToolAdaptors/__init__/script_init.bat: added `EXEC_CALLF_PREFIX_NO_PAUSE_ON_EXIT` variable usage to skip default pause on exit in related scripts
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-use-getlink`, `-print-remapped-names` flags to use `GetLink` property additionally to `CreateShortcut` method to create shortcut properties
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: `-use-getlink`, `-print-remapped-names` flags to use `GetLink` property instead of `CreateShortcut` method to read and update shortcut properties
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: `-allow-dos-wd` flag to use `GetLink` property instead of `CreateShortcut` method to read and update shortcut properties
+* new: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, reset_shortcut.vbs, update_shortcut.vbs: `-print-assigned` flag to reread and print property value after the assignment
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: `-use-getlink`, `-print-remapped-names` flags to use `GetLink` property instead of `CreateShortcut` method to read and update shortcut properties
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: `-allow-dos-wd`, `-allow-dos-paths` flags to reread respective path after assign and if it does not exist, then reassign it by a reduced DOS path version
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: `-allow-paths-reassign` flag to allow reassign a path property in case of equal case insensitive path assign
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: `-print-remapped-names` flag to use `GetLink` property instead of `CreateShortcut` method to read and update shortcut properties
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: `-print-read` flag to print property read values before `update_shortcut.vbs` script call
+* new: Scripts/Tools/ToolAdaptors/vbs: reset_shortcut_from_dir.bat, update_shortcut_props_from_dir.bat: `-print-assigned` flag to reread and print property value after assignment
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: `-no-allow-dos-wd` flag to do not allow working directory reset by a reduced DOS path version as by default
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: `-allow-wd-reassign`, `-allow-paths-reassign` flags to allow reassign respective path property in case of same path assign
+* new: Scripts/Tools/ToolAdaptors/lnk/empty.lnk: empty shortcut example
+* changed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: partial merge from `update_shortcut.vbs` script
+* changed: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, reset_shortcut.vbs, update_shortcut.vbs, read_shortcut.vbs: common implementation
+* changed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs, Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs, Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: code improvement
+* changed: ISSUES.txt: issues update
+* refactor: Scripts/Tools: std/if_.bat, ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: minor refactor
+
 2024.08.20:
 * new: Scripts/Tests/bench/batscripts: more `test__*.bat` tests
 * new: Scripts/Tests/manual/batscripts/test_all.bat: all `test_*.bat` tests

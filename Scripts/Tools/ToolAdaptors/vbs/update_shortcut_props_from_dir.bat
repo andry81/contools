@@ -19,6 +19,7 @@ rem     Set explicit code page.
 rem   -ignore-unexist
 rem     By default TargetPath and WorkingDirectory does check on existence.
 rem     Use this flag to skip the check.
+rem
 rem   -no-skip-on-empty-assign
 rem     Do not skip on property empty value assignment.
 rem     By default skips any property assignment by an empty value.
@@ -26,22 +27,38 @@ rem     Has effect only if a value become empty after the replace.
 rem     Has no effect if a value was already empty.
 rem   -no-allow-dos-target-path
 rem     Do not allow target path reset by a reduced DOS path version.
+rem   -no-allow-dos-wd
+rem     Do not allow working directory reset by a reduced DOS path version.
+rem
 rem   -allow-target-path-reassign
-rem     Allow TargetPath reassign if has the same path.
+rem     Allow `TargetPath` property reassign if has the same path.
 rem     Path comparison depends on `-use-case-compare` flag.
+rem   -allow-wd-reassign
+rem     Allow `WorkingDirectory` property reassign if has the same path.
+rem     Path comparison depends on `-use-case-compare` flag.
+rem   -allow-paths-reassign
+rem     Implies all `-allow-*-reassign` flags.
 rem
 rem   -use-case-compare
 rem     Use case sensitive compare instead of the case insensitive as by
 rem     default.
+rem     Has effect only for `TargetPath` and `WorkingDirectory` properties.
 rem     Has effect only for a replaced value to test on empty change.
-rem   -use-getlink
-rem     Use `GetLink` property through the `read_shortcut.vbs` script instead
-rem     of `CreateShortcut` method (same script).
-rem     Use `GetLink` property to update property using
-rem     `update_shortcut.vbs` script.
+rem   -use-getlink | -g
+rem     Use `GetLink` property instead of `CreateShortcut` method.
+rem     Alternative interface to assign path properties with Unicode
+rem     characters.
+rem   -print-remapped-names | -k
+rem     Print remapped key names instead of `CreateShortcut` method object
+rem     names.
+rem     Has no effect if `-use-getlink` flag is not used.
 rem
+rem   -print-read | -pr
+rem     Print property read.
 rem   -p[rint-assign]
-rem     Print assign.
+rem     Print property assign before assign.
+rem   -print-assigned | -pd
+rem     Reread property after assign and print.
 rem   -t-suffix <ShortcutTargetSuffix>
 rem     Shortcut target suffix value to append if <ShortcutTarget> does not
 rem     exist. Has no effect if `-ignore-unexist` is used.
@@ -86,7 +103,7 @@ rem
 
 rem CAUTION:
 rem   Base `CreateShortcut` method does not support all Unicode characters.
-rem   Use `GetLink` property (`-use_getlink` flag) instead to workaround that.
+rem   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
 
 setlocal
 
@@ -102,10 +119,12 @@ set "FLAG_CHCP="
 set FLAG_NO_BACKUP=0
 set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=0
 set FLAG_NO_ALLOW_DOS_TARGET_PATH=0
+set FLAG_NO_ALLOW_DOS_WORKING_DIR=0
 set FLAG_ALLOW_TARGET_PATH_REASSIGN=0
+set FLAG_ALLOW_WORKING_DIR_REASSIGN=0
+set FLAG_ALLOW_PATHS_REASSIGN=0
 set FLAG_USE_CASE_COMPARE=0
-set FLAG_USE_GETLINK=0
-set FLAG_PRINT_ASSIGN=0
+set FLAG_PRINT_READ=0
 set "READ_SHORTCUT_BARE_FLAGS="
 set "UPDATE_SHORTCUT_BARE_FLAGS="
 
@@ -145,20 +164,42 @@ if defined FLAG (
     set FLAG_NO_SKIP_ON_EMPTY_ASSIGN=1
   ) else if "%FLAG%" == "-no-allow-dos-target-path" (
     set FLAG_NO_ALLOW_DOS_TARGET_PATH=1
+  ) else if "%FLAG%" == "-no-allow-dos-wd" (
+    set FLAG_NO_ALLOW_DOS_WORKING_DIR=1
   ) else if "%FLAG%" == "-allow-target-path-reassign" (
     set FLAG_ALLOW_TARGET_PATH_REASSIGN=1
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-allow-wd-reassign" (
+    set FLAG_ALLOW_WORKING_DIR_REASSIGN=1
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-allow-paths-reassign" (
+    set FLAG_ALLOW_PATHS_REASSIGN=1
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-use-case-compare" (
     set FLAG_USE_CASE_COMPARE=1
   ) else if "%FLAG%" == "-use-getlink" (
-    set FLAG_USE_GETLINK=1
     set READ_SHORTCUT_BARE_FLAGS=%READ_SHORTCUT_BARE_FLAGS% %FLAG%
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-g" (
+    set READ_SHORTCUT_BARE_FLAGS=%READ_SHORTCUT_BARE_FLAGS% %FLAG%
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "--print-remapped-names" (
+    set READ_SHORTCUT_BARE_FLAGS=%READ_SHORTCUT_BARE_FLAGS% %FLAG%
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-k" (
+    set READ_SHORTCUT_BARE_FLAGS=%READ_SHORTCUT_BARE_FLAGS% %FLAG%
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-print-read" (
+    set FLAG_PRINT_READ=1
+  ) else if "%FLAG%" == "-pr" (
+    set FLAG_PRINT_READ=1
   ) else if "%FLAG%" == "-print-assign" (
-    set FLAG_PRINT_ASSIGN=1
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-p" (
-    set FLAG_PRINT_ASSIGN=1
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-print-assigned-feedback" (
+    set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-pd" (
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-t-suffix" (
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG% %2
@@ -257,6 +298,10 @@ if not defined PROPS_LIST_FILTERED (
 ) >&2
 
 if %FLAG_NO_ALLOW_DOS_TARGET_PATH% EQU 0 set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% -allow-dos-target-path
+if %FLAG_NO_ALLOW_DOS_WORKING_DIR% EQU 0 set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% -allow-dos-wd
+
+if %FLAG_ALLOW_PATHS_REASSIGN% NEQ 0 set "FLAG_ALLOW_TARGET_PATH_REASSIGN=1"
+if %FLAG_ALLOW_PATHS_REASSIGN% NEQ 0 set "FLAG_ALLOW_WORKING_DIR_REASSIGN=1"
 
 for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
@@ -438,6 +483,13 @@ if not defined PROP_PREV_VALUE exit /b 0
 
 call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
 
+rem remove trailing backslash
+if defined PROP_NEXT_VALUE if "%PROP_NEXT_VALUE:~-1%" == "\" set "PROP_NEXT_VALUE=%PROP_NEXT_VALUE:~0,-1%"
+
+set "PROP_LINE=%PROP_NAME%(read)=%PROP_NEXT_VALUE%"
+
+if %FLAG_PRINT_READ% NEQ 0 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
+
 rem skip on empty assign
 if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 (
   if not defined PROP_NEXT_VALUE (
@@ -447,13 +499,27 @@ if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 (
 )
 
 rem skip on empty change
-if %FLAG_USE_CASE_COMPARE% NEQ 0 (
-  if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 exit /b 0
-) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 exit /b 0
-
-set "PROP_LINE=%PROP_NAME%=%PROP_NEXT_VALUE%"
-
-if %FLAG_PRINT_ASSIGN% EQU 0 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
+if "%PROP_NAME%" == "TargetPath" (
+  if %FLAG_USE_CASE_COMPARE% NEQ 0 (
+    if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 (
+      echo.%?~nx0%: warning: property `TargetPath` is not changed (case^).
+      exit /b 0
+    ) >&2
+  ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 (
+    echo.%?~nx0%: warning: property `TargetPath` is not changed (nocase^).
+    exit /b 0
+  ) >&2
+) else if "%PROP_NAME%" == "WorkingDirectory" (
+  if %FLAG_USE_CASE_COMPARE% NEQ 0 (
+    if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_WORKING_DIR_REASSIGN% EQU 0 (
+      echo.%?~nx0%: warning: property `WorkingDirectory` is not changed (case^).
+      exit /b 0
+    ) >&2
+  ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_WORKING_DIR_REASSIGN% EQU 0 (
+    echo.%?~nx0%: warning: property `WorkingDirectory` is not changed (nocase^).
+    exit /b 0
+  ) >&2
+)
 
 if /i "%PROP_NAME%" == "TargetPath" (
   "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"

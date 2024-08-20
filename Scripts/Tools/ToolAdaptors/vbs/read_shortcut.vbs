@@ -9,9 +9,10 @@
 '''   read_shortcut.vbs
 '''     [-u] [-q]
 '''     [-E[0 | p]]
+'''     [-use-getlink | -g] [-print-remapped-names | -k]
 '''     [-p <PropertyPattern>]
 '''     [--]
-'''     <ShortcutFilePath>
+'''       <ShortcutFilePath>
 
 ''' DESCRIPTION:
 '''   --
@@ -28,11 +29,12 @@
 '''
 '''   -use-getlink | -g
 '''     Use `GetLink` property instead of `CreateShortcut` method.
-'''     Alternative interface to assign path properties with Unicode characters.
+'''     Alternative interface to assign path properties with Unicode
+'''     characters.
 '''   -print-remapped-names | -k
 '''     Print remapped key names instead of `CreateShortcut` method object
 '''     names.
-'''     Has effect if `-use-getlink` flag is used.
+'''     Has no effect if `-use-getlink` flag is not used.
 '''
 '''   -p <PropertyPattern>
 '''     List of shortcut property names to read, separated by `|` character.
@@ -175,18 +177,18 @@ Dim cmd_args_ubound : cmd_args_ubound = UBound(cmd_args)
 
 If cmd_args_ubound < 0 Then
   PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
-  WScript.Quit 1
+  WScript.Quit 255
 End If
 
 ' functions
 
-Function MakeShortcut(ShortcutFilePathToOpen)
+Function GetShortcut(ShortcutFilePathToOpen)
   If Not UseGetLink Then
     ' CAUTION:
     '   Base `CreateShortcut` method does not support all Unicode characters.
     '   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
     '
-    Set MakeShortcut = objShell.CreateShortcut(ShortcutFilePathToOpen)
+    Set GetShortcut = objShell.CreateShortcut(ShortcutFilePathToOpen)
   Else
     Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
     Dim ShortcutParentPath : ShortcutParentPath = objFS.GetParentFolderName(ShortcutFilePathToOpen)
@@ -202,11 +204,11 @@ Function MakeShortcut(ShortcutFilePathToOpen)
     If IsNothing(objFile) Then
       PrintOrEchoErrorLine _
         WScript.ScriptName & ": error: path is not parsed." & vbCrLf & _
-        WScript.ScriptName & ": info: Path=`" & ShortcutFilePathAbs & "`"
+        WScript.ScriptName & ": info: Path=`" & ShortcutFilePathToOpen & "`"
       WScript.Quit 128
     End If
 
-    Set MakeShortcut = objFile.GetLink
+    Set GetShortcut = objFile.GetLink
   End If
 End Function
 
@@ -217,12 +219,20 @@ Function GetShortcutProperty(PropertyName)
     ' remap property name
     If PropertyName = "TargetPath" Then
       PropertyName_ = "Path"
+    ElseIf PropertyName = "TargetArgs" Then ' alternative name
+      PropertyName_ = "Arguments"
     ElseIf PropertyName = "WindowStyle" Then
       PropertyName_ = "ShowCommand"
     End If
-  End If
 
-  GetShortcutProperty = Eval("objSC." & PropertyName_)
+    If Not (PropertyName_ = "IconLocation") Then
+      GetShortcutProperty = Eval("objSC." & PropertyName_)
+    Else
+      GetShortcutProperty = objSC.Path & "," & objSC.GetIconLocation(objSC.Path)
+    End If
+  Else
+    GetShortcutProperty = Eval("objSC." & PropertyName_)
+  End If
 End Function
 
 Function GetShortcutPropertyName(PropertyName)
@@ -232,6 +242,8 @@ Function GetShortcutPropertyName(PropertyName)
     ' remap property name
     If PropertyName = "TargetPath" Then
       PropertyName_ = "Path"
+    ElseIf PropertyName = "TargetArgs" Then ' alternative name
+      PropertyName_ = "Arguments"
     ElseIf PropertyName = "WindowStyle" Then
       PropertyName_ = "ShowCommand"
     End If
@@ -257,7 +269,7 @@ If Not IsShortcutFileExist Then
   PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: shortcut file does not exist:" & vbCrLf & _
     WScript.ScriptName & ": info: ShortcutFilePath=`" & ShortcutFilePathAbs & "`"
-  WScript.Quit 1
+  WScript.Quit 10
 End If
 
 Dim ShortcutFilePathToOpen
@@ -280,7 +292,7 @@ Else
   ShortcutFilePathToOpen = ShortcutFileShortPath
 End If
 
-Dim objSC : Set objSC = MakeShortcut(ShortcutFilePathToOpen)
+Dim objSC : Set objSC = GetShortcut(ShortcutFilePathToOpen)
 
 Dim PropertyArr : PropertyArr = Split(PropertyPattern, "|", -1, vbTextCompare)
 
@@ -288,7 +300,7 @@ Dim PropertyArrUbound : PropertyArrUbound = UBound(PropertyArr)
 
 Dim PropertyName, PropertyValue
 
-' MsgBox "Link=" & ShortcutFilePath & vbCrLf & "TargetPath=" & objSC.TargetPath & vbCrLf & "WorkingDirectory=" & objSC.WorkingDirectory
+' MsgBox "Link=" & ShortcutFilePath & vbCrLf & GetShortcutPropertyName("TargetPath") & "=" & GetShortcutProperty("TargetPath") & vbCrLf & "WorkingDirectory=" & objSC.WorkingDirectory
 
 For i = 0 To PropertyArrUbound
   PropertyName = PropertyArr(i)
