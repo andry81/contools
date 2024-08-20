@@ -1,32 +1,19 @@
 @echo off
 
 rem USAGE:
-rem   callshift.bat [-exe] [-no_trim] [-skip <skip-num>] [<shift> [<command> [<cmdline>...]]]
+rem   call.bat [-exe] [--] <cmdline>...
 
 rem Description:
-rem   Script calls `<command>` with skipped and shifted `<cmdline>`.
+rem   Script calls `<cmdline>` as is.
 rem   The `call` prefix is not required to call batch scripts.
+
+rem --:
+rem   Separator to stop parse flags.
 
 rem -exe
 rem   Use exe command line encoder instead of the batch as by default.
 rem   An executable command line does not use `,;=` characters as command line
 rem   arguments separator.
-
-rem -no_trim
-rem   Avoids spaces trim in the shifted command line.
-
-rem -skip <skip-num>
-rem   Number of `<cmdline>` arguments to skip before shift.
-rem   If not defined, then 0.
-
-rem <shift>:
-rem   Number of `<cmdline>` argument to skip and shift.
-rem   If >=0, then shifts by `<shift>` beginning from `<skip-num>` argument.
-rem   If < 0, then shifts by `|<shift>|` beginning from `<skip-num>+|<shift>|`
-rem   argument.
-
-rem <command>:
-rem   Command to call with arguments.
 
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
@@ -35,52 +22,39 @@ rem   expanded.
 rem
 
 rem Examples (in console):
-rem   1. >callshift.bat 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+rem   1. >call.bat echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | "=" 3
-rem   2. >callshift.bat -exe 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+rem   2. >call.bat -exe echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | , ; = = "=" 3
-rem   3. >callshift.bat 2 echo."1 2" 3 4 5
-rem      "1 2" 5
-rem   4. >callshift.bat . set | sort
-rem   5. >errlvl.bat 123
-rem      >callshift.bat
-rem      >callshift.bat 0 echo.
-rem      >callshift.bat 0 echo 1 2 3
+rem   3. >call.bat set | sort
+rem   4. >errlvl.bat 123
+rem      >call.bat
+rem      >call.bat echo.
+rem      >call.bat echo 1 2 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
-rem   6. >callshift.bat -3 echo 1 2 3 4 5 6 7
-rem      1 2 3 7
-rem      rem in a script
-rem      >call callshift.bat -3 command %%3 %%2 %%1 %%*
-rem   7. >callshift.bat -skip 2 -3 echo a b 1 2 3 4 5 6 7
-rem      a b 1 2 3 7
-rem      rem in a script
-rem      >call callshift.bat -skip 2 -3 command param0 param1 %%3 %%2 %%1 %%*
-rem   8. >callshift.bat 0 exit /b 321
+rem   5. >call.bat exit /b 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
-rem   9. >errlvl.bat 123
-rem      >callshift.bat 0 errlvl.bat 321
+rem   6. >errlvl.bat 123
+rem      >call.bat errlvl.bat 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
-rem  10. >callshift.bat -no_trim 1 echo  a  b  c  d
-rem       b  c  d
-rem  11. >callshift.bat 0 echo.^>cmd param0 param1
+rem   7. >call.bat echo.^>cmd param0 param1
 rem      >cmd param0 param1
 
 rem Examples (in script):
 rem   1. set "$5E$3E=^>"
-rem      call callshift.bat 0 echo.%%$5E$3E%%cmd param0 param1
+rem      call call.bat echo.%%$5E$3E%%cmd param0 param1
 rem   2. set "TAB=	"
-rem      call callshift.bat -no_trim 0 echo.cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+rem      call call.bat echo.cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+rem   3. call call.bat %%*
 
 rem Pros:
 rem
 rem   * Can handle almost all control characters.
 rem   * Can call builtin commands.
 rem   * Does restore previous ERRORLEVEL variable before call a command.
-rem   * Can skip first N used arguments from the `%*` variable including
-rem     additional command line arguments.
 rem   * Can avoid spaces and tabulation characters trim in the shifted command line.
 rem
 rem Cons:
@@ -93,9 +67,6 @@ rem     `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem     expanded.
 rem   * A batch script command line and an executable command line has
 rem     different encoders.
-rem   * In case of tabulation and space characters mix between command line
-rem     arguments, you must entail each argument at least with one space,
-rem     otherwise arguments would be concatenated.
 
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
@@ -126,8 +97,6 @@ set "?~dp0=%~dp0"
 rem script flags
 set FLAG_SHIFT=0
 set FLAG_EXE=0
-set FLAG_NO_TRIM=0
-set FLAG_SKIP=0
 
 rem flags always at first
 set "FLAG=%~1"
@@ -142,40 +111,12 @@ if defined FLAG if "%FLAG%" == "-exe" (
   set /A FLAG_SHIFT+=1
 )
 
-if defined FLAG if "%FLAG%" == "-no_trim" (
-  set FLAG_NO_TRIM=1
+if defined FLAG if "%FLAG%" == "--" (
   shift
-  call set "FLAG=%%~1"
   set /A FLAG_SHIFT+=1
 )
 
-if defined FLAG if "%FLAG%" == "-skip" (
-  set "FLAG_SKIP=%~2"
-  shift
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=2
-)
-
-set "SHIFT=%~1"
-set "COMMAND="
 set "CMDLINE="
-
-rem cast to integer
-set /A FLAG_SKIP+=0
-set /A SHIFT+=0
-
-set /A COMMAND_INDEX=FLAG_SHIFT+1
-set /A ARG0_INDEX=FLAG_SHIFT+2
-
-set /A SKIP=FLAG_SHIFT+2+FLAG_SKIP
-
-if %SHIFT% GEQ 0 (
-  set /A SHIFT+=SKIP
-) else (
-  set /A SKIP+=-SHIFT
-  set /A SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2
-)
 
 rem encode specific command line characters
 if %FLAG_EXE% EQU 0 (
@@ -186,7 +127,7 @@ rem CAUTION:
 rem   Encode ALL tabulation characters.
 rem   To split arguments with tabulation characters mix you must to entail each argument with at least one SPACE character!
 rem
-if %FLAG_NO_TRIM% NEQ 0 setlocal ENABLEDELAYEDEXPANSION & ^
+setlocal ENABLEDELAYEDEXPANSION & ^
 set "__STRING__=!__STRING__:  = $20!" & set "__STRING__=!__STRING__:$20 =$20$20!" & ^
 set "__STRING__=!__STRING__:		=	$09!" & set "__STRING__=!__STRING__:$09	=$09$09!" & ^
 set "__STRING__=!__STRING__:	 =$09$20!" & set "__STRING__=!__STRING__:$09 =$09$20!" & ^
@@ -194,28 +135,19 @@ for /F "eol= tokens=* delims=" %%i in ("!__STRING__:	=$09!") do endlocal & set 
 
 set INDEX=-1
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do (
-  setlocal ENABLEDELAYEDEXPANSION & if !INDEX! GEQ !ARG0_INDEX! (
-    if !INDEX! LSS !SKIP! (
-      if defined CMDLINE (
-        for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
-      ) else endlocal & set "CMDLINE=%%j"
-    ) else if !INDEX! GEQ !SHIFT! (
-      if defined CMDLINE (
-        for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
-      ) else endlocal & set "CMDLINE=%%j"
-    ) else endlocal
-  ) else if !INDEX! EQU !COMMAND_INDEX! (
-    endlocal & set "COMMAND=%%j"
+setlocal ENABLEDELAYEDEXPANSION
+for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do (
+  setlocal ENABLEDELAYEDEXPANSION & if !INDEX! GEQ !FLAG_SHIFT! (
+    if defined CMDLINE (
+      for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
+    ) else endlocal & set "CMDLINE=%%j"
   ) else endlocal
   set /A INDEX+=1
 )
 
-if not defined COMMAND endlocal & exit /b %LAST_ERROR%
-setlocal ENABLEDELAYEDEXPANSION & if defined CMDLINE (
-  set "__STRING__=!COMMAND! !CMDLINE!"
-) else set "__STRING__=!COMMAND!"
-if %FLAG_NO_TRIM% NEQ 0 set "__STRING__=!__STRING__:$20= !" & set "__STRING__=!__STRING__:$09=	!"
+if not defined CMDLINE endlocal & exit /b %LAST_ERROR%
+setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!CMDLINE!" & ^
+set "__STRING__=!__STRING__:$20= !" & set "__STRING__=!__STRING__:$09=	!"
 
 setlocal DISABLEDELAYEDEXPANSION & if %FLAG_EXE% EQU 0 (
   call "%%?~dp0%%encode\decode_sys_chars_bat_cmdline.bat"

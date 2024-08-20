@@ -1,3 +1,8 @@
+2024.08.20:
+* fixed: Scripts/Tools/std/callshift.bat: accidental script exit in case of call a batch file without `call` prefix
+* new: Scripts/Tools/std/call.bat: script to call the whole command line
+* changed: Scripts/Tools/std: callshift.bat, setshift.bat: code imrovement
+
 2024.08.18:
 * fixed: Scripts/Tools/std: callshift.bat, setshift.bat: tabulation characters workaround for `-no_trim` flag
 * changed: Scripts/Tools/std/encode/*.bat: tabulation character encode/decode support

@@ -4,9 +4,7 @@ rem USAGE:
 rem   setshift.bat [-exe] [-no_trim] [-skip <skip-num>] <shift> <var> [<cmdline>...]
 
 rem Description:
-rem   Script sets variable from second argument to a command line formed from
-rem   arguments beginning from %3 plus index from %1.
-rem   Script can skip first N arguments after %2 before shift the rest.
+rem   Script sets `<var>` variable to skipped and shifted `<cmdline>`.
 
 rem -exe
 rem   Use exe command line encoder instead of the batch as by default.
@@ -17,17 +15,17 @@ rem -no_trim
 rem   Avoids spaces trim in the shifted command line.
 
 rem -skip <skip-num>
-rem   Additional number of skip arguments after %2 argument.
+rem   Number of `<cmdline>` arguments to skip before shift.
 rem   If not defined, then 0.
 
 rem <shift>:
-rem   Number of arguments in <cmdline> to skip and shift.
-rem   If >=0, then only shifts <cmdline> after %2 argument plus <skip-num>.
-rem   If < 0, then skips first <shift> arguments after %2 argument plus
-rem   <skip-num> and shifts the rest <cmdline>.
+rem   Number of `<cmdline>` argument to skip and shift.
+rem   If >=0, then shifts by `<shift>` beginning by `<skip-num>` argument.
+rem   If < 0, then shifts by `|<shift>|` beginning by `<skip-num>+|<shift>|`
+rem   argument.
 
 rem <var>:
-rem   Variable to set with skipped and shifted arguments from <cmdline>.
+rem   Variable to set.
 
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
@@ -35,7 +33,7 @@ rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem   expanded.
 rem
 
-rem Examples:
+rem Examples (in console):
 rem   1. >setshift.bat 0 x "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      >set x
 rem      x="1 2" ! ? * & | "=" 3
@@ -66,13 +64,15 @@ rem      >call setshift.bat -skip 2 -3 x param0 param1 %%3 %%2 %%1 %%*
 rem   7. >setshift.bat -no_trim 1 x  a  b  c  d
 rem      >set x
 rem      x= b  c  d
-rem   8. >set "$5E$3E=^>"
-rem      >setshift.bat 0 x %$5E$3E%cmd param0 param1
+rem   8. >setshift.bat 0 x ^>cmd param0 param1
 rem      >set x
 rem      x=>cmd param0 param1
 
 rem Examples (in script):
-rem   1. set "TAB=	"
+rem   1. set "$5E$3E=^>"
+rem      call setshift.bat 0 x %%$5E$3E%%cmd param0 param1
+rem      set x
+rem   2. set "TAB=	"
 rem      call setshift.bat -no_trim 0 x cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
 rem      set x
 
@@ -195,8 +195,7 @@ for /F "eol= tokens=* delims=" %%i in ("!__STRING__:	=$09!") do endlocal & set 
 
 set INDEX=-1
 
-setlocal ENABLEDELAYEDEXPANSION
-for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do (
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do (
   setlocal ENABLEDELAYEDEXPANSION & if !INDEX! GEQ !ARG0_INDEX! (
     if !INDEX! LSS !SKIP! (
       if defined CMDLINE (
