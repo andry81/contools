@@ -16,4 +16,5 @@ rem
   if defined %~2 (
     setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!%~2!") do endlocal & set "%~1=%%i"
   ) else set "%~1="
-) & exit /b %ERRORLEVEL%
+  exit /b %ERRORLEVEL%
+)

@@ -1,17 +1,27 @@
 @echo off
 
 rem USAGE:
-rem   echo_var.bat <Var> [<Prefix> [<Suffix>]]
+rem   echo_var.bat <var> [<prefix> [<suffix>]]
 
-setlocal DISABLEDELAYEDEXPANSION
+rem Description:
+rem   Script prints a variable value with prefix and suffix text.
+rem   Does not change the error level.
+
+rem with save of previous error level
+setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
 
 set "__?VAR__=%~1"
-if not defined __?PREFIX__ set "__?PREFIX__=%~2"
-if not defined __?SUFFIX__ set "__?SUFFIX__=%~3"
 
 if not defined __?VAR__ exit /b 255
 if not defined %__?VAR__% exit /b 1
 
+if not defined __?PREFIX__ set "__?PREFIX__=%~2"
+if not defined __?SUFFIX__ set "__?SUFFIX__=%~3"
+
 rem safe echo
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__?PREFIX__!!%__?VAR__%!!__?SUFFIX__!") do endlocal & echo.%%i
-exit /b 0
+
+(
+  endlocal
+  exit /b %LAST_ERROR%
+)

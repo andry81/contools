@@ -1,18 +1,26 @@
 @echo off
 
 rem USAGE:
-rem   echo_pathglob_var.bat <VAR> [<PREFIX> [<SUFFIX>]]
+rem   echo_pathglob_var.bat <var> [<prefix> [<suffix>]]
 
-rem <VAR>: VALUE1;VALUE2;...;VALUEN
+rem Description:
+rem   Script prints PATH like variable with globbing characters expansion,
+rem   and with prefix and suffix text.
+rem   Does not change the error level.
 
-setlocal DISABLEDELAYEDEXPANSION
+rem <var> format:
+rem   VALUE1;VALUE2;...;VALUEN
+
+rem with save of previous error level
+setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
 
 set "__?VAR__=%~1"
-if not defined __?PREFIX__ set "__?PREFIX__=%~2"
-if not defined __?SUFFIX__ set "__?SUFFIX__=%~3"
 
 if not defined __?VAR__ exit /b 255
 if not defined %__?VAR__% exit /b 1
+
+if not defined __?PREFIX__ set "__?PREFIX__=%~2"
+if not defined __?SUFFIX__ set "__?SUFFIX__=%~3"
 
 if /i not "%__?VAR__%" == "__STRING__" (
   set "__STRING__="
@@ -25,4 +33,7 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__ST
 call "%%~dp0%%encode\decode_pathlist_chars_glob.bat" & ^
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%k in ("!__?PREFIX__!!__STRING__!!__?SUFFIX__!") do endlocal & echo.%%k
 
-exit /b 0
+(
+  endlocal
+  exit /b %LAST_ERROR%
+)

@@ -13,6 +13,11 @@
 * changed: Scripts/Tools/std: callshift.bat, setshift.bat: code imrovement
 
 2024.08.18:
+* fixed: Scripts/Tools/std/echo_*.bat: avoid error level change
+* changed: Scripts/Tools/std: echo_*.bat, set_var.bat: code imrovement
+* refactor: Scripts/Tools/std: echo_*.bat, get_cmdline*.bat: minor refactor
+
+2024.08.18:
 * fixed: Scripts/Tools/std: callshift.bat, setshift.bat: tabulation characters workaround for `-no_trim` flag
 * changed: Scripts/Tools/std/encode/*.bat: tabulation character encode/decode support
 

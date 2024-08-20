@@ -5,7 +5,8 @@ rem   get_cmdline.bat <cmdline>...
 
 rem Description:
 rem   Script sets RETURN_VALUE variable to a command line without skip or shift
-rem   the arguments and returns a previous error code.
+rem   the arguments.
+rem   Does not change the error level.
 
 rem <cmdline>:
 rem   Command line to get.

@@ -37,7 +37,6 @@ rem      >get_cmdline_len.bat -exe -- "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=12
 
-rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION
 
 rem drop last error level
