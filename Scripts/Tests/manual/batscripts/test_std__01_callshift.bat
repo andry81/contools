@@ -4,6 +4,8 @@ setlocal DISABLEDELAYEDEXPANSION
 
 rem call "%%~dp0__init__/__init__.bat" || exit /b
 
+echo.^>%~nx0
+
 setlocal
 set ARGS="1 2" ! ? * ^^^& ^^^| , ; = ^^= "=" 3
 call "%%~dp0..\..\..\Tools\std\callshift.bat" 0 echo %%ARGS%%
@@ -58,14 +60,14 @@ endlocal
 echo.---
 
 setlocal
-call "%%~dp0..\..\..\Tools\std\callshift.bat" 0 exit /b 123
+call "%%~dp0..\..\..\Tools\std\callshift.bat" 0 exit /b 321
 echo ERRORLEVEL=%ERRORLEVEL%
 endlocal
 echo.---
 
 setlocal
 call "%%~dp0..\..\..\Tools\std\errlvl.bat" 123
-call "%%~dp0..\..\..\Tools\std\callshift.bat" 0 call "%%~dp0..\..\..\Tools\std\errlvl.bat" 321
+call "%%~dp0..\..\..\Tools\std\callshift.bat" 0 "%%~dp0..\..\..\Tools\std\errlvl.bat" 321
 echo ERRORLEVEL=%ERRORLEVEL%
 endlocal
 echo.---
@@ -80,3 +82,11 @@ set "$5E$3E=^>"
 call "%%~dp0..\..\..\Tools\std\callshift.bat" 0 echo.%%$5E$3E%%cmd param0 param1
 endlocal
 echo.---
+
+setlocal
+set "TAB=	"
+call "%%~dp0..\..\..\Tools\std\callshift.bat" -no_trim 0 echo.cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+endlocal
+echo.---
+
+echo.

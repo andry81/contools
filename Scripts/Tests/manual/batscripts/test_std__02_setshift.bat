@@ -4,6 +4,8 @@ setlocal DISABLEDELAYEDEXPANSION
 
 rem call "%%~dp0__init__/__init__.bat" || exit /b
 
+echo.^>%~nx0
+
 setlocal
 set ARGS="1 2" ! ? * ^^^& ^^^| , ; = ^^= "=" 3
 call "%%~dp0..\..\..\Tools\std\setshift.bat" 0 x %%ARGS%%
@@ -72,3 +74,12 @@ call "%%~dp0..\..\..\Tools\std\setshift.bat" 0 x %%$5E$3E%%cmd param0 param1
 set x
 endlocal
 echo.---
+
+setlocal
+set "TAB=	"
+call "%%~dp0..\..\..\Tools\std\setshift.bat" -no_trim 0 x cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+set x
+endlocal
+echo.---
+
+echo.

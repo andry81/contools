@@ -2,7 +2,9 @@
 
 setlocal DISABLEDELAYEDEXPANSION
 
-call "%%~dp0__init__/__init__.bat" || exit /b
+rem call "%%~dp0__init__/__init__.bat" || exit /b
+
+echo.^>%~nx0
 
 setlocal
 call "%%~dp0..\..\..\Tools\std\get_cmdline_len.bat" --
@@ -51,3 +53,5 @@ echo ARGS_COUNT(exe)=%ERRORLEVEL%
 set CMDLINE
 endlocal
 echo.---
+
+echo.

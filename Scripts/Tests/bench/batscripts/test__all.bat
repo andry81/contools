@@ -5,7 +5,7 @@ setlocal
 
 call "%%~dp0__init__/__init__.bat" || exit /b
 
-call "%%TESTS_PROJECT_ROOT%%/test__copy_nul_tempfile.bat"
-call "%%TESTS_PROJECT_ROOT%%/test__copy_nul_tempfile_single_redir.bat"
-call "%%TESTS_PROJECT_ROOT%%/test__type_nul_tempfile.bat"
-call "%%TESTS_PROJECT_ROOT%%/test__type_nul_tempfile_single_redir.bat"
+for %%i in ("%TESTS_PROJECT_ROOT%\test__*.bat") do (
+  set "SCRIPT_FILE=%%i"
+  call "%%CONTOOLS_ROOT%%/std/if_.bat" not "%%SCRIPT_FILE:*\test__all.bat=%%" == "" && call "%%CONTOOLS_ROOT%%/std/call.bat" "%%SCRIPT_FILE%%"
+)

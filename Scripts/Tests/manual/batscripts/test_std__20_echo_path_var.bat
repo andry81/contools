@@ -4,6 +4,8 @@ setlocal DISABLEDELAYEDEXPANSION
 
 rem call "%%~dp0__init__/__init__.bat" || exit /b
 
+echo.^>%~nx0
+
 setlocal
 set __LIST__="1 2" ! ? * ^& ^| , ; = ^^= "=" 3
 set __LIST__
@@ -59,3 +61,5 @@ set __STRING__
 call "%%~dp0..\..\..\Tools\std\echo_path_var.bat" __STRING__ " " "|"
 endlocal
 echo.---
+
+echo.

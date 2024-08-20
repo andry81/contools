@@ -6,13 +6,10 @@ setlocal
 call "%%~dp0__init__/__init__.bat" || exit /b
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
-call "%%TESTS_PROJECT_ROOT%%/test_std.bat"
-call "%%TESTS_PROJECT_ROOT%%/test_std_encode.bat"
-call "%%TESTS_PROJECT_ROOT%%/test_build.bat"
-
-call "%%TESTS_PROJECT_ROOT%%/test_extract_version.bat"
-
-call "%%TESTS_PROJECT_ROOT%%/test_xml.bat"
+for %%i in ("%TESTS_PROJECT_ROOT%\test_xml__*.bat") do (
+  set "SCRIPT_FILE=%%i"
+  call "%%CONTOOLS_ROOT%%/std/if_.bat" not "%%SCRIPT_FILE:*\test_xml.bat=%%" == "" && call "%%CONTOOLS_ROOT%%/std/call.bat" "%%SCRIPT_FILE%%"
+)
 
 rem WARNING: must be called without the call prefix!
 "%CONTOOLS_TESTLIB_ROOT%/exit.bat"

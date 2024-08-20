@@ -4,6 +4,8 @@ setlocal DISABLEDELAYEDEXPANSION
 
 rem call "%%~dp0__init__/__init__.bat" || exit /b
 
+echo.^>%~nx0
+
 setlocal
 rem CAUTION: in case of globbing the result is dependent on the file system
 set __STRING__="1 2";3 4;5,6;7=8;9!*?0
@@ -47,3 +49,5 @@ call "%%~dp0..\..\..\Tools\std\encode/decode_pathlist_chars_glob.bat" & ^
 call "%%~dp0..\..\..\Tools\std\echo_var.bat" __STRING__ " " "|"
 endlocal
 echo.---
+
+echo.
