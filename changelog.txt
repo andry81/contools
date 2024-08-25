@@ -1,4 +1,7 @@
 2024.08.25:
+* changed: Scripts/Tools/cleanup/cleanup_file.bat: `github_pat_*` added tokens cleanup
+
+2024.08.25:
 * changed: Scripts/Tools/ToolAdaptors/vbs: minor improvements
 
 2024.08.23:
