@@ -866,7 +866,7 @@ Do ' empty `Do-Loop` to emulate `Break`
   If Not AllowTargetPathReassign Then
     If LCase(ShortcutTargetPrev) = ShortcutTargetUnquotedAbsLCase Then
       PrintOrEchoErrorLine _
-        WScript.ScriptName & ": warning: property `" & GetShortcutPropertyName("TargetPath") & "` is not changed (nocase)."
+        WScript.ScriptName & ": warning: property `" & GetShortcutPropertyName("TargetPath") & "` has nocase equal path."
       Exit Do
     End If
   End If
@@ -902,7 +902,7 @@ Do ' empty `Do-Loop` to emulate `Break`
       If Not AllowTargetPathReassign Then
         If ShortcutTargetLCase = LCase(ShortcutTargetShortPath) Then
           PrintOrEchoErrorLine _
-            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyName("TargetPath") & "` is not changed (nocase)."
+            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyName("TargetPath") & "` has nocase equal path."
           Exit Do
         End If
       End If
@@ -968,7 +968,7 @@ Do ' empty `Do-Loop` to emulate `Break`
   If Not AllowWorkingDirectoryReassign Then
     If LCase(ShortcutWorkingDirectoryPrev) = ShortcutWorkingDirectoryAbsLCase Then
       PrintOrEchoErrorLine _
-        WScript.ScriptName & ": warning: property `" & GetShortcutPropertyName("WorkingDirectory") & "` is not changed (nocase)."
+        WScript.ScriptName & ": warning: property `" & GetShortcutPropertyName("WorkingDirectory") & "` has nocase equal path."
       Exit Do
     End If
   End If
@@ -1005,7 +1005,7 @@ Do ' empty `Do-Loop` to emulate `Break`
       If Not AllowWorkingDirectoryReassign Then
         If ShortcutWorkingDirectoryLCase = LCase(ShortcutWorkingDirectoryShortPath) Then
           PrintOrEchoErrorLine _
-            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyName("WorkingDirectory") & "` is not changed (DOS, nocase)."
+            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyName("WorkingDirectory") & "` has nocase equal DOS path."
           Exit Do
         End If
       End If

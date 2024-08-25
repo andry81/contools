@@ -1,3 +1,6 @@
+2024.08.25:
+* changed: Scripts/Tools/ToolAdaptors/vbs: minor improvements
+
 2024.08.23:
 * fixed: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, update_shortcut.vbs: case where `TargetPath` is set to a DOS path variant, `WorkingDirectory` does not exist and `Save` function fails to create/update a shortcut because of unexisted `WorkingDirectory` path
 * fixed: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, update_shortcut.vbs: circumvented unknown unicode characters conversion in paths into character `?`

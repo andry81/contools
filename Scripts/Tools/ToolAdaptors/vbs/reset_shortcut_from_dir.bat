@@ -185,9 +185,13 @@ for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
   call :UPDATE_LINK
 )
 
+echo.
+
 exit /b 0
 
 :UPDATE_LINK
 echo."%LINK_FILE_PATH%"
 
 "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/reset_shortcut.vbs"%RESET_SHORTCUT_BARE_FLAGS% -- "%LINK_FILE_PATH%"
+
+echo.
