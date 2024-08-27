@@ -457,7 +457,7 @@ Function MakeShortcut(ShortcutFilePathToOpen)
 
     Dim EmptyLnk : EmptyLnk = "4C0000000114020000000000C000000000000046800000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000"
 
-    ' create empty shortcut to test shortcut file path and open in `ParseName`
+    ' create empty shortcut to open in `ParseName`
     Dim objSCFile : Set objSCFile = objFS.CreateTextFile("\\?\" & ShortcutFilePathToOpen, True)
 
     Dim i

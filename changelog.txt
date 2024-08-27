@@ -1,3 +1,7 @@
+2024.08.28:
+* changed: **/__init__/script_init.bat: removed unnecessary `call` prefix in a parameter of all `callshift.bat` calls
+* refactor: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: minor refactor
+
 2024.08.25:
 * changed: Scripts/Tools/cleanup/cleanup_file.bat: `github_pat_*` added tokens cleanup
 
