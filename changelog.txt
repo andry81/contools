@@ -1,4 +1,7 @@
 2024.08.28:
+* changed: Utilities/bin/contools/TODO.txt: todo update
+
+2024.08.28:
 * changed: **/__init__/script_init.bat: removed unnecessary `call` prefix in a parameter of all `callshift.bat` calls
 * refactor: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: minor refactor
 

@@ -381,3 +381,6 @@ These flags already partially added into `help.tpl`, but still is not implemente
   Add `/allow-child-console-ownership-reaquire-recursively` flag to enable this
   for all children processes (recursive injection including all `callf*.exe`
   child processes in process inheritance chain).
+
+* Consume spaces before `{*}`, `{@}` placeholders in case of empty value
+  expansion.
