@@ -1,4 +1,7 @@
 2024.08.29:
+* changed: Scripts/Tools/exec/exec_*_prefix.bat: avoid reuse of `FLAG_SHIFT` variable
+
+2024.08.29:
 * fixed: Utilities/Projects/**/*.vcxproj: build fixup
 
 2024.08.29:

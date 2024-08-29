@@ -25,7 +25,14 @@ if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 set "?~nx0=%~nx0"
 
 rem script flags
-if not defined FLAG_SHIFT set FLAG_SHIFT=0
+
+rem NOTE:
+rem   The `FLAG_SHIFT` now drops unconditionally because must not interfere within a nested call and used ONLY locally.
+rem   If you want to pass the shift value into `callf` utility, then you must explicitly use the `-X /shift-N` option.
+rem   Otherwise use `callshift.bat` script to explicitly shift the rest of the commad line before call to this script.
+rem
+set FLAG_SHIFT=0
+
 set FLAG_ELEVATE=0
 set "ELEVATE_PREFIX_NAME="
 set "CALLF_BARE_FLAGS="
