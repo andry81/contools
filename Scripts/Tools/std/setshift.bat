@@ -112,7 +112,7 @@ rem redirect command line into temporary file to print it correcly
 for %%i in (1) do (
   set "PROMPT=$_"
   echo on
-  for %%b in (1) do rem %*
+  for %%b in (1) do rem * %*
   @echo off
 ) > "%CMDLINE_TEMP_FILE%"
 
@@ -120,7 +120,14 @@ for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "
 
 del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~0,-1!") do endlocal & set "__STRING__=%%i"
+rem WORKAROUND:
+rem   In case if `echo` is turned off externally.
+rem
+if not defined __STRING__ exit /b %LAST_ERROR%
+
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-1!") do endlocal & set "__STRING__=%%i"
+
+if not defined __STRING__ exit /b %LAST_ERROR%
 
 set "?~dp0=%~dp0"
 
@@ -193,7 +200,7 @@ set "__STRING__=!__STRING__:		=	$09!" & set "__STRING__=!__STRING__:$09	=$09$09!
 set "__STRING__=!__STRING__:	 =$09$20!" & set "__STRING__=!__STRING__:$09 =$09$20!" & ^
 for /F "eol= tokens=* delims=" %%i in ("!__STRING__:	=$09!") do endlocal & set "__STRING__=%%i"
 
-set INDEX=-1
+set INDEX=0
 
 setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do (
   setlocal ENABLEDELAYEDEXPANSION & if !INDEX! GEQ !ARG0_INDEX! (

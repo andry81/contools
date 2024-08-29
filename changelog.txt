@@ -1,3 +1,8 @@
+2024.08.29:
+* fixed: Scripts/Tools/std: call.bat, callshift.bat, get_cmdline.bat, get_cmdline_len.bat, setshift.bat: case where command line starts by `/?`
+* fixed: Scripts/Tools/std: call.bat, callshift.bat, get_cmdline.bat, get_cmdline_len.bat, setshift.bat: case where the echo is turned off by `cmd.exe /Q` option
+* fixed: BuildTools/TargetProject.PostBuildStep.bat: workaround for the turned off echo from the Visual Studio
+
 2024.08.28:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 

@@ -17,7 +17,10 @@ rem sanitize trailing slash character
 if "%TARGET_DIR:~-1%" == "\" set "TARGET_DIR=%TARGET_DIR:~0,-1%"
 if "%BINARY_DIR:~-1%" == "\" set "BINARY_DIR=%BINARY_DIR:~0,-1%"
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%TARGET_DIR%%" "%%TARGET_FILE%%" "%%BINARY_DIR%%" /Y /H /R
+rem WORKAROUND:
+rem   Run script using `cmd.exe` to bypass echo suppression from Visual Studio (`cmd.exe /Q` option).
+rem
+"%SystemRoot%\System32\cmd.exe" /c @"%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%TARGET_DIR%%" "%%TARGET_FILE%%" "%%BINARY_DIR%%" /Y /H /R
 
 set LAST_ERROR=%ERRORLEVEL%
 

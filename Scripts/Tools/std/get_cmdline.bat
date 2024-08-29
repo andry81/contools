@@ -46,18 +46,24 @@ rem redirect command line into temporary file to print it correcly
 for %%i in (1) do (
   set "PROMPT=$_"
   echo on
-  for %%b in (1) do rem %*
+  for %%b in (1) do rem * %*
   @echo off
 ) > "%CMDLINE_TEMP_FILE%"
 
-for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "RETURN_VALUE=%%i"
+for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
 
 del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
+rem WORKAROUND:
+rem   In case if `echo` is turned off externally.
+rem
+if not defined __STRING__ endlocal & set "RETURN_VALUE=" & exit /b %LAST_ERROR%
+
+setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-1!") do endlocal & set "__STRING__=%%i"
+
+if not defined __STRING__ endlocal & set "RETURN_VALUE=" & exit /b %LAST_ERROR%
+
 (
-  setlocal ENABLEDELAYEDEXPANSION
-  if not "!RETURN_VALUE:~4,-1!" == "" (
-    for /F "eol= tokens=* delims=" %%i in ("!RETURN_VALUE:~4,-1!") do endlocal & endlocal & set "RETURN_VALUE=%%i"
-  ) else endlocal & endlocal & set "RETURN_VALUE="
+  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & endlocal & set "RETURN_VALUE=%%i"
   exit /b %LAST_ERROR%
 )
