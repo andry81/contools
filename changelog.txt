@@ -1,4 +1,7 @@
 2024.08.31:
+* fixed: Scripts/Tools/admin/Wincred/newcred.bat: special characters in arguments workaround
+
+2024.08.31:
 * new: Scripts/Tools/admin/Wincred: Windows credentials maintain scripts
 
 2024.08.29:
