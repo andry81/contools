@@ -1,3 +1,6 @@
+2024.08.31:
+* new: Scripts/Tools/admin/Wincred: Windows credentials maintain scripts
+
 2024.08.29:
 * changed: Scripts/Tools/exec/exec_*_prefix.bat: avoid reuse of `FLAG_SHIFT` variable
 
