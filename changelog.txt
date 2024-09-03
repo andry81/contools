@@ -1,3 +1,6 @@
+2024.09.03:
+* fixed: Scripts/Tools/admin/Junction: scripts fixup and improvement
+
 2024.08.31:
 * fixed: Scripts/Tools/admin/Wincred/newcred.bat: special characters in arguments workaround
 
