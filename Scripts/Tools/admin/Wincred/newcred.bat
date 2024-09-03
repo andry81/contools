@@ -32,4 +32,4 @@ set "USER=%~2"
 set "PASS=%~3"
 set "PERSIST=%~4"
 
-powershell.exe -NoLogo -Command "& {New-StoredCredential -Target "'"%TARGET%"'" -UserName "'"%USER%"'" -Password "'"%PASS%"'" -Persist "'"%PERSIST%"'"}"
+powershell.exe -NoLogo -Command "& {New-StoredCredential -Target "'"%TARGET:'=''%"'" -UserName "'"%USER:'=''%"'" -Password "'"%PASS:'=''%"'" -Persist "'"%PERSIST:'=''%"'"}"
