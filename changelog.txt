@@ -1,3 +1,6 @@
+2024.09.04:
+* changed: Scripts/Tools/std: code cleanup
+
 2024.09.03:
 * fixed: Scripts/Tools/admin/Wincred/newcred.bat: single quote in arguments escape
 
