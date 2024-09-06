@@ -75,11 +75,4 @@ set x
 endlocal
 echo.---
 
-setlocal
-set "TAB=	"
-call "%%~dp0..\..\..\Tools\std\setshift.bat" -no_trim 0 x cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
-set x
-endlocal
-echo.---
-
 echo.

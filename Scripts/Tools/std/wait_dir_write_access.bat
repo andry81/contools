@@ -1,5 +1,8 @@
 @echo off
 
+rem USAGE:
+rem   wait_dir_write_access.bat <dir-path> [<wait-timeout-msec>|-1]
+
 setlocal
 
 if "%~1" == "" exit /b 0

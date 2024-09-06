@@ -83,10 +83,4 @@ call "%%~dp0..\..\..\Tools\std\callshift.bat" 0 echo.%%$5E$3E%%cmd param0 param1
 endlocal
 echo.---
 
-setlocal
-set "TAB=	"
-call "%%~dp0..\..\..\Tools\std\callshift.bat" -no_trim 0 echo.cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
-endlocal
-echo.---
-
 echo.

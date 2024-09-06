@@ -82,7 +82,7 @@ rem redirect command line into temporary file to print it correcly
 for %%i in (1) do (
   set "PROMPT=$_"
   echo on
-  for %%b in (1) do rem * %*
+  for %%b in (1) do rem * %*#
   @echo off
 ) > "%CMDLINE_TEMP_FILE%"
 
@@ -95,7 +95,9 @@ rem   In case if `echo` is turned off externally.
 rem
 if not defined __STRING__ exit /b %LAST_ERROR%
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-1!") do endlocal & set "__STRING__=%%i"
+setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
+  for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
+) else endlocal & set "__STRING__="
 
 if not defined __STRING__ exit /b %LAST_ERROR%
 
@@ -131,8 +133,7 @@ if %FLAG_EXE% EQU 0 (
 ) else call "%%?~dp0%%encode\encode_sys_chars_exe_cmdline.bat"
 
 rem CAUTION:
-rem   Encode ALL tabulation characters.
-rem   To split arguments with tabulation characters mix you must to entail each argument with at least one SPACE character!
+rem   Encodes ALL tabulation characters.
 rem
 setlocal ENABLEDELAYEDEXPANSION & ^
 set "__STRING__=!__STRING__:  = $20!" & set "__STRING__=!__STRING__:$20 =$20$20!" & ^

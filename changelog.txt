@@ -1,3 +1,8 @@
+2024.09.06:
+* fixed: Scripts/Tools/std/call*.bat: empty command line workaround
+* new: Scripts/Tests/manual/batscripts/test_std__*_calls*_with_tabs.bat: manual tests with tabulation characters
+* refactor: Scripts/Tools/std/wait_*_write_acces.bat: minor improvement
+
 2024.09.05:
 * new: Scripts/Tools/std/wait_*_write_acces.bat: scripts to wait for a file, a directory or directory files on write access
 

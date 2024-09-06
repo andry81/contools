@@ -14,7 +14,7 @@ echo.---
 
 setlocal
 set ARGS="1 2" ! ? * ^^^& ^^^| , ; = ^^= "=" 3
-call "%%~dp0..\..\..\Tools\std\call.bat" -exe echo %%ARGS%%
+call "%%~dp0..\..\..\Tools\std\call.bat" -exe -- echo %%ARGS%%
 endlocal
 echo.---
 
@@ -26,7 +26,7 @@ echo.---
 
 setlocal
 set ARGS=$*^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+?** ,;=
-call "%%~dp0..\..\..\Tools\std\call.bat" -exe echo %%ARGS%%
+call "%%~dp0..\..\..\Tools\std\call.bat" -exe -- echo %%ARGS%%
 endlocal
 echo.---
 
@@ -60,12 +60,6 @@ echo.---
 setlocal
 set "$5E$3E=^>"
 call "%%~dp0..\..\..\Tools\std\call.bat" echo.%%$5E$3E%%cmd param0 param1
-endlocal
-echo.---
-
-setlocal
-set "TAB=	"
-call "%%~dp0..\..\..\Tools\std\call.bat" echo.cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
 endlocal
 echo.---
 

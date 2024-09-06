@@ -20,7 +20,7 @@ rem   Number of `<cmdline>` arguments to skip before shift.
 rem   If not defined, then 0.
 
 rem <shift>:
-rem   Number of `<cmdline>` argument to skip and shift.
+rem   Number of `<cmdline>` arguments to skip and shift.
 rem   If >=0, then shifts by `<shift>` beginning from `<skip-num>` argument.
 rem   If < 0, then shifts by `|<shift>|` beginning from `<skip-num>+|<shift>|`
 rem   argument.
@@ -93,9 +93,10 @@ rem     `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem     expanded.
 rem   * A batch script command line and an executable command line has
 rem     different encoders.
-rem   * In case of tabulation and space characters mix between command line
-rem     arguments, you must entail each argument at least with one space,
-rem     otherwise arguments would be concatenated.
+rem   * In case of a tabulation character immediately after a command line
+rem     argument, you must entail each argument at least with one space
+rem     character, because all tabulation characters does encode which may end
+rem     up with arguments concatenetion and so wrong skip and/or shift.
 
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
@@ -111,7 +112,7 @@ rem redirect command line into temporary file to print it correcly
 for %%i in (1) do (
   set "PROMPT=$_"
   echo on
-  for %%b in (1) do rem * %*
+  for %%b in (1) do rem * %*#
   @echo off
 ) > "%CMDLINE_TEMP_FILE%"
 
@@ -124,9 +125,9 @@ rem   In case if `echo` is turned off externally.
 rem
 if not defined __STRING__ exit /b %LAST_ERROR%
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-1!") do endlocal & set "__STRING__=%%i"
-
-if not defined __STRING__ exit /b %LAST_ERROR%
+setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
+  for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
+) else endlocal & set "__STRING__="
 
 set "?~dp0=%~dp0"
 
@@ -190,8 +191,7 @@ if %FLAG_EXE% EQU 0 (
 ) else call "%%?~dp0%%encode\encode_sys_chars_exe_cmdline.bat"
 
 rem CAUTION:
-rem   Encode ALL tabulation characters.
-rem   To split arguments with tabulation characters mix you must to entail each argument with at least one SPACE character!
+rem   Encodes ALL tabulation characters.
 rem
 if %FLAG_NO_TRIM% NEQ 0 setlocal ENABLEDELAYEDEXPANSION & ^
 set "__STRING__=!__STRING__:  = $20!" & set "__STRING__=!__STRING__:$20 =$20$20!" & ^
