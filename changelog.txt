@@ -1,4 +1,7 @@
 2024.09.08:
+* fixed: Scripts/Tests/bench/batscripts: minor fixup
+
+2024.09.08:
 * fixed: Scripts/Tests/bench/batscripts/test__*.bat: minor fixup
 * new: ScriptsScripts/Tests/bench/batscripts/test_std_sleep*.bat: bench tests for `sleep.bat` script
 * changed: Scripts/Tools/std/sleep.bat: code improvement
