@@ -12,10 +12,8 @@ setlocal DISABLEDELAYEDEXPANSION
 
 set "BEGIN_TIME=%TIME%"
 
-(
-  for /L %%i in (1,1,10000) do (
-    copy nul "%TEMP_FILE%" /B /Y
-  )
+for /L %%i in (1,1,10000) do (
+  copy nul "%TEMP_FILE%" /B /Y
 ) >nul 2>nul
 
 call "%%CONTOOLS_ROOT%%/timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"
@@ -33,7 +31,7 @@ set /A TIME_MSECS=%TIMEDIFF% %% 1000
 if "%TIME_MSECS:~2,1%" == "" set "TIME_MSECS=0%TIME_MSECS%"
 if "%TIME_MSECS:~1,1%" == "" set "TIME_MSECS=0%TIME_MSECS%"
 
-echo Time spent: %TIME_SECS%.%TIME_MSECS% secs
+echo Time spent: %TIME_SECS%.%TIME_MSECS% msecs
 echo.
 
 del /F /Q /A:-D "%TEMP_FILE%" >nul 2>nul
