@@ -1,6 +1,15 @@
 @echo off
 
+rem USAGE:
+rem   sleep.bat [-vbs] <timeout-msec>
+
 setlocal
+
+if "%~1" == "-vbs" (
+  if "%~2" == "" exit /b -1
+  "%SystemRoot%\System32\cscript.exe" //nologo "%~dp0sleep.vbs" "%~2"
+  exit /b
+)
 
 set "TIME_SLEEP_MSEC=%~1"
 

@@ -17,4 +17,3 @@ rem initialize testlib "module"
 call "%%CONTOOLS_ROOT%%/testlib/__init__.bat" || exit /b
 
 exit /b 0
-
