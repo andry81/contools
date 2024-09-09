@@ -1,4 +1,11 @@
 2024.09.08:
+* new: Scripts/Tools/lock/sleep.vbs: vbs script to call Win32 `Sleep` function
+* new: Scripts/Tools/lock/delete_file.vbs: vbs script to delete long path file
+* changed: Scripts/Tools/lock/wait_*_write_access.bat: code improvements
+* changed: Scripts/Tools/std/sleep.bat: minor change
+* refactor: Scripts/Tools/lock/wait_*_write_access.bat: moved from `std` directory
+
+2024.09.08:
 * fixed: Scripts/Tests/bench/batscripts/test__*.bat: minor fixup
 * new: Scripts/Tools/std/sleep.vbs: vbs script to call Win32 `Sleep` function
 * new: Scripts/Tools/std/sleep.bat: `-vbs` flag to use `sleep.vbs` script as implementation

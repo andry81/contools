@@ -14,12 +14,13 @@ if "%~1" == "-vbs" (
 set "TIME_SLEEP_MSEC=%~1"
 
 if not defined TIME_SLEEP_MSEC exit /b -1
+if %TIME_SLEEP_MSEC% LEQ 0 exit /b 0
 
 rem use pingpath to wait longer than 500 msec
 if %TIME_SLEEP_MSEC% GEQ 500 (
   "%SystemRoot%\System32\pathping.exe" 127.0.0.1 -n -q 1 -p %TIME_SLEEP_MSEC% >nul 2>nul
   exit /b 0
-) else if %TIME_SLEEP_MSEC% LEQ 0 exit /b 0
+)
 
 call :SET_TIMESTAMP
 set BEGIN_TIMESTAMP=%TIMESTAMP%
