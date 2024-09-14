@@ -1,3 +1,14 @@
+2024.09.14:
+* fixed: Scripts/Tools/std/touch_dir.bat: temporary file delete by a long path
+* fixed: Scripts/Tools/std/touch_file.bat: accidental file recreation with previous creation date
+* fixed: Scripts/Tools/std/touch_file.bat: fall back to `type nul >> ...` for a long path without `robocopy` presence (Windows XP workaround)
+* fixed: Scripts/Tools/std/del_*.bat: better long paths detection (but still can not delete a long path file)
+* fixed: Scripts/Tools/std/touch_*.bat: better long paths detection
+* new: Scripts/Tools/std/delete_file.vbs: vbs script to delete long path file
+* new: Scripts/Tools/std/xremove_file.bat: script to delete long path file with a fall back implementation
+* changed: Scripts/Tools/std/del_*.bat: added more verbosity
+* changed: Scripts/Tools/std/touch_dir.bat: `xremove_file.bat` script usage
+
 2024.09.11:
 * changed: Scripts/Tools/locks/wait_dir_write_access.bat: temporary file name with extension
 

@@ -17,7 +17,9 @@ if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 
 setlocal
 
+set "?~n0=%~n0%"
 set "?~nx0=%~nx0%"
+set "?~dp0=%~dp0%"
 
 set "FILE_PATH=%~1"
 set FILE_COUNT=1
@@ -30,6 +32,8 @@ if not defined FILE_PATH (
 :TOUCH_FILE_LOOP
 
 set "FILE_PATH=%FILE_PATH:/=\%"
+
+if "%FILE_PATH:~0,4%" == "\\?\" set "FILE_PATH=%FILE_PATH:~4%"
 
 rem check on missed components...
 
@@ -57,13 +61,7 @@ goto FILE_PATH_OK
 :FILE_PATH_OK
 
 for /F "eol= tokens=* delims=" %%i in ("%FILE_PATH%\.") do ^
-for /F "eol= tokens=* delims=" %%j in ("%%~dpi.") do ( set "FILE_PATH=%%~fi" & set "FILE_DIR=%%~fj" & set "FILE_NAME=%%~nxi" )
-
-if "%FILE_PATH:~0,4%" == "\\?\" set "FILE_PATH=%FILE_PATH:~4%"
-if "%FILE_DIR:~0,4%" == "\\?\" set "FILE_DIR=%FILE_DIR:~4%"
-
-rem CAUTION: must be with `\\?\` prefix to workaround a long path
-for /F "eol= tokens=* delims=" %%i in ("\\?\%FILE_PATH%") do set "FILE_ATTR=%%~ai"
+for /F "eol= tokens=* delims=" %%j in ("%%~dpi.") do set "FILE_PATH=%%~fi" & set "FILE_DIR=%%~fj" & set "FILE_NAME=%%~nxi"
 
 if exist "\\?\%FILE_PATH%\*" (
   echo.%?~nx0%: error: file path is a directory: "%FILE_PATH%".
@@ -80,18 +78,34 @@ rem   The `type nul >> \\?\...` nor `copy \\?\...` does not support long file pa
 rem   So we test on a long file path existence and if a long path, then move the file to a temporary directory,
 rem   touch it and move back.
 
-if not exist "\\?\%FILE_PATH%" ( type nul >> "\\?\%FILE_PATH%" & goto CONTINUE )
-
 rem CAUTION:
-rem   If the file were deleted before, then the creation date will be set from the previously deleted file!
+rem   If the file were deleted before, then the creation date will be set by `type nul >> ...` from the previously deleted file!
+
+if not exist "\\?\%FILE_PATH%" type nul > "\\?\%FILE_PATH%" & goto CONTINUE
+
+rem TODO: Windows XP `robocopy` workaround
 
 rem check on long file path
-if not exist "%FILE_PATH%" if exist "%SystemRoot%\System32\robocopy.exe" goto MOVE_TO_TMP
+set FILE_PATH_LONG=0
+if not exist "%FILE_PATH%" set FILE_PATH_LONG=1
 
-if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
-  copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul
+if %FILE_PATH_LONG% NEQ 0 if exist "%SystemRoot%\System32\robocopy.exe" goto MOVE_TO_TMP
+
+for /F "eol= tokens=* delims=" %%i in ("\\?\%FILE_PATH%") do set "FILE_ATTR=%%~ai"
+
+if %FILE_PATH_LONG% EQU 0 (
+  if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
+    copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul
+  ) else (
+    attrib -r "%FILE_PATH%" >nul & copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul & attrib +r "%FILE_PATH%" >nul
+  )
 ) else (
-  attrib -r "%FILE_PATH%" >nul & copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul & attrib +r "%FILE_PATH%" >nul
+  rem fall back to `type nul >> ...`
+  if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
+    type nul >> "\\?\%FILE_PATH%"
+  ) else (
+    attrib -r "%FILE_PATH%" >nul & type nul >> "\\?\%FILE_PATH%" & attrib +r "%FILE_PATH%" >nul
+  )
 )
 
 goto CONTINUE
@@ -99,8 +113,8 @@ goto CONTINUE
 :MOVE_TO_TMP
 
 if defined SCRIPT_TEMP_CURRENT_DIR (
-  set "FILE_PATH_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\touch_file.%RANDOM%-%RANDOM%"
-) else set "FILE_PATH_TEMP_DIR=%TEMP%\touch_file.%RANDOM%-%RANDOM%"
+  set "FILE_PATH_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%"
+) else set "FILE_PATH_TEMP_DIR=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%"
 
 "%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
 

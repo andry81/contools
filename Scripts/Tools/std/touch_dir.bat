@@ -6,7 +6,7 @@ rem   touch_dir.bat <path>...
 rem Description:
 rem   The `touch` command analog for directories, with echo and some conditions
 rem   check before call. Does support long paths.
-rem
+
 rem <path>...
 rem   Directory path list.
 
@@ -14,7 +14,9 @@ if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 
 setlocal
 
+set "?~n0=%~n0%"
 set "?~nx0=%~nx0%"
+set "?~dp0=%~dp0%"
 
 set "DIR_PATH=%~1"
 set DIR_COUNT=1
@@ -27,6 +29,8 @@ if not defined DIR_PATH (
 :TOUCH_DIR_LOOP
 
 set "DIR_PATH=%DIR_PATH:/=\%"
+
+if "%DIR_PATH:~0,4%" == "\\?\" set "DIR_PATH=%DIR_PATH:~4%"
 
 rem check on missed components...
 
@@ -55,36 +59,20 @@ goto DIR_PATH_OK
 
 for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
 
-if "%DIR_PATH:~0,4%" == "\\?\" set "DIR_PATH=%DIR_PATH:~4%"
-
 if not exist "\\?\%DIR_PATH%\*" (
   echo.%?~nx0%: error: directory does not exist: "%DIR_PATH%".
   goto CONTINUE
 ) >&2
 
-set "DIR_PATH_TEMP_FILE_NAME=touch_dir.%RANDOM%-%RANDOM%.tmp"
+set "DIR_PATH_TEMP_FILE_NAME=.%?~n0%.%RANDOM%-%RANDOM%.tmp"
 set "DIR_PATH_TEMP_FILE=%DIR_PATH%\%DIR_PATH_TEMP_FILE_NAME%"
 
-type nul >> "\\?\%DIR_PATH_TEMP_FILE%"
+rem CAUTION:
+rem   If the file were deleted before, then the creation date will be set by `type nul >> ...` from the previously deleted file!
 
-rem check on long file path and if long file path, then move the file to a temporary directory to delete it
-if not exist "%FILE_PATH%" if exist "%SystemRoot%\System32\robocopy.exe" goto MOVE_TO_TMP
+type nul > "\\?\%DIR_PATH_TEMP_FILE%"
 
-del /F /Q /A:-D "\\?\%DIR_PATH_TEMP_FILE%" >nul 2>nul
-
-goto CONTINUE
-
-:MOVE_TO_TMP
-
-if defined SCRIPT_TEMP_CURRENT_DIR (
-  set "FILE_PATH_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\touch_dir.%RANDOM%-%RANDOM%"
-) else set "FILE_PATH_TEMP_DIR=%TEMP%\touch_dir.%RANDOM%-%RANDOM%"
-
-"%SystemRoot%\System32\robocopy.exe" "%DIR_PATH%" "%FILE_PATH_TEMP_DIR%" "%DIR_PATH_TEMP_FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
-
-rmdir /S /Q "%FILE_PATH_TEMP_DIR%" >nul 2>nul
-
-:CONTINUE
+call "%%?~dp0%%xremove_file.bat" "%%DIR_PATH_TEMP_FILE%%"
 
 shift
 

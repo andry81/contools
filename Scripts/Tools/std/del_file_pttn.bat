@@ -6,6 +6,7 @@ rem   del_file_pttn.bat <dir> <name-pttn> <ext-pttn> [<del-flags>...]
 rem Description:
 rem   The `del` wrapper script with echo and some conditions check before call.
 rem   Can remove a file by extended and separated patterns: dir+file+extention.
+rem   Does support long paths, but can not delete.
 
 rem <dir>
 rem   Directory path.
@@ -37,6 +38,8 @@ if not defined FILE_DIR (
 ) >&2
 
 set "FILE_DIR=%FILE_DIR:/=\%"
+
+if "%FILE_DIR:~0,4%" == "\\?\" set "FILE_DIR=%FILE_DIR:~4%"
 
 rem check on missed components...
 
@@ -105,7 +108,7 @@ if not exist "\\?\%FILE_PATH%" (
 rem CAUTION: we must override `/A` flag for a file removement ONLY
 call "%%~dp0setshift.bat" 3 DEL_FLAGS_ %%* /A:-D
 
-echo.^>^>del %DEL_FLAGS_% "%FILE_PATH%"
+if %TOOLS_VERBOSE%0 NEQ 0 echo.^>^>del %DEL_FLAGS_% "%FILE_PATH%"
 del %DEL_FLAGS_% "%FILE_PATH%"
 
 exit /b

@@ -5,7 +5,7 @@ rem   del_file_if_exist.bat <path> [<del-flags>...]
 
 rem Description:
 rem   The `del` wrapper script with echo and some conditions check before
-rem   call.
+rem   call. Does support long paths, but can not delete.
 
 rem <path>
 rem   Single file path.
@@ -29,6 +29,8 @@ if not defined FROM_PATH (
 ) >&2
 
 set "FROM_PATH=%FROM_PATH:/=\%"
+
+if "%FROM_PATH:~0,4%" == "\\?\" set "FROM_PATH=%FROM_PATH:~4%"
 
 rem check on missed components...
 
@@ -76,4 +78,5 @@ if not exist "\\?\%FROM_PATH%" (
 rem CAUTION: we must override `/A` flag for a file removement ONLY
 call "%%~dp0setshift.bat" 1 DEL_FLAGS_ %%* /A:-D
 
+if %TOOLS_VERBOSE%0 NEQ 0 echo.^>^>del %DEL_FLAGS_% "%FROM_PATH%"
 del %DEL_FLAGS_% "%FROM_PATH%"
