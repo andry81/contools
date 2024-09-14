@@ -97,14 +97,14 @@ if %FILE_PATH_LONG% EQU 0 (
   if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
     copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul
   ) else (
-    attrib -r "%FILE_PATH%" >nul & copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul & attrib +r "%FILE_PATH%" >nul
+    "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
   )
 ) else (
-  rem fall back to `type nul >> ...`
+  rem CAUTION: `type nul >> ...` does not work as expected on Windows XP
   if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
-    type nul >> "\\?\%FILE_PATH%"
+    "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0touch_file.vbs" "\\?\%FILE_PATH%"
   ) else (
-    attrib -r "%FILE_PATH%" >nul & type nul >> "\\?\%FILE_PATH%" & attrib +r "%FILE_PATH%" >nul
+    "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0touch_file.vbs" "\\?\%FILE_PATH%" & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
   )
 )
 

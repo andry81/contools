@@ -74,6 +74,8 @@ type nul > "\\?\%DIR_PATH_TEMP_FILE%"
 
 call "%%?~dp0%%xremove_file.bat" "%%DIR_PATH_TEMP_FILE%%"
 
+:CONTINUE
+
 shift
 
 set "DIR_PATH=%~1"

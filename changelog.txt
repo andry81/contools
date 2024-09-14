@@ -1,4 +1,9 @@
 2024.09.14:
+* fixed: Scripts/Tools/std/touch_dir.bat: execution fixup
+* fixed: Scripts/Tools/std/touch_file.bat: `type nul >> ...` code is replaced by `touch_file.vbs` script as the former does not work as expected on Windows XP
+* new: Scripts/Tools/std/touch_file.vbs: vbs script to touch long path file
+
+2024.09.14:
 * fixed: Scripts/Tools/std/touch_dir.bat: temporary file delete by a long path
 * fixed: Scripts/Tools/std/touch_file.bat: accidental file recreation with previous creation date
 * fixed: Scripts/Tools/std/touch_file.bat: fall back to `type nul >> ...` for a long path without `robocopy` presence (Windows XP workaround)
