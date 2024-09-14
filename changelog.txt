@@ -1,3 +1,6 @@
+2024.09.11:
+* changed: Scripts/Tools/locks/wait_dir_write_access.bat: temporary file name with extension
+
 2024.09.08:
 * new: Scripts/Tools/lock/sleep.vbs: vbs script to call Win32 `Sleep` function
 * new: Scripts/Tools/lock/delete_file.vbs: vbs script to delete long path file

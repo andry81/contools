@@ -36,7 +36,7 @@ for /F "tokens=* delims=" %%i in ("\\?\%FILE_PATH%") do set "FILE_PATH_ATTR=%%~a
 if not defined FILE_PATH_ATTR exit /b 255
 if /i not "%FILE_PATH_ATTR:~0,1%" == "d" exit /b 255
 
-set "FILE_NAME_TMP=.tmp-%RANDOM%-%RANDOM%"
+set "FILE_NAME_TMP=.%~n0.%RANDOM%-%RANDOM%.tmp"
 
 if not "%~2" == "" if %~20 LSS 0 (
   ( type nul > "\\?\%FILE_PATH%\%FILE_NAME_TMP%" ) 2>nul || exit /b 1
