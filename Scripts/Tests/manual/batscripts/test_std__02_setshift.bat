@@ -63,7 +63,7 @@ endlocal
 echo.---
 
 setlocal
-call "%%~dp0..\..\..\Tools\std\setshift.bat" -no_trim 1 x  a  b  c  d
+call "%%~dp0..\..\..\Tools\std\setshift.bat" -notrim 1 x  a  b  c  d
 set x
 endlocal
 echo.---

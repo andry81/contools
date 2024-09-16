@@ -88,7 +88,7 @@ set /A FLAG_SHIFT+=1
 rem reset output variable if defined
 if defined VARIABLE if defined %VARIABLE% set "%VARIABLE%="
 
-call "%%?~dp0%%setshift.bat" -no_trim %%FLAG_SHIFT%% MESSAGE %%*
+call "%%?~dp0%%setshift.bat" -notrim %%FLAG_SHIFT%% MESSAGE %%*
 
 if not defined VARIABLE (
   echo.%?~nx0%: error: output variable name is not defined.

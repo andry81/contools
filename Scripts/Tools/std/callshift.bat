@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   callshift.bat [-exe] [-no_trim] [-skip <skip-num>] [<shift> [<command> [<cmdline>...]]]
+rem   callshift.bat [-exe] [-notrim] [-skip <skip-num>] [<shift> [<command> [<cmdline>...]]]
 
 rem Description:
 rem   Script calls `<command>` with skipped and shifted `<cmdline>`.
@@ -12,7 +12,7 @@ rem   Use exe command line encoder instead of the batch as by default.
 rem   An executable command line does not use `,;=` characters as command line
 rem   arguments separator.
 
-rem -no_trim
+rem -notrim
 rem   Avoids spaces trim in the shifted command line.
 
 rem -skip <skip-num>
@@ -63,7 +63,7 @@ rem   9. >errlvl.bat 123
 rem      >callshift.bat 0 errlvl.bat 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
-rem  10. >callshift.bat -no_trim 1 echo  a  b  c  d
+rem  10. >callshift.bat -notrim 1 echo  a  b  c  d
 rem       b  c  d
 rem  11. >callshift.bat 0 echo.^>cmd param0 param1
 rem      >cmd param0 param1
@@ -72,7 +72,7 @@ rem Examples (in script):
 rem   1. set "$5E$3E=^>"
 rem      call callshift.bat 0 echo.%%$5E$3E%%cmd param0 param1
 rem   2. set "TAB=	"
-rem      call callshift.bat -no_trim 0 echo.cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+rem      call callshift.bat -notrim 0 echo.cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
 
 rem Pros:
 rem
@@ -154,7 +154,7 @@ if defined FLAG if "%FLAG%" == "-exe" (
   set /A FLAG_SHIFT+=1
 )
 
-if defined FLAG if "%FLAG%" == "-no_trim" (
+if defined FLAG if "%FLAG%" == "-notrim" (
   set FLAG_NO_TRIM=1
   shift
   call set "FLAG=%%~1"
@@ -173,9 +173,18 @@ set "SHIFT=%~1"
 set "COMMAND="
 set "CMDLINE="
 
+rem test on invalid flag
+if not defined SHIFT exit /b %LAST_ERROR%
+
+set "SHIFT_=%SHIFT%"
+
+rem cast to integer
+set /A SHIFT+=0
+
+if not "%SHIFT%" == "%SHIFT_%" exit /b %LAST_ERROR%
+
 rem cast to integer
 set /A FLAG_SKIP+=0
-set /A SHIFT+=0
 
 set /A COMMAND_INDEX=FLAG_SHIFT+1
 set /A ARG0_INDEX=FLAG_SHIFT+2

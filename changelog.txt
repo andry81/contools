@@ -1,4 +1,8 @@
 2024.09.16:
+* changed: Scripts/Tools/std: callshift.bat, setshift.bat, choice.bat: `-no_trim` renamed to `-notrim`
+* changed: Scripts/Tools/std: callshift.bat, setshift.bat: workaround to avoid invalid `<shift>` parameter or invalid flag
+
+2024.09.16:
 * fixed: Scripts/Tools/std: call.bat, callshift.bat, setshift.bat, get_cmdline*.bat: #2: workarounds for specific builtin variable placeholders
 * changed: Scripts/Tools/std/get_cmdline*.bat: missed merge from `callshift.bat` script
 * refactor: Scripts/Tools/std: call.bat, callshift.bat, setshift.bat: minor refactor

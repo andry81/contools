@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   setshift.bat [-exe] [-no_trim] [-skip <skip-num>] <shift> <var> [<cmdline>...]
+rem   setshift.bat [-exe] [-notrim] [-skip <skip-num>] <shift> <var> [<cmdline>...]
 
 rem Description:
 rem   Script sets `<var>` variable to skipped and shifted `<cmdline>`.
@@ -11,7 +11,7 @@ rem   Use exe command line encoder instead of the batch as by default.
 rem   An executable command line does not use `,;=` characters as command line
 rem   arguments separator.
 
-rem -no_trim
+rem -notrim
 rem   Avoids spaces trim in the shifted command line.
 
 rem -skip <skip-num>
@@ -61,7 +61,7 @@ rem      >set x
 rem      x=a b 1 2 3 7
 rem      rem in a script
 rem      >call setshift.bat -skip 2 -3 x param0 param1 %%3 %%2 %%1 %%*
-rem   7. >setshift.bat -no_trim 1 x  a  b  c  d
+rem   7. >setshift.bat -notrim 1 x  a  b  c  d
 rem      >set x
 rem      x= b  c  d
 rem   8. >setshift.bat 0 x ^>cmd param0 param1
@@ -73,7 +73,7 @@ rem   1. set "$5E$3E=^>"
 rem      call setshift.bat 0 x %%$5E$3E%%cmd param0 param1
 rem      set x
 rem   2. set "TAB=	"
-rem      call setshift.bat -no_trim 0 x cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+rem      call setshift.bat -notrim 0 x cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
 rem      set x
 
 rem Pros:
@@ -157,7 +157,7 @@ if defined FLAG if "%FLAG%" == "-exe" (
   set /A FLAG_SHIFT+=1
 )
 
-if defined FLAG if "%FLAG%" == "-no_trim" (
+if defined FLAG if "%FLAG%" == "-notrim" (
   set FLAG_NO_TRIM=1
   shift
   call set "FLAG=%%~1"
@@ -176,9 +176,18 @@ set "SHIFT=%~1"
 set "VAR="
 set "CMDLINE="
 
+rem test on invalid flag
+if not defined SHIFT exit /b %LAST_ERROR%
+
+set "SHIFT_=%SHIFT%"
+
+rem cast to integer
+set /A SHIFT+=0
+
+if not "%SHIFT%" == "%SHIFT_%" exit /b %LAST_ERROR%
+
 rem cast to integer
 set /A FLAG_SKIP+=0
-set /A SHIFT+=0
 
 set /A VAR_INDEX=FLAG_SHIFT+1
 set /A ARG0_INDEX=FLAG_SHIFT+2

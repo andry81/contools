@@ -73,7 +73,7 @@ endlocal
 echo.---
 
 setlocal
-call "%%~dp0..\..\..\Tools\std\callshift.bat" -no_trim 1 echo  a  b  c  d
+call "%%~dp0..\..\..\Tools\std\callshift.bat" -notrim 1 echo  a  b  c  d
 endlocal
 echo.---
 
