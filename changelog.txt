@@ -1,3 +1,8 @@
+2024.09.16:
+* fixed: Scripts/Tools/std: call.bat, callshift.bat, setshift.bat, get_cmdline*.bat: #2: workarounds for specific builtin variable placeholders
+* changed: Scripts/Tools/std/get_cmdline*.bat: missed merge from `callshift.bat` script
+* refactor: Scripts/Tools/std: call.bat, callshift.bat, setshift.bat: minor refactor
+
 2024.09.14:
 * fixed: Scripts/Tools/std/touch_dir.bat: execution fixup
 * fixed: Scripts/Tools/std/touch_file.bat: `type nul >> ...` code is replaced by `touch_file.vbs` script as the former does not work as expected on Windows XP

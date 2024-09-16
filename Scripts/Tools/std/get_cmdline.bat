@@ -39,15 +39,17 @@ rem drop last error level
 call;
 
 if defined SCRIPT_TEMP_CURRENT_DIR (
-  set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\get_cmdline.%RANDOM%-%RANDOM%.txt"
-) else set "CMDLINE_TEMP_FILE=%TEMP%\get_cmdline.%RANDOM%-%RANDOM%.txt"
+  set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%.txt"
+) else set "CMDLINE_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
 
 rem redirect command line into temporary file to print it correcly
-for %%i in (1) do (
-  set "PROMPT=$_"
+(
+  setlocal DISABLEEXTENSIONS
+  (set PROMPT=$_)
   echo on
-  for %%b in (1) do rem * %*
+  for %%z in (%%z) do rem * %*#
   @echo off
+  endlocal
 ) > "%CMDLINE_TEMP_FILE%"
 
 for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
@@ -59,7 +61,9 @@ rem   In case if `echo` is turned off externally.
 rem
 if not defined __STRING__ endlocal & set "RETURN_VALUE=" & exit /b %LAST_ERROR%
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-1!") do endlocal & set "__STRING__=%%i"
+setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
+  for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
+) else endlocal & set "__STRING__="
 
 if not defined __STRING__ endlocal & set "RETURN_VALUE=" & exit /b %LAST_ERROR%
 

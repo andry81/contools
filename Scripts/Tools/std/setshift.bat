@@ -82,13 +82,15 @@ rem   * Can handle almost all control characters.
 rem   * Does restore previous ERRORLEVEL variable before call a command.
 rem   * Can skip first N used arguments from the `%*` variable including
 rem     additional command line arguments.
-rem   * Can avoid spaces and tabulation characters trim in the shifted command line.
+rem   * Can avoid spaces and tabulation characters trim in the shifted command
+rem     line.
 rem
 rem Cons:
 rem
 rem   * The control characters like `&` and `|` still must be escaped before
 rem     call in a user script (side issue).
-rem   * Does write to a temporary file to save the command line as is.
+rem   * Does write to a temporary file to save the command line as is and
+rem     `cmd.exe /Q ...` can suppress `echo on` at all.
 rem   * The delayed expansion feature must be disabled before this script call:
 rem     `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem     expanded.
@@ -97,7 +99,7 @@ rem     different encoders.
 rem   * In case of a tabulation character immediately after a command line
 rem     argument, you must entail each argument at least with one space
 rem     character, because all tabulation characters does encode which may end
-rem     up with arguments concatenetion and so wrong skip and/or shift.
+rem     up with arguments concatenation and so wrong skip and/or shift.
 
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
@@ -106,15 +108,17 @@ rem drop last error level
 call;
 
 if defined SCRIPT_TEMP_CURRENT_DIR (
-  set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\setshift.%RANDOM%-%RANDOM%.txt"
-) else set "CMDLINE_TEMP_FILE=%TEMP%\setshift.%RANDOM%-%RANDOM%.txt"
+  set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%.txt"
+) else set "CMDLINE_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
 
 rem redirect command line into temporary file to print it correcly
-for %%i in (1) do (
-  set "PROMPT=$_"
+(
+  setlocal DISABLEEXTENSIONS
+  (set PROMPT=$_)
   echo on
-  for %%b in (1) do rem * %*#
+  for %%z in (%%z) do rem * %*#
   @echo off
+  endlocal
 ) > "%CMDLINE_TEMP_FILE%"
 
 for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
