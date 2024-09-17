@@ -9,7 +9,7 @@
 '''   update_shortcut.vbs
 '''     [-CD <CurrentDirectoryPath>]
 '''     [-showas <ShowWindowAsNumber>]
-'''     [-no-backup] [-ignore-unexist]
+'''     [-no-backup] [-backup-dir] [-ignore-unexist]
 '''     [-allow-target-path-reassign] [-allow-wd-reassign] [-allow-paths-reassign]
 '''     [-allow-dos-current-dir] [-allow-dos-target-path] [-allow-dos-wd] [-allow-dos-paths]
 '''     [-p[rint-assign]] [-print-assigned | -pd]

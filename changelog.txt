@@ -1,3 +1,7 @@
+2024.09.17:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: print of wrong read property value
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut*.bat: code cleanup
+
 2024.09.16:
 * changed: Scripts/Tools/std: callshift.bat, setshift.bat, choice.bat: `-no_trim` renamed to `-notrim`
 * changed: Scripts/Tools/std: callshift.bat, setshift.bat: workaround to avoid invalid `<shift>` parameter or invalid flag

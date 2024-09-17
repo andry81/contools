@@ -323,8 +323,6 @@ set "BACKUP_DIR=%BACKUP_DIR:]=\]%"
 
 set "BACKUP_DIR=%BACKUP_DIR%[0-9][0-9][0-9][0-9]'[0-9][0-9]'[0-9][0-9]\.backup\\"
 
-set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% -backup-dir "%BACKUP_DIR%"
-
 :SKIP_BACKUP_DIR
 
 set "READ_SHORTCUT_PROP_TEMP_STDOUT_FILE=%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props_to_match-utf-16le.lst"
@@ -486,7 +484,7 @@ call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
 rem remove trailing backslash
 if defined PROP_NEXT_VALUE if "%PROP_NEXT_VALUE:~-1%" == "\" set "PROP_NEXT_VALUE=%PROP_NEXT_VALUE:~0,-1%"
 
-set "PROP_LINE=%PROP_NAME%(read)=%PROP_NEXT_VALUE%"
+set "PROP_LINE=%PROP_NAME%(read)=%PROP_PREV_VALUE%"
 
 if %FLAG_PRINT_READ% NEQ 0 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
