@@ -1,4 +1,8 @@
 2024.10.16:
+* fixed: Scripts/Tools/filesys/read_shortcut_target_path.bat: execution fixup
+* new: Scripts/Tools/filesys/read_shortcut_target_path.bat: added `-print-stdout` flag to print property `name=value` expression after each read from stdout of all inner script calls
+
+2024.10.16:
 * changed: ISSUES.txt: issues update
 
 2024.09.17:

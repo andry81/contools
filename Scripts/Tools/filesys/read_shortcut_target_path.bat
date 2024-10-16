@@ -25,6 +25,10 @@ rem   -retry_extended_property
 rem     Retry by `ExtendedProperty` method through the `read_path_props.vbs`
 rem     script if `read_shortcut.vbs` script is returted empty result or an
 rem     error.
+rem
+rem   -print-stdout| -p
+rem     Print property `name=value` expression after each read from stdout of
+rem     all inner script calls.
 
 rem <ShortcutFile>:
 rem   Path to shortcut file.
@@ -44,9 +48,11 @@ call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
 set FLAG_SHIFT=0
+set FLAG_SKIP=0
 set FLAG_USE_EXTENDED_PROPERTY=0
 set FLAG_USE_GETLINK=0
 set FLAG_RETRY_EXTENDED_PROPERTY=0
+set FLAG_PRINT_STDOUT=0
 set "READ_SHORTCUT_BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -63,9 +69,13 @@ if defined FLAG (
   ) else if "%FLAG%" == "-use_getlink" (
     set FLAG_USE_GETLINK=1
     set READ_SHORTCUT_BARE_FLAGS=%READ_SHORTCUT_BARE_FLAGS% -g
-    set /A FLAG_SHIFT+=1
+    set /A FLAG_SKIP+=1
   ) else if "%FLAG%" == "-retry_extended_property" (
     set FLAG_RETRY_EXTENDED_PROPERTY=1
+  ) else if "%FLAG%" == "-print-stdout" (
+    set FLAG_PRINT_STDOUT=1
+  ) else if "%FLAG%" == "-p" (
+    set FLAG_PRINT_STDOUT=1
   ) else if not "%FLAG%" == "--" (
     echo.%?~nx0%: error: invalid flag: %FLAG%
     exit /b -255
@@ -123,11 +133,15 @@ rem UTF-8 BOM
 rem set /P =﻿<nul > "%TARGET_PATH_STDOUT_FILE%"
 
 if %FLAG_USE_EXTENDED_PROPERTY% EQU 0 (
-  call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 6 "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_shortcut.vbs"%%READ_SHORTCUT_BARE_FLAGS%% -p TargetPath -- %%* >> "%TARGET_PATH_STDOUT_FILE%" 2>> "%TARGET_PATH_STDERR_FILE%"
+  set /A FLAG_SKIP+=6
+  call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip %%FLAG_SKIP%% "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_shortcut.vbs"%%READ_SHORTCUT_BARE_FLAGS%% -p TargetPath -- %%* >> "%TARGET_PATH_STDOUT_FILE%" 2>> "%TARGET_PATH_STDERR_FILE%"
 ) else call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 8 "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_path_props.vbs" -v -x -lr -- LinkTarget %%* >> "%TARGET_PATH_STDOUT_FILE%" 2>> "%TARGET_PATH_STDERR_FILE%"
 set LAST_ERROR=%ERRORLEVEL%
 
 rem NOTE: `type` respects UTF-16LE file with BOM header
+
+if %FLAG_PRINT_STDOUT% NEQ 0 for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do echo.%%i
+
 type "%TARGET_PATH_STDERR_FILE%" >&2
 
 if %LAST_ERROR% NEQ 0 (
@@ -154,6 +168,9 @@ call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 8 "%%FLAG_SHIFT%%" "%%SystemRoo
 set LAST_ERROR=%ERRORLEVEL%
 
 rem NOTE: `type` respects UTF-16LE file with BOM header
+
+if %FLAG_PRINT_STDOUT% NEQ 0 for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do echo.LinkTarget=%%i
+
 type "%TARGET_PATH_STDERR_FILE%" >&2
 
 if %LAST_ERROR% NEQ 0 exit /b %LAST_ERROR%
