@@ -96,3 +96,17 @@ Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat:
 Scripts/Tools/std/xcopy_*.bat, Scripts/Tools/std/xmove_*.bat:
 
   * Fix output touching in case of `/Y` flag absence (no overwrite).
+
+Scripts/Tools/build/load_config.bat:
+
+  * Fix error:
+
+    `load_config.bat: error: input config directory does not exist: "...\--".`
+
+    in case of:
+
+    chcp 65000
+
+    catched in:
+
+    Scripts/Tools/filesys/read_shortcut_target_path.bat
