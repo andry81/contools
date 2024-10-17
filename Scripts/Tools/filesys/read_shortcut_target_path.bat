@@ -132,31 +132,25 @@ copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%TARGET_PATH_STDERR_FILE%" /B /Y 
 rem UTF-8 BOM
 rem set /P =﻿<nul > "%TARGET_PATH_STDOUT_FILE%"
 
-if %FLAG_USE_EXTENDED_PROPERTY% EQU 0 (
-  set /A FLAG_SKIP+=6
-  call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip %%FLAG_SKIP%% "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_shortcut.vbs"%%READ_SHORTCUT_BARE_FLAGS%% -p TargetPath -- %%* >> "%TARGET_PATH_STDOUT_FILE%" 2>> "%TARGET_PATH_STDERR_FILE%"
-) else call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 8 "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_path_props.vbs" -v -x -lr -- LinkTarget %%* >> "%TARGET_PATH_STDOUT_FILE%" 2>> "%TARGET_PATH_STDERR_FILE%"
+if %FLAG_USE_EXTENDED_PROPERTY% NEQ 0 goto USE_EXTENDED_PROPERTY
+
+set /A FLAG_SKIP+=6
+call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip %%FLAG_SKIP%% "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_shortcut.vbs"%%READ_SHORTCUT_BARE_FLAGS%% -p TargetPath -- %%* >> "%TARGET_PATH_STDOUT_FILE%" 2>> "%TARGET_PATH_STDERR_FILE%"
+
+rem CAUTION:
+rem   Exit code can be zero in case of empty TargetPath.
 set LAST_ERROR=%ERRORLEVEL%
 
 rem NOTE: `type` respects UTF-16LE file with BOM header
 
-if %FLAG_PRINT_STDOUT% NEQ 0 for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do echo.%%i
+set IS_STDOUT_PRINTED=0
+for /F "usebackq eol= tokens=1,* delims==" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%j" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo.%%i=%%j
+if %FLAG_PRINT_STDOUT% NEQ 0 if %IS_STDOUT_PRINTED% EQU 0 echo.TargetPath=
 
 type "%TARGET_PATH_STDERR_FILE%" >&2
 
-if %LAST_ERROR% NEQ 0 (
-  if %FLAG_USE_EXTENDED_PROPERTY% EQU 0 (
-    if %FLAG_RETRY_EXTENDED_PROPERTY% EQU 0 exit /b %LAST_ERROR%
-  ) else exit /b %LAST_ERROR%
-)
-
-if %FLAG_USE_EXTENDED_PROPERTY% EQU 0 (
-  for /F "usebackq eol= tokens=1,* delims==" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%j"
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%i"
-
-if %FLAG_USE_EXTENDED_PROPERTY% NEQ 0 exit /b
-if %FLAG_RETRY_EXTENDED_PROPERTY% EQU 0 exit /b
-if defined RETURN_VALUE exit /b
+if %FLAG_RETRY_EXTENDED_PROPERTY% EQU 0 exit /b %LAST_ERROR%
+if defined RETURN_VALUE exit /b %LAST_ERROR%
 
 rem Retry on `ExtendedProperty` method.
 
@@ -164,17 +158,16 @@ rem UTF-16LE BOM
 copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%TARGET_PATH_STDOUT_FILE%" /B /Y >nul 2>nul
 copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%TARGET_PATH_STDERR_FILE%" /B /Y >nul 2>nul
 
+:USE_EXTENDED_PROPERTY
 call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 8 "%%FLAG_SHIFT%%" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO //U "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_path_props.vbs" -v -x -lr -- LinkTarget %%* >> "%TARGET_PATH_STDOUT_FILE%" 2>> "%TARGET_PATH_STDERR_FILE%"
 set LAST_ERROR=%ERRORLEVEL%
 
 rem NOTE: `type` respects UTF-16LE file with BOM header
 
-if %FLAG_PRINT_STDOUT% NEQ 0 for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do echo.LinkTarget=%%i
+set IS_STDOUT_PRINTED=0
+for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%i" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo.LinkTarget=%%i
+if %FLAG_PRINT_STDOUT% NEQ 0 if %IS_STDOUT_PRINTED% EQU 0 echo.LinkTarget=
 
 type "%TARGET_PATH_STDERR_FILE%" >&2
 
-if %LAST_ERROR% NEQ 0 exit /b %LAST_ERROR%
-
-for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%TARGET_PATH_STDOUT_FILE%"`) do set "RETURN_VALUE=%%i"
-
-exit /b 0
+exit /b %LAST_ERROR%

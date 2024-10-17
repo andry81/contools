@@ -68,6 +68,11 @@ rem   Directory to search shortcut files from.
 rem NOTE:
 rem   For detailed parameters description see `reset_shortcut.vbs` script.
 
+rem CAUTION:
+rem   Base `CreateShortcut` method does not support all Unicode characters nor
+rem   `search-ms` Windows Explorer moniker path for the filter field.
+rem   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
+
 setlocal
 
 call "%%~dp0__init__/script_init.bat" %%0 %%* || exit /b

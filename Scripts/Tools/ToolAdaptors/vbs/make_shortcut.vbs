@@ -215,7 +215,8 @@
 '''   https://github.com/libyal/liblnk/blob/main/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc
 
 ''' CAUTION:
-'''   Base `CreateShortcut` method does not support all Unicode characters.
+'''   Base `CreateShortcut` method does not support all Unicode characters nor
+'''   `search-ms` Windows Explorer moniker path for the filter field.
 '''   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
 
 Function IsNothing(obj)

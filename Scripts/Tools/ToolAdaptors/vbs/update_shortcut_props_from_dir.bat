@@ -102,7 +102,8 @@ rem   property values.
 rem
 
 rem CAUTION:
-rem   Base `CreateShortcut` method does not support all Unicode characters.
+rem   Base `CreateShortcut` method does not support all Unicode characters nor
+rem   `search-ms` Windows Explorer moniker path for the filter field.
 rem   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
 
 setlocal
