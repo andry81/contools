@@ -144,7 +144,7 @@ set LAST_ERROR=%ERRORLEVEL%
 rem NOTE: `type` respects UTF-16LE file with BOM header
 
 set IS_STDOUT_PRINTED=0
-for /F "usebackq eol= tokens=1,* delims==" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%j" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo.%%i=%%j
+for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%j" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo.%%i=%%j
 if %FLAG_PRINT_STDOUT% NEQ 0 if %IS_STDOUT_PRINTED% EQU 0 echo.TargetPath=
 
 type "%TARGET_PATH_STDERR_FILE%" >&2
@@ -165,7 +165,7 @@ set LAST_ERROR=%ERRORLEVEL%
 rem NOTE: `type` respects UTF-16LE file with BOM header
 
 set IS_STDOUT_PRINTED=0
-for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%i" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo.LinkTarget=%%i
+for /F "usebackq tokens=* delims="eol^= %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%i" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo.LinkTarget=%%i
 if %FLAG_PRINT_STDOUT% NEQ 0 if %IS_STDOUT_PRINTED% EQU 0 echo.LinkTarget=
 
 type "%TARGET_PATH_STDERR_FILE%" >&2

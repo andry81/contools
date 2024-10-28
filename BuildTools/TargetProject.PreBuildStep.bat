@@ -18,7 +18,7 @@ set AUTOGEN_DEF_INDEX=1
 
 :AUTOGEN_DEFINITIONS_LOOP
 set "AUTOGEN_DEF_VALUE="
-for /F "eol= tokens=%AUTOGEN_DEF_INDEX% delims=;" %%i in ("%AUTOGEN_DEFINITIONS%") do set "AUTOGEN_DEF_VALUE=%%i"
+for /F "tokens=%AUTOGEN_DEF_INDEX% delims=;"eol^= %%i in ("%AUTOGEN_DEFINITIONS%") do set "AUTOGEN_DEF_VALUE=%%i"
 
 if not defined AUTOGEN_DEF_VALUE goto AUTOGEN_DEFINITIONS_END
 

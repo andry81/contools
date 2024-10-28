@@ -68,7 +68,7 @@ if not defined SEARCH_FROM (
 
 set "SEARCH_FROM_IN=%SEARCH_FROM%"
 
-for /F "eol= tokens=* delims=" %%i in ("%SEARCH_FROM%\.") do set "SEARCH_FROM=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%SEARCH_FROM%\.") do set "SEARCH_FROM=%%~fi"
 
 if not exist "\\?\%SEARCH_FROM%" (
   echo.%?~nx0%: error: SEARCH_FROM does not exist: "%SEARCH_FROM%".
@@ -82,7 +82,7 @@ if not defined EXTRACT_TO_DIR (
 
 set "EXTRACT_TO_DIR_IN=%EXTRACT_TO_DIR%"
 
-for /F "eol= tokens=* delims=" %%i in ("%EXTRACT_TO_DIR%\.") do set "EXTRACT_TO_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%EXTRACT_TO_DIR%\.") do set "EXTRACT_TO_DIR=%%~fi"
 
 if %CREATE_EXTRACT_TO_DIR% EQU 0 if not exist "\\?\%EXTRACT_TO_DIR%\*" (
   echo.%?~nx0%: error: EXTRACT_TO_DIR directory does not exist: "%EXTRACT_TO_DIR%".
@@ -149,7 +149,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir%SEARCH_FROM_FILES% /A:-D /B /O:N /S 2^>nul
 
-if defined SEARCH_FROM_FILES for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do set "ARC_FILE_PATH=%%i" & call :PROCESS_DIR
+if defined SEARCH_FROM_FILES for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "ARC_FILE_PATH=%%i" & call :PROCESS_DIR
 exit /b
 
 :EXTRACT_FROM_FILE
@@ -163,8 +163,8 @@ if not defined ARC_FILE_PATH exit /b 0
 
 call set "ARC_FILE_REL_PATH=%%ARC_FILE_PATH:~%ARC_FILE_PATH_OFFSET%%%"
 
-for /F "eol= tokens=* delims=" %%i in ("%EXTRACT_TO_DIR%\%ARC_FILE_REL_PATH%\..") do set "EXTRACT_TO_FILE_DIR=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%ARC_FILE_REL_PATH%") do set "EXTRACT_FILE_NAME=%%~ni"
+for /F "tokens=* delims="eol^= %%i in ("%EXTRACT_TO_DIR%\%ARC_FILE_REL_PATH%\..") do set "EXTRACT_TO_FILE_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%ARC_FILE_REL_PATH%") do set "EXTRACT_FILE_NAME=%%~ni"
 
 set "EXTRACT_TO_FILE_DIR_W_NAME=%EXTRACT_TO_FILE_DIR%\%EXTRACT_FILE_NAME%"
 

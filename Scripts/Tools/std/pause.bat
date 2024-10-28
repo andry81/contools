@@ -57,7 +57,7 @@ if defined FLAG_CHCP (
   exit /b %LAST_ERROR%
 )
 
-for /F "usebackq eol= tokens=1,* delims=:" %%i in (`@"%%CHCP_FILE%%" ^<nul 2^>nul`) do set "CURRENT_CP=%%j"
+for /F "usebackq tokens=1,* delims=:"eol^= %%i in (`@"%%CHCP_FILE%%" ^<nul 2^>nul`) do set "CURRENT_CP=%%j"
 if defined CURRENT_CP set "CURRENT_CP=%CURRENT_CP: =%"
 
 if exist "%SystemRoot%\System32\timeout.exe" (

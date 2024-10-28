@@ -74,9 +74,9 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%FILES_PATH%\" /B /O:N /S 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "FILE_PATH=%%i"
-  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!FILE_PATH:~%FILES_PATH_LEN%!") do endlocal & echo.%%i
+  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!FILE_PATH:~%FILES_PATH_LEN%!") do endlocal & echo.%%i
 )
 exit /b
 

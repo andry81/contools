@@ -24,14 +24,14 @@ if not defined __?SUFFIX__ set "__?SUFFIX__=%~3"
 
 if /i not "%__?VAR__%" == "__STRING__" (
   set "__STRING__="
-  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!%__?VAR__%!") do endlocal & set "__STRING__=%%i"
+  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!%__?VAR__%!") do endlocal & set "__STRING__=%%i"
 )
 
 call "%%~dp0%%encode\encode_pathlist_chars.bat"
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do set "__STRING__=%%j" & ^
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do set "__STRING__=%%j" & ^
 call "%%~dp0%%encode\decode_pathlist_chars.bat" & ^
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%k in ("!__?PREFIX__!!__STRING__!!__?SUFFIX__!") do endlocal & echo.%%k
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%k in ("!__?PREFIX__!!__STRING__!!__?SUFFIX__!") do endlocal & echo.%%k
 
 (
   endlocal

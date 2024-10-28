@@ -84,7 +84,7 @@ if not "%~1" == "" (
   goto ARGSN_LOOP
 )
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%%CONTOOLS_ROOT%%/hash/hashdeep.bat" %%HASHDEEP_CMD_FLAG_ARGS%% %%HASHDEEP_CMD_ARGS%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`@"%%CONTOOLS_ROOT%%/hash/hashdeep.bat" %%HASHDEEP_CMD_FLAG_ARGS%% %%HASHDEEP_CMD_ARGS%%`) do (
   set "HASHDEEP_LINE=%%i"
   call :PROCESS_LINE || goto EXIT
 )

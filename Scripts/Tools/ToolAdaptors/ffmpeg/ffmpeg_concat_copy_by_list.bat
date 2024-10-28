@@ -120,7 +120,7 @@ set "FILE_PATH=%FILE_PATH:\=/%"
 rem escape characters
 set "FILE_PATH=%FILE_PATH:'='\''%"
 
-for /f "eol= tokens=* delims=" %%i in ("%FILE_PATH%") do (
+for /f "tokens=* delims="eol^= %%i in ("%FILE_PATH%") do (
   echo.file '%%i'
 ) >> "%TEMP_FILE_LIST%"
 

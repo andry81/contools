@@ -38,7 +38,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%~2\bin\uname.exe" -r`) do ^
+for /F "usebackq tokens=* delims="eol^= %%i in (`@"%~2\bin\uname.exe" -r`) do ^
 for /F "tokens=1,* delims= " %%j in ("%%i") do (
   set MSYS_VER_STR=0
   set "MSYS_VER_STR=%%j"

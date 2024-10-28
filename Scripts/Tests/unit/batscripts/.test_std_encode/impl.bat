@@ -2,15 +2,15 @@
 
 setlocal DISABLEDELAYEDEXPANSION
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & set "STRING_INPUT=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "STRING_INPUT=%%i"
 
 call "%%CONTOOLS_ROOT%%/std/encode/encode_%%TEST_FUNC%%.bat" || exit /b 255
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & set "STRING_ENCODED=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "STRING_ENCODED=%%i"
 
 call "%%CONTOOLS_ROOT%%/std/encode/decode_%%TEST_FUNC%%.bat" || exit /b 255
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & set "STRING_OUTPUT=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "STRING_OUTPUT=%%i"
 
 if %TESTLIB__OVERALL_TESTS% GTR %TESTLIB__CURRENT_TESTS% (
   set "TEST_REPORT_PREFIX_STR=%TESTLIB__OVERALL_TESTS%`%TESTLIB__CURRENT_TESTS%"

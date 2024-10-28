@@ -86,7 +86,7 @@ rem
 set ?.=@dir %FILE_PTTN_LIST% /A:-D /B /O:N /S 2^>nul
 
 pushd "%XCOPY_FROM_DIR%" && (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do set "FILE_PATH=%%i" & call :PROCESS
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "FILE_PATH=%%i" & call :PROCESS
   popd
 )
 exit /b 0
@@ -96,8 +96,8 @@ if not defined FILE_PATH exit /b 0
 
 call set "FILE_REL_PATH=%%FILE_PATH:~%XCOPY_FROM_DIR_OFFSET%%%"
 
-for /F "eol= tokens=* delims=" %%i in ("%XCOPY_FROM_DIR%\%FILE_REL_PATH%\..") do set "XCOPY_FROM_FILE_DIR=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%XCOPY_TO_DIR%\%FILE_REL_PATH%\..") do set "XCOPY_TO_FILE_DIR=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%FILE_REL_PATH%") do set "XCOPY_FILE_NAME=%%~nxi"
+for /F "tokens=* delims="eol^= %%i in ("%XCOPY_FROM_DIR%\%FILE_REL_PATH%\..") do set "XCOPY_FROM_FILE_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%XCOPY_TO_DIR%\%FILE_REL_PATH%\..") do set "XCOPY_TO_FILE_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%FILE_REL_PATH%") do set "XCOPY_FILE_NAME=%%~nxi"
 
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%XCOPY_FROM_FILE_DIR%%" "%%XCOPY_FILE_NAME%%" "%%XCOPY_TO_FILE_DIR%%" %%XCOPY_SWITCHES%%

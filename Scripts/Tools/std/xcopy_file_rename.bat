@@ -204,8 +204,8 @@ goto TO_FILE_OK
 
 :TO_FILE_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%FROM_PATH%\.") do set "FROM_DIR=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%TO_PATH%\.") do set "TO_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%FROM_PATH%\.") do set "FROM_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_DIR=%%~fi"
 
 if not exist "\\?\%FROM_DIR%\*" (
   echo.%?~nx0%: error: input directory does not exist: "%FROM_DIR%\"

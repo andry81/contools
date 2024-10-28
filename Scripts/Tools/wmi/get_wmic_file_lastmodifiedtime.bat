@@ -34,11 +34,11 @@ if not exist "%FILE%" (
   exit /b 1
 ) >&2
 
-for /F "eol= tokens=* delims=" %%i in ("%FILE%\.") do set "FILE=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%FILE%\.") do set "FILE=%%~fi"
 
 rem CAUTION:
 rem   `for /F` does not return a command error code
-for /F "usebackq eol= tokens=1,* delims==" %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" DataFile where "Name='%%FILE:\=\\%%'" get LastModified /VALUE`) do if "%%i" == "LastModified" set "RETURN_VALUE=%%j"
+for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" DataFile where "Name='%%FILE:\=\\%%'" get LastModified /VALUE`) do if "%%i" == "LastModified" set "RETURN_VALUE=%%j"
 
 if defined RETURN_VALUE ( endlocal & set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0 )
 

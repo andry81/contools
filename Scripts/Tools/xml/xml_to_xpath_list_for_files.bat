@@ -69,7 +69,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir%CMD_VA_ARGS% /A:-D /B /O:N /S 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   echo.# ------------------------------------------------------------------------------
   echo # File: "%%i"
   echo.# ------------------------------------------------------------------------------

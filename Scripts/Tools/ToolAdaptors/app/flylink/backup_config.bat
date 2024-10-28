@@ -30,7 +30,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%FLYLINKDC_SETTINGS_PATH%\*.sqlite" /A:-D /B /O:N 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "FILE_NAME=%%i"
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%FLYLINKDC_SETTINGS_PATH%%" "%%FILE_NAME%%"  "%%FLYLINK_ADAPTOR_BACKUP_DIR%%/flylink--%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H || exit /b 10
 )

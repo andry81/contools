@@ -101,5 +101,5 @@ echo.
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" -skip 1 1 TEST_TITLE %%?~nx0%% %%*
 
 setlocal DISABLEDELAYEDEXPANSION & ^
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!TEST_TITLE!") do endlocal & title %%i
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!TEST_TITLE!") do endlocal & title %%i
 exit /b 0

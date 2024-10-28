@@ -104,7 +104,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%SOURCE_DIR%\*.pyc." /A:-D /B /O:N /S 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set FILE_PATH=%%i
   call :COPY_FILE_PATH || exit /b
 )
@@ -126,7 +126,7 @@ if not defined DIR_PATH_TO goto PREFIX_DIRS_END
 set "NEXT_PREFIX_DIR=%FLAG_VALUE_PREFIX_DIRS%"
 :PREFIX_DIRS_LOOP
 set "PREFIX_DIR="
-for /F "eol= tokens=1,* delims=|" %%i in ("%NEXT_PREFIX_DIR%") do (
+for /F "tokens=1,* delims=|"eol^= %%i in ("%NEXT_PREFIX_DIR%") do (
   set PREFIX_DIR=%%i
   set NEXT_PREFIX_DIR=%%j
 )
@@ -143,7 +143,7 @@ if not defined FILE_PATH_TO goto SUFFIX_NAMES_END
 set "NEXT_SUFFIX_NAME=%FLAG_VALUE_SUFFIX_NAMES%"
 :SUFFIX_NAMES_LOOP
 set "SUFFIX_NAME="
-for /F "eol= tokens=1,* delims=|" %%i in ("%NEXT_SUFFIX_NAME%") do (
+for /F "tokens=1,* delims=|"eol^= %%i in ("%NEXT_SUFFIX_NAME%") do (
   set SUFFIX_NAME=%%i
   set NEXT_SUFFIX_NAME=%%j
 )
@@ -180,7 +180,7 @@ set "NEXT_FILE_PATH=%FILE_PATH%"
 
 :SPLIT_PATHSTR_LOOP
 set "PREV_DIR="
-for /F "eol= tokens=1,* delims=/" %%i in ("%NEXT_FILE_PATH%") do (
+for /F "tokens=1,* delims=/"eol^= %%i in ("%NEXT_FILE_PATH%") do (
   set PREV_DIR_PATH=%%i
   set NEXT_FILE_PATH=%%j
 )

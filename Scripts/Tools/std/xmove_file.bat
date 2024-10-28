@@ -217,9 +217,9 @@ goto TO_PATH_OK
 
 :TO_PATH_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%FROM_PATH%\.") do set "FROM_DIR_PATH_ABS=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%TO_PATH_ABS%") do for /F "eol= tokens=* delims=" %%j in ("%%~dpi.") do set "TO_PARENT_DIR_ABS=%%~fj"
+for /F "tokens=* delims="eol^= %%i in ("%FROM_PATH%\.") do set "FROM_DIR_PATH_ABS=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%TO_PATH_ABS%") do for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "TO_PARENT_DIR_ABS=%%~fj"
 
 if not exist "\\?\%FROM_DIR_PATH_ABS%\*" (
   echo.%?~nx0%: error: input directory does not exist:
@@ -341,16 +341,16 @@ rem
 set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %XMOVE_DIR_RECUR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+) else for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (
@@ -383,7 +383,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%FROM_FILE_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "FROM_FILE=%%~nxi"
   echo.^>^>move%XMOVE_FLAGS:~1% "%FROM_DIR_PATH_ABS%\%%~nxi" "%TO_PATH_ABS%"
   if %FLAG_USE_BUILTIN_MOVE% EQU 0 (
@@ -462,16 +462,16 @@ rem
 set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %XMOVE_DIR_RECUR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+) else for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (
@@ -509,11 +509,11 @@ rem
 set ?.=@dir "%FROM_FILE_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N 2^>nul
 
 if %XMOVE_DIR_RECUR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
     set "FROM_FILE=%%~nxi"
     call :EXEC_ROBOCOPY_NO_DIR_REMOVE || goto BREAK
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+) else for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "FROM_FILE=%%~nxi"
   if exist "\\?\%FROM_DIR_PATH_ABS%\%%~nxi\*" (
     call :EXEC_ROBOCOPY_FILE_AS_DIR || goto BREAK

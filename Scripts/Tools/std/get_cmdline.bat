@@ -52,7 +52,7 @@ rem redirect command line into temporary file to print it correcly
   endlocal
 ) > "%CMDLINE_TEMP_FILE%"
 
-for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
+for /F "usebackq tokens=* delims="eol^= %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
 
 del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
@@ -62,12 +62,12 @@ rem
 if not defined __STRING__ endlocal & set "RETURN_VALUE=" & exit /b %LAST_ERROR%
 
 setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
-  for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
+  for /F "tokens=* delims="eol^= %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
 ) else endlocal & set "__STRING__="
 
 if not defined __STRING__ endlocal & set "RETURN_VALUE=" & exit /b %LAST_ERROR%
 
 (
-  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & endlocal & set "RETURN_VALUE=%%i"
+  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & endlocal & set "RETURN_VALUE=%%i"
   exit /b %LAST_ERROR%
 )

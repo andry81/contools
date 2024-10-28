@@ -107,8 +107,8 @@ if not defined CONFIG_FILE (
   exit /b 3
 ) >&2
 
-for /F "eol= tokens=* delims=" %%i in ("%CONFIG_IN_DIR%\.") do set "CONFIG_IN_DIR=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%CONFIG_OUT_DIR%\.") do set "CONFIG_OUT_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%CONFIG_IN_DIR%\.") do set "CONFIG_IN_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%CONFIG_OUT_DIR%\.") do set "CONFIG_OUT_DIR=%%~fi"
 
 if not exist "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" (
   echo.%?~nx0%: error: input config file does not exist: "%CONFIG_IN_DIR%\%CONFIG_FILE%.in".

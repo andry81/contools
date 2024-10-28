@@ -32,7 +32,7 @@ set "CurrentVerticalResolution="
 
 rem CAUTION:
 rem   `for /F` does not return a command error code
-for /F "usebackq eol= tokens=1,2 delims==" %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_VideoController get CurrentHorizontalResolution^,CurrentVerticalResolution /VALUE 2^>nul`) do (
+for /F "usebackq tokens=1,2 delims=="eol^= %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_VideoController get CurrentHorizontalResolution^,CurrentVerticalResolution /VALUE 2^>nul`) do (
   if "%%i" == "CurrentHorizontalResolution" set "CurrentHorizontalResolution=%%j"
   if "%%i" == "CurrentVerticalResolution" set "CurrentVerticalResolution=%%j"
 )

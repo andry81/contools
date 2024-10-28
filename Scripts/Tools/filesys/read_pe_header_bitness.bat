@@ -13,7 +13,7 @@ call "%%~dp0__init__.bat" || exit /b
 
 rem CAUTION:
 rem   `for /F` does not return a command error code
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%%SystemRoot%%\System32\cscript.exe" //nologo "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_pe_header_bitness.vbs" %*`) do set "RETURN_VALUE=%%i"
+for /F "usebackq tokens=* delims="eol^= %%i in (`@"%%SystemRoot%%\System32\cscript.exe" //nologo "%%CONTOOLS_TOOL_ADAPTORS_ROOT%%/vbs/read_pe_header_bitness.vbs" %*`) do set "RETURN_VALUE=%%i"
 
 rem cast to integer
 set /A RETURN_VALUE+=0

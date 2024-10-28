@@ -12,4 +12,4 @@ rem   The delayed expansion feature must be disabled before this script call: `s
 rem   the `!` character will be expanded.
 rem
 
-( for %%i in (%*) do if defined %%i setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%j in ("!%%i!") do endlocal & call set "%%i=%%j" ) & exit /b %ERRORLEVEL%
+( for %%i in (%*) do if defined %%i setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%j in ("!%%i!") do endlocal & call set "%%i=%%j" ) & exit /b %ERRORLEVEL%

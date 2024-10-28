@@ -25,7 +25,7 @@ set ?.=@dir "%TEST_TEMP_DIR%" /B /O:-N 2^>nul
 
 rem cleanup empty temporary directory
 set "TEST_TEMP_DIR_PATH_ITEM="
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "TEST_TEMP_DIR_PATH_ITEM=%%i"
   goto EXIT
 )

@@ -62,7 +62,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do ( set "DIR_PATH=%%~fi" && set "DIR_DRIVE=%%~di" )
+for /F "tokens=* delims="eol^= %%i in ("%DIR_PATH%\.") do ( set "DIR_PATH=%%~fi" && set "DIR_DRIVE=%%~di" )
 
 rem CAUTION:
 rem   The drive still must exist even if the path is not. If path exists, the path directory still can be in a disconnected state.

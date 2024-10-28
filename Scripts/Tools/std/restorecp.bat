@@ -63,14 +63,14 @@ rem
 set "LAST_CP=%CURRENT_CP%"
 if not defined LAST_CP (
   "%__?CHCP_FILE%" 2>nul > "%__?CHCP_TEMP_FILE%"
-  for /F "usebackq eol= tokens=1,* delims=:" %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
+  for /F "usebackq tokens=1,* delims=:"eol^= %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
   del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>nul
 ) <nul
 
 set "__?CHCP_TEMP_FILE="
 
 set "CURRENT_CP="
-for /F "eol= tokens=1,* delims=|" %%i in ("%CP_HISTORY_LIST%") do ( set "CURRENT_CP=%%i" & set "CP_HISTORY_LIST=%%j" )
+for /F "tokens=1,* delims=|"eol^= %%i in ("%CP_HISTORY_LIST%") do ( set "CURRENT_CP=%%i" & set "CP_HISTORY_LIST=%%j" )
 
 if not defined CURRENT_CP exit /b 0
 if "%CURRENT_CP%" == "%LAST_CP%" (

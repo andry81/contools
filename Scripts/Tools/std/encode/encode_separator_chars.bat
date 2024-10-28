@@ -18,5 +18,5 @@ call "%%~dp0encode_equal_char.bat"
 
 setlocal ENABLEDELAYEDEXPANSION & ^
 set "__STRING__=!__STRING__: =$20!" & set "__STRING__=!__STRING__:,=$2C!" & set "__STRING__=!__STRING__:;=$38!" & ^
-for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & set "__STRING__=%%i"
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "__STRING__=%%i"
 exit /b 0

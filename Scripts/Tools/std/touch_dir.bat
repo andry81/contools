@@ -57,7 +57,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
 
 if not exist "\\?\%DIR_PATH%\*" (
   echo.%?~nx0%: error: directory does not exist: "%DIR_PATH%".

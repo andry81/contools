@@ -128,7 +128,7 @@ if not defined BARE_FLAGS set "BARE_FLAGS= /N"
 if defined MESSAGE (
   rem special escape sequence for the choice utility
   set "MESSAGE=%MESSAGE:!__?QUOT__!=\!__?QUOT__!%"
-  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!MESSAGE!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do endlocal & "%SystemRoot%\System32\choice.exe" /C "%FLAG_INPUT_CHARS%"%BARE_FLAGS% /M "%%j"
+  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!MESSAGE!") do for /F "tokens=* delims="eol^= %%j in ("%%i") do endlocal & "%SystemRoot%\System32\choice.exe" /C "%FLAG_INPUT_CHARS%"%BARE_FLAGS% /M "%%j"
 ) else "%SystemRoot%\System32\choice.exe" /C "%FLAG_INPUT_CHARS%"%BARE_FLAGS%
 
 set LAST_ERROR=%ERRORLEVEL%
@@ -151,7 +151,7 @@ call set "INPUT_CHAR=%%FLAG_INPUT_CHARS:~%COUNT%,1%%"
 
 :USE_SET_COMMAND_LOOP
 if defined MESSAGE (
-  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!MESSAGE!") do for /F "eol= tokens=* delims=" %%j in ("%%i") do endlocal & set /P "%VARIABLE%=%%j"
+  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!MESSAGE!") do for /F "tokens=* delims="eol^= %%j in ("%%i") do endlocal & set /P "%VARIABLE%=%%j"
 ) else set /P "%VARIABLE%="
 
 rem not defined choice

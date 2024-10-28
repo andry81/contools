@@ -107,7 +107,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%DESTDIR_ABS%" /A:D /B /O:N /S 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set FILE_PATH=%%i
   call :REBUILD_FILE_PATH || exit /b
 )
@@ -123,7 +123,7 @@ set "FILE_PATH_FROM=%FILE_PATH_FROM:~1%"
 set "NEXT_EXCLUDE_DIR=%FLAG_VALUE_EXCLUDE_DIRS%"
 :EXCLUDE_DIRS_LOOP
 set "EXCLUDE_DIR="
-for /F "eol= tokens=1,* delims=|" %%i in ("%NEXT_EXCLUDE_DIR%") do (
+for /F "tokens=1,* delims=|"eol^= %%i in ("%NEXT_EXCLUDE_DIR%") do (
   set EXCLUDE_DIR=%%i
   set NEXT_EXCLUDE_DIR=%%j
 )

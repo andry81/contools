@@ -32,7 +32,7 @@ if not defined CMDLINE_FILE (
   exit /b 2
 ) >&2
 
-for /F "eol= tokens=* delims=" %%i in ("%CMDLINE_FILE%\.") do set "CMDLINE_FILE=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%CMDLINE_FILE%\.") do set "CMDLINE_FILE=%%~fi"
 
 if not exist "%CMDLINE_FILE%" (
   echo.%~nx0: error: command line file does not exist: "%CMDLINE_FILE%".
@@ -43,13 +43,13 @@ set "CMDLINE="
 
 for /F "usebackq eol=# tokens=* delims=" %%i in ("%CMDLINE_FILE%") do (
   if defined CMDLINE (
-    setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%j in ("!CMDLINE!") do endlocal & set "CMDLINE=%%j %%i"
+    setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%j in ("!CMDLINE!") do endlocal & set "CMDLINE=%%j %%i"
   ) else set "CMDLINE=%%i"
 )
 
 rem return variable
 if defined CMDLINE (
-  setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!CMDLINE!") do endlocal & endlocal & set "%OUT_VAR%=%%i"
+  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!CMDLINE!") do endlocal & endlocal & set "%OUT_VAR%=%%i"
 )
 
 exit /b 0

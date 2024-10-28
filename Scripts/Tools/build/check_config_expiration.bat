@@ -65,8 +65,8 @@ if not defined VARS_FILE (
   exit /b 255
 ) >&2
 
-for /F "eol= tokens=* delims=" %%i in ("%VARS_FILE_IN%\.") do set "VARS_FILE_IN=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%VARS_FILE%\.") do set "VARS_FILE=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%VARS_FILE_IN%\.") do set "VARS_FILE_IN=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%VARS_FILE%\.") do set "VARS_FILE=%%~fi"
 
 if not exist "%VARS_FILE_IN%" (
   echo.%?~nx0%: error: input config file does not exist: "%VARS_FILE_IN%".

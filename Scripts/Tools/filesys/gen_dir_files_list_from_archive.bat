@@ -78,7 +78,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%FILE_PATH%" /A:-D /B /O:N /S 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "ARCHIVE_FILE_PATH=%%i"
   call :PROCESS_ARCHIVE_FILE || exit /b
 )
@@ -110,7 +110,7 @@ exit /b %LAST_ERROR%
 set ARCHIVE_LIST_FILTER=0
 set ARCHIVE_LIST_EOF=0
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%CONTOOLS_ROOT%/arc/7zip/7z.bat" l "%ARCHIVE_FILE_PATH%"`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`@"%CONTOOLS_ROOT%/arc/7zip/7z.bat" l "%ARCHIVE_FILE_PATH%"`) do (
   set "ARCHIVE_LIST_LINE=%%i"
   call :PROCESS_ARCHIVE_LIST_LINE || exit /b
   call :IS_ARCHIVE_LIST_EOF && goto PROCESS_ARCHIVE_FILE_IMPL_EXIT
@@ -158,7 +158,7 @@ if not defined ARCHIVE_LIST_FILE_PATH exit /b 0
 
 rem use attributes to determine directory path from file path
 set "ARCHIVE_LIST_LINE_ATTR="
-for /F "eol= tokens=3" %%i in ("%ARCHIVE_LIST_LINE%") do set "ARCHIVE_LIST_LINE_ATTR=%%i"
+for /F "tokens=3"eol^= %%i in ("%ARCHIVE_LIST_LINE%") do set "ARCHIVE_LIST_LINE_ATTR=%%i"
 
 set "ARCHIVE_LIST_FILE_PATH_ATTR0="
 if defined ARCHIVE_LIST_LINE_ATTR set "ARCHIVE_LIST_FILE_PATH_ATTR0=%ARCHIVE_LIST_LINE_ATTR:~0,1%"

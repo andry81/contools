@@ -18,14 +18,14 @@ if "%~1" == "" (
   exit /b 255
 ) >&2
 
-for /F "eol= tokens=* delims=" %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
 
 if not exist "\\?\%FILE_PATH%" (
   echo.%?~%: error: directory path does not exist: "%FILE_PATH%".
   exit /b 1
 ) >&2
 
-for /F "eol= tokens=* delims=" %%i in ("\\?\%FILE_PATH%") do set "FILE_PATH_ATTR=%%~ai"
+for /F "tokens=* delims="eol^= %%i in ("\\?\%FILE_PATH%") do set "FILE_PATH_ATTR=%%~ai"
 
 if /i not "%FILE_PATH_ATTR:~0,1%" == "d" exit /b 2
 

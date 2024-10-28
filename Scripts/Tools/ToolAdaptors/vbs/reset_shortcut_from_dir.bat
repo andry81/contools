@@ -168,7 +168,7 @@ if defined LINKS_DIR (
 
 :LINKS_DIR_EXIST
 
-for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
 if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
 
@@ -185,7 +185,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "LINK_FILE_PATH=%%i"
   call :UPDATE_LINK
 )

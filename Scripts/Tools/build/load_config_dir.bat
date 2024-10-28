@@ -92,7 +92,7 @@ if "%~2" == "" (
 set __?LAST_ERROR=%ERRORLEVEL%
 
 rem drop all locals
-for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set __? 2^>nul`) do set "%%i="
+for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@set __? 2^>nul`) do set "%%i="
 exit /b
 
 :MAIN

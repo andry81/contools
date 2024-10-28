@@ -30,7 +30,7 @@ set "NEXT_FILE=%FILE%"
 
 :LOOP
 set "SUBDIR="
-for /F "eol= tokens=1,* delims=%DELIMS%" %%i in ("%NEXT_FILE%") do (
+for /F "tokens=1,* delims=%DELIMS%"eol^= %%i in ("%NEXT_FILE%") do (
   set SUBDIR=%%i
   set NEXT_FILE=%%j
 )

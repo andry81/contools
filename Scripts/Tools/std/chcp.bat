@@ -74,7 +74,7 @@ rem
 set "LAST_CP=%CURRENT_CP%"
 if not defined LAST_CP (
   "%__?CHCP_FILE%" 2>nul > "%__?CHCP_TEMP_FILE%"
-  for /F "usebackq eol= tokens=1,* delims=:" %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
+  for /F "usebackq tokens=1,* delims=:"eol^= %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
   del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>nul
 ) <nul
 set "CP_HISTORY_LIST=%LAST_CP%|%CP_HISTORY_LIST%"
@@ -86,7 +86,7 @@ goto UPDATECP
 set "LAST_CP="
 (
   "%__?CHCP_FILE%" 2>nul > "%__?CHCP_TEMP_FILE%"
-  for /F "usebackq eol= tokens=1,* delims=:" %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
+  for /F "usebackq tokens=1,* delims=:"eol^= %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
   del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>nul
 ) <nul
 if defined LAST_CP set "LAST_CP=%LAST_CP: =%"

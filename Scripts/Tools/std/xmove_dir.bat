@@ -199,9 +199,9 @@ goto TO_PATH_OK
 
 :TO_PATH_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%FROM_PATH%\.") do set "FROM_PATH_ABS=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%TO_PATH_ABS%") do for /F "eol= tokens=* delims=" %%j in ("%%~dpi.") do set "TO_PARENT_DIR_ABS=%%~fj"
+for /F "tokens=* delims="eol^= %%i in ("%FROM_PATH%\.") do set "FROM_PATH_ABS=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%TO_PATH_ABS%") do for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "TO_PARENT_DIR_ABS=%%~fj"
 
 if not exist "\\?\%FROM_PATH_ABS%\*" (
   echo.%?~nx0%: error: input directory does not exist:
@@ -302,16 +302,16 @@ rem
 set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %FLAG_TOUCH_FILE% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%?~dp0%%touch_dir.bat" "%%TO_PATH%%"
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+) else for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (
@@ -420,16 +420,16 @@ rem
 set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
   )
 ) else if %FLAG_TOUCH_FILE% EQU 0 (
-  for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
     set "TO_PATH=%%i"
     call "%%?~dp0%%touch_dir.bat" "%%TO_PATH%%"
   )
-) else for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+) else for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
     if %FLAG_TOUCH_DIR% NEQ 0 (

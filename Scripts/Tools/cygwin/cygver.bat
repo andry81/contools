@@ -40,7 +40,7 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@"%~2\bin\cygcheck.exe" -cd "%~1" ^^^| "%%SystemRoot%%\System32\findstr.exe" /I /R /C:"^%~1  *[0-9][0-9]*."`) do ^
+for /F "usebackq tokens=* delims="eol^= %%i in (`@"%~2\bin\cygcheck.exe" -cd "%~1" ^^^| "%%SystemRoot%%\System32\findstr.exe" /I /R /C:"^%~1  *[0-9][0-9]*."`) do ^
 for /F "tokens=1,* delims= " %%j in ("%%i") do (
   set CYGWIN_VER_STR=0
   set "CYGWIN_VER_STR=%%k"

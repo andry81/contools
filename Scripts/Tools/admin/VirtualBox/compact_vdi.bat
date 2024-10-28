@@ -17,7 +17,7 @@ if not defined VDI_DIR (
   exit /b 255
 ) >&2
 
-for /F "eol= tokens=* delims=" %%i in ("%VDI_DIR%\.") do set "VDI_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%VDI_DIR%\.") do set "VDI_DIR=%%~fi"
 
 if not exist "%VDI_DIR%\*" (
   echo.%~nx0: error: VDI_DIR does not exist: VDI_DIR="%VDI_DIR%"
@@ -42,7 +42,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%VDI_DIR%\*.vdi" /A:-D /B /O:N /S 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "VDI_FILE=%%i"
   call :COMPACT_VDI_FILE
 )

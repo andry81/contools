@@ -57,7 +57,7 @@ exit /b 0
 if not defined EMULE_SEARCH_STR exit /b 0
 
 set WAIT_TIMEOUT=0
-if "%EMULE_SEARCH_STR:~0,1%" == ":" for /F "eol= tokens=1,* delims=:" %%i in ("%EMULE_SEARCH_STR%") do if "%%i" == "wait" set "WAIT_TIMEOUT=%%j"
+if "%EMULE_SEARCH_STR:~0,1%" == ":" for /F "tokens=1,* delims=:"eol^= %%i in ("%EMULE_SEARCH_STR%") do if "%%i" == "wait" set "WAIT_TIMEOUT=%%j"
 if not defined WAIT_TIMEOUT set WAIT_TIMEOUT=0
 
 if %WAIT_TIMEOUT% NEQ 0 (

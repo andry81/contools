@@ -57,19 +57,19 @@ for /F "usebackq eol=# tokens=1,* delims=|" %%i in ("%RECENT_LISTS_PTTN_FILE%") 
   if "%%i" == "reg" (
     set "RECENT_LIST_REG_KEY_RECORD=%%j"
 
-    for /F "eol= tokens=1,* delims=|" %%k in ("%%j") do (
+    for /F "tokens=1,* delims=|"eol^= %%k in ("%%j") do (
       if "%%k" == "*" (
         set "RECENT_LIST_REG_KEY_PATH=%%l"
         call :CLEANUP_RECENT_LIST_REG_KEY_ALL
       ) else if "%%k" == "." (
-        for /F "eol= tokens=1,2,* delims=|" %%m in ("%%l") do (
+        for /F "tokens=1,2,* delims=|"eol^= %%m in ("%%l") do (
           set "RECENT_LIST_REG_KEY_PATH=%%m"
           set "RECENT_LIST_REG_KEY_TYPE=%%n"
           set "RECENT_LIST_REG_KEY_NAME=%%o"
           call :CLEANUP_RECENT_LIST_REG_KEY_NAME
         )
       ) else if "%%k" == "n" (
-        for /F "eol= tokens=1,2,* delims=|" %%m in ("%%l") do (
+        for /F "tokens=1,2,* delims=|"eol^= %%m in ("%%l") do (
           set "RECENT_LIST_REG_KEY_PATH_RE=%%m"
           set "RECENT_LIST_REG_KEY_TYPE=%%n"
           set "RECENT_LIST_REG_KEY_NAME_RE=%%o"
@@ -80,11 +80,11 @@ for /F "usebackq eol=# tokens=1,* delims=|" %%i in ("%RECENT_LISTS_PTTN_FILE%") 
   ) else if "%%i" == "file" (
     set "RECENT_LIST_FILE_RECORD=%%j"
 
-    for /F "eol= tokens=1,* delims=|" %%k in ("%%j") do (
+    for /F "tokens=1,* delims=|"eol^= %%k in ("%%j") do (
       if "%%k" == "ini" (
-        for /F "eol= tokens=1,* delims=|" %%m in ("%%l") do (
+        for /F "tokens=1,* delims=|"eol^= %%m in ("%%l") do (
           if "%%m" == "*" (
-            for /F "eol= tokens=1,* delims=|" %%o in ("%%n") do (
+            for /F "tokens=1,* delims=|"eol^= %%o in ("%%n") do (
               set "RECENT_LIST_FILE_INI_EXPAND_PATH=%%o"
               set "RECENT_LIST_FILE_INI_CLEANUP_INI_FILE=%%p"
               call :CLEANUP_RECENT_LIST_FILE_INI_SECTIONS_ALL
@@ -164,7 +164,7 @@ if not "%REGQUERY_LINE:~0,4%" == "    " exit /b 0
 
 rem CAUTION: name must be without whitespaces!
 set "REGQUERY_KEY_NAME="
-for /f "eol= tokens=1,* delims= " %%i in ("%REGQUERY_LINE:~4%") do set "REGQUERY_KEY_NAME=%%i"
+for /f "tokens=1,* delims= "eol^= %%i in ("%REGQUERY_LINE:~4%") do set "REGQUERY_KEY_NAME=%%i"
 
 call :CMD_W_INDENT "%%SystemRoot%%\System32\reg.exe" query "%%RECENT_LIST_REG_KEY_SUBPATH%%" /v "%%REGQUERY_KEY_NAME%%" && (
   call :CMD_W_INDENT "%%SystemRoot%%\System32\reg.exe" add "%%RECENT_LIST_REG_KEY_SUBPATH%%" /v "%%REGQUERY_KEY_NAME%%" /t "%%RECENT_LIST_REG_KEY_TYPE%%" /f

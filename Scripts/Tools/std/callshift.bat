@@ -120,7 +120,7 @@ rem redirect command line into temporary file to print it correcly
   endlocal
 ) > "%CMDLINE_TEMP_FILE%"
 
-for /F "usebackq eol= tokens=* delims=" %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
+for /F "usebackq tokens=* delims="eol^= %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
 
 del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
@@ -130,7 +130,7 @@ rem
 if not defined __STRING__ exit /b %LAST_ERROR%
 
 setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
-  for /F "eol= tokens=* delims=" %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
+  for /F "tokens=* delims="eol^= %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
 ) else endlocal & set "__STRING__="
 
 set "?~dp0=%~dp0"
@@ -210,19 +210,19 @@ if %FLAG_NO_TRIM% NEQ 0 setlocal ENABLEDELAYEDEXPANSION & ^
 set "__STRING__=!__STRING__:  = $20!" & set "__STRING__=!__STRING__:$20 =$20$20!" & ^
 set "__STRING__=!__STRING__:		=	$09!" & set "__STRING__=!__STRING__:$09	=$09$09!" & ^
 set "__STRING__=!__STRING__:	 =$09$20!" & set "__STRING__=!__STRING__:$09 =$09$20!" & ^
-for /F "eol= tokens=* delims=" %%i in ("!__STRING__:	=$09!") do endlocal & set "__STRING__=%%i"
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__:	=$09!") do endlocal & set "__STRING__=%%i"
 
 set INDEX=0
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do (
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do (
   setlocal ENABLEDELAYEDEXPANSION & if !INDEX! GEQ !ARG0_INDEX! (
     if !INDEX! LSS !SKIP! (
       if defined CMDLINE (
-        for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
+        for /F "tokens=* delims="eol^= %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
       ) else endlocal & set "CMDLINE=%%j"
     ) else if !INDEX! GEQ !SHIFT! (
       if defined CMDLINE (
-        for /F "eol= tokens=* delims=" %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
+        for /F "tokens=* delims="eol^= %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
       ) else endlocal & set "CMDLINE=%%j"
     ) else endlocal
   ) else if !INDEX! EQU !COMMAND_INDEX! (
@@ -240,7 +240,7 @@ if %FLAG_NO_TRIM% NEQ 0 set "__STRING__=!__STRING__:$20= !" & set "__STRING__=!_
 setlocal DISABLEDELAYEDEXPANSION & if %FLAG_EXE% EQU 0 (
   call "%%?~dp0%%encode\decode_sys_chars_bat_cmdline.bat"
 ) else call "%%?~dp0%%encode\decode_sys_chars_exe_cmdline.bat"
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%v in ("!__STRING__!") do endlocal & endlocal & endlocal & endlocal & call :SETERRORLEVEL %LAST_ERROR% & (
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%v in ("!__STRING__!") do endlocal & endlocal & endlocal & endlocal & call :SETERRORLEVEL %LAST_ERROR% & (
   %%v
 )
 exit /b

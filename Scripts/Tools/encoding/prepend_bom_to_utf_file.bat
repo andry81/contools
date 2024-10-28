@@ -77,9 +77,9 @@ if not defined OUTPUT_FILE_PATH (
 
 set "BOM_FILE_PATH=%CONTOOLS_ROOT%/encoding/boms/%BOM_FILE_TOKEN%.bin"
 
-for /f "eol= tokens=* delims=" %%i in ("%INPUT_FILE_PATH%\.") do ( set "INPUT_FILE_PATH=%%~fi" )
-for /f "eol= tokens=* delims=" %%i in ("%BOM_FILE_PATH%\.") do ( set "BOM_FILE_PATH=%%~fi" )
-for /f "eol= tokens=* delims=" %%i in ("%OUTPUT_FILE_PATH%\.") do ( set "OUTPUT_FILE_DIR=%%~dpi" & set "OUTPUT_FILE_PATH=%%~fi" )
+for /f "tokens=* delims="eol^= %%i in ("%INPUT_FILE_PATH%\.") do ( set "INPUT_FILE_PATH=%%~fi" )
+for /f "tokens=* delims="eol^= %%i in ("%BOM_FILE_PATH%\.") do ( set "BOM_FILE_PATH=%%~fi" )
+for /f "tokens=* delims="eol^= %%i in ("%OUTPUT_FILE_PATH%\.") do ( set "OUTPUT_FILE_DIR=%%~dpi" & set "OUTPUT_FILE_PATH=%%~fi" )
 
 if not exist "%INPUT_FILE_PATH%" (
   echo.%?~nx0%%: error: INPUT_FILE_PATH does not exist: "%INPUT_FILE_PATH%".
@@ -132,7 +132,7 @@ set /P INPUT_FILE_BOM_STR=< "%INPUT_FILE_PATH%"
 
 if not defined INPUT_FILE_BOM_STR goto IGNORE_BOM_CHECK
 
-for /F "eol= tokens=* delims=" %%i in ("%BOM_FILE_PATH%") do set "BOM_FILE_SIZE=%%~zi"
+for /F "tokens=* delims="eol^= %%i in ("%BOM_FILE_PATH%") do set "BOM_FILE_SIZE=%%~zi"
 
 rem avoid quote characters
 set "INPUT_FILE_BOM_STR=%INPUT_FILE_BOM_STR:"=%"
@@ -142,7 +142,7 @@ if defined INPUT_FILE_BOM_STR call set "INPUT_FILE_BOM_STR=%%INPUT_FILE_BOM_STR:
 
 if not defined INPUT_FILE_BOM_STR goto IGNORE_BOM_CHECK
 
-for /F "eol= tokens=* delims=" %%i in ("%INPUT_FILE_BOM_STR%") do set /P =%%i<nul > "%INPUT_FILE_BOM_PREFIX_TMP%"
+for /F "tokens=* delims="eol^= %%i in ("%INPUT_FILE_BOM_STR%") do set /P =%%i<nul > "%INPUT_FILE_BOM_PREFIX_TMP%"
 "%SystemRoot%\System32\fc.exe" "%INPUT_FILE_BOM_PREFIX_TMP%" "%BOM_FILE_PATH%" >nul
 if %ERRORLEVEL% NEQ 0 goto IGNORE_BOM_CHECK
 

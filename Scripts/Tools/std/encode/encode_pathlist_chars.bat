@@ -23,11 +23,11 @@ rem
 if not defined __STRING__ exit /b 0
 
 setlocal DISABLEDELAYEDEXPANSION & ^
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__:$=$24!") do endlocal & set "__STRING__=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__:$=$24!") do endlocal & set "__STRING__=%%i"
 
 rem NOTE: restore the quote character later
 setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!__STRING__:"=$22!"
-for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & set "__STRING__=%%i"
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "__STRING__=%%i"
 
 set "__STRING__=%__STRING__:!=$21%"
 
@@ -39,5 +39,5 @@ set "__STRING__=!__STRING__:<=$3C!" & set "__STRING__=!__STRING__:>=$3E!"  & set
 set "__STRING__=!__STRING__:^=$5E!" & set "__STRING__=!__STRING__:%%=$25!" & set "__STRING__=!__STRING__:+=$2B!" & ^
 set "__STRING__=!__STRING__:?=$3F!" & set "__STRING__=!__STRING__: =$20!"  & set "__STRING__=!__STRING__:	=$09!" & set "__STRING__=!__STRING__:,=$2C!" & ^
 set "__STRING__=!__STRING__:$22="!"
-for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & endlocal & set "__STRING__=%%i"
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & endlocal & set "__STRING__=%%i"
 exit /b 0

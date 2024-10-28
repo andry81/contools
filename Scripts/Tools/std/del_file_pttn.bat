@@ -66,7 +66,7 @@ goto FILE_DIR_OK
 
 :FILE_DIR_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%FILE_DIR%\.") do set "FILE_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%FILE_DIR%\.") do set "FILE_DIR=%%~fi"
 
 if not exist "%FILE_DIR%\*" (
   echo.%?~%: error: file directory does not exist: "%FILE_DIR%"
@@ -88,7 +88,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%FILE_DIR%\%FILE_NAME_PTTN%%FILE_EXT_PTTN%" /A:-D /B /O:N /S 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "FILE_PATH=%%i"
   call :DEL_FILE %%*
 )
@@ -98,7 +98,7 @@ exit /b
 call :GET_FILE_EXT "%%FILE_PATH%%"
 if defined FILE_EXT_PTTN if "%FILE_EXT_PTTN:~-1%" == "." if not "%FILE_EXT%" == "%FILE_EXT_PTTN:~0,-1%" exit /b
 
-for /F "eol= tokens=* delims=" %%i in ("%FILE_PATH%\.") do set "FILE_PATH=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%FILE_PATH%\.") do set "FILE_PATH=%%~fi"
 
 if not exist "\\?\%FILE_PATH%" (
   echo.%?~%: error: path does not exist: "%FILE_PATH%"

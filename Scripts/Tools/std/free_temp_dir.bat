@@ -9,27 +9,27 @@ set /A SCRIPT_TEMP_NEST_LVL+=0
 
 if %SCRIPT_TEMP_NEST_LVL% EQU 0 goto NEST_LVL_0
 
-for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_CURRENT_TASK_NAME_LIST%") do (
+for /F "tokens=1,* delims=|"eol^= %%i in ("%SCRIPT_TEMP_CURRENT_TASK_NAME_LIST%") do (
   set "SCRIPT_TEMP_CURRENT_TASK_NAME=%%i"
   set "SCRIPT_TEMP_CURRENT_TASK_NAME_LIST=%%j"
 )
-for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_CURRENT_DIR_LIST%") do (
+for /F "tokens=1,* delims=|"eol^= %%i in ("%SCRIPT_TEMP_CURRENT_DIR_LIST%") do (
   set "SCRIPT_TEMP_CURRENT_DIR=%%i"
   set "SCRIPT_TEMP_CURRENT_DIR_LIST=%%j"
 )
-for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_BASE_DIR_LIST%") do (
+for /F "tokens=1,* delims=|"eol^= %%i in ("%SCRIPT_TEMP_BASE_DIR_LIST%") do (
   set "SCRIPT_TEMP_BASE_DIR=%%i"
   set "SCRIPT_TEMP_BASE_DIR_LIST=%%j"
 )
-for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR_LIST%") do (
+for /F "tokens=1,* delims=|"eol^= %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR_LIST%") do (
   set "SCRIPT_TEMP_PARENT_PATH_DIR=%%i"
   set "SCRIPT_TEMP_PARENT_PATH_DIR_LIST=%%j"
 )
-for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_DIR_NAME_TOKEN_LIST%") do (
+for /F "tokens=1,* delims=|"eol^= %%i in ("%SCRIPT_TEMP_DIR_NAME_TOKEN_LIST%") do (
   set "SCRIPT_TEMP_DIR_NAME_TOKEN=%%i"
   set "SCRIPT_TEMP_DIR_NAME_TOKEN_LIST=%%j"
 )
-for /F "eol= tokens=1,* delims=|" %%i in ("%SCRIPT_TEMP_TASK_COUNT_LIST%") do (
+for /F "tokens=1,* delims=|"eol^= %%i in ("%SCRIPT_TEMP_TASK_COUNT_LIST%") do (
   set "SCRIPT_TEMP_TASK_COUNT=%%i"
   set "SCRIPT_TEMP_TASK_COUNT_LIST=%%j"
 )
@@ -58,7 +58,7 @@ if "%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX:~1,1%" == "" set "SCRIPT_TEMP_TASK_COUNT
 rem echo =%SCRIPT_TEMP_BASE_DIR%=%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_NAME_TOKEN%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%=
 
 rem remove parent directory
-for /F "eol= tokens=1,* delims=\" %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_NAME_TOKEN%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%") do (
+for /F "tokens=1,* delims=\"eol^= %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_NAME_TOKEN%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%") do (
   if exist "\\?\%SCRIPT_TEMP_BASE_DIR%\%%i\*" rmdir /S /Q "%SCRIPT_TEMP_BASE_DIR%\%%i" || (
     echo.%?~%: error: could not free temporary directory: "%SCRIPT_TEMP_BASE_DIR%\%%i".
     echo.

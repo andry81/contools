@@ -56,7 +56,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%DIR_PATH%\.") do ( set "DIR_PATH=%%~fi" && set "DIR_DRIVE=%%~di" )
+for /F "tokens=* delims="eol^= %%i in ("%DIR_PATH%\.") do ( set "DIR_PATH=%%~fi" && set "DIR_DRIVE=%%~di" )
 
 rem CAUTION:
 rem   The drive still must exist even if the path is not. If path exists, the path directory still can be in a disconnected state.
@@ -94,7 +94,7 @@ if not exist "\\?\%SystemRoot%\System32\robocopy.exe" (
 
 set REMOVE_EMPTY_DIR_TMP=0
 if defined EMPTY_DIR_TMP (
-  for /F "eol= tokens=* delims=" %%i in ("%EMPTY_DIR_TMP%\.") do set "EMPTY_DIR_TMP=%%~fi"
+  for /F "tokens=* delims="eol^= %%i in ("%EMPTY_DIR_TMP%\.") do set "EMPTY_DIR_TMP=%%~fi"
 ) else if defined SCRIPT_TEMP_CURRENT_DIR (
   set REMOVE_EMPTY_DIR_TMP=1
   set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%?~nx0%.emptydir.%RANDOM%-%RANDOM%"

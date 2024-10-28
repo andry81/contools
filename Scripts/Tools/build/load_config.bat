@@ -138,8 +138,8 @@ if not defined __?CONFIG_OUT_DIR (
   exit /b 2
 ) >&2
 
-for /F "eol= tokens=* delims=" %%i in ("%__?CONFIG_IN_DIR%\.") do set "__?CONFIG_IN_DIR=%%~fi"
-for /F "eol= tokens=* delims=" %%i in ("%__?CONFIG_OUT_DIR%\.") do set "__?CONFIG_OUT_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%__?CONFIG_IN_DIR%\.") do set "__?CONFIG_IN_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%__?CONFIG_OUT_DIR%\.") do set "__?CONFIG_OUT_DIR=%%~fi"
 
 if not exist "%__?CONFIG_IN_DIR%\*" (
   echo.%__?~nx0%: error: input config directory does not exist: "%__?CONFIG_IN_DIR%".
@@ -186,11 +186,11 @@ set "__?VAR_PREFIX=__?:%RANDOM%-%RANDOM%:"
 
 for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_NAME_DIR%/%__?CONFIG_FILE_NAME%") do set "__?VALUE=%%j" & call :PARSE "%%__?FLAG_NO_EXPAND%%" "%%__?PARAM0%%" "%%__?PARAM1%%" %%i
 
-for /F "usebackq eol= tokens=1,* delims==" %%i in (`@set "%%__?VAR_PREFIX%%" 2^>nul`) do ^
-for /F "eol= tokens=3 delims=:" %%k in ("%%i") do endlocal & set "__?VALUE=%%j" & setlocal ENABLEDELAYEDEXPANSION & ^
+for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@set "%%__?VAR_PREFIX%%" 2^>nul`) do ^
+for /F "tokens=3 delims=:"eol^= %%k in ("%%i") do endlocal & set "__?VALUE=%%j" & setlocal ENABLEDELAYEDEXPANSION & ^
 set "__?VALUE=!__?VALUE:~1!" & if defined __?VALUE (
   set "__?VALUE=!__?VALUE:="!"
-  for /F "eol= tokens=* delims=" %%l in ("!__?VALUE!") do endlocal & set "%%k=%%l"
+  for /F "tokens=* delims="eol^= %%l in ("!__?VALUE!") do endlocal & set "%%k=%%l"
 ) else set "%%k="
 
 set "__?VALUE="
@@ -208,7 +208,7 @@ set "__?VAR_EXPR=!__?VAR_EXPR:"=!"
 set "__?VAR_EXPR=!__?VAR_EXPR:::=:.:!"
 if "!__?VAR_EXPR:~0,1!" == ":" set "__?VAR_EXPR=.!__?VAR_EXPR!"
 
-for /F "eol= tokens=1,2,* delims=:" %%i in ("!__?VAR_EXPR!") do for /F "eol= tokens=* delims=" %%l in ("!__?ATTR!") do endlocal & ^
+for /F "tokens=1,2,* delims=:"eol^= %%i in ("!__?VAR_EXPR!") do for /F "tokens=* delims="eol^= %%l in ("!__?ATTR!") do endlocal & ^
 call :PARSE_EXPR "%%~i" "%%~j" "%%~k" "%%~1" "%%~2" "%%~3" "%%l"
 exit /b 0
 
@@ -241,6 +241,6 @@ if not "!__?ATTR:|once|=!" == "!__?ATTR!" if defined %~1 exit /b 0
 if not defined __?VALUE endlocal & set "%~1=" & exit /b 0
 
 rem safe set
-if not "!__?ATTR:|upath|=!" == "!__?ATTR!" ( for /F "eol= tokens=* delims=" %%i in ("!__?VALUE:\=/!") do endlocal & set "%__?VAR_PREFIX%%~1=.%%i" & set "%~1=%%i"
-) else for /F "eol= tokens=* delims=" %%i in ("!__?VALUE!") do endlocal & set "%__?VAR_PREFIX%%~1=.%%i" & set "%~1=%%i"
+if not "!__?ATTR:|upath|=!" == "!__?ATTR!" ( for /F "tokens=* delims="eol^= %%i in ("!__?VALUE:\=/!") do endlocal & set "%__?VAR_PREFIX%%~1=.%%i" & set "%~1=%%i"
+) else for /F "tokens=* delims="eol^= %%i in ("!__?VALUE!") do endlocal & set "%__?VAR_PREFIX%%~1=.%%i" & set "%~1=%%i"
 exit /b 0

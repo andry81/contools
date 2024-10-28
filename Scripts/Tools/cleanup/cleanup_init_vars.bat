@@ -11,7 +11,7 @@ if exist "%INIT_VARS_FILE%" (
     del /F /Q /A:-D "sed*" 2>nul
 
     popd
-  ) else for /F "eol= tokens=* delims=" %%i in ("%INIT_VARS_FILE%") do pushd "%%~di" && (
+  ) else for /F "tokens=* delims="eol^= %%i in ("%INIT_VARS_FILE%") do pushd "%%~di" && (
     call "%%~dp0cleanup_file.bat" "%%INIT_VARS_FILE%%"
 
     rem delete GnuWin32 sed inplace backups

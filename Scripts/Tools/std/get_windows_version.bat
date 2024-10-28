@@ -20,7 +20,7 @@ set "__?VER_TEMP_FILE="
 
 set WINDOWS_MAJOR_VER=0
 set WINDOWS_MINOR_VER=0
-for /F "eol= tokens=1,2,* delims=." %%i in ("%WINDOWS_VER_STR%") do ( set "WINDOWS_MAJOR_VER=%%i" & set "WINDOWS_MINOR_VER=%%j" )
+for /F "tokens=1,2,* delims=."eol^= %%i in ("%WINDOWS_VER_STR%") do ( set "WINDOWS_MAJOR_VER=%%i" & set "WINDOWS_MINOR_VER=%%j" )
 
 set WINDOWS_X64_VER=0
 if defined PROCESSOR_ARCHITEW6432 ( set "WINDOWS_X64_VER=1" ) else if /i not "%PROCESSOR_ARCHITECTURE%" == "x86" set WINDOWS_X64_VER=1

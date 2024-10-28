@@ -42,19 +42,19 @@ echo.
 set "CORRUPTED_EMULE_PART_FILE_LIST=%SCRIPT_TEMP_CURRENT_DIR%\corrupted_emule_part_file_list.lst"
 set "CORRUPTED_EMULE_PART_FILE_NOEXT_LIST=%SCRIPT_TEMP_CURRENT_DIR%\corrupted_emule_part_file_list.noext.lst"
 
-(for /F "usebackq eol= tokens=1,* delims=(" %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"Failed to open part.met file! ([0-9][0-9]*.part.met.bak "`) do ^
-for /F "eol= tokens=1,* delims= " %%k in ("%%j") do echo.%%k) >> "%CORRUPTED_EMULE_PART_FILE_LIST%"
+(for /F "usebackq tokens=1,* delims=("eol^= %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"Failed to open part.met file! ([0-9][0-9]*.part.met.bak "`) do ^
+for /F "tokens=1,* delims= "eol^= %%k in ("%%j") do echo.%%k) >> "%CORRUPTED_EMULE_PART_FILE_LIST%"
 
-(for /F "usebackq eol= tokens=1,2,3,4,* delims= " %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"[0-9][0-9]*.part.met.bak () is corrupt"`) do echo.%%l) >> "%CORRUPTED_EMULE_PART_FILE_LIST%"
+(for /F "usebackq tokens=1,2,3,4,* delims= "eol^= %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"[0-9][0-9]*.part.met.bak () is corrupt"`) do echo.%%l) >> "%CORRUPTED_EMULE_PART_FILE_LIST%"
 
-(for /F "usebackq eol= tokens=1,* delims=(" %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"Invalid part.met file version! ([0-9][0-9]*.part.met.bak "`) do ^
-for /F "eol= tokens=1,* delims= " %%k in ("%%j") do echo.%%k) >> "%CORRUPTED_EMULE_PART_FILE_LIST%"
+(for /F "usebackq tokens=1,* delims=("eol^= %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"Invalid part.met file version! ([0-9][0-9]*.part.met.bak "`) do ^
+for /F "tokens=1,* delims= "eol^= %%k in ("%%j") do echo.%%k) >> "%CORRUPTED_EMULE_PART_FILE_LIST%"
 
-for /F "usebackq eol= tokens=1,2,3,4,* delims= " %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"[0-9][0-9]*.part.met () is corrupt"`) do (^
+for /F "usebackq tokens=1,2,3,4,* delims= "eol^= %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"[0-9][0-9]*.part.met () is corrupt"`) do (^
 ((echo.%%l) >> "%CORRUPTED_EMULE_PART_FILE_LIST%") & ((echo.%%~nl) >> "%CORRUPTED_EMULE_PART_FILE_NOEXT_LIST%"))
 
-for /F "usebackq eol= tokens=1,* delims=(" %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"Invalid part.met file version! ([0-9][0-9]*.part.met "`) do ^
-for /F "eol= tokens=1,* delims= " %%k in ("%%j") do (^
+for /F "usebackq tokens=1,* delims=("eol^= %%i in (`type "%LOG_FILE%" ^| "%SystemRoot%\System32\findstr.exe" /R /I /C:"Invalid part.met file version! ([0-9][0-9]*.part.met "`) do ^
+for /F "tokens=1,* delims= "eol^= %%k in ("%%j") do (^
 ((echo.%%k) >> "%CORRUPTED_EMULE_PART_FILE_LIST%") & ((echo.%%~nk) >> "%CORRUPTED_EMULE_PART_FILE_NOEXT_LIST%"))
 
 type "%EMULE_CONFIG_DIR%\downloads.txt" | "%SystemRoot%\System32\findstr.exe" /B /L /G:"%CORRUPTED_EMULE_PART_FILE_NOEXT_LIST%"
@@ -62,7 +62,7 @@ type "%EMULE_CONFIG_DIR%\downloads.txt" | "%SystemRoot%\System32\findstr.exe" /B
 echo.
 echo.Deleting...
 
-for /F "eol= tokens=* delims=" %%i in ("%CORRUPTED_EMULE_PART_FILE_LIST%") do call :DEL "%%i"
+for /F "tokens=* delims="eol^= %%i in ("%CORRUPTED_EMULE_PART_FILE_LIST%") do call :DEL "%%i"
 
 exit /b 0
 

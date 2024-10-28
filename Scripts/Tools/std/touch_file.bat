@@ -60,8 +60,8 @@ goto FILE_PATH_OK
 
 :FILE_PATH_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%FILE_PATH%\.") do ^
-for /F "eol= tokens=* delims=" %%j in ("%%~dpi.") do set "FILE_PATH=%%~fi" & set "FILE_DIR=%%~fj" & set "FILE_NAME=%%~nxi"
+for /F "tokens=* delims="eol^= %%i in ("%FILE_PATH%\.") do ^
+for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "FILE_PATH=%%~fi" & set "FILE_DIR=%%~fj" & set "FILE_NAME=%%~nxi"
 
 if exist "\\?\%FILE_PATH%\*" (
   echo.%?~nx0%: error: file path is a directory: "%FILE_PATH%".
@@ -91,7 +91,7 @@ if not exist "%FILE_PATH%" set FILE_PATH_LONG=1
 
 if %FILE_PATH_LONG% NEQ 0 if exist "%SystemRoot%\System32\robocopy.exe" goto MOVE_TO_TMP
 
-for /F "eol= tokens=* delims=" %%i in ("\\?\%FILE_PATH%") do set "FILE_ATTR=%%~ai"
+for /F "tokens=* delims="eol^= %%i in ("\\?\%FILE_PATH%") do set "FILE_ATTR=%%~ai"
 
 if %FILE_PATH_LONG% EQU 0 (
   if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (

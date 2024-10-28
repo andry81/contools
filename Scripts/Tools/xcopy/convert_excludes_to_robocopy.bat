@@ -47,7 +47,7 @@ set INDEX=1
 
 :ROBOCOPY_EXCLUDES_LIST_LOOP
 set "FILE="
-for /F "eol= tokens=%INDEX% delims=|" %%i in ("%ROBOCOPY_EXCLUDES_LIST%") do set "FILE=%%i"
+for /F "tokens=%INDEX% delims=|"eol^= %%i in ("%ROBOCOPY_EXCLUDES_LIST%") do set "FILE=%%i"
 if not defined FILE exit /b 0
 
 if "%FILE:~0,1%" == "@" set "FILE=%FILE:~1%" & goto EXCLUDE_LIST_FILE
@@ -69,14 +69,14 @@ set /A INDEX+=1
 goto ROBOCOPY_EXCLUDES_LIST_LOOP
 
 :PROCESS_EXCLUDES_LIST_FILE
-for /F "usebackq eol= tokens=* delims=" %%i in ("%FILE%") do (
+for /F "usebackq tokens=* delims="eol^= %%i in ("%FILE%") do (
   set "FILE=%%i"
   call :PROCESS_WILDCARD || exit /b
 )
 exit /b 0
 
 :PROCESS_WILDCARD
-for /F "eol= tokens=* delims=" %%i in ("%FILE%") do ^
+for /F "tokens=* delims="eol^= %%i in ("%FILE%") do ^
 set RETURN_VALUE=%RETURN_VALUE% %ROBOCOPY_EXCLUDES_FLAG_PREFIX% "%%i"
 
 exit /b 0

@@ -68,7 +68,7 @@ if defined FLAG if "%FLAG%" == "--" (
 
 if "%~1" == "" exit /b 0
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!%~1!") do endlocal & set "__STRING__=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!%~1!") do endlocal & set "__STRING__=%%i"
 
 if not defined __STRING__ exit /b 0
 
@@ -79,6 +79,6 @@ if %FLAG_EXE% EQU 0 (
 
 set COUNT=0
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=* delims=" %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do set /A COUNT+=1
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do set /A COUNT+=1
 
 endlocal & exit /b %COUNT%

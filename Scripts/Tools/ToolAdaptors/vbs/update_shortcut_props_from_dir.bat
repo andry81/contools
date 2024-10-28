@@ -304,7 +304,7 @@ if %FLAG_NO_ALLOW_DOS_WORKING_DIR% EQU 0 set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_
 if %FLAG_ALLOW_PATHS_REASSIGN% NEQ 0 set "FLAG_ALLOW_TARGET_PATH_REASSIGN=1"
 if %FLAG_ALLOW_PATHS_REASSIGN% NEQ 0 set "FLAG_ALLOW_WORKING_DIR_REASSIGN=1"
 
-for /F "eol= tokens=* delims=" %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
 if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
 
@@ -344,7 +344,7 @@ if defined BACKUP_DIR (
   set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul ^| "%SystemRoot%\System32\findstr.exe" /B /R /I /V /C:"%BACKUP_DIR%\\"
 ) else set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`%%?.%%`) do (
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "LINK_FILE_PATH=%%i"
   call :UPDATE_LINK
 )
@@ -379,7 +379,7 @@ if %FLAG_MATCH_STRING% NEQ 0 (
     type nul > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
   )
 
-  for /F "usebackq eol= tokens=1,* delims==" %%i in (`@type "%%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%%"`) do (
+  for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@type "%%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%%"`) do (
     set "PROP_NAME=%%i"
     set "PROP_VALUE=%%j"
     call :MATCH_SHORTCUT
@@ -408,7 +408,7 @@ copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDERR_F
 rem NOTE: `type` respects UTF-16LE file with BOM header
 type "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" >&2
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%"`) do set "PROP_VALUE=%%i"
+for /F "usebackq tokens=* delims="eol^= %%i in (`@type "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%"`) do set "PROP_VALUE=%%i"
 
 rem skip on empty value
 if not defined PROP_VALUE exit /b 0
@@ -426,7 +426,7 @@ call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%FLAG_MATCH_STRING_VALUE%="
 rem skip on no match
 if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" exit /b 0
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "eol= tokens=1,* delims==" %%i in ("!PROP_NAME!=!PROP_VALUE!") do (
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=1,* delims=="eol^= %%i in ("!PROP_NAME!=!PROP_VALUE!") do (
   endlocal
   echo %%i=%%j
 ) >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
@@ -437,7 +437,7 @@ exit /b 0
 
 rem Read shortcut PROPS_LIST to replace
 
-for /F "usebackq eol= tokens=1,* delims==" %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst") do (
+for /F "usebackq tokens=1,* delims=="eol^= %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst") do (
   set "PROP_NAME=%%i"
   set "PROP_VALUE=%%j"
   call :UPDATE_SHORTCUT_TO_REPLACE
@@ -467,7 +467,7 @@ copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDERR_F
 rem NOTE: `type` respects UTF-16LE file with BOM header
 type "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" >&2
 
-for /F "usebackq eol= tokens=* delims=" %%i in (`@type "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%"`) do set "PROP_VALUE=%%i"
+for /F "usebackq tokens=* delims="eol^= %%i in (`@type "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%"`) do set "PROP_VALUE=%%i"
 
 rem skip on empty value
 if not defined PROP_VALUE exit /b 0

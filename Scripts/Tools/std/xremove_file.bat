@@ -54,8 +54,8 @@ goto FROM_PATH_OK
 
 :FROM_PATH_OK
 
-for /F "eol= tokens=* delims=" %%i in ("%FROM_PATH%\.") do ^
-for /F "eol= tokens=* delims=" %%j in ("%%~dpi.") do set "FILE_PATH=%%~fi" & set "FILE_DIR=%%~fj" & set "FILE_NAME=%%~nxi"
+for /F "tokens=* delims="eol^= %%i in ("%FROM_PATH%\.") do ^
+for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "FILE_PATH=%%~fi" & set "FILE_DIR=%%~fj" & set "FILE_NAME=%%~nxi"
 
 rem CAUTION:
 rem   The `mklink` command can create symbolic directory link and in the disconnected state it does
