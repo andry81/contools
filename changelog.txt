@@ -1,4 +1,7 @@
 2024.11.02:
+* changed: Scripts/Tools/admin/RecentLists, TODO.txt: moved to `contools--recent-lists` project
+
+2024.11.02:
 * new: Scripts/Tools/build/gen_config.bat: output file expiration detection (by default now), added `-noexpire` flag to disable the expiration detection
 
 2024.10.28:

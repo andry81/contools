@@ -1,9 +1,0 @@
-# adobe acrobat reader
-
-# <Storage>|...
-# reg|<CleanupMode>|...
-# reg|*|<RegKeyPath>
-
-reg|*|HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\DC\AVGeneral\cRecentFiles
-reg|*|HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\DC\AVGeneral\cRecentFolders
-reg|*|HKEY_CURRENT_USER\Software\Adobe\Acrobat Reader\DC\AVConnector\cIconCache

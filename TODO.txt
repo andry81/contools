@@ -3,15 +3,6 @@
   Add flag `-allow-auto-recover` to automatically detect and recover broken
   shortcuts.
 
-* Scripts/Tools/admin/RecentLists:
-
-  Add Notepad++ recent lists cleanup.
-
-  c:\Users\User\AppData\Roaming\Notepad++\config.xml
-
-  NotepadPlus/FindHistory
-  NotepadPlus/History
-
 * Utilities/src/callf:
 
   See details in `Utilities/bin/contools/TODO.txt`.
