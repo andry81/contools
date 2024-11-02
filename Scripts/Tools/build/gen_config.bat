@@ -10,13 +10,24 @@ rem   The input configuration file is deteminded by the `.in` suffix in the
 rem   file name and basically stores in a version control system.
 rem   The output configuration file must not contain the `.in` suffix in the
 rem   file name and is used as a local storage for a user values.
+rem
+rem   The script by default detects the input file change after the output
+rem   file change and interrupts the generation with an error.
+rem
+rem   Additionally the `#%% version: ...` line is searched in both files and
+rem   compared to force the user to manually update the output confuguration
+rem   file from the input configuration file in case if are not equal.
 
 rem <Flags>:
 rem   -r <sed_replace_from> <sed_replace_to>
 rem     The expression to replace for the sed in form:
 rem       `s|<sed_replace_from>|<sed_replace_to>}mg`
+rem
 rem   -if_notexist
 rem     Generate if output config does not exist.
+rem
+rem   -noexpire
+rem     Disables output file expiration detection as by default.
 
 rem --:
 rem   Separator to stop parse flags.
@@ -41,6 +52,7 @@ call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
 set FLAG_IF_NOTEXIST=0
+set FLAG_DETECT_EXPIRATION=1
 set "SED_BARE_FLAGS="
 set "SED_REPLACE_FROM="
 set "SED_REPLACE_TO="
@@ -72,6 +84,8 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 if defined FLAG (
   if "%FLAG%" == "-if_notexist" (
     set FLAG_IF_NOTEXIST=1
+  ) else if "%FLAG%" == "-noexpire" (
+    set FLAG_DETECT_EXPIRATION=0
   ) else if "%FLAG%" == "-r" (
     set "SED_REPLACE_FROM=%~2"
     set "SED_REPLACE_TO=%~3"
@@ -120,7 +134,10 @@ if not exist "%CONFIG_OUT_DIR%\*" (
   exit /b 11
 ) >&2
 
-if %FLAG_IF_NOTEXIST% NEQ 0 if exist "%CONFIG_OUT_DIR%\%CONFIG_FILE%" exit /b 0
+if exist "%CONFIG_OUT_DIR%\%CONFIG_FILE%" (
+  if %FLAG_DETECT_EXPIRATION% NEQ 0 call "%%?~dp0%%check_config_expiration.bat" -- "%%CONFIG_IN_DIR%%\%%CONFIG_FILE%%.in" "%%CONFIG_OUT_DIR%%\%%CONFIG_FILE%%" || exit /b
+  if %FLAG_IF_NOTEXIST% NEQ 0 exit /b 0
+)
 
 echo."%CONFIG_IN_DIR%\%CONFIG_FILE%.in" -^> "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
 

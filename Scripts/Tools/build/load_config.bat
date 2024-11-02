@@ -18,12 +18,12 @@ rem   file name and basically stores in a version control system.
 rem   The output configuration file must not contain the `.in` suffix in the
 rem   file name and is used as a local storage for a user values.
 rem
-rem   The script detects the input file change before the output file change
+rem   The script detects the input file change after the output file change
 rem   and interrupts the load with an error.
 rem
-rem   Additionally the `#%% version: ...` line is used to force the user to
-rem   manually update the output confuguration file from the input
-rem   configuration file in case if are not equal.
+rem   Additionally the `#%% version: ...` line is searched in both files and
+rem   compared to force the user to manually update the output confuguration
+rem   file from the input configuration file in case if are not equal.
 rem
 rem   By default the script does load the input configuration from the
 rem   `<ConfigFileName>` file.
