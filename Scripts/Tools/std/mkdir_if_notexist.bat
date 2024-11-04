@@ -28,14 +28,41 @@ if not defined DIR_PATH (
   exit /b -255
 ) >&2
 
+if defined SCRIPT_TEMP_CURRENT_DIR (
+  set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%.txt"
+) else set "CMDLINE_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
+
+rem redirect command line into temporary file to print it correcly
+(
+  setlocal DISABLEEXTENSIONS
+  (set PROMPT=$_)
+  echo on
+  for %%z in (%%z) do rem * %*#
+  @echo off
+  endlocal
+) > "%CMDLINE_TEMP_FILE%"
+
+for /F "usebackq tokens=* delims="eol^= %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
+
+del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
+
+rem WORKAROUND:
+rem   In case if `echo` is turned off externally.
+rem
+if not defined __STRING__ exit /b 0
+
+setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
+  for /F "tokens=* delims="eol^= %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
+) else endlocal & set "__STRING__="
+
+if not defined __STRING__ exit /b 0
+
+call "%%~dp0encode\encode_sys_chars_bat_cmdline.bat"
+
 set DIR_COUNT=1
 set DIR_COUNT_MAX=0
 
-rem CAUTION:
-rem   The `for %%i in (%*)` statement still can expand the globbing characters
-rem   for the files in a current directory. You must avoid them.
-
-for %%i in (%*) do set /A DIR_COUNT_MAX+=1
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do set /A DIR_COUNT_MAX+=1
 
 set "DIR_PATHS="
 
@@ -68,7 +95,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_OK
 
-for /F "tokens=* delims="eol^= %%i in ("%DIR_PATH%\.") do ( set "DIR_PATH=%%~fi" && set "DIR_DRIVE=%%~di" )
+for /F "tokens=* delims="eol^= %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi" & set "DIR_DRIVE=%%~di"
 
 rem CAUTION:
 rem   The drive still must exist even if the path is not. If path exists, the path directory still can be in a disconnected state.
