@@ -12,4 +12,8 @@ rem   The delayed expansion feature must be disabled before this script call: `s
 rem   the `!` character will be expanded.
 rem
 
+rem CAUTION:
+rem   The `for %%i in (%*)` statement still can expand the globbing characters
+rem   for the files in a current directory. You must avoid them.
+
 ( for %%i in (%*) do if defined %%i setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%j in ("!%%i!") do endlocal & call set "%%i=%%j" ) & exit /b %ERRORLEVEL%

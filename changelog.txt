@@ -1,4 +1,7 @@
 2024.11.04:
+* changed: Scripts/Tools/build/load_config.bat: workaround for `for %%i in (%*)` statement issue with globbing characters
+
+2024.11.04:
 * changed: Scripts/Tools/build/load_config_dir.bat: prevent mix detection incompatible config flags
 
 2024.11.02:

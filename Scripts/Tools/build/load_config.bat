@@ -138,6 +138,28 @@ if not defined __?CONFIG_OUT_DIR (
   exit /b 2
 ) >&2
 
+rem check on invalid characters in params
+if not "%__?PARAM0%" == "%__?PARAM0:**=%" goto PARAM0_ERROR
+if not "%__?PARAM0%" == "%__?PARAM0:?=%" goto PARAM0_ERROR
+if not "%__?PARAM1%" == "%__?PARAM1:**=%" goto PARAM1_ERROR
+if not "%__?PARAM1%" == "%__?PARAM1:?=%" goto PARAM1_ERROR
+
+goto PARAMS_OK
+
+:PARAM0_ERROR
+(
+  echo.%__?~nx0%: error: param0 is invalid: "%__?PARAM0%".
+  exit /b 3
+) >&2
+
+:PARAM1_ERROR
+(
+  echo.%__?~nx0%: error: param1 is invalid: "%__?PARAM1%".
+  exit /b 4
+) >&2
+
+:PARAMS_OK
+
 for /F "tokens=* delims="eol^= %%i in ("%__?CONFIG_IN_DIR%\.") do set "__?CONFIG_IN_DIR=%%~fi"
 for /F "tokens=* delims="eol^= %%i in ("%__?CONFIG_OUT_DIR%\.") do set "__?CONFIG_OUT_DIR=%%~fi"
 
@@ -196,6 +218,10 @@ set "__?VALUE=!__?VALUE:~1!" & if defined __?VALUE (
 set "__?VALUE="
 
 exit /b 0
+
+rem CAUTION:
+rem   The `for %%i in (%*)` statement still can expand the globbing characters
+rem   for the files in a current directory. You must avoid them.
 
 :PARSE "%__?FLAG_NO_EXPAND%" "%__?PARAM0%" "%__?PARAM1%" [ATTRS] VAR[:PARAM0[:PARAM1]]
 setlocal ENABLEDELAYEDEXPANSION & ^

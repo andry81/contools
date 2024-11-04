@@ -31,6 +31,10 @@ if not defined DIR_PATH (
 set DIR_COUNT=1
 set DIR_COUNT_MAX=0
 
+rem CAUTION:
+rem   The `for %%i in (%*)` statement still can expand the globbing characters
+rem   for the files in a current directory. You must avoid them.
+
 for %%i in (%*) do set /A DIR_COUNT_MAX+=1
 
 set "DIR_PATHS="
