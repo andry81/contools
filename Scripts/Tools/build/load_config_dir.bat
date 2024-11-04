@@ -24,22 +24,30 @@ rem <Flags>:
 rem   -gen_system_config
 rem     Generates the system configuration file.
 rem     Implies `-load_system_output_config` flag.
+rem     Can not be used together with `-no_load_system_config` flag.
 rem
 rem   -gen_user_config
 rem     Generates the user configuration file.
 rem     Implies `-load_user_output_config` flag.
+rem     Can not be used together with `-no_load_user_config` flag.
 rem
 rem   -load_system_output_config
 rem     Loads the system configuration file from output directory.
+rem     Can not be used together with `-no_load_system_config` flag.
 rem
 rem   -load_user_output_config
 rem     Loads the user configuration file(s) from output directory.
+rem     Can not be used together with `-no_load_user_config` flag.
 rem
 rem   -no_load_system_config
 rem     Skips load the system configuration file.
+rem     Can not be used together with `-gen_system_config` and
+rem     `-load_system_output_config` flags.
 rem
 rem   -no_load_user_config
 rem     Skips load the user configuration file(s).
+rem     Can not be used together with `-gen_user_config` and
+rem     `-load_user_output_config` flags.
 
 rem --:
 rem   Separator to stop parse flags.
@@ -64,6 +72,15 @@ if defined NO_GEN set /A NO_GEN+=0
 call "%%__?~dp0%%.load_config_dir/load_config_dir.read_flags.bat" %%* || exit /b
 
 if %__?FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%__?FLAG_SHIFT%) do shift
+
+if %__?FLAG_NO_LOAD_SYSTEM_CONFIG% NEQ 0 if %__?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG%%__?FLAG_GEN_SYSTEM_CONFIG% NEQ 0
+  echo.%__?~nx0%: error: system config flags are mixed.
+  exit /b 255
+) >&2
+if %__?FLAG_NO_LOAD_USER_CONFIG% NEQ 0 if %__?FLAG_LOAD_USER_OUTPUT_CONFIG%%__?FLAG_GEN_USER_CONFIG% NEQ 0
+  echo.%__?~nx0%: error: user config flags are mixed.
+  exit /b 255
+) >&2
 
 if %NO_GEN%0 NEQ 0 (
   if %__?FLAG_GEN_SYSTEM_CONFIG% NEQ 0 (
