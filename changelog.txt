@@ -1,4 +1,8 @@
 2024.11.05:
+* fixed: Scripts/Tools/build/load_config*.bat: execution fixup
+* changed: Scripts/Tools/build/load_config_dir.bat: reverted incompatible config flags mix check, `-no_load_*_config` flags has now priority over other flags
+
+2024.11.05:
 * fixed: Scripts/Tools/std/mkdir*.bat: fixup of `for %%i in (%*)` statement issue with globbing characters
 * changed: Scripts/Tools: std/mkdir*.bat, std/rmdir*.bat, build/mkdir*.bat: code cleanup
 
