@@ -1,4 +1,7 @@
 2024.11.07:
+* new: *.bat: switch scripts from `type 2>nul` usage to `call` as the fastest variant (for reset ERRORLEVEL to 1)
+
+2024.11.07:
 * new: Scripts/Tests/bench/batscripts: test__call_*.bat, test__type_*.bat: bench tests for `call;` and `call` variants as an alternative to `type nul>nul` and `type 2>nul` to reset ERRORLEVEL to 0 and 1 respectively
 
 2024.11.05:
