@@ -1,3 +1,9 @@
+2024.11.21:
+* fixed: Scripts/Tools/build/get_cmdline_len.bat: zero instead of negative length return
+* fixed: Scripts/Tools/build/get_cmdline_var_len.bat: correct variable read in case of empty variable
+* new: Scripts/Tools/build/get_cmdline_*len.bat: implemented `-skip <skip-num>` option to skip additional arguments before count
+* new: Scripts/Tools/build/get_cmdline_*len.bat: implemented `-shift <shift>` option to shift additional arguments before count
+
 2024.11.13:
 * changed: Scripts/Tools/testlib/save_locals.bat: minor optimization based on the suggestion in the issue #3 (`Batch FOR-Loops EOL relies on a rare character`)
 
