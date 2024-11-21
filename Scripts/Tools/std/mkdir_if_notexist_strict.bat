@@ -107,7 +107,7 @@ if not exist "%DIR_DRIVE%" (
 
 rem CAUTION:
 rem   The `mklink` command can create symbolic directory link and in the disconnected state it does
-rem   report existences of a directory without the trailing back slash:
+rem   report existence of a directory without the trailing back slash:
 rem     `x:\<path-to-dir-without-trailing-back-slash>`
 rem   So we must test the path with the trailing back slash to check existence of the link AND it's connection state.
 rem
