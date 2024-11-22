@@ -1,7 +1,10 @@
 @echo off
 
 rem USAGE:
-rem   trim_var.bat <Var> [<OutVar>]
+rem   trim_var.bat <var> [<outvar>]
+
+rem Description:
+rem   Trims variable optionally into another variable.
 
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:

@@ -1,4 +1,7 @@
 2024.11.22:
+* fixed: Scripts/Tools/std: set_var.bat, expand_var*.bat: empty variable case usage
+
+2024.11.22:
 * new: Scripts/Tools/build/gen_config_dir.bat: script to generate configuration files from a directory into another directory using file globbing list
 * new: Scripts/Tools/build/gen_config.bat: `skip_checks` flag to skip parameters checks
 * changed: Scripts/Tools/build/gen_config.bat: execute `__init__.bat` only in case of the sed usage to speed up the execution
