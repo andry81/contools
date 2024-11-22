@@ -6,12 +6,14 @@ rem   load_config_dir.bat [<Flags>] [--] <InputDir> <OutputDir> [<Param0> [<Para
 rem Description:
 rem   Script to load input and output directory with configuration files using
 rem   the `load_Config.bat` script.
+rem
 rem   A directory can contain a set of configuration files which loads in this
 rem   order if exist:
 rem     * config.system.vars[.in]
 rem     * config.0.vars[.in]
 rem     * ...
 rem     * config.N.vars[.in]
+rem
 rem   The `.in` suffix basically related to the configuration files in the
 rem   input directory.
 rem   By default the script does load the system and the user configuration

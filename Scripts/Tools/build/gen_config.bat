@@ -6,6 +6,7 @@ rem   gen_config.bat [<flags>] [--] <InputDir> <OutputDir> <ConfigFileName>
 rem Description:
 rem   Script to generate a configuration file which can consist of an input and
 rem   output parts using `sed` utility.
+rem
 rem   The input configuration file is deteminded by the `.in` suffix in the
 rem   file name and basically stores in a version control system.
 rem   The output configuration file must not contain the `.in` suffix in the
@@ -23,11 +24,17 @@ rem   -r <sed_replace_from> <sed_replace_to>
 rem     The expression to replace for the sed in form:
 rem       `s|<sed_replace_from>|<sed_replace_to>}mg`
 rem
+rem     To pass a special code character you can use the `$/<char>` or `$/\xNN`
+rem     syntax, where `NN` is a hexidecimal code of a character.
+rem
 rem   -if_notexist
 rem     Generate if output config does not exist.
 rem
 rem   -noexpire
 rem     Disables output file expiration detection as by default.
+rem
+rem   -skip_checks
+rem     Skip checks for faster execution.
 
 rem --:
 rem   Separator to stop parse flags.
@@ -46,28 +53,37 @@ rem   Must not contain `.in` suffix.
 
 setlocal
 
-call "%%~dp0__init__.bat" || exit /b
-
-call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
+set "?~dp0=%~dp0"
+set "?~n0=%~n0"
+set "?~nx0=%~nx0"
 
 rem script flags
 set FLAG_IF_NOTEXIST=0
 set FLAG_DETECT_EXPIRATION=1
+set FLAG_SKIP_CHECKS=0
 set "SED_BARE_FLAGS="
 set "SED_REPLACE_FROM="
 set "SED_REPLACE_TO="
 
 :FLAGS_LOOP
 
-if defined SED_REPLACE_FROM set "SED_REPLACE_FROM=%SED_REPLACE_FROM:\=\\%"
-if defined SED_REPLACE_FROM set "SED_REPLACE_FROM=%SED_REPLACE_FROM:|=\|%"
-if defined SED_REPLACE_FROM set "SED_REPLACE_FROM=%SED_REPLACE_FROM:{=\{%"
-if defined SED_REPLACE_FROM set "SED_REPLACE_FROM=%SED_REPLACE_FROM:}=\}%"
+if not defined SED_REPLACE_FROM goto SKIP_SED_REPLACE_FROM
 
-if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:\=\\%"
-if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:|=\|%"
-if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:{=\{%"
-if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:}=\}%"
+set "SED_REPLACE_FROM=%SED_REPLACE_FROM:\=\\%"
+set "SED_REPLACE_FROM=%SED_REPLACE_FROM:|=\|%"
+set "SED_REPLACE_FROM=%SED_REPLACE_FROM:{=\{%"
+set "SED_REPLACE_FROM=%SED_REPLACE_FROM:}=\}%"
+
+:SKIP_SED_REPLACE_FROM
+
+if not defined SED_REPLACE_TO goto SKIP_SED_REPLACE_TO
+
+set "SED_REPLACE_TO=%SED_REPLACE_TO:\=\\%"
+set "SED_REPLACE_TO=%SED_REPLACE_TO:|=\|%"
+set "SED_REPLACE_TO=%SED_REPLACE_TO:{=\{%"
+set "SED_REPLACE_TO=%SED_REPLACE_TO:}=\}%"
+
+:SKIP_SED_REPLACE_TO
 
 rem special `$/<char>` sequence to pass `<char>` character as is (ex: `$/\x22` translates into `\x22` - a quote character)
 if defined SED_REPLACE_FROM set "SED_REPLACE_FROM=%SED_REPLACE_FROM:$/\\=\%"
@@ -86,6 +102,8 @@ if defined FLAG (
     set FLAG_IF_NOTEXIST=1
   ) else if "%FLAG%" == "-noexpire" (
     set FLAG_DETECT_EXPIRATION=0
+  ) else if "%FLAG%" == "-skip_checks" (
+    set FLAG_SKIP_CHECKS=1
   ) else if "%FLAG%" == "-r" (
     set "SED_REPLACE_FROM=%~2"
     set "SED_REPLACE_TO=%~3"
@@ -105,6 +123,8 @@ if defined FLAG (
 set "CONFIG_IN_DIR=%~1"
 set "CONFIG_OUT_DIR=%~2"
 set "CONFIG_FILE=%~3"
+
+if %FLAG_SKIP_CHECKS% NEQ 0 goto SKIP_CHECKS
 
 if not defined CONFIG_IN_DIR (
   echo.%?~nx0%: error: input config directory is not defined.
@@ -134,6 +154,8 @@ if not exist "%CONFIG_OUT_DIR%\*" (
   exit /b 11
 ) >&2
 
+:SKIP_CHECKS
+
 if exist "%CONFIG_OUT_DIR%\%CONFIG_FILE%" (
   if %FLAG_DETECT_EXPIRATION% NEQ 0 call "%%?~dp0%%check_config_expiration.bat" -- "%%CONFIG_IN_DIR%%\%%CONFIG_FILE%%.in" "%%CONFIG_OUT_DIR%%\%%CONFIG_FILE%%" || exit /b
   if %FLAG_IF_NOTEXIST% NEQ 0 exit /b 0
@@ -141,6 +163,12 @@ if exist "%CONFIG_OUT_DIR%\%CONFIG_FILE%" (
 
 echo."%CONFIG_IN_DIR%\%CONFIG_FILE%.in" -^> "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
 
-if defined SED_BARE_FLAGS (
-  type "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" | "%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" -r -b%SED_BARE_FLAGS% > "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
-) else type "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" > "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
+if not defined SED_BARE_FLAGS (
+  type "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" > "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
+  exit /b
+)
+
+rem initialize only in case of the sed usage
+call "%%?~dp0%%__init__.bat" || exit /b
+
+type "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" | "%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" -r -b%SED_BARE_FLAGS% > "%CONFIG_OUT_DIR%\%CONFIG_FILE%"

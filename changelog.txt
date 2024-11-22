@@ -1,3 +1,8 @@
+2024.11.22:
+* new: Scripts/Tools/build/gen_config_dir.bat: script to generate configuration files from a directory into another directory using file globbing list
+* new: Scripts/Tools/build/gen_config.bat: `skip_checks` flag to skip parameters checks
+* changed: Scripts/Tools/build/gen_config.bat: execute `__init__.bat` only in case of the sed usage to speed up the execution
+
 2024.11.21:
 * fixed: Scripts/Tools/build/get_cmdline_len.bat: zero instead of negative length return
 * fixed: Scripts/Tools/build/get_cmdline_var_len.bat: correct variable read in case of empty variable
