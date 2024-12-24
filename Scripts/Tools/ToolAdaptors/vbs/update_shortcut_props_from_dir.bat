@@ -198,7 +198,7 @@ if defined FLAG (
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-p" (
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
-  ) else if "%FLAG%" == "-print-assigned-feedback" (
+  ) else if "%FLAG%" == "-print-assigned" (
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-pd" (
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG%
@@ -437,13 +437,18 @@ exit /b 0
 
 rem Read shortcut PROPS_LIST to replace
 
+set "UPDATE_SHORTCUT_PROP_FLAGS="
+
 for /F "usebackq tokens=1,* delims=="eol^= %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst") do (
   set "PROP_NAME=%%i"
   set "PROP_VALUE=%%j"
   call :UPDATE_SHORTCUT_TO_REPLACE
 )
 
-echo.
+if defined UPDATE_SHORTCUT_PROP_FLAGS (
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS%%UPDATE_SHORTCUT_PROP_FLAGS% -- "%LINK_FILE_PATH%"
+  echo.
+)
 
 exit /b
 
@@ -490,12 +495,10 @@ set "PROP_LINE=%PROP_NAME%(read)=%PROP_PREV_VALUE%"
 if %FLAG_PRINT_READ% NEQ 0 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
 rem skip on empty assign
-if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 (
-  if not defined PROP_NEXT_VALUE (
-    echo.%?~nx0%: warning: property empty value assignment: "%PROP_NAME%"
-    exit /b 0
-  ) >&2
-)
+if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 if not defined PROP_NEXT_VALUE (
+  echo.%?~nx0%: warning: property empty value assignment: "%PROP_NAME%"
+  exit /b 0
+) >&2
 
 rem skip on empty change
 if "%PROP_NAME%" == "TargetPath" (
@@ -521,9 +524,9 @@ if "%PROP_NAME%" == "TargetPath" (
 )
 
 if /i "%PROP_NAME%" == "TargetPath" (
-  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -t "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  set UPDATE_SHORTCUT_PROP_FLAGS=%UPDATE_SHORTCUT_PROP_FLAGS% -t "%PROP_NEXT_VALUE%"
 ) else if /i "%PROP_NAME%" == "Arguments" (
-  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -args "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  set UPDATE_SHORTCUT_PROP_FLAGS=%UPDATE_SHORTCUT_PROP_FLAGS% -args "%PROP_NEXT_VALUE%"
 ) else if /i "%PROP_NAME%" == "WorkingDirectory" (
-  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS% -wd "%PROP_NEXT_VALUE%" -- "%LINK_FILE_PATH%"
+  set UPDATE_SHORTCUT_PROP_FLAGS=%UPDATE_SHORTCUT_PROP_FLAGS% -wd "%PROP_NEXT_VALUE%"
 )

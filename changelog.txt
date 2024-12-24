@@ -1,3 +1,7 @@
+2024.12.20:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: avoid multiple shortcuts backup, minor fixup
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: update all properties in a single call to `update_shortcut.vbs` script instead of a call per property
+
 2024.11.22:
 * fixed: Scripts/Tools/std: set_var.bat, expand_var*.bat: empty variable case usage
 
