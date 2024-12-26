@@ -604,7 +604,7 @@ If ChangeCurrentDirectoryExist Then
   End If
 
   ' test on path existence including long path
-  Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = objFS.FileExists("\\?\" & ChangeCurrentDirectoryAbs)
+  Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = objFS.FolderExists("\\?\" & ChangeCurrentDirectoryAbs)
   If IsCurrentDirectoryExist Then
     PrintOrEchoErrorLine _
       WScript.ScriptName & ": error: could not change current directory:" & vbCrLf & _
@@ -641,7 +641,7 @@ If IsShortcutFileExist Then
 End If
 
 Dim ShortcutFileDir : ShortcutFileDir = objFS.GetParentFolderName(ShortcutFilePathAbs)
-Dim IsShortcutFileDirExist : IsShortcutFileDirExist = objFS.FolderExists("\\?\" & ShortcutFileDir & "\")
+Dim IsShortcutFileDirExist : IsShortcutFileDirExist = objFS.FolderExists("\\?\" & ShortcutFileDir)
 If Not IsShortcutFileDirExist Then
   PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: shortcut file directory must exist:" & vbCrLf & _

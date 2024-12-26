@@ -681,9 +681,9 @@ End Function
 
 Function GetExistedShortPath(PathAbs, AsFile)
   If AsFile Then
-    GetShortPath = GetExistedFileShortPath(PathAbs)
+    GetExistedShortPath = GetExistedFileShortPath(PathAbs)
   Else
-    GetShortPath = GetExistedFolderShortPath(PathAbs)
+    GetExistedShortPath = GetExistedFolderShortPath(PathAbs)
   End If
 End Function
 
@@ -715,7 +715,7 @@ If ChangeCurrentDirectoryExist Then
   End If
 
   ' test on path existence including long path
-  Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = objFS.FileExists("\\?\" & ChangeCurrentDirectoryAbs)
+  Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = objFS.FolderExists("\\?\" & ChangeCurrentDirectoryAbs)
   If IsCurrentDirectoryExist Then
     PrintOrEchoErrorLine _
       WScript.ScriptName & ": error: could not change current directory:" & vbCrLf & _
@@ -1148,7 +1148,7 @@ If ShortcutUpdated Then
       End If
 
       ' test on path existence including long path
-      If Not objFS.FolderExists("\\?\" & to_file_parent_dir_path_abs & "\") Then
+      If Not objFS.FolderExists("\\?\" & to_file_parent_dir_path_abs) Then
         PrintOrEchoErrorLine _
           WScript.ScriptName & ": error: output parent directory path does not exist:" & vbCrLf & _
           WScript.ScriptName & ": info: OutputPath=`" & to_file_path_abs & "`"

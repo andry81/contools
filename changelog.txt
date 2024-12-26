@@ -1,3 +1,7 @@
+2024.12.26:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: empty short path assign
+* fixed: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: minor fixup
+
 2024.12.20:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: avoid multiple shortcuts backup, minor fixup
 * changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: update all properties in a single call to `update_shortcut.vbs` script instead of a call per property
