@@ -3,7 +3,8 @@
 setlocal
 
 rem CAUTION:
-rem   The `declare_builtins.bat` script must be called before.
+rem   The `declare_builtins.bat` script with the script path parameter must be
+rem   called before.
 
 rem CAUTION:
 rem   The `for %%i in (%*)` statement still can expand the globbing characters

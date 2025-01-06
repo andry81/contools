@@ -13,10 +13,14 @@ set "INIT_VARS_FILE="
 if %NO_GEN%0 NEQ 0 exit /b 0
 if %NO_LOG%0 NEQ 0 exit /b 0
 
-if not exist "%PROJECT_LOG_DIR%\*" (
+if defined PROJECT_LOG_DIR if exist "%PROJECT_LOG_DIR%\*" goto USE_INIT_VARS
+
+(
   echo.%~nx0%: error: can not use initial variables file while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
   exit /b 255
 ) >&2
+
+:USE_INIT_VARS
 
 set "INIT_VARS_FILE=%PROJECT_LOG_DIR%\init.vars"
 

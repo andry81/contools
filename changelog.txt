@@ -1,3 +1,9 @@
+2025.01.06:
+* fixed: __init__: accidental code page change in an external  `__init__.bat` script call
+* fixed: Scripts/Tools/std/is_admin_elevated.bat, Scripts/Tools, Utilities/bin: workaround for the cmd pipe operator and `find.exe` utility (hangs) under Windows 7
+* fixed: Scripts/Tools/build/init_vars_file.bat: correct `PROJECT_LOG_DIR` variable existence check
+* fixed: Scripts/Tools/build/init_project_log.bat: suffix name parameter check on empty
+
 2024.12.30:
 * changed: README_EN.txt: reamoved lgtm badges as not used anymore
 

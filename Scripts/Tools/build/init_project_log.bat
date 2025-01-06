@@ -18,7 +18,7 @@ call "%%~dp0__init__.bat" || exit /b
 
 set "SUFFIX_NAME=%~1"
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/check_vars.bat" CONTOOLS_ROOT SUFFIX_NAME || exit /b
 
 if defined PROJECT_LOG_DIR exit /b 0
 if defined PROJECT_LOG_FILE exit /b 0
