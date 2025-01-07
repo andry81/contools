@@ -1,3 +1,6 @@
+2025.01.08:
+* changed: README.md: externals note update
+
 2025.01.07:
 * changed: Scripts/Tools/ToolAdaptors/app/curl: moved to `contools--curl` project
 * changed: TODO.txt: todo cleanup

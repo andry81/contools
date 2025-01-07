@@ -1,4 +1,4 @@
-> **Warning** FOR GIT USERS: To clone including all dependecies you must use [fork](https://github.com/plusone-robotics/vcstool) (has the sparse checkout feature) of the [vcstool](https://github.com/dirk-thomas/vcstool) python module (currently the sparse checkout feature is not merged).
+> **Note** To checkout externals read the details here: https://github.com/andry81/externals
 
 <p align="center">A wide range of scripts for Windows interpreter (cmd.exe) and other
 interpreters such as bash shell (.sh), visual basic (.vbs), python (.py) and so on.
