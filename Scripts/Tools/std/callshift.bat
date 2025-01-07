@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   callshift.bat [-exe] [-notrim] [-skip <skip-num>] [<shift> [<command> [<cmdline>...]]]
+rem   callshift.bat [-exe] [-notrim] [-skip <skip-num>] [-lockfile <lock-file> [-trylock] [-lock-sleep-cmdline <lock-sleep-cmdline>]] [<shift> [<command> [<cmdline>...]]]
 
 rem Description:
 rem   Script calls `<command>` with skipped and shifted `<cmdline>`.
@@ -18,6 +18,28 @@ rem   Avoids spaces trim in the shifted command line.
 rem -skip <skip-num>
 rem   Number of `<cmdline>` arguments to skip before shift.
 rem   If not defined, then 0.
+
+rem -lockfile <lock-file>
+rem   Calls a command line under the lock (a file redirection trick).
+rem   If the lock was holden before the call, then the call waits the unlock
+rem   if `-trylock` flag is not defined. Otherwise just ignores and the script
+rem   returns a negative error code (-1024).
+rem   The lock file directory must exist before the call.
+rem   The lock file will be removed on script exit.
+
+rem -lockfile <lock-file>
+rem   Lock file path to lock the call.
+
+rem -trylock
+rem   Try to lock and if not, then exit immediately (-1024) instead of waiting
+rem   the lock.
+rem   Has no effect if `-lockfile` is not defined.
+
+rem -lock-sleep-cmdline <lock-sleep-cmdline>
+rem   The command line for the `sleep.bat` script to call on before attempt to
+rem   acquire another lock.
+rem   Has no effect if `-lockfile` is not defined.
+rem   If not defined, then `50` (ms) is used by default.
 
 rem <shift>:
 rem   Number of `<cmdline>` arguments to skip and shift.
@@ -67,6 +89,7 @@ rem  10. >callshift.bat -notrim 1 echo  a  b  c  d
 rem       b  c  d
 rem  11. >callshift.bat 0 echo.^>cmd param0 param1
 rem      >cmd param0 param1
+rem  12. >callshift.bat -lockfile "%TEMP%\lock0.myscript" 0 echo.Exclusive print
 
 rem Examples (in script):
 rem   1. set "$5E$3E=^>"
@@ -83,6 +106,8 @@ rem   * Can skip first N used arguments from the `%*` variable including
 rem     additional command line arguments.
 rem   * Can avoid spaces and tabulation characters trim in the shifted command
 rem     line.
+rem   * Can lock the call using a redirection into a file while at the command
+rem     line call.
 rem
 rem Cons:
 rem
@@ -133,6 +158,8 @@ setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
   for /F "tokens=* delims="eol^= %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
 ) else endlocal & set "__STRING__="
 
+if not defined __STRING__ exit /b %LAST_ERROR%
+
 set "?~dp0=%~dp0"
 
 rem script flags
@@ -140,6 +167,9 @@ set FLAG_SHIFT=0
 set FLAG_EXE=0
 set FLAG_NO_TRIM=0
 set FLAG_SKIP=0
+set "FLAG_LOCK_FILE="
+set "FLAG_LOCK_SLEEP_CMDLINE= 50"
+set FLAG_TRYLOCK=0
 
 rem flags always at first
 set "FLAG=%~1"
@@ -169,6 +199,29 @@ if defined FLAG if "%FLAG%" == "-skip" (
   set /A FLAG_SHIFT+=2
 )
 
+if defined FLAG if "%FLAG%" == "-lockfile" (
+  set "FLAG_LOCK_FILE=%~2"
+  shift
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=2
+)
+
+if defined FLAG if "%FLAG%" == "-lock-sleep-cmdline" (
+  set "FLAG_LOCK_SLEEP_CMDLINE= %~2"
+  shift
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=2
+)
+
+if defined FLAG if "%FLAG%" == "-trylock" (
+  set FLAG_TRYLOCK=1
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=1
+)
+
 set "SHIFT=%~1"
 set "COMMAND="
 set "CMDLINE="
@@ -182,6 +235,42 @@ rem cast to integer
 set /A SHIFT+=0
 
 if not "%SHIFT%" == "%SHIFT_%" exit /b %LAST_ERROR%
+
+if not defined FLAG_LOCK_FILE goto SKIP_CALL_LOCK
+
+for /F "tokens=* delims="eol^= %%i in ("%FLAG_LOCK_FILE%\.") do set "FLAG_LOCK_FILE_DIR=%%~dpi"
+
+if not exist "%FLAG_LOCK_FILE_DIR%*" (
+  echo.%~nx0: error: lock file directory does not exist: "%FLAG_LOCK_FILE_DIR%"
+  exit /b -1024
+) >&2
+
+rem lock loop
+:CALL_LOCK_LOOP
+
+rem lock via redirection to file
+set LOCK_ACQUIRE=0
+( ( set "LOCK_ACQUIRE=1" & call :LOCKED_CALL ) 9> "%FLAG_LOCK_FILE%" ) 2>nul
+
+set LAST_ERROR=%ERRORLEVEL%
+
+if %LOCK_ACQUIRE% EQU 0 (
+  if %FLAG_TRYLOCK% NEQ 0 (
+    del /F /Q /A:-D "%FLAG_LOCK_FILE%" >nul 2>nul
+    exit /b -1024
+  )
+
+  call "%%?~dp0%%sleep.bat"%%FLAG_LOCK_SLEEP_CMDLINE%%
+
+  goto CALL_LOCK_LOOP
+)
+
+del /F /Q /A:-D "%FLAG_LOCK_FILE%" >nul 2>nul
+
+exit /b %LAST_ERROR%
+
+:SKIP_CALL_LOCK
+:LOCKED_CALL
 
 rem cast to integer
 set /A FLAG_SKIP+=0

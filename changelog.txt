@@ -1,3 +1,8 @@
+2025.01.07:
+* new: Scripts/Tools/std: call.bat, callshift.bat: `-lockfile`, `-trylock`, `-lock-sleep-cmdline` options to use call with lock
+* new: Scripts/Tests/manual/batscripts/test_std__*_call*_with_*lock.bat: manual tests with wait lock and try lock
+* changed: Scripts/Tools/exec_once_or_exit.bat: removed because implemented in `call.bat` and `callshift.bat` scripts
+
 2025.01.06:
 * fixed: __init__: accidental code page change in an external  `__init__.bat` script call
 * fixed: Scripts/Tools/std/is_admin_elevated.bat, Scripts/Tools, Utilities/bin: workaround for the cmd pipe operator and `find.exe` utility (hangs) under Windows 7

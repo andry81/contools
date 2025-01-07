@@ -1,7 +1,7 @@
 @echo off
 
 rem USAGE:
-rem   call.bat [-exe] [--] <cmdline>...
+rem   call.bat [-exe] [-lockfile <lock-file> [-trylock] [-lock-sleep-cmdline <lock-sleep-cmdline>]] [--] <cmdline>...
 
 rem Description:
 rem   Script calls `<cmdline>` as is.
@@ -14,6 +14,28 @@ rem -exe
 rem   Use exe command line encoder instead of the batch as by default.
 rem   An executable command line does not use `,;=` characters as command line
 rem   arguments separator.
+
+rem -lockfile <lock-file>
+rem   Calls a command line under the lock (a file redirection trick).
+rem   If the lock was holden before the call, then the call waits the unlock
+rem   if `-trylock` flag is not defined. Otherwise just ignores and the script
+rem   returns a negative error code (-1024).
+rem   The lock file directory must exist before the call.
+rem   The lock file will be removed on script exit.
+
+rem -lockfile <lock-file>
+rem   Lock file path to lock the call.
+
+rem -trylock
+rem   Try to lock and if not, then exit immediately (-1024) instead of waiting
+rem   the lock.
+rem   Has no effect if `-lockfile` is not defined.
+
+rem -lock-sleep-cmdline <lock-sleep-cmdline>
+rem   The command line for the `sleep.bat` script to call on before attempt to
+rem   acquire another lock.
+rem   Has no effect if `-lockfile` is not defined.
+rem   If not defined, then `50` (ms) is used by default.
 
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
@@ -42,6 +64,7 @@ rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
 rem   7. >call.bat echo.^>cmd param0 param1
 rem      >cmd param0 param1
+rem   8. >call.bat -lockfile "%TEMP%\lock0.myscript" 0 echo.Exclusive print
 
 rem Examples (in script):
 rem   1. set "$5E$3E=^>"
@@ -57,6 +80,8 @@ rem   * Can call builtin commands.
 rem   * Does restore previous ERRORLEVEL variable before call a command.
 rem   * Can avoid spaces and tabulation characters trim in the shifted command
 rem     line.
+rem   * Can lock the call using a redirection into a file while at the command
+rem     line call.
 rem
 rem Cons:
 rem
@@ -110,6 +135,9 @@ set "?~dp0=%~dp0"
 rem script flags
 set FLAG_SHIFT=0
 set FLAG_EXE=0
+set "FLAG_LOCK_FILE="
+set "FLAG_LOCK_SLEEP_CMDLINE= 50"
+set FLAG_TRYLOCK=0
 
 rem flags always at first
 set "FLAG=%~1"
@@ -124,12 +152,71 @@ if defined FLAG if "%FLAG%" == "-exe" (
   set /A FLAG_SHIFT+=1
 )
 
+if defined FLAG if "%FLAG%" == "-lockfile" (
+  set "FLAG_LOCK_FILE=%~2"
+  shift
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=2
+)
+
+if defined FLAG if "%FLAG%" == "-lock-sleep-cmdline" (
+  set "FLAG_LOCK_SLEEP_CMDLINE= %~2"
+  shift
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=2
+)
+
+if defined FLAG if "%FLAG%" == "-trylock" (
+  set FLAG_TRYLOCK=1
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=1
+)
+
 if defined FLAG if "%FLAG%" == "--" (
   shift
   set /A FLAG_SHIFT+=1
 )
 
 set "CMDLINE="
+
+if not defined FLAG_LOCK_FILE goto SKIP_CALL_LOCK
+
+for /F "tokens=* delims="eol^= %%i in ("%FLAG_LOCK_FILE%\.") do set "FLAG_LOCK_FILE_DIR=%%~dpi"
+
+if not exist "%FLAG_LOCK_FILE_DIR%*" (
+  echo.%~nx0: error: lock file directory does not exist: "%FLAG_LOCK_FILE_DIR%"
+  exit /b -1024
+) >&2
+
+rem lock loop
+:CALL_LOCK_LOOP
+
+rem lock via redirection to file
+set LOCK_ACQUIRE=0
+( ( set "LOCK_ACQUIRE=1" & call :LOCKED_CALL ) 9> "%FLAG_LOCK_FILE%" ) 2>nul
+
+set LAST_ERROR=%ERRORLEVEL%
+
+if %LOCK_ACQUIRE% EQU 0 (
+  if %FLAG_TRYLOCK% NEQ 0 (
+    del /F /Q /A:-D "%FLAG_LOCK_FILE%" >nul 2>nul
+    exit /b -1024
+  )
+
+  call "%%?~dp0%%sleep.bat"%%FLAG_LOCK_SLEEP_CMDLINE%%
+
+  goto CALL_LOCK_LOOP
+)
+
+del /F /Q /A:-D "%FLAG_LOCK_FILE%" >nul 2>nul
+
+exit /b %LAST_ERROR%
+
+:SKIP_CALL_LOCK
+:LOCKED_CALL
 
 rem encode specific command line characters
 if %FLAG_EXE% EQU 0 (
@@ -147,8 +234,7 @@ for /F "tokens=* delims="eol^= %%i in ("!__STRING__:	=$09!") do endlocal & set "
 
 set INDEX=0
 
-setlocal ENABLEDELAYEDEXPANSION
-for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do (
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do (
   setlocal ENABLEDELAYEDEXPANSION & if !INDEX! GEQ !FLAG_SHIFT! (
     if defined CMDLINE (
       for /F "tokens=* delims="eol^= %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
