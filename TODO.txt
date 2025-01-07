@@ -1,8 +1,3 @@
-* Tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat:
-
-  Add flag `-allow-auto-recover` to automatically detect and recover broken
-  shortcuts.
-
 * Utilities/src/callf:
 
   See details in `Utilities/bin/contools/TODO.txt`.

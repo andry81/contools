@@ -1,4 +1,8 @@
 2025.01.07:
+* changed: Scripts/Tools/ToolAdaptors/app/curl: moved to `contools--curl` project
+* changed: TODO.txt: todo cleanup
+
+2025.01.07:
 * new: Scripts/Tools/std: call.bat, callshift.bat: `-lockfile`, `-trylock`, `-lock-sleep-cmdline` options to use call with lock
 * new: Scripts/Tests/manual/batscripts/test_std__*_call*_with_*lock.bat: manual tests with wait lock and try lock
 * changed: Scripts/Tools/exec_once_or_exit.bat: removed because implemented in `call.bat` and `callshift.bat` scripts
