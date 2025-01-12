@@ -1,3 +1,6 @@
+2025.01.12:
+* changed: Scripts/Tools/std/get_windows_version.bat: improved parse, removed temporary file usage
+
 2025.01.09:
 * fixed: README.md: `codacy` badge link
 
