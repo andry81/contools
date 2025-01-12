@@ -14,7 +14,9 @@ rem   bypass that limitation we falls back to use `robocopy.exe` instead
 rem   (Windows Vista and higher ONLY) if the `move` fails.
 rem
 rem   In case of default command line the `robocopy.exe` will move files with
-rem   all attributes, but not timestamps (`/COPY:DAT /DCOPY:DAT /MOVE`).
+rem   all attributes, but not timestamps:
+rem     Windows Vista+: `/COPY:DAT /DCOPY:T /MOVE` (`/DCOPY` is limited)
+rem     Windows 8+:     `/COPY:DAT /DCOPY:DAT /MOVE`
 rem
 rem   This happens because `robocopy.exe` can not move not empty directories
 rem   without a directory modification timestamp change when it does shallow
@@ -356,10 +358,13 @@ if %XMOVE_FLAG_PARSED% EQU 0 set "XMOVE_FLAGS=%XMOVE_FLAGS% %XMOVE_FLAG%"
 exit /b 0
 
 :USE_ROBOCOPY
+call :GET_WINDOWS_VERSION
+
 set "ROBOCOPY_FLAGS= "
 set "ROBOCOPY_ATTR_COPY=0"
 set "ROBOCOPY_COPY_FLAGS=DAT"
-set "ROBOCOPY_DCOPY_FLAGS=DAT"
+set "ROBOCOPY_DCOPY_FLAGS=T"
+if %WINDOWS_MAJOR_VER% GTR 6 ( set "ROBOCOPY_DCOPY_FLAGS=DAT" ) else if %WINDOWS_MAJOR_VER% EQU 6 if %WINDOWS_MINOR_VER% GEQ 2 set "ROBOCOPY_DCOPY_FLAGS=DAT"
 set "XMOVE_Y_FLAG_PARSED=0"
 for %%i in (%XMOVE_FLAGS_%) do (
   set XMOVE_FLAG=%%i
@@ -450,6 +455,16 @@ echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" 
 "%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /NJH /NS /NC /E /MOVE /XX%ROBOCOPY_FLAGS:~1% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
+
+:GET_WINDOWS_VERSION
+rem `get_windows_version.bat` inline
+set "WINDOWS_VER_STR="
+for /F "usebackq tokens=1,* delims=[" %%i in (`@ver 2^>nul`) do for /F "tokens=1,* delims=]" %%k in ("%%j") do set "WINDOWS_VER_STR=%%k"
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!WINDOWS_VER_STR:* =!"') do endlocal & set "WINDOWS_VER_STR=%%~i"
+set WINDOWS_MAJOR_VER=0
+set WINDOWS_MINOR_VER=0
+for /F "tokens=1,2,* delims=."eol^= %%i in ("%WINDOWS_VER_STR%") do set "WINDOWS_MAJOR_VER=%%i" & set "WINDOWS_MINOR_VER=%%j"
+exit /b 0
 
 :XMOVE_FLAGS_CONVERT
 set "XMOVE_FLAG=%~1"

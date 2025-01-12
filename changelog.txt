@@ -1,4 +1,7 @@
 2025.01.12:
+* fixed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: `/DCOPY:DAT` only available in `robocopy` from Windows 8+
+
+2025.01.12:
 * changed: Scripts/Tools/std/get_windows_version.bat: improved parse, removed temporary file usage
 
 2025.01.09:

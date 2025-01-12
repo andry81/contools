@@ -404,11 +404,14 @@ if %XCOPY_FLAG_PARSED% EQU 0 set "XCOPY_FLAGS=%XCOPY_FLAGS% %XCOPY_FLAG%"
 exit /b 0
 
 :USE_ROBOCOPY
+call :GET_WINDOWS_VERSION
+
 set XCOPY_DIR_RECUR=0
 set "ROBOCOPY_FLAGS= "
 set "ROBOCOPY_ATTR_COPY=0"
 set "ROBOCOPY_COPY_FLAGS=DAT"
-set "ROBOCOPY_DCOPY_FLAGS=DAT"
+set "ROBOCOPY_DCOPY_FLAGS=T"
+if %WINDOWS_MAJOR_VER% GTR 6 ( set "ROBOCOPY_DCOPY_FLAGS=DAT" ) else if %WINDOWS_MAJOR_VER% EQU 6 if %WINDOWS_MINOR_VER% GEQ 2 set "ROBOCOPY_DCOPY_FLAGS=DAT"
 set "XCOPY_Y_FLAG_PARSED=0"
 for %%i in (%XCOPY_FLAGS_%) do (
   set XCOPY_FLAG=%%i
@@ -500,6 +503,16 @@ echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_AB
 "%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /XX%ROBOCOPY_FLAGS:~1% %ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
+
+:GET_WINDOWS_VERSION
+rem `get_windows_version.bat` inline
+set "WINDOWS_VER_STR="
+for /F "usebackq tokens=1,* delims=[" %%i in (`@ver 2^>nul`) do for /F "tokens=1,* delims=]" %%k in ("%%j") do set "WINDOWS_VER_STR=%%k"
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!WINDOWS_VER_STR:* =!"') do endlocal & set "WINDOWS_VER_STR=%%~i"
+set WINDOWS_MAJOR_VER=0
+set WINDOWS_MINOR_VER=0
+for /F "tokens=1,2,* delims=."eol^= %%i in ("%WINDOWS_VER_STR%") do set "WINDOWS_MAJOR_VER=%%i" & set "WINDOWS_MINOR_VER=%%j"
+exit /b 0
 
 :XCOPY_FLAGS_CONVERT
 set "XCOPY_FLAG=%~1"
