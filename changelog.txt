@@ -1,3 +1,6 @@
+2025.01.13:
+* new: Scripts/Tools/std/canonical_path_if_def.bat: complementary of `canonical_path_if_ndef.bat`
+
 2025.01.12:
 * fixed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: `/DCOPY:DAT` only available in `robocopy` from Windows 8+
 
