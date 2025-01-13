@@ -1,4 +1,7 @@
 2025.01.13:
+* fixed: Scripts/Tools/std/canonical_path_if_def.bat: check variable's value after existence of a variable
+
+2025.01.13:
 * new: Scripts/Tools/std/canonical_path_if_def.bat: complementary of `canonical_path_if_ndef.bat`
 
 2025.01.12:
