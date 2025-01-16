@@ -1,3 +1,7 @@
+2025.01.17:
+* new: Deploy/notepad++/plugins/MultiReplace/tests/manual/replace_builtins.txt.*: manual tests
+* changed: Deploy/notepad++/plugins/MultiReplace/Lists/contools/replace_builtins.csv: improved regexp
+
 2025.01.16:
 * changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: minor cleanup
 
