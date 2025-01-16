@@ -1,3 +1,6 @@
+2025.01.16:
+* changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: minor cleanup
+
 2025.01.13:
 * fixed: Scripts/Tools/std/canonical_path_if_def.bat: check variable's value after existence of a variable
 
