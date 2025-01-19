@@ -384,3 +384,53 @@ These flags already partially added into `help.tpl`, but still is not implemente
 
 * Consume spaces before `{*}`, `{@}` placeholders in case of empty value
   expansion.
+
+* Add multiple apply
+  `/filter-stdout-expr <filter-expr>`,
+  `/filter-stderr-expr <filter-expr>`,
+  `/filter-output-expr <filter-expr>` options
+
+  , where `<filter-expr>` a sed-like regexp expression to filter text in each
+    line.
+
+    Examples:
+
+      1. To mask a line substring:
+        `/filter-output-expr "/ghp_[0-9a-zA-Z]{16,}/ghp_*/"`
+
+      2. To delete the entire line if substring is matched:
+        `/filter-output-expr "/(?:^|["\\/])runas(?:\.exe)?["]?\s/d"`
+
+* Add multiple apply
+  `/filter-stdout <filter-config>`,
+  `/filter-stderr <filter-config>`,
+  `/filter-output <filter-config>`
+
+  , where `<filter-config>` a yaml file with a sed-like regexp expressions to
+    filter text in each line in format:
+
+    ```yaml
+    callf:
+      cmdline:
+        /filter-stdout-expr:
+          - <filter-expr>
+          - <filter-expr>
+          ...
+        /filter-stderr-expr:
+          - <filter-expr>
+          - <filter-expr>
+          ...
+        /filter-output-expr:
+          - <filter-expr>
+          - <filter-expr>
+          ...
+    ```
+
+  The `<filter-config>` may contain other fields. Only the
+  `callf/cmdline//filter-*` keys does read.
+
+  The `<filter-expr>` expressions in the filter config file applies in order of
+  appearance.
+
+  Each `<filter-expr>` applies only to the input line and each line can apply
+  only one `<filter-expr>`.

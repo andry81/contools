@@ -1,3 +1,7 @@
 * Utilities/src/callf:
 
   See details in `Utilities/bin/contools/TODO.txt`.
+
+* Utilities:
+
+  Extract directory into standalone repository.
