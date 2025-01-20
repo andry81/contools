@@ -1,8 +1,18 @@
 ''' Call an executable through the `Shell.Application.ShellExecute` function.
 
 ''' USAGE:
-'''   winshell_call.vbs [-D <CurrentDirectoryPath>] [-verb <ShellVerb>] [-showas <ShowWindowAsNumber>] [-u[<N>]] [-q[a]] [-nowait] [-nowindow]
-''''                    [-make_temp_dir_as_cwd <CwdPlaceholder>] [-wait_delete_cwd] [--wait_on_file_exist] [-E[a | <N>]] [-re[a | <N>] <from> <to>] [-r[a | <N>] <from> <to>] [-v <name> <value>] [--] <CommandLine>
+'''   winshell_call.vbs
+'''     [-D <CurrentDirectoryPath>]
+'''     [-verb <ShellVerb>]
+'''     [-showas <ShowWindowAsNumber>]
+'''     [-u[<N>]] [-q[a]]
+'''     [-nowait] [-nowindow]
+'''     [-make_temp_dir_as_cwd <CwdPlaceholder>] [-wait_delete_cwd] [--wait_on_file_exist]
+'''     [-E[a | <N>]]
+'''     [-re[a | <N>] <from> <to>] [-r[a | <N>] <from> <to>]
+'''     [-v <name> <value>]
+'''     [--]
+'''       <CommandLine>
 '''
 ''' DESCRIPTION:
 '''   --
@@ -153,8 +163,8 @@
 '''
 ''' CAUTION:
 '''   This implementation has issues which can not be fixed at all (by design).
-'''   There is a better implementation through standalone executable:
-'''     `Utilities/src/callf`
+'''   There is a better implementation through a standalone executable, see
+'''   the `contools--utils` project.
 '''
 ''' CAUTION:
 '''   The list of issues around `winshell_call.vbs` implementation:

@@ -1,4 +1,7 @@
 2025.01.20:
+* refactor: Scripts/Tools/Scripts/Tools/ToolAdaptors/vbs: minor refactor
+
+2025.01.20:
 * changed: Utilities/bin/contools/TODO.txt: todo update
 * changed: TODO.txt: todo update
 

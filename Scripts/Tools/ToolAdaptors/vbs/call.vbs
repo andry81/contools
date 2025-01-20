@@ -1,7 +1,17 @@
 ''' Call an executable through the `WScript.Shell.Run` function.
 
 ''' USAGE:
-'''   call.vbs [-D <CurrentDirectoryPath>] [-showas <ShowWindowAsNumber>] [-s] [-u[<N>]] [-q[a]] [-nowait] [-nowindow] [-E[a | <N>]] [-re[a | <N>] <from> <to>] [-r[a | <N>] <from> <to>] [-v <name> <value>] [--] <CommandLine>
+'''   call.vbs
+'''     [-D <CurrentDirectoryPath>]
+'''     [-showas <ShowWindowAsNumber>]
+'''     [-s]
+'''     [-u[<N>]] [-q[a]]
+'''     [-nowait] [-nowindow]
+'''     [-E[a | <N>]]
+'''     [-re[a | <N>] <from> <to>] [-r[a | <N>] <from> <to>]
+'''     [-v <name> <value>]
+'''     [--]
+'''       <CommandLine>
 '''
 ''' DESCRIPTION:
 '''   --
@@ -123,8 +133,8 @@
 '''
 ''' CAUTION:
 '''   This implementation has issues which can not be fixed at all (by design).
-'''   There is a better implementation through standalone executable:
-'''     `Utilities/src/callf`
+'''   There is a better implementation through a standalone executable, see
+'''   the `contools--utils` project.
 '''
 ''' CAUTION:
 '''   The list of issues around `call.vbs` implementation:
