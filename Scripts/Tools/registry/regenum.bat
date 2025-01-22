@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script outputs subkeys of registry key by read and parse output of
 rem   reg.exe utility. Utility findstr.exe searches target string by regular

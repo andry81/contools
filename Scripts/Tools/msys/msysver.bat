@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script reads version of msys dll and sets variable MSYS_VER_STR
 rem     to read value.

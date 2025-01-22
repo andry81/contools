@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script reads and parses standard output of "reg.exe query" to variable
 rem   REGQUERY_VALUE. Script setvarfromstd.bat ignores empty strings until not

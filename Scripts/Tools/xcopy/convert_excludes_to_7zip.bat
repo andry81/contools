@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script converts unform file/directory excludes list in format of
 rem     `exclude1|..|excludeN` ,where

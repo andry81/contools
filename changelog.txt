@@ -1,3 +1,6 @@
+2025.01.22:
+* refactor: *.bat: author line remove
+
 2025.01.21:
 * fixed: Scripts/Tools/std: call.bat, callshift.bat: rare case where echo is turned off by `cmd.exe /Q ...` and `__STRING__` does exist before the call
 

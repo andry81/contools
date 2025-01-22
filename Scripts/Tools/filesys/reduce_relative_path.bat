@@ -1,7 +1,5 @@
 @echo off
 
-rem Author: Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script converts relative path with . and .. occurrences to the absolute
 rem   path and tries subtract current directory path from it.

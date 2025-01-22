@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Directory file hashes difference generation script.
 rem   Generates directories file hash difference list.

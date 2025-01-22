@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Filters xpath through another xpath.
 rem   Xpath list must be in predefined format, where the "# File: " sequence

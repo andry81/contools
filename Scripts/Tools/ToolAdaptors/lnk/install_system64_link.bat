@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Installation script to create `System64` directory through the
 rem   `mklink_system64.bat` or `juntion.exe` utility.

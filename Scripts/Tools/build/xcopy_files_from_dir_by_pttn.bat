@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script xcopy files from a directory preserving relative paths to each file.
 rem   Script automatically does self logging.

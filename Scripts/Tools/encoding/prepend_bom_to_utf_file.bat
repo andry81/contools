@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script prepends UTF BOM sequence to a text file if file does not
 rem   have it yet and output the result into another text file.

@@ -1,7 +1,5 @@
 @echo off
 
-rem Author: Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script for rebuilding the python cache files (*.pyc) for the portable
 rem   version.

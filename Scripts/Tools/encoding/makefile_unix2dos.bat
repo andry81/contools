@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script converts all files in directory with script by wildcards
 rem   "*.*sh.;configure.*.;makefile.*." from the Unix text format to the Dos

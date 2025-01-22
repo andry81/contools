@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script reads version of cygwin package and sets variable CYGWIN_VER_STR
 rem     to read value.

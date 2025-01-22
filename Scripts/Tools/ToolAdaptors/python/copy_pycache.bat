@@ -1,7 +1,5 @@
 @echo off
 
-rem Author: Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script for __pycache__ (.pyc) files copy from source directory into
 rem   target one with preserve of original directory structure with or without

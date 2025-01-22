@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script adds files/directories into 7zip archive. Archive would have relative path prefix
 rem   from %2 variable.

@@ -1,7 +1,5 @@
 @echo off
 
-rem Author:   Andrey Dibrov (andry at inbox dot ru)
-
 rem Description:
 rem   Script to extract an archive or all archives from a directory recursively using 7zip.
 rem   Script automatically does self logging.
