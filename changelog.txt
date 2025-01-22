@@ -1,4 +1,9 @@
 2025.01.22:
+* new: Scripts/Tools/ToolAdaptors/hta/cmd_admin.bat: script runs `cmd.exe` under UAC promotion using `mshta.exe` executable
+* new: Scripts/Tools/ToolAdaptors/hta/Samples/mshta_cmd_elevate.bat: batch script example for the uniform variant of a command line as a single argument for the `mshta.exe` executable and other cases
+* changed: Scripts/Tools/ToolAdaptors/hta/Samples/cmd_admin.bat: removed as does not support nested quotes
+
+2025.01.22:
 * refactor: *.bat: author line remove
 
 2025.01.21:
