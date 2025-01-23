@@ -1,4 +1,7 @@
 2025.01.23:
+* changed: Scripts/Tools/ToolAdaptors/hta: cmd_admin.bat, Samples/mshta_cmd_elevate.bat: improved arguments translation for the case where `\"` sequence already does exist as a part of a batch script command line
+
+2025.01.23:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: shortcut with an object target must be created with the `-obj` flag now
 * fixed: Scripts/Tools/ToolAdaptors/vbs/*.vbs: check on empty command line arguments
 * new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-obj` flag to handle shortcut `TargetPath` property value as an object string
