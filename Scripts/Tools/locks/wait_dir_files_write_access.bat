@@ -30,7 +30,7 @@ rem Cons:
 rem   * Does not support empty directory. At least one file must exist.
 rem   * Does not support long paths (but detects them to exit correctly).
 rem   * Does not support files and directories in nested directories
-rem     including subdirectories in a directory.
+rem     including subdirectories in `<dir-path>` directory.
 
 setlocal
 

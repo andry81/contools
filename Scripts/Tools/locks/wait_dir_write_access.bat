@@ -24,7 +24,7 @@ rem   * Can sleep on a specified timeout in milliseconds between checks.
 
 rem Cons:
 rem   * Does not support directories in nested directories including
-rem     subdirectories in a directory.
+rem     subdirectories in `<dir-path>` directory.
 
 setlocal
 

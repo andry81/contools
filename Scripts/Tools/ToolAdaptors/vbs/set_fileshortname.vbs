@@ -16,6 +16,47 @@
 ''
 'Dim objWMIService  : Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate, (Restore,Backup)}")
 
+Function IsEmptyArg(args, index)
+  ''' Based on: https://stackoverflow.com/questions/4466967/how-can-i-determine-if-a-dynamic-array-has-not-be-dimensioned-in-vbscript/4469121#4469121
+  On Error Resume Next
+  Dim args_ubound : args_ubound = UBound(args)
+  If Err = 0 Then
+    If args_ubound >= index Then
+      ' CAUTION:
+      '   Must be a standalone condition.
+      '   Must be negative condition in case of an invalid `index`
+      If Not (Len(args(index)) > 0) Then
+        IsEmptyArg = True
+      Else
+        IsEmptyArg = False
+      End If
+    Else
+      IsEmptyArg = True
+    End If
+  Else
+    ' Workaround for `WScript.Arguments`
+    Err.Clear
+    Dim num_args : num_args = args.count
+    If Err = 0 Then
+      If index < num_args Then
+        ' CAUTION:
+        '   Must be a standalone condition.
+        '   Must be negative condition in case of an invalid `index`
+        If Not (Len(args(index)) > 0) Then
+          IsEmptyArg = True
+        Else
+          IsEmptyArg = False
+        End If
+      Else
+        IsEmptyArg = True
+      End If
+    Else
+      IsEmptyArg = True
+    End If
+  End If
+  On Error Goto 0
+End Function
+
 Function FixStrToPrint(str)
   Dim new_str : new_str = ""
   Dim i, Char, CharAsc
@@ -58,20 +99,19 @@ Sub PrintOrEchoErrorLine(str)
   On Error Goto 0
 End Sub
 
-On Error Resume Next
-Dim Path : Path = WScript.Arguments(0)
-Dim ShortFileName : ShortFileName = WScript.Arguments(1)
-On Error Goto 0
-
-If Not (Len(Path) > 0) Then
+If IsEmptyArg(WScript.Arguments, 0) Then
   PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: path is empty."
+    WScript.ScriptName & ": error: <path> is empty."
   WScript.Quit 255
 End If
 
+Dim Path : Path = WScript.Arguments(0)
+
+Dim ShortFileName : If Not IsEmptyArg(WScript.Arguments, 1) Then ShortFileName = WScript.Arguments(1)
+
 If Not (Len(ShortFileName) > 0) Or Len(ShortFileName) > 8 Then
   PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: short file name is empty or longer than 8 characters:" & vbCrLf & _
+    WScript.ScriptName & ": error: <short-file-name> is empty or longer than 8 characters:" & vbCrLf & _
     WScript.ScriptName & ": info: ShortFileName=`" & ShortFileName & "`"
   WScript.Quit 255
 End If
@@ -115,7 +155,7 @@ objJcbTools.SetPrivileges
 ' To check wsh host process privileges
 'MsgBox "Wait..."
 
-' requires `Utilities/bin/wshbazaar/wshdynacall/wshdynacall32.dll` as already registered
+' requires `wshbazaar/wshdynacall/wshdynacall32.dll` as already registered (`contools--utils` project)
 On Error Resume Next
 Dim dynacall : Set dynacall = CreateObject("DynamicWrapper")
 If err <> 0 Then

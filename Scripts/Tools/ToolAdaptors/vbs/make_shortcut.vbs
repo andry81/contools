@@ -8,6 +8,7 @@
 ''' USAGE:
 '''   make_shortcut.vbs
 '''     [-CD <CurrentDirectoryPath>]
+'''     [-obj] [-ignore-unexist]
 '''     [-showas <ShowWindowAsNumber>]
 '''     [-allow-dos-current-dir] [-allow-dos-target-path] [-allow-dos-wd] [-allow-dos-paths]
 '''     [-p[rint-assign]] [-print-assigned | -pd]
@@ -26,6 +27,15 @@
 '''   -CD <CurrentDirectoryPath>
 '''     Changes current directory to <CurrentDirectoryPath> before the
 '''     execution.
+'''
+'''   -obj
+'''     By default <ShortcutTarget> does used as a file path. Use this flag to
+'''     handle it as an object string and avoid path functions call on it.
+'''
+'''   -ignore-unexist
+'''     By default <ShortcutTarget> does check on existence before shortcut
+'''     creation. Use this flag to skip the check.
+'''     Has no effect if `-obj` flag is defined.
 '''
 '''   -showas <ShowWindowAsNumber>
 ''''     Handles a child process window show state.
@@ -76,27 +86,29 @@
 '''      See detailed documentation in MSDN for the function `ShowWindow`.
 '''
 '''   -allow-dos-current-dir
-'''     Allow long path conversion into DOS path for the current directory.
-'''     Has effect only if path does exist.
+'''     Allows long path conversion into a reduced DOS path version for the
+'''     current directory.
+'''     Has no effect if path does not exist.
 '''   -allow-dos-target-path
-'''     Reread target path after assign and if it does not exist, then reassign
-'''     it by a reduced DOS path version.
+'''     Rereads target path after assign and if it does not exist, then
+'''     reassigns it by a reduced DOS path version.
 '''     It is useful when you want to create not truncated shortcut target file
 '''     path to open it by an old version application which does not support
 '''     long paths or Win32 Namespace paths, but supports open target paths by
 '''     a shortcut file.
-'''     Has effect only if path does exist.
+'''     Has no effect if `-obj` flag is defined.
+'''     Has no effect if path does not exist.
 '''   -allow-dos-wd
-'''     Reread working directory after assign and if it does not exist, then
-'''     reassign it by a reduced DOS path version.
-'''     Has effect only if path does exist.
+'''     Rereads working directory after assign and if it does not exist, then
+'''     reassigns it by a reduced DOS path version.
+'''     Has no effect if path does not exist.
 '''   -allow-dos-paths
 '''     Implies all `-allow-dos-*` flags.
 '''
 '''   -p[rint-assign]
 '''     Print property assign before assign.
 '''   -print-assigned | -pd
-'''     Reread property after assign and print.
+'''     Rereads property after assign and prints it.
 '''
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
@@ -116,8 +128,9 @@
 '''     argument.
 '''
 '''   -use-getlink | -g
-'''     Use `GetLink` property additionally to `CreateShortcut` method.
-'''     Alternative interface to assign path properties with Unicode characters.
+'''     Use `GetLink` property instead of `CreateShortcut` method.
+'''     Alternative interface to assign path properties with Unicode
+'''     characters.
 '''   -print-remapped-names | -k
 '''     Print remapped key names instead of `CreateShortcut` method object
 '''     names.
@@ -159,16 +172,16 @@
 ''' Example to create MyComputer shortcut:
 '''   >
 '''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat mycomputer.lnk
+'''   make_shortcut.bat -obj mycomputer.lnk
 ''' Or
 '''   >
 '''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
+'''   make_shortcut.bat -obj mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
 
 ''' Example to create MTP device folder shortcut:
 '''   >
 '''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
+'''   make_shortcut.bat -obj mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
 '''
 '''   , where the `\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}` might be different for each device
 '''
@@ -176,7 +189,7 @@
 
 ''' Example to create the Master Control Panel link or directory on the Desktop
 '''   >
-'''   make_shortcut.bat "%USERPROFILE%\Desktop\GodMode.lnk" "shell:::{ED7BA470-8E54-465E-825C-99712043E01C}"
+'''   make_shortcut.bat -obj "%USERPROFILE%\Desktop\GodMode.lnk" "shell:::{ED7BA470-8E54-465E-825C-99712043E01C}"
 ''' Or
 '''   >
 '''   mkdir "%USERPROFILE%\Desktop\GodMode.{ED7BA470-8E54-465E-825C-99712043E01C}"
@@ -231,6 +244,62 @@ Function IsNothing(obj)
   End If
 End Function
 
+Function NumArgs(args)
+  ''' Based on: https://stackoverflow.com/questions/4466967/how-can-i-determine-if-a-dynamic-array-has-not-be-dimensioned-in-vbscript/4469121#4469121
+  On Error Resume Next
+  Dim args_ubound : args_ubound = UBound(args)
+  If Err = 0 Then
+    NumArgs = args_ubound + 1
+  Else
+    ' Workaround for `WScript.Arguments`
+    Err.Clear
+    NumArgs = args.count
+    If Err <> 0 Then NumArgs = 0
+  End If
+  On Error Goto 0
+End Function
+
+Function IsEmptyArg(args, index)
+  ''' Based on: https://stackoverflow.com/questions/4466967/how-can-i-determine-if-a-dynamic-array-has-not-be-dimensioned-in-vbscript/4469121#4469121
+  On Error Resume Next
+  Dim args_ubound : args_ubound = UBound(args)
+  If Err = 0 Then
+    If args_ubound >= index Then
+      ' CAUTION:
+      '   Must be a standalone condition.
+      '   Must be negative condition in case of an invalid `index`
+      If Not (Len(args(index)) > 0) Then
+        IsEmptyArg = True
+      Else
+        IsEmptyArg = False
+      End If
+    Else
+      IsEmptyArg = True
+    End If
+  Else
+    ' Workaround for `WScript.Arguments`
+    Err.Clear
+    Dim num_args : num_args = args.count
+    If Err = 0 Then
+      If index < num_args Then
+        ' CAUTION:
+        '   Must be a standalone condition.
+        '   Must be negative condition in case of an invalid `index`
+        If Not (Len(args(index)) > 0) Then
+          IsEmptyArg = True
+        Else
+          IsEmptyArg = False
+        End If
+      Else
+        IsEmptyArg = True
+      End If
+    Else
+      IsEmptyArg = True
+    End If
+  End If
+  On Error Goto 0
+End Function
+
 Function FixStrToPrint(str)
   Dim new_str : new_str = ""
   Dim i, Char, CharAsc
@@ -280,13 +349,16 @@ Dim ExpectFlags : ExpectFlags = True
 Dim PrintAssign : PrintAssign = False
 Dim PrintAssigned : PrintAssigned = False
 
+Dim IgnoreUnexist : IgnoreUnexist = False
+
 Dim UnescapeAllArgs : UnescapeAllArgs = False
 
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ChangeCurrentDirectoryExist : ChangeCurrentDirectoryExist = False
 
 Dim ShortcutTarget : ShortcutTarget = ""
-Dim ShortcutTargetUnquoted : ShortcutTargetUnquoted = ""
+Dim ShortcutTargetObj : ShortcutTargetObj = False
+Dim ShortcutTargetUnquoted : ShortcutTargetUnquoted = "" ' CAUTION: does not used in case of `-obj` flag
 
 Dim ShortcutTargetArgs : ShortcutTargetArgs = ""
 Dim ShortcutTargetArgsExist : ShortcutTargetArgsExist = False
@@ -328,6 +400,10 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ChangeCurrentDirectory = WScript.Arguments(i)
         ChangeCurrentDirectoryExist = True
+      ElseIf arg = "-obj" Then
+       ShortcutTargetObj = True
+      ElseIf arg = "-ignore-unexist" Then
+       IgnoreUnexist = True
       ElseIf arg = "-print-assign" Or arg = "-p" Then ' Print assign
         PrintAssign = True
       ElseIf arg = "-print-assigned" Or arg = "-pd" Then ' Print assigned
@@ -402,14 +478,14 @@ ReDim Preserve cmd_args(j - 1)
 
 ' MsgBox Join(cmd_args, " ")
 
-Dim cmd_args_ubound : cmd_args_ubound = UBound(cmd_args)
+Dim num_args : num_args = NumArgs(cmd_args)
 
-If cmd_args_ubound < 0 Then
+If IsEmptyArg(cmd_args, 0) Then
   PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
   WScript.Quit 255
 End If
 
-If cmd_args_ubound < 1 Then
+If IsEmptyArg(cmd_args, 1) Then
   PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutTarget> argument is not defined."
   WScript.Quit 255
 End If
@@ -441,7 +517,14 @@ Function GetShortcut(ShortcutFilePathToOpen)
     WScript.Quit 128
   End If
 
-  Set GetShortcut = objFile.GetLink
+  If objFile.IsLink Then
+    Set GetShortcut = objFile.GetLink
+  Else
+    PrintOrEchoErrorLine _
+      WScript.ScriptName & ": error: file is not a shortcut." & vbCrLf & _
+      WScript.ScriptName & ": info: Path=`" & ShortcutFilePathToOpen & "`"
+    WScript.Quit 129
+  End If
 End Function
 
 Function MakeShortcut(ShortcutFilePathToOpen)
@@ -651,7 +734,7 @@ End If
 
 ShortcutTarget = cmd_args(1)
 
-If cmd_args_ubound >= 2 Then
+If num_args > 2 Then
   ShortcutTargetArgs = cmd_args(2)
   ShortcutTargetArgsExist = True
 End If
@@ -668,39 +751,47 @@ If UnescapeAllArgs Then
   ShortcutTarget = Unescape(ShortcutTarget)
 End If
 
-If Len(ShortcutTarget) > 1 And Left(ShortcutTarget, 1) = Chr(34) And Right(ShortcutTarget, 1) = Chr(34) Then
-  ShortcutTargetUnquoted = Mid(ShortcutTarget, 2, Len(ShortcutTarget) - 2)
+Dim ShortcutTargetUnquotedAbs ' CAUTION: used as an object string (not unquoted nor absolute) in case of `-obj` flag
+
+If Not ShortcutTargetObj Then
+  If Len(ShortcutTarget) > 1 And Left(ShortcutTarget, 1) = Chr(34) And Right(ShortcutTarget, 1) = Chr(34) Then
+    ShortcutTargetUnquoted = Mid(ShortcutTarget, 2, Len(ShortcutTarget) - 2)
+  Else
+    ShortcutTargetUnquoted = ShortcutTarget
+  End If
+
+  ShortcutTargetUnquotedAbs = objFS.GetAbsolutePathName(ShortcutTargetUnquoted) ' CAUTION: can alter a path character case if path exists
+
+  ' remove `\\?\` prefix
+  If Left(ShortcutTargetUnquotedAbs, 4) = "\\?\" Then
+    ShortcutTargetUnquotedAbs = Mid(ShortcutTargetUnquotedAbs, 5)
+  End If
+
+  If Not IgnoreUnexist Then
+    Dim IsShortcutTargetPathExist : IsShortcutTargetPathExist = False
+
+    ' test on path existence including long path
+    If objFS.FileExists("\\?\" & ShortcutTargetUnquotedAbs) Then
+      IsShortcutTargetPathExist = True
+    ElseIf objFS.FolderExists("\\?\" & ShortcutTargetUnquotedAbs) Then
+      IsShortcutTargetPathExist = True
+    End If
+
+    If Not IsShortcutTargetPathExist Then
+      PrintOrEchoErrorLine _
+        WScript.ScriptName & ": error: shortcut target path does not exist:" & vbCrLf & _
+        WScript.ScriptName & ": info: ShortcutTarget=`" & ShortcutTargetUnquotedAbs & "`"
+      WScript.Quit 30
+    End If
+  End If
+
+  If Not AlwaysQuote Then
+    ShortcutTarget = ShortcutTargetUnquotedAbs
+  Else
+    ShortcutTarget = Chr(34) & ShortcutTargetUnquotedAbs & Chr(34)
+  End If
 Else
-  ShortcutTargetUnquoted = ShortcutTarget
-End If
-
-Dim ShortcutTargetUnquotedAbs : ShortcutTargetUnquotedAbs = objFS.GetAbsolutePathName(ShortcutTargetUnquoted) ' CAUTION: can alter a path character case if path exists
-
-' remove `\\?\` prefix
-If Left(ShortcutTargetUnquotedAbs, 4) = "\\?\" Then
-  ShortcutTargetUnquotedAbs = Mid(ShortcutTargetUnquotedAbs, 5)
-End If
-
-Dim IsShortcutTargetPathExist : IsShortcutTargetPathExist = False
-
-' test on path existence including long path
-If objFS.FileExists("\\?\" & ShortcutTargetUnquotedAbs) Then
-  IsShortcutTargetPathExist = True
-ElseIf objFS.FolderExists("\\?\" & ShortcutTargetUnquotedAbs) Then
-  IsShortcutTargetPathExist = True
-End If
-
-If Not IsShortcutTargetPathExist Then
-  PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: shortcut target path does not exist:" & vbCrLf & _
-    WScript.ScriptName & ": info: ShortcutTarget=`" & ShortcutTargetUnquotedAbs & "`"
-  WScript.Quit 30
-End If
-
-If Not AlwaysQuote Then
-  ShortcutTarget = ShortcutTargetUnquotedAbs
-Else
-  ShortcutTarget = Chr(34) & ShortcutTargetUnquotedAbs & Chr(34)
+  ShortcutTargetUnquotedAbs = ShortcutTarget ' CAUTION: is not unquoted because is not a file path
 End If
 
 Dim ShortcutFilePathToOpen
@@ -742,7 +833,7 @@ If PrintAssigned Then
   PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(assigned)=" & ShortcutTarget
 End If
 
-If AllowDOSTargetPath Then
+If (Not ShortcutTargetObj) And AllowDOSTargetPath Then
 Do ' empty `Do-Loop` to emulate `Break`
   Dim ShortcutTargetLCase : ShortcutTargetLCase = LCase(ShortcutTarget)
 

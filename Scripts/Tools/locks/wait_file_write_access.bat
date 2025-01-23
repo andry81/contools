@@ -13,8 +13,8 @@ rem   https://stackoverflow.com/questions/1999988/how-to-check-whether-a-file-di
 
 rem Pros:
 rem   * Awaits on a file write access privilege.
-rem   * Await on deny write access privilege change like `Everyone Deny Access`
-rem     removement.
+rem   * Awaits on deny write access privilege change like
+rem     `Everyone Deny Access` removement.
 rem   * Awaits on a parent directory write access privilege in case of
 rem     privileges inheritance.
 rem   * Does not wait a parent directory write access privilege if a file

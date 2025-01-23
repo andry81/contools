@@ -1,3 +1,11 @@
+2025.01.23:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: shortcut with an object target must be created with the `-obj` flag now
+* fixed: Scripts/Tools/ToolAdaptors/vbs/*.vbs: check on empty command line arguments
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-obj` flag to handle shortcut `TargetPath` property value as an object string
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-ignore-unexist` flag to ignore shortcut `TargetPath` property path unexistence before shortcut creation if `-obj` is not used
+* changed: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: check file on a shortcut format in case of `-use-getlink` flag is used
+* refactor: Scripts/Tools: ToolAdaptors/vbs/*_shortcut.vbs, locks/wait_*_access.bat: comments refactor
+
 2025.01.22:
 * new: Scripts/Tools/ToolAdaptors/hta/cmd_admin.bat: script runs `cmd.exe` under UAC promotion using `mshta.exe` executable
 * new: Scripts/Tools/ToolAdaptors/hta/Samples/mshta_cmd_elevate.bat: batch script example for the uniform variant of a command line as a single argument for the `mshta.exe` executable and other cases

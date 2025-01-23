@@ -6,7 +6,8 @@
 '''
 
 ''' USAGE:
-'''   reset_shortcut.vbs [-CD <CurrentDirectoryPath>]
+'''   reset_shortcut.vbs
+'''     [-CD <CurrentDirectoryPath>]
 '''     [-ignore-unexist]
 '''     [-reset-wd[-from-target-path]]
 '''     [-reset-target-path-from-wd]
@@ -24,10 +25,10 @@
 
 ''' DESCRIPTION:
 '''   By default resaves shortcut which does trigger the Windows Shell
-'''   component to validate the path and rewrites the shortcut file even if
-'''   nothing is changed reducing the shortcut content.
+'''   component to validate all properties and rewrite the shortcut file even
+'''   if nothing is changed reducing the shortcut content.
 '''   Does not apply if TargetPath does not exist and `-ignore-unexist`
-'''   option is not used, to avoid a shortcut accident corruption by the
+'''   option is not used to avoid a shortcut accident corruption by the
 '''   Windows Shell component internal guess logic (see `-ignore-unexist`
 '''   option description).
 '''   Has no effect if TargetPath is already changed using `-reset-*` flags or
@@ -108,22 +109,23 @@
 '''     Can not be used together with `-ignore-unexist` flag.
 '''
 '''   -allow-target-path-reassign
-'''     Allow `TargetPath` property reassign if has not been assigned.
+'''     Allows `TargetPath` property reassign if has not been assigned.
 '''     Has no effect if `TargetPath` is already resetted.
 '''
 '''   -allow-dos-current-dir
-'''     Allow long path conversion into DOS path for the current directory.
+'''     Allows long path conversion into a reduced DOS path version for the
+'''     current directory.
 '''     Has no effect if path does not exist.
 '''   -allow-dos-target-path
-'''     Reread target path after assign and if it does not exist, then reassign
-'''     it by a reduced DOS path version.
+'''     Rereads target path after assign and if it does not exist, then
+'''     reassigns it by a reduced DOS path version.
 '''     It is useful when you want to create not truncated shortcut target file
 '''     path to open it by an old version application which does not support
 '''     long paths or Win32 Namespace paths, but supports open target paths by
 '''     a shortcut file.
 '''     Has no effect if path does not exist.
 '''   -allow-dos-wd
-'''     Reread working directory after assign and if it does not exist, then
+'''     Rereads working directory after assign and if it does not exist, then
 '''     reassign it by a reduced DOS path version.
 '''     Has no effect if path does not exist.
 '''   -allow-dos-paths
@@ -141,7 +143,7 @@
 '''   -p[rint-assign]
 '''     Print property assign before assign.
 '''   -print-assigned | -pd
-'''     Reread property after assign and print.
+'''     Rereads property after assign and prints it.
 '''
 '''   -q
 '''     Always quote target path argument if has no quote characters.
@@ -179,16 +181,16 @@
 ''' Example to create MyComputer shortcut:
 '''   >
 '''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat mycomputer.lnk
+'''   make_shortcut.bat -obj mycomputer.lnk
 ''' Or
 '''   >
 '''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
+'''   make_shortcut.bat -obj mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
 
 ''' Example to create MTP device folder shortcut:
 '''   >
 '''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
+'''   make_shortcut.bat -obj mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
 '''
 '''   , where the `\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}` might be different for each device
 '''
@@ -196,7 +198,7 @@
 
 ''' Example to create the Master Control Panel link or directory on the Desktop
 '''   >
-'''   make_shortcut.bat "%USERPROFILE%\Desktop\GodMode.lnk" "shell:::{ED7BA470-8E54-465E-825C-99712043E01C}"
+'''   make_shortcut.bat -obj "%USERPROFILE%\Desktop\GodMode.lnk" "shell:::{ED7BA470-8E54-465E-825C-99712043E01C}"
 ''' Or
 '''   >
 '''   mkdir "%USERPROFILE%\Desktop\GodMode.{ED7BA470-8E54-465E-825C-99712043E01C}"
@@ -249,6 +251,47 @@ Function IsNothing(obj)
   Else
     IsNothing = False
   End If
+End Function
+
+Function IsEmptyArg(args, index)
+  ''' Based on: https://stackoverflow.com/questions/4466967/how-can-i-determine-if-a-dynamic-array-has-not-be-dimensioned-in-vbscript/4469121#4469121
+  On Error Resume Next
+  Dim args_ubound : args_ubound = UBound(args)
+  If Err = 0 Then
+    If args_ubound >= index Then
+      ' CAUTION:
+      '   Must be a standalone condition.
+      '   Must be negative condition in case of an invalid `index`
+      If Not (Len(args(index)) > 0) Then
+        IsEmptyArg = True
+      Else
+        IsEmptyArg = False
+      End If
+    Else
+      IsEmptyArg = True
+    End If
+  Else
+    ' Workaround for `WScript.Arguments`
+    Err.Clear
+    Dim num_args : num_args = args.count
+    If Err = 0 Then
+      If index < num_args Then
+        ' CAUTION:
+        '   Must be a standalone condition.
+        '   Must be negative condition in case of an invalid `index`
+        If Not (Len(args(index)) > 0) Then
+          IsEmptyArg = True
+        Else
+          IsEmptyArg = False
+        End If
+      Else
+        IsEmptyArg = True
+      End If
+    Else
+      IsEmptyArg = True
+    End If
+  End If
+  On Error Goto 0
 End Function
 
 Function FixStrToPrint(str)
@@ -415,9 +458,7 @@ ReDim Preserve cmd_args(j - 1)
 
 ' MsgBox Join(cmd_args, " ")
 
-Dim cmd_args_ubound : cmd_args_ubound = UBound(cmd_args)
-
-If cmd_args_ubound < 0 Then
+If IsEmptyArg(cmd_args, 0) Then
   PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
   WScript.Quit 255
 End If
@@ -461,7 +502,14 @@ Function GetShortcut(ShortcutFilePathToOpen)
       WScript.Quit 128
     End If
 
-    Set GetShortcut = objFile.GetLink
+    If objFile.IsLink Then
+      Set GetShortcut = objFile.GetLink
+    Else
+      PrintOrEchoErrorLine _
+        WScript.ScriptName & ": error: file is not a shortcut." & vbCrLf & _
+        WScript.ScriptName & ": info: Path=`" & ShortcutFilePathToOpen & "`"
+      WScript.Quit 129
+    End If
   End If
 End Function
 
@@ -664,6 +712,8 @@ Dim objSC : Set objSC = GetShortcut(ShortcutFilePathToOpen)
 ' read TargetPath unconditionally
 
 ShortcutTarget = GetShortcutProperty("TargetPath")
+
+' TODO: add support of object targets (not a file path), avoid path function calls
 
 If Len(ShortcutTarget) > 1 And Left(ShortcutTarget, 1) = Chr(34) And Right(ShortcutTarget, 1) = Chr(34) Then
   ShortcutTargetUnquoted = Mid(ShortcutTarget, 2, Len(ShortcutTarget) - 2)

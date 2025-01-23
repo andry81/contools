@@ -11,6 +11,47 @@
 '''   The file or directory must have has the short file name otherwise the
 '''   script will return the long path.
 
+Function IsEmptyArg(args, index)
+  ''' Based on: https://stackoverflow.com/questions/4466967/how-can-i-determine-if-a-dynamic-array-has-not-be-dimensioned-in-vbscript/4469121#4469121
+  On Error Resume Next
+  Dim args_ubound : args_ubound = UBound(args)
+  If Err = 0 Then
+    If args_ubound >= index Then
+      ' CAUTION:
+      '   Must be a standalone condition.
+      '   Must be negative condition in case of an invalid `index`
+      If Not (Len(args(index)) > 0) Then
+        IsEmptyArg = True
+      Else
+        IsEmptyArg = False
+      End If
+    Else
+      IsEmptyArg = True
+    End If
+  Else
+    ' Workaround for `WScript.Arguments`
+    Err.Clear
+    Dim num_args : num_args = args.count
+    If Err = 0 Then
+      If index < num_args Then
+        ' CAUTION:
+        '   Must be a standalone condition.
+        '   Must be negative condition in case of an invalid `index`
+        If Not (Len(args(index)) > 0) Then
+          IsEmptyArg = True
+        Else
+          IsEmptyArg = False
+        End If
+      Else
+        IsEmptyArg = True
+      End If
+    Else
+      IsEmptyArg = True
+    End If
+  End If
+  On Error Goto 0
+End Function
+
 Function FixStrToPrint(str)
   Dim new_str : new_str = ""
   Dim i, Char, CharAsc
@@ -53,15 +94,13 @@ Sub PrintOrEchoErrorLine(str)
   On Error Goto 0
 End Sub
 
-On Error Resume Next
-Dim Path : Path = WScript.Arguments(0)
-On Error Goto 0
-
-If Not (Len(Path) > 0) Then
+If IsEmptyArg(WScript.Arguments, 0) Then
   PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: path is empty."
+    WScript.ScriptName & ": error: <path> is empty."
   WScript.Quit 255
 End If
+
+Dim Path : Path = WScript.Arguments(0)
 
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
