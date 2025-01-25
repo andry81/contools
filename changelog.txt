@@ -1,3 +1,7 @@
+2025.01.25:
+* new: Scripts/Tools/admin/Maintenance/01_disable_maintenance_win8.bat: Windows 8 maintenance disable script
+* refactor: Scripts/Tools/admin/Telemetry/01_disable_telemetry_junk_win7.bat: minor refactor
+
 2025.01.24:
 * fixed: Scripts/Tools/*.bat: elevation execution fixup
 

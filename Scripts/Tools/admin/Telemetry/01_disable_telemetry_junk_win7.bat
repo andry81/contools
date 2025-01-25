@@ -7,12 +7,12 @@ rem
 setlocal
 
 rem scripts must run in administrator mode
-call :IS_ADMIN_ELEVATED || (
-  echo.%~nx0: error: run script in administrator mode!
-  exit /b -255
-) >&2
+call :IS_ADMIN_ELEVATED && goto MAIN
 
-goto MAIN
+(
+  echo.%~nx0: error: process must be elevated before continue.
+  exit /b 255
+) >&2
 
 rem CAUTIOM:
 rem   Windows 7 has an issue around the `find.exe` utility and code page 65001.
