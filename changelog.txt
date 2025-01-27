@@ -1,9 +1,12 @@
+2025.01.27:
+* fixed: Scripts/Tools/*.bat, Utilities/bin/*.bat: corner cases fixup
+
 2025.01.25:
 * new: Scripts/Tools/admin/Maintenance/01_disable_maintenance_win8.bat: Windows 8 maintenance disable script
 * refactor: Scripts/Tools/admin/Telemetry/01_disable_telemetry_junk_win7.bat: minor refactor
 
 2025.01.24:
-* fixed: Scripts/Tools/*.bat: elevation execution fixup
+* fixed: Scripts/Tools/*.bat, Utilities/bin/*.bat: elevation execution fixup
 
 2025.01.23:
 * changed: Scripts/Tools/ToolAdaptors/hta: cmd_admin.bat, Samples/mshta_cmd_elevate.bat: improved arguments translation for the case where `\"` sequence already does exist as a part of a batch script command line
