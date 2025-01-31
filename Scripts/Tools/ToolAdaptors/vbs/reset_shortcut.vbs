@@ -1,4 +1,4 @@
-''' Resets the Windows shortcut file.
+''' Resets the Windows shortcut file using inner value(s).
 
 ''' CAUTION:
 '''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
@@ -8,7 +8,7 @@
 ''' USAGE:
 '''   reset_shortcut.vbs
 '''     [-CD <CurrentDirectoryPath>]
-'''     [-ignore-unexist]
+'''     [-obj] [-ignore-unexist]
 '''     [-reset-wd[-from-target-path]]
 '''     [-reset-target-path-from-wd]
 '''     [-reset-target-path-from-desc]
@@ -42,9 +42,18 @@
 '''     Changes current directory to <CurrentDirectoryPath> before the
 '''     execution.
 '''
+'''   -obj
+'''     By default the target path does used as a file path. Use this flag to
+'''     handle it as an object string and reduce (but not avoid) path functions
+'''     call on it.
+'''     Can not be used together with  `-q` flag.
+'''     Has no effect in case of `-reset-*` or `-allow-auto-recover` flags.
+'''
 '''   -ignore-unexist
 '''     By default TargetPath and WorkingDirectory does check on existence
 '''     before assign. Use this flag to skip the check.
+'''     Can not be used together with `-allow-auto-recover` flag.
+'''     Has no effect for TargetPath if `-obj` flag is defined.
 '''
 '''     CAUTION:
 '''       The Windows Shell component does use a guess logic to restore
@@ -75,13 +84,16 @@
 '''   -reset-wd[-from-target-path]
 '''     Reset WorkingDirectory from TargetPath.
 '''     Does not apply if TargetPath is empty.
+'''     Has effect if `-obj` flag is used.
 '''   -reset-target-path-from-wd
 '''     Reset TargetPath from WorkingDirectory leaving the file name as is.
 '''     Does not apply if WorkingDirectory or TargetPath is empty.
+'''     Has effect if `-obj` flag is used.
 '''   -reset-target-path-from-desc
 '''     Reset TargetPath from Description.
 '''     Does not apply if Description is empty or not a path.
 '''     Has no effect if TargetPath is already resetted.
+'''     Has effect if `-obj` flag is used.
 '''   -reset-target-name-from-file-path
 '''     Reset TargetPath name from shortcut file name without `.lnk` extension.
 '''   -reset-target-drive-from-file-path
@@ -111,6 +123,7 @@
 '''   -allow-target-path-reassign
 '''     Allows `TargetPath` property reassign if has not been assigned.
 '''     Has no effect if `TargetPath` is already resetted.
+'''     Has effect if `-obj` flag is used.
 '''
 '''   -allow-dos-current-dir
 '''     Allows long path conversion into a reduced DOS path version for the
@@ -124,6 +137,7 @@
 '''     long paths or Win32 Namespace paths, but supports open target paths by
 '''     a shortcut file.
 '''     Has no effect if path does not exist.
+'''     Has no effect if `-obj` flag is used.
 '''   -allow-dos-wd
 '''     Rereads working directory after assign and if it does not exist, then
 '''     reassign it by a reduced DOS path version.
@@ -147,6 +161,7 @@
 '''
 '''   -q
 '''     Always quote target path argument if has no quote characters.
+'''     Can not be used together with  `-obj` flag.
 
 ''' NOTE:
 '''   1. Creation of a shortcut under ealier version of the Windows makes
@@ -181,7 +196,7 @@
 ''' Example to create MyComputer shortcut:
 '''   >
 '''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat -obj mycomputer.lnk
+'''   make_shortcut.bat -obj -ignore-empty mycomputer.lnk
 ''' Or
 '''   >
 '''   del /F /Q mycomputer.lnk
@@ -189,8 +204,8 @@
 
 ''' Example to create MTP device folder shortcut:
 '''   >
-'''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat -obj mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
+'''   del /F /Q myfolder.lnk
+'''   make_shortcut.bat -obj myfolder.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
 '''
 '''   , where the `\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}` might be different for each device
 '''
@@ -358,7 +373,8 @@ Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
 Dim ChangeCurrentDirectoryExist : ChangeCurrentDirectoryExist = False
 
 Dim ShortcutTarget : ShortcutTarget = ""
-Dim ShortcutTargetUnquoted : ShortcutTargetUnquoted = ""
+Dim ShortcutTargetObj : ShortcutTargetObj = False
+Dim ShortcutTargetUnquoted : ShortcutTargetUnquoted = "" ' CAUTION: DOES used in case of `-obj` flag
 Dim ShortcutTargetEmpty : ShortcutTargetEmpty = False
 Dim ShortcutTargetExist : ShortcutTargetExist = False ' not empty and exists
 Dim ShortcutTargetToAssign : ShortcutTargetToAssign = ""
@@ -402,6 +418,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ChangeCurrentDirectory = WScript.Arguments(i)
         ChangeCurrentDirectoryExist = True
+      ElseIf arg = "-obj" Then
+       ShortcutTargetObj = True
       ElseIf arg = "-ignore-unexist" Then
        IgnoreUnexist = True
       ElseIf arg = "-reset-wd-from-target-path" Or arg = "-reset-wd" Then
@@ -458,13 +476,18 @@ ReDim Preserve cmd_args(j - 1)
 
 ' MsgBox Join(cmd_args, " ")
 
-If IsEmptyArg(cmd_args, 0) Then
-  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
+If ShortcutTargetObj And AlwaysQuote Then
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: flags is mixed: -obj <-> -q"
   WScript.Quit 255
 End If
 
 If IgnoreUnexist And AllowAutoRecover Then
   PrintOrEchoErrorLine WScript.ScriptName & ": error: flags is mixed: -ignore-unexist <-> -allow-auto-recover"
+  WScript.Quit 255
+End If
+
+If IsEmptyArg(cmd_args, 0) Then
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
   WScript.Quit 255
 End If
 
@@ -661,7 +684,7 @@ If ChangeCurrentDirectoryExist Then
 
   ' test on path existence including long path
   Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = objFS.FolderExists("\\?\" & ChangeCurrentDirectoryAbs)
-  If IsCurrentDirectoryExist Then
+  If Not IsCurrentDirectoryExist Then
     PrintOrEchoErrorLine _
       WScript.ScriptName & ": error: could not change current directory:" & vbCrLf & _
       WScript.ScriptName & ": info: CurrentDirectory=`" & ChangeCurrentDirectoryAbs & "`"
@@ -712,8 +735,6 @@ Dim objSC : Set objSC = GetShortcut(ShortcutFilePathToOpen)
 ' read TargetPath unconditionally
 
 ShortcutTarget = GetShortcutProperty("TargetPath")
-
-' TODO: add support of object targets (not a file path), avoid path function calls
 
 If Len(ShortcutTarget) > 1 And Left(ShortcutTarget, 1) = Chr(34) And Right(ShortcutTarget, 1) = Chr(34) Then
   ShortcutTargetUnquoted = Mid(ShortcutTarget, 2, Len(ShortcutTarget) - 2)
@@ -1062,9 +1083,25 @@ If ShortcutTargetAssigned Then
     PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(assigned)=" & ShortcutTarget
   End If
 ElseIf AllowTargetPathReassign Then
-  If ShortcutTargetExist Or IgnoreUnexist Then
+  If Not ShortcutTargetObj Then
+    If ShortcutTargetExist Or IgnoreUnexist Then
+      If PrintAssign Then
+        PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(reassign)=" & ShortcutTargetUnquoted
+      End If
+
+      SetShortcutProperty "TargetPath", ShortcutTarget ' reassign
+      ShortcutTargetAssigned = True
+
+      ' reread `TargetPath`
+      ShortcutTarget = GetShortcutProperty("TargetPath")
+
+      If PrintAssigned Then
+        PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(reassigned)=" & ShortcutTarget
+      End If
+    End If
+  Else
     If PrintAssign Then
-      PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(reassign)=" & ShortcutTargetUnquoted
+      PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(reassign)=" & ShortcutTarget
     End If
 
     SetShortcutProperty "TargetPath", ShortcutTarget ' reassign
@@ -1079,7 +1116,7 @@ ElseIf AllowTargetPathReassign Then
   End If
 End If
 
-If ShortcutTargetAssigned And AllowDOSTargetPath Then
+If (Not ShortcutTargetObj) And ShortcutTargetAssigned And AllowDOSTargetPath Then
   Dim ShortcutTargetAbs : ShortcutTargetAbs = objFS.GetAbsolutePathName(ShortcutTarget)
 
   Dim ShortcutTargetShortPath : ShortcutTargetShortPath = ""

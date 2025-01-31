@@ -1,3 +1,13 @@
+2025.01.31:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: allow shortcut creation with empty `ShortcutTarget` value with or without `-obj` flag
+* fixed: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: allow shortcut reassign with empty `TargetPath` value in case of `-obj` flag
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-ignore-empty` flag to ignore empty `ShortcutTarget` value
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: `-obj` flag to handle shortcut `TargetPath` property value as an object string
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: `-obj` flag to handle shortcut `ShortcutTarget` value as an object string
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: `ShortcutTarget` value must be always not empty in case of `-t` option
+* changed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: script returns `-1` if nothing to update
+* refactor: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: comments refactor
+
 2025.01.27:
 * fixed: Scripts/Tools/*.bat, Utilities/bin/*.bat: corner cases fixup
 

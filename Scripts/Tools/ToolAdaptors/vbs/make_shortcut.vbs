@@ -8,7 +8,7 @@
 ''' USAGE:
 '''   make_shortcut.vbs
 '''     [-CD <CurrentDirectoryPath>]
-'''     [-obj] [-ignore-unexist]
+'''     [-obj] [-ignore-unexist] [-ignore-empty]
 '''     [-showas <ShowWindowAsNumber>]
 '''     [-allow-dos-current-dir] [-allow-dos-target-path] [-allow-dos-wd] [-allow-dos-paths]
 '''     [-p[rint-assign]] [-print-assigned | -pd]
@@ -31,11 +31,17 @@
 '''   -obj
 '''     By default <ShortcutTarget> does used as a file path. Use this flag to
 '''     handle it as an object string and avoid path functions call on it.
+'''     Can not be used together with  `-q` flag.
 '''
 '''   -ignore-unexist
 '''     By default <ShortcutTarget> does check on existence before shortcut
 '''     creation. Use this flag to skip the check.
 '''     Has no effect if `-obj` flag is defined.
+'''
+'''   -ignore-empty
+'''     By default <ShortcutTarget> does check on empty before shortcut
+'''     creation. Use this flag to skip the check.
+'''     Has effect if `-obj` flag is defined.
 '''
 '''   -showas <ShowWindowAsNumber>
 ''''     Handles a child process window show state.
@@ -114,6 +120,7 @@
 '''     Unescape %xx or %uxxxx sequences.
 '''   -q
 '''     Always quote target path argument if has no quote characters.
+'''     Can not be used together with  `-obj` flag.
 '''   -E
 '''     Expand environment variables in all shortcut arguments.
 '''   -E0
@@ -172,7 +179,7 @@
 ''' Example to create MyComputer shortcut:
 '''   >
 '''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat -obj mycomputer.lnk
+'''   make_shortcut.bat -obj -ignore-empty mycomputer.lnk
 ''' Or
 '''   >
 '''   del /F /Q mycomputer.lnk
@@ -180,8 +187,8 @@
 
 ''' Example to create MTP device folder shortcut:
 '''   >
-'''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat -obj mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
+'''   del /F /Q myfolder.lnk
+'''   make_shortcut.bat -obj myfolder.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
 '''
 '''   , where the `\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}` might be different for each device
 '''
@@ -350,6 +357,7 @@ Dim PrintAssign : PrintAssign = False
 Dim PrintAssigned : PrintAssigned = False
 
 Dim IgnoreUnexist : IgnoreUnexist = False
+Dim IgnoreEmpty : IgnoreEmpty = False
 
 Dim UnescapeAllArgs : UnescapeAllArgs = False
 
@@ -358,7 +366,7 @@ Dim ChangeCurrentDirectoryExist : ChangeCurrentDirectoryExist = False
 
 Dim ShortcutTarget : ShortcutTarget = ""
 Dim ShortcutTargetObj : ShortcutTargetObj = False
-Dim ShortcutTargetUnquoted : ShortcutTargetUnquoted = "" ' CAUTION: does not used in case of `-obj` flag
+Dim ShortcutTargetUnquoted : ShortcutTargetUnquoted = "" ' CAUTION: does NOT used in case of `-obj` flag
 
 Dim ShortcutTargetArgs : ShortcutTargetArgs = ""
 Dim ShortcutTargetArgsExist : ShortcutTargetArgsExist = False
@@ -404,6 +412,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
        ShortcutTargetObj = True
       ElseIf arg = "-ignore-unexist" Then
        IgnoreUnexist = True
+      ElseIf arg = "-ignore-empty" Then
+       IgnoreEmpty = True
       ElseIf arg = "-print-assign" Or arg = "-p" Then ' Print assign
         PrintAssign = True
       ElseIf arg = "-print-assigned" Or arg = "-pd" Then ' Print assigned
@@ -478,6 +488,11 @@ ReDim Preserve cmd_args(j - 1)
 
 ' MsgBox Join(cmd_args, " ")
 
+If ShortcutTargetObj And AlwaysQuote Then
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: flags is mixed: -obj <-> -q"
+  WScript.Quit 255
+End If
+
 Dim num_args : num_args = NumArgs(cmd_args)
 
 If IsEmptyArg(cmd_args, 0) Then
@@ -485,9 +500,11 @@ If IsEmptyArg(cmd_args, 0) Then
   WScript.Quit 255
 End If
 
-If IsEmptyArg(cmd_args, 1) Then
-  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutTarget> argument is not defined."
-  WScript.Quit 255
+If Not IgnoreEmpty Then
+  If IsEmptyArg(cmd_args, 1) Then
+    PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutTarget> argument is not defined."
+    WScript.Quit 255
+  End If
 End If
 
 If AllowDOSPaths Then
@@ -688,7 +705,7 @@ If ChangeCurrentDirectoryExist Then
 
   ' test on path existence including long path
   Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = objFS.FolderExists("\\?\" & ChangeCurrentDirectoryAbs)
-  If IsCurrentDirectoryExist Then
+  If Not IsCurrentDirectoryExist Then
     PrintOrEchoErrorLine _
       WScript.ScriptName & ": error: could not change current directory:" & vbCrLf & _
       WScript.ScriptName & ": info: CurrentDirectory=`" & ChangeCurrentDirectoryAbs & "`"
@@ -732,7 +749,9 @@ If Not IsShortcutFileDirExist Then
   WScript.Quit 20
 End If
 
-ShortcutTarget = cmd_args(1)
+If Not IsEmptyArg(cmd_args, 1) Then
+  ShortcutTarget = cmd_args(1)
+End If
 
 If num_args > 2 Then
   ShortcutTargetArgs = cmd_args(2)
