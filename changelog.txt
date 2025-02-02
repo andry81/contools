@@ -1,3 +1,6 @@
+2025.02.03:
+* changed: .externals: switch `7zip` to `24_09_release` branch
+
 2025.02.02:
 * fixed: Scripts/Tools/admin/Maintenance/01_disable_maintenance_win8.bat: elevate to `System` account to circumvent Task Scheduler `The user account you are operating under does not have permission to disable this task.` error message
 * new: Scripts/Tools/admin/Telemetry/01_disable_telemetry_junk_win8.bat: telemetry disable script from Microsoft and others
