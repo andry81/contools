@@ -1,10 +1,8 @@
 @echo off
 
 rem Description:
-rem   Script disables maintenance tasks in Windows 8...
+rem   Script disables telemetry junk from Microsoft and others...
 rem
-rem   Based on:
-rem     https://serverfault.com/questions/866336/do-i-need-to-disable-tiworker-exe-and-respective-tasksheduler-task-in-windows-se
 
 setlocal DISABLEDELAYEDEXPANSION
 
@@ -85,12 +83,20 @@ call :CMD "%%CONTOOLS_SYSINTERNALS_ROOT%%/psexec.exe" -i -s -d %%0 %%*
 exit /b
 
 :SYSTEM_ELEVATED
-call :CMD schtasks /Change /tn "\Microsoft\Windows\TaskScheduler\Idle Maintenance" /Disable
-call :CMD schtasks /Change /tn "\Microsoft\Windows\TaskScheduler\Maintenance Configurator" /Disable
-call :CMD schtasks /Change /tn "\Microsoft\Windows\TaskScheduler\Manual Maintenance" /Disable
-call :CMD schtasks /Change /tn "\Microsoft\Windows\TaskScheduler\Regular Maintenance" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\Application Experience\AitAgent" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\Application Experience\ProgramDataUpdater" /Disable
 
-call :CMD "%%SystemRoot%%\System32\reg.exe" add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance" /v MaintenanceDisabled /t REG_DWORD /d 1 /f
+call :CMD schtasks /Change /tn "\Microsoft\Windows\Customer Experience Improvement Program\BthSQM" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\Customer Experience Improvement Program\Consolidator" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip" /Disable
+
+call :CMD schtasks /Change /tn "\Microsoft\Windows\WindowsUpdate\AUFirmwareInstall" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\WindowsUpdate\AUScheduledInstall" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\WindowsUpdate\AUSessionConnect" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\WindowsUpdate\Scheduled Start" /Disable
+call :CMD schtasks /Change /tn "\Microsoft\Windows\WindowsUpdate\Scheduled Start With Network" /Disable
 
 echo.
 
