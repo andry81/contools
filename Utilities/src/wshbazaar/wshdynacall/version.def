@@ -1,7 +1,0 @@
-autogen definitions version;
-
-AppName = "wshdynacall";
-AppMajorVer = 1;
-AppMinorVer = 0;
-AppRevision = 2;
-AppBuildNum = 2;

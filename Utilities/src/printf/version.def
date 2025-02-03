@@ -1,7 +1,0 @@
-autogen definitions version;
-
-AppName = "printf";
-AppMajorVer = 1;
-AppMinorVer = 5;
-AppRevision = 9;
-AppBuildNum = 19;

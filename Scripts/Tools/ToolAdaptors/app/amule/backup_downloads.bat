@@ -26,7 +26,7 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%AMULE_ADAPTOR_BACK
 
 echo.^>"%AMULE_CMD_EXECUTABLE%" %AMULE_CMDLINE%
 
-"%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
+"%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" ^
   /ret-child-exit /tee-stdout "%AMULE_ADAPTOR_BACKUP_DIR%/%AMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%PROJECT_LOG_FILE_NAME_DATE_TIME%/downloads.txt" /tee-stderr-dup 1 ^
   "${AMULE_CMD_EXECUTABLE}" "{*}" ${AMULE_CMDLINE} || exit /b
 

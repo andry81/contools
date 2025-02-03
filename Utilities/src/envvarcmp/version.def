@@ -1,7 +1,0 @@
-autogen definitions version;
-
-AppName = "envvarcmp";
-AppMajorVer = 1;
-AppMinorVer = 1;
-AppRevision = 3;
-AppBuildNum = 8;

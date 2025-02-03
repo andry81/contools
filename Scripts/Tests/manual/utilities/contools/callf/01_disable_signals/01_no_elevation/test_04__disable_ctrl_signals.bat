@@ -8,7 +8,7 @@ call "%%~dp0__init__/__init__.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
-"%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" ^
+"%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" ^
   /v IMPL_MODE 1 /no-expand-env /no-subst-pos-vars /no-esc ^
   /print-win-error-string /ret-child-exit /pause-on-exit ^
   /disable-ctrl-signals ^

@@ -17,7 +17,7 @@ rem
 (
   endlocal
   set IMPL_MODE=1
-  "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe"%MINTTY_CALLF_BARE_FLAGS% ^
+  "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%MINTTY_CALLF_BARE_FLAGS% ^
     "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
     %*
 )

@@ -54,17 +54,17 @@ rem     Or
 rem
 rem     NOTE: The `1.bat` is not quoted here, because `cmd.exe` will remove first and last quotes after the `/c`.
 rem     >
-rem     "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe /c 1.bat & \"${CONTOOLS_ROOT}/std/errlvl.bat\""
+rem     "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe /c 1.bat & \"${CONTOOLS_ROOT}/std/errlvl.bat\""
 rem
 rem     Or
 rem
 rem     >
-rem     "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe /c \"1.bat ^& \"${CONTOOLS_ROOT}/std/errlvl.bat\"\""
+rem     "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe /c \"1.bat ^& \"${CONTOOLS_ROOT}/std/errlvl.bat\"\""
 rem
 rem     Or
 rem
 rem     >
-rem     "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe \"/c \"1.bat ^& \"${CONTOOLS_ROOT}/std/errlvl.bat\"\"\""
+rem     "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe \"/c \"1.bat ^& \"${CONTOOLS_ROOT}/std/errlvl.bat\"\"\""
 rem
 rem     Or
 rem
@@ -81,7 +81,7 @@ rem          To bypass that you can use additional `callf` options: `/ra "%%" "%
 rem       2. To disable the rest `callf` features: `/no-subst-pos-vars /no-esc`
 rem
 rem     >
-rem     "%CONTOOLS_UTILITIES_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe /c @\"1.bat\" & \"${CONTOOLS_ROOT}/std/errlvl.bat\"\""
+rem     "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe /c @\"1.bat\" & \"${CONTOOLS_ROOT}/std/errlvl.bat\"\""
 
 rem CAUTION:
 rem   The `call` operator will expand environment variables twice:

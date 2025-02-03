@@ -1,7 +1,0 @@
-autogen definitions version;
-
-AppName = "clearcache";
-AppMajorVer = 1;
-AppMinorVer = 1;
-AppRevision = 2;
-AppBuildNum = 4;

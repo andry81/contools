@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2024.06.08
+* 2025.02.03
 * contools
 
 1. DESCRIPTION
@@ -77,25 +77,13 @@ Second mirror:
  |      # Template file with user set of environment variables
  |      # designed to be stored in a version control system.
  |
- +- /`Projects`
+ +- /`_out`
  |    #
- |    # Project files to build contools utilities.
- |
- +- /`Output`
- |    #
- |    # Temporary directory with build output.
+ |    # Output directory for all files.
  |
  +- /`Scripts`
- |    #
- |    # The root for all scripts and tools excluding external or standalone.
- |
- +- /`Utilities`
-    | #
-    | # Internal and external utilities and tools.
-    |
-    +- /`bin/contools`
-         #
-         # Internal utilities and tools built by the project.
+      #
+      # The root for all scripts and tools excluding external or standalone.
 
 -------------------------------------------------------------------------------
 5. PREREQUISITES
@@ -118,19 +106,10 @@ IDE's, applications and patches to run with or from:
 
 * Linux Mint 18.3 x64 (`.sh` only)
 
-2. C++11 compilers:
-
-* (primary) Microsoft Visual C++ 2015 Update 3 or Microsoft Visual C++ 2017
-* (secondary) GCC 5.4+
-
-3. Interpreters:
+2. Interpreters:
 
 * bash shell 3.2.48+
   - to run unix shell scripts
-
-* cmake 3.14+ :
-  https://cmake.org/download/
-  - to run cmake scripts and modules
 
 * python 3.7.3 or 3.7.5 (3.4+ or 3.5+)
   https://python.org
@@ -143,16 +122,10 @@ IDE's, applications and patches to run with or from:
     as noted in the documentation:
     https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
 
-* cmake 3.15.1 (3.14+):
-  https://cmake.org/download/
-  - to run cmake scripts and modules
-  - 3.14+ does allow use generator expressions at install phase:
-    https://cmake.org/cmake/help/v3.14/policy/CMP0087.html
-
 * Windows Script Host 5.8+
   - standard implementation to run vbs scripts
 
-4. Applications:
+3. Applications:
 
 * subversion 1.8+
   https://tortoisesvn.net
@@ -171,46 +144,10 @@ IDE's, applications and patches to run with or from:
 * cygwin readlink 6.10+
   - to run specific bash script functions with `readlink` calls
 
-5. IDE's.
-
-* Microsoft Visual Studio 2015 Update 3
-* Microsoft Visual Studio 2017
-* QtCreator 4.6+
-
-Noticeable cmake changes from the version 3.14:
-
-https://cmake.org/cmake/help/v3.14/release/3.14.html#deprecated-and-removed-features
-
-* The FindQt module is no longer used by the find_package() command as a find
-  module. This allows the Qt Project upstream to optionally provide its own
-  QtConfig.cmake package configuration file and have applications use it via
-  find_package(Qt) rather than find_package(Qt CONFIG). See policy CMP0084.
-
-* Support for running CMake on Windows XP and Windows Vista has been dropped.
-  The precompiled Windows binaries provided on cmake.org now require Windows 7
-  or higher.
-
-https://cmake.org/cmake/help/v3.14/release/3.14.html#id13
-
-* The install(CODE) and install(SCRIPT) commands learned to support generator
-  expressions. See policy CMP0087
-  (https://cmake.org/cmake/help/v3.14/policy/CMP0087.html):
-
-  In CMake 3.13 and earlier, install(CODE) and install(SCRIPT) did not evaluate
-  generator expressions. CMake 3.14 and later will evaluate generator
-  expressions for install(CODE) and install(SCRIPT).
-
-6. Patches:
-
-  Target repository with a 3dparty component sources must already contain all
-  patches and description with it.
-
 -------------------------------------------------------------------------------
 6. DEPENDENCIES
 -------------------------------------------------------------------------------
-Any project which is dependent on this project have has to contain the
-`README_EN.deps.txt` description file for the common dependencies in the
-Windows and in the Linux like platforms.
+N/A
 
 -------------------------------------------------------------------------------
 7. EXTERNALS

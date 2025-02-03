@@ -59,7 +59,7 @@ if defined FLAG (
 set "CONTOOLS_DIR_TMP=%TEMP_DIR%\contools"
 
 rem copy `callf.exe` into temporary directory to be able to run elevated from a Network Drive
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%CONTOOLS_UTILITIES_BIN_ROOT%%/contools" callf.exe "%%CONTOOLS_DIR_TMP%%" || exit /b 255
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%CONTOOLS_UTILS_BIN_ROOT%%/contools" callf.exe "%%CONTOOLS_DIR_TMP%%" || exit /b 255
 
 rem NOTE: In the `callf.exe` the backslash character escaping requires only in case of conjunction with the double quote character escaping: `\\\"`.
 rem
@@ -69,7 +69,7 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_DIR_TMP%%/callf.exe" ^
   /ret-child-exit /no-subst-pos-vars /no-esc ^
   /ra "%%%%" "%%%%?01%%%%" /v "?01" "%%%%" ^
   /v FLAG_USE_CALLF_EXECUTABLE "%%FLAG_USE_CALLF_EXECUTABLE%%" ^
-  /v CONTOOLS_UTILITIES_BIN_ROOT "%%CONTOOLS_UTILITIES_BIN_ROOT%%" ^
+  /v CONTOOLS_UTILS_BIN_ROOT "%%CONTOOLS_UTILS_BIN_ROOT%%" ^
   /v TEMP_DIR "%%TEMP_DIR%%" ^
   /v QBITTORRENT_EXECUTABLE "%%QBITTORRENT_EXECUTABLE%%" ^
   "${COMSPEC}" "/c \"@\"${?~dp0}.${?~n0}\${?~n0}.update.bat\" {*}\"" %%* || exit /b

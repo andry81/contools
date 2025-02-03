@@ -1,4 +1,11 @@
 2025.02.03:
+* changed: Projects, Output, Utilities: moved into `contools--utils` project
+* changed: Scripts: *.bat: `CONTOOLS_UTILITIES_BIN_ROOT` variable renamed into `CONTOOLS_UTILS_BIN_ROOT`
+* changed: README_EN.txt: readme update
+* changed: ISSUES.txt: issues update
+* changed: TODO.txt: todo update
+
+2025.02.03:
 * changed: README.md: github markdown blockquotes update
 * refactor: README.md: minor refactor
 

@@ -1,112 +1,39 @@
-Utilities/src/callf:
+-------------------------------------------------------------------------------
+Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat
+-------------------------------------------------------------------------------
 
-  * Fix the case where the
-    `callf /tee-stdin 0.log /pipe-stdin-to-child-stdin "" "cmd.exe /k"`
-    expression has broken/altered autocompletion feature in the `cmd.exe` process
-    and the `cmd.exe` treats all the tab characters as is.
+* Does not accept not english characters in files names/paths.
 
-    The issue is attached to the stdin handle type inside the `cmd.exe` process.
-    If the stdin handle has not a character device type
-    (GetFileType(GetStdHandle(STD_INPUT_HANDLE)) != FILE_TYPE_CHAR), then the
-    autocompletion feature is turned off and all characters including a tab
-    character processes as is. Otherwise the tab button press triggers
-    the autocompletion feature.
+-------------------------------------------------------------------------------
+Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat
+-------------------------------------------------------------------------------
 
-    The stdin handle changes its type from the `FILE_TYPE_CHAR`, for example, if
-    the process input is redirected.
+* Does not accept not english characters in files names/paths.
 
-    The fix can be made portably between different Windows versions, for example,
-    through the code injection into a child process and interception of the
-    `ReadConsole`/`WriteConsole` calls.
+-------------------------------------------------------------------------------
+Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat
+-------------------------------------------------------------------------------
 
-  * Fix `start "" /WAIT callfg.exe /attach-parent-console "" "unexisted.exe"`
-    invalid print in non 65001 code page.
+* Fix infinite recursion because of builtin backup in `update_shortcut.vbs`.
 
-  * Fix `callf.exe /detach-console "" "unexisted.exe"` crash.
+-------------------------------------------------------------------------------
+Scripts/Tools/std/xcopy_*.bat, Scripts/Tools/std/xmove_*.bat
+-------------------------------------------------------------------------------
 
-  * Fix `callf.exe` long paths open.
+* Fix output touching in case of `/Y` flag absence (no overwrite).
 
-  * Fix `callf.exe /shell-exec-unelevate-from-explorer /D . "callf.exe" "/shell-exec runas \"${COMSPEC}\" \"/k\""`
-    current directory propagation.
+-------------------------------------------------------------------------------
+Scripts/Tools/build/load_config.bat
+-------------------------------------------------------------------------------
 
-  * The `/r* ...` options does not execute for variable arguments
+* Fix error:
 
-  * Fix leak behind `/load-parent-proc-init-env-vars` before this-process exit
-    (call UnMapViewOfFile and CloseHandle)
+  `load_config.bat: error: input config directory does not exist: "...\--".`
 
-  * Fix `callf /D "<long-path>` ...` by using `SetCurrentDirectory` with `\\?\`
-    prefix.
+  in case of:
 
-    Add `/CD ...` option to change current directory before a child process
-    creation.
+  chcp 65000
 
-    Update `KNOWN ISSUES` section.
+  catched in:
 
-  * Fix `callf "" "callf /create-console /invalid-flag \"\" \"cmd.exe /c echo 123\""`
-    error message around `/invalid-flag` which is not always reprint in the
-    first callf process console window.
-
-  * callf crash on too long wait for UAC promotion with error message:
-    `server connection timeout of inbound server named pipe end to (null): pipe="(null)" timeout=0 ms`
-
-  * Fix nested quotes escape skip in case of `{*}` variable substitution:
-
-    >
-    callf.exe /pause-on-exit /no-esc /elevate{ /no-window }{ /attach-parent-console } "${SystemRoot}\System32\runas.exe" "/user:user {*}" "\"${SystemRoot}\System32\explorer.exe\" \"...\.\""
-
-    Result:
-
-    >
-    callf.exe /pause-on-exit /no-subst-vars /no-esc /attach-parent-console "C:\WINDOWS\System32\runas.exe" "/user:user \"\\"C:\WINDOWS\System32\explorer.exe\\" \\"...\\.\\"\""
-
-    Must be:
-
-    >
-    callf.exe /pause-on-exit /no-subst-vars /no-esc /attach-parent-console "C:\WINDOWS\System32\runas.exe" "/user:user \"\\\"C:\WINDOWS\System32\explorer.exe\\\" \\\"...\\.\\\"\""
-
-  * Unknown unicode characters prints as `?` in case of tee redirection options:
-
-    `/tee-stdout <stdout-file>`
-
-    Replace by unicode print function variant.
-
-Utilities/tests/manual/contools/callf:
-
-  * Fix slow print:
-
-    - 00-test--01-cui--02-existing_console--01-print_help.bat
-    - 00-test--02-gui--02-existing_console--01-print_help.bat
-
-Utilities/src/wshbazaar/wshdynacall:
-
-  * component registration error under Windows XP 32-bit SP3
-
-Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat:
-
-  * Does not accept not english characters in files names/paths.
-
-Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat:
-
-  * Does not accept not english characters in files names/paths.
-
-Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat:
-
-  * Fix infinite recursion because of builtin backup in `update_shortcut.vbs`.
-
-Scripts/Tools/std/xcopy_*.bat, Scripts/Tools/std/xmove_*.bat:
-
-  * Fix output touching in case of `/Y` flag absence (no overwrite).
-
-Scripts/Tools/build/load_config.bat:
-
-  * Fix error:
-
-    `load_config.bat: error: input config directory does not exist: "...\--".`
-
-    in case of:
-
-    chcp 65000
-
-    catched in:
-
-    Scripts/Tools/filesys/read_shortcut_target_path.bat
+  Scripts/Tools/filesys/read_shortcut_target_path.bat
