@@ -586,12 +586,12 @@ If IsEmptyArg(cmd_args, 0) Then
   WScript.Quit 255
 End If
 
-'If ShortcutTargetExist Then
-'  If Not (Len(ShortcutTarget) > 0) Then
-'    PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutTarget> argument is not defined."
-'    WScript.Quit 255
-'  End If
-'End If
+If ShortcutTargetExist Then
+  If Not (Len(ShortcutTarget) > 0) Then
+    PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutTarget> argument is not defined."
+    WScript.Quit 255
+  End If
+End If
 
 If AllowPathsReassign Then
   AllowTargetPathReassign = AllowPathsReassign
