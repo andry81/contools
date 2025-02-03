@@ -1,4 +1,5 @@
-> **Note** To checkout externals read the details here: https://github.com/andry81/externals
+> [!NOTE]
+> To checkout externals read the details here: https://github.com/andry81/externals
 
 <p align="center">A wide range of scripts for Windows interpreter (cmd.exe) and other
 interpreters such as bash shell (.sh), visual basic (.vbs), python (.py) and so on.
@@ -58,7 +59,7 @@ Plus some set of standalone console utilities and tools aside other utilities an
 <p align="center">
   <a href="https://github.com/andry81/contools/tree/HEAD/changelog.txt">Changelog</a>
 • <a href="https://github.com/andry81/contools/tree/HEAD/README_EN.txt">Readme</a>
-• <a href="#dependecies">Dependencies</a>
+• <a href="#dependencies">Dependencies</a>
 • <a href="#related-projects">Related projects</a>
 • <a href="#copyright-and-license"><img src="https://github.com/andry81-cache/gh-content-static-cache/raw/master/common/badges/license/mit-license.svg" valign="middle" alt="copyright and license" />&nbsp;Copyright and License</a>
 </p>
@@ -73,7 +74,7 @@ Plus some set of standalone console utilities and tools aside other utilities an
 
 ---
 
-## <a name="dependecies">Dependencies</a>
+## <a name="dependencies">Dependencies</a>
 
 * https://github.com/andry81-3dparty/wxwidgets
 

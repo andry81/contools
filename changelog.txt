@@ -1,4 +1,8 @@
 2025.02.03:
+* changed: README.md: github markdown blockquotes update
+* refactor: README.md: minor refactor
+
+2025.02.03:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut.vbs: missed change
 
 2025.02.03:
