@@ -286,7 +286,7 @@ set LAST_ERROR=%ERRORLEVEL%
 rem restore locale
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
-exit /b %LASTERROR%
+exit /b %LAST_ERROR%
 
 :MAIN
 if %FLAG_USE_BUILTIN_MOVE% EQU 0 (
