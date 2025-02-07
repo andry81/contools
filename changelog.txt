@@ -1,3 +1,6 @@
+2025.02.07:
+* changed: Scripts/Tools/std/setshift.bat: missed merge from `callshift.bat`
+
 2025.02.03:
 * changed: Projects, Output, Utilities: moved into `contools--utils` project
 * changed: Scripts: *.bat: `CONTOOLS_UTILITIES_BIN_ROOT` variable renamed into `CONTOOLS_UTILS_BIN_ROOT`

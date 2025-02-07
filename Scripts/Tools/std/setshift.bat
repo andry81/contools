@@ -20,8 +20,8 @@ rem   If not defined, then 0.
 
 rem <shift>:
 rem   Number of `<cmdline>` arguments to skip and shift.
-rem   If >=0, then shifts by `<shift>` beginning by `<skip-num>` argument.
-rem   If < 0, then shifts by `|<shift>|` beginning by `<skip-num>+|<shift>|`
+rem   If >=0, then shifts by `<shift>` beginning from `<skip-num>` argument.
+rem   If < 0, then shifts by `|<shift>|` beginning from `<skip-num>+|<shift>|`
 rem   argument.
 
 rem <var>:
@@ -121,7 +121,7 @@ rem redirect command line into temporary file to print it correcly
   endlocal
 ) > "%CMDLINE_TEMP_FILE%"
 
-for /F "usebackq tokens=* delims="eol^= %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
+set "__STRING__=" & for /F "usebackq tokens=* delims="eol^= %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
 
 del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
