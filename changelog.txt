@@ -1,3 +1,10 @@
+2025.02.11:
+* fixed: Scripts/Tools/ToolAdaptors/hta/cmd_admin.bat: script variables leak into child process
+* new: Scripts/Tools/std/is_system_elevated.bat: script checks System account privileges
+* new: Scripts/Tools/ToolAdaptors/hta/cmd_admin_system.bat: script runs `psexec.exe` under UAC promotion using `mshta.exe` executable and command line to `COMSPEC` executable
+* changed: Scripts/Tools/ToolAdaptors/hta/cmd_admin.bat: improved command line parse
+* changed: Scripts/Tools/admin: 01_disable_*_win8.bat: scripts switched to use `cmd_admin_system.bat` and `is_system_elevated.bat` scripts
+
 2025.02.07:
 * changed: Scripts/Tools/std/setshift.bat: missed merge from `callshift.bat`
 

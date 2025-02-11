@@ -1,13 +1,14 @@
 @echo off
 
 rem USAGE:
-rem   cmd_admin.bat <cmdline>...
+rem   cmd_admin_system.bat <cmdline>...
 
 rem Description:
-rem   Script runs `cmd.exe` under UAC promotion using `mshta.exe` executable
-rem   and command line to `COMSPEC` executable.
+rem   Script runs `psexec.exe` under UAC promotion using `mshta.exe`
+rem   executable and command line to `COMSPEC` executable.
+rem   Requires `psexec.exe` in the `PATH` or in the `PSEXEC` variable.
 
-rem Example: cmd_admin.bat /k echo 123
+rem Example: cmd_admin_system.bat /k echo 123
 
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
@@ -17,6 +18,15 @@ setlocal
 
 rem drop last error level
 call;
+
+if not defined PSEXEC set "PSEXEC=psexec.exe"
+
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!PSEXEC!") do endlocal & set "PSEXEC=%%~fi"
+
+if not exist "%PSEXEC%" (
+  echo.%~nx0: error: `psexec.exe` is not found: "%PSEXEC%".
+  exit /b 255
+) >&2
 
 rem Load Windows Batch compatible command line with escapes (`\""` is a single nested `"`, `\""""` is a double nested `"` and so on).
 
@@ -56,7 +66,7 @@ if not defined ?. exit /b %LAST_ERROR%
 call :IS_ADMIN_ELEVATED || ( call :CALL_ELEVATE & exit /b )
 
 rem with locals drop
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in (""!COMSPEC!" !?.!") do endlocal & endlocal & %%i
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in (""!PSEXEC!" -i -s -d "!COMSPEC!" !?.!") do endlocal & endlocal & %%i
 exit /b
 
 rem CAUTIOM:
@@ -91,5 +101,5 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0
 
 rem CAUTION: ShellExecute does not wait a child process close!
 rem NOTE: `ExecuteGlobal` is used as a workaround, because the `mshta.exe` first argument must not be used with the surrounded quotes
-start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%COMSPEC%"", ""%?.%"", """", ""runas"", 1))")
+start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%PSEXEC%"", ""-i -s -d """"%COMSPEC%"""" %?.%"", """", ""runas"", 0))")
 exit /b
