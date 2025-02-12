@@ -14,7 +14,7 @@ rem   `ExecuteGlobal` is used as a workaround, because the `mshta.exe` first
 rem    argument must not be used with the surrounded quotes.
 
 rem Windows Batch compatible command line with escapes (`\""` is a single nested `"`, `\""""` is a double nested `"` and so on).
-set "__QARG0__=vbscript:ExecuteGlobal(\""Close(CreateObject(\""""Shell.Application\"""").ShellExecute(\""""%COMSPEC%\"""", \""""/k @cd \""""""""%CD%\"""""""" & %CD:~0,2% & \""""""""%CONTOOLS_UTILS_BIN_ROOT%/contools/printargs.exe\"""""""" \""""""""123 456\""""""""\"""", \""""\"""", \""""runas\"""", True))\"")"
+set "__QARG0__=vbscript:ExecuteGlobal(\""Close(CreateObject(\""""Shell.Application\"""").ShellExecute(\""""%COMSPEC%\"""", \""""/k @cd \""""""""%CD%\"""""""" & %CD:~0,2% & \""""""""%CONTOOLS_UTILS_BIN_ROOT%/contools/printargs.exe\"""""""" \""""""""123 456\""""""""\"""", \""""\"""", \""""runas\"""", 1))\"")"
 
 rem Command line variant for the Windows Batch `echo` command
 

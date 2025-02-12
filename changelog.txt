@@ -1,3 +1,7 @@
+2025.02.12:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/set_fileshortname.bat: current directory restore
+* changed: Scripts/Tools: *.bat: minor improvement
+
 2025.02.11:
 * fixed: Scripts/Tools/ToolAdaptors/hta/cmd_admin.bat: script variables leak into child process
 * new: Scripts/Tools/std/is_system_elevated.bat: script checks System account privileges

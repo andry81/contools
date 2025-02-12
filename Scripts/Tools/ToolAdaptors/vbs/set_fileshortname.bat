@@ -29,7 +29,7 @@ rem   `Uniform variant of a command line as a single argument for the `mshta.exe
 rem   https://github.com/andry81/contools/discussions/11
 
 rem Windows Batch compatible command line with escapes (`\""` is a single nested `"`, `\""""` is a double nested `"` and so on).
-set ?.=set "IMPL_MODE=1" ^& "%~f0" %* ^& pause
+set ?.=set "IMPL_MODE=1" ^& cd "%CD%" ^& %CD:~0,2% ^& "%~f0" %* ^& pause
 
 rem translate Windows Batch compatible escapes into escape placeholders
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$=$0!") do endlocal & set "?.=%%i"
@@ -55,13 +55,13 @@ if not exist "%SystemRoot%\Syswow64\*" (
 
 rem CAUTION: ShellExecute does not wait a child process close!
 rem NOTE: `ExecuteGlobal` is used as a workaround, because the `mshta.exe` first argument must not be used with the surrounded quotes
-start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%SystemRoot%\Syswow64\cmd.exe"", ""/c @%?.%"", """", ""runas"", True))")
+start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%SystemRoot%\Syswow64\cmd.exe"", ""/c @%?.%"", """", ""runas"", 1))")
 exit /b
 
 :X86
 rem CAUTION: ShellExecute does not wait a child process close!
 rem NOTE: `ExecuteGlobal` is used as a workaround, because the `mshta.exe` first argument must not be used with the surrounded quotes
-start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%COMSPEC%"", ""/c @%?.%"", """", ""runas"", True))")
+start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%COMSPEC%"", ""/c @%?.%"", """", ""runas"", 1))")
 exit /b
 
 :ELEVATED
