@@ -1,4 +1,8 @@
 2025.02.13:
+* fixed: Scripts/Tools/build/load_cmdline.bat: leading white spaces trim
+* fixed: Scripts/Tools/build/load_cmdline.bat: missed to unset output variable if a command line is empty
+
+2025.02.13:
 * fixed: *.bat: missed changes code fixup
 * changed: *.bat: global code cleanup
 * changed: Scripts/Tools/exec: code improvement

@@ -1,17 +1,17 @@
 @echo off
 
 rem USAGE:
-rem   load_cmdline.bat <OutVar> <CmdlineFile>
+rem   load_cmdline.bat <outvar> <cmdline-file>
 
 rem Description:
-rem   Script to load a command line file, where an argument is treated per line.
+rem   Script to load a command line file, where an argument is a text line.
 rem   The `#` as the line first character is a line comment starter.
 rem   To insert `#` as the line first raw character use the space character.
 
-rem <OutVar>
+rem <outvar>
 rem   Output variable name.
 
-rem <CmdlineFile>:
+rem <cmdline-file>:
 rem   Command line file path.
 
 rem reset output variable
@@ -47,9 +47,9 @@ for /F "usebackq eol=# tokens=* delims=" %%i in ("%CMDLINE_FILE%") do (
   ) else set "CMDLINE=%%i"
 )
 
-rem return variable
+rem return variable with leading white spaces trim
 if defined CMDLINE (
-  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!CMDLINE!") do endlocal & endlocal & set "%OUT_VAR%=%%i"
-)
+  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims=	 "eol^= %%i in ("!CMDLINE!") do endlocal & endlocal & set "%OUT_VAR%=%%i"
+) else endlocal & set "%OUT_VAR%="
 
 exit /b 0
