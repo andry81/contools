@@ -18,6 +18,6 @@ for /F "usebackq tokens=* delims="eol^= %%i in (`@"%%SystemRoot%%\System32\cscri
 rem cast to integer
 set /A RETURN_VALUE+=0
 
-if %RETURN_VALUE% NEQ 0 ( endlocal & set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0 )
+if %RETURN_VALUE% NEQ 0 endlocal & set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0
 
 exit /b 1

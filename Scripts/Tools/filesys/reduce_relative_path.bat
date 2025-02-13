@@ -38,10 +38,7 @@ if %ERRORLEVEL% EQU 0 (
   set "RETURN_VALUE=%ABS_PATH%"
 )
 
-(
-  endlocal
-  set "RETURN_VALUE=%RETURN_VALUE%"
-)
+endlocal & set "RETURN_VALUE=%RETURN_VALUE%"
 
 exit /b
 

@@ -126,10 +126,7 @@ if not defined __VER_REVISION2 (
   set "RETURN_VALUE=%__VER_MAJOR%.%__VER_MINOR%.%__VER_PATCH%.%__VER_REVISION1%.%__VER_REVISION2%"
 )
 
-(
-  endlocal
-  set "RETURN_VALUE=%RETURN_VALUE%"
-)
+endlocal & set "RETURN_VALUE=%RETURN_VALUE%"
 
 exit /b 0
 

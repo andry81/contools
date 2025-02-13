@@ -88,10 +88,7 @@ for /F "usebackq tokens=* delims="eol^= %%i in (`@"%%CONTOOLS_ROOT%%/hash/hashde
 )
 
 :EXIT
-(
-  endlocal
-  set "RETURN_VALUE=%RETURN_VALUE%"
-)
+endlocal & set "RETURN_VALUE=%RETURN_VALUE%"
 
 exit /b 0
 

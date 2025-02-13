@@ -426,10 +426,7 @@ call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%FLAG_MATCH_STRING_VALUE%="
 rem skip on no match
 if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" exit /b 0
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=1,* delims=="eol^= %%i in ("!PROP_NAME!=!PROP_VALUE!") do (
-  endlocal
-  echo %%i=%%j
-) >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=1,* delims=="eol^= %%i in ("!PROP_NAME!=!PROP_VALUE!") do endlocal & (echo %%i=%%j) >> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
 
 exit /b 0
 

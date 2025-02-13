@@ -40,6 +40,6 @@ rem CAUTION:
 rem   `for /F` does not return a command error code
 for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" DataFile where "Name='%%FILE:\=\\%%'" get LastModified /VALUE`) do if "%%i" == "LastModified" set "RETURN_VALUE=%%j"
 
-if defined RETURN_VALUE ( endlocal & set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0 )
+if defined RETURN_VALUE endlocal & set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0
 
 exit /b 1

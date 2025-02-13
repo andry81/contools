@@ -8,11 +8,7 @@ call "%%~dp0__init__/__init__.bat"
 echo Running %~nx0...
 
 rem safe title call
-setlocal DISABLEDELAYEDEXPANSION
-for /F "tokens=* delims="eol^= %%i in ("%~nx0 %*") do (
-  endlocal
-  title %%i
-)
+setlocal DISABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("%~nx0 %*") do endlocal & title %%i
 
 set /A __NEST_LVL+=1
 

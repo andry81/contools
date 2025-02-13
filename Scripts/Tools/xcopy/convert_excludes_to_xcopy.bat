@@ -34,8 +34,8 @@ if not defined XCOPY_EXCLUDES_LIST_FILE exit /b 2
 rem create empty file
 type nul> "%XCOPY_EXCLUDES_LIST_FILE%" || exit /b 2
 
-if defined XCOPY_EXCLUDE_FILES_LIST ( call :PROCESS_EXCLUDES_LIST "%%XCOPY_EXCLUDE_FILES_LIST%%" || exit /b )
-if defined XCOPY_EXCLUDE_DIRS_LIST ( call :PROCESS_EXCLUDES_LIST "%%XCOPY_EXCLUDE_DIRS_LIST%%" || exit /b )
+if defined XCOPY_EXCLUDE_FILES_LIST call :PROCESS_EXCLUDES_LIST "%%XCOPY_EXCLUDE_FILES_LIST%%" || exit /b
+if defined XCOPY_EXCLUDE_DIRS_LIST call :PROCESS_EXCLUDES_LIST "%%XCOPY_EXCLUDE_DIRS_LIST%%" || exit /b
 
 exit /b 0
 

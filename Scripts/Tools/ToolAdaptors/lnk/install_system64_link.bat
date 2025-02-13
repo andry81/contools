@@ -36,7 +36,7 @@ for /F "usebackq tokens=1,2,* delims=[]" %%i in (`ver`) do for /F "tokens=1,2,* 
 
 set WINDOWS_MAJOR_VER=0
 set WINDOWS_MINOR_VER=0
-for /F "tokens=1,2,* delims=."eol^= %%i in ("%WINDOWS_VER_STR%") do ( set "WINDOWS_MAJOR_VER=%%i" & set "WINDOWS_MINOR_VER=%%j" )
+for /F "tokens=1,2,* delims=."eol^= %%i in ("%WINDOWS_VER_STR%") do set "WINDOWS_MAJOR_VER=%%i" & set "WINDOWS_MINOR_VER=%%j"
 
 echo.Creating link: "%SystemRoot%\System64" -^> "%SystemRoot%\System32"
 

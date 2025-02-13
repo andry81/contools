@@ -70,7 +70,7 @@ if not defined LAST_CP (
 set "__?CHCP_TEMP_FILE="
 
 set "CURRENT_CP="
-for /F "tokens=1,* delims=|"eol^= %%i in ("%CP_HISTORY_LIST%") do ( set "CURRENT_CP=%%i" & set "CP_HISTORY_LIST=%%j" )
+for /F "tokens=1,* delims=|"eol^= %%i in ("%CP_HISTORY_LIST%") do set "CURRENT_CP=%%i" & set "CP_HISTORY_LIST=%%j"
 
 if not defined CURRENT_CP exit /b 0
 if "%CURRENT_CP%" == "%LAST_CP%" (

@@ -32,9 +32,6 @@ for %%j in (%CMAKE_CONFIG_TYPES:;= %) do (
 exit /b 1
 
 :CMAKE_CONFIG_ABBR_TYPES_END
-(
-  endlocal
-  set "CMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%"
-)
+endlocal & set "CMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%"
 
 exit /b 0

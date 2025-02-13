@@ -138,9 +138,6 @@ if defined __CYGWIN_VER_REVISION2 (
 
 :EXIT
 rem Drop internal variables but use some changed value(s) for the return
-(
-  endlocal
-  set "CYGWIN_VER_STR=%CYGWIN_VER_STR%"
-)
+endlocal & set "CYGWIN_VER_STR=%CYGWIN_VER_STR%"
 
 exit /b 0

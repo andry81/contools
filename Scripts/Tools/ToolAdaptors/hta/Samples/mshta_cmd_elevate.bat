@@ -18,8 +18,7 @@ set "__QARG0__=vbscript:ExecuteGlobal(\""Close(CreateObject(\""""Shell.Applicati
 
 rem Command line variant for the Windows Batch `echo` command
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__QARG0__!") do endlocal & ^
-echo.^>%%i
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__QARG0__!") do endlocal & echo.^>%%i
 
 echo.---
 

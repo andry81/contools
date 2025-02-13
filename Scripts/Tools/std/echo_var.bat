@@ -21,7 +21,4 @@ if not defined __?SUFFIX__ set "__?SUFFIX__=%~3"
 rem safe echo
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__?PREFIX__!!%__?VAR__%!!__?SUFFIX__!") do endlocal & echo.%%i
 
-(
-  endlocal
-  exit /b %LAST_ERROR%
-)
+endlocal & exit /b %LAST_ERROR%

@@ -33,7 +33,4 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STR
 call "%%~dp0%%encode\decode_pathlist_chars_glob.bat" & ^
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%k in ("!__?PREFIX__!!__STRING__!!__?SUFFIX__!") do endlocal & echo.%%k
 
-(
-  endlocal
-  exit /b %LAST_ERROR%
-)
+endlocal & exit /b %LAST_ERROR%

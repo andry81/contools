@@ -141,9 +141,6 @@ if defined __MSYS_VER_REVISION2 (
 
 :EXIT
 rem Drop internal variables but use some changed value(s) for the return
-(
-  endlocal
-  set "MSYS_VER_STR=%MSYS_VER_STR%"
-)
+endlocal & set "MSYS_VER_STR=%MSYS_VER_STR%"
 
 exit /b 0

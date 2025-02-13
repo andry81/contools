@@ -58,7 +58,4 @@ goto PATH_LOOP
 exit /b 0
 
 :EXIT
-(
-  endlocal
-  set "RETURN_VALUE=%RETURN_VALUE:/=\%"
-)
+endlocal & set "RETURN_VALUE=%RETURN_VALUE:/=\%"

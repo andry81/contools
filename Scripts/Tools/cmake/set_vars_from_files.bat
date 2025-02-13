@@ -14,10 +14,7 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%TEMP_OUTPUT_DIR%%" >nul || exit /b -255
 
 rem drop rest variables
-(
-  endlocal
-  set "TEMP_OUTPUT_DIR=%TEMP_OUTPUT_DIR:\=/%"
-)
+endlocal & set "TEMP_OUTPUT_DIR=%TEMP_OUTPUT_DIR:\=/%"
 
 call :MAIN %%*
 set LAST_ERROR=%ERRORLEVEL%
@@ -35,13 +32,11 @@ rmdir /S /Q "%TEMP_OUTPUT_DIR%"
 setlocal
 call :SET_FLAGS %%*
 
-(
-  endlocal
-  call :MAIN_IMPL ^
-    %__SET_VARS_FROM_FILES_FLAGS__% ^
-    --flock "%%TEMP_OUTPUT_DIR%%/lock" --vars "%%TEMP_OUTPUT_DIR%%/var_names.lst" --values "%%TEMP_OUTPUT_DIR%%/var_values.lst" ^
-    "%%~1" "%%~2" "%%~3" "%%~4" "%%~5" "%%~6"
-)
+endlocal & ^
+call :MAIN_IMPL ^
+%__SET_VARS_FROM_FILES_FLAGS__% ^
+--flock "%%TEMP_OUTPUT_DIR%%/lock" --vars "%%TEMP_OUTPUT_DIR%%/var_names.lst" --values "%%TEMP_OUTPUT_DIR%%/var_values.lst" ^
+"%%~1" "%%~2" "%%~3" "%%~4" "%%~5" "%%~6"
 
 exit /b
 
@@ -61,16 +56,9 @@ set "__FLAGS__=%~1"
 if not defined __FLAGS__ goto FLAGS_LOOP_END
 
 rem safe set call
-setlocal ENABLEDELAYEDEXPANSION
-if defined __SET_VARS_FROM_FILES_FLAGS__ (
-  for /F "tokens=1,* delims=|"eol^= %%i in ("!__SET_VARS_FROM_FILES_FLAGS__!|!__FLAGS__!") do (
-    endlocal
-    set __SET_VARS_FROM_FILES_FLAGS__=%%i "%%j"
-  )
-) else for /F "tokens=* delims="eol^= %%i in ("!__FLAGS__!") do (
-  endlocal
-  set __SET_VARS_FROM_FILES_FLAGS__="%%i"
-)
+setlocal ENABLEDELAYEDEXPANSION & if defined __SET_VARS_FROM_FILES_FLAGS__ (
+  for /F "tokens=1,* delims=|"eol^= %%i in ("!__SET_VARS_FROM_FILES_FLAGS__!|!__FLAGS__!") do endlocal & set __SET_VARS_FROM_FILES_FLAGS__=%%i "%%j"
+) else for /F "tokens=* delims="eol^= %%i in ("!__FLAGS__!") do endlocal & set __SET_VARS_FROM_FILES_FLAGS__="%%i"
 
 shift
 
@@ -78,20 +66,11 @@ goto FLAGS_LOOP
 
 :FLAGS_LOOP_END
 
-if defined __SET_VARS_FROM_FILES_FLAGS__ (
-  setlocal ENABLEDELAYEDEXPANSION
-  for /F "tokens=* delims="eol^= %%i in ("!__SET_VARS_FROM_FILES_FLAGS__:%%=%%%%!") do (
-    endlocal
-    set "__SET_VARS_FROM_FILES_FLAGS__=%%i"
-  )
-)
+if defined __SET_VARS_FROM_FILES_FLAGS__ ^
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__SET_VARS_FROM_FILES_FLAGS__:%%=%%%%!") do endlocal & set "__SET_VARS_FROM_FILES_FLAGS__=%%i"
 
 rem safe set call
-setlocal ENABLEDELAYEDEXPANSION
-for /F "tokens=* delims="eol^= %%i in ("!__SET_VARS_FROM_FILES_FLAGS__!") do (
-  endlocal
-  set "__SET_VARS_FROM_FILES_FLAGS__=%%i"
-)
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__SET_VARS_FROM_FILES_FLAGS__!") do endlocal & set "__SET_VARS_FROM_FILES_FLAGS__=%%i"
 
 exit /b 0
 

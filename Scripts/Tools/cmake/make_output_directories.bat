@@ -34,7 +34,7 @@ if not defined PARENT_DIR (
   exit /b 4
 ) >&2
 
-if not exist "%CMAKE_OUTPUT_ROOT%" ( mkdir "%CMAKE_OUTPUT_ROOT%" || exit /b )
+if not exist "%CMAKE_OUTPUT_ROOT%" mkdir "%CMAKE_OUTPUT_ROOT%" || exit /b
 
 if defined CMAKE_OUTPUT_GENERATOR_DIR (
   call :PARENT_DIR "%%CMAKE_OUTPUT_GENERATOR_DIR%%"
@@ -43,7 +43,7 @@ if defined CMAKE_OUTPUT_GENERATOR_DIR (
     exit /b 5
   ) >&2
 
-  if not exist "%CMAKE_OUTPUT_DIR%" ( mkdir "%CMAKE_OUTPUT_DIR%" || exit /b )
+  if not exist "%CMAKE_OUTPUT_DIR%" mkdir "%CMAKE_OUTPUT_DIR%" || exit /b
 )
 
 call :PARENT_DIR "%%CMAKE_OUTPUT_DIR%%"
@@ -52,13 +52,13 @@ if not defined PARENT_DIR (
   exit /b 6
 ) >&2
 
-if not exist "%CMAKE_OUTPUT_DIR%" ( mkdir "%CMAKE_OUTPUT_DIR%" || exit /b )
+if not exist "%CMAKE_OUTPUT_DIR%" mkdir "%CMAKE_OUTPUT_DIR%" || exit /b
 
-if not exist "%CMAKE_BUILD_ROOT%" ( mkdir "%CMAKE_BUILD_DIR%" || exit /b )
-if not exist "%CMAKE_BIN_ROOT%" ( mkdir "%CMAKE_BIN_DIR%" || exit /b )
-if not exist "%CMAKE_LIB_ROOT%" ( mkdir "%CMAKE_LIB_DIR%" || exit /b )
-if not exist "%CMAKE_INSTALL_ROOT%" ( mkdir "%CMAKE_INSTALL_ROOT%" || exit /b )
-if not exist "%CMAKE_PACK_ROOT%" ( mkdir "%CMAKE_PACK_ROOT%" || exit /b )
+if not exist "%CMAKE_BUILD_ROOT%" mkdir "%CMAKE_BUILD_DIR%" || exit /b
+if not exist "%CMAKE_BIN_ROOT%" mkdir "%CMAKE_BIN_DIR%" || exit /b
+if not exist "%CMAKE_LIB_ROOT%" mkdir "%CMAKE_LIB_DIR%" || exit /b
+if not exist "%CMAKE_INSTALL_ROOT%" mkdir "%CMAKE_INSTALL_ROOT%" || exit /b
+if not exist "%CMAKE_PACK_ROOT%" mkdir "%CMAKE_PACK_ROOT%" || exit /b
 
 call :PARENT_DIR "%%CMAKE_BUILD_DIR%%"
 if not defined PARENT_DIR (
@@ -99,10 +99,10 @@ rem return variables
   set "CMAKE_PACK_DIR=%CMAKE_PACK_DIR%"
 )
 
-if not exist "%CMAKE_BUILD_DIR%" ( mkdir "%CMAKE_BUILD_DIR%" || exit /b )
-if not exist "%CMAKE_BIN_DIR%" ( mkdir "%CMAKE_BIN_DIR%" || exit /b )
-if not exist "%CMAKE_LIB_DIR%" ( mkdir "%CMAKE_LIB_DIR%" || exit /b )
-if not exist "%CMAKE_PACK_DIR%" ( mkdir "%CMAKE_PACK_DIR%" || exit /b )
+if not exist "%CMAKE_BUILD_DIR%" mkdir "%CMAKE_BUILD_DIR%" || exit /b
+if not exist "%CMAKE_BIN_DIR%" mkdir "%CMAKE_BIN_DIR%" || exit /b
+if not exist "%CMAKE_LIB_DIR%" mkdir "%CMAKE_LIB_DIR%" || exit /b
+if not exist "%CMAKE_PACK_DIR%" mkdir "%CMAKE_PACK_DIR%" || exit /b
 
 exit /b 0
 

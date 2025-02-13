@@ -58,11 +58,11 @@ call;
 
 if %~20 NEQ 0 goto SET_WITH_PRINT
 
-for /f "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do ( call :FILTER && set "%%i=%%j" )
+for /f "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do call :FILTER && set "%%i=%%j"
 exit /b 0
 
 :SET_WITH_PRINT
-for /f "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do ( call :FILTER && ( echo.%%i=%%j& set "%%i=%%j" ) )
+for /f "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do call :FILTER && ( (echo.%%i=%%j) & set "%%i=%%j" )
 exit /b 0
 
 :FILTER

@@ -1,3 +1,9 @@
+2025.02.13:
+* fixed: *.bat: missed changes code fixup
+* changed: *.bat: global code cleanup
+* changed: Scripts/Tools/exec: code improvement
+* refactor: *.bat: global code refactor
+
 2025.02.12:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/set_fileshortname.bat: current directory restore
 * changed: Scripts/Tools: *.bat: minor improvement

@@ -2,10 +2,11 @@
 
 setlocal
 
-rem Do not continue if already in Impl Mode
-if defined IMPL_MODE set /A IMPL_MODE+=0
+rem cast to integer
+set /A IMPL_MODE+=0
 
-if %IMPL_MODE%0 NEQ 0 (
+rem do not continue if already in Impl Mode
+if %IMPL_MODE% NEQ 0 (
   echo.%~nx0: error: Impl Mode already used.
   exit /b 255
 ) >&2
@@ -132,13 +133,12 @@ rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
 rem CAUTION:
 rem   The MinTTY must call to `cmd.exe` script at first, not to `callf.exe`, to bypass weird MinTTY escape rules over backslash - `\`.
-(
-  rem The `start` exists here just in case the MinTTY would not close immediately after the start.
-  start "" /B /WAIT %MINTTY_TERMINAL_PREFIX% -e ^
-    "%CONTOOLS_ROOT:/=\%/exec/exec_mintty_prefix.bat" %* & "%CONTOOLS_ROOT:/=\%/std/errlvl.bat"
-)
 
-set LAST_ERROR=%ERRORLEVEL%
+rem The `start` exists here just in case the MinTTY would not close immediately after the start.
+start "" /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_ROOT:/=\%/exec/exec_mintty_prefix.bat" %* & "%CONTOOLS_ROOT:/=\%/std/errlvl.bat"
+
+rem to drop local variables
+setlocal & set LAST_ERROR=%ERRORLEVEL%
 
 rem CAUTION:
 rem   DO NOT CLEANUP because mintty restarts itself and mintty parent process does exit immediately!
@@ -146,11 +146,7 @@ rem   Instead do cleap in a child process.
 rem
 rem call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
-(
-  rem drop local variables
-  set "LAST_ERROR="
-  exit /b %LAST_ERROR%
-)
+exit /b %LAST_ERROR%
 
 :SKIP_USE_MINTTY
 
@@ -164,22 +160,17 @@ rem CAUTION:
 rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
-(
-  endlocal
-  %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" -cur_console:n ^
-    %*
-)
+endlocal & ^
+%CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
+"%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" -cur_console:n ^
+%*
 
-set LAST_ERROR=%ERRORLEVEL%
+rem to drop local variables
+setlocal & set LAST_ERROR=%ERRORLEVEL%
 
 call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
-(
-  rem drop local variables
-  set "LAST_ERROR="
-  exit /b %LAST_ERROR%
-)
+exit /b %LAST_ERROR%
 
 :SKIP_USE_CONEMU
 
@@ -187,19 +178,14 @@ rem CAUTION:
 rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
 rem
-(
-  endlocal
-  "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% ^
-    "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
-    %*
-)
+endlocal & ^
+"%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
+"%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
+%*
 
-set LAST_ERROR=%ERRORLEVEL%
+rem to drop local variables
+setlocal & set LAST_ERROR=%ERRORLEVEL%
 
 call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
-(
-  rem drop local variables
-  set "LAST_ERROR="
-  exit /b %LAST_ERROR%
-)
+exit /b %LAST_ERROR%

@@ -21,10 +21,7 @@ rem create temporary files to store local context output
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%TEMP_OUTPUT_DIR%%" >nul || exit /b -255
 
 rem drop rest variables
-(
-  endlocal
-  set "TEMP_OUTPUT_DIR=%TEMP_OUTPUT_DIR:\=/%"
-)
+endlocal & set "TEMP_OUTPUT_DIR=%TEMP_OUTPUT_DIR:\=/%"
 
 call :MAIN %%*
 set LAST_ERROR=%ERRORLEVEL%

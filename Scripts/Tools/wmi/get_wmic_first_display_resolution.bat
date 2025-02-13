@@ -38,6 +38,6 @@ for /F "usebackq tokens=1,2 delims=="eol^= %%i in (`@"%%SystemRoot%%\System32\wb
 )
 if defined CurrentHorizontalResolution if defined CurrentVerticalResolution set "RETURN_VALUE=%CurrentHorizontalResolution%|%CurrentVerticalResolution%"
 
-if defined RETURN_VALUE ( endlocal & set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0 )
+if defined RETURN_VALUE endlocal & set "RETURN_VALUE=%RETURN_VALUE%" & exit /b 0
 
 exit /b 1

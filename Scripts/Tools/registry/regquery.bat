@@ -116,9 +116,6 @@ goto EXIT
 
 :EXIT
 rem Drop internal variables but use some changed value(s) for the return
-(
-  endlocal
-  set "REGQUERY_VALUE=%REGQUERY_VALUE%"
-)
+endlocal & set "REGQUERY_VALUE=%REGQUERY_VALUE%"
 
 exit /b 0
