@@ -31,8 +31,6 @@ upath CMAKE_SHELL:SH                            =%SHELL%
 
 upath CMAKE_PROJECT_ROOT                        ="%TACKLELIB_PROJECT_ROOT%"
 
-upath CONTOOLS_PROJECT_BUILD_ROOT               ="%TACKLELIB_PROJECT_ROOT%/_build"
-
 upath CONTOOLS_BASH_ROOT                        ="%CONTOOLS_ROOT%/bash"
 upath CONTOOLS_BUILD_TOOLS_ROOT                 ="%CONTOOLS_ROOT%/build"
 upath CONTOOLS_SQLITE_TOOLS_ROOT                ="%CONTOOLS_ROOT%/sqlite"

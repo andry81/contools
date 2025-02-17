@@ -1,0 +1,97 @@
+* admin_windows7_telemetry_precaution.txt
+* 2023.02.25
+* admin/Telemetry
+
+1. DESCRIPTION
+2. AFTER INSTALL
+3. UPDATING
+4. APPLICATIONS
+
+-------------------------------------------------------------------------------
+1. DESCRIPTION
+-------------------------------------------------------------------------------
+This is a readme file from the `contools` project.
+
+-------------------------------------------------------------------------------
+2. AFTER INSTALL
+-------------------------------------------------------------------------------
+
+1. Disable Windows Update service to auto check/download/install 
+
+2. Disable all scheduler tasks and see network connections reduction in the
+  builtin `perfmon` application / network page.
+
+3. Add firewall rules both into builtin Firewall and external / antivirus
+  firewall (in case when antivirus would be reinstalled or disabled):
+
+  1. Add `Deny all in` for all processes and addresses
+  2. Add `Deny all in/out` rule for all processes and addresses except
+     Browser(s), Windows Update, Antivirus, Virtual Machine process
+  4. Specifically deny all traffic for these processes:
+
+    * %SYSTEMROOT%\system32\consent.exe
+
+4. Disable common services
+
+  * WSearch
+  * Spooler
+  * RasMan
+  * RemoteAccess
+  * SharedAccess
+  * Mcx2Svc
+  * DPS
+
+5. Disable services related to the Microsoft Office platform like:
+
+  * ose / Office Source Engine
+  * osppsvc / Office Software Protection Platform
+  * ClickToRunSvc  / Office ClickToRun
+
+6. Install process blocker application, for example, from here:
+  https://www.processblocker.com (or find something similar)
+
+  1. Block all external process calls from browser processes
+  2. Block `tracert.exe` process from any other process except directly from
+    `cmd.exe` which runned directly by the user (for example, from Total
+      Commander or Far process)
+
+7. Disable services related to the Microsoft Visual Studio
+
+7.1. Block Visual Studio hab processes by:
+
+  1. Renaming `c:\Program Files (x86)\Common Files\microsoft shared\VsHub`
+    directory into  `VsHub_`
+  2. Create new empty
+    `c:\Program Files (x86)\Common Files\microsoft shared\VsHub` directory
+  3. Add deny premission for execute/write to the
+    `c:\Program Files (x86)\Common Files\microsoft shared\VsHub` directory for
+    the `Everyone` user
+
+7.2. Disable Visual Studio Experience Improvement Program:
+
+  1. https://stackoverflow.com/questions/42662444/how-to-disable-perfwatson2-exe-from-visual-studio-2017
+  2. From the help menu, select Send Feedback > Settings.
+  3. In the Visual Studio Experience Improvement Program dialog, select
+    `No, I would not like to participate.`
+
+8. Run `*_disable_telemetry_junk_win7.bat` scripts to cleanup system from
+   telemetry junk updates.
+
+-------------------------------------------------------------------------------
+3. UPDATING
+-------------------------------------------------------------------------------
+
+1. Avoid install updates listed here:
+
+* `admin/KnownIssues/admin_windows7_crash_updates.txt`
+
+2. Avoid install updates listed in the scripts:
+
+* `*_disable_telemetry_junk_win7.bat`
+
+-------------------------------------------------------------------------------
+4. APPLICATIONS
+-------------------------------------------------------------------------------
+
+1. Install messengers or not trusted applications with network access in a
+  separate virtual machine ONLY (for example, in the VirtualBox).

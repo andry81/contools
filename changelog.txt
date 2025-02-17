@@ -1,3 +1,10 @@
+2025.02.17:
+* new: Scripts/Tools/admin/TasksDisable/01_Telemetry/02_disable_telemetry_junk_win8.bat: more tasks to disable
+* new: Scripts/Tools/admin/TasksDisable/02_Maintenance/02_disable_maintenance_win8.bat: more tasks to disable
+* changed: Scripts/Tools/admin/TasksDisable/01_Telemetry/*_win7.bat: code rework and cleanup
+* changed: _config: cleanup
+* refactor: Scripts/Tools/admin/TasksDisable: joined `Telemetry` and `Maintenance`
+
 2025.02.13:
 * fixed: Scripts/Tools/build/load_cmdline.bat: leading white spaces trim
 * fixed: Scripts/Tools/build/load_cmdline.bat: missed to unset output variable if a command line is empty
