@@ -33,6 +33,7 @@ upath CMAKE_PROJECT_ROOT                        ="%TACKLELIB_PROJECT_ROOT%"
 
 upath CONTOOLS_BASH_ROOT                        ="%CONTOOLS_ROOT%/bash"
 upath CONTOOLS_BUILD_TOOLS_ROOT                 ="%CONTOOLS_ROOT%/build"
+upath CONTOOLS_CMAKE_ROOT                       ="%CONTOOLS_ROOT%/cmake"
 upath CONTOOLS_SQLITE_TOOLS_ROOT                ="%CONTOOLS_ROOT%/sqlite"
 upath CONTOOLS_TESTLIB_ROOT                     ="%CONTOOLS_ROOT%/testlib"
 upath CONTOOLS_VARS_ROOT                        ="%CONTOOLS_ROOT%/vars"

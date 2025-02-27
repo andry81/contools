@@ -1,3 +1,7 @@
+2025.02.27:
+* changed: Scripts/Tools/admin: moved to `contools--admin` project
+* changed: _config: added `CONTOOLS_CMAKE_ROOT` variable
+
 2025.02.17:
 * new: Scripts/Tools/admin/TasksDisable/01_Telemetry/02_disable_telemetry_junk_win8.bat: more tasks to disable
 * new: Scripts/Tools/admin/TasksDisable/02_Maintenance/02_disable_maintenance_win8.bat: more tasks to disable
