@@ -1,3 +1,6 @@
+2025.03.05:
+* changed: README.md: readme cleanup
+
 2025.02.27:
 * changed: Scripts/Tools/admin: moved to `contools--admin` project
 * changed: _config: added `CONTOOLS_CMAKE_ROOT` variable
