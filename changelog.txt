@@ -1,4 +1,9 @@
 2025.03.06:
+* fixed: Scripts/Tests/bench/batscripts/test_all.bat: missed child tests script call
+* changed: Scripts/Tests/bench/batscripts/test_*.bat: code cleanup
+* refactor: Scripts/Tools/*.bat: typo
+
+2025.03.06:
 * fixed: Scripts/Tools/ToolAdaptors/app/*.bat: execution fixup
 
 2025.03.06:

@@ -105,7 +105,7 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
   set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%.txt"
 ) else set "CMDLINE_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
 
-rem redirect command line into temporary file to print it correcly
+rem redirect command line into temporary file to print it correctly
 (
   setlocal DISABLEEXTENSIONS
   (set PROMPT=$_)
