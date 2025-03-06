@@ -2,7 +2,7 @@
 
 setlocal
 
-call "%%~dp0../__init__/script_init.bat" %%0 %%* || exit /b
+call "%%~dp0__init__/script_init.bat" %%0 %%* || exit /b
 if %IMPL_MODE%0 EQU 0 exit /b
 
 rem call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b

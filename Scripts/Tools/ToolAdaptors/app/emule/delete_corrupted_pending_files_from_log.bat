@@ -2,7 +2,7 @@
 
 setlocal
 
-call "%%~dp0../__init__/script_init.bat" %%0 %%* || exit /b
+call "%%~dp0__init__/script_init.bat" %%0 %%* || exit /b
 if %IMPL_MODE%0 EQU 0 exit /b
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
@@ -62,11 +62,11 @@ type "%EMULE_CONFIG_DIR%\downloads.txt" | "%SystemRoot%\System32\findstr.exe" /B
 echo.
 echo.Deleting...
 
-for /F "tokens=* delims="eol^= %%i in ("%CORRUPTED_EMULE_PART_FILE_LIST%") do call :DEL "%%i"
+for /F "usebackq tokens=* delims="eol^= %%i in ("%CORRUPTED_EMULE_PART_FILE_LIST%") do call :DEL "%%i"
 
 exit /b 0
 
 :DEL
-if not exist "%EMULE_PENDING_DIR%\%~1" exit /b 0
+if not exist "%EMULE_TEMP_DIR%\%~1" exit /b 0
 echo.- %~1
-del /F /Q /A:-D "%EMULE_PENDING_DIR%\%~1"
+del /F /Q /A:-D "%EMULE_TEMP_DIR%\%~1"
