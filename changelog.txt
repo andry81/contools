@@ -1,3 +1,6 @@
+2025.03.06:
+* fixed: Scripts/Tools/exec/exec_*.bat: execution fixup around line end escaping
+
 2025.03.05:
 * changed: README.md: readme cleanup
 
