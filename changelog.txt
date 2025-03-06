@@ -1,4 +1,7 @@
 2025.03.06:
+* changed: README.md: link to discussions for usage examples
+
+2025.03.06:
 * fixed: Scripts/Tests/bench/batscripts/test_all.bat: missed child tests script call
 * changed: Scripts/Tests/bench/batscripts/test_*.bat: code cleanup
 * refactor: Scripts/Tools/*.bat: typo

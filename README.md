@@ -73,6 +73,10 @@ Plus some set of standalone console utilities and tools aside other utilities an
 
 ---
 
+## <a name="usage-examples">Usage examples</a>
+
+See discussions (`impl` label): https://github.com/andry81/contools/discussions
+
 ## <a name="related-projects">Related projects</a>
 
 https://github.com/andry81?tab=repositories&q=contools
