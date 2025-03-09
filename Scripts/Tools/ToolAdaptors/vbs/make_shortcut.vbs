@@ -16,6 +16,7 @@
 '''     [-E[0 | t | a | wd]]
 '''     [-use-getlink | -g] [-print-remapped-names | -k]
 '''     [-wd <ShortcutWorkingDirectory>]
+'''     [-desc <ShortcutDescription> | -assign-target-to-desc | -dt]
 '''     [--]
 '''       <ShortcutFilePath> <ShortcutTarget> [<ShortcutTargetArgs>]
 
@@ -145,6 +146,13 @@
 '''
 '''   -wd <ShortcutWorkingDirectory>
 '''     Working directory value to assign.
+'''
+'''   -desc <ShortcutDescription>
+'''     Description string to assign.
+'''
+'''   -assign-target-to-desc | -dt
+'''     Use <ShortcutTarget> to assign <ShortcutDescription>.
+'''     Has no effect if `-desc` option is used.
 
 ''' NOTE:
 '''   1. Creation of a shortcut under ealier version of the Windows makes
@@ -375,6 +383,11 @@ Dim ShortcutWorkingDirectory : ShortcutWorkingDirectory = ""
 Dim ShortcutWorkingDirectoryUnquoted : ShortcutWorkingDirectoryUnquoted = ""
 Dim ShortcutWorkingDirectoryExist : ShortcutWorkingDirectoryExist = False
 
+Dim ShortcutDescription : ShortcutDescription = ""
+Dim ShortcutDescriptionExist : ShortcutDescriptionExist = False
+
+Dim AssignTargetToDesc : AssignTargetToDesc = False
+
 Dim ShowAs : ShowAs = 1
 Dim ShowAsExist : ShowAsExist = False
 
@@ -424,6 +437,11 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ShortcutWorkingDirectory = WScript.Arguments(i)
         ShortcutWorkingDirectoryExist = True
+      ElseIf arg = "-desc" Then ' Shortcut description
+        i = i + 1
+        ShortcutDescription = WScript.Arguments(i)
+      ElseIf arg = "-assign-target-to-desc" Or arg = "-dt" Then ' assign ShortcutTarget to ShortcutDescription
+        AssignTargetToDesc = True
       ElseIf arg = "-use-getlink" Or arg = "-g" Then
         UseGetLink = True
       ElseIf arg = "-print-remapped-names" Or arg = "-k" Then
@@ -933,7 +951,7 @@ If err <> 0 Then
 End If
 On Error Goto 0
 
-' ShortcutTarget assign
+' ShortcutTarget
 
 If PrintAssign Then
   PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "=" & ShortcutTargetUnquotedAbs
@@ -984,7 +1002,7 @@ Do ' empty `Do-Loop` to emulate `Break`
 Loop While False
 End If
 
-' ShortcutTargetArgs set
+' ShortcutTargetArgs
 
 If ShortcutTargetArgsExist Then
   If ExpandAllArgs Or ExpandShortcutTargetArgs Then
@@ -1079,6 +1097,30 @@ Do ' empty `Do-Loop` to emulate `Break`
     If PrintAssigned Then
       PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "(assigned)=" & ShortcutWorkingDirectory
     End If
+  End If
+Loop While False
+End If
+
+' ShortcutDescription
+
+If (Not ShortcutDescriptionExist) And AssignTargetToDesc Then
+  ShortcutDescription = ShortcutTargetUnquotedAbs
+  ShortcutDescriptionExist = True
+End If
+
+If ShortcutDescriptionExist Then
+Do ' empty `Do-Loop` to emulate `Break`
+  If PrintAssign Then
+    PrintOrEchoLine GetShortcutPropertyName("Description") & "=" & ShortcutDescription
+  End If
+
+  SetShortcutProperty "Description", ShortcutDescription
+
+  ' reread `Description`
+  ShortcutDescription = GetShortcutProperty("Description")
+
+  If PrintAssigned Then
+    PrintOrEchoLine GetShortcutPropertyName("Description") & "(assigned)=" & ShortcutDescription
   End If
 Loop While False
 End If

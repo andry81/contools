@@ -1,4 +1,8 @@
 2025.03.09:
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-desc` option to assign `Description` property
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-assign-target-to-desc`, `-dt` flags to use `TargetPath` to assign `Description`
+
+2025.03.09:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: volume paths support (`\\?\Volume{...}\...`)
 * fixed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: missed to delete incomplete shortcut file after error in the `MakeShortcut` function in case of `GetLink` mode
 
