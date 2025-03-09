@@ -515,6 +515,123 @@ End If
 
 ' functions
 
+Dim ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext
+
+Function CopyError()
+  ErrNumber = Err.Number
+  ErrSource = Err.Source
+  ErrDesc = Err.Description
+  ErrHelpFile = Err.HelpFile
+  ErrHelpContext = Err.HelpContext
+End Function
+
+Function GetFile(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+  If Not Left(PathAbs, 2) = "\\" Then
+    Set GetFile = objFS.GetFile("\\?\" & PathAbs)
+  Else
+    Set GetFile = objFS.GetFile(PathAbs)
+  End If
+End Function
+
+Function GetFolder(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFolder` error: `Path not found`.
+  If Not Left(PathAbs, 2) = "\\" Then
+    Set GetFolder = objFS.GetFolder("\\?\" & PathAbs & "\")
+  Else
+    Set GetFolder = objFS.GetFolder(PathAbs)
+  End If
+End Function
+
+Function FileExists(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `FileExists` error: `File not found`.
+  If Not Left(PathAbs, 2) = "\\" Then
+    FileExists = objFS.FileExists("\\?\" & PathAbs)
+  Else
+    FileExists = objFS.FileExists(PathAbs)
+  End If
+End Function
+
+Function FolderExists(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `FolderExists` error: `Path not found`.
+  If Not Left(PathAbs, 2) = "\\" Then
+    FolderExists = objFS.FolderExists("\\?\" & PathAbs & "\")
+  Else
+    FolderExists = objFS.FolderExists(PathAbs)
+  End If
+End Function
+
+' https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/createtextfile-method
+'
+Function CreateTextFileEx(FilePathAbs, IsOverwrite, IsUnicode)
+  If Not Left(FilePathAbs, 2) = "\\" Then
+    Set CreateTextFileEx = objFS.CreateTextFile("\\?\" & FilePathAbs, IsOverwrite, IsUnicode)
+  Else
+    Set CreateTextFileEx = objFS.CreateTextFile(FilePathAbs, IsOverwrite, IsUnicode)
+  End If
+End Function
+
+Function RemoveWin32NamespacePathPrefix(PathAbs)
+  ' CAUTION:
+  '   Avoid to remove other path prefixes started by `\\`:
+  '     * UNC: \\domain...
+  '     * Volume: \\?\Volume{...
+  '
+  If Left(PathAbs, 4) = "\\?\" And Mid(PathAbs, 6, 1) = ":" Then
+    RemoveWin32NamespacePathPrefix = Mid(RemoveWin32NamespacePathPrefix, 5)
+  Else
+    RemoveWin32NamespacePathPrefix = PathAbs
+  End If
+End Function
+
+Function GetExistedFileShortPath(FilePathAbs)
+  Dim File : Set File = GetFile(FilePathAbs)
+  GetExistedFileShortPath = RemoveWin32NamespacePathPrefix(File.ShortPath)
+End Function
+
+Function GetExistedFolderShortPath(FolderPathAbs)
+  Dim Folder : Set Folder = GetFolder(FolderPathAbs)
+  GetExistedFolderShortPath = RemoveWin32NamespacePathPrefix(Folder.ShortPath)
+End Function
+
+Function CreateTextFile(FilePathAbs)
+  Set CreateTextFile = CreateTextFileEx(FilePathAbs, True, False)
+End Function
+
+Function DeleteFile(FilePathAbs)
+  If Not Left(FilePathAbs, 2) = "\\" Then
+    objFS.DeleteFile("\\?\" & FilePathAbs)
+  Else
+    objFS.DeleteFile(FilePathAbs)
+  End If
+End Function
+
+Function DeleteFileEx(FilePathAbs)
+  If objFS.FileExists(FilePathAbs) Then
+    ' is not long path
+    DeleteFile(FilePathAbs)
+  Else
+    ' translate into short path
+    Dim FileShortPath : FileShortPath = GetExistedFileShortPath(FilePathAbs)
+
+    DeleteFile(FileShortPath)
+  End If
+End Function
+
+Function GetShortPath(PathAbs)
+  If FileExists(PathAbs) Then
+    GetShortPath = GetExistedFileShortPath(PathAbs)
+  ElseIf FolderExists(PathAbs) Then
+    GetShortPath = GetExistedFolderShortPath(PathAbs)
+  Else
+    GetShortPath = ""
+  End If
+End Function
+
 Function GetShortcut(ShortcutFilePathToOpen)
   Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
   Dim ShortcutParentPath : ShortcutParentPath = objFS.GetParentFolderName(ShortcutFilePathToOpen)
@@ -559,7 +676,7 @@ Function MakeShortcut(ShortcutFilePathToOpen)
     Dim EmptyLnk : EmptyLnk = "4C0000000114020000000000C000000000000046800000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000"
 
     ' create empty shortcut to open in `ParseName`
-    Dim objSCFile : Set objSCFile = objFS.CreateTextFile("\\?\" & ShortcutFilePathToOpen, True)
+    Dim objSCFile : Set objSCFile = CreateTextFileEx(ShortcutFilePathToOpen, True, False)
 
     Dim i
     For i = 1 To Len(EmptyLnk) Step 2
@@ -662,49 +779,17 @@ Sub SetShortcutProperty(PropertyName, PropertyValue)
   End If
 End Sub
 
-Function GetExistedFileShortPath(FilePathAbs)
-  ' WORKAROUND:
-  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
-  Dim File : Set File = objFS.GetFile("\\?\" & FilePathAbs)
-  GetExistedFileShortPath = File.ShortPath
-  If Left(GetExistedFileShortPath, 4) = "\\?\" Then
-    GetExistedFileShortPath = Mid(GetExistedFileShortPath, 5)
-  End If
-End Function
-
-Function GetExistedFolderShortPath(FolderPathAbs)
-  ' WORKAROUND:
-  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
-  Dim Folder : Set Folder = objFS.GetFolder("\\?\" & FolderPathAbs & "\")
-  GetExistedFolderShortPath = Folder.ShortPath
-  If Left(GetExistedFolderShortPath, 4) = "\\?\" Then
-    GetExistedFolderShortPath = Mid(GetExistedFolderShortPath, 5)
-  End If
-End Function
-
-Function GetShortPath(PathAbs)
-  If objFS.FileExists("\\?\" & PathAbs) Then
-    GetShortPath = GetExistedFileShortPath(PathAbs)
-  ElseIf objFS.FolderExists("\\?\" & PathAbs) Then
-    GetShortPath = GetExistedFolderShortPath(PathAbs)
-  Else
-    GetShortPath = ""
-  End If
-End Function
-
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
 ' change current directory before any file system request because of relative paths
 If ChangeCurrentDirectoryExist Then
   Dim ChangeCurrentDirectoryAbs : ChangeCurrentDirectoryAbs = objFS.GetAbsolutePathName(ChangeCurrentDirectory) ' CAUTION: can alter a path character case if path exists
 
-  ' remove `\\?\` prefix
-  If Left(ChangeCurrentDirectoryAbs, 4) = "\\?\" Then
-    ChangeCurrentDirectoryAbs = Mid(ChangeCurrentDirectoryAbs, 5)
-  End If
+  ' remove `\\?\` Win32 Namespace prefix
+  ChangeCurrentDirectoryAbs = RemoveWin32NamespacePathPrefix(ChangeCurrentDirectoryAbs)
 
   ' test on path existence including long path
-  Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = objFS.FolderExists("\\?\" & ChangeCurrentDirectoryAbs)
+  Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = FolderExists(ChangeCurrentDirectoryAbs)
   If Not IsCurrentDirectoryExist Then
     PrintOrEchoErrorLine _
       WScript.ScriptName & ": error: could not change current directory:" & vbCrLf & _
@@ -726,13 +811,11 @@ Dim ShortcutFilePath : ShortcutFilePath = cmd_args(0)
 
 Dim ShortcutFilePathAbs : ShortcutFilePathAbs = objFS.GetAbsolutePathName(ShortcutFilePath) ' CAUTION: can alter a path character case if path exists
 
-' remove `\\?\` prefix
-If Left(ShortcutFilePathAbs, 4) = "\\?\" Then
-  ShortcutFilePathAbs = Mid(ShortcutFilePathAbs, 5)
-End If
+' remove `\\?\` Win32 Namespace prefix
+ShortcutFilePathAbs = RemoveWin32NamespacePathPrefix(ShortcutFilePathAbs)
 
 ' test on path existence including long path
-Dim IsShortcutFileExist : IsShortcutFileExist = objFS.FileExists("\\?\" & ShortcutFilePathAbs)
+Dim IsShortcutFileExist : IsShortcutFileExist = FileExists(ShortcutFilePathAbs)
 If IsShortcutFileExist Then
   PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: shortcut file must not exist:" & vbCrLf & _
@@ -741,7 +824,7 @@ If IsShortcutFileExist Then
 End If
 
 Dim ShortcutFileDir : ShortcutFileDir = objFS.GetParentFolderName(ShortcutFilePathAbs)
-Dim IsShortcutFileDirExist : IsShortcutFileDirExist = objFS.FolderExists("\\?\" & ShortcutFileDir)
+Dim IsShortcutFileDirExist : IsShortcutFileDirExist = FolderExists(ShortcutFileDir)
 If Not IsShortcutFileDirExist Then
   PrintOrEchoErrorLine _
     WScript.ScriptName & ": error: shortcut file directory must exist:" & vbCrLf & _
@@ -781,18 +864,16 @@ If Not ShortcutTargetObj Then
 
   ShortcutTargetUnquotedAbs = objFS.GetAbsolutePathName(ShortcutTargetUnquoted) ' CAUTION: can alter a path character case if path exists
 
-  ' remove `\\?\` prefix
-  If Left(ShortcutTargetUnquotedAbs, 4) = "\\?\" Then
-    ShortcutTargetUnquotedAbs = Mid(ShortcutTargetUnquotedAbs, 5)
-  End If
+  ' remove `\\?\` Win32 Namespace prefix
+  ShortcutTargetUnquotedAbs = RemoveWin32NamespacePathPrefix(ShortcutTargetUnquotedAbs)
 
   If Not IgnoreUnexist Then
     Dim IsShortcutTargetPathExist : IsShortcutTargetPathExist = False
 
     ' test on path existence including long path
-    If objFS.FileExists("\\?\" & ShortcutTargetUnquotedAbs) Then
+    If FileExists(ShortcutTargetUnquotedAbs) Then
       IsShortcutTargetPathExist = True
-    ElseIf objFS.FolderExists("\\?\" & ShortcutTargetUnquotedAbs) Then
+    ElseIf FolderExists(ShortcutTargetUnquotedAbs) Then
       IsShortcutTargetPathExist = True
     End If
 
@@ -816,26 +897,41 @@ End If
 Dim ShortcutFilePathToOpen
 
 ' test on long path existence by temporary empty text file
-Dim ShortcutEmptyFile : Set ShortcutEmptyFile = objFS.CreateTextFile("\\?\" & ShortcutFilePathAbs)
+Dim ShortcutEmptyFile : Set ShortcutEmptyFile = CreateTextFile(ShortcutFilePathAbs)
 ' close handle immediately to be able to delete the file later
 ShortcutEmptyFile.Close()
 Set ShortcutEmptyFile = Nothing
 
-If objFS.FileExists(ShortcutFilePathAbs) Then
+If FileExists(ShortcutFilePathAbs) Then
   ' is not long path
-  objFS.DeleteFile("\\?\" & ShortcutFilePathAbs)
+  DeleteFile(ShortcutFilePathAbs)
   ShortcutFilePathToOpen = ShortcutFilePathAbs
 Else
   ' translate into short path
   Dim ShortcutFileShortPath : ShortcutFileShortPath = GetExistedFileShortPath(ShortcutFilePathAbs)
 
-  objFS.DeleteFile("\\?\" & ShortcutFilePathAbs)
+  DeleteFile(ShortcutFilePathAbs)
 
   ' construct path from short path parent directory and long path file name
   ShortcutFilePathToOpen = objFS.GetParentFolderName(ShortcutFileShortPath) & "\" & objFS.GetFileName(ShortcutFilePathAbs)
 End If
 
-Dim objSC : Set objSC = MakeShortcut(ShortcutFilePathToOpen)
+Dim objSC
+
+On Error Resume Next
+Set objSC = MakeShortcut(ShortcutFilePathToOpen)
+If err <> 0 Then
+  CopyError()
+
+  ' Remove shortcut if created from a template file
+  If UseGetLink Then
+    DeleteFileEx(ShortcutFilePathToOpen)
+  End If
+
+  On Error Goto 0
+  err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext
+End If
+On Error Goto 0
 
 ' ShortcutTarget assign
 
@@ -924,15 +1020,13 @@ Do ' empty `Do-Loop` to emulate `Break`
 
   Dim ShortcutWorkingDirectoryAbs : ShortcutWorkingDirectoryAbs = objFS.GetAbsolutePathName(ShortcutWorkingDirectory) ' CAUTION: can alter a path character case if path exists
 
-  ' remove `\\?\` prefix
-  If Left(ShortcutWorkingDirectoryAbs, 4) = "\\?\" Then
-    ShortcutWorkingDirectoryAbs = Mid(ShortcutWorkingDirectoryAbs, 5)
-  End If
+  ' remove `\\?\` Win32 Namespace prefix
+  ShortcutWorkingDirectoryAbs = RemoveWin32NamespacePathPrefix(ShortcutWorkingDirectoryAbs)
 
   Dim IsShortcutWorkingDirectoryExist : IsShortcutWorkingDirectoryExist = False
 
   ' test on path existence including long path
-  If objFS.FolderExists("\\?\" & ShortcutWorkingDirectoryAbs) Then
+  If FolderExists(ShortcutWorkingDirectoryAbs) Then
     IsShortcutWorkingDirectoryExist = True
   End If
 
