@@ -30,13 +30,14 @@
 '''     execution.
 '''
 '''   -obj
-'''     By default <ShortcutTarget> does used as a file path. Use this flag to
-'''     handle it as an object string and avoid path functions call on it.
+'''     By default <ShortcutTarget> and <ShortcutWorkingDirectory> does used as
+'''     a file path. Use this flag to handle it as an object string and avoid
+'''     path functions call on it.
 '''     Can not be used together with  `-q` flag.
 '''
 '''   -ignore-unexist
-'''     By default <ShortcutTarget> does check on existence before shortcut
-'''     creation. Use this flag to skip the check.
+'''     By default <ShortcutTarget> and <ShortcutWorkingDirectory> does check
+'''     on existence before shortcut creation. Use this flag to skip the check.
 '''     Has no effect if `-obj` flag is defined.
 '''
 '''   -ignore-empty
@@ -192,6 +193,13 @@
 '''   >
 '''   del /F /Q mycomputer.lnk
 '''   make_shortcut.bat -obj mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
+
+''' Example to create a volume folder path shortcut without a drive letter and open it in the Windows Explorer:
+'''   >
+'''   del /F /Q myvolpath.lnk
+'''   make_shortcut.bat -u -g -obj myvolpath.lnk "cmd.exe" "/c start %22%22 %22\\?\Volume{...}\...%22"
+'''   >
+'''   start /WAIT /B "" myvolpath.lnk
 
 ''' Example to create MTP device folder shortcut:
 '''   >
@@ -660,7 +668,7 @@ Function GetShortcut(ShortcutFilePathToOpen)
   Else
     Set objNamespace = objShellApp.Namespace(ShortcutFilePathToOpen)
     Set objFile = objNamespace.Self
-  End if
+  End If
 
   If IsNothing(objFile) Then
     PrintOrEchoErrorLine _
@@ -691,17 +699,31 @@ Function MakeShortcut(ShortcutFilePathToOpen)
     '   The `ParseName` still requires a shortcut file existence, but `CreateShortcut` can not handle unknown unicode characters in the path.
     '   Use empty shortcut binary file to open it through `ShellLinkObject` interface.
 
+    ' create empty shortcut to open in `ParseName`
     Dim EmptyLnk : EmptyLnk = "4C0000000114020000000000C000000000000046800000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000"
 
-    ' create empty shortcut to open in `ParseName`
-    Dim objSCFile : Set objSCFile = CreateTextFileEx(ShortcutFilePathToOpen, True, False)
+    ' CAUTION:
+    '   `WriteFile` is broken for binary writes, DO NOT USE!
+    '
+    'Dim objSCFile : Set objSCFile = CreateTextFileEx(ShortcutFilePathToOpen, True, False)
+
+    Const TypeBinary = 1, TypeText = 2
+    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+
+    Dim objSCFile : Set objSCFile = CreateObject("ADODB.Stream")
+
+    objSCFile.Type = TypeText
+    objSCFile.Charset = "x-ansi"
+    objSCFile.Open()
 
     Dim i
     For i = 1 To Len(EmptyLnk) Step 2
-      objSCFile.Write Chr(CLng("&H" & Mid(EmptyLnk, i, 2)))
+      objSCFile.WriteText Chr(CLng("&H" & Mid(EmptyLnk, i, 2)))
     Next
 
-    objSCFile.Close
+    objSCFile.SaveToFile ShortcutFilePathToOpen, ForWriting
+ 
+    objSCFile.Close()
     Set objSCFile = Nothing
 
     Set MakeShortcut = GetShortcut(ShortcutFilePathToOpen)
@@ -936,7 +958,7 @@ End If
 
 Dim objSC
 
-On Error Resume Next
+'On Error Resume Next
 Set objSC = MakeShortcut(ShortcutFilePathToOpen)
 If err <> 0 Then
   CopyError()
@@ -1041,18 +1063,20 @@ Do ' empty `Do-Loop` to emulate `Break`
   ' remove `\\?\` Win32 Namespace prefix
   ShortcutWorkingDirectoryAbs = RemoveWin32NamespacePathPrefix(ShortcutWorkingDirectoryAbs)
 
-  Dim IsShortcutWorkingDirectoryExist : IsShortcutWorkingDirectoryExist = False
+  If Not IgnoreUnexist Then
+    Dim IsShortcutWorkingDirectoryExist : IsShortcutWorkingDirectoryExist = False
 
-  ' test on path existence including long path
-  If FolderExists(ShortcutWorkingDirectoryAbs) Then
-    IsShortcutWorkingDirectoryExist = True
-  End If
+    ' test on path existence including long path
+    If FolderExists(ShortcutWorkingDirectoryAbs) Then
+      IsShortcutWorkingDirectoryExist = True
+    End If
 
-  If Not IsShortcutWorkingDirectoryExist Then
-    PrintOrEchoErrorLine _
-      WScript.ScriptName & ": error: shortcut working directory does not exist:" & vbCrLf & _
-      WScript.ScriptName & ": info: ShortcutWorkingDirectory=`" & ShortcutWorkingDirectoryAbs & "`"
-    WScript.Quit 40
+    If Not IsShortcutWorkingDirectoryExist Then
+      PrintOrEchoErrorLine _
+        WScript.ScriptName & ": error: shortcut working directory does not exist:" & vbCrLf & _
+        WScript.ScriptName & ": info: ShortcutWorkingDirectory=`" & ShortcutWorkingDirectoryAbs & "`"
+      WScript.Quit 40
+    End If
   End If
 
   ShortcutWorkingDirectoryAbsLCase = LCase(ShortcutWorkingDirectoryAbs)

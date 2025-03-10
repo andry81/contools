@@ -1,3 +1,7 @@
+2025.03.10:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `Unspecified error` (0x80004005) error in the `GetLink` method (empty shortcut wrong bytes write issue)
+* changed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: avoid check on existence `WorkingDirectory` property if `-ignore-unexist` flag is used
+
 2025.03.09:
 * new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-desc` option to assign `Description` property
 * new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-assign-target-to-desc`, `-dt` flags to use `TargetPath` to assign `Description`
