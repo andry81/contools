@@ -1,4 +1,7 @@
 2025.03.12:
+* fixed: Scripts/Tools/cleanup/cleanup_init_vars.bat: execution fixup in case of relative `PROJECT_LOG_ROOT`
+
+2025.03.12:
 * new: Scripts/Tools/std/declare_builtins.bat, Scripts/Tools/*.bat: update `?~` variable as script names call stack: `A.bat->...->Z.bat` instead of `Y.bat: Z.bat` or `Z.bat`
 * changed: Scripts/Tools/*.bat: global code improvement to replace `echo.%?~nx0%` and `echo.%~nx0` calls by `echo.%?~%`
 * changed: Scripts/Tools/*.bat: global code improvements
