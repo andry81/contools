@@ -125,7 +125,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-pd" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if not "%FLAG%" == "--" (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -161,7 +161,7 @@ set "LINKS_DIR=%~1"
 
 if defined LINKS_DIR (
   if not exist "%LINKS_DIR%\*" (
-    echo.%?~nx0%: error: LINKS_DIR does not exist: "%LINKS_DIR%".
+    echo.%?~%: error: LINKS_DIR does not exist: "%LINKS_DIR%".
     exit /b 255
   ) >&2
 ) else set "LINKS_DIR=."

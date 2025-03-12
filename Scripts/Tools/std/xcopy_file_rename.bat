@@ -52,6 +52,10 @@ setlocal
 
 set "?~dp0=%~dp0"
 set "?~n0=%~n0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "?~nx0=%~nx0"
 
 rem script flags
@@ -82,7 +86,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-use_utility_flags" (
     set FLAG_USE_UTILITY_FLAGS=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -98,22 +102,22 @@ set "FROM_FILE=%~3"
 set "TO_FILE=%~4"
 
 if not defined FROM_PATH (
-  echo.%?~nx0%: error: input directory path argument must be defined.
+  echo.%?~%: error: input directory path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined TO_PATH (
-  echo.%?~nx0%: error: output directory path argument must be defined.
+  echo.%?~%: error: output directory path argument must be defined.
   exit /b -254
 ) >&2
 
 if not defined FROM_FILE (
-  echo.%?~nx0%: error: input from file argument must be defined.
+  echo.%?~%: error: input from file argument must be defined.
   exit /b -253
 ) >&2
 
 if not defined TO_FILE (
-  echo.%?~nx0%: error: input to file argument must be defined.
+  echo.%?~%: error: input to file argument must be defined.
   exit /b -252
 ) >&2
 
@@ -141,7 +145,7 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%?~nx0%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
+  echo.%?~%: error: input directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
   exit /b -250
 ) >&2
 
@@ -168,7 +172,7 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%?~nx0%: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
+  echo.%?~%: error: output directory path is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
   exit /b -249
 ) >&2
 
@@ -183,7 +187,7 @@ goto FROM_FILE_OK
 
 :FROM_FILE_ERROR
 (
-  echo.%?~nx0%: error: input from file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
+  echo.%?~%: error: input from file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
   exit /b -248
 ) >&2
 
@@ -198,7 +202,7 @@ goto TO_FILE_OK
 
 :TO_FILE_ERROR
 (
-  echo.%?~nx0%: error: input to file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
+  echo.%?~%: error: input to file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%" TO_FILE="%TO_FILE%".
   exit /b -247
 ) >&2
 
@@ -208,12 +212,12 @@ for /F "tokens=* delims="eol^= %%i in ("%FROM_PATH%\.") do set "FROM_DIR=%%~fi"
 for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_DIR=%%~fi"
 
 if not exist "\\?\%FROM_DIR%\*" (
-  echo.%?~nx0%: error: input directory does not exist: "%FROM_DIR%\"
+  echo.%?~%: error: input directory does not exist: "%FROM_DIR%\"
   exit /b -246
 ) >&2
 
 if not exist "\\?\%TO_DIR%\*" (
-  echo.%?~nx0%: error: output directory does not exist: "%TO_DIR%\"
+  echo.%?~%: error: output directory does not exist: "%TO_DIR%\"
   exit /b -245
 ) >&2
 

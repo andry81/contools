@@ -71,6 +71,10 @@ setlocal
 
 set "?~dp0=%~dp0"
 set "?~n0=%~n0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "?~nx0=%~nx0"
 
 rem script flags
@@ -106,7 +110,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-touch_file" (
     set FLAG_TOUCH_FILE=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -121,12 +125,12 @@ set "FROM_PATH=%~1"
 set "TO_PATH=%~2"
 
 if not defined FROM_PATH (
-  echo.%?~nx0%: error: input directory path argument must be defined.
+  echo.%?~%: error: input directory path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined TO_PATH (
-  echo.%?~nx0%: error: output directory path argument must be defined.
+  echo.%?~%: error: output directory path argument must be defined.
   exit /b -253
 ) >&2
 
@@ -152,7 +156,7 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%?~nx0%: error: input directory path is invalid:
+  echo.%?~%: error: input directory path is invalid:
   echo.  FROM_PATH="%FROM_PATH%"
   echo.  TO_PATH  ="%TO_PATH%"
   exit /b -248
@@ -181,7 +185,7 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%?~nx0%: error: output directory path is invalid:
+  echo.%?~%: error: output directory path is invalid:
   echo.  FROM_PATH="%FROM_PATH%"
   echo.  TO_PATH  ="%TO_PATH%"
   exit /b -249
@@ -194,7 +198,7 @@ for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
 for /F "tokens=* delims="eol^= %%i in ("%TO_PATH_ABS%") do for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "TO_PARENT_DIR_ABS=%%~fj"
 
 if not exist "\\?\%FROM_PATH_ABS%\*" (
-  echo.%?~nx0%: error: input directory does not exist:
+  echo.%?~%: error: input directory does not exist:
   echo.  FROM_PATH="%FROM_PATH%"
   exit /b -248
 ) >&2
@@ -202,7 +206,7 @@ if not exist "\\?\%FROM_PATH_ABS%\*" (
 if %FLAG_IGNORE_UNEXIST% NEQ 0 goto IGNORE_TO_PATH_UNEXIST
 
 if not exist "\\?\%TO_PATH_ABS%\*" (
-  echo.%?~nx0%: error: output directory does not exist:
+  echo.%?~%: error: output directory does not exist:
   echo.  TO_PATH="%TO_PATH%"
   exit /b -247
 ) >&2
@@ -212,7 +216,7 @@ goto INIT
 :IGNORE_TO_PATH_UNEXIST
 
 if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
-  echo.%?~nx0%: error: output parent directory does not exist:
+  echo.%?~%: error: output parent directory does not exist:
   echo.  TO_PARENT_DIR_ABS="%TO_PARENT_DIR_ABS%"
   exit /b -249
 ) >&2
@@ -241,14 +245,14 @@ exit /b %LAST_ERROR%
 if %FLAG_USE_XCOPY% EQU 0 (
   if not exist "%SystemRoot%\System32\robocopy.exe" (
     if %FLAG_USE_ROBOCOPY% NEQ 0 (
-      echo.%?~nx0%: error: `robocopy.exe` is not found.
+      echo.%?~%: error: `robocopy.exe` is not found.
       exit /b -240
     ) >&2
     set FLAG_USE_XCOPY=1
   )
 ) else if %FLAG_USE_ROBOCOPY% NEQ 0 (
   if not exist "%SystemRoot%\System32\robocopy.exe" (
-    echo.%?~nx0%: error: `robocopy.exe` is not found.
+    echo.%?~%: error: `robocopy.exe` is not found.
     exit /b -240
   ) >&2
 )
@@ -274,7 +278,7 @@ call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || ( set "LAST_E
 set "XCOPY_EXCLUDES_LIST_TMP=%SCRIPT_TEMP_CURRENT_DIR%\$xcopy_excludes.lst"
 
 call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_xcopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" "%%XCOPY_EXCLUDES_LIST_TMP%%" || (
-  echo.%?~nx0%: error: xcopy excludes list is invalid:
+  echo.%?~%: error: xcopy excludes list is invalid:
   echo.  XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%"
   echo.  XCOPY_EXCLUDES_LIST_TMP ="%XCOPY_EXCLUDES_LIST_TMP%"
   set LAST_ERROR=-250
@@ -358,7 +362,7 @@ set "XCOPY_FLAG=%~1"
 if not defined XCOPY_FLAG exit /b 0
 set XCOPY_FLAG_PARSED=0
 if "%XCOPY_FLAG:~0,4%" == "/MOV" (
-  echo.%?~nx0%: error: /MOV and /MOVE parameters is not accepted to copy a directory.
+  echo.%?~%: error: /MOV and /MOVE parameters is not accepted to copy a directory.
   exit /b 1
 ) >&2
 if %XCOPY_FLAG_PARSED% EQU 0 set "XCOPY_FLAGS=%XCOPY_FLAGS% %XCOPY_FLAG%"
@@ -383,7 +387,7 @@ set "ROBOCOPY_EXCLUDES_CMD="
 if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_ROBOCOPY_EXCLUDES
 
 call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_robocopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" || (
-  echo.%?~nx0%: error: robocopy excludes list is invalid:
+  echo.%?~%: error: robocopy excludes list is invalid:
   echo.  XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%"
   echo.  XCOPY_EXCLUDES_LIST_TMP ="%XCOPY_EXCLUDES_LIST_TMP%"
   exit /b -246

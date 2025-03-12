@@ -8,32 +8,37 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
+set "?~=%~nx0"
+
 set "INPUT_PATH_PTTN=%~1"
 set "OUTPUT_DIR=%~2"
 set "OUTPUT_EXT=%~3"
 
 if not defined INPUT_PATH_PTTN (
-  echo.%~nx0: error: INPUT_PATH_PTTN input file path pattern is not set.
+  echo.%?~%: error: INPUT_PATH_PTTN input file path pattern is not set.
   exit /b 1
 ) >&2
 
 if not defined OUTPUT_DIR (
-  echo.%~nx0: error: OUTPUT_DIR output directory path is not set.
+  echo.%?~%: error: OUTPUT_DIR output directory path is not set.
   exit /b 2
 ) >&2
 
 if not exist "%OUTPUT_DIR%\*" (
-  echo.%~nx0: error: OUTPUT_DIR output directory path does not exist: "%OUTPUT_DIR%".
+  echo.%?~%: error: OUTPUT_DIR output directory path does not exist: "%OUTPUT_DIR%".
   exit /b 3
 ) >&2
 
 if not defined OUTPUT_EXT (
-  echo.%~nx0: error: OUTPUT_EXT output file extension is not set.
+  echo.%?~%: error: OUTPUT_EXT output file extension is not set.
   exit /b 4
 ) >&2
 
 if "%OUTPUT_EXT:~0,1%" == "." (
-  echo.%~nx0: error: OUTPUT_EXT should not begins by dot: "%OUTPUT_EXT%".
+  echo.%?~%: error: OUTPUT_EXT should not begins by dot: "%OUTPUT_EXT%".
   exit /b 5
 ) >&2
 

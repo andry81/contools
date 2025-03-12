@@ -7,17 +7,20 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "__VAR_DEFAULT_VALUE=%~1"
 set "__LOCK_FILE0=%~2"
 set "__READWRITE_FILE0=%~3"
 
 if not defined __LOCK_FILE0 (
-  echo.%~nx0: error: LOCK_FILE0 is not defined.
+  echo.%?~%: error: LOCK_FILE0 is not defined.
   exit /b 1
 ) >&2
 
 if not exist "%__READWRITE_FILE0%" (
-  echo.%~nx0: error: READWRITE_FILE0 does not exist: "%__READWRITE_FILE0%"
+  echo.%?~%: error: READWRITE_FILE0 does not exist: "%__READWRITE_FILE0%"
   exit /b 2
 ) >&2
 

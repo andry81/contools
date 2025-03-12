@@ -39,7 +39,9 @@ call;
 
 set "?~dp0=%~dp0"
 set "?~n0=%~n0"
-set "?~nx0=%~nx0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem script flags
 set FLAG_SHIFT=0
@@ -70,7 +72,7 @@ if defined FLAG (
     shift
     set /A FLAG_SHIFT+=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -91,12 +93,12 @@ if defined VARIABLE if defined %VARIABLE% set "%VARIABLE%="
 call "%%?~dp0%%setshift.bat" -notrim %%FLAG_SHIFT%% MESSAGE %%*
 
 if not defined VARIABLE (
-  echo.%?~nx0%: error: output variable name is not defined.
+  echo.%?~%: error: output variable name is not defined.
   exit /b -1
 ) >&2
 
 if not defined FLAG_INPUT_CHARS (
-  echo.%?~nx0%: error: input selection key characters are not defined.
+  echo.%?~%: error: input selection key characters are not defined.
   exit /b -1
 ) >&2
 

@@ -32,7 +32,7 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" LOG_FILE "%%EMULE_LOG_DIR%%\eMul
 :USE_EMULE_LOG_DIR_END
 
 if not exist "%LOG_FILE%" (
-  echo.%?~nx0%: error: LOG_FILE does not exist: "%LOG_FILE%".
+  echo.%?~%: error: LOG_FILE does not exist: "%LOG_FILE%".
   exit /b 255
 ) >&2
 

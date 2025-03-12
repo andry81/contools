@@ -15,14 +15,18 @@ if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 setlocal
 
 set "?~n0=%~n0%"
-set "?~nx0=%~nx0%"
+set "?~n0=%~n0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "?~dp0=%~dp0%"
 
 set "DIR_PATH=%~1"
 set DIR_COUNT=1
 
 if not defined DIR_PATH (
-  echo.%?~nx0%: error: at least one directory path argument must be defined.
+  echo.%?~%: error: at least one directory path argument must be defined.
   exit /b -255
 ) >&2
 
@@ -51,7 +55,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_ERROR
 (
-  echo.%?~nx0%: error: directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo.%?~%: error: directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -60,7 +64,7 @@ goto DIR_PATH_OK
 for /F "tokens=* delims="eol^= %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
 
 if not exist "\\?\%DIR_PATH%\*" (
-  echo.%?~nx0%: error: directory does not exist: "%DIR_PATH%".
+  echo.%?~%: error: directory does not exist: "%DIR_PATH%".
   goto CONTINUE
 ) >&2
 

@@ -15,16 +15,19 @@ rem    type dir_hash_list_diff.lst
 
 setlocal
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "DIR_PATH_FROM=%~f1"
 set "HASH_LIST_FILE=%~f2"
 
 if not exist "%DIR_PATH_FROM%\*" (
-  echo.%~nx0: error: hashing directory does not exist: "%DIR_PATH_FROM%"
+  echo.%?~%: error: hashing directory does not exist: "%DIR_PATH_FROM%"
   exit /b 1
 ) >&2
 
 if not exist "%HASH_LIST_FILE%" (
-  echo.%~nx0: error: hash list files does not exist: "%HASH_LIST_FILE%"
+  echo.%?~%: error: hash list files does not exist: "%HASH_LIST_FILE%"
   exit /b 2
 ) >&2
 

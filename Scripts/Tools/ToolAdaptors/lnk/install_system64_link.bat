@@ -9,23 +9,26 @@ if exist "%SystemRoot%\System64\*" exit /b 0
 
 setlocal
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 rem drop last error
 call;
 
 for %%i in (CONTOOLS_ROOT CONTOOLS_SYSINTERNALS_ROOT) do (
   if not defined %%i (
-    echo.%~nx0: error: `%%i` variable is not defined.
+    echo.%?~%: error: `%%i` variable is not defined.
     exit /b 1
   ) >&2
 )
 
 if not exist "%CONTOOLS_ROOT%\*" (
-  echo.%~nx0: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%"
+  echo.%?~%: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%"
   exit /b 2
 ) >&2
 
 if not exist "%CONTOOLS_SYSINTERNALS_ROOT%\*" (
-  echo.%~nx0: error: CONTOOLS_SYSINTERNALS_ROOT directory does not exist: "%CONTOOLS_SYSINTERNALS_ROOT%"
+  echo.%?~%: error: CONTOOLS_SYSINTERNALS_ROOT directory does not exist: "%CONTOOLS_SYSINTERNALS_ROOT%"
   exit /b 3
 ) >&2
 

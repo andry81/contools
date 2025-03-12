@@ -17,9 +17,8 @@ echo.^>%~nx0 %*
 
 setlocal
 
-if not defined ?~nx0 (
-  set "?~=%~nx0"
-) else set "?~=%?~nx0%: %~nx0"
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 set "FROM_PATH=%~1"
 

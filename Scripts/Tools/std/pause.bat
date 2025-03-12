@@ -23,6 +23,10 @@ if not defined CHCP_FILE (
 
 set "?~dp0=%~dp0"
 set "?~n0=%~n0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "?~nx0=%~nx0"
 
 rem script flags
@@ -41,7 +45,7 @@ if defined FLAG (
     set "FLAG_CHCP=%~2"
     shift
   ) else (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
   ) >&2
 
   shift

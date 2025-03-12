@@ -15,9 +15,13 @@ rem 1. call add_files_to_archive.bat c:\path_to_archive\app release\x86 c:\path_
 
 setlocal
 
-set "?~n0=%~n0"
-set "?~nx0=%~nx0"
 set "?~dp0=%~dp0"
+set "?~n0=%~n0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
+set "?~nx0=%~nx0"
 
 set "DIR=%~f1"
 set "REL_PATH=%~2"
@@ -48,7 +52,7 @@ goto SWITCHES_LOOP
 call "%%?~dp0%%__init__.bat" || exit /b
 
 pushd "%DIR%" || (
-  echo.%?~nx0%: error: could not switch current directory: "%DIR%".
+  echo.%?~%: error: could not switch current directory: "%DIR%".
   set LAST_ERROR=1
   goto EXIT
 )

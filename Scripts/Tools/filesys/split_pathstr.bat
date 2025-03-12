@@ -5,13 +5,16 @@ set RETURN_VALUE=0
 
 setlocal
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "FILE_PATH=%~1"
 set "DELIMS=%~2"
 set "FILE_VAR=%~3"
 set "DIR_PATH_VAR=%~4"
 
 if not defined DIR_PATH_VAR if not defined FILE_VAR (
-  echo.%~nx0: error: at least one variable name must be set.
+  echo.%?~%: error: at least one variable name must be set.
   exit /b 1
 ) >&2
 
@@ -30,10 +33,8 @@ set "NEXT_FILE=%FILE%"
 
 :LOOP
 set "SUBDIR="
-for /F "tokens=1,* delims=%DELIMS%"eol^= %%i in ("%NEXT_FILE%") do (
-  set SUBDIR=%%i
-  set NEXT_FILE=%%j
-)
+for /F "tokens=1,* delims=%DELIMS%"eol^= %%i in ("%NEXT_FILE%") do set "SUBDIR=%%i" & set "NEXT_FILE=%%j"
+
 rem echo SUBDIR=%SUBDIR%
 rem echo NEXT_FILE=%NEXT_FILE%
 if not defined SUBDIR goto EXIT
@@ -43,9 +44,7 @@ set "FILE=%NEXT_FILE%"
 
 if defined DIR_PATH (
   set "DIR_PATH=%DIR_PATH%%SEPARATOR%%SUBDIR%"
-) else (
-  set "DIR_PATH=%SUBDIR%"
-)
+) else set "DIR_PATH=%SUBDIR%"
 
 set /A DIR_INDEX+=1
 
@@ -54,12 +53,9 @@ goto LOOP
 :EXIT
 if not defined DIR_PATH call set "FILE_BUF=%%FILE:%DELIMS:~0,1%=%%"
 
+rem swap
 if not defined DIR_PATH ^
-if not "%FILE%" == "%FILE_BUF%" (
-  rem swap
-  set "DIR_PATH=%FILE%"
-  set "FILE="
-)
+if not "%FILE%" == "%FILE_BUF%" set "DIR_PATH=%FILE%" & set "FILE="
 
 (
   endlocal

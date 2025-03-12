@@ -7,18 +7,21 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "__VAR_NAME=%~1"
 set "__VAR_DEFAULT_VALUE=%~2"
 set "__LOCK_FILE0=%~3"
 set "__READ_FILE0=%~4"
 
 if not defined __VAR_NAME (
-  echo.%~nx0: error: VAR_NAME is not defined.
+  echo.%?~%: error: VAR_NAME is not defined.
   exit /b 1
 ) >&2
 
 if not defined __LOCK_FILE0 (
-  echo.%~nx0: error: LOCK_FILE0 is not defined.
+  echo.%?~%: error: LOCK_FILE0 is not defined.
   exit /b 2
 ) >&2
 

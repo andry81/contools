@@ -108,15 +108,16 @@ rem   The only `%<variable>%` placeholders can be expanded in a variable value.
 setlocal DISABLEDELAYEDEXPANSION
 
 set "__?~dp0=%~dp0"
-set "__?~n0=%~n0"
-set "__?~nx0=%~nx0"
+
+rem script names call stack
+if defined ?~ ( set "__?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "__?~=%?~nx0%-^>%~nx0" ) else set "__?~=%~nx0"
 
 if defined NO_GEN set /A NO_GEN+=0
 
 call "%%__?~dp0%%.load_config/load_config.read_flags.bat" %%* || exit /b
 
 if %NO_GEN%0 NEQ 0 if %__?FLAG_GEN_CONFIG% NEQ 0 (
-  echo.%__?~nx0%: error: can not generate config while NO_GEN is set.
+  echo.%__?~%: error: can not generate config while NO_GEN is set.
   exit /b 255
 ) >&2
 
@@ -129,12 +130,12 @@ set "__?PARAM0=%~4"
 set "__?PARAM1=%~5"
 
 if not defined __?CONFIG_IN_DIR (
-  echo.%__?~nx0%: error: input config directory is not defined.
+  echo.%__?~%: error: input config directory is not defined.
   exit /b 1
 ) >&2
 
 if not defined __?CONFIG_OUT_DIR (
-  echo.%__?~nx0%: error: output config directory is not defined.
+  echo.%__?~%: error: output config directory is not defined.
   exit /b 2
 ) >&2
 
@@ -148,13 +149,13 @@ goto PARAMS_OK
 
 :PARAM0_ERROR
 (
-  echo.%__?~nx0%: error: param0 is invalid: "%__?PARAM0%".
+  echo.%__?~%: error: param0 is invalid: "%__?PARAM0%".
   exit /b 3
 ) >&2
 
 :PARAM1_ERROR
 (
-  echo.%__?~nx0%: error: param1 is invalid: "%__?PARAM1%".
+  echo.%__?~%: error: param1 is invalid: "%__?PARAM1%".
   exit /b 4
 ) >&2
 
@@ -164,14 +165,14 @@ for /F "tokens=* delims="eol^= %%i in ("%__?CONFIG_IN_DIR%\.") do set "__?CONFIG
 for /F "tokens=* delims="eol^= %%i in ("%__?CONFIG_OUT_DIR%\.") do set "__?CONFIG_OUT_DIR=%%~fi"
 
 if not exist "%__?CONFIG_IN_DIR%\*" (
-  echo.%__?~nx0%: error: input config directory does not exist: "%__?CONFIG_IN_DIR%".
+  echo.%__?~%: error: input config directory does not exist: "%__?CONFIG_IN_DIR%".
   exit /b 10
 ) >&2
 
 if %__?FLAG_GEN_CONFIG% EQU 0 if %__?FLAG_LOAD_OUTPUT_CONFIG% EQU 0 goto SKIP_CONFIG_OUT_DIR_CHECK
 
 if not exist "%__?CONFIG_OUT_DIR%\*" (
-  echo.%__?~nx0%: error: output config directory does not exist: "%__?CONFIG_OUT_DIR%".
+  echo.%__?~%: error: output config directory does not exist: "%__?CONFIG_OUT_DIR%".
   exit /b 11
 ) >&2
 
@@ -192,7 +193,7 @@ if %__?FLAG_GEN_CONFIG% EQU 0 (
 
 rem load configuration files
 if not exist "%__?CONFIG_FILE_NAME_DIR%\%__?CONFIG_FILE_NAME%" (
-  echo.%__?~nx0%: error: config file is not found: "%__?CONFIG_FILE_NAME_DIR%\%__?CONFIG_FILE_NAME%".
+  echo.%__?~%: error: config file is not found: "%__?CONFIG_FILE_NAME_DIR%\%__?CONFIG_FILE_NAME%".
   exit /b 20
 ) >&2
 

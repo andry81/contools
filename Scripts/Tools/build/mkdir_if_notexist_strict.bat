@@ -18,9 +18,10 @@ rem   Single directory path.
 
 setlocal
 
-if not defined ?~nx0 (
-  set "?~=%~nx0"
-) else set "?~=%?~nx0%: %~nx0"
+set "?~n0=%~n0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 set "DIR_PATH=%~1"
 
@@ -97,10 +98,10 @@ if defined EMPTY_DIR_TMP (
   for /F "tokens=* delims="eol^= %%i in ("%EMPTY_DIR_TMP%\.") do set "EMPTY_DIR_TMP=%%~fi"
 ) else if defined SCRIPT_TEMP_CURRENT_DIR (
   set REMOVE_EMPTY_DIR_TMP=1
-  set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%?~nx0%.emptydir.%RANDOM%-%RANDOM%"
+  set "EMPTY_DIR_TMP=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.emptydir.%RANDOM%-%RANDOM%"
 ) else (
   set REMOVE_EMPTY_DIR_TMP=1
-  set "EMPTY_DIR_TMP=%TEMP%\%?~nx0%.emptydir.%RANDOM%-%RANDOM%"
+  set "EMPTY_DIR_TMP=%TEMP%\%?~n0%.emptydir.%RANDOM%-%RANDOM%"
 )
 
 if exist "\\?\EMPTY_DIR_TMP\*" (

@@ -11,8 +11,8 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "?~nx0=%~nx0"
-set "?~dp0=%~dp0"
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem script flags
 set FLAG_NOPROPS=0
@@ -34,7 +34,7 @@ if defined FLAG (
     set FLAG_LNODES=1
     shift
   ) else (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b 255
   ) >&2
 
@@ -45,12 +45,12 @@ if defined FLAG (
 set "XML_FILE=%~1"
 
 if not defined XML_FILE (
-  echo.%?~nx0%: error: xml file is no set.
+  echo.%?~%: error: xml file is no set.
   exit /b 254
 ) >&2
 
 if not exist "%XML_FILE%" (
-  echo.%?~nx0%: error: xml file is not found: "%XML_FILE%".
+  echo.%?~%: error: xml file is not found: "%XML_FILE%".
   exit /b 253
 ) >&2
 

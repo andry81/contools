@@ -49,7 +49,7 @@ if defined FLAG (
     set FLAG_IGNORE_PROPS=1
     shift
   ) else (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b 1
   ) >&2
 
@@ -61,22 +61,22 @@ set "XPATH_LIST_FILE_IN=%~1"
 set "XPATH_LIST_FILE_FILTER=%~2"
 
 if not defined XPATH_LIST_FILE_IN (
-  echo.%?~nx0%: error: input xpath file is no set.
+  echo.%?~%: error: input xpath file is no set.
   exit /b 2
 ) >&2
 
 if not exist "%XPATH_LIST_FILE_IN%" (
-  echo.%?~nx0%: error: input xpath file is not found: "%XPATH_LIST_FILE_IN%".
+  echo.%?~%: error: input xpath file is not found: "%XPATH_LIST_FILE_IN%".
   exit /b 3
 ) >&2
 
 if not defined XPATH_LIST_FILE_FILTER (
-  echo.%?~nx0%: error: xpath filter file is no set.
+  echo.%?~%: error: xpath filter file is no set.
   exit /b 4
 ) >&2
 
 if not exist "%XPATH_LIST_FILE_FILTER%" (
-  echo.%?~nx0%: error: xpath filter file is not found: "%XPATH_LIST_FILE_FILTER%".
+  echo.%?~%: error: xpath filter file is not found: "%XPATH_LIST_FILE_FILTER%".
   exit /b 5
 ) >&2
 

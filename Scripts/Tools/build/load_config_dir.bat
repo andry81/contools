@@ -66,8 +66,9 @@ rem NOTE:
 rem   All the rest parameters is in the `load_config.bat` script.
 
 set "__?~dp0=%~dp0"
-set "__?~n0=%~n0"
-set "__?~nx0=%~nx0"
+
+rem script names call stack
+if defined ?~ ( set "__?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "__?~=%?~nx0%-^>%~nx0" ) else set "__?~=%~nx0"
 
 if defined NO_GEN set /A NO_GEN+=0
 
@@ -77,11 +78,11 @@ if %__?FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%__?FLAG_SHIFT%) do shift
 
 if %NO_GEN%0 NEQ 0 (
   if %__?FLAG_GEN_SYSTEM_CONFIG% NEQ 0 (
-    echo.%__?~nx0%: error: can not generate system config while NO_GEN is set.
+    echo.%__?~%: error: can not generate system config while NO_GEN is set.
     exit /b 255
   ) >&2
   if %__?FLAG_GEN_USER_CONFIG% NEQ 0 (
-    echo.%__?~nx0%: error: can not generate user config while NO_GEN is set.
+    echo.%__?~%: error: can not generate user config while NO_GEN is set.
     exit /b 255
   ) >&2
 )

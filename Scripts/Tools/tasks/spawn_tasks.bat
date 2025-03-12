@@ -5,6 +5,9 @@ rem   Script to spawn tasks in parallel but not greater than maximum.
 
 setlocal
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 rem overall tasks to spawn, exit when reached
 set "MAX_SPAWN_TASKS=%~1"
 
@@ -15,17 +18,17 @@ rem min busy tasks to unlock spawn new tasks, may be left empty to not lock to s
 set "MIN_BUSY_TASKS_TO_UNLOCK_SPAWN=%~3"
 
 if not defined MAX_SPAWN_TASKS (
-  echo.%~nx0: error: max spawn tasks is not defined.
+  echo.%?~%: error: max spawn tasks is not defined.
   exit /b 1
 ) >&2
 
 if not defined MAX_BUSY_TASKS (
-  echo.%~nx0: error: max busy tasks is not defined.
+  echo.%?~%: error: max busy tasks is not defined.
   exit /b 2
 ) >&2
 
 if "%~4" == "" (
-  echo.%~nx0: error: command line is empty.
+  echo.%?~%: error: command line is empty.
   exit /b -1
 ) >&2
 

@@ -1,5 +1,8 @@
 @echo off
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx1" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx1" ) else set "?~=%~nx1"
+
 set ?0=%1
 set "?~0=%~1"
 set "?~f0=%~f1"

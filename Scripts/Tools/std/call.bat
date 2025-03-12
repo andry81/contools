@@ -98,6 +98,9 @@ rem     different encoders.
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 rem drop last error level
 call;
 
@@ -187,7 +190,7 @@ if not defined FLAG_LOCK_FILE goto SKIP_CALL_LOCK
 for /F "tokens=* delims="eol^= %%i in ("%FLAG_LOCK_FILE%\.") do set "FLAG_LOCK_FILE_DIR=%%~dpi"
 
 if not exist "%FLAG_LOCK_FILE_DIR%*" (
-  echo.%~nx0: error: lock file directory does not exist: "%FLAG_LOCK_FILE_DIR%"
+  echo.%?~%: error: lock file directory does not exist: "%FLAG_LOCK_FILE_DIR%"
   exit /b -1024
 ) >&2
 

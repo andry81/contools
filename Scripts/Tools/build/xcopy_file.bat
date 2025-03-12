@@ -13,8 +13,11 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 if "%~3" == "" (
-  echo.%~nx0%: error: target directory is not defined.
+  echo.%?~%%: error: target directory is not defined.
   exit /b 255
 ) >&2
 

@@ -22,7 +22,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-k" (
     set SKIP_ARCHIVES_WITH_EXISTED_EXTRACTED_PREFIX_PATH=1
   ) else (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 

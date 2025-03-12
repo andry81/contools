@@ -2,6 +2,10 @@
 
 setlocal DISABLEDELAYEDEXPANSION
 
+rem script names call stack, disabled due to self call and partial inheritance (process elevation does not inherit a parent process variables by default)
+rem if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+set "?~=%~nx0"
+
 set /A ELEVATED+=0
 
 if %IMPL_MODE%0 NEQ 0 goto IMPL
@@ -49,7 +53,7 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
 if not exist "%SystemRoot%\Syswow64\*" (
-  echo.%~nx0: error: not x86 system without Syswow64 system directory.
+  echo.%?~%: error: not x86 system without Syswow64 system directory.
   exit /b 255
 ) >&2
 
@@ -71,7 +75,7 @@ set IMPL_MODE=1
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto IMPL
 
 if not exist "%SystemRoot%\Syswow64\*" (
-  echo.%~nx0: error: not x86 system without Syswow64 system directory.
+  echo.%?~%: error: not x86 system without Syswow64 system directory.
   exit /b 255
 ) >&2
 

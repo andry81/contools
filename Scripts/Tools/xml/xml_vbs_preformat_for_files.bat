@@ -16,8 +16,8 @@ setlocal
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "?~nx0=%~nx0"
-set "?~dp0=%~dp0"
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem script flags
 set "CMD_FLAG_ARGS="
@@ -54,7 +54,7 @@ goto PROCESS_FILES_LOOP
 :PROCESS_FILES_LOOP_END
 
 if %NUM_CMD_VA_ARGS% EQU 0 (
-  echo.%?~nx0%: error: must set at least one wildcard token or directory path.
+  echo.%?~%: error: must set at least one wildcard token or directory path.
   exit /b 255
 ) >&2
 

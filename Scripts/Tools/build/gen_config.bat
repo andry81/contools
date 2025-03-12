@@ -54,8 +54,9 @@ rem   Must not contain `.in` suffix.
 setlocal
 
 set "?~dp0=%~dp0"
-set "?~n0=%~n0"
-set "?~nx0=%~nx0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem script flags
 set FLAG_IF_NOTEXIST=0
@@ -110,7 +111,7 @@ if defined FLAG (
     shift
     shift
   ) else if not "%FLAG%" == "--" (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -127,17 +128,17 @@ set "CONFIG_FILE=%~3"
 if %FLAG_SKIP_CHECKS% NEQ 0 goto SKIP_CHECKS
 
 if not defined CONFIG_IN_DIR (
-  echo.%?~nx0%: error: input config directory is not defined.
+  echo.%?~%: error: input config directory is not defined.
   exit /b 1
 ) >&2
 
 if not defined CONFIG_OUT_DIR (
-  echo.%?~nx0%: error: output config directory is not defined.
+  echo.%?~%: error: output config directory is not defined.
   exit /b 2
 ) >&2
 
 if not defined CONFIG_FILE (
-  echo.%?~nx0%: error: config file is not defined.
+  echo.%?~%: error: config file is not defined.
   exit /b 3
 ) >&2
 
@@ -145,12 +146,12 @@ for /F "tokens=* delims="eol^= %%i in ("%CONFIG_IN_DIR%\.") do set "CONFIG_IN_DI
 for /F "tokens=* delims="eol^= %%i in ("%CONFIG_OUT_DIR%\.") do set "CONFIG_OUT_DIR=%%~fi"
 
 if not exist "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" (
-  echo.%?~nx0%: error: input config file does not exist: "%CONFIG_IN_DIR%\%CONFIG_FILE%.in".
+  echo.%?~%: error: input config file does not exist: "%CONFIG_IN_DIR%\%CONFIG_FILE%.in".
   exit /b 10
 ) >&2
 
 if not exist "%CONFIG_OUT_DIR%\*" (
-  echo.%?~nx0%: error: output config directory does not exist: "%CONFIG_OUT_DIR%".
+  echo.%?~%: error: output config directory does not exist: "%CONFIG_OUT_DIR%".
   exit /b 11
 ) >&2
 

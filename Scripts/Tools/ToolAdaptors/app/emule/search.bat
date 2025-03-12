@@ -23,7 +23,7 @@ set "SEARCH_EXPR_SUFFIX=%~2"
 if defined SEARCH_EXPR_SUFFIX set "SEARCH_EXPR_SUFFIX= %SEARCH_EXPR_SUFFIX%"
 
 if not exist "%SEARCH_LIST_FILE%" (
-  echo.%~nx0: error: SEARCH_LIST_FILE file path is not found: "%SEARCH_LIST_FILE%"
+  echo.%?~%: error: SEARCH_LIST_FILE file path is not found: "%SEARCH_LIST_FILE%"
   exit /b 1
 ) >&2
 

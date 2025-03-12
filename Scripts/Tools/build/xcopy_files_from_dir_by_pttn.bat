@@ -15,6 +15,10 @@ rem %4-%N - Optional file pattern list for the `dir` command, ex: `"*.txt" "*.md
 
 setlocal
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
+rem log into current directory
 if not defined PROJECT_LOG_ROOT set PROJECT_LOG_ROOT=.log
 
 call "%%~dp0../__init__/script_init.bat" %%0 %%* || exit /b
@@ -36,27 +40,27 @@ rem read archive file pattern list
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" 3 FILE_PTTN_LIST %%*
 
 if not defined XCOPY_FROM_DIR (
-  echo.%~nx0: error: XCOPY_FROM_DIR is not defined.
+  echo.%?~%: error: XCOPY_FROM_DIR is not defined.
   exit /b 255
 ) >&2
 
 if not exist "%XCOPY_FROM_DIR%\*" (
-  echo.%~nx0: error: XCOPY_FROM_DIR does not exist: "%XCOPY_FROM_DIR%".
+  echo.%?~%: error: XCOPY_FROM_DIR does not exist: "%XCOPY_FROM_DIR%".
   exit /b 255
 ) >&2
 
 if not defined XCOPY_TO_DIR (
-  echo.%~nx0: error: XCOPY_TO_DIR is not defined.
+  echo.%?~%: error: XCOPY_TO_DIR is not defined.
   exit /b 255
 ) >&2
 
 if not exist "%XCOPY_TO_DIR%\*" (
-  echo.%~nx0: error: XCOPY_TO_DIR does not exist: "%XCOPY_TO_DIR%".
+  echo.%?~%: error: XCOPY_TO_DIR does not exist: "%XCOPY_TO_DIR%".
   exit /b 255
 ) >&2
 
 if not defined FILE_PTTN_LIST (
-  echo.%~nx0: error: FILE_PTTN_LIST is not defined.
+  echo.%?~%: error: FILE_PTTN_LIST is not defined.
   exit /b 255
 ) >&2
 

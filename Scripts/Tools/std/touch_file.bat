@@ -18,14 +18,18 @@ if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 setlocal
 
 set "?~n0=%~n0%"
-set "?~nx0=%~nx0%"
+set "?~n0=%~n0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "?~dp0=%~dp0%"
 
 set "FILE_PATH=%~1"
 set FILE_COUNT=1
 
 if not defined FILE_PATH (
-  echo.%?~nx0%: error: at least one file path argument must be defined.
+  echo.%?~%: error: at least one file path argument must be defined.
   exit /b -255
 ) >&2
 
@@ -54,7 +58,7 @@ goto FILE_PATH_OK
 
 :FILE_PATH_ERROR
 (
-  echo.%?~nx0%: error: file path is invalid: ARG=%FILE_COUNT% FILE_PATH="%FILE_PATH%".
+  echo.%?~%: error: file path is invalid: ARG=%FILE_COUNT% FILE_PATH="%FILE_PATH%".
   exit /b -254
 ) >&2
 
@@ -64,12 +68,12 @@ for /F "tokens=* delims="eol^= %%i in ("%FILE_PATH%\.") do ^
 for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "FILE_PATH=%%~fi" & set "FILE_DIR=%%~fj" & set "FILE_NAME=%%~nxi"
 
 if exist "\\?\%FILE_PATH%\*" (
-  echo.%?~nx0%: error: file path is a directory: "%FILE_PATH%".
+  echo.%?~%: error: file path is a directory: "%FILE_PATH%".
   goto CONTINUE
 ) >&2
 
 if not exist "\\?\%FILE_DIR%\*" (
-  echo.%?~nx0%: error: directory does not exist: "%FILE_DIR%".
+  echo.%?~%: error: directory does not exist: "%FILE_DIR%".
   goto CONTINUE
 ) >&2
 

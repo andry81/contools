@@ -86,7 +86,7 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.impl%TEST_SCRIPT_FI
     ( call "%%TEST_SCRIPT_HANDLERS_DIR%%/impl%%TEST_SCRIPT_FILE_EXT%%" ) || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
   )
 ) || (
-  echo.%?~nx0%: error: test script implementation is not found: "%TEST_SCRIPT_FILE_NAME%".
+  echo.%?~%: error: test script implementation is not found: "%TEST_SCRIPT_FILE_NAME%".
   set "LAST_ERROR=-255"
 ) >&2
 

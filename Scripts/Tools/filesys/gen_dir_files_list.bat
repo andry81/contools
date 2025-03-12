@@ -4,7 +4,8 @@ setlocal DISABLEDELAYEDEXPANSION
 
 call "%%~dp0__init__.bat" || exit /b
 
-set "?~nx0=%~nx0"
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem get code page value from first parameter
 set "LAST_CODE_PAGE="
@@ -20,11 +21,11 @@ set "FILE_PATH_PTTN=%~1"
 
 rem ignore specific patterns to avoid problems
 if not defined FILE_PATH_PTTN (
-  echo.%?~nx0%: error: file or directory is not set.
+  echo.%?~%: error: file or directory is not set.
   exit /b 1
 ) >&2
 if "%FILE_PATH_PTTN:~0,1%" == "\" (
-  echo.%?~nx0%: error: path is not acceptable: "%FILE_PATH_PTTN%".
+  echo.%?~%: error: path is not acceptable: "%FILE_PATH_PTTN%".
   exit /b 2
 ) >&2
 
@@ -45,7 +46,7 @@ exit /b 0
 set "FILES_PATH=%~f1"
 
 if not exist "%FILES_PATH%" (
-  echo.%?~nx0%: error: file or directory is not found: "%FILES_PATH%".
+  echo.%?~%: error: file or directory is not found: "%FILES_PATH%".
   exit /b -1
 ) >&2
 

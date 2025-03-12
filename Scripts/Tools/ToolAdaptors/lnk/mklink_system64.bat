@@ -20,16 +20,19 @@ rem   available otherwise the script won't work properly.
 
 setlocal
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 rem drop last error
 call;
 
 if not defined CONTOOLS_ROOT (
-  echo.%~nx0: error: CONTOOLS_ROOT variable is not defined.
+  echo.%?~%: error: CONTOOLS_ROOT variable is not defined.
   exit /b 1
 ) >&2
 
 if not exist "%CONTOOLS_ROOT%\*" (
-  echo.%~nx0: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%".
+  echo.%?~%: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%".
   exit /b 2
 ) >&2
 
@@ -42,7 +45,7 @@ if %ERRORLEVEL% EQU 0 goto MKLINK
 if exist "linkd.exe" goto LINKD
 
 (
-  echo.%~nx0: error: can not create `%SYSTEMROOT%\System64` directory
+  echo.%?~%: error: can not create `%SYSTEMROOT%\System64` directory
   exit /b 255
 ) >&2
 

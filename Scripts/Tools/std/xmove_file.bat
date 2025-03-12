@@ -77,6 +77,10 @@ setlocal
 
 set "?~dp0=%~dp0"
 set "?~n0=%~n0"
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "?~nx0=%~nx0"
 
 rem script flags
@@ -112,7 +116,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-touch_file" (
     set FLAG_TOUCH_FILE=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -128,17 +132,17 @@ set "FROM_FILE=%~2"
 set "TO_PATH=%~3"
 
 if not defined FROM_PATH (
-  echo.%?~nx0%: error: input directory path argument must be defined.
+  echo.%?~%: error: input directory path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined FROM_FILE (
-  echo.%?~nx0%: error: input file argument must be defined.
+  echo.%?~%: error: input file argument must be defined.
   exit /b -254
 ) >&2
 
 if not defined TO_PATH (
-  echo.%?~nx0%: error: output directory path argument must be defined.
+  echo.%?~%: error: output directory path argument must be defined.
   exit /b -253
 ) >&2
 
@@ -165,7 +169,7 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%?~nx0%: error: input directory path is invalid:
+  echo.%?~%: error: input directory path is invalid:
   echo.  FROM_PATH="%FROM_PATH%"
   echo.  FROM_FILE="%FROM_FILE%"
   echo.  TO_PATH  ="%TO_PATH%"
@@ -183,7 +187,7 @@ goto FROM_FILE_OK
 
 :FROM_FILE_ERROR
 (
-  echo.%?~nx0%: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  echo.%?~%: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
   exit /b -248
 ) >&2
 
@@ -210,7 +214,7 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%?~nx0%: error: output directory path is invalid:
+  echo.%?~%: error: output directory path is invalid:
   echo.  FROM_PATH="%FROM_PATH%"
   echo.  FROM_FILE="%FROM_FILE%"
   echo.  TO_PATH  ="%TO_PATH%"
@@ -224,7 +228,7 @@ for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
 for /F "tokens=* delims="eol^= %%i in ("%TO_PATH_ABS%") do for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "TO_PARENT_DIR_ABS=%%~fj"
 
 if not exist "\\?\%FROM_DIR_PATH_ABS%\*" (
-  echo.%?~nx0%: error: input directory does not exist:
+  echo.%?~%: error: input directory does not exist:
   echo.  FROM_PATH="%FROM_PATH%"
   exit /b -248
 ) >&2
@@ -237,14 +241,14 @@ if not "%FROM_FILE%" == "%FROM_FILE:?=%" goto SKIP_FROM_FILE_CHECK
 
 rem check on input file existence
 if not exist "\\?\%FROM_FILE_PATH_ABS%" (
-  echo.%?~nx0%: error: input file path does not exist:
+  echo.%?~%: error: input file path does not exist:
   echo.  FROM_FILE_PATH="%FROM_PATH%\%FROM_FILE%"
   exit /b -248
 ) >&2
 
 rem check on input file as directory existence
 if exist "\\?\%FROM_FILE_PATH_ABS%\*" (
-  echo.%?~nx0%: error: input file is a directory:
+  echo.%?~%: error: input file is a directory:
   echo.  FROM_FILE_PATH="%FROM_PATH%\%FROM_FILE%"
   exit /b -248
 ) >&2
@@ -254,7 +258,7 @@ if exist "\\?\%FROM_FILE_PATH_ABS%\*" (
 if %FLAG_IGNORE_UNEXIST% NEQ 0 goto IGNORE_TO_PATH_UNEXIST
 
 if not exist "\\?\%TO_PATH_ABS%\*" (
-  echo.%?~nx0%: error: output directory does not exist: "%TO_PATH%\"
+  echo.%?~%: error: output directory does not exist: "%TO_PATH%\"
   exit /b -249
 ) >&2
 
@@ -263,7 +267,7 @@ goto INIT
 :IGNORE_TO_PATH_UNEXIST
 
 if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
-  echo.%?~nx0%: error: output parent directory does not exist:
+  echo.%?~%: error: output parent directory does not exist:
   echo.  TO_PARENT_DIR_ABS="%TO_PARENT_DIR_ABS%"
   exit /b -249
 ) >&2
@@ -292,7 +296,7 @@ exit /b %LAST_ERROR%
 if %FLAG_USE_BUILTIN_MOVE% EQU 0 (
   if not exist "%SystemRoot%\System32\robocopy.exe" (
     if %FLAG_USE_ROBOCOPY% NEQ 0 (
-      echo.%?~nx0%: error: `robocopy.exe` is not found.
+      echo.%?~%: error: `robocopy.exe` is not found.
       exit /b -240
     ) >&2
     set FLAG_USE_BUILTIN_MOVE=1
@@ -405,7 +409,7 @@ if "%XMOVE_FLAG%" == "/Y" (
   exit /b 0
 )
 if "%XMOVE_FLAG%" == "/S" (
-  echo.%?~nx0%: error: /S flag is not applicable.
+  echo.%?~%: error: /S flag is not applicable.
   exit /b 1
 ) >&2
 rem CAUTION: /E must be used in case of file globbing including directories
@@ -414,7 +418,7 @@ if "%XMOVE_FLAG%" == "/E" (
   exit /b 0
 )
 if "%XMOVE_FLAG:~0,4%" == "/MOV" (
-  echo.%?~nx0%: error: /MOV and /MOVE parameters is not accepted to move a file.
+  echo.%?~%: error: /MOV and /MOVE parameters is not accepted to move a file.
   exit /b 1
 ) >&2
 if %XMOVE_FLAG_PARSED% EQU 0 set "XMOVE_FLAGS=%XMOVE_FLAGS% %XMOVE_FLAG%"
@@ -563,7 +567,7 @@ set "ROBOCOPY_EXCLUDES_CMD="
 if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_ROBOCOPY_EXCLUDES
 
 call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_robocopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" || (
-  echo.%?~nx0%: error: robocopy excludes list is invalid:
+  echo.%?~%: error: robocopy excludes list is invalid:
   echo.  XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%"
   echo.  XCOPY_EXCLUDES_LIST_TMP ="%XCOPY_EXCLUDES_LIST_TMP%"
   exit /b -246

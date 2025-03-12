@@ -39,7 +39,8 @@ rem
 
 setlocal
 
-set "?~nx0=%~nx0"
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem script flags
 set "FLAG_VALUE_EXCLUDE_DIRS="
@@ -58,7 +59,7 @@ if defined FLAG (
     shift
     shift
   ) else (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -75,7 +76,7 @@ set "DESTDIR_ABS=%~f2"
 set "PYTHON_EXE=%PYTHON_DIR%\python.exe"
 
 if not exist "%PYTHON_EXE%" (
-  echo.%?~nx0%: error: python.exe is not found: "%PYTHON_EXE%"
+  echo.%?~%: error: python.exe is not found: "%PYTHON_EXE%"
   exit /b 255
 ) >&2
 
@@ -83,7 +84,7 @@ if defined DESTDIR ^
 if exist "%DESTDIR_ABS%\*" goto DESTDIR_OK
 
 (
-  echo.%?~nx0%: error: DESTDIR is invalid: "%DESTDIR_ABS%"
+  echo.%?~%: error: DESTDIR is invalid: "%DESTDIR_ABS%"
   exit /b 254
 ) >&2
 

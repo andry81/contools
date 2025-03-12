@@ -29,6 +29,7 @@ rem 4. call extract_files_from_archives.bat c:\path_with_archives\app_release_x8
 
 setlocal
 
+rem log into current directory
 if not defined PROJECT_LOG_ROOT set PROJECT_LOG_ROOT=.log
 
 call "%%~dp0../__init__/script_init.bat" %%0 %%* || exit /b
@@ -60,7 +61,7 @@ rem read archive file pattern list
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" %%FLAG_SHIFT%% ARC_FILE_PTTN_LIST %%*
 
 if not defined SEARCH_FROM (
-  echo.%?~nx0%: error: SEARCH_FROM is not defined.
+  echo.%?~%: error: SEARCH_FROM is not defined.
   exit /b 255
 ) >&2
 
@@ -69,12 +70,12 @@ set "SEARCH_FROM_IN=%SEARCH_FROM%"
 for /F "tokens=* delims="eol^= %%i in ("%SEARCH_FROM%\.") do set "SEARCH_FROM=%%~fi"
 
 if not exist "\\?\%SEARCH_FROM%" (
-  echo.%?~nx0%: error: SEARCH_FROM does not exist: "%SEARCH_FROM%".
+  echo.%?~%: error: SEARCH_FROM does not exist: "%SEARCH_FROM%".
   exit /b 255
 ) >&2
 
 if not defined EXTRACT_TO_DIR (
-  echo.%?~nx0%: error: EXTRACT_TO_DIR is not defined.
+  echo.%?~%: error: EXTRACT_TO_DIR is not defined.
   exit /b 255
 ) >&2
 
@@ -83,7 +84,7 @@ set "EXTRACT_TO_DIR_IN=%EXTRACT_TO_DIR%"
 for /F "tokens=* delims="eol^= %%i in ("%EXTRACT_TO_DIR%\.") do set "EXTRACT_TO_DIR=%%~fi"
 
 if %CREATE_EXTRACT_TO_DIR% EQU 0 if not exist "\\?\%EXTRACT_TO_DIR%\*" (
-  echo.%?~nx0%: error: EXTRACT_TO_DIR directory does not exist: "%EXTRACT_TO_DIR%".
+  echo.%?~%: error: EXTRACT_TO_DIR directory does not exist: "%EXTRACT_TO_DIR%".
   exit /b 255
 ) >&2
 
@@ -183,7 +184,7 @@ exit /b
 
 :EXTRACT_PTTN_ERROR
 (
-  echo.%?~nx0%: error: EXTRACT_PTTN must not contain wildcards: "%EXTRACT_PTTN%".
+  echo.%?~%: error: EXTRACT_PTTN must not contain wildcards: "%EXTRACT_PTTN%".
   exit /b 255
 ) >&2
 exit /b 255

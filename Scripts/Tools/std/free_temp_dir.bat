@@ -1,8 +1,7 @@
 @echo off
 
-if not defined ?~nx0 (
-  set "?~=%~nx0"
-) else set "?~=%?~nx0%: %~nx0"
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem cast to ingeter
 set /A SCRIPT_TEMP_NEST_LVL+=0

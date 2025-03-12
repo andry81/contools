@@ -207,7 +207,7 @@ if defined FLAG (
     shift
     set /A FLAG_SHIFT+=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -220,7 +220,7 @@ if defined FLAG (
 
 if %FLAG_MATCH_STRING% NEQ 0 ^
 if not defined FLAG_MATCH_STRING_VALUE (
-  echo.%?~nx0%: error: MATCH_STRING must be defined.
+  echo.%?~%: error: MATCH_STRING must be defined.
   exit /b 255
 ) >&2
 
@@ -253,34 +253,34 @@ set "REPLACE_TO=%~4"
 if defined LINKS_DIR if exist "%LINKS_DIR%\*" goto LINKS_DIR_EXIST
 
 (
-  echo.%?~nx0%: error: LINKS_DIR does not exist: `%LINKS_DIR%`.
+  echo.%?~%: error: LINKS_DIR does not exist: `%LINKS_DIR%`.
   exit /b 255
 ) >&2
 
 :LINKS_DIR_EXIST
 
 if not defined PROPS_LIST (
-  echo.%?~nx0%: error: PROPS_LIST is not defined.
+  echo.%?~%: error: PROPS_LIST is not defined.
   exit /b 255
 ) >&2
 
 if not defined REPLACE_FROM (
-  echo.%?~nx0%: error: REPLACE_FROM is not defined.
+  echo.%?~%: error: REPLACE_FROM is not defined.
   exit /b 255
 ) >&2
 
 if %FLAG_DELETE% EQU 0 (
   if not defined REPLACE_TO (
-    echo.%?~nx0%: error: REPLACE_TO is not defined.
+    echo.%?~%: error: REPLACE_TO is not defined.
     exit /b 255
   ) >&2
 
   if "%REPLACE_FROM%" == "%REPLACE_TO%" (
-    echo.%?~nx0%: error: REPLACE_FROM must be not equal to REPLACE_TO: REPLACE_FROM="%REPLACE_FROM%".
+    echo.%?~%: error: REPLACE_FROM must be not equal to REPLACE_TO: REPLACE_FROM="%REPLACE_FROM%".
     exit /b 255
   ) >&2
 ) else if defined REPLACE_TO (
-  echo.%?~nx0%: error: REPLACE_TO must be not defined.
+  echo.%?~%: error: REPLACE_TO must be not defined.
   exit /b 255
 ) >&2
 
@@ -294,7 +294,7 @@ set "PROPS_LIST_FILTERED="
 if defined PROPS_LIST set "PROPS_LIST_FILTERED=%PROPS_LIST:|=%"
 
 if not defined PROPS_LIST_FILTERED (
-  echo.%?~nx0%: error: PROPS_LIST is empty or not applied: PROPS_LIST="%PROPS_LIST%".
+  echo.%?~%: error: PROPS_LIST is empty or not applied: PROPS_LIST="%PROPS_LIST%".
   exit /b 255
 ) >&2
 
@@ -493,7 +493,7 @@ if %FLAG_PRINT_READ% NEQ 0 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
 rem skip on empty assign
 if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 if not defined PROP_NEXT_VALUE (
-  echo.%?~nx0%: warning: property empty value assignment: "%PROP_NAME%"
+  echo.%?~%: warning: property empty value assignment: "%PROP_NAME%"
   exit /b 0
 ) >&2
 
@@ -501,21 +501,21 @@ rem skip on empty change
 if "%PROP_NAME%" == "TargetPath" (
   if %FLAG_USE_CASE_COMPARE% NEQ 0 (
     if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 (
-      echo.%?~nx0%: warning: property `TargetPath` is not changed (case^).
+      echo.%?~%: warning: property `TargetPath` is not changed (case^).
       exit /b 0
     ) >&2
   ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 (
-    echo.%?~nx0%: warning: property `TargetPath` is not changed (nocase^).
+    echo.%?~%: warning: property `TargetPath` is not changed (nocase^).
     exit /b 0
   ) >&2
 ) else if "%PROP_NAME%" == "WorkingDirectory" (
   if %FLAG_USE_CASE_COMPARE% NEQ 0 (
     if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_WORKING_DIR_REASSIGN% EQU 0 (
-      echo.%?~nx0%: warning: property `WorkingDirectory` is not changed (case^).
+      echo.%?~%: warning: property `WorkingDirectory` is not changed (case^).
       exit /b 0
     ) >&2
   ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_WORKING_DIR_REASSIGN% EQU 0 (
-    echo.%?~nx0%: warning: property `WorkingDirectory` is not changed (nocase^).
+    echo.%?~%: warning: property `WorkingDirectory` is not changed (nocase^).
     exit /b 0
   ) >&2
 )

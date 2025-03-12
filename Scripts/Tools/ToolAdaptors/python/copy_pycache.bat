@@ -27,7 +27,8 @@ rem
 
 setlocal
 
-set "?~nx0=%~nx0"
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem script flags
 set "FLAG_VALUE_PREFIX_DIRS="
@@ -51,7 +52,7 @@ if defined FLAG (
     shift
     shift
   ) else (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -73,7 +74,7 @@ if not exist "%SOURCE_DIR%\*" goto NO_SOURCE_DIR
 goto NO_SOURCE_DIR_END
 :NO_SOURCE_DIR
 (
-  echo.%?~nx0%: error: source directory does not exist: "%SOURCE_DIR%".
+  echo.%?~%: error: source directory does not exist: "%SOURCE_DIR%".
   exit /b 1
 ) >&2
 :NO_SOURCE_DIR_END
@@ -84,7 +85,7 @@ if not exist "%TARGET_DIR%\*" goto NO_TARGET_DIR
 goto NO_TARGET_DIR_END
 :NO_TARGET_DIR
 (
-  echo.%?~nx0%: error: target directory does not exist: "%TARGET_DIR%".
+  echo.%?~%: error: target directory does not exist: "%TARGET_DIR%".
   exit /b 2
 ) >&2
 :NO_TARGET_DIR_END

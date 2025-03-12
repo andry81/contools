@@ -9,9 +9,8 @@ rem   https://stackoverflow.com/questions/138981/how-to-test-if-a-file-is-a-dire
 
 setlocal
 
-if not defined ?~nx0 (
-  set "?~=%~nx0"
-) else set "?~=%?~nx0%: %~nx0"
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 if "%~1" == "" (
   echo.%?~%: error: directory path is not defined.

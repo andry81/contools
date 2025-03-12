@@ -2,9 +2,10 @@
 
 setlocal
 
-set "?~nx0=%~nx0"
-
 call "%%~dp0__init__.bat" || exit /b
+
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem script flags
 set "FLAG_CHCP="
@@ -33,7 +34,7 @@ if defined FLAG (
     set "FLAG_CHCP=%~2"
     shift
   ) else (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -48,12 +49,12 @@ set "OUTPUT_CHARSET=%~2"
 set "INPUT_FILE=%~3"
 
 if not defined INPUT_CHARSET (
-  echo.%?~nx0%: error: INPUT_CHARSET is not set.
+  echo.%?~%: error: INPUT_CHARSET is not set.
   exit /b 1
 ) >&2
 
 if not exist "%INPUT_FILE%" (
-  echo.%?~nx0%: error: INPUT_FILE does not exist: INPUT_FILE="%INPUT_FILE%".
+  echo.%?~%: error: INPUT_FILE does not exist: INPUT_FILE="%INPUT_FILE%".
   exit /b 2
 ) >&2
 

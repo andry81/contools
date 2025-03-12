@@ -9,6 +9,9 @@ rem 3. path where to read a file with variable values (each per line, must be th
 rem disable alternative variables expansion to avoid `!` character consumption
 setlocal DISABLEDELAYEDEXPANSION
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 set "FILE_LOCK_PATH=%~1"
 set "FILE_VAR_NAMES_PATH=%~2"
 set "FILE_VAR_VALUES_PATH=%~3"
@@ -18,17 +21,17 @@ set "FILE_LOCK_DIR=%~d1"
 
 rem the lock file directory must already exist
 if not exist "%FILE_LOCK_DIR%" (
-  echo.%~nx0: error: FILE_LOCK_DIR does not exist: "%FILE_LOCK_DIR%"
+  echo.%?~%: error: FILE_LOCK_DIR does not exist: "%FILE_LOCK_DIR%"
   exit /b 1
 ) >&2
 
 if not exist "%FILE_VAR_NAMES_PATH%" (
-  echo.%~nx0: error: FILE_VAR_NAMES_PATH does not exist: "%FILE_VAR_NAMES_PATH%"
+  echo.%?~%: error: FILE_VAR_NAMES_PATH does not exist: "%FILE_VAR_NAMES_PATH%"
   exit /b 2
 ) >&2
 
 if not exist "%FILE_VAR_VALUES_PATH%" (
-  echo.%~nx0: error: FILE_VAR_VALUES_PATH does not exist: "%FILE_VAR_VALUES_PATH%"
+  echo.%?~%: error: FILE_VAR_VALUES_PATH does not exist: "%FILE_VAR_VALUES_PATH%"
   exit /b 3
 ) >&2
 

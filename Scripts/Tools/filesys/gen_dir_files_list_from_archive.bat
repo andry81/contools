@@ -19,11 +19,11 @@ set "FILE_FILTER=%~1"
 
 rem ignore specific patterns to avoid problems
 if not defined FILE_FILTER (
-  echo.%?~nx0%: error: file or directory is not set.
+  echo.%?~%: error: file or directory is not set.
   exit /b 1
 ) >&2
 if "%FILE_FILTER:~0,1%" == "\" (
-  echo.%?~nx0%: error: path is not acceptable: "%FILE_FILTER%".
+  echo.%?~%: error: path is not acceptable: "%FILE_FILTER%".
   exit /b 2
 ) >&2
 
@@ -33,7 +33,7 @@ set "FILE_PATH=%~f1"
 shift
 
 if "%~1" == "" (
-  echo.%?~nx0%: error: archive file filter is not set.
+  echo.%?~%: error: archive file filter is not set.
   exit /b 3
 )
 

@@ -77,7 +77,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-p" (
     set FLAG_PRINT_STDOUT=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~nx0%: error: invalid flag: %FLAG%
+    echo.%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -89,7 +89,7 @@ if defined FLAG (
 )
 
 if %FLAG_USE_EXTENDED_PROPERTY%%FLAG_USE_GETLINK% EQU 11 (
-  echo.%?~nx0%: error: `-use_extprop` flag is mixed with `-use_getlink` flag.
+  echo.%?~%: error: `-use_extprop` flag is mixed with `-use_getlink` flag.
   exit /b 255
 ) >&2
 

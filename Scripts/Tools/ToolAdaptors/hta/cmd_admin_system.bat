@@ -16,6 +16,9 @@ setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
 rem to drop locals in case of already elevated environment
 setlocal
 
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
 rem drop last error level
 call;
 
@@ -24,7 +27,7 @@ if not defined PSEXEC set "PSEXEC=psexec.exe"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!PSEXEC!") do endlocal & set "PSEXEC=%%~fi"
 
 if not exist "%PSEXEC%" (
-  echo.%~nx0: error: `psexec.exe` is not found: "%PSEXEC%".
+  echo.%?~%: error: `psexec.exe` is not found: "%PSEXEC%".
   exit /b 255
 ) >&2
 

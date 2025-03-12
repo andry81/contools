@@ -2,12 +2,16 @@
 
 setlocal
 
+rem script names call stack, disabled due to self call and partial inheritance (process elevation does not inherit a parent process variables by default)
+rem if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+set "?~=%~nx0"
+
 rem cast to integer
 set /A IMPL_MODE+=0
 
 rem do not continue if already in Impl Mode
 if %IMPL_MODE% NEQ 0 (
-  echo.%~nx0: error: Impl Mode already used.
+  echo.%?~%: error: Impl Mode already used.
   exit /b 255
 ) >&2
 

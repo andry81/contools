@@ -22,7 +22,7 @@ if defined __?FLAG (
   ) else if "%__?FLAG%" == "-noexpand" (
     set __?FLAG_NO_EXPAND=1
   ) else if not "%__?FLAG%" == "--" (
-    echo.%__?~nx0%: error: invalid flag: %__?FLAG%
+    echo.%__?~%: error: invalid flag: %__?FLAG%
     exit /b -255
   ) >&2
 
