@@ -1,3 +1,8 @@
+2025.03.13:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: missed to cleanup temporary shortcut file in case of error in the `MakeShortcut` function (`GetLink` method)
+* new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-debug` flag to turn off global `On Error` handlers to debug immediate lines of an error
+* refactor: Scripts/Tools/ToolAdaptors/vbs/*_shortcut.vbs: code cleanup
+
 2025.03.12:
 * fixed: Scripts/Tools/cleanup/cleanup_init_vars.bat: execution fixup in case of relative `PROJECT_LOG_ROOT`
 

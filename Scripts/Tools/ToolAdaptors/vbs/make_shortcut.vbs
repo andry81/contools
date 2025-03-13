@@ -17,6 +17,7 @@
 '''     [-use-getlink | -g] [-print-remapped-names | -k]
 '''     [-wd <ShortcutWorkingDirectory>]
 '''     [-desc <ShortcutDescription> | -assign-target-to-desc | -dt]
+'''     [-debug]
 '''     [--]
 '''       <ShortcutFilePath> <ShortcutTarget> [<ShortcutTargetArgs>]
 
@@ -154,6 +155,12 @@
 '''   -assign-target-to-desc | -dt
 '''     Use <ShortcutTarget> to assign <ShortcutDescription>.
 '''     Has no effect if `-desc` option is used.
+'''
+'''   -debug
+'''     Turns off global `On Error` handlers to debug immediate lines of an
+'''     error.
+'''     CAUTION:
+'''       May leave the created shortcut file in an incomplete state.
 
 ''' NOTE:
 '''   1. Creation of a shortcut under ealier version of the Windows makes
@@ -169,12 +176,12 @@
 ''' Example to create a minimalistic and clean version of a shortcut:
 '''   >
 '''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
-'''   make_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk ^%SystemRoot^%\System32\cmd.exe
+'''   make_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk "%SystemRoot%\System32\cmd.exe"
 '''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
 ''' Or
 '''   >
 '''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
-'''   make_shortcut.bat -CD "%WINDIR%\System32" -u cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
+'''   make_shortcut.bat -CD "%WINDIR%\System32" -u -Et cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
 '''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
 '''
 ''' NOTE:
@@ -199,7 +206,7 @@
 '''   del /F /Q myvolpath.lnk
 '''   make_shortcut.bat -u -g -obj myvolpath.lnk "cmd.exe" "/c start %22%22 %22\\?\Volume{...}\...%22"
 '''   >
-'''   start /WAIT /B "" myvolpath.lnk
+'''   start /B /WAIT "" myvolpath.lnk
 
 ''' Example to create MTP device folder shortcut:
 '''   >
@@ -415,6 +422,8 @@ Dim AllowDOSPaths : AllowDOSPaths = False
 Dim UseGetLink : UseGetLink = False
 Dim PrintRemappedNames : PrintRemappedNames = False
 
+Dim DebugMode : DebugMode = False
+
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
 
 Dim arg
@@ -478,6 +487,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         AllowDOSWorkingDirectory = True
       ElseIf arg = "-allow-dos-paths" Then ' Allow a property reset by a reduced DOS path version
         AllowDOSPaths = True
+      ElseIf arg = "-debug" Then ' Debug mode
+        DebugMode = True
       Else
         PrintOrEchoErrorLine WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
         WScript.Quit 255
@@ -958,7 +969,7 @@ End If
 
 Dim objSC
 
-'On Error Resume Next
+If Not DebugMode Then On Error Resume Next
 Set objSC = MakeShortcut(ShortcutFilePathToOpen)
 If err <> 0 Then
   CopyError()
