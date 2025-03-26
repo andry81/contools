@@ -14,7 +14,6 @@ if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 
 setlocal
 
-set "?~n0=%~n0%"
 set "?~n0=%~n0"
 
 rem script names call stack

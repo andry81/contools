@@ -13,10 +13,12 @@
 '''     [-allow-dos-current-dir] [-allow-dos-target-path] [-allow-dos-wd] [-allow-dos-paths]
 '''     [-p[rint-assign]] [-print-assigned | -pd]
 '''     [-u] [-q]
-'''     [-E[0 | t | a | wd]]
+'''     [-E[0 | t | a | wd | il | hk]]
 '''     [-use-getlink | -g] [-print-remapped-names | -k]
 '''     [-wd <ShortcutWorkingDirectory>]
 '''     [-desc <ShortcutDescription> | -assign-target-to-desc | -dt]
+'''     [-icon <ShortcutIconLocation> ]
+'''     [-hotkey <ShortcutHotKey> ]
 '''     [-debug]
 '''     [--]
 '''       <ShortcutFilePath> <ShortcutTarget> [<ShortcutTargetArgs>]
@@ -47,7 +49,7 @@
 '''     Has effect if `-obj` flag is defined.
 '''
 '''   -showas <ShowWindowAsNumber>
-''''     Handles a child process window show state.
+'''      Handles a child process window show state.
 '''
 '''      CreateProcess or ShellExecute
 '''        0 = SW_HIDE
@@ -136,6 +138,11 @@
 '''   -Ewd
 '''     Expand environment variables only in the shortcut working directory
 '''     argument.
+'''   -Eil
+'''     Expand environment variables only in the shortcut icon location
+'''     argument.
+'''   -Ehk
+'''     Expand environment variables only in the shortcut hot key argument.
 '''
 '''   -use-getlink | -g
 '''     Use `GetLink` property instead of `CreateShortcut` method.
@@ -155,6 +162,19 @@
 '''   -assign-target-to-desc | -dt
 '''     Use <ShortcutTarget> to assign <ShortcutDescription>.
 '''     Has no effect if `-desc` option is used.
+'''
+'''   -icon <ShortcutIconLocation>
+'''     Icon location string to assign.
+'''     Format example:
+'''       `notepad.exe, 0`
+'''
+'''   -hotkey <ShortcutHotKey>
+'''     Hot key string to assign.
+'''     Format example:
+'''       If `-use-getlink` is not used:
+'''         `Ctrl+Shift+Alt+Q`
+'''       If `-use-getlink` is used (`-u` flag is required):
+'''         `&H400+&H100+&H200+Asc(%22Q%22)` (`Asc` requires capital letters)
 '''
 '''   -debug
 '''     Turns off global `On Error` handlers to debug immediate lines of an
@@ -192,21 +212,21 @@
 '''   `make_shortcut.vbs`+`reset_shortcut.vbs` can generate a cleaner shortcut,
 '''   but in other cases is vice versa.
 
-''' Example to create MyComputer shortcut:
+''' Example to create MyComputer shortcut with icon and `Ctrl+Shift+Alt+Q` hot key:
 '''   >
-'''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat -obj -ignore-empty mycomputer.lnk
+'''   del /F /Q "%USERPROFILE%\Desktop\mycomputer.lnk"
+'''   make_shortcut.bat -u -g -obj -icon "%SystemRoot%\System32\shell32.dll,16" -hotkey "&H400+&H100+&H200+Asc(%22Q%22)" -ignore-empty "%USERPROFILE%\Desktop\mycomputer.lnk"
 ''' Or
 '''   >
-'''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat -obj mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
+'''   del /F /Q "%USERPROFILE%\Desktop\mycomputer.lnk"
+'''   make_shortcut.bat -obj -icon "%SystemRoot%\System32\shell32.dll,16" -hotkey "Ctrl+Shift+Alt+Q" "%USERPROFILE%\Desktop\mycomputer.lnk" "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
 
 ''' Example to create a volume folder path shortcut without a drive letter and open it in the Windows Explorer:
 '''   >
 '''   del /F /Q myvolpath.lnk
 '''   make_shortcut.bat -u -g -obj myvolpath.lnk "cmd.exe" "/c start %22%22 %22\\?\Volume{...}\...%22"
 '''   >
-'''   start /B /WAIT "" myvolpath.lnk
+'''   myvolpath.lnk
 
 ''' Example to create MTP device folder shortcut:
 '''   >
@@ -401,6 +421,12 @@ Dim ShortcutWorkingDirectoryExist : ShortcutWorkingDirectoryExist = False
 Dim ShortcutDescription : ShortcutDescription = ""
 Dim ShortcutDescriptionExist : ShortcutDescriptionExist = False
 
+Dim ShortcutIconLocation : ShortcutIconLocation = ""
+Dim ShortcutIconLocationExist : ShortcutIconLocationExist = False
+
+Dim ShortcutHotKey : ShortcutHotKey = ""
+Dim ShortcutHotKeyExist : ShortcutHotKeyExist = False
+
 Dim AssignTargetToDesc : AssignTargetToDesc = False
 
 Dim ShowAs : ShowAs = 1
@@ -411,6 +437,8 @@ Dim ExpandArg0 : ExpandArg0 = False
 Dim ExpandShortcutTarget : ExpandShortcutTarget = False
 Dim ExpandShortcutTargetArgs : ExpandShortcutTargetArgs = False
 Dim ExpandShortcutWorkingDirectory : ExpandShortcutWorkingDirectory = False
+Dim ExpandShortcutIconLocation : ExpandShortcutIconLocation = False
+Dim ExpandShortcutHotKey : ExpandShortcutHotKey = False
 
 Dim AlwaysQuote : AlwaysQuote = False
 
@@ -457,6 +485,15 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
       ElseIf arg = "-desc" Then ' Shortcut description
         i = i + 1
         ShortcutDescription = WScript.Arguments(i)
+        ShortcutDescriptionExist = True
+      ElseIf arg = "-icon" Then ' Shortcut icon
+        i = i + 1
+        ShortcutIconLocationObj = WScript.Arguments(i)
+        ShortcutIconLocationExist = True
+      ElseIf arg = "-hotkey" Then ' Shortcut hot key
+        i = i + 1
+        ShortcutHotKey = WScript.Arguments(i)
+        ShortcutHotKeyExist = True
       ElseIf arg = "-assign-target-to-desc" Or arg = "-dt" Then ' assign ShortcutTarget to ShortcutDescription
         AssignTargetToDesc = True
       ElseIf arg = "-use-getlink" Or arg = "-g" Then
@@ -479,6 +516,10 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         ExpandShortcutTargetArgs = True
       ElseIf arg = "-Ewd" Then ' Expand environment variables only in the shortcut working directory argument
         ExpandShortcutWorkingDirectory = True
+      ElseIf arg = "-Eil" Then ' Expand environment variables only in the shortcut icon location argument
+        ExpandShortcutIconLocation = True
+      ElseIf arg = "-Ehk" Then ' Expand environment variables only in the shortcut hot key argument
+        ExpandShortcutHotKey = True
       ElseIf arg = "-allow-dos-current-dir" Then ' Allow long path conversion into DOS path for the current directory
         AllowDOSCurrentDirectory = True
       ElseIf arg = "-allow-dos-target-path" Then ' Allow target path reset by a reduced DOS path version
@@ -764,7 +805,7 @@ Function GetShortcutProperty(PropertyName)
   End If
 End Function
 
-Function GetShortcutPropertyName(PropertyName)
+Function GetShortcutPropertyNameToPrint(PropertyName)
   Dim PropertyName_ : PropertyName_ = PropertyName
 
   If UseGetLink And PrintRemappedNames Then
@@ -778,7 +819,7 @@ Function GetShortcutPropertyName(PropertyName)
     End If
   End If
 
-  GetShortcutPropertyName = PropertyName_
+  GetShortcutPropertyNameToPrint = PropertyName_
 End Function
 
 Sub SetShortcutProperty_ShellLinkObject(PropertyName, PropertyValue)
@@ -794,7 +835,7 @@ Sub SetShortcutProperty_ShellLinkObject(PropertyName, PropertyValue)
   ElseIf PropertyName = "WindowStyle" Then
     objSC.WindowsStyle = PropertyValue
   ElseIf PropertyName = "HotKey" Then
-    objSC.HotKey = Eval(PropertyValue)  ' ex: `&H400+&H200+Asc("Q")` (`Asc` requires capital letters)
+    objSC.HotKey = CLng(Eval(PropertyValue))  ' ex: `&H400+&H100+&H200+Asc("Q")` (`Asc` requires capital letters)
   ElseIf PropertyName = "IconLocation" Then
     Dim IconLocationArr : IconLocationArr = Split(PropertyValue, ",", -1, 1)
     objSC.SetIconLocation IconLocationArr(0), CInt(IconLocationArr(1))
@@ -815,7 +856,7 @@ Sub SetShortcutProperty_WScript_Shell_CreateShortcut(PropertyName, PropertyValue
   ElseIf PropertyName = "WindowStyle" Then
     objSC.WindowsStyle = PropertyValue
   ElseIf PropertyName = "HotKey" Then
-    objSC.HotKey = PropertyValue        ' ex: `Ctrl+Alt+Q`
+    objSC.HotKey = PropertyValue        ' ex: `Ctrl+Shift+Alt+Q`
   ElseIf PropertyName = "IconLocation" Then
     objSC.IconLocation = PropertyValue  ' ex: `notepad.exe, 0`
   End If
@@ -987,7 +1028,7 @@ On Error Goto 0
 ' ShortcutTarget
 
 If PrintAssign Then
-  PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "=" & ShortcutTargetUnquotedAbs
+  PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTargetUnquotedAbs
 End If
 
 SetShortcutProperty "TargetPath", ShortcutTarget
@@ -996,7 +1037,7 @@ SetShortcutProperty "TargetPath", ShortcutTarget
 ShortcutTarget = GetShortcutProperty("TargetPath")
 
 If PrintAssigned Then
-  PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(assigned)=" & ShortcutTarget
+  PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(assigned)=" & ShortcutTarget
 End If
 
 If (Not ShortcutTargetObj) And AllowDOSTargetPath Then
@@ -1015,7 +1056,7 @@ Do ' empty `Do-Loop` to emulate `Break`
   End If
 
   If PrintAssign Then
-    PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(short)=" & ShortcutTargetShortPath
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(short)=" & ShortcutTargetShortPath
   End If
 
   If Not AlwaysQuote Then
@@ -1030,7 +1071,7 @@ Do ' empty `Do-Loop` to emulate `Break`
   ShortcutTarget = GetShortcutProperty("TargetPath")
 
   If PrintAssigned Then
-    PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(assigned)=" & ShortcutTarget
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(assigned)=" & ShortcutTarget
   End If
 Loop While False
 End If
@@ -1047,10 +1088,17 @@ If ShortcutTargetArgsExist Then
   End If
 
   If PrintAssign Then
-    PrintOrEchoLine GetShortcutPropertyName("TargetArgs") & "=" & ShortcutTargetArgs
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetArgs") & "=" & ShortcutTargetArgs
   End If
 
   SetShortcutProperty "Arguments", ShortcutTargetArgs
+
+  ' reread `ShortcutTargetArgs`
+  ShortcutTargetArgs = GetShortcutProperty("TargetArgs")
+
+  If PrintAssigned Then
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetArgs") & "(assigned)=" & ShortcutTargetArgs
+  End If
 End If
 
 ' ShortcutWorkingDirectory
@@ -1093,7 +1141,7 @@ Do ' empty `Do-Loop` to emulate `Break`
   ShortcutWorkingDirectoryAbsLCase = LCase(ShortcutWorkingDirectoryAbs)
 
   If PrintAssign Then
-    PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "=" & ShortcutWorkingDirectoryAbs
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("WorkingDirectory") & "=" & ShortcutWorkingDirectoryAbs
   End If
 
   SetShortcutProperty "WorkingDirectory", ShortcutWorkingDirectoryAbs
@@ -1103,7 +1151,7 @@ Do ' empty `Do-Loop` to emulate `Break`
   ShortcutWorkingDirectory = GetShortcutProperty("WorkingDirectory")
 
   If PrintAssigned Then
-    PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "(assigned)=" & ShortcutWorkingDirectory
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("WorkingDirectory") & "(assigned)=" & ShortcutWorkingDirectory
   End If
 
   If AllowDOSWorkingDirectory Then
@@ -1121,7 +1169,7 @@ Do ' empty `Do-Loop` to emulate `Break`
     End If
 
     If PrintAssign Then
-      PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "(short)=" & ShortcutWorkingDirectoryShortPath
+      PrintOrEchoLine GetShortcutPropertyNameToPrint("WorkingDirectory") & "(short)=" & ShortcutWorkingDirectoryShortPath
     End If
 
     SetShortcutProperty "WorkingDirectory", ShortcutWorkingDirectoryShortPath
@@ -1130,7 +1178,7 @@ Do ' empty `Do-Loop` to emulate `Break`
     ShortcutWorkingDirectory = GetShortcutProperty("WorkingDirectory")
 
     If PrintAssigned Then
-      PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "(assigned)=" & ShortcutWorkingDirectory
+      PrintOrEchoLine GetShortcutPropertyNameToPrint("WorkingDirectory") & "(assigned)=" & ShortcutWorkingDirectory
     End If
   End If
 Loop While False
@@ -1146,7 +1194,7 @@ End If
 If ShortcutDescriptionExist Then
 Do ' empty `Do-Loop` to emulate `Break`
   If PrintAssign Then
-    PrintOrEchoLine GetShortcutPropertyName("Description") & "=" & ShortcutDescription
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("Description") & "=" & ShortcutDescription
   End If
 
   SetShortcutProperty "Description", ShortcutDescription
@@ -1155,13 +1203,80 @@ Do ' empty `Do-Loop` to emulate `Break`
   ShortcutDescription = GetShortcutProperty("Description")
 
   If PrintAssigned Then
-    PrintOrEchoLine GetShortcutPropertyName("Description") & "(assigned)=" & ShortcutDescription
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("Description") & "(assigned)=" & ShortcutDescription
+  End If
+Loop While False
+End If
+
+' ShortcutIconLocation
+
+If ShortcutIconLocationExist Then
+Do ' empty `Do-Loop` to emulate `Break`
+  If ExpandAllArgs Or ExpandShortcutIconLocation Then
+    ShortcutIconLocation = objShell.ExpandEnvironmentStrings(ShortcutIconLocation)
+  End If
+
+  If UnescapeAllArgs Then
+    ShortcutIconLocation = Unescape(ShortcutIconLocation)
+  End If
+
+  If PrintAssign Then
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("IconLocation") & "=" & ShortcutIconLocation
+  End If
+
+  SetShortcutProperty "IconLocation", ShortcutIconLocation
+
+  ' reread `IconLocation`
+  ShortcutIconLocation = GetShortcutProperty("IconLocation")
+
+  If PrintAssigned Then
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("IconLocation") & "(assigned)=" & ShortcutIconLocation
+  End If
+Loop While False
+End If
+
+' ShortcutHotKey
+
+If ShortcutHotKeyExist Then
+Do ' empty `Do-Loop` to emulate `Break`
+  If ExpandAllArgs Or ExpandShortcutHotKey Then
+    ShortcutHotKey = objShell.ExpandEnvironmentStrings(ShortcutHotKey)
+  End If
+
+  If UnescapeAllArgs Then
+    ShortcutHotKey = Unescape(ShortcutHotKey)
+  End If
+
+  If PrintAssign Then
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("HotKey") & "=" & ShortcutHotKey
+  End If
+
+  SetShortcutProperty "HotKey", ShortcutHotKey
+
+  ' reread `HotKey`
+  ShortcutHotKey = GetShortcutProperty("HotKey")
+
+  If PrintAssigned Then
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("HotKey") & "(assigned)=" & ShortcutHotKey
   End If
 Loop While False
 End If
 
 If ShowAsExist Then
+Do ' empty `Do-Loop` to emulate `Break`
+  If PrintAssign Then
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("ShowAs") & "=" & ShowAs
+  End If
+
   SetShortcutProperty "WindowStyle", CInt(ShowAs)
+
+  ' reread `ShowAs`
+  ShowAs = GetShortcutProperty("WindowStyle")
+
+  If PrintAssigned Then
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("ShowAs") & "(assigned)=" & ShowAs
+  End If
+Loop While False
 End If
 
 objSC.Save

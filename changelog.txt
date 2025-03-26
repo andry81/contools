@@ -1,3 +1,13 @@
+2025.03.26:
+* fixed: Scripts/Tools/std: get_windows_version.bat, touch_file.bat: minor fixup
+* fixed: Scripts/Tools: std/is_dir_exist.bat, ToolAdaptors/vbs/make_shortcut.vbs: execution fixup
+* fixed: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, update_shortcut.vbd: missed prints
+* fixed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-icon` and `-hotkey` options
+* changed: Scripts/Tools/std: del_file_pttn.bat, touch_dir.bat, touch_file.bat, x*_dir.bat, x*_file.bat: code cleanup
+* changed: Scripts/Tools/std/is_dir_exist.bat: code improvement
+* refactor: Scripts/Tools/build/check_vars.bat: cleanup
+* refactor: Scripts/Tools/ToolAdaptors/vbs: *_shortcut.vbs: code refactor
+
 2025.03.13:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: missed to cleanup temporary shortcut file in case of error in the `MakeShortcut` function (`GetLink` method)
 * new: Scripts/Tools/ToolAdaptors/vbs/make_shortcut.vbs: `-debug` flag to turn off global `On Error` handlers to debug immediate lines of an error

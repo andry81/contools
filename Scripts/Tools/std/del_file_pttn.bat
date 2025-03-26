@@ -87,10 +87,7 @@ rem   We must expand the command line into a variable to avoid these above.
 rem
 set ?.=@dir "%FILE_DIR%\%FILE_NAME_PTTN%%FILE_EXT_PTTN%" /A:-D /B /O:N /S 2^>nul
 
-for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
-  set "FILE_PATH=%%i"
-  call :DEL_FILE %%*
-)
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "FILE_PATH=%%i" & call :DEL_FILE %%*
 exit /b
 
 :DEL_FILE

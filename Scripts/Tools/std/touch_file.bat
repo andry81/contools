@@ -17,7 +17,6 @@ if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
 
 setlocal
 
-set "?~n0=%~n0%"
 set "?~n0=%~n0"
 
 rem script names call stack
@@ -96,6 +95,8 @@ if not exist "%FILE_PATH%" set FILE_PATH_LONG=1
 if %FILE_PATH_LONG% NEQ 0 if exist "%SystemRoot%\System32\robocopy.exe" goto MOVE_TO_TMP
 
 for /F "tokens=* delims="eol^= %%i in ("\\?\%FILE_PATH%") do set "FILE_ATTR=%%~ai"
+
+if not defined FILE_ATTR set "FILE_ATTR=."
 
 if %FILE_PATH_LONG% EQU 0 (
   if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (

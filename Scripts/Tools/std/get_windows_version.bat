@@ -8,6 +8,8 @@ rem
 set "WINDOWS_VER_STR="
 for /F "usebackq tokens=1,* delims=[" %%i in (`@ver 2^>nul`) do for /F "tokens=1,* delims=]" %%k in ("%%j") do set "WINDOWS_VER_STR=%%k"
 
+if not defined WINDOWS_VER_STR goto EXIT
+
 setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!WINDOWS_VER_STR:* =!"') do endlocal & set "WINDOWS_VER_STR=%%~i"
 
 set WINDOWS_MAJOR_VER=0
@@ -23,6 +25,7 @@ rem
 set COMSPEC_X64_VER=0
 if /i not "%PROCESSOR_ARCHITECTURE%" == "x86" if not defined PROCESSOR_ARCHITEW6432 set COMSPEC_X64_VER=1
 
+:EXIT
 (
   endlocal
   set "WINDOWS_VER_STR=%WINDOWS_VER_STR%"

@@ -164,97 +164,7 @@
 '''     Can not be used together with  `-obj` flag.
 
 ''' NOTE:
-'''   1. Creation of a shortcut under ealier version of the Windows makes
-'''      shortcut cleaner. For example, do use Windows XP instead of the
-'''      Windows 7 and x86 instead of x64 to make a cleaner shortcut without
-'''      redundant data.
-'''   2. Creation of a shortcut to the `cmd.exe` with the current directory in
-'''      the "%SYSTEMROOT%\system32" directory avoids generation of redundant
-'''      path prefixes (offset) in the shortcut file internals.
-'''   3. Update of a shortcut immediately after it's creation does cleanup
-'''      shortcut from redundant data.
-
-''' Example to create a minimalistic and clean version of a shortcut:
-'''   >
-'''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
-'''   make_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk "%SystemRoot%\System32\cmd.exe"
-'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
-''' Or
-'''   >
-'''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
-'''   make_shortcut.bat -CD "%WINDIR%\System32" -u -Et cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
-'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
-'''
-''' NOTE:
-'''   A difference in above examples between call to `make_shortcut.vbs` and
-'''   call to `make_shortcut.vbs`+`reset_shortcut.vbs` has first found in the
-'''   `Windows XP x64 Pro SP2` and `Windows XP x86 Pro SP3`.
-'''   The single call in above example to `make_shortcut.vbs` instead of
-'''   `make_shortcut.vbs`+`reset_shortcut.vbs` can generate a cleaner shortcut,
-'''   but in other cases is vice versa.
-
-''' Example to create MyComputer shortcut:
-'''   >
-'''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat -obj -ignore-empty mycomputer.lnk
-''' Or
-'''   >
-'''   del /F /Q mycomputer.lnk
-'''   make_shortcut.bat -obj mycomputer.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
-
-''' Example to create MTP device folder shortcut:
-'''   >
-'''   del /F /Q myfolder.lnk
-'''   make_shortcut.bat -obj myfolder.lnk "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}"
-'''
-'''   , where the `\\?\usb#vid_0e8d&pid_201d&mi_00#7&1084e14&0&0000#{6ac27878-a6fa-4155-ba85-f98f491d4f33}` might be different for each device
-'''
-'''   See details: https://stackoverflow.com/questions/39397348/open-folder-on-portable-device-with-batch-file/65997169#65997169
-
-''' Example to create the Master Control Panel link or directory on the Desktop
-'''   >
-'''   make_shortcut.bat -obj "%USERPROFILE%\Desktop\GodMode.lnk" "shell:::{ED7BA470-8E54-465E-825C-99712043E01C}"
-''' Or
-'''   >
-'''   mkdir "%USERPROFILE%\Desktop\GodMode.{ED7BA470-8E54-465E-825C-99712043E01C}"
-'''
-''' Example to open the Master Control Panel from Taskbar pinned shortcut
-'''   >
-'''   explorer "shell:::{ED7BA470-8E54-465E-825C-99712043E01C}"
-'''
-'''   See details: https://en.wikipedia.org/wiki/Windows_Master_Control_Panel_shortcut
-
-''' CAUTION:
-'''   The list of issues around a shortcut (.lnk) file:
-'''
-'''   PROS:
-'''     * If you want to run a process elevated, then you can raise the
-'''       `Run as Administrator` flag in the shortcut.
-'''       You don't need a localized version of Administrator account name like
-'''       for the runas executable.
-'''
-'''   CONS:
-'''     * If create a shortcut to the Windows command interpreter (cmd.exe)
-'''       with `Run as Administrator` flag raised, then you will run elevated
-'''       only the cmd.exe process. To start any other process you have to
-'''       either run it from the `cmd.exe` script, or create another standalone
-'''       shortcut with the `Run as Administrator` flag raised.
-'''     * Run from shortcut file (.lnk) in the Windows XP (but not in the
-'''       Windows 7) brings truncated command line down to ~260 characters.
-'''     * Run from shortcut file (.lnk) loads console windows parameters (font,
-'''       windows size, buffer size, etc) from the shortcut at first and from
-'''       the registry (HKCU\Console) at second. If try to change and save
-'''       parameters, then it will be saved ONLY into the shortcut, which
-'''       brings the shortcut file overwrite.
-
-''' Related resources:
-'''   https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink
-'''   https://github.com/libyal/liblnk/blob/main/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc
-
-''' CAUTION:
-'''   Base `CreateShortcut` method does not support all Unicode characters nor
-'''   `search-ms` Windows Explorer moniker path for the filter field.
-'''   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
+'''   See details and examples in the `make_shortcut.vbs` script.
 
 Function IsNothing(obj)
   If IsEmpty(obj) Then
@@ -559,7 +469,7 @@ Function GetShortcutProperty(PropertyName)
   End If
 End Function
 
-Function GetShortcutPropertyName(PropertyName)
+Function GetShortcutPropertyNameToPrint(PropertyName)
   Dim PropertyName_ : PropertyName_ = PropertyName
 
   If UseGetLink And PrintRemappedNames Then
@@ -573,7 +483,7 @@ Function GetShortcutPropertyName(PropertyName)
     End If
   End If
 
-  GetShortcutPropertyName = PropertyName_
+  GetShortcutPropertyNameToPrint = PropertyName_
 End Function
 
 Sub SetShortcutProperty_ShellLinkObject(PropertyName, PropertyValue)
@@ -1067,7 +977,7 @@ End If
 
 If ShortcutTargetAssigned Then
   If PrintAssign Then
-    PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "=" & ShortcutTargetToAssign
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTargetToAssign
   End If
 
   If AlwaysQuote And InStr(ShortcutTargetToAssign, Chr(34)) = 0 Then
@@ -1080,13 +990,13 @@ If ShortcutTargetAssigned Then
   ShortcutTarget = GetShortcutProperty("TargetPath")
 
   If PrintAssigned Then
-    PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(assigned)=" & ShortcutTarget
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(assigned)=" & ShortcutTarget
   End If
 ElseIf AllowTargetPathReassign Then
   If Not ShortcutTargetObj Then
     If ShortcutTargetExist Or IgnoreUnexist Then
       If PrintAssign Then
-        PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(reassign)=" & ShortcutTargetUnquoted
+        PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(reassign)=" & ShortcutTargetUnquoted
       End If
 
       SetShortcutProperty "TargetPath", ShortcutTarget ' reassign
@@ -1096,12 +1006,12 @@ ElseIf AllowTargetPathReassign Then
       ShortcutTarget = GetShortcutProperty("TargetPath")
 
       If PrintAssigned Then
-        PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(reassigned)=" & ShortcutTarget
+        PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(reassigned)=" & ShortcutTarget
       End If
     End If
   Else
     If PrintAssign Then
-      PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(reassign)=" & ShortcutTarget
+      PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(reassign)=" & ShortcutTarget
     End If
 
     SetShortcutProperty "TargetPath", ShortcutTarget ' reassign
@@ -1111,7 +1021,7 @@ ElseIf AllowTargetPathReassign Then
     ShortcutTarget = GetShortcutProperty("TargetPath")
 
     If PrintAssigned Then
-      PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(reassigned)=" & ShortcutTarget
+      PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(reassigned)=" & ShortcutTarget
     End If
   End If
 End If
@@ -1127,7 +1037,7 @@ If (Not ShortcutTargetObj) And ShortcutTargetAssigned And AllowDOSTargetPath The
 
   If Len(ShortcutTargetShortPath) > 0 Then
     If PrintAssign Then
-      PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(short)=" & ShortcutTargetShortPath
+      PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(short)=" & ShortcutTargetShortPath
     End If
 
     SetShortcutProperty "TargetPath", ShortcutTargetShortPath
@@ -1136,14 +1046,14 @@ If (Not ShortcutTargetObj) And ShortcutTargetAssigned And AllowDOSTargetPath The
     ShortcutTarget = GetShortcutProperty("TargetPath")
 
     If PrintAssigned Then
-      PrintOrEchoLine GetShortcutPropertyName("TargetPath") & "(assigned)=" & ShortcutTarget
+      PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(assigned)=" & ShortcutTarget
     End If
   End If
 End If
 
 If ShortcutWorkingDirectoryAssigned Then
   If PrintAssign Then
-    PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "=" & ShortcutWorkingDirectoryToAssign
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("WorkingDirectory") & "=" & ShortcutWorkingDirectoryToAssign
   End If
 
   SetShortcutProperty "WorkingDirectory", ShortcutWorkingDirectoryToAssign
@@ -1152,7 +1062,7 @@ If ShortcutWorkingDirectoryAssigned Then
   ShortcutWorkingDirectory = GetShortcutProperty("WorkingDirectory")
 
   If PrintAssigned Then
-    PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "(assigned)=" & ShortcutWorkingDirectory
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("WorkingDirectory") & "(assigned)=" & ShortcutWorkingDirectory
   End If
 
   If AllowDOSWorkingDirectory Then
@@ -1166,7 +1076,7 @@ If ShortcutWorkingDirectoryAssigned Then
 
     If Len(ShortcutWorkingDirectoryShortPath) > 0 Then
       If PrintAssign Then
-        PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "(short)=" & ShortcutWorkingDirectoryShortPath
+        PrintOrEchoLine GetShortcutPropertyNameToPrint("WorkingDirectory") & "(short)=" & ShortcutWorkingDirectoryShortPath
       End If
 
       SetShortcutProperty "WorkingDirectory", ShortcutWorkingDirectoryShortPath
@@ -1175,7 +1085,7 @@ If ShortcutWorkingDirectoryAssigned Then
       ShortcutWorkingDirectory = GetShortcutProperty("WorkingDirectory")
 
       If PrintAssigned Then
-        PrintOrEchoLine GetShortcutPropertyName("WorkingDirectory") & "(assigned)=" & ShortcutWorkingDirectory
+        PrintOrEchoLine GetShortcutPropertyNameToPrint("WorkingDirectory") & "(assigned)=" & ShortcutWorkingDirectory
       End If
     End If
   End If

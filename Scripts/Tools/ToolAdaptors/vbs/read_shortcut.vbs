@@ -39,14 +39,8 @@
 '''   -p <PropertyPattern>
 '''     List of shortcut property names to read, separated by `|` character.
 
-''' Related resources:
-'''   https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-shllink
-'''   https://github.com/libyal/liblnk/blob/main/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc
-
-''' CAUTION:
-'''   Base `CreateShortcut` method does not support all Unicode characters nor
-'''   `search-ms` Windows Explorer moniker path for the filter field.
-'''   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
+''' NOTE:
+'''   See more details and examples in the `make_shortcut.vbs` script.
 
 Function IsNothing(obj)
   If IsEmpty(obj) Then
@@ -282,7 +276,7 @@ Function GetShortcutProperty(PropertyName)
   End If
 End Function
 
-Function GetShortcutPropertyName(PropertyName)
+Function GetShortcutPropertyNameToPrint(PropertyName)
   Dim PropertyName_ : PropertyName_ = PropertyName
 
   If UseGetLink And PrintRemappedNames Then
@@ -296,7 +290,7 @@ Function GetShortcutPropertyName(PropertyName)
     End If
   End If
 
-  GetShortcutPropertyName = PropertyName_
+  GetShortcutPropertyNameToPrint = PropertyName_
 End Function
 
 Dim ShortcutFilePath : ShortcutFilePath = cmd_args(0)
@@ -347,7 +341,7 @@ Dim PropertyArrUbound : PropertyArrUbound = UBound(PropertyArr)
 
 Dim PropertyName, PropertyValue
 
-' MsgBox "Link=" & ShortcutFilePath & vbCrLf & GetShortcutPropertyName("TargetPath") & "=" & GetShortcutProperty("TargetPath") & vbCrLf & "WorkingDirectory=" & objSC.WorkingDirectory
+' MsgBox "Link=" & ShortcutFilePath & vbCrLf & GetShortcutPropertyNameToPrint("TargetPath") & "=" & GetShortcutProperty("TargetPath") & vbCrLf & "WorkingDirectory=" & objSC.WorkingDirectory
 
 For i = 0 To PropertyArrUbound
   PropertyName = PropertyArr(i)
@@ -357,5 +351,5 @@ For i = 0 To PropertyArrUbound
     PropertyValue = objShell.ExpandEnvironmentStrings(PropertyValue)
   End If
 
-  PrintOrEchoLine GetShortcutPropertyName(PropertyName) & "=" & PropertyValue
+  PrintOrEchoLine GetShortcutPropertyNameToPrint(PropertyName) & "=" & PropertyValue
 Next
