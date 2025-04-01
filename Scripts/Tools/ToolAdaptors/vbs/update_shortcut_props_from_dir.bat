@@ -1,9 +1,8 @@
 @echo off
 
 rem USAGE:
-rem   update_shortcut_props_from_dir.bat [<Flags>] [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO>
-rem   update_shortcut_props_from_dir.bat [<Flags>] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO>
-rem   update_shortcut_props_from_dir.bat [<Flags>] -d[elete] [-m[atch] <MATCH_STRING>] [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM>
+rem   update_shortcut_props_from_dir.bat [<Flags>] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO> [<REPLACE_FROM> <REPLACE_TO>]...
+rem   update_shortcut_props_from_dir.bat [<Flags>] -d[elete] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> ["" [<REPLACE_FROM>]...]
 
 rem <Flags>:
 rem   --
@@ -106,7 +105,7 @@ rem   Base `CreateShortcut` method does not support all Unicode characters nor
 rem   `search-ms` Windows Explorer moniker path for the filter field.
 rem   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 call "%%~dp0__init__/script_init.bat" %%0 %%* || exit /b
 if %IMPL_MODE%0 EQU 0 exit /b
@@ -326,6 +325,10 @@ set "BACKUP_DIR=%BACKUP_DIR%[0-9][0-9][0-9][0-9]'[0-9][0-9]'[0-9][0-9]\.backup\\
 
 :SKIP_BACKUP_DIR
 
+set /A CMDLINE_SHIFT=%FLAG_SHIFT%+4
+
+call "%%CONTOOLS_ROOT%%\std\setshift.bat" %%CMDLINE_SHIFT%% CMDLINE_SHIFTED %%*
+
 set "READ_SHORTCUT_PROP_TEMP_STDOUT_FILE=%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props_to_match-utf-16le.lst"
 set "READ_SHORTCUT_PROP_TEMP_STDERR_FILE=%SCRIPT_TEMP_CURRENT_DIR%\shortcut_props_to_match-utf-16le.stderr.txt"
 
@@ -408,6 +411,7 @@ copy "%CONTOOLS_ROOT%\encoding\boms\fffe.bin" "%READ_SHORTCUT_PROP_TEMP_STDERR_F
 rem NOTE: `type` respects UTF-16LE file with BOM header
 type "%READ_SHORTCUT_PROP_TEMP_STDERR_FILE%" >&2
 
+set "PROP_VALUE="
 for /F "usebackq tokens=* delims="eol^= %%i in (`@type "%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%"`) do set "PROP_VALUE=%%i"
 
 rem skip on empty value
@@ -434,6 +438,7 @@ exit /b 0
 
 rem Read shortcut PROPS_LIST to replace
 
+set UPDATE_SHORTCUT=0
 set "UPDATE_SHORTCUT_PROP_FLAGS="
 
 for /F "usebackq tokens=1,* delims=="eol^= %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst") do (
@@ -442,10 +447,10 @@ for /F "usebackq tokens=1,* delims=="eol^= %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/sh
   call :UPDATE_SHORTCUT_TO_REPLACE
 )
 
-if defined UPDATE_SHORTCUT_PROP_FLAGS (
-  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS%%UPDATE_SHORTCUT_PROP_FLAGS% -- "%LINK_FILE_PATH%"
-  echo.
-)
+if %UPDATE_SHORTCUT% NEQ 0 ^
+"%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS%%UPDATE_SHORTCUT_PROP_FLAGS% -- "%LINK_FILE_PATH%"
+
+echo.
 
 exit /b
 
@@ -482,43 +487,13 @@ set "PROP_PREV_VALUE=%PROP_VALUE:"=%"
 rem skip on empty value again
 if not defined PROP_PREV_VALUE exit /b 0
 
-call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
-
-rem remove trailing backslash
-if defined PROP_NEXT_VALUE if "%PROP_NEXT_VALUE:~-1%" == "\" set "PROP_NEXT_VALUE=%PROP_NEXT_VALUE:~0,-1%"
-
 set "PROP_LINE=%PROP_NAME%(read)=%PROP_PREV_VALUE%"
 
 if %FLAG_PRINT_READ% NEQ 0 call "%%CONTOOLS_ROOT%%/std/echo_var.bat" PROP_LINE
 
-rem skip on empty assign
-if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 if not defined PROP_NEXT_VALUE (
-  echo.%?~%: warning: property empty value assignment: "%PROP_NAME%"
-  exit /b 0
-) >&2
+call "%%?~dp0%%.%%?~n0%%\%%?~n0%%.replace.bat" %%CMDLINE_SHIFTED%%
 
-rem skip on empty change
-if "%PROP_NAME%" == "TargetPath" (
-  if %FLAG_USE_CASE_COMPARE% NEQ 0 (
-    if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 (
-      echo.%?~%: warning: property `TargetPath` is not changed (case^).
-      exit /b 0
-    ) >&2
-  ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 (
-    echo.%?~%: warning: property `TargetPath` is not changed (nocase^).
-    exit /b 0
-  ) >&2
-) else if "%PROP_NAME%" == "WorkingDirectory" (
-  if %FLAG_USE_CASE_COMPARE% NEQ 0 (
-    if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_WORKING_DIR_REASSIGN% EQU 0 (
-      echo.%?~%: warning: property `WorkingDirectory` is not changed (case^).
-      exit /b 0
-    ) >&2
-  ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_WORKING_DIR_REASSIGN% EQU 0 (
-    echo.%?~%: warning: property `WorkingDirectory` is not changed (nocase^).
-    exit /b 0
-  ) >&2
-)
+if %UPDATE_SHORTCUT% EQU 0 exit /b 0
 
 if /i "%PROP_NAME%" == "TargetPath" (
   set UPDATE_SHORTCUT_PROP_FLAGS=%UPDATE_SHORTCUT_PROP_FLAGS% -t "%PROP_NEXT_VALUE%"

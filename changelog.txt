@@ -1,3 +1,6 @@
+2025.04.01:
+* new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: multiple replace arguments
+
 2025.03.26:
 * fixed: Scripts/Tools/std: get_windows_version.bat, touch_file.bat: minor fixup
 * fixed: Scripts/Tools: std/is_dir_exist.bat, ToolAdaptors/vbs/make_shortcut.vbs: execution fixup

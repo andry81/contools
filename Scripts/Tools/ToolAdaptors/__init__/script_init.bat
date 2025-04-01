@@ -35,9 +35,9 @@ call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%* || exit /b
 rem load initialization environment variables
 if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat" "%%INIT_VARS_FILE%%"
 
-rem call "%%CONTOOLS_ROOT%%/std/get_cmdline.bat" %%*
-rem call "%%CONTOOLS_ROOT%%/std/echo_var.bat" RETURN_VALUE ">"
-rem echo.
+call "%%CONTOOLS_ROOT%%/std/get_cmdline.bat" %%*
+call "%%CONTOOLS_ROOT%%/std/echo_var.bat" RETURN_VALUE ">"
+echo.
 
 rem The caller can continue after this exit.
 exit /b 0
