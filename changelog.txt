@@ -1,3 +1,6 @@
+2025.04.02:
+* changed: *.sh: global header code reduction
+
 2025.04.01:
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: multiple replace arguments
 
