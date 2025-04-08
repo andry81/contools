@@ -32,6 +32,10 @@ rem Based on:
 rem   `Uniform variant of a command line as a single argument for the `mshta.exe` executable and other cases` :
 rem   https://github.com/andry81/contools/discussions/11
 
+rem CAUTION:
+rem   The `cd "%CD%" ^& %CD:~0,2%` must be before the command, otherwise the system root will be the current directory!
+rem
+
 rem Windows Batch compatible command line with escapes (`\""` is a single nested `"`, `\""""` is a double nested `"` and so on).
 set ?.=set "IMPL_MODE=1" ^& cd "%CD%" ^& %CD:~0,2% ^& "%~f0" %* ^& pause
 

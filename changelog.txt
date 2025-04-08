@@ -1,3 +1,6 @@
+2025.04.09:
+* refactor: Scripts/Tools/ToolAdaptors/vbs/set_fileshortname.bat: minor refactor
+
 2025.04.08:
 * fixed: Scripts/Tools/build/gen_config.bat: minor fixup
 * new: Scripts/Tools/build/gen_config.bat: `-rm` option to remove text instead of replace
