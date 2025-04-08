@@ -22,10 +22,18 @@ rem   file from the input configuration file in case if are not equal.
 rem <Flags>:
 rem   -r <sed_replace_from> <sed_replace_to>
 rem     The expression to replace for the sed in form:
-rem       `s|<sed_replace_from>|<sed_replace_to>}mg`
+rem       `s|<sed_replace_from>|<sed_replace_to>|mg`
+rem
+rem     Has no effect if <sed_replace_from> or <sed_replace_to> is empty.
 rem
 rem     To pass a special code character you can use the `$/<char>` or `$/\xNN`
 rem     syntax, where `NN` is a hexidecimal code of a character.
+rem
+rem   -rm <sed_remove_from>
+rem     The expression to replace for the sed in form:
+rem       `s|<sed_remove_from>||mg`
+rem
+rem     Has no effect if <sed_remove_from> is empty.
 rem
 rem   -if_notexist
 rem     Generate if output config does not exist.
@@ -65,6 +73,7 @@ set FLAG_SKIP_CHECKS=0
 set "SED_BARE_FLAGS="
 set "SED_REPLACE_FROM="
 set "SED_REPLACE_TO="
+set "SED_REMOVE_FROM="
 
 :FLAGS_LOOP
 
@@ -86,11 +95,26 @@ set "SED_REPLACE_TO=%SED_REPLACE_TO:}=\}%"
 
 :SKIP_SED_REPLACE_TO
 
+if not defined SED_REMOVE_FROM goto SKIP_SED_REMOVE_FROM
+
+set "SED_REMOVE_FROM=%SED_REMOVE_FROM:\=\\%"
+set "SED_REMOVE_FROM=%SED_REMOVE_FROM:|=\|%"
+set "SED_REMOVE_FROM=%SED_REMOVE_FROM:{=\{%"
+set "SED_REMOVE_FROM=%SED_REMOVE_FROM:}=\}%"
+
+:SKIP_SED_REMOVE_FROM
+
 rem special `$/<char>` sequence to pass `<char>` character as is (ex: `$/\x22` translates into `\x22` - a quote character)
 if defined SED_REPLACE_FROM set "SED_REPLACE_FROM=%SED_REPLACE_FROM:$/\\=\%"
 if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:$/\\=\%"
+if defined SED_REMOVE_FROM set "SED_REMOVE_FROM=%SED_REMOVE_FROM:$/\\=\%"
 
 if defined SED_REPLACE_FROM if defined SED_REPLACE_TO set SED_BARE_FLAGS=%SED_BARE_FLAGS% -e "s|%SED_REPLACE_FROM%|%SED_REPLACE_TO%|mg"
+if defined SED_REMOVE_FROM set SED_BARE_FLAGS=%SED_BARE_FLAGS% -e "s|%SED_REMOVE_FROM%||mg"
+
+set "SED_REPLACE_FROM="
+set "SED_REPLACE_TO="
+set "SED_REMOVE_FROM="
 
 rem flags always at first
 set "FLAG=%~1"
@@ -109,6 +133,9 @@ if defined FLAG (
     set "SED_REPLACE_FROM=%~2"
     set "SED_REPLACE_TO=%~3"
     shift
+    shift
+  ) else if "%FLAG%" == "-rm" (
+    set "SED_REMOVE_FROM=%~2"
     shift
   ) else if not "%FLAG%" == "--" (
     echo.%?~%: error: invalid flag: %FLAG%
