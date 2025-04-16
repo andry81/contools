@@ -29,7 +29,7 @@ If fso_obj.FileExists(cmdline_file) Then
 
     QuoteArg = False
     If InStr(line, Chr(34)) = 0 Then
-      If Len(line & "") = 0 Then
+      If IsCmdArg Or Len(line & "") = 0 Then
         QuoteArg = True
       Else
         QuoteArg = False
@@ -55,7 +55,7 @@ If fso_obj.FileExists(cmdline_file) Then
       End If
     End If
 
-    If QuoteArg Or IsCmdArg Then
+    If QuoteArg Then
       line = Chr(34) & line & Chr(34)
     End If
 
