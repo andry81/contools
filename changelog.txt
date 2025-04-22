@@ -1,3 +1,7 @@
+2025.04.23:
+* new: Scripts/Tests/bench/batscripts/test__echo*.bat: bench tests
+* refactor: Scripts/Tests/bench/batscripts: test__call*.bat, test__all.bat: tests refactor
+
 2025.04.17:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline.vbs: avoid quote the first command line argument if already has a quote character
 
