@@ -1,4 +1,8 @@
 2025.04.24:
+* new: Scripts/Tools/ToolAdaptors/app/emule/exec_gui_emule.bat: `-backup-all`, `-backup-config`, `-backup-logs`, `-backup-part-met` flags
+* changed: Scripts/Tools/ToolAdaptors/app/emule/exec_gui_emule.bat: don't wait GUI executable to exit as long as it does not print into stdout
+
+2025.04.24:
 * fixed: Scripts/Tools/ToolAdaptors/app/emule/backup_config.bat: skip unexisted `KnownPrefs.met`
 * new: Scripts/Tools/ToolAdaptors/app/emule/backup_logs.bat: backup logs to save errors and corrupted part met file names to locate them later in previously backuped downloads
 * changed: Scripts/Tools/ToolAdaptors/app/emule/backup_config.bat: added `downloads.bak` and `fileinfo.ini` to backup
