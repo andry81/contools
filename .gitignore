@@ -1,3 +1,4 @@
 /.log
 /_out
 /**/__pycache__
+/**/.temp

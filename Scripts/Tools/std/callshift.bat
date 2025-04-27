@@ -61,12 +61,12 @@ rem   1. >callshift.bat 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | "=" 3
 rem   2. >callshift.bat -exe 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | , ; = = "=" 3
-rem   3. >callshift.bat 2 echo;"1 2" 3 4 5
+rem   3. >callshift.bat 2 echo:"1 2" 3 4 5
 rem      "1 2" 5
 rem   4. >callshift.bat . set | sort
 rem   5. >errlvl.bat 123
 rem      >callshift.bat
-rem      >callshift.bat 0 echo;
+rem      >callshift.bat 0 echo:
 rem      >callshift.bat 0 echo 1 2 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123

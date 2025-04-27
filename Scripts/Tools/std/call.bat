@@ -51,7 +51,7 @@ rem      "1 2" ! ? * & | , ; = = "=" 3
 rem   3. >call.bat set | sort
 rem   4. >errlvl.bat 123
 rem      >call.bat
-rem      >call.bat echo;
+rem      >call.bat echo:
 rem      >call.bat echo 1 2 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123

@@ -1,3 +1,12 @@
+2025.04.28:
+* fixed: Scripts/Tools/std/*shift.bat, Scripts/Tests/manual/batscripts/test_std: execution fixup
+* new: Scripts/Tests/manual/batscripts/test_std: test_std__00_call.bat, test_std__10_callshift.bat: more `echo` tests related to "Different `echo?...` variants" : https://github.com/andry81/contools/discussions/22
+* changed: Scripts/Tests/manual/batscripts/test_std/test_std__02_setshift.bat: output improvement
+* changed: Scripts/Tests/manual/batscripts/test_std: tests with locks removed from run all
+* changed: Scripts/Tests/manual/batscripts: code cleanup
+* refactor: Scripts/Tests/bench/batscripts, Scripts/Tests/manual/batscripts: tests moved to subdirectories for unification
+* refactor: Scripts/Tests/bench/batscripts, Scripts/Tests/manual/batscripts: tests rename
+
 2025.04.27:
 * changed: global code improvement: `echo.` -> `echo;`, based on "Different `echo?...` variants" : https://github.com/andry81/contools/discussions/22
 
