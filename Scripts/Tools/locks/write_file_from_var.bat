@@ -15,12 +15,12 @@ set "__LOCK_FILE0=%~2"
 set "__WRITE_FILE0=%~3"
 
 if not defined __VAR_NAME (
-  echo.%?~%: error: VAR_NAME is not defined.
+  echo;%?~%: error: VAR_NAME is not defined.
   exit /b 1
 ) >&2
 
 if not defined __LOCK_FILE0 (
-  echo.%?~%: error: LOCK_FILE0 is not defined.
+  echo;%?~%: error: LOCK_FILE0 is not defined.
   exit /b 2
 ) >&2
 
@@ -33,7 +33,7 @@ set __LOCK_FILE0_ACQUIRE=0
   (
     rem if lock is acquired, then we are in...
     rem safe echo call
-    for /F "tokens=* delims="eol^= %%i in ("%__VAR__%") do (echo.%%i) > "%__WRITE_FILE0%"
+    for /F "tokens=* delims="eol^= %%i in ("%__VAR__%") do (echo;%%i) > "%__WRITE_FILE0%"
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
     call;

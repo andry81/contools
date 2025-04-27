@@ -18,17 +18,17 @@ rem min busy tasks to unlock spawn new tasks, may be left empty to not lock to s
 set "MIN_BUSY_TASKS_TO_UNLOCK_SPAWN=%~3"
 
 if not defined MAX_SPAWN_TASKS (
-  echo.%?~%: error: max spawn tasks is not defined.
+  echo;%?~%: error: max spawn tasks is not defined.
   exit /b 1
 ) >&2
 
 if not defined MAX_BUSY_TASKS (
-  echo.%?~%: error: max busy tasks is not defined.
+  echo;%?~%: error: max busy tasks is not defined.
   exit /b 2
 ) >&2
 
 if "%~4" == "" (
-  echo.%?~%: error: command line is empty.
+  echo;%?~%: error: command line is empty.
   exit /b -1
 ) >&2
 
@@ -109,7 +109,7 @@ set LOCK_FILE0_ACQUIRE=0
     set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
     if not defined RUNNING_TASKS_COUNTER set RUNNING_TASKS_COUNTER=0
     set /A RUNNING_TASKS_COUNTER+=1
-    (call echo.%%RUNNING_TASKS_COUNTER%%) > "%RUNNING_TASKS_COUNTER_FILE%"
+    (call echo;%%RUNNING_TASKS_COUNTER%%) > "%RUNNING_TASKS_COUNTER_FILE%"
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
     call;

@@ -10,7 +10,7 @@ rem   check before call. Does support long paths.
 rem <path>...
 rem   Directory path list.
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
+if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 
 setlocal
 
@@ -25,7 +25,7 @@ set "DIR_PATH=%~1"
 set DIR_COUNT=1
 
 if not defined DIR_PATH (
-  echo.%?~%: error: at least one directory path argument must be defined.
+  echo;%?~%: error: at least one directory path argument must be defined.
   exit /b -255
 ) >&2
 
@@ -54,7 +54,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_ERROR
 (
-  echo.%?~%: error: directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo;%?~%: error: directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -63,7 +63,7 @@ goto DIR_PATH_OK
 for /F "tokens=* delims="eol^= %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi"
 
 if not exist "\\?\%DIR_PATH%\*" (
-  echo.%?~%: error: directory does not exist: "%DIR_PATH%".
+  echo;%?~%: error: directory does not exist: "%DIR_PATH%".
   goto CONTINUE
 ) >&2
 

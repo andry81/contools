@@ -27,7 +27,7 @@ for /L %%i in (1,1,1000) do (
   call :GET %%i
 )
 
-echo.
+echo;
 
 set /A __NEST_LVL-=1
 if %__NEST_LVL%0 EQU 0 call "%%CONTOOLS_ROOT%%/std/pause.bat"
@@ -35,7 +35,7 @@ if %__NEST_LVL%0 EQU 0 call "%%CONTOOLS_ROOT%%/std/pause.bat"
 exit /b 0
 
 :GET
-echo.%__COUNTER1% !STRING_%__COUNTER1%:~0,4!..!STRING_%__COUNTER1%:~-4!
+echo;%__COUNTER1% !STRING_%__COUNTER1%:~0,4!..!STRING_%__COUNTER1%:~-4!
 set /A __COUNTER1+=1
 exit /b 0
 
@@ -52,7 +52,7 @@ for /L %%i in (1,1,10) do (
 
 set STRING_%__COUNTER1%=!__STRING__!
 
-if %INDEX_BLOCK% EQU 1 echo.%INDEX% len=%__STRING_LEN__%
+if %INDEX_BLOCK% EQU 1 echo;%INDEX% len=%__STRING_LEN__%
 
 set /A __STRING_CHARS__+=1
 set /A __COUNTER1+=1

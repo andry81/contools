@@ -9,7 +9,7 @@ rem drop last error level
 call;
 
 if "%~1" == "" (
-  echo.%?~%: error: command argument is not defined.
+  echo;%?~%: error: command argument is not defined.
   exit /b 255
 ) >&2
 

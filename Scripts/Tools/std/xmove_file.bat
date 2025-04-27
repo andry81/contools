@@ -71,7 +71,7 @@ rem   To directory path.
 rem <xmove-flags>:
 rem   Command line flags to pass into subsequent commands and utilities.
 
-echo.^>%~nx0 %*
+echo;^>%~nx0 %*
 
 setlocal
 
@@ -116,7 +116,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-touch_file" (
     set FLAG_TOUCH_FILE=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -132,17 +132,17 @@ set "FROM_FILE=%~2"
 set "TO_PATH=%~3"
 
 if not defined FROM_PATH (
-  echo.%?~%: error: input directory path argument must be defined.
+  echo;%?~%: error: input directory path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined FROM_FILE (
-  echo.%?~%: error: input file argument must be defined.
+  echo;%?~%: error: input file argument must be defined.
   exit /b -254
 ) >&2
 
 if not defined TO_PATH (
-  echo.%?~%: error: output directory path argument must be defined.
+  echo;%?~%: error: output directory path argument must be defined.
   exit /b -253
 ) >&2
 
@@ -169,10 +169,10 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%?~%: error: input directory path is invalid:
-  echo.  FROM_PATH="%FROM_PATH%"
-  echo.  FROM_FILE="%FROM_FILE%"
-  echo.  TO_PATH  ="%TO_PATH%"
+  echo;%?~%: error: input directory path is invalid:
+  echo;  FROM_PATH="%FROM_PATH%"
+  echo;  FROM_FILE="%FROM_FILE%"
+  echo;  TO_PATH  ="%TO_PATH%"
   exit /b -248
 ) >&2
 
@@ -187,7 +187,7 @@ goto FROM_FILE_OK
 
 :FROM_FILE_ERROR
 (
-  echo.%?~%: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
+  echo;%?~%: error: input file is invalid: FROM_PATH="%FROM_PATH%" FROM_FILE="%FROM_FILE%" TO_PATH="%TO_PATH%".
   exit /b -248
 ) >&2
 
@@ -214,10 +214,10 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%?~%: error: output directory path is invalid:
-  echo.  FROM_PATH="%FROM_PATH%"
-  echo.  FROM_FILE="%FROM_FILE%"
-  echo.  TO_PATH  ="%TO_PATH%"
+  echo;%?~%: error: output directory path is invalid:
+  echo;  FROM_PATH="%FROM_PATH%"
+  echo;  FROM_FILE="%FROM_FILE%"
+  echo;  TO_PATH  ="%TO_PATH%"
   exit /b -249
 ) >&2
 
@@ -228,8 +228,8 @@ for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
 for /F "tokens=* delims="eol^= %%i in ("%TO_PATH_ABS%") do for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "TO_PARENT_DIR_ABS=%%~fj"
 
 if not exist "\\?\%FROM_DIR_PATH_ABS%\*" (
-  echo.%?~%: error: input directory does not exist:
-  echo.  FROM_PATH="%FROM_PATH%"
+  echo;%?~%: error: input directory does not exist:
+  echo;  FROM_PATH="%FROM_PATH%"
   exit /b -248
 ) >&2
 
@@ -241,15 +241,15 @@ if not "%FROM_FILE%" == "%FROM_FILE:?=%" goto SKIP_FROM_FILE_CHECK
 
 rem check on input file existence
 if not exist "\\?\%FROM_FILE_PATH_ABS%" (
-  echo.%?~%: error: input file path does not exist:
-  echo.  FROM_FILE_PATH="%FROM_PATH%\%FROM_FILE%"
+  echo;%?~%: error: input file path does not exist:
+  echo;  FROM_FILE_PATH="%FROM_PATH%\%FROM_FILE%"
   exit /b -248
 ) >&2
 
 rem check on input file as directory existence
 if exist "\\?\%FROM_FILE_PATH_ABS%\*" (
-  echo.%?~%: error: input file is a directory:
-  echo.  FROM_FILE_PATH="%FROM_PATH%\%FROM_FILE%"
+  echo;%?~%: error: input file is a directory:
+  echo;  FROM_FILE_PATH="%FROM_PATH%\%FROM_FILE%"
   exit /b -248
 ) >&2
 
@@ -258,7 +258,7 @@ if exist "\\?\%FROM_FILE_PATH_ABS%\*" (
 if %FLAG_IGNORE_UNEXIST% NEQ 0 goto IGNORE_TO_PATH_UNEXIST
 
 if not exist "\\?\%TO_PATH_ABS%\*" (
-  echo.%?~%: error: output directory does not exist: "%TO_PATH%\"
+  echo;%?~%: error: output directory does not exist: "%TO_PATH%\"
   exit /b -249
 ) >&2
 
@@ -267,8 +267,8 @@ goto INIT
 :IGNORE_TO_PATH_UNEXIST
 
 if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
-  echo.%?~%: error: output parent directory does not exist:
-  echo.  TO_PARENT_DIR_ABS="%TO_PARENT_DIR_ABS%"
+  echo;%?~%: error: output parent directory does not exist:
+  echo;  TO_PARENT_DIR_ABS="%TO_PARENT_DIR_ABS%"
   exit /b -249
 ) >&2
 
@@ -296,7 +296,7 @@ exit /b %LAST_ERROR%
 if %FLAG_USE_BUILTIN_MOVE% EQU 0 (
   if not exist "%SystemRoot%\System32\robocopy.exe" (
     if %FLAG_USE_ROBOCOPY% NEQ 0 (
-      echo.%?~%: error: `robocopy.exe` is not found.
+      echo;%?~%: error: `robocopy.exe` is not found.
       exit /b -240
     ) >&2
     set FLAG_USE_BUILTIN_MOVE=1
@@ -320,7 +320,7 @@ if %FLAG_USE_BUILTIN_MOVE% EQU 0 call :PARSE_ROBOCOPY_FLAGS
 if %FLAG_TOUCH_DIR%%FLAG_TOUCH_FILE% EQU 0 goto SKIP_TOUCH
 if %FLAG_TOUCH_DIR% NEQ 0 if %FLAG_TOUCH_FILE% EQU 0 if %XMOVE_DIR_RECUR% EQU 0 goto SKIP_TOUCH
 
-echo.^>^>touch "%TO_PATH_ABS%\%FROM_FILE%"
+echo;^>^>touch "%TO_PATH_ABS%\%FROM_FILE%"
 
 setlocal
 
@@ -379,7 +379,7 @@ set ?.=@dir "%FROM_FILE_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N 2^>nul
 
 for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "FROM_FILE=%%~nxi"
-  echo.^>^>move%XMOVE_FLAGS:~1% "%FROM_DIR_PATH_ABS%\%%~nxi" "%TO_PATH_ABS%"
+  echo;^>^>move%XMOVE_FLAGS:~1% "%FROM_DIR_PATH_ABS%\%%~nxi" "%TO_PATH_ABS%"
   if %FLAG_USE_BUILTIN_MOVE% EQU 0 (
     move%XMOVE_FLAGS:~1% "%FROM_DIR_PATH_ABS%\%%~nxi" "%TO_PATH_ABS%" || call :EXEC_ROBOCOPY || goto BREAK
   ) else move%XMOVE_FLAGS:~1% "%FROM_DIR_PATH_ABS%\%%~nxi" "%TO_PATH_ABS%" || goto BREAK
@@ -397,7 +397,7 @@ if "%XMOVE_FLAG%" == "/Y" (
   exit /b 0
 )
 if "%XMOVE_FLAG%" == "/S" (
-  echo.%?~%: error: /S flag is not applicable.
+  echo;%?~%: error: /S flag is not applicable.
   exit /b 1
 ) >&2
 rem CAUTION: /E must be used in case of file globbing including directories
@@ -406,7 +406,7 @@ if "%XMOVE_FLAG%" == "/E" (
   exit /b 0
 )
 if "%XMOVE_FLAG:~0,4%" == "/MOV" (
-  echo.%?~%: error: /MOV and /MOVE parameters is not accepted to move a file.
+  echo;%?~%: error: /MOV and /MOVE parameters is not accepted to move a file.
   exit /b 1
 ) >&2
 if %XMOVE_FLAG_PARSED% EQU 0 set "XMOVE_FLAGS=%XMOVE_FLAGS% %XMOVE_FLAG%"
@@ -429,7 +429,7 @@ call :PARSE_ROBOCOPY_FLAGS
 if %FLAG_TOUCH_DIR%%FLAG_TOUCH_FILE% EQU 0 goto SKIP_TOUCH
 if %FLAG_TOUCH_DIR% NEQ 0 if %FLAG_TOUCH_FILE% EQU 0 if %XMOVE_DIR_RECUR% EQU 0 goto SKIP_TOUCH
 
-echo.^>^>touch "%TO_PATH_ABS%\%FROM_FILE%"
+echo;^>^>touch "%TO_PATH_ABS%\%FROM_FILE%"
 
 setlocal
 
@@ -506,19 +506,19 @@ if %XMOVE_DIR_RECUR% EQU 0 (
 exit /b
 
 :EXEC_ROBOCOPY_NO_DIR_REMOVE
-echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOV /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
+echo;^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOV /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
 "%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOV /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
 :EXEC_ROBOCOPY_FILE_AS_DIR
-echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%" "*.*" /R:0 /W:0 /NP /NJH /NS /NC /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
+echo;^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%" "*.*" /R:0 /W:0 /NP /NJH /NS /NC /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
 "%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%\%FROM_FILE%" "%TO_PATH_ABS%" "*.* /R:0 /W:0 /NP /NJH /NS /NC /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
 :EXEC_ROBOCOPY
-echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
+echo;^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
 "%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
@@ -543,9 +543,9 @@ set "ROBOCOPY_EXCLUDES_CMD="
 if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_ROBOCOPY_EXCLUDES
 
 call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_robocopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" || (
-  echo.%?~%: error: robocopy excludes list is invalid:
-  echo.  XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%"
-  echo.  XCOPY_EXCLUDES_LIST_TMP ="%XCOPY_EXCLUDES_LIST_TMP%"
+  echo;%?~%: error: robocopy excludes list is invalid:
+  echo;  XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%"
+  echo;  XCOPY_EXCLUDES_LIST_TMP ="%XCOPY_EXCLUDES_LIST_TMP%"
   exit /b -246
 ) >&2
 if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%

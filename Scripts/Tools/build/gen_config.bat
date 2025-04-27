@@ -138,7 +138,7 @@ if defined FLAG (
     set "SED_REMOVE_FROM=%~2"
     shift
   ) else if not "%FLAG%" == "--" (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -155,17 +155,17 @@ set "CONFIG_FILE=%~3"
 if %FLAG_SKIP_CHECKS% NEQ 0 goto SKIP_CHECKS
 
 if not defined CONFIG_IN_DIR (
-  echo.%?~%: error: input config directory is not defined.
+  echo;%?~%: error: input config directory is not defined.
   exit /b 1
 ) >&2
 
 if not defined CONFIG_OUT_DIR (
-  echo.%?~%: error: output config directory is not defined.
+  echo;%?~%: error: output config directory is not defined.
   exit /b 2
 ) >&2
 
 if not defined CONFIG_FILE (
-  echo.%?~%: error: config file is not defined.
+  echo;%?~%: error: config file is not defined.
   exit /b 3
 ) >&2
 
@@ -173,12 +173,12 @@ for /F "tokens=* delims="eol^= %%i in ("%CONFIG_IN_DIR%\.") do set "CONFIG_IN_DI
 for /F "tokens=* delims="eol^= %%i in ("%CONFIG_OUT_DIR%\.") do set "CONFIG_OUT_DIR=%%~fi"
 
 if not exist "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" (
-  echo.%?~%: error: input config file does not exist: "%CONFIG_IN_DIR%\%CONFIG_FILE%.in".
+  echo;%?~%: error: input config file does not exist: "%CONFIG_IN_DIR%\%CONFIG_FILE%.in".
   exit /b 10
 ) >&2
 
 if not exist "%CONFIG_OUT_DIR%\*" (
-  echo.%?~%: error: output config directory does not exist: "%CONFIG_OUT_DIR%".
+  echo;%?~%: error: output config directory does not exist: "%CONFIG_OUT_DIR%".
   exit /b 11
 ) >&2
 
@@ -189,7 +189,7 @@ if exist "%CONFIG_OUT_DIR%\%CONFIG_FILE%" (
   if %FLAG_IF_NOTEXIST% NEQ 0 exit /b 0
 )
 
-echo."%CONFIG_IN_DIR%\%CONFIG_FILE%.in" -^> "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
+echo;"%CONFIG_IN_DIR%\%CONFIG_FILE%.in" -^> "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
 
 if not defined SED_BARE_FLAGS (
   type "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" > "%CONFIG_OUT_DIR%\%CONFIG_FILE%"

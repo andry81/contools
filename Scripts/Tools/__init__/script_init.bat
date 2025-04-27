@@ -26,7 +26,7 @@ rem if defined INIT_VARS_FILE call "%%CONTOOLS_ROOT%%/std/set_vars_from_file.bat
 
 rem call "%%CONTOOLS_ROOT%%/std/get_cmdline.bat" %%*
 rem call "%%CONTOOLS_ROOT%%/std/echo_var.bat" RETURN_VALUE ">"
-rem echo.
+rem echo;
 
 rem The caller can continue after this exit.
 exit /b 0

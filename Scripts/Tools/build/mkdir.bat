@@ -26,7 +26,7 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 set "DIR_PATH=%~1"
 
 if not defined DIR_PATH (
-  echo.%?~%: error: directory path is not defined.
+  echo;%?~%: error: directory path is not defined.
   exit /b -255
 ) >&2
 
@@ -51,7 +51,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_ERROR
 (
-  echo.%?~%: error: directory path is invalid: "%DIR_PATH%".
+  echo;%?~%: error: directory path is invalid: "%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -63,7 +63,7 @@ rem CAUTION:
 rem   The drive still must exist even if the path is not. If path exists, the path directory still can be in a disconnected state.
 rem
 if not exist "%DIR_DRIVE%" (
-  echo.%?~%: error: the directory path drive is not exist: "%DIR_PATH%".
+  echo;%?~%: error: the directory path drive is not exist: "%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -74,23 +74,23 @@ rem     `x:\<path-to-dir-without-trailing-back-slash>`
 rem   So we must test the path with the trailing back slash to check existence of the link AND it's connection state.
 rem
 if exist "\\?\%DIR_PATH%\*" (
-  echo.%?~%: error: directory already exists: "%DIR_PATH%".
+  echo;%?~%: error: directory already exists: "%DIR_PATH%".
   exit /b 1
 ) >&2 else if exist "\\?\%DIR_PATH%" (
-  echo.%?~%: error: path does exist and is not a directory: "%DIR_PATH%".
+  echo;%?~%: error: path does exist and is not a directory: "%DIR_PATH%".
   exit /b -254
 ) >&2
 
-echo.^>mkdir "%DIR_PATH%"
+echo;^>mkdir "%DIR_PATH%"
 
 mkdir "%DIR_PATH%" 2>nul && (
-  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;
   exit /b 0
 )
 
 if not exist "\\?\%SystemRoot%\System32\robocopy.exe" (
-  echo.%?~%: error: could not create a target file directory: "%DIR_PATH%".
-  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
+  echo;%?~%: error: could not create a target file directory: "%DIR_PATH%".
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;
   exit /b 255
 ) >&2
 
@@ -115,4 +115,4 @@ rem updates the modification file time if exists
 
 if %REMOVE_EMPTY_DIR_TMP% NEQ 0 rmdir /S /Q "%EMPTY_DIR_TMP%" >nul
 
-if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
+if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;

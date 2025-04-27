@@ -11,7 +11,7 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 
 for %%i in (%*) do (
   if not defined %%~i (
-    echo.%?~%: error: `%%~i` variable is not defined.
+    echo;%?~%: error: `%%~i` variable is not defined.
     exit /b 255
   ) >&2
 )

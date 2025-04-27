@@ -20,7 +20,7 @@ rem   File name extension pattern.
 rem <del-flags>:
 rem   Command line flags to pass into builtin `del` command.
 
-echo.^>%~nx0 %*
+echo;^>%~nx0 %*
 
 setlocal
 
@@ -32,7 +32,7 @@ set "FILE_NAME_PTTN=%~2"
 set "FILE_EXT_PTTN=%~3"
 
 if not defined FILE_DIR (
-  echo.%?~%: error: file directory argument must be defined.
+  echo;%?~%: error: file directory argument must be defined.
   exit /b -255
 ) >&2
 
@@ -59,7 +59,7 @@ goto FILE_DIR_OK
 
 :FILE_DIR_ERROR
 (
-  echo.%?~%: error: file directory path is invalid: "%FILE_DIR%".
+  echo;%?~%: error: file directory path is invalid: "%FILE_DIR%".
   exit /b -254
 ) >&2
 
@@ -68,7 +68,7 @@ goto FILE_DIR_OK
 for /F "tokens=* delims="eol^= %%i in ("%FILE_DIR%\.") do set "FILE_DIR=%%~fi"
 
 if not exist "%FILE_DIR%\*" (
-  echo.%?~%: error: file directory does not exist: "%FILE_DIR%"
+  echo;%?~%: error: file directory does not exist: "%FILE_DIR%"
   exit /b -253
 ) >&2
 
@@ -97,14 +97,14 @@ if defined FILE_EXT_PTTN if "%FILE_EXT_PTTN:~-1%" == "." if not "%FILE_EXT%" == 
 for /F "tokens=* delims="eol^= %%i in ("%FILE_PATH%\.") do set "FILE_PATH=%%~fi"
 
 if not exist "\\?\%FILE_PATH%" (
-  echo.%?~%: error: path does not exist: "%FILE_PATH%"
+  echo;%?~%: error: path does not exist: "%FILE_PATH%"
   exit /b 1
 ) >&2
 
 rem CAUTION: we must override `/A` flag for a file removement ONLY
 call "%%~dp0setshift.bat" 3 DEL_FLAGS_ %%* /A:-D
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>^>del %DEL_FLAGS_% "%FILE_PATH%"
+if %TOOLS_VERBOSE%0 NEQ 0 echo;^>^>del %DEL_FLAGS_% "%FILE_PATH%"
 del %DEL_FLAGS_% "%FILE_PATH%"
 
 exit /b

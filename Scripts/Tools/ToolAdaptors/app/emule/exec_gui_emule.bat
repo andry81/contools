@@ -67,7 +67,7 @@ if %FLAG_BACKUP_CONFIG% NEQ 0 call "%?~dp0%backup_config.bat" || exit /b
 if %FLAG_BACKUP_LOGS% NEQ 0 call "%?~dp0%backup_logs.bat" || exit /b
 if %FLAG_BACKUP_PART_MET% NEQ 0 call "%?~dp0%backup_part_met_files.bat" || exit /b
 
-if %BACKUP% NEQ 0 echo.
+if %BACKUP% NEQ 0 echo;
 
-echo.^>"%EMULE_EXECUTABLE%"
+echo;^>"%EMULE_EXECUTABLE%"
 start "" "%EMULE_EXECUTABLE%"

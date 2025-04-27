@@ -125,7 +125,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-pd" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if not "%FLAG%" == "--" (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -161,7 +161,7 @@ set "LINKS_DIR=%~1"
 
 if defined LINKS_DIR (
   if not exist "%LINKS_DIR%\*" (
-    echo.%?~%: error: LINKS_DIR does not exist: "%LINKS_DIR%".
+    echo;%?~%: error: LINKS_DIR does not exist: "%LINKS_DIR%".
     exit /b 255
   ) >&2
 ) else set "LINKS_DIR=."
@@ -190,13 +190,13 @@ for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   call :UPDATE_LINK
 )
 
-echo.
+echo;
 
 exit /b 0
 
 :UPDATE_LINK
-echo."%LINK_FILE_PATH%"
+echo;"%LINK_FILE_PATH%"
 
 "%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/reset_shortcut.vbs"%RESET_SHORTCUT_BARE_FLAGS% -- "%LINK_FILE_PATH%"
 
-echo.
+echo;

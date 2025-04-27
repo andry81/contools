@@ -40,27 +40,27 @@ rem read archive file pattern list
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" 3 FILE_PTTN_LIST %%*
 
 if not defined XCOPY_FROM_DIR (
-  echo.%?~%: error: XCOPY_FROM_DIR is not defined.
+  echo;%?~%: error: XCOPY_FROM_DIR is not defined.
   exit /b 255
 ) >&2
 
 if not exist "%XCOPY_FROM_DIR%\*" (
-  echo.%?~%: error: XCOPY_FROM_DIR does not exist: "%XCOPY_FROM_DIR%".
+  echo;%?~%: error: XCOPY_FROM_DIR does not exist: "%XCOPY_FROM_DIR%".
   exit /b 255
 ) >&2
 
 if not defined XCOPY_TO_DIR (
-  echo.%?~%: error: XCOPY_TO_DIR is not defined.
+  echo;%?~%: error: XCOPY_TO_DIR is not defined.
   exit /b 255
 ) >&2
 
 if not exist "%XCOPY_TO_DIR%\*" (
-  echo.%?~%: error: XCOPY_TO_DIR does not exist: "%XCOPY_TO_DIR%".
+  echo;%?~%: error: XCOPY_TO_DIR does not exist: "%XCOPY_TO_DIR%".
   exit /b 255
 ) >&2
 
 if not defined FILE_PTTN_LIST (
-  echo.%?~%: error: FILE_PTTN_LIST is not defined.
+  echo;%?~%: error: FILE_PTTN_LIST is not defined.
   exit /b 255
 ) >&2
 

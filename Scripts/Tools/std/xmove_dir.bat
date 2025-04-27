@@ -77,7 +77,7 @@ rem   To directory path.
 rem <xmove-flags>:
 rem   Command line flags to pass into subsequent commands and utilities.
 
-echo.^>%~nx0 %*
+echo;^>%~nx0 %*
 
 setlocal
 
@@ -122,7 +122,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-touch_file" (
     set FLAG_TOUCH_FILE=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -137,12 +137,12 @@ set "FROM_PATH=%~1"
 set "TO_PATH=%~2"
 
 if not defined FROM_PATH (
-  echo.%?~%: error: input directory path argument must be defined.
+  echo;%?~%: error: input directory path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined TO_PATH (
-  echo.%?~%: error: output directory path argument must be defined.
+  echo;%?~%: error: output directory path argument must be defined.
   exit /b -253
 ) >&2
 
@@ -168,9 +168,9 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%?~%: error: input directory path is invalid:
-  echo.  FROM_PATH="%FROM_PATH%"
-  echo.  TO_PATH  ="%TO_PATH%"
+  echo;%?~%: error: input directory path is invalid:
+  echo;  FROM_PATH="%FROM_PATH%"
+  echo;  TO_PATH  ="%TO_PATH%"
   exit /b -248
 ) >&2
 
@@ -197,9 +197,9 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%?~%: error: output directory path is invalid:
-  echo.  FROM_PATH="%FROM_PATH%"
-  echo.  TO_PATH  ="%TO_PATH%"
+  echo;%?~%: error: output directory path is invalid:
+  echo;  FROM_PATH="%FROM_PATH%"
+  echo;  TO_PATH  ="%TO_PATH%"
   exit /b -249
 ) >&2
 
@@ -210,8 +210,8 @@ for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
 for /F "tokens=* delims="eol^= %%i in ("%TO_PATH_ABS%") do for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "TO_PARENT_DIR_ABS=%%~fj"
 
 if not exist "\\?\%FROM_PATH_ABS%\*" (
-  echo.%?~%: error: input directory does not exist:
-  echo.  FROM_PATH="%FROM_PATH%"
+  echo;%?~%: error: input directory does not exist:
+  echo;  FROM_PATH="%FROM_PATH%"
   exit /b -248
 ) >&2
 
@@ -224,14 +224,14 @@ rem   1. Difference between `move` and `robocopy.exe` in case of existed path.
 rem   2. To be able to rename the input directory.
 rem
 if %FLAG_IGNORE_EXISTED% EQU 0 if %TO_PATH_AS_DIR_EXISTS% NEQ 0 (
-  echo.%?~%: error: output directory does exist:
-  echo.  TO_PATH="%TO_PATH%"
+  echo;%?~%: error: output directory does exist:
+  echo;  TO_PATH="%TO_PATH%"
   exit /b -247
 ) >&2
 
 if not exist "\\?\%TO_PARENT_DIR_ABS%\*" (
-  echo.%?~%: error: output parent directory does not exist:
-  echo.  TO_PARENT_DIR_ABS="%TO_PARENT_DIR_ABS%"
+  echo;%?~%: error: output parent directory does not exist:
+  echo;  TO_PARENT_DIR_ABS="%TO_PARENT_DIR_ABS%"
   exit /b -249
 ) >&2
 
@@ -258,7 +258,7 @@ exit /b %LAST_ERROR%
 if %FLAG_USE_BUILTIN_MOVE% EQU 0 (
   if not exist "%SystemRoot%\System32\robocopy.exe" (
     if %FLAG_USE_ROBOCOPY% NEQ 0 (
-      echo.%?~%: error: `robocopy.exe` is not found.
+      echo;%?~%: error: `robocopy.exe` is not found.
       exit /b -240
     ) >&2
     set FLAG_USE_BUILTIN_MOVE=1
@@ -281,7 +281,7 @@ for %%i in (%XMOVE_FLAGS_%) do (
 
 if %FLAG_TOUCH_DIR%%FLAG_TOUCH_FILE% EQU 0 goto SKIP_TOUCH
 
-echo.^>^>touch "%TO_PATH_ABS%\*"
+echo;^>^>touch "%TO_PATH_ABS%\*"
 
 setlocal
 
@@ -322,7 +322,7 @@ endlocal
 
 :SKIP_TOUCH
 
-echo.^>^>move%XMOVE_FLAGS:~1% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
+echo;^>^>move%XMOVE_FLAGS:~1% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
 move%XMOVE_FLAGS:~1% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
 set LAST_ERROR=%ERRORLEVEL%
 
@@ -338,12 +338,12 @@ set "XMOVE_FLAG=%~1"
 if not defined XMOVE_FLAG exit /b 0
 set XMOVE_FLAG_PARSED=0
 if "%XMOVE_FLAG%" == "/S" (
-  echo.%?~%: error: /S flag is not supported.
+  echo;%?~%: error: /S flag is not supported.
   exit /b 1
 ) >&2
 if "%XMOVE_FLAG%" == "/E" exit /b 0
 if "%XMOVE_FLAG:~0,4%" == "/MOV" (
-  echo.%?~%: error: /MOV and /MOVE parameters is not accepted to move a directory.
+  echo;%?~%: error: /MOV and /MOVE parameters is not accepted to move a directory.
   exit /b 1
 ) >&2
 if %XMOVE_FLAG_PARSED% EQU 0 set "XMOVE_FLAGS=%XMOVE_FLAGS% %XMOVE_FLAG%"
@@ -368,9 +368,9 @@ set "ROBOCOPY_EXCLUDES_CMD="
 if not defined XCOPY_EXCLUDE_FILES_LIST if not defined XCOPY_EXCLUDE_DIRS_LIST goto IGNORE_ROBOCOPY_EXCLUDES
 
 call "%%CONTOOLS_ROOT%%/xcopy/convert_excludes_to_robocopy.bat" "%%XCOPY_EXCLUDE_FILES_LIST%%" "%%XCOPY_EXCLUDE_DIRS_LIST%%" || (
-  echo.%?~%: error: robocopy excludes list is invalid:
-  echo.  XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%"
-  echo.  XCOPY_EXCLUDES_LIST_TMP ="%XCOPY_EXCLUDES_LIST_TMP%"
+  echo;%?~%: error: robocopy excludes list is invalid:
+  echo;  XCOPY_EXCLUDE_FILES_LIST="%XCOPY_EXCLUDE_FILES_LIST%"
+  echo;  XCOPY_EXCLUDES_LIST_TMP ="%XCOPY_EXCLUDES_LIST_TMP%"
   exit /b -246
 ) >&2
 if %ERRORLEVEL% EQU 0 set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
@@ -390,7 +390,7 @@ if "%ROBOCOPY_FLAGS:/DCOPY=%" == "%ROBOCOPY_FLAGS%" set "ROBOCOPY_FLAGS=%ROBOCOP
 
 if %FLAG_TOUCH_DIR%%FLAG_TOUCH_FILE% EQU 0 goto SKIP_TOUCH
 
-echo.^>^>touch "%TO_PATH_ABS%\*"
+echo;^>^>touch "%TO_PATH_ABS%\*"
 
 setlocal
 
@@ -431,7 +431,7 @@ endlocal
 
 :SKIP_TOUCH
 
-echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /NJH /NS /NC /E /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
+echo;^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /NJH /NS /NC /E /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
 "%SystemRoot%\System32\robocopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%" /R:0 /W:0 /NP /NJH /NS /NC /E /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_DIR_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b

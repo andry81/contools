@@ -16,8 +16,8 @@ goto X64
 :NOTX64
 rem WORKAROUND: The last slash must be backward otherwise "Unknown algorithm" error will be thrown.
 if %TOOLS_VERBOSE%0 NEQ 0 (
-  echo.^>^>"%CONTOOLS_7ZIP_ROOT%\x86\7z.exe" %*
-  echo.
+  echo;^>^>"%CONTOOLS_7ZIP_ROOT%\x86\7z.exe" %*
+  echo;
 )
 "%CONTOOLS_7ZIP_ROOT%\x86\7z.exe" %* >nul
 
@@ -26,8 +26,8 @@ exit /b
 :X64
 rem WORKAROUND: The last slash must be backward otherwise "Unknown algorithm" error will be thrown.
 if %TOOLS_VERBOSE%0 NEQ 0 (
-  echo.^>^>"%CONTOOLS_7ZIP_ROOT%\x64\7z.exe" %*
-  echo.
+  echo;^>^>"%CONTOOLS_7ZIP_ROOT%\x64\7z.exe" %*
+  echo;
 )
 "%CONTOOLS_7ZIP_ROOT%\x64\7z.exe" %* >nul
 

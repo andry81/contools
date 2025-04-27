@@ -34,7 +34,7 @@ if defined FLAG (
     set FLAG_LNODES=1
     shift
   ) else (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b 255
   ) >&2
 
@@ -45,12 +45,12 @@ if defined FLAG (
 set "XML_FILE=%~1"
 
 if not defined XML_FILE (
-  echo.%?~%: error: xml file is no set.
+  echo;%?~%: error: xml file is no set.
   exit /b 254
 ) >&2
 
 if not exist "%XML_FILE%" (
-  echo.%?~%: error: xml file is not found: "%XML_FILE%".
+  echo;%?~%: error: xml file is not found: "%XML_FILE%".
   exit /b 253
 ) >&2
 

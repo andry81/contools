@@ -27,7 +27,7 @@ if not defined PSEXEC set "PSEXEC=psexec.exe"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!PSEXEC!") do endlocal & set "PSEXEC=%%~fi"
 
 if not exist "%PSEXEC%" (
-  echo.%?~%: error: `psexec.exe` is not found: "%PSEXEC%".
+  echo;%?~%: error: `psexec.exe` is not found: "%PSEXEC%".
   exit /b 255
 ) >&2
 

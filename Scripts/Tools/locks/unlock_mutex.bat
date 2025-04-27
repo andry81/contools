@@ -28,7 +28,7 @@ set PRE_LOCK_ACQUIRE=0
       set LAST_ERROR=-1
       goto EXIT_FROM_PRELOCK
     )
-    echo.%UNLOCK_DIR%_%LOCK_NAME% > "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%\%UNLOCK_FILE%"
+    echo;%UNLOCK_DIR%_%LOCK_NAME% > "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%\%UNLOCK_FILE%"
     popd
 
     rem Drop error level to 0 to avoid accidental exit by error from above commands.

@@ -22,12 +22,12 @@ set "DIR_PATH_FROM=%~f1"
 set "HASH_LIST_FILE=%~f2"
 
 if not exist "%DIR_PATH_FROM%\*" (
-  echo.%?~%: error: hashing directory does not exist: "%DIR_PATH_FROM%"
+  echo;%?~%: error: hashing directory does not exist: "%DIR_PATH_FROM%"
   exit /b 1
 ) >&2
 
 if not exist "%HASH_LIST_FILE%" (
-  echo.%?~%: error: hash list files does not exist: "%HASH_LIST_FILE%"
+  echo;%?~%: error: hash list files does not exist: "%HASH_LIST_FILE%"
   exit /b 2
 ) >&2
 

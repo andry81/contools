@@ -4,7 +4,7 @@ setlocal DISABLEDELAYEDEXPANSION
 
 rem call "%%~dp0__init__/__init__.bat" || exit /b
 
-echo.^>%~nx0
+echo;^>%~nx0
 
 setlocal
 rem CAUTION: in case of globbing the result is dependent on the file system
@@ -15,7 +15,7 @@ for %%i in (%__STRING__%) do set "__STRING__=%%i" & ^
 call "%%~dp0..\..\..\Tools\std\encode/decode_pathlist_chars_glob.bat" & ^
 call "%%~dp0..\..\..\Tools\std\echo_var.bat" __STRING__ " " "|"
 endlocal
-echo.---
+echo;---
 
 setlocal
 rem CAUTION: in case of globbing the result is dependent on the file system
@@ -26,7 +26,7 @@ setlocal ENABLEDELAYEDEXPANSION & for %%i in (!__STRING__!) do endlocal & set "_
 call "%%~dp0..\..\..\Tools\std\encode/decode_pathlist_chars_glob.bat" & ^
 call "%%~dp0..\..\..\Tools\std\echo_var.bat" __STRING__ " " "|"
 endlocal
-echo.---
+echo;---
 
 setlocal
 rem CAUTION: in case of globbing the result is dependent on the file system
@@ -37,7 +37,7 @@ for %%i in (%__STRING__%) do set "__STRING__=%%i" & ^
 call "%%~dp0..\..\..\Tools\std\encode/decode_pathlist_chars_glob.bat" & ^
 call "%%~dp0..\..\..\Tools\std\echo_var.bat" __STRING__ " " "|"
 endlocal
-echo.---
+echo;---
 
 setlocal
 rem CAUTION: in case of globbing the result is dependent on the file system
@@ -48,6 +48,6 @@ setlocal ENABLEDELAYEDEXPANSION & for %%i in (!__STRING__!) do endlocal & set "_
 call "%%~dp0..\..\..\Tools\std\encode/decode_pathlist_chars_glob.bat" & ^
 call "%%~dp0..\..\..\Tools\std\echo_var.bat" __STRING__ " " "|"
 endlocal
-echo.---
+echo;---
 
-echo.
+echo;

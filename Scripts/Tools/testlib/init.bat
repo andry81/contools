@@ -35,7 +35,7 @@ if defined TEST_SCRIPT_FILE_PATH ^
 if "%TEST_SCRIPT_FILE_PATH:~1,1%" == ":" goto TEST_SCRIPT_FILE_PATH_OK
 
 (
-  echo.%~nx0: error: test script file path is empty or not absolute: "%TEST_SCRIPT_FILE_PATH%".
+  echo;%~nx0: error: test script file path is empty or not absolute: "%TEST_SCRIPT_FILE_PATH%".
   exit /b -255
 ) >&2
 
@@ -96,7 +96,7 @@ rem return code from user test script implementation
 set INTERRORLEVEL=0
 
 echo Running %?~nx0%...
-echo.
+echo;
 
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" -skip 1 1 TEST_TITLE %%?~nx0%% %%*
 

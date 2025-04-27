@@ -26,19 +26,19 @@ set "OUT_VAR=%~1"
 set "CMDLINE_FILE=%~2"
 
 if not defined OUT_VAR (
-  echo.%?~%: error: output variable name is not defined.
+  echo;%?~%: error: output variable name is not defined.
   exit /b 1
 ) >&2
 
 if not defined CMDLINE_FILE (
-  echo.%?~%: error: command line file is not defined.
+  echo;%?~%: error: command line file is not defined.
   exit /b 2
 ) >&2
 
 for /F "tokens=* delims="eol^= %%i in ("%CMDLINE_FILE%\.") do set "CMDLINE_FILE=%%~fi"
 
 if not exist "%CMDLINE_FILE%" (
-  echo.%?~%: error: command line file does not exist: "%CMDLINE_FILE%".
+  echo;%?~%: error: command line file does not exist: "%CMDLINE_FILE%".
   exit /b 10
 ) >&2
 

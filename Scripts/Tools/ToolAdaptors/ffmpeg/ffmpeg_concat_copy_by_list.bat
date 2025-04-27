@@ -71,7 +71,7 @@ set "FILE_OUT_DIR=%~dp2"
 if defined FFMPEG_TOOL_EXE goto IGNORE_SEARCH_IN_PATH
 
 if not exist "ffmpeg.exe" (
-  echo.%?~%: error: ffmpeg.exe is not found in the PATH variable.
+  echo;%?~%: error: ffmpeg.exe is not found in the PATH variable.
   exit /b 255
 ) >&2
 
@@ -80,12 +80,12 @@ set "FFMPEG_TOOL_EXE=ffmpeg.exe"
 :IGNORE_SEARCH_IN_PATH
 
 if not exist "%FILE_OUT_DIR%" (
-  echo.%?~%: error: file output parent directory does not exist: "%FILE_OUT_DIR%".
+  echo;%?~%: error: file output parent directory does not exist: "%FILE_OUT_DIR%".
   exit /b 254
 ) >&2
 
 if exist "%FILE_OUT%" (
-  echo.%?~%: error: output file already exist: "%FILE_OUT%".
+  echo;%?~%: error: output file already exist: "%FILE_OUT%".
   exit /b 253
 ) >&2
 
@@ -111,7 +111,7 @@ exit /b %LAST_ERROR%
 
 :CHECK_PATH
 if not exist "%FILE_PATH%" (
-  echo.%?~%: error: file not found: "%FILE_PATH%"
+  echo;%?~%: error: file not found: "%FILE_PATH%"
   exit /b 252
 ) >&2
 
@@ -121,7 +121,7 @@ rem escape characters
 set "FILE_PATH=%FILE_PATH:'='\''%"
 
 for /f "tokens=* delims="eol^= %%i in ("%FILE_PATH%") do (
-  echo.file '%%i'
+  echo;file '%%i'
 ) >> "%TEMP_FILE_LIST%"
 
 exit /b

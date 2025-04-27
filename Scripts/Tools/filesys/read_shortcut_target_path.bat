@@ -77,7 +77,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-p" (
     set FLAG_PRINT_STDOUT=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -89,7 +89,7 @@ if defined FLAG (
 )
 
 if %FLAG_USE_EXTENDED_PROPERTY%%FLAG_USE_GETLINK% EQU 11 (
-  echo.%?~%: error: `-use_extprop` flag is mixed with `-use_getlink` flag.
+  echo;%?~%: error: `-use_extprop` flag is mixed with `-use_getlink` flag.
   exit /b 255
 ) >&2
 
@@ -144,8 +144,8 @@ set LAST_ERROR=%ERRORLEVEL%
 rem NOTE: `type` respects UTF-16LE file with BOM header
 
 set IS_STDOUT_PRINTED=0
-for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%j" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo.%%i=%%j
-if %FLAG_PRINT_STDOUT% NEQ 0 if %IS_STDOUT_PRINTED% EQU 0 echo.TargetPath=
+for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%j" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo;%%i=%%j
+if %FLAG_PRINT_STDOUT% NEQ 0 if %IS_STDOUT_PRINTED% EQU 0 echo;TargetPath=
 
 type "%TARGET_PATH_STDERR_FILE%" >&2
 
@@ -165,8 +165,8 @@ set LAST_ERROR=%ERRORLEVEL%
 rem NOTE: `type` respects UTF-16LE file with BOM header
 
 set IS_STDOUT_PRINTED=0
-for /F "usebackq tokens=* delims="eol^= %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%i" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo.LinkTarget=%%i
-if %FLAG_PRINT_STDOUT% NEQ 0 if %IS_STDOUT_PRINTED% EQU 0 echo.LinkTarget=
+for /F "usebackq tokens=* delims="eol^= %%i in (`@type "%%TARGET_PATH_STDOUT_FILE%%"`) do set "RETURN_VALUE=%%i" & if %FLAG_PRINT_STDOUT% NEQ 0 set "IS_STDOUT_PRINTED=1" & echo;LinkTarget=%%i
+if %FLAG_PRINT_STDOUT% NEQ 0 if %IS_STDOUT_PRINTED% EQU 0 echo;LinkTarget=
 
 type "%TARGET_PATH_STDERR_FILE%" >&2
 

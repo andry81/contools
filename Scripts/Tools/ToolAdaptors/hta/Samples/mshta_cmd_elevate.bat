@@ -18,9 +18,9 @@ set "__QARG0__=vbscript:ExecuteGlobal(\""Close(CreateObject(\""""Shell.Applicati
 
 rem Command line variant for the Windows Batch `echo` command
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__QARG0__!") do endlocal & echo.^>%%i
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__QARG0__!") do endlocal & echo;^>%%i
 
-echo.---
+echo;---
 
 rem Command line variant for the executable with C runtime command line parser
 
@@ -42,7 +42,7 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.!") do endlocal & ^
 start /B /WAIT "" "%CONTOOLS_UTILS_BIN_ROOT%/contools/printargs.exe" "%%i"
 
-echo.---
+echo;---
 
 rem Command line variant for `mshta.exe` executable
 

@@ -4,7 +4,7 @@ rem Create local variable's stack
 setlocal DISABLEDELAYEDEXPANSION
 
 if 0%__CTRL_SETLOCAL% EQU 1 (
-  echo.%~nx0: error: cmd.exe is broken, please restart it!>&2
+  echo;%~nx0: error: cmd.exe is broken, please restart it!>&2
   exit /b 65535
 )
 set __CTRL_SETLOCAL=1
@@ -18,7 +18,7 @@ call :TEST
 call :TEST --
 call :TEST -exe
 call :TEST -exe --
-echo.---
+echo;---
 
 set "CMDLINE= 	 		  	 "
 set ARGS_COUNT_REFERENCE=0
@@ -26,7 +26,7 @@ call :TEST
 call :TEST --
 call :TEST -exe
 call :TEST -exe --
-echo.---
+echo;---
 
 rem CAUTION:
 rem   Last 2 pargument is a single argument!
@@ -38,7 +38,7 @@ call :TEST --
 set ARGS_COUNT_REFERENCE=32
 call :TEST -exe
 call :TEST -exe --
-echo.---
+echo;---
 
 set CMDLINE="1 2" ! ? * ^& ^| , ; = ^= "=" 3
 set ARGS_COUNT_REFERENCE=8
@@ -47,7 +47,7 @@ call :TEST --
 set ARGS_COUNT_REFERENCE=12
 call :TEST -exe
 call :TEST -exe --
-echo.---
+echo;---
 
 set CMDLINE=$*^|^&(=)^<^>^"='`^^%%!+?** ,;=
 set ARGS_COUNT_REFERENCE=2
@@ -57,7 +57,7 @@ set ARGS_COUNT_REFERENCE=1
 call :TEST -exe
 call :TEST -exe --
 
-echo.
+echo;
 
 rem WARNING: must be called without the call prefix!
 "%CONTOOLS_TESTLIB_ROOT%/exit.bat"

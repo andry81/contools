@@ -23,12 +23,12 @@ set "FILE_LOCK_DIR=%~d1"
 
 rem the lock file directory must already exist
 if not exist "%FILE_LOCK_DIR%" (
-  echo.%?~%: error: FILE_LOCK_DIR does not exist: "%FILE_LOCK_DIR%"
+  echo;%?~%: error: FILE_LOCK_DIR does not exist: "%FILE_LOCK_DIR%"
   exit /b 1
 ) >&2
 
 if not exist "%FILE_VARS_PATH%" (
-  echo.%?~%: error: FILE_VARS_PATH does not exist: "%FILE_VARS_PATH%"
+  echo;%?~%: error: FILE_VARS_PATH does not exist: "%FILE_VARS_PATH%"
   exit /b 2
 ) >&2
 
@@ -65,7 +65,7 @@ for /f "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do call :FILTER && se
 exit /b 0
 
 :SET_WITH_PRINT
-for /f "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do call :FILTER && ( (echo.%%i=%%j) & set "%%i=%%j" )
+for /f "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do call :FILTER && ( (echo;%%i=%%j) & set "%%i=%%j" )
 exit /b 0
 
 :FILTER

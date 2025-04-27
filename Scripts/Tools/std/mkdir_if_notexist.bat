@@ -13,7 +13,7 @@ rem   does not check for disconnected symbolic reference to a directory.
 rem <path>...
 rem   Directory path list.
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
+if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 
 setlocal
 
@@ -23,7 +23,7 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 set "DIR_PATH=%~1"
 
 if not defined DIR_PATH (
-  echo.%?~%: error: at least one directory path argument must be defined.
+  echo;%?~%: error: at least one directory path argument must be defined.
   exit /b -255
 ) >&2
 
@@ -88,7 +88,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_ERROR
 (
-  echo.%?~%: error: directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo;%?~%: error: directory path is invalid: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -100,7 +100,7 @@ rem CAUTION:
 rem   The drive still must exist even if the path is not. If path exists, the path directory still can be in a disconnected state.
 rem
 if not exist "%DIR_DRIVE%" (
-  echo.%?~%: error: the directory path drive is not exist: "%DIR_PATH%".
+  echo;%?~%: error: the directory path drive is not exist: "%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -121,7 +121,7 @@ if %DIR_COUNT_MAX% LSS %DIR_COUNT% goto EXEC
 set "DIR_PATH=%~1"
 
 if not defined DIR_PATH (
-  echo.%?~%: error: directory path argument is not defined: ARG=%DIR_COUNT%
+  echo;%?~%: error: directory path argument is not defined: ARG=%DIR_COUNT%
   exit /b -255
 ) >&2
 
@@ -130,5 +130,5 @@ goto MKDIR_LOOP
 :EXEC
 if not defined DIR_PATHS exit /b 0
 
-echo.^>^>mkdir%DIR_PATHS%
+echo;^>^>mkdir%DIR_PATHS%
 mkdir%DIR_PATHS%

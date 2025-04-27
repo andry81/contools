@@ -10,12 +10,12 @@ set "TO_LIST_FILE_HEX_UCP=%~2"
 set "TO_LIST_FILE_DIR_HEX_UCP=%~dp2"
 
 if not exist "%FROM_LIST_FILE_HEX%" (
-  echo.%?~%: error: FROM_LIST_FILE_HEX file does not exist: "%FROM_LIST_FILE_HEX%".
+  echo;%?~%: error: FROM_LIST_FILE_HEX file does not exist: "%FROM_LIST_FILE_HEX%".
   exit /b 1
 ) >&2
 
 if not exist "%TO_LIST_FILE_DIR_HEX_UCP%" (
-  echo.%?~%: error: TO_LIST_FILE_DIR_HEX_UCP directory does not exist: "%TO_LIST_FILE_DIR_HEX_UCP%".
+  echo;%?~%: error: TO_LIST_FILE_DIR_HEX_UCP directory does not exist: "%TO_LIST_FILE_DIR_HEX_UCP%".
   exit /b 2
 ) >&2
 
@@ -46,7 +46,7 @@ for /F "usebackq tokens=1,* delims=	" %%i in ("%FROM_LIST_FILE_HEX%") do (
         if not "!UTF_16_CHAR!" == "0a00" (
           if !LINE_RETURN! NEQ 0 (
             set LINE_RETURN=0
-            echo.>> "!TO_LIST_FILE_HEX_UCP!"
+            echo;>> "!TO_LIST_FILE_HEX_UCP!"
           )
           rem echo w/o line return
           set /P =^&#x!UTF_16_CHAR:~2,2!!UTF_16_CHAR:~0,2!;<nul >> "!TO_LIST_FILE_HEX_UCP!"

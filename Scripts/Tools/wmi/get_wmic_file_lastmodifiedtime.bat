@@ -33,7 +33,7 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 set "FILE=%~1"
 
 if not exist "%FILE%" (
-  echo.%?~%: error: FILE does not exist: "%FILE%".
+  echo;%?~%: error: FILE does not exist: "%FILE%".
   exit /b 1
 ) >&2
 

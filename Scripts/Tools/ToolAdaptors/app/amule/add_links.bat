@@ -24,7 +24,7 @@ set "ECPASS=%~3"
 if defined LINK_SUFFIX set "LINK_SUFFIX=|%LINK_SUFFIX%"
 
 if not exist "%LINK_LIST_FILE%" (
-  echo.%?~%: error: LINK_LIST_FILE file path is not found: "%LINK_LIST_FILE%"
+  echo;%?~%: error: LINK_LIST_FILE file path is not found: "%LINK_LIST_FILE%"
   exit /b 1
 ) >&2
 
@@ -62,5 +62,5 @@ set /A NUM_LINK_STR+=1
 if defined ECPASS set AMULE_CMDLINE=/P "%ECPASS%"
 set AMULE_CMDLINE=%AMULE_CMDLINE% /c "add %AMULE_LINK_STR%%LINK_SUFFIX%"
 
-echo.%NUM_LINK_STR% of %NUM_OVERALL_LINK_STR%: ^>"%AMULE_CMD_EXECUTABLE%" %AMULE_CMDLINE%
+echo;%NUM_LINK_STR% of %NUM_OVERALL_LINK_STR%: ^>"%AMULE_CMD_EXECUTABLE%" %AMULE_CMDLINE%
 "%AMULE_CMD_EXECUTABLE%" %AMULE_CMDLINE%

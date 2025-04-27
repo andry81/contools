@@ -11,7 +11,7 @@ set "__DELIMS__=%~2"
 set "__STRING__=%~3"
 
 if not defined __VAR_NAME_PREFIX__ (
-  echo.%?~%: error: Variable name prefix is not set.
+  echo;%?~%: error: Variable name prefix is not set.
   exit /b 1
 ) >&2
 

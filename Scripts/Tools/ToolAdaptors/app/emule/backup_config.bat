@@ -43,9 +43,9 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%EMULE_CONFIG_DIR%%"      
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%EMULE_CONFIG_DIR%%"          statistics.ini                "%%EMULE_ADAPTOR_BACKUP_DIR%%/%%EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H || exit /b 10
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%EMULE_CONFIG_DIR%%"          fileinfo.ini                  "%%EMULE_ADAPTOR_BACKUP_DIR%%/%%EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /Y /D /H
 
-echo.Archiving backup directory...
+echo;Archiving backup directory...
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/add_files_to_archive.bat" "%%EMULE_ADAPTOR_BACKUP_DIR%%" "%%EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%/*" "%%EMULE_ADAPTOR_BACKUP_DIR%%/%%EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%.7z" -sdel || exit /b 20
-echo.
+echo;
 
 call "%%CONTOOLS_ROOT%%/std/rmdir.bat" "%%EMULE_ADAPTOR_BACKUP_DIR%%/%%EMULE_ADAPTOR_BACKUP_FILE_NAME_PREFIX%%%%PROJECT_LOG_FILE_NAME_DATE_TIME%%" /S /Q
 

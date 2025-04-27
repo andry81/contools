@@ -25,8 +25,8 @@ if "%OSTYPE%" == "cygwin" (
   for /R "%~dp0" %%i in (%__SEARCH_FILTER%) do call :PROCESS_MINGW "%%i"
 )
 
-echo.
-echo.%__CONVERTED_COUNTER% of %__OVERALL_COUNTER% files converted.
+echo;
+echo;%__CONVERTED_COUNTER% of %__OVERALL_COUNTER% files converted.
 
 goto EXIT
 

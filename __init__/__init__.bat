@@ -23,7 +23,7 @@ call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_PROJECT_ROOT                   
 call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_PROJECT_EXTERNALS_ROOT         "%%CONTOOLS_PROJECT_ROOT%%/_externals"
 
 if not exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%\*" (
-  echo.%~nx0: error: CONTOOLS_PROJECT_EXTERNALS_ROOT directory does not exist: "%CONTOOLS_PROJECT_EXTERNALS_ROOT%".
+  echo;%~nx0: error: CONTOOLS_PROJECT_EXTERNALS_ROOT directory does not exist: "%CONTOOLS_PROJECT_EXTERNALS_ROOT%".
   exit /b 255
 ) >&2
 

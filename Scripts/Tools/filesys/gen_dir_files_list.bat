@@ -21,11 +21,11 @@ set "FILE_PATH_PTTN=%~1"
 
 rem ignore specific patterns to avoid problems
 if not defined FILE_PATH_PTTN (
-  echo.%?~%: error: file or directory is not set.
+  echo;%?~%: error: file or directory is not set.
   exit /b 1
 ) >&2
 if "%FILE_PATH_PTTN:~0,1%" == "\" (
-  echo.%?~%: error: path is not acceptable: "%FILE_PATH_PTTN%".
+  echo;%?~%: error: path is not acceptable: "%FILE_PATH_PTTN%".
   exit /b 2
 ) >&2
 
@@ -46,7 +46,7 @@ exit /b 0
 set "FILES_PATH=%~f1"
 
 if not exist "%FILES_PATH%" (
-  echo.%?~%: error: file or directory is not found: "%FILES_PATH%".
+  echo;%?~%: error: file or directory is not found: "%FILES_PATH%".
   exit /b -1
 ) >&2
 
@@ -77,9 +77,9 @@ set ?.=@dir "%FILES_PATH%\" /B /O:N /S 2^>nul
 
 for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "FILE_PATH=%%i"
-  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!FILE_PATH:~%FILES_PATH_LEN%!") do endlocal & echo.%%i
+  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!FILE_PATH:~%FILES_PATH_LEN%!") do endlocal & echo;%%i
 )
 exit /b
 
 :FILES_PATH_AS_FILE
-echo.%~nx1
+echo;%~nx1

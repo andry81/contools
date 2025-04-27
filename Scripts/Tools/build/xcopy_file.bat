@@ -17,7 +17,7 @@ rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 if "%~3" == "" (
-  echo.%?~%%: error: target directory is not defined.
+  echo;%?~%%: error: target directory is not defined.
   exit /b 255
 ) >&2
 
@@ -38,6 +38,6 @@ call "%%CONTOOLS_ROOT%%/std/xcopy_file.bat"%%XCOPY_FILE_CMD_BARE_FLAGS%% -- %%*
 set LAST_ERROR=%ERRORLEVEL%
 
 :EXIT
-if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo.
+if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;
 
 exit /b %LAST_ERROR%

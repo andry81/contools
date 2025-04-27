@@ -11,7 +11,7 @@ set /A IMPL_MODE+=0
 
 rem do not continue if already in Impl Mode
 if %IMPL_MODE% NEQ 0 (
-  echo.%?~%: error: Impl Mode already used.
+  echo;%?~%: error: Impl Mode already used.
   exit /b 255
 ) >&2
 
@@ -64,7 +64,7 @@ if defined FLAG (
     shift
     set /A FLAG_SHIFT+=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -82,12 +82,12 @@ if %NO_LOG%0 NEQ 0 set FLAG_NO_LOG=1
 if %NO_LOG_OUTPUT%0 NEQ 0 set FLAG_NO_LOG=1
 
 if not exist "%PROJECT_LOG_DIR%\*" if %FLAG_NO_LOG% EQU 0 (
-  echo.%?~%: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
+  echo;%?~%: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
   exit /b 255
 ) >&2
 
 if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
-  echo.%?~%: error: can not use initial variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
+  echo;%?~%: error: can not use initial variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
   exit /b 255
 ) >&2
 

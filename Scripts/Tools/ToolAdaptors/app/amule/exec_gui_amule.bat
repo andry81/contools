@@ -23,9 +23,9 @@ rem backup all before start
 call "%?~dp0%backup_logs.bat" || exit /b
 call "%?~dp0%backup_config.bat" || exit /b
 
-echo.
+echo;
 
 if defined ECPASS set AMULE_CMDLINE=/P "%ECPASS%"
 
-echo.^>"%AMULE_CMD_EXECUTABLE%" %AMULE_CMDLINE%
+echo;^>"%AMULE_CMD_EXECUTABLE%" %AMULE_CMDLINE%
 "%AMULE_GUI_EXECUTABLE%" %AMULE_CMDLINE%

@@ -33,7 +33,7 @@ if defined FLAG (
   if "%FLAG%" == "-p" (
     set FLAG_PRINT=1
   ) else (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -46,7 +46,7 @@ if defined FLAG (
 set "CODE_PAGE=%~1"
 
 if not defined CODE_PAGE (
-  echo.%?~%: error: CODE_PAGE is not defined.
+  echo;%?~%: error: CODE_PAGE is not defined.
   exit /b 255
 ) >&2
 
@@ -55,7 +55,7 @@ if exist "%SystemRoot%\System32\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System3
 if not defined __?CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System64\chcp.com"
 
 if not defined __?CHCP_FILE (
-  echo.%?~%: error: `chcp.com` is not found.
+  echo;%?~%: error: `chcp.com` is not found.
   exit /b 255
 ) >&2
 

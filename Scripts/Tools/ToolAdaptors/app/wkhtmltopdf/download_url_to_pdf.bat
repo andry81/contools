@@ -53,17 +53,17 @@ rem Use {PAGENUM} as placeholder
 set "OUT_FILE_PATH_TMPL=%~4"
 
 if not defined FROM_PAGE (
-  echo.%?~%: error: FROM_PAGE is not defined.
+  echo;%?~%: error: FROM_PAGE is not defined.
   exit /b 10
 ) >&2
 
 if not defined TO_PAGE (
-  echo.%?~%: error: TO_PAGE is not defined.
+  echo;%?~%: error: TO_PAGE is not defined.
   exit /b 11
 ) >&2
 
 if not defined OUT_FILE_PATH_TMPL (
-  echo.%?~%: error: OUT_FILE_PATH_TMPL is not defined.
+  echo;%?~%: error: OUT_FILE_PATH_TMPL is not defined.
   exit /b 12
 ) >&2
 
@@ -72,7 +72,7 @@ set "OUT_FILE_PATH_TMPL=%~f4"
 set "OUT_FILE_DIR=%~dp4"
 
 if not exist "%OUT_FILE_DIR%" (
-  echo.%?~%: error: OUT_FILE_DIR directory does not exist: "%OUT_FILE_DIR%".
+  echo;%?~%: error: OUT_FILE_DIR directory does not exist: "%OUT_FILE_DIR%".
   exit /b 20
 ) >&2
 
@@ -81,12 +81,12 @@ set /A "FROM_PAGE*=1"
 set /A "TO_PAGE*=1"
 
 if %FROM_PAGE% LSS 0 (
-  echo.%?~%: error: FROM_PAGE must be not negative number: "%FROM_PAGE%".
+  echo;%?~%: error: FROM_PAGE must be not negative number: "%FROM_PAGE%".
   exit /b 30
 ) >&2
 
 if %TO_PAGE% LSS 0 (
-  echo.%?~%: error: TO_PAGE must be not negative number: "%TO_PAGE%".
+  echo;%?~%: error: TO_PAGE must be not negative number: "%TO_PAGE%".
   exit /b 31
 ) >&2
 
@@ -134,7 +134,7 @@ call set "OUT_FILE_PATH=%%OUT_FILE_PATH_TMPL:{PAGENUM}=%PAGE_NUM%%%"
 
 if exist "%OUT_FILE_PATH%" (
   if %FLAG_OVERWRITE_OUTPUT_FILE%0 EQU 0 (
-    echo.%?~%: warning: "%OUT_FILE_PATH%" file is already exist, overwrite is not allowed, ignored.
+    echo;%?~%: warning: "%OUT_FILE_PATH%" file is already exist, overwrite is not allowed, ignored.
     exit /b 0
   )
 )

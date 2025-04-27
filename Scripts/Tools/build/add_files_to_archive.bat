@@ -52,12 +52,12 @@ goto SWITCHES_LOOP
 call "%%?~dp0%%__init__.bat" || exit /b
 
 pushd "%DIR%" || (
-  echo.%?~%: error: could not switch current directory: "%DIR%".
+  echo;%?~%: error: could not switch current directory: "%DIR%".
   set LAST_ERROR=1
   goto EXIT
 )
 
-echo.  "%DIR%" -^> "%REL_PATH%"
+echo;  "%DIR%" -^> "%REL_PATH%"
 
 rem CAUTION:
 rem   Explicitly use temporary directory for 7zip. This is required in some cases where 7zip can't create temporary

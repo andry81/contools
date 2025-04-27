@@ -59,7 +59,7 @@ if defined FLAG (
     shift
     shift
   ) else (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -76,7 +76,7 @@ set "DESTDIR_ABS=%~f2"
 set "PYTHON_EXE=%PYTHON_DIR%\python.exe"
 
 if not exist "%PYTHON_EXE%" (
-  echo.%?~%: error: python.exe is not found: "%PYTHON_EXE%"
+  echo;%?~%: error: python.exe is not found: "%PYTHON_EXE%"
   exit /b 255
 ) >&2
 
@@ -84,7 +84,7 @@ if defined DESTDIR ^
 if exist "%DESTDIR_ABS%\*" goto DESTDIR_OK
 
 (
-  echo.%?~%: error: DESTDIR is invalid: "%DESTDIR_ABS%"
+  echo;%?~%: error: DESTDIR is invalid: "%DESTDIR_ABS%"
   exit /b 254
 ) >&2
 
@@ -140,11 +140,11 @@ call :CMD "%%PYTHON_EXE%%" -m compileall -f -d "%%FILE_PATH_FROM%%" "%%DESTDIR_A
 exit /b 0
 
 :CMD
-echo.^>%*
+echo;^>%*
 (
   %*
 )
-echo.
+echo;
 exit /b
 
 :PREPROCESS_EXCLUDE_DIR

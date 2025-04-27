@@ -4,7 +4,7 @@ rem Create local variable's stack
 setlocal
 
 if 0%__CTRL_SETLOCAL% EQU 1 (
-  echo.%~nx0: error: cmd.exe is broken, please restart it!
+  echo;%~nx0: error: cmd.exe is broken, please restart it!
   exit /b 65535
 ) >&2
 set __CTRL_SETLOCAL=1
@@ -541,7 +541,7 @@ call :TEST test_9_mixed.vars TEST_9_VALUE_ REFERENCE_9_VALUE_ ^
   01 02 03 04 05 06 07 08 09 10 11 12  a1 a2 a3
 endlocal
 
-echo.
+echo;
 
 rem WARNING: must be called without the call prefix!
 "%CONTOOLS_TESTLIB_ROOT%/exit.bat"
@@ -550,6 +550,6 @@ rem no code can be executed here, just in case
 exit /b
 
 :TEST
-echo.%~1...
+echo;%~1...
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b

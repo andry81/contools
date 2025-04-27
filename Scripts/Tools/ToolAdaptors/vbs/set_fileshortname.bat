@@ -57,7 +57,7 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
 if not exist "%SystemRoot%\Syswow64\*" (
-  echo.%?~%: error: not x86 system without Syswow64 system directory.
+  echo;%?~%: error: not x86 system without Syswow64 system directory.
   exit /b 255
 ) >&2
 
@@ -79,7 +79,7 @@ set IMPL_MODE=1
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto IMPL
 
 if not exist "%SystemRoot%\Syswow64\*" (
-  echo.%?~%: error: not x86 system without Syswow64 system directory.
+  echo;%?~%: error: not x86 system without Syswow64 system directory.
   exit /b 255
 ) >&2
 
@@ -89,9 +89,9 @@ exit /b
 
 :IMPL
 if %ELEVATED% EQU 0 call :IS_ADMIN_ELEVATED || (
-  echo.%~nx0: error: process must be elevated before continue.
+  echo;%~nx0: error: process must be elevated before continue.
   exit /b 255
 ) >&2
 
-echo.^>cscript.exe //nologo "%~dp0set_fileshortname.vbs" %*
+echo;^>cscript.exe //nologo "%~dp0set_fileshortname.vbs" %*
 cscript.exe //nologo "%~dp0set_fileshortname.vbs" %*

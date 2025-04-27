@@ -37,7 +37,7 @@ if defined FLAG (
   ) else if "%FLAG%" == "-bom" (
     set FLAG_USE_BOM=1
   ) else (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -52,12 +52,12 @@ set "OUTPUT_CHARSET=%~2"
 set "INPUT_FILE=%~3"
 
 if not defined OUTPUT_CHARSET (
-  echo.%?~%: error: OUTPUT_CHARSET is not set.
+  echo;%?~%: error: OUTPUT_CHARSET is not set.
   exit /b 1
 ) >&2
 
 if not exist "%INPUT_FILE%" (
-  echo.%?~%: error: INPUT_FILE does not exist: INPUT_FILE="%INPUT_FILE%".
+  echo;%?~%: error: INPUT_FILE does not exist: INPUT_FILE="%INPUT_FILE%".
   exit /b 2
 ) >&2
 

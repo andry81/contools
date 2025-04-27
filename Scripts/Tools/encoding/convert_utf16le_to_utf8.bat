@@ -10,12 +10,12 @@ set "TO_FILE_PATH=%~2"
 set "TO_FILE_DIR_PATH=%~dp2"
 
 if not exist "%FROM_FILE_PATH%" (
-  echo.%?~%: error: FROM_FILE_PATH file does not exist: "%FROM_FILE_PATH%".
+  echo;%?~%: error: FROM_FILE_PATH file does not exist: "%FROM_FILE_PATH%".
   exit /b 1
 ) >&2
 
 if not exist "%TO_FILE_DIR_PATH%" (
-  echo.%?~%: error: TO_FILE_DIR_PATH directory does not exist: "%TO_FILE_DIR_PATH%".
+  echo;%?~%: error: TO_FILE_DIR_PATH directory does not exist: "%TO_FILE_DIR_PATH%".
   exit /b 2
 ) >&2
 

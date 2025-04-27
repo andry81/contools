@@ -15,12 +15,12 @@ set "__LOCK_FILE0=%~2"
 set "__READWRITE_FILE0=%~3"
 
 if not defined __LOCK_FILE0 (
-  echo.%?~%: error: LOCK_FILE0 is not defined.
+  echo;%?~%: error: LOCK_FILE0 is not defined.
   exit /b 1
 ) >&2
 
 if not exist "%__READWRITE_FILE0%" (
-  echo.%?~%: error: READWRITE_FILE0 does not exist: "%__READWRITE_FILE0%"
+  echo;%?~%: error: READWRITE_FILE0 does not exist: "%__READWRITE_FILE0%"
   exit /b 2
 ) >&2
 
@@ -51,7 +51,7 @@ set /P __VAR__= < "%__READWRITE_FILE0%"
 if defined __VAR_DEFAULT_VALUE if not defined __VAR__ set "__VAR__=%__VAR_DEFAULT_VALUE%"
 set /A __VAR__+=1
 rem safe echo call
-(echo.%__VAR__%) > "%__READWRITE_FILE0%"
+(echo;%__VAR__%) > "%__READWRITE_FILE0%"
 
 exit /b 0
 

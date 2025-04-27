@@ -45,7 +45,7 @@ if defined FLAG (
     set "FLAG_CHCP=%~2"
     shift
   ) else (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
   ) >&2
 
   shift

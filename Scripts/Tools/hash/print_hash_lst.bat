@@ -15,4 +15,4 @@ set "FILE_PATH=%~4"
 
 if "%FILE_SIZE:~0,1%" == "%%" exit /b 0
 
-echo.%FILE_SIZE%^|%HASH_MD5%^|%HASH_SHA256%^|"%FILE_PATH%"
+echo;%FILE_SIZE%^|%HASH_MD5%^|%HASH_SHA256%^|"%FILE_PATH%"

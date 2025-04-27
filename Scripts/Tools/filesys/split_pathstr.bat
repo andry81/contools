@@ -14,7 +14,7 @@ set "FILE_VAR=%~3"
 set "DIR_PATH_VAR=%~4"
 
 if not defined DIR_PATH_VAR if not defined FILE_VAR (
-  echo.%?~%: error: at least one variable name must be set.
+  echo;%?~%: error: at least one variable name must be set.
   exit /b 1
 ) >&2
 

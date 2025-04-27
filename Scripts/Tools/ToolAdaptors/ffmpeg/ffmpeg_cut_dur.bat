@@ -74,7 +74,7 @@ set "TIME_DUR=%~4"
 if defined FFMPEG_TOOL_EXE goto IGNORE_SEARCH_IN_PATH
 
 if not exist "ffmpeg.exe" (
-  echo.%?~%: error: ffmpeg.exe is not found in the PATH variable.
+  echo;%?~%: error: ffmpeg.exe is not found in the PATH variable.
   exit /b 255
 ) >&2
 
@@ -83,7 +83,7 @@ set "FFMPEG_TOOL_EXE=ffmpeg.exe"
 :IGNORE_SEARCH_IN_PATH
 
 if not exist "%FILE_IN%" (
-  echo.%?~%: error: input file does not exist: "%FILE_IN%".
+  echo;%?~%: error: input file does not exist: "%FILE_IN%".
   exit /b 254
 ) >&2
 

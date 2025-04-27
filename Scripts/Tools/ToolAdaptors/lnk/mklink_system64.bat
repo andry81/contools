@@ -27,12 +27,12 @@ rem drop last error
 call;
 
 if not defined CONTOOLS_ROOT (
-  echo.%?~%: error: CONTOOLS_ROOT variable is not defined.
+  echo;%?~%: error: CONTOOLS_ROOT variable is not defined.
   exit /b 1
 ) >&2
 
 if not exist "%CONTOOLS_ROOT%\*" (
-  echo.%?~%: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%".
+  echo;%?~%: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%".
   exit /b 2
 ) >&2
 
@@ -45,7 +45,7 @@ if %ERRORLEVEL% EQU 0 goto MKLINK
 if exist "linkd.exe" goto LINKD
 
 (
-  echo.%?~%: error: can not create `%SYSTEMROOT%\System64` directory
+  echo;%?~%: error: can not create `%SYSTEMROOT%\System64` directory
   exit /b 255
 ) >&2
 

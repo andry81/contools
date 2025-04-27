@@ -16,7 +16,7 @@ call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 set LAST_ERROR=%ERRORLEVEL%
 
-echo.LAST_ERROR=%LAST_ERROR%
+echo;LAST_ERROR=%LAST_ERROR%
 
 exit /b %LAST_ERROR%
 

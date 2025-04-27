@@ -52,7 +52,7 @@ if defined FLAG (
     shift
     shift
   ) else (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -74,7 +74,7 @@ if not exist "%SOURCE_DIR%\*" goto NO_SOURCE_DIR
 goto NO_SOURCE_DIR_END
 :NO_SOURCE_DIR
 (
-  echo.%?~%: error: source directory does not exist: "%SOURCE_DIR%".
+  echo;%?~%: error: source directory does not exist: "%SOURCE_DIR%".
   exit /b 1
 ) >&2
 :NO_SOURCE_DIR_END
@@ -85,7 +85,7 @@ if not exist "%TARGET_DIR%\*" goto NO_TARGET_DIR
 goto NO_TARGET_DIR_END
 :NO_TARGET_DIR
 (
-  echo.%?~%: error: target directory does not exist: "%TARGET_DIR%".
+  echo;%?~%: error: target directory does not exist: "%TARGET_DIR%".
   exit /b 2
 ) >&2
 :NO_TARGET_DIR_END

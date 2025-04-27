@@ -17,18 +17,18 @@ call;
 
 for %%i in (CONTOOLS_ROOT CONTOOLS_SYSINTERNALS_ROOT) do (
   if not defined %%i (
-    echo.%?~%: error: `%%i` variable is not defined.
+    echo;%?~%: error: `%%i` variable is not defined.
     exit /b 1
   ) >&2
 )
 
 if not exist "%CONTOOLS_ROOT%\*" (
-  echo.%?~%: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%"
+  echo;%?~%: error: CONTOOLS_ROOT directory does not exist: "%CONTOOLS_ROOT%"
   exit /b 2
 ) >&2
 
 if not exist "%CONTOOLS_SYSINTERNALS_ROOT%\*" (
-  echo.%?~%: error: CONTOOLS_SYSINTERNALS_ROOT directory does not exist: "%CONTOOLS_SYSINTERNALS_ROOT%"
+  echo;%?~%: error: CONTOOLS_SYSINTERNALS_ROOT directory does not exist: "%CONTOOLS_SYSINTERNALS_ROOT%"
   exit /b 3
 ) >&2
 
@@ -41,7 +41,7 @@ set WINDOWS_MAJOR_VER=0
 set WINDOWS_MINOR_VER=0
 for /F "tokens=1,2,* delims=."eol^= %%i in ("%WINDOWS_VER_STR%") do set "WINDOWS_MAJOR_VER=%%i" & set "WINDOWS_MINOR_VER=%%j"
 
-echo.Creating link: "%SystemRoot%\System64" -^> "%SystemRoot%\System32"
+echo;Creating link: "%SystemRoot%\System64" -^> "%SystemRoot%\System32"
 
 if %WINDOWS_MAJOR_VER% GTR 5 (
   call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/mklink_system64.bat"

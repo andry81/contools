@@ -16,12 +16,12 @@ set "__LOCK_FILE0=%~3"
 set "__READ_FILE0=%~4"
 
 if not defined __VAR_NAME (
-  echo.%?~%: error: VAR_NAME is not defined.
+  echo;%?~%: error: VAR_NAME is not defined.
   exit /b 1
 ) >&2
 
 if not defined __LOCK_FILE0 (
-  echo.%?~%: error: LOCK_FILE0 is not defined.
+  echo;%?~%: error: LOCK_FILE0 is not defined.
   exit /b 2
 ) >&2
 

@@ -23,7 +23,7 @@ set "LINK_SUFFIX=%~2"
 if defined LINK_SUFFIX set "LINK_SUFFIX=|%LINK_SUFFIX%"
 
 if not exist "%LINK_LIST_FILE%" (
-  echo.%?~%: error: LINK_LIST_FILE file path is not found: "%LINK_LIST_FILE%"
+  echo;%?~%: error: LINK_LIST_FILE file path is not found: "%LINK_LIST_FILE%"
   exit /b 1
 ) >&2
 
@@ -60,5 +60,5 @@ set /A NUM_LINK_STR+=1
 
 set EMULE_CMDLINE="%EMULE_LINK_STR%%LINK_SUFFIX%"
 
-echo.%NUM_LINK_STR% of %NUM_OVERALL_LINK_STR%: ^>"%EMULE_EXECUTABLE%" %EMULE_CMDLINE%
+echo;%NUM_LINK_STR% of %NUM_OVERALL_LINK_STR%: ^>"%EMULE_EXECUTABLE%" %EMULE_CMDLINE%
 "%EMULE_EXECUTABLE%" %EMULE_CMDLINE%

@@ -23,7 +23,7 @@ rem   To path.
 rem <copy-flags>:
 rem   Command line flags to pass into builtin `copy` command.
 
-echo.^>%~nx0 %*
+echo;^>%~nx0 %*
 
 setlocal
 
@@ -51,7 +51,7 @@ if defined FLAG (
     set "FLAG_CHCP=%~2"
     shift
   ) else if not "%FLAG%" == "--" (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -65,12 +65,12 @@ set "FROM_PATH=%~1"
 set "TO_PATH=%~2"
 
 if not defined FROM_PATH (
-  echo.%?~%: error: input path argument must be defined.
+  echo;%?~%: error: input path argument must be defined.
   exit /b -255
 ) >&2
 
 if not defined TO_PATH (
-  echo.%?~%: error: output path argument must be defined.
+  echo;%?~%: error: output path argument must be defined.
   exit /b -254
 ) >&2
 
@@ -96,7 +96,7 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%?~%: error: input path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+  echo;%?~%: error: input path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
   exit /b -253
 ) >&2
 
@@ -123,7 +123,7 @@ goto TO_PATH_OK
 
 :TO_PATH_ERROR
 (
-  echo.%?~%: error: output path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
+  echo;%?~%: error: output path is invalid: FROM_PATH="%FROM_PATH%" TO_PATH="%TO_PATH%".
   exit /b -252
 ) >&2
 
@@ -133,7 +133,7 @@ for /F "tokens=* delims="eol^= %%i in ("%FROM_PATH%\.") do set "FROM_PATH_ABS=%%
 for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
 
 if not exist "\\?\%FROM_PATH_ABS%" (
-  echo.%?~%: error: input path does not exist: "%FROM_PATH_ABS%"
+  echo;%?~%: error: input path does not exist: "%FROM_PATH_ABS%"
   exit /b -251
 ) >&2
 
@@ -142,10 +142,10 @@ if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 call "%%?~dp0%%setshift.bat" 2 COPY_FLAGS_ %%*
 
 if defined COPY_FLAGS_ (
-  echo.^>^>copy %COPY_FLAGS_% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
+  echo;^>^>copy %COPY_FLAGS_% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
   copy %COPY_FLAGS_% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
 ) else (
-  echo.^>^>copy "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
+  echo;^>^>copy "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
   copy "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
 )
 

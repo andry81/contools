@@ -10,7 +10,7 @@ set "GENERATOR_IS_MULTI_CONFIG=%~2"
 
 if exist "%CMAKE_BUILD_ROOT%/singleconfig.tag" (
   if not defined CMAKE_BUILD_TYPE (
-    echo.%?~%: error: CMAKE_BUILD_TYPE must be set for single config cmake cache.
+    echo;%?~%: error: CMAKE_BUILD_TYPE must be set for single config cmake cache.
     exit /b 1
   ) >&2
   call "%%~dp0canonical_path.bat" CMAKE_BUILD_DIR  "%%CMAKE_BUILD_ROOT%%\%%CMAKE_BUILD_TYPE%%"
@@ -19,7 +19,7 @@ if exist "%CMAKE_BUILD_ROOT%/singleconfig.tag" (
   call "%%~dp0canonical_path.bat" CMAKE_PACK_DIR   "%%CMAKE_PACK_ROOT%%\%%CMAKE_BUILD_TYPE%%"
 ) else if exist "%CMAKE_BUILD_ROOT%/multiconfig.tag" (
   if %GENERATOR_IS_MULTI_CONFIG%0 EQU 0 (
-    echo.%?~%: error: GENERATOR_IS_MULTI_CONFIG must be already set for multi config cmake cache.
+    echo;%?~%: error: GENERATOR_IS_MULTI_CONFIG must be already set for multi config cmake cache.
     exit /b 2
   ) >&2
   call "%%~dp0canonical_path.bat" CMAKE_BUILD_DIR  "%%CMAKE_BUILD_ROOT%%"
@@ -27,13 +27,13 @@ if exist "%CMAKE_BUILD_ROOT%/singleconfig.tag" (
   call "%%~dp0canonical_path.bat" CMAKE_LIB_DIR    "%%CMAKE_LIB_ROOT%%"
   call "%%~dp0canonical_path.bat" CMAKE_PACK_DIR   "%%CMAKE_PACK_ROOT%%"
 ) else (
-  echo.%?~%: error: cmake cache is not created as single config nor multi config.
+  echo;%?~%: error: cmake cache is not created as single config nor multi config.
   exit /b 3
 ) >&2
 
 call :PARENT_DIR "%%CMAKE_OUTPUT_ROOT%%"
 if not defined PARENT_DIR (
-  echo.%?~%: error: parent directory of the CMAKE_OUTPUT_ROOT does not exist "%CMAKE_OUTPUT_ROOT%".
+  echo;%?~%: error: parent directory of the CMAKE_OUTPUT_ROOT does not exist "%CMAKE_OUTPUT_ROOT%".
   exit /b 4
 ) >&2
 
@@ -42,7 +42,7 @@ if not exist "%CMAKE_OUTPUT_ROOT%" mkdir "%CMAKE_OUTPUT_ROOT%" || exit /b
 if defined CMAKE_OUTPUT_GENERATOR_DIR (
   call :PARENT_DIR "%%CMAKE_OUTPUT_GENERATOR_DIR%%"
   if not defined PARENT_DIR (
-    echo.%?~%: error: parent directory of the CMAKE_OUTPUT_GENERATOR_DIR does not exist "%CMAKE_OUTPUT_GENERATOR_DIR%".
+    echo;%?~%: error: parent directory of the CMAKE_OUTPUT_GENERATOR_DIR does not exist "%CMAKE_OUTPUT_GENERATOR_DIR%".
     exit /b 5
   ) >&2
 
@@ -51,7 +51,7 @@ if defined CMAKE_OUTPUT_GENERATOR_DIR (
 
 call :PARENT_DIR "%%CMAKE_OUTPUT_DIR%%"
 if not defined PARENT_DIR (
-  echo.%?~%: error: parent directory of the CMAKE_OUTPUT_DIR does not exist "%CMAKE_OUTPUT_DIR%".
+  echo;%?~%: error: parent directory of the CMAKE_OUTPUT_DIR does not exist "%CMAKE_OUTPUT_DIR%".
   exit /b 6
 ) >&2
 
@@ -65,31 +65,31 @@ if not exist "%CMAKE_PACK_ROOT%" mkdir "%CMAKE_PACK_ROOT%" || exit /b
 
 call :PARENT_DIR "%%CMAKE_BUILD_DIR%%"
 if not defined PARENT_DIR (
-  echo.%?~%: error: parent directory of the CMAKE_BUILD_DIR does not exist "%CMAKE_BUILD_DIR%".
+  echo;%?~%: error: parent directory of the CMAKE_BUILD_DIR does not exist "%CMAKE_BUILD_DIR%".
   exit /b 10
 ) >&2
 
 call :PARENT_DIR "%%CMAKE_BIN_DIR%%"
 if not defined PARENT_DIR (
-  echo.%?~%: error: parent directory of the CMAKE_BIN_DIR does not exist "%CMAKE_BIN_DIR%".
+  echo;%?~%: error: parent directory of the CMAKE_BIN_DIR does not exist "%CMAKE_BIN_DIR%".
   exit /b 11
 ) >&2
 
 call :PARENT_DIR "%%CMAKE_LIB_DIR%%"
 if not defined PARENT_DIR (
-  echo.%?~%: error: parent directory of the CMAKE_LIB_DIR does not exist "%CMAKE_LIB_DIR%".
+  echo;%?~%: error: parent directory of the CMAKE_LIB_DIR does not exist "%CMAKE_LIB_DIR%".
   exit /b 12
 ) >&2
 
 call :PARENT_DIR "%%CMAKE_INSTALL_ROOT%%"
 if not defined PARENT_DIR (
-  echo.%?~%: error: parent directory of the CMAKE_INSTALL_ROOT does not exist "%CMAKE_INSTALL_ROOT%".
+  echo;%?~%: error: parent directory of the CMAKE_INSTALL_ROOT does not exist "%CMAKE_INSTALL_ROOT%".
   exit /b 13
 ) >&2
 
 call :PARENT_DIR "%%CMAKE_PACK_DIR%%"
 if not defined PARENT_DIR (
-  echo.%?~%: error: parent directory of the CMAKE_PACK_DIR does not exist "%CMAKE_PACK_DIR%".
+  echo;%?~%: error: parent directory of the CMAKE_PACK_DIR does not exist "%CMAKE_PACK_DIR%".
   exit /b 14
 ) >&2
 

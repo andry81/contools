@@ -21,17 +21,17 @@ set "FILE_LOCK_DIR=%~d1"
 
 rem the lock file directory must already exist
 if not exist "%FILE_LOCK_DIR%" (
-  echo.%?~%: error: FILE_LOCK_DIR does not exist: "%FILE_LOCK_DIR%"
+  echo;%?~%: error: FILE_LOCK_DIR does not exist: "%FILE_LOCK_DIR%"
   exit /b 1
 ) >&2
 
 if not exist "%FILE_VAR_NAMES_PATH%" (
-  echo.%?~%: error: FILE_VAR_NAMES_PATH does not exist: "%FILE_VAR_NAMES_PATH%"
+  echo;%?~%: error: FILE_VAR_NAMES_PATH does not exist: "%FILE_VAR_NAMES_PATH%"
   exit /b 2
 ) >&2
 
 if not exist "%FILE_VAR_VALUES_PATH%" (
-  echo.%?~%: error: FILE_VAR_VALUES_PATH does not exist: "%FILE_VAR_VALUES_PATH%"
+  echo;%?~%: error: FILE_VAR_VALUES_PATH does not exist: "%FILE_VAR_VALUES_PATH%"
   exit /b 3
 ) >&2
 
@@ -79,7 +79,7 @@ rem trick with simultaneous iteration over 2 lists in the same time
   for /f "usebackq eol=# tokens=* delims=" %%i in ("%~1") do (
     set /p "%%i="
     rem to filter out wrong matches of a variable from the `set "%%i"`
-    for /f "usebackq eol=# tokens=1,* delims==" %%j in (`set "%%i"`) do if /i "%%j" == "%%i" echo.%%i=%%k
+    for /f "usebackq eol=# tokens=1,* delims==" %%j in (`set "%%i"`) do if /i "%%j" == "%%i" echo;%%i=%%k
   )
 ) < "%~2"
 

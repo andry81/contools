@@ -9,12 +9,12 @@ set "CMAKE_BUILD_TYPE=%~1"
 set "CMAKE_CONFIG_TYPES=%~2"
 
 if not defined CMAKE_BUILD_TYPE (
-  echo.%?~%: error: CMAKE_BUILD_TYPE is not defined
+  echo;%?~%: error: CMAKE_BUILD_TYPE is not defined
   exit /b 1
 ) >&2
 
 if not defined CMAKE_CONFIG_TYPES (
-  echo.%?~%: error: CMAKE_CONFIG_TYPES is not defined
+  echo;%?~%: error: CMAKE_CONFIG_TYPES is not defined
   goto exit /b 2
 ) >&2
 
@@ -25,7 +25,7 @@ if /i "%%i" == "%CMAKE_BUILD_TYPE%" set "CMAKE_BUILD_TYPE_FOUND=1" & goto CMAKE_
 :CMAKE_BUILD_TYPE_END
 
 if %CMAKE_BUILD_TYPE_FOUND% EQU 0 (
-  echo.%?~%: error: CMAKE_BUILD_TYPE is not declared in CMAKE_CONFIG_TYPES: CMAKE_BUILD_TYPE="%CMAKE_BUILD_TYPE%" CMAKE_CONFIG_TYPES="%CMAKE_CONFIG_TYPES%"
+  echo;%?~%: error: CMAKE_BUILD_TYPE is not declared in CMAKE_CONFIG_TYPES: CMAKE_BUILD_TYPE="%CMAKE_BUILD_TYPE%" CMAKE_CONFIG_TYPES="%CMAKE_CONFIG_TYPES%"
   exit /b 3
 ) >&2
 

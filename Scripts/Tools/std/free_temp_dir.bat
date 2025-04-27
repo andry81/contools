@@ -56,8 +56,8 @@ rem echo =%SCRIPT_TEMP_BASE_DIR%=%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_N
 rem remove parent directory
 for /F "tokens=1,* delims=\"eol^= %%i in ("%SCRIPT_TEMP_PARENT_PATH_DIR%%SCRIPT_TEMP_DIR_NAME_TOKEN%.%SCRIPT_TEMP_TASK_COUNT_FILE_SUFFIX%") do (
   if exist "\\?\%SCRIPT_TEMP_BASE_DIR%\%%i\*" rmdir /S /Q "%SCRIPT_TEMP_BASE_DIR%\%%i" || (
-    echo.%?~%: error: could not free temporary directory: "%SCRIPT_TEMP_BASE_DIR%\%%i".
-    echo.
+    echo;%?~%: error: could not free temporary directory: "%SCRIPT_TEMP_BASE_DIR%\%%i".
+    echo;
   ) >&2
 )
 

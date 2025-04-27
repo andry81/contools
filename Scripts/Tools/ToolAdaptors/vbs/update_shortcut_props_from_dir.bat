@@ -206,7 +206,7 @@ if defined FLAG (
     shift
     set /A FLAG_SHIFT+=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -219,7 +219,7 @@ if defined FLAG (
 
 if %FLAG_MATCH_STRING% NEQ 0 ^
 if not defined FLAG_MATCH_STRING_VALUE (
-  echo.%?~%: error: MATCH_STRING must be defined.
+  echo;%?~%: error: MATCH_STRING must be defined.
   exit /b 255
 ) >&2
 
@@ -252,34 +252,34 @@ set "REPLACE_TO=%~4"
 if defined LINKS_DIR if exist "%LINKS_DIR%\*" goto LINKS_DIR_EXIST
 
 (
-  echo.%?~%: error: LINKS_DIR does not exist: `%LINKS_DIR%`.
+  echo;%?~%: error: LINKS_DIR does not exist: `%LINKS_DIR%`.
   exit /b 255
 ) >&2
 
 :LINKS_DIR_EXIST
 
 if not defined PROPS_LIST (
-  echo.%?~%: error: PROPS_LIST is not defined.
+  echo;%?~%: error: PROPS_LIST is not defined.
   exit /b 255
 ) >&2
 
 if not defined REPLACE_FROM (
-  echo.%?~%: error: REPLACE_FROM is not defined.
+  echo;%?~%: error: REPLACE_FROM is not defined.
   exit /b 255
 ) >&2
 
 if %FLAG_DELETE% EQU 0 (
   if not defined REPLACE_TO (
-    echo.%?~%: error: REPLACE_TO is not defined.
+    echo;%?~%: error: REPLACE_TO is not defined.
     exit /b 255
   ) >&2
 
   if "%REPLACE_FROM%" == "%REPLACE_TO%" (
-    echo.%?~%: error: REPLACE_FROM must be not equal to REPLACE_TO: REPLACE_FROM="%REPLACE_FROM%".
+    echo;%?~%: error: REPLACE_FROM must be not equal to REPLACE_TO: REPLACE_FROM="%REPLACE_FROM%".
     exit /b 255
   ) >&2
 ) else if defined REPLACE_TO (
-  echo.%?~%: error: REPLACE_TO must be not defined.
+  echo;%?~%: error: REPLACE_TO must be not defined.
   exit /b 255
 ) >&2
 
@@ -293,7 +293,7 @@ set "PROPS_LIST_FILTERED="
 if defined PROPS_LIST set "PROPS_LIST_FILTERED=%PROPS_LIST:|=%"
 
 if not defined PROPS_LIST_FILTERED (
-  echo.%?~%: error: PROPS_LIST is empty or not applied: PROPS_LIST="%PROPS_LIST%".
+  echo;%?~%: error: PROPS_LIST is empty or not applied: PROPS_LIST="%PROPS_LIST%".
   exit /b 255
 ) >&2
 
@@ -355,7 +355,7 @@ for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
 exit /b 0
 
 :UPDATE_LINK
-echo."%LINK_FILE_PATH%"
+echo;"%LINK_FILE_PATH%"
 
 rem Read shortcut PROPS_LIST to match
 
@@ -450,7 +450,7 @@ for /F "usebackq tokens=1,* delims=="eol^= %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/sh
 if %UPDATE_SHORTCUT% NEQ 0 ^
 "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS%%UPDATE_SHORTCUT_PROP_FLAGS% -- "%LINK_FILE_PATH%"
 
-echo.
+echo;
 
 exit /b
 

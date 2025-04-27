@@ -5,7 +5,7 @@ setlocal
 rem get and set code page
 call "%%CONTOOLS_ROOT%%/std/chcp.bat" 866
 
-if 0%SVNCMD_TOOLS_DEBUG_VERBOSITY_LVL% GEQ 1 (echo.^>^>%0 %*) >&3
+if 0%SVNCMD_TOOLS_DEBUG_VERBOSITY_LVL% GEQ 1 (echo;^>^>%0 %*) >&3
 
 "%CONTOOLS_SQLITE_ROOT%/sqlite3.exe" %*
 set LAST_ERROR=%ERRORLEVEL%

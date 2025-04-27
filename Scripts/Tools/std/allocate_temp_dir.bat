@@ -93,15 +93,15 @@ rem   In case of nested call, the last diretory may be locked from the remove in
 rem   We must randomize the directory name and try to allocate again!
 rem
 (
-  echo.%?~%: warning: could not allocate nested temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%", attempting to reallocate...
-  echo.
+  echo;%?~%: warning: could not allocate nested temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%", attempting to reallocate...
+  echo;
   rmdir /S /Q "%SCRIPT_TEMP_CURRENT_DIR%" 2>nul
   (
     set LAST_ERROR=0
     mkdir "%SCRIPT_TEMP_CURRENT_DIR%" 2>nul && goto EXIT
   ) || (
-    echo.%?~%: error: could not reallocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%", attempting to allocate unique directory...
-    echo.
+    echo;%?~%: error: could not reallocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%", attempting to allocate unique directory...
+    echo;
   )
 ) >&2
 
@@ -113,8 +113,8 @@ set LAST_ERROR=%ERRORLEVEL%
 
 :SKIP_REALLOCATE
 (
-  echo.%?~%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%".
-  echo.
+  echo;%?~%: error: could not allocate temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%".
+  echo;
 ) >&2
 
 :EXIT
@@ -141,8 +141,8 @@ rem return values
   if %LAST_ERROR% NEQ 0 (
     rem just in case
     if exist "\\?\%SCRIPT_TEMP_CURRENT_DIR%\*" rmdir /S /Q "%SCRIPT_TEMP_CURRENT_DIR%" || (
-      echo.%?~%: error: could not free temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%".
-      echo.
+      echo;%?~%: error: could not free temporary directory: "%SCRIPT_TEMP_CURRENT_DIR%".
+      echo;
       exit /b 255
     ) >&2
   )

@@ -26,7 +26,7 @@ call :SET_TIMESTAMP
 set BEGIN_TIMESTAMP=%TIMESTAMP%
 set BEGIN_HOURS=%HOURS%
 
-rem echo.---
+rem echo;---
 
 :WAIT_LOOP
 call :BUSY_WAIT

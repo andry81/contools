@@ -4,7 +4,7 @@ rem Create local variable's stack
 setlocal
 
 if 0%__CTRL_SETLOCAL% EQU 1 (
-  echo.%~nx0: error: cmd.exe is broken, please restart it!>&2
+  echo;%~nx0: error: cmd.exe is broken, please restart it!>&2
   exit /b 65535
 )
 set __CTRL_SETLOCAL=1
@@ -21,7 +21,7 @@ rem xpath_search_list/0X
 call :TEST "xpath_search_list/01_empty" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
 call :TEST "xpath_search_list/02" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
 
-echo.
+echo;
 
 rem WARNING: must be called without the call prefix!
 "%CONTOOLS_TESTLIB_ROOT%/exit.bat"

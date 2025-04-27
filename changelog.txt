@@ -1,3 +1,6 @@
+2025.04.27:
+* changed: global code improvement: `echo.` -> `echo;`, based on "Different `echo?...` variants" : https://github.com/andry81/contools/discussions/22
+
 2025.04.24:
 * new: Scripts/Tools/ToolAdaptors/app/emule/exec_gui_emule.bat: `-backup-all`, `-backup-config`, `-backup-logs`, `-backup-part-met` flags
 * changed: Scripts/Tools/ToolAdaptors/app/emule/exec_gui_emule.bat: don't wait GUI executable to exit as long as it does not print into stdout

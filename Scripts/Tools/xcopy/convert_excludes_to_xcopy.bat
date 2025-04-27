@@ -77,6 +77,6 @@ exit /b 0
 :PROCESS_WILDCARD
 rem convert `*suffix.ext` into `suffix.ext`
 if "%FILE:~0,1%" == "*" set "FILE=%FILE:~1%"
-for /F "tokens=* delims="eol^= %%i in ("%FILE%") do (echo.%%i) >> "%XCOPY_EXCLUDES_LIST_FILE%"
+for /F "tokens=* delims="eol^= %%i in ("%FILE%") do (echo;%%i) >> "%XCOPY_EXCLUDES_LIST_FILE%"
 
 exit /b 0

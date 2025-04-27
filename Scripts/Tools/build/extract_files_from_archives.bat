@@ -61,7 +61,7 @@ rem read archive file pattern list
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" %%FLAG_SHIFT%% ARC_FILE_PTTN_LIST %%*
 
 if not defined SEARCH_FROM (
-  echo.%?~%: error: SEARCH_FROM is not defined.
+  echo;%?~%: error: SEARCH_FROM is not defined.
   exit /b 255
 ) >&2
 
@@ -70,12 +70,12 @@ set "SEARCH_FROM_IN=%SEARCH_FROM%"
 for /F "tokens=* delims="eol^= %%i in ("%SEARCH_FROM%\.") do set "SEARCH_FROM=%%~fi"
 
 if not exist "\\?\%SEARCH_FROM%" (
-  echo.%?~%: error: SEARCH_FROM does not exist: "%SEARCH_FROM%".
+  echo;%?~%: error: SEARCH_FROM does not exist: "%SEARCH_FROM%".
   exit /b 255
 ) >&2
 
 if not defined EXTRACT_TO_DIR (
-  echo.%?~%: error: EXTRACT_TO_DIR is not defined.
+  echo;%?~%: error: EXTRACT_TO_DIR is not defined.
   exit /b 255
 ) >&2
 
@@ -84,7 +84,7 @@ set "EXTRACT_TO_DIR_IN=%EXTRACT_TO_DIR%"
 for /F "tokens=* delims="eol^= %%i in ("%EXTRACT_TO_DIR%\.") do set "EXTRACT_TO_DIR=%%~fi"
 
 if %CREATE_EXTRACT_TO_DIR% EQU 0 if not exist "\\?\%EXTRACT_TO_DIR%\*" (
-  echo.%?~%: error: EXTRACT_TO_DIR directory does not exist: "%EXTRACT_TO_DIR%".
+  echo;%?~%: error: EXTRACT_TO_DIR directory does not exist: "%EXTRACT_TO_DIR%".
   exit /b 255
 ) >&2
 
@@ -103,7 +103,7 @@ rem   For example: pushd c:\ && ( 7z.exe a -r <PathToArchive> "<SomeRelativePath
 rem
 set "TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
-echo.  "%EXTRACT_PTTN%" -^> "%EXTRACT_TO_DIR_IN%"
+echo;  "%EXTRACT_PTTN%" -^> "%EXTRACT_TO_DIR_IN%"
 
 if %CREATE_EXTRACT_TO_DIR% NEQ 0 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%EXTRACT_TO_DIR%%" >nul || exit /b
 
@@ -169,7 +169,7 @@ set "EXTRACT_TO_FILE_DIR_W_NAME=%EXTRACT_TO_FILE_DIR%\%EXTRACT_FILE_NAME%"
 
 if %CREATE_DIR_FROM_ARCHIVE_FILE_NAME% NEQ 0 set "EXTRACT_TO_FILE_DIR=%EXTRACT_TO_FILE_DIR_W_NAME%"
 
-echo."%ARC_FILE_REL_PATH%"
+echo;"%ARC_FILE_REL_PATH%"
 
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%EXTRACT_TO_FILE_DIR%%" >nul || exit /b
 
@@ -184,7 +184,7 @@ exit /b
 
 :EXTRACT_PTTN_ERROR
 (
-  echo.%?~%: error: EXTRACT_PTTN must not contain wildcards: "%EXTRACT_PTTN%".
+  echo;%?~%: error: EXTRACT_PTTN must not contain wildcards: "%EXTRACT_PTTN%".
   exit /b 255
 ) >&2
 exit /b 255

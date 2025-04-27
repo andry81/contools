@@ -4,7 +4,7 @@ rem Create local variable's stack
 setlocal DISABLEDELAYEDEXPANSION
 
 if 0%__CTRL_SETLOCAL% EQU 1 (
-  echo.%~nx0: error: cmd.exe is broken, please restart it!>&2
+  echo;%~nx0: error: cmd.exe is broken, please restart it!>&2
   exit /b 65535
 )
 set __CTRL_SETLOCAL=1
@@ -48,7 +48,7 @@ call :TEST pathlist_chars
 set __STRING__=$*^^^|^^^&^(=^)^^^<^^^>^"='`^^%%!+?** ,;=
 call :TEST pathlist_chars
 
-echo.
+echo;
 
 rem WARNING: must be called without the call prefix!
 "%CONTOOLS_TESTLIB_ROOT%/exit.bat"

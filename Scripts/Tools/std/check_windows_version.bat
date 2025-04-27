@@ -22,7 +22,7 @@ if %WINDOWS_MAJOR_VER% EQU %MAJOR_VER% if %WINDOWS_MINOR_VER% GEQ %MINOR_VER% go
 :WINDOWS_VER_NOT_SUPPORTED
 
 (
-  echo.%?~%: error: unsupported version of Windows: "%WINDOWS_VER_STR%"
+  echo;%?~%: error: unsupported version of Windows: "%WINDOWS_VER_STR%"
   exit /b 255
 ) >&2
 

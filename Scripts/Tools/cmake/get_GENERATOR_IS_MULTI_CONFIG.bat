@@ -43,7 +43,7 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" cmake -G "%%~1" "-DCMAKE_MODULE
   --flock "%%TEMP_OUTPUT_DIR%%/lock" "%%TEMP_OUTPUT_DIR%%/var_values.lst" || exit /b
 
 (
-  echo.GENERATOR_IS_MULTI_CONFIG
+  echo;GENERATOR_IS_MULTI_CONFIG
 ) > "%TEMP_OUTPUT_DIR%/var_names.lst" || exit /b
 
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" "%%CONTOOLS_ROOT%%/std/set_vars_from_locked_file_pair.bat" ^

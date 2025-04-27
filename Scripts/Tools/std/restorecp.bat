@@ -28,7 +28,7 @@ if defined FLAG (
   if "%FLAG%" == "-p" (
     set FLAG_PRINT=1
   ) else (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -39,7 +39,7 @@ if defined FLAG (
 )
 
 if not defined CP_HISTORY_LIST (
-  echo.%?~%: error: CP_HISTORY_LIST is not defined.
+  echo;%?~%: error: CP_HISTORY_LIST is not defined.
   exit /b 255
 ) >&2
 
@@ -48,7 +48,7 @@ if exist "%SystemRoot%\System32\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System3
 if not defined __?CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System64\chcp.com"
 
 if not defined __?CHCP_FILE (
-  echo.%?~%: error: `chcp.com` is not found.
+  echo;%?~%: error: `chcp.com` is not found.
   exit /b 255
 ) >&2
 
@@ -85,7 +85,7 @@ if "%CURRENT_CP%" == "%LAST_CP%" (
   exit /b 0
 )
 
-rem echo.chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
+rem echo;chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
 
 (
   if %FLAG_PRINT% NEQ 0 (

@@ -19,7 +19,7 @@ set LOCK_FILE0_ACQUIRE=0
     set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
     if not defined RUNNING_TASKS_COUNTER set RUNNING_TASKS_COUNTER=0
     set /A RUNNING_TASKS_COUNTER-=1
-    (call echo.%%RUNNING_TASKS_COUNTER%%) > "%RUNNING_TASKS_COUNTER_FILE%"
+    (call echo;%%RUNNING_TASKS_COUNTER%%) > "%RUNNING_TASKS_COUNTER_FILE%"
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
     call;

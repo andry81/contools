@@ -61,12 +61,12 @@ rem   1. >callshift.bat 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | "=" 3
 rem   2. >callshift.bat -exe 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | , ; = = "=" 3
-rem   3. >callshift.bat 2 echo."1 2" 3 4 5
+rem   3. >callshift.bat 2 echo;"1 2" 3 4 5
 rem      "1 2" 5
 rem   4. >callshift.bat . set | sort
 rem   5. >errlvl.bat 123
 rem      >callshift.bat
-rem      >callshift.bat 0 echo.
+rem      >callshift.bat 0 echo;
 rem      >callshift.bat 0 echo 1 2 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
@@ -87,15 +87,15 @@ rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
 rem  10. >callshift.bat -notrim 1 echo  a  b  c  d
 rem       b  c  d
-rem  11. >callshift.bat 0 echo.^>cmd param0 param1
+rem  11. >callshift.bat 0 echo;^>cmd param0 param1
 rem      >cmd param0 param1
-rem  12. >callshift.bat -lockfile "%TEMP%\lock0.myscript" 0 echo.Exclusive print
+rem  12. >callshift.bat -lockfile "%TEMP%\lock0.myscript" 0 echo;Exclusive print
 
 rem Examples (in script):
 rem   1. set "$5E$3E=^>"
-rem      call callshift.bat 0 echo.%%$5E$3E%%cmd param0 param1
+rem      call callshift.bat 0 echo;%%$5E$3E%%cmd param0 param1
 rem   2. set "TAB=	"
-rem      call callshift.bat -notrim 0 echo.cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+rem      call callshift.bat -notrim 0 echo;cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
 
 rem Pros:
 rem
@@ -244,7 +244,7 @@ if not defined FLAG_LOCK_FILE goto SKIP_CALL_LOCK
 for /F "tokens=* delims="eol^= %%i in ("%FLAG_LOCK_FILE%\.") do set "FLAG_LOCK_FILE_DIR=%%~dpi"
 
 if not exist "%FLAG_LOCK_FILE_DIR%*" (
-  echo.%?~%: error: lock file directory does not exist: "%FLAG_LOCK_FILE_DIR%"
+  echo;%?~%: error: lock file directory does not exist: "%FLAG_LOCK_FILE_DIR%"
   exit /b -1024
 ) >&2
 

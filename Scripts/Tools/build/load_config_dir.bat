@@ -78,11 +78,11 @@ if %__?FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%__?FLAG_SHIFT%) do shift
 
 if %NO_GEN%0 NEQ 0 (
   if %__?FLAG_GEN_SYSTEM_CONFIG% NEQ 0 (
-    echo.%__?~%: error: can not generate system config while NO_GEN is set.
+    echo;%__?~%: error: can not generate system config while NO_GEN is set.
     exit /b 255
   ) >&2
   if %__?FLAG_GEN_USER_CONFIG% NEQ 0 (
-    echo.%__?~%: error: can not generate user config while NO_GEN is set.
+    echo;%__?~%: error: can not generate user config while NO_GEN is set.
     exit /b 255
   ) >&2
 )

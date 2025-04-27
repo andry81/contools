@@ -24,7 +24,7 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
 
 if %TESTLIB__NEST_LVL%0 EQU 0 (
   echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% tests is passed.
-  echo.^
+  echo;^
   if defined OEMCP ( call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
 )
 

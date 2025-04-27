@@ -29,7 +29,7 @@ rem <variable>:
 rem   Variable to return the selected key.
 
 rem <message>:
-rem   Message before the input echo.
+rem   Message before the input echo;
 rem   Leave empty if you want to echo input on the next line.
 
 setlocal
@@ -72,7 +72,7 @@ if defined FLAG (
     shift
     set /A FLAG_SHIFT+=1
   ) else if not "%FLAG%" == "--" (
-    echo.%?~%: error: invalid flag: %FLAG%
+    echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
 
@@ -93,12 +93,12 @@ if defined VARIABLE if defined %VARIABLE% set "%VARIABLE%="
 call "%%?~dp0%%setshift.bat" -notrim %%FLAG_SHIFT%% MESSAGE %%*
 
 if not defined VARIABLE (
-  echo.%?~%: error: output variable name is not defined.
+  echo;%?~%: error: output variable name is not defined.
   exit /b -1
 ) >&2
 
 if not defined FLAG_INPUT_CHARS (
-  echo.%?~%: error: input selection key characters are not defined.
+  echo;%?~%: error: input selection key characters are not defined.
   exit /b -1
 ) >&2
 

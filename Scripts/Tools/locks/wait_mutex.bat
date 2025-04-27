@@ -30,10 +30,10 @@ set PRE_LOCK_ACQUIRE=0
 
     pushd "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%" >nul 2>nul || (
       set LAST_ERROR=-1
-      echo.Waiter [ %LOCK_NAME%\%WAITER_FILE% ] already unlocked
+      echo;Waiter [ %LOCK_NAME%\%WAITER_FILE% ] already unlocked
       goto EXIT_FROM_PRELOCK
     )
-    echo.waiter_%LOCK_NAME% > "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%\%WAITER_FILE%"
+    echo;waiter_%LOCK_NAME% > "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%\%WAITER_FILE%"
     popd
 
     rem Drop error level to 0 to avoid accidental exit by error from above commands.
@@ -74,7 +74,7 @@ rem prelock via redirection to file
 rem directory lock is cleanuped under the prelock, now is safe to remove the prelock file
 call :CLEANUP_PRELOCK
 
-echo.Waiter [ %LOCK_NAME%\%WAITER_FILE% ] exited
+echo;Waiter [ %LOCK_NAME%\%WAITER_FILE% ] exited
 
 exit /b 0
 

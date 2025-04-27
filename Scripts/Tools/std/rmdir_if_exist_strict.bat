@@ -16,7 +16,7 @@ rem   Single directory path.
 rem <rmdir-flags>:
 rem   Command line flags to pass into builtin `rmdir` command.
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
+if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 
 setlocal
 
@@ -26,7 +26,7 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 set "DIR_PATH=%~1"
 
 if not defined DIR_PATH (
-  echo.%?~%: error: directory path is not defined.
+  echo;%?~%: error: directory path is not defined.
   exit /b -255
 ) >&2
 
@@ -51,7 +51,7 @@ goto DIR_PATH_OK
 
 :DIR_PATH_ERROR
 (
-  echo.%?~%: error: directory path is invalid: "%DIR_PATH%".
+  echo;%?~%: error: directory path is invalid: "%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -63,7 +63,7 @@ rem CAUTION:
 rem   The drive still must exist even if the path is not. If path exists, the path directory still can be in a disconnected state.
 rem
 if not exist "%DIR_DRIVE%" (
-  echo.%?~%: error: the directory path drive is not exist: "%DIR_PATH%".
+  echo;%?~%: error: the directory path drive is not exist: "%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -78,12 +78,12 @@ if not exist "\\?\%DIR_PATH%" (
 ) >&2 else if exist "\\?\%DIR_PATH%\*" (
   rem
 ) >&2 else if exist "\\?\%DIR_PATH%\" (
-  echo.%?~%: error: path does exist and is an unlinked directory: "%DIR_PATH%"
-  echo.
+  echo;%?~%: error: path does exist and is an unlinked directory: "%DIR_PATH%"
+  echo;
   exit /b -253
 ) >&2
 
 call "%%~dp0setshift.bat" 1 RMDIR_FLAGS_ %%*
 
-echo.^>^>rmdir "%DIR_PATH%" %RMDIR_FLAGS_%
+echo;^>^>rmdir "%DIR_PATH%" %RMDIR_FLAGS_%
 rmdir "%DIR_PATH%" %RMDIR_FLAGS_%

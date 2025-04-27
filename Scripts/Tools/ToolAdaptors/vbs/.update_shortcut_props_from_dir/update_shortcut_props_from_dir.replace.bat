@@ -8,9 +8,9 @@ call set "PROP_NEXT_VALUE=%%PROP_PREV_VALUE:%REPLACE_FROM%=%REPLACE_TO%%%"
 
 rem skip on empty assign
 if %FLAG_NO_SKIP_ON_EMPTY_ASSIGN% EQU 0 if not defined PROP_NEXT_VALUE (
-  echo.%?~%: warning: property empty value assignment: "%PROP_NAME%"
-  echo.%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
-  if %FLAG_DELETE% EQU 0 echo.%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
+  echo;%?~%: warning: property empty value assignment: "%PROP_NAME%"
+  echo;%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
+  if %FLAG_DELETE% EQU 0 echo;%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
   goto REPLACE_LOOP_NEXT
 ) >&2
 
@@ -18,29 +18,29 @@ rem skip on empty change
 if "%PROP_NAME%" == "TargetPath" (
   if %FLAG_USE_CASE_COMPARE% NEQ 0 (
     if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 (
-      echo.%?~%: warning: property `TargetPath` is not changed (case^).
-      echo.%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
-      if %FLAG_DELETE% EQU 0 echo.%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
+      echo;%?~%: warning: property `TargetPath` is not changed (case^).
+      echo;%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
+      if %FLAG_DELETE% EQU 0 echo;%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
       goto REPLACE_LOOP_NEXT
     ) >&2
   ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_TARGET_PATH_REASSIGN% EQU 0 (
-    echo.%?~%: warning: property `TargetPath` is not changed (nocase^).
-    echo.%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
-    if %FLAG_DELETE% EQU 0 echo.%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
+    echo;%?~%: warning: property `TargetPath` is not changed (nocase^).
+    echo;%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
+    if %FLAG_DELETE% EQU 0 echo;%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
     goto REPLACE_LOOP_NEXT
   ) >&2
 ) else if "%PROP_NAME%" == "WorkingDirectory" (
   if %FLAG_USE_CASE_COMPARE% NEQ 0 (
     if "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_WORKING_DIR_REASSIGN% EQU 0 (
-      echo.%?~%: warning: property `WorkingDirectory` is not changed (case^).
-      echo.%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
-      if %FLAG_DELETE% EQU 0 echo.%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
+      echo;%?~%: warning: property `WorkingDirectory` is not changed (case^).
+      echo;%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
+      if %FLAG_DELETE% EQU 0 echo;%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
       goto REPLACE_LOOP_NEXT
     ) >&2
   ) else if /i "%PROP_PREV_VALUE%" == "%PROP_NEXT_VALUE%" if %FLAG_ALLOW_WORKING_DIR_REASSIGN% EQU 0 (
-    echo.%?~%: warning: property `WorkingDirectory` is not changed (nocase^).
-    echo.%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
-    if %FLAG_DELETE% EQU 0 echo.%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
+    echo;%?~%: warning: property `WorkingDirectory` is not changed (nocase^).
+    echo;%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
+    if %FLAG_DELETE% EQU 0 echo;%?~nx0%: info: REPLACE_TO: "%REPLACE_TO%"
     goto REPLACE_LOOP_NEXT
   ) >&2
 )
@@ -64,15 +64,15 @@ if %FLAG_DELETE% EQU 0 (
 )
 
 if %FLAG_DELETE% EQU 0 if defined REPLACE_FROM if not defined REPLACE_TO (
-  echo.%?~%: warning: REPLACE_TO is not defined.
-  echo.%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
+  echo;%?~%: warning: REPLACE_TO is not defined.
+  echo;%?~nx0%: info: REPLACE_FROM: "%REPLACE_FROM%"
   goto EXIT
 ) >&2
 
 if not defined REPLACE_FROM goto EXIT
 
 if %FLAG_DELETE% EQU 0 if "%REPLACE_FROM%" == "%REPLACE_TO%" (
-  echo.%?~%: warning: REPLACE_FROM must be not equal to REPLACE_TO: REPLACE_FROM="%REPLACE_FROM%".
+  echo;%?~%: warning: REPLACE_FROM must be not equal to REPLACE_TO: REPLACE_FROM="%REPLACE_FROM%".
   goto REPLACE_LOOP_NEXT
 ) >&2
 

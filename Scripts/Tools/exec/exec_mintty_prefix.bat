@@ -11,7 +11,7 @@ set /A IMPL_MODE+=0
 
 rem do not continue if already in Impl Mode
 if %IMPL_MODE% NEQ 0 (
-  echo.%?~%: error: Impl Mode already used.
+  echo;%?~%: error: Impl Mode already used.
   exit /b 255
 ) >&2
 

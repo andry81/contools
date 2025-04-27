@@ -20,7 +20,7 @@ for %%i in (qBittorrent magnet) do (
 exit /b 0
 
 :CMD
-echo.^>%*
+echo;^>%*
 (
   %*
 )

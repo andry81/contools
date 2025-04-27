@@ -10,7 +10,7 @@ rem   call. Does support long paths.
 rem <path>
 rem   Single file path.
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>%~nx0 %*
+if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 
 setlocal
 
@@ -22,7 +22,7 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 set "FROM_PATH=%~1"
 
 if not defined FROM_PATH (
-  echo.%?~%: error: file path argument must be defined.
+  echo;%?~%: error: file path argument must be defined.
   exit /b -255
 ) >&2
 
@@ -49,7 +49,7 @@ goto FROM_PATH_OK
 
 :FROM_PATH_ERROR
 (
-  echo.%?~%: error: file path is invalid: "%FROM_PATH%".
+  echo;%?~%: error: file path is invalid: "%FROM_PATH%".
   exit /b -254
 ) >&2
 
@@ -65,19 +65,19 @@ rem     `x:\<path-to-dir-without-trailing-back-slash>`
 rem   So we must test the path with the trailing back slash to check existence of the link AND it's connection state.
 rem
 if not exist "\\?\%FILE_PATH%" (
-  echo.%?~%: error: path does not exist: "%FILE_PATH%"
+  echo;%?~%: error: path does not exist: "%FILE_PATH%"
   exit /b 1
 ) >&2 else if exist "\\?\%FILE_PATH%\*" (
-  echo.%?~%: error: path does exist and is a directory: "%FILE_PATH%"
+  echo;%?~%: error: path does exist and is a directory: "%FILE_PATH%"
   exit /b -254
 ) >&2 else if exist "\\?\%FILE_PATH%\" (
-  echo.%?~%: error: path does exist and is an unlinked directory: "%FILE_PATH%"
+  echo;%?~%: error: path does exist and is an unlinked directory: "%FILE_PATH%"
   exit /b -253
 ) >&2
 
 rem check on long file path
 if exist "%FILE_PATH%" (
-  if %TOOLS_VERBOSE%0 NEQ 0 echo.^>^>del /F /Q /A:-D "%FILE_PATH%"
+  if %TOOLS_VERBOSE%0 NEQ 0 echo;^>^>del /F /Q /A:-D "%FILE_PATH%"
   del /F /Q /A:-D "%FILE_PATH%" >nul 2>nul
   exit /b
 )
@@ -90,13 +90,13 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
   set "FILE_PATH_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%"
 ) else set "FILE_PATH_TEMP_DIR=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%"
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>^>"%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV
+if %TOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV
 "%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
 
 rmdir /S /Q "%FILE_PATH_TEMP_DIR%" >nul 2>nul
 exit /b
 
 :DELETE_FILE_VBS
-if %TOOLS_VERBOSE%0 NEQ 0 echo.^>^>"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%"
+if %TOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%"
 "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%"
 exit /b

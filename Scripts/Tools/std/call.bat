@@ -51,7 +51,7 @@ rem      "1 2" ! ? * & | , ; = = "=" 3
 rem   3. >call.bat set | sort
 rem   4. >errlvl.bat 123
 rem      >call.bat
-rem      >call.bat echo.
+rem      >call.bat echo;
 rem      >call.bat echo 1 2 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
@@ -62,15 +62,15 @@ rem   6. >errlvl.bat 123
 rem      >call.bat errlvl.bat 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
-rem   7. >call.bat echo.^>cmd param0 param1
+rem   7. >call.bat echo;^>cmd param0 param1
 rem      >cmd param0 param1
-rem   8. >call.bat -lockfile "%TEMP%\lock0.myscript" 0 echo.Exclusive print
+rem   8. >call.bat -lockfile "%TEMP%\lock0.myscript" 0 echo;Exclusive print
 
 rem Examples (in script):
 rem   1. set "$5E$3E=^>"
-rem      call call.bat echo.%%$5E$3E%%cmd param0 param1
+rem      call call.bat echo;%%$5E$3E%%cmd param0 param1
 rem   2. set "TAB=	"
-rem      call call.bat echo.cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+rem      call call.bat echo;cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
 rem   3. call call.bat %%*
 
 rem Pros:
@@ -190,7 +190,7 @@ if not defined FLAG_LOCK_FILE goto SKIP_CALL_LOCK
 for /F "tokens=* delims="eol^= %%i in ("%FLAG_LOCK_FILE%\.") do set "FLAG_LOCK_FILE_DIR=%%~dpi"
 
 if not exist "%FLAG_LOCK_FILE_DIR%*" (
-  echo.%?~%: error: lock file directory does not exist: "%FLAG_LOCK_FILE_DIR%"
+  echo;%?~%: error: lock file directory does not exist: "%FLAG_LOCK_FILE_DIR%"
   exit /b -1024
 ) >&2
 
