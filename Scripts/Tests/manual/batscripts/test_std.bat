@@ -9,5 +9,6 @@ for %%i in ("%~dpn0\%~n0__*.bat") do (
   set "SCRIPT_NAME=%%~ni"
   set "SCRIPT_FILE=%%i"
   call "%%~dp0..\..\..\Tools\std\if_.bat" ^
-    "%%SCRIPT_NAME:!=%%" == "%%SCRIPT_NAME%%" && call "%%~dp0..\..\..\Tools\std\call.bat" "%%SCRIPT_FILE%%"
+    "%%SCRIPT_NAME:!=%%" == "%%SCRIPT_NAME%%" ^
+      && call "%%~dp0..\..\..\Tools\std\call.bat" "%%SCRIPT_FILE%%"
 )
