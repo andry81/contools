@@ -1,4 +1,7 @@
 2025.04.28:
+* changed: Scripts/Tests/manual/utilities: moved to `contools--utils` project
+
+2025.04.28:
 * fixed: Scripts/Tests/unit/batscripts/test_build/test_build__00_load_config.bat: execution fixup
 * refactor: Scripts/Tests/unit/batscripts: tests moved to subdirectories for unification
 * refactor: Scripts/Tests: bench, manual: minor refactor
