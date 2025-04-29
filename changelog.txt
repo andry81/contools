@@ -1,3 +1,6 @@
+2025.04.29:
+* new: Scripts/Tools/hash/certutil.bat: `certutil.exe` wrapper script for a file hash calculation
+
 2025.04.28:
 * changed: Scripts/Tests/manual/utilities: moved to `contools--utils` project
 
