@@ -1,5 +1,7 @@
 @echo off
-@if 0 %*
+(
+  if 0 %*
+) >&2
 
 rem Description:
 rem   Stops an outer script execution with the message:

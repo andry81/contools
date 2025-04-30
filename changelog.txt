@@ -1,3 +1,6 @@
+2025.04.30:
+* changed: Scripts/Tools/std/assert.bat: redirect any output into stderr
+
 2025.04.29:
 * new: Scripts/Tools/hash/certutil.bat: `certutil.exe` wrapper script for a file hash calculation
 
