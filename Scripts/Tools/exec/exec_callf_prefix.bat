@@ -143,7 +143,7 @@ if %FLAG_ELEVATE% EQU 0 (
 )
 
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
-/ra "%%" "%%?01%%" /v "?01" "%%" ^
+/ra "%%" "%%?25%%" /v "?25" "%%" ^
 /shift-%FLAG_SHIFT%
 
 rem drop FLAG_SHIFT because already processed by `/shift-%FLAG_SHIFT%`

@@ -118,7 +118,7 @@ if %FLAG_NO_LOG% EQU 0 (
 
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% ^
 /no-expand-env /no-subst-pos-vars /no-esc /ret-child-exit ^
-/ra "%%" "%%?01%%" /v "?01" "%%" /shift-%FLAG_SHIFT%
+/ra "%%" "%%?25%%" /v "?25" "%%" /shift-%FLAG_SHIFT%
 
 rem drop FLAG_SHIFT because already processed by `/shift-%FLAG_SHIFT%`
 set FLAG_SHIFT=0

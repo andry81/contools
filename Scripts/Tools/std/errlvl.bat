@@ -77,11 +77,11 @@ rem       3. Special control character `&` does not need to be quoted or escaped
 rem
 rem     Cons:
 rem       1. The part of a command line after the `cmd.exe` still does expand by the `cmd.exe` itself.
-rem          To bypass that you can use additional `callf` options: `/ra "%%" "%%?01%%" /v "?01" "%%"`
+rem          To bypass that you can use additional `callf` options: `/ra "%%" "%%?25%%" /v "?25" "%%"`
 rem       2. To disable the rest `callf` features: `/no-subst-pos-vars /no-esc`
 rem
 rem     >
-rem     "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" /ret-child-exit "" "cmd.exe /c @\"1.bat\" & \"${CONTOOLS_ROOT}/std/errlvl.bat\"\""
+rem     "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" /ret-child-exit /no-subst-pos-vars /no-esc "" "cmd.exe /c @\"1.bat\" & \"${CONTOOLS_ROOT}/std/errlvl.bat\"\""
 
 rem CAUTION:
 rem   The `call` operator will expand environment variables twice:

@@ -12,6 +12,8 @@ set "?~n0=%~n1"
 set "?~nx0=%~nx1"
 set "?~x0=%~x1"
 
-set "?00=^"
+rem minimal set of sensitive control characters
+set ?22=^"
+set "?26=&" & set "?5E=^" & set "?7C=|"
 
 exit /b 0

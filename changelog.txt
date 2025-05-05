@@ -1,3 +1,10 @@
+2025.05.05:
+* fixed: Scripts/Tools/std: expand_var.bat, set_var.bat: accept most of the control characters in a variable's name
+* changed: Scripts/Tools/std/expand_vars.bat: minor improvement
+* changed: Scripts/Tools/std/declare_builtins.bat: minimal set of sensitive control characters
+* changed: Scripts/Tools/std: scripts reduction and minimization
+* changed: global improvement to use `?NN` as a variable hex representation of ascii character
+
 2025.04.30:
 * changed: Scripts/Tools/std/assert.bat: redirect any output into stderr
 

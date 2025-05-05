@@ -1,4 +1,4 @@
-@echo off
+@echo off & ( for %%i in (%*) do setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%j in ('"!%%i!"') do endlocal & call set "%%i=%%~j" ) & exit /b %ERRORLEVEL%
 
 rem USAGE:
 rem   expand_vars.bat <var0> ... <varN>
@@ -15,5 +15,3 @@ rem
 rem CAUTION:
 rem   The `for %%i in (%*)` statement still can expand the globbing characters
 rem   for the files in a current directory. You must avoid them.
-
-( for %%i in (%*) do setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%j in (""!%%i!"") do endlocal & call set "%%i=%%~j" ) & exit /b %ERRORLEVEL%
