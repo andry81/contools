@@ -35,7 +35,7 @@ if "%CURRENT_CP%" == "65000" (
 )
 
 rem workaround for the plus sign control character under a unicode codepage
-set "?5=+"
+set "?2B=+"
 
 rem restore back
 if defined CURRENT_CP ^
@@ -49,8 +49,8 @@ set "TEST_DATA_REF_FILE="
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat"
 
-set /A TESTLIB__CURRENT_TESTS%?5%=1
-set /A TESTLIB__OVERALL_TESTS%?5%=1
+set /A TESTLIB__CURRENT_TESTS%?2B%=1
+set /A TESTLIB__OVERALL_TESTS%?2B%=1
 
 if %TESTLIB__TEST_SETUP%0 EQU 0 (
   set TESTLIB__TEST_DO_TEARDOWN=1
@@ -104,8 +104,8 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.exit%TEST_SCRIPT_FI
 
 :TEST_REPORT
 if %LAST_ERROR% EQU 0 (
-  set /A TESTLIB__CURRENT_PASSED_TESTS%?5%=1
-  set /A TESTLIB__OVERALL_PASSED_TESTS%?5%=1
+  set /A TESTLIB__CURRENT_PASSED_TESTS%?2B%=1
+  set /A TESTLIB__OVERALL_PASSED_TESTS%?2B%=1
 )
 
 rem call user report script

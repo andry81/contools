@@ -22,7 +22,7 @@ if "%CURRENT_CP%" == "65000" (
 )
 
 rem workaround for the plus sign control character under a unicode codepage
-set "?5=+"
+set "?2B=+"
 
 rem restore back
 if defined CURRENT_CP ^
@@ -85,7 +85,7 @@ if %TESTLIB__NEST_LVL%0 EQU 0 (
 set TESTLIB__CURRENT_PASSED_TESTS=0
 set TESTLIB__CURRENT_TESTS=0
 
-set /A TESTLIB__NEST_LVL%?5%=1
+set /A TESTLIB__NEST_LVL%?2B%=1
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
 

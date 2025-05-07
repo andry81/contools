@@ -1,3 +1,10 @@
+2025.05.07:
+* new: Scripts/Tools/time: begin_time.bat, end_time.bat: scripts to calculate spent time in integral plus fractional part (secs.msecs, msecs.mcsecs, etc)
+* changed: Scripts/Tools/testlib: global improvement to use `?NN` as a variable hex representation of ascii character
+* changed: Scripts/Tests/bench: scripts reduction and minimization
+* changed: Scripts/Tests/manual: code cleanup
+* refactor: Scripts/Tools/time/time*.bat: scripts moved from the parent directory
+
 2025.05.05:
 * fixed: Scripts/Tools/std: expand_var.bat, set_var.bat: accept most of the control characters in a variable's name
 * changed: Scripts/Tools/std/expand_vars.bat: minor improvement
