@@ -165,7 +165,7 @@
 '''
 '''   * The `cmd.exe` command line parser use %-character expansion for all
 '''     parameters.
-'''     You must use, for example, the `-ra "%" "%?01%" -v "?01" "%"` options
+'''     You must use, for example, the `-ra "%" "%?25%" -v "?25" "%"` options
 '''     to workaround the issue for the `cmd.exe` command line.
 '''   * The `cmd.exe` command line parser treats the `,` character as command
 '''     line parameters separator additionally to the space character.

@@ -67,7 +67,7 @@ rem
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_DIR_TMP%%/callf.exe" ^
   /elevate{ /no-window }{ /attach-parent-console } ^
   /ret-child-exit /no-subst-pos-vars /no-esc ^
-  /ra "%%%%" "%%%%?01%%%%" /v "?01" "%%%%" ^
+  /ra "%%%%" "%%%%?25%%%%" /v "?25" "%%%%" ^
   /v FLAG_USE_CALLF_EXECUTABLE "%%FLAG_USE_CALLF_EXECUTABLE%%" ^
   /v CONTOOLS_UTILS_BIN_ROOT "%%CONTOOLS_UTILS_BIN_ROOT%%" ^
   /v TEMP_DIR "%%TEMP_DIR%%" ^
