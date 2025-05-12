@@ -1,3 +1,8 @@
+2025.05.13:
+* changed: Scripts/Tools/build/init_vars_file.bat: improved environment variables load
+* changed: Scripts/Tools/exec: improved scripts nested call without log attachment
+* changed: Scripts/Tools: minor refactor
+
 2025.05.12:
 * changed: global improvement to use `?NN` as a variable hex representation of ascii character
 

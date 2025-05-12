@@ -89,7 +89,7 @@ exit /b
 
 :IMPL
 if %ELEVATED% EQU 0 call :IS_ADMIN_ELEVATED || (
-  echo;%~nx0: error: process must be elevated before continue.
+  echo;%?~%: error: process must be elevated before continue.
   exit /b 255
 ) >&2
 

@@ -2,9 +2,8 @@
 
 setlocal
 
-rem script names call stack, disabled due to self call and partial inheritance (process elevation does not inherit a parent process variables by default)
-rem if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
-set "?~=%~nx0"
+rem script names call stack
+if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem cast to integer
 set /A IMPL_MODE+=0
@@ -36,6 +35,7 @@ rem   Otherwise use `callshift.bat` script to explicitly shift the rest of the c
 rem
 set FLAG_SHIFT=0
 
+set FLAG_NO_LOG=0
 set FLAG_LOG_STDIN=0
 set "CALLF_BARE_FLAGS="
 
@@ -48,7 +48,9 @@ if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if defined FLAG (
-  if "%FLAG%" == "-log-stdin" (
+  if "%FLAG%" == "-nolog" (
+    set FLAG_NO_LOG=1
+  ) else if "%FLAG%" == "-log-stdin" (
     set FLAG_LOG_STDIN=1
   ) else if "%FLAG%" == "-X" (
     set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% %2
@@ -66,19 +68,17 @@ if defined FLAG (
   if not "%FLAG%" == "--" goto FLAGS_LOOP
 )
 
-set FLAG_NO_LOG=0
-
 if %NO_GEN%0 NEQ 0 set FLAG_NO_LOG=1
 if %NO_LOG%0 NEQ 0 set FLAG_NO_LOG=1
 if %NO_LOG_OUTPUT%0 NEQ 0 set FLAG_NO_LOG=1
 
-if not exist "%PROJECT_LOG_DIR%\*" if %FLAG_NO_LOG% EQU 0 (
+if %FLAG_NO_LOG% EQU 0 if defined PROJECT_LOG_DIR if not exist "%PROJECT_LOG_DIR%\*" (
   echo;%?~%: error: can not use log while PROJECT_LOG_DIR does not exist: "%PROJECT_LOG_DIR%".
   exit /b 255
 ) >&2
 
 if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
-  echo;%?~%: error: can not use initial variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
+  echo;%?~%: error: can not use initial environment variables file while INIT_VARS_FILE does not exist: "%INIT_VARS_FILE%".
   exit /b 255
 ) >&2
 
