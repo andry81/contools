@@ -1,4 +1,9 @@
-@echo off
+@echo off & if not defined __STRING__ exit /b 0
+
+call "%%~dp0encode_asterisk_char.bat"
+
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__:?=$3F!") do endlocal & set "__STRING__=%%i"
+exit /b 0
 
 rem Encode these characters:
 rem  ?*         - globbing characters in the `for ... %%i in (...)` expression or in a command line
@@ -12,9 +17,6 @@ rem CAUTION:
 rem   Character `$` must be encoded separately BEFORE this script call!
 rem
 
-if not defined __STRING__ exit /b 0
-
-call "%%~dp0encode_asterisk_char.bat"
-
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__:?=$3F!") do endlocal & set "__STRING__=%%i"
-exit /b 0
+rem CAUTION:
+rem   Keep comments at the end of the script to speed up the parsing times!
+rem

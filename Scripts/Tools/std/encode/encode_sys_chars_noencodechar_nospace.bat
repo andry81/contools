@@ -1,21 +1,4 @@
-@echo off
-
-rem Encode these characters:
-rem  |&()<>     - control flow characters
-rem  "'`^%!+    - escape or sequence expand characters (`+` is a unicode codepoint sequence character in 65000 code page)
-rem  ?*         - globbing characters in the `for ... %%i in (...)` expression or in a command line
-rem  ,;=        - separator characters in the `for ... %%i in (...)` expression or in a command line
-
-rem CAUTION:
-rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
-rem   the `!` character will be expanded.
-rem
-
-rem CAUTION:
-rem   Character `$` must be encoded separately BEFORE this script call!
-rem
-
-if not defined __STRING__ exit /b 0
+@echo off & if not defined __STRING__ exit /b 0
 
 setlocal DISABLEDELAYEDEXPANSION & ^
 setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!__STRING__:"=$22!"
@@ -32,3 +15,34 @@ set "__STRING__=!__STRING__:^=$5E!" & set "__STRING__=!__STRING__:%%=$25!" & set
 set "__STRING__=!__STRING__:?=$3F!" & set "__STRING__=!__STRING__:,=$2C!"  & set "__STRING__=!__STRING__:;=$3B!" & ^
 for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & endlocal & set "__STRING__=%%i"
 exit /b 0
+
+rem Encode these characters:
+rem  |&()<>     - control flow characters
+rem  "'`^%!+    - escape or sequence expand characters (`+` is a unicode codepoint sequence character in 65000 code page)
+rem  ?*         - globbing characters in the `for ... %%i in (...)` expression or in a command line
+rem  ,;=        - separator characters in the `for ... %%i in (...)` expression or in a command line
+
+rem CAUTION:
+rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
+rem   the `!` character will be expanded.
+rem
+
+rem CAUTION:
+rem   Character `$` must be encoded separately BEFORE this script call!
+rem
+
+rem Encode these characters:
+rem  $          - encode character
+rem  |&()<>     - control flow characters
+rem  "'`^%!+    - escape or sequence expand characters (`+` is a unicode codepoint sequence character in 65000 code page)
+rem  ?*         - globbing characters in the `for ... %%i in (...)` expression or in a command line
+rem  ,;=        - separator characters in the `for ... %%i in (...)` expression or in a command line
+
+rem CAUTION:
+rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
+rem   the `!` character will be expanded.
+rem
+
+rem CAUTION:
+rem   Keep comments at the end of the script to speed up the parsing times!
+rem

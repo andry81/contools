@@ -1,4 +1,11 @@
-@echo off
+@echo off & if not defined __STRING__ exit /b 0
+
+call "%%~dp0decode_equal_char.bat"
+
+setlocal ENABLEDELAYEDEXPANSION & ^
+set "__STRING__=!__STRING__:$2C=,!" & set "__STRING__=!__STRING__:$38=;!" & ^
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "__STRING__=%%i"
+exit /b 0
 
 rem Decode these characters:
 rem  ,;=        - separator characters in the `for ... %%i in (...)` expression or in a command line
@@ -12,11 +19,6 @@ rem CAUTION:
 rem   Character `$` must be decoded separately AFTER this script call!
 rem
 
-if not defined __STRING__ exit /b 0
-
-call "%%~dp0decode_equal_char.bat"
-
-setlocal ENABLEDELAYEDEXPANSION & ^
-set "__STRING__=!__STRING__:$2C=,!" & set "__STRING__=!__STRING__:$38=;!" & ^
-for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "__STRING__=%%i"
-exit /b 0
+rem CAUTION:
+rem   Keep comments at the end of the script to speed up the parsing times!
+rem

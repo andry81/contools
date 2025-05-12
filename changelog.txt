@@ -1,3 +1,6 @@
+2025.05.12:
+* changed: Scripts/Tools/std/encode: scripts speed up
+
 2025.05.07:
 * new: Scripts/Tools/time: begin_time.bat, end_time.bat: scripts to calculate spent time in integral plus fractional part (secs.msecs, msecs.mcsecs, etc)
 * changed: Scripts/Tools/testlib: global improvement to use `?NN` as a variable hex representation of ascii character
