@@ -1,3 +1,6 @@
+2025.05.14:
+* refactor: Scripts/Tools: std, build: inner script documentation details
+
 2025.05.13:
 * changed: Scripts/Tools/build/init_vars_file.bat: improved environment variables load
 * changed: Scripts/Tools/exec: improved scripts nested call without log attachment

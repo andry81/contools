@@ -5,7 +5,19 @@ rem   xremove_file.bat <path>
 
 rem Description:
 rem   A file path delete script with echo and some conditions check before
-rem   call. Does support long paths.
+rem   call.
+rem
+rem   Does support long paths.
+rem
+rem   NOTE:
+rem     All input paths must be without `\\?\` prefix because:
+rem       1. Can be directly used in commands which does not support long paths
+rem          like builtin `dir` command.
+rem       2. Can be checked on absence of globbing characters which includes
+rem          `?` character.
+rem       3. The `%%~f` builtin variables extension and other extensions does
+rem          remove the prefix and then a path can be prefixed internally by
+rem          the script.
 
 rem <path>
 rem   Single file path.

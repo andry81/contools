@@ -6,6 +6,18 @@ rem   copy.bat [<flags>] [--] <from-path> <to-path> [<copy-flags>...]
 rem Description:
 rem   The builtin `copy` command wrapper script with echo and some conditions
 rem   check before call.
+rem
+rem   Does support long paths, but can not copy.
+rem
+rem   NOTE:
+rem     All input paths must be without `\\?\` prefix because:
+rem       1. Can be directly used in commands which does not support long paths
+rem          like builtin `dir` command.
+rem       2. Can be checked on absence of globbing characters which includes
+rem          `?` character.
+rem       3. The `%%~f` builtin variables extension and other extensions does
+rem          remove the prefix and then a path can be prefixed internally by
+rem          the script.
 
 rem <flags>:
 rem   -chcp <CodePage>

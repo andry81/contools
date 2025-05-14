@@ -8,6 +8,18 @@ rem   A build pipeline wrapper over builtin `mkdir` command with
 rem   echo, some conditions check, single long path workaround through the
 rem   `robocopy` executable utility and `EMPTY_DIR_TMP` variable.
 rem
+rem   Does support long paths, but falls back to `robocopy.exe` implementation.
+rem
+rem   NOTE:
+rem     All input paths must be without `\\?\` prefix because:
+rem       1. Can be directly used in commands which does not support long paths
+rem          like builtin `dir` command.
+rem       2. Can be checked on absence of globbing characters which includes
+rem          `?` character.
+rem       3. The `%%~f` builtin variables extension and other extensions does
+rem          remove the prefix and then a path can be prefixed internally by
+rem          the script.
+rem
 rem   Directory in the `EMPTY_DIR_TMP` variable must be not a long path.
 rem
 rem   Strict version, reports an error in case of unexisted drive or

@@ -7,6 +7,18 @@ rem Description:
 rem   The `xcopy.exe`/`robocopy.exe` seemless wrapper script with xcopy
 rem   compatible command line flags/excludes, echo and some conditions check
 rem   before call to copy a directory to a directory.
+rem
+rem   Does support long paths.
+rem
+rem   NOTE:
+rem     All input paths must be without `\\?\` prefix because:
+rem       1. Can be directly used in commands which does not support long paths
+rem          like builtin `dir` command.
+rem       2. Can be checked on absence of globbing characters which includes
+rem          `?` character.
+rem       3. The `%%~f` builtin variables extension and other extensions does
+rem          remove the prefix and then a path can be prefixed internally by
+rem          the script.
 
 rem CAUTION:
 rem   `xcopy.exe` has a file path limit up to 260 characters in a path. To

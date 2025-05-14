@@ -1,15 +1,30 @@
 @echo off
 
 rem Description:
-rem   Script xcopy files from a directory preserving relative paths to each file.
+rem   Script xcopy files from a source directory preserving relative paths to
+rem   each file in the target directory.
+rem
 rem   Script automatically does self logging.
+rem
+rem   Does support long paths, but not for the source directory.
+rem
+rem   NOTE:
+rem     All input paths must be without `\\?\` prefix because:
+rem       1. Can be directly used in commands which does not support long paths
+rem          like builtin `dir` command.
+rem       2. Can be checked on absence of globbing characters which includes
+rem          `?` character.
+rem       3. The `%%~f` builtin variables extension and other extensions does
+rem          remove the prefix and then a path can be prefixed internally by
+rem          the script.
 
 rem Usage:
 rem  <Command arguments>
 
 rem Command arguments:
-rem %1 - Path to directory with files including subdirectories.
-rem %2 - Path to directory with going to be copied files.
+rem %1 - Path to source directory with going to be copied files including
+rem      subdirectories.
+rem %2 - Path to target directory.
 rem %3 - Additional arguments for `xcopy.bat` script.
 rem %4-%N - Optional file pattern list for the `dir` command, ex: `"*.txt" "*.md"
 

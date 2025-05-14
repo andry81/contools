@@ -6,6 +6,18 @@ rem   xmove_dir.bat <from-path> <to-path> [<xmove-flags>...]
 rem Description:
 rem   A build pipeline wrapper over `xmove_dir.bat` script with bare flags from
 rem   `XMOVE_DIR_CMD_BARE_FLAGS` variable.
+rem
+rem   Does support long paths.
+rem
+rem   NOTE:
+rem     All input paths must be without `\\?\` prefix because:
+rem       1. Can be directly used in commands which does not support long paths
+rem          like builtin `dir` command.
+rem       2. Can be checked on absence of globbing characters which includes
+rem          `?` character.
+rem       3. The `%%~f` builtin variables extension and other extensions does
+rem          remove the prefix and then a path can be prefixed internally by
+rem          the script.
 
 setlocal
 

@@ -6,7 +6,19 @@ rem   del_file_pttn.bat <dir> <name-pttn> <ext-pttn> [<del-flags>...]
 rem Description:
 rem   The `del` wrapper script with echo and some conditions check before call.
 rem   Can remove a file by extended and separated patterns: dir+file+extention.
-rem   Does support long paths, but can not delete.
+rem
+rem   Does support long paths, but can not reach them from `<dir>` directory to
+rem   delete.
+rem
+rem   NOTE:
+rem     All input paths must be without `\\?\` prefix because:
+rem       1. Can be directly used in commands which does not support long paths
+rem          like builtin `dir` command.
+rem       2. Can be checked on absence of globbing characters which includes
+rem          `?` character.
+rem       3. The `%%~f` builtin variables extension and other extensions does
+rem          remove the prefix and then a path can be prefixed internally by
+rem          the script.
 
 rem <dir>
 rem   Directory path.
