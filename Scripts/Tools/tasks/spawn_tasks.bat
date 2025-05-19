@@ -5,6 +5,8 @@ rem   Script to spawn tasks in parallel but not greater than maximum.
 
 setlocal
 
+set "?~dp0=%~dp0"
+
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
@@ -32,7 +34,7 @@ if "%~4" == "" (
   exit /b -1
 ) >&2
 
-call "%%~dp0__init__.bat" || exit /b
+call "%%?~dp0%%__init__.bat" || exit /b
 
 set SPAWN_TASK_INDEX=0
 set RUNNING_TASKS_COUNTER=0
@@ -92,7 +94,7 @@ goto REPEAT_READ_LOOP
 
 :SPAWN_TASK
 rem the task spawner CAN decrement the counter to the negative value, this is not critical here
-start /B "" "%COMSPEC%" /c call "%%%%CONTOOLS_ROOT%%%%/std/callshift.bat" 3 "%~dp0task_spawner.bat" %*
+start /B "" "%COMSPEC%" /c @"%%CONTOOLS_ROOT%%/std/callshift.bat" 3 "%%?~dp0%%task_spawner.bat" %*
 
 set /A SPAWN_TASK_INDEX+=1
 

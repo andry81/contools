@@ -1,3 +1,6 @@
+2025.05.20:
+* fixed: Scripts/Tools/tasks/spawn_tasks.bat: execution fixup
+
 2025.05.14:
 * refactor: Scripts/Tools: std, build: inner script documentation details
 
