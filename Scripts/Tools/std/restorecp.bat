@@ -71,23 +71,14 @@ if not defined LAST_CP (
   del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>nul
 ) <nul
 
-set "__?CHCP_TEMP_FILE="
+if defined LAST_CP set "LAST_CP=%LAST_CP: =%"
 
 set "CURRENT_CP="
 for /F "tokens=1,* delims=|"eol^= %%i in ("%CP_HISTORY_LIST%") do set "CURRENT_CP=%%i" & set "CP_HISTORY_LIST=%%j"
 
-if not defined CURRENT_CP exit /b 0
-if "%CURRENT_CP%" == "%LAST_CP%" (
-  endlocal
-  set "LAST_CP=%LAST_CP%"
-  set "CURRENT_CP=%CURRENT_CP%"
-  set "CP_HISTORY_LIST=%CP_HISTORY_LIST%"
-  exit /b 0
-)
-
 rem echo;chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
 
-(
+if not "%CURRENT_CP%" == "%LAST_CP%" (
   if %FLAG_PRINT% NEQ 0 (
     "%__?CHCP_FILE%" %CURRENT_CP%
   ) else "%__?CHCP_FILE%" %CURRENT_CP% >nul
@@ -98,6 +89,5 @@ rem echo;chcp restore "%LAST_CP%" ^<- "%CURRENT_CP%" >&2
   set "LAST_CP=%LAST_CP%"
   set "CURRENT_CP=%CURRENT_CP%"
   set "CP_HISTORY_LIST=%CP_HISTORY_LIST%"
-  set "__?CHCP_FILE="
   exit /b 0
 )

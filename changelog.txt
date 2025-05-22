@@ -1,3 +1,16 @@
+2025.05.27:
+* fixed: Scripts/Tools/testlib: init.bat, test.bat, exit.bat: reimplemented to support execution over `65000` code page ("`+` character has a special meaning in `65000` codepage" : https://github.com/andry81/contools/discussions/20)
+* fixed: Scripts/Tools/testlib: save_locals.bat, load_locals.bat, update_locals.bat: use `65001` code page to save and load to circumvent code page change between calls
+* fixed: Scripts/Tools/testlib: init.bat, test.bat: the test setup has moved into `init.bat` script in case of an external setlocal/endlocal call
+* new: Scripts/Tools/testlib: getcp.bat, set_*_cp.bat: testlib scripts to temporary override a test script code page
+* new: Scripts/Tools/testlib: generate internal and return test variables after `init.bat`, `test.bat`, `exit.bat`, `report.bat` scripts call
+* changed: Scripts/Tools/testlib: init.bat, test.bat, exit.bat: reimplemented and simplified
+* changed: Scripts/Tools/testlib/save_locals.bat: code cleanup and improvement, saves internal variables at the last
+* changed: Scripts/Tools/testlib: code improvements to better support tests nesting
+* changed: Scripts/Tools/std: getcp.bat, restorecp.bat: code cleanup and minor improvement
+* changed: Scripts/Tools/std/chcp.bat: reimplemented and simplified
+* changed: Scripts/Tests/unit/batscripts: tests code refactor
+
 2025.05.25:
 * changed: README_EN.txt: readme update
 

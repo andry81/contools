@@ -25,88 +25,126 @@ rem     *teardown.bat - a test last time teardown handler.
 rem     *exit.bat - exit handler for a test, useful if required to copy test
 rem                 data out of a test script temporary output directory.
 rem
+rem CAUTION:
+rem   We must use an uniform code page to avod a code page change between calls
+rem   and so accidental recode on a file read/write.
+rem
 :DOC_END
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
+
+if %TESTLIB__INIT%0 EQU 0 (
+  echo;%~nx0: error: test is not initialized.
+  exit /b 255
+) >&2
+
+if not defined TESTLIB__CHCP_EXE (
+  echo;%~nx0: error: `TESTLIB__CHCP_EXE` is not initialized.
+  exit /b 255
+) >&2
+
+rem reread current code page for each test, before run and after run
+
+call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
 rem must be assigned not to 65000 codepage!
-if defined CURRENT_CP ^
-if "%CURRENT_CP%" == "65000" (
-  chcp 866 >nul
+call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
+
+set "TESTLIB__EXEC_ON_ENDLOCAL="
+
+call :MAIN %%*
+set TEST_LAST_ERROR=%ERRORLEVEL%
+
+call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
+call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" ^
+  TEST_LAST_ERROR TEST_IMPL_ERROR
+copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" >nul
+
+rem restore outter code page
+call "%%CONTOOLS_TESTLIB_ROOT%%/set_outter_cp.bat"
+
+rem Drop internal variables but use some changed value(s) for the return
+(
+  endlocal
+
+  set "TEST_LAST_ERROR=%TEST_LAST_ERROR%"
+  set "TESTLIB__OVERALL_PASSED_TESTS=%TESTLIB__OVERALL_PASSED_TESTS%"
+  set "TESTLIB__OVERALL_TESTS=%TESTLIB__OVERALL_TESTS%"
+  set "TESTLIB__CURRENT_PASSED_TESTS=%TESTLIB__CURRENT_PASSED_TESTS%"
+  set "TESTLIB__CURRENT_TESTS=%TESTLIB__CURRENT_TESTS%"
+
+  rem return user declared variables
+  %TESTLIB__EXEC_ON_ENDLOCAL%
 )
 
-rem workaround for the plus sign control character under a unicode codepage
-set "?2B=+"
+exit /b %TEST_LAST_ERROR%
 
-rem restore back
-if defined CURRENT_CP ^
-if "%CURRENT_CP%" == "65000" (
-  chcp 65000 >nul
-)
+:MAIN
+call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
 
-set LAST_ERROR=0
-set INTERRORLEVEL=0
-set "TEST_DATA_REF_FILE="
+rem return code from a user test script handler
+set TEST_LAST_ERROR=0
 
-call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat"
+rem return code from user test script implementation (`*impl.bat`)
+set TEST_IMPL_ERROR=0
 
-set /A TESTLIB__CURRENT_TESTS%?2B%=1
-set /A TESTLIB__OVERALL_TESTS%?2B%=1
-
-if %TESTLIB__TEST_SETUP%0 EQU 0 (
-  set TESTLIB__TEST_DO_TEARDOWN=1
-  call :TEST_SETUP || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT ) )
-  set TESTLIB__TEST_SETUP=0
-)
+set /A TESTLIB__CURRENT_TESTS+=1
+set /A TESTLIB__OVERALL_TESTS+=1
 
 rem call user initialization script
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.init%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "TEST_LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/init%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "TEST_LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/init%TEST_SCRIPT_FILE_EXT%" (
-    call "%%TEST_SCRIPT_HANDLERS_DIR%%/init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+    call "%%TEST_SCRIPT_HANDLERS_DIR%%/init%%TEST_SCRIPT_FILE_EXT%%" %%* || ( call set "TEST_LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
   )
 )
 
+rem restore outter code page
+call "%%CONTOOLS_TESTLIB_ROOT%%/set_outter_cp.bat"
+
 rem call user implementation script
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.impl%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.impl%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.impl%%TEST_SCRIPT_FILE_EXT%%" || ( call set "TEST_LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/impl%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/impl%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/impl%%TEST_SCRIPT_FILE_EXT%%" || ( call set "TEST_LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
 ) else (
   rem the one big IF+AND operator
   (
     if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" ( call; ) else call
   ) && (
-    echo 2
     if exist "%TEST_SCRIPT_HANDLERS_DIR%/impl%TEST_SCRIPT_FILE_EXT%" ( call; ) else call
   ) && (
-    echo 1
-    ( call "%%TEST_SCRIPT_HANDLERS_DIR%%/impl%%TEST_SCRIPT_FILE_EXT%%" ) || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
+    ( call "%%TEST_SCRIPT_HANDLERS_DIR%%/impl%%TEST_SCRIPT_FILE_EXT%%" ) || ( call set "TEST_LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_EXIT )
   )
 ) || (
-  echo;%?~%: error: test script implementation is not found: "%TEST_SCRIPT_FILE_NAME%".
-  set "LAST_ERROR=-255"
+  echo;%~nx0: error: test script implementation is not found: "%TEST_SCRIPT_FILE_NAME%".
+  set "TEST_LAST_ERROR=255"
 ) >&2
 
 :TEST_EXIT
 rem call user exit script
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.exit%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "TEST_LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/exit%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "TEST_LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/exit%TEST_SCRIPT_FILE_EXT%" (
-    call "%%TEST_SCRIPT_HANDLERS_DIR%%/exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
+    call "%%TEST_SCRIPT_HANDLERS_DIR%%/exit%%TEST_SCRIPT_FILE_EXT%%" || ( call set "TEST_LAST_ERROR=%%ERRORLEVEL%%" & goto TEST_REPORT )
   )
 )
 
 :TEST_REPORT
-if %LAST_ERROR% EQU 0 (
-  set /A TESTLIB__CURRENT_PASSED_TESTS%?2B%=1
-  set /A TESTLIB__OVERALL_PASSED_TESTS%?2B%=1
+call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
+
+rem must be assigned not to 65000 codepage!
+call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
+
+if %TEST_LAST_ERROR% EQU 0 (
+  set /A TESTLIB__CURRENT_PASSED_TESTS+=1
+  set /A TESTLIB__OVERALL_PASSED_TESTS+=1
 )
 
 rem call user report script
@@ -125,83 +163,48 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.report%TEST_SCRIPT_
   )
 )
 
-goto TEST_END
-
-:TEST_SETUP
-if %TESTLIB__TEST_SETUP%0 NEQ 0 exit /b -1
-set TESTLIB__TEST_SETUP=1
-set "TESTLIB__TEST_TEARDOWN="
-
-set LAST_ERROR=0
-set INTERRORLEVEL=0
-
-rem call user setup script
-if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.setup%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.setup%%TEST_SCRIPT_FILE_EXT%%" || exit /b
-) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/setup%TEST_SCRIPT_FILE_EXT%" (
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/setup%%TEST_SCRIPT_FILE_EXT%%" || exit /b
-) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
-  if exist "%TEST_SCRIPT_HANDLERS_DIR%/setup%TEST_SCRIPT_FILE_EXT%" (
-    call "%%TEST_SCRIPT_HANDLERS_DIR%%/setup%%TEST_SCRIPT_FILE_EXT%%" || exit /b
-  )
-)
-
-exit /b 0
-
-:TEST_END
+rem reset after load
 set "TESTLIB__EXEC_ON_ENDLOCAL="
 
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars" (
-  call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.return.vars"
-  for /F "usebackq eol=# tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars") do (
+  call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_RETURN_VARS_FILE_PATH%%" "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.return.vars"
+  copy /Y /B "%TEST_SCRIPT_RETURN_VARS_FILE_PATH%" + "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" >nul
+  move /Y "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" >nul
+  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.return.vars") do (
     set "__?RETURN_VAR_NAME=%%i"
     call :SET_EXEC_ON_ENDLOCAL
   )
 ) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars" (
-  call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/return.vars"
-  for /F "usebackq eol=# tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars") do (
+  call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_RETURN_VARS_FILE_PATH%%" "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/return.vars"
+  copy /Y /B "%TEST_SCRIPT_RETURN_VARS_FILE_PATH%" + "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" >nul
+  move /Y "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" >nul
+  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars") do (
     set "__?RETURN_VAR_NAME=%%i"
     call :SET_EXEC_ON_ENDLOCAL
   )
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/return.vars" (
-    call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_HANDLERS_DIR%%/return.vars"
-    for /F "usebackq eol=# tokens=* delims=" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/return.vars") do (
+    call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_RETURN_VARS_FILE_PATH%%" "%%TEST_SCRIPT_HANDLERS_DIR%%/return.vars"
+    copy /Y /B "%TEST_SCRIPT_RETURN_VARS_FILE_PATH%" + "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" >nul
+    move /Y "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" >nul
+    for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/return.vars") do (
       set "__?RETURN_VAR_NAME=%%i"
       call :SET_EXEC_ON_ENDLOCAL
     )
-  ) else call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
-) else call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
-
-goto EXIT
-
-:SET_EXEC_ON_ENDLOCAL
-if defined TESTLIB__EXEC_ON_ENDLOCAL (
-  setlocal ENABLEDELAYEDEXPANSION
-  for /F "tokens=* delims="eol^= %%i in ("!TESTLIB__EXEC_ON_ENDLOCAL!") do (
-    endlocal
-    call set TESTLIB__EXEC_ON_ENDLOCAL=%%i {{AND}} set "%%__?RETURN_VAR_NAME%%=%%%__?RETURN_VAR_NAME%%%"
   )
-) else call set TESTLIB__EXEC_ON_ENDLOCAL=set "%%__?RETURN_VAR_NAME%%=%%%__?RETURN_VAR_NAME%%%"
+)
 
 exit /b 0
 
-:EXIT
-if defined TESTLIB__EXEC_ON_ENDLOCAL set TESTLIB__EXEC_ON_ENDLOCAL=%TESTLIB__EXEC_ON_ENDLOCAL:{{AND}}=^&%
-
-rem Drop internal variables but use some changed value(s) for the return
-(
+:SET_EXEC_ON_ENDLOCAL
+if defined TESTLIB__EXEC_ON_ENDLOCAL (
+  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=1,* delims=|"eol^= %%i in ("!TESTLIB__EXEC_ON_ENDLOCAL!|!%__?RETURN_VAR_NAME%!") do (
+    endlocal
+    set TESTLIB__EXEC_ON_ENDLOCAL=%%i ^& set "%__?RETURN_VAR_NAME%=%%j"
+  )
+) else setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=1,* delims=|"eol^= %%i in (".|!%__?RETURN_VAR_NAME%!") do (
   endlocal
-
-  set "LAST_ERROR=%LAST_ERROR%"
-  set "TESTLIB__OVERALL_PASSED_TESTS=%TESTLIB__OVERALL_PASSED_TESTS%"
-  set "TESTLIB__OVERALL_TESTS=%TESTLIB__OVERALL_TESTS%"
-  set "TESTLIB__CURRENT_PASSED_TESTS=%TESTLIB__CURRENT_PASSED_TESTS%"
-  set "TESTLIB__CURRENT_TESTS=%TESTLIB__CURRENT_TESTS%"
-  set "TESTLIB__TEST_DO_TEARDOWN=%TESTLIB__TEST_DO_TEARDOWN%"
-
-  rem return user declared variables
-  %TESTLIB__EXEC_ON_ENDLOCAL%
+  set TESTLIB__EXEC_ON_ENDLOCAL=set "%__?RETURN_VAR_NAME%=%%j"
 )
 
-exit /b %LAST_ERROR%
+exit /b 0

@@ -17,15 +17,11 @@ setlocal EnableDelayedExpansion
 set __COUNTER1=1
 set __STRING_CHARS__=0
 
-for /L %%i in (1,1,1000) do (
-  call :SET %%i
-)
+for /L %%i in (1,1,1000) do call :SET %%i
 
 set __COUNTER1=1
 
-for /L %%i in (1,1,1000) do (
-  call :GET %%i
-)
+for /L %%i in (1,1,1000) do call :GET %%i
 
 echo;
 

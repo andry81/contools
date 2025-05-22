@@ -12,14 +12,17 @@ set __CTRL_SETLOCAL=1
 call "%%~dp0__init__/__init__.bat" || exit /b
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
-call :TEST chcp 65000 866 "866|"
-call :TEST chcp 65001 65000 "65000|866|"
-call :TEST restorecp 65000 65001 "866|"
-call :TEST restorecp 866 65000 ""
-call :TEST chcp 866 866 "866|"
-call :TEST chcp 866 866 "866|866|"
-call :TEST restorecp 866 866 "866|"
-call :TEST restorecp 866 866 ""
+call :TEST chcp 65000 "%%SETUP_CP%%" "%%SETUP_CP%%|"
+call :TEST chcp 65001 65000 "65000|%%SETUP_CP%%|"
+call :TEST restorecp 65000 65001 "%%SETUP_CP%%|"
+call :TEST restorecp "%%SETUP_CP%%" 65000 ""
+call :TEST chcp 866 "%%SETUP_CP%%" "%%SETUP_CP%%|"
+call :TEST chcp 866 866 "866|%%SETUP_CP%%|"
+call :TEST chcp 437 866 "866|866|%%SETUP_CP%%|"
+call :TEST restorecp 866 437 "866|%%SETUP_CP%%|"
+call :TEST restorecp 866 866 "%%SETUP_CP%%|"
+call :TEST restorecp "%%SETUP_CP%%" 866 ""
+call :TEST restorecp "%%SETUP_CP%%" 866 ""
 
 echo;
 

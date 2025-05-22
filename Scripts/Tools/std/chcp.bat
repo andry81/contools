@@ -67,8 +67,6 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
   set "__?CHCP_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%.txt"
 ) else set "__?CHCP_TEMP_FILE=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%.txt"
 
-if not defined CP_HISTORY_LIST goto INIT
-
 rem CAUTION:
 rem   Windows XP/7 implementation has an issue with stdin+stdout/stderr double redirection:
 rem     `call <nul >nul & call <nul >nul` or `call <nul 2>nul & call <nul 2>nul`
@@ -83,41 +81,23 @@ if not defined LAST_CP (
   for /F "usebackq tokens=1,* delims=:"eol^= %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
   del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>nul
 ) <nul
+
+if defined LAST_CP set "LAST_CP=%LAST_CP: =%"
+
 set "CP_HISTORY_LIST=%LAST_CP%|%CP_HISTORY_LIST%"
 set "CURRENT_CP=%CODE_PAGE%"
 
-goto UPDATECP
-
-:INIT
-set "LAST_CP="
-(
-  "%__?CHCP_FILE%" 2>nul > "%__?CHCP_TEMP_FILE%"
-  for /F "usebackq tokens=1,* delims=:"eol^= %%i in ("%__?CHCP_TEMP_FILE%") do set "LAST_CP=%%j"
-  del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>nul
-) <nul
-if defined LAST_CP set "LAST_CP=%LAST_CP: =%"
-
-set "CURRENT_CP=%CODE_PAGE%"
-set "CP_HISTORY_LIST=%LAST_CP%|"
-
-:UPDATECP
-set "__?CHCP_TEMP_FILE="
-
-if "%CURRENT_CP%" == "%LAST_CP%" goto EXIT
-
-(
+if not "%CURRENT_CP%" == "%LAST_CP%" (
   if %FLAG_PRINT% NEQ 0 (
     "%__?CHCP_FILE%" %CURRENT_CP% || set "CURRENT_CP=%LAST_CP%"
   ) else "%__?CHCP_FILE%" %CURRENT_CP% >nul || set "CURRENT_CP=%LAST_CP%"
 ) <nul
 
-:EXIT
 (
   endlocal
   set "LAST_CP=%LAST_CP%"
   set "CURRENT_CP=%CURRENT_CP%"
   set "CP_HISTORY_LIST=%CP_HISTORY_LIST%"
-  set "__?CHCP_FILE="
 )
 
 exit /b 0

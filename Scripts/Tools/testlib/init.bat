@@ -11,39 +11,106 @@ rem   The second argument (optional) can point to a directory with user handler
 rem   scripts. Can be absolute or relative. If is a relative then relative to
 rem   the directory path from the first argument.
 rem
+rem CAUTION:
+rem   We must use an uniform code page to avod a code page change between calls
+rem   and so accidental recode on a file read/write.
+rem
+rem CAUTION:
+rem   The script can be nest called, but nesting is limited up to 31 calls.
+rem
+rem CAUTION:
+rem   If the script is returned the zero code, then you must call to `exit.bat`
+rem   respectively, otherwise the code page may be left changed.
 :DOC_END
 
-rem initialize testlib "module"
+rem initialize testlib module
 call "%%~dp0__init__.bat" || exit /b
 
+if %TESTLIB__INIT%0 GEQ 320 (
+  echo;%~nx0: error: test initialization is reached the nest limit: 31.
+  exit /b 255
+) >&2
+
+rem reread current code page for each test, before init and after init
+
+set "TESTLIB__CHCP_EXE="
+if exist "%SystemRoot%\System32\chcp.com" set "TESTLIB__CHCP_EXE=%SystemRoot%\System32\chcp.com"
+if not defined TESTLIB__CHCP_EXE if exist "%SystemRoot%\System64\chcp.com" set "TESTLIB__CHCP_EXE=%SystemRoot%\System64\chcp.com"
+
+if not defined TESTLIB__CHCP_EXE  (
+  echo;%~nx0: error: `chcp.com` is not found.
+  exit /b 255
+) >&2
+
+call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
+
+rem previous code page before init
+set "TESTLIB__PREV_CP=%TESTLIB__TEST_CP%"
+
 rem must be assigned not to 65000 codepage!
-if defined CURRENT_CP ^
-if "%CURRENT_CP%" == "65000" (
-  chcp 866 >nul
+call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
+
+call :MAIN %%*
+set TEST_LAST_ERROR=%ERRORLEVEL%
+
+:EXIT_MAIN
+if %TESTLIB__TEST_SETUP%0 EQU 0 goto SKIP_UPDATE_CURRENT_CP
+
+call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
+
+:SKIP_UPDATE_CURRENT_CP
+
+if %TEST_LAST_ERROR% NEQ 0 (
+  call "%%CONTOOLS_TESTLIB_ROOT%%/set_prev_cp.bat"
+  rem calls to `set_inner_cp.bat` at the beginning
+  call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" ^
+    TEST_LAST_ERROR TESTLIB__INIT TESTLIB__INIT_INDEX TESTLIB__TEST_SETUP TESTLIB__PREV_CP TESTLIB__TEST_CP
+  copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_INIT_VARS_FILE_PATH%" >nul
+  exit /b %TEST_LAST_ERROR%
 )
 
-rem workaround for the plus sign control character under a unicode codepage
-set "?2B=+"
+set /A TESTLIB__INIT+=1
+set /A TESTLIB__INIT_INDEX+=1
 
-rem restore back
-if defined CURRENT_CP ^
-if "%CURRENT_CP%" == "65000" (
-  chcp 65000 >nul
-)
+rem calls to `set_inner_cp.bat` at the beginning
+call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" ^
+  TEST_LAST_ERROR TESTLIB__INIT TESTLIB__INIT_INDEX TESTLIB__TEST_SETUP TESTLIB__PREV_CP TESTLIB__TEST_CP
+copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_INIT_VARS_FILE_PATH%" >nul
 
-set "TEST_SCRIPT_FILE_PATH=%~1"
-if defined TEST_SCRIPT_FILE_PATH ^
-if "%TEST_SCRIPT_FILE_PATH:~1,1%" == ":" goto TEST_SCRIPT_FILE_PATH_OK
+rem restore outter code page
+call "%%CONTOOLS_TESTLIB_ROOT%%/set_outter_cp.bat"
+
+exit /b 0
+
+:MAIN
+call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
+
+rem cast to integer
+set /A "TESTLIB__INIT+=0"       & rem nest level
+set /A "TESTLIB__INIT_INDEX+=0" & rem init index
+set /A "TESTLIB__TEST_SETUP+=0" & rem bitmask, 31 bits
+
+set "TEST_SCRIPT_FILE_PATH_=%~1"
+set "TEST_SCRIPT_HANDLERS_DIR=%~2"
+
+if defined TEST_SCRIPT_FILE_PATH_ if "%TEST_SCRIPT_FILE_PATH_:~1,1%" == ":" goto TEST_SCRIPT_FILE_PATH_OK
 
 (
-  echo;%~nx0: error: test script file path is empty or not absolute: "%TEST_SCRIPT_FILE_PATH%".
-  exit /b -255
+  echo;%~nx0: error: test script file path is empty or not absolute: "%TEST_SCRIPT_FILE_PATH_%".
+  exit /b 255
 ) >&2
 
 :TEST_SCRIPT_FILE_PATH_OK
 
 rem shortcuts to the user test script file name
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%* || exit /b
+
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_def.bat" TEST_SCRIPT_FILE_PATH "%%TEST_SCRIPT_FILE_PATH%%"
+
+if /i "%TEST_SCRIPT_FILE_PATH%" == "%?~f0%" (
+  echo;%~nx0: error: test script file path already initialized: "%TEST_SCRIPT_FILE_PATH%".
+  exit /b 255
+) >&2
 
 rem make builtin canonical user script path variables
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_PATH "%%?~f0%%"
@@ -52,17 +119,28 @@ set "TEST_SCRIPT_FILE_NAME=%?~n0%"
 set "TEST_SCRIPT_FILE_EXT=%?~x0%"
 set "TEST_SCRIPT_FILE=%?~nx0%"
 
+set "TEST_SCRIPT_NEST_LVL_DIR_NAME=%TESTLIB__INIT%"
+set "TEST_SCRIPT_INDEX_DIR_NAME=%TESTLIB__INIT_INDEX%"
+
+if "%TEST_SCRIPT_NEST_LVL_DIR_NAME:~1,1%" == "" set "TEST_SCRIPT_NEST_LVL_DIR_NAME=0%TEST_SCRIPT_NEST_LVL_DIR_NAME%"
+if "%TEST_SCRIPT_INDEX_DIR_NAME:~2,1%" == "" set "TEST_SCRIPT_INDEX_DIR_NAME=0%TEST_SCRIPT_INDEX_DIR_NAME%"
+if "%TEST_SCRIPT_INDEX_DIR_NAME:~2,1%" == "" set "TEST_SCRIPT_INDEX_DIR_NAME=0%TEST_SCRIPT_INDEX_DIR_NAME%"
+
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_DIR "%%?~dp0%%"
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_OUTPUT_DIR       "%%TEST_SCRIPT_FILE_DIR%%/_out"
-call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_LOCAL_TEMP_DIR   "%%TEST_SCRIPT_OUTPUT_DIR%%/_temp"
+rem defined ONCE
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_OUTPUT_DIR      "%%TEST_SCRIPT_FILE_DIR%%/_out"
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_LOCAL_TEMP_DIR  "%%TEST_SCRIPT_OUTPUT_DIR%%/temp"
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VARS_DIR          "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%/test_return_vars"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VARS_FILE_PATH    "%%TEST_SCRIPT_RETURN_VARS_DIR%%/vars.txt"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VALUES_FILE_PATH  "%%TEST_SCRIPT_RETURN_VARS_DIR%%/values.txt"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_LOCK_FILE_PATH    "%%TEST_SCRIPT_RETURN_VARS_DIR%%/.lock"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_DIR              "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%/shared"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_LOCAL_DIR               "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%/local/%%TEST_SCRIPT_INDEX_DIR_NAME%%--%%TEST_SCRIPT_NEST_LVL_DIR_NAME%%--%%TEST_SCRIPT_FILE_NAME%%"
 
-set "TEST_SCRIPT_HANDLERS_DIR=%~2"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_VARS_FILE_PATH   "%%TEST_SCRIPT_SHARED_DIR%%/test.vars"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP "%%TEST_SCRIPT_SHARED_DIR%%/test.tmp.vars"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_INIT_VARS_FILE_PATH     "%%TEST_SCRIPT_LOCAL_DIR%%/00-init.vars"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_TEST_VARS_FILE_PATH     "%%TEST_SCRIPT_LOCAL_DIR%%/01-test.vars"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_EXIT_VARS_FILE_PATH     "%%TEST_SCRIPT_LOCAL_DIR%%/02-exit.vars"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_RETURN_VARS_FILE_PATH   "%%TEST_SCRIPT_LOCAL_DIR%%/03-return.vars"
 
 if not defined TEST_SCRIPT_HANDLERS_DIR (
   set "TEST_SCRIPT_HANDLERS_DIR=%TEST_SCRIPT_FILE_DIR%"
@@ -71,36 +149,42 @@ if not defined TEST_SCRIPT_HANDLERS_DIR (
   call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_HANDLERS_DIR "%%TEST_SCRIPT_FILE_DIR%%/%%TEST_SCRIPT_HANDLERS_DIR%%"
 )
 
-if not defined TESTLIB__NEST_LVL set TESTLIB__NEST_LVL=0
-if not defined TESTLIB__TEST_DO_TEARDOWN set TESTLIB__TEST_DO_TEARDOWN=0
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_OUTPUT_DIR%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_LOCAL_DIR%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_SHARED_DIR%%" || exit /b
 
-if %TESTLIB__NEST_LVL%0 EQU 0 (
-  call "%%CONTOOLS_ROOT%%/std/rmdir_if_exist.bat" "%%TEST_SCRIPT_RETURN_VARS_DIR%%" /S /Q
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_OUTPUT_DIR%%" || exit /b
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%" || exit /b
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_RETURN_VARS_DIR%%" || exit /b
-  set TESTLIB__OVERALL_PASSED_TESTS=0
-  set TESTLIB__OVERALL_TESTS=0
-) else call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat"
+type nul > "%TEST_SCRIPT_INIT_VARS_FILE_PATH%"
+if exist "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" del /F /Q /A:-D "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" >nul
+if exist "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" del /F /Q /A:-D "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" >nul
 
-set TESTLIB__CURRENT_PASSED_TESTS=0
-set TESTLIB__CURRENT_TESTS=0
+rem case to integer
+set /A TESTLIB__OVERALL_PASSED_TESTS+=0
+set /A TESTLIB__OVERALL_TESTS+=0
 
-set /A TESTLIB__NEST_LVL%?2B%=1
+set /A TESTLIB__CURRENT_PASSED_TESTS+=0
+set /A TESTLIB__CURRENT_TESTS+=0
 
-call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat"
-
-rem return code from user test script
-set LAST_ERROR=0
-
-rem return code from user test script implementation
-set INTERRORLEVEL=0
+call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
+copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_INIT_VARS_FILE_PATH%" >nul
 
 echo Running %?~nx0%...
 echo;
 
-call "%%CONTOOLS_ROOT%%/std/setshift.bat" -skip 1 1 TEST_TITLE %%?~nx0%% %%*
+call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 1 1 title %%?~nx0%% %%*
 
-setlocal DISABLEDELAYEDEXPANSION & ^
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!TEST_TITLE!") do endlocal & title %%i
+:TEST_SETUP
+rem call user setup script
+if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.setup%TEST_SCRIPT_FILE_EXT%" (
+  set /A "TESTLIB__TEST_SETUP|=1 << TESTLIB__INIT"
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.setup%%TEST_SCRIPT_FILE_EXT%%" || exit /b
+) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/setup%TEST_SCRIPT_FILE_EXT%" (
+  set /A "TESTLIB__TEST_SETUP|=1 << TESTLIB__INIT"
+  call "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/setup%%TEST_SCRIPT_FILE_EXT%%" || exit /b
+) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
+  if exist "%TEST_SCRIPT_HANDLERS_DIR%/setup%TEST_SCRIPT_FILE_EXT%" (
+    set /A "TESTLIB__TEST_SETUP|=1 << TESTLIB__INIT"
+    call "%%TEST_SCRIPT_HANDLERS_DIR%%/setup%%TEST_SCRIPT_FILE_EXT%%" || exit /b
+  )
+)
+
 exit /b 0

@@ -1,15 +1,13 @@
 @echo off
 
-call :GET_ABSOLUTE_PATH "%%TEST_DATA_BASE_DIR%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_REF_DIR%%"
-set "TEST_DATA_REF_DIR_ROOT=%RETURN_VALUE%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_REF_DIR_ROOT "%%TEST_DATA_BASE_DIR%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_REF_DIR%%"
 
 set "TEST_DATA_DIR_LIST_FILE=%TEST_DATA_REF_DIR_ROOT%\dir.lst"
 set "TEST_DATA_OUTPUT_FILE_NAME_PTTN=output{{INDEX}}.txt"
 set "TEST_DATA_ALLOC_SCRIPT_FILE=%TEST_DATA_REF_DIR_ROOT%\allocate.bat"
 set "TEST_DATA_FREE_SCRIPT_FILE=%TEST_DATA_REF_DIR_ROOT%\free.bat"
 
-call :GET_ABSOLUTE_PATH "%%TEST_TEMP_DIR%%\output.txt"
-set "TEST_DATA_OUT_FILE=%RETURN_VALUE%"
+rem call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_OUT_FILE "%%TEST_TEMP_DIR%%\output.txt"
 
 rem make an allocation
 call "%%TEST_DATA_ALLOC_SCRIPT_FILE%%"
@@ -63,8 +61,4 @@ if %ERRORLEVEL% NEQ 0 exit /b 5
 
 set /A DIR_INDEX+=1
 
-exit /b 0
-
-:GET_ABSOLUTE_PATH
-set "RETURN_VALUE=%~f1"
 exit /b 0
