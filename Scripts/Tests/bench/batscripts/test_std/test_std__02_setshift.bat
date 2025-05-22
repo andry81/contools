@@ -10,9 +10,7 @@ setlocal DISABLEDELAYEDEXPANSION
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-for /L %%i in (1,1,10) do (
-  call "%%CONTOOLS_ROOT%%/std/setshift.bat" 0 x rem
-)
+for /L %%i in (1,1,10) do call "%%CONTOOLS_ROOT%%/std/setshift.bat" 0 x rem
 
 call "%%CONTOOLS_ROOT%%/time/end_time.bat" 10
 
