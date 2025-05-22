@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   reset_shortcut_from_dir.bat [<Flags>] [--] <LINKS_DIR>
@@ -72,6 +72,7 @@ rem CAUTION:
 rem   Base `CreateShortcut` method does not support all Unicode characters nor
 rem   `search-ms` Windows Explorer moniker path for the filter field.
 rem   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
+:DOC_END
 
 setlocal
 

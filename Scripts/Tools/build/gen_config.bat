@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   gen_config.bat [<flags>] [--] <InputDir> <OutputDir> <ConfigFileName>
@@ -58,6 +58,7 @@ rem   Must be not empty and exist.
 rem <ConfigFileName>:
 rem   Input/Output configuration file.
 rem   Must not contain `.in` suffix.
+:DOC_END
 
 setlocal
 

@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script reads version of msys dll and sets variable MSYS_VER_STR
@@ -23,6 +23,7 @@ rem %2 - Path to msys directory.
 rem Examples:
 rem 1. call msysver.bat msys "c:\msys\1.0"
 rem    echo MSYS_VER_STR=%MSYS_VER_STR%
+:DOC_END
 
 rem Drop output values before request
 set "MSYS_VER_STR="

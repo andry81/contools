@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script reads a shortcut target path property.
@@ -36,6 +36,7 @@ rem   Path to shortcut file.
 rem CAUTION:
 rem   Base `CreateShortcut` method does not support all Unicode characters.
 rem   Use `GetLink` property (`-use_getlink` flag) instead to workaround that.
+:DOC_END
 
 rem drop return value
 set "RETURN_VALUE="

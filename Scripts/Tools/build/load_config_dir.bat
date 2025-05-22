@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   load_config_dir.bat [<Flags>] [--] <InputDir> <OutputDir> [<Param0> [<Param1>]]
@@ -64,6 +64,7 @@ rem   Can be empty, then `<InputDir>` is used instead.
 
 rem NOTE:
 rem   All the rest parameters is in the `load_config.bat` script.
+:DOC_END
 
 set "__?~dp0=%~dp0"
 

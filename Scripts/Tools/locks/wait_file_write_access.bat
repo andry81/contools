@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   wait_file_write_access.bat <file-path> [<wait-timeout-msec>|-1]
@@ -28,6 +28,7 @@ rem   * Can sleep on a specified timeout in milliseconds between checks.
 
 rem Cons:
 rem   * Does not support long paths (but detects them to exit correctly).
+:DOC_END
 
 setlocal
 

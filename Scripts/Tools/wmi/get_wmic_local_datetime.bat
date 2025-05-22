@@ -1,5 +1,19 @@
 @echo off
 
+rem drop return value
+set "RETURN_VALUE="
+
+rem Drop last error level
+call;
+
+rem CAUTION:
+rem   `for /F` does not return a command error code
+for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_OperatingSystem get LocalDateTime /VALUE 2^>nul`) do if "%%i" == "LocalDateTime" set "RETURN_VALUE=%%j"
+
+if defined RETURN_VALUE ( set "RETURN_VALUE=%RETURN_VALUE:~0,18%" & exit /b 0 )
+
+exit /b 1
+
 rem Description:
 rem   Independent to Windows locale date/time request.
 
@@ -18,17 +32,3 @@ rem       or the /output switch, wmic will use UCS-2 LE BOM
 rem     * If you send the output to the console or to a pipe, wmic will use OEM
 rem       codepage
 rem
-
-rem drop return value
-set "RETURN_VALUE="
-
-rem Drop last error level
-call;
-
-rem CAUTION:
-rem   `for /F` does not return a command error code
-for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_OperatingSystem get LocalDateTime /VALUE 2^>nul`) do if "%%i" == "LocalDateTime" set "RETURN_VALUE=%%j"
-
-if defined RETURN_VALUE ( set "RETURN_VALUE=%RETURN_VALUE:~0,18%" & exit /b 0 )
-
-exit /b 1

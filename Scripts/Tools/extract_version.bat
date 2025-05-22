@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script reads a version string and sets variable RETURN_VALUE
@@ -30,6 +30,7 @@ rem 2. call extract_version.bat "1.3.30c.10" -d
 rem    echo VER_STR=%RETURN_VALUE%
 rem output: 1.3.30.10
 rem
+:DOC_END
 
 rem Drop return value
 set RETURN_VALUE=

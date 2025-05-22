@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script can check a directory existence in case of the read permissions
@@ -18,6 +18,7 @@ rem          the script.
 
 rem Based on:
 rem   https://stackoverflow.com/questions/138981/how-to-test-if-a-file-is-a-directory-in-a-batch-script/3728742#3728742
+:DOC_END
 
 setlocal
 

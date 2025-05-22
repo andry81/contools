@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   del_file_if_exist.bat <path> [<del-flags>...]
@@ -24,6 +24,7 @@ rem   Single file path.
 
 rem <del-flags>:
 rem   Command line flags to pass into builtin `del` command.
+:DOC_END
 
 echo;^>%~nx0 %*
 

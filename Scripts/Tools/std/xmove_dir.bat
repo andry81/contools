@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   xmove_dir.bat [<flags>] [--] <from-path> <to-path> [<xmove-flags>...]
@@ -88,6 +88,7 @@ rem   To directory path.
 
 rem <xmove-flags>:
 rem   Command line flags to pass into subsequent commands and utilities.
+:DOC_END
 
 echo;^>%~nx0 %*
 

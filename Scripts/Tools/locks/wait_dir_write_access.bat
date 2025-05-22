@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   wait_dir_write_access.bat <dir-path> [<wait-timeout-msec>|-1]
@@ -25,6 +25,7 @@ rem   * Can sleep on a specified timeout in milliseconds between checks.
 rem Cons:
 rem   * Does not support directories in nested directories including
 rem     subdirectories in `<dir-path>` directory.
+:DOC_END
 
 setlocal
 

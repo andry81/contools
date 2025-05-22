@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script converts unform file/directory excludes list in format of
@@ -20,6 +20,7 @@ rem CAUTION:
 rem   1. The excludes directory list does NOT differ to the excludes file list because
 rem      the xcopy utility has the common flags for both the files and the directories.
 rem   2. Exclude parameters should not contain not printable or control characters.
+:DOC_END
 
 setlocal
 

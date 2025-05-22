@@ -1,7 +1,8 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   sleep.bat [-vbs] <timeout-msec>
+:DOC_END
 
 setlocal
 

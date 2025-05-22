@@ -1,9 +1,10 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Loads variables from a file using exclusion list with builtin and
 rem   specific custom variables.
 rem   Additionally filters out internal variables beginning by `?` prefix.
+:DOC_END
 
 for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do call :FILTER "%%i" && set "%%i=%%j"
 exit /b 0

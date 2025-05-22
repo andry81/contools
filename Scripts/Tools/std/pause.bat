@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem DESCRIPTION:
 rem   Sets the code page to the last known (`%LAST_CP%`) after a code page restore routine (basically after a call to the
@@ -9,6 +9,7 @@ rem
 rem NOTE:
 rem   Script does not change the error level because restores it internally
 rem
+:DOC_END
 
 setlocal & set "LAST_ERROR=%ERRORLEVEL%"
 

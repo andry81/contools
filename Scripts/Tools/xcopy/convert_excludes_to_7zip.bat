@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script converts unform file/directory excludes list in format of
@@ -14,6 +14,7 @@ rem
 rem   2. # NEW FORMAT: to exclude wildcards beginning by `@` or use exclude list file name beginning by `@`
 rem      >
 rem      call convert_excludes_to_7zip.bat "/@excludes_file_list.lst|:@file|:@file*" "/@excludes_dir_list.lst|:@dir|:@dir*"
+:DOC_END
 
 rem Drop return value
 set "RETURN_VALUE="

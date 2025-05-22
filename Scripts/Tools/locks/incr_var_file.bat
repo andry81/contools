@@ -1,7 +1,8 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script to exclusively increment a file integral value.
+:DOC_END
 
 setlocal
 

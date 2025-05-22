@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script outputs subkeys of registry key by read and parse output of
@@ -13,6 +13,7 @@ rem %1 - Registry key path.
 rem Examples:
 rem 1. call regenum.bat "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft"
 rem 2. call regenum.bat "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\"
+:DOC_END
 
 rem Drop last error level
 call;

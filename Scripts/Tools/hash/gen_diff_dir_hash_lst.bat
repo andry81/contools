@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Directory file hashes difference generation script.
@@ -12,6 +12,7 @@ rem Examples:
 rem 1. call gen_dir_hash_lst.bat . > dir_hash_list.lst
 rem    call gen_diff_dir_hash_lst.bat . dir_hash_list.lst > dir_hash_list_diff.lst
 rem    type dir_hash_list_diff.lst
+:DOC_END
 
 setlocal
 

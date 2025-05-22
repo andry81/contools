@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script for rebuilding the python cache files (*.pyc) for the portable
@@ -36,6 +36,7 @@ rem Examples:
 rem   1. call rebuild_portable_pycache.bat "c:\Python36" "c:\Python36\Lib\site-packages"
 rem   2. call rebuild_portable_pycache.bat -exclude_dirs "__pycache__|__pycache__/37" "c:\Python36" "c:\Python36\Lib\site-packages"
 rem
+:DOC_END
 
 setlocal
 

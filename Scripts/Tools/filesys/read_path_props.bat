@@ -1,8 +1,9 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script reads a path property values.
 rem   OS: Windows XP+
+:DOC_END
 
 rem drop return value
 set "RETURN_VALUE="

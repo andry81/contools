@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Directory file hashes generation script.
@@ -8,6 +8,7 @@ rem     <size>,<Hash1>,<Hash2>,...,<HashN>,<path>
 
 rem Examples:
 rem 1. call gen_dir_hash_lst.bat -c "md5,sha256" -l -r . > dir_hash_list.lst
+:DOC_END
 
 setlocal
 

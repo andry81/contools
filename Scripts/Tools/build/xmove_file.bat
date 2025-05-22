@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   xmove_file.bat <from-path> <from-file-pttn> <to-path> [<xmove-flags>...]
@@ -18,6 +18,7 @@ rem          `?` character.
 rem       3. The `%%~f` builtin variables extension and other extensions does
 rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
+:DOC_END
 
 setlocal
 

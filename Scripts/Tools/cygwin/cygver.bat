@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script reads version of cygwin package and sets variable CYGWIN_VER_STR
@@ -25,6 +25,7 @@ rem 1. call cygver.bat cygwin "c:\cygwin"
 rem    echo CYGWIN_VER_STR=%CYGWIN_VER_STR%
 rem 2. call cygver.bat cygwin-doc "c:\cygwin"
 rem    echo CYGWIN_VER_STR=%CYGWIN_VER_STR%
+:DOC_END
 
 rem Drop output values before request
 set "CYGWIN_VER_STR="

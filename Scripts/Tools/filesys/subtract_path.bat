@@ -1,6 +1,7 @@
-@echo off
+@echo off & goto DOC_END
 
 rem <TO_PATH_SUFFIX> = <TO_PATH> - <FROM_PATH>
+:DOC_END
 
 rem drop return value
 set "RETURN_VALUE="

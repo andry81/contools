@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   load_cmdline.bat <outvar> <cmdline-file>
@@ -13,6 +13,7 @@ rem   Output variable name.
 
 rem <cmdline-file>:
 rem   Command line file path.
+:DOC_END
 
 rem reset output variable
 if not "%~1" == "" if defined %~1 set "%~1="

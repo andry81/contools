@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   xcopy_dir.bat <from-path> <to-path> [<xcopy-flags>...]
@@ -20,6 +20,7 @@ rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 rem
 rem   Creates `<to-path>` directory if does not exist.
+:DOC_END
 
 setlocal
 

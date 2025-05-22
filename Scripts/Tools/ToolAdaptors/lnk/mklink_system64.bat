@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script creates `System64` directory additionally to the `Sysnative`,
@@ -17,6 +17,7 @@ rem   For those not server Windows systems or server Windows systems less than
 rem   Windows Server 2003 you have to install at least
 rem   "Windows Server 2003 Resource Kit Tools" to set the tool "linkd.exe"
 rem   available otherwise the script won't work properly.
+:DOC_END
 
 setlocal
 

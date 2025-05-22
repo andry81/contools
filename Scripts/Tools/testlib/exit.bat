@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   The tests exit script. Must be called one time in a user test script
@@ -7,6 +7,7 @@ rem   after the last call to the `test.bat` script.
 rem CAUTION:
 rem   This script must be called without the `call` prefix!
 rem
+:DOC_END
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat"
 

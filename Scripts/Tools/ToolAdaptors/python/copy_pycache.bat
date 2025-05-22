@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script for __pycache__ (.pyc) files copy from source directory into
@@ -24,6 +24,7 @@ rem      call copy_pycache.bat -prefix_dirs "__pycache__|__pycache__/37" -suffix
 rem   3. mkdir "c:\Python36\Lib\site-packages.pycache_copy"
 rem      call copy_pycache.bat -prefix_dirs "" -suffix_names "" "c:\Python36\Lib\site-packages" "c:\Python36\Lib\site-packages.pycache_copy"
 rem
+:DOC_END
 
 setlocal
 

@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   xcopy_dir.bat [<flags>] [--] <from-path> <to-path> [<xcopy-flags>...]
@@ -76,6 +76,7 @@ rem   To directory path.
 
 rem <xcopy-flags>:
 rem   Command line flags to pass into subsequent utilities.
+:DOC_END
 
 echo;^>%~nx0 %*
 

@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   wait_dir_files_write_access.bat <dir-path> [<wait-timeout-msec>|-1]
@@ -31,6 +31,7 @@ rem   * Does not support empty directory. At least one file must exist.
 rem   * Does not support long paths (but detects them to exit correctly).
 rem   * Does not support files and directories in nested directories
 rem     including subdirectories in `<dir-path>` directory.
+:DOC_END
 
 setlocal
 

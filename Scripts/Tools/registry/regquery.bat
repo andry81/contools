@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script reads and parses standard output of "reg.exe query" to variable
@@ -22,6 +22,7 @@ rem    -t - Just tests key or value on existance.
 rem Examples:
 rem 1. call regquery.bat "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Command Processor" EnableExtensions
 rem    echo REGQUERY_VALUE=%REGQUERY_VALUE%
+:DOC_END
 
 rem Drop REGQUERY_VALUE variable
 set "REGQUERY_VALUE="

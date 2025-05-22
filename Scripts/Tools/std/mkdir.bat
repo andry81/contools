@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   mkdir.bat <path>...
@@ -24,6 +24,7 @@ rem   disconnected symbolic reference to a directory.
 
 rem <path>...
 rem   Directory path list.
+:DOC_END
 
 if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 

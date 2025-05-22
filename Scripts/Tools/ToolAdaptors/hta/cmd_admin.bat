@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   cmd_admin.bat <cmdline>...
@@ -8,6 +8,7 @@ rem   Script runs `cmd.exe` under UAC promotion using `mshta.exe` executable
 rem   and command line to `COMSPEC` executable.
 
 rem Example: cmd_admin.bat /k echo 123
+:DOC_END
 
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%

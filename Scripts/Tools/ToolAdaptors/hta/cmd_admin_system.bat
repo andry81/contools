@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   cmd_admin_system.bat <cmdline>...
@@ -9,6 +9,7 @@ rem   executable and command line to `COMSPEC` executable.
 rem   Requires `psexec.exe` in the `PATH` or in the `PSEXEC` variable.
 
 rem Example: cmd_admin_system.bat /k echo 123
+:DOC_END
 
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%

@@ -1,9 +1,10 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script converts all files in directory with script by wildcards
 rem   "*.*sh.;configure.*.;makefile.*." from the Unix text format to the Dos
 rem   text format using the unix2dos utility.
+:DOC_END
 
 rem Create local variable's stack
 setlocal

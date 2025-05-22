@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   check_config_expiration.bat [<flags>] [--] <InputFile> <OutputFile>
@@ -21,6 +21,7 @@ rem   Input configuration file path.
 rem <OutputFile>:
 rem   Output configuration file path.
 rem   Must exist if `-optional_compare` is not defined.
+:DOC_END
 
 setlocal
 

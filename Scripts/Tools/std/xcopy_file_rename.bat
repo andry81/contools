@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   xcopy_file_rename.bat [<flags>] [--] <from-path> <to-path> <from-file> <to-file>
@@ -59,6 +59,7 @@ rem   From file name.
 
 rem <to-file>:
 rem   To file name.
+:DOC_END
 
 setlocal
 

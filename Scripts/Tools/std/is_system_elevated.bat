@@ -1,12 +1,9 @@
 @echo off
+if exist "%SystemRoot%\System32\whoami.exe" "%SystemRoot%\System32\whoami.exe" /groups | "%SystemRoot%\System32\findstr.exe" /L "S-1-16-16384" >nul 2>nul & exit /b
+exit /b 255
 
 rem Description:
 rem   Script checks System account privileges.
-
-setlocal
-
-if exist "%SystemRoot%\System32\whoami.exe" "%SystemRoot%\System32\whoami.exe" /groups | "%SystemRoot%\System32\findstr.exe" /L "S-1-16-16384" >nul 2>nul & exit /b
-exit /b 255
 
 rem CAUTIOM:
 rem   Windows 7 has an issue around the `find.exe` utility and code page 65001.

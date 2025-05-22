@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   touch_file.bat <path>...
@@ -24,6 +24,7 @@ rem     https://superuser.com/questions/10426/windows-equivalent-of-the-linux-co
 
 rem <path>...
 rem   File path list.
+:DOC_END
 
 if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 

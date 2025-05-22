@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   get_cmdline_len.bat [<flags>] [--] <cmdline>...
@@ -54,6 +54,7 @@ rem      a b 1 2 3 7
 rem      >get_cmdline_len.bat -skip 3 -shift -3 -- echo a b 1 2 3 4 5 6 7
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=7
+:DOC_END
 
 setlocal DISABLEDELAYEDEXPANSION
 

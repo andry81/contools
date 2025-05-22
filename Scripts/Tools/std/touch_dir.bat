@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   touch_dir.bat <path>...
@@ -21,6 +21,7 @@ rem          the script.
 
 rem <path>...
 rem   Directory path list.
+:DOC_END
 
 if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 

@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   callshift.bat [-exe] [-notrim] [-skip <skip-num>] [-lockfile <lock-file> [-trylock] [-lock-sleep-cmdline <lock-sleep-cmdline>]] [<shift> [<command> [<cmdline>...]]]
@@ -124,6 +124,7 @@ rem   * In case of a tabulation character immediately after a command line
 rem     argument, you must entail each argument at least with one space
 rem     character, because all tabulation characters does encode which may end
 rem     up with arguments concatenation and so wrong skip and/or shift.
+:DOC_END
 
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%

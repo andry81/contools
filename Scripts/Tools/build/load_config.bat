@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   load_config.bat [<Flags>] [--] <InputDir> <OutputDir> <ConfigFileName> [<Param0> [<Param1>]]
@@ -104,6 +104,7 @@ rem     (use forward slashes only).
 rem Parse logic:
 rem   Uses %-variables expansion.
 rem   The only `%<variable>%` placeholders can be expanded in a variable value.
+:DOC_END
 
 setlocal DISABLEDELAYEDEXPANSION
 

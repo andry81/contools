@@ -1,8 +1,9 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script prepends UTF BOM sequence to a text file if file does not
 rem   have it yet and output the result into another text file.
+:DOC_END
 
 setlocal
 

@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   trim_var.bat <var> [<outvar>]
@@ -11,6 +11,7 @@ rem   The delayed expansion feature must be disabled before this script call:
 rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem   expanded.
 rem
+:DOC_END
 
 rem drop the output variable value
 if not "%~2" == "" if not "%~1" == "%~2" set "%~2="

@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script xcopy files from a source directory preserving relative paths to
@@ -27,6 +27,7 @@ rem      subdirectories.
 rem %2 - Path to target directory.
 rem %3 - Additional arguments for `xcopy.bat` script.
 rem %4-%N - Optional file pattern list for the `dir` command, ex: `"*.txt" "*.md"
+:DOC_END
 
 setlocal
 

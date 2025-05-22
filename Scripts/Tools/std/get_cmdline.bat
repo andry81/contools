@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   get_cmdline.bat <cmdline>...
@@ -31,6 +31,7 @@ rem      >get_cmdline.bat
 rem      >get_cmdline.bat 1
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
+:DOC_END
 
 rem with save of previous error level
 setlocal & set LAST_ERROR=%ERRORLEVEL%

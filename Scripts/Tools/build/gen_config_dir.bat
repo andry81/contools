@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   gen_config_dir.bat [<Flags>] [--] <InputDir> <OutputDir> <ConfigFiles>...
@@ -50,6 +50,7 @@ rem   Must not contain `.in` suffix.
 
 rem NOTE:
 rem   All the rest parameters is in the `gen_config.bat` script.
+:DOC_END
 
 setlocal
 

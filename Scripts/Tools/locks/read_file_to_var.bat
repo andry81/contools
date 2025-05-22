@@ -1,7 +1,8 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script to exclusively read a file into a variable.
+:DOC_END
 
 setlocal
 

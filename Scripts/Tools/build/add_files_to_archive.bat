@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script adds files/directories into 7zip archive. Archive would have relative path prefix
@@ -12,6 +12,7 @@ rem %4-%N - Additional arguments for 7zip utility.
 
 rem Examples:
 rem 1. call add_files_to_archive.bat c:\path_to_archive\app release\x86 c:\path_of_archives\app_release_x86.7z -xr!"*.lib" -xr!"*.exp" -xr@"7zip_excludes_list.lst"
+:DOC_END
 
 setlocal
 

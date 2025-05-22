@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Examples:
 rem
@@ -21,6 +21,7 @@ rem * mpeg1video
 rem * mpeg2video
 rem * mpeg4
 rem
+:DOC_END
 
 setlocal
 

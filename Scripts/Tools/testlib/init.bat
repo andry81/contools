@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   The tests initialization script. Must be called one time in a user test
@@ -11,6 +11,7 @@ rem   The second argument (optional) can point to a directory with user handler
 rem   scripts. Can be absolute or relative. If is a relative then relative to
 rem   the directory path from the first argument.
 rem
+:DOC_END
 
 rem initialize testlib "module"
 call "%%~dp0__init__.bat" || exit /b

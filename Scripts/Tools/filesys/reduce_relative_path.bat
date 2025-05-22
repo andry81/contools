@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script converts relative path with . and .. occurrences to the absolute
@@ -15,6 +15,7 @@ rem    rem RETURN_VALUE=Test
 rem 2. call reduce_relative_path.bat "../Test"
 rem 3. call reduce_relative_path.bat "aaa/../bbb"
 rem    rem RETURN_VALUE=bbb
+:DOC_END
 
 rem Drop return value
 set "RETURN_VALUE=%~1"

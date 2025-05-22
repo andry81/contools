@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   rmdir_if_exist_strict.bat <path> [<rmdir-flags>...]
@@ -15,6 +15,7 @@ rem   Single directory path.
 
 rem <rmdir-flags>:
 rem   Command line flags to pass into builtin `rmdir` command.
+:DOC_END
 
 if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 

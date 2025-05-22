@@ -2,6 +2,7 @@
 (
   if 0 %*
 ) >&2
+exit /b
 
 rem Description:
 rem   Stops an outer script execution with the message:

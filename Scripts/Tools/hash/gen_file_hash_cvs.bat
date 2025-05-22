@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Get file hash in a CVS format into the variable.
@@ -6,6 +6,7 @@ rem   Get file hash in a CVS format into the variable.
 rem Example:
 rem 1. call get_file_hash_cvs.bat -c md5 -b -s <file>
 rem    rem RETURN_VALUE=<size>,<md5>,<file>
+:DOC_END
 
 rem drop return value
 set "RETURN_VALUE="

@@ -1,4 +1,7 @@
-@echo off
+@echo off & goto DOC_END
+
+rem USAGE:
+rem   chcp.bat [-p] <code-page>
 
 rem CAUTION:
 rem   When the 65000 codepage is used then some of characters DOES BECOME
@@ -6,6 +9,7 @@ rem   CONTROL CHARACTERS!
 rem   For example, the plus character (`+`) becomes the unicode codepoint
 rem   prefix character and expressions which contain this character like
 rem   `set BLABLA=1+1` WILL FAIL!
+:DOC_END
 
 setlocal
 

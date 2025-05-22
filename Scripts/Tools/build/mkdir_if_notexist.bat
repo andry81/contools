@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   mkdir_if_notexist.bat <path>
@@ -27,6 +27,7 @@ rem   does not check for disconnected symbolic reference to a directory.
 
 rem <path>
 rem   Single directory path.
+:DOC_END
 
 setlocal
 

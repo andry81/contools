@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   call.bat [-exe] [-lockfile <lock-file> [-trylock] [-lock-sleep-cmdline <lock-sleep-cmdline>]] [--] <cmdline>...
@@ -94,6 +94,7 @@ rem     `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem     expanded.
 rem   * A batch script command line and an executable command line has
 rem     different encoders.
+:DOC_END
 
 rem with save of previous error level
 setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%

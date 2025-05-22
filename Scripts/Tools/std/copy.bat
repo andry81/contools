@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   copy.bat [<flags>] [--] <from-path> <to-path> [<copy-flags>...]
@@ -34,6 +34,7 @@ rem   To path.
 
 rem <copy-flags>:
 rem   Command line flags to pass into builtin `copy` command.
+:DOC_END
 
 echo;^>%~nx0 %*
 

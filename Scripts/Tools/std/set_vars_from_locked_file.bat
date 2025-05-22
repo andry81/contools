@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Another variant of a configuration file variables read and set script.
@@ -8,6 +8,7 @@ rem
 rem   The script must stay as simple as possible, so for this task it uses these parameters:
 rem   1. path where to lock a lock file
 rem   2. path where to read a file with variable names and value in format of `NAME=VALUE`.
+:DOC_END
 
 rem disable alternative variables expansion to avoid `!` character consumption
 setlocal DISABLEDELAYEDEXPANSION

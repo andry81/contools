@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Script to extract an archive or all archives from a directory recursively using 7zip.
@@ -16,6 +16,7 @@ rem %5-%N - Optional archive file pattern list for the `dir` command, ex: `"*.7z
 
 rem Examples:
 rem 1. call extract_files_from_archive.bat c:\path_for_unpack\app release\x86\app.exe c:\path_with_archives\app_release_x86.7z
+:DOC_END
 
 setlocal
 

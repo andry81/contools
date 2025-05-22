@@ -1,7 +1,8 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   7zip wrapper script.
+:DOC_END
 
 setlocal
 

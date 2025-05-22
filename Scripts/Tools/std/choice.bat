@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   choice.bat [<flags>] [--] <variable> [<message>...]
@@ -31,6 +31,7 @@ rem   Variable to return the selected key.
 rem <message>:
 rem   Message before the input echo;
 rem   Leave empty if you want to echo input on the next line.
+:DOC_END
 
 setlocal
 

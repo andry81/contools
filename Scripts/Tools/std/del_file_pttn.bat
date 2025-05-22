@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   del_file_pttn.bat <dir> <name-pttn> <ext-pttn> [<del-flags>...]
@@ -31,6 +31,7 @@ rem   File name extension pattern.
 
 rem <del-flags>:
 rem   Command line flags to pass into builtin `del` command.
+:DOC_END
 
 echo;^>%~nx0 %*
 

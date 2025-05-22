@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   update_shortcut_props_from_dir.bat [<Flags>] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO> [<REPLACE_FROM> <REPLACE_TO>]...
@@ -104,6 +104,7 @@ rem CAUTION:
 rem   Base `CreateShortcut` method does not support all Unicode characters nor
 rem   `search-ms` Windows Explorer moniker path for the filter field.
 rem   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
+:DOC_END
 
 setlocal DISABLEDELAYEDEXPANSION
 

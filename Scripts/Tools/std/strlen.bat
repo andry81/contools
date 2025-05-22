@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem USAGE:
 rem   strlen.bat "" <string>
@@ -24,6 +24,7 @@ rem    echo ERRORLEVEL=%ERRORLEVEL%
 rem 2. set "__STRING__=Hello world!"
 rem    call strlen.bat /v
 rem    echo ERRORLEVEL=%ERRORLEVEL%
+:DOC_END
 
 setlocal DISABLEDELAYEDEXPANSION
 

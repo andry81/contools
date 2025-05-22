@@ -1,3 +1,9 @@
+2025.05.22:
+* new: Scripts/Tests/bench/batscripts/test_rem*: `rem` bench tests
+* changed: Scripts/Tools/*.bat: `@echo off` replaced by `@echo off & goto DOC_END` to speed up a documentation header skip
+* changed: Scripts/Tools/*.bat: the rest scripts minor speed up
+* changed: Scripts/Tools/which.bat: moved to `userbin` project
+
 2025.05.20:
 * fixed: Scripts/Tools/tasks/spawn_tasks.bat: execution fixup
 

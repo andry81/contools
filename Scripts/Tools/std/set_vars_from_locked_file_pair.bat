@@ -1,10 +1,11 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Another variant of a configuration file variables read and set script.
 rem The script must stay as simple as possible, so for this task it uses these parameters:
 rem 1. path where to lock a lock file
 rem 2. path where to read a file with variable names (each per line)
 rem 3. path where to read a file with variable values (each per line, must be the same quantity of lines with the variable names file)
+:DOC_END
 
 rem disable alternative variables expansion to avoid `!` character consumption
 setlocal DISABLEDELAYEDEXPANSION

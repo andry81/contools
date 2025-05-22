@@ -1,4 +1,4 @@
-@echo off
+@echo off & goto DOC_END
 
 rem Description:
 rem   Main entry point script for a user test script.
@@ -25,6 +25,7 @@ rem     *teardown.bat - a test last time teardown handler.
 rem     *exit.bat - exit handler for a test, useful if required to copy test
 rem                 data out of a test script temporary output directory.
 rem
+:DOC_END
 
 setlocal
 
