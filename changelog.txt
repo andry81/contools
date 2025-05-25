@@ -1,3 +1,6 @@
+2025.05.25:
+* changed: README_EN.txt: readme update
+
 2025.05.22:
 * new: Scripts/Tests/bench/batscripts/test__set: `set` bench tests
 * changed: Scripts/Tests/bench/batscripts/test__type: more tests

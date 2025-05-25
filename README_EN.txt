@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2025.05.22
+* 2025.05.25
 * contools
 
 1. DESCRIPTION
@@ -17,10 +17,9 @@
 1. DESCRIPTION
 -------------------------------------------------------------------------------
 A wide range of scripts for Windows interpreter (cmd.exe) and other
-interpreters such as bash shell (.sh), visual basic (.vbs), jscript (.js),
-python (.py), perl (.pl) and so on. Plus some set of standalone console
-utilities and tools aside other utilities and tools from cygwin, msys and
-mingw.
+interpreters such as bash shell (.sh), visual basic (.vbs), python (.py) and
+so on. Plus some set of standalone console utilities and tools aside other
+utilities and tools from cygwin, msys and mingw.
 
 The rest is extracted into standalone repositories beginning by `contools--`.
 
