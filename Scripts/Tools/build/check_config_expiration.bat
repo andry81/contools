@@ -25,6 +25,7 @@ rem   Must exist if `-optional_compare` is not defined.
 
 setlocal
 
+set "?~dp0=%~dp0"
 set "?~n0=%~n0"
 
 rem script names call stack
@@ -32,30 +33,9 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 
 set "?~nx0=%~nx0"
 
-rem script flags
-set FLAG_OPTIONAL_COMPARE=0
+call "%%?~dp0%%.check_config_expiration/check_config_expiration.read_flags.bat" %%* || exit /b
 
-:FLAGS_LOOP
-
-rem flags always at first
-set "FLAG=%~1"
-
-if defined FLAG ^
-if not "%FLAG:~0,1%" == "-" set "FLAG="
-
-if defined FLAG (
-  if "%FLAG%" == "-optional_compare" (
-    set FLAG_OPTIONAL_COMPARE=1
-  ) else if not "%FLAG%" == "--" (
-    echo;%?~%: error: invalid flag: %FLAG%
-    exit /b -255
-  ) >&2
-
-  shift
-
-  rem read until no flags
-  if not "%FLAG%" == "--" goto FLAGS_LOOP
-)
+if %FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%FLAG_SHIFT%) do shift
 
 set "VARS_FILE_IN=%~1"
 set "VARS_FILE=%~2"
@@ -97,39 +77,33 @@ rem
 
 rem compare versions
 
-if defined SCRIPT_TEMP_CURRENT_DIR (
-  set "VERSION_LINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.version.%RANDOM%-%RANDOM%.txt"
-) else set "VERSION_LINE_TEMP_FILE=%TEMP%\%?~n0%.version.%RANDOM%-%RANDOM%.txt"
+rem CAUTION: `#%% version: ...` must be at first line
+set /P CONFIG_IN_FILE_VERSION_LINE=<"%VARS_FILE_IN%"
+set /P CONFIG_OUT_FILE_VERSION_LINE=<"%VARS_FILE%"
 
-"%SystemRoot%\System32\findstr.exe" /B /C:"#%%%% version:" "%VARS_FILE_IN%" > "%VERSION_LINE_TEMP_FILE%"
+if defined CONFIG_IN_FILE_VERSION_LINE ^
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!CONFIG_IN_FILE_VERSION_LINE:~0,12!") do endlocal & ^
+if not "%%i" == "#%%%% version:" set "CONFIG_IN_FILE_VERSION_LINE="
 
-set /P CONFIG_IN_FILE_VERSION_LINE=<"%VERSION_LINE_TEMP_FILE%"
-
-if not defined CONFIG_IN_FILE_VERSION_LINE (
-  del /F /Q /A:-D "%VERSION_LINE_TEMP_FILE%" >nul 2>nul
-  goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
-)
+if not defined CONFIG_IN_FILE_VERSION_LINE goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 
 set "CONFIG_IN_FILE_VERSION_LINE=%CONFIG_IN_FILE_VERSION_LINE:"=%"
 
-set "CONFIG_OUT_FILE_VERSION_LINE="
-set CONFIG_OUT_FILE_VERSION_EQUAL=0
-"%SystemRoot%\System32\findstr.exe" /X /B /E /C:"%CONFIG_IN_FILE_VERSION_LINE%" "%VARS_FILE%" >nul && set CONFIG_OUT_FILE_VERSION_EQUAL=1
+if defined CONFIG_OUT_FILE_VERSION_LINE ^
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!CONFIG_OUT_FILE_VERSION_LINE:~0,12!") do endlocal & ^
+if not "%%i" == "#%%%% version:" set "CONFIG_OUT_FILE_VERSION_LINE="
 
-if %CONFIG_OUT_FILE_VERSION_EQUAL% EQU 0 (
-  "%SystemRoot%\System32\findstr.exe" /B /C:"#%%%% version:" "%VARS_FILE%" > "%VERSION_LINE_TEMP_FILE%"
+if not defined CONFIG_OUT_FILE_VERSION_LINE goto SKIP_OUTPUT_CONFIG_EXPIRATION_CHECK
 
-  set /P CONFIG_OUT_FILE_VERSION_LINE=<"%VERSION_LINE_TEMP_FILE%"
-)
+set "CONFIG_OUT_FILE_VERSION_LINE=%CONFIG_OUT_FILE_VERSION_LINE:"=%"
 
-del /F /Q /A:-D "%VERSION_LINE_TEMP_FILE%" >nul 2>nul
-
-if %CONFIG_OUT_FILE_VERSION_EQUAL% EQU 0 (
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=1,* delims=|"eol^= %%i in ("!CONFIG_IN_FILE_VERSION_LINE!|!CONFIG_OUT_FILE_VERSION_LINE!") do endlocal & ^
+if not "%%i" == "%%j" (
   echo;%?~%: error: input config version line is not found in the output config file, either merge it with or regenerate it from the input config file:
   echo;%?~nx0%: info: input config file : "%VARS_FILE_IN%"
   echo;%?~nx0%: info: output config file: "%VARS_FILE%"
-  echo;%?~nx0%: info: input config version line : "%CONFIG_IN_FILE_VERSION_LINE%"
-  echo;%?~nx0%: info: output config version line: "%CONFIG_OUT_FILE_VERSION_LINE%"
+  echo;%?~nx0%: info: input config version line : "%%i"
+  echo;%?~nx0%: info: output config version line: "%%j"
   exit /b 101
 ) >&2
 
