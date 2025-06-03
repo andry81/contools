@@ -1,4 +1,8 @@
 2025.06.03:
+* fixed: Scripts/Tools: std/get_windows_version.bat, ToolAdaptors/lnk/install_system64_link.bat: minor fixup
+* changed: Scripts/Tools: std/get_windows_version.bat, ToolAdaptors/lnk/install_system64_link.bat: merge to common code
+
+2025.06.03:
 * new: Scripts/Tools/std/check_vars.bat: moving from `build` directory
 * new: Scripts/Tools/std: check_*_vars.bat: reduction from `canonical_path.bat` for a list of variables
 * new: Scripts/Tools/std: canonical_*_vars.bat: merge from `check_*_vars.bat` and `canonical_path.bat` for a list of variables

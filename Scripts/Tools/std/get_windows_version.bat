@@ -2,11 +2,16 @@
 
 setlocal
 
+set "WINDOWS_VER_STR="
+set "WINDOWS_MAJOR_VER="
+set "WINDOWS_MINOR_VER="
+set "WINDOWS_X64_VER="
+set "COMSPEC_X64_VER="
+
 rem CAUTION:
 rem   In Windowx XP an elevated call under data protection flag will block the wmic tool, so we have to use `ver` command instead!
 rem
-set "WINDOWS_VER_STR="
-for /F "usebackq tokens=1,* delims=[" %%i in (`@ver 2^>nul`) do for /F "tokens=1,* delims=]" %%k in ("%%j") do set "WINDOWS_VER_STR=%%k"
+for /F "usebackq tokens=1,2,* delims=[]" %%i in (`@ver 2^>nul`) do set "WINDOWS_VER_STR=%%j"
 
 if not defined WINDOWS_VER_STR goto EXIT
 
