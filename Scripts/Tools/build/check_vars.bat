@@ -1,19 +1,15 @@
 @echo off
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 rem script names call stack
-if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+if defined ?~ ( set "__?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "__?~=%?~nx0%-^>%~nx0" ) else set "__?~=%~nx0"
 
-for %%i in (%*) do (
-  if not defined %%~i (
-    echo;%?~%: error: `%%~i` variable is not defined.
-    exit /b 255
-  ) >&2
-)
-
-exit /b 0
-
-rem CAUTION:
-rem   The `for %%i in (%*)` statement still can expand the globbing characters
-rem   for the files in a current directory. You must avoid them.
+:LOOP
+if "%~1" == "" exit /b 0
+if not defined %1 (
+  echo;%__?~%: error: `%1` variable is not defined.
+  exit /b 255
+) >&2
+shift
+goto LOOP

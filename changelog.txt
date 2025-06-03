@@ -1,3 +1,12 @@
+2025.06.03:
+* new: Scripts/Tools/std/check_vars.bat: moving from `build` directory
+* new: Scripts/Tools/std: check_*_vars.bat: reduction from `canonical_path.bat` for a list of variables
+* new: Scripts/Tools/std: canonical_*_vars.bat: merge from `check_*_vars.bat` and `canonical_path.bat` for a list of variables
+* changed: Scripts/Tools/build/check_vars.bat: reimplemented to be able to check variables with `!`, `?` and `*` characters in the name
+* changed: Scripts/Tools/std/canonical_path*.bat: minor improvement
+* changed: Scripts/Tools/std/if_*.bat: return 255 as the false condition exit code instead of 1
+* changed: Scripts/Tools/ToolAdaptors/app: replace `if_var_defined_and_*_exist.bat` and `canonical_path.bat` script calls by `canonical_*_vars.bat` call
+
 2025.06.02:
 * changed: Scripts/Tools/build/check_config_expiration.bat: minor comparison speedup
 * changed: Scripts/Tools/build/check_config_expiration.bat: now only the first line does read

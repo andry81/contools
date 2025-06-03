@@ -17,8 +17,6 @@ if "%~2" == "" (
   exit /b 255
 ) >&2
 
-for /F "tokens=* delims="eol^= %%i in ("%~2\.") do set "RETURN_VALUE=%%~fi"
-rem set "RETURN_VALUE=%RETURN_VALUE:\=/%"
-endlocal & set "%~1=%RETURN_VALUE%"
+for /F "tokens=* delims="eol^= %%i in ("%~2\.") do endlocal & set "%~1=%%~fi"
 
 exit /b 0
