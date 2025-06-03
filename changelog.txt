@@ -1,4 +1,7 @@
 2025.06.03:
+* new: Scripts/Tests/bench/batscripts/test__echo_!exclusive: exclusive `echo` bench tests
+
+2025.06.03:
 * fixed: Scripts/Tools: std/get_windows_version.bat, ToolAdaptors/lnk/install_system64_link.bat: minor fixup
 * changed: Scripts/Tools: std/get_windows_version.bat, ToolAdaptors/lnk/install_system64_link.bat: merge to common code
 
