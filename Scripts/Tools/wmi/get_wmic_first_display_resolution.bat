@@ -28,7 +28,6 @@ rem   Independent to Windows first display resolution request.
 
 rem CAUTION:
 rem   In Windowx XP an elevated call under data protection flag will block the wmic tool!
-rem
 
 rem CAUTION:
 rem   The `wmic` executable has an issue with different output codepage:
@@ -40,4 +39,9 @@ rem     * If you send the output to a disk file by using a redirection operator
 rem       or the /output switch, wmic will use UCS-2 LE BOM
 rem     * If you send the output to the console or to a pipe, wmic will use OEM
 rem       codepage
-rem
+
+rem CAUTION:
+rem   The `wmic` executable does consume a first key press into the console
+rem   window. So if you run a script with the pause at the script end, then it
+rem   may remain paused after a single press into the console window if a key
+rem   was pressed before the call to `wmic.exe`.

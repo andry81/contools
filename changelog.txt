@@ -1,4 +1,7 @@
 2025.06.03:
+* changed: Scripts/Tools/wmi: minor improvements
+
+2025.06.03:
 * new: Scripts/Tests/bench/batscripts/test__echo_!exclusive: exclusive `echo` bench tests
 
 2025.06.03:
