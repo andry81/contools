@@ -1,3 +1,7 @@
+2025.06.04:
+* new: Scripts/Tools/wmi: print_wmi_local_datetime.vbs, print_wmi_local_datetime.vbs.bat, get_wmi_local_datetime.vbs.bat: vbs variant if WMI date/time getter with bat wrappers
+* new: Scripts/Tools/bench/batscripts/test_wmi*: WMI scripts bench tests
+
 2025.06.03:
 * changed: Scripts/Tools/wmi: minor improvements
 
