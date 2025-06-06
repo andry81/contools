@@ -1,4 +1,8 @@
 2025.06.06:
+* fixed: Scripts/Tools/*.bat: Windows XP Administrator privileges elevation code fixup
+* changed: ISSUES.txt: issues update
+
+2025.06.06:
 * changed: ISSUES.txt: issues update
 
 2025.06.04:

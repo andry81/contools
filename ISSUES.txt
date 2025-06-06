@@ -17,24 +17,6 @@ Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat
 * Fix infinite recursion because of builtin backup in `update_shortcut.vbs`.
 
 -------------------------------------------------------------------------------
-Scripts/Tools/std: is_admin_elevated.bat, cmd_admin.bat
--------------------------------------------------------------------------------
-
-* is_admin_elevated.bat:
-
-  Returns 0 on Windows XP x86 in case of a not limited user (Administartor),
-  because `whoami.exe` does not exist and `fltmc.exe` returns always 0.
-
-  Returns 1 on Windows XP x86 in case of a limited user (not an Administartor),
-  because `whoami.exe` does not exist and `fltmc.exe` returns always 1.
-
-  Returns always 1 on Windows XP x64 on any user, because `whoami.exe` exists,
-  but a user never has SID `S-1-16-12288` (Vista+ only).
-
-  Needs to additionally use `ver` to detect Windows XP in case of `whoami.exe`
-  existence.
-
--------------------------------------------------------------------------------
 Scripts/Tools/std: xcopy_*.bat, xmove_*.bat
 -------------------------------------------------------------------------------
 
