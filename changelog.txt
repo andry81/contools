@@ -1,3 +1,6 @@
+2025.06.06:
+* changed: ISSUES.txt: issues update
+
 2025.06.04:
 * changed: Scripts/Tools/*.bat: switch from `wmic.exe` utility usage to a vbs script wrapper because of the issue ("`wmic.exe` does consume a console window input" : https://github.com/andry81/contools/discussions/25)
 
