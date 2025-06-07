@@ -43,7 +43,7 @@ if /i "%FILE_PATH_ATTR:~0,1%" == "d" exit /b 255
 if not "%~2" == "" if %~20 LSS 0 move /Y "%~1" "%~1" >nul 2>nul & exit /b
 
 :FILE_MOVE_LOOP
-move /Y "%~1" "%~1" >nul 2>nul || ( call :SLEEP %2 & goto FILE_MOVE_LOOP )
+move /Y "%~1" "%~1" >nul 2>nul || ( call :SLEEP %%2 & goto FILE_MOVE_LOOP )
 exit /b 0
 
 :SLEEP

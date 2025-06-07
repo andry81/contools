@@ -150,7 +150,7 @@ exit /b
 
 :PREPROCESS_EXCLUDE_DIR
 call set "FILE_PATH_FROM_PREFIX=%%FILE_PATH_FROM:%EXCLUDE_DIR%=%%"
-if not defined FILE_PATH_FROM_PREFIX ( set "FILE_PATH_FROM=" & exit /b 0 )
+if not defined FILE_PATH_FROM_PREFIX set "FILE_PATH_FROM=" & exit /b 0
 if not "%FILE_PATH_FROM_PREFIX%%EXCLUDE_DIR%" == "%FILE_PATH_FROM%" exit /b 1
 if not "%FILE_PATH_FROM_PREFIX:~-1%" == "/" exit /b 1
 set "FILE_PATH_FROM="

@@ -477,10 +477,10 @@ rem   DO NOT USE "/IA" flag because:
 rem   1. It does implicitly exclude those files which were not included (implicit exclude).
 rem   2. It does ignore files without any attribute even if all attribute set is used: `/IA:RASHCNETO`.
 rem
-rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/H" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
-rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/K" ( set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
-if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/H" ( set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
-if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/K" ( set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1" )
+rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/H" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1"
+rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/K" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /IA:RASHCNETO" & set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1"
+if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/H" set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1"
+if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/K" set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1"
 if "%XMOVE_FLAG%" == "/O" call :SET_ROBOCOPY_SO_FLAGS
 rem NOTE: in case of `robocopy` - use lowercase `/x`
 if "%XMOVE_FLAG%" == "/X" call :SET_ROBOCOPY_U_FLAG

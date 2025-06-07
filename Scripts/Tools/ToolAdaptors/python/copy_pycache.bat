@@ -167,7 +167,7 @@ exit /b 0
 
 :PREPROCESS_PREFIX_DIR
 call set "DIR_PATH_TO_PREFIX=%%DIR_PATH_TO:%PREFIX_DIR%=%%"
-if not defined DIR_PATH_TO_PREFIX ( set "DIR_PATH_TO=" & exit /b 0 )
+if not defined DIR_PATH_TO_PREFIX set "DIR_PATH_TO=" & exit /b 0
 if not "%DIR_PATH_TO_PREFIX%%PREFIX_DIR%" == "%DIR_PATH_TO%" exit /b 1
 if not "%DIR_PATH_TO_PREFIX:~-1%" == "/" exit /b 1
 set "DIR_PATH_TO=%DIR_PATH_TO_PREFIX:~0,-1%"

@@ -1,3 +1,7 @@
+2025.06.07:
+* changed: Scripts/Tools/locks: minor fixup
+* changed: Scripts/Tools/*.bat: code cleanup
+
 2025.06.06:
 * fixed: Scripts/Tools/*.bat: Windows XP Administrator privileges elevation code fixup
 * changed: ISSUES.txt: issues update
