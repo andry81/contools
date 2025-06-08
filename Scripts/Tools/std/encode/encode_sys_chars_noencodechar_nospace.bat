@@ -19,7 +19,7 @@ exit /b 0
 rem Encode these characters:
 rem  |&()<>     - control flow characters
 rem  "'`^%!+    - escape or sequence expand characters (`+` is a unicode codepoint sequence character in 65000 code page)
-rem  ?*         - globbing characters in the `for ... %%i in (...)` expression or in a command line
+rem  ?*<>       - globbing characters in the `for ... %%i in (...)` expression or in a command line (`?<` has different globbing versus `*`, `*.` versus `*.>`)
 rem  ,;=        - separator characters in the `for ... %%i in (...)` expression or in a command line
 
 rem CAUTION:
@@ -29,18 +29,6 @@ rem
 
 rem CAUTION:
 rem   Character `$` must be encoded separately BEFORE this script call!
-rem
-
-rem Encode these characters:
-rem  $          - encode character
-rem  |&()<>     - control flow characters
-rem  "'`^%!+    - escape or sequence expand characters (`+` is a unicode codepoint sequence character in 65000 code page)
-rem  ?*         - globbing characters in the `for ... %%i in (...)` expression or in a command line
-rem  ,;=        - separator characters in the `for ... %%i in (...)` expression or in a command line
-
-rem CAUTION:
-rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
-rem   the `!` character will be expanded.
 rem
 
 rem CAUTION:

@@ -2,11 +2,12 @@
 
 call "%%~dp0decode_asterisk_char.bat"
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__:$3F=?!") do endlocal & set "__STRING__=%%i"
+setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!__STRING__:$3C=<!" & set "__STRING__=!__STRING__:$3E=>!" & ^
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__:$3F=?!") do endlocal & set "__STRING__=%%i"
 exit /b 0
 
 rem Decode these characters:
-rem  ?*         - globbing characters in the `for ... %%i in (...)` expression or in a command line
+rem  ?*<>       - globbing characters in the `for ... %%i in (...)` expression or in a command line (`?<` has different globbing versus `*`, `*.` versus `*.>`)
 
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise

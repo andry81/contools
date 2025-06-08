@@ -1,3 +1,6 @@
+2025.06.08:
+* fixed: Scripts/Tools/std/encode: missed to encode/decode `<>` as path globbing characters
+
 2025.06.07:
 * changed: Scripts/Tools/locks: minor fixup
 * changed: Scripts/Tools/*.bat: code cleanup

@@ -27,7 +27,7 @@ rem  <space><tab>,=   - separator characters in the `for ... %%i in (...)` expre
 
 rem Does not encode these characters:
 rem  "          - quotes in the `for ... %%i in (...)` expression or or in a command line
-rem  ?*         - globbing characters in the `for ... %%i in (...)` expression or in a command line
+rem  ?*         - globbing characters in the `for ... %%i in (...)` expression or in a command line (`?<` has different globbing versus `*`, `*.` versus `*.>`)
 rem  ;          - separator characters in the `for ... %%i in (...)` expression or in a command line
 
 rem CAUTION:

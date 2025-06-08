@@ -19,7 +19,7 @@ exit /b 0
 rem Encode these characters:
 rem  |&()<>           - control flow characters
 rem  "'`^%!+          - escape or sequence expand characters (`+` is a unicode codepoint sequence character in 65000 code page)
-rem  ?*               - globbing characters in the `for ... %%i in (...)` expression or in a command line
+rem  ?*<>             - globbing characters in the `for ... %%i in (...)` expression or in a command line (`?<` has different globbing versus `*`, `*.` versus `*.>`)
 rem  <space><tab>,;=  - separator characters in the `for ... %%i in (...)` expression or in a command line
 
 rem CAUTION:
