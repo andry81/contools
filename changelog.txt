@@ -1,4 +1,7 @@
 2025.06.09:
+* changed: Scripts/Tools/std: ifn_or.bat, ifn_and.bat: improved, can use variadic `if`, ex : `call ifn_and.bat 3 1 EQU 1 4 /i a "==" A && echo true`
+
+2025.06.09:
 * changed: Scripts/Tools/std: if*_or.bat, if*_and.bat: replaced by a multi argument if
 
 2025.06.08:
