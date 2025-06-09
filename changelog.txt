@@ -1,5 +1,5 @@
-2025.06.08:
-* new: Scripts/Tools/std: if*_or.bat, if*_and.bat: `if-or`, `if-and` script replacements
+2025.06.09:
+* changed: Scripts/Tools/std: if*_or.bat, if*_and.bat: replaced by a multi argument if
 
 2025.06.08:
 * fixed: Scripts/Tools/std/encode: missed to encode/decode `<>` as path globbing characters
