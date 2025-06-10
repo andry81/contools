@@ -1,6 +1,5 @@
 @echo off
-rem call "%%~dp0call.bat" echo;%%*
+rem echo;%*
 :LOOP
-if %~1 ( exit /b 0 ) else shift
-if not "%~1" == "" goto LOOP
-exit /b 255
+(call) & if %~1 <nul ( exit /b 0 ) else shift
+( if not "%~1" == "" goto LOOP ) & exit /b 255

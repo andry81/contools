@@ -3,13 +3,8 @@
 rem Create local variable's stack
 setlocal DISABLEDELAYEDEXPANSION
 
-if 0%__CTRL_SETLOCAL% EQU 1 (
-  echo;%~nx0: error: cmd.exe is broken, please restart it!>&2
-  exit /b 65535
-)
-set __CTRL_SETLOCAL=1
-
 call "%%~dp0__init__/__init__.bat" || exit /b
+call "%%CONTOOLS_ROOT%%/std/assert_if_def.bat" __CTRL_SETLOCAL "error: cmd.exe is broken, please restart it!" && set "__CTRL_SETLOCAL=1"
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
 set "CMDLINE="

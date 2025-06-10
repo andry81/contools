@@ -1,21 +1,29 @@
 @echo off
+(call)
 (
-  if 0 %*
+  setlocal DISABLEDELAYEDEXPANSION
+  if 0 "%~nx0: %~1"
 ) >&2
 exit /b
 
+rem USAGE:
+rem   assert.bat <message>
+
 rem Description:
-rem   Stops an outer script execution with the message:
-rem     `The syntax of the command is incorrect.` if `%1` is empty, otherwise
-rem     `%1 was unexpected at this time.` if not.
-rem   Does not change the error level.
+rem   Tests `<message>` and if is not empty, then stops an outer script
+rem   execution with the error message:
+rem     `"assert.bat: <message>" was unexpected at this time.`
+rem   If `<message>` is empty, then stops an outer script execution
+rem   with the error message:
+rem     `The syntax of the command is incorrect.`
+rem   Returns not zero error level.
 
 rem Examples:
 rem   1. >assert.bat
 rem      The syntax of the command is incorrect.
 rem
 rem   2. >assert.bat a b c
-rem      a was unexpected at this time.
+rem      "assert.bat: a" was unexpected at this time.
 rem
 rem   3. >assert.bat "a b c"
-rem      "a b c" was unexpected at this time.
+rem      "assert_if_def.bat: a b c" was unexpected at this time.

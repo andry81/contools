@@ -1,3 +1,15 @@
+2025.06.10:
+* new: Scripts/Tools/std/assert_if_*.bat: assert scripts on a variable's value empty, false or true
+* new: Scripts/Tests/unit/batscripts/test_std/test_std__*_if*.bat: `std/if*_*.bat` scripts unit tests
+* new: Scripts/Tests/unit/batscripts/test_std_if_!exclusive.bat: `std/if*_*.bat` exclusive scripts unit tests
+* new: Scripts/Tests/bench/batscripts/test_std/test_std__*_if*.bat: `std/if*_*.bat` scripts bench tests
+* new: Scripts/Tests/bench/batscripts/test_std_if_!exclusive.bat: `std/if*_*.bat` exclusive scripts bench tests
+* changed: Scripts/Tools/std/if_.bat: improved, error `< was unexpected at this time.` if `if` expression is incomplete, with not zero exit code
+* changed: Scripts/Tools/std: if_*.bat, ifn_*.bat: improved, error `< was unexpected at this time.` if `if` expression is incomplete, with not zero exit code
+* changed: Scripts/Tools/std/assert.bat: improved, always return not zero exit code
+* changed: Scripts/Tools/std/testlib: testlib improvement
+* changed: Scripts/Tests/unit/batscripts: tests improvement
+
 2025.06.09:
 * changed: Scripts/Tools/std: ifn_or.bat, ifn_and.bat: improved, can use variadic `if`, ex : `call ifn_and.bat 3 1 EQU 1 4 /i a "==" A && echo true`
 
