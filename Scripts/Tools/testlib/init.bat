@@ -77,8 +77,8 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FI
   TEST_LAST_ERROR TESTLIB__INIT TESTLIB__INIT_INDEX TESTLIB__TEST_SETUP TESTLIB__PREV_CP TESTLIB__TEST_CP
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_INIT_VARS_FILE_PATH%" >nul
 
-rem restore outter code page
-call "%%CONTOOLS_TESTLIB_ROOT%%/set_outter_cp.bat"
+rem restore outer code page
+call "%%CONTOOLS_TESTLIB_ROOT%%/set_outer_cp.bat"
 
 exit /b 0
 

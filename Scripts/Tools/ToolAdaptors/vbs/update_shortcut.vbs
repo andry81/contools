@@ -1,4 +1,4 @@
-''' Updates existing Windows shortcut file using outter value(s).
+''' Updates existing Windows shortcut file using outer value(s).
 
 ''' CAUTION:
 '''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
