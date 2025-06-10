@@ -1,4 +1,10 @@
 2025.06.10:
+* fixed: Scripts/Tools/std/if*.bat: error level reset on empty argument
+* changed: Scripts/Tools/std/if_var_defined.bat: removed as not used anymore
+* changed: Scripts/Tools/std/if_defined_*.bat: minor improvement
+* refactor: Scripts/Tools/std/if_defined_*.bat: renamed from `if_var_defined_*.bat`
+
+2025.06.10:
 * new: Scripts/Tools/std/assert_if_*.bat: assert scripts on a variable's value empty, false or true
 * new: Scripts/Tests/unit/batscripts/test_std/test_std__*_if*.bat: `std/if*_*.bat` scripts unit tests
 * new: Scripts/Tests/unit/batscripts/test_std_if_!exclusive.bat: `std/if*_*.bat` exclusive scripts unit tests
