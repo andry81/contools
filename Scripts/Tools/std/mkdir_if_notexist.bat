@@ -96,6 +96,8 @@ if "\" == "%DIR_PATH:~-1%" goto DIR_PATH_ERROR
 rem check on invalid characters in path
 if not "%DIR_PATH%" == "%DIR_PATH:**=%" goto DIR_PATH_ERROR
 if not "%DIR_PATH%" == "%DIR_PATH:?=%" goto DIR_PATH_ERROR
+if not "%DIR_PATH%" == "%DIR_PATH:<=%" goto DIR_PATH_ERROR
+if not "%DIR_PATH%" == "%DIR_PATH:>=%" goto DIR_PATH_ERROR
 
 goto DIR_PATH_OK
 

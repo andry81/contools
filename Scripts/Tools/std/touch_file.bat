@@ -65,6 +65,8 @@ if "\" == "%FILE_PATH:~-1%" goto FILE_PATH_ERROR
 rem check on invalid characters in path
 if not "%FILE_PATH%" == "%FILE_PATH:**=%" goto FILE_PATH_ERROR
 if not "%FILE_PATH%" == "%FILE_PATH:?=%" goto FILE_PATH_ERROR
+if not "%FILE_PATH%" == "%FILE_PATH:<=%" goto FILE_PATH_ERROR
+if not "%FILE_PATH%" == "%FILE_PATH:>=%" goto FILE_PATH_ERROR
 
 goto FILE_PATH_OK
 

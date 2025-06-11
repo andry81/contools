@@ -177,6 +177,8 @@ rem if "\" == "%FROM_PATH:~-1%" goto FROM_PATH_ERROR
 rem check on invalid characters in path
 if not "%FROM_PATH%" == "%FROM_PATH:**=%" goto FROM_PATH_ERROR
 if not "%FROM_PATH%" == "%FROM_PATH:?=%" goto FROM_PATH_ERROR
+if not "%FROM_PATH%" == "%FROM_PATH:<=%" goto FROM_PATH_ERROR
+if not "%FROM_PATH%" == "%FROM_PATH:>=%" goto FROM_PATH_ERROR
 
 goto FROM_PATH_OK
 
@@ -220,6 +222,8 @@ rem if "\" == "%TO_PATH:~-1%" goto TO_PATH_ERROR
 rem check on invalid characters in path
 if not "%TO_PATH%" == "%TO_PATH:**=%" goto TO_PATH_ERROR
 if not "%TO_PATH%" == "%TO_PATH:?=%" goto TO_PATH_ERROR
+if not "%TO_PATH%" == "%TO_PATH:<=%" goto TO_PATH_ERROR
+if not "%TO_PATH%" == "%TO_PATH:>=%" goto TO_PATH_ERROR
 
 if "\" == "%TO_PATH:~0,1%" goto TO_PATH_ERROR
 
@@ -251,6 +255,8 @@ set "FROM_FILE_PATH_ABS=%FROM_DIR_PATH_ABS%\%FROM_FILE%"
 rem check on glob characters in file name
 if not "%FROM_FILE%" == "%FROM_FILE:**=%" goto SKIP_FROM_FILE_CHECK
 if not "%FROM_FILE%" == "%FROM_FILE:?=%" goto SKIP_FROM_FILE_CHECK
+if not "%FROM_FILE%" == "%FROM_FILE:<=%" goto SKIP_FROM_FILE_CHECK
+if not "%FROM_FILE%" == "%FROM_FILE:>=%" goto SKIP_FROM_FILE_CHECK
 
 rem check on input file existence
 if not exist "\\?\%FROM_FILE_PATH_ABS%" (

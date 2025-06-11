@@ -1,3 +1,7 @@
+2025.06.11:
+* fixed: Scripts/Tools/*.bat: missed to check not-globbing paths on `<>` characters as a path globbing characters
+* fixed: Scripts/Tools/std/copy.bat: typo
+
 2025.06.10:
 * refactor: typo
 

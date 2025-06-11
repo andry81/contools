@@ -143,8 +143,12 @@ if not defined __?CONFIG_OUT_DIR (
 rem check on invalid characters in params
 if defined __?PARAM0 if not "%__?PARAM0%" == "%__?PARAM0:**=%" goto PARAM0_ERROR
 if defined __?PARAM0 if not "%__?PARAM0%" == "%__?PARAM0:?=%" goto PARAM0_ERROR
+if defined __?PARAM0 if not "%__?PARAM0%" == "%__?PARAM0:<=%" goto PARAM0_ERROR
+if defined __?PARAM0 if not "%__?PARAM0%" == "%__?PARAM0:>=%" goto PARAM0_ERROR
 if defined __?PARAM1 if not "%__?PARAM1%" == "%__?PARAM1:**=%" goto PARAM1_ERROR
 if defined __?PARAM1 if not "%__?PARAM1%" == "%__?PARAM1:?=%" goto PARAM1_ERROR
+if defined __?PARAM1 if not "%__?PARAM1%" == "%__?PARAM1:<=%" goto PARAM1_ERROR
+if defined __?PARAM1 if not "%__?PARAM1%" == "%__?PARAM1:>=%" goto PARAM1_ERROR
 
 goto PARAMS_OK
 

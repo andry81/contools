@@ -153,6 +153,8 @@ if "\" == "%FROM_PATH:~-1%" goto FROM_PATH_ERROR
 rem check on invalid characters in path
 if not "%FROM_PATH%" == "%FROM_PATH:**=%" goto FROM_PATH_ERROR
 if not "%FROM_PATH%" == "%FROM_PATH:?=%" goto FROM_PATH_ERROR
+if not "%FROM_PATH%" == "%FROM_PATH:<=%" goto FROM_PATH_ERROR
+if not "%FROM_PATH%" == "%FROM_PATH:>=%" goto FROM_PATH_ERROR
 
 goto FROM_PATH_OK
 
@@ -178,6 +180,8 @@ if "\" == "%TO_PATH:~-1%" goto TO_PATH_ERROR
 rem check on invalid characters in path
 if not "%TO_PATH%" == "%TO_PATH:**=%" goto TO_PATH_ERROR
 if not "%TO_PATH%" == "%TO_PATH:?=%" goto TO_PATH_ERROR
+if not "%TO_PATH%" == "%TO_PATH:<=%" goto TO_PATH_ERROR
+if not "%TO_PATH%" == "%TO_PATH:>=%" goto TO_PATH_ERROR
 
 if "\" == "%TO_PATH:~0,1%" goto TO_PATH_ERROR
 

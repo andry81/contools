@@ -57,6 +57,8 @@ if "\" == "%FROM_PATH:~-1%" goto FROM_PATH_ERROR
 rem check on invalid characters in path
 if not "%FROM_PATH%" == "%FROM_PATH:**=%" goto FROM_PATH_ERROR
 if not "%FROM_PATH%" == "%FROM_PATH:?=%" goto FROM_PATH_ERROR
+if not "%FROM_PATH%" == "%FROM_PATH:<=%" goto FROM_PATH_ERROR
+if not "%FROM_PATH%" == "%FROM_PATH:>=%" goto FROM_PATH_ERROR
 
 goto FROM_PATH_OK
 
