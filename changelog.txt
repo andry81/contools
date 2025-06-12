@@ -1,3 +1,6 @@
+2025.06.12:
+* new: Scripts/Tools/wmi/print_all_wmi_classes.vbs*: scripts to print all WMI classes
+
 2025.06.11:
 * fixed: Scripts/Tools/*.bat: missed to check not-globbing paths on `<>` characters as a path globbing characters
 * fixed: Scripts/Tools/std/copy.bat: typo
