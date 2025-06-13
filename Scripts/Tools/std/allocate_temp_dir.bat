@@ -1,4 +1,8 @@
-@echo off
+@echo off & goto DOC_END
+
+rem CAUTION:
+rem   All paths here must be Windows canonical with backward slashes!
+:DOC_END
 
 setlocal
 

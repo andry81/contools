@@ -1,3 +1,6 @@
+2025.06.13:
+* refactor: Scripts/Tools/std/allocate_temp_dir.bat: minor improvement
+
 2025.06.12:
 * new: Scripts/Tools/wmi/print_all_wmi_classes.vbs*: scripts to print all WMI classes
 
