@@ -1,3 +1,8 @@
+2025.06.14:
+* fixed: Scripts/Tools/build/check_config_expiration.bat: ignore case where the first line of the input file has no version line
+* changed Scripts/Tools/build/check_config_expiration.bat: input and output file paths must be different
+* changed Scripts/Tools/build: check_config_expiration.bat, gen_config.bat: improvements
+
 2025.06.13:
 * refactor: Scripts/Tools/std/allocate_temp_dir.bat: minor improvement
 
@@ -107,6 +112,14 @@
 * changed: Scripts/Tools/*.bat: `@echo off` replaced by `@echo off & goto DOC_END` to speed up a documentation header skip
 * changed: Scripts/Tools/*.bat: the rest scripts minor speed up
 * changed: Scripts/Tools/which.bat: moved to `userbin` project
+
+2025.05.20:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/*.vbs: correct processing of object paths beginning by `\\?\`
+* new: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, reset_shortcut.vbs: `<ShortcutTarget>` object path auto detection
+* changed: Scripts/Tools/ToolAdaptors/vbs/*.vbs: better errors report
+* changed: Scripts/Tools/ToolAdaptors/vbs: reset_shortcut.vbs, reset_shortcut_from_dir.bat: code improvement
+* changed: TODO.txt: todo update
+* refactor: Scripts/Tools/ToolAdaptors/vbs: code refactor
 
 2025.05.20:
 * fixed: Scripts/Tools/tasks/spawn_tasks.bat: execution fixup

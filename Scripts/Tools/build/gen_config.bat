@@ -15,9 +15,13 @@ rem
 rem   The script by default detects the input file change after the output
 rem   file change and interrupts the generation with an error.
 rem
-rem   Additionally the `#%% version: ...` line is searched in both files and
-rem   compared to force the user to manually update the output confuguration
-rem   file from the input configuration file in case if are not equal.
+rem   Additionally the `#%% version: ...` first line does read from both files
+rem   to force the user to manually update the output confuguration file from
+rem   the input configuration file in case if these lines are not equal.
+rem
+rem   If the first line of the `<InputDir>/<ConfigFileName>` does not begin by
+rem   the `#%% version:`, then the first line of the
+rem   `<OutputDir>/<ConfigFileName>` does ignore.
 
 rem <Flags>:
 rem   -r <sed_replace_from> <sed_replace_to>
