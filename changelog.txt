@@ -1,4 +1,8 @@
 2025.06.15:
+* new: Scripts/Tools/wmi/print_wmic_path_all_props.bat: script to print all WMI property values from a path
+* changed: Scripts/Tools/wmi/print_all_wmi_classes.vbs: code cleanup
+
+2025.06.15:
 * new: Scripts/Tests/unit/batscripts/test_build/test_build__*_check_config_expiration.bat: script bench test
 * refactor: Scripts/Tests/unit/batscripts/test_build: minor refactor
 
