@@ -1,3 +1,7 @@
+2025.06.15:
+* new: Scripts/Tests/unit/batscripts/test_build/test_build__*_check_config_expiration.bat: script bench test
+* refactor: Scripts/Tests/unit/batscripts/test_build: minor refactor
+
 2025.06.14:
 * fixed: Scripts/Tools/build/check_config_expiration.bat: ignore case where the first line of the input file has no version line
 * changed Scripts/Tools/build/check_config_expiration.bat: input and output file paths must be different
