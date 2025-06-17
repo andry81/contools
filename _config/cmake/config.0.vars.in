@@ -2,7 +2,7 @@
 
 # CAUTION:
 #  This configuration file is designed to be portable between 3 interpreters: cmake, unix shell scripts, windows (cmd.exe) batch scripts,
-#  so it is made up to be simple as possible but not simplier as to support a single value or a values list
+#  so it is made up to be simple as possible but not simpler as to support a single value or a values list
 #  together with an escape sequence, where the character `\` is not an escape sequence character.
 #  Use `$/<char>` to escape a `<char>` character which is a part of a configuration file format:
 #  `"` -> `$/"` or `(` -> `$/(` or `$/` -> `$/$/`
@@ -15,7 +15,7 @@
 #  windows batch script.
 
 # CAUTION:
-#  DO NOT USE `@` character pairs unescaped as a plain value as long as it is used as a placehoder in a replacement of `@<variable>@` sequence,
+#  DO NOT USE `@` character pairs unescaped as a plain value as long as it is used as a placeholder in a replacement of `@<variable>@` sequence,
 #  where the `<variable>` is a cmake variable. For that case do replace all `@` characters by this escape sequence: `$/@`.
 #  It will avoid the substitution in case of an accidental match.
 
@@ -44,7 +44,7 @@
 # <value>:                Value with escaping and substitution support: `$/<escape_char>`, `$/{<variable>}`
 #
 
-# PREDEFINED BUILTIN VARIABLES ACCESIBLE FROM THIS FILE:
+# PREDEFINED BUILTIN VARIABLES ACCESSIBLE FROM THIS FILE:
 #
 # CMAKE_CURRENT_LOAD_VARS_FILE_INDEX:           Index in a file paths list from which this file have has an ordered load.
 # CMAKE_CURRENT_LOAD_VARS_FILE_DIR:             Directory path from which this file being loaded from.

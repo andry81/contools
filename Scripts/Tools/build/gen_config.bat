@@ -7,7 +7,7 @@ rem Description:
 rem   Script to generate a configuration file which can consist of an input and
 rem   output parts using `sed` utility.
 rem
-rem   The input configuration file is deteminded by the `.in` suffix in the
+rem   The input configuration file is determined by the `.in` suffix in the
 rem   file name and basically stores in a version control system.
 rem   The output configuration file must not contain the `.in` suffix in the
 rem   file name and is used as a local storage for a user values.
@@ -16,7 +16,7 @@ rem   The script by default detects the input file change after the output
 rem   file change and interrupts the generation with an error.
 rem
 rem   Additionally the `#%% version: ...` first line does read from both files
-rem   to force the user to manually update the output confuguration file from
+rem   to force the user to manually update the output configuration file from
 rem   the input configuration file in case if these lines are not equal.
 rem
 rem   If the first line of the `<InputDir>/<ConfigFileName>` does not begin by
@@ -31,7 +31,7 @@ rem
 rem     Has no effect if <sed_replace_from> or <sed_replace_to> is empty.
 rem
 rem     To pass a special code character you can use the `$/<char>` or `$/\xNN`
-rem     syntax, where `NN` is a hexidecimal code of a character.
+rem     syntax, where `NN` is a hexadecimal code of a character.
 rem
 rem   -rm <sed_remove_from>
 rem     The expression to replace for the sed in form:

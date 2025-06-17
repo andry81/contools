@@ -4,7 +4,7 @@ rem USAGE:
 rem   xcopy_file.bat [<flags>] [--] <from-path> <from-file-pttn> <to-path> [<xcopy-flags>...]
 
 rem Description:
-rem   The `xcopy.exe`/`robocopy.exe` seemless wrapper script with xcopy
+rem   The `xcopy.exe`/`robocopy.exe` seamless wrapper script with xcopy
 rem   compatible command line flags/excludes, echo and some conditions check
 rem   before call to copy a file or file pattern in a directory to another
 rem   directory.
@@ -14,10 +14,10 @@ rem
 rem   NOTE:
 rem     All input paths must be without `\\?\` prefix because:
 rem       1. Can be directly used in commands which does not support long paths
-rem          like builtin `dir` command.
+rem          like built in `dir` command.
 rem       2. Can be checked on absence of globbing characters which includes
 rem          `?` character.
-rem       3. The `%%~f` builtin variables extension and other extensions does
+rem       3. The `%%~f` built in variables extension and other extensions does
 rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 
@@ -277,7 +277,7 @@ set /A FLAG_SHIFT+=3
 call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XCOPY_FLAGS_ %%*
 
 rem CAUTION:
-rem   You must switch code page into english compatible locale.
+rem   You must switch code page into English compatible locale.
 rem
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 
@@ -381,7 +381,7 @@ endlocal
 
 :SKIP_TOUCH
 
-rem echo;F will ONLY work if locale is compatible with english !!!
+rem echo;F will ONLY work if locale is compatible with English !!!
 echo;^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_FILE_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS:~1% %XCOPY_EXCLUDES_CMD%%XCOPY_FILE_BARE_FLAGS%
 echo;F|"%SystemRoot%\System32\xcopy.exe" "%FROM_FILE_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS:~1% %XCOPY_EXCLUDES_CMD%%XCOPY_FILE_BARE_FLAGS%
 
@@ -389,7 +389,7 @@ set LAST_ERROR=%ERRORLEVEL%
 
 :EXIT
 if defined XCOPY_EXCLUDES_LIST_TMP (
-  rem cleanup temporary files
+  rem clean up temporary files
   call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 )
 

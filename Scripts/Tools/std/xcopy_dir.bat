@@ -4,7 +4,7 @@ rem USAGE:
 rem   xcopy_dir.bat [<flags>] [--] <from-path> <to-path> [<xcopy-flags>...]
 
 rem Description:
-rem   The `xcopy.exe`/`robocopy.exe` seemless wrapper script with xcopy
+rem   The `xcopy.exe`/`robocopy.exe` seamless wrapper script with xcopy
 rem   compatible command line flags/excludes, echo and some conditions check
 rem   before call to copy a directory to a directory.
 rem
@@ -13,10 +13,10 @@ rem
 rem   NOTE:
 rem     All input paths must be without `\\?\` prefix because:
 rem       1. Can be directly used in commands which does not support long paths
-rem          like builtin `dir` command.
+rem          like built in `dir` command.
 rem       2. Can be checked on absence of globbing characters which includes
 rem          `?` character.
-rem       3. The `%%~f` builtin variables extension and other extensions does
+rem       3. The `%%~f` built in variables extension and other extensions does
 rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 
@@ -56,7 +56,7 @@ rem
 rem   -ignore_unexist
 rem     By default `<to-path>` does check on directory existence and throw
 rem     an error if not exists.
-rem     Use this flag to ignore unexisted target directory.
+rem     Use this flag to ignore inexistent target directory.
 rem
 rem   -touch_dir
 rem     Use `touch_dir.bat` script to touch the output directories before the
@@ -246,7 +246,7 @@ set /A FLAG_SHIFT+=2
 call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XCOPY_FLAGS_ %%*
 
 rem CAUTION:
-rem   You must switch code page into english compatible locale.
+rem   You must switch code page into English compatible locale.
 rem
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 
@@ -348,7 +348,7 @@ endlocal
 
 :SKIP_TOUCH
 
-rem echo;D will ONLY work if locale is compatible with english !!!
+rem echo;D will ONLY work if locale is compatible with English !!!
 echo;^>^>"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS:~1% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
 echo;D|"%SystemRoot%\System32\xcopy.exe" "%FROM_PATH_ABS%" "%TO_PATH_ABS%"%XCOPY_FLAGS:~1% %XCOPY_EXCLUDES_CMD%%XCOPY_DIR_BARE_FLAGS%
 

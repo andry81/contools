@@ -8,7 +8,7 @@ rem WARNING:
 rem   1. .pyc files are cross platform
 rem   2. ALL .pyc files must be the same version and must be executed by the
 rem      same python version which has been used to build them!
-rem   3. The last path in below examle command is a mandatory, otherwise if
+rem   3. The last path in below example command is a mandatory, otherwise if
 rem      empty then the -d flag won't apply or if not empty then may be
 rem      incorrect (the portable version does address modules internally w/o
 rem      the `site-packages` subdirectory and does use relative paths!).
@@ -18,7 +18,7 @@ rem      script on them separately but with different last path in a command.
 
 rem CAUTION:
 rem   1. Because all the .pyc files in the destination directory will be
-rem      rebuilded, then you have to make a copy of the destination directory
+rem      rebuilt, then you have to make a copy of the destination directory
 rem      (in examples below this is the `site-packages` directory) on yourself
 rem      to avoid any changed in the original directory. To do so just do copy
 rem      the original directory and run the script on the copied one instead of

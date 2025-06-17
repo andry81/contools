@@ -150,7 +150,7 @@ rem restore locale
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 :FREE_TEMP_DIR
-rem cleanup temporary files
+rem clean up temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
 exit /b %LAST_ERROR%

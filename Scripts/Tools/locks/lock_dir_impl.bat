@@ -28,7 +28,7 @@ goto WAIT_LOOP
 
 :EXIT
 
-rem cleanup nested directories recursively before exit
+rem clean up nested directories recursively before exit
 :EXIT_CLEANUP_LOOP0
 set CLEANUP_UNLOCK_DIR=0
 set CLEANUP_WAITERS_DIR=0
@@ -45,7 +45,7 @@ if not exist "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%" (
   set CLEANUP_WAITERS_DIR=1
 )
 
-rem we should not exit until nested directories would not be fully cleanuped
+rem we should not exit until nested directories would not be fully cleaned up
 if %CLEANUP_UNLOCK_DIR% EQU 0 goto EXIT_CLEANUP_LOOP0
 if %CLEANUP_WAITERS_DIR% EQU 0 goto EXIT_CLEANUP_LOOP0
 
@@ -56,7 +56,7 @@ rem prelock via redirection to file
 set PRE_LOCK_ACQUIRE=0
 (
   (
-    rem now is safe to release the lock and cleanup the lock directory
+    rem now is safe to release the lock and clean up the lock directory
     call :RELEASE_AND_CLEANUP_LOCK
 
     rem Drop error level to 0 to avoid accidental exit by error from above commands.
@@ -66,9 +66,9 @@ set PRE_LOCK_ACQUIRE=0
   ) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%" && set PRE_LOCK_ACQUIRE=1
 ) 2>nul
 
-rem if could not prelock operations over the lock directory - somebody is already proccessing it for locking/unlocking
+rem if could not prelock operations over the lock directory - somebody is already processing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% NEQ 0 (
-  rem directory lock is released and cleanuped under the prelock, now is safe to remove the prelock file
+  rem directory lock is released and cleaned up under the prelock, now is safe to remove the prelock file
   del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>nul
 
   exit /b 0
@@ -83,12 +83,12 @@ rem release the lock
 cd "%LOCK_PATH%"
 
 :RELEASE_AND_CLEANUP_LOCK_LOOP
-rem cleanup the lock directory
+rem clean up the lock directory
 rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
 
 if not exist "%LOCK_PATH%\%LOCK_DIR%" exit /b 0
 
-rem we should not exit until the lock directory would not be cleanuped
+rem we should not exit until the lock directory would not be cleaned up
 rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 
 goto RELEASE_AND_CLEANUP_LOCK_LOOP

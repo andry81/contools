@@ -1,3 +1,6 @@
+2025.06.18:
+* refactor: spelling fixup
+
 2025.06.15:
 * new: Scripts/Tools/wmi/print_wmic_path_all_props.bat: script to print all WMI property values from a path
 * changed: Scripts/Tools/wmi/print_all_wmi_classes.vbs: code cleanup
@@ -622,11 +625,11 @@
 2024.08.20:
 * fixed: Scripts/Tools/std/callshift.bat: accidental script exit in case of call a batch file without `call` prefix
 * new: Scripts/Tools/std/call.bat: script to call the whole command line
-* changed: Scripts/Tools/std: callshift.bat, setshift.bat: code imrovement
+* changed: Scripts/Tools/std: callshift.bat, setshift.bat: code improvement
 
 2024.08.18:
 * fixed: Scripts/Tools/std/echo_*.bat: avoid error level change
-* changed: Scripts/Tools/std: echo_*.bat, set_var.bat: code imrovement
+* changed: Scripts/Tools/std: echo_*.bat, set_var.bat: code improvement
 * refactor: Scripts/Tools/std: echo_*.bat, get_cmdline*.bat: minor refactor
 
 2024.08.18:
@@ -1397,7 +1400,7 @@
 * new: Scripts/Tools/ToolAdaptors/lnk/chcp.com.lnk: example of minimalistic shortcut file to `.com` extension executable (not `.pif` extension)
 
 2023.10.01:
-* fixed: Utilities/src/callf: Win32 API functions dynamic load because of compatability with Windows XP
+* fixed: Utilities/src/callf: Win32 API functions dynamic load because of compatibility with Windows XP
 * fixed: Utilities/src/callf: missed to collect early printed messages
 * changed: Utilities/src/callf: store size of allocated shared memory block in the beginning of a block (`/load-parent-proc-init-env-vars` flag implementation)
 * changed: Utilities/bin/contools/README_EN.txt: readme update
@@ -1422,7 +1425,7 @@
 * new: Utilities/src/thlibautocfg: added `-m <output-file-line-template>` option to insert into the main output file a custom template lines (`-h ...` option must be used)
 * new: Utilities/src/_common/std: c++ template and overload functions over std c functions
 * changed: Utilities/src, BuildTools: switched to use recent version of `thlibautocfg tool`
-* chnaged: Utilities/src/_common/std: reimplemented functions with `std::tstring` type into templated functions
+* changed: Utilities/src/_common/std: reimplemented functions with `std::tstring` type into templated functions
 * changed: Utilities/src/*/version.def: versions increment
 * refactor: Utilities/src/thlibautocfg: code refactor
 * refactor: Utilities/src: moved files generation into `gen` subdirectory
@@ -2076,7 +2079,7 @@
 * changed: Utilities/test/README_EN.txt: readme update
 
 2022.01.08:
-* fixed: Utilities/src/callf: always check CRT streams text mode and use only wide string print functions for not ansi text mode CRT streams (otherise an internal CRT assert will be called)
+* fixed: Utilities/src/callf: always check CRT streams text mode and use only wide string print functions for not ansi text mode CRT streams (otherwise an internal CRT assert will be called)
 * fixed: Utilities/src/callf: always read STD handles flags and modes before CRT handles detach in case of last STD handles close on CRT handles close
 * new: Utilities/src/callf: `/detach-inherited-console-on-wait` flag to detach console before wait on child process exit and reattach after exit (workaround to avoid losing arrows key interactive input handling in the child `cmd.exe` process - command line history traverse)
 * changed: Utilities/src/callf/help.tpl: help update
@@ -2432,11 +2435,11 @@
 * new: Scripts/Tools/ToolAdaptors/app: `emule` and `flylink` setting files backup scripts
 
 2021.09.21:
-* fixed: Scrips/Tools/build/load_config_dir.bat: missed to return an exit code
+* fixed: Scripts/Tools/build/load_config_dir.bat: missed to return an exit code
 * changed: __init__: load root directory variables before all externals
 
 2021.09.20:
-* changed: _config: moved not immediate variables from the root `__init__.*` into `config.systen.vars.in`
+* changed: _config: moved not immediate variables from the root `__init__.*` into `config.system.vars.in`
 
 2021.09.19:
 * fixed: Scripts/Tests/bench/batscripts: `load_config.bat` script fast parse bench test fixup
@@ -2447,7 +2450,7 @@
 2021.09.18:
 * changed: Scripts/Tools/build: moved `load_config*.bat` scripts into more relevant `build` directory from the `std` directory
 * changed: Scripts/Tools/build: The `load_config_dir.bat` script is reworked to load a system configuration file independently to a user configuration files. Added `-gen_system_config` flag to explicitly load an output system configuration file. The `-gen_user_config` flag is used to explicitly load an output user configuration file.
-* changed: _config: configuration files is reworked to move all potential changable by a user values into a user configuration file
+* changed: _config: configuration files is reworked to move all potential changeable by a user values into a user configuration file
 * changed: Utilities/src/callf: minor changes
 
 2021.09.17:
@@ -2477,7 +2480,7 @@
 * changed: __init__, Scripts/Tools/bash, Scripts/Tools/ToolAdaptors, Scripts/Tests: bash scripts speedup optimization
 * changed: readme update
 * changed: readme dependencies update
-* chnaged: ignores update
+* changed: ignores update
 * refactor: Scripts/Tools/bash: tacklelib `bash_tacklelib` script now has used instead of `bash_entry`
 * refactor: removed unused files and data
 
@@ -2571,7 +2574,7 @@
 2021.08.12:
 * fixed: Utilities/src/callf: missed case where stdin can be not reopened but has not a character device handle type and so must be piped into child stdin
 * fixed: Utilities/src/callf: missed case where stdout/stderr can be not reopened but has not a character device handle type and so must be piped from child stdout/stderr
-* fixed: Utilities/src/callf: rewrited child in/out piping to control piping over stdin/stdout/stderr independently
+* fixed: Utilities/src/callf: rewrote child in/out piping to control piping over stdin/stdout/stderr independently
 * new: Utilities/src/callf: `/pipe-stdin-to-child-stdin`, `/pipe-child-stdout-to-stdout`, `/pipe-child-stderr-to-stderr`, `/pipe-inout-child` flags to explicitly declare piping to/from a child process
 * refactor: Utilities/src/callf: code refactor
 
@@ -2741,14 +2744,14 @@
 * new: Utilities/tests: manual tests for `callf` utility
 * changed: Scripts/Tools/testlib/init.bat: `_output` changed to `_out` directory, set `TEST_SCRIPT_OUTPUT_DIR`/`TEST_SCRIPT_LOCAL_TEMP_DIR` variables only if not defined
 * changed: Utilities/bin/contools: readme update
-* refactor: Scrtips/Tests/unit/batscripts: tests refactor
+* refactor: Scripts/Tests/unit/batscripts: tests refactor
 
 2021.07.19:
 * fixed: Scripts/Tools/std/restorecp.bat: tests pass
 
 2021.07.18:
 * fixed: Utilities/src/callf: missed to close server named pipe end after connection timeout
-* changed: Utilities/src/callf: rewrited code cleanup for all pipe threads to always disconnect a server named pipe end together with the handle close even if connection is not accomplished or SEH exception is thrown, otherwise a client may be blocked on the `PeekNamedPipe` call in an infinite loop
+* changed: Utilities/src/callf: rewrote code cleanup for all pipe threads to always disconnect a server named pipe end together with the handle close even if connection is not accomplished or SEH exception is thrown, otherwise a client may be blocked on the `PeekNamedPipe` call in an infinite loop
 
 2021.07.16:
 * new: Utilities/bin/contools: binaries update
@@ -2777,7 +2780,7 @@
 * fixed: Utilities/src/callf: Application abort after `std::runtime_error` exception in the `std::locale(".65001")` call (C++11 standard does not support unicode code page locale). Fixed by switching from absolute file path compare (`GetFullPathName` + `tolower`) to opened file handles compare (`GetFileInformationByHandle` + `GetFileInformationByHandleEx`)
 * fixed: Utilities/src/callf: Error message `could not set std* handle information: ...`. A default standard handle can not be changed for inheritance, we can change for inheritance only reopened standard handles.
 * fixed: Utilities/src/callf: missed to pass internal "no inherit" flag to `CreateProcess` function
-* changed: Utilities/src/callf: Rewrited the check of the same file usage. Instead of use the absolute file path compare (`GetFullPathName` + `tolower`), do use the opened file handles compare (`GetFileInformationByHandle`/`GetFileInformationByHandleEx`). As an addition, file hard links now compares correctly.
+* changed: Utilities/src/callf: Rewrote the check of the same file usage. Instead of use the absolute file path compare (`GetFullPathName` + `tolower`), do use the opened file handles compare (`GetFileInformationByHandle`/`GetFileInformationByHandleEx`). As an addition, file hard links now compares correctly.
 * refactor: Utilities/src/callf: code refactor
 
 2021.07.11:
@@ -3512,7 +3515,7 @@
 * fixed: Scripts/Tools/ToolAdapters/totalcmd/Tools: check_config_version.bat: fix in case of a quote character in the version line
 
 2020.08.01:
-* new: Scripts/Tools/ToolAdapters/ffmpeg: enable reencode flag for the cut scripts
+* new: Scripts/Tools/ToolAdapters/ffmpeg: enable re-encode flag for the cut scripts
 
 2020.07.31:
 * new: Scripts/Tests/batscripts: more `load_config.bat` script tests
@@ -3597,7 +3600,7 @@
 * new: Scripts/Tools/ToolAdapters: download scripts to download web files and html pages as is or html files as pdf files
 
 2020.07.07:
-* fixed: Scripts/Tools: the `wtee.exe` utility (now is deprecated) has an issue over a console progress bar (`\r` (character return) is not handled properly and so the output is messed), the gnuwin32 tee utility has another issue over `Cwrite error: No such file or directroy` error message when the pipe/output handle does close by the system. To workaround those issues the UnxUtils tee utility implementation does used instead of these are because works as expected in both cases. More details: https://stackoverflow.com/questions/796476/displaying-windows-command-prompt-output-and-redirecting-it-to-a-file/62771772#62771772
+* fixed: Scripts/Tools: the `wtee.exe` utility (now is deprecated) has an issue over a console progress bar (`\r` (character return) is not handled properly and so the output is messed), the gnuwin32 tee utility has another issue over `Cwrite error: No such file or directory` error message when the pipe/output handle does close by the system. To workaround those issues the UnxUtils tee utility implementation does used instead of these are because works as expected in both cases. More details: https://stackoverflow.com/questions/796476/displaying-windows-command-prompt-output-and-redirecting-it-to-a-file/62771772#62771772
 * new: Scripts/Tools: the `tee` utility implementation from the UnxUtils project: http://unxutils.sourceforge.net
 
 2020.07.06:
@@ -3613,7 +3616,7 @@
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: todo list update
 
 2020.05.26:
-* fixed: Scripts/Tools/ToolAdaptors/totalcmd: scm/shell: shell_copy_by_list.bat: derectory paths copy as directories
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: scm/shell: shell_copy_by_list.bat: directory paths copy as directories
 
 2020.05.20:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: todo list update
@@ -3674,7 +3677,7 @@
 2020.02.09:
 * fixed: utilities: wxwidgets build fixup
 * new: utilities: wxFileDialog: added support a directory selection
-* changed: utilities: wxFileDialog: rebuilded versus wxwidgets 3.1.3
+* changed: utilities: wxFileDialog: rebuilt versus wxwidgets 3.1.3
 * changed: readme update
 
 2020.02.09:
@@ -3714,7 +3717,7 @@
 * new: Scripts/Tools/ToolAdaptors/totalcmd: `compare_paths.bat` script to compare paths in a command line, `compare_paths_from_list.bat` script to compare paths in a single list file and `compare_paths_by_list.bat` script to compare paths in multiple list files
 * new: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars: compare: added `compare current directories of 2 panels` and `compare selected paths to saveload list...` items
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: ButtonBars: compare: `compare selected paths from current panel (odd-to-even)` and `compare selected paths from current panel (odd-to-even, sort file lines)` items
-* refactor: Scripts/Tools/ToolAdaptors/totalcmd: compare function completely rewrited to support single panel compare (single list compare) and 2 panel compare (multiple lists compare)
+* refactor: Scripts/Tools/ToolAdaptors/totalcmd: compare function completely rewrote to support single panel compare (single list compare) and 2 panel compare (multiple lists compare)
 * refactor: Scripts/Tools/ToolAdaptors/totalcmd: Tools: minor cleanup
 
 2020.01.23:
@@ -4015,7 +4018,7 @@
 * changed: Scripts/Tools/admin/Telemetry: minor change
 
 2019.07.03:
-* fixed: Scripts/Tools/ToolAdaptors/totalcmd: `configure.bat` script mutiple fixes
+* fixed: Scripts/Tools/ToolAdaptors/totalcmd: `configure.bat` script multiple fixes
 * new: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat: `configure.bat` can configure now into outer directory instead of inner one as is by default (if no input parameters)
 * new: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat: `configure.bat` now tries to create `%SYSTEMROOT%\System64` automatically if not done yet (`System64` must be visible from any bitness mode, when the `Sysnative` is visible only in the 32-bit mode)
 * new: Scripts/Tools/ToolAdaptors/totalcmd: Total Commander button bars examples for all scripts
@@ -4026,7 +4029,7 @@
 * refactor: Scripts/Tools/ToolAdaptors/totalcmd: minor refactor
 
 2019.07.02:
-* changed: Scripts/Tools/admin/Telemetry: add interation with the user to ask for quiet uninstall (now is not by default, because Event Viewer can contain errors after unsuccessful uninstall and user might not to known that)
+* changed: Scripts/Tools/admin/Telemetry: add interaction with the user to ask for quiet uninstall (now is not by default, because Event Viewer can contain errors after unsuccessful uninstall and user might not to known that)
 
 2019.06.30:
 * fixed: Scripts/Tools/ToolAdaptors/totalcmd: TortoiseProc.bat: script does not process all records if quantity was greater than TORTOISEPROC_MAX_CALLS
@@ -4098,7 +4101,7 @@
 * new: Scripts/Tools/admin/VM: `compact_vdi.bat` script to call the VirtualBox compact command on all `*.vdi` files in a directory
 
 2019.04.14:
-* new: Scripts/Tools/admin: `comspec_as_svc.bat` script to run cmd.exe interactively in the Local System Account (Seesion 0 process)
+* new: Scripts/Tools/admin: `comspec_as_svc.bat` script to run cmd.exe interactively in the Local System Account (Session 0 process)
 
 2019.04.05:
 * new: Scripts/Tools/admin: `test_connect.bat` script to test remote ports on open (PowerShell)
@@ -4191,7 +4194,7 @@
 * new: Scripts/Tools/encoding: convert_utf16le_to_utf8.bat script
 
 2018.12.25:
-* fixed: Scripts/Tools/ToolAdaptors/lnk: `*_sysnative_*.lnk` shortcuts replaced by `*_system64_*.lnk` shortcuts to fix problems over `sysnative` directory usage in particular cases (see `Open Administator console window in current directory` in the readme file)
+* fixed: Scripts/Tools/ToolAdaptors/lnk: `*_sysnative_*.lnk` shortcuts replaced by `*_system64_*.lnk` shortcuts to fix problems over `sysnative` directory usage in particular cases (see `Open Administrator console window in current directory` in the readme file)
 * changed: Scripts/Tools/ToolAdaptors/lnk: updated all other shortcuts to remove references to drive `C:\`
 
 2018.12.24:
@@ -4240,8 +4243,8 @@
 * fixed: multiple minor build issues
 * new: Utilities/*/gui/wxSaveFileDialog project (wxWidgets library must be installed separately into `_3dparty` subdirectory, see the `INSTALLATION` section in the `README_EN.txt` file for details)
 * added: wxWidgets setup.h for the msvc build to build as much as possible a minimal sized binary linked with the wxWidgets library
-* changed: git/svn ingores
-* changed: rebuilded all utilities
+* changed: git/svn ignores
+* changed: rebuilt all utilities
 
 2018.09.10:
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: configure.bat script update
@@ -4276,7 +4279,7 @@
 * fixed: typo
 
 2018.07.28:
-* new: Scripts/Tools/ToolAdaptors/totalcmd: standalone changelog (all previous history partially compied from the root changelog)
+* new: Scripts/Tools/ToolAdaptors/totalcmd: standalone changelog (all previous history partially copied from the root changelog)
 * changed: Scripts/Tools/ToolAdaptors/totalcmd: minor icons edit
 
 2018.07.24:

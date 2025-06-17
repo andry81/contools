@@ -21,13 +21,13 @@ rem     *impl.bat - implementation handler for a test, does not have command
 rem                 line arguments.
 rem     *report.bat - report handler for a test, to print user test result.
 rem     *setup.bat - a test first time setup handler.
-rem     *teardown.bat - a test last time teardown handler.
+rem     *teardown.bat - a test last time tear down handler.
 rem     *exit.bat - exit handler for a test, useful if required to copy test
 rem                 data out of a test script temporary output directory.
 rem
 rem CAUTION:
-rem   We must use an uniform code page to avod a code page change between calls
-rem   and so accidental recode on a file read/write.
+rem   We must use an uniform code page to avoid a code page change between
+rem   calls and so accidental recode on a file read/write.
 rem
 :DOC_END
 
@@ -47,7 +47,7 @@ rem reread current code page for each test, before run and after run
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
-rem must be assigned not to 65000 codepage!
+rem must be assigned not to 65000 code page!
 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
 set "TESTLIB__EXEC_ON_ENDLOCAL="
@@ -143,7 +143,7 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.exit%TEST_SCRIPT_FI
 :TEST_REPORT
 call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
-rem must be assigned not to 65000 codepage!
+rem must be assigned not to 65000 code page!
 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
 if %TEST_LAST_ERROR% EQU 0 (

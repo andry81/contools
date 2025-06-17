@@ -183,7 +183,7 @@
 '''       May leave the created shortcut file in an incomplete state.
 
 ''' NOTE:
-'''   1. Creation of a shortcut under ealier version of the Windows makes
+'''   1. Creation of a shortcut under earlier version of the Windows makes
 '''      shortcut cleaner. For example, do use Windows XP instead of the
 '''      Windows 7 and x86 instead of x64 to make a cleaner shortcut without
 '''      redundant data.
@@ -263,8 +263,8 @@
 '''     * If create a shortcut to the Windows command interpreter (cmd.exe)
 '''       with `Run as Administrator` flag raised, then you will run elevated
 '''       only the cmd.exe process. To start any other process you have to
-'''       either run it from the `cmd.exe` script, or create another standalone
-'''       shortcut with the `Run as Administrator` flag raised.
+'''       either run it from the `cmd.exe` script, or create another stand
+'''       alone shortcut with the `Run as Administrator` flag raised.
 '''     * Run from shortcut file (.lnk) in the Windows XP (but not in the
 '''       Windows 7) brings truncated command line down to ~260 characters.
 '''     * Run from shortcut file (.lnk) loads console windows parameters (font,
@@ -316,7 +316,7 @@ Function IsEmptyArg(args, index)
   If Err = 0 Then
     If args_ubound >= index Then
       ' CAUTION:
-      '   Must be a standalone condition.
+      '   Must be a stand alone condition.
       '   Must be negative condition in case of an invalid `index`
       If Not (Len(args(index)) > 0) Then
         IsEmptyArg = True
@@ -333,7 +333,7 @@ Function IsEmptyArg(args, index)
     If Err = 0 Then
       If index < num_args Then
         ' CAUTION:
-        '   Must be a standalone condition.
+        '   Must be a stand alone condition.
         '   Must be negative condition in case of an invalid `index`
         If Not (Len(args(index)) > 0) Then
           IsEmptyArg = True

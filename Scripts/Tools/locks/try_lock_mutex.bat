@@ -22,7 +22,7 @@ rem prelock via redirection to file
 set PRE_LOCK_ACQUIRE=0
 (
   (
-    rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
+    rem clean up if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
     rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
 
     mkdir "%LOCK_PATH%\%LOCK_DIR%" >nul 2>nul || (
@@ -43,7 +43,7 @@ set PRE_LOCK_ACQUIRE=0
   ) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%" && set PRE_LOCK_ACQUIRE=1
 ) 2>nul
 
-rem could not prelock operations over the lock directory - somebody is already proccessing it for locking/unlocking
+rem could not prelock operations over the lock directory - somebody is already processing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% EQU 0 (
   rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 

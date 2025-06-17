@@ -3,7 +3,7 @@
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
-rem cast to ingeter
+rem cast to integer
 set /A SCRIPT_TEMP_NEST_LVL+=0
 
 if %SCRIPT_TEMP_NEST_LVL% EQU 0 goto NEST_LVL_0
@@ -36,7 +36,7 @@ for /F "tokens=1,* delims=|"eol^= %%i in ("%SCRIPT_TEMP_TASK_COUNT_LIST%") do (
 set /A SCRIPT_TEMP_NEST_LVL-=1
 
 :NEST_LVL_0
-rem remove \.\ occurences
+rem remove \.\ occurrences
 setlocal
 set "SCRIPT_TEMP_PARENT_PATH_DIR_DECORATED=\%SCRIPT_TEMP_PARENT_PATH_DIR%\"
 set "SCRIPT_TEMP_PARENT_PATH_DIR_DECORATED=%SCRIPT_TEMP_PARENT_PATH_DIR_DECORATED:\.\=\%"

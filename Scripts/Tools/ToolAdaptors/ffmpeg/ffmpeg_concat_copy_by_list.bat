@@ -4,11 +4,11 @@ rem Examples:
 rem
 rem For details: https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar/1056632#1056632
 rem
-rem * reencode with better quality (default: `-crf 23`):
+rem * re-encode with better quality (default: `-crf 23`):
 rem
 rem   -enable_reencode -c:v -/ <encoder> -crf -/ 18 -preset -/ slow -q:v -/ 0 -c:a -/ copy ...
 rem
-rem * reencode with maximum quality (slower and bigger output file):
+rem * re-encode with maximum quality (slower and bigger output file):
 rem
 rem   -enable_reencode -c:v -/ <encoder> -crf -/ 0 -preset -/ slow -q:v -/ 0 -c:a -/ copy ...
 rem
@@ -97,7 +97,7 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
 
 type nul > "%TEMP_FILE_LIST%"
 
-rem check on all files existance at first
+rem check on all files existence at first
 for /f "usebackq eol=# tokens=* delims=" %%i in ("%FILE_LIST_IN:/=\%") do (
   set "FILE_PATH=%%i"
   if defined FILE_PATH call :CHECK_PATH || exit /b

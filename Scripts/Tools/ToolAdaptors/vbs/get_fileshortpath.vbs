@@ -4,7 +4,7 @@
 '''   get_shortfilepath.vbs <path>
 
 ''' NOTE:
-'''   This script does not require the Adminitrator privileges.
+'''   This script does not require the Administrator privileges.
 '''
 
 ''' CAUTION:
@@ -35,7 +35,7 @@ Function IsEmptyArg(args, index)
     If Err = 0 Then
       If index < num_args Then
         ' CAUTION:
-        '   Must be a standalone condition.
+        '   Must be a stand alone condition.
         '   Must be negative condition in case of an invalid `index`
         If Not (Len(args(index)) > 0) Then
           IsEmptyArg = True

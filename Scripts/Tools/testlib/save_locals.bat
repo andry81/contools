@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem CAUTION:
-rem   We must use an uniform code page to avod a code page change between calls
+rem   We must use an uniform code page to avoid a code page change between calls
 rem   and so accidental recode on a file read/write.
 rem
 :DOC_END

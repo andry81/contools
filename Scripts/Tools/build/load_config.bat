@@ -13,7 +13,7 @@ rem Description:
 rem   Script to load a configuration file which can consist of an input and
 rem   output parts.
 rem
-rem   The input configuration file is determinded by the `.in` suffix in the
+rem   The input configuration file is determined by the `.in` suffix in the
 rem   file name and basically stores in a version control system.
 rem   The output configuration file must not contain the `.in` suffix in the
 rem   file name and is used as a local storage for a user values.
@@ -22,7 +22,7 @@ rem   The script detects the input file change after the output file change
 rem   and interrupts the load with an error.
 rem
 rem   Additionally the `#%% version: ...` line is searched in both files and
-rem   compared to force the user to manually update the output confuguration
+rem   compared to force the user to manually update the output configuration
 rem   file from the input configuration file in case if are not equal.
 rem
 rem   By default the script does load the input configuration from the

@@ -28,7 +28,7 @@
 '''         If the first argument of <CommandLine> is not a document file, the
 '''         function will fail.
 '''       explore
-'''         Explores a folder specified by the first argumnet of <CommandLine>.
+'''         Explores a folder specified by the first argument of <CommandLine>.
 '''       find
 '''         Initiates a search beginning in the directory specified by
 '''         <CurrentDirectoryPath>.
@@ -119,7 +119,7 @@
 '''   -nowindow
 '''     Hide child process window upon child process creation.
 ''''  -make_temp_dir_as_cwd <CwdPlaceholder>
-'''     Make Current Working Directory as unique subdirectry in the temporary
+'''     Make Current Working Directory as unique subdirectory in the temporary
 '''     directories storage. Replace all <CwdPlaceholder> strings in all
 '''     arguments by absolute path to Current Working Directory.
 ''''  -wait_delete_cwd
@@ -163,7 +163,7 @@
 '''
 ''' CAUTION:
 '''   This implementation has issues which can not be fixed at all (by design).
-'''   There is a better implementation through a standalone executable, see
+'''   There is a better implementation through a stand alone executable, see
 '''   the `contools--utils` project.
 '''
 ''' CAUTION:

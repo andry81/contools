@@ -12,7 +12,7 @@ rem   scripts. Can be absolute or relative. If is a relative then relative to
 rem   the directory path from the first argument.
 rem
 rem CAUTION:
-rem   We must use an uniform code page to avod a code page change between calls
+rem   We must use an uniform code page to avoid a code page change between calls
 rem   and so accidental recode on a file read/write.
 rem
 rem CAUTION:
@@ -47,7 +47,7 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 rem previous code page before init
 set "TESTLIB__PREV_CP=%TESTLIB__TEST_CP%"
 
-rem must be assigned not to 65000 codepage!
+rem must be assigned not to 65000 code page!
 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
 call :MAIN %%*
@@ -112,7 +112,7 @@ if /i "%TEST_SCRIPT_FILE_PATH%" == "%?~f0%" (
   exit /b 255
 ) >&2
 
-rem make builtin canonical user script path variables
+rem make built in canonical user script path variables
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_PATH "%%?~f0%%"
 
 set "TEST_SCRIPT_FILE_NAME=%?~n0%"

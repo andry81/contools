@@ -42,7 +42,7 @@ set "RAND=%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
 set "WAITER_FILE=waiter.%RAND%"
 set "WAITER_FILE_%LOCK_WAITER_INDEX%="
 
-rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
+rem clean up if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
 set "OLD_LOCK_DIR=%LOCK_DIR%.%RAND%"
 
 :PRE_LOCK_LOOP0
@@ -75,7 +75,7 @@ set PRE_LOCK_ACQUIRE=0
   ) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%" && set PRE_LOCK_ACQUIRE=1
 ) 2>nul
 
-rem could not prelock operations over the lock directory - somebody is already proccessing it for locking/unlocking
+rem could not prelock operations over the lock directory - somebody is already processing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% NEQ 0 exit /b 0
 
 rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
@@ -113,7 +113,7 @@ set "OLD_LOCK_DIR=%LOCK_DIR%.%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
 rem prelock via redirection to file
 (
   (
-    rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
+    rem clean up if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
     rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
   ) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%"
 ) 2>nul
@@ -123,17 +123,17 @@ if not exist "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%\%WAITER_FILE%" (
   set "WAITER_FILE_%LOCK_WAITER_INDEX%="
   set /A NUM_WAITERS_COMPLETE+=1
 
-  rem Try to cleanup the lock directory before the exit.
+  rem Try to clean up the lock directory before the exit.
 
   rem prelock via redirection to file
   (
     (
-      rem cleanup if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
+      rem clean up if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
       rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
     ) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%"
   ) 2>nul
 
-  rem directory lock is cleanuped under the prelock, now is safe to remove the prelock file
+  rem directory lock is cleaned up under the prelock, now is safe to remove the prelock file
   call :CLEANUP_PRELOCK
 
   echo;Waiter [ %LOCK_NAME%\%WAITER_FILE% ] exited

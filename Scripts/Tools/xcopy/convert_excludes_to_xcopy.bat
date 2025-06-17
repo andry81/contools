@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem Description:
-rem   Script converts unform file/directory excludes list in format of
+rem   Script converts uniform file/directory excludes list in format of
 rem     `exclude1|..|excludeN` ,where
 rem       `exclude` can be an exclude wildcard file name or @-prefixed path to
 rem       text file with list of file name wildcards.

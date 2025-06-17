@@ -93,7 +93,7 @@ set LAST_ERROR=%ERRORLEVEL%
 if %SCRIPT_TEMP_NEST_LVL% EQU 0 goto SKIP_REALLOCATE
 
 rem CAUTION:
-rem   In case of nested call, the last diretory may be locked from the remove in the previous `free_temp_dir.bat` call.
+rem   In case of nested call, the last directory may be locked from the remove in the previous `free_temp_dir.bat` call.
 rem   We must randomize the directory name and try to allocate again!
 rem
 (

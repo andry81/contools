@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem CAUTION:
-rem   We must use an uniform code page to avod a code page change between calls
+rem   We must use an uniform code page to avoid a code page change between calls
 rem   and so accidental recode on a file read/write.
 rem
 :DOC_END
@@ -10,7 +10,7 @@ set "TEST_SCRIPT_LOCAL_VARS_FILE_PATH=%~1"
 
 shift
 
-rem must be assigned not to 65000 codepage!
+rem must be assigned not to 65000 code page!
 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
 if not exist "%TEST_SCRIPT_LOCAL_VARS_FILE_PATH%" type nul > "%TEST_SCRIPT_LOCAL_VARS_FILE_PATH%"

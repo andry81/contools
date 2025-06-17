@@ -11,7 +11,7 @@ rem   The script detects the input file change after the output file change and
 rem   returns an error.
 rem
 rem   Additionally the `#%% version: ...` first line does read from both files
-rem   to force the user to manually update the output confuguration file from
+rem   to force the user to manually update the output configuration file from
 rem   the input configuration file in case if these lines are not equal.
 rem
 rem   If the first line of the `<InputFile>` does not begin by the

@@ -8,7 +8,7 @@ rem CAUTION:
 rem   This script must be called without the `call` prefix!
 rem
 rem CAUTION:
-rem   We must use an uniform code page to avod a code page change between calls
+rem   We must use an uniform code page to avoid a code page change between calls
 rem   and so accidental recode on a file read/write.
 rem
 rem CAUTION:
@@ -29,7 +29,7 @@ rem reread current code page for each test, before exit and after exit
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
-rem must be assigned not to 65000 codepage!
+rem must be assigned not to 65000 code page!
 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
 call :MAIN %%*
@@ -65,7 +65,7 @@ call :TEST_TEARDOWN
 set TEST_LAST_ERROR=%ERRORLEVEL%
 
 if %TEST_LAST_ERROR% EQU 0 (
-  rem negative return code to indicate no error in the teardown
+  rem negative return code to indicate no error in the tear down
   if %TESTLIB__CURRENT_PASSED_TESTS% LSS %TESTLIB__CURRENT_TESTS% set /A TEST_LAST_ERROR=TESTLIB__CURRENT_PASSED_TESTS-TESTLIB__CURRENT_TESTS
 )
 

@@ -25,7 +25,7 @@ rem     The expression to replace for the sed in form:
 rem       `s|<sed_replace_from>|<sed_replace_to>}mg`
 rem
 rem     To pass a special code character you can use the `$/<char>` or `$/\xNN`
-rem     syntax, where `NN` is a hexidecimal code of a character.
+rem     syntax, where `NN` is a hexadecimal code of a character.
 rem
 rem   -if_notexist
 rem     Generate if output config does not exist.

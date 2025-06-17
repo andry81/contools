@@ -4,7 +4,7 @@
 '''   set_shortfilename.vbs <path> <short-file-name>
 
 ''' CAUTION:
-'''   This script requires the Adminitrator privileges to request below privileges.
+'''   This script requires the Administrator privileges to request below privileges.
 
 ''' CAUTION:
 '''   The script process must be a 32-bit process to create `jcb.tools` object.
@@ -23,7 +23,7 @@ Function IsEmptyArg(args, index)
   If Err = 0 Then
     If args_ubound >= index Then
       ' CAUTION:
-      '   Must be a standalone condition.
+      '   Must be a stand alone condition.
       '   Must be negative condition in case of an invalid `index`
       If Not (Len(args(index)) > 0) Then
         IsEmptyArg = True
@@ -40,7 +40,7 @@ Function IsEmptyArg(args, index)
     If Err = 0 Then
       If index < num_args Then
         ' CAUTION:
-        '   Must be a standalone condition.
+        '   Must be a stand alone condition.
         '   Must be negative condition in case of an invalid `index`
         If Not (Len(args(index)) > 0) Then
           IsEmptyArg = True
@@ -233,5 +233,5 @@ PrintOrEchoErrorLine _
   WScript.ScriptName & ": error: CreateFileW is failed:" & vbCrLf & _
   WScript.ScriptName & ": info: LastError=`" & CStr(dwLastError) & "` (0x" & Hex(dwLastError) & ")" & vbCrLf & _
   WScript.ScriptName & ": info: Path=`" & PathAbs & "`" & vbCrLf & _
-  WScript.ScriptName & ": note: the process must have has Adminitrator privileges.`"
+  WScript.ScriptName & ": note: the process must have has Administrator privileges.`"
 WScript.Quit -1

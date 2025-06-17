@@ -5,7 +5,7 @@ rem   Script to extract an archive or all archives from a directory recursively 
 rem   Script automatically does self logging.
 
 rem CAUTION:
-rem   Script is left for the backward compatability. Use `extract_files_from_archives.bat` script instead.
+rem   Script is left for the backward compatibility. Use `extract_files_from_archives.bat` script instead.
 
 rem Command arguments:
 rem %1 - Path to output directory for extracted files.

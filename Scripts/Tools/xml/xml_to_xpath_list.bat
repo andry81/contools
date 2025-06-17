@@ -1,7 +1,7 @@
 @echo off
 
 rem Description:
-rem   Script converts input XML into XPATH list by appling bundled XSLT file.
+rem   Script converts input XML into XPATH list by applying bundled XSLT file.
 
 rem Flags:
 rem  -noprops - do not print properties

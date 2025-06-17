@@ -122,16 +122,16 @@
 '''
 '''     CAUTION:
 '''       The Windows Shell component does use a guess logic to restore
-'''       unexisted or invalid target path or/and working directory properties.
-'''       In some cases or OS versions it may lead to a path property
-'''       corruption or even an entire shortcut corruption.
+'''       inexistent or invalid target path or/and working directory
+'''       properties. In some cases or OS versions it may lead to a path
+'''       property corruption or even an entire shortcut corruption.
 '''
 '''       Details:
 '''         https://learn.microsoft.com/en-us/windows/win32/shell/links#link-resolution
 '''         https://github.com/libyal/liblnk/tree/HEAD/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc#8-corruption-scenarios
 '''         https://stackoverflow.com/questions/22382010/what-options-are-available-for-shell32-folder-getdetailsof/37061433#37061433
 '''
-'''       In the wild has been catched several cases of a shortcut corruption:
+'''       In the wild has been caught several cases of a shortcut corruption:
 '''       - Shortcut path can change length from long path to short DOS path.
 '''       - Shortcut path can change language characters localization from
 '''         Unicode to ANSI with wrong code page.
@@ -242,7 +242,7 @@ Function IsEmptyArg(args, index)
   If Err = 0 Then
     If args_ubound >= index Then
       ' CAUTION:
-      '   Must be a standalone condition.
+      '   Must be a stand alone condition.
       '   Must be negative condition in case of an invalid `index`
       If Not (Len(args(index)) > 0) Then
         IsEmptyArg = True
@@ -259,7 +259,7 @@ Function IsEmptyArg(args, index)
     If Err = 0 Then
       If index < num_args Then
         ' CAUTION:
-        '   Must be a standalone condition.
+        '   Must be a stand alone condition.
         '   Must be negative condition in case of an invalid `index`
         If Not (Len(args(index)) > 0) Then
           IsEmptyArg = True
@@ -855,7 +855,7 @@ Do ' empty `Do-Loop` to emulate `Break`
     If Not AllowTargetPathReassign Then
       If LCase(ShortcutTargetPrev) = ShortcutTargetUnquotedAbsLCase Then
         PrintOrEchoErrorLine _
-          WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("TargetPath") & "` has nocase equal path."
+          WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("TargetPath") & "` has no case equal path."
         Exit Do
       End If
     End If
@@ -918,7 +918,7 @@ Do ' empty `Do-Loop` to emulate `Break`
       If Not AllowTargetPathReassign Then
         If ShortcutTargetLCase = LCase(ShortcutTargetShortPath) Then
           PrintOrEchoErrorLine _
-            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("TargetPath") & "` has nocase equal path."
+            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("TargetPath") & "` has no case equal path."
           Exit Do
         End If
       End If
@@ -997,7 +997,7 @@ Do ' empty `Do-Loop` to emulate `Break`
   If Not AllowWorkingDirectoryReassign Then
     If LCase(ShortcutWorkingDirectoryPrev) = ShortcutWorkingDirectoryAbsLCase Then
       PrintOrEchoErrorLine _
-        WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("WorkingDirectory") & "` has nocase equal path."
+        WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("WorkingDirectory") & "` has no case equal path."
       Exit Do
     End If
   End If
@@ -1034,7 +1034,7 @@ Do ' empty `Do-Loop` to emulate `Break`
       If Not AllowWorkingDirectoryReassign Then
         If ShortcutWorkingDirectoryLCase = LCase(ShortcutWorkingDirectoryShortPath) Then
           PrintOrEchoErrorLine _
-            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("WorkingDirectory") & "` has nocase equal DOS path."
+            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("WorkingDirectory") & "` has no case equal DOS path."
           Exit Do
         End If
       End If
@@ -1135,7 +1135,7 @@ If ShortcutUpdated Then
     If Not objFS.FolderExists("\\?\" & ShortcutFileBackupDir) Then
       objFS.CreateFolder "\\?\" & ShortcutFileBackupDir
 
-      If (err <> 0) And err <> &h800A003A& Then ' File aready exists
+      If (err <> 0) And err <> &h800A003A& Then ' File already exists
         PrintOrEchoErrorLine _
           WScript.ScriptName & ": error: could not create a shortcut file backup directory:" & vbCrLf & _
           WScript.ScriptName & ": info: BackupFilePath=`" & ShortcutFileBackupDir & "`" & vbCrLf & _

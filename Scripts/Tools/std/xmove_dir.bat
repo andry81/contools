@@ -4,7 +4,7 @@ rem USAGE:
 rem   xmove_dir.bat [<flags>] [--] <from-path> <to-path> [<xmove-flags>...]
 
 rem Description:
-rem   The `move`/`robocopy.exe` seemless wrapper script with xcopy
+rem   The `move`/`robocopy.exe` seamless wrapper script with xcopy
 rem   compatible command line flags/excludes, echo and some conditions check
 rem   before call to move a directory to a directory.
 rem
@@ -13,10 +13,10 @@ rem
 rem   NOTE:
 rem     All input paths must be without `\\?\` prefix because:
 rem       1. Can be directly used in commands which does not support long paths
-rem          like builtin `dir` command.
+rem          like built in `dir` command.
 rem       2. Can be checked on absence of globbing characters which includes
 rem          `?` character.
-rem       3. The `%%~f` builtin variables extension and other extensions does
+rem       3. The `%%~f` built in variables extension and other extensions does
 rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 
@@ -51,12 +51,12 @@ rem   -chcp <CodePage>
 rem     Set explicit code page.
 rem
 rem   -use_builtin_move
-rem     Use builtin `move` command instead of `robocopy` executable utility.
+rem     Use built in `move` command instead of `robocopy` executable utility.
 rem     CAUTION:
 rem       Movement can fail with that flag in case of a long path.
 rem
 rem   -use_robocopy
-rem     Use `robocopy` executable utility instead of builtin `move` command.
+rem     Use `robocopy` executable utility instead of built in `move` command.
 rem     Has no effect if `-use_builtin_move` flag is used.
 rem     Can not be used if `robocopy.exe` is not found.
 rem     NOTE:
@@ -67,7 +67,7 @@ rem     By default `<to-path>` does check on directory existence and throw
 rem     an error if exists.
 rem     Use this flag to ignore existed target directory and use `robocopy.exe`
 rem     if existed in case of a directory move-to-merge, otherwise fallback to
-rem     builtin `move` command if `-use_robocopy` flag is not used.
+rem     built in `move` command if `-use_robocopy` flag is not used.
 rem     Has no effect if `-use_builtin_move` flag is used.
 rem
 rem   -touch_dir
@@ -259,7 +259,7 @@ set /A FLAG_SHIFT+=2
 call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XMOVE_FLAGS_ %%*
 
 rem CAUTION:
-rem   You must switch code page into english compatible locale.
+rem   You must switch code page into English compatible locale.
 rem
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 

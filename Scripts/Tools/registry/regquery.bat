@@ -13,11 +13,11 @@ rem   If key and value not empty and found, then error level sets to 0.
 
 rem Command arguments:
 rem %1 - Registry key path.
-rem %2 - Key variable name (case insentive). If doesn't exist or empty, script
+rem %2 - Key variable name (case insensitive). If doesn't exist or empty, script
 rem      reads default value of key.
 rem %3 - Flags:
 rem    -v - (Default) Reads key value and sets REGQUERY_VALUE variable.
-rem    -t - Just tests key or value on existance.
+rem    -t - Just tests key or value on existence.
 
 rem Examples:
 rem 1. call regquery.bat "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Command Processor" EnableExtensions

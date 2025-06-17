@@ -57,16 +57,16 @@
 '''
 '''     CAUTION:
 '''       The Windows Shell component does use a guess logic to restore
-'''       unexisted or invalid target path or/and working directory properties.
-'''       In some cases or OS versions it may lead to a path property
-'''       corruption or even an entire shortcut corruption.
+'''       inexistent or invalid target path or/and working directory
+'''       properties. In some cases or OS versions it may lead to a path
+'''       property corruption or even an entire shortcut corruption.
 '''
 '''       Details:
 '''         https://learn.microsoft.com/en-us/windows/win32/shell/links#link-resolution
 '''         https://github.com/libyal/liblnk/tree/HEAD/documentation/Windows%20Shortcut%20File%20(LNK)%20format.asciidoc#8-corruption-scenarios
 '''         https://stackoverflow.com/questions/22382010/what-options-are-available-for-shell32-folder-getdetailsof/37061433#37061433
 '''
-'''       In the wild has been catched several cases of a shortcut corruption:
+'''       In the wild has been caught several cases of a shortcut corruption:
 '''       - Shortcut path can change length from long path to short DOS path.
 '''       - Shortcut path can change language characters localization from
 '''         Unicode to ANSI with wrong code page.
@@ -185,7 +185,7 @@ Function IsEmptyArg(args, index)
   If Err = 0 Then
     If args_ubound >= index Then
       ' CAUTION:
-      '   Must be a standalone condition.
+      '   Must be a stand alone condition.
       '   Must be negative condition in case of an invalid `index`
       If Not (Len(args(index)) > 0) Then
         IsEmptyArg = True
@@ -202,7 +202,7 @@ Function IsEmptyArg(args, index)
     If Err = 0 Then
       If index < num_args Then
         ' CAUTION:
-        '   Must be a standalone condition.
+        '   Must be a stand alone condition.
         '   Must be negative condition in case of an invalid `index`
         If Not (Len(args(index)) > 0) Then
           IsEmptyArg = True
@@ -796,7 +796,7 @@ If ResetTargetPathFromDesc And (Not ShortcutTargetAssigned) Then
 
       If Not ShortcutTargetToAssignExist Then
         PrintOrEchoErrorLine _
-          WScript.ScriptName & ": error: shortcut desciprion as path to assign does not exist:" & vbCrLf & _
+          WScript.ScriptName & ": error: shortcut description as path to assign does not exist:" & vbCrLf & _
           WScript.ScriptName & ": info: TargetPath=`" & ShortcutTargetToAssign & "`"
         WScript.Quit 20
       End If

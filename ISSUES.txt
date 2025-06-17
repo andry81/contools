@@ -34,6 +34,6 @@ Scripts/Tools/build/load_config.bat
 
   chcp 65000
 
-  catched in:
+  caught in:
 
   Scripts/Tools/filesys/read_shortcut_target_path.bat

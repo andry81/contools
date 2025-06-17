@@ -4,11 +4,11 @@ rem Examples:
 rem
 rem For details: https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar/1056632#1056632
 rem
-rem * reencode with better quality (default: `-crf 23`):
+rem * re-encode with better quality (default: `-crf 23`):
 rem
 rem   -enable_reencode -c:v -/ <encoder> -crf -/ 18 -preset -/ slow -q:v -/ 0 -c:a -/ copy ...
 rem
-rem * reencode with maximum quality (slower and bigger output file):
+rem * re-encode with maximum quality (slower and bigger output file):
 rem
 rem   -enable_reencode -c:v -/ <encoder> -crf -/ 0 -preset -/ slow -q:v -/ 0 -c:a -/ copy ...
 rem
