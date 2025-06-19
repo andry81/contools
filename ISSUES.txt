@@ -37,3 +37,10 @@ Scripts/Tools/build/load_config.bat
   caught in:
 
   Scripts/Tools/filesys/read_shortcut_target_path.bat
+
+-------------------------------------------------------------------------------
+sed.exe
+-------------------------------------------------------------------------------
+
+* Any `sed.exe` invocation does truncate the output by the CTRL-Z character
+  (code hex `1A` or dec 26)
