@@ -1,3 +1,7 @@
+2025.06.19:
+* fixed: Scripts/Tools/build/mkdir*.bat: print error
+* changed: Scripts/Tools/build: mkdir*.bat, xcopy_*bat: print blank line
+
 2025.06.18:
 * refactor: spelling fixup
 

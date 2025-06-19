@@ -40,6 +40,7 @@ set "DIR_PATH=%~1"
 
 if not defined DIR_PATH (
   echo;%?~%: error: directory path is not defined.
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;
   exit /b -255
 ) >&2
 
@@ -67,6 +68,7 @@ goto DIR_PATH_OK
 :DIR_PATH_ERROR
 (
   echo;%?~%: error: directory path is invalid: "%DIR_PATH%".
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;
   exit /b -254
 ) >&2
 
@@ -79,6 +81,7 @@ rem   The drive still must exist even if the path is not. If path exists, the pa
 rem
 if not exist "%DIR_DRIVE%" (
   echo;%?~%: error: the directory path drive is not exist: "%DIR_PATH%".
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;
   exit /b -254
 ) >&2
 
@@ -92,7 +95,7 @@ if exist "\\?\%DIR_PATH%" exit /b 0
 
 echo;^>mkdir "%DIR_PATH%"
 
-mkdir "%DIR_PATH%" 2>nul && (
+mkdir "%DIR_PATH%" && (
   if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;
   exit /b 0
 )

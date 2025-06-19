@@ -31,6 +31,7 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 
 if "%~3" == "" (
   echo;%?~%%: error: target directory is not defined.
+  if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;
   exit /b 255
 ) >&2
 
