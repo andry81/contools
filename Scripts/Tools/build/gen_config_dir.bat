@@ -131,6 +131,7 @@ if not defined CONFIG_FILE (
   exit /b 20
 ) >&2
 
+:CONFIG_FILE_LOOP
 for %%i in ("%CONFIG_IN_DIR%\%CONFIG_FILE%.in") do (
   for /F "tokens=* delims="eol^= %%j in ("%%i") do set "CONFIG_FILE_NAME=%%~nj"
   call "%%?~dp0%%gen_config.bat" -skip_checks%%GEN_CONFIG_FLAGS%% -- "%%CONFIG_IN_DIR%%" "%%CONFIG_OUT_DIR%%" "%%CONFIG_FILE_NAME%%" || exit /b
@@ -138,16 +139,8 @@ for %%i in ("%CONFIG_IN_DIR%\%CONFIG_FILE%.in") do (
 
 shift
 
-:CONFIG_FILE_LOOP
 set "CONFIG_FILE=%~1"
 
 if not defined CONFIG_FILE exit /b 0
-
-for %%i in ("%CONFIG_IN_DIR%\%CONFIG_FILE%.in") do (
-  for /F "tokens=* delims="eol^= %%j in ("%%i") do set "CONFIG_FILE_NAME=%%~nj"
-  call "%%?~dp0%%gen_config.bat" -skip_checks%%GEN_CONFIG_FLAGS%% -- "%%CONFIG_IN_DIR%%" "%%CONFIG_OUT_DIR%%" "%%CONFIG_FILE_NAME%%" || exit /b
-)
-
-shift
 
 goto CONFIG_FILE_LOOP

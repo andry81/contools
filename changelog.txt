@@ -1,3 +1,6 @@
+2025.06.20:
+* changed: Scripts/Tools/build/gen_config_dir.bat: code cleanup
+
 2025.06.19:
 * changed: ISSUES.txt: issues update
 
