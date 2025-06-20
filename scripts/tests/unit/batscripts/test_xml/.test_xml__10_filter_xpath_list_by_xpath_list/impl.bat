@@ -29,7 +29,7 @@ if not exist "%TEST_DATA_REF_FILE%" set "TEST_LAST_ERROR=22" & goto EXIT
 exit /b %TEST_LAST_ERROR%
 
 :GET_TEST_DATA_FILE_DIR
-set "FILE_PATH=%~dp1"
+for /F "tokens=* delims="eol^= %%i in ("%~dp1.") do set "FILE_PATH=%%~fi"
 call set "RETURN_VALUE=%%FILE_PATH:%TEST_DATA_IN_ROOT:/=\%\%TEST_SCRIPT_FILE_NAME%\=%%"
 exit /b 0
 

@@ -1,3 +1,8 @@
+2025.06.27:
+* fixed: scripts/tools/xml: sed/*.sed, filter_xpath_list_by_xpath_list.bat: port `sed` expressions from `GnuWin32` to `Msys2` (`Msys2` pattern expressions `.`, `$`, `[^]` does not respect the carriage return character - `\r`)
+* fixed: scripts: tools/cleanup/cleanup_file.bat, tests/unit/batscripts/test_xml/test_xml__00_sed.bat: preserve Windows line returns
+* fixed: scripts/tests/unit/batscripts/test_xml: tests pass
+
 2025.06.25:
 * refactor: global directories rename to lower case name
 

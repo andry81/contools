@@ -8,13 +8,13 @@ call "%%CONTOOLS_ROOT%%/std/assert_if_def.bat" __CTRL_SETLOCAL "error: cmd.exe i
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
 rem xpath_filter_list/0X
-call :TEST "xpath_filter_list/01_empty" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
-call :TEST "xpath_filter_list/11_inexact" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
-call :TEST "xpath_filter_list/12_exact" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_exact_list.sed"
+call :TEST "xpath_filter_list/01_empty" -n -b -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
+call :TEST "xpath_filter_list/11_inexact" -n -b -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
+call :TEST "xpath_filter_list/12_exact" -n -b -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_filter_list_to_flat_findstr_pttn_exact_list.sed"
 
 rem xpath_search_list/0X
-call :TEST "xpath_search_list/01_empty" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
-call :TEST "xpath_search_list/02" -n -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
+call :TEST "xpath_search_list/01_empty" -n -b -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
+call :TEST "xpath_search_list/02" -n -b -f "%%CONTOOLS_ROOT%%/xml/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed"
 
 echo;
 
