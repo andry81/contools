@@ -70,9 +70,9 @@ if %FLAG_USE_BOM% NEQ 0 call :OUTPUT_BOM
 
 rem workaround for `conversion from CP65001 unsupported`
 if "%INPUT_CHARSET%" == "CP65001" (
-  "%CONTOOLS_GNUWIN32_ROOT%/bin/iconv.exe" -c -f UTF-8 -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
+  "%CONTOOLS_MSYS2_USR_ROOT%/bin/iconv.exe" -c -f UTF-8 -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
 ) else (
-  "%CONTOOLS_GNUWIN32_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
+  "%CONTOOLS_MSYS2_USR_ROOT%/bin/iconv.exe" -c -f "%INPUT_CHARSET%" -t "%OUTPUT_CHARSET%" "%INPUT_FILE%"
 )
 exit /b
 

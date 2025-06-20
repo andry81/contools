@@ -10,7 +10,7 @@ setlocal
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config.bat" "%%TEST_DATA_BASE_DIR%%/test_build__load_config" . test_01.vars "" OS64 || (
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config.bat" "%%TEST_DATA_IN_ROOT%%/test_build__load_config" . test_01.vars "" OS64 || (
   echo;%~nx0: error: failed to execute `load_config.bat`
   exit /b 255
 ) >&2

@@ -14,4 +14,4 @@ if not exist "%INPUT_FILE%" (
   exit /b 1
 ) >&2
 
-type "%INPUT_FILE%" | "%CONTOOLS_GNUWIN32_ROOT%/bin/tr.exe" -d "\15\32"
+type "%INPUT_FILE%" | "%CONTOOLS_MSYS2_USR_ROOT%/bin/tr.exe" -d "\15\32"

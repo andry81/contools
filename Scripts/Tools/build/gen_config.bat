@@ -204,4 +204,4 @@ if not defined SED_BARE_FLAGS (
 rem initialize only in case of the sed usage
 call "%%?~dp0%%__init__.bat" || exit /b
 
-type "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" | "%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" -r -b%SED_BARE_FLAGS% > "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
+type "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" | "%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -r -b%SED_BARE_FLAGS% > "%CONFIG_OUT_DIR%\%CONFIG_FILE%"

@@ -26,10 +26,6 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
-TEST_SRC_BASE_DIR           ="%TESTS_PROJECT_ROOT%"
-TEST_DATA_BASE_DIR          ="%TEST_SRC_BASE_DIR%/_testdata"
-TEST_DATA_OUT_DIR           ="%PROJECT_OUTPUT_ROOT%/_tests/bench/out"
-TEST_TEMP_BASE_DIR          ="%PROJECT_OUTPUT_ROOT%/_tests/bench/temp"
-
-TEST_SCRIPT_OUTPUT_DIR      ="%TEST_DATA_OUT_DIR%"
-TEST_SCRIPT_LOCAL_TEMP_DIR  ="%TEST_TEMP_BASE_DIR%"
+TEST_DATA_IN_ROOT           ="%TESTS_PROJECT_ROOT%/_testdata"
+TEST_DATA_OUT_ROOT          ="%PROJECT_OUTPUT_ROOT%/_tests/bench/out"
+TEST_DATA_TEMP_ROOT         ="%PROJECT_OUTPUT_ROOT%/_tests/bench/temp"

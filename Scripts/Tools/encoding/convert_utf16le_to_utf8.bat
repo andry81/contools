@@ -20,4 +20,4 @@ if not exist "%TO_FILE_DIR_PATH%" (
 ) >&2
 
 rem UTF-16 w/o byte ordering suffix to avoid BOM generation
-"%CONTOOLS_GNUWIN32_ROOT%/bin/iconv.exe" -c -f UTF-16 -t UTF-8 "%FROM_FILE_PATH%" > "%TO_FILE_PATH%"
+"%CONTOOLS_MSYS2_USR_ROOT%/bin/iconv.exe" -c -f UTF-16 -t UTF-8 "%FROM_FILE_PATH%" > "%TO_FILE_PATH%"

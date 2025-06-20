@@ -1,4 +1,13 @@
 2025.06.20:
+* fixed: ISSUES.txt: switched to `msys2` `sed.exe` without the stream truncation issue
+* fixed: Scripts/Tests/unit/batscripts/test_xml/.test_xml__10_filter_xpath_list_by_xpath_list/impl.bat: test output error
+* new: .externals*: `msys2` external dependencies for Windows XP and Windows 7+
+* new: tools/load_config_dir.bat, _config/config.system.vars.in: parameterized config and config directory load script wrapper to parameterize the loading phase
+* changed: Scripts/Tools: switched to new `msys2` external
+* changed: __init__.bat: switched to parameterized config directory script loader
+* changed: Scripts: Tests, Tools/testlib/init.bat: test variables refactor
+
+2025.06.20:
 * changed: Scripts/Tools/build/gen_config_dir.bat: code cleanup
 
 2025.06.19:

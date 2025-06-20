@@ -44,6 +44,11 @@ rem   Only `CONTOOLS_ROOT` variable is available from here.
 rem
 call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_ROOT                           "%%CONTOOLS_PROJECT_ROOT%%/Scripts/Tools"
 
+call "%%CONTOOLS_ROOT%%/std/get_windows_version.bat" || exit /b
+
+rem Windows XP is minimal
+call "%%CONTOOLS_ROOT%%/std/check_windows_version.bat" 5 1 || exit /b
+
 if %NO_GEN%0 EQU 0 (
   call "%%CONTOOLS_ROOT%%/build/mkdir_if_notexist.bat" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 )
@@ -54,8 +59,8 @@ rem NOTE:
 rem   After the config load, all the variables additionally to the `CONTOOLS_ROOT` variable would be available from here.
 rem
 if %NO_GEN%0 EQU 0 (
-  call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -gen_user_config -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
-) else call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
+  call "%%CONTOOLS_PROJECT_ROOT%%/tools/load_config_dir.bat" %%* -gen_user_config -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
+) else call "%%CONTOOLS_PROJECT_ROOT%%/tools/load_config_dir.bat" %%* -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
 rem init external projects
 

@@ -43,8 +43,11 @@ upath CONTOOLS_WMI_ROOT                         ="%CONTOOLS_ROOT%/wmi"
 upath CONTOOLS_TOOL_ADAPTORS_ROOT               ="%CONTOOLS_ROOT%/ToolAdaptors"
 
 upath CONTOOLS_7ZIP_ROOT                        ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/7zip"
-upath CONTOOLS_GNUWIN32_ROOT                    ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/gnuwin32"
-upath CONTOOLS_AUTOGEN_ROOT                     ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/msys"
+
+upath CONTOOLS_MSYS2_ROOT                       ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/msys2"
+upath CONTOOLS_MSYS2_USR_ROOT                   ="%CONTOOLS_MSYS2_ROOT%/win7"
+upath CONTOOLS_MSYS2_USR_ROOT:OSWINXP           ="%CONTOOLS_MSYS2_ROOT%/winxp"
+
 upath CONTOOLS_HASHDEEP_ROOT                    ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/hashdeep"
 upath CONTOOLS_SQLITE_ROOT                      ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/sqlite"
 upath CONTOOLS_SPMILLER_CONSOLE_TOOLBOX_ROOT    ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/stevemiller-console-toolbox"

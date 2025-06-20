@@ -16,7 +16,7 @@ goto TEST_DATA_CMD_LINE_LOOP
 
 :TEST_DATA_CMD_LINE_LOOP_END
 
-call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%" "" "%%TEST_TEMP_BASE_DIR%%" || exit /b
+call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%" "" "%%TEST_DATA_TEMP_ROOT%%" || exit /b
 
 set "TEST_TEMP_DIR_NAME=%SCRIPT_TEMP_DIR_NAME%"
 set "TEST_TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"

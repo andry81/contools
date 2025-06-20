@@ -29,11 +29,6 @@ repositories:
       - _config
       - Scripts
 
-  _externals/gnuwin32:
-    type:         git
-    url:          https://github.com/andry81-3dparty/external-tools--gnuwin32
-    version:      20101227
-
   _externals/7zip:
     type:         git
     url:          https://github.com/andry81-3dparty/external-tools--7zip

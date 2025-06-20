@@ -129,11 +129,11 @@ if "%TEST_SCRIPT_INDEX_DIR_NAME:~2,1%" == "" set "TEST_SCRIPT_INDEX_DIR_NAME=0%T
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_DIR "%%?~dp0%%"
 
 rem defined ONCE
-call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_OUTPUT_DIR      "%%TEST_SCRIPT_FILE_DIR%%/_out"
-call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_LOCAL_TEMP_DIR  "%%TEST_SCRIPT_OUTPUT_DIR%%/temp"
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_DATA_OUT_ROOT          "%%TEST_SCRIPT_FILE_DIR%%/_tests/out"
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_DATA_TEMP_ROOT         "%%TEST_SCRIPT_FILE_DIR%%/_tests/temp"
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_DIR              "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%/shared"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_LOCAL_DIR               "%%TEST_SCRIPT_LOCAL_TEMP_DIR%%/local/%%TEST_SCRIPT_INDEX_DIR_NAME%%--%%TEST_SCRIPT_NEST_LVL_DIR_NAME%%--%%TEST_SCRIPT_FILE_NAME%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_DIR              "%%TEST_DATA_TEMP_ROOT%%/shared"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_LOCAL_DIR               "%%TEST_DATA_TEMP_ROOT%%/local/%%TEST_SCRIPT_INDEX_DIR_NAME%%--%%TEST_SCRIPT_NEST_LVL_DIR_NAME%%--%%TEST_SCRIPT_FILE_NAME%%"
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_VARS_FILE_PATH   "%%TEST_SCRIPT_SHARED_DIR%%/test.vars"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP "%%TEST_SCRIPT_SHARED_DIR%%/test.tmp.vars"
@@ -149,7 +149,7 @@ if not defined TEST_SCRIPT_HANDLERS_DIR (
   call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_HANDLERS_DIR "%%TEST_SCRIPT_FILE_DIR%%/%%TEST_SCRIPT_HANDLERS_DIR%%"
 )
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_OUTPUT_DIR%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_DATA_OUT_ROOT%%" || exit /b
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_LOCAL_DIR%%" || exit /b
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_SHARED_DIR%%" || exit /b
 

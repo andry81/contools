@@ -106,12 +106,12 @@ if %FLAG_EXACT% NEQ 0 (
 ) else (
   set "SED_FILTER_SUFFIX_CMD_FILE=convert_xpath_filter_list_to_flat_findstr_pttn_list.sed"
 )
-"%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" -n %SED_FILTER_PREFIX_CMD_LINE% -f "%CONTOOLS_XML_TOOLS_ROOT%/sed/%SED_FILTER_SUFFIX_CMD_FILE%" "%XPATH_LIST_FILE_FILTER%" > "%XPATH_LIST_FILE_FILTER_TEMP_FILE%" || exit /b
+"%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -n %SED_FILTER_PREFIX_CMD_LINE% -f "%CONTOOLS_XML_TOOLS_ROOT%/sed/%SED_FILTER_SUFFIX_CMD_FILE%" "%XPATH_LIST_FILE_FILTER%" > "%XPATH_LIST_FILE_FILTER_TEMP_FILE%" || exit /b
 
 rem create search list, append "/" to end of each xpath for exact/subdir match
 set SED_SEARCH_PREFIX_CMD_LINE=-e "/^#/ !{ /[^\/]\[@/ { s/\([^\/]\)\[@/\1\/[@/; }; /\/\[@/ !{ /[^[[:space:]]]/ { /\/$/ !{ s/$/\//; } } } }"
-"%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" -n %SED_SEARCH_PREFIX_CMD_LINE% -f "%CONTOOLS_XML_TOOLS_ROOT%/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed" %SED_SEARCH_LAST_CMD_LINE% "%XPATH_LIST_FILE_IN%" > "%XPATH_LIST_FILE_IN_TEMP_FILE%" || exit /b
+"%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -n %SED_SEARCH_PREFIX_CMD_LINE% -f "%CONTOOLS_XML_TOOLS_ROOT%/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed" %SED_SEARCH_LAST_CMD_LINE% "%XPATH_LIST_FILE_IN%" > "%XPATH_LIST_FILE_IN_TEMP_FILE%" || exit /b
 
 rem apply filter list to search list and remove flat list prefixes, convert empty lines to special comments to save them in output, remove "/" from end of each xpath
 set SED_CLEANUP_LAST_CMD_LINE=-e "/^#/ { s/^# :EOL$//; }; /^#/ !{ /./ { s/.*|//; } }; /\/\[@/ { s/\/\[@/[@/; }; /\/\[@/ !{ s/\/$//; }"
-"%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" -e "/./ !{ s/^$/# :EOL/ }" "%XPATH_LIST_FILE_IN_TEMP_FILE%" | "%SystemRoot%\System32\findstr.exe" /R /B /G:"%XPATH_LIST_FILE_FILTER_TEMP_FILE%" /C:"#" | "%CONTOOLS_GNUWIN32_ROOT%/bin/sed.exe" %SED_CLEANUP_LAST_CMD_LINE%
+"%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -e "/./ !{ s/^$/# :EOL/ }" "%XPATH_LIST_FILE_IN_TEMP_FILE%" | "%SystemRoot%\System32\findstr.exe" /R /B /G:"%XPATH_LIST_FILE_FILTER_TEMP_FILE%" /C:"#" | "%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" %SED_CLEANUP_LAST_CMD_LINE%
