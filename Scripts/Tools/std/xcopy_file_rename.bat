@@ -183,8 +183,6 @@ if not "%TO_PATH%" == "%TO_PATH:?=%" goto TO_PATH_ERROR
 if not "%TO_PATH%" == "%TO_PATH:<=%" goto TO_PATH_ERROR
 if not "%TO_PATH%" == "%TO_PATH:>=%" goto TO_PATH_ERROR
 
-if "\" == "%TO_PATH:~0,1%" goto TO_PATH_ERROR
-
 goto TO_PATH_OK
 
 :TO_PATH_ERROR

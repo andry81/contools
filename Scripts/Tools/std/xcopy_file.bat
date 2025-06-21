@@ -44,6 +44,7 @@ rem   -use_xcopy
 rem     Use `xcopy` executable utility instead of `robocopy` executable
 rem     utility.
 rem     Has no effect if `-use_robocopy` flag is used.
+rem
 rem     CAUTION:
 rem       Copy can fail with that flag in case of a long path.
 rem
@@ -51,6 +52,7 @@ rem   -use_robocopy
 rem     Use `robocopy` executable utility instead of `xcopy` executable
 rem     utility.
 rem     Can not be used if `robocopy.exe` is not found.
+rem
 rem     NOTE:
 rem       Movement is emulated by copy+delete `robocopy.exe` internal logic.
 rem
@@ -215,8 +217,6 @@ if not "%TO_PATH%" == "%TO_PATH:**=%" goto TO_PATH_ERROR
 if not "%TO_PATH%" == "%TO_PATH:?=%" goto TO_PATH_ERROR
 if not "%TO_PATH%" == "%TO_PATH:<=%" goto TO_PATH_ERROR
 if not "%TO_PATH%" == "%TO_PATH:>=%" goto TO_PATH_ERROR
-
-if "\" == "%TO_PATH:~0,1%" goto TO_PATH_ERROR
 
 goto TO_PATH_OK
 

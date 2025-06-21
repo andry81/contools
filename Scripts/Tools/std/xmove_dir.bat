@@ -52,6 +52,7 @@ rem     Set explicit code page.
 rem
 rem   -use_builtin_move
 rem     Use built in `move` command instead of `robocopy` executable utility.
+rem
 rem     CAUTION:
 rem       Movement can fail with that flag in case of a long path.
 rem
@@ -59,6 +60,7 @@ rem   -use_robocopy
 rem     Use `robocopy` executable utility instead of built in `move` command.
 rem     Has no effect if `-use_builtin_move` flag is used.
 rem     Can not be used if `robocopy.exe` is not found.
+rem
 rem     NOTE:
 rem       Movement is emulated by copy+delete `robocopy.exe` internal logic.
 rem
@@ -208,8 +210,6 @@ if not "%TO_PATH%" == "%TO_PATH:?=%" goto TO_PATH_ERROR
 if not "%TO_PATH%" == "%TO_PATH:<=%" goto TO_PATH_ERROR
 if not "%TO_PATH%" == "%TO_PATH:>=%" goto TO_PATH_ERROR
 
-if "\" == "%TO_PATH:~0,1%" goto TO_PATH_ERROR
-
 goto TO_PATH_OK
 
 :TO_PATH_ERROR
@@ -223,8 +223,8 @@ goto TO_PATH_OK
 :TO_PATH_OK
 
 for /F "tokens=* delims="eol^= %%i in ("%FROM_PATH%\.") do set "FROM_PATH_ABS=%%~fi"
-for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do set "TO_PATH_ABS=%%~fi"
-for /F "tokens=* delims="eol^= %%i in ("%TO_PATH_ABS%") do for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "TO_PARENT_DIR_ABS=%%~fj"
+for /F "tokens=* delims="eol^= %%i in ("%TO_PATH%\.") do ^
+for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "TO_PATH_ABS=%%~fi" & set "TO_PARENT_DIR_ABS=%%~fj"
 
 if not exist "\\?\%FROM_PATH_ABS%\*" (
   echo;%?~%: error: input directory does not exist:

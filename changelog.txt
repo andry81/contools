@@ -1,3 +1,6 @@
+2025.06.21:
+* changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: minor improvement and code cleanup
+
 2025.06.20:
 * fixed: ISSUES.txt: switched to `msys2` `sed.exe` without the stream truncation issue
 * fixed: Scripts/Tests/unit/batscripts/test_xml/.test_xml__10_filter_xpath_list_by_xpath_list/impl.bat: test output error
