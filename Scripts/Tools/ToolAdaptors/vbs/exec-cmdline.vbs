@@ -1,4 +1,10 @@
-''' Call a command line using "<ScriptName>.cmdline" file to build it.
+''' Calls a command line using "<ScriptName>.cmdline" file to build it.
+'''
+''' Avoids the shell built in %-variable expansion for the command line by
+''' using the `?.` environment variable as a command line place holder.
+'''
+''' Detects `%?NN%` character sequences to create respective environment
+''' variables to use as ASCII values in `cmd.exe`-like command line expansion.
 
 Const ForReading = 1
 
@@ -108,4 +114,39 @@ Next
 
 ' MsgBox cmdline
 
-WScript.Quit shell_obj.Run(cmdline, 1, True)
+Dim PrevStr : PrevStr = cmdline
+'Dim NextStr
+'Dim PrevMatchIndex : PrevMatchIndex = 1
+'Dim NextMatchIndex : NextMatchIndex = -1
+
+' detect `%?NN%` character sequences to create respective environment variables to use as ASCII code character place holders in `cmd.exe` like command lines
+Dim env_obj : Set env_obj = shell_obj.Environment("Process")
+
+Dim CharHex
+Dim Char
+
+Dim objVarPlaceHoldersRE : Set objVarPlaceHoldersRE = New RegExp
+objVarPlaceHoldersRE.Global = True
+objVarPlaceHoldersRE.Pattern = "%\?[0-9a-zA-Z]{2}%"
+
+Dim objVarPlaceHolderMatches : Set objVarPlaceHolderMatches = objVarPlaceHoldersRE.Execute(PrevStr)
+
+For Each objVarPlaceHolderMatch In objVarPlaceHolderMatches
+  'NextMatchIndex = objVarPlaceHolderMatch.FirstIndex + 6
+  'WScript.Echo CStr(NextMatchIndex) & " = " & objVarPlaceHolderMatch.Value
+  CharHex = Mid(objVarPlaceHolderMatch.Value, 3, 2)
+  Char = Chr(CInt("&H" & CharHex))
+  env_obj("?" & CharHex) = Char
+  'NextStr = NextStr & Mid(PrevStr, PrevMatchIndex, objVarPlaceHolderMatch.FirstIndex + 1 - PrevMatchIndex) & Char
+  'PrevMatchIndex = NextMatchIndex
+Next
+
+'If PrevMatchIndex > 0 Then
+'  NextStr = NextStr & Mid(PrevStr, PrevMatchIndex)
+'End If
+
+'WScript.Echo ">" & NextStr
+
+env_obj("?.") = cmdline ' a kind of unique or internal variable name
+
+WScript.Quit shell_obj.Run("%?.%", 1, True)

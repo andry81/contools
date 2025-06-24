@@ -1,3 +1,8 @@
+2025.06.24:
+* new: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline-exp.vbs: script variant with the Windows Shell command line expansion
+* new: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline.vbs: detection of `%?NN%` character sequences to create respective environment variables to use as ASCII values in `cmd.exe`-like command line expansion
+* changed: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline.vbs: avoided the shell built in %-variable expansion for the command line by using the `?.` environment variable as a command line place holder
+
 2025.06.21:
 * changed: Scripts/Tools/std: xcopy_*.bat, xmove_*.bat: minor improvement and code cleanup
 
