@@ -85,7 +85,7 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 rem common flags for all terminals
 
 rem CAUTION:
-rem   Because `callf.exe` does use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` and `NEST_LVL` variables into the command line.
+rem   Because `callf.exe` may use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` and `NEST_LVL` variables into the command line.
 rem   Otherwise we can fall into infinite recursion because of the unset of the `IMPL_MODE` variable.
 rem
 set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /v IMPL_MODE 1
@@ -100,7 +100,7 @@ rem CAUTION:
 rem   We must always disable handling of signals to prevent `cmd.exe` double termination request.
 rem   For details see `callf` tests.
 
-set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /load-parent-proc-init-env-vars /disable-ctrl-signals /print-win-error-string
+set CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS% /disable-ctrl-signals /print-win-error-string
 
 rem Windows 7 and less check
 call "%%CONTOOLS_ROOT%%/std/check_windows_version.bat" 6 2 || (

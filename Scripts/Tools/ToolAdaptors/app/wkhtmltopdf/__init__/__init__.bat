@@ -6,7 +6,8 @@ call "%%~dp0..\..\__init__\__init__.bat" || exit /b
 
 set "WKHTMLTOPDF_ADAPTOR_PROJECT_ROOT_INIT0_DIR=%~dp0"
 
-if not defined NEST_LVL set NEST_LVL=0
+rem cast to integer
+set /A NEST_LVL+=0
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" WKHTMLTOPDF_ADAPTOR_PROJECT_ROOT                  "%%~dp0.."
 

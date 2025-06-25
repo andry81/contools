@@ -1,3 +1,7 @@
+2025.06.25:
+* fixed: Scripts/Tools/exec/exec_*_prefix.bat: avoid use `/load-parent-proc-init-env-vars` flag by default in case if a script has called with custom init variables, otherwise they would be dropped by the flag
+* changed: Scripts/Tools/ToolAdaptors/app: minor improvement
+
 2025.06.24:
 * new: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline-exp.vbs: script variant with the Windows Shell command line expansion
 * new: Scripts/Tools/ToolAdaptors/vbs/exec-cmdline.vbs: detection of `%?NN%` character sequences to create respective environment variables to use as ASCII values in `cmd.exe`-like command line expansion
