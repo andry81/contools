@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2025.05.25
+* 2025.06.25
 * contools
 
 1. DESCRIPTION
@@ -80,7 +80,7 @@ Second mirror:
  |    #
  |    # Output directory for all files.
  |
- +- /`Scripts`
+ +- /`scripts`
       #
       # The root for all scripts and tools excluding external or standalone.
 
@@ -177,9 +177,9 @@ sudo chmod a+r  /bin/bash_tacklelib
 -------------------------------------------------------------------------------
 * bat scripts tests:
 
-  ** Scripts/Tests/manual/batscripts
-  ** Scripts/Tests/unit/batscripts
-  ** Scripts/Tests/bench/batscripts
+  ** scripts/tests/manual/batscripts
+  ** scripts/tests/unit/batscripts
+  ** scripts/tests/bench/batscripts
 
 -------------------------------------------------------------------------------
 10. AUTHOR

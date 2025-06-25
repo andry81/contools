@@ -42,7 +42,7 @@ call "%%~dp0canonical_path_if_ndef.bat" SVNCMD_PROJECT_EXTERNALS_ROOT           
 rem CAUTION:
 rem   Only `CONTOOLS_ROOT` variable is available from here.
 rem
-call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_ROOT                           "%%CONTOOLS_PROJECT_ROOT%%/Scripts/Tools"
+call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_ROOT                           "%%CONTOOLS_PROJECT_ROOT%%/scripts/tools"
 
 call "%%CONTOOLS_ROOT%%/std/get_windows_version.bat" || exit /b
 

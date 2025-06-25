@@ -1,29 +1,29 @@
 -------------------------------------------------------------------------------
-Scripts/Tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat
+scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_concat_copy_by_list.bat
 -------------------------------------------------------------------------------
 
 * Does not accept not english characters in files names/paths.
 
 -------------------------------------------------------------------------------
-Scripts/Tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat
+scripts/tools/ToolAdaptors/timestamp/copy_timestamp_by_pttn.bat
 -------------------------------------------------------------------------------
 
 * Does not accept not english characters in files names/paths.
 
 -------------------------------------------------------------------------------
-Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat
+scripts/tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat
 -------------------------------------------------------------------------------
 
 * Fix infinite recursion because of builtin backup in `update_shortcut.vbs`.
 
 -------------------------------------------------------------------------------
-Scripts/Tools/std: xcopy_*.bat, xmove_*.bat
+scripts/tools/std: xcopy_*.bat, xmove_*.bat
 -------------------------------------------------------------------------------
 
 * Fix output touching in case of `/Y` flag absence (no overwrite).
 
 -------------------------------------------------------------------------------
-Scripts/Tools/build/load_config.bat
+scripts/tools/build/load_config.bat
 -------------------------------------------------------------------------------
 
 * Fix error:
@@ -36,5 +36,5 @@ Scripts/Tools/build/load_config.bat
 
   caught in:
 
-  Scripts/Tools/filesys/read_shortcut_target_path.bat
+  scripts/tools/filesys/read_shortcut_target_path.bat
 

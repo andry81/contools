@@ -1,4 +1,7 @@
 2025.06.25:
+* refactor: global directories rename to lower case name
+
+2025.06.25:
 * fixed: Scripts/Tools/exec/exec_*_prefix.bat: avoid use `/load-parent-proc-init-env-vars` flag by default in case if a script has called with custom init variables, otherwise they would be dropped by the flag
 * changed: Scripts/Tools/ToolAdaptors/app: minor improvement
 
