@@ -1,3 +1,6 @@
+2025.07.05:
+* refactor: .externals-win*: default branch rename
+
 2025.06.29:
 * changed: deploy/notepad++/plugins/MultiReplace: moved to `contools--notepadplusplus` project
 
