@@ -1,4 +1,8 @@
 2025.07.07:
+* new: scripts/tools/encoding/any2ansi.bat: `-bom` flag to output a file with the BOM UTF byte sequence
+* changed: scripts/tools/encoding: ansi2any.bat, any2ansi.bat: code improvement and usage description
+
+2025.07.07:
 * changed: scripts/tests/bench/batscripts/test__read/test__read__23_by_for_exec_to_var.bat: test speedup
 
 2025.07.07:
