@@ -1,3 +1,6 @@
+2025.07.07:
+* new: scripts/tests/bench/batscripts/test__read: script bench tests
+
 2025.07.05:
 * refactor: .externals-win*: default branch rename
 
@@ -51,8 +54,8 @@
 * changed: Scripts/Tools/wmi/print_all_wmi_classes.vbs: code cleanup
 
 2025.06.15:
-* new: Scripts/Tests/unit/batscripts/test_build/test_build__*_check_config_expiration.bat: script bench test
-* refactor: Scripts/Tests/unit/batscripts/test_build: minor refactor
+* new: Scripts/Tests/bench/batscripts/test_build/test_build__*_check_config_expiration.bat: script bench test
+* refactor: Scripts/Tests/bench/batscripts/test_build: minor refactor
 
 2025.06.14:
 * fixed: Scripts/Tools/build/check_config_expiration.bat: ignore case where the first line of the input file has no version line
