@@ -1,4 +1,7 @@
 2025.07.07:
+* changed: scripts/tests/bench/batscripts/test__read/test__read__23_by_for_exec_to_var.bat: test speedup
+
+2025.07.07:
 * new: scripts/tests/bench/batscripts/test__read: script bench tests
 
 2025.07.05:
