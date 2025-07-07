@@ -77,6 +77,8 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 
 call "%%?~dp0%%.gen_config/gen_config.read_flags.bat" %%* || exit /b
 
+if %FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%FLAG_SHIFT%) do shift
+
 set "CONFIG_IN_DIR=%~1"
 set "CONFIG_OUT_DIR=%~2"
 set "CONFIG_FILE=%~3"

@@ -1,4 +1,7 @@
 2025.07.07:
+* fixed: scripts/tools/build/gen_config*.bat: execution fixup
+
+2025.07.07:
 * changed: *.bat: flag parse global code improvement, added `-+` flag to begin flags scope
 * changed: scripts/tools/build/gen_config*.bat: moved flags parse into separate script
 * changed: scripts/tools/encoding/prepend_bom_to_utf_file.bat: minor improvement

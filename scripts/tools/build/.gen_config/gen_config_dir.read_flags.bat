@@ -1,6 +1,7 @@
 @echo off
 
 rem script flags
+set FLAG_SHIFT=0
 set FLAG_FLAGS_SCOPE=0
 set HAS_SED_FLAGS=0
 set "GEN_CONFIG_FLAGS="
@@ -32,6 +33,7 @@ if defined FLAG (
   ) >&2
 
   shift
+  set /A FLAG_SHIFT+=1
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
