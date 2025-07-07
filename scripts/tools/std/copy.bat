@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   copy.bat [<flags>] [--] <from-path> <to-path> [<copy-flags>...]
+rem   copy.bat [-+] [<flags>] [--] <from-path> <to-path> [<copy-flags>...]
 
 rem Description:
 rem   The builtin `copy` command wrapper script with echo and some conditions
@@ -23,8 +23,12 @@ rem <flags>:
 rem   -chcp <CodePage>
 rem     Set explicit code page.
 
+rem -+:
+rem   Separator to begin flags scope to parse.
 rem --:
-rem   Separator to stop parse flags.
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
 
 rem <from-path>:
 rem   From path.
@@ -49,6 +53,7 @@ if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-
 set "?~nx0=%~nx0"
 
 rem script flags
+set FLAG_FLAGS_SCOPE=0
 set "FLAG_CHCP="
 
 :FLAGS_LOOP
@@ -59,11 +64,14 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
+if defined FLAG if "%FLAG%" == "-+" set /A FLAG_FLAGS_SCOPE+=1
+if defined FLAG if "%FLAG%" == "--" set /A FLAG_FLAGS_SCOPE-=1
+
 if defined FLAG (
   if "%FLAG%" == "-chcp" (
     set "FLAG_CHCP=%~2"
     shift
-  ) else if not "%FLAG%" == "--" (
+  ) else if not "%FLAG%" == "-+" if not "%FLAG%" == "--" (
     echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -72,7 +80,14 @@ if defined FLAG (
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
+
+  if %FLAG_FLAGS_SCOPE% GTR 0 goto FLAGS_LOOP
 )
+
+if %FLAG_FLAGS_SCOPE% GTR 0 (
+  echo;%?~%: error: not ended flags scope: [%FLAG_FLAGS_SCOPE%]: %FLAG%
+  exit /b -255
+) >&2
 
 set "FROM_PATH=%~1"
 set "TO_PATH=%~2"

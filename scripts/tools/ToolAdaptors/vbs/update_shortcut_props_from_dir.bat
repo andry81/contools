@@ -1,12 +1,10 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   update_shortcut_props_from_dir.bat [<Flags>] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO> [<REPLACE_FROM> <REPLACE_TO>]...
-rem   update_shortcut_props_from_dir.bat [<Flags>] -d[elete] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> ["" [<REPLACE_FROM>]...]
+rem   update_shortcut_props_from_dir.bat [-+] [<flags>] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO> [<REPLACE_FROM> <REPLACE_TO>]...
+rem   update_shortcut_props_from_dir.bat [-+] [<flags>] -d[elete] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> ["" [<REPLACE_FROM>]...]
 
-rem <Flags>:
-rem   --
-rem     Stop flags parse.
+rem <flags>:
 rem   -m[atch] <MATCH_STRING>
 rem     String to case sensitive match a portion of property value before the
 rem     replace. If not defined, then does match all.
@@ -62,6 +60,13 @@ rem   -t-suffix <ShortcutTargetSuffix>
 rem     Shortcut target suffix value to append if <ShortcutTarget> does not
 rem     exist. Has no effect if `-ignore-unexist` is used.
 
+rem -+:
+rem   Separator to begin flags scope to parse.
+rem --:
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
+
 rem <LINKS_DIR>:
 rem   Directory to search shortcut files from.
 
@@ -113,6 +118,7 @@ if %IMPL_MODE%0 EQU 0 exit /b
 
 rem script flags
 set FLAG_SHIFT=0
+set FLAG_FLAGS_SCOPE=0
 set FLAG_MATCH_STRING=0
 set FLAG_DELETE=0
 set "FLAG_MATCH_STRING_VALUE="
@@ -136,6 +142,9 @@ set "FLAG=%~1"
 
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG if "%FLAG%" == "-+" set /A FLAG_FLAGS_SCOPE+=1
+if defined FLAG if "%FLAG%" == "--" set /A FLAG_FLAGS_SCOPE-=1
 
 if defined FLAG (
   if "%FLAG%" == "-match" (
@@ -206,7 +215,7 @@ if defined FLAG (
     set UPDATE_SHORTCUT_BARE_FLAGS=%UPDATE_SHORTCUT_BARE_FLAGS% %FLAG% %2
     shift
     set /A FLAG_SHIFT+=1
-  ) else if not "%FLAG%" == "--" (
+  ) else if not "%FLAG%" == "-+" if not "%FLAG%" == "--" (
     echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -216,7 +225,14 @@ if defined FLAG (
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
+
+  if %FLAG_FLAGS_SCOPE% GTR 0 goto FLAGS_LOOP
 )
+
+if %FLAG_FLAGS_SCOPE% GTR 0 (
+  echo;%?~%: error: not ended flags scope: [%FLAG_FLAGS_SCOPE%]: %FLAG%
+  exit /b -255
+) >&2
 
 if %FLAG_MATCH_STRING% NEQ 0 ^
 if not defined FLAG_MATCH_STRING_VALUE (

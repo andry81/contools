@@ -1,13 +1,13 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   choice.bat [<flags>] [--] <variable> [<message>...]
+rem   choice.bat [-+] [<flags>] [--] <variable> [<message>...]
 
 rem Description:
 rem   The choice utility wrapper, falls back to `set /P ...` if the utility
 rem   does not exist (Windows XP 32-bit SP3).
 
-rem <Flags>:
+rem <flags>:
 rem   -c <chars>
 rem     List of choice key characters.
 rem
@@ -22,8 +22,12 @@ rem
 rem   -X <param>
 rem     Parameter to pass into the choice utility.
 
+rem -+:
+rem   Separator to begin flags scope to parse.
 rem --:
-rem   Separator to stop parse flags.
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
 
 rem <variable>:
 rem   Variable to return the selected key.
@@ -59,6 +63,9 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
+if defined FLAG if "%FLAG%" == "-+" set /A FLAG_FLAGS_SCOPE+=1
+if defined FLAG if "%FLAG%" == "--" set /A FLAG_FLAGS_SCOPE-=1
+
 if defined FLAG (
   if "%FLAG%" == "-c" (
     set "FLAG_INPUT_CHARS=%~2"
@@ -72,7 +79,7 @@ if defined FLAG (
     set BARE_FLAGS=%BARE_FLAGS% %2
     shift
     set /A FLAG_SHIFT+=1
-  ) else if not "%FLAG%" == "--" (
+  ) else if not "%FLAG%" == "-+" if not "%FLAG%" == "--" (
     echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -82,7 +89,14 @@ if defined FLAG (
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
+
+  if %FLAG_FLAGS_SCOPE% GTR 0 goto FLAGS_LOOP
 )
+
+if %FLAG_FLAGS_SCOPE% GTR 0 (
+  echo;%?~%: error: not ended flags scope: [%FLAG_FLAGS_SCOPE%]: %FLAG%
+  exit /b -255
+) >&2
 
 set "VARIABLE=%~1"
 

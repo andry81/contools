@@ -48,7 +48,7 @@ if not "%XCOPY_DIR_CMD_BARE_FLAGS:~0,1%" == " " set "XCOPY_DIR_CMD_BARE_FLAGS= %
 
 :SKIP_XCOPY_DIR_CMD_BARE_FLAGS
 
-call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat"%%XCOPY_DIR_CMD_BARE_FLAGS%% -- %%*
+call "%%CONTOOLS_ROOT%%/std/xcopy_dir.bat" -+%%XCOPY_DIR_CMD_BARE_FLAGS%% -- %%*
 set LAST_ERROR=%ERRORLEVEL%
 
 :EXIT

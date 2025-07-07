@@ -35,6 +35,7 @@ rem   Otherwise use `callshift.bat` script to explicitly shift the rest of the c
 rem
 set FLAG_SHIFT=0
 
+set FLAG_FLAGS_SCOPE=0
 set FLAG_NO_LOG=0
 set FLAG_ELEVATE=0
 set "ELEVATE_PREFIX_NAME="
@@ -48,6 +49,9 @@ set "FLAG=%~1"
 
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG if "%FLAG%" == "-+" set /A FLAG_FLAGS_SCOPE+=1
+if defined FLAG if "%FLAG%" == "--" set /A FLAG_FLAGS_SCOPE-=1
 
 if defined FLAG (
   if "%FLAG%" == "-nolog" (
@@ -65,7 +69,7 @@ if defined FLAG (
     set CALLF_PROMOTE_PARENT_FLAGS=%CALLF_PROMOTE_PARENT_FLAGS% %2
     shift
     set /A FLAG_SHIFT+=1
-  ) else if not "%FLAG%" == "--" (
+  ) else if not "%FLAG%" == "-+" if not "%FLAG%" == "--" (
     echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -75,7 +79,14 @@ if defined FLAG (
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
+
+  if %FLAG_FLAGS_SCOPE% GTR 0 goto FLAGS_LOOP
 )
+
+if %FLAG_FLAGS_SCOPE% GTR 0 (
+  echo;%?~%: error: not ended flags scope: [%FLAG_FLAGS_SCOPE%]: %FLAG%
+  exit /b -255
+) >&2
 
 if %NO_GEN%0 NEQ 0 set FLAG_NO_LOG=1
 if %NO_LOG%0 NEQ 0 set FLAG_NO_LOG=1

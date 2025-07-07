@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   gen_config.bat [<flags>] [--] <InputDir> <OutputDir> <ConfigFileName>
+rem   gen_config.bat [-+] [<flags>] [--] <InputDir> <OutputDir> <ConfigFileName>
 
 rem Description:
 rem   Script to generate a configuration file which can consist of an input and
@@ -23,7 +23,7 @@ rem   If the first line of the `<InputDir>/<ConfigFileName>` does not begin by
 rem   the `#%% version:`, then the first line of the
 rem   `<OutputDir>/<ConfigFileName>` does ignore.
 
-rem <Flags>:
+rem <flags>:
 rem   -r <sed_replace_from> <sed_replace_to>
 rem     The expression to replace for the sed in form:
 rem       `s|<sed_replace_from>|<sed_replace_to>|mg`
@@ -48,8 +48,12 @@ rem
 rem   -skip_checks
 rem     Skip checks for faster execution.
 
+rem -+:
+rem   Separator to begin flags scope to parse.
 rem --:
-rem   Separator to stop parse flags.
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
 
 rem <InputDir>:
 rem   Input configuration file directory.
@@ -71,87 +75,7 @@ set "?~dp0=%~dp0"
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
-rem script flags
-set FLAG_IF_NOTEXIST=0
-set FLAG_DETECT_EXPIRATION=1
-set FLAG_SKIP_CHECKS=0
-set "SED_BARE_FLAGS="
-set "SED_REPLACE_FROM="
-set "SED_REPLACE_TO="
-set "SED_REMOVE_FROM="
-
-:FLAGS_LOOP
-
-if not defined SED_REPLACE_FROM goto SKIP_SED_REPLACE_FROM
-
-set "SED_REPLACE_FROM=%SED_REPLACE_FROM:\=\\%"
-set "SED_REPLACE_FROM=%SED_REPLACE_FROM:|=\|%"
-set "SED_REPLACE_FROM=%SED_REPLACE_FROM:{=\{%"
-set "SED_REPLACE_FROM=%SED_REPLACE_FROM:}=\}%"
-
-:SKIP_SED_REPLACE_FROM
-
-if not defined SED_REPLACE_TO goto SKIP_SED_REPLACE_TO
-
-set "SED_REPLACE_TO=%SED_REPLACE_TO:\=\\%"
-set "SED_REPLACE_TO=%SED_REPLACE_TO:|=\|%"
-set "SED_REPLACE_TO=%SED_REPLACE_TO:{=\{%"
-set "SED_REPLACE_TO=%SED_REPLACE_TO:}=\}%"
-
-:SKIP_SED_REPLACE_TO
-
-if not defined SED_REMOVE_FROM goto SKIP_SED_REMOVE_FROM
-
-set "SED_REMOVE_FROM=%SED_REMOVE_FROM:\=\\%"
-set "SED_REMOVE_FROM=%SED_REMOVE_FROM:|=\|%"
-set "SED_REMOVE_FROM=%SED_REMOVE_FROM:{=\{%"
-set "SED_REMOVE_FROM=%SED_REMOVE_FROM:}=\}%"
-
-:SKIP_SED_REMOVE_FROM
-
-rem special `$/<char>` sequence to pass `<char>` character as is (ex: `$/\x22` translates into `\x22` - a quote character)
-if defined SED_REPLACE_FROM set "SED_REPLACE_FROM=%SED_REPLACE_FROM:$/\\=\%"
-if defined SED_REPLACE_TO set "SED_REPLACE_TO=%SED_REPLACE_TO:$/\\=\%"
-if defined SED_REMOVE_FROM set "SED_REMOVE_FROM=%SED_REMOVE_FROM:$/\\=\%"
-
-if defined SED_REPLACE_FROM if defined SED_REPLACE_TO set SED_BARE_FLAGS=%SED_BARE_FLAGS% -e "s|%SED_REPLACE_FROM%|%SED_REPLACE_TO%|mg"
-if defined SED_REMOVE_FROM set SED_BARE_FLAGS=%SED_BARE_FLAGS% -e "s|%SED_REMOVE_FROM%||mg"
-
-set "SED_REPLACE_FROM="
-set "SED_REPLACE_TO="
-set "SED_REMOVE_FROM="
-
-rem flags always at first
-set "FLAG=%~1"
-
-if defined FLAG ^
-if not "%FLAG:~0,1%" == "-" set "FLAG="
-
-if defined FLAG (
-  if "%FLAG%" == "-if_notexist" (
-    set FLAG_IF_NOTEXIST=1
-  ) else if "%FLAG%" == "-noexpire" (
-    set FLAG_DETECT_EXPIRATION=0
-  ) else if "%FLAG%" == "-skip_checks" (
-    set FLAG_SKIP_CHECKS=1
-  ) else if "%FLAG%" == "-r" (
-    set "SED_REPLACE_FROM=%~2"
-    set "SED_REPLACE_TO=%~3"
-    shift
-    shift
-  ) else if "%FLAG%" == "-rm" (
-    set "SED_REMOVE_FROM=%~2"
-    shift
-  ) else if not "%FLAG%" == "--" (
-    echo;%?~%: error: invalid flag: %FLAG%
-    exit /b -255
-  ) >&2
-
-  shift
-
-  rem read until no flags
-  if not "%FLAG%" == "--" goto FLAGS_LOOP
-)
+call "%%?~dp0%%.gen_config/gen_config.read_flags.bat" %%* || exit /b
 
 set "CONFIG_IN_DIR=%~1"
 set "CONFIG_OUT_DIR=%~2"

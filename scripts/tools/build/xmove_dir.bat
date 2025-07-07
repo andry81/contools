@@ -32,7 +32,7 @@ if not "%XMOVE_DIR_CMD_BARE_FLAGS:~0,1%" == " " set "XMOVE_DIR_CMD_BARE_FLAGS= %
 
 :SKIP_XMOVE_DIR_CMD_BARE_FLAGS
 
-call "%%CONTOOLS_ROOT%%/std/xmove_dir.bat"%%XMOVE_DIR_CMD_BARE_FLAGS%% -- %%*
+call "%%CONTOOLS_ROOT%%/std/xmove_dir.bat" -+%%XMOVE_DIR_CMD_BARE_FLAGS%% -- %%*
 set LAST_ERROR=%ERRORLEVEL%
 
 if %NO_PRINT_LAST_BLANK_LINE%0 EQU 0 echo;

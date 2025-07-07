@@ -5,12 +5,9 @@ rem   Script reads a shortcut target path property.
 rem   OS: Windows XP+
 
 rem USAGE:
-rem   read_shortcut_target_path.bat [<Flags>] [--] <ShortcutFile>
+rem   read_shortcut_target_path.bat [-+] [<flags>] [--] <ShortcutFile>
 
-rem <Flags>:
-rem   --
-rem     Stop flags parse.
-rem
+rem <flags>:
 rem   -use_extprop
 rem     Use `ExtendedProperty` method through the `read_path_props.vbs` script
 rem     instead of `read_shortcut.vbs` script.
@@ -29,6 +26,13 @@ rem
 rem   -print-stdout| -p
 rem     Print property `name=value` expression after each read from stdout of
 rem     all inner script calls.
+
+rem -+:
+rem   Separator to begin flags scope to parse.
+rem --:
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
 
 rem <ShortcutFile>:
 rem   Path to shortcut file.
@@ -49,6 +53,7 @@ call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
 set FLAG_SHIFT=0
+set FLAG_FLAGS_SCOPE=0
 set FLAG_SKIP=0
 set FLAG_USE_EXTENDED_PROPERTY=0
 set FLAG_USE_GETLINK=0
@@ -64,6 +69,9 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
+if defined FLAG if "%FLAG%" == "-+" set /A FLAG_FLAGS_SCOPE+=1
+if defined FLAG if "%FLAG%" == "--" set /A FLAG_FLAGS_SCOPE-=1
+
 if defined FLAG (
   if "%FLAG%" == "-use_extprop" (
     set FLAG_USE_EXTENDED_PROPERTY=1
@@ -77,7 +85,7 @@ if defined FLAG (
     set FLAG_PRINT_STDOUT=1
   ) else if "%FLAG%" == "-p" (
     set FLAG_PRINT_STDOUT=1
-  ) else if not "%FLAG%" == "--" (
+  ) else if not "%FLAG%" == "-+" if not "%FLAG%" == "--" (
     echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -87,7 +95,14 @@ if defined FLAG (
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
+
+  if %FLAG_FLAGS_SCOPE% GTR 0 goto FLAGS_LOOP
 )
+
+if %FLAG_FLAGS_SCOPE% GTR 0 (
+  echo;%?~%: error: not ended flags scope: [%FLAG_FLAGS_SCOPE%]: %FLAG%
+  exit /b -255
+) >&2
 
 if %FLAG_USE_EXTENDED_PROPERTY%%FLAG_USE_GETLINK% EQU 11 (
   echo;%?~%: error: `-use_extprop` flag is mixed with `-use_getlink` flag.

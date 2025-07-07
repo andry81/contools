@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   xcopy_dir.bat [<flags>] [--] <from-path> <to-path> [<xcopy-flags>...]
+rem   xcopy_dir.bat [-+] [<flags>] [--] <from-path> <to-path> [<xcopy-flags>...]
 
 rem Description:
 rem   The `xcopy.exe`/`robocopy.exe` seamless wrapper script with xcopy
@@ -67,8 +67,12 @@ rem
 rem   -touch_file
 rem     Use `touch_file.bat` script to touch the output files before the copy.
 
+rem -+:
+rem   Separator to begin flags scope to parse.
 rem --:
-rem   Separator to stop parse flags.
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
 
 rem <from-path>:
 rem   From directory path.
@@ -94,6 +98,7 @@ set "?~nx0=%~nx0"
 
 rem script flags
 set FLAG_SHIFT=0
+set FLAG_FLAGS_SCOPE=0
 set "FLAG_CHCP="
 set FLAG_USE_XCOPY=0
 set FLAG_USE_ROBOCOPY=0
@@ -108,6 +113,9 @@ set "FLAG=%~1"
 
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG if "%FLAG%" == "-+" set /A FLAG_FLAGS_SCOPE+=1
+if defined FLAG if "%FLAG%" == "--" set /A FLAG_FLAGS_SCOPE-=1
 
 if defined FLAG (
   if "%FLAG%" == "-chcp" (
@@ -124,7 +132,7 @@ if defined FLAG (
     set FLAG_TOUCH_DIR=1
   ) else if "%FLAG%" == "-touch_file" (
     set FLAG_TOUCH_FILE=1
-  ) else if not "%FLAG%" == "--" (
+  ) else if not "%FLAG%" == "-+" if not "%FLAG%" == "--" (
     echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -134,7 +142,14 @@ if defined FLAG (
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
+
+  if %FLAG_FLAGS_SCOPE% GTR 0 goto FLAGS_LOOP
 )
+
+if %FLAG_FLAGS_SCOPE% GTR 0 (
+  echo;%?~%: error: not ended flags scope: [%FLAG_FLAGS_SCOPE%]: %FLAG%
+  exit /b -255
+) >&2
 
 set "FROM_PATH=%~1"
 set "TO_PATH=%~2"

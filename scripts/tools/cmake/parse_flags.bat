@@ -2,6 +2,7 @@
 
 rem script flags
 set __?FLAG_SHIFT=0
+set __?FLAG_FLAGS_SCOPE=0
 
 :FLAGS_LOOP
 
@@ -10,6 +11,9 @@ set "__?FLAG=%~1"
 
 if defined __?FLAG ^
 if not "%__?FLAG:~0,1%" == "-" set "__?FLAG="
+
+if defined __?FLAG if "%__?FLAG%" == "-+" set /A __?FLAG_FLAGS_SCOPE+=1
+if defined __?FLAG if "%__?FLAG%" == "--" set /A __?FLAG_FLAGS_SCOPE-=1
 
 if defined __?FLAG (
   if "%__?FLAG%" == "-T" (
@@ -24,7 +28,7 @@ if defined __?FLAG (
     set "CMAKE_GENERATOR_INSTANCE=%~2"
     shift
     set /A __?FLAG_SHIFT+=1
-  ) else (
+  ) else if not "%FLAG%" == "-+" if not "%FLAG%" == "--" (
     exit /b 0
   )
 
@@ -32,5 +36,14 @@ if defined __?FLAG (
   set /A __?FLAG_SHIFT+=1
 
   rem read until no flags
-  goto FLAGS_LOOP
+  if not "%FLAG%" == "--" goto FLAGS_LOOP
+
+  if %FLAG_FLAGS_SCOPE% GTR 0 goto FLAGS_LOOP
 )
+
+if %__?FLAG_FLAGS_SCOPE% GTR 0 (
+  echo;%__?~%: error: not ended flags scope: [%__?FLAG_FLAGS_SCOPE%]: %__?FLAG%
+  exit /b -255
+) >&2
+
+exit /b 0

@@ -1,5 +1,10 @@
 2025.07.07:
-* new: scripts/tools/encoding/any2ansi.bat: `-bom` flag to output a file with the BOM UTF byte sequence
+* changed: *.bat: flag parse global code improvement, added `-+` flag to begin flags scope
+* changed: scripts/tools/build/gen_config*.bat: moved flags parse into separate script
+* changed: scripts/tools/encoding/prepend_bom_to_utf_file.bat: minor improvement
+
+2025.07.07:
+* new: scripts/tools/encoding/any2ansi.bat: `-bom` flag to prepend the output file with the UTF BOM sequence
 * changed: scripts/tools/encoding: ansi2any.bat, any2ansi.bat: code improvement and usage description
 
 2025.07.07:

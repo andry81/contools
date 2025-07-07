@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   gen_config_dir.bat [<Flags>] [--] <InputDir> <OutputDir> <ConfigFiles>...
+rem   gen_config_dir.bat [-+] [<flags>] [--] <InputDir> <OutputDir> <ConfigFiles>...
 
 rem Description:
 rem   Script to generate a list of configuration files in the output directory
@@ -19,7 +19,7 @@ rem
 rem   NOTE:
 rem     All the rest description is in the `gen_config.bat` script.
 
-rem <Flags>:
+rem <flags>:
 rem   -r <sed_replace_from> <sed_replace_to>
 rem     The expression to replace for the sed in form:
 rem       `s|<sed_replace_from>|<sed_replace_to>}mg`
@@ -33,8 +33,12 @@ rem
 rem   -noexpire
 rem     Disables output file expiration detection as by default.
 
+rem -+:
+rem   Separator to begin flags scope to parse.
 rem --:
-rem   Separator to stop parse flags.
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
 
 rem <InputDir>:
 rem   Input configuration file directory.
@@ -59,38 +63,7 @@ set "?~dp0=%~dp0"
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
-rem script flags
-set HAS_SED_FLAGS=0
-set "GEN_CONFIG_FLAGS="
-
-:FLAGS_LOOP
-
-rem flags always at first
-set "FLAG=%~1"
-
-if defined FLAG ^
-if not "%FLAG:~0,1%" == "-" set "FLAG="
-
-if defined FLAG (
-  if "%FLAG%" == "-if_notexist" (
-    set GEN_CONFIG_FLAGS=%GEN_CONFIG_FLAGS% %1
-  ) else if "%FLAG%" == "-noexpire" (
-    set GEN_CONFIG_FLAGS=%GEN_CONFIG_FLAGS% %1
-  ) else if "%FLAG%" == "-r" (
-    set GEN_CONFIG_FLAGS=%GEN_CONFIG_FLAGS% -r %2 %3
-    set HAS_SED_FLAGS=1
-    shift
-    shift
-  ) else if not "%FLAG%" == "--" (
-    echo;%?~%: error: invalid flag: %FLAG%
-    exit /b -255
-  ) >&2
-
-  shift
-
-  rem read until no flags
-  if not "%FLAG%" == "--" goto FLAGS_LOOP
-)
+call "%%?~dp0%%.gen_config/gen_config_dir.read_flags.bat" %%* || exit /b
 
 set "CONFIG_IN_DIR=%~1"
 set "CONFIG_OUT_DIR=%~2"
@@ -134,7 +107,7 @@ if not defined CONFIG_FILE (
 :CONFIG_FILE_LOOP
 for %%i in ("%CONFIG_IN_DIR%\%CONFIG_FILE%.in") do (
   for /F "tokens=* delims="eol^= %%j in ("%%i") do set "CONFIG_FILE_NAME=%%~nj"
-  call "%%?~dp0%%gen_config.bat" -skip_checks%%GEN_CONFIG_FLAGS%% -- "%%CONFIG_IN_DIR%%" "%%CONFIG_OUT_DIR%%" "%%CONFIG_FILE_NAME%%" || exit /b
+  call "%%?~dp0%%gen_config.bat" -skip_checks -+%%GEN_CONFIG_FLAGS%% -- "%%CONFIG_IN_DIR%%" "%%CONFIG_OUT_DIR%%" "%%CONFIG_FILE_NAME%%" || exit /b
 )
 
 shift

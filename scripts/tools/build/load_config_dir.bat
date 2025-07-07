@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   load_config_dir.bat [<Flags>] [--] <InputDir> <OutputDir> [<Param0> [<Param1>]]
+rem   load_config_dir.bat [-+] [<Flags>] [--] <InputDir> <OutputDir> [<Param0> [<Param1>]]
 
 rem Description:
 rem   Script to load input and output directory with configuration files using
@@ -51,8 +51,12 @@ rem     Skips load the user configuration file(s).
 rem     Has priority over `-gen_user_config` and `-load_user_output_config`
 rem     flags.
 
+rem -+:
+rem   Separator to begin flags scope to parse.
 rem --:
-rem   Separator to stop parse flags.
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
 
 rem <InputDir>:
 rem   Input configuration file directory.
@@ -73,7 +77,7 @@ if defined ?~ ( set "__?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "__?~=%?~n
 
 if defined NO_GEN set /A NO_GEN+=0
 
-call "%%__?~dp0%%.load_config_dir/load_config_dir.read_flags.bat" %%* || exit /b
+call "%%__?~dp0%%.load_config/load_config_dir.read_flags.bat" %%* || exit /b
 
 if %__?FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%__?FLAG_SHIFT%) do shift
 
@@ -110,7 +114,7 @@ exit /b
 :MAIN
 if %__?FLAG_NO_LOAD_SYSTEM_CONFIG% NEQ 0 goto LOAD_SYSTEM_CONFIG_END
 
-call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_SYSTEM_FLAGS%% -- %%1 %%2 "config.system.vars%%__?SYSTEM_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
+call :CMD "%%__?~dp0%%load_config.bat" -+%%__?BARE_SYSTEM_FLAGS%% -- %%1 %%2 "config.system.vars%%__?SYSTEM_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
 
 :LOAD_SYSTEM_CONFIG_END
 
@@ -134,7 +138,7 @@ set /A __?CONFIG_INDEX+=1
 goto LOAD_CONFIG_LOOP
 
 :LOAD_CONFIG
-call :CMD "%%__?~dp0%%load_config.bat"%%__?BARE_USER_FLAGS%% -- %%1 %%2 "config.%%__?CONFIG_INDEX%%.vars%%__?USER_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
+call :CMD "%%__?~dp0%%load_config.bat" -+%%__?BARE_USER_FLAGS%% -- %%1 %%2 "config.%%__?CONFIG_INDEX%%.vars%%__?USER_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
 
 :LOAD_USER_CONFIG_END
 

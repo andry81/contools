@@ -1,11 +1,9 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   reset_shortcut_from_dir.bat [<Flags>] [--] <LINKS_DIR>
+rem   reset_shortcut_from_dir.bat [-+] [<flags>] [--] <LINKS_DIR>
 
-rem <Flags>:
-rem   --
-rem     Stop flags parse.
+rem <flags>:
 rem   -chcp <CodePage>
 rem     Set explicit code page.
 rem
@@ -62,6 +60,13 @@ rem   -print-assigned | -pd
 rem     Reread property after assign and print.
 rem
 
+rem -+:
+rem   Separator to begin flags scope to parse.
+rem --:
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
+
 rem <LINKS_DIR>:
 rem   Directory to search shortcut files from.
 
@@ -81,6 +86,7 @@ if %IMPL_MODE%0 EQU 0 exit /b
 
 rem script flags
 set FLAG_SHIFT=0
+set FLAG_FLAGS_SCOPE=0
 set "FLAG_CHCP="
 set "RESET_SHORTCUT_BARE_FLAGS="
 
@@ -91,6 +97,9 @@ set "FLAG=%~1"
 
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG if "%FLAG%" == "-+" set /A FLAG_FLAGS_SCOPE+=1
+if defined FLAG if "%FLAG%" == "--" set /A FLAG_FLAGS_SCOPE-=1
 
 if defined FLAG (
   if "%FLAG%" == "-chcp" (
@@ -125,7 +134,7 @@ if defined FLAG (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-pd" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
-  ) else if not "%FLAG%" == "--" (
+  ) else if not "%FLAG%" == "-+" if not "%FLAG%" == "--" (
     echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255
   ) >&2
@@ -135,7 +144,14 @@ if defined FLAG (
 
   rem read until no flags
   if not "%FLAG%" == "--" goto FLAGS_LOOP
+
+  if %FLAG_FLAGS_SCOPE% GTR 0 goto FLAGS_LOOP
 )
+
+if %FLAG_FLAGS_SCOPE% GTR 0 (
+  echo;%?~%: error: not ended flags scope: [%FLAG_FLAGS_SCOPE%]: %FLAG%
+  exit /b -255
+) >&2
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 

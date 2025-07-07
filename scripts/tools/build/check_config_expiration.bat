@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   check_config_expiration.bat [<flags>] [--] <InputFile> <OutputFile>
+rem   check_config_expiration.bat [-+] [<flags>] [--] <InputFile> <OutputFile>
 
 rem Description:
 rem   Script to check <OutputFile> expiration versus <InputFile> to prevent
@@ -21,9 +21,12 @@ rem <flags>:
 rem   -optional_compare
 rem     Does not require <OutputFile> existence.
 
+rem -+:
+rem   Separator to begin flags scope to parse.
 rem --:
-rem   Separator to stop parse flags.
-rem
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
 
 rem <InputFile>:
 rem   Input configuration file path.

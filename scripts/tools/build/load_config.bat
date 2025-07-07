@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   load_config.bat [<Flags>] [--] <InputDir> <OutputDir> <ConfigFileName> [<Param0> [<Param1>]]
+rem   load_config.bat [-+] [<Flags>] [--] <InputDir> <OutputDir> <ConfigFileName> [<Param0> [<Param1>]]
 
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
@@ -45,8 +45,12 @@ rem
 rem   -noexpand
 rem     Disables expansion of %-variables.
 
+rem -+:
+rem   Separator to begin flags scope to parse.
 rem --:
-rem   Separator to stop parse flags.
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
 
 rem <InputDir>:
 rem   Input configuration file directory.

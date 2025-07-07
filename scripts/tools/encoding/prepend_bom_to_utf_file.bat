@@ -78,7 +78,8 @@ set "BOM_FILE_PATH=%CONTOOLS_ROOT%/encoding/boms/%BOM_FILE_TOKEN%.bin"
 
 for /f "tokens=* delims="eol^= %%i in ("%INPUT_FILE_PATH%\.") do set "INPUT_FILE_PATH=%%~fi"
 for /f "tokens=* delims="eol^= %%i in ("%BOM_FILE_PATH%\.") do set "BOM_FILE_PATH=%%~fi"
-for /f "tokens=* delims="eol^= %%i in ("%OUTPUT_FILE_PATH%\.") do set "OUTPUT_FILE_DIR=%%~dpi" & set "OUTPUT_FILE_PATH=%%~fi"
+for /f "tokens=* delims="eol^= %%i in ("%OUTPUT_FILE_PATH%\.") do ^
+for /f "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "OUTPUT_FILE_DIR=%%~fj" & set "OUTPUT_FILE_PATH=%%~fi"
 
 if not exist "%INPUT_FILE_PATH%" (
   echo;%?~%: error: INPUT_FILE_PATH does not exist: "%INPUT_FILE_PATH%".

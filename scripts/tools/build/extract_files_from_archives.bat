@@ -1,31 +1,41 @@
 @echo off & goto DOC_END
 
+rem USAGE:
+rem   extract_files_from_archives.bat [-+] <flags> [--] <cmdline>...
+
 rem Description:
-rem   Script to extract an archive or all archives from a directory recursively using 7zip.
-rem   Script automatically does self logging.
+rem   Script to extract an archive or all archives from a directory recursively
+rem   using 7zip. Script automatically does self logging.
 
-rem Usage:
-rem  <Flags> <Command arguments>
-
-rem Flags:
-rem   -i  - Do not create a subdirectory from an archive file name to unpack.
-rem         By default does create a subdirectory from an archive file name for each archive.
+rem <flags>:
+rem   -i  - Do not create a sub directory from an archive file name to unpack.
+rem         By default does create a sub directory from an archive file name
+rem         for each archive.
 rem   -p  - Create extraction directory if does not exist.
-rem   -k  - Skip archives which prefix path already existed in the output directory.
+rem   -k  - Skip archives which prefix path already existed in the output
+rem         directory.
 
-rem Command arguments:
-rem %1 - Path to an archive file or a directory to search from.
-rem %2 - Relative path with pattern inside archive.
-rem %3 - Path to output directory for extracted files.
-rem %4 - Additional arguments for 7zip utility.
-rem %5-%N - Optional archive file pattern list for the `dir` command, ex: `"*.7z" "*.zip" "*.rar"`
-rem         Has no effect if %1 is a file path.
+rem -+:
+rem   Separator to begin flags scope to parse.
+rem --:
+rem   Separator to end flags scope to parse.
+rem   Required if `-+` is used.
+rem   If `-+` is used, then must be used the same quantity of times.
+
+rem <cmdline>:
+rem   %1 - Path to an archive file or a directory to search from.
+rem   %2 - Relative path with pattern inside archive.
+rem   %3 - Path to output directory for extracted files.
+rem   %4 - Additional arguments for 7zip utility.
+rem   %5-%N - Optional archive file pattern list for the `dir` command,
+rem           ex: `"*.7z" "*.zip" "*.rar"`
+rem           Has no effect if %1 is a file path.
 
 rem Examples:
-rem 1. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives
-rem 2. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives "" "*.7z"
-rem 3. call extract_files_from_archives.bat c:\path_with_archives\app_release_x86.7z release\x86\app.exe c:\path_for_unpack\app
-rem 4. call extract_files_from_archives.bat c:\path_with_archives\app_release_x86.7z * c:\path_for_unpack\app
+rem   1. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives
+rem   2. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives "" "*.7z"
+rem   3. call extract_files_from_archives.bat c:\path_with_archives\app_release_x86.7z release\x86\app.exe c:\path_for_unpack\app
+rem   4. call extract_files_from_archives.bat c:\path_with_archives\app_release_x86.7z * c:\path_for_unpack\app
 :DOC_END
 
 setlocal

@@ -13,7 +13,7 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_vars_file.bat" || exit /b
 
 set "EXEC_CALLF_PREFIX_BARE_FLAGS="
-set EXEC_CALLF_FLAG_SKIP=1
+set EXEC_CALLF_FLAG_SKIP=2
 
 rem cast to integer
 set /A EXEC_CALLF_PREFIX_NO_PAUSE_ON_EXIT+=0
@@ -23,7 +23,7 @@ if %EXEC_CALLF_PREFIX_NO_PAUSE_ON_EXIT% EQU 0 (
   set /A EXEC_CALLF_FLAG_SKIP+=2
 )
 
-call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip %%EXEC_CALLF_FLAG_SKIP%% 1 "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat"%%EXEC_CALLF_PREFIX_BARE_FLAGS%% -- %%* || exit /b
+call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip %%EXEC_CALLF_FLAG_SKIP%% 1 "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -+%%EXEC_CALLF_PREFIX_BARE_FLAGS%% -- %%* || exit /b
 
 rem The caller must exit after this exit.
 exit /b 0
