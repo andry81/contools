@@ -59,7 +59,7 @@ set LOCK_FILE0_ACQUIRE=0
   (
     rem if lock is acquired, then we are in...
     set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
-    if not defined RUNNING_TASKS_COUNTER set RUNNING_TASKS_COUNTER=0
+    set /A RUNNING_TASKS_COUNTER+=0
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
     call;
@@ -109,7 +109,6 @@ set LOCK_FILE0_ACQUIRE=0
     rem if lock is acquired, then we are in...
     rem reread the counter
     set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
-    if not defined RUNNING_TASKS_COUNTER set RUNNING_TASKS_COUNTER=0
     set /A RUNNING_TASKS_COUNTER+=1
     (call echo;%%RUNNING_TASKS_COUNTER%%) > "%RUNNING_TASKS_COUNTER_FILE%"
 
@@ -158,7 +157,7 @@ set LOCK_FILE0_ACQUIRE=0
   (
     rem if lock is acquired, then we are in...
     set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
-    if not defined RUNNING_TASKS_COUNTER set RUNNING_TASKS_COUNTER=0
+    set /A RUNNING_TASKS_COUNTER+=0
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
     call;

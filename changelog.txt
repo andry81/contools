@@ -1,3 +1,6 @@
+2025.07.11:
+* changed: scripts/tools/tasks: code cleanup
+
 2025.07.07:
 * changed: scripts/tests/unit/batscripts/**/init.bat: switched to `setshift.bat` script to read the rest of a test command line
 
