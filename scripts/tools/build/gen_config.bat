@@ -19,11 +19,15 @@ rem   Additionally the `#%% version: ...` first line does read from both files
 rem   to force the user to manually update the output configuration file from
 rem   the input configuration file in case if these lines are not equal.
 rem
-rem   If the first line of the `<InputDir>/<ConfigFileName>` does not begin by
-rem   the `#%% version:`, then the first line of the
+rem   If the first line of the `<InputDir>/<ConfigFileName>.in` does not begin
+rem   by the `#%% version:`, then the first line of the
 rem   `<OutputDir>/<ConfigFileName>` does ignore.
 
 rem <flags>:
+rem   -s
+rem     Replace in the entire file as a single instead of in each line as by
+rem     default.
+rem
 rem   -r <sed_replace_from> <sed_replace_to>
 rem     The expression to replace for the sed in form:
 rem       `s|<sed_replace_from>|<sed_replace_to>|mg`
@@ -66,9 +70,40 @@ rem   Must be not empty and exist.
 rem <ConfigFileName>:
 rem   Input/Output configuration file.
 rem   Must not contain `.in` suffix.
+
+rem CAUTION:
+rem   The `sed` does interpret the input as a character stream separated by
+rem   line returns. So if you want to replace in the entire file as a single,
+rem   then you must use `-s` flag.
+
+rem NOTE:
+rem   These characters can not be used directly and must be escaped with the
+rem   `$/\xNN` sequence:
+rem
+rem     NUL   ->    $/\x00
+rem     LF    ->    $/\x0A
+rem     CR    ->    $/\x0D
+rem     SUB   ->    $/\x1A
+rem     "     ->    $/\x22
+rem
+rem   These characters can be used directly but has side effects and has to be
+rem   escaped with the `$/\xNN` sequence:
+rem
+rem     ^     ->    $/\x5E (duplicates by the `call` prefix)
+rem
+rem   These characters can be used directly but still can be escaped with the
+rem   `$/\xNN` sequence:
+rem
+rem     %     ->    $/\x25
+rem
+rem   The character with code higher than 127 (7F) still must be escaped with
+rem   `$/\xNN` sequence.
+rem
+rem   The unicode characters can be escaped by `$/\uNNNN` sequence.
+
 :DOC_END
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 set "?~dp0=%~dp0"
 
@@ -129,5 +164,12 @@ if not defined SED_BARE_FLAGS (
 
 rem initialize only in case of the sed usage
 call "%%?~dp0%%__init__.bat" || exit /b
+
+rem Based on: https://unix.stackexchange.com/questions/182153/sed-read-whole-file-into-pattern-space-without-failing-on-single-line-input/182154#182154
+rem
+rem NOTE:
+rem   Reads portably whole file into pattern space.
+rem
+if %FLAG_SINGLE% NEQ 0 set SED_BARE_FLAGS= -e "H;1h;$!d;x"%SED_BARE_FLAGS%
 
 type "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" | "%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -r -b%SED_BARE_FLAGS% > "%CONFIG_OUT_DIR%\%CONFIG_FILE%"

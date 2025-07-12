@@ -129,8 +129,9 @@ if "%TEST_SCRIPT_INDEX_DIR_NAME:~2,1%" == "" set "TEST_SCRIPT_INDEX_DIR_NAME=0%T
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_DIR "%%?~dp0%%"
 
 rem defined ONCE
-call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_DATA_OUT_ROOT          "%%TEST_SCRIPT_FILE_DIR%%/_tests/out"
-call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_DATA_TEMP_ROOT         "%%TEST_SCRIPT_FILE_DIR%%/_tests/temp"
+if defined TEST_DATA_IN_ROOT call "%%CONTOOLS_ROOT%%/std/canonical_dir_vars.bat"    TEST_DATA_IN_ROOT || exit /b
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_DATA_OUT_ROOT          "%%TEST_SCRIPT_FILE_DIR%%/_tests/out" || exit /b
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_DATA_TEMP_ROOT         "%%TEST_SCRIPT_FILE_DIR%%/_tests/temp" || exit /b
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_DIR              "%%TEST_DATA_TEMP_ROOT%%/shared"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_LOCAL_DIR               "%%TEST_DATA_TEMP_ROOT%%/local/%%TEST_SCRIPT_INDEX_DIR_NAME%%--%%TEST_SCRIPT_NEST_LVL_DIR_NAME%%--%%TEST_SCRIPT_FILE_NAME%%"

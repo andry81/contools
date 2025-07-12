@@ -1,3 +1,11 @@
+2025.07.12:
+* fixed: scripts/tools/build/.gen_config/gen_config.read_flags.bat: `sed` control characters correct escape
+* new: scripts/tools/build/gen_config.bat: `-s` flag to replace in the entire file as a single instead of in each line as by default
+* new: scripts/tests/unit/batscripts/test_build/test_build__11_gen_config.bat: `gen_config.bat` unit tests
+* changed: scripts/tools/build/gen_config.bat: improved parser to replace ASCII hex coded characters and unicode coded characters
+* changed: scripts/tools/testlib/init.bat: testlib improvement
+* changed: scripts/tests/unit/batscripts: tests code improvement
+
 2025.07.11:
 * changed: scripts/tools/tasks: code cleanup
 

@@ -2,7 +2,7 @@
 
 setlocal
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config.bat" . . "%%CONFIG_FILE%%" "%%PARAM0%%" "%%PARAM1%%"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config.bat" -- . . "%%CONFIG_FILE%%" "%%PARAM0%%" "%%PARAM1%%"
 
 echo;PARAM0=%PARAM0%
 echo;PARAM1=%PARAM1%
