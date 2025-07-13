@@ -1,4 +1,8 @@
 2025.07.13:
+* changed: TODO.txt: todo update
+* refactor: scripts/tools/ToolAdaptors/vbs/*.vbs: code refactor
+
+2025.07.13:
 * new: scripts/tests/bench/batscripts/test__which/test__which__01.bat: bench test for the `which.bat` script
 * new: scripts/tests/bench/batscripts/test__which/test__which__02_where.bat: bench test for the `where.exe` executable
 * new: .externals-tests: externals for all tests

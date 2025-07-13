@@ -3,3 +3,19 @@ scripts/tests
 -------------------------------------------------------------------------------
 
 * self logging
+
+-------------------------------------------------------------------------------
+scripts/tools/ToolAdapters/vbs/make_shortcut.vbs,
+scripts/tools/ToolAdapters/vbs/update_shortcut.vbs,
+scripts/tools/ToolAdapters/vbs/reset_shortcut.vbs
+-------------------------------------------------------------------------------
+
+* Rewrite to assign a short path version only after compare of the path before
+  assignment with the path after assignment. If both paths are not case
+  insensitively equal, then only after do request the short version path from
+  the path before assignment.
+
+  Currently, the path after assignment checks on existence and if does not
+  exist, then the short path version is requested. This would not work if the
+  path after assignment is truncated or corrupted to a path that accidentally
+  exist.
