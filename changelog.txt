@@ -1,3 +1,10 @@
+2025.07.15:
+* fixed: scripts/tools/std/echo_*.bat: scripts fixup for an empty string expansion
+* fixed: scripts/tools/std/time: scripts fixup for UTF-7 code page
+* fixed: scripts/tools/std/testlib, scripts/tests, _config/config.system.vars.in: set 437 as default code page for Windows XP, UTF code page is avoided for Windows XP
+* new: scripts/tools/std/asc-utf.bat: character to ASCII code conversion script
+* new: scripts/tests/manual/batscripts/test_std/test_std__60_asc.bat: manual test for `asc-utf.bat` script in an arbitrary code page
+
 2025.07.13:
 * fixed: *.bat: flags scope minor fixup
 

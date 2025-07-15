@@ -66,7 +66,10 @@ upath CMAKE_CONFIG_VARS_USER_0_FILE             ="%CMAKE_PROJECT_OUTPUT_CONFIG_R
 
 # CAUTION:
 #
-#   Is required for `set_vars_from_locked_file_pair.bat` script which does called from `cmake/set_vars_from_files.bat` script
-#   to be able to create variables with UTF-8 values.
+#   * Is required for `set_vars_from_locked_file_pair.bat` script which does called from `cmake/set_vars_from_files.bat` script
+#     to be able to create variables with UTF-8 values.
+#   * Windows XP must not use UTF code page.
 #
 once CHCP                                       =65001
+CHCP:OSWINXP                                    =437
+OEMCP:OSWINXP                                   =437

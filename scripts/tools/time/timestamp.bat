@@ -15,7 +15,7 @@ if defined MSECS ( if 0 EQU %MSECS:~0,1%0 set "MSECS=%MSECS:~1%" ) else set MSEC
 if defined MSECS ( if not "%MSECS%" == "0" if 0 EQU %MSECS:~0,1%0 set "MSECS=%MSECS:~1%" ) else set MSECS=0
 if not defined MSECS set MSECS=0
 
-set /A TIMESTAMP=(%HOURS%*60*60*1000)+(%MINS%*60*1000)+(%SECS%*1000)+%MSECS%*10
+set /A TIMESTAMP=(%HOURS%*60*60*1000)-(-%MINS%*60*1000)-(-%SECS%*1000)-(-%MSECS%*10)
 
 (
   endlocal
