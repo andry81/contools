@@ -1,3 +1,6 @@
+2025.07.18:
+* changed: __init__.sh: avoid parameters pass to the root init script from a sub directory (if you want to pass a script parameter, then you have to pass it in to a script from the same directory or below it)
+
 2025.07.15:
 * fixed: scripts/tools/std/echo_*.bat: scripts fixup for an empty string expansion
 * fixed: scripts/tools/std/time: scripts fixup for UTF-7 code page
