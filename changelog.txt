@@ -1,4 +1,8 @@
 2025.07.18:
+* new: scripts/tools/std/*shift.bat: `-num <num-args>` option to limit the arguments to use after skip and shift
+* changed: scripts/tests/unit/batscripts/test_build/test_build__11_gen_config.bat: test output improvement
+
+2025.07.18:
 * changed: *.bat: global code cleanup
 
 2025.07.18:

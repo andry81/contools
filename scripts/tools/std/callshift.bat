@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   callshift.bat [-exe] [-notrim] [-skip <skip-num>] [-lockfile <lock-file> [-trylock] [-lock-sleep-cmdline <lock-sleep-cmdline>]] [<shift> [<command> [<cmdline>...]]]
+rem   callshift.bat [-exe] [-notrim] [-skip <skip-num>] [-num <num-args>] [-lockfile <lock-file> [-trylock] [-lock-sleep-cmdline <lock-sleep-cmdline>]] [<shift> [<command> [<cmdline>...]]]
 
 rem Description:
 rem   Script calls `<command>` with skipped and shifted `<cmdline>`.
@@ -18,6 +18,10 @@ rem   Avoids spaces trim in the shifted command line.
 rem -skip <skip-num>
 rem   Number of `<cmdline>` arguments to skip before shift.
 rem   If not defined, then 0.
+
+rem -num <num-args>
+rem   Number of `<cmdline>` arguments to use after skip and shift.
+rem   If not defined, then use all (65535 is max).
 
 rem -lockfile <lock-file>
 rem   Calls a command line under the lock (a file redirection trick).
@@ -70,26 +74,30 @@ rem      >callshift.bat 0 echo:
 rem      >callshift.bat 0 echo 1 2 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
-rem   6. >callshift.bat -3 echo 1 2 3 4 5 6 7
+rem   6. >callshift.bat -num 3 1 echo 1 2 3 4 5 6 7
+rem      2 3 4
+rem      rem in a script
+rem      >call callshift.bat -num 3 1 command %%*
+rem   7. >callshift.bat -3 echo 1 2 3 4 5 6 7
 rem      1 2 3 7
 rem      rem in a script
 rem      >call callshift.bat -3 command %%3 %%2 %%1 %%*
-rem   7. >callshift.bat -skip 2 -3 echo a b 1 2 3 4 5 6 7
+rem   8. >callshift.bat -skip 2 -3 echo a b 1 2 3 4 5 6 7
 rem      a b 1 2 3 7
 rem      rem in a script
 rem      >call callshift.bat -skip 2 -3 command param0 param1 %%3 %%2 %%1 %%*
-rem   8. >callshift.bat 0 exit /b 321
+rem   9. >callshift.bat 0 exit /b 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
-rem   9. >errlvl.bat 123
+rem  10. >errlvl.bat 123
 rem      >callshift.bat 0 errlvl.bat 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
-rem  10. >callshift.bat -notrim 1 echo  a  b  c  d
+rem  11. >callshift.bat -notrim 1 echo  a  b  c  d
 rem       b  c  d
-rem  11. >callshift.bat 0 echo;^>cmd param0 param1
+rem  12. >callshift.bat 0 echo;^>cmd param0 param1
 rem      >cmd param0 param1
-rem  12. >callshift.bat -lockfile "%TEMP%\lock0.myscript" 0 echo;Exclusive print
+rem  13. >callshift.bat -lockfile "%TEMP%\lock0.myscript" 0 echo;Exclusive print
 
 rem Examples (in script):
 rem   1. set "$5E$3E=^>"
@@ -171,6 +179,7 @@ set FLAG_SHIFT=0
 set FLAG_EXE=0
 set FLAG_NO_TRIM=0
 set FLAG_SKIP=0
+set FLAG_NUM_ARGS=65536
 set "FLAG_LOCK_FILE="
 set "FLAG_LOCK_SLEEP_CMDLINE= 50"
 set FLAG_TRYLOCK=0
@@ -197,6 +206,14 @@ if defined FLAG if "%FLAG%" == "-notrim" (
 
 if defined FLAG if "%FLAG%" == "-skip" (
   set "FLAG_SKIP=%~2"
+  shift
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=2
+)
+
+if defined FLAG if "%FLAG%" == "-num" (
+  set "FLAG_NUM_ARGS=%~2"
   shift
   shift
   call set "FLAG=%%~1"
@@ -291,6 +308,8 @@ if %SHIFT% GEQ 0 (
   set /A SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2
 )
 
+set /A ARGS_END=SHIFT+FLAG_NUM_ARGS
+
 rem encode specific command line characters
 if %FLAG_EXE% EQU 0 (
   call "%%?~dp0%%encode\encode_sys_chars_bat_cmdline.bat"
@@ -314,9 +333,11 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STR
         for /F "tokens=* delims="eol^= %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
       ) else endlocal & set "CMDLINE=%%j"
     ) else if !INDEX! GEQ !SHIFT! (
-      if defined CMDLINE (
-        for /F "tokens=* delims="eol^= %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
-      ) else endlocal & set "CMDLINE=%%j"
+      if !INDEX! LSS !ARGS_END! (
+        if defined CMDLINE (
+          for /F "tokens=* delims="eol^= %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
+        ) else endlocal & set "CMDLINE=%%j"
+      ) else endlocal
     ) else endlocal
   ) else if !INDEX! EQU !COMMAND_INDEX! (
     endlocal & set "COMMAND=%%j"

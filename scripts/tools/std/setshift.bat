@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   setshift.bat [-exe] [-notrim] [-skip <skip-num>] <shift> <var> [<cmdline>...]
+rem   setshift.bat [-exe] [-notrim] [-skip <skip-num>] [-num <num-args>] <shift> <var> [<cmdline>...]
 
 rem Description:
 rem   Script sets `<var>` variable to skipped and shifted `<cmdline>`.
@@ -17,6 +17,10 @@ rem   Avoids spaces trim in the shifted command line.
 rem -skip <skip-num>
 rem   Number of `<cmdline>` arguments to skip before shift.
 rem   If not defined, then 0.
+
+rem -num <num-args>
+rem   Number of `<cmdline>` arguments to use after skip and shift.
+rem   If not defined, then use all (65535 is max).
 
 rem <shift>:
 rem   Number of `<cmdline>` arguments to skip and shift.
@@ -51,20 +55,25 @@ rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
 rem      >set x
 rem      x=1 2 3
-rem   5. >setshift.bat -3 x 1 2 3 4 5 6 7
+rem   5. >setshift.bat -num 3 1 x 1 2 3 4 5 6 7
+rem      >set x
+rem      x=2 3 4
+rem      rem in a script
+rem      >call setshift.bat -num 3 1 x %%*
+rem   6. >setshift.bat -3 x 1 2 3 4 5 6 7
 rem      >set x
 rem      x=1 2 3 7
 rem      rem in a script
 rem      >call setshift.bat -3 x %%3 %%2 %%1 %%*
-rem   6. >setshift.bat -skip 2 -3 x a b 1 2 3 4 5 6 7
+rem   7. >setshift.bat -skip 2 -3 x a b 1 2 3 4 5 6 7
 rem      >set x
 rem      x=a b 1 2 3 7
 rem      rem in a script
 rem      >call setshift.bat -skip 2 -3 x param0 param1 %%3 %%2 %%1 %%*
-rem   7. >setshift.bat -notrim 1 x  a  b  c  d
+rem   8. >setshift.bat -notrim 1 x  a  b  c  d
 rem      >set x
 rem      x= b  c  d
-rem   8. >setshift.bat 0 x ^>cmd param0 param1
+rem   9. >setshift.bat 0 x ^>cmd param0 param1
 rem      >set x
 rem      x=>cmd param0 param1
 
@@ -144,6 +153,7 @@ set FLAG_SHIFT=0
 set FLAG_EXE=0
 set FLAG_NO_TRIM=0
 set FLAG_SKIP=0
+set FLAG_NUM_ARGS=65536
 
 rem flags always at first
 set "FLAG=%~1"
@@ -167,6 +177,14 @@ if defined FLAG if "%FLAG%" == "-notrim" (
 
 if defined FLAG if "%FLAG%" == "-skip" (
   set "FLAG_SKIP=%~2"
+  shift
+  shift
+  call set "FLAG=%%~1"
+  set /A FLAG_SHIFT+=2
+)
+
+if defined FLAG if "%FLAG%" == "-num" (
+  set "FLAG_NUM_ARGS=%~2"
   shift
   shift
   call set "FLAG=%%~1"
@@ -202,6 +220,8 @@ if %SHIFT% GEQ 0 (
   set /A SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2
 )
 
+set /A ARGS_END=SHIFT+FLAG_NUM_ARGS
+
 rem encode specific command line characters
 if %FLAG_EXE% EQU 0 (
   call "%%?~dp0%%encode\encode_sys_chars_bat_cmdline.bat"
@@ -225,9 +245,11 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STR
         for /F "tokens=* delims="eol^= %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
       ) else endlocal & set "CMDLINE=%%j"
     ) else if !INDEX! GEQ !SHIFT! (
-      if defined CMDLINE (
-        for /F "tokens=* delims="eol^= %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
-      ) else endlocal & set "CMDLINE=%%j"
+      if !INDEX! LSS !ARGS_END! (
+        if defined CMDLINE (
+          for /F "tokens=* delims="eol^= %%v in ("!CMDLINE!") do endlocal & set "CMDLINE=%%v %%j"
+        ) else endlocal & set "CMDLINE=%%j"
+      ) else endlocal
     ) else endlocal
   ) else if !INDEX! EQU !VAR_INDEX! (
     endlocal & set "VAR=%%j"
