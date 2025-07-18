@@ -3,9 +3,6 @@
 rem drop return value
 set "RETURN_VALUE="
 
-rem Drop last error level
-call;
-
 rem CAUTION:
 rem   `for /F` does not return a command error code
 for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_OperatingSystem get LocalDateTime /VALUE 2^>nul`) do ^

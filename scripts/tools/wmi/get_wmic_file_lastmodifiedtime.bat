@@ -3,10 +3,7 @@
 rem drop return value
 set "RETURN_VALUE="
 
-rem Drop last error level
-call;
-
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"

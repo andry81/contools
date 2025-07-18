@@ -15,10 +15,8 @@ rem 1. call regenum.bat "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft"
 rem 2. call regenum.bat "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\"
 :DOC_END
 
-rem Drop last error level
 call;
 
-rem Create local variable's stack
 setlocal
 
 set "__REG_PATH=%~1"

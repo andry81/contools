@@ -41,7 +41,6 @@ call :MAIN %%*
 exit /b
 
 :MAIN
-rem Create local variable's stack
 setlocal
 
 set "VER_STR=%~1"

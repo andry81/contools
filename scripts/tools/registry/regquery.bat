@@ -27,10 +27,8 @@ rem    echo REGQUERY_VALUE=%REGQUERY_VALUE%
 rem Drop REGQUERY_VALUE variable
 set "REGQUERY_VALUE="
 
-rem Drop last error level
 call;
 
-rem Create local variable's stack
 setlocal
 
 set "__REG_PATH=%~1"

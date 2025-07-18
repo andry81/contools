@@ -34,7 +34,6 @@ if "%~1" == "" exit /b 65
 if "%~2" == "" exit /b 66
 if not exist "%~2\bin\cygcheck.exe" exit /b 67
 
-rem Create local variable's stack
 setlocal
 
 call "%%~dp0__init__.bat" || exit /b

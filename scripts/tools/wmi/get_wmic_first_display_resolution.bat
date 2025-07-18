@@ -3,9 +3,6 @@
 rem drop return value
 set "RETURN_VALUE="
 
-rem Drop last error level
-call;
-
 setlocal
 
 set "CurrentHorizontalResolution="

@@ -1,6 +1,5 @@
 @echo off
 
-rem Create local variable's stack
 setlocal DISABLEDELAYEDEXPANSION
 
 call "%%~dp0__init__/__init__.bat" || exit /b

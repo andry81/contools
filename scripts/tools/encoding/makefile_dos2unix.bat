@@ -6,7 +6,6 @@ rem   "*.*sh.;configure.*.;makefile.*." from the Dos text format to the Unix
 rem   text format using the dos2unix utility.
 :DOC_END
 
-rem Create local variable's stack
 setlocal
 
 set "__SEARCH_FILTER=*.*sh.;configure.*.;makefile.*."
