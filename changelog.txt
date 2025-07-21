@@ -1,3 +1,7 @@
+2025.07.21:
+* new: scripts/tests/bench/batscripts/test__setlocal: bench tests for `setlocal` and `endlocal` commands
+* refactor: scripts/tests/bench/batscripts/test_build: tests minor refactor
+
 2025.07.18:
 * new: scripts/tools/std/*shift.bat: `-num <num-args>` option to limit the arguments to use after skip and shift
 * changed: scripts/tests/unit/batscripts/test_build/test_build__11_gen_config.bat: test output improvement

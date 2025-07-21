@@ -6,7 +6,7 @@ call "%%~dp0__init__/__init__.bat" || exit /b
 
 echo;^>%~nx0
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
