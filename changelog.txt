@@ -1,3 +1,6 @@
+2025.07.22:
+* new: scripts/tests/bench/batscripts/test__read_dir: bench tests for `dir` vs `for` commands
+
 2025.07.21:
 * new: scripts/tests/bench/batscripts/test__setlocal: bench tests for `setlocal` and `endlocal` commands
 * refactor: scripts/tests/bench/batscripts/test_build: tests minor refactor
