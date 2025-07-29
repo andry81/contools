@@ -1,3 +1,7 @@
+2025.07.29:
+* changed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_cut*.bat: move custom flags variable before `-ss` option
+* changed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_*.bat: added `-map 0` option to select all streams by default
+
 2025.07.22:
 * new: scripts/tests/bench/batscripts/test__read_dir: bench tests for `dir` vs `for` commands
 

@@ -1,8 +1,14 @@
 @echo off & goto DOC_END
 
+rem ffmpeg command line reference:
+rem
+rem   https://ffmpeg.org/ffmpeg.html
+
 rem Examples:
 rem
-rem For details: https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar/1056632#1056632
+rem For details:
+rem
+rem   https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar/1056632#1056632
 rem
 rem * re-encode with better quality (default: `-crf 23`):
 rem
@@ -131,7 +137,7 @@ exit /b
 if %NO_DEFAULT_FLAGS% NEQ 0 (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -i "%%TEMP_FILE_LIST%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
 ) else if %ENABLE_REENCODE% NEQ 0 (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
-) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -map 0 -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
+) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -map 0 -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
 
 exit /b

@@ -1,8 +1,14 @@
 @echo off & goto DOC_END
 
+rem ffmpeg command line reference:
+rem
+rem   https://ffmpeg.org/ffmpeg.html
+
 rem Examples:
 rem
-rem For details: https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar/1056632#1056632
+rem For details:
+rem
+rem   https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar/1056632#1056632
 rem
 rem * re-encode with better quality (default: `-crf 23`):
 rem
@@ -93,7 +99,7 @@ if exist "%FILE_OUT%" (
 if %NO_DEFAULT_FLAGS% NEQ 0 (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -i "%%FILE_IN%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
 ) else if %ENABLE_REENCODE% NEQ 0 (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -err_detect ignore_err -i "%%FILE_IN%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
-) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -err_detect ignore_err -i "%%FILE_IN%%" -c copy%%BARE_FLAGS%% "%%FILE_OUT%%"
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -err_detect ignore_err -i "%%FILE_IN%%" -map 0 %%BARE_FLAGS%% "%%FILE_OUT%%"
+) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -err_detect ignore_err -i "%%FILE_IN%%" -map 0 -c copy%%BARE_FLAGS%% "%%FILE_OUT%%"
 
 exit /b
