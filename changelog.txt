@@ -1,4 +1,7 @@
 2025.07.31:
+* refactor: scripts/tests/manual/bat/test_std/test_std__60_asc_!exclusive.bat: excluded from `test_all.bat` because the test is complex, slow and relied upon the current code page
+
+2025.07.31:
 * refactor: scripts/tests, README_EN.txt: directory rename
 
 2025.07.29:
