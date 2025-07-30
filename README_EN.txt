@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2025.06.25
+* 2025.07.31
 * contools
 
 1. DESCRIPTION
@@ -177,9 +177,9 @@ sudo chmod a+r  /bin/bash_tacklelib
 -------------------------------------------------------------------------------
 * bat scripts tests:
 
-  ** scripts/tests/manual/batscripts
-  ** scripts/tests/unit/batscripts
-  ** scripts/tests/bench/batscripts
+  ** scripts/tests/manual/bat
+  ** scripts/tests/unit/bat
+  ** scripts/tests/bench/bat
 
 -------------------------------------------------------------------------------
 10. AUTHOR

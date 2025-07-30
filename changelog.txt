@@ -1,3 +1,6 @@
+2025.07.31:
+* refactor: scripts/tests, README_EN.txt: directory rename
+
 2025.07.29:
 * changed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_cut*.bat: move custom flags variable before `-ss` option
 * changed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_*.bat: added `-map 0` option to select all streams by default
