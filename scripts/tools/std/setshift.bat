@@ -20,7 +20,8 @@ rem   If not defined, then 0.
 
 rem -num <num-args>
 rem   Number of `<cmdline>` arguments to use after skip and shift.
-rem   If not defined, then use all (65535 is max).
+rem   Starts to count the number of arguments after the skip but before the
+rem   shift. If not defined, then use all (65535 is max).
 
 rem <shift>:
 rem   Number of `<cmdline>` arguments to skip and shift.
@@ -88,7 +89,8 @@ rem      set x
 rem Pros:
 rem
 rem   * Can handle almost all control characters.
-rem   * Does restore previous ERRORLEVEL variable before call a command.
+rem   * Does restore previous ERRORLEVEL variable after a variable assign or on
+rem     an error before the assign.
 rem   * Can skip first N used arguments from the `%*` variable including
 rem     additional command line arguments.
 rem   * Can avoid spaces and tabulation characters trim in the shifted command
@@ -215,12 +217,12 @@ set /A SKIP=FLAG_SHIFT+2+FLAG_SKIP
 
 if %SHIFT% GEQ 0 (
   set /A SHIFT+=SKIP
+  set /A ARGS_END=FLAG_NUM_ARGS+SHIFT
 ) else (
+  set /A ARGS_END=SKIP+FLAG_NUM_ARGS-SHIFT
   set /A SKIP+=-SHIFT
   set /A SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2
 )
-
-set /A ARGS_END=SHIFT+FLAG_NUM_ARGS
 
 rem encode specific command line characters
 if %FLAG_EXE% EQU 0 (

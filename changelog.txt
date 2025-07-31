@@ -1,4 +1,10 @@
 2025.07.31:
+* fixed: scripts/tools/std/*shift.bat: `-num` option fixup
+* fixed: scripts/tests/manual/bat/test_std/test_std__*__*shift.bat: manual tests fixup
+* fixed: scripts/tests/manual/bat/test_std/test_std__*_call*_with_*lock_!exclusive.bat: missed to create a temporary directory
+* new: scripts/tests/manual/bat/test_std/test_std__*__*shift.bat: manual tests for `-num` option
+
+2025.07.31:
 * refactor: scripts/tests/manual/bat/test_std/test_std__60_asc_!exclusive.bat: excluded from `test_all.bat` because the test is complex, slow and relied upon the current code page
 
 2025.07.31:

@@ -58,22 +58,47 @@ rem endlocal
 rem echo;---
 
 setlocal
-call "%%~dp0..\..\..\..\tools\std\errlvl.bat" 123
 set "ARGS="
+call "%%~dp0..\..\..\..\tools\std\errlvl.bat" 123
+echo ERRORLEVEL=%ERRORLEVEL%
 call :CALLSHIFT
+echo ERRORLEVEL=%ERRORLEVEL%
 set ARGS=echo:
 call :CALLSHIFT 0
+echo ERRORLEVEL=%ERRORLEVEL%
 set ARGS=echo;
 call :CALLSHIFT 0
+echo ERRORLEVEL=%ERRORLEVEL%
 set ARGS=echo;
 call :CALLSHIFT -exe 0
+echo ERRORLEVEL=%ERRORLEVEL%
 set ARGS=echo 1 2 3
 call :CALLSHIFT 0
+echo ERRORLEVEL=%ERRORLEVEL%
 set ARGS=echo 1;2,3=
 call :CALLSHIFT 0
+echo ERRORLEVEL=%ERRORLEVEL%
 set ARGS=echo 1;2,3=
 call :CALLSHIFT -exe 0
 echo ERRORLEVEL=%ERRORLEVEL%
+endlocal
+echo;---
+
+setlocal
+set ARGS=echo 1 2 3 4 5 6 7
+call :CALLSHIFT 1
+endlocal
+echo;---
+
+setlocal
+set ARGS=echo 1 2 3 4 5 6 7
+call :CALLSHIFT -num 3 1
+endlocal
+echo;---
+
+setlocal
+set ARGS=echo a b 1 2 3 4 5 6 7
+call :CALLSHIFT -skip 2 -num 3 1
 endlocal
 echo;---
 
@@ -90,6 +115,14 @@ endlocal
 echo;---
 
 setlocal
+set ARGS=echo a b 1 2 3 4 5 6 7 8
+call :CALLSHIFT -skip 2 -num 4 -3
+endlocal
+echo;---
+
+setlocal
+call "%%~dp0..\..\..\..\tools\std\errlvl.bat" 123
+echo ERRORLEVEL=%ERRORLEVEL%
 set ARGS=exit /b 321
 call :CALLSHIFT 0
 echo ERRORLEVEL=%ERRORLEVEL%
@@ -98,6 +131,7 @@ echo;---
 
 setlocal
 call "%%~dp0..\..\..\..\tools\std\errlvl.bat" 123
+echo ERRORLEVEL=%ERRORLEVEL%
 set ARGS="%~dp0..\..\..\..\tools\std\errlvl.bat" 321
 call :CALLSHIFT 0
 echo ERRORLEVEL=%ERRORLEVEL%
@@ -122,5 +156,6 @@ echo;
 exit /b
 
 :CALLSHIFT
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!ARGS!") do endlocal & echo callshift.bat %* %%i
+rem with ERRORLEVEL restore workaround
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!ARGS!"') do endlocal & echo callshift.bat %* %%~i & call "%%~dp0..\..\..\..\tools\std\errlvl.bat" %ERRORLEVEL%
 call "%%~dp0..\..\..\..\tools\std\callshift.bat" %%* %%ARGS%%
