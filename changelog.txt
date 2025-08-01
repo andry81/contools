@@ -1,3 +1,6 @@
+2025.08.01:
+* refactor: scripts/tools/cleanup: `sed` implementation detail
+
 2025.07.31:
 * fixed: scripts/tools/std/*shift.bat: `-num` option fixup
 * fixed: scripts/tests/manual/bat/test_std/test_std__*__*shift.bat: manual tests fixup
