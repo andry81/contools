@@ -144,12 +144,14 @@ if not defined INPUT_FILE_BOM_STR goto IGNORE_BOM_CHECK
 
 for /F "tokens=* delims="eol^= %%i in ("%INPUT_FILE_BOM_STR%") do set /P =%%i<nul > "%INPUT_FILE_BOM_PREFIX_TMP%"
 "%SystemRoot%\System32\fc.exe" "%INPUT_FILE_BOM_PREFIX_TMP%" "%BOM_FILE_PATH%" >nul
-if %ERRORLEVEL% NEQ 0 goto IGNORE_BOM_CHECK
+set LAST_ERROR=%ERRORLEVEL%
 
 if %RESTORE_LOCALE% GTR 1 (
   call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
   set /A RESTORE_LOCALE-=1
 )
+
+if %LAST_ERROR% NEQ 0 goto IGNORE_BOM_CHECK
 
 copy "%INPUT_FILE_PATH%" "%OUTPUT_FILE_PATH%" /B /Y >nul 2>nul || (
   echo;%?~%: error: could not copy to the output file (2^): "%OUTPUT_FILE_PATH%".
@@ -159,11 +161,6 @@ copy "%INPUT_FILE_PATH%" "%OUTPUT_FILE_PATH%" /B /Y >nul 2>nul || (
 exit /b 0
 
 :IGNORE_BOM_CHECK
-
-if %RESTORE_LOCALE% GTR 1 (
-  call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
-  set /A RESTORE_LOCALE-=1
-)
 
 rem copy as binary files
 copy "%BOM_FILE_PATH%" /B + "%INPUT_FILE_PATH%" /B "%OUTPUT_FILE_PATH%" /B /Y >nul 2>nul || (

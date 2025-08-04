@@ -26,6 +26,8 @@
 #                         Can start by the `"` quote character, but two quotes does remove only when exist on both ends of a value.
 #
 
-TEST_DATA_IN_ROOT           ="%TESTS_PROJECT_ROOT%/_testdata"
-TEST_DATA_OUT_ROOT          ="%PROJECT_OUTPUT_ROOT%/_tests/unit/out"
-TEST_DATA_TEMP_ROOT         ="%PROJECT_OUTPUT_ROOT%/_tests/unit/temp"
+TEST_DATA_IN_ROOT             ="%TESTS_PROJECT_ROOT%/_testdata"
+TEST_DATA_OUT_ROOT            ="%PROJECT_OUTPUT_ROOT%/_tests/unit/out"
+TEST_DATA_TEMP_ROOT           ="%PROJECT_OUTPUT_ROOT%/_tests/unit/temp"
+
+upath CONTOOLS_GNUWIN32_ROOT  ="%CONTOOLS_PROJECT_EXTERNALS_ROOT%/gnuwin32"

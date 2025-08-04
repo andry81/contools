@@ -1,3 +1,11 @@
+2025.08.05:
+* new: scripts/tools/encoding: unix2dos.bat, dos2unix.bat: mixed line ending conversion scripts using `msys2` or `gnuwin32` `sed` implementation
+* new: scripts/tests/unit/bat/test_encoding/test_encoding__01_unix2dos.bat: unit tests for `unix2dos.bat` script
+* new: scripts/tests/unit/bat/test_encoding/test_encoding__02_dos2unix.bat: unit tests for `dos2unix.bat` script
+* new: .externals-tests: GnuWin32 externals for tests
+* changed: scripts/tests/unit/bat: unit test scripts improvement
+* changed: scripts/tools/encoding/prepend_bom_to_utf_file.bat: code cleanup
+
 2025.08.01:
 * refactor: scripts/tools/cleanup: `sed` implementation detail
 
