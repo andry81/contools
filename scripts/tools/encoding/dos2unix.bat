@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   dos2unix.bat [-i] <file>
+rem   dos2unix.bat [-i] [-fix-tail-lr] <file>
 
 rem Description:
 rem   Converts mixed line endings text file into Windows text format first and
