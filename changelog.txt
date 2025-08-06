@@ -1,4 +1,7 @@
 2025.08.06:
+* fixed: scripts/tools/xml/sed: tests pass
+
+2025.08.06:
 * fixed: scripts/tests/unit/bat/_testdata: test_encoding__*_unix2dos, test_encoding__*_dos2unix: unit tests data fixup
 * fixed: scripts/tests/unit/bat/test_encoding/test_encoding__01_EOL_conversion: unit test scripts fixup
 * new: scripts/tools/encoding: unix2dos.bat, dos2unix.bat: `-fix-tail-lr` flag to fix the tail line return using additional queries to the file through the `sed`

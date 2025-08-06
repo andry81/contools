@@ -33,11 +33,11 @@
     # copy Buffer Space to Pattern Space
     g
     # remove first 2 lines from Pattern Space
-    s/[^\r]*\r\?\n[^\r]*\r\?\n\([^\r]*\)/\1/
+    s/[^\r]*\r\?\n[^\r]*\r\?\n\([^\r]*\r\?\)/\1/
     # exchange Pattern Space with Buffer Space
     x
     # remove 1t and 3d lines from Pattern Space
-    s/[^\r]*\r\?\n\([^\r]*\)\r\?\n[^\r]*/\1/
+    s/[^\r]*\r\?\n\([^\r]*\r\?\)\n[^\r]*/\1/
   }
 
   # print Pattern Space
