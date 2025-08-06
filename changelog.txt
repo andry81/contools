@@ -1,4 +1,13 @@
 2025.08.06:
+* fixed: scripts/tests/unit/bat/_testdata: test_encoding__*_unix2dos, test_encoding__*_dos2unix: unit tests data fixup
+* fixed: scripts/tests/unit/bat/test_encoding/test_encoding__01_EOL_conversion: unit test scripts fixup
+* new: scripts/tools/encoding: unix2dos.bat, dos2unix.bat: `-fix-tail-lr` flag to fix the tail line return using additional queries to the file through the `sed`
+* new: scripts/tests/unit/bat/test_encoding: more exclusive unit tests
+* changed: scripts/tools/encoding: unix2dos.bat, dos2unix.bat: code improvement
+* changed: scripts/tests/unit/bat/test_encoding/test_encoding__01_EOL_conversion: unit test scripts improvements
+* changed: scripts/tests/unit/bat: test_encoding: excluded `unix2dos` and `dos2unix` unit tests from `all` as too long to wait
+
+2025.08.06:
 * fixed: scripts: inappropriate default behavior of the `fc.exe`, by default it does ignore line returns difference, switched to always use the binary mode comparison
 
 2025.08.05:

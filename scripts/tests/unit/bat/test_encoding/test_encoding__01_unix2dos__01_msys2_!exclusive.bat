@@ -5,7 +5,7 @@ setlocal DISABLEDELAYEDEXPANSION
 call "%%~dp0__init__/__init__.bat" || exit /b
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
-for %%i in ("%TESTS_PROJECT_ROOT%\test_encoding\test_encoding__01_EOL_conversion\%~n0__*.bat") do (
+for %%i in ("%TESTS_PROJECT_ROOT%\test_encoding\test_encoding__01_EOL_conversion\test_encoding__01_unix2dos__01_*.bat") do (
   set "SCRIPT_NAME=%%~ni"
   set "SCRIPT_FILE=%%i"
   call "%%CONTOOLS_ROOT%%/std/if_.bat" ^

@@ -13,7 +13,7 @@ set "TEST_TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
 rem initialize setup parameters
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_TEMP_DATA_OUT_FILE "%%TEST_TEMP_DIR_PATH%%\output.txt"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_REF_DIR       "%%TEST_DATA_IN_ROOT%%\test_encoding__01_unix2dos\%%TEST_DATA_FILE_IN_OUT_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_REF_DIR       "%%TEST_DATA_IN_ROOT%%\%%TEST_DATA_DIR_NAME%%\%%TEST_DATA_FILE_IN_OUT_DIR%%"
 
 set "TEST_DATA_IN_FILE=%TEST_DATA_REF_DIR%\input.txt"
 set "TEST_DATA_REF_FILE=%TEST_DATA_REF_DIR%\output.txt"
