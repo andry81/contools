@@ -54,7 +54,7 @@ if not defined DIR_NAME exit /b 4
 
 call "%%CONTOOLS_ROOT%%/filesys/gen_dir_files_list.bat" "%%CHCP%%" "%DIR_PATH%\%DIR_NAME%" > "%TEST_DATA_OUTPUT_FILE_NAME%"
 
-"%SystemRoot%\System32\fc.exe" "%TEST_DATA_OUTPUT_FILE_NAME%" "%TEST_DATA_REF_DIR_PATH%\%TEST_DATA_OUTPUT_FILE_NAME%" >nul || exit /b 5
+"%SystemRoot%\System32\fc.exe" /B "%TEST_DATA_OUTPUT_FILE_NAME%" "%TEST_DATA_REF_DIR_PATH%\%TEST_DATA_OUTPUT_FILE_NAME%" >nul || exit /b 5
 
 set /A DIR_INDEX+=1
 
