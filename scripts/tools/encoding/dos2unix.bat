@@ -86,20 +86,17 @@ if defined SED_EXEC if exist "%SED_EXEC%" goto EXEC
 set "SED_APPEND_LF_EXPR="
 
 if %FLAG_FIX_TAIL_LR% EQU 0 goto SKIP_FIX_TAIL_LR
+for /F "tokens=* delims="eol^= %%i in ("%INPUT_FILE%") do if %%~zi EQU 0 goto SKIP_FIX_TAIL_LR
 
-for /F "tokens=* delims="eol^= %%i in ("%INPUT_FILE%") do set "INPUT_FILE_SIZE=%%~zi"
+rem CAUTION:
+rem   The piping here is required by the design of the `sed`, because it does
+rem   not update the $-address of a selector after an append to the end.
+rem
+"%SED_EXEC%" -b -e "H;1h;$!d;x" -e "/$/s/$/\n/g" "%INPUT_FILE%" | "%SED_EXEC%" -n -b -e "H;1h;$!d;x" -e "/[^\r\n]\n$/q1; /\r$/q2; q0"
 
-set LAST_LINE_NOT_EMPTY_WITH_LF=0
-set LAST_CR=0
-if %INPUT_FILE_SIZE% NEQ 0 (
-  "%SED_EXEC%" -b -e "H;1h;$!d;x" -e "/$/s/$/\n/g" "%INPUT_FILE%" | "%SED_EXEC%" -n -b -e "H;1h;$!d;x" -e "/[^\r\n]\n$/q0; q1" && set LAST_LINE_NOT_EMPTY_WITH_LF=1
-)
-if %INPUT_FILE_SIZE% NEQ 0 if %LAST_LINE_NOT_EMPTY_WITH_LF% EQU 0 (
-  "%SED_EXEC%" -b -e "H;1h;$!d;x" -e "/$/s/$/\n/g" "%INPUT_FILE%" | "%SED_EXEC%" -n -b -e "H;1h;$!d;x" -e "/\r$/q0; q1" && set LAST_CR=1
-)
-
-if %LAST_LINE_NOT_EMPTY_WITH_LF% NEQ 0 set SED_APPEND_LF_EXPR= -e "/$/s/$/\r/g"
-if %LAST_CR% NEQ 0 set SED_APPEND_LF_EXPR= -e "/$/s/$/\n/g"
+rem last LF of not empty line
+if %ERRORLEVEL% EQU 1 set SED_APPEND_LF_EXPR= -e "/$/s/$/\r/g"
+if %ERRORLEVEL% EQU 2 set SED_APPEND_LF_EXPR= -e "/$/s/$/\n/g"
 
 :SKIP_FIX_TAIL_LR
 "%SED_EXEC%" -n -b%SED_BARE_FLAGS% ^
