@@ -1,4 +1,7 @@
 2025.08.08:
+* new: scripts/tools/ToolAdaptors/hta/README_EN.txt: readme file
+
+2025.08.08:
 * changed: scripts/tools/encoding: unix2dos.bat, dos2unix.bat: minor fix
 
 2025.08.08:
