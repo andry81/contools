@@ -1,3 +1,6 @@
+2025.08.08:
+* new: scripts/tests/bench/bat/test_encoding: bench tests for `unix2dos.bat` and `dos2unix.bat` scripts
+
 2025.08.07:
 * new: scripts/tests/unit/bat/test_encoding: more `unix2dos` and `dos2unix` unit tests for `CRLF` and `LF` only, generated from mixed variants
 * changed: scripts/tools/encoding: unix2dos.bat, dos2unix.bat: performance improvement by processing 2 queries in a single pipe
