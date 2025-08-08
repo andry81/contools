@@ -57,6 +57,8 @@ if not exist "%INPUT_FILE%" (
   exit /b 1
 ) >&2
 
+for /F "tokens=* delims="eol^= %%i in ("%INPUT_FILE%") do if %%~zi EQU 0 exit /b 0
+
 rem Based on: https://unix.stackexchange.com/questions/182153/sed-read-whole-file-into-pattern-space-without-failing-on-single-line-input/182154#182154
 rem
 rem NOTE:
@@ -86,7 +88,6 @@ if defined SED_EXEC if exist "%SED_EXEC%" goto EXEC
 set "SED_APPEND_LF_EXPR="
 
 if %FLAG_FIX_TAIL_LR% EQU 0 goto SKIP_FIX_TAIL_LR
-for /F "tokens=* delims="eol^= %%i in ("%INPUT_FILE%") do if %%~zi EQU 0 goto SKIP_FIX_TAIL_LR
 
 rem CAUTION:
 rem   The piping here is required by the design of the `sed`, because it does
