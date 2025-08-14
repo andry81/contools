@@ -1,3 +1,6 @@
+2025.08.11:
+* changed: scripts/tools/encoding/prepend_bom_to_utf_file.bat: minor change
+
 2025.08.08:
 * new: scripts/tools/ToolAdaptors/hta/README_EN.txt: readme file
 

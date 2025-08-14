@@ -101,9 +101,9 @@ if /i "%INPUT_FILE_PATH%" == "%OUTPUT_FILE_PATH%" (
   exit /b 1
 ) >&2
 
-set "INPUT_FILE_BOM_PREFIX_TMP=%TEMP_DIR%\input_file_bom_prefix.bin"
+mkdir "%TEMP_DIR%" >nul || exit /b 255
 
-mkdir "%TEMP_DIR%" >nul 2>nul
+set "INPUT_FILE_BOM_PREFIX_TMP=%TEMP_DIR%\input_file_bom_prefix.bin"
 
 if defined FLAG_CHCP (
   call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
