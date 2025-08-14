@@ -1,3 +1,11 @@
+2025.08.14:
+* new: scripts/tests/unit/bat/test_math.bat: `fold.bat`, `unfold.bat` unit tests
+* new: scripts/tests/bench/bat/test_math.bat: `fold.bat`, `unfold.bat` bench tests
+
+2025.08.12:
+* new: scripts/tools/std/cmp_*var.bat: scripts to compare string and number values in variables
+* new: scripts/tools/math: scripts to partially circumvent 32-bit arithmetic limitation
+
 2025.08.11:
 * changed: scripts/tools/encoding/prepend_bom_to_utf_file.bat: minor change
 
