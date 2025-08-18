@@ -14,7 +14,7 @@ set /A "F=R" & set "R=" ^
   & ( if !L5! NEQ 0 ( set "R=!R!!L5!" ) else if defined R set "R=!R!0" ) & ( if defined R set "R=!R!," ) ^
   & ( if !L6! NEQ 0 ( set "R=!R!!L6!" ) else if defined R set "R=!R!0" )
 for /F "tokens=* delims=" %%a in ("!R!") do endlocal & set "%~1=%%a" & exit /b %F%
-endlocal & set /A "%~1=0" & if not "%~2" == "" if defined %~2 exit /b %F%
+endlocal & set "%~1=0" & if not "%~2" == "" if defined %~2 exit /b %F%
 exit /b -1
 
 rem USAGE:

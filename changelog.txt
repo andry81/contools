@@ -1,3 +1,8 @@
+2025.08.18:
+* new: scripts\tests\unit\bat\test_math\test_math__02_unfold.bat: more unit tests
+* changed: scripts/tools/math/unfold.bat: add only an overflow part of the right expression
+* changed: scripts/tools/math/*fold.bat: minor improvement
+
 2025.08.14:
 * new: scripts/tests/unit/bat/test_math.bat: `fold.bat`, `unfold.bat` unit tests
 * new: scripts/tests/bench/bat/test_math.bat: `fold.bat`, `unfold.bat` bench tests

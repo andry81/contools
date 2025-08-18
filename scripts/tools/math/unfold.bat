@@ -7,8 +7,8 @@ set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "
   & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) & ( if defined L1 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) ^
   & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L1 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) ^
   & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L1 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) ^
-  & ( if defined F if not "!F:,=!" == "!F!" call "%%~0" F F ) & ^
-set /A "L6+=F" & set /A "L5+=L6/1000" & set /A "L4+=L5/1000" & set /A "L3+=L4/1000" & set /A "L2+=L3/1000" & set /A "L1+=L2/1000" & set /A "F=L1/1000" & ^
+  & ( if defined F if not "!F:,=!" == "!F!" call "%%~0" F F || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
+set /A "L5+=L6/1000" & set /A "L4+=L5/1000" & set /A "L3+=L4/1000" & set /A "L2+=L3/1000" & set /A "L1+=L2/1000" & set /A "F=L1/1000" & ^
 set /A "L6%%=1000" & set /A "L5%%=1000" & set /A "L4%%=1000" & set /A "L3%%=1000" & set /A "L2%%=1000" & set /A "L1%%=1000" ^
   & ( if "%%b" == "" set "L2=!L1!" & set /A "L1=F %% 1000" & set /A "F/=1000" ) ^
   & ( if "%%c" == "" set "L3=!L2!" & set "L2=!L1!" & set /A "L1=F %% 1000" & set /A "F/=1000" ) ^
@@ -27,7 +27,7 @@ set /A "L6%%=1000" & set /A "L5%%=1000" & set /A "L4%%=1000" & set /A "L3%%=1000
   & ( if not "!R!" == "" ( ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) ) ) ^
   & ( if !L6! NEQ 0 ( set "R=!R!!L6!" ) else if not "!R!" == "" set "R=!R!000" )
 for /F "tokens=* delims=" %%a in ("!R!") do endlocal & set "%~1=%%a" & exit /b %F%
-endlocal & set /A "%~1=0" & if not "%~2" == "" if defined %~2 exit /b %F%
+endlocal & set "%~1=0" & if not "%~2" == "" if defined %~2 exit /b %F%
 exit /b -1
 
 rem USAGE:
@@ -52,6 +52,6 @@ rem      set a=0,1,2,3
 rem      unfold.bat b a
 rem      rem b=1002003
 rem   2. >
-rem      set a=0,1,2,3
+rem      set a=1,2,3,4,5,6,4567,1,2,3,4,5
 rem      unfold.bat b a
-rem      rem b=1002003
+rem      rem b=1002003004005010
