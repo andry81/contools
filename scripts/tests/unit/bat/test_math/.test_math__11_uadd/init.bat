@@ -1,7 +1,10 @@
 @echo off
 
+set "VALUE=%~3"
+
 set OUTDEF=0
 set INDEF=0
+set VALUEDEF=0
 
 if not "%~1" == "" set OUTDEF=1
 if not "%~2" == "" set INDEF=1

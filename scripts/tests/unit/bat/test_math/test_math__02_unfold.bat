@@ -7,6 +7,7 @@ call "%%CONTOOLS_ROOT%%/std/assert_if_def.bat" __CTRL_SETLOCAL "error: cmd.exe i
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
 rem reset all test variables at first
+set "IN="
 set "OUT="
 set "OUTREF="
 set "RETREF=0"
@@ -27,11 +28,21 @@ call :TEST OUT
 endlocal
 
 setlocal
-set "IN="
 set OUT=x
 set OUTREF=0
 set RETREF=-1
 call :TEST OUT IN
+endlocal
+
+setlocal
+set RETREF=-1
+call :TEST "" IN
+endlocal
+
+setlocal
+set IN=1
+set RETREF=-1
+call :TEST "" IN
 endlocal
 
 for /L %%i in (1,1,27) do (
@@ -41,6 +52,33 @@ for /L %%i in (1,1,27) do (
   call :TEST OUT IN
   endlocal
 )
+
+
+rem NOTE: tests from the script documentation in the description
+
+rem Examples:
+rem   1. >
+rem      set a=0,1,2,3
+rem      unfold.bat b a
+rem      rem ERRORLEVEL=0
+rem      rem b=1002003
+setlocal
+set IN=0,1,2,3
+set OUTREF=1002003
+call :TEST OUT IN
+endlocal
+
+rem   2. >
+rem      set a=4321,2,3,4,5,6,4567,1,2,3,4,5
+rem      unfold.bat b a
+rem      rem ERRORLEVEL=4
+rem      rem b=321002003004005010
+setlocal
+set IN=4321,2,3,4,5,6,4567,1,2,3,4,5
+set OUTREF=321002003004005010
+set RETREF=4
+call :TEST OUT IN
+endlocal
 
 
 setlocal
@@ -124,6 +162,12 @@ endlocal
 setlocal
 set IN=12,345,678,912,345
 set OUTREF=12345678912345
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=123,456,789,123,456
+set OUTREF=123456789123456
 call :TEST OUT IN
 endlocal
 
@@ -636,33 +680,39 @@ set OUTREF=2100
 call :TEST OUT IN
 endlocal
 
+
 setlocal
 set IN=1234
-set OUTREF=1234
+set OUTREF=234
+set RETREF=1
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1234,1234
-set OUTREF=1235234
+set OUTREF=235234
+set RETREF=1
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1234,1234,1234
-set OUTREF=1235235234
+set OUTREF=235235234
+set RETREF=1
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1234,1234,1234,1234
-set OUTREF=1235235235234
+set OUTREF=235235235234
+set RETREF=1
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1234,1234,1234,1234,1234
-set OUTREF=1235235235235234
+set OUTREF=235235235235234
+set RETREF=1
 call :TEST OUT IN
 endlocal
 
@@ -673,58 +723,22 @@ set RETREF=1
 call :TEST OUT IN
 endlocal
 
-
 setlocal
 set IN=1234,1234,1234,1234,1234,1234,1111
-set OUTREF=235235235235235234
-set RETREF=1
-call :TEST OUT IN
-endlocal
-
-setlocal
-set IN=1234,1234,1234,1234,1234,1234,1111,1111
-set OUTREF=235235235235235234
-set RETREF=1
-call :TEST OUT IN
-endlocal
-
-setlocal
-set IN=1234,1234,1234,1234,1234,1234,1111,1111,1111
-set OUTREF=235235235235235234
-set RETREF=1
-call :TEST OUT IN
-endlocal
-
-setlocal
-set IN=1234,1234,1234,1234,1234,1234,1111,1111,1111,1111
-set OUTREF=235235235235235234
-set RETREF=1
-call :TEST OUT IN
-endlocal
-
-setlocal
-set IN=1234,1234,1234,1234,1234,1234,1111,1111,1111,1111,1111
-set OUTREF=235235235235235234
-set RETREF=1
-call :TEST OUT IN
-endlocal
-
-setlocal
-set IN=1234,1234,1234,1234,1234,1234,1111,1111,1111,1111,1111,1111
 set OUTREF=235235235235235235
 set RETREF=1
 call :TEST OUT IN
 endlocal
 
 setlocal
-set IN=1234,1234,1234,1234,1234,1234,1998,1111,1111,1111,1111,1111
+set IN=1234,1234,1234,1234,1234,1234,1998,1111
 set OUTREF=235235235235235235
 set RETREF=1
 call :TEST OUT IN
 endlocal
 
 setlocal
-set IN=1234,1234,1234,1234,1234,1234,1999,1111,1111,1111,1111,1111
+set IN=1234,1234,1234,1234,1234,1234,1999,1111
 set OUTREF=235235235235235236
 set RETREF=1
 call :TEST OUT IN

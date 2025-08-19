@@ -1,5 +1,14 @@
+2025.08.19:
+* fixed: scripts/tools/math/*fold.bat: execution fixup
+* new: scripts/tools/math/uadd.bat: script to circumvent 32-bit addition arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__11_uadd.bat: `uadd.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__11_uadd.bat: `uadd.bat` bench test
+* new: scripts/tests/unit/bat/test_math/test_math__*_*fold.bat: more unit tests
+* changed: scripts/tools/math/*fold.bat: code improvement
+* changed: scripts/tests/unit/bat/test_math: unit tests report improvement
+
 2025.08.18:
-* new: scripts\tests\unit\bat\test_math\test_math__02_unfold.bat: more unit tests
+* new: scripts/tests/unit/bat/test_math/test_math__02_unfold.bat: more unit tests
 * changed: scripts/tools/math/unfold.bat: add only an overflow part of the right expression
 * changed: scripts/tools/math/*fold.bat: minor improvement
 

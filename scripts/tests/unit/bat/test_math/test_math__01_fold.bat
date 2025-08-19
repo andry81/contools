@@ -7,11 +7,16 @@ call "%%CONTOOLS_ROOT%%/std/assert_if_def.bat" __CTRL_SETLOCAL "error: cmd.exe i
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
 rem reset all test variables at first
+set "IN="
 set "OUT="
 set "OUTREF="
 set "RETREF=0"
 
 set ZEROS=00000000000000000000
+
+rem NOTE:
+rem   The `OUT` must be only be splitted by the comma if not empty and longer than NNN,
+rem   and is not required to be the full length formatted as `N,N,N,N,N,N`.
 
 
 setlocal
@@ -27,11 +32,21 @@ call :TEST OUT
 endlocal
 
 setlocal
-set "IN="
 set OUT=x
 set OUTREF=0
 set RETREF=-1
 call :TEST OUT IN
+endlocal
+
+setlocal
+set RETREF=-1
+call :TEST "" IN
+endlocal
+
+setlocal
+set IN=1
+set RETREF=-1
+call :TEST "" IN
 endlocal
 
 for /L %%i in (1,1,20) do (
@@ -41,6 +56,21 @@ for /L %%i in (1,1,20) do (
   call :TEST OUT IN
   endlocal
 )
+
+
+rem NOTE: tests from the script documentation in the description
+
+rem Examples:
+rem   1. >
+rem      set a=0123456000001002003
+rem      fold.bat b a
+rem      rem ERRORLEVEL=0
+rem      rem b=123,456,0,1,2,3
+setlocal
+set IN=0123456000001002003
+set OUTREF=123,456,0,1,2,3
+call :TEST OUT IN
+endlocal
 
 
 setlocal

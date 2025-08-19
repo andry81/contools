@@ -1,4 +1,4 @@
-@echo off & setlocal ENABLEDELAYEDEXPANSION & set "R=" & ^
+@echo off & ( if "%~1" == "" exit /b -1 ) & setlocal ENABLEDELAYEDEXPANSION & set "R=" & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!%~2!") do ^
 set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" ^
   & ( if defined L1 if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) ^
@@ -7,14 +7,14 @@ set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "
   & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) & ( if defined L1 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) ^
   & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L1 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) ^
   & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L1 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) ^
-  & ( if defined F if not "!F:,=!" == "!F!" call "%%~0" F F || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
+  & ( if defined F call "%%~0" F F || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
 set /A "L5+=L6/1000" & set /A "L4+=L5/1000" & set /A "L3+=L4/1000" & set /A "L2+=L3/1000" & set /A "L1+=L2/1000" & set /A "F=L1/1000" & ^
 set /A "L6%%=1000" & set /A "L5%%=1000" & set /A "L4%%=1000" & set /A "L3%%=1000" & set /A "L2%%=1000" & set /A "L1%%=1000" ^
-  & ( if "%%b" == "" set "L2=!L1!" & set /A "L1=F %% 1000" & set /A "F/=1000" ) ^
-  & ( if "%%c" == "" set "L3=!L2!" & set "L2=!L1!" & set /A "L1=F %% 1000" & set /A "F/=1000" ) ^
-  & ( if "%%d" == "" set "L4=!L3!" & set "L3=!L2!" & set "L2=!L1!" & set /A "L1=F %% 1000" & set /A "F/=1000" ) ^
-  & ( if "%%e" == "" set "L5=!L4!" & set "L4=!L3!" & set "L3=!L2!" & set "L2=!L1!" & set /A "L1=F %% 1000" & set /A "F/=1000" ) ^
-  & ( if "%%f" == "" set "L6=!L5!" & set "L5=!L4!" & set "L4=!L3!" & set "L3=!L2!" & set "L2=!L1!" & set /A "L1=F %% 1000" & set /A "F/=1000" ) ^
+  & ( if "%%b" == "" set "L2=!L1!" & set "L1=0" ) ^
+  & ( if "%%c" == "" set "L3=!L2!" & set "L2=!L1!" & set "L1=0" ) ^
+  & ( if "%%d" == "" set "L4=!L3!" & set "L3=!L2!" & set "L2=!L1!" & set "L1=0" ) ^
+  & ( if "%%e" == "" set "L5=!L4!" & set "L4=!L3!" & set "L3=!L2!" & set "L2=!L1!" & set "L1=0" ) ^
+  & ( if "%%f" == "" set "L6=!L5!" & set "L5=!L4!" & set "L4=!L3!" & set "L3=!L2!" & set "L2=!L1!" & set "L1=0" ) ^
   & ( if !L1! NEQ 0 set "R=!L1!" ) ^
   & ( if not "!R!" == "" ( ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) ) ) ^
   & ( if !L2! NEQ 0 ( set "R=!R!!L2!" ) else if not "!R!" == "" set "R=!R!000" ) ^
@@ -36,22 +36,40 @@ rem   unfold.bat <out-var> <var>
 rem Description:
 rem   Unsigned integer series unfold script.
 rem   Positive exit code indicates an overflow.
-rem   Negative exit code indicates invalid input.
-
-rem <var>:
-rem   Integer series of numbers in the format:
-rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN]]]]]
-rem     , where NNN must not begin by 0 except `0`
+rem   Negative exit code indicates an invalid or incomplete input.
 
 rem <out-var>:
-rem   String value of unfolded <var>.
+rem   A variable name for a string value of an unfolded <var>.
+
+rem <var>:
+rem   A variable name for a string value of a partially folded integer number.
+rem
+rem   Integer series of numbers in the format:
+rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN]]]]]
+rem     , where NNN can begin by 0 but does not treated as an octal number.
+rem
+rem   Unfolds the sequence from the left to the right.
+rem
+rem   Can contain additional inner sequence(s) to the right of the outer
+rem   sequence:
+rem
+rem     A1[,A2[,A3[,A4[,A5[,A6[,B1[,B2[,B3[,B4[,B5[,B6[,...]]]]]]]]]]]]
+rem
+rem   In that case the right sequence of `Bn` does evaluate the same way as the
+rem   left sequence of `An`, and the overflow result of the `Bn` does add up to
+rem   the `An` after the normalization of the `Bn`.
+rem
+rem   Then the `An` normalizes to return the self overflow out to the exit
+rem   code.
 
 rem Examples:
 rem   1. >
 rem      set a=0,1,2,3
 rem      unfold.bat b a
+rem      rem ERRORLEVEL=0
 rem      rem b=1002003
 rem   2. >
-rem      set a=1,2,3,4,5,6,4567,1,2,3,4,5
+rem      set a=4321,2,3,4,5,6,4567,1,2,3,4,5
 rem      unfold.bat b a
-rem      rem b=1002003004005010
+rem      rem ERRORLEVEL=4
+rem      rem b=321002003004005010
