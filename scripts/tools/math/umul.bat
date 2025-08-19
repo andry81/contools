@@ -1,7 +1,8 @@
 @echo off & ( if "%~1" == "" exit /b -1 ) & setlocal ENABLEDELAYEDEXPANSION & set "R=" & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!%~2!") do ^
-set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" & set "R=%~3" ^
-  & ( if defined F call "%%~0" F F 0 || call set /A "L6+=%%ERRORLEVEL%%" ) & set /A "L6+=R" & ^
+set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" & set "R=%~3" & ^
+set /A "L1*=R" & set /A "L2*=R" & set /A "L3*=R" & set /A "L4*=R" & set /A "L5*=R" & set /A "L6*=R" ^
+  & ( if defined F call "%%~0" F F "%%R%%" || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
 set /A "L5+=L6 / 1000" & set /A "L6%%=1000" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" & ^
 set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "F=L1 / 1000" & set /A "L1%%=1000" & ^
 for /F "tokens=1,2,3,4,5,6,7 delims=," %%a in ("!L1!,!L2!,!L3!,!L4!,!L5!,!L6!,!F!") do endlocal & set "%~1=%%a,%%b,%%c,%%d,%%e,%%f" & exit /b %%g
@@ -9,11 +10,11 @@ endlocal & set "%~1=0,0,0,0,0,%~3" & call "%%~0" %%1 %%1 0 & if not "%~2" == "" 
 exit /b -1
 
 rem USAGE:
-rem   uadd.bat <out-var> <var> <value>
+rem   umul.bat <out-var> <var> <value>
 
 rem Description:
-rem   An unsigned integer number addition script to workaround the `set /A`
-rem   command 32-bit range limitation.
+rem   An unsigned integer number multiplication script to workaround the
+rem   `set /A` command 32-bit range limitation.
 rem   Positive exit code indicates an overflow.
 rem   Negative exit code indicates an invalid or incomplete input.
 
@@ -49,32 +50,34 @@ rem   In that case the right sequence of `Bn` does evaluate the same way as the
 rem   left sequence of `An`, and the overflow result of the `Bn` does add up to
 rem   the `An` after the normalization of the `Bn`.
 rem
-rem   Then the `An` adds up with the <value> and normalizes to return the
+rem   Then the `An` multiplies up with the <value> and normalizes to return the
 rem   self overflow out to the exit code.
 
 rem <value>:
 rem   An unsigned integer number with the 32-bit range limitation.
-rem   Must be less than 2147482649 for the `A6=999` excluding overflow in `Bn`.
+rem   Must be less than 2149634 for the `A6=999` excluding overflow in `Bn`.
+rem   And must be less than 2149634 for the rest `An=999` excluding overflow in
+rem   `An+1`.
 
 rem Examples:
 rem   1. >
 rem      set a=1,2,3
-rem      uadd.bat b a
+rem      umul.bat b a
 rem      rem ERRORLEVEL=0
-rem      rem b=1,2,3,0,0,0
-rem      uadd.bat b a 12345
-rem      rem ERRORLEVEL=0
-rem      rem b=1,2,3,0,12,345
+rem      rem b=0,0,0,0,0,0
+rem      umul.bat b a 12345
+rem      rem ERRORLEVEL=12
+rem      rem b=369,727,35,0,0,0
 rem   2. >
 rem      set a=0,0,0,1,2,3
-rem      uadd.bat b a 12345
+rem      umul.bat b a 12345
 rem      rem ERRORLEVEL=0
-rem      rem b=0,0,0,1,14,348
+rem      rem b=0,0,12,369,727,35
 rem   3. >
-rem      uadd.bat b "" 12345
+rem      umul.bat b "" 12345
 rem      rem ERRORLEVEL=-1
-rem      rem b=0,0,0,0,12,345
+rem      rem b=0,0,0,0,0,0
 rem   4. >
-rem      uadd.bat b
+rem      umul.bat b
 rem      rem ERRORLEVEL=-1
 rem      rem b=0,0,0,0,0,0

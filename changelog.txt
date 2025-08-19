@@ -1,4 +1,12 @@
 2025.08.19:
+* fixed: scripts/tests/bench/bat/test_math/test_math__11_uadd.bat: bench test fixup
+* new: scripts/tools/math/umul.bat: script to circumvent 32-bit multiplication arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__12_umul.bat: `umul.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__12_umul.bat: `umul.bat` bench test
+* new: scripts/tests/unit/bat/test_math/test_math__11_uadd.bat: unit test for a maximum limit
+* refactor: scripts/tools/math/uadd.bat: minor improvement
+
+2025.08.19:
 * new: scripts/tests/bench/bat/test__exit_b.bat: `exit /b`, `goto :EOF`, `goto END` comparison bench tests
 
 2025.08.19:

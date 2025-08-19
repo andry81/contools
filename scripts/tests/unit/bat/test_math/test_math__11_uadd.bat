@@ -85,6 +85,13 @@ for /L %%i in (1,1,27) do (
   endlocal
 )
 
+rem test on a maximum limit
+setlocal
+set IN=999,999,999,999,999,999
+set OUTREF=0,0,2,147,482,647
+set RETREF=1
+call :TEST OUT IN 2147482648
+endlocal
 
 rem NOTE: tests from the script documentation in the description
 
@@ -247,15 +254,15 @@ endlocal
 
 setlocal
 set IN=1234,567,891,234,567,891
-set RETREF=1
 set OUTREF=234,567,892,345,679,2
+set RETREF=1
 call :TEST OUT IN 1111111111
 endlocal
 
 setlocal
 set IN=12345,678,912,345,678,912
-set RETREF=12
 set OUTREF=345,678,913,456,790,23
+set RETREF=12
 call :TEST OUT IN 1111111111
 endlocal
 
