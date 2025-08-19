@@ -1,3 +1,11 @@
+2025.08.21:
+* fixed: scripts/tests/unit/bat/test_math/test_math__12_umul.bat: minor fixup
+* new: scripts/tools/math/udiv.bat: script to circumvent 32-bit division arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__13_udiv.bat: `udiv.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__13_udiv.bat: `udiv.bat` bench test
+* changed: scripts/tools/math: umul.bat, unfold.bat: minor code improvement
+* refactor: scripts/tools/math: *fold.bat, umul.bat, uadd.bat: minor improvement
+
 2025.08.19:
 * fixed: scripts/tests/bench/bat/test_math/test_math__11_uadd.bat: bench test fixup
 * new: scripts/tools/math/umul.bat: script to circumvent 32-bit multiplication arithmetic limitation

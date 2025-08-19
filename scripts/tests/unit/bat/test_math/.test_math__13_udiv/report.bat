@@ -1,0 +1,14 @@
+@echo off
+
+if %OUTDEF% EQU 0 set "OUT=^<undef^>"
+if %INDEF% EQU 0 set "IN=^<undef^>"
+
+if %TEST_LAST_ERROR% NEQ 0 (
+  echo;FAILED: %TESTLIB__OVERALL_TESTS%.%TESTLIB__CURRENT_TESTS%: RETREF=`%RETREF%` RET=`%TEST_IMPL_ERROR%` OUTREF=`%OUTREF%` OUT=`%OUT%` IN=`%IN%` VALUE=`%VALUE%`
+  echo;
+  exit /b 0
+)
+
+echo;PASSED: %TESTLIB__OVERALL_TESTS%.%TESTLIB__CURRENT_TESTS%: RET=`%TEST_IMPL_ERROR%` IN=`%IN%` OUT=`%OUT%` VALUE=`%VALUE%`
+
+exit /b 0

@@ -22,15 +22,16 @@ rem   fold.bat <out-var> <var>
 
 rem Description:
 rem   Unsigned integer series fold script.
+rem
 rem   Positive exit code indicates an overflow.
 rem   Negative exit code indicates an invalid or incomplete input.
 
 rem <out-var>:
-rem   A variable name for a string value of a folded <var>.
+rem   A variable name for a string value of a folded integer number from <var>.
 rem
-rem   Integer series of numbers in the format:
+rem   Format:
 rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN]]]]]
-rem     , where NNN does not begin by 0 except `0`.
+rem     , where NNN does not begin by 0 except 0.
 rem
 rem   Folds the sequence from the right to the left.
 rem
@@ -46,6 +47,10 @@ rem     rem x=0,0,0,0,12,345
 rem <var>:
 rem   A variable name for a string value of an unfolded integer number.
 rem   The value digits must not be splitted by separator character(s).
+rem
+rem   NOTE:
+rem     The number can represent a value greater than 32-bit unsigned integer
+rem     as a string input.
 
 rem Examples:
 rem   1. >

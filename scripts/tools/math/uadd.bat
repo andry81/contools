@@ -14,15 +14,17 @@ rem   uadd.bat <out-var> <var> <value>
 rem Description:
 rem   An unsigned integer number addition script to workaround the `set /A`
 rem   command 32-bit range limitation.
+rem
 rem   Positive exit code indicates an overflow.
 rem   Negative exit code indicates an invalid or incomplete input.
 
 rem <out-var>:
-rem   A variable name for a string value of completely folded integer number.
+rem   A variable name for a string value of completely folded integer number
+rem   as an addition result of <var> with <value>.
 rem
-rem   Integer series of numbers in the format:
+rem   Format:
 rem     NNN,NNN,NNN,NNN,NNN,NNN
-rem     , where NNN does not begin by 0 except `0`.
+rem     , where NNN does not begin by 0 except 0.
 rem
 rem   The output value is always `N,N,N,N,N,N` formatted if a variable name is
 rem   not empty.
@@ -34,9 +36,9 @@ rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 rem <var>:
 rem   A variable name for a string value of a partially folded integer number.
 rem
-rem   Integer series of numbers in the format:
+rem   Format:
 rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN]]]]]
-rem     , where NNN must not begin by 0 except `0` or only sequence of zeroes.
+rem     , where NNN must not begin by 0 except 0 or except sequence of zeroes.
 rem
 rem   Evaluates the sequence from the left to the right.
 rem
@@ -55,6 +57,7 @@ rem   self overflow out to the exit code.
 rem <value>:
 rem   An unsigned integer number with the 32-bit range limitation.
 rem   Must be less than 2147482649 for the `A6=999` excluding overflow in `Bn`.
+rem   If not defined, then is 0.
 
 rem Examples:
 rem   1. >

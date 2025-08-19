@@ -16,15 +16,15 @@ set /A "L6%%=1000" & set /A "L5%%=1000" & set /A "L4%%=1000" & set /A "L3%%=1000
   & ( if "%%e" == "" set "L5=!L4!" & set "L4=!L3!" & set "L3=!L2!" & set "L2=!L1!" & set "L1=0" ) ^
   & ( if "%%f" == "" set "L6=!L5!" & set "L5=!L4!" & set "L4=!L3!" & set "L3=!L2!" & set "L2=!L1!" & set "L1=0" ) ^
   & ( if !L1! NEQ 0 set "R=!L1!" ) ^
-  & ( if not "!R!" == "" ( ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) ) ) ^
+  & ( if not "!R!" == "" ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) ) ^
   & ( if !L2! NEQ 0 ( set "R=!R!!L2!" ) else if not "!R!" == "" set "R=!R!000" ) ^
-  & ( if not "!R!" == "" ( ( if "!L3:~2,1!" == "" set "L3=0!L3!" ) & ( if "!L3:~2,1!" == "" set "L3=0!L3!" ) ) ) ^
+  & ( if not "!R!" == "" ( if "!L3:~2,1!" == "" set "L3=0!L3!" ) & ( if "!L3:~2,1!" == "" set "L3=0!L3!" ) ) ^
   & ( if !L3! NEQ 0 ( set "R=!R!!L3!" ) else if not "!R!" == "" set "R=!R!000" ) ^
-  & ( if not "!R!" == "" ( ( if "!L4:~2,1!" == "" set "L4=0!L4!" ) & ( if "!L4:~2,1!" == "" set "L4=0!L4!" ) ) ) ^
+  & ( if not "!R!" == "" ( if "!L4:~2,1!" == "" set "L4=0!L4!" ) & ( if "!L4:~2,1!" == "" set "L4=0!L4!" ) ) ^
   & ( if !L4! NEQ 0 ( set "R=!R!!L4!" ) else if not "!R!" == "" set "R=!R!000" ) ^
-  & ( if not "!R!" == "" ( ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) ) ) ^
+  & ( if not "!R!" == "" ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) ) ^
   & ( if !L5! NEQ 0 ( set "R=!R!!L5!" ) else if not "!R!" == "" set "R=!R!000" ) ^
-  & ( if not "!R!" == "" ( ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) ) ) ^
+  & ( if not "!R!" == "" ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) ) ^
   & ( if !L6! NEQ 0 ( set "R=!R!!L6!" ) else if not "!R!" == "" set "R=!R!000" )
 for /F "tokens=* delims=" %%a in ("!R!") do endlocal & set "%~1=%%a" & exit /b %F%
 endlocal & set "%~1=0" & if not "%~2" == "" if defined %~2 exit /b %F%
@@ -35,16 +35,21 @@ rem   unfold.bat <out-var> <var>
 
 rem Description:
 rem   Unsigned integer series unfold script.
+rem
 rem   Positive exit code indicates an overflow.
 rem   Negative exit code indicates an invalid or incomplete input.
 
 rem <out-var>:
-rem   A variable name for a string value of an unfolded <var>.
+rem   A variable name for a string value of an unfolded integer <var>.
+rem
+rem   NOTE:
+rem     The number can represent a value greater than 32-bit unsigned integer
+rem     as a string output.
 
 rem <var>:
 rem   A variable name for a string value of a partially folded integer number.
 rem
-rem   Integer series of numbers in the format:
+rem   Format:
 rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN]]]]]
 rem     , where NNN can begin by 0 but does not treated as an octal number.
 rem

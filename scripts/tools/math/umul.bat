@@ -6,7 +6,7 @@ set /A "L1*=R" & set /A "L2*=R" & set /A "L3*=R" & set /A "L4*=R" & set /A "L5*=
 set /A "L5+=L6 / 1000" & set /A "L6%%=1000" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" & ^
 set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "F=L1 / 1000" & set /A "L1%%=1000" & ^
 for /F "tokens=1,2,3,4,5,6,7 delims=," %%a in ("!L1!,!L2!,!L3!,!L4!,!L5!,!L6!,!F!") do endlocal & set "%~1=%%a,%%b,%%c,%%d,%%e,%%f" & exit /b %%g
-endlocal & set "%~1=0,0,0,0,0,%~3" & call "%%~0" %%1 %%1 0 & if not "%~2" == "" if defined %~2 exit /b
+endlocal & set "%~1=0,0,0,0,0,0" & if not "%~2" == "" if defined %~2 exit /b 0
 exit /b -1
 
 rem USAGE:
@@ -15,15 +15,17 @@ rem   umul.bat <out-var> <var> <value>
 rem Description:
 rem   An unsigned integer number multiplication script to workaround the
 rem   `set /A` command 32-bit range limitation.
+rem
 rem   Positive exit code indicates an overflow.
 rem   Negative exit code indicates an invalid or incomplete input.
 
 rem <out-var>:
-rem   A variable name for a string value of completely folded integer number.
+rem   A variable name for a string value of completely folded integer number
+rem   as a multiplication result of <var> with <value>.
 rem
-rem   Integer series of numbers in the format:
+rem   Format:
 rem     NNN,NNN,NNN,NNN,NNN,NNN
-rem     , where NNN does not begin by 0 except `0`.
+rem     , where NNN does not begin by 0 except 0.
 rem
 rem   The output value is always `N,N,N,N,N,N` formatted if a variable name is
 rem   not empty.
@@ -35,9 +37,9 @@ rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 rem <var>:
 rem   A variable name for a string value of a partially folded integer number.
 rem
-rem   Integer series of numbers in the format:
+rem   Format:
 rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN]]]]]
-rem     , where NNN must not begin by 0 except `0` or only sequence of zeroes.
+rem     , where NNN must not begin by 0 except 0 or except sequence of zeroes.
 rem
 rem   Evaluates the sequence from the left to the right.
 rem
@@ -58,6 +60,7 @@ rem   An unsigned integer number with the 32-bit range limitation.
 rem   Must be less than 2149634 for the `A6=999` excluding overflow in `Bn`.
 rem   And must be less than 2149634 for the rest `An=999` excluding overflow in
 rem   `An+1`.
+rem   If not defined, then is 0.
 
 rem Examples:
 rem   1. >

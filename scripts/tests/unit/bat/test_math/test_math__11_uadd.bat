@@ -65,8 +65,8 @@ call :TEST "" IN 1
 endlocal
 
 setlocal
-set RETREF=-1
 set "OUTREF="
+set RETREF=-1
 call :TEST "" IN 1
 endlocal
 
