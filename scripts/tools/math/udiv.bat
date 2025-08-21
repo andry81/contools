@@ -59,9 +59,17 @@ rem     , where NNN must not begin by 0 except 0 or except sequence of zeroes.
 rem
 rem   Evaluates the sequence from the left to the right.
 rem
-rem   Does contain only an integer part without a fractional:
+rem   Can contain additional inner sequence(s) to the right of the outer
+rem   sequence:
 rem
-rem     A1[,A2[,A3[,A4[,A5[,A6]]]]]
+rem     A1[,A2[,A3[,A4[,A5[,A6[,B1[,B2[,B3[,B4[,B5[,B6[,...]]]]]]]]]]]]
+rem
+rem   In that case the right sequence of `Bn` does evaluate the same way as the
+rem   left sequence of `An`, and the overflow result of the `Bn` does add up to
+rem   the `An` after the normalization of the `Bn`.
+rem
+rem   Then the `An` divides by the <value> and returns the remainder out to the
+rem   exit code.
 
 rem <value>:
 rem   An unsigned integer number with the 32-bit range limitation.
@@ -71,8 +79,9 @@ rem
 rem   CAUTION:
 rem     The algorithm still can reach an underflow with a too big <value>, even
 rem     if it is less than 2147483648.
-rem     To avoid this case do decrease the divisor by at least 1000 or use the
-rem     value less than 2147484. This will avoid an underflow condition.
+rem     To avoid this case do decrease the divisor by at least 1000 times or
+rem     use the value less than 2147484. This will avoid an underflow
+rem     condition.
 
 rem Examples:
 rem   1. >
