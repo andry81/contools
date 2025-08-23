@@ -84,18 +84,21 @@ rem     use the value less than 2147484. This will avoid an underflow
 rem     condition.
 
 rem Examples:
+rem
 rem   1. >
 rem      rem 2,147,483,648,000,000
 rem      set a=2,147,483,648
 rem      udiv.bat b a 123
 rem      rem ERRORLEVEL=62
 rem      rem b=0,17,459,216,650,406
+rem
 rem   2. >
 rem      rem 1,023,045,067,890,000
 rem      set a=1,23,45,67,890
 rem      udiv.bat b a 123456
 rem      rem ERRORLEVEL=111696
 rem      rem b=0,0,8,286,718,84
+rem
 rem   3. >
 rem      rem 1,000,000,000,000,000
 rem      set a=1

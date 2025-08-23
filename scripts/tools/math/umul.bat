@@ -63,6 +63,7 @@ rem   `An+1`.
 rem   If not defined, then is 0.
 
 rem Examples:
+rem
 rem   1. >
 rem      set a=1,2,3
 rem      umul.bat b a
@@ -71,15 +72,18 @@ rem      rem b=0,0,0,0,0,0
 rem      umul.bat b a 12345
 rem      rem ERRORLEVEL=12
 rem      rem b=369,727,35,0,0,0
+rem
 rem   2. >
 rem      set a=0,0,0,1,2,3
 rem      umul.bat b a 12345
 rem      rem ERRORLEVEL=0
 rem      rem b=0,0,12,369,727,35
+rem
 rem   3. >
 rem      umul.bat b "" 12345
 rem      rem ERRORLEVEL=-1
 rem      rem b=0,0,0,0,0,0
+rem
 rem   4. >
 rem      umul.bat b
 rem      rem ERRORLEVEL=-1

@@ -14,7 +14,7 @@ setlocal ENABLEDELAYEDEXPANSION & (
 exit /b 0
 
 rem USAGE:
-rem   asc-utf-8.bat [<char>]
+rem   asc-utf.bat [<char>]
 
 rem Description:
 rem   Returns ASCII code for a character from either `__STRING__` variable or
@@ -32,18 +32,18 @@ rem       * The `CR` affects `set /P ...` context.
 rem       * The `+` is affected by `65000` (UTF-7) code page because is the
 rem         Unicode shift character (See RFC 2152).
 rem
-rem   Examples:
+rem Examples:
 rem
-rem     Quote character
+rem  1. Quote character
 rem     >
 rem     set __STRING__=^"
-rem     asc-utf-8.bat
+rem     asc-utf.bat
 rem
-rem     Caret character
+rem  2. Caret character
 rem     >
 rem     set "__STRING__=^"
-rem     asc-utf-8.bat
+rem     asc-utf.bat
 rem
-rem     Shift encoded plus in 65000 (UTF-7) code page
+rem  3. Shift encoded plus in 65000 (UTF-7) code page
 rem     >
-rem     asc-utf-8.bat "+-"
+rem     asc-utf.bat "+-"

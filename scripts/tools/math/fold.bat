@@ -1,11 +1,11 @@
 @echo off & ( if "%~1" == "" exit /b -1 ) & setlocal ENABLEDELAYEDEXPANSION & ^
 set "R=!%~2!" & set "L1=0" & set "L2=0" & set "L3=0" & set "L4=0" & set "L5=0" & set "L6=0" ^
-  & ( if defined R set "L6=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if not defined L6 set "L6=0" ) ^
-  & ( if defined R set "L5=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if not defined L5 set "L5=0" ) ^
-  & ( if defined R set "L4=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) & ( if not defined L4 set "L4=0" ) ^
-  & ( if defined R set "L3=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if defined L3 if "!L3:~0,1!" == "0" set "L3=!L3:~1!" ) & ( if defined L3 if "!L3:~0,1!" == "0" set "L3=!L3:~1!" ) & ( if not defined L3 set "L3=0" ) ^
-  & ( if defined R set "L2=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if defined L2 if "!L2:~0,1!" == "0" set "L2=!L2:~1!" ) & ( if defined L2 if "!L2:~0,1!" == "0" set "L2=!L2:~1!" ) & ( if not defined L2 set "L2=0" ) ^
-  & ( if defined R set "L1=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if defined L1 if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) & ( if not defined L1 set "L1=0" ) & ^
+  & ( if defined R set "L6=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if not defined L6 set "L6=0" ) ^
+  & ( if defined R set "L5=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if not defined L5 set "L5=0" ) ^
+  & ( if defined R set "L4=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) & ( if not defined L4 set "L4=0" ) ^
+  & ( if defined R set "L3=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L3:~0,1!" == "0" set "L3=!L3:~1!" ) & ( if defined L3 if "!L3:~0,1!" == "0" set "L3=!L3:~1!" ) & ( if not defined L3 set "L3=0" ) ^
+  & ( if defined R set "L2=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L2:~0,1!" == "0" set "L2=!L2:~1!" ) & ( if defined L2 if "!L2:~0,1!" == "0" set "L2=!L2:~1!" ) & ( if not defined L2 set "L2=0" ) ^
+  & ( if defined R set "L1=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) & ( if not defined L1 set "L1=0" ) & ^
 set /A "F=R" & set "R=" ^
   & ( if !L1! NEQ 0 set "R=!L1!" ) & ( if defined R set "R=!R!," ) ^
   & ( if !L2! NEQ 0 ( set "R=!R!!L2!" ) else if defined R set "R=!R!0" ) & ( if defined R set "R=!R!," ) ^
@@ -53,11 +53,13 @@ rem     The number can represent a value greater than 32-bit unsigned integer
 rem     as a string input.
 
 rem Examples:
+rem
 rem   1. >
 rem      set a=0123456000001002003
 rem      fold.bat b a
 rem      rem ERRORLEVEL=0
 rem      rem b=123,456,0,1,2,3
+rem
 rem   2. >
 rem      fold.bat b
 rem      rem ERRORLEVEL=-1

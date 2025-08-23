@@ -1,3 +1,15 @@
+2025.08.23:
+* new: scripts/tools/math/ucmp.bat: script to circumvent 32-bit comparison arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__21_ucmp.bat: `ucmp.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__21_ucmp.bat: `ucmp.bat` bench tests
+* changed: scripts/tools/std/cmp_*var.bat: code improvement
+* refactor: scripts/tools/math: *fold.bat, uadd.bat, umul.bat, udiv.bat: minor improvement
+* refactor: scripts/tools/std/asc-utf.bat: minor improvement
+
+2025.08.22:
+* fixed: scripts/tools/math/unfold.bat: code fixup
+* changed: scripts/tools/math/fold.bat: minor code improvement
+
 2025.08.21:
 * refactor: scripts/tools/math/udiv.bat: description fixup
 

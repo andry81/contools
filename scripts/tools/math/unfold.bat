@@ -2,11 +2,11 @@
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!%~2!") do ^
 set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" ^
   & ( if defined L1 if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) ^
-  & ( if defined L2 if "!L2:~0,1!" == "0" set "L2=!L2:~1!" ) & ( if defined L1 if "!L2:~0,1!" == "0" set "L2=!L2:~1!" ) ^
-  & ( if defined L3 if "!L3:~0,1!" == "0" set "L3=!L3:~1!" ) & ( if defined L1 if "!L3:~0,1!" == "0" set "L3=!L3:~1!" ) ^
-  & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) & ( if defined L1 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) ^
-  & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L1 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) ^
-  & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L1 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) ^
+  & ( if defined L2 if "!L2:~0,1!" == "0" set "L2=!L2:~1!" ) & ( if defined L2 if "!L2:~0,1!" == "0" set "L2=!L2:~1!" ) ^
+  & ( if defined L3 if "!L3:~0,1!" == "0" set "L3=!L3:~1!" ) & ( if defined L3 if "!L3:~0,1!" == "0" set "L3=!L3:~1!" ) ^
+  & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) ^
+  & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) ^
+  & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) ^
   & ( if defined F call "%%~0" F F || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
 set /A "L5+=L6/1000" & set /A "L4+=L5/1000" & set /A "L3+=L4/1000" & set /A "L2+=L3/1000" & set /A "L1+=L2/1000" & set /A "F=L1/1000" & ^
 set /A "L6%%=1000" & set /A "L5%%=1000" & set /A "L4%%=1000" & set /A "L3%%=1000" & set /A "L2%%=1000" & set /A "L1%%=1000" ^
@@ -68,11 +68,13 @@ rem   Then the `An` normalizes to return the self overflow out to the exit
 rem   code.
 
 rem Examples:
+rem
 rem   1. >
 rem      set a=0,1,2,3
 rem      unfold.bat b a
 rem      rem ERRORLEVEL=0
 rem      rem b=1002003
+rem
 rem   2. >
 rem      set a=4321,2,3,4,5,6,4567,1,2,3,4,5
 rem      unfold.bat b a

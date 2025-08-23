@@ -60,6 +60,7 @@ rem   Must be less than 2147482649 for the `A6=999` excluding overflow in `Bn`.
 rem   If not defined, then is 0.
 
 rem Examples:
+rem
 rem   1. >
 rem      set a=1,2,3
 rem      uadd.bat b a
@@ -68,15 +69,18 @@ rem      rem b=1,2,3,0,0,0
 rem      uadd.bat b a 12345
 rem      rem ERRORLEVEL=0
 rem      rem b=1,2,3,0,12,345
+rem
 rem   2. >
 rem      set a=0,0,0,1,2,3
 rem      uadd.bat b a 12345
 rem      rem ERRORLEVEL=0
 rem      rem b=0,0,0,1,14,348
+rem
 rem   3. >
 rem      uadd.bat b "" 12345
 rem      rem ERRORLEVEL=-1
 rem      rem b=0,0,0,0,12,345
+rem
 rem   4. >
 rem      uadd.bat b
 rem      rem ERRORLEVEL=-1
