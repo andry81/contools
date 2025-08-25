@@ -44,7 +44,7 @@ rem <lvar>, <rvar>:
 rem   A variable name for a string value of a partially folded integer number.
 rem
 rem   Format:
-rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN]]]]]
+rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN[,...]]]]]]
 rem     , where NNN can begin by 0 but does not treated as an octal number.
 rem
 rem   Unfolds the sequence from the left to the right.

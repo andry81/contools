@@ -15,7 +15,7 @@ set ZEROS=000,000,000,000,000,000,000
 
 rem NOTE:
 rem   Opposite to `fold.bat` script, the `OUT` must be always at least
-rem   `N,N,N,N,N,N` formatted if defined.
+rem   `N,N,N,N,N,N` formatted if defined and the divisor is not 0.
 set OUTREF=0,0,0,0,0,0
 
 
@@ -27,24 +27,29 @@ endlocal
 
 setlocal
 set OUT=x
+set "OUTREF=x"
 set RETREF=-1
 call :TEST OUT
 endlocal
 
 setlocal
 set OUT=x
+set "OUTREF=x"
 set RETREF=-1
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1
-set RETREF=0
+set OUT=x
+set "OUTREF=x"
+set RETREF=-1
 call :TEST OUT IN
 endlocal
 
 setlocal
 set OUT=x
+set "OUTREF=x"
 set RETREF=-1
 call :TEST OUT "" 0
 endlocal
@@ -78,718 +83,731 @@ endlocal
 for /L %%i in (1,1,27) do (
   setlocal
   call set "IN=%%ZEROS:~0,%%i%%"
-  call :TEST OUT IN 0
-  endlocal
-)
-
-for /L %%i in (1,1,27) do (
-  setlocal
-  call set "IN=%%ZEROS:~0,%%i%%"
-  call :TEST OUT IN 1111111
+  call :TEST OUT IN 1
   endlocal
 )
 
 rem test on a maximum limit
 setlocal
-set IN=998,998,998,998,998,999
-set OUTREF=215,215,215,215,217,367
-set RETREF=2147481
-call :TEST OUT IN 2149633
+set IN=999,999,999,999,999,999
+set OUTREF=0,0,465,661,427,820
+set RETREF=822939
+call :TEST OUT IN 2147483
 endlocal
+
+setlocal
+set IN=2,147,482,999,999,999
+set OUTREF=0,0,0,999,999,999
+set RETREF=2147482
+call :TEST OUT IN 2147483
+endlocal
+
 
 rem NOTE: tests from the script documentation in the description
 
 rem Examples:
 rem
 rem   1. >
-rem      set a=1,2,3
-rem      umul.bat b a
-rem      rem ERRORLEVEL=0
-rem      rem b=0,0,0,0,0,0
+rem      rem 2,147,483,648,000,000
+rem      set a=2,147,483,648
+rem      udiv.bat b a 123
+rem      rem ERRORLEVEL=62
+rem      rem b=0,17,459,216,650,406
 setlocal
-set IN=1,2,3
-set OUTREF=0,0,0,0,0,0
-call :TEST OUT IN
-endlocal
-
-rem      umul.bat b a 12345
-rem      rem ERRORLEVEL=12
-rem      rem b=369,727,35,0,0,0
-setlocal
-set IN=1,2,3
-set OUTREF=369,727,35,0,0,0
-set RETREF=12
-call :TEST OUT IN 12345
+set IN=2,147,483,648
+set OUTREF=0,17,459,216,650,406
+set RETREF=62
+call :TEST OUT IN 123
 endlocal
 
 rem   2. >
-rem      set a=0,0,0,1,2,3
-rem      umul.bat b a 12345
-rem      rem ERRORLEVEL=0
-rem      rem b=0,0,12,369,727,35
+rem      rem 1,023,045,067,890,000
+rem      set a=1,23,45,67,890
+rem      udiv.bat b a 123456
+rem      rem ERRORLEVEL=111696
+rem      rem b=0,0,8,286,718,84
 setlocal
-set IN=0,0,0,1,2,3
-set OUTREF=0,0,12,369,727,35
-call :TEST OUT IN 12345
+set IN=1,23,45,67,890
+set OUTREF=0,0,8,286,718,84
+set RETREF=111696
+call :TEST OUT IN 123456
 endlocal
 
 rem   3. >
-rem      umul.bat b "" 12345
+rem      rem 1,000,000,000,000,000
+rem      set a=1
+rem      set b=x
+rem      udiv.bat b a
+rem      Divide by zero error.
 rem      rem ERRORLEVEL=-1
-rem      rem b=0,0,0,0,0,0
+rem      rem b=x
 setlocal
-set OUTREF=0,0,0,0,0,0
+set IN=1
+set OUT=x
+set "OUTREF=x"
 set RETREF=-1
-call :TEST OUT IN 12345
+call :TEST OUT IN
 endlocal
 
 
 setlocal
 set IN=1
-set OUTREF=111,0,0,0,0,0
-set RETREF=1111
+set OUTREF=0,0,0,900,0,90
+set RETREF=10
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=12
-set OUTREF=332,0,0,0,0,0
-set RETREF=13333
+set OUTREF=0,0,10,800,1,80
+set RETREF=120
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=123
-set OUTREF=653,0,0,0,0,0
-set RETREF=136666
+set OUTREF=0,0,110,700,11,70
+set RETREF=1230
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1,234
-set OUTREF=110,974,0,0,0,0
-set RETREF=1371
+set OUTREF=0,0,1,110,600,111
+set RETREF=66679
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=12,345
-set OUTREF=665,295,0,0,0,0
-set RETREF=13716
+set OUTREF=0,0,11,110,501,111
+set RETREF=55679
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=123,456
-set OUTREF=319,616,0,0,0,0
-set RETREF=137173
+set OUTREF=0,0,111,110,411,111
+set RETREF=45679
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1,234,567
-set OUTREF=740,973,937,0,0,0
-set RETREF=1371
+set OUTREF=0,0,1,111,110,411
+set RETREF=123379
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=12,345,678
-set OUTREF=418,628,258,0,0,0
-set RETREF=13717
+set OUTREF=0,0,11,111,111,311
+set RETREF=123479
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=123,456,789
-set OUTREF=196,282,579,0,0,0
-set RETREF=137174
+set OUTREF=0,0,111,111,121,211
+set RETREF=124579
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1,234,567,891
-set OUTREF=741,963,936,901,0,0
-set RETREF=1371
+set OUTREF=0,0,1,111,111,213
+set RETREF=12357
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=12,345,678,912
-set OUTREF=419,641,591,232,0,0
-set RETREF=13717
+set OUTREF=0,0,11,111,112,131
+set RETREF=1012459
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=123,456,789,123
-set OUTREF=196,419,245,653,0,0
-set RETREF=137174
+set OUTREF=0,0,111,111,121,321
+set RETREF=902369
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1,234,567,891,234
-set OUTREF=741,964,196,900,974,0
-set RETREF=1371
+set OUTREF=0,0,1,111,111,213
+set RETREF=246357
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=12,345,678,912,345
-set OUTREF=419,641,974,565,295,0
-set RETREF=13717
+set OUTREF=0,0,11,111,112,132
+set RETREF=246348
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=123,456,789,123,456
-set OUTREF=196,419,752,319,616,0
-set RETREF=137174
+set OUTREF=0,0,111,111,121,322
+set RETREF=247258
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1,234,567,891,234,567
-set OUTREF=741,964,197,530,973,937
-set RETREF=1371
+set OUTREF=0,0,1,111,111,213
+set RETREF=246924
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=12,345,678,912,345,678
-set OUTREF=419,641,975,318,628,258
-set RETREF=13717
+set OUTREF=0,0,11,111,112,132
+set RETREF=247026
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=123,456,789,123,456,789
-set OUTREF=196,419,753,196,282,579
-set RETREF=137174
+set OUTREF=0,0,111,111,121,322
+set RETREF=248047
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1,234,567,891,234,567,891
-set OUTREF=741,964,197,531,963,936
-set RETREF=1371
+set OUTREF=0,0,1,111,111,213
+set RETREF=246924
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1,000,000,000,000,000,000
-set OUTREF=111,0,0,0,0,0
-set RETREF=1111
+set OUTREF=0,0,0,900,0,90
+set RETREF=10
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1,100,000,000,000,000,000
-set OUTREF=222,100,0,0,0,0
-set RETREF=1222
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=100,000,000,000,000,000
-set OUTREF=100,0,0,0,0,0
-set RETREF=111111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=10,000,000,000,000,000
-set OUTREF=110,0,0,0,0,0
-set RETREF=11111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=1,000,000,000,000,000
-set OUTREF=111,0,0,0,0,0
-set RETREF=1111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=100,000,000,000,000
-set OUTREF=100,0,0,0,0,0
-set RETREF=111111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=10,000,000,000,000
-set OUTREF=110,0,0,0,0,0
-set RETREF=11111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=1,000,000,000,000
-set OUTREF=111,0,0,0,0,0
-set RETREF=1111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=100,000,000,000
-set OUTREF=100,0,0,0,0,0
-set RETREF=111111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=10,000,000,000
-set OUTREF=110,0,0,0,0,0
-set RETREF=11111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=1,000,000,000
-set OUTREF=111,0,0,0,0,0
-set RETREF=1111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=100,000,000
-set OUTREF=100,0,0,0,0,0
-set RETREF=111111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=10,000,000
-set OUTREF=110,0,0,0,0,0
-set RETREF=11111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=1,000,000
-set OUTREF=111,0,0,0,0,0
-set RETREF=1111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=100,000
-set OUTREF=100,0,0,0,0,0
-set RETREF=111111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=10,000
-set OUTREF=110,0,0,0,0,0
-set RETREF=11111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=1,000
-set OUTREF=111,0,0,0,0,0
-set RETREF=1111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=100
-set OUTREF=100,0,0,0,0,0
-set RETREF=111111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=10
-set OUTREF=110,0,0,0,0,0
-set RETREF=11111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=000,100,000,000,000,000
-set OUTREF=111,100,0,0,0,0
-set RETREF=111
-call :TEST OUT IN 1111111
-endlocal
-
-setlocal
-set IN=000,10,000,000,000,000
-set OUTREF=111,110,0,0,0,0
+set OUTREF=0,0,0,990,0,99
 set RETREF=11
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
-set IN=000,1,000,000,000,000
-set OUTREF=111,111,0,0,0,0
+set IN=100,000,000,000,000,000
+set OUTREF=0,0,90,0,9,0
+set RETREF=1000
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=10,000,000,000,000,000
+set OUTREF=0,0,9,0,0,900
+set RETREF=100
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=1,000,000,000,000,000
+set OUTREF=0,0,0,900,0,90
+set RETREF=10
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=100,000,000,000,000
+set OUTREF=0,0,90,0,9,0
+set RETREF=1000
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=10,000,000,000,000
+set OUTREF=0,0,9,0,0,900
+set RETREF=100
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=1,000,000,000,000
+set OUTREF=0,0,0,900,0,90
+set RETREF=10
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=100,000,000,000
+set OUTREF=0,0,90,0,9,0
+set RETREF=1000
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=10,000,000,000
+set OUTREF=0,0,9,0,0,900
+set RETREF=100
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=1,000,000,000
+set OUTREF=0,0,0,900,0,90
+set RETREF=10
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=100,000,000
+set OUTREF=0,0,90,0,9,0
+set RETREF=1000
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=10,000,000
+set OUTREF=0,0,9,0,0,900
+set RETREF=100
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=1,000,000
+set OUTREF=0,0,0,900,0,90
+set RETREF=10
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=100,000
+set OUTREF=0,0,90,0,9,0
+set RETREF=1000
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=10,000
+set OUTREF=0,0,9,0,0,900
+set RETREF=100
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=1,000
+set OUTREF=0,0,0,900,0,90
+set RETREF=10
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=100
+set OUTREF=0,0,90,0,9,0
+set RETREF=1000
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=10
+set OUTREF=0,0,9,0,0,900
+set RETREF=100
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=000,100,000,000,000,000
+set OUTREF=0,0,0,90,0,9
 set RETREF=1
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
+set IN=000,10,000,000,000,000
+set OUTREF=0,0,0,9,0,0
+set RETREF=1000000
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
+set IN=000,1,000,000,000,000
+set OUTREF=0,0,0,0,900,0
+set RETREF=100000
+call :TEST OUT IN 1111111
+endlocal
+
+setlocal
 set IN=000,000,100,000,000,000
-set OUTREF=111,111,100,0,0,0
+set OUTREF=0,0,0,0,90,0
+set RETREF=10000
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,10,000,000,000
-set OUTREF=11,111,110,0,0,0
+set OUTREF=0,0,0,0,9,0
+set RETREF=1000
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,1,000,000,000
-set OUTREF=1,111,111,0,0,0
+set OUTREF=0,0,0,0,0,900
+set RETREF=100
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,000,100,000,000
-set OUTREF=0,111,111,100,0,0
+set OUTREF=0,0,0,0,0,90
+set RETREF=10
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,000,10,000,000
-set OUTREF=0,11,111,110,0,0
+set OUTREF=0,0,0,0,0,9
+set RETREF=1
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,000,1,000,000
-set OUTREF=0,1,111,111,0,0
+set OUTREF=0,0,0,0,0,0
+set RETREF=1000000
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,000,000,100,000
-set OUTREF=0,0,111,111,100,0
+set OUTREF=0,0,0,0,0,0
+set RETREF=100000
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,000,000,10,000
-set OUTREF=0,0,11,111,110,0
+set OUTREF=0,0,0,0,0,0
+set RETREF=10000
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,000,000,1,000
-set OUTREF=0,0,1,111,111,0
+set OUTREF=0,0,0,0,0,0
+set RETREF=1000
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,000,000,000,100
-set OUTREF=0,0,0,111,111,100
+set OUTREF=0,0,0,0,0,0
+set RETREF=100
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,000,000,000,10
-set OUTREF=0,0,0,11,111,110
+set OUTREF=0,0,0,0,0,0
+set RETREF=10
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=000,000,000,000,000,1
-set OUTREF=0,0,0,1,111,111
+set OUTREF=0,0,0,0,0,0
+set RETREF=1
 call :TEST OUT IN 1111111
 endlocal
 
 
 setlocal
 set IN=2,1
-set OUTREF=333,111,0,0,0,0
-set RETREF=2223
+set OUTREF=0,0,1,800,900,180
+set RETREF=100020
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=3,2,1
-set OUTREF=556,333,111,0,0,0
-set RETREF=3335
+set OUTREF=0,0,2,701,801,170
+set RETREF=200130
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=4,3,2,1
-set OUTREF=779,556,333,111,0,0
-set RETREF=4447
+set OUTREF=0,0,3,602,702,161
+set RETREF=189129
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=5,4,3,2,1
-set OUTREF=2,779,556,333,111,0
-set RETREF=5560
+set OUTREF=0,0,4,503,603,152
+set RETREF=179128
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=6,5,4,3,2,1
-set OUTREF=226,2,779,556,333,111
-set RETREF=6672
+set OUTREF=0,0,5,404,504,143
+set RETREF=169128
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=7,6,5,4,3,2,1
-set OUTREF=449,226,2,779,556,333
-set RETREF=7784
+set OUTREF=0,0,6,305,405,134
+set RETREF=159128
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=8,7,6,5,4,3,2,1
-set OUTREF=672,449,226,2,779,556
-set RETREF=8896
+set OUTREF=0,0,7,206,306,125
+set RETREF=149128
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=9,8,7,6,5,4,3,2,1
-set OUTREF=895,672,449,226,2,779
-set RETREF=10008
+set OUTREF=0,0,8,107,207,116
+set RETREF=139128
 call :TEST OUT IN 1111111
 endlocal
 
 
 setlocal
 set IN=900,800,700,600,500,400,300,200,100
-set OUTREF=567,244,922,600,277,955
-set RETREF=1000889
+set OUTREF=0,0,810,720,711,612
+set RETREF=579468
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=90,800,700,600,500,400,300,200,100
-set OUTREF=657,244,922,600,277,955
-set RETREF=100889
+set OUTREF=0,0,81,720,638,712
+set RETREF=571368
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=9,800,700,600,500,400,300,200,100
-set OUTREF=666,244,922,600,277,955
-set RETREF=10889
+set OUTREF=0,0,8,820,631,422
+set RETREF=570558
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=800,700,600,500,400,300,200,100
-set OUTREF=244,922,600,277,955,633
-set RETREF=889667
+set OUTREF=0,0,720,630,612,513
+set RETREF=468357
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=80,700,600,500,400,300,200,100
-set OUTREF=324,922,600,277,955,633
-set RETREF=89667
+set OUTREF=0,0,72,630,547,713
+set RETREF=461157
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=8,700,600,500,400,300,200,100
-set OUTREF=332,922,600,277,955,633
-set RETREF=9667
+set OUTREF=0,0,7,830,541,233
+set RETREF=460437
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=700,600,500,400,300,200,100
-set OUTREF=922,600,277,955,633,311
-set RETREF=778444
+set OUTREF=0,0,630,540,513,414
+set RETREF=357246
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=70,600,500,400,300,200,100
-set OUTREF=992,600,277,955,633,311
-set RETREF=78444
+set OUTREF=0,0,63,540,456,714
+set RETREF=350946
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=7,600,500,400,300,200,100
-set OUTREF=999,600,277,955,633,311
-set RETREF=8444
+set OUTREF=0,0,6,840,451,44
+set RETREF=350316
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=600,500,400,300,200,100
-set OUTREF=600,277,955,633,311,100
-set RETREF=667222
+set OUTREF=0,0,540,450,414,315
+set RETREF=246135
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=60,500,400,300,200,100
-set OUTREF=660,277,955,633,311,100
-set RETREF=67222
+set OUTREF=0,0,54,450,365,715
+set RETREF=240735
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=6,500,400,300,200,100
-set OUTREF=666,277,955,633,311,100
-set RETREF=7222
+set OUTREF=0,0,5,850,360,855
+set RETREF=240195
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=500,400,300,200,100
-set OUTREF=277,955,633,311,100,0
-set RETREF=556000
+set OUTREF=0,0,450,360,315,216
+set RETREF=135024
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=50,400,300,200,100
-set OUTREF=327,955,633,311,100,0
-set RETREF=56000
+set OUTREF=0,0,45,360,274,716
+set RETREF=130524
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=5,400,300,200,100
-set OUTREF=332,955,633,311,100,0
-set RETREF=6000
+set OUTREF=0,0,4,860,270,666
+set RETREF=130074
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=400,300,200,100
-set OUTREF=955,633,311,100,0,0
-set RETREF=444777
+set OUTREF=0,0,360,270,216,117
+set RETREF=24013
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=40,300,200,100
-set OUTREF=995,633,311,100,0,0
-set RETREF=44777
+set OUTREF=0,0,36,270,183,717
+set RETREF=20413
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=4,300,200,100
-set OUTREF=999,633,311,100,0,0
-set RETREF=4777
+set OUTREF=0,0,3,870,180,477
+set RETREF=20053
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=300,200,100
-set OUTREF=633,311,100,0,0,0
-set RETREF=333555
+set OUTREF=0,0,270,180,117,18
+set RETREF=13002
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=30,200,100
-set OUTREF=663,311,100,0,0,0
-set RETREF=33555
+set OUTREF=0,0,27,180,92,718
+set RETREF=10302
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=3,200,100
-set OUTREF=666,311,100,0,0,0
-set RETREF=3555
+set OUTREF=0,0,2,880,90,288
+set RETREF=10032
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=200,100
-set OUTREF=311,100,0,0,0,0
-set RETREF=222333
+set OUTREF=0,0,180,90,18,9
+set RETREF=2001
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=20,100
-set OUTREF=331,100,0,0,0,0
-set RETREF=22333
+set OUTREF=0,0,18,90,1,809
+set RETREF=201
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=2,100
-set OUTREF=333,100,0,0,0,0
-set RETREF=2333
+set OUTREF=0,0,1,890,0,189
+set RETREF=21
 call :TEST OUT IN 1111111
 endlocal
 
 rem NOTE: near the overflow
 setlocal
 set IN=1234
-set OUTREF=974,0,0,0,0,0
-set RETREF=1371110
+set OUTREF=0,1,110,600,111,60
+set RETREF=12340
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1234,1234
-set OUTREF=84,974,0,0,0,0
-set RETREF=1372482
+set OUTREF=0,1,111,710,711,171
+set RETREF=79019
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1234,1234,1234
-set OUTREF=456,84,974,0,0,0
-set RETREF=1372483
+set OUTREF=0,1,111,711,821,771
+set RETREF=202419
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1234,1234,1234,1234
-set OUTREF=457,456,84,974,0,0
-set RETREF=1372483
+set OUTREF=0,1,111,711,822,881
+set RETREF=869209
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1234,1234,1234,1234,1234
-set OUTREF=457,457,456,84,974,0
-set RETREF=1372483
+set OUTREF=0,1,111,711,822,882
+set RETREF=992098
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1234,1234,1234,1234,1234,1234
-set OUTREF=457,457,457,456,84,974
-set RETREF=1372483
+set OUTREF=0,1,111,711,822,882
+set RETREF=993332
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1234,1234,1234,1234,1234,1234,1234
-set OUTREF=457,457,457,457,456,84
-set RETREF=1372483
+set OUTREF=0,1,111,711,822,882
+set RETREF=993333
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1234,1234,1234,1234,1234,1234,1234,1234
-set OUTREF=457,457,457,457,457,456
-set RETREF=1372483
+set OUTREF=0,1,111,711,822,882
+set RETREF=993333
 call :TEST OUT IN 1111111
 endlocal
 
 setlocal
 set IN=1234,1234,1234,1234,1234,1234,1234,1234,1234
-set OUTREF=457,457,457,457,457,457
-set RETREF=1372483
+set OUTREF=0,1,111,711,822,882
+set RETREF=993333
 call :TEST OUT IN 1111111
 endlocal
 

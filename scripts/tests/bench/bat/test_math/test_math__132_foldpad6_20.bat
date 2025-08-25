@@ -8,15 +8,17 @@ echo;^>%~nx0
 
 setlocal DISABLEDELAYEDEXPANSION
 
-set IN=998,998,998,998,998,999
+set IN=12345678912345678912
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-for /L %%i in (1,1,1000) do call "%%CONTOOLS_ROOT%%/math/umul.bat" OUT IN 2149633
+for /L %%i in (1,1,100) do call "%%CONTOOLS_ROOT%%/math/foldpad6.bat" OUT IN
 
 call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
 
-echo Time spent: %TIME_INTS%.%TIME_FRACS% msecs
+if %TIME_INTS% EQU 0 set "TIME_INTS="
+
+echo Time spent: %TIME_INTS%%TIME_FRACS:~0,1%.%TIME_FRACS:~1%0 msecs
 echo;
 
 exit /b 0

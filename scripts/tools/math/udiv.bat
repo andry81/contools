@@ -57,7 +57,7 @@ rem <var>:
 rem   A variable name for a string value of a partially folded integer number.
 rem
 rem   Format:
-rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN]]]]]
+rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN[,...]]]]]]
 rem     , where NNN must not begin by 0 except 0 or except sequence of zeroes.
 rem
 rem   Evaluates the sequence from the left to the right.

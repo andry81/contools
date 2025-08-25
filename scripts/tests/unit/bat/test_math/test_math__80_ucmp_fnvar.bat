@@ -116,6 +116,7 @@ for %%i in (NEQ GTR LSS) do (
   endlocal
 )
 
+
 rem NOTE: tests from the script documentation in the description
 
 rem Examples:

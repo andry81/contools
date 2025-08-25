@@ -41,8 +41,8 @@ rem <lvalue>, <rvalue>:
 rem   String value of an unfolded integer number.
 rem
 rem   Format:
-rem     NNN[NNN[NNN[NNN[NNN[NNN]]]]]
-rem     , where NNN complements with the zeros from the left.
+rem     NNN[NNN[NNN[NNN[NNN[NNN[...]]]]]]
+rem     , where NNN can begin by 0 but does not treated as an octal number.
 rem
 rem   Evaluates the sequence from the right to the left, but compares from the
 rem   left to the right.

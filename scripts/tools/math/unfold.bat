@@ -42,6 +42,10 @@ rem   Negative exit code indicates an invalid or incomplete input.
 rem <out-var>:
 rem   A variable name for a string value of an unfolded integer <var>.
 rem
+rem   Format:
+rem     NNN[NNN[NNN[NNN[NNN[NNN]]]]]
+rem     , where NNN does not begin by 0 except 0 as a whole sequence.
+rem
 rem   NOTE:
 rem     The number can represent a value greater than 32-bit unsigned integer
 rem     as a string output.
@@ -53,7 +57,7 @@ rem <var>:
 rem   A variable name for a string value of a partially folded integer number.
 rem
 rem   Format:
-rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN]]]]]
+rem     NNN[,NNN[,NNN[,NNN[,NNN[,NNN[,...]]]]]]
 rem     , where NNN can begin by 0 but does not treated as an octal number.
 rem
 rem   Unfolds the sequence from the left to the right.

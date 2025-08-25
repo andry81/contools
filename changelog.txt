@@ -1,3 +1,12 @@
+2025.08.26:
+* new: scripts/tools/math/foldpad.bat: script without an overflow, but for sequences longer than `N,N,N,N,N,N`
+* new: scripts/tools/math/foldpad*.bat: scripts without an overflow, but for sequences longer than `N,N,N,N,N,N` with 0 padding
+* new: scripts/tests/unit/bat/test_math/test_math__*_foldpad*.bat: `foldpad*.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__*_foldpad*.bat: `foldpad*.bat` bench tests
+* refactor: scripts/tools/math: *fold.bat, uadd.bat, umul.bat, udiv.bat, ucmp*.bat: minor improvement
+* refactor: scripts/tests/unit/bat/test_math: unit tests refactor
+* refactor: scripts/tests/bench/bat/test_math: bench tests refactor
+
 2025.08.25:
 * fixed: scripts/tools/testlib/init.bat: execution fixup
 * new: scripts/tools/math/ucmp_*nvar.bat: script to circumvent 32-bit comparison arithmetic limitation
