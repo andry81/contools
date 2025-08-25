@@ -9,7 +9,6 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 rem reset all test variables at first
 set "IN="
 set "OUT="
-set "OUTREF="
 set "RETREF=0"
 
 set ZEROS=000,000,000,000,000,000,000
@@ -35,6 +34,12 @@ endlocal
 setlocal
 set OUT=x
 set RETREF=-1
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=1
+set RETREF=0
 call :TEST OUT IN
 endlocal
 
@@ -95,6 +100,7 @@ endlocal
 rem NOTE: tests from the script documentation in the description
 
 rem Examples:
+rem
 rem   1. >
 rem      set a=1,2,3
 rem      umul.bat b a

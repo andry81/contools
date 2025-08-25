@@ -43,6 +43,13 @@ rem   To use the full length format output use `uadd.bat` script instead:
 rem     >
 rem     uadd.bat x "" 12345
 rem     rem x=0,0,0,0,12,345
+rem
+rem   NOTE:
+rem     The number can represent a value greater than 32-bit unsigned integer
+rem     as a string output.
+rem
+rem     999,999,999,999,999,999 is equivalent to 60-bit integer
+rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 
 rem <var>:
 rem   A variable name for a string value of an unfolded integer number.
@@ -51,6 +58,9 @@ rem
 rem   NOTE:
 rem     The number can represent a value greater than 32-bit unsigned integer
 rem     as a string input.
+rem
+rem     999999999999999999 is equivalent to 60-bit integer
+rem     2147483647999999999999999 is equivalent to 81-bit integer
 
 rem Examples:
 rem

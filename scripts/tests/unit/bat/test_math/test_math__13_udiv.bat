@@ -9,7 +9,6 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 rem reset all test variables at first
 set "IN="
 set "OUT="
-set "OUTREF="
 set "RETREF=0"
 
 set ZEROS=000,000,000,000,000,000,000
@@ -34,6 +33,14 @@ call :TEST OUT
 endlocal
 
 setlocal
+set OUT=x
+set "OUTREF=x"
+set RETREF=-1
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=1
 set OUT=x
 set "OUTREF=x"
 set RETREF=-1
@@ -98,6 +105,7 @@ endlocal
 rem NOTE: tests from the script documentation in the description
 
 rem Examples:
+rem
 rem   1. >
 rem      rem 2,147,483,648,000,000
 rem      set a=2,147,483,648

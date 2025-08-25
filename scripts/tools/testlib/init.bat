@@ -62,10 +62,15 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
 if %TEST_LAST_ERROR% NEQ 0 (
   call "%%CONTOOLS_TESTLIB_ROOT%%/set_prev_cp.bat"
-  rem calls to `set_inner_cp.bat` at the beginning
-  call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" ^
-    TEST_LAST_ERROR TESTLIB__INIT TESTLIB__INIT_INDEX TESTLIB__TEST_SETUP TESTLIB__PREV_CP TESTLIB__TEST_CP
-  copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_INIT_VARS_FILE_PATH%" >nul
+
+  rem skip init finalization if the init is incomplete
+  if not defined TESTLIB__INITING (
+    rem calls to `set_inner_cp.bat` at the beginning
+    call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" ^
+      TEST_LAST_ERROR TESTLIB__INIT TESTLIB__INIT_INDEX TESTLIB__TEST_SETUP TESTLIB__PREV_CP TESTLIB__TEST_CP
+    copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_INIT_VARS_FILE_PATH%" >nul
+  )
+
   exit /b %TEST_LAST_ERROR%
 )
 
@@ -83,6 +88,8 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/set_outer_cp.bat"
 exit /b 0
 
 :MAIN
+set TESTLIB__INITING=1
+
 call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
 
 rem cast to integer
@@ -172,6 +179,8 @@ echo Running %?~nx0%...
 echo;
 
 call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 1 1 title %%?~nx0%% %%*
+
+set "TESTLIB__INITING="
 
 :TEST_SETUP
 rem call user setup script

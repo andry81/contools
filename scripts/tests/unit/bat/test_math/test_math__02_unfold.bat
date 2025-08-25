@@ -57,6 +57,7 @@ for /L %%i in (1,1,27) do (
 rem NOTE: tests from the script documentation in the description
 
 rem Examples:
+rem
 rem   1. >
 rem      set a=0,1,2,3
 rem      unfold.bat b a

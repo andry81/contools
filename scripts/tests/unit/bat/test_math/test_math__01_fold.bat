@@ -61,6 +61,7 @@ for /L %%i in (1,1,20) do (
 rem NOTE: tests from the script documentation in the description
 
 rem Examples:
+rem
 rem   1. >
 rem      set a=0123456000001002003
 rem      fold.bat b a

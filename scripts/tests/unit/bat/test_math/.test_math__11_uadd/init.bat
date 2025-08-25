@@ -1,13 +1,8 @@
 @echo off
 
+set "OUTVAR=%~1"
+set "INVAR=%~2"
 set "VALUE=%~3"
-
-set OUTDEF=0
-set INDEF=0
-set VALUEDEF=0
-
-if not "%~1" == "" set OUTDEF=1
-if not "%~2" == "" set INDEF=1
 
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" 0 TEST_DATA_CMD_LINE %%*
 

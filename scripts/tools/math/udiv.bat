@@ -47,6 +47,9 @@ rem
 rem   If the divisor is 0, then a variable value does not change.
 rem
 rem   NOTE:
+rem     The number can represent a value greater than 32-bit unsigned integer
+rem     as a string output.
+rem
 rem     999,999,999,999,999,999 is equivalent to 60-bit integer
 rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 
@@ -70,6 +73,13 @@ rem   the `An` after the normalization of the `Bn`.
 rem
 rem   Then the `An` divides by the <value> and returns the remainder out to the
 rem   exit code.
+rem
+rem   NOTE:
+rem     The number can represent a value greater than 32-bit unsigned integer
+rem     as a string input.
+rem
+rem     999,999,999,999,999,999 is equivalent to 60-bit integer
+rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 
 rem <value>:
 rem   An unsigned integer number with the 32-bit range limitation.
