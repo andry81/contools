@@ -1,3 +1,7 @@
+2025.08.27:
+* new: scripts/tests/bench/bat/test__exit: one more case
+* refactor: scripts/tests/bench/bat/test__exit: minor refactor
+
 2025.08.26:
 * new: scripts/tools/math/foldpad.bat: script without an overflow, but for sequences longer than `N,N,N,N,N,N`
 * new: scripts/tools/math/foldpad*.bat: scripts without an overflow, but for sequences longer than `N,N,N,N,N,N` with 0 padding
