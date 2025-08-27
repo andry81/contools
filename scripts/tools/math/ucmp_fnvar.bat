@@ -38,6 +38,8 @@ rem Description:
 rem   Compares folded unsigned integer number values in variables as 0
 rem   complemented strings.
 rem
+rem   Positive exit code indicates a false.
+rem   Zero exit code indicates a true.
 rem   Negative exit code indicates an error.
 
 rem <lvar>, <rvar>:

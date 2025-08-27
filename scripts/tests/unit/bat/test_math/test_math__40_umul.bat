@@ -21,19 +21,19 @@ set OUTREF=0,0,0,0,0,0
 
 setlocal
 set "OUTREF="
-set RETREF=-1
+set RETREF=0
 call :TEST
 endlocal
 
 setlocal
 set OUT=x
-set RETREF=-1
+set RETREF=0
 call :TEST OUT
 endlocal
 
 setlocal
 set OUT=x
-set RETREF=-1
+set RETREF=0
 call :TEST OUT IN
 endlocal
 
@@ -45,33 +45,33 @@ endlocal
 
 setlocal
 set OUT=x
-set RETREF=-1
+set RETREF=0
 call :TEST OUT "" 0
 endlocal
 
 setlocal
 set "OUTREF="
-set RETREF=-1
+set RETREF=0
 call :TEST "" IN
 endlocal
 
 setlocal
 set IN=1
 set "OUTREF="
-set RETREF=-1
+set RETREF=0
 call :TEST "" IN
 endlocal
 
 setlocal
 set IN=1
 set "OUTREF="
-set RETREF=-1
+set RETREF=0
 call :TEST "" IN 1
 endlocal
 
 setlocal
 set "OUTREF="
-set RETREF=-1
+set RETREF=0
 call :TEST "" IN 1
 endlocal
 
@@ -136,11 +136,11 @@ endlocal
 
 rem   3. >
 rem      umul.bat b "" 12345
-rem      rem ERRORLEVEL=-1
+rem      rem ERRORLEVEL=0
 rem      rem b=0,0,0,0,0,0
 setlocal
 set OUTREF=0,0,0,0,0,0
-set RETREF=-1
+set RETREF=0
 call :TEST OUT IN 12345
 endlocal
 

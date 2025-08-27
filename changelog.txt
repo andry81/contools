@@ -1,4 +1,7 @@
 2025.08.27:
+* changed: scripts/tools/math, scripts/tests/unit/bat/test_math: removed negative exit code indicating a not arithmetic error, except division by zero and comparison operators
+
+2025.08.27:
 * new: scripts/tests/bench/bat/test__exit: one more case
 * refactor: scripts/tests/bench/bat/test__exit: minor refactor
 

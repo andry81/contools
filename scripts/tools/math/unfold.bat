@@ -1,4 +1,4 @@
-@echo off & ( if "%~1" == "" exit /b -1 ) & setlocal ENABLEDELAYEDEXPANSION & set "R=" & ^
+@echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & set "R=" & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!%~2!") do ^
 set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" ^
   & ( if defined L1 if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "0" set "L1=!L1:~1!" ) ^
@@ -28,7 +28,7 @@ set /A "L6%%=1000" & set /A "L5%%=1000" & set /A "L4%%=1000" & set /A "L3%%=1000
   & ( if !L6! NEQ 0 ( set "R=!R!!L6!" ) else if not "!R!" == "" set "R=!R!000" )
 for /F "tokens=* delims=" %%a in ("!R!") do endlocal & set "%~1=%%a" & exit /b %F%
 endlocal & set "%~1=0" & if not "%~2" == "" if defined %~2 exit /b %F%
-exit /b -1
+exit /b 0
 
 rem USAGE:
 rem   unfold.bat <out-var> <var>
@@ -36,8 +36,7 @@ rem   unfold.bat <out-var> <var>
 rem Description:
 rem   Unsigned integer series unfold script.
 rem
-rem   Positive exit code indicates an overflow.
-rem   Negative exit code indicates an invalid or incomplete input.
+rem   Exit code indicates an overflow.
 
 rem <out-var>:
 rem   A variable name for a string value of an unfolded integer <var>.

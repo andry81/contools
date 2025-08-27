@@ -20,32 +20,32 @@ rem   and is not required to be the full length formatted as `N,N,N,N,N,N`.
 
 
 setlocal
-set RETREF=-1
+set RETREF=0
 call :TEST
 endlocal
 
 setlocal
 set OUT=x
 set OUTREF=0
-set RETREF=-1
+set RETREF=0
 call :TEST OUT
 endlocal
 
 setlocal
 set OUT=x
 set OUTREF=0
-set RETREF=-1
+set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
-set RETREF=-1
+set RETREF=0
 call :TEST "" IN
 endlocal
 
 setlocal
 set IN=1
-set RETREF=-1
+set RETREF=0
 call :TEST "" IN
 endlocal
 

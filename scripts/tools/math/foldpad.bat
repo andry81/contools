@@ -1,4 +1,4 @@
-@echo off & ( if "%~1" == "" exit /b -1 ) & setlocal ENABLEDELAYEDEXPANSION & ^
+@echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
 set "R=!%~2!" & set "L1=0" & set "L2=0" & set "L3=0" & set "L4=0" & set "L5=0" & set "L6=0" ^
   & ( if defined R set "L6=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if not defined L6 set "L6=0" ) ^
   & ( if defined R set "L5=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if not defined L5 set "L5=0" ) ^
@@ -18,7 +18,7 @@ set "R=" ^
   & ( if !L6! NEQ 0 ( set "R=!R!!L6!" ) else if defined R set "R=!R!0" ) & ^
 for /F "tokens=* delims=" %%a in ("!L!!R!") do for /F "tokens=* delims=" %%i in ("!F!") do endlocal & set "%~1=%%a" & exit /b %%i
 endlocal & set "%~1=0" & exit /b 1
-exit /b -1
+exit /b 0
 
 rem USAGE:
 rem   foldpad.bat <out-var> <var>
@@ -27,7 +27,7 @@ rem Description:
 rem   Unsigned integer series fold script without 0 padding from the left.
 rem
 rem   Positive exit code indicates a zero value.
-rem   Negative exit code indicates an invalid or incomplete input.
+rem   Zero exit code indicates a not zero value.
 rem
 rem   Difference with the `fold.bat` script is that it does not return an
 rem   overflow and support an extended sequence longer than `N,N,N,N,N,N`.
@@ -74,7 +74,7 @@ rem     rem b=0,0,0,0,12,345
 rem
 rem     >
 rem     uadd.bat b "" 12345
-rem     rem ERRORLEVEL=-1
+rem     rem ERRORLEVEL=0
 rem     rem b=0,0,0,0,12,345
 rem
 rem   NOTE:
@@ -121,5 +121,5 @@ rem      rem b=12,345
 rem
 rem   4. >
 rem      foldpad.bat b
-rem      rem ERRORLEVEL=1
+rem      rem ERRORLEVEL=0
 rem      rem b=0

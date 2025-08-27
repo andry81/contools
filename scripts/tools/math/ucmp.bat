@@ -35,6 +35,8 @@ rem Description:
 rem   Compares unfolded unsigned integer number values as 0 complemented
 rem   strings.
 rem
+rem   Positive exit code indicates a false.
+rem   Zero exit code indicates a true.
 rem   Negative exit code indicates an error.
 
 rem <lvalue>, <rvalue>:

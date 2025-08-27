@@ -1,4 +1,4 @@
-@echo off & ( if "%~1" == "" exit /b -1 ) & set "D=%~3" & set /A "D=D/D - 1 + D" || exit /b -1 & setlocal ENABLEDELAYEDEXPANSION & ^
+@echo off & set "D=%~3" & set /A "D=D/D - 1 + D" || exit /b -1 & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!%~2!") do ^
 set /A "L1=%%i" & set "L2=%%j" & set "L3=%%k" & set "L4=%%l" & set "L5=%%m" & set "L6=%%n" & set "F=%%o" ^
   & ( if defined F call "%%~dp0uadd.bat" F F 0 || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
@@ -17,7 +17,7 @@ set /A "L5=R / D" & set /A "R%%=D" ^
 set /A "L6=R / D" & set /A "R%%=D" & ^
 for /F "tokens=1,2,3,4,5,6,7 delims=," %%a in ("!L1!,!L2!,!L3!,!L4!,!L5!,!L6!,!R!") do endlocal & set "%~1=%%a,%%b,%%c,%%d,%%e,%%f" & exit /b %%g
 endlocal & set "%~1=0,0,0,0,0,0" & if not "%~2" == "" if defined %~2 exit /b 0
-exit /b -1
+exit /b 0
 
 rem USAGE:
 rem   udiv.bat <out-var> <var> <value>
@@ -26,12 +26,8 @@ rem Description:
 rem   An unsigned division script to workaround the `set /A` command 32-bit
 rem   range limitation.
 rem
-rem   Not negative exit code returns an unsigned remainder to a dividend.
-rem   The exit code -1 indicates an invalid or incomplete input.
-rem
-rem   NOTE:
-rem     Both <out-var> and the exit code still can be 0. But for a valid
-rem     division the exit code must has a not negative value.
+rem   Exit code returns a remainder to a dividend, except division by zero when
+rem   it returns -1.
 
 rem <out-var>:
 rem   A variable name for a string value of completely folded integer number

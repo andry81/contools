@@ -1,4 +1,4 @@
-@echo off & ( if "%~1" == "" exit /b -1 ) & setlocal ENABLEDELAYEDEXPANSION & ^
+@echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
 set "R=!%~2!" & set "L1=0" & set "L2=0" & set "L3=0" & set "L4=0" & set "L5=0" & set "L6=0" ^
   & ( if defined R set "L6=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if not defined L6 set "L6=0" ) ^
   & ( if defined R set "L5=!R:~-3!" & set "R=!R:~0,-3!" ) & ( if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if not defined L5 set "L5=0" ) ^
@@ -10,7 +10,7 @@ set "L=" & set "F=0" ^
   & ( if !L1! EQU 0 if !L2! EQU 0 if !L3! EQU 0 if !L4! EQU 0 if !L5! EQU 0 if !L6! EQU 0 set "F=1" ) ^
   & ( if defined R call "%%~dp0foldpad.bat" L R && set "F=0" || set "L=" ) & ( if defined L set "L=!L!," ) & ^
 for /F "tokens=* delims=" %%a in ("!L!!L1!,!L2!,!L3!,!L4!,!L5!,!L6!") do for /F "tokens=* delims=" %%i in ("!F!") do endlocal & set "%~1=%%a" & exit /b %%i
-exit /b -1
+exit /b 0
 
 rem USAGE:
 rem   foldpad6.bat <out-var> <var>
@@ -20,7 +20,7 @@ rem   Unsigned integer series fold script with 0 padding from the left if
 rem   shorter than `N,N,N,N,N,N`.
 rem
 rem   Positive exit code indicates a zero value.
-rem   Negative exit code indicates an invalid or incomplete input.
+rem   Zero exit code indicates a not zero value.
 
 rem <out-var>:
 rem   A variable name for a string value of a folded integer number from <var>.
