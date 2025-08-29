@@ -278,6 +278,7 @@ set RETREF=1371
 call :TEST OUT IN 1111111
 endlocal
 
+
 setlocal
 set IN=1,000,000,000,000,000,000
 set OUTREF=111,0,0,0,0,0
@@ -410,6 +411,7 @@ set OUTREF=110,0,0,0,0,0
 set RETREF=11111
 call :TEST OUT IN 1111111
 endlocal
+
 
 setlocal
 set IN=000,100,000,000,000,000

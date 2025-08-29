@@ -1,3 +1,9 @@
+2025.08.29:
+* new: scripts/tools/math/iadd.bat: script to circumvent 32-bit signed addition arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__35_uadd.bat: `iadd.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__35_uadd.bat: `iadd.bat` bench test
+* refactor: scripts/tests: unit/bat/test_math, bench/bat/test_math: minor refactor
+
 2025.08.27:
 * changed: scripts/tools/math, scripts/tests/unit/bat/test_math: removed negative exit code indicating a not arithmetic error, except division by zero and comparison operators
 
