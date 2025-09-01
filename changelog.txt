@@ -1,4 +1,7 @@
 2025.09.01:
+* changed: _config/config.0.vars.in: disable clink extension to speedup execution
+
+2025.09.01:
 * new: scripts/tools/testlib: print tests pass overall number in the console window title
 
 2025.09.01:

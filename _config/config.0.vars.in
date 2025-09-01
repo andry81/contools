@@ -29,3 +29,5 @@
 once INIT_VERBOSE                         =0
 once TOOLS_VERBOSE                        =0
 once PRINT_VARS_SET                       =0
+
+CLINK_NOAUTORUN                           =1
