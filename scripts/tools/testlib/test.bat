@@ -43,12 +43,16 @@ if not defined TESTLIB__CHCP_EXE (
   exit /b 255
 ) >&2
 
+if not defined SETUP_CP goto SKIP_SETUP_CP
+
 rem reread current code page for each test, before run and after run
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
 rem must be assigned not to 65000 code page!
 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
+
+:SKIP_SETUP_CP
 
 set "TESTLIB__EXEC_ON_ENDLOCAL="
 
@@ -61,7 +65,7 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FI
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" >nul
 
 rem restore outer code page
-call "%%CONTOOLS_TESTLIB_ROOT%%/set_outer_cp.bat"
+if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/set_outer_cp.bat"
 
 rem Drop internal variables but use some changed value(s) for the return
 (
@@ -107,7 +111,7 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.init%TEST_SCRIPT_FI
 )
 
 rem restore outer code page
-call "%%CONTOOLS_TESTLIB_ROOT%%/set_outer_cp.bat"
+if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/set_outer_cp.bat"
 
 rem call user implementation script
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.impl%TEST_SCRIPT_FILE_EXT%" (
@@ -141,10 +145,14 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.exit%TEST_SCRIPT_FI
 )
 
 :TEST_REPORT
+if not defined SETUP_CP goto SKIP_SETUP_CP
+
 call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
 rem must be assigned not to 65000 code page!
 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
+
+:SKIP_SETUP_CP
 
 if %TEST_LAST_ERROR% EQU 0 (
   set /A TESTLIB__CURRENT_PASSED_TESTS+=1

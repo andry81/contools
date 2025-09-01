@@ -18,7 +18,7 @@ if exist "%TEST_SCRIPT_USER_VARS_FILE_PATH%" if exist "%~1" for /F "usebackq tok
 )
 
 rem save testlib internal variables at the last
-for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@set TESTLIB__ 2^>nul`) do (echo;%%i=%%j) >> "%TEST_SCRIPT_LOCAL_VARS_FILE_PATH%"
+set TESTLIB__ 2>nul >> "%TEST_SCRIPT_LOCAL_VARS_FILE_PATH%"
 
 exit /b 0
 
