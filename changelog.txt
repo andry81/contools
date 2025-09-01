@@ -1,4 +1,7 @@
 2025.09.01:
+* new: scripts/tools/testlib: test script group time spent print
+
+2025.09.01:
 * changed: scripts/tools/testlib: improved tests performance
 
 2025.09.01:

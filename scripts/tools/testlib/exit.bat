@@ -64,6 +64,21 @@ set TESTLIB__TEST_TEARDOWN_CALLED=0
 call :TEST_TEARDOWN
 set TEST_LAST_ERROR=%ERRORLEVEL%
 
+setlocal DISABLEDELAYEDEXPANSION
+
+set "BEGIN_TIME=%TESTLIB__BEGIN_TIME%"
+
+call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+set "TESTLIB__TIME=%TIME_INTS%.%TIME_FRACS%"
+
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("Time spent: !TESTLIB__TIME! secs (!TESTLIB__TEST_SCRIPT_FILE_STACK!)") do endlocal & echo;%%i
+echo;
+
+(
+  endlocal
+  set "TESTLIB__TIME=%TESTLIB__TIME%"
+)
+
 if %TEST_LAST_ERROR% EQU 0 (
   rem negative return code to indicate no error in the tear down
   if %TESTLIB__CURRENT_PASSED_TESTS% LSS %TESTLIB__CURRENT_TESTS% set /A TEST_LAST_ERROR=TESTLIB__CURRENT_PASSED_TESTS-TESTLIB__CURRENT_TESTS
