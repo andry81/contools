@@ -119,6 +119,8 @@ if /i "%TEST_SCRIPT_FILE_PATH%" == "%?~f0%" (
   exit /b 255
 ) >&2
 
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" 1 TEST_SCRIPT_INIT_CMDLINE %%*
+
 rem make built in canonical user script path variables
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_PATH "%%?~f0%%"
 
@@ -178,7 +180,11 @@ copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_INIT_VARS_FILE_PA
 echo Running %?~nx0%...
 echo;
 
-call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 1 1 title %%?~nx0%% %%*
+setlocal DISABLEDELAYEDEXPANSION & setlocal ENABLEDELAYEDEXPANSION & ^
+for /F "tokens=* delims="eol^= %%i in ("!TEST_SCRIPT_FILE!") do ^
+for /F "usebackq tokens=* delims="eol^= %%j in ('"!TEST_SCRIPT_INIT_CMDLINE!"') do endlocal & ^
+title [%TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS%] %%i %%~j
+endlocal
 
 set "TESTLIB__INITING="
 

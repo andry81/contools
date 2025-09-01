@@ -74,6 +74,12 @@ set /A TESTLIB__INIT-=1
 call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" >nul
 
+setlocal DISABLEDELAYEDEXPANSION & setlocal ENABLEDELAYEDEXPANSION & ^
+for /F "tokens=* delims="eol^= %%i in ("!TEST_SCRIPT_FILE!") do ^
+for /F "usebackq tokens=* delims="eol^= %%j in ('"!TEST_SCRIPT_INIT_CMDLINE!"') do endlocal & ^
+title [%TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS%] %%i %%~j
+endlocal
+
 if %TESTLIB__INIT% EQU 0 (
   echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% tests is passed.
   echo;^

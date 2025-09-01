@@ -1,4 +1,7 @@
 2025.09.01:
+* new: scripts/tools/testlib: print tests pass overall number in the console window title
+
+2025.09.01:
 * fixed: scripts/tools/math: iadd.bat: execution fixup
 * new: scripts/tools/math: icmp.bat, icmp_nvar.bat: script to circumvent 32-bit signed comparison arithmetic limitation
 * new: scripts/tests/unit/bat/test_math/test_math__*_cmp: `icmp.bat`, `icmp_nvar` unit tests
