@@ -1,3 +1,12 @@
+2025.09.01:
+* fixed: scripts/tools/math: iadd.bat: execution fixup
+* new: scripts/tools/math: icmp.bat, icmp_nvar.bat: script to circumvent 32-bit signed comparison arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__*_cmp: `icmp.bat`, `icmp_nvar` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__*_cmp.bat: `icmp.bat`, `icmp_nvar` bench test
+* changed: scripts/tools/math: ucmp*.bat: minor improvement
+* refactor: scripts/tools/math: *fold.bat, uadd.bat, umul.bat, udiv.bat, ucmp*.bat: minor improvement
+* refactor: scripts/tests: unit/bat/test_math, bench/bat/test_math: tests refactor
+
 2025.08.29:
 * new: scripts/tools/math/iadd.bat: script to circumvent 32-bit signed addition arithmetic limitation
 * new: scripts/tests/unit/bat/test_math/test_math__35_uadd.bat: `iadd.bat` unit tests

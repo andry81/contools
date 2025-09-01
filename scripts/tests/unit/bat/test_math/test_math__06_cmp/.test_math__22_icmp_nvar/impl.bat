@@ -1,0 +1,6 @@
+@echo off
+
+call "%%CONTOOLS_ROOT%%/math/%%TEST_IMPL_SCRIPT_NAME%%" %%TEST_DATA_CMD_LINE%%
+set TEST_IMPL_ERROR=%ERRORLEVEL%
+
+exit /b 0

@@ -18,8 +18,9 @@ set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "
   & ( if not defined L5 set "L5=0" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) ^
   & ( if not defined L6 set "L6=0" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" )
 for /F "tokens=* delims="eol^= %%i in ("!L!") do for /F "tokens=* delims="eol^= %%j in ("!L1!,!L2!,!L3!,!L4!,!L5!,!L6!") do ^
-for /F "usebackq tokens=* delims="eol^= %%l in ('"!LR!"') do for /F "usebackq tokens=* delims="eol^= %%r in ('"!RR!"') do endlocal & ^
-set "LR=%%~l" & set "RR=%%~r" & ( if not defined LR if not defined RR if "%%i" %~2 "%%j" ( exit /b 0 ) else exit /b 1 ) ^
+for /F "usebackq tokens=* delims="eol^= %%l in ('"!LR!"') do for /F "usebackq tokens=* delims="eol^= %%r in ('"!RR!"') do endlocal ^
+  & ( if "%%~l" == "" if "%%~r" == "" if "%%i" %~2 "%%j" ( exit /b 0 ) else exit /b 1 ) & ^
+set "LR=%%~l" & set "RR=%%~r" ^
   & ( if not defined LR set "LR=0" ) & ( if not defined RR set "RR=0" ) & ^
 set "OP=%~2" & setlocal ENABLEDELAYEDEXPANSION ^
   & ( if "!OP!" == "=="  set "OP=EQU" ) & ( if "!OP!" == "<" set "OP=LSS" ) & ( if "!OP!" == ">=" set "OP=GEQ" ) & ( if "!OP!" == ">" set "OP=GTR" ) & ( if "!OP!" == "<=" set "OP=LEQ" ) ^
@@ -41,6 +42,10 @@ rem
 rem   Positive exit code indicates a false.
 rem   Zero exit code indicates a true.
 rem   Negative exit code indicates an error.
+rem
+rem   NOTE:
+rem     The `unsigned` in case of an integer number prefix does mean you must
+rem     not use negative `-` nor positive `+` signs.
 
 rem <lvar>, <rvar>:
 rem   A variable name for a string value of a partially folded integer number.

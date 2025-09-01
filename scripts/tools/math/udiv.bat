@@ -28,6 +28,10 @@ rem   range limitation.
 rem
 rem   Exit code returns a remainder to a dividend, except division by zero when
 rem   it returns -1.
+rem
+rem   NOTE:
+rem     The `unsigned` in case of an integer number prefix does mean you must
+rem     not use negative `-` nor positive `+` signs.
 
 rem <out-var>:
 rem   A variable name for a string value of completely folded integer number

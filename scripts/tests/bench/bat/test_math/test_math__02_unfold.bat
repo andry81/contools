@@ -1,0 +1,10 @@
+@echo off
+
+setlocal
+
+call "%%~dp0__init__/__init__.bat" || exit /b
+
+for %%i in ("%TESTS_PROJECT_ROOT%\test_math\%~n0\test_math__*.bat") do (
+  set "SCRIPT_FILE=%%i"
+  call "%%CONTOOLS_ROOT%%/std/call.bat" "%%SCRIPT_FILE%%"
+)

@@ -31,6 +31,10 @@ rem   Zero exit code indicates a not zero value.
 rem
 rem   Difference with the `fold.bat` script is that it does not return an
 rem   overflow and support an extended sequence longer than `N,N,N,N,N,N`.
+rem
+rem   NOTE:
+rem     The `unsigned` in case of an integer number prefix does mean you must
+rem     not use negative `-` nor positive `+` signs.
 
 rem <out-var>:
 rem   A variable name for a string value of a folded integer number from <var>.

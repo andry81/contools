@@ -24,6 +24,10 @@ rem Description:
 rem   Unsigned integer series fold script without 0 padding from the left.
 rem
 rem   Exit code indicates an overflow.
+rem
+rem   NOTE:
+rem     The `unsigned` in case of an integer number prefix does mean you must
+rem     not use negative `-` nor positive `+` signs.
 
 rem <out-var>:
 rem   A variable name for a string value of a folded integer number from <var>.
