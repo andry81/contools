@@ -137,13 +137,20 @@ if "%TEST_SCRIPT_INDEX_DIR_NAME:~2,1%" == "" set "TEST_SCRIPT_INDEX_DIR_NAME=0%T
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_DIR "%%?~dp0%%"
 
+if defined TEST_SCRIPT_ROOT_INIT_DATE_TIME goto SKIP_TEST_SCRIPT_ROOT_INIT_DATE_TIME
+
+call "%%CONTOOLS_WMI_ROOT%%\get_wmi_local_datetime.vbs.bat"
+set "TEST_SCRIPT_ROOT_INIT_DATE_TIME=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
+
+:SKIP_TEST_SCRIPT_ROOT_INIT_DATE_TIME
+
 rem defined ONCE
 if defined TEST_DATA_IN_ROOT call "%%CONTOOLS_ROOT%%/std/canonical_dir_vars.bat"    TEST_DATA_IN_ROOT || exit /b
 call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_DATA_OUT_ROOT          "%%TEST_SCRIPT_FILE_DIR%%/_tests/out" || exit /b
 call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_DATA_TEMP_ROOT         "%%TEST_SCRIPT_FILE_DIR%%/_tests/temp" || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_DIR              "%%TEST_DATA_TEMP_ROOT%%/shared"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_LOCAL_DIR               "%%TEST_DATA_TEMP_ROOT%%/local/%%TEST_SCRIPT_INDEX_DIR_NAME%%--%%TEST_SCRIPT_NEST_LVL_DIR_NAME%%--%%TEST_SCRIPT_FILE_NAME%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_SHARED_DIR      "%%TEST_DATA_TEMP_ROOT%%/shared/%%TEST_SCRIPT_ROOT_INIT_DATE_TIME%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_LOCAL_DIR               "%%TEST_DATA_TEMP_ROOT%%/local/%%TEST_SCRIPT_ROOT_INIT_DATE_TIME%%/%%TEST_SCRIPT_INDEX_DIR_NAME%%--%%TEST_SCRIPT_NEST_LVL_DIR_NAME%%--%%TEST_SCRIPT_FILE_NAME%%"
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_VARS_FILE_PATH   "%%TEST_SCRIPT_SHARED_DIR%%/test.vars"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP "%%TEST_SCRIPT_SHARED_DIR%%/test.tmp.vars"
