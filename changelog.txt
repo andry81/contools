@@ -1,4 +1,7 @@
 2025.09.02:
+* changed: scripts/tools/testlib: code improvement, reduction and cleanup
+
+2025.09.02:
 * fixed: scripts/tools/math/icmp*.bat: comparison with signed zero
 * fixed: scripts/tests/unit/bat/test_math/test_math__*_cmp/test_math__*_ucmp_fnvar.bat: skip test cases with invalid or duplicated input
 * new: scripts/tools/math/icmp_fnvar.bat: script to circumvent 32-bit signed comparison arithmetic limitation
