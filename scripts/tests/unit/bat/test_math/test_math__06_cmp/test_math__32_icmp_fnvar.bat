@@ -86,14 +86,14 @@ for %%i in (EQU NEQ GTR GEQ LSS LEQ) do (
 
 for %%i in (EQU GEQ LEQ) do (
   setlocal
-  set RETREF=0
+  set RETREF=-1
   set L=0
   set "R="
   call :TEST L %%i R
   endlocal
 
   setlocal
-  set RETREF=0
+  set RETREF=-1
   set "L="
   set R=0
   call :TEST L %%i R
@@ -102,14 +102,14 @@ for %%i in (EQU GEQ LEQ) do (
 
 for %%i in (NEQ GTR LSS) do (
   setlocal
-  set RETREF=1
+  set RETREF=-1
   set L=0
   set "R="
   call :TEST L %%i R
   endlocal
 
   setlocal
-  set RETREF=1
+  set RETREF=-1
   set "L="
   set R=0
   call :TEST L %%i R
