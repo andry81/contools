@@ -1,3 +1,13 @@
+2025.09.02:
+* fixed: scripts/tools/math/icmp*.bat: comparison with signed zero
+* fixed: scripts/tests/unit/bat/test_math/test_math__*_cmp/test_math__*_ucmp_fnvar.bat: skip test cases with invalid or duplicated input
+* new: scripts/tools/math/icmp_fnvar.bat: script to circumvent 32-bit signed comparison arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__*_cmp: `icmp_fnvar` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__*_cmp.bat: `icmp_fnvar` bench tests
+* changed: scripts/tools/math/*cmp*.bat: code reduction
+* changed: scripts: tools/math/icmp*.bat, tests/unit/bat/test_math/test_math__*_cmp: removed `==` operator
+* refactor: scripts/tools/math/icmp*.bat: minor refactor
+
 2025.09.01:
 * new: scripts/tools/testlib: test script group time spent print
 
@@ -17,7 +27,7 @@
 * fixed: scripts/tools/math: iadd.bat: execution fixup
 * new: scripts/tools/math: icmp.bat, icmp_nvar.bat: script to circumvent 32-bit signed comparison arithmetic limitation
 * new: scripts/tests/unit/bat/test_math/test_math__*_cmp: `icmp.bat`, `icmp_nvar` unit tests
-* new: scripts/tests/bench/bat/test_math/test_math__*_cmp.bat: `icmp.bat`, `icmp_nvar` bench test
+* new: scripts/tests/bench/bat/test_math/test_math__*_cmp.bat: `icmp.bat`, `icmp_nvar` bench tests
 * changed: scripts/tools/math: ucmp*.bat: minor improvement
 * refactor: scripts/tools/math: *fold.bat, uadd.bat, umul.bat, udiv.bat, ucmp*.bat: minor improvement
 * refactor: scripts/tests: unit/bat/test_math, bench/bat/test_math: tests refactor
@@ -937,7 +947,7 @@
 * new: Scripts/Tools/filesys/read_shortcut_target_path.bat: `-use_getlink` flag to use `GetLink` property instead of `CreateShortcut` method to read shortcut properties
 * new: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: `-use-getlink` flag to use `GetLink` property instead of `CreateShortcut` method to read and update shortcut properties
 * changed: Scripts/Tools/ToolAdaptors/vbs/read_path_props.vbs: added `-use-extprop` flag to use `ExtendedProperty` method instead of `CreateShortcut` method to read shortcut `TargetPath` property
-* refactor: Scripts/Tools:/filesys/read_shortcut_target_path.bat: `-use_extended_property` flag renamed into `-use_extprop`
+* refactor: Scripts/Tools/filesys/read_shortcut_target_path.bat: `-use_extended_property` flag renamed into `-use_extprop`
 
 2024.08.16:
 * fixed: Scripts/Tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: reimplemented using code base from `read_shortcut_target_path.bat` script as most reliable

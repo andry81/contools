@@ -91,7 +91,7 @@ if "%TEST_IMPL_SCRIPT_NAME%" == "icmp.bat" (
 )
 
 if "%TEST_IMPL_SCRIPT_NAME%" == "icmp.bat" (
-  for %%i in (EQU NEQ GTR GEQ LSS LEQ "==") do (
+  for %%i in (EQU NEQ GTR GEQ LSS LEQ) do (
     setlocal
     set RETREF=-1
     call :TEST 0 %%i
@@ -103,7 +103,7 @@ if "%TEST_IMPL_SCRIPT_NAME%" == "icmp.bat" (
     endlocal
   )
 ) else (
-  for %%i in (EQU NEQ GTR GEQ LSS LEQ "==") do (
+  for %%i in (EQU NEQ GTR GEQ LSS LEQ) do (
     setlocal
     set RETREF=-1
     set L=0
@@ -117,7 +117,7 @@ if "%TEST_IMPL_SCRIPT_NAME%" == "icmp.bat" (
     endlocal
   )
 
-  for %%i in (EQU GEQ LEQ "==") do (
+  for %%i in (EQU GEQ LEQ) do (
     setlocal
     set RETREF=0
     set L=0
@@ -175,7 +175,7 @@ if "%TEST_IMPL_SCRIPT_NAME%" == "icmp.bat" (
   endlocal
 )
 
-rem   3. Still number comparison
+rem   3. Number comparison
 rem      >
 rem      call icmp.bat "-0" EQU "+0" && echo TRUE || echo FALSE
 rem      rem TRUE

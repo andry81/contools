@@ -18,15 +18,12 @@ for /F "tokens=* delims="eol^= %%i in ("!L!") do for /F "tokens=* delims="eol^= 
 for /F "usebackq tokens=* delims="eol^= %%l in ('"!LR!"') do for /F "usebackq tokens=* delims="eol^= %%r in ('"!R!"') do endlocal ^
   & ( if "%%~l" == "" if "%%~r" == "" if "%%i" %~2 "%%j" ( exit /b 0 ) else exit /b 1 ) & ^
 set "LR=%%~l" & set "RR=%%~r" ^
-  & ( if not defined LR set "LR=0" ) & ( if not defined RR set "RR=0" ) & ^
-set "OP=%~2" & setlocal ENABLEDELAYEDEXPANSION ^
-  & ( if "!OP!" == "=="  set "OP=EQU" ) & ( if "!OP!" == "<" set "OP=LSS" ) & ( if "!OP!" == ">=" set "OP=GEQ" ) & ( if "!OP!" == ">" set "OP=GTR" ) & ( if "!OP!" == "<=" set "OP=LEQ" ) ^
-  & ( if /i "!OP!" == "EQU" endlocal & ( if "%%i" EQU "%%j" ( call "%%~0" LR EQU RR & exit /b ) else exit /b 1 ) ) ^
-  & ( if /i "!OP!" == "NEQ" endlocal & ( if "%%i" NEQ "%%j" ( exit /b 0 ) else call "%%~0" LR NEQ RR & exit /b ) ) ^
-  & ( if /i "!OP!" == "LSS" endlocal & ( ( call "%%~0" LR LSS RR && exit /b 0 ) & ( call "%%~0" LR EQU RR && ( if "%%i" LSS "%%j" ( exit /b 0 ) else exit /b 1 ) || exit /b ) ) ) ^
-  & ( if /i "!OP!" == "GEQ" endlocal & ( ( call "%%~0" LR GTR RR && exit /b 0 ) & ( call "%%~0" LR EQU RR && ( if "%%i" GEQ "%%j" ( exit /b 0 ) else exit /b 1 ) || exit /b ) ) ) ^
-  & ( if /i "!OP!" == "GTR" endlocal & ( ( call "%%~0" LR GTR RR && exit /b 0 ) & ( call "%%~0" LR EQU RR && ( if "%%i" GTR "%%j" ( exit /b 0 ) else exit /b 1 ) || exit /b ) ) ) ^
-  & ( if /i "!OP!" == "LEQ" endlocal & ( ( call "%%~0" LR LSS RR && exit /b 0 ) & ( call "%%~0" LR EQU RR && ( if "%%i" LEQ "%%j" ( exit /b 0 ) else exit /b 1 ) || exit /b ) ) )
+  & ( if /i "%~2" == "EQU" if "%%i" EQU "%%j" ( call "%%~0" LR EQU RR & exit /b ) else exit /b 1 ) ^
+  & ( if /i "%~2" == "NEQ" if "%%i" NEQ "%%j" ( exit /b 0 ) else call "%%~0" LR NEQ RR & exit /b ) ^
+  & ( if /i "%~2" == "LSS" ( call "%%~0" LR LSS RR && exit /b 0 ) & ( call "%%~0" LR EQU RR && ( if "%%i" LSS "%%j" ( exit /b 0 ) else exit /b 1 ) || exit /b ) ) ^
+  & ( if /i "%~2" == "GEQ" ( call "%%~0" LR GTR RR && exit /b 0 ) & ( call "%%~0" LR EQU RR && ( if "%%i" GEQ "%%j" ( exit /b 0 ) else exit /b 1 ) || exit /b ) ) ^
+  & ( if /i "%~2" == "GTR" ( call "%%~0" LR GTR RR && exit /b 0 ) & ( call "%%~0" LR EQU RR && ( if "%%i" GTR "%%j" ( exit /b 0 ) else exit /b 1 ) || exit /b ) ) ^
+  & ( if /i "%~2" == "LEQ" ( call "%%~0" LR LSS RR && exit /b 0 ) & ( call "%%~0" LR EQU RR && ( if "%%i" LEQ "%%j" ( exit /b 0 ) else exit /b 1 ) || exit /b ) )
 exit /b -1
 
 rem USAGE:
@@ -76,6 +73,10 @@ rem     as a string input.
 rem
 rem     999999999999999999 is equivalent to 60-bit integer
 rem     2147483647999999999999999 is equivalent to 81-bit integer
+
+rem <op>:
+rem   Comparison operator. See `if /?` for details.
+rem   The `==` operator does not supported.
 
 rem Examples:
 rem
