@@ -1,4 +1,8 @@
 2025.09.02:
+* fixed: scripts/tools/testlib: time spent calculation
+* fixed: scripts/tools/testlib/update_locals.bat: missed a code page change skip
+
+2025.09.02:
 * fixed: scripts/tools/math/?cmp_*nvar.bat: execution fixup
 
 2025.09.02:

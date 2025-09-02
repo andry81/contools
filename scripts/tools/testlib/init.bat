@@ -156,7 +156,9 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_DATA_TEMP_ROOT     
 call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" TEST_SCRIPT_SHARED_DIR      "%%TEST_DATA_TEMP_ROOT%%/shared/%%TEST_SCRIPT_ROOT_INIT_DATE_TIME%%"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_LOCAL_DIR               "%%TEST_DATA_TEMP_ROOT%%/local/%%TEST_SCRIPT_ROOT_INIT_DATE_TIME%%/%%TEST_SCRIPT_INDEX_DIR_NAME%%--%%TEST_SCRIPT_NEST_LVL_DIR_NAME%%--%%TEST_SCRIPT_FILE_NAME%%"
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_VARS_FILE_PATH   "%%TEST_SCRIPT_SHARED_DIR%%/test.vars"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_VARS_FILE_PATH   "%%TEST_SCRIPT_SHARED_DIR%%/current.vars"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH "%%TEST_SCRIPT_SHARED_DIR%%/%%TEST_SCRIPT_NEST_LVL_DIR_NAME%%.vars"
+
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP "%%TEST_SCRIPT_SHARED_DIR%%/test.tmp.vars"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_INIT_VARS_FILE_PATH     "%%TEST_SCRIPT_LOCAL_DIR%%/00-init.vars"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_TEST_VARS_FILE_PATH     "%%TEST_SCRIPT_LOCAL_DIR%%/01-test.vars"
@@ -187,8 +189,10 @@ set TESTLIB__CURRENT_TESTS=0
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 set "TESTLIB__BEGIN_TIME=%BEGIN_TIME%"
+set "TESTLIB__END_TIME="
+set "TESTLIB__TIME="
 
-call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
+call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" "" "%%TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH%%"
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_INIT_VARS_FILE_PATH%" >nul
 
 echo Running %?~nx0%...

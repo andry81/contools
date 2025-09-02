@@ -7,10 +7,15 @@ rem
 :DOC_END
 
 set "TEST_SCRIPT_LOCAL_VARS_FILE_PATH=%~1"
+set "TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH=%~2"
 
-if not exist "%TEST_SCRIPT_LOCAL_VARS_FILE_PATH%" exit /b 0
-
+if exist "%TEST_SCRIPT_LOCAL_VARS_FILE_PATH%" ^
 for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%TEST_SCRIPT_LOCAL_VARS_FILE_PATH%") do call :FILTER "%%i" && set "%%i=%%j"
+
+rem load testlib nested variables
+if exist "%TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH%" ^
+for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH%") do set "%%i=%%j"
+
 exit /b 0
 
 :FILTER

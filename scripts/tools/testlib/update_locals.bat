@@ -11,7 +11,7 @@ set "TEST_SCRIPT_LOCAL_VARS_FILE_PATH=%~1"
 shift
 
 rem must be assigned not to 65000 code page!
-call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
+if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
 if not exist "%TEST_SCRIPT_LOCAL_VARS_FILE_PATH%" type nul > "%TEST_SCRIPT_LOCAL_VARS_FILE_PATH%"
 

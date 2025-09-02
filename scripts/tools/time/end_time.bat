@@ -1,5 +1,6 @@
 @echo off
 
+set END_TIME=0
 set TIMEDIFF=0
 set TIME_INTS=0
 set TIME_FRACS=0
@@ -8,7 +9,9 @@ if not defined BEGIN_TIME exit /b 255
 
 setlocal
 
-call "%%~dp0timediff.bat" "%%BEGIN_TIME%%" "%%TIME%%"
+set "END_TIME=%TIME%"
+
+call "%%~dp0timediff.bat" "%%BEGIN_TIME%%" "%%END_TIME%%"
 
 set /A "TIME_DENOMINATOR=%~1"
 
@@ -24,6 +27,7 @@ if "%TIME_FRACS:~2,1%" == "" set "TIME_FRACS=0%TIME_FRACS%"
 
 (
   endlocal
+  set "END_TIME=%END_TIME%"
   set "TIMEDIFF=%TIMEDIFF%"
   set "TIME_INTS=%TIME_INTS%"
   set "TIME_FRACS=%TIME_FRACS%"
