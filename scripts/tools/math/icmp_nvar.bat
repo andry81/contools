@@ -27,7 +27,7 @@ for /F "tokens=* delims="eol^= %%i in ("!LN!") do for /F "tokens=* delims="eol^=
 for /F "usebackq tokens=* delims="eol^= %%l in ('"!LR!"') do for /F "usebackq tokens=* delims="eol^= %%r in ('"!RR!"') do endlocal ^
   & ( if "%%~l" == "" if "%%~r" == "" if "%%i" %~2 "%%j" ( exit /b 0 ) else exit /b 1 ) & ^
 set "LR=%%~l" & set "RR=%%~r" ^
-  & ( if defined LR set "LR=%%a%%~l" ) & ( if defined RR set "RR=%%b%%~r" ) ^
+  & ( if defined LR ( set "LR=%%a%%~l" ) else set "LR=0" ) & ( if defined RR ( set "RR=%%b%%~r" ) else set "RR=0" ) ^
   & ( if /i "%~2" == "EQU" if "%%i" EQU "%%j" ( call "%%~0" LR EQU RR & exit /b ) else exit /b 1 ) ^
   & ( if /i "%~2" == "NEQ" if "%%i" NEQ "%%j" ( exit /b 0 ) else call "%%~0" LR NEQ RR & exit /b ) ^
   & ( if /i "%~2" == "LSS" ( call "%%~0" LR LSS RR && exit /b 0 ) & ( call "%%~0" LR EQU RR && ( if "%%i" LSS "%%j" ( exit /b 0 ) else exit /b 1 ) || exit /b ) ) ^

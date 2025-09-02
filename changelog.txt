@@ -1,8 +1,11 @@
 2025.09.02:
+* fixed: scripts/tools/math/?cmp_*nvar.bat: execution fixup
+
+2025.09.02:
 * fixed: scripts: tools/testlib, tests/unit/bat: tests order number
 
 2025.09.02:
-* changed: scripts: tools/math/*cmp*.bat, tests/unit/bat/test_math/test_math__*_cmp: reverted to return negative exit code on undefined variable instead of treat it as `0`
+* changed: scripts: tools/math/?cmp*.bat, tests/unit/bat/test_math/test_math__*_cmp: reverted to return negative exit code on undefined variable instead of treat it as `0`
 
 2025.09.02:
 * changed: scripts/tools/testlib: code improvement, reduction and cleanup
@@ -13,7 +16,7 @@
 * new: scripts/tools/math/icmp_fnvar.bat: script to circumvent 32-bit signed comparison arithmetic limitation
 * new: scripts/tests/unit/bat/test_math/test_math__*_cmp: `icmp_fnvar` unit tests
 * new: scripts/tests/bench/bat/test_math/test_math__*_cmp.bat: `icmp_fnvar` bench tests
-* changed: scripts/tools/math/*cmp*.bat: code reduction
+* changed: scripts/tools/math/?cmp*.bat: code reduction
 * changed: scripts: tools/math/icmp*.bat, tests/unit/bat/test_math/test_math__*_cmp: removed `==` operator
 * refactor: scripts/tools/math/icmp*.bat: minor refactor
 
