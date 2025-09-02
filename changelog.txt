@@ -1,4 +1,7 @@
 2025.09.02:
+* changed: scripts/tools/testlib/.locals/nest.vars: save additionally a spent time for a nested call
+
+2025.09.02:
 * fixed: scripts/tools/testlib: time spent calculation
 * fixed: scripts/tools/testlib/update_locals.bat: missed a code page change skip
 
