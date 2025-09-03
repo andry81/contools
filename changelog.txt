@@ -1,3 +1,9 @@
+2025.09.03:
+* new: scripts/tools/math/sign.bat: script to return the sign of a value
+* new: scripts/tests/unit/bat/test_math/test_math__*_sign: `sign.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__*_sign.bat: `sign.bat` bench test
+* refactor: scripts/tools/math/icmp*.bat: minor refactor
+
 2025.09.02:
 * changed: scripts/tools/testlib/.locals/nest.vars: save additionally a spent time for a nested call
 
@@ -21,8 +27,8 @@
 * fixed: scripts/tools/math/icmp*.bat: comparison with signed zero
 * fixed: scripts/tests/unit/bat/test_math/test_math__*_cmp/test_math__*_ucmp_fnvar.bat: skip test cases with invalid or duplicated input
 * new: scripts/tools/math/icmp_fnvar.bat: script to circumvent 32-bit signed comparison arithmetic limitation
-* new: scripts/tests/unit/bat/test_math/test_math__*_cmp: `icmp_fnvar` unit tests
-* new: scripts/tests/bench/bat/test_math/test_math__*_cmp.bat: `icmp_fnvar` bench tests
+* new: scripts/tests/unit/bat/test_math/test_math__*_cmp: `icmp_fnvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__*_cmp.bat: `icmp_fnvar.bat` bench tests
 * changed: scripts/tools/math/?cmp*.bat: code reduction
 * changed: scripts: tools/math/icmp*.bat, tests/unit/bat/test_math/test_math__*_cmp: removed `==` operator
 * refactor: scripts/tools/math/icmp*.bat: minor refactor
@@ -45,8 +51,8 @@
 2025.09.01:
 * fixed: scripts/tools/math: iadd.bat: execution fixup
 * new: scripts/tools/math: icmp.bat, icmp_nvar.bat: script to circumvent 32-bit signed comparison arithmetic limitation
-* new: scripts/tests/unit/bat/test_math/test_math__*_cmp: `icmp.bat`, `icmp_nvar` unit tests
-* new: scripts/tests/bench/bat/test_math/test_math__*_cmp.bat: `icmp.bat`, `icmp_nvar` bench tests
+* new: scripts/tests/unit/bat/test_math/test_math__*_cmp: `icmp.bat`, `icmp_nvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__*_cmp.bat: `icmp.bat`, `icmp_nvar.bat` bench tests
 * changed: scripts/tools/math: ucmp*.bat: minor improvement
 * refactor: scripts/tools/math: *fold.bat, uadd.bat, umul.bat, udiv.bat, ucmp*.bat: minor improvement
 * refactor: scripts/tests: unit/bat/test_math, bench/bat/test_math: tests refactor

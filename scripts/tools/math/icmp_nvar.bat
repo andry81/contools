@@ -46,6 +46,18 @@ rem
 rem   Positive exit code indicates a false.
 rem   Zero exit code indicates a true.
 rem   Negative exit code indicates an error.
+rem
+rem   NOTE:
+rem     As long as a value may be undefined and a negative exit code is issued,
+rem     then to avoid continuation of execution you have to check the exit code
+rem     on a third state:
+rem
+rem       >
+rem       call icmp_nvar.bat UNDEFINED ...
+rem       if %ERRORLEVEL% LSS 0 goto ERROR
+rem
+rem     This will prevent to spread an invalid calculation because of an
+rem     undefined variable.
 
 rem <lvar>, <rvar>:
 rem   A variable name for a string value of an unfolded integer number.
