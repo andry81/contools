@@ -1,3 +1,6 @@
+2025.09.09:
+* new: scripts/tests/bench/bat/test__math/test__math__*_fold_vs_add: `fold*.bat` vs `?add*.bat` script bench tests
+
 2025.09.03:
 * new: scripts/tools/math/sign.bat: script to return the sign of a value
 * new: scripts/tests/unit/bat/test_math/test_math__*_sign: `sign.bat` unit tests
