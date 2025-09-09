@@ -10,7 +10,7 @@ endlocal & set "%~1=0,0,0,0,0,0" & if not "%~2" == "" if defined %~2 exit /b 0
 exit /b 0
 
 rem USAGE:
-rem   umul.bat <out-var> <var> <value>
+rem   umul.bat <out-var> <lvar> <rvalue>
 
 rem Description:
 rem   An unsigned integer number multiplication script to workaround the
@@ -24,7 +24,7 @@ rem     not use negative `-` nor positive `+` signs.
 
 rem <out-var>:
 rem   A variable name for a string value of completely folded integer number
-rem   as a multiplication result of <var> with <value>.
+rem   as a multiplication result of <lvar> with <rvalue>.
 rem
 rem   Format:
 rem     NNN,NNN,NNN,NNN,NNN,NNN
@@ -40,7 +40,7 @@ rem
 rem     999,999,999,999,999,999 is equivalent to 60-bit integer
 rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 
-rem <var>:
+rem <lvar>:
 rem   A variable name for a string value of a partially folded integer number.
 rem
 rem   Format:
@@ -58,8 +58,8 @@ rem   In that case the right sequence of `Bn` does evaluate the same way as the
 rem   left sequence of `An`, and the overflow result of the `Bn` does add up to
 rem   the `An` after the normalization of the `Bn`.
 rem
-rem   Then the `An` multiplies up with the <value> and normalizes to return the
-rem   self overflow out to the exit code.
+rem   Then the `An` multiplies up with the <rvalue> and normalizes to return
+rem   the self overflow out to the exit code.
 rem
 rem   NOTE:
 rem     The number can represent a value greater than 32-bit unsigned integer
@@ -68,7 +68,7 @@ rem
 rem     999,999,999,999,999,999 is equivalent to 60-bit integer
 rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 
-rem <value>:
+rem <rvalue>:
 rem   An unsigned integer number with the 32-bit range limitation.
 rem   Must be less than 2149634 for the `A6=999` excluding overflow in `Bn`.
 rem   And must be less than 2149634 for the rest `An=999` excluding overflow in

@@ -20,7 +20,7 @@ endlocal & set "%~1=0,0,0,0,0,0" & if not "%~2" == "" if defined %~2 exit /b 0
 exit /b 0
 
 rem USAGE:
-rem   udiv.bat <out-var> <var> <value>
+rem   udiv.bat <out-var> <lvar> <rvalue>
 
 rem Description:
 rem   An unsigned division script to workaround the `set /A` command 32-bit
@@ -35,7 +35,7 @@ rem     not use negative `-` nor positive `+` signs.
 
 rem <out-var>:
 rem   A variable name for a string value of completely folded integer number
-rem   as a division result of <var> with <value>.
+rem   as a division result of <lvar> with <rvalue>.
 rem
 rem   Format:
 rem     NNN,NNN,NNN,NNN,NNN,NNN
@@ -53,7 +53,7 @@ rem
 rem     999,999,999,999,999,999 is equivalent to 60-bit integer
 rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 
-rem <var>:
+rem <lvar>:
 rem   A variable name for a string value of a partially folded integer number.
 rem
 rem   Format:
@@ -71,7 +71,7 @@ rem   In that case the right sequence of `Bn` does evaluate the same way as the
 rem   left sequence of `An`, and the overflow result of the `Bn` does add up to
 rem   the `An` after the normalization of the `Bn`.
 rem
-rem   Then the `An` divides by the <value> and returns the remainder out to the
+rem   Then the `An` divides by the <rvalue> and returns the remainder out to the
 rem   exit code.
 rem
 rem   NOTE:
@@ -81,14 +81,14 @@ rem
 rem     999,999,999,999,999,999 is equivalent to 60-bit integer
 rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 
-rem <value>:
+rem <rvalue>:
 rem   An unsigned integer number with the 32-bit range limitation.
 rem   Must be less than 2147483648.
 rem   If not defined, then is 0 and triggers a division by zero error.
 rem
 rem   CAUTION:
-rem     The algorithm still can reach an underflow with a too big <value>, even
-rem     if it is less than 2147483648.
+rem     The algorithm still can reach an underflow with a too big <rvalue>,
+rem     even if it is less than 2147483648.
 rem     To avoid this case do decrease the divisor by at least 1000 times or
 rem     use the value less than 2147484. This will avoid an underflow
 rem     condition.

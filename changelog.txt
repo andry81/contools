@@ -1,4 +1,9 @@
 2025.09.09:
+* refactor: scripts/tools/math: ?add.bat, udiv.bat, umul.bat: minor refactor
+* refactor: scripts/tests/unit/bat/test_math: unit tests refactor
+* refactor: scripts/tests/bench/bat/test_math: bench tests refactor
+
+2025.09.09:
 * new: scripts/tests/bench/bat/test__math/test__math__*_fold_vs_add: `fold*.bat` vs `?add*.bat` script bench tests
 
 2025.09.03:

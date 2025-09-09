@@ -8,11 +8,11 @@ echo;^>%~nx0
 
 setlocal DISABLEDELAYEDEXPANSION
 
-set IN=999,999,999,999,999,999
+set L=999,999,999,999,999,999
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-for /L %%i in (1,1,100) do call "%%CONTOOLS_ROOT%%/math/uadd.bat" OUT IN 2147482648
+for /L %%i in (1,1,100) do call "%%CONTOOLS_ROOT%%/math/uadd.bat" OUT L 2147482648
 
 call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
 
