@@ -1,3 +1,6 @@
+2025.09.11:
+* changed: README.md: global remove of code metric references from all project pages
+
 2025.09.09:
 * refactor: scripts/tools/math: ?add.bat, udiv.bat, umul.bat: minor refactor
 * refactor: scripts/tests/unit/bat/test_math: unit tests refactor
