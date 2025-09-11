@@ -1,4 +1,7 @@
 2025.09.11:
+* new: README.md: `contools` discussion badge
+
+2025.09.11:
 * changed: README.md: `stackoverflow` badge and reference is replaced by `stackexchange`
 
 2025.09.11:
