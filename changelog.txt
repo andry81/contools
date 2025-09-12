@@ -1,3 +1,6 @@
+2025.09.12:
+* changed: scripts/tools/testlib: turn off calls to `chcp.com` if `SETUP_CP` or `CHCP` variables are not defined
+
 2025.09.11:
 * new: README.md: `contools` discussion badge
 

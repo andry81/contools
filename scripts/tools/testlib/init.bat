@@ -42,6 +42,9 @@ if not defined TESTLIB__CHCP_EXE  (
   exit /b 255
 ) >&2
 
+if not defined SETUP_CP goto SKIP_SETUP_CP
+if not defined CHCP goto SKIP_SETUP_CP
+
 call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
 rem previous code page before init
@@ -50,18 +53,20 @@ set "TESTLIB__PREV_CP=%TESTLIB__TEST_CP%"
 rem must be assigned not to 65000 code page!
 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
+:SKIP_SETUP_CP
+
 call :MAIN %%*
 set TEST_LAST_ERROR=%ERRORLEVEL%
 
 :EXIT_MAIN
 if %TESTLIB__TEST_SETUP%0 EQU 0 goto SKIP_UPDATE_CURRENT_CP
 
-call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
+if defined SETUP_CP if defined CHCP call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
 :SKIP_UPDATE_CURRENT_CP
 
 if %TEST_LAST_ERROR% NEQ 0 (
-  call "%%CONTOOLS_TESTLIB_ROOT%%/set_prev_cp.bat"
+  if defined SETUP_CP if defined CHCP call "%%CONTOOLS_TESTLIB_ROOT%%/set_prev_cp.bat"
 
   rem skip init finalization if the init is incomplete
   if not defined TESTLIB__INITING (
@@ -83,7 +88,7 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FI
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_INIT_VARS_FILE_PATH%" >nul
 
 rem restore outer code page
-call "%%CONTOOLS_TESTLIB_ROOT%%/set_outer_cp.bat"
+if defined SETUP_CP if defined CHCP call "%%CONTOOLS_TESTLIB_ROOT%%/set_outer_cp.bat"
 
 exit /b 0
 

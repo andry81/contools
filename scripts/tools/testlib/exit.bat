@@ -27,15 +27,23 @@ if not defined TESTLIB__CHCP_EXE (
 
 rem reread current code page for each test, before exit and after exit
 
+if not defined SETUP_CP goto SKIP_SETUP_CP
+if not defined CHCP goto SKIP_SETUP_CP
+
 call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
 rem must be assigned not to 65000 code page!
 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
+:SKIP_SETUP_CP
+
 call :MAIN %%*
 set TEST_LAST_ERROR=%ERRORLEVEL%
 
 if %TESTLIB__TEST_TEARDOWN_CALLED% EQU 0 goto SKIP_UPDATE_CURRENT_CP
+
+if not defined SETUP_CP goto SKIP_UPDATE_CURRENT_CP
+if not defined CHCP goto SKIP_UPDATE_CURRENT_CP
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
 
@@ -46,7 +54,7 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FI
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" >nul
 
 rem restore code page before init
-call "%%CONTOOLS_TESTLIB_ROOT%%/set_prev_cp.bat"
+if defined SETUP_CP if defined CHCP call "%%CONTOOLS_TESTLIB_ROOT%%/set_prev_cp.bat"
 
 exit /b %TEST_LAST_ERROR%
 
