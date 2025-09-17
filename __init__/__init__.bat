@@ -89,6 +89,11 @@ if %NO_GEN%0 EQU 0 (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%PROJECT_OUTPUT_ROOT%%" || exit /b
 )
 
+if defined CHCP if %CHCP% EQU 65000 (
+  echo;%~nx0: error: CHCP code page must not be 65000.
+  exit /b 255
+) >&2
+
 if %NO_CHCP%0 EQU 0 (
   if defined CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CHCP%%
 )
