@@ -1,4 +1,7 @@
 2025.09.18:
+* fixed: scripts/tests/unit/bat/test_math/test_math__03_add/.test_math__22_iadd_fnvar/report.bat inner variable set
+
+2025.09.18:
 * fixed: scripts/tools/math/?cmp_*.bat: inner variable set
 * new: scripts/tools/math/iadd_fnvar.bat: script to circumvent 32-bit signed addition arithmetic limitation
 * new: scripts/tests/unit/bat/test_math/test_math__*_iadd_fnvar.bat: `iadd_fnvar.bat` unit tests

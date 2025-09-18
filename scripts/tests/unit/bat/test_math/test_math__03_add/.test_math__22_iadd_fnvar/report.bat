@@ -3,15 +3,14 @@
 setlocal ENABLEDELAYEDEXPANSION
 
 if defined OUTVAR set "OUT=!%OUTVAR%!"
-if defined LVAR set "L_=!%LVAR%!"
-if defined RVAR set "R_=!%RVAR%!"
+for /F "usebackq tokens=* delims="eol^= %%a in ('"!%LVAR%!"') do ^
+for /F "usebackq tokens=* delims="eol^= %%b in ('"!%RVAR%!"') do ^
+set "L=%%~a" & ^
+set "R=%%~b"
 
 if not defined OUTVAR set "OUT=<undef>"
-if not defined LVAR set "L_=<undef>"
-if not defined RVAR set "R_=<undef>"
-
-set "L=!L_!"
-set "R=!R_!"
+if not defined LVAR set "L=<undef>"
+if not defined RVAR set "R=<undef>"
 
 if !TEST_LAST_ERROR! NEQ 0 (
   echo;FAILED: !TESTLIB__TEST_ORDER_NUMBER!: RETREF=`!RETREF!` RET=`!TEST_IMPL_ERROR!` OUTREF=`!OUTREF!` OUT=`!OUT!` L=`!L!` R=`!R!`
