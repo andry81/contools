@@ -1,4 +1,11 @@
 2025.09.18:
+* fixed: scripts/tools/math/?cmp_*.bat: inner variable set
+* new: scripts/tools/math/iadd_fnvar.bat: script to circumvent 32-bit signed addition arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__*_iadd_fnvar.bat: `iadd_fnvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__*_iadd_fnvar.bat: `iadd_fnvar.bat` bench test
+* refactor: scripts/tests: unit/bat/test_math, bench/bat/test_math: minor refactor
+
+2025.09.18:
 * changed: scripts/tools/testlib: turn off calls to `chcp.com` if `NO_CHCP` variable is defined and not zero
 * changed: __init__/__init__.bat, scripts/tests/unit/bat/test_std/.test_std__20_chcp/setup.bat: improvements
 * refactor: scripts/tools/testlib: minor refactor

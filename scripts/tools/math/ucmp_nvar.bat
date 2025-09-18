@@ -1,6 +1,7 @@
 @echo off & ( if "%~1" == "" exit /b -1 ) & ( if "%~2" == "" exit /b -1 ) & ( if "%~3" == "" exit /b -1 ) & ^
 setlocal DISABLEDELAYEDEXPANSION & setlocal ENABLEDELAYEDEXPANSION & ^
-set "L=!%~1!" & set "R=!%~3!" & ( if not defined L exit /b -1 ) & ( if not defined R exit /b -1 ) & ^
+for /F "usebackq tokens=* delims="eol^= %%a in ('"!%~1!"') do for /F "usebackq tokens=* delims="eol^= %%b in ('"!%~3!"') do ^
+set "L=%%~a" & set "R=%%~b" & ( if not defined L exit /b -1 ) & ( if not defined R exit /b -1 ) & ^
 set "L1=0" & set "L2=0" & set "L3=0" & set "L4=0" & set "L5=0" & set "L6=0" ^
   & ( if defined L set "L6=!L:~-3!" & set "L=!L:~0,-3!" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) ^
   & ( if defined L set "L5=!L:~-3!" & set "L=!L:~0,-3!" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) ^
