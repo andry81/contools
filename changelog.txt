@@ -1,3 +1,11 @@
+2025.09.20:
+* fixed: scripts: tools/math/umul.bat, tests/unit/bat/test_math/test_math__04_mul/test_math__11_umul.bat: fractional part remainder addition
+* new: scripts/tools/math/imul.bat: script to circumvent 32-bit signed multiplication arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__*_imul.bat: `imul.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__*_imul.bat: `imul.bat` bench test
+* changed: scripts/tools/math: ?add.bat, umul.bat, udiv.bat: code cleanup
+* refactor: scripts/tests/unit/bat/test_math: minor refactor
+
 2025.09.18:
 * fixed: scripts/tests/unit/bat/test_math/test_math__03_add/.test_math__22_iadd_fnvar/report.bat inner variable set
 

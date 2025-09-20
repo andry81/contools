@@ -1,13 +1,12 @@
-@echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & set "R=" & ^
+@echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!%~2!") do ^
-set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" & set "R=%~3" & ^
-set /A "L1*=R" & set /A "L2*=R" & set /A "L3*=R" & set /A "L4*=R" & set /A "L5*=R" & set /A "L6*=R" ^
-  & ( if defined F call "%%~0" F F "%%R%%" || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
+set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" & set "R=%~3" & set "FR=0" ^
+  & ( if defined F call "%%~0" F F "%%R%%" || call set /A "FR=%%ERRORLEVEL%%" ) & ^
+set /A "L1*=R" & set /A "L2*=R" & set /A "L3*=R" & set /A "L4*=R" & set /A "L5*=R" & set /A "L6=L6*R + FR" & ^
 set /A "L5+=L6 / 1000" & set /A "L6%%=1000" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" & ^
 set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "F=L1 / 1000" & set /A "L1%%=1000" & ^
 for /F "tokens=1,2,3,4,5,6,7 delims=," %%a in ("!L1!,!L2!,!L3!,!L4!,!L5!,!L6!,!F!") do endlocal & set "%~1=%%a,%%b,%%c,%%d,%%e,%%f" & exit /b %%g
-endlocal & set "%~1=0,0,0,0,0,0" & if not "%~2" == "" if defined %~2 exit /b 0
-exit /b 0
+endlocal & set "%~1=0,0,0,0,0,0" & exit /b 0
 
 rem USAGE:
 rem   umul.bat <out-var> <lvar> <rvalue>

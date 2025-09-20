@@ -1,4 +1,4 @@
-@echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & set "R=" & ^
+@echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!%~2!") do ^
 set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" & set "R=%~3" ^
   & ( if defined F call "%%~0" F F 0 || call set /A "L6+=%%ERRORLEVEL%%" ) & set /A "L6+=R" & ^
