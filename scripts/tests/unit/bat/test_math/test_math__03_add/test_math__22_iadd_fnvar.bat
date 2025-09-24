@@ -126,6 +126,15 @@ set RETREF=0
 call :TEST OUT "" R
 endlocal
 
+rem signed zero case
+for %%i in ("+0" "-0" "+0,0,0,0,0,0" "-0,0,0,0,0,0") do (
+  setlocal
+  set "L=%%~i"
+  set R=0
+  call :TEST_SWAP OUT L R
+  endlocal
+)
+
 for /L %%i in (1,1,27) do (
   setlocal
   call set "L=%%ZEROS:~0,%%i%%"

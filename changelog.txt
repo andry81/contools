@@ -1,3 +1,11 @@
+2025.09.24:
+* new: scripts/tools/math/idiv.bat: script to circumvent 32-bit signed division arithmetic limitation
+* new: scripts/tests/unit/bat/test_math/test_math__*_idiv.bat: `idiv.bat` unit tests
+* new: scripts/tests/bench/bat/test_math/test_math__*_idiv.bat: `idiv.bat` bench test
+* new: scripts/tests/bench/bat/test_math: test_math__*_iadd*.bat, test_math__*_imul.bat: signed zero test cases
+* changed: scripts/tools/math/udiv.bat: code cleanup
+* refactor: scripts/tools/math: iadd*.bat, udiv.bat: minor refactor
+
 2025.09.20:
 * fixed: scripts: tools/math/umul.bat, tests/unit/bat/test_math/test_math__04_mul/test_math__11_umul.bat: fractional part remainder addition
 * new: scripts/tools/math/imul.bat: script to circumvent 32-bit signed multiplication arithmetic limitation
