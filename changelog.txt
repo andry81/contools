@@ -1,7 +1,17 @@
+2025.09.25:
+* new: scripts/tools/math/ifoldpad6*.bat: scripts without an overflow, but for signed sequences longer than `N,N,N,N,N,N` with 0 padding
+* new: scripts/tools/math/iunfold.bat: a signed integer unfold script
+* new: scripts/tests/unit/bat/test_math: `ifoldpad6*.bat`, `iunfold.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `ifoldpad6*.bat`, `iunfold.bat` bench test
+* changed: scripts/tools/math: ufoldpad*.bat, uunfold.bat: minor improvement
+* refactor: scripts/tools/math: ufold*.bat, uunfold.bat: scripts rename for an unsigned integer
+* refactor: scripts/tools/math: ?add*.bat, idiv.bat, ?mul.bat: minor refactor
+* refactor: scripts/tests: unit/bat/test_math, bench/bat/test_math: minor refactor
+
 2025.09.24:
 * new: scripts/tools/math/idiv.bat: script to circumvent 32-bit signed division arithmetic limitation
-* new: scripts/tests/unit/bat/test_math/test_math__*_idiv.bat: `idiv.bat` unit tests
-* new: scripts/tests/bench/bat/test_math/test_math__*_idiv.bat: `idiv.bat` bench test
+* new: scripts/tests/unit/bat/test_math: `idiv.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `idiv.bat` bench test
 * new: scripts/tests/bench/bat/test_math: test_math__*_iadd*.bat, test_math__*_imul.bat: signed zero test cases
 * changed: scripts/tools/math/udiv.bat: code cleanup
 * refactor: scripts/tools/math: iadd*.bat, udiv.bat: minor refactor
@@ -9,8 +19,8 @@
 2025.09.20:
 * fixed: scripts: tools/math/umul.bat, tests/unit/bat/test_math/test_math__04_mul/test_math__11_umul.bat: fractional part remainder addition
 * new: scripts/tools/math/imul.bat: script to circumvent 32-bit signed multiplication arithmetic limitation
-* new: scripts/tests/unit/bat/test_math/test_math__*_imul.bat: `imul.bat` unit tests
-* new: scripts/tests/bench/bat/test_math/test_math__*_imul.bat: `imul.bat` bench test
+* new: scripts/tests/unit/bat/test_math: `imul.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `imul.bat` bench test
 * changed: scripts/tools/math: ?add.bat, umul.bat, udiv.bat: code cleanup
 * refactor: scripts/tests/unit/bat/test_math: minor refactor
 
@@ -20,8 +30,8 @@
 2025.09.18:
 * fixed: scripts/tools/math/?cmp_*.bat: inner variable set
 * new: scripts/tools/math/iadd_fnvar.bat: script to circumvent 32-bit signed addition arithmetic limitation
-* new: scripts/tests/unit/bat/test_math/test_math__*_iadd_fnvar.bat: `iadd_fnvar.bat` unit tests
-* new: scripts/tests/bench/bat/test_math/test_math__*_iadd_fnvar.bat: `iadd_fnvar.bat` bench test
+* new: scripts/tests/unit/bat/test_math: `iadd_fnvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `iadd_fnvar.bat` bench test
 * refactor: scripts/tests: unit/bat/test_math, bench/bat/test_math: minor refactor
 
 2025.09.18:

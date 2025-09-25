@@ -57,7 +57,7 @@ rem <lvar>, <rvar>:
 rem   A variable name for a string value of a partially folded integer number.
 rem
 rem   Format:
-rem     [-]NNN[,NNN[,NNN[,NNN[,NNN[,NNN[,...]]]]]]
+rem     [+|-]NNN[,NNN[,NNN[,NNN[,NNN[,NNN[,...]]]]]]
 rem     , where NNN must not begin by 0 except 0 or except sequence of zeroes.
 rem
 rem   Evaluates the sequence from the left to the right.
@@ -84,6 +84,7 @@ rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 rem Examples:
 rem
 rem   1. >
+rem      rem -1,002,003,000,000,000
 rem      set a=-1,2,3
 rem      iadd_fnvar.bat x a
 rem      rem ERRORLEVEL=0

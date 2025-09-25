@@ -184,6 +184,7 @@ rem NOTE: tests from the script documentation in the description
 rem Examples:
 rem
 rem   1. >
+rem      rem -1,002,003,000,000,000
 rem      set a=-1,2,3
 rem      iadd_fnvar.bat x a
 rem      rem ERRORLEVEL=0
