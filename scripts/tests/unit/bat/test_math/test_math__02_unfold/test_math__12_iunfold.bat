@@ -775,5 +775,7 @@ rem no code can be executed here, just in case
 exit /b
 
 :TEST
+set "IN_=%~2"
+if "%IN_:~-1%" == "," exit /b 0
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b

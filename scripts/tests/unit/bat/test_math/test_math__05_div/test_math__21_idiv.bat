@@ -868,5 +868,7 @@ rem no code can be executed here, just in case
 exit /b
 
 :TEST
+set "L_=%~2"
+if "%L_:~-1%" == "," exit /b 0
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b

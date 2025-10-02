@@ -934,10 +934,18 @@ rem no code can be executed here, just in case
 exit /b
 
 :TEST_SWAP
+set "L_=%~2"
+set "R_=%~3"
+if "%L_:~-1%" == "," exit /b 0
+if "%R_:~-1%" == "," exit /b 0
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %1 %3 %2
 exit /b
 
 :TEST
+set "L_=%~2"
+set "R_=%~3"
+if "%L_:~-1%" == "," exit /b 0
+if "%R_:~-1%" == "," exit /b 0
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b

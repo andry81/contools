@@ -1,3 +1,10 @@
+2025.10.02:
+* new: scripts/tools/math/inorm.bat: script to explicit normalize a folded integer number with a sign
+* new: scripts/tests/unit/bat/test_math: `inorm.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `inorm.bat` bench test
+* changed: scripts/tools/math, scripts/tests/unit/bat/test_math: minor improvement
+* refactor: scripts/tools/math, scripts/tests/unit/bat/test_math: minor refactor
+
 2025.09.25:
 * new: scripts/tools/math/ifoldpad6*.bat: scripts without an overflow, but for signed sequences longer than `N,N,N,N,N,N` with 0 padding
 * new: scripts/tools/math/iunfold.bat: a signed integer unfold script

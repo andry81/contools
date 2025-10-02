@@ -4,7 +4,7 @@ set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "
   & ( if defined L1 if "!L1:~0,1!" == "+" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "-" set "S=-" & set /A "L6=-L6" & if defined F set "F=-!F!" ) ^
   & ( if defined F call "%%~0" F F 0 || call set /A "L6+=%%ERRORLEVEL%%" ) & set /A "L6+=R" & ^
 set /A "L5=!S!L5 + L6 / 1000" & set /A "L6%%=1000" & set /A "L4=!S!L4 + L5 / 1000" & set /A "L5%%=1000" & set /A "L3=!S!L3 + L4 / 1000" & set /A "L4%%=1000" & ^
-set /A "L2=!S!L2 + L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "F=L1 / 1000" & set /A "L1%%=1000" & set "S=" ^
+set /A "L2=!S!L2 + L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "R=L1 / 1000" & set /A "L1%%=1000" & set "S=" ^
   & ( if !L1! LSS 0 ( set "S=-" ) else if !L1! GTR 0 set "S=+" ) ^
   & ( if not defined S if !L2! LSS 0 ( set "S=-" ) else if !L2! GTR 0 set "S=+" ) ^
   & ( if not defined S if !L3! LSS 0 ( set "S=-" ) else if !L3! GTR 0 set "S=+" ) ^
@@ -15,8 +15,8 @@ set /A "L2=!S!L2 + L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & se
   & ( if "!S!" == "+" if !L5! LSS 0 set /A "L5+=1000" & set /A "L4-=1" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" ) ^
   & ( if "!S!" == "+" if !L4! LSS 0 set /A "L4+=1000" & set /A "L3-=1" & set /A "L2+=L3 / 1000" & set /A "L3%%=1000" ) ^
   & ( if "!S!" == "+" if !L3! LSS 0 set /A "L3+=1000" & set /A "L2-=1" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" ) ^
-  & ( if "!S!" == "+" if !L2! LSS 0 set /A "L2+=1000" & set /A "L1-=1" & set /A "F+=L1 / 1000" & set /A "L1%%=1000" ) & ( if defined S set "S=!S:+=!" ) & ^
-for /F "tokens=1,2,3,4,5,6,7 delims=," %%a in ("!S!!L1:-=!,!L2:-=!,!L3:-=!,!L4:-=!,!L5:-=!,!L6:-=!,!F!") do endlocal & set "%~1=%%a,%%b,%%c,%%d,%%e,%%f" & exit /b %%g
+  & ( if "!S!" == "+" if !L2! LSS 0 set /A "L2+=1000" & set /A "L1-=1" & set /A "R+=L1 / 1000" & set /A "L1%%=1000" ) & ( if defined S set "S=!S:+=!" ) & ^
+for /F "tokens=1,* delims=," %%a in ("!R!,!S!!L1:-=!,!L2:-=!,!L3:-=!,!L4:-=!,!L5:-=!,!L6:-=!") do endlocal & set "%~1=%%b" & exit /b %%a
 endlocal & set "%~1=0,0,0,0,0,%~3" & call "%%~0" %%1 %%1 0 & if not "%~2" == "" if defined %~2 exit /b
 exit /b 0
 

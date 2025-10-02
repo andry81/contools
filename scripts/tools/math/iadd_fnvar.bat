@@ -11,7 +11,7 @@ set "R1=%%i" & set "R2=%%j" & set "R3=%%k" & set "R4=%%l" & set "R5=%%m" & set "
   & ( if defined F call "%%~dp0iadd.bat" F F 0 || call set /A "R6+=%%ERRORLEVEL%%" ) & ^
 set /A "L6+=R6" & set /A "L5=!LS!L5 + !RS!R5" & set /A "L4=!LS!L4 + !RS!R4" & set /A "L3=!LS!L3 + !RS!R3" & set /A "L2=!LS!L2 + !RS!R2" & set /A "L1+=R1" & ^
 set /A "L5+=L6 / 1000" & set /A "L6%%=1000" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" & ^
-set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "F=L1 / 1000" & set /A "L1%%=1000" & set "LS=" ^
+set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "R=L1 / 1000" & set /A "L1%%=1000" & set "LS=" ^
   & ( if !L1! LSS 0 ( set "LS=-" ) else if !L1! GTR 0 set "LS=+" ) ^
   & ( if not defined LS if !L2! LSS 0 ( set "LS=-" ) else if !L2! GTR 0 set "LS=+" ) ^
   & ( if not defined LS if !L3! LSS 0 ( set "LS=-" ) else if !L3! GTR 0 set "LS=+" ) ^
@@ -22,8 +22,8 @@ set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L
   & ( if "!LS!" == "+" if !L5! LSS 0 set /A "L5+=1000" & set /A "L4-=1" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" ) ^
   & ( if "!LS!" == "+" if !L4! LSS 0 set /A "L4+=1000" & set /A "L3-=1" & set /A "L2+=L3 / 1000" & set /A "L3%%=1000" ) ^
   & ( if "!LS!" == "+" if !L3! LSS 0 set /A "L3+=1000" & set /A "L2-=1" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" ) ^
-  & ( if "!LS!" == "+" if !L2! LSS 0 set /A "L2+=1000" & set /A "L1-=1" & set /A "F+=L1 / 1000" & set /A "L1%%=1000" ) & ( if defined LS set "LS=!LS:+=!" ) & ^
-for /F "tokens=1,2,3,4,5,6,7 delims=," %%a in ("!LS!!L1:-=!,!L2:-=!,!L3:-=!,!L4:-=!,!L5:-=!,!L6:-=!,!F!") do endlocal & set "%~1=%%a,%%b,%%c,%%d,%%e,%%f" & exit /b %%g
+  & ( if "!LS!" == "+" if !L2! LSS 0 set /A "L2+=1000" & set /A "L1-=1" & set /A "R+=L1 / 1000" & set /A "L1%%=1000" ) & ( if defined LS set "LS=!LS:+=!" ) & ^
+for /F "tokens=1,* delims=," %%a in ("!R!,!LS!!L1:-=!,!L2:-=!,!L3:-=!,!L4:-=!,!L5:-=!,!L6:-=!") do endlocal & set "%~1=%%b" & exit /b %%a
 exit /b 0
 
 rem USAGE:

@@ -12,7 +12,7 @@ set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L
   & ( if !R! NEQ 0 ( ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) & set "R=!R!!L5!" ) else set "R=!L5!" ) & set /A "L5=R / D" & set /A "R%%=D" ^
   & ( if !R! NEQ 0 ( ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & set "R=!R!!L6!" ) else set "R=!L6!" ) & set /A "L6=R / D" & set /A "R%%=D" ^
   & set /A "F=!S!1 * !DS!1" & set "S=" & ( if !F! LSS 0 set "S=-" & set /A "R=-R" ) & ( if "!L1!!L2!!L3!!L4!!L5!!L6!" == "000000" set "S=" ) & ^
-for /F "tokens=1,2,3,4,5,6,7 delims=," %%a in ("!S!!L1!,!L2!,!L3!,!L4!,!L5!,!L6!,!R!") do endlocal & set "%~1=%%a,%%b,%%c,%%d,%%e,%%f" & exit /b %%g
+for /F "tokens=1,* delims=," %%a in ("!R!,!S!!L1!,!L2!,!L3!,!L4!,!L5!,!L6!") do endlocal & set "%~1=%%b" & exit /b %%a
 endlocal & set "%~1=0,0,0,0,0,0" & exit /b 0
 
 rem USAGE:

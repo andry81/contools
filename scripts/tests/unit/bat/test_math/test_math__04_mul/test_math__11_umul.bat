@@ -103,6 +103,7 @@ rem NOTE: tests from the script documentation in the description
 rem Examples:
 rem
 rem   1. >
+rem      rem 1,002,003,000,000,000
 rem      set a=1,2,3
 rem      umul.bat b a
 rem      rem ERRORLEVEL=0
@@ -805,5 +806,7 @@ rem no code can be executed here, just in case
 exit /b
 
 :TEST
+set "L_=%~2"
+if "%L_:~-1%" == "," exit /b 0
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b
