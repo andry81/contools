@@ -40,3 +40,5 @@ once EMULE_ADAPTOR_BACKUP_DIR             ="%PROJECT_OUTPUT_ROOT%/emule/backup"
 once EMULE_LOG_DIR                        ="%LOCALAPPDATA%/eMule/logs"
 
 once EMULE_TEMP_DIR                       ="%USERPROFILE%/Downloads/eMule/Temp"
+
+once EMULE_BACKUP_LOGS_NOT_OLDER_DAYS     =45

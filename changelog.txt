@@ -1,3 +1,7 @@
+2025.10.03:
+* new: scripts/tools/ToolAdaptors/app/emule/_config/config.0.vars.in: `EMULE_BACKUP_LOGS_NOT_OLDER_DAYS` variable to store a value for the `backup logs not older than X days`
+* changed: scripts/tools/ToolAdaptors/app/emule/backup_logs.bat: use `robocopy` to always copy log files with `not older than X days` filter
+
 2025.10.02:
 * new: scripts/tools/math/inorm.bat: script to explicit normalize a folded integer number with a sign
 * new: scripts/tests/unit/bat/test_math: `inorm.bat` unit tests
