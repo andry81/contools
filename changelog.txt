@@ -1,4 +1,7 @@
 2025.10.06:
+* changed: scripts/tools/math/imul2x_fnvar.bat: switched to `unorm.bat` script as a bit faster
+
+2025.10.06:
 * new: scripts/tools/math/unorm.bat: script to explicit normalize a folded integer number without a sing
 * new: scripts/tests/unit/bat/test_math: `unorm.bat` unit tests
 * new: scripts/tests/bench/bat/test_math: `unorm.bat` bench test
