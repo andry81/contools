@@ -1,4 +1,9 @@
 2025.10.06:
+* new: scripts/tools/math/unorm.bat: script to explicit normalize a folded integer number without a sing
+* new: scripts/tests/unit/bat/test_math: `unorm.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `unorm.bat` bench test
+
+2025.10.06:
 * changed: scripts/tools/wmi/print_wmic_path_all_props.bat: minor improvement
 
 2025.10.06:
