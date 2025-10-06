@@ -1,4 +1,7 @@
 2025.10.06:
+* refactor: scripts/tools/math/?cmp_fnvar.bat: minor refactor
+
+2025.10.06:
 * changed: scripts/tools/math/imul2x_fnvar.bat: switched to `unorm.bat` script as a bit faster
 
 2025.10.06:

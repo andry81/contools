@@ -45,6 +45,9 @@ rem
 rem   NOTE:
 rem     The `unsigned` in case of an integer number prefix does mean you must
 rem     not use negative `-` nor positive `+` signs.
+rem
+rem   CAUTION:
+rem     The input values must be normalized, otherwise result is undefined.
 
 rem <lvar>, <rvar>:
 rem   A variable name for a string value of a partially folded integer number.

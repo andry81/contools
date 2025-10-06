@@ -60,6 +60,9 @@ rem       if %ERRORLEVEL% LSS 0 goto ERROR
 rem
 rem     This will prevent to spread an invalid calculation because of an
 rem     undefined variable.
+rem
+rem   CAUTION:
+rem     The input values must be normalized, otherwise result is undefined.
 
 rem <lvar>, <rvar>:
 rem   A variable name for a string value of a partially folded integer number.
