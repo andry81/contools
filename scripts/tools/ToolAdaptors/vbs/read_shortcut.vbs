@@ -42,12 +42,107 @@
 ''' NOTE:
 '''   See more details and examples in the `make_shortcut.vbs` script.
 
+''' CAUTION:
+'''   Windows Scripting Host version 5.8 (Windows 7, 8, 8.1) has an issue
+'''   around a conditional expression:
+'''     `If Expr1 Or Expr2 ...`
+'''   , where `Expr2` does execute even if `Expr1` is `True`.
+'''
+'''   Additionally, there is another issue, when the `Expr2` can trigger the
+'''   corruption of following code.
+'''
+'''   The case is found in the `Expr2` expression, where a function does write
+'''   into it's input parameter.
+'''
+'''   To workaround that we must declare a temporary parameter in the function
+'''   of the `Expr2` and write into a temporary variable instead of an input
+'''   parameter.
+'''
+'''   Example of potentially corrupted code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       MyVar1 = ... ' write into input parameter triggers the issue
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' code here is potentially corrupted
+'''     End If
+'''
+'''   Example of workarounded code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       Dim TempVar1 : TempVar1 = MyVar1
+'''       TempVar1 = ... ' write into temporary parameter instead
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' workarounded
+'''     End If
+'''
+'''   Another workaround is to split the `Or` expression in a single `If` by a
+'''   sequence of `If`/`ElseIf` conditions.
+'''
+
+Dim ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext
+
+Function CopyError()
+  ErrNumber = Err.Number
+  ErrSource = Err.Source
+  ErrDesc = Err.Description
+  ErrHelpFile = Err.HelpFile
+  ErrHelpContext = Err.HelpContext
+End Function
+
+Function HasProperty(ObjName, PropertyName)
+  On Error Resume Next
+  Eval(ObjName & "." & PropertyName)
+  If err = 0 Then
+    HasProperty = True
+    On Error Goto 0
+  ElseIf err = 424 Then ' Object required
+    HasProperty = False
+    On Error Goto 0
+  Else
+    CopyError()
+    On Error Goto 0
+    err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext ' rethrow
+  End If
+End Function
+
+Function GetProperty(ObjName, PropertyName)
+  On Error Resume Next
+  GetProperty = Eval(ObjName & "." & PropertyName)
+  If err = 0 Then
+    On Error Goto 0
+  ElseIf err = 424 Then ' Object required
+    On Error Goto 0
+  Else
+    CopyError()
+    On Error Goto 0
+    err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext ' rethrow
+  End If
+End Function
+
+Function GetObjectProperty(ObjName, PropertyName)
+  On Error Resume Next
+  Set GetObjectProperty = Eval(ObjName & "." & PropertyName)
+  If err = 0 Then
+    On Error Goto 0
+  ElseIf err = 424 Then ' Object required
+    On Error Goto 0
+  Else
+    CopyError()
+    On Error Goto 0
+    err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext ' rethrow
+  End If
+End Function
+
 Function IsNothing(obj)
   If IsEmpty(obj) Then
     IsNothing = True
     Exit Function
   End If
-  If obj Is Nothing Then
+  If obj Is Nothing Then ' TypeName(obj) = "Nothing"
     IsNothing = True
   Else
     IsNothing = False
@@ -137,6 +232,110 @@ Sub PrintOrEchoErrorLine(str)
   On Error Goto 0
 End Sub
 
+Function GetFile(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    Set GetFile = objFS.GetFile("\\?\" & PathAbs)
+  Else
+    Set GetFile = objFS.GetFile(PathAbs)
+  End If
+End Function
+
+'Function GetFolder(PathAbs)
+'  ' WORKAROUND:
+'  '   We use `\\?\` to bypass `GetFolder` error: `Path not found`.
+'  If Not Left(PathAbs, 4) = "\\?\" Then
+'    Set GetFolder = objFS.GetFolder("\\?\" & PathAbs & "\")
+'  Else
+'    Set GetFolder = objFS.GetFolder(PathAbs)
+'  End If
+'End Function
+
+Function FileExists(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `FileExists` error: `File not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    FileExists = objFS.FileExists("\\?\" & PathAbs)
+  Else
+    FileExists = objFS.FileExists(PathAbs)
+  End If
+End Function
+
+'Function FolderExists(PathAbs)
+'  ' WORKAROUND:
+'  '   We use `\\?\` to bypass `FolderExists` error: `Path not found`.
+'  If Not Left(PathAbs, 4) = "\\?\" Then
+'    FolderExists = objFS.FolderExists("\\?\" & PathAbs & "\")
+'  Else
+'    FolderExists = objFS.FolderExists(PathAbs)
+'  End If
+'End Function
+
+Function FileExistsNoPrefix(PathAbs)
+  If Left(PathAbs, 4) = "\\?\" Then
+    FileExistsNoPrefix = objFS.FileExists(Mid(PathAbs, 5))
+  Else
+    FileExistsNoPrefix = objFS.FileExists(PathAbs)
+  End If
+End Function
+
+'Function FolderExistsNoPrefix(PathAbs)
+'  If Left(PathAbs, 4) = "\\?\" Then
+'    FolderExistsNoPrefix = objFS.FolderExists(Mid(PathAbs, 5))
+'  Else
+'    FolderExistsNoPrefix = objFS.FolderExists(PathAbs)
+'  End If
+'End Function
+
+' Detects Win32 Namespace object path.
+Function IsWin32NamespaceObjectPath(PathAbs)
+  ' NOTE: does not check the drive letter
+  If Left(PathAbs, 4) = "\\?\" Then
+    If Mid(PathAbs, 6, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 7, 1), vbTextCompare) Then
+      IsWin32NamespaceObjectPath = False
+    Else
+      IsWin32NamespaceObjectPath = True
+    End If
+  ElseIf Mid(PathAbs, 2, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 3, 1), vbTextCompare) Then
+    IsWin32NamespaceObjectPath = False
+  ElseIf InStr(1, PathAbs, ":", vbTextCompare) Or InStr(1, PathAbs, "?", vbTextCompare) Or InStr(1, PathAbs, "*", vbTextCompare) Then
+    IsWin32NamespaceObjectPath = True
+  Else
+    IsWin32NamespaceObjectPath = False
+  End If
+End Function
+
+Function RemoveWin32NamespacePathPrefix(PathAbs)
+  ' CAUTION:
+  '   Avoid to remove path prefixes started by `\\`:
+  '     * UNC: \\domain...
+  '     * Volume: \\?\Volume{...
+  '
+  If Left(PathAbs, 4) = "\\?\" And Mid(PathAbs, 6, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 7, 1), vbTextCompare) Then
+    RemoveWin32NamespacePathPrefix = Mid(PathAbs, 5)
+  Else
+    RemoveWin32NamespacePathPrefix = PathAbs
+  End If
+End Function
+
+Function GetParentFolderName(PathAbs)
+  If IsWin32NamespaceObjectPath(PathAbs) Then
+    Dim ParentPathAbs : ParentPathAbs = objFS.GetParentFolderName(PathAbs)
+    If Len(ParentPathAbs) > 0 Then
+      If Left(ParentPathAbs, 4) <> "\\?\" Then
+        GetParentFolderName = "\\?\" & ParentPathAbs ' restores `\\?\` prefix
+      Else
+        GetParentFolderName = ParentPathAbs
+      End If
+    Else
+      GetParentFolderName = PathAbs ' parent of an object string root is the object string root
+    End If
+  Else
+    GetParentFolderName = objFS.GetParentFolderName(PathAbs) ' can be empty
+  End If
+End Function
+
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
@@ -210,11 +409,11 @@ ReDim Preserve cmd_args(j - 1)
 ' MsgBox Join(cmd_args, " ")
 
 If IsEmptyArg(cmd_args, 0) Then
-  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> is empty."
   WScript.Quit 255
 End If
 
-' functions
+' additional functions
 
 Function GetShortcut(ShortcutFilePathToOpen)
   If Not UseGetLink Then
@@ -225,19 +424,27 @@ Function GetShortcut(ShortcutFilePathToOpen)
     Set GetShortcut = objShell.CreateShortcut(ShortcutFilePathToOpen)
   Else
     Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
-    Dim ShortcutParentPath : ShortcutParentPath = objFS.GetParentFolderName(ShortcutFilePathToOpen)
+    Dim ShortcutParentPath : ShortcutParentPath = GetParentFolderName(ShortcutFilePathToOpen)
     Dim objNamespace, objFile
     If Len(ShortcutParentPath) > 0 Then
       Set objNamespace = objShellApp.Namespace(ShortcutParentPath)
-      Set objFile = objNamespace.ParseName(objFS.GetFileName(ShortcutFilePathToOpen))
+      If Not IsNothing(objNamespace) Then
+        Set objFile = objNamespace.ParseName(objFS.GetFileName(ShortcutFilePathToOpen))
+      End If
     Else
       Set objNamespace = objShellApp.Namespace(ShortcutFilePathToOpen)
-      Set objFile = objNamespace.Self
+      If Not IsNothing(objNamespace) Then
+        If HasProperty("objNamespace", "Self") Then
+          Set objFile = objNamespace.Self
+        Else
+          objFile = GetObjectProperty("objNamespace", "Items().Item()")
+        End If
+      End If
     End if
 
     If IsNothing(objFile) Then
       PrintOrEchoErrorLine _
-        WScript.ScriptName & ": error: path is not parsed." & vbCrLf & _
+        WScript.ScriptName & ": error: <Path> is not parsed." & vbCrLf & _
         WScript.ScriptName & ": info: Path=`" & ShortcutFilePathToOpen & "`"
       WScript.Quit 128
     End If
@@ -246,7 +453,7 @@ Function GetShortcut(ShortcutFilePathToOpen)
       Set GetShortcut = objFile.GetLink
     Else
       PrintOrEchoErrorLine _
-        WScript.ScriptName & ": error: file is not a shortcut." & vbCrLf & _
+        WScript.ScriptName & ": error: <Path> is not a shortcut." & vbCrLf & _
         WScript.ScriptName & ": info: Path=`" & ShortcutFilePathToOpen & "`"
       WScript.Quit 129
     End If
@@ -297,34 +504,38 @@ Dim ShortcutFilePath : ShortcutFilePath = cmd_args(0)
 
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
-Dim ShortcutFilePathAbs : ShortcutFilePathAbs = objFS.GetAbsolutePathName(ShortcutFilePath) ' CAUTION: can alter a path character case if path exists
+Dim IsObjPath : IsObjPath = IsWin32NamespaceObjectPath(ShortcutFilePath)
 
-' remove `\\?\` prefix
-If Left(ShortcutFilePathAbs, 4) = "\\?\" Then
-  ShortcutFilePathAbs = Mid(ShortcutFilePathAbs, 5)
+If IsObjPath Then
+  PrintOrEchoErrorLine _
+    WScript.ScriptName & ": error: <Path> is not valid:" & vbCrLf & _
+    WScript.ScriptName & ": info: Path=`" & ShortcutFilePath & "`"
+  WScript.Quit 10
 End If
 
+Dim ShortcutFilePathAbs : ShortcutFilePathAbs = objFS.GetAbsolutePathName(ShortcutFilePath) ' CAUTION: can alter a path character case if path exists
+
+ShortcutFilePathAbs = RemoveWin32NamespacePathPrefix(ShortcutFilePathAbs)
+
 ' test on path existence including long path
-Dim IsShortcutFileExist : IsShortcutFileExist = objFS.FileExists("\\?\" & ShortcutFilePathAbs)
+Dim IsShortcutFileExist : IsShortcutFileExist = FileExists(ShortcutFilePathAbs)
 If Not IsShortcutFileExist Then
   PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: shortcut file does not exist:" & vbCrLf & _
-    WScript.ScriptName & ": info: ShortcutFilePath=`" & ShortcutFilePathAbs & "`"
-  WScript.Quit 10
+    WScript.ScriptName & ": error: <Path> does not exist:" & vbCrLf & _
+    WScript.ScriptName & ": info: Path=`" & ShortcutFilePathAbs & "`"
+  WScript.Quit 11
 End If
 
 Dim ShortcutFilePathToOpen
 
 ' test on long path existence
-If objFS.FileExists(ShortcutFilePathAbs) Then
+If FileExistsNoPrefix(ShortcutFilePathAbs) Then
   ' is not long path
   ShortcutFilePathToOpen = ShortcutFilePathAbs
 Else
   ' translate into short path
 
-  ' WORKAROUND:
-  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
-  Dim ShortcutFile : Set ShortcutFile = objFS.GetFile("\\?\" & ShortcutFilePathAbs)
+  Dim ShortcutFile : Set ShortcutFile = GetFile(ShortcutFilePathAbs)
   Dim ShortcutFileShortPath : ShortcutFileShortPath = ShortcutFile.ShortPath
   If Left(ShortcutFileShortPath, 4) = "\\?\" Then
     ShortcutFileShortPath = Mid(ShortcutFileShortPath, 5)

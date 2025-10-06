@@ -9,6 +9,47 @@
 ''' CAUTION:
 '''   The script process must be a 32-bit process to create `jcb.tools` object.
 
+''' CAUTION:
+'''   Windows Scripting Host version 5.8 (Windows 7, 8, 8.1) has an issue
+'''   around a conditional expression:
+'''     `If Expr1 Or Expr2 ...`
+'''   , where `Expr2` does execute even if `Expr1` is `True`.
+'''
+'''   Additionally, there is another issue, when the `Expr2` can trigger the
+'''   corruption of following code.
+'''
+'''   The case is found in the `Expr2` expression, where a function does write
+'''   into it's input parameter.
+'''
+'''   To workaround that we must declare a temporary parameter in the function
+'''   of the `Expr2` and write into a temporary variable instead of an input
+'''   parameter.
+'''
+'''   Example of potentially corrupted code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       MyVar1 = ... ' write into input parameter triggers the issue
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' code here is potentially corrupted
+'''     End If
+'''
+'''   Example of workarounded code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       Dim TempVar1 : TempVar1 = MyVar1
+'''       TempVar1 = ... ' write into temporary parameter instead
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' workarounded
+'''     End If
+'''
+'''   Another workaround is to split the `Or` expression in a single `If` by a
+'''   sequence of `If`/`ElseIf` conditions.
+'''
+
 '' The privileges request example though the WMI.
 ''
 '' CAUTION:
@@ -210,7 +251,7 @@ If hFile <> INVLID_HANDLE_VALUE Then
     End If
 
     PrintOrEchoLine FileShortPath
-  ElseIf IsFolderExist Then ' just in case
+  ElseIf IsFolderExist Then
     ' WORKAROUND:
     '   We use `\\?\` to bypass `GetFolder` error: `Path not found`.
     Dim Folder : Set Folder = objFS.GetFolder("\\?\" & PathAbs & "\")

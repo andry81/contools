@@ -1,4 +1,4 @@
-''' Read a path property values.
+''' Reads property values from a path.
 
 ''' USAGE:
 '''   read_path_props.vbs
@@ -7,7 +7,7 @@
 '''     [-val-null | -vnull]
 '''     [-val-notempty | -n]
 '''     [-use-extprop | -x]
-'''     [-i[gnore-unexist]]
+'''     [-obj] [-i[gnore-unexist]]
 '''     [-u[rl-encode]]
 '''     [-line-return | -lr]
 '''     [--]
@@ -44,10 +44,14 @@
 '''     Use `ExtendedProperty` method (O(1)) instead of enumeration with
 '''     `GetDetailsOf` (O(N)).
 '''
+'''   -obj
+'''     Handles <Path> as an object string. See <Path> description for details.
+'''
 '''   -i[gnore-unexist]
 '''     Ignores unexisted path.
 '''     Useful in case of an unlinked or unresolved path with partial property
 '''     list.
+'''     Has no effect if `-obj` flag is used.
 '''
 '''   -u[rl-encode]
 '''     URL encode property value characters in form of `%NN` in case if
@@ -58,16 +62,78 @@
 '''
 '''   -line-return | -lr
 '''     Return on first line print.
-'''     Useful to skip iteration over property list.
+'''     Useful to skip iteration over property list or return the first
+'''     globbing partial match.
 '''
 '''   <PropertyPattern>
 '''     List of property names or property indexes to read, separated by `|`
 '''     character.
+'''
+'''     Can contain these globbing characters for a string partial matching:
+'''       ?*<>
+'''
 '''     Property indexes has effect only when `-use-extprop` flag is not used
-'''     (`ExtendedProperty` method).
+'''     (`ExtendedProperty` method) and has no globbing characters.
+'''     The globbing characters has no effect if `-use-extprop` flag is used.
+'''
+'''     NOTE:
+'''       Internally globbing characters does convert into RegExp characters
+'''       (case sensitive) using this translation list:
+'''         `>` as not the last character does escape the next character.
+'''         `<<` as the first characters -> `^`
+'''         `<<` as the last characters -> `$`
+'''         `*?` -> `.*?` (lazy)
+'''         `?*` -> `.+?` (lazy)
+'''         `?<` -> `\w+`
+'''         `<` -> `\b`
+'''         `?` -> `.`
+'''         `*` -> `.*` (greedy)
+'''         `>` as the last character -> `\b`
+'''
+'''       Examples:
+'''         In `a`:
+'''           `a*`  matches `a`
+'''           `a*?` matches `a`
+'''           `a?*` matches ``
+'''           `a?<` matches ``
+'''         In `ab`:
+'''           `a*`  matches `ab`
+'''           `a*?` matches `a`
+'''           `a?*` matches `ab`
+'''           `a?<` matches `ab`
+'''         In `abc`:
+'''           `a*`  matches `abc`
+'''           `a*?` matches `a`
+'''           `a?*` matches `ab`
+'''           `a?<` matches `abc`
+'''         In `a ab abc`:
+'''           `a*`  matches `a ab abc`
+'''           `a*?` matches `a`
+'''           `a?*` matches `a`
+'''           `a?<` matches `ab`
+'''
+'''     NOTE:
+'''       If the pattern contains a property index number together with a
+'''       globbing character, then it does treated as a property name instead
+'''       of a property index number.
+'''
+'''     NOTE:
+'''       In case of globbing characters the matching does multiple times.
+'''       Use `-line-return` flag to return the first globbing partial match.
 '''
 '''   <Path>
 '''     Path to read.
+'''     The script tries to use the path as a file system path if:
+'''       * Has no `?`, `*`, `<`, `>`, `|`, `"` characters AND:
+'''       * Has `\\?\X:[\/]` prefix OR.
+'''       * Has `X:[\/]` prefix OR.
+'''       * Has no `:` character and `[\/]` prefix.
+'''     Otherwise does used as an object string and path function calls are
+'''     avoided. Use `-obj` flag to explicitly handle it as an object string.
+'''     NOTE:
+'''       The `?`, `*`, `<` and `>` characters does used only to fast detect an
+'''       object string and is not supposed to avoid path function calls in all
+'''       cases.
 
 ''' Error codes:
 '''   255 - unspecified error
@@ -98,12 +164,107 @@
 '''      >
 '''      cscript //nologo read_path_props.vbs -x "{F29F85E0-4FF9-1068-AB91-08002B27B3D9} 2|{F29F85E0-4FF9-1068-AB91-08002B27B3D9} 8" "c:\Windows\System32\MSDRM\MsoIrmProtector.doc"
 
+''' CAUTION:
+'''   Windows Scripting Host version 5.8 (Windows 7, 8, 8.1) has an issue
+'''   around a conditional expression:
+'''     `If Expr1 Or Expr2 ...`
+'''   , where `Expr2` does execute even if `Expr1` is `True`.
+'''
+'''   Additionally, there is another issue, when the `Expr2` can trigger the
+'''   corruption of following code.
+'''
+'''   The case is found in the `Expr2` expression, where a function does write
+'''   into it's input parameter.
+'''
+'''   To workaround that we must declare a temporary parameter in the function
+'''   of the `Expr2` and write into a temporary variable instead of an input
+'''   parameter.
+'''
+'''   Example of potentially corrupted code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       MyVar1 = ... ' write into input parameter triggers the issue
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' code here is potentially corrupted
+'''     End If
+'''
+'''   Example of workarounded code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       Dim TempVar1 : TempVar1 = MyVar1
+'''       TempVar1 = ... ' write into temporary parameter instead
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' workarounded
+'''     End If
+'''
+'''   Another workaround is to split the `Or` expression in a single `If` by a
+'''   sequence of `If`/`ElseIf` conditions.
+'''
+
+Dim ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext
+
+Function CopyError()
+  ErrNumber = Err.Number
+  ErrSource = Err.Source
+  ErrDesc = Err.Description
+  ErrHelpFile = Err.HelpFile
+  ErrHelpContext = Err.HelpContext
+End Function
+
+Function HasProperty(ObjName, PropertyName)
+  On Error Resume Next
+  Eval(ObjName & "." & PropertyName)
+  If err = 0 Then
+    HasProperty = True
+    On Error Goto 0
+  ElseIf err = 424 Then ' Object required
+    HasProperty = False
+    On Error Goto 0
+  Else
+    CopyError()
+    On Error Goto 0
+    err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext ' rethrow
+  End If
+End Function
+
+Function GetProperty(ObjName, PropertyName)
+  On Error Resume Next
+  GetProperty = Eval(ObjName & "." & PropertyName)
+  If err = 0 Then
+    On Error Goto 0
+  ElseIf err = 424 Then ' Object required
+    On Error Goto 0
+  Else
+    CopyError()
+    On Error Goto 0
+    err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext ' rethrow
+  End If
+End Function
+
+Function GetObjectProperty(ObjName, PropertyName)
+  On Error Resume Next
+  Set GetObjectProperty = Eval(ObjName & "." & PropertyName)
+  If err = 0 Then
+    On Error Goto 0
+  ElseIf err = 424 Then ' Object required
+    On Error Goto 0
+  Else
+    CopyError()
+    On Error Goto 0
+    err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext ' rethrow
+  End If
+End Function
+
 Function IsNothing(obj)
   If IsEmpty(obj) Then
     IsNothing = True
     Exit Function
   End If
-  If obj Is Nothing Then
+  If obj Is Nothing Then ' TypeName(obj) = "Nothing"
     IsNothing = True
   Else
     IsNothing = False
@@ -193,6 +354,110 @@ Sub PrintOrEchoErrorLine(str)
   On Error Goto 0
 End Sub
 
+Function GetFile(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    Set GetFile = objFS.GetFile("\\?\" & PathAbs)
+  Else
+    Set GetFile = objFS.GetFile(PathAbs)
+  End If
+End Function
+
+Function GetFolder(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFolder` error: `Path not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    Set GetFolder = objFS.GetFolder("\\?\" & PathAbs & "\")
+  Else
+    Set GetFolder = objFS.GetFolder(PathAbs)
+  End If
+End Function
+
+Function FileExists(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `FileExists` error: `File not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    FileExists = objFS.FileExists("\\?\" & PathAbs)
+  Else
+    FileExists = objFS.FileExists(PathAbs)
+  End If
+End Function
+
+Function FolderExists(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `FolderExists` error: `Path not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    FolderExists = objFS.FolderExists("\\?\" & PathAbs & "\")
+  Else
+    FolderExists = objFS.FolderExists(PathAbs)
+  End If
+End Function
+
+Function FileExistsNoPrefix(PathAbs)
+  If Left(PathAbs, 4) = "\\?\" Then
+    FileExistsNoPrefix = objFS.FileExists(Mid(PathAbs, 5))
+  Else
+    FileExistsNoPrefix = objFS.FileExists(PathAbs)
+  End If
+End Function
+
+Function FolderExistsNoPrefix(PathAbs)
+  If Left(PathAbs, 4) = "\\?\" Then
+    FolderExistsNoPrefix = objFS.FolderExists(Mid(PathAbs, 5))
+  Else
+    FolderExistsNoPrefix = objFS.FolderExists(PathAbs)
+  End If
+End Function
+
+' Detects Win32 Namespace object path.
+Function IsWin32NamespaceObjectPath(PathAbs)
+  ' NOTE: does not check the drive letter
+  If Left(PathAbs, 4) = "\\?\" Then
+    If Mid(PathAbs, 6, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 7, 1), vbTextCompare) Then
+      IsWin32NamespaceObjectPath = False
+    Else
+      IsWin32NamespaceObjectPath = True
+    End If
+  ElseIf Mid(PathAbs, 2, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 3, 1), vbTextCompare) Then
+    IsWin32NamespaceObjectPath = False
+  ElseIf InStr(1, PathAbs, ":", vbTextCompare) Or InStr(1, PathAbs, "?", vbTextCompare) Or InStr(1, PathAbs, "*", vbTextCompare) Then
+    IsWin32NamespaceObjectPath = True
+  Else
+    IsWin32NamespaceObjectPath = False
+  End If
+End Function
+
+Function RemoveWin32NamespacePathPrefix(PathAbs)
+  ' CAUTION:
+  '   Avoid to remove path prefixes started by `\\`:
+  '     * UNC: \\domain...
+  '     * Volume: \\?\Volume{...
+  '
+  If Left(PathAbs, 4) = "\\?\" And Mid(PathAbs, 6, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 7, 1), vbTextCompare) Then
+    RemoveWin32NamespacePathPrefix = Mid(PathAbs, 5)
+  Else
+    RemoveWin32NamespacePathPrefix = PathAbs
+  End If
+End Function
+
+Function GetParentFolderName(PathAbs)
+  If IsWin32NamespaceObjectPath(PathAbs) Then
+    Dim ParentPathAbs : ParentPathAbs = objFS.GetParentFolderName(PathAbs)
+    If Len(ParentPathAbs) > 0 Then
+      If Left(ParentPathAbs, 4) <> "\\?\" Then
+        GetParentFolderName = "\\?\" & ParentPathAbs ' restores `\\?\` prefix
+      Else
+        GetParentFolderName = ParentPathAbs
+      End If
+    Else
+      GetParentFolderName = PathAbs ' parent of an object string root is the object string root
+    End If
+  Else
+    GetParentFolderName = objFS.GetParentFolderName(PathAbs) ' can be empty
+  End If
+End Function
+
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
@@ -202,6 +467,7 @@ Dim PrintDecorValueOnly : PrintDecorValueOnly = False
 Dim PrintValueNull : PrintValueNull = False
 Dim PrintValueNotEmptyOnly : PrintValueNotEmptyOnly = False
 Dim UseExtendedProperty : UseExtendedProperty = False
+Dim IsObjPath: IsObjPath = False
 Dim IgnoreUnexist : IgnoreUnexist = False
 Dim UrlEncode : UrlEncode = False
 Dim LineReturn : LineReturn = False
@@ -227,6 +493,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         PrintValueNotEmptyOnly = True
       ElseIf arg = "-use-extprop" Or arg = "-x" Then
         UseExtendedProperty = True
+      ElseIf arg = "-obj" Then
+        IsObjPath = True
       ElseIf arg = "-ignore-unexist" Or arg = "-i" Then
         IgnoreUnexist = True
       ElseIf arg = "-url-encode" Or arg = "-u" Then
@@ -256,12 +524,12 @@ ReDim Preserve cmd_args(j - 1)
 ' MsgBox Join(cmd_args, " ")
 
 If IsEmptyArg(cmd_args, 0) Then
-  PrintOrEchoErrorLine WScript.ScriptName & ": error: <PropertyPattern> argument is not defined."
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <PropertyPattern> is empty."
   WScript.Quit 2
 End If
 
 If IsEmptyArg(cmd_args, 1) Then
-  PrintOrEchoErrorLine WScript.ScriptName & ": error: <Path> argument is not defined."
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <Path> is empty."
   WScript.Quit 1
 End If
 
@@ -270,48 +538,52 @@ Dim Path : Path = cmd_args(1)
 
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
-Dim PathAbs : PathAbs = objFS.GetAbsolutePathName(Path) ' CAUTION: can alter a path character case if path exists
-
-' remove `\\?\` prefix
-If Left(PathAbs, 4) = "\\?\" Then
-  PathAbs = Mid(PathAbs, 5)
+If Not IsObjPath Then
+  IsObjPath = IsWin32NamespaceObjectPath(Path)
 End If
 
-' test on path existence including long path
-Dim IsFileExist : IsFileExist = objFS.FileExists("\\?\" & PathAbs)
+Dim PathAbs
+Dim IsFileExist
 Dim IsFolderExist : IsFolderExist = False
-If Not IsFileExist Then
-  IsFolderExist = objFS.FolderExists("\\?\" & PathAbs)
-End If
-If (Not IgnoreUnexist) And (Not IsFileExist) And (Not IsFolderExist) Then
-  PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: path does not exist:" & vbCrLf & _
-    WScript.ScriptName & ": info: Path=`" & PathAbs & "`"
-  WScript.Quit 1
+
+If Not IsObjPath Then
+  PathAbs = objFS.GetAbsolutePathName(Path) ' CAUTION: can alter a path character case if path exists
+
+  PathAbs = RemoveWin32NamespacePathPrefix(PathAbs)
+
+  ' test on path existence including long path
+  IsFileExist = FileExists(PathAbs)
+  If Not IsFileExist Then
+    IsFolderExist = FolderExists(PathAbs)
+  End If
+  If (Not IgnoreUnexist) And (Not IsFileExist) And (Not IsFolderExist) Then
+    PrintOrEchoErrorLine _
+      WScript.ScriptName & ": error: <Path> does not exist:" & vbCrLf & _
+      WScript.ScriptName & ": info: Path=`" & PathAbs & "`"
+    WScript.Quit 1
+  End If
+Else
+  PathAbs = Path
 End If
 
 Dim PathToOpen
 
-' test on long path existence
-If (IsFileExist And objFS.FileExists(PathAbs)) Or (IsFolderExist And objFS.FolderExists(PathAbs)) Then
+' test on long path existence if not an object string
+If IsObjPath Or (IsFileExist And FileExistsNoPrefix(PathAbs)) Or (IsFolderExist And FolderExistsNoPrefix(PathAbs)) Then
   ' is not long path
   PathToOpen = PathAbs
 Else
   ' translate into short path
 
   If IsFileExist Then
-    ' WORKAROUND:
-    '   We use `\\?\` to bypass `GetFile` error: `File not found`.
-    Dim File : Set File = objFS.GetFile("\\?\" & PathAbs)
+    Dim File : Set File = GetFile(PathAbs)
     Dim FileShortPath : FileShortPath = File.ShortPath
     If Left(FileShortPath, 4) = "\\?\" Then
       FileShortPath = Mid(FileShortPath, 5)
     End If
     PathToOpen = FileShortPath
-  ElseIf IsFolderExist Then ' just in case
-    ' WORKAROUND:
-    '   We use `\\?\` to bypass `GetFolder` error: `Path not found`.
-    Dim Folder : Set Folder = objFS.GetFolder("\\?\" & PathAbs & "\")
+  ElseIf IsFolderExist Then
+    Dim Folder : Set Folder = GetFolder(PathAbs)
     Dim FolderShortPath : FolderShortPath = Folder.ShortPath
     If Left(FolderShortPath, 4) = "\\?\" Then
       FolderShortPath = Mid(FolderShortPath, 5)
@@ -324,21 +596,29 @@ End If
 
 Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
 
-Dim ParentPath : ParentPath = objFS.GetParentFolderName(PathToOpen)
+Dim ParentPath : ParentPath = GetParentFolderName(PathToOpen)
 
 Dim objNamespace, objFile
 
 If Len(ParentPath) > 0 Then
   Set objNamespace = objShellApp.Namespace(ParentPath)
-  Set objFile = objNamespace.ParseName(objFS.GetFileName(PathToOpen))
+  If Not IsNothing(objNamespace) Then
+    Set objFile = objNamespace.ParseName(objFS.GetFileName(PathToOpen))
+  End If
 Else
   Set objNamespace = objShellApp.Namespace(PathToOpen)
-  Set objFile = objNamespace.Self
-End if
+  If Not IsNothing(objNamespace) Then
+    If HasProperty("objNamespace", "Self") Then
+      Set objFile = objNamespace.Self
+    Else
+      objFile = GetObjectProperty("objNamespace", "Items().Item()")
+    End If
+  End If
+End If
 
 If IsNothing(objFile) Then
   PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: path is not parsed." & vbCrLf & _
+    WScript.ScriptName & ": error: <Path> is not parsed." & vbCrLf & _
     WScript.ScriptName & ": info: Path=`" & PathAbs & "`"
   WScript.Quit 128
 End If
@@ -353,8 +633,190 @@ Dim FilePropIndexStr
 
 Dim Printed : Printed = False
 
-For j = 0 To PropertyArrUbound
+Dim bHasGlobChars
+Dim objHasGlobCharsRE : Set objHasGlobCharsRE = New RegExp
+objHasGlobCharsRE.Pattern = "[?*<>]"
+
+Function ConvertGlobToRegex(GlobStr)
+  If Not (Len(GlobStr) > 0) Then
+    ConvertGlobToRegex = ""
+    Exit Function
+  End If
+
+  Dim PrevStr : PrevStr = GlobStr
+  Dim NextStr
+  Dim LastStr
+  Dim PrevMatchIndex : PrevMatchIndex = 1
+  Dim NextMatchIndex : NextMatchIndex = -1
+  Dim bIsFirstMatch
+  Dim PrefixStr
+  Dim SuffixStr
+
+  Dim objEscapeRegexpCharsRE : Set objEscapeRegexpCharsRE = New RegExp
+  objEscapeRegexpCharsRE.Global = True
+  objEscapeRegexpCharsRE.Pattern = "[.*+?\\()\[\]{}^$|]"
+
+  'WScript.Echo PrevStr
+  Dim objEscapeAllMatches : Set objEscapeAllMatches = objEscapeRegexpCharsRE.Execute(PrevStr)
+
+  For Each objEscapeAllMatch In objEscapeAllMatches
+    NextMatchIndex = objEscapeAllMatch.FirstIndex + 1
+    'WScript.Echo CStr(NextMatchIndex) & " = " & objEscapeAllMatch.Value
+    NextStr = NextStr & Mid(PrevStr, PrevMatchIndex, NextMatchIndex - PrevMatchIndex) & "\"
+    PrevMatchIndex = NextMatchIndex
+  Next
+
+  If PrevMatchIndex > 0 Then
+    NextStr = NextStr & Mid(PrevStr, PrevMatchIndex)
+  End If
+
+  PrevStr = NextStr
+  NextStr = ""
+  PrevMatchIndex = 1
+  NextMatchIndex = -1
+
+  Dim objEscapeGlobCharRE : Set objEscapeGlobCharRE = New RegExp
+  objEscapeGlobCharRE.Global = True
+  objEscapeGlobCharRE.Pattern = ">."
+
+  'WScript.Echo PrevStr
+  Dim objEscapeGlobCharMatches : Set objEscapeGlobCharMatches = objEscapeGlobCharRE.Execute(PrevStr)
+
+  bIsFirstMatch = True
+
+  For Each objEscapeGlobCharMatch In objEscapeGlobCharMatches
+    NextMatchIndex = objEscapeGlobCharMatch.FirstIndex + 1
+    LastStr = Mid(PrevStr, PrevMatchIndex, NextMatchIndex - PrevMatchIndex)
+    'WScript.Echo CStr(NextMatchIndex) & " | " & LastStr & " | " & objEscapeGlobCharMatch.Value
+
+    ' Process:
+    '   `<<` as the first characters -> `^`
+    '   `*?` -> `.*?`
+    '   `?*` -> `.+?`
+    '   `?<` -> `\w+`
+    '   `<` -> `\b`
+    '   `?` -> `.`
+    '   `*` -> `.*`
+
+    If bIsFirstMatch Then
+      ' including first not escaped character
+      If Left(LastStr, 2) = "<<" Then
+        PrefixStr = "^"
+        SuffixStr = Mid(LastStr, 3)
+      Else
+        PrefixStr = ""
+        SuffixStr = LastStr
+      End If
+
+      bIsFirstMatch = False
+    Else
+      ' excluding first escaped character
+      PrefixStr = Left(LastStr, 1)
+      SuffixStr = Mid(LastStr, 2)
+    End If
+
+    SuffixStr = Replace(SuffixStr, "\*\?", ".*?", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "\?\*", ".+?", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "\?<", "\w+", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "<", "\b", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "\?", ".", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "\*", ".*", 1, -1, vbTextCompare)
+
+    NextStr = NextStr & PrefixStr & SuffixStr
+    PrevMatchIndex = NextMatchIndex + 1
+  Next
+
+  If PrevMatchIndex > 0 Then
+    LastStr = Mid(PrevStr, PrevMatchIndex)
+
+    ' Process:
+    '   `<<` as the first characters -> `^`
+    '   `<<` as the last characters -> `$`
+    '   `*?` -> `.*?`
+    '   `?*` -> `.+?`
+    '   `?<` -> `\w+`
+    '   `<` -> `\b`
+    '   `?` -> `.`
+    '   `*` -> `.*`
+    '   `>` as the last character -> `\b`
+
+    If PrevMatchIndex > 1 Then
+      ' excluding first escaped character
+      PrefixStr = Left(LastStr, 1)
+      SuffixStr = Mid(LastStr, 2)
+    Else
+      ' including first not escaped character
+      If Left(LastStr, 2) = "<<" Then
+        PrefixStr = "^"
+        SuffixStr = Mid(LastStr, 3)
+      Else
+        PrefixStr = ""
+        SuffixStr = LastStr
+      End If
+    End If
+
+    If Len(LastStr) > 2 Then
+      ' the last 2 characters is not escaped by `>` globbing character
+      If Right(SuffixStr, 2) = "<<" Then
+        SuffixStr = Mid(SuffixStr, 1, Len(SuffixStr) - 2) & "$"
+      End If
+    End If
+
+    SuffixStr = Replace(SuffixStr, "\*\?", ".*?", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "\?\*", ".+?", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "\?<", "\w+", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "<", "\b", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "\?", ".", 1, -1, vbTextCompare)
+    SuffixStr = Replace(SuffixStr, "\*", ".*", 1, -1, vbTextCompare)
+
+    If Len(SuffixStr) > 1 Then
+      ' the last character is not escaped by `>` globbing character
+      If Right(SuffixStr, 1) = ">" Then
+        SuffixStr = Mid(SuffixStr, 1, Len(SuffixStr) - 1) & "\b"
+      End If
+    End If
+
+    NextStr = NextStr & PrefixStr & SuffixStr
+  End If
+
+  'WScript.Echo GlobStr & " | " & NextStr
+
+  ConvertGlobToRegex = NextStr
+End Function
+
+Function TestGlob(Str, GlobStr, bIsGlobal, bIgnoreCase)
+  Dim objMatchStrRE : Set objMatchStrRE = New RegExp
+  objMatchStrRE.Global = bIsGlobal
+  objMatchStrRE.IgnoreCase = bIgnoreCase
+  objMatchStrRE.Pattern = ConvertGlobToRegex(GlobStr)
+
+  TestGlob = objMatchStrRE.Test(Str)
+End Function
+
+Function ExecuteGlob(Str, GlobStr, bIsGlobal, bIgnoreCase)
+  Dim objMatchStrRE : Set objMatchStrRE = New RegExp
+  objMatchStrRE.Global = bIsGlobal
+  objMatchStrRE.IgnoreCase = bIgnoreCase
+  objMatchStrRE.Pattern = ConvertGlobToRegex(GlobStr)
+
+  Set ExecuteGlob = objMatchStrRE.Execute(Str)
+End Function
+
+Function MatchGlob(Str, GlobStr, bIsGlobal, bIgnoreCase)
+  Dim Matches : Set Matches = ExecuteGlob(Str, GlobStr, bIsGlobal, bIgnoreCase)
+  For Each Match In Matches
+    'WScript.Echo Str & " | " & GlobStr & " -> " & Match.Value
+    MatchGlob = Match.Value
+    Exit Function
+  Next
+  'WScript.Echo Str & " | " & GlobStr & " -> " & ""
+  MatchGlob = ""
+End Function
+
+For j = 0 To PropertyArrUbound : Do ' empty `Do-Loop` to emulate `Continue`
   PropertyName = PropertyArr(j)
+
+  If Not (Len(PropertyName) > 0) Then Exit Do ' continue on empty property name
 
   If UseExtendedProperty Then
     FilePropValue = objFile.ExtendedProperty(PropertyName)
@@ -408,7 +870,13 @@ For j = 0 To PropertyArrUbound
       If LineReturn Then Exit For
     End If
   Else
-    IsPropNameNum = IsNumeric(PropertyName)
+    bHasGlobChars = objHasGlobCharsRE.Test(PropertyName)
+
+    If Not bHasGlobChars Then
+      IsPropNameNum = IsNumeric(PropertyName)
+    Else
+      IsPropNameNum = False
+    End If
 
     ' 999 - maximum
     For FilePropIndex = 0 To 999 : Do ' empty `Do-Loop` to emulate `Continue`
@@ -419,7 +887,11 @@ For j = 0 To PropertyArrUbound
       If IsPropNameNum Then
         If Int(PropertyName) <> FilePropIndex Then Exit Do ' Continue
       Else
-        If PropertyName <> FilePropName Then Exit Do ' Continue
+        If Not bHasGlobChars Then
+          If PropertyName <> FilePropName Then Exit Do ' Continue
+        Else
+          If Not TestGlob(FilePropName, PropertyName, False, False) Then Exit Do ' Continue
+        End If
       End If
 
       FilePropValue = objNamespace.GetDetailsOf(objFile, FilePropIndex)
@@ -475,9 +947,9 @@ For j = 0 To PropertyArrUbound
         If LineReturn Then Exit For
       End If
 
-      Exit For
+      If Not bHasGlobChars Then Exit For
     Loop While False : Next
   End If
 
   If LineReturn And Printed Then Exit For
-Next
+Loop While False : Next

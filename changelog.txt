@@ -315,6 +315,15 @@
 * new: scripts/tests/manual/batscripts/test_std/test_std__60_asc.bat: manual test for `asc-utf.bat` script in an arbitrary code page
 
 2025.07.13:
+* fixed: Scripts/Tools/ToolAdaptors/vbs/*.vbs: correct processing of object paths beginning by `\\?\`
+* new: Scripts/Tools/ToolAdaptors/vbs: make_shortcut.vbs, reset_shortcut.vbs: `<ShortcutTarget>` object path auto detection
+* new: Scripts/Tools/ToolAdaptors/vbs/read_path_props.bat: property name globbing match
+* changed: Scripts/Tools/ToolAdaptors/vbs/*.vbs: better errors report
+* changed: Scripts/Tools/ToolAdaptors/vbs: reset_shortcut.vbs, reset_shortcut_from_dir.bat: code improvement
+* changed: TODO.txt: todo update
+* refactor: Scripts/Tools/ToolAdaptors/vbs: code refactor
+
+2025.07.13:
 * fixed: *.bat: flags scope minor fixup
 
 2025.07.13:

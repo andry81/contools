@@ -1,4 +1,5 @@
-''' Read a binary file MSI summary PID_TEMPLATE.
+''' Reads a binary file MSI summary PID_TEMPLATE.
+''' Can check MSI package bitness.
 
 ''' USAGE:
 '''   read_msi_summary_template.vbs <FilePath>
@@ -7,7 +8,46 @@
 '''   <FilePath>
 '''     Path to binary file to read.
 
-' Can check if an MSI package has 32 bit (x86) or 64 bit (x64) bitness.
+''' CAUTION:
+'''   Windows Scripting Host version 5.8 (Windows 7, 8, 8.1) has an issue
+'''   around a conditional expression:
+'''     `If Expr1 Or Expr2 ...`
+'''   , where `Expr2` does execute even if `Expr1` is `True`.
+'''
+'''   Additionally, there is another issue, when the `Expr2` can trigger the
+'''   corruption of following code.
+'''
+'''   The case is found in the `Expr2` expression, where a function does write
+'''   into it's input parameter.
+'''
+'''   To workaround that we must declare a temporary parameter in the function
+'''   of the `Expr2` and write into a temporary variable instead of an input
+'''   parameter.
+'''
+'''   Example of potentially corrupted code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       MyVar1 = ... ' write into input parameter triggers the issue
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' code here is potentially corrupted
+'''     End If
+'''
+'''   Example of workarounded code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       Dim TempVar1 : TempVar1 = MyVar1
+'''       TempVar1 = ... ' write into temporary parameter instead
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' workarounded
+'''     End If
+'''
+'''   Another workaround is to split the `Or` expression in a single `If` by a
+'''   sequence of `If`/`ElseIf` conditions.
+'''
 
 Function IsEmptyArg(args, index)
   ''' Based on: https://stackoverflow.com/questions/4466967/how-can-i-determine-if-a-dynamic-array-has-not-be-dimensioned-in-vbscript/4469121#4469121
@@ -92,6 +132,93 @@ Sub PrintOrEchoErrorLine(str)
   On Error Goto 0
 End Sub
 
+Function GetFile(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    Set GetFile = objFS.GetFile("\\?\" & PathAbs)
+  Else
+    Set GetFile = objFS.GetFile(PathAbs)
+  End If
+End Function
+
+Function GetFolder(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFolder` error: `Path not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    Set GetFolder = objFS.GetFolder("\\?\" & PathAbs & "\")
+  Else
+    Set GetFolder = objFS.GetFolder(PathAbs)
+  End If
+End Function
+
+Function FileExists(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `FileExists` error: `File not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    FileExists = objFS.FileExists("\\?\" & PathAbs)
+  Else
+    FileExists = objFS.FileExists(PathAbs)
+  End If
+End Function
+
+Function FolderExists(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `FolderExists` error: `Path not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    FolderExists = objFS.FolderExists("\\?\" & PathAbs & "\")
+  Else
+    FolderExists = objFS.FolderExists(PathAbs)
+  End If
+End Function
+
+Function FileExistsNoPrefix(PathAbs)
+  If Left(PathAbs, 4) = "\\?\" Then
+    FileExistsNoPrefix = objFS.FileExists(Mid(PathAbs, 5))
+  Else
+    FileExistsNoPrefix = objFS.FileExists(PathAbs)
+  End If
+End Function
+
+Function FolderExistsNoPrefix(PathAbs)
+  If Left(PathAbs, 4) = "\\?\" Then
+    FolderExistsNoPrefix = objFS.FolderExists(Mid(PathAbs, 5))
+  Else
+    FolderExistsNoPrefix = objFS.FolderExists(PathAbs)
+  End If
+End Function
+
+' Detects Win32 Namespace object path.
+Function IsWin32NamespaceObjectPath(PathAbs)
+  ' NOTE: does not check the drive letter
+  If Left(PathAbs, 4) = "\\?\" Then
+    If Mid(PathAbs, 6, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 7, 1), vbTextCompare) Then
+      IsWin32NamespaceObjectPath = False
+    Else
+      IsWin32NamespaceObjectPath = True
+    End If
+  ElseIf Mid(PathAbs, 2, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 3, 1), vbTextCompare) Then
+    IsWin32NamespaceObjectPath = False
+  ElseIf InStr(1, PathAbs, ":", vbTextCompare) Or InStr(1, PathAbs, "?", vbTextCompare) Or InStr(1, PathAbs, "*", vbTextCompare) Then
+    IsWin32NamespaceObjectPath = True
+  Else
+    IsWin32NamespaceObjectPath = False
+  End If
+End Function
+
+Function RemoveWin32NamespacePathPrefix(PathAbs)
+  ' CAUTION:
+  '   Avoid to remove path prefixes started by `\\`:
+  '     * UNC: \\domain...
+  '     * Volume: \\?\Volume{...
+  '
+  If Left(PathAbs, 4) = "\\?\" And Mid(PathAbs, 6, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 7, 1), vbTextCompare) Then
+    RemoveWin32NamespacePathPrefix = Mid(PathAbs, 5)
+  Else
+    RemoveWin32NamespacePathPrefix = PathAbs
+  End If
+End Function
+
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
@@ -114,7 +241,7 @@ ReDim Preserve cmd_args(j - 1)
 ' MsgBox Join(cmd_args, " ")
 
 If IsEmptyArg(cmd_args, 0) Then
-  PrintOrEchoErrorLine WScript.ScriptName & ": error: <FilePath> argument is not defined."
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <FilePath> is empty"
   WScript.Quit 1
 End If
 
@@ -122,35 +249,43 @@ Dim FilePath : FilePath = cmd_args(0)
 
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
-Dim FilePathAbs : FilePathAbs = objFS.GetAbsolutePathName(FilePath) ' CAUTION: can alter a path character case if path exists
+Dim IsObjPath : IsObjPath = IsWin32NamespaceObjectPath(FilePath)
 
-' remove `\\?\` prefix
-If Left(FilePathAbs, 4) = "\\?\" Then
-  FilePathAbs = Mid(FilePathAbs, 5)
+If IsObjPath Then
+  PrintOrEchoErrorLine _
+    WScript.ScriptName & ": error: <FilePath> is not valid:" & vbCrLf & _
+    WScript.ScriptName & ": info: FilePath=`" & FilePath & "`"
+  WScript.Quit 2
 End If
 
+Dim FilePathAbs
+Dim IsFileExist
+Dim IsFolderExist : IsFolderExist = False
+
+FilePathAbs = objFS.GetAbsolutePathName(FilePath) ' CAUTION: can alter a path character case if path exists
+
+FilePathAbs = RemoveWin32NamespacePathPrefix(FilePathAbs)
+
 ' test on path existence including long path
-Dim IsFileExist : IsFileExist = objFS.FileExists("\\?\" & FilePathAbs)
+IsFileExist = FileExists(FilePathAbs)
 If Not IsFileExist Then
   PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: file does not exist:" & vbCrLf & _
+    WScript.ScriptName & ": error: <FilePath> does not exist:" & vbCrLf & _
     WScript.ScriptName & ": info: FilePath=`" & FilePathAbs & "`"
-  WScript.Quit 2
+  WScript.Quit 3
 End If
 
 Dim FilePathToOpen
 
 ' test on long path existence
-If objFS.FileExists(FilePathAbs) Then
+If FileExistsNoPrefix(FilePathAbs) Then
   ' is not long path
   FilePathToOpen = FilePathAbs
 Else
   ' translate into short path
 
-  ' WORKAROUND:
-  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
-  Dim File_ : Set File_ = objFS.GetFile("\\?\" & FilePathAbs)
-  Dim FileShortPath : FileShortPath = File_.ShortPath
+  Dim File : Set File = GetFile(FilePathAbs)
+  Dim FileShortPath : FileShortPath = File.ShortPath
   If Left(FileShortPath, 4) = "\\?\" Then
     FileShortPath = Mid(FileShortPath, 5)
   End If

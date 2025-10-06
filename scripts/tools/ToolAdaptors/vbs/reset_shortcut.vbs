@@ -43,17 +43,17 @@
 '''     execution.
 '''
 '''   -obj
-'''     By default the target path does used as a file path. Use this flag to
-'''     handle it as an object string and reduce (but not avoid) path functions
-'''     call on it.
+'''     Handles shortcut target path as an object string. See <ShortcutTarget>
+'''     description for details.
 '''     Can not be used together with  `-q` flag.
-'''     Has no effect in case of `-reset-*` or `-allow-auto-recover` flags.
+'''     Can reduce or remove the effect of `-reset-*` or `-allow-auto-recover`
+'''     flags.
 '''
 '''   -ignore-unexist
 '''     By default TargetPath and WorkingDirectory does check on existence
 '''     before assign. Use this flag to skip the check.
 '''     Can not be used together with `-allow-auto-recover` flag.
-'''     Has no effect for TargetPath if `-obj` flag is defined.
+'''     Has no effect for TargetPath if `-obj` flag is used.
 '''
 '''     CAUTION:
 '''       The Windows Shell component does use a guess logic to restore
@@ -84,40 +84,51 @@
 '''   -reset-wd[-from-target-path]
 '''     Reset WorkingDirectory from TargetPath.
 '''     Does not apply if TargetPath is empty.
-'''     Has effect if `-obj` flag is used.
+'''     Has no effect if `-obj` flag is used.
 '''   -reset-target-path-from-wd
 '''     Reset TargetPath from WorkingDirectory leaving the file name as is.
 '''     Does not apply if WorkingDirectory or TargetPath is empty.
-'''     Has effect if `-obj` flag is used.
+'''     Has no effect if `-obj` flag is used.
 '''   -reset-target-path-from-desc
 '''     Reset TargetPath from Description.
-'''     Does not apply if Description is empty or not a path.
+'''     Does not apply if Description is empty.
+'''     Does not apply if Description is not a path and `-obj` flag is not
+'''     used.
 '''     Has no effect if TargetPath is already resetted.
 '''     Has effect if `-obj` flag is used.
 '''   -reset-target-name-from-file-path
 '''     Reset TargetPath name from shortcut file name without `.lnk` extension.
+'''     Has no effect if `-obj` flag is used.
 '''   -reset-target-drive-from-file-path
 '''     Reset TargetPath drive from shortcut file drive.
+'''     Has no effect if `-obj` flag is used.
 '''
 '''   -allow-auto-recover
 '''     Allow auto recover by using the guess logic applying in this order:
 '''     1. Reset WorkingDirectory from TargetPath.
+'''        Has no effect if `-obj` flag is used.
 '''        Has no effect if TargetPath is empty.
 '''        Has no effect if resulted WorkingDirectory does not exist.
 '''     2. Reset TargetPath from WorkingDirectory leaving the file name as is.
+'''        Has no effect if `-obj` flag is used.
 '''        Has no effect if WorkingDirectory or TargetPath is empty.
 '''        Has no effect if resulted TargetPath does not exist.
 '''     3. Reset TargetPath from Description.
-'''        Has no effect if Description is empty or not a path.
+'''        Has no effect if Description is empty.
+'''        Has no effect if not a path and `-obj` flag is not used.
 '''        Has no effect if resulted TargetPath does not exist.
 '''     4. Reset TargetPath name from shortcut file name without `.lnk`
 '''        extension.
+'''        Has no effect if `-obj` flag is used.
 '''        Has no effect if resulted TargetPath does not exist.
 '''     5. Reset TargetPath/WorkingDirectory drive from shortcut file drive.
+'''        Has no effect if `-obj` flag is used.
 '''        Has no effect if resulted TargetPath/WorkingDirectory does not
 '''        exist.
 '''     6. The rest combinations of above steps 1-5 with the order preserving:
 '''        1+5, 2+4, 2+5, 3+4, 3+5, 2+4+5, 3+4+5
+'''        Has no effect if `-obj` flag is used.
+'''     Implies all `-reset-*` flags.
 '''     Can not be used together with `-ignore-unexist` flag.
 '''
 '''   -allow-target-path-reassign
@@ -162,16 +173,124 @@
 '''   -q
 '''     Always quote target path argument if has no quote characters.
 '''     Can not be used together with  `-obj` flag.
+'''
+'''   <ShortcutTarget>
+'''     The script tries to use the path as a file system path if:
+'''       * Has no `?`, `*`, `<`, `>`, `|`, `"` characters AND:
+'''       * Has `\\?\X:[\/]` prefix OR.
+'''       * Has `X:[\/]` prefix OR.
+'''       * Has no `:` character and `[\/]` prefix.
+'''     Otherwise does used as an object string and path function calls are
+'''     avoided. Use `-obj` flag to explicitly handle it as an object string.
+'''     NOTE:
+'''       The `?`, `*`, `<` and `>` characters does used only to fast detect an
+'''       object string and is not supposed to avoid path function calls in all
+'''       cases.
 
 ''' NOTE:
 '''   See details and examples in the `make_shortcut.vbs` script.
+
+''' CAUTION:
+'''   Windows Scripting Host version 5.8 (Windows 7, 8, 8.1) has an issue
+'''   around a conditional expression:
+'''     `If Expr1 Or Expr2 ...`
+'''   , where `Expr2` does execute even if `Expr1` is `True`.
+'''
+'''   Additionally, there is another issue, when the `Expr2` can trigger the
+'''   corruption of following code.
+'''
+'''   The case is found in the `Expr2` expression, where a function does write
+'''   into it's input parameter.
+'''
+'''   To workaround that we must declare a temporary parameter in the function
+'''   of the `Expr2` and write into a temporary variable instead of an input
+'''   parameter.
+'''
+'''   Example of potentially corrupted code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       MyVar1 = ... ' write into input parameter triggers the issue
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' code here is potentially corrupted
+'''     End If
+'''
+'''   Example of workarounded code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       Dim TempVar1 : TempVar1 = MyVar1
+'''       TempVar1 = ... ' write into temporary parameter instead
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' workarounded
+'''     End If
+'''
+'''   Another workaround is to split the `Or` expression in a single `If` by a
+'''   sequence of `If`/`ElseIf` conditions.
+'''
+
+Dim ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext
+
+Function CopyError()
+  ErrNumber = Err.Number
+  ErrSource = Err.Source
+  ErrDesc = Err.Description
+  ErrHelpFile = Err.HelpFile
+  ErrHelpContext = Err.HelpContext
+End Function
+
+Function HasProperty(ObjName, PropertyName)
+  On Error Resume Next
+  Eval(ObjName & "." & PropertyName)
+  If err = 0 Then
+    HasProperty = True
+    On Error Goto 0
+  ElseIf err = 424 Then ' Object required
+    HasProperty = False
+    On Error Goto 0
+  Else
+    CopyError()
+    On Error Goto 0
+    err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext ' rethrow
+  End If
+End Function
+
+Function GetProperty(ObjName, PropertyName)
+  On Error Resume Next
+  GetProperty = Eval(ObjName & "." & PropertyName)
+  If err = 0 Then
+    On Error Goto 0
+  ElseIf err = 424 Then ' Object required
+    On Error Goto 0
+  Else
+    CopyError()
+    On Error Goto 0
+    err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext ' rethrow
+  End If
+End Function
+
+Function GetObjectProperty(ObjName, PropertyName)
+  On Error Resume Next
+  Set GetObjectProperty = Eval(ObjName & "." & PropertyName)
+  If err = 0 Then
+    On Error Goto 0
+  ElseIf err = 424 Then ' Object required
+    On Error Goto 0
+  Else
+    CopyError()
+    On Error Goto 0
+    err.Raise ErrNumber, ErrSource, ErrDesc, ErrHelpFile, ErrHelpContext ' rethrow
+  End If
+End Function
 
 Function IsNothing(obj)
   If IsEmpty(obj) Then
     IsNothing = True
     Exit Function
   End If
-  If obj Is Nothing Then
+  If obj Is Nothing Then ' TypeName(obj) = "Nothing"
     IsNothing = True
   Else
     IsNothing = False
@@ -261,6 +380,146 @@ Sub PrintOrEchoErrorLine(str)
   On Error Goto 0
 End Sub
 
+Function GetFile(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    Set GetFile = objFS.GetFile("\\?\" & PathAbs)
+  Else
+    Set GetFile = objFS.GetFile(PathAbs)
+  End If
+End Function
+
+Function GetFolder(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `GetFolder` error: `Path not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    Set GetFolder = objFS.GetFolder("\\?\" & PathAbs & "\")
+  Else
+    Set GetFolder = objFS.GetFolder(PathAbs)
+  End If
+End Function
+
+Function FileExists(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `FileExists` error: `File not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    FileExists = objFS.FileExists("\\?\" & PathAbs)
+  Else
+    FileExists = objFS.FileExists(PathAbs)
+  End If
+End Function
+
+Function FolderExists(PathAbs)
+  ' WORKAROUND:
+  '   We use `\\?\` to bypass `FolderExists` error: `Path not found`.
+  If Not Left(PathAbs, 4) = "\\?\" Then
+    FolderExists = objFS.FolderExists("\\?\" & PathAbs & "\")
+  Else
+    FolderExists = objFS.FolderExists(PathAbs)
+  End If
+End Function
+
+Function FileExistsNoPrefix(PathAbs)
+  If Left(PathAbs, 4) = "\\?\" Then
+    FileExistsNoPrefix = objFS.FileExists(Mid(PathAbs, 5))
+  Else
+    FileExistsNoPrefix = objFS.FileExists(PathAbs)
+  End If
+End Function
+
+Function FolderExistsNoPrefix(PathAbs)
+  If Left(PathAbs, 4) = "\\?\" Then
+    FolderExistsNoPrefix = objFS.FolderExists(Mid(PathAbs, 5))
+  Else
+    FolderExistsNoPrefix = objFS.FolderExists(PathAbs)
+  End If
+End Function
+
+' Detects Win32 Namespace object path.
+Function IsWin32NamespaceObjectPath(PathAbs)
+  ' NOTE: does not check the drive letter
+  If Left(PathAbs, 4) = "\\?\" Then
+    If Mid(PathAbs, 6, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 7, 1), vbTextCompare) Then
+      IsWin32NamespaceObjectPath = False
+    Else
+      IsWin32NamespaceObjectPath = True
+    End If
+  ElseIf Mid(PathAbs, 2, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 3, 1), vbTextCompare) Then
+    IsWin32NamespaceObjectPath = False
+  ElseIf InStr(1, PathAbs, ":", vbTextCompare) Or InStr(1, PathAbs, "?", vbTextCompare) Or InStr(1, PathAbs, "*", vbTextCompare) Then
+    IsWin32NamespaceObjectPath = True
+  Else
+    IsWin32NamespaceObjectPath = False
+  End If
+End Function
+
+Function RemoveWin32NamespacePathPrefix(PathAbs)
+  ' CAUTION:
+  '   Avoid to remove path prefixes started by `\\`:
+  '     * UNC: \\domain...
+  '     * Volume: \\?\Volume{...
+  '
+  If Left(PathAbs, 4) = "\\?\" And Mid(PathAbs, 6, 1) = ":" And InStr(1, "\/", Mid(PathAbs, 7, 1), vbTextCompare) Then
+    RemoveWin32NamespacePathPrefix = Mid(PathAbs, 5)
+  Else
+    RemoveWin32NamespacePathPrefix = PathAbs
+  End If
+End Function
+
+Function GetParentFolderName(PathAbs)
+  If IsWin32NamespaceObjectPath(PathAbs) Then
+    Dim ParentPathAbs : ParentPathAbs = objFS.GetParentFolderName(PathAbs)
+    If Len(ParentPathAbs) > 0 Then
+      If Left(ParentPathAbs, 4) <> "\\?\" Then
+        GetParentFolderName = "\\?\" & ParentPathAbs ' restores `\\?\` prefix
+      Else
+        GetParentFolderName = ParentPathAbs
+      End If
+    Else
+      GetParentFolderName = PathAbs ' parent of an object string root is the object string root
+    End If
+  Else
+    GetParentFolderName = objFS.GetParentFolderName(PathAbs) ' can be empty
+  End If
+End Function
+
+Function GetExistedFileShortPath(FilePathAbs)
+  Dim File : Set File = GetFile(FilePathAbs)
+  GetExistedFileShortPath = RemoveWin32NamespacePathPrefix(File.ShortPath)
+End Function
+
+Function GetExistedFolderShortPath(FolderPathAbs)
+  Dim Folder : Set Folder = GetFolder(FolderPathAbs)
+  GetExistedFolderShortPath = RemoveWin32NamespacePathPrefix(Folder.ShortPath)
+End Function
+
+Function GetShortPath(PathAbs)
+  If FileExists(PathAbs) Then
+    GetShortPath = GetExistedFileShortPath(PathAbs)
+  ElseIf FolderExists(PathAbs) Then
+    GetShortPath = GetExistedFolderShortPath(PathAbs)
+  Else
+    GetShortPath = ""
+  End If
+End Function
+
+Function GetFolderShortPath(PathAbs)
+  If FolderExists(PathAbs) Then
+    GetFolderShortPath = GetExistedFolderShortPath(PathAbs)
+  Else
+    GetFolderShortPath = ""
+  End If
+End Function
+
+Function IsPathExistsNoPrefix(Path)
+  If FileExistsNoPrefix(Path) Or FolderExistsNoPrefix(Path) Then
+    IsPathExistsNoPrefix = True
+  Else
+    IsPathExistsNoPrefix = False
+  End If
+End Function
+
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
@@ -300,6 +559,7 @@ Dim ShortcutWorkingDirectoryToAssignExist : ShortcutWorkingDirectoryToAssignExis
 Dim ShortcutWorkingDirectoryAssigned : ShortcutWorkingDirectoryAssigned = False
 
 Dim ShortcutDesc : ShortcutDesc = ""
+Dim ShortcutDescObj : ShortcutDescObj = False
 Dim ShortcutDescUnquoted : ShortcutDescUnquoted = ""
 Dim ShortcutDescEmpty : ShortcutDescEmpty = False
 Dim ShortcutDescExist : ShortcutDescExist = False ' not empty and exists
@@ -397,8 +657,16 @@ If IgnoreUnexist And AllowAutoRecover Then
 End If
 
 If IsEmptyArg(cmd_args, 0) Then
-  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> argument is not defined."
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <ShortcutFilePath> is empty."
   WScript.Quit 255
+End If
+
+If AllowAutoRecover Then
+  ResetWorkingDirFromTargetPath = True
+  ResetTargetPathFromWorkingDir = True
+  ResetTargetPathFromDesc = True
+  ResetTargetNameFromFilePath = True
+  ResetTargetDriveFromFilePath = True
 End If
 
 If AllowDOSPaths Then
@@ -407,7 +675,7 @@ If AllowDOSPaths Then
   AllowDOSWorkingDirectory = AllowDOSPaths
 End If
 
-' functions
+' additional functions
 
 Function GetShortcut(ShortcutFilePathToOpen)
   If Not UseGetLink Then
@@ -418,19 +686,27 @@ Function GetShortcut(ShortcutFilePathToOpen)
     Set GetShortcut = objShell.CreateShortcut(ShortcutFilePathToOpen)
   Else
     Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
-    Dim ShortcutParentPath : ShortcutParentPath = objFS.GetParentFolderName(ShortcutFilePathToOpen)
+    Dim ShortcutParentPath : ShortcutParentPath = GetParentFolderName(ShortcutFilePathToOpen)
     Dim objNamespace, objFile
     If Len(ShortcutParentPath) > 0 Then
       Set objNamespace = objShellApp.Namespace(ShortcutParentPath)
-      Set objFile = objNamespace.ParseName(objFS.GetFileName(ShortcutFilePathToOpen))
+      If Not IsNothing(objNamespace) Then
+        Set objFile = objNamespace.ParseName(objFS.GetFileName(ShortcutFilePathToOpen))
+      End If
     Else
       Set objNamespace = objShellApp.Namespace(ShortcutFilePathToOpen)
-      Set objFile = objNamespace.Self
+      If Not IsNothing(objNamespace) Then
+        If HasProperty("objNamespace", "Self") Then
+          Set objFile = objNamespace.Self
+        Else
+          objFile = GetObjectProperty("objNamespace", "Items().Item()")
+        End If
+      End If
     End if
 
     If IsNothing(objFile) Then
       PrintOrEchoErrorLine _
-        WScript.ScriptName & ": error: path is not parsed." & vbCrLf & _
+        WScript.ScriptName & ": error: <Path> is not parsed." & vbCrLf & _
         WScript.ScriptName & ": info: Path=`" & ShortcutFilePathToOpen & "`"
       WScript.Quit 128
     End If
@@ -439,7 +715,7 @@ Function GetShortcut(ShortcutFilePathToOpen)
       Set GetShortcut = objFile.GetLink
     Else
       PrintOrEchoErrorLine _
-        WScript.ScriptName & ": error: file is not a shortcut." & vbCrLf & _
+        WScript.ScriptName & ": error: <Path> is not a shortcut." & vbCrLf & _
         WScript.ScriptName & ": info: Path=`" & ShortcutFilePathToOpen & "`"
       WScript.Quit 129
     End If
@@ -535,65 +811,16 @@ Sub SetShortcutProperty(PropertyName, PropertyValue)
   End If
 End Sub
 
-Function GetExistedFileShortPath(FilePathAbs)
-  ' WORKAROUND:
-  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
-  Dim File : Set File = objFS.GetFile("\\?\" & FilePathAbs)
-  GetExistedFileShortPath = File.ShortPath
-  If Left(GetExistedFileShortPath, 4) = "\\?\" Then
-    GetExistedFileShortPath = Mid(GetExistedFileShortPath, 5)
-  End If
-End Function
-
-Function GetExistedFolderShortPath(FolderPathAbs)
-  ' WORKAROUND:
-  '   We use `\\?\` to bypass `GetFile` error: `File not found`.
-  Dim Folder : Set Folder = objFS.GetFolder("\\?\" & FolderPathAbs & "\")
-  GetExistedFolderShortPath = Folder.ShortPath
-  If Left(GetExistedFolderShortPath, 4) = "\\?\" Then
-    GetExistedFolderShortPath = Mid(GetExistedFolderShortPath, 5)
-  End If
-End Function
-
-Function GetShortPath(PathAbs)
-  If objFS.FileExists("\\?\" & PathAbs) Then
-    GetShortPath = GetExistedFileShortPath(PathAbs)
-  ElseIf objFS.FolderExists("\\?\" & PathAbs) Then
-    GetShortPath = GetExistedFolderShortPath(PathAbs)
-  Else
-    GetShortPath = ""
-  End If
-End Function
-
-Function GetFolderShortPath(PathAbs)
-  If objFS.FolderExists("\\?\" & PathAbs) Then
-    GetShortPath = GetExistedFolderShortPath(PathAbs)
-  Else
-    GetShortPath = ""
-  End If
-End Function
-
-Function IsPathExists(Path)
-  If objFS.FileExists(Path) Or objFS.FolderExists(Path) Then
-    IsPathExists = True
-  Else
-    IsPathExists = False
-  End If
-End Function
-
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
 ' change current directory before any file system request because of relative paths
 If ChangeCurrentDirectoryExist Then
   Dim ChangeCurrentDirectoryAbs : ChangeCurrentDirectoryAbs = objFS.GetAbsolutePathName(ChangeCurrentDirectory) ' CAUTION: can alter a path character case if path exists
 
-  ' remove `\\?\` prefix
-  If Left(ChangeCurrentDirectoryAbs, 4) = "\\?\" Then
-    ChangeCurrentDirectoryAbs = Mid(ChangeCurrentDirectoryAbs, 5)
-  End If
+  ChangeCurrentDirectoryAbs = RemoveWin32NamespacePathPrefix(ChangeCurrentDirectoryAbs)
 
   ' test on path existence including long path
-  Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = objFS.FolderExists("\\?\" & ChangeCurrentDirectoryAbs)
+  Dim IsCurrentDirectoryExist : IsCurrentDirectoryExist = FolderExists(ChangeCurrentDirectoryAbs)
   If Not IsCurrentDirectoryExist Then
     PrintOrEchoErrorLine _
       WScript.ScriptName & ": error: could not change current directory:" & vbCrLf & _
@@ -602,7 +829,7 @@ If ChangeCurrentDirectoryExist Then
   End If
 
   ' test on long path existence
-  If (Not AllowDOSCurrentDirectory) Or objFS.FolderExists(ChangeCurrentDirectoryAbs) Then
+  If (Not AllowDOSCurrentDirectory) Or FolderExistsNoPrefix(ChangeCurrentDirectoryAbs) Then
     ' is not long path
     objShell.CurrentDirectory = ChangeCurrentDirectoryAbs
   ElseIf AllowDOSCurrentDirectory Then
@@ -615,16 +842,13 @@ Dim ShortcutFilePath : ShortcutFilePath = cmd_args(0)
 
 Dim ShortcutFilePathAbs : ShortcutFilePathAbs = objFS.GetAbsolutePathName(ShortcutFilePath) ' CAUTION: can alter a path character case if path exists
 
-' remove `\\?\` prefix
-If Left(ShortcutFilePathAbs, 4) = "\\?\" Then
-  ShortcutFilePathAbs = Mid(ShortcutFilePathAbs, 5)
-End If
+ShortcutFilePathAbs = RemoveWin32NamespacePathPrefix(ShortcutFilePathAbs)
 
 ' test on path existence including long path
-Dim IsShortcutFileExist : IsShortcutFileExist = objFS.FileExists("\\?\" & ShortcutFilePathAbs)
+Dim IsShortcutFileExist : IsShortcutFileExist = FileExists(ShortcutFilePathAbs)
 If Not IsShortcutFileExist Then
   PrintOrEchoErrorLine _
-    WScript.ScriptName & ": error: shortcut file does not exist:" & vbCrLf & _
+    WScript.ScriptName & ": error: <ShortcutFilePath> does not exist:" & vbCrLf & _
     WScript.ScriptName & ": info: ShortcutFilePath=`" & ShortcutFilePathAbs & "`"
   WScript.Quit 10
 End If
@@ -632,7 +856,7 @@ End If
 Dim ShortcutFilePathToOpen
 
 ' test on long path existence
-If objFS.FileExists(ShortcutFilePathAbs) Then
+If FileExistsNoPrefix(ShortcutFilePathAbs) Then
   ' is not long path
   ShortcutFilePathToOpen = ShortcutFilePathAbs
 Else
@@ -646,28 +870,37 @@ Dim objSC : Set objSC = GetShortcut(ShortcutFilePathToOpen)
 
 ShortcutTarget = GetShortcutProperty("TargetPath")
 
-If Len(ShortcutTarget) > 1 And Left(ShortcutTarget, 1) = Chr(34) And Right(ShortcutTarget, 1) = Chr(34) Then
-  ShortcutTargetUnquoted = Mid(ShortcutTarget, 2, Len(ShortcutTarget) - 2)
-Else
-  ShortcutTargetUnquoted = ShortcutTarget
-End If
-
-Dim ShortcutTargetDirExist : ShortcutTargetDirExist = False
-
-If Len(ShortcutTargetUnquoted) > 0 Then
-  If objFS.FileExists(ShortcutTargetUnquoted) Then
-    ShortcutTargetExist = True
-  ElseIf objFS.FolderExists(ShortcutTargetUnquoted) Then
-    ShortcutTargetDirExist = True
-    ShortcutTargetExist = True
+Do ' empty `Do-Loop` to emulate `Break`
+If Not ShortcutTargetObj Then
+  If Len(ShortcutTarget) > 1 And Left(ShortcutTarget, 1) = Chr(34) And Right(ShortcutTarget, 1) = Chr(34) Then
+    ShortcutTargetUnquoted = Mid(ShortcutTarget, 2, Len(ShortcutTarget) - 2)
+  Else
+    ShortcutTargetUnquoted = ShortcutTarget
   End If
-Else
-  ShortcutTargetEmpty = True
-End If
 
-If AlwaysQuote And InStr(ShortcutTargetUnquoted, Chr(34)) = 0 Then
-  ShortcutTarget = Chr(34) & ShortcutTargetUnquoted & Chr(34)
+  ' auto detect the object string
+  ShortcutTargetObj = IsWin32NamespaceObjectPath(ShortcutTargetUnquoted)
+
+  If Not ShortcutTargetObj Then
+    Dim ShortcutTargetDirExist : ShortcutTargetDirExist = False
+
+    If Len(ShortcutTargetUnquoted) > 0 Then
+      If FileExists(ShortcutTargetUnquoted) Then
+        ShortcutTargetExist = True
+      ElseIf FolderExists(ShortcutTargetUnquoted) Then
+        ShortcutTargetDirExist = True
+        ShortcutTargetExist = True
+      End If
+    Else
+      ShortcutTargetEmpty = True
+    End If
+
+    If AlwaysQuote And InStr(ShortcutTargetUnquoted, Chr(34)) = 0 Then
+      ShortcutTarget = Chr(34) & ShortcutTargetUnquoted & Chr(34)
+    End If
+  End If
 End If
+Loop While False
 
 ' read WorkingDirectory unconditionally
 
@@ -680,7 +913,7 @@ Else
 End If
 
 If Len(ShortcutWorkingDirectoryUnquoted) > 0 Then
-  If objFS.FolderExists(ShortcutWorkingDirectoryUnquoted) Then
+  If FolderExists(ShortcutWorkingDirectoryUnquoted) Then
     ShortcutWorkingDirectoryExist = True
   End If
 Else
@@ -688,8 +921,6 @@ Else
 End If
 
 ' read Description conditionally
-
-Dim ShortcutDescDirExist : ShortcutDescDirExist = False
 
 If ResetTargetPathFromDesc Or AllowAutoRecover Then
   ShortcutDesc = GetShortcutProperty("Description")
@@ -700,12 +931,16 @@ If ResetTargetPathFromDesc Or AllowAutoRecover Then
     ShortcutDescUnquoted = ShortcutDesc
   End If
 
+  ' auto detect the object string
+  ShortcutDescObj = IsWin32NamespaceObjectPath(ShortcutDescUnquoted)
+
   If Len(ShortcutDescUnquoted) > 0 Then
-    If objFS.FileExists(ShortcutDescUnquoted) Then
-      ShortcutDescExist = True
-    ElseIf objFS.FolderExists(ShortcutDescUnquoted) Then
-      ShortcutDescDirExist = True
-      ShortcutDescExist = True
+    If Not ShortcutDescObj Then
+      If FileExists(ShortcutDescUnquoted) Then
+        ShortcutDescExist = True
+      ElseIf FolderExists(ShortcutDescUnquoted) Then
+        ShortcutDescExist = True
+      End If
     End If
   Else
     ShortcutDescEmpty = True
@@ -714,7 +949,7 @@ End If
 
 ' 1
 
-If ResetWorkingDirFromTargetPath Then
+If (Not ShortcutTargetObj) And ResetWorkingDirFromTargetPath Then
   ' NOTE:
   '   Shortcut target must not be an existed DIRECTORY path, otherwise WorkingDirectory must be not empty, otherwise - ignore.
   '   Meaning:
@@ -726,13 +961,13 @@ If ResetWorkingDirFromTargetPath Then
   If Not ShortcutTargetEmpty Then
     If (Not ShortcutTargetDirExist) Or (Not ShortcutWorkingDirectoryEmpty) Then
       If Not ShortcutTargetDirExist Then
-        ShortcutWorkingDirectoryToAssign = objFS.GetParentFolderName(ShortcutTargetUnquoted)
+        ShortcutWorkingDirectoryToAssign = GetParentFolderName(ShortcutTargetUnquoted)
       Else
         ShortcutWorkingDirectoryToAssign = ShortcutTargetUnquoted ' use the whole path
       End If
 
       If Not IgnoreUnexist Then
-        ShortcutWorkingDirectoryToAssignExist = objFS.FolderExists(ShortcutWorkingDirectoryToAssign)
+        ShortcutWorkingDirectoryToAssignExist = FolderExists(ShortcutWorkingDirectoryToAssign)
 
         If Not ShortcutWorkingDirectoryToAssignExist Then
           PrintOrEchoErrorLine _
@@ -745,25 +980,25 @@ If ResetWorkingDirFromTargetPath Then
       ShortcutWorkingDirectoryAssigned = True
     Else
       PrintOrEchoErrorLine _
-        WScript.ScriptName & ": warning: WorkingDirectory reset is skipped because WorkingDirectory is empty and TargetPath is existed directory path:" & vbCrLf & _
+        WScript.ScriptName & ": warning: <WorkingDirectory> reset is skipped because is empty and <TargetPath> does exist:" & vbCrLf & _
         WScript.ScriptName & ": info: TargetPath=`" & ShortcutTargetUnquoted & "`"
     End If
   Else
-    PrintOrEchoErrorLine WScript.ScriptName & ": error: shortcut target path is empty."
+    PrintOrEchoErrorLine WScript.ScriptName & ": error: <TargetPath> is empty."
     WScript.Quit 10
   End If
 End If
 
 ' 2
 
-If ResetTargetPathFromWorkingDir Then
+If (Not ShortcutTargetObj) And ResetTargetPathFromWorkingDir Then
   If ShortcutTargetEmpty Then
-    PrintOrEchoErrorLine WScript.ScriptName & ": error: shortcut target path is empty."
+    PrintOrEchoErrorLine WScript.ScriptName & ": error: <TargetPath> is empty."
     WScript.Quit 10
   End If
 
   If ShortcutWorkingDirectoryEmpty Then
-    PrintOrEchoErrorLine WScript.ScriptName & ": error: shortcut working directory path is empty."
+    PrintOrEchoErrorLine WScript.ScriptName & ": error: <WorkingDirectory> is empty."
     WScript.Quit 11
   End If
 
@@ -771,7 +1006,7 @@ If ResetTargetPathFromWorkingDir Then
     ShortcutTargetToAssign = ShortcutWorkingDirectoryUnquoted & "\" & objFS.GetFileName(ShortcutTargetUnquoted)
 
     If Not IgnoreUnexist Then
-      ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
+      ShortcutTargetToAssignExist = FileExists(ShortcutTargetToAssign)
 
       If Not ShortcutTargetToAssignExist Then
         PrintOrEchoErrorLine _
@@ -788,11 +1023,11 @@ End If
 ' 3
 
 If ResetTargetPathFromDesc And (Not ShortcutTargetAssigned) Then
-  If (Not ShortcutDescEmpty) And ShortcutDescExist Then
+  If (Not ShortcutDescEmpty) And (ShortcutDescObj Or ShortcutDescExist) Then
     ShortcutTargetToAssign = ShortcutDescUnquoted
 
-    If Not IgnoreUnexist Then
-      ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
+    If (Not ShortcutDescObj) And (Not IgnoreUnexist) Then
+      ShortcutTargetToAssignExist = FileExists(ShortcutTargetToAssign)
 
       If Not ShortcutTargetToAssignExist Then
         PrintOrEchoErrorLine _
@@ -805,7 +1040,7 @@ If ResetTargetPathFromDesc And (Not ShortcutTargetAssigned) Then
     ShortcutTargetAssigned = True
   Else
     PrintOrEchoErrorLine _
-      WScript.ScriptName & ": error: shortcut description is empty or not exist:" & vbCrLf & _
+      WScript.ScriptName & ": error: <Description> is empty or not exist:" & vbCrLf & _
       WScript.ScriptName & ": info: Description=`" & ShortcutDescUnquoted & "`"
     WScript.Quit 13
   End If
@@ -816,12 +1051,12 @@ End If
 Dim ShortcutTargetExt
 Dim ShortcutTargetExtLen
 
-If ResetTargetNameFromFilePath Then
+If (Not ShortcutTargetObj) And ResetTargetNameFromFilePath Then
   If Not ShortcutTargetAssigned Then
-    ShortcutTargetToAssign = objFS.GetParentFolderName(ShortcutTargetUnquoted) & "\" & objFS.GetFileName(ShortcutFilePath)
+    ShortcutTargetToAssign = GetParentFolderName(ShortcutTargetUnquoted) & "\" & objFS.GetFileName(ShortcutFilePath)
     ShortcutTargetAssigned = True
   Else
-    ShortcutTargetToAssign = objFS.GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
+    ShortcutTargetToAssign = GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
   End If
 
   ShortcutTargetExt = objFS.GetExtensionName(ShortcutTargetToAssign)
@@ -833,7 +1068,7 @@ End If
 
 ' 5
 
-If ResetTargetDriveFromFilePath And Mid(ShortcutTargetUnquoted, 2, 1) = ":" Then
+If (Not ShortcutTargetObj) And ResetTargetDriveFromFilePath Then
   If Not ShortcutTargetAssigned Then
     ShortcutTargetToAssign = objFS.GetDriveName(objFS.GetAbsolutePathName(ShortcutFilePath)) & "\" & Mid(ShortcutTargetUnquoted, 3)
     ShortcutTargetAssigned = True
@@ -842,19 +1077,19 @@ If ResetTargetDriveFromFilePath And Mid(ShortcutTargetUnquoted, 2, 1) = ":" Then
   End If
 End If
 
-If AllowAutoRecover Then
+If (Not ShortcutTargetObj) And AllowAutoRecover Then
   ' 1+5
-  If (Not ShortcutWorkingDirectoryAssigned) And (Not ShortcutTargetEmpty) And Mid(ShortcutTargetUnquoted, 2, 1) = ":" Then
+  If (Not ShortcutWorkingDirectoryAssigned) And (Not ShortcutTargetEmpty) Then
     If (Not ShortcutTargetDirExist) Or (Not ShortcutWorkingDirectoryEmpty) Then
       If Not ShortcutTargetDirExist Then
-        ShortcutWorkingDirectoryToAssign = objFS.GetParentFolderName(ShortcutTargetUnquoted)
+        ShortcutWorkingDirectoryToAssign = GetParentFolderName(ShortcutTargetUnquoted)
       Else
         ShortcutWorkingDirectoryToAssign = ShortcutTargetUnquoted ' use the whole path
       End If
 
       ShortcutWorkingDirectoryToAssign = objFS.GetDriveName(objFS.GetAbsolutePathName(ShortcutFilePath)) & "\" & Mid(ShortcutWorkingDirectoryToAssign, 3)
 
-      ShortcutWorkingDirectoryToAssignExist = objFS.FolderExists(ShortcutWorkingDirectoryToAssign)
+      ShortcutWorkingDirectoryToAssignExist = FolderExists(ShortcutWorkingDirectoryToAssign)
 
       If ShortcutWorkingDirectoryToAssignExist Then
         ShortcutWorkingDirectoryAssigned = True
@@ -867,7 +1102,7 @@ If AllowAutoRecover Then
   If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutWorkingDirectoryEmpty) Then
     ShortcutTargetToAssign = ShortcutWorkingDirectoryUnquoted & "\" & objFS.GetFileName(ShortcutTargetUnquoted)
 
-    ShortcutTargetToAssign = objFS.GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
+    ShortcutTargetToAssign = GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
 
     ShortcutTargetExt = objFS.GetExtensionName(ShortcutTargetToAssign)
     ShortcutTargetExtLen = Len(ShortcutTargetExt)
@@ -875,7 +1110,7 @@ If AllowAutoRecover Then
       ShortcutTargetToAssign = Mid(ShortcutTargetToAssign, 1, Len(ShortcutTargetToAssign) - ShortcutTargetExtLen - 1)
     End If
 
-    ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
+    ShortcutTargetToAssignExist = FileExists(ShortcutTargetToAssign)
 
     If ShortcutTargetToAssignExist Then
       ShortcutTargetAssigned = True
@@ -884,12 +1119,12 @@ If AllowAutoRecover Then
 
   ' 2+5
 
-  If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutWorkingDirectoryEmpty) And Mid(ShortcutWorkingDirectoryUnquoted, 2, 1) = ":" Then
+  If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutWorkingDirectoryEmpty) Then
     ShortcutTargetToAssign = ShortcutWorkingDirectoryUnquoted & "\" & objFS.GetFileName(ShortcutTargetUnquoted)
 
     ShortcutTargetToAssign = objFS.GetDriveName(objFS.GetAbsolutePathName(ShortcutFilePath)) & "\" & Mid(ShortcutTargetToAssign, 3)
 
-    ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
+    ShortcutTargetToAssignExist = FileExists(ShortcutTargetToAssign)
 
     If ShortcutTargetToAssignExist Then
       ShortcutTargetAssigned = True
@@ -901,7 +1136,7 @@ If AllowAutoRecover Then
   If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutDescEmpty) And ShortcutDescExist Then
     ShortcutTargetToAssign = ShortcutDescUnquoted
 
-    ShortcutTargetToAssign = objFS.GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
+    ShortcutTargetToAssign = GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
 
     ShortcutTargetExt = objFS.GetExtensionName(ShortcutTargetToAssign)
     ShortcutTargetExtLen = Len(ShortcutTargetExt)
@@ -909,7 +1144,7 @@ If AllowAutoRecover Then
       ShortcutTargetToAssign = Mid(ShortcutTargetToAssign, 1, Len(ShortcutTargetToAssign) - ShortcutTargetExtLen - 1)
     End If
 
-    ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
+    ShortcutTargetToAssignExist = FileExists(ShortcutTargetToAssign)
 
     If ShortcutTargetToAssignExist Then
       ShortcutTargetAssigned = True
@@ -918,12 +1153,12 @@ If AllowAutoRecover Then
 
   ' 3+5
 
-  If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutDescEmpty) And ShortcutDescExist And Mid(ShortcutDescUnquoted, 2, 1) = ":" Then
+  If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutDescEmpty) And ShortcutDescExist Then
     ShortcutTargetToAssign = ShortcutDescUnquoted
 
     ShortcutTargetToAssign = objFS.GetDriveName(objFS.GetAbsolutePathName(ShortcutFilePath)) & "\" & Mid(ShortcutTargetToAssign, 3)
 
-    ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
+    ShortcutTargetToAssignExist = FileExists(ShortcutTargetToAssign)
 
     If ShortcutTargetToAssignExist Then
       ShortcutTargetAssigned = True
@@ -932,10 +1167,10 @@ If AllowAutoRecover Then
 
   ' 2+4+5
 
-  If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutWorkingDirectoryEmpty) And Mid(ShortcutWorkingDirectoryUnquoted, 2, 1) = ":" Then
+  If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutWorkingDirectoryEmpty) Then
     ShortcutTargetToAssign = ShortcutWorkingDirectoryUnquoted & "\" & objFS.GetFileName(ShortcutTargetUnquoted)
 
-    ShortcutTargetToAssign = objFS.GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
+    ShortcutTargetToAssign = GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
 
     ShortcutTargetExt = objFS.GetExtensionName(ShortcutTargetToAssign)
     ShortcutTargetExtLen = Len(ShortcutTargetExt)
@@ -945,7 +1180,7 @@ If AllowAutoRecover Then
 
     ShortcutTargetToAssign = objFS.GetDriveName(objFS.GetAbsolutePathName(ShortcutFilePath)) & "\" & Mid(ShortcutTargetToAssign, 3)
 
-    ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
+    ShortcutTargetToAssignExist = FileExists(ShortcutTargetToAssign)
 
     If ShortcutTargetToAssignExist Then
       ShortcutTargetAssigned = True
@@ -954,10 +1189,10 @@ If AllowAutoRecover Then
 
   ' 3+4+5
 
-  If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutDescEmpty) And ShortcutDescExist And Mid(ShortcutDescUnquoted, 2, 1) = ":" Then
+  If (Not ShortcutTargetAssigned) And (Not ShortcutTargetEmpty) And (Not ShortcutDescEmpty) And ShortcutDescExist Then
     ShortcutTargetToAssign = ShortcutDescUnquoted
 
-    ShortcutTargetToAssign = objFS.GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
+    ShortcutTargetToAssign = GetParentFolderName(ShortcutTargetToAssign) & "\" & objFS.GetFileName(ShortcutFilePath)
 
     ShortcutTargetExt = objFS.GetExtensionName(ShortcutTargetToAssign)
     ShortcutTargetExtLen = Len(ShortcutTargetExt)
@@ -967,7 +1202,7 @@ If AllowAutoRecover Then
 
     ShortcutTargetToAssign = objFS.GetDriveName(objFS.GetAbsolutePathName(ShortcutFilePath)) & "\" & Mid(ShortcutTargetToAssign, 3)
 
-    ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
+    ShortcutTargetToAssignExist = FileExists(ShortcutTargetToAssign)
 
     If ShortcutTargetToAssignExist Then
       ShortcutTargetAssigned = True
@@ -993,23 +1228,7 @@ If ShortcutTargetAssigned Then
     PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(assigned)=" & ShortcutTarget
   End If
 ElseIf AllowTargetPathReassign Then
-  If Not ShortcutTargetObj Then
-    If ShortcutTargetExist Or IgnoreUnexist Then
-      If PrintAssign Then
-        PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(reassign)=" & ShortcutTargetUnquoted
-      End If
-
-      SetShortcutProperty "TargetPath", ShortcutTarget ' reassign
-      ShortcutTargetAssigned = True
-
-      ' reread `TargetPath`
-      ShortcutTarget = GetShortcutProperty("TargetPath")
-
-      If PrintAssigned Then
-        PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(reassigned)=" & ShortcutTarget
-      End If
-    End If
-  Else
+  If ShortcutTargetObj Or IgnoreUnexist Or ShortcutTargetExist Then
     If PrintAssign Then
       PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(reassign)=" & ShortcutTarget
     End If
@@ -1031,7 +1250,7 @@ If (Not ShortcutTargetObj) And ShortcutTargetAssigned And AllowDOSTargetPath The
 
   Dim ShortcutTargetShortPath : ShortcutTargetShortPath = ""
 
-  If Not IsPathExists(ShortcutTargetAbs) Then
+  If Not IsPathExistsNoPrefix(ShortcutTargetAbs) Then
     ShortcutTargetShortPath = GetShortPath(ShortcutTargetAbs)
   End If
 
@@ -1070,7 +1289,7 @@ If ShortcutWorkingDirectoryAssigned Then
 
     Dim ShortcutWorkingDirectoryShortPath : ShortcutWorkingDirectoryShortPath = ""
 
-    If Not objFS.FolderExists(ShortcutWorkingDirectory) Then
+    If Not FolderExistsNoPrefix(ShortcutWorkingDirectory) Then
       ShortcutWorkingDirectoryShortPath = GetFolderShortPath(ShortcutWorkingDirectory)
     End If
 

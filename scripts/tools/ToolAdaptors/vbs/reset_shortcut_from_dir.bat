@@ -7,49 +7,70 @@ rem <flags>:
 rem   -chcp <CodePage>
 rem     Set explicit code page.
 rem
+rem   -obj
+rem     Handles shortcut target path as an object string. See <ShortcutTarget>
+rem     description for details.
+rem     Can reduce or remove the effect of `-reset-*` or `-allow-auto-recover`
+rem     flags.
+rem
 rem   -reset-wd[-from-target-path]
 rem     Reset WorkingDirectory from TargetPath.
 rem     Does not apply if TargetPath is empty.
+rem     Has no effect if `-obj` flag is used.
 rem   -reset-target-path-from-wd
 rem     Reset TargetPath from WorkingDirectory leaving the file name as is.
 rem     Does not apply if WorkingDirectory or TargetPath is empty.
+rem     Has no effect if `-obj` flag is used.
 rem   -reset-target-path-from-desc
 rem     Reset TargetPath from Description.
-rem     Does not apply if Description is empty or not a path.
+rem     Does not apply if Description is empty.
+rem     Does not apply if Description is not a path and `-obj` flag is not
+rem     used.
 rem     Has no effect if TargetPath is already resetted.
+rem     Has effect if `-obj` flag is used.
 rem   -reset-target-name-from-file-path
 rem     Reset TargetPath name from shortcut file name without `.lnk` extension.
+rem     Has no effect if `-obj` flag is used.
 rem   -reset-target-drive-from-file-path
 rem     Reset TargetPath drive from shortcut file drive.
+rem     Has no effect if `-obj` flag is used.
 rem
 rem   -allow-auto-recover
-rem     Allow to auto detect and recover broken shortcuts.
+rem     Allow auto recover by using the guess logic.
+rem     Implies all `-reset-*` flags.
 rem     Can not be used together with `-ignore-unexist` flag.
+rem     Has reduced effect if `-obj` flag is used.
 rem
 rem   -allow-target-path-reassign
-rem     Allow `TargetPath` property reassign if has not been assigned.
+rem     Allows `TargetPath` property reassign if has not been assigned.
 rem     Has no effect if `TargetPath` is already resetted.
+rem     Has effect if `-obj` flag is used.
 rem
+rem   -allow-dos-current-dir
+rem     Allows long path conversion into a reduced DOS path version for the
+rem     current directory.
+rem     Has no effect if path does not exist.
 rem   -allow-dos-target-path
-rem     Reread target path after assign and if it does not exist, then reassign
-rem     it by a reduced DOS path version.
+rem     Rereads target path after assign and if it does not exist, then
+rem     reassigns it by a reduced DOS path version.
 rem     It is useful when you want to create not truncated shortcut target file
 rem     path to open it by an old version application which does not support
 rem     long paths or Win32 Namespace paths, but supports open target paths by
 rem     a shortcut file.
 rem     Has no effect if path does not exist.
+rem     Has no effect if `-obj` flag is used.
 rem   -allow-dos-wd
-rem     Reread working directory after assign and if it does not exist, then
+rem     Rereads working directory after assign and if it does not exist, then
 rem     reassign it by a reduced DOS path version.
 rem     Has no effect if path does not exist.
 rem   -allow-dos-paths
 rem     Implies all `-allow-dos-*` flags.
 rem
-rem   -use-getlink | -g
+rem   -use-getlink
 rem     Use `GetLink` property instead of `CreateShortcut` method.
 rem     Alternative interface to assign path properties with Unicode
 rem     characters.
-rem   -print-remapped-names | -k
+rem   -print-remapped-names
 rem     Print remapped key names instead of `CreateShortcut` method object
 rem     names.
 rem     Has no effect if `-use-getlink` flag is not used.
@@ -57,7 +78,7 @@ rem
 rem   -p[rint-assign]
 rem     Print property assign before assign.
 rem   -print-assigned | -pd
-rem     Reread property after assign and print.
+rem     Rereads property after assign and prints it.
 rem
 
 rem -+:
@@ -106,9 +127,9 @@ if defined FLAG (
     set "FLAG_CHCP=%~2"
     shift
     set /A FLAG_SHIFT+=1
-  ) else if "%FLAG%" == "-reset-wd-from-target-path" (
-    set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-reset-wd" (
+    set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-reset-wd-from-target-path" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-reset-target-path-from-wd" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
@@ -122,9 +143,17 @@ if defined FLAG (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-allow-target-path-reassign" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-allow-dos-current-dir" (
+    set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-allow-dos-target-path" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-allow-dos-wd" (
+    set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-allow-dos-paths" (
+    set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-use-getlink" (
+    set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-print-remapped-names" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-print-assign" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
