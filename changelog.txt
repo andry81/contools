@@ -1,3 +1,6 @@
+2025.10.06:
+* fixed: scripts/tests/bench/bat/test_math/test_math__04_mul/test_math__21_imul.bat: bench test fixup
+
 2025.10.04:
 * changed: scripts/tests/unit/bat/test_math: unit tests improvement, define `RETREF=0` by default because a return value must always exist
 
