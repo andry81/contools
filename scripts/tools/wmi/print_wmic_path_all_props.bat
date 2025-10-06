@@ -1,6 +1,9 @@
 @echo off
 
-setlocal DISABLEDELAYEDEXPANSION
+setlocal
+
+rem Drop last error level
+call;
 
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
