@@ -10,7 +10,7 @@ rem reset all test variables at first
 set "L="
 set "OP="
 set "R="
-set "RETREF="
+set "RETREF=0"
 
 setlocal
 set RETREF=-1
@@ -160,7 +160,6 @@ rem      rem number comparison
 rem      call icmp.bat 10 GTR 9 && echo TRUE || echo FALSE
 rem      rem TRUE
 setlocal
-set RETREF=0
 call :TEST_SELECT 10 GTR 9
 endlocal
 
@@ -170,7 +169,6 @@ rem      call icmp.bat "10" GTR "9" && echo TRUE || echo FALSE
 rem      rem TRUE
 if "%TEST_IMPL_SCRIPT_NAME%" == "icmp.bat" (
   setlocal
-  set RETREF=0
   call :TEST "10" GTR "9"
   endlocal
 )
@@ -180,7 +178,6 @@ rem      >
 rem      call icmp.bat "-0" EQU "+0" && echo TRUE || echo FALSE
 rem      rem TRUE
 setlocal
-set RETREF=0
 call :TEST_SELECT "-0" EQU "+0"
 endlocal
 
@@ -199,7 +196,6 @@ set DIGITS_B20_2=21987654321987654321
 for %%a in ("" "+" "-") do ^
 for /L %%i in (1,1,20) do (
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%~a%%ZEROS:~0,%%i%% EQU %%~a%%ZEROS:~0,%%i%%
   endlocal
 
@@ -214,7 +210,6 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%~a%%ZEROS:~0,%%i%% GEQ %%~a%%ZEROS:~0,%%i%%
   endlocal
 
@@ -224,7 +219,6 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%~a%%ZEROS:~0,%%i%% LEQ %%~a%%ZEROS:~0,%%i%%
   endlocal
 )
@@ -232,7 +226,6 @@ for /L %%i in (1,1,20) do (
 for %%a in ("" "+" "-") do ^
 for /L %%i in (1,1,20) do (
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%~a%%ONES:~0,%%i%% EQU %%~a%%ONES:~0,%%i%%
   endlocal
 
@@ -247,7 +240,6 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%~a%%ONES:~0,%%i%% GEQ %%~a%%ONES:~0,%%i%%
   endlocal
 
@@ -257,7 +249,6 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%~a%%ONES:~0,%%i%% LEQ %%~a%%ONES:~0,%%i%%
   endlocal
 )
@@ -269,17 +260,14 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%ONE_ZEROS:~0,%%i%% NEQ %%ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%ONE_ZEROS:~0,%%i%% GTR %%ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%ONE_ZEROS:~0,%%i%% GEQ %%ZEROS:~0,%%i%%
   endlocal
 
@@ -301,7 +289,6 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%ONE_ZEROS:~0,%%i%% NEQ %%ZEROS:~0,%%i%%
   endlocal
 
@@ -316,12 +303,10 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%ONE_ZEROS:~0,%%i%% LSS %%ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%ONE_ZEROS:~0,%%i%% LEQ %%ZEROS:~0,%%i%%
   endlocal
 )
@@ -333,7 +318,6 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%ZEROS:~0,%%i%% NEQ %%ONE_ZEROS:~0,%%i%%
   endlocal
 
@@ -348,12 +332,10 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%ZEROS:~0,%%i%% LSS %%ONE_ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%ZEROS:~0,%%i%% LEQ %%ONE_ZEROS:~0,%%i%%
   endlocal
 )
@@ -365,17 +347,14 @@ for /L %%i in (1,1,20) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%ZEROS:~0,%%i%% NEQ -%%ONE_ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%ZEROS:~0,%%i%% GTR -%%ONE_ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%ZEROS:~0,%%i%% GEQ -%%ONE_ZEROS:~0,%%i%%
   endlocal
 
@@ -397,17 +376,14 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%TEN_ZEROS:~0,%%i%% NEQ %%NINE_ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%TEN_ZEROS:~0,%%i%% GTR %%NINE_ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%TEN_ZEROS:~0,%%i%% GEQ %%NINE_ZEROS:~0,%%i%%
   endlocal
 
@@ -429,7 +405,6 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%TEN_ZEROS:~0,%%i%% NEQ -%%NINE_ZEROS:~0,%%i%%
   endlocal
 
@@ -444,12 +419,10 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%TEN_ZEROS:~0,%%i%% LSS -%%NINE_ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%TEN_ZEROS:~0,%%i%% LEQ -%%NINE_ZEROS:~0,%%i%%
   endlocal
 )
@@ -461,7 +434,6 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%NINE_ZEROS:~0,%%i%% NEQ %%TEN_ZEROS:~0,%%i%%
   endlocal
 
@@ -476,12 +448,10 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%NINE_ZEROS:~0,%%i%% LSS %%TEN_ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%NINE_ZEROS:~0,%%i%% LEQ %%TEN_ZEROS:~0,%%i%%
   endlocal
 )
@@ -493,17 +463,14 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%NINE_ZEROS:~0,%%i%% NEQ -%%TEN_ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%NINE_ZEROS:~0,%%i%% GTR -%%TEN_ZEROS:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%NINE_ZEROS:~0,%%i%% GEQ -%%TEN_ZEROS:~0,%%i%%
   endlocal
 
@@ -525,17 +492,14 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_F21:~0,%%i%% NEQ %%DIGITS_F20:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_F21:~0,%%i%% GTR %%DIGITS_F20:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_F21:~0,%%i%% GEQ %%DIGITS_F20:~0,%%i%%
   endlocal
 
@@ -557,7 +521,6 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_F21:~0,%%i%% NEQ -%%DIGITS_F20:~0,%%i%%
   endlocal
 
@@ -572,12 +535,10 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_F21:~0,%%i%% LSS -%%DIGITS_F20:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_F21:~0,%%i%% LEQ -%%DIGITS_F20:~0,%%i%%
   endlocal
 )
@@ -589,7 +550,6 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_F20:~0,%%i%% NEQ %%DIGITS_F21:~0,%%i%%
   endlocal
 
@@ -604,12 +564,10 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_F20:~0,%%i%% LSS %%DIGITS_F21:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_F20:~0,%%i%% LEQ %%DIGITS_F21:~0,%%i%%
   endlocal
 )
@@ -621,17 +579,14 @@ for /L %%i in (-20,1,-1) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_F20:~0,%%i%% NEQ -%%DIGITS_F21:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_F20:~0,%%i%% GTR -%%DIGITS_F21:~0,%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_F20:~0,%%i%% GEQ -%%DIGITS_F21:~0,%%i%%
   endlocal
 
@@ -653,17 +608,14 @@ for /L %%i in (-20,1,-2) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_B20_2:~%%i%% NEQ %%DIGITS_B20_1:~%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_B20_2:~%%i%% GTR %%DIGITS_B20_1:~%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_B20_2:~%%i%% GEQ %%DIGITS_B20_1:~%%i%%
   endlocal
 
@@ -685,7 +637,6 @@ for /L %%i in (-20,1,-2) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_B20_2:~%%i%% NEQ -%%DIGITS_B20_1:~%%i%%
   endlocal
 
@@ -700,12 +651,10 @@ for /L %%i in (-20,1,-2) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_B20_2:~%%i%% LSS -%%DIGITS_B20_1:~%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_B20_2:~%%i%% LEQ -%%DIGITS_B20_1:~%%i%%
   endlocal
 )
@@ -717,7 +666,6 @@ for /L %%i in (-20,1,-2) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_B20_1:~%%i%% NEQ %%DIGITS_B20_2:~%%i%%
   endlocal
 
@@ -732,12 +680,10 @@ for /L %%i in (-20,1,-2) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_B20_1:~%%i%% LSS %%DIGITS_B20_2:~%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT %%DIGITS_B20_1:~%%i%% LEQ %%DIGITS_B20_2:~%%i%%
   endlocal
 )
@@ -749,17 +695,14 @@ for /L %%i in (-20,1,-2) do (
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_B20_1:~%%i%% NEQ -%%DIGITS_B20_2:~%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_B20_1:~%%i%% GTR -%%DIGITS_B20_2:~%%i%%
   endlocal
 
   setlocal
-  set RETREF=0
   call :TEST_SELECT -%%DIGITS_B20_1:~%%i%% GEQ -%%DIGITS_B20_2:~%%i%%
   endlocal
 

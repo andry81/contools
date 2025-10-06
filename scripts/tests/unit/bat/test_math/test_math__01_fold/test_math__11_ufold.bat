@@ -20,32 +20,27 @@ rem   and is not required to be the full length formatted as `N,N,N,N,N,N`.
 
 
 setlocal
-set RETREF=0
 call :TEST
 endlocal
 
 setlocal
 set OUT=x
 set OUTREF=0
-set RETREF=0
 call :TEST OUT
 endlocal
 
 setlocal
 set OUT=x
 set OUTREF=0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
-set RETREF=0
 call :TEST "" IN
 endlocal
 
 setlocal
 set IN=1
-set RETREF=0
 call :TEST "" IN
 endlocal
 
@@ -439,126 +434,108 @@ endlocal
 setlocal
 set IN=0100000000000000000
 set OUTREF=100,0,0,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=100000000000000000
 set OUTREF=100,0,0,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=10000000000000000
 set OUTREF=10,0,0,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1000000000000000
 set OUTREF=1,0,0,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=100000000000000
 set OUTREF=100,0,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=10000000000000
 set OUTREF=10,0,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1000000000000
 set OUTREF=1,0,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=100000000000
 set OUTREF=100,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=10000000000
 set OUTREF=10,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1000000000
 set OUTREF=1,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=100000000
 set OUTREF=100,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=10000000
 set OUTREF=10,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1000000
 set OUTREF=1,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=100000
 set OUTREF=100,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=10000
 set OUTREF=10,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=1000
 set OUTREF=1,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=100
 set OUTREF=100
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=10
 set OUTREF=10
-set RETREF=0
 call :TEST OUT IN
 endlocal
 

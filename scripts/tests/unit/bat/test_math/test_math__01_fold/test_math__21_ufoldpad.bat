@@ -20,7 +20,6 @@ rem   and is not required to be the full length formatted as `N,N,N,N,N,N`.
 
 
 setlocal
-set RETREF=0
 call :TEST
 endlocal
 
@@ -39,13 +38,11 @@ call :TEST OUT IN
 endlocal
 
 setlocal
-set RETREF=0
 call :TEST "" IN
 endlocal
 
 setlocal
 set IN=1
-set RETREF=0
 call :TEST "" IN
 endlocal
 
@@ -426,7 +423,6 @@ endlocal
 setlocal
 set IN=0100000000000000000
 set OUTREF=100,0,0,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
@@ -439,7 +435,6 @@ endlocal
 setlocal
 set IN=10000000000000000
 set OUTREF=10,0,0,0,0,0
-set RETREF=0
 call :TEST OUT IN
 endlocal
 

@@ -21,58 +21,49 @@ set OUTREF=0,0,0,0,0,0
 
 setlocal
 set "OUTREF="
-set RETREF=0
 call :TEST
 endlocal
 
 setlocal
 set "OUTREF="
-set RETREF=0
 call :TEST "" L
 endlocal
 
 setlocal
 set L=1
 set "OUTREF="
-set RETREF=0
 call :TEST "" L
 endlocal
 
 setlocal
 set L=1
 set "OUTREF="
-set RETREF=0
 call :TEST "" L 1
 endlocal
 
 setlocal
 set "OUTREF="
-set RETREF=0
 call :TEST "" L 1
 endlocal
 
 setlocal
 set OUT=x
-set RETREF=0
 call :TEST OUT
 endlocal
 
 setlocal
 set OUT=x
-set RETREF=0
 call :TEST OUT L
 endlocal
 
 setlocal
 set L=0
 set OUT=x
-set RETREF=0
 call :TEST OUT L
 endlocal
 
 setlocal
 set OUT=x
-set RETREF=0
 call :TEST OUT "" 0
 endlocal
 
@@ -142,7 +133,6 @@ rem      rem ERRORLEVEL=0
 rem      rem b=0,0,0,0,12,345
 setlocal
 set OUTREF=0,0,0,0,12,345
-set RETREF=0
 call :TEST OUT L 12345
 endlocal
 

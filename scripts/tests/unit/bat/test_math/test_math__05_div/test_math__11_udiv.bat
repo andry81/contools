@@ -41,13 +41,11 @@ endlocal
 setlocal
 set L=1
 set "OUTREF="
-set RETREF=0
 call :TEST "" L 1
 endlocal
 
 setlocal
 set "OUTREF="
-set RETREF=0
 call :TEST "" L 1
 endlocal
 

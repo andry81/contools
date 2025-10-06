@@ -21,39 +21,33 @@ set OUTREF=0,0,0,0,0,0
 
 setlocal
 set "OUTREF="
-set RETREF=0
 call :TEST
 endlocal
 
 setlocal
 set "OUTREF="
-set RETREF=0
 call :TEST "" IN
 endlocal
 
 setlocal
 set IN=1
 set "OUTREF="
-set RETREF=0
 call :TEST "" IN
 endlocal
 
 setlocal
 set OUT=x
-set RETREF=0
 call :TEST OUT
 endlocal
 
 setlocal
 set OUT=x
-set RETREF=0
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=0
 set OUT=x
-set RETREF=0
 call :TEST OUT IN
 endlocal
 

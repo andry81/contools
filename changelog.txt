@@ -1,3 +1,6 @@
+2025.10.04:
+* changed: scripts/tests/unit/bat/test_math: unit tests improvement, define `RETREF=0` by default because a return value must always exist
+
 2025.10.03:
 * refactor: scripts/tools/math: ?add*.bat, ?cmp*.bat, ?div.bat, ?mul.bat, inorm.bat, ?unfold.bat: minor refactor
 
