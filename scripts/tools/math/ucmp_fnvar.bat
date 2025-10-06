@@ -60,7 +60,7 @@ rem   sequence:
 rem
 rem     A1[,A2[,A3[,A4[,A5[,A6[,B1[,B2[,B3[,B4[,B5[,B6[,...]]]]]]]]]]]]
 rem
-rem   In that case the left sequence of `An` compares before a right sequence
+rem   In that case the left sequence `An` compares before a right sequence
 rem   comparison and if is weakly ordered, then a right sequence does compare
 rem   recursively until of a strong order or until the end of a sequence or a
 rem   comparison.

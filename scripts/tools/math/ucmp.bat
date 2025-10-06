@@ -57,10 +57,10 @@ rem   sequence:
 rem
 rem     [[[[[[[[[[[[...]B1]B2]B3]B4]B5]B6]A1]A2]A3]A4]A5]A6
 rem
-rem   In that case a left sequence of `Bn` compares recursively before the
-rem   right sequence comparison and if is weakly ordered, then the right
-rem   sequence does compare after until of a strong order or until the end of a
-rem   sequence or a comparison.
+rem   In that case a left sequence `Bn` compares recursively before the right
+rem   sequence comparison and if is weakly ordered, then the right sequence
+rem   does compare after until of a strong order or until the end of a sequence
+rem   or a comparison.
 rem
 rem   If a left sequence is empty for both arguments, then returns
 rem   comparison result of the right sequence.

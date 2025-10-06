@@ -1,4 +1,7 @@
 2025.10.03:
+* refactor: scripts/tools/math: ?add*.bat, ?cmp*.bat, ?div.bat, ?mul.bat, inorm.bat, ?unfold.bat: minor refactor
+
+2025.10.03:
 * new: scripts/tools/ToolAdaptors/app/emule/_config/config.0.vars.in: `EMULE_BACKUP_LOGS_NOT_OLDER_DAYS` variable to store a value for the `backup logs not older than X days`
 * changed: scripts/tools/ToolAdaptors/app/emule/backup_logs.bat: use `robocopy` to always copy log files with `not older than X days` filter
 

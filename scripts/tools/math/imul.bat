@@ -60,8 +60,8 @@ rem   sequence:
 rem
 rem     A1[,A2[,A3[,A4[,A5[,A6[,B1[,B2[,B3[,B4[,B5[,B6[,...]]]]]]]]]]]]
 rem
-rem   In that case the right sequence of `Bn` does evaluate the same way as the
-rem   left sequence of `An`, and the overflow result of the `Bn` does add up to
+rem   In that case the right sequence `Bn` does evaluate the same way as the
+rem   left sequence `An`, and the overflow result of the `Bn` does add up to
 rem   the `An` after the normalization of the `Bn`.
 rem
 rem   Then the `An` multiplies up with the <rvalue> and normalizes to return
