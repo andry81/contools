@@ -30,7 +30,7 @@ fi
 [[ -n "$TACKLELIB_PROJECT_EXTERNALS_ROOT" ]] ||     tkl_export_path -a -s TACKLELIB_PROJECT_EXTERNALS_ROOT    "$CONTOOLS_PROJECT_EXTERNALS_ROOT"
 [[ -n "$SVNCMD_PROJECT_EXTERNALS_ROOT" ]] ||        tkl_export_path -a -s SVNCMD_PROJECT_EXTERNALS_ROOT       "$CONTOOLS_PROJECT_EXTERNALS_ROOT"
 
-# config loader must be included before any external project init and using init variables (declared here and not by the config)
+# config loader must be included before any external project init and has using only init variables (declared here and not by the config)
 
 if (( ! SOURCE_TACKLELIB_TOOLS_LOAD_CONFIG_SH )); then # check inclusion guard
   tkl_include_or_abort "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/bash/tacklelib/tools/load_config.sh"
