@@ -1,4 +1,9 @@
 2025.10.06:
+* new: scripts/tools/math/imul2x_fnvar.bat: script to circumvent 32-bit signed multiplication arithmetic limitation
+* new: scripts/tests/unit/bat/test_math: `imul2x_fnvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `imul2x_fnvar.bat` bench test
+
+2025.10.06:
 * fixed: scripts/tests/bench/bat/test_math/test_math__04_mul/test_math__21_imul.bat: bench test fixup
 
 2025.10.04:
