@@ -52,7 +52,7 @@ rem   than NNN, and is not required to be the full length formatted as
 rem   `N,N,N,N,N,N`.
 rem
 rem   To use the full length format output you can use either
-rem   `ufoldpad6*.bat` scripts or `uadd.bat` script instead:
+rem   `ufoldpad6*.bat` scripts, `uadd.bat` or `unorm.bat` script instead:
 rem
 rem     >
 rem     set a=12345678901234567890
@@ -80,6 +80,12 @@ rem     rem b=0,0,0,0,12,345
 rem
 rem     >
 rem     uadd.bat b "" 12345
+rem     rem ERRORLEVEL=0
+rem     rem b=0,0,0,0,12,345
+rem
+rem     >
+rem     set a=0,0,0,0,0,12345
+rem     unorm.bat b a
 rem     rem ERRORLEVEL=0
 rem     rem b=0,0,0,0,12,345
 rem

@@ -1,7 +1,7 @@
 @echo off & set "D=%~3" & set /A "D=D/D - 1 + D" || exit /b -1 & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!%~2!") do ^
 set "L1=%%i" & set "L2=%%j" & set "L3=%%k" & set "L4=%%l" & set "L5=%%m" & set "L6=%%n" & set "F=%%o" ^
-  & ( if defined F call "%%~dp0uadd.bat" F F 0 || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
+  & ( if defined F call "%%~dp0unorm.bat" F F || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
 set /A "L5+=L6 / 1000" & set /A "L6%%=1000" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" & ^
 set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "R=L1 %% D" & set /A "L1/=D" ^
   & ( if !R! NEQ 0 ( ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) & set "R=!R!!L2!" ) else set "R=!L2!" ) & set /A "L2=R / D" & set /A "R%%=D" ^

@@ -1,4 +1,9 @@
 2025.10.07:
+* changed: scripts/tools/math: ?add*.bat, ?div.bat: switched to `?norm.bat` scripts as a bit faster
+* changed: scripts/tools/math/unorm.bat: code cleanup
+* refactor: scripts/tools/math/ufold*.bat: minor refactor
+
+2025.10.07:
 * fixed: scripts/tests/unit/bat/test_math/test_math__04_mul/test_math__22_imul2x_fnvar.bat: missed to cleanup
 * new: scripts/tools/math/iadd2x_fnvar.bat: script to circumvent 32-bit signed addition arithmetic limitation
 * new: scripts/tests/unit/bat/test_math: `iadd2x_fnvar.bat` unit tests
