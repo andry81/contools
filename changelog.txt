@@ -1,4 +1,12 @@
 2025.10.07:
+* fixed: scripts/tests/unit/bat/test_math/test_math__04_mul/test_math__22_imul2x_fnvar.bat: missed to cleanup
+* new: scripts/tools/math/iadd2x_fnvar.bat: script to circumvent 32-bit signed addition arithmetic limitation
+* new: scripts/tests/unit/bat/test_math: `iadd2x_fnvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `iadd2x_fnvar.bat` bench test
+* changed: scripts/tools/math: iadd*.bat, imul2x_fnvar.bat: code cleanup
+* refactor: scripts/tools/math/?add*.bat: minor refactor
+
+2025.10.07:
 * fixed: scripts/tests/bench/bat/test__exit.bat: execution fixup
 * new: scripts/tests/bench/bat/test__exit: more tests
 * refactor: scripts/tests/bench/bat/test__exit: minor refactor

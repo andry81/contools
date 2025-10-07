@@ -20,6 +20,11 @@ rem
 rem   NOTE:
 rem     The `unsigned` in case of an integer number prefix does mean you must
 rem     not use negative `-` nor positive `+` signs.
+rem
+rem   NOTE:
+rem     The output integer part addition is limited by 6 folded groups of
+rem     digits. To add into 12 folded groups number use `iadd2x*.bat`
+rem     script(s) instead.
 
 rem <out-var>:
 rem   A variable name for a string value of completely folded integer number

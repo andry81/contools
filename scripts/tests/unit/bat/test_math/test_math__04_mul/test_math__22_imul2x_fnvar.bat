@@ -16,10 +16,10 @@ set ZEROS=000,000,000,000,000,000,000
 
 rem NOTE:
 rem   Opposite to `fold.bat` script, the `OUT` must be always at least
-rem   `N,N,N,N,N,N` formatted if defined.
+rem   `N,N,N,N,N,N,N,N,N,N,N,N` formatted if defined.
 set OUTREF=0,0,0,0,0,0,0,0,0,0,0,0
 
-goto x
+
 setlocal
 set "OUTREF="
 call :TEST
@@ -242,7 +242,7 @@ set OUTREF=0,0,0,0,0,0,0,0,0,0,0,0
 call :TEST OUT L R
 endlocal
 
-:x
+
 setlocal
 set R=0,0,0,1,111,111
 for %%a in ("" "-") do (

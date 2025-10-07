@@ -28,6 +28,11 @@ rem   A signed integer number addition script to workaround the `set /A`
 rem   command 32-bit range limitation.
 rem
 rem   Exit code indicates an overflow with a sign.
+rem
+rem   NOTE:
+rem     The output integer part addition is limited by 6 folded groups of
+rem     digits. To add into 12 folded groups number use `iadd2x*.bat`
+rem     script(s) instead.
 
 rem <out-var>:
 rem   A variable name for a string value of completely folded integer number
