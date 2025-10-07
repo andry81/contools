@@ -1,3 +1,8 @@
+2025.10.07:
+* fixed: scripts/tests/bench/bat/test__exit.bat: execution fixup
+* new: scripts/tests/bench/bat/test__exit: more tests
+* refactor: scripts/tests/bench/bat/test__exit: minor refactor
+
 2025.10.06:
 * refactor: scripts/tools/math/?cmp_fnvar.bat: minor refactor
 
