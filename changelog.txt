@@ -1,3 +1,6 @@
+2025.10.09:
+* new: scripts/tests/bench/bat/test__for: `for /L` vs `for ... in` bench tests
+
 2025.10.07:
 * changed: scripts/tools/math: ?add*.bat, ?div.bat: switched to `?norm.bat` scripts as a bit faster
 * changed: scripts/tools/math/unorm.bat: code cleanup
