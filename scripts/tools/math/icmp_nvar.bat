@@ -116,10 +116,10 @@ rem
 rem   3. Invalid comparison
 rem      >
 rem      set b=0
-rem      call icmp_nvar "" EQU b && echo TRUE || echo FALSE
+rem      call icmp_nvar.bat "" EQU b && echo TRUE || echo FALSE
 rem      rem ERRORLEVEL=-1
 rem      rem FALSE
 rem      set a=-1
-rem      call icmp_nvar a LSS "" && echo TRUE || echo FALSE
+rem      call icmp_nvar.bat a LSS "" && echo TRUE || echo FALSE
 rem      rem ERRORLEVEL=-1
 rem      rem FALSE

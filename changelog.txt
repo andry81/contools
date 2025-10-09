@@ -1,4 +1,11 @@
 2025.10.09:
+* new: scripts/tools/math/?ltrim_nvar.bat: script to zero trim integer unfolded numbers
+* new: scripts/tests/unit/bat/test_math: `?ltrim_nvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `?ltrim_nvar.bat` bench tests
+* changed: scripts/tests/unit/bat/test_math/test_math__08_norm: minor improvements
+* refactor: scripts/tools/math/?cmp_nvar.bat: minor refactor
+
+2025.10.09:
 * new: scripts/tests/bench/bat/test__for: `for /L` vs `for ... in` bench tests
 
 2025.10.07:

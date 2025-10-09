@@ -45,14 +45,8 @@ set OUT=x
 call :TEST OUT IN
 endlocal
 
-setlocal
-set IN=0
-set OUT=x
-call :TEST OUT IN
-endlocal
-
 rem signed zero case
-for %%i in ("+0" "-0" "+0,0,0,0,0,0" "-0,0,0,0,0,0") do (
+for %%i in ("0" "+0" "-0" "00" "+00" "-00" "0,0,0,0,0,0" "+0,0,0,0,0,0" "-0,0,0,0,0,0") do (
   setlocal
   set "IN=%%~i"
   call :TEST OUT IN 0
