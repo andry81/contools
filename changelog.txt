@@ -1,3 +1,7 @@
+2025.10.10:
+* changed: scripts/tools/ToolAdaptors/app/emule: splitted `backup_config.bat` into multiple scripts
+* changed: scripts/tools/ToolAdaptors/app/emule: added more backup files
+
 2025.10.09:
 * new: scripts/tools/math/?ltrim_nvar.bat: script to zero trim integer unfolded numbers
 * new: scripts/tests/unit/bat/test_math: `?ltrim_nvar.bat` unit tests
