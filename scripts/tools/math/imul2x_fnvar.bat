@@ -106,19 +106,19 @@ rem     normalize after the input multiplication.
 rem
 rem   CAUTION:
 rem     In case of a value greater by modulo than `999,999,999,999,999,999`,
-rem     the `<lvar>[An] x <rvar>[An]` product can give an overflow:
+rem     the `<lvar>[Ai] x <rvar>[Aj]` product can give an overflow:
 rem
-rem         X2^2  <= 2147483647
-rem       2*X3^2  <= 2147483647
-rem       3*X4^2  <= 2147483647
-rem       4*X5^2  <= 2147483647
-rem       5*X6^2  <= 2147483647
-rem       6*X7^2  <= 2147483647
-rem       5*X8^2  <= 2147483647
-rem       4*X9^2  <= 2147483647
-rem       3*X10^2 <= 2147483647
-rem       2*X11^2 <= 2147483647
-rem         X12^2 <= 2147483647
+rem         X2  <= 2147483647
+rem       2*X3  <= 2147483647
+rem       3*X4  <= 2147483647
+rem       4*X5  <= 2147483647
+rem       5*X6  <= 2147483647
+rem       6*X7  <= 2147483647
+rem       5*X8  <= 2147483647
+rem       4*X9  <= 2147483647
+rem       3*X10 <= 2147483647
+rem       2*X11 <= 2147483647
+rem         X12 <= 2147483647
 rem
 rem       , where Xn = Ai x Aj
 rem
@@ -126,7 +126,7 @@ rem     Then Xn must be in average by modulo less or equal than
 rem     `sqrt(2147483647 / K)`, where K=6 is a maximum quantity of additions
 rem     (accumulation) into `X7` group, excluding the normalization:
 rem
-rem       Xn = sqrt(2147483647 / 6) = 18918
+rem       Xn <= sqrt(2147483647 / 6) = 18918
 rem
 rem     Normalization gives additional condition:
 rem

@@ -21,7 +21,7 @@ rem <out-var>:
 rem   A variable name for a string value of a trimmed integer <var>.
 rem
 rem   Format:
-rem     [+|-]NNN[NNN[NNN[NNN[NNN[NNN[...]]]]]]
+rem     [-]NNN[NNN[NNN[NNN[NNN[NNN[...]]]]]]
 rem     , where a not first NNN can begin by 0 but does not treated as an octal
 rem       number.
 rem

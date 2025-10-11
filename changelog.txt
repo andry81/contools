@@ -1,3 +1,10 @@
+2025.10.11:
+* new: scripts/tools/math/?ltrim_fnvar.bat: script to zero trim integer folded numbers
+* new: scripts/tests/unit/bat/test_math: `?ltrim_fnvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `?ltrim_fnvar.bat` bench tests
+* refactor: scripts/tests: unit/bat/test_math/test_math__09_trim, bench/bat/test_math/test_math__08_norm, bench/bat/test_math/test_math__09_trim: minor refactor
+* refactor: scripts/tools/math: imul2x_fnvar.bat, iltrim_nvar.bat: minor fixup
+
 2025.10.10:
 * changed: scripts/tools/ToolAdaptors/app/emule: splitted `backup_config.bat` into multiple scripts
 * changed: scripts/tools/ToolAdaptors/app/emule: added more backup files
