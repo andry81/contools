@@ -1,13 +1,41 @@
-''' Read a binary file MSI summary PID_TEMPLATE.
+''' Read an MSI/MSP file summary PID_TEMPLATE property value.
+''' Prints if an MSI package has 32 bit (x86) or 64 bit (x64) bitness.
+
 
 ''' USAGE:
-'''   read_msi_summary_template.vbs <FilePath>
+'''   read_msi_summary_template.vbs
+'''     [-msp]
+'''     [--]
+'''       <FilePath>
 
 ''' DESCRIPTION:
+'''   --
+'''     Separator between flags and positional arguments to explicitly stop the
+'''     flags parser.
+'''
+'''   -msp
+'''     Open <FilePath> as MSP file.
+'''
 '''   <FilePath>
-'''     Path to binary file to read.
+'''     Path to MSI/MSP file to read.
 
-' Can check if an MSI package has 32 bit (x86) or 64 bit (x64) bitness.
+''' Error codes:
+'''   255 - unspecified error
+'''   128 - <FilePath> is not WindowsInstaller.Installer object
+'''   1   - <FilePath> is not defined or not exist
+'''   0   - Success
+
+Function IsNothing(obj)
+  If IsEmpty(obj) Then
+    IsNothing = True
+    Exit Function
+  End If
+  If obj Is Nothing Then
+    IsNothing = True
+  Else
+    IsNothing = False
+  End If
+End Function
 
 Function IsEmptyArg(args, index)
   ''' Based on: https://stackoverflow.com/questions/4466967/how-can-i-determine-if-a-dynamic-array-has-not-be-dimensioned-in-vbscript/4469121#4469121
@@ -94,7 +122,9 @@ End Sub
 
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
-Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
+Dim ExpectFlags : ExpectFlags = True
+
+Dim OpenAsMSP : OpenAsMSP = False
 
 Dim arg
 Dim j : j = 0
@@ -102,11 +132,26 @@ Dim j : j = 0
 For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Continue`
   arg = WScript.Arguments(i)
 
-  ' read command line flags here...
+  If ExpectFlags Then
+    If arg <> "--" And Mid(arg, 1, 1) = "-" Then
+      If arg = "-msp" Then
+        OpenAsMSP = True
+      Else
+        PrintOrEchoErrorLine WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
+        WScript.Quit 255
+      End If
+    Else
+      ExpectFlags = False
 
-  cmd_args(j) = arg
+      If arg = "--" Then Exit Do
+    End If
+  End If
 
-  j = j + 1
+  If Not ExpectFlags Then
+    cmd_args(j) = arg
+
+    j = j + 1
+  End If
 Loop While False : Next
 
 ReDim Preserve cmd_args(j - 1)
@@ -160,9 +205,23 @@ End If
 
 ' create installer object
 Dim objInstaller : Set objInstaller = CreateObject("WindowsInstaller.Installer")
+Dim objMsiDB
+
+Const MSIOPENDATABASEMODE_PATCHFILE = 32
 
 ' open msi in read-only mode
-Dim objMsiDB : Set objMsiDB = objInstaller.OpenDatabase(FilePathToOpen, 0)
+If Not OpenAsMSP Then
+  Set objMsiDB = objInstaller.OpenDatabase(FilePathToOpen, 0)
+Else
+  Set objMsiDB = objInstaller.OpenDatabase(FilePathToOpen, MSIOPENDATABASEMODE_PATCHFILE)
+End If
+
+If IsNothing(objMsiDB) Then
+  PrintOrEchoErrorLine _
+    WScript.ScriptName & ": error: file path is not parsed." & vbCrLf & _
+    WScript.ScriptName & ": info: FilePath=`" & FilePathAbs & "`"
+  WScript.Quit 128
+End If
 
 Dim objMsiDBStream : Set objMsiDBStream = objMsiDB.SummaryInformation(0) ' 0 = read only
 

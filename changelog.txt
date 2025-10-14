@@ -1,3 +1,7 @@
+2025.10.14:
+* new: scripts/tools/ToolAdaptors/vbs/read_msi_summary_all_props.*: scripts to read MSI/MSP files summary info
+* changed: scripts/tools/ToolAdaptors/vbs/read_msi_summary_template.vbs: added `-msp` flag to read MSP file template property
+
 2025.10.11:
 * new: scripts/tools/math/?ltrim_fnvar.bat: script to zero trim integer folded numbers
 * new: scripts/tests/unit/bat/test_math: `?ltrim_fnvar.bat` unit tests
