@@ -1,17 +1,28 @@
-''' Read an MSI/MSP file summary all property values.
+''' Read an MSI/MSP file summary arbitrary property values.
 
 ''' USAGE:
-'''   read_msi_summary_all_props.vbs
+'''   read_msi_summary_props.vbs
+'''     [-v[al-only]]
+'''     [-val-decor-only | -vd]
 '''     [-u[rl-encode]]
 '''     [-line-return | -lr]
 '''     [-msp]
 '''     [--]
-'''       <FilePath>
+'''       <PropertyPattern> <FilePath>
 
 ''' DESCRIPTION:
 '''   --
 '''     Separator between flags and positional arguments to explicitly stop the
 '''     flags parser.
+'''
+'''   -v[al-only]
+'''     Print only undecorated property value instead of decorated assignment
+'''     expression.
+'''     Has no effect if `-val-decor-only` is used.
+'''
+'''   -val-decor-only | -vd
+'''     Print only decorated property value instead of decorated assignment
+'''     expression.
 '''
 '''   -u[rl-encode]
 '''     URL encode property value characters in form of `%NN` in case if
@@ -26,6 +37,10 @@
 '''
 '''   -msp
 '''     Open <FilePath> as MSP file.
+'''
+'''   <PropertyPattern>
+'''     List of property names or property indexes to read, separated by `|`
+'''     character.
 '''
 '''   <FilePath>
 '''     Path to MSI/MSP file to read.
@@ -164,10 +179,39 @@ Function GetMsiSummaryInfoPropIndexName(index)
   End Select
 End Function
 
+Function GetMsiSummaryInfoPropIndex(name)
+  Select Case name
+    Case "Dictionary" : GetMsiSummaryInfoPropIndex = 0      ' PID_DICTIONARY: Special format, not support by SummaryInfo object
+    Case "Codepage"   : GetMsiSummaryInfoPropIndex = 1      ' "ANSI codepage of text strings in summary information only"
+    Case "Title"      : GetMsiSummaryInfoPropIndex = 2      ' "Package type, e.g. Installation Database"
+    Case "Subject"    : GetMsiSummaryInfoPropIndex = 3      ' "Product full name or description"
+    Case "Author"     : GetMsiSummaryInfoPropIndex = 4      ' "Creator, typically vendor name"
+    Case "Keywords"   : GetMsiSummaryInfoPropIndex = 5      ' "List of keywords for use by file browsers"
+    Case "Comments"   : GetMsiSummaryInfoPropIndex = 6      ' "Description of purpose or use of package"
+    Case "Template"   : GetMsiSummaryInfoPropIndex = 7      ' "Target system: Platform(s);Language(s)"
+    Case "LastAuthor" : GetMsiSummaryInfoPropIndex = 8      ' "Used for transforms only: New target: Platform(s);Language(s)"
+    Case "Revision"   : GetMsiSummaryInfoPropIndex = 9      ' "Package code GUID, for transforms contains old and new info"
+    Case "Edited"     : GetMsiSummaryInfoPropIndex = 10     '
+    Case "Printed"    : GetMsiSummaryInfoPropIndex = 11     ' "Date and time of installation image, same as Created if CD"
+    Case "Created"    : GetMsiSummaryInfoPropIndex = 12     ' "Date and time of package creation"
+    Case "Saved"      : GetMsiSummaryInfoPropIndex = 13     ' "Date and time of last package modification"
+    Case "Pages"      : GetMsiSummaryInfoPropIndex = 14     ' "Minimum Windows Installer version required: Major * 100 + Minor"
+    Case "Words"      : GetMsiSummaryInfoPropIndex = 15     ' "Source flags: 1=short names, 2=compressed, 4=network image"
+    Case "Characters" : GetMsiSummaryInfoPropIndex = 16     ' "Used for transforms only: validation and error flags"
+    Case "Thumbnail"  : GetMsiSummaryInfoPropIndex = 17     '
+    Case "Application": GetMsiSummaryInfoPropIndex = 18     ' "Application associated with file, ""Windows Installer"" for MSI"
+    Case "Security"   : GetMsiSummaryInfoPropIndex = 19     ' "0=Read/write 1=Readonly recommended 2=Readonly enforced"
+
+    Case Else: GetMsiSummaryInfoPropIndex = -1
+  End Select
+End Function
+
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
 
+Dim PrintValueOnly : PrintValueOnly = False
+Dim PrintDecorValueOnly : PrintDecorValueOnly = False
 Dim UrlEncode : UrlEncode = False
 Dim LineReturn : LineReturn = False
 Dim OpenAsMSP : OpenAsMSP = False
@@ -180,7 +224,11 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
 
   If ExpectFlags Then
     If arg <> "--" And Mid(arg, 1, 1) = "-" Then
-      If arg = "-url-encode" Or arg = "-u" Then
+      If arg = "-val-only" Or arg = "-v" Then
+        PrintValueOnly = True
+      ElseIf arg = "-val-decor-only" Or arg = "-vd" Then
+        PrintDecorValueOnly = True
+      ElseIf arg = "-url-encode" Or arg = "-u" Then
         UrlEncode = True
       ElseIf arg = "-line-return" Or arg = "-lr" Then
         LineReturn = True
@@ -209,11 +257,17 @@ ReDim Preserve cmd_args(j - 1)
 ' MsgBox Join(cmd_args, " ")
 
 If IsEmptyArg(cmd_args, 0) Then
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: <PropertyPattern> argument is not defined."
+  WScript.Quit 2
+End If
+
+If IsEmptyArg(cmd_args, 1) Then
   PrintOrEchoErrorLine WScript.ScriptName & ": error: <FilePath> argument is not defined."
   WScript.Quit 1
 End If
 
-Dim FilePath : FilePath = cmd_args(0)
+Dim PropertyPattern : PropertyPattern = cmd_args(0)
+Dim FilePath : FilePath = cmd_args(1)
 
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
@@ -273,6 +327,10 @@ If IsNothing(objMsiDB) Then
   WScript.Quit 128
 End If
 
+Dim PropertyArr : PropertyArr = Split(PropertyPattern, "|", -1, vbTextCompare)
+Dim PropertyArrUbound : PropertyArrUbound = UBound(PropertyArr)
+Dim PropertyName, IsPropNameNum
+
 Dim objMsiDBStream : Set objMsiDBStream = objMsiDB.SummaryInformation(0) ' 0 = read only
 
 Dim LastError
@@ -283,8 +341,24 @@ Dim FilePropIndexStr
 
 Dim Printed : Printed = False
 
-' 99 - maximum
-For FilePropIndex = 0 To 99 : Do ' empty `Do-Loop` to emulate `Continue`
+For j = 0 To PropertyArrUbound : Do ' empty `Do-Loop` to emulate `Continue`
+  PropertyName = PropertyArr(j)
+
+  IsPropNameNum = IsNumeric(PropertyName)
+
+  If IsPropNameNum Then
+    FilePropIndex = CLng(PropertyName)
+  Else
+    FilePropIndex = GetMsiSummaryInfoPropIndex(PropertyName)
+
+    If FilePropIndex < 0 Then
+      PrintOrEchoErrorLine _
+        WScript.ScriptName & ": error: property name is unknown." & vbCrLf & _
+        WScript.ScriptName & ": info: PropertyName=`" & PropertyName & "`"
+      Exit Do ' continue on unexisted property index
+    End If
+  End If
+
   On Error Resume Next
   FilePropValue = objMsiDBStream.Property(FilePropIndex)
   LastError = Err
@@ -325,7 +399,15 @@ For FilePropIndex = 0 To 99 : Do ' empty `Do-Loop` to emulate `Continue`
     FilePropValue = FilePropEncodedValue
   End If
 
-  PrintOrEchoLine "[" & Left("000", 3 - Len(FilePropIndexStr)) & FilePropIndexStr & "] " & FilePropName & "=`" & FilePropValue & "`"
+  If (Not PrintValueOnly) And (Not PrintDecorValueOnly) Then
+    PrintOrEchoLine "[" & Left("000", 3 - Len(FilePropIndexStr)) & FilePropIndexStr & "] " & FilePropName & "=`" & FilePropValue & "`"
+  Else
+    If PrintDecorValueOnly Then
+      PrintOrEchoLine "`" & FilePropValue & "`"
+    Else
+      PrintOrEchoLine "" & FilePropValue
+    End If
+  End If
 
   Printed = True
 

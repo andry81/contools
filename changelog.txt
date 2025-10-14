@@ -1,4 +1,8 @@
 2025.10.14:
+* new: scripts/tools/ToolAdaptors/vbs/read_msi_summary_props.vbs: scripts to read MSI/MSP files arbitrary summary properties
+* changed: scripts/tools/ToolAdaptors/vbs/read_msi_summary_all_props.*: added `-line-return` flag to return on first line print
+
+2025.10.14:
 * new: scripts/tools/ToolAdaptors/vbs/read_msi_summary_all_props.*: scripts to read MSI/MSP files summary info
 * changed: scripts/tools/ToolAdaptors/vbs/read_msi_summary_template.vbs: added `-msp` flag to read MSP file template property
 
