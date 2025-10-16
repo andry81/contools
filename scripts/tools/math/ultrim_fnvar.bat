@@ -42,7 +42,7 @@ rem     0|NNN,NNN,NNN,NNN,NNN,NNN[,NNN,NNN,NNN,NNN,NNN,NNN[,...]]
 rem     , where NNN does not begin by 0 except 0.
 rem
 rem   The output value is always `N,N,N,N,N,N[,N,N,N,N,N,N[,...]]` formatted if
-rem   a variable name is not empty and not zero.
+rem   a variable name is not empty and has a not zero number value.
 rem
 rem   NOTE:
 rem     The number can represent a value greater than 32-bit unsigned integer
@@ -71,7 +71,7 @@ rem   consisted of zero(s), then `0` returns.
 rem
 rem   NOTE:
 rem     The number can represent a value greater than 32-bit unsigned integer
-rem     as a string output.
+rem     as a string input.
 rem
 rem     999,999,999,999,999,999 is equivalent to 60-bit integer
 rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer

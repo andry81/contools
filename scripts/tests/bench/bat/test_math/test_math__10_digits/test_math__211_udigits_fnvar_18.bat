@@ -8,11 +8,11 @@ echo;^>%~nx0
 
 setlocal DISABLEDELAYEDEXPANSION
 
-set IN=999999999999999999999999999999999999
+set IN=000,000,000,999,999,999
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-for /L %%i in (1,1,100) do call "%%CONTOOLS_ROOT%%/math/ultrim_nvar.bat" OUT IN
+for /L %%i in (1,1,100) do call "%%CONTOOLS_ROOT%%/math/udigits_fnvar.bat" IN
 
 call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
 

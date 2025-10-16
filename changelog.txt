@@ -1,3 +1,16 @@
+2025.10.16:
+* new: scripts/tools/math/?digits_fnvar.bat: script to count digits of integer folded numbers
+* new: scripts/tests/unit/bat/test_math: `?digits_fnvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `?digits_fnvar.bat` bench tests
+* changed: scripts/tests/unit/bat/test_math/test_math__09_trim: minor improvement
+* changed: scripts/tests/bench/bat/test_math/test_math__09_trim: improved to show maximum delay
+* refactor: scripts/tools/math/?ltrim_*nvar.bat: minor refactor
+
+2025.10.15:
+* new: scripts/tools/math/?digits_nvar.bat: script to count digits of integer unfolded numbers
+* new: scripts/tests/unit/bat/test_math: `?digits_nvar.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `?digits_nvar.bat` bench tests
+
 2025.10.14:
 * new: scripts/tools/ToolAdaptors/vbs/read_msi_summary_props.vbs: scripts to read MSI/MSP files arbitrary summary properties
 * changed: scripts/tools/ToolAdaptors/vbs/read_msi_summary_all_props.*: added `-line-return` flag to return on first line print

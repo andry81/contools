@@ -46,11 +46,11 @@ call :TEST OUT IN
 endlocal
 
 rem signed zero case
-for %%i in ("0" "+0" "-0" "00" "+00" "-00") do (
+for %%i in ("+0" "-0" "+00" "-00") do (
   setlocal
   set "IN=%%~i"
   set "OUTREF=0"
-  call :TEST OUT IN 0
+  call :TEST OUT IN
   endlocal
 )
 
@@ -65,37 +65,37 @@ for /L %%i in (1,1,18) do (
 rem test on overflow
 setlocal
 set IN=1999999999999999999
-set OUTREF=1999999999999999999
+set "OUTREF=%IN%"
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=-1999999999999999999
-set OUTREF=-1999999999999999999
+set "OUTREF=%IN%"
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=19999999999999999991000
-set OUTREF=19999999999999999991000
+set "OUTREF=%IN%"
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=-19999999999999999991000
-set OUTREF=-19999999999999999991000
+set "OUTREF=%IN%"
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=19999999999999999999999999999999999991000
-set OUTREF=19999999999999999999999999999999999991000
+set "OUTREF=%IN%"
 call :TEST OUT IN
 endlocal
 
 setlocal
 set IN=-19999999999999999999999999999999999991000
-set OUTREF=-19999999999999999999999999999999999991000
+set "OUTREF=%IN%"
 call :TEST OUT IN
 endlocal
 

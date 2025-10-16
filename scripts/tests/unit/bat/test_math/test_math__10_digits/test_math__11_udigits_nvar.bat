@@ -8,68 +8,58 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
 rem reset all test variables at first
 set "IN="
-set "OUT="
-set "OUTREF="
+set "INREF="
 set "RETREF=0"
 
 set ZEROS=000000000000000000
 
 
 setlocal
-set RETREF=-1
+set RETREF=1
 call :TEST
 endlocal
 
 setlocal
-set RETREF=-1
-call :TEST "" IN
+set RETREF=1
+call :TEST IN
 endlocal
 
 setlocal
-set IN=1
-set RETREF=-1
-call :TEST "" IN
-endlocal
-
-setlocal
-set OUT=x
-set "OUTREF=x"
-set RETREF=-1
-call :TEST OUT
-endlocal
-
-setlocal
-set OUT=+x
-set "OUTREF=+x"
-set RETREF=-1
-call :TEST OUT IN
+set IN=xxx
+set INREF=xxx
+set RETREF=1
+call :TEST IN
 endlocal
 
 for /L %%i in (1,1,18) do (
   setlocal
   call set "IN=%%ZEROS:~0,%%i%%"
-  set "OUTREF=0"
-  call :TEST OUT IN
+  call set "INREF=%%IN%%"
+  set RETREF=1
+  call :TEST IN
   endlocal
 )
 
 rem test on overflow
 setlocal
 set IN=1999999999999999999
-set "OUTREF=%IN%"
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=19
+call :TEST IN
 endlocal
 
 setlocal
 set IN=19999999999999999991000
-set "OUTREF=%IN%"
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=23
+call :TEST IN
 endlocal
 
 setlocal
 set IN=19999999999999999999999999999999999991000
-set "OUTREF=%IN%"
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=41
+call :TEST IN
 endlocal
 
 
@@ -79,24 +69,24 @@ rem Examples:
 rem
 rem   1. >
 rem      set a=000123000
-rem      ultrim_nvar.bat b a
-rem      rem ERRORLEVEL=0
-rem      rem b=123000
+rem      udigits_nvar.bat a
+rem      rem ERRORLEVEL=6
 setlocal
 set IN=000123000
-set OUTREF=123000
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=6
+call :TEST IN
 endlocal
 
 rem   2. >
-rem      set a=+000123000
-rem      ultrim_nvar.bat b a
-rem      rem ERRORLEVEL=0
-rem      rem b=+000123000
+rem      set a=000000000
+rem      udigits_nvar.bat a
+rem      rem ERRORLEVEL=1
 setlocal
-set IN=+000123000
-set OUTREF=+000123000
-call :TEST OUT IN
+set IN=000000000
+set "INREF=%IN%"
+set RETREF=1
+call :TEST IN
 endlocal
 
 echo;

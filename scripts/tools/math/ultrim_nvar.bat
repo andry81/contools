@@ -40,7 +40,7 @@ rem     , where NNN can begin by 0 but does not treated as an octal number.
 rem
 rem   NOTE:
 rem     The number can represent a value greater than 32-bit unsigned integer
-rem     as a string output.
+rem     as a string input.
 rem
 rem     999999999999999999 is equivalent to 60-bit integer
 rem     2147483647999999999999999 is equivalent to 81-bit integer

@@ -8,95 +8,89 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
 rem reset all test variables at first
 set "IN="
-set "OUT="
-set "OUTREF="
+set "INREF="
 set "RETREF=0"
 
-set ZEROS=000,000,000,000,000,000,000,000,000,000,000,000
+set ZEROS=000,000,000,000,000,000
 
 
 setlocal
-set RETREF=-1
+set RETREF=1
 call :TEST
 endlocal
 
 setlocal
-set RETREF=-1
-call :TEST "" IN
+set RETREF=1
+call :TEST IN
 endlocal
 
 setlocal
-set IN=1
-set RETREF=-1
-call :TEST "" IN
-endlocal
-
-setlocal
-set OUT=x
-set "OUTREF=x"
-set RETREF=-1
-call :TEST OUT
-endlocal
-
-setlocal
-set OUT=x
-set "OUTREF=x"
-set RETREF=-1
-call :TEST OUT IN
+set IN=-xxx
+set INREF=-xxx
+set RETREF=1
+call :TEST IN
 endlocal
 
 rem signed zero case
-for %%i in ("+0" "-0" "+00" "-00" "0,00,000" "+0,00,000" "-0,00,000") do (
+for %%i in ("+0" "-0" "+00" "-00") do (
   setlocal
   set "IN=%%~i"
-  set "OUTREF=0"
-  call :TEST OUT IN
+  set "INREF=%%~i"
+  set RETREF=1
+  call :TEST IN
   endlocal
 )
 
-for /L %%i in (1,1,47) do (
+for /L %%i in (1,1,18) do (
   setlocal
   call set "IN=%%ZEROS:~0,%%i%%"
-  set "OUTREF=0"
-  call :TEST OUT IN
+  call set "INREF=%%IN%%"
+  set RETREF=1
+  call :TEST IN
   endlocal
 )
 
 rem test on overflow
 setlocal
 set IN=1999,999,999,999,999,999
-set "OUTREF=%IN%"
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=19
+call :TEST IN
 endlocal
 
 setlocal
 set IN=-1999,999,999,999,999,999
-set "OUTREF=%IN%"
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=19
+call :TEST IN
 endlocal
 
 setlocal
 set IN=1999,999,999,999,999,999,1000
-set "OUTREF=%IN%"
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=38
+call :TEST IN
 endlocal
 
 setlocal
 set IN=-1999,999,999,999,999,999,1000
-set "OUTREF=%IN%"
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=38
+call :TEST IN
 endlocal
 
 setlocal
 set IN=1999,999,999,999,999,999,999,999,999,999,999,999,1000
-set "OUTREF=%IN%"
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=56
+call :TEST IN
 endlocal
 
 setlocal
 set IN=-1999,999,999,999,999,999,999,999,999,999,999,999,1000
-set "OUTREF=%IN%"
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=56
+call :TEST IN
 endlocal
 
 
@@ -106,47 +100,76 @@ rem Examples:
 rem
 rem   1. >
 rem      set a=-000,123,000
-rem      iltrim_fnvar.bat b a
-rem      rem ERRORLEVEL=0
-rem      rem b=-0,123,0,0,0,0
+rem      idigits_fnvar.bat a
+rem      rem ERRORLEVEL=15
 setlocal
 set IN=-000,123,000
-set OUTREF=-0,123,0,0,0,0
-call :TEST OUT IN
+set "INREF=%IN%"
+set RETREF=15
+call :TEST IN
 endlocal
 
 rem   2. >
-rem      set a=-123000
-rem      iltrim_fnvar.bat b a
-rem      rem ERRORLEVEL=0
-rem      rem b=-123000,0,0,0,0,0
+rem      set a=+000,000,000
+rem      idigits_fnvar.bat a
+rem      rem ERRORLEVEL=1
 setlocal
-set IN=-123000
-set OUTREF=-123000,0,0,0,0,0
-call :TEST OUT IN
+set IN=+000,000,000
+set "INREF=%IN%"
+set RETREF=1
+call :TEST IN
 endlocal
 
-rem   3. >
-rem      set a=-0,0,0,0,00,000,0,0,0,0,0,1
-rem      iltrim_fnvar.bat b a
-rem      rem ERRORLEVEL=0
-rem      rem b=-0,0,0,0,0,1
+
 setlocal
-set IN=-0,0,0,0,00,000,0,0,0,0,0,1
-set OUTREF=-0,0,0,0,0,1
-call :TEST OUT IN
+set IN=-001
+set "INREF=%IN%"
+set RETREF=16
+call :TEST IN
 endlocal
 
-rem   4. >
-rem      set a=-0,0,0,0,00,000
-rem      iltrim_fnvar.bat b a
-rem      rem ERRORLEVEL=0
-rem      rem b=0
 setlocal
-set IN=-0,0,0,0,00,000
-set OUTREF=0
-call :TEST OUT IN
+set IN=-0,001
+set "INREF=%IN%"
+set RETREF=13
+call :TEST IN
 endlocal
+
+setlocal
+set IN=-0,0,001
+set "INREF=%IN%"
+set RETREF=10
+call :TEST IN
+endlocal
+
+setlocal
+set IN=-0,0,0,001
+set "INREF=%IN%"
+set RETREF=7
+call :TEST IN
+endlocal
+
+setlocal
+set IN=-0,0,0,0,001
+set "INREF=%IN%"
+set RETREF=4
+call :TEST IN
+endlocal
+
+setlocal
+set IN=-0,0,0,0,0,001
+set "INREF=%IN%"
+set RETREF=1
+call :TEST IN
+endlocal
+
+setlocal
+set IN=-0,0,0,0,0,0,001
+set "INREF=%IN%"
+set RETREF=16
+call :TEST IN
+endlocal
+
 
 echo;
 
@@ -157,7 +180,7 @@ rem no code can be executed here, just in case
 exit /b
 
 :TEST
-set "IN_=%~2"
+set "IN_=%~1"
 if "%IN_:~-1%" == "," exit /b 0
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b
