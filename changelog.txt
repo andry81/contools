@@ -1,3 +1,6 @@
+2025.10.19:
+* changed: scripts/tools/ToolAdaptors/vbs/get_drives_list.*: scripts moved to `contools--admin` project
+
 2025.10.16:
 * new: scripts/tools/math/?digits_fnvar.bat: script to count digits of integer folded numbers
 * new: scripts/tests/unit/bat/test_math: `?digits_fnvar.bat` unit tests
