@@ -1,4 +1,7 @@
 2025.10.20:
+* changed: scripts/tests/manual/bat: __init__, test_all.bat: switched to use tests init variables
+
+2025.10.20:
 * new: scripts/tests/__init__/script_init.bat: init script to enable logging for all test scripts
 * new: scripts/tests/manual/logs/*/*.test_all.log: manual tests first log example to compare with
 * changed: scripts/tests/manual: enabled usage of project's init
