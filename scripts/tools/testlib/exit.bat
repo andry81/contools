@@ -116,7 +116,7 @@ endlocal
 if %TESTLIB__INIT% EQU 0 (
   echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% tests is passed.
   echo;^
-  if defined OEMCP ( call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
+  if not defined IMPL_MODE if defined OEMCP ( call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
 )
 
 exit /b %TEST_LAST_ERROR%
