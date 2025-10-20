@@ -21,7 +21,7 @@ cd "%TEST_READ_DIR%"
 
 for /F "usebackq tokens=* delims="eol^= %%j in (`%%?.%%`) do echo;%%j
 
-for /L %%i in (1,1,9) do (
+for /L %%i in (1,1,10) do (
   for /F "usebackq tokens=* delims="eol^= %%j in (`%%?.%%`) do rem
 )
 

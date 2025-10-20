@@ -1,4 +1,9 @@
 2025.10.20:
+* fixed: scripts/tests/bench/bat/test__read_dir: minor fixup
+* changed: scripts/tests/bench: enabled usage of project's init
+* changed: scripts/tests/bench/bat: test_all.bat, test__all.bat: switched to use self logging
+
+2025.10.20:
 * fixed: scripts/tools/testlib/exit.bat: avoid double pause in case of logging from the impl mode
 * changed: scripts/tests/unit: enabled usage of project's init
 * changed: scripts/tests/unit/bat/test_all.bat: switched to use self logging

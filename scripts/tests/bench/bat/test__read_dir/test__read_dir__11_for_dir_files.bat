@@ -16,7 +16,7 @@ cd "%TEST_READ_DIR%"
 
 for %%j in (*_*_*.lst) do echo;%%j
 
-for /L %%i in (1,1,999) do (
+for /L %%i in (1,1,100) do (
   for %%j in (*_*_*.lst) do rem
 )
 
