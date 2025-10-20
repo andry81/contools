@@ -1,3 +1,11 @@
+2025.10.20:
+* new: scripts/tests/__init__/script_init.bat: init script to enable logging for all test scripts
+* new: scripts/tests/manual/logs/*/*.test_all.log: manual tests first log example to compare with
+* changed: scripts/tests/manual: enabled usage of project's init
+* changed: scripts/tests/manual/bat/test_all.bat: switched to use self logging
+* changed: ISSUES.txt: issues update
+* changed: TODO.txt: todo update
+
 2025.10.19:
 * changed: scripts/tools/ToolAdaptors/vbs/get_drives_list.*: scripts moved to `contools--admin` project
 

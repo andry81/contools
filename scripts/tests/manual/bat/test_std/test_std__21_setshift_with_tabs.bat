@@ -2,7 +2,7 @@
 
 setlocal DISABLEDELAYEDEXPANSION
 
-rem call "%%~dp0__init__/__init__.bat" || exit /b
+call "%%~dp0__init__/__init__.bat" || exit /b
 
 echo;^>%~nx0
 
@@ -12,7 +12,7 @@ set "TAB=	"
 set ARGS=cmd %TAB% %TAB% param0  %TAB%%TAB%  %TAB%%TAB%  param1 %TAB% %TAB%param2 %TAB%param3
 set "ARGS_=%ARGS: =o%"
 echo;%ARGS_%
-call "%%~dp0..\..\..\..\tools\std\setshift.bat" -notrim 0 x %%ARGS%%
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" -notrim 0 x %%ARGS%%
 set x
 echo;	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
 endlocal
@@ -23,7 +23,7 @@ echo;	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
 set ARGS=0	1		2			3	 4	  5	 	6		 7	 8 		 9  	10
 set "ARGS_=%ARGS: =o%"
 echo;%ARGS_%
-call "%%~dp0..\..\..\..\tools\std\setshift.bat" -notrim 0 x %%ARGS%%
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" -notrim 0 x %%ARGS%%
 set x
 echo;	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
 endlocal
@@ -31,7 +31,7 @@ echo;---
 
 setlocal
 set ARGS=0 	1 		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
-for /L %%i in (0,1,10) do call "%%~dp0..\..\..\..\tools\std\setshift.bat" -notrim %%i CMDLINE %%ARGS%% & call :TEST
+for /L %%i in (0,1,10) do call "%%CONTOOLS_ROOT%%/std/setshift.bat" -notrim %%i CMDLINE %%ARGS%% & call :TEST
 endlocal
 echo;---
 

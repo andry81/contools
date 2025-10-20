@@ -1,0 +1,654 @@
+>"C:\WINDOWS\System32\wbem\wmic.exe" cpu get Caption,Name
+Caption                               Name                                       
+Intel64 Family 6 Model 58 Stepping 9  Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz  
+
+
+>test_build__00_load_config.bat
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=A
+BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=B1$/{{A}}
+Environment variable CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC not defined
+Environment variable DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD not defined
+Environment variable EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE not defined
+Environment variable XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX not defined
+YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY=YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+Environment variable WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW not defined
+ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ=ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+TEST00=123 456/abc efg
+TEST01=C:/WINDOWS/system32/cmd.exe
+TEST02a=;!COMSPEC!^=\000
+TEST02b=;C:\WINDOWS\system32\cmd.exe"^"=\000
+TEST03a=;!COMSPEC!^=/000
+TEST03b=;C:/WINDOWS/system32/cmd.exe"^"=/000
+TEST04a=;!COMSPEC!^=/000/_build
+TEST04b=;C:/WINDOWS/system32/cmd.exe"^"=/000/_build
+TEST05a=;!COMSPEC!^=/000/aaa
+TEST05b=;C:/WINDOWS/system32/cmd.exe"^"=/000/bbb
+TEST06a=;!COMSPEC!^=/000/ccc
+TEST06b=;C:/WINDOWS/system32/cmd.exe"^"=/000/ddd
+TEST07a=;!COMSPEC!^=/000/_build/aaa
+TEST07b=;C:/WINDOWS/system32/cmd.exe"^"=/000/_build/bbb
+TEST08a=;!COMSPEC!^=/000/aaa/xxx
+TEST08b=;C:/WINDOWS/system32/cmd.exe"^"=/000/bbb/yyy
+TEST09a=;!COMSPEC!^=/000/aaa/xxx/zzz
+TEST09b=;C:/WINDOWS/system32/cmd.exe"^"=/000/bbb/yyy/www
+Environment variable TEST10 not defined
+Environment variable TEST11 not defined
+Environment variable TEST12 not defined
+TEST13=1
+TEST14=TEST6
+Environment variable TEST15 not defined
+
+>test_std__00_call.bat
+call.bat  echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+"1 2" ! ? * & | "=" 3
+---
+call.bat -exe -- echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+"1 2" ! ? * & | , ; = = "=" 3
+---
+call.bat  echo $*^|^&(=)^<^>"='`^%!+?** ,;=
+$*|&( )<>"='`^%!+?** ,;=
+---
+call.bat -exe -- echo $*^|^&(=)^<^>"='`^%!+?** ,;=
+$*|&(=)<>"='`^%!+?** ,;=
+---
+call.bat  echo:"1 2" 3 4 5
+"1 2" 3 4 5
+---
+call.bat  echo;"1 2" 3 4 5
+"1 2" 3 4 5
+---
+call.bat  echo("1 2" 3 4 5
+'echo("1 2"' is not recognized as an internal or external command,
+operable program or batch file.
+---
+call.bat  
+call.bat  echo:
+
+call.bat  echo;
+ECHO is off.
+call.bat -exe echo;
+
+call.bat  echo 1 2 3
+1 2 3
+call.bat  echo 1;2,3=
+1 2 3
+call.bat -exe echo 1;2,3=
+1;2,3=
+ERRORLEVEL=0
+---
+call.bat  exit /b 321
+ERRORLEVEL=321
+---
+call.bat  "\scripts\tools/std/errlvl.bat" 321
+ERRORLEVEL=321
+---
+call.bat  echo;^>cmd param0 param1
+>cmd param0 param1
+---
+
+>test_std__01_call_with_tabs.bat
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+cmdo	o	oparam0oo		oo		ooparam1o	o	param2o	param3
+cmd 	 	 param0  		  		  param1 	 	param2 	param3
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+---
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+0	1		2			3	o4	oo5	o	6		o7	o8o		o9oo	10
+0	1		2			3	 4	  5	 	6		 7	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+---
+
+>test_std__10_callshift.bat
+callshift.bat 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3 
+"1 2" ! ? * & | "=" 3
+---
+callshift.bat -exe 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3 
+"1 2" ! ? * & | , ; = = "=" 3
+---
+callshift.bat 0 echo $*^|^&(=)^<^>"='`^%!+?** ,;= 
+$*|&( )<>"='`^%!+?** ,;=
+---
+callshift.bat -exe 0 echo $*^|^&(=)^<^>"='`^%!+?** ,;= 
+$*|&(=)<>"='`^%!+?** ,;=
+---
+callshift.bat 2 echo:"1 2" 3 4 5 
+"1 2" 5
+---
+callshift.bat 2 echo;"1 2" 3 4 5 
+4 5
+---
+callshift.bat 2 echo("1 2" 3 4 5 
+'echo("1 2"' is not recognized as an internal or external command,
+operable program or batch file.
+---
+ERRORLEVEL=123
+callshift.bat   
+ERRORLEVEL=123
+callshift.bat 0 echo: 
+
+ERRORLEVEL=123
+callshift.bat 0 echo; 
+ECHO is off.
+ERRORLEVEL=123
+callshift.bat -exe 0 echo; 
+
+ERRORLEVEL=123
+callshift.bat 0 echo 1 2 3 
+1 2 3
+ERRORLEVEL=123
+callshift.bat 0 echo 1;2,3= 
+1 2 3
+ERRORLEVEL=123
+callshift.bat -exe 0 echo 1;2,3= 
+1;2,3=
+ERRORLEVEL=123
+---
+callshift.bat 1 echo 1 2 3 4 5 6 7 
+2 3 4 5 6 7
+---
+callshift.bat -num 3 1 echo 1 2 3 4 5 6 7 
+2 3 4
+---
+callshift.bat -skip 2 -num 3 1 echo a b 1 2 3 4 5 6 7 
+a b 2 3 4
+---
+callshift.bat -3 echo 1 2 3 4 5 6 7 
+1 2 3 7
+---
+callshift.bat -skip 2 -3 echo a b 1 2 3 4 5 6 7 
+a b 1 2 3 7
+---
+callshift.bat -skip 2 -num 4 -3 echo a b 1 2 3 4 5 6 7 8 
+a b 1 2 3 7
+---
+ERRORLEVEL=123
+callshift.bat 0 exit /b 321 
+ERRORLEVEL=321
+---
+ERRORLEVEL=123
+callshift.bat 0 "\scripts\tools/std/errlvl.bat" 321 
+ERRORLEVEL=321
+---
+callshift.bat -notrim 1 echo  a  b  c  d 
+ b  c  d
+---
+callshift.bat 0 echo;^>cmd param0 param1 
+>cmd param0 param1
+---
+
+>test_std__11_callshift_with_tabs.bat
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+cmdo	o	oparam0oo		oo		ooparam1o	o	param2o	param3
+cmd 	 	 param0  		  		  param1 	 	param2 	param3
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+---
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+0	1		2			3	o4	oo5	o	6		o7	o8o		o9oo	10
+0	1		2			3	 4	  5	 	6		 7	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+---
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+0o	1o		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+0 	1 		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=0=1=2=3=4=5=6=7=8=9=10=
+-0-1-2-3-4-5-6-7-8-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+1o		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+1 		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=1=2=3=4=5=6=7=8=9=10=
+-1-2-3-4-5-6-7-8-9-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=2=3=4=5=6=7=8=9=10=
+-2-3-4-5-6-7-8-9-10-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=3=4=5=6=7=8=9=10=
+-3-4-5-6-7-8-9-10--
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+4o	oo5o	o	6o		o7o	o8o		o9oo	10
+4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=4=5=6=7=8=9=10=
+-4-5-6-7-8-9-10---
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+5o	o	6o		o7o	o8o		o9oo	10
+5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=5=6=7=8=9=10=
+-5-6-7-8-9-10----
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+6o		o7o	o8o		o9oo	10
+6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=6=7=8=9=10=
+-6-7-8-9-10-----
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+7o	o8o		o9oo	10
+7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=7=8=9=10=
+-7-8-9-10------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+8o		o9oo	10
+8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=8=9=10=
+-8-9-10-------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+9oo	10
+9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=9=10=
+-9-10--------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+10
+10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=10=
+-10---------
+
+---
+
+>test_std__20_setshift.bat
+setshift.bat 0 x "1 2" ! ? * ^& ^| , ; = ^= "=" 3 
+x="1 2" ! ? * & | "=" 3
+---
+setshift.bat -exe 0 x "1 2" ! ? * ^& ^| , ; = ^= "=" 3 
+x="1 2" ! ? * & | , ; = = "=" 3
+---
+setshift.bat 0 x $*^|^&(=)^<^>"='`^%!+?** ,;= 
+x=$*|&( )<>"='`^%!+?** ,;=
+---
+setshift.bat -exe 0 x $*^|^&(=)^<^>"='`^%!+?** ,;= 
+x=$*|&(=)<>"='`^%!+?** ,;=
+---
+setshift.bat 2 x "1 2" 3 4 5 
+x=4 5
+---
+Environment variable x not defined
+ERRORLEVEL=123
+setshift.bat   
+ERRORLEVEL=123
+setshift.bat 0 x  
+ERRORLEVEL=123
+Environment variable x  not defined
+setshift.bat 0 x 1 2 3 
+ERRORLEVEL=123
+x=1 2 3
+setshift.bat 0 x 1;2,3= 
+ERRORLEVEL=123
+x=1 2 3
+---
+setshift.bat 1 x 1 2 3 4 5 6 7 
+x=2 3 4 5 6 7
+---
+setshift.bat -num 3 1 x 1 2 3 4 5 6 7 
+x=2 3 4
+---
+setshift.bat -skip 2 -num 3 1 x 1 2 3 4 5 6 7 
+x=1 2 4 5 6
+---
+setshift.bat -3 x 1 2 3 4 5 6 7 
+x=1 2 3 7
+---
+setshift.bat -skip 2 -3 x a b 1 2 3 4 5 6 7 
+x=a b 1 2 3 7
+---
+setshift.bat -skip 2 -num 4 -3 x a b 1 2 3 4 5 6 7 8 
+x=a b 1 2 3 7
+---
+setshift.bat -notrim 1 x  a  b  c  d 
+x= b  c  d
+---
+setshift.bat 0 x ^>cmd param0 param1 
+x=>cmd param0 param1
+---
+
+>test_std__21_setshift_with_tabs.bat
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+cmdo	o	oparam0oo		oo		ooparam1o	o	param2o	param3
+x=cmd 	 	 param0  		  		  param1 	 	param2 	param3
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+---
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+0	1		2			3	o4	oo5	o	6		o7	o8o		o9oo	10
+x=0	1		2			3	 4	  5	 	6		 7	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+---
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+0o	1o		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+0 	1 		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=0=1=2=3=4=5=6=7=8=9=10=
+-0-1-2-3-4-5-6-7-8-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	1o		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+	1 		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=1=2=3=4=5=6=7=8=9=10=
+-1-2-3-4-5-6-7-8-9-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=2=3=4=5=6=7=8=9=10=
+-2-3-4-5-6-7-8-9-10-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=3=4=5=6=7=8=9=10=
+-3-4-5-6-7-8-9-10--
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=4=5=6=7=8=9=10=
+-4-5-6-7-8-9-10---
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	oo5o	o	6o		o7o	o8o		o9oo	10
+	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=5=6=7=8=9=10=
+-5-6-7-8-9-10----
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	o	6o		o7o	o8o		o9oo	10
+	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=6=7=8=9=10=
+-6-7-8-9-10-----
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+		o7o	o8o		o9oo	10
+		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=7=8=9=10=
+-7-8-9-10------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	o8o		o9oo	10
+	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=8=9=10=
+-8-9-10-------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+		o9oo	10
+		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=9=10=
+-9-10--------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+o	10
+ 	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=10=
+-10---------
+
+---
+
+>test_std__30_echo_path_var.bat
+__LIST__="1 2" ! ? * & | , ; = ^= "=" 3
+ "1 2" ! ? * & | , |
+  = ^= "=" 3|
+---
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+ "1 2" ! ? * & | , |
+  = ^= "=" 3|
+---
+__LIST__=$*|&(=)<>"='`^%!+?** ,;=
+ $*|&(=)<>"='`^%!+?** ,;=|
+---
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+ $*|&(=)<>"='`^%!+?** ,;=|
+---
+__LIST__="1 2";3 4;5,6;7=8;9!*?0
+ "1 2"|
+ 3 4|
+ 5,6|
+ 7=8|
+ 9!*?0|
+---
+__STRING__="1 2";3 4;5,6;7=8;9!*?0
+ "1 2"|
+ 3 4|
+ 5,6|
+ 7=8|
+ 9!*?0|
+---
+__LIST__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
+ "?a/b/%c%!" |
+ 	 "!d! ^; e ; f" |
+  |
+  |
+  !AAA! ^|
+  g,g |
+  h h|
+---
+__STRING__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
+ "?a/b/%c%!" |
+ 	 "!d! ^; e ; f" |
+  |
+  |
+  !AAA! ^|
+  g,g |
+  h h|
+---
+
+>test_std__31_echo_pathglob_var.bat
+__LIST__="1 2";3 4;5,6;7=8;9!*?0
+ "1 2"|
+ 3 4|
+ 5,6|
+ 7=8|
+---
+__STRING__="1 2";3 4;5,6;7=8;9!*?0
+ "1 2"|
+ 3 4|
+ 5,6|
+ 7=8|
+---
+__LIST__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
+ 	 "!d! ^; e ; f" |
+  |
+  |
+  !AAA! ^|
+  g,g |
+  h h|
+---
+__STRING__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
+ 	 "!d! ^; e ; f" |
+  |
+  |
+  !AAA! ^|
+  g,g |
+  h h|
+---
+
+>test_std__40_trim_var.bat
+- 	 	 	 1 ! 2 | 3 & 4 ^ 5 = 6 , 7 ; 8 * 9 # 0 % 1 / 2 \ 3 ? 4 > 5 < 6 " 7 	 	 	 -
+-1 ! 2 | 3 & 4 ^ 5 = 6 , 7 ; 8 * 9 # 0 % 1 / 2 \ 3 ? 4 > 5 < 6 " 7-
+
+>test_std__50_get_cmdline.bat
+Environment variable RETURN_VALUE not defined
+---
+CMDLINE=  	 		  	 
+Environment variable RETURN_VALUE not defined
+---
+CMDLINE= 	 	 	 1 ! 2 ^| 3 ^& 4 ^^ 5 = 6 , 7 ; 8 * 9 # 0 % 1 / 2 \ 3 ? 4 ^> 5 ^< 6 " 7 	 	 	 
+RETURN_VALUE=1 ! 2 | 3 & 4 ^ 5 = 6 , 7 ; 8 * 9 # 0 % 1 / 2 \ 3 ? 4 > 5 < 6 " 7
+---
+CMDLINE="1 2" ! ? * ^& ^| , ; = ^= "=" 3
+RETURN_VALUE="1 2" ! ? * & | , ; = = "=" 3
+---
+CMDLINE=$*^|^&^(=^)^<^>"='`^%!+?** ,;=
+RETURN_VALUE=$*|&(=)<>"='`^%!+?** ,;=
+---
+
+>test_std__51_get_cmdline_len.bat
+ARGS_COUNT(bat)=0
+ARGS_COUNT(exe)=0
+---
+ARGS_COUNT(bat)=0
+ARGS_COUNT(exe)=0
+CMDLINE=  	 		  	 
+---
+ARGS_COUNT(bat)=29
+ARGS_COUNT(exe)=32
+CMDLINE= 	 	 	 1 ! 2 ^| 3 ^& 4 ^^ 5 = 6 , 7 ; 8 * 9 # 0 % 1 / 2 \ 3 ? 4 ^> 5 ^< 6 " 7 	 	 	 
+---
+ARGS_COUNT(bat)=8
+ARGS_COUNT(exe)=12
+CMDLINE="1 2" ! ? * ^& ^| , ; = ^= "=" 3
+---
+ARGS_COUNT(bat)=2
+ARGS_COUNT(exe)=1
+CMDLINE=$*^|^&^(=^)^<^>"='`^%!+?** ,;=
+---
+
+>test_std_encode__00_asterisk_char.bat
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+__STRING__="1 2" ! ? $2A & | , ; = ^= "=" 3
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+---
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+__STRING__=$$2A|&(=)<>"='`^%!+?$2A$2A ,;=
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+---
+
+>test_std_encode__01_equal_char.bat
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+__STRING__="1 2" ! ? * & | , ; $3D ^$3D "$3D" 3
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+---
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+__STRING__=$*|&($3D)<>"$3D'`^%!+?** ,;$3D
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+---
+
+>test_std_encode__10_pathlist_chars.bat
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+__STRING__="1$202"$20$21$20$3F$20$2A$20$26$20$7C$20$2C$20;$20$3D$20$5E$3D$20"$3D"$203
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+---
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+__STRING__=$24$2A$7C$26$28$3D$29$3C$3E"$3D$27$60$5E$25$21$2B$3F$2A$2A$20$2C;$3D
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+---
+__STRING__="1 2";3 4;5,6;7=8;9!*?0
+ "1 2"|
+ 3 4|
+ 5,6|
+ 7=8|
+ 9!*?0|
+---
+__STRING__="1 2";3 4;5,6;7=8;9!*?0
+ "1 2"|
+ 3 4|
+ 5,6|
+ 7=8|
+ 9!*?0|
+---
+__STRING__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
+ "?a/b/%c%!" |
+ 	 "!d! ^; e ; f" |
+  |
+  |
+  !AAA! ^|
+  g,g |
+  h h|
+---
+__STRING__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
+ "?a/b/%c%!" |
+ 	 "!d! ^; e ; f" |
+  |
+  |
+  !AAA! ^|
+  g,g |
+  h h|
+---
+
+>test_std_encode__11_pathlist_chars_glob.bat
+__STRING__="1 2";3 4;5,6;7=8;9!*?0
+ "1 2"|
+ 3 4|
+ 5,6|
+ 7=8|
+---
+__STRING__="1 2";3 4;5,6;7=8;9!*?0
+ "1 2"|
+ 3 4|
+ 5,6|
+ 7=8|
+---
+__STRING__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
+ 	 "!d! ^; e ; f" |
+  |
+  |
+  !AAA! ^|
+  g,g |
+  h h|
+---
+__STRING__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
+ 	 "!d! ^; e ; f" |
+  |
+  |
+  !AAA! ^|
+  g,g |
+  h h|
+---
+
+>test_std_encode__20_sys_chars.bat
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+__STRING__=$221$202$22$20$21$20$3F$20$2A$20$26$20$7C$20$2C$20$3B$20$3D$20$5E$3D$20$22$3D$22$203
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+---
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+__STRING__=$24$2A$7C$26$28$3D$29$3C$3E$22$3D$27$60$5E$25$21$2B$3F$2A$2A$20$2C$3B$3D
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+---
+
+>test_std_encode__21_sys_chars_bat_cmdline.bat
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+__STRING__="1 2" $21 $3F $2A $26 $7C , ; = $5E= "=" 3
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+---
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+__STRING__=$24$2A$7C$26$28=$29$3C$3E"=$27$60$5E$25$21$2B$3F$2A$2A ,;=
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+---
+
+>test_std_encode__22_sys_chars_exe_cmdline.bat
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+__STRING__="1 2" $21 $3F $2A $26 $7C $2C $3B $3D $5E$3D "$3D" 3
+__STRING__="1 2" ! ? * & | , ; = ^= "=" 3
+---
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+__STRING__=$24$2A$7C$26$28$3D$29$3C$3E"$3D$27$60$5E$25$21$2B$3F$2A$2A $2C$3B$3D
+__STRING__=$*|&(=)<>"='`^%!+?** ,;=
+---
+

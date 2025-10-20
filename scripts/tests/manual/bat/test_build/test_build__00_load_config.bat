@@ -2,11 +2,11 @@
 
 setlocal DISABLEDELAYEDEXPANSION
 
-rem call "%%~dp0__init__/__init__.bat" || exit /b
+call "%%~dp0__init__/__init__.bat" || exit /b
 
 echo;^>%~nx0
 
-call "%%~dp0..\..\..\..\tools\build\load_config.bat" "%%~dp0_testdata\test_build__load_config" . test_01.vars "" OS64 || (
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config.bat" "%%~dp0_testdata\test_build__load_config" . test_01.vars "" OS64 || (
   echo;%~nx0: error: failed to execute `load_config.bat`
   exit /b 255
 ) >&2

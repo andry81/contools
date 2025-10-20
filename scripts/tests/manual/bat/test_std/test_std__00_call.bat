@@ -2,7 +2,7 @@
 
 setlocal DISABLEDELAYEDEXPANSION
 
-rem call "%%~dp0__init__/__init__.bat" || exit /b
+call "%%~dp0__init__/__init__.bat" || exit /b
 
 echo;^>%~nx0
 
@@ -58,7 +58,7 @@ rem endlocal
 rem echo;---
 
 setlocal
-call "%%~dp0..\..\..\..\tools\std\errlvl.bat" 123
+call "%%CONTOOLS_ROOT%%/std/errlvl.bat" 123
 set "ARGS="
 call :CALL
 set ARGS=echo:
@@ -85,8 +85,8 @@ endlocal
 echo;---
 
 setlocal
-call "%%~dp0..\..\..\..\tools\std\errlvl.bat" 123
-set ARGS="%~dp0..\..\..\..\tools\std\errlvl.bat" 321
+call "%%CONTOOLS_ROOT%%/std/errlvl.bat" 123
+set ARGS="%CONTOOLS_ROOT%/std/errlvl.bat" 321
 call :CALL
 echo ERRORLEVEL=%ERRORLEVEL%
 endlocal
@@ -104,5 +104,7 @@ echo;
 exit /b
 
 :CALL
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!ARGS!") do endlocal & echo call.bat %* %%i
-call "%%~dp0..\..\..\..\tools\std\call.bat" %%* %%ARGS%%
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!ARGS!"') do endlocal & set "ECHO_ARGS=%%~i"
+if defined ECHO_ARGS setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!ECHO_ARGS:%CONTOOLS_PROJECT_ROOT%=!") do endlocal & set "ECHO_ARGS=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!ECHO_ARGS!"') do endlocal & echo call.bat %* %%~i
+call "%%CONTOOLS_ROOT%%/std/call.bat" %%* %%ARGS%%

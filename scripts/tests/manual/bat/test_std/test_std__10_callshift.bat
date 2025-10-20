@@ -2,7 +2,7 @@
 
 setlocal DISABLEDELAYEDEXPANSION
 
-rem call "%%~dp0__init__/__init__.bat" || exit /b
+call "%%~dp0__init__/__init__.bat" || exit /b
 
 echo;^>%~nx0
 
@@ -59,7 +59,7 @@ rem echo;---
 
 setlocal
 set "ARGS="
-call "%%~dp0..\..\..\..\tools\std\errlvl.bat" 123
+call "%%CONTOOLS_ROOT%%/std/errlvl.bat" 123
 echo ERRORLEVEL=%ERRORLEVEL%
 call :CALLSHIFT
 echo ERRORLEVEL=%ERRORLEVEL%
@@ -121,7 +121,7 @@ endlocal
 echo;---
 
 setlocal
-call "%%~dp0..\..\..\..\tools\std\errlvl.bat" 123
+call "%%CONTOOLS_ROOT%%/std/errlvl.bat" 123
 echo ERRORLEVEL=%ERRORLEVEL%
 set ARGS=exit /b 321
 call :CALLSHIFT 0
@@ -130,9 +130,9 @@ endlocal
 echo;---
 
 setlocal
-call "%%~dp0..\..\..\..\tools\std\errlvl.bat" 123
+call "%%CONTOOLS_ROOT%%/std/errlvl.bat" 123
 echo ERRORLEVEL=%ERRORLEVEL%
-set ARGS="%~dp0..\..\..\..\tools\std\errlvl.bat" 321
+set ARGS="%CONTOOLS_ROOT%/std/errlvl.bat" 321
 call :CALLSHIFT 0
 echo ERRORLEVEL=%ERRORLEVEL%
 endlocal
@@ -157,5 +157,7 @@ exit /b
 
 :CALLSHIFT
 rem with ERRORLEVEL restore workaround
-setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!ARGS!"') do endlocal & echo callshift.bat %* %%~i & call "%%~dp0..\..\..\..\tools\std\errlvl.bat" %ERRORLEVEL%
-call "%%~dp0..\..\..\..\tools\std\callshift.bat" %%* %%ARGS%%
+    ( setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!ARGS!"') do endlocal & set "ECHO_ARGS=%%~i" ) ^
+  & ( if defined ECHO_ARGS setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!ECHO_ARGS:%CONTOOLS_PROJECT_ROOT%=!") do endlocal & set "ECHO_ARGS=%%i" ) ^
+  & ( setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!ECHO_ARGS!"') do endlocal & echo callshift.bat %* %%~i & call "%%CONTOOLS_ROOT%%/std/errlvl.bat" %ERRORLEVEL% )
+call "%%CONTOOLS_ROOT%%/std/callshift.bat" %%* %%ARGS%%

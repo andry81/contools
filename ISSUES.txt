@@ -38,3 +38,13 @@ scripts/tools/build/load_config.bat
 
   scripts/tools/filesys/read_shortcut_target_path.bat
 
+-------------------------------------------------------------------------------
+scripts/tests/manual/bat/test_all.bat
+-------------------------------------------------------------------------------
+
+* Script double execution with log mess in case of call without extension:
+
+  >
+  test_all
+
+* Log print race condition between stdout and stderr

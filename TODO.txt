@@ -1,10 +1,4 @@
 -------------------------------------------------------------------------------
-scripts/tests
--------------------------------------------------------------------------------
-
-* self logging
-
--------------------------------------------------------------------------------
 scripts/tools/ToolAdapters/vbs/make_shortcut.vbs,
 scripts/tools/ToolAdapters/vbs/update_shortcut.vbs,
 scripts/tools/ToolAdapters/vbs/reset_shortcut.vbs
