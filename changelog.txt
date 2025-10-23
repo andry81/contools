@@ -1,3 +1,10 @@
+2025.10.25:
+* new: scripts/tools/math/?div2x.bat: scripts to circumvent 32-bit (un)signed division arithmetic limitation
+* new: scripts/tests/unit/bat/test_math: `?div2x.bat` unit tests
+* new: scripts/tests/bench/bat/test_math: `?div2x.bat` bench tests
+* refactor: scripts/tools/math: iadd2x_fnvar.bat, ?div.bat, imul2x_fnvar.bat: minor refactor
+* refactor: scripts/tests/unit/bat/test_math/test_math__05_div/test_math__*_?div.bat: minor refactor
+
 2025.10.20:
 * fixed: scripts/tests/bench/bat/test__read_dir: minor fixup
 * changed: scripts/tests/bench: enabled usage of project's init

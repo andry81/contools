@@ -747,7 +747,7 @@ set RETREF=21
 call :TEST OUT L 1111111
 endlocal
 
-rem NOTE: near the overflow
+
 setlocal
 set L=1234
 set OUTREF=0,1,110,600,111,60

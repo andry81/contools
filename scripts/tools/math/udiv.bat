@@ -25,6 +25,11 @@ rem
 rem   NOTE:
 rem     The `unsigned` in case of an integer number prefix does mean you must
 rem     not use negative `-` nor positive `+` signs.
+rem
+rem   NOTE:
+rem     The output integer part division is limited by 6 folded groups of
+rem     digits. To divide of 12 folded groups number use `udiv2x*.bat`
+rem     script(s) instead.
 
 rem <out-var>:
 rem   A variable name for a string value of completely folded integer number
@@ -34,7 +39,7 @@ rem   Format:
 rem     NNN,NNN,NNN,NNN,NNN,NNN
 rem     , where NNN does not begin by 0 except 0.
 rem
-rem   The output value is `N,N,N,N,N,N` formatted if a variable name is
+rem   The output value is always `N,N,N,N,N,N` formatted if a variable name is
 rem   not empty and the divisor is not 0.
 rem
 rem   If the divisor is 0, then a variable value does not change.

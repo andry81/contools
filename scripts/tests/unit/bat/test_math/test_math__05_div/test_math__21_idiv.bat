@@ -617,8 +617,10 @@ for %%a in ("" "-") do (
   set RETREF=%%~a139128
   call :TEST OUT L 1111111
   endlocal
+)
 
 
+for %%a in ("" "-") do (
   setlocal
   set L=%%~a900,800,700,600,500,400,300,200,100
   set OUTREF=%%~a0,0,810,720,711,612
@@ -790,7 +792,6 @@ for %%a in ("" "-") do (
 
 
 for %%a in ("" "-") do (
-  rem NOTE: near the overflow
   setlocal
   set L=%%~a1234
   set OUTREF=%%~a0,1,110,600,111,60

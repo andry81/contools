@@ -99,6 +99,7 @@ rem     as a string input.
 rem
 rem     999,999,999,999,999,999 is equivalent to 60-bit integer
 rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
+rem     999,999,999,999,999,999 ^ 2 is equivalent to 120-bit integer
 rem
 rem   CAUTION:
 rem     An input number groups are used as is and an output number groups does
