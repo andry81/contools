@@ -1,4 +1,8 @@
 2025.10.25:
+* fixed: scripts/tests/bench/bat/test__math/test__math__01_fold_vs_add: tests execution fixup
+* new: scripts/tests/bench/bat/test__math/test__math__01_fold_vs_add: more tests
+
+2025.10.25:
 * new: scripts/tools/math/?div2x.bat: scripts to circumvent 32-bit (un)signed division arithmetic limitation
 * new: scripts/tests/unit/bat/test_math: `?div2x.bat` unit tests
 * new: scripts/tests/bench/bat/test_math: `?div2x.bat` bench tests

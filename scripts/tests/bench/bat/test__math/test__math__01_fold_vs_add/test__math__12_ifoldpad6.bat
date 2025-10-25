@@ -8,11 +8,11 @@ echo;^>%~nx0
 
 setlocal DISABLEDELAYEDEXPANSION
 
-set IN=2147483647
+set IN=-2147483647
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-for /L %%i in (1,1,100) do call "%%CONTOOLS_ROOT%%/math/foldpad6.bat" OUT IN
+for /L %%i in (1,1,100) do call "%%CONTOOLS_ROOT%%/math/ifoldpad6.bat" OUT IN
 
 call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
 
