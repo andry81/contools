@@ -1,4 +1,8 @@
 2025.10.25:
+* new: scripts/tests/unit/logs/*/*.test_all.log: unit tests first log example to compare with
+* new: scripts/tests/bench/logs/*: *.test__all.log, *.test_all.log: bench tests first log examples to compare with
+
+2025.10.25:
 * fixed: scripts/tests/bench/bat/test__math/test__math__01_fold_vs_add: tests execution fixup
 * new: scripts/tests/bench/bat/test__math/test__math__01_fold_vs_add: more tests
 
