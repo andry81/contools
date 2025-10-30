@@ -1,3 +1,12 @@
+2025.11.XX:
+* fixed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_*.bat: code fixup
+* new: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_split_copy_by_list.bat: script for video files batch splitting
+* changed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_cut.bat: merged with `ffmpeg_cut_dur.bat` script and `ffmpeg_cut_dur.bat` script is removed
+* changed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_*.bat: added `-use-accurate-seek` flag to explicitly use an accurate seek mode
+* changed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_*.bat: added `-no-copy-ts` flag to reset original timestamps
+* changed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_*.bat: added `-force` flag to force output file overwrite
+* changed: scripts/tools/ToolAdaptors/ffmpeg/ffmpeg_*.bat: code improvement, options refactor, header documentation
+
 2025.12.13:
 * fixed: scripts/tools/std/touch_file.bat: correct selection between a builtin copy and another method
 * new: scripts/tools/std/is_str_shorter_than.bat: script to check on length shorter than

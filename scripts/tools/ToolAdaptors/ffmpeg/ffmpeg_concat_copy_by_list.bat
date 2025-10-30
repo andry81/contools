@@ -1,32 +1,92 @@
 @echo off & goto DOC_END
 
-rem ffmpeg command line reference:
-rem
-rem   https://ffmpeg.org/ffmpeg.html
+rem USAGE:
+rem   ffmpeg_concat_copy_by_list.bat [<flags>] [--] <input-list-file> <output-file>
 
-rem Examples:
+rem Description:
+rem   Video files concatenation script. Uses a list of files as an input to
+rem   concatenate to a single file by a criteria.
 rem
-rem For details:
+rem   By default avoids a recode using a copy method.
 rem
-rem   https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar/1056632#1056632
+rem   Uses either `FFMPEG_ROOT` or `PATH` variable to locate `ffmpeg`
+rem   executables.
+
+rem   CAUTION:
+rem     A resulted output file can have has a beginning video freeze in case of
+rem     split not by a key frame.
 rem
-rem * re-encode with better quality (default: `-crf 23`):
+rem     See details: https://trac.ffmpeg.org/wiki/Seeking#codec-copy
+
+rem   ffmpeg command line reference:
 rem
-rem   -enable_reencode -c:v -/ <encoder> -crf -/ 18 -preset -/ slow -q:v -/ 0 -c:a -/ copy ...
+rem     https://ffmpeg.org/ffmpeg.html
+
+rem   For details:
 rem
-rem * re-encode with maximum quality (slower and bigger output file):
+rem     https://superuser.com/questions/1056599/ffmpeg-re-encode-a-video-keeping-settings-similar/1056632#1056632
+rem     https://trac.ffmpeg.org/wiki/Seeking#Seekingwhiledoingacodeccopy
+
+rem   Examples:
 rem
-rem   -enable_reencode -c:v -/ <encoder> -crf -/ 0 -preset -/ slow -q:v -/ 0 -c:a -/ copy ...
+rem     * re-encode with better quality (default: `-crf 23`):
 rem
-rem <encoder> variants:
+rem       -enable-reencode -c:v -/ <encoder> -crf -/ 18 -preset -/ slow -q:v -/ 0 -c:a -/ copy -copyts ...
 rem
-rem * libx264
-rem * libx265
-rem * mjpeg
-rem * mpeg1video
-rem * mpeg2video
-rem * mpeg4
+rem     * re-encode with maximum quality (slower and bigger output file):
 rem
+rem       -enable-reencode -c:v -/ <encoder> -crf -/ 0 -preset -/ slow -q:v -/ 0 -c:a -/ copy -copyts ...
+rem
+rem   <encoder> variants:
+rem
+rem     * libx264
+rem     * libx265
+rem     * mjpeg
+rem     * mpeg1video
+rem     * mpeg2video
+rem     * mpeg4
+
+rem <flags>:
+rem   -no-default-flags
+rem     Removes all default flags usage. You must pass all the required ffmpeg
+rem     flags directly using `-/` option.
+rem
+rem     Affects mostly those options which are used as constants in the ffmpeg
+rem     command line.
+rem
+rem     Has priority over `-enable-reencode` flag.
+rem
+rem     Does not affect functionality related to these options:
+rem       -no-copy-ts
+rem       -force
+rem
+rem   -enable-reencode
+rem     Enables a reencode method instead of a copy method.
+rem     You may use `-/` option to define it explicitly.
+rem
+rem     Has no effect if `-no-default-flags` is defined.
+rem
+rem   -no-copy-ts
+rem     Avoids original timestamp coping and resets it for each output file.
+rem
+rem     Has effect if `-no-default-flags` is defined.
+rem
+rem   -/ <option>
+rem     Pass an option through to the ffmpeg command line.
+rem
+rem     Has effect if `-no-default-flags` is defined.
+rem
+rem     NOTE:
+rem       The `-y` and `-n` must not be passed as used implicitly by the
+rem       `-force` flag.
+rem
+rem   -force | -f
+rem     Allows output file overwrite.
+rem
+rem     Has effect if `-no-default-flags` is defined.
+
+rem --:
+rem   Separator to stop parse flags.
 :DOC_END
 
 setlocal
@@ -36,8 +96,10 @@ call "%%~dp0__init__.bat" || exit /b
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%0 %%* || exit /b
 
 rem script flags
-set NO_DEFAULT_FLAGS=0
-set ENABLE_REENCODE=0
+set FLAG_FORCE=0
+set FLAG_NO_DEFAULT_FLAGS=0
+set FLAG_ENABLE_REENCODE=0
+set FLAG_NO_COPY_TS=0
 set "BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -50,10 +112,16 @@ if not "%FLAG:~0,1%" == "-" set "FLAG="
 
 if not defined FLAG goto FLAGS_END
 
-if "%FLAG%" == "-no_default_flags" (
-  set NO_DEFAULT_FLAGS=1
-) else if "%FLAG%" == "-enable_reencode" (
-  set ENABLE_REENCODE=1
+if "%FLAG%" == "-force" (
+  set FLAG_FORCE=1
+) else if "%FLAG%" == "-f" (
+  set FLAG_FORCE=1
+) else if "%FLAG%" == "-no-default-flags" (
+  set FLAG_NO_DEFAULT_FLAGS=1
+) else if "%FLAG%" == "-enable-reencode" (
+  set FLAG_ENABLE_REENCODE=1
+) else if "%FLAG%" == "-no-copy-ts" (
+  set FLAG_NO_COPY_TS=1
 ) else if "%FLAG%" == "-/" ( rem pass on to ffmpeg command line
   set BARE_FLAGS=%BARE_FLAGS% %2
   shift
@@ -71,55 +139,86 @@ goto FLAGS_LOOP
 
 :FLAGS_END
 
-set "FILE_LIST_IN=%~1"
-set "FILE_OUT=%~fx2"
-set "FILE_OUT_DIR=%~dp2"
+if defined FFMPEG_ROOT if exist "%FFMPEG_ROOT%/bin/ffmpeg.exe" set "FFMPEG_EXE=%FFMPEG_ROOT%/bin/ffmpeg.exe" & goto FFMPEG_EXE_OK
+if not defined FFMPEG_ROOT for /F "tokens=* delims="eol^= %%i in ("ffmpeg.exe") do ^
+for /F "tokens=* delims="eol^= %%j in ("%%~$PATH:i") do set "FFMPEG_EXE=%%j" & goto FFMPEG_EXE_OK
 
-if defined FFMPEG_TOOL_EXE goto IGNORE_SEARCH_IN_PATH
-
-if not exist "ffmpeg.exe" (
-  echo;%?~%: error: ffmpeg.exe is not found in the PATH variable.
+(
+  echo;%?~%: error: `ffmpeg.exe` is not found in `FFMPEG_ROOT` or `PATH` variable: FFMPEG_ROOT="%FFMPEG_ROOT%".
   exit /b 255
 ) >&2
 
-set "FFMPEG_TOOL_EXE=ffmpeg.exe"
+:FFMPEG_EXE_OK
 
-:IGNORE_SEARCH_IN_PATH
+set "LIST_FILE_PATH=%~1"
+set "FILE_OUT=%~2"
 
-if not exist "%FILE_OUT_DIR%" (
-  echo;%?~%: error: file output parent directory does not exist: "%FILE_OUT_DIR%".
-  exit /b 254
+if not defined LIST_FILE_PATH (
+  echo;%?~%: error: list file path is not defined.
+  exit /b 255
 ) >&2
 
-if exist "%FILE_OUT%" (
-  echo;%?~%: error: output file already exist: "%FILE_OUT%".
-  exit /b 253
+if not defined FILE_OUT (
+  echo;%?~%: error: output file is not defined.
+  exit /b 255
+) >&2
+
+for /F "tokens=* delims="eol^= %%i in ("%LIST_FILE_PATH%\.") do set "LIST_FILE_PATH=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%FILE_OUT%\.") do ^
+for /F "tokens=* delims="eol^= %%j in ("%%~dpi.") do set "FILE_OUT=%%~fi" & set "FILE_OUT_DIR=%%~fj"
+
+if not exist "\\?\%LIST_FILE_PATH%" (
+  echo;%?~%: error: list file path does not exists: "%LIST_FILE_PATH%".
+  exit /b 255
+) >&2
+
+if exist "\\?\%LIST_FILE_PATH%\*" (
+  echo;%?~%: error: list file path is not a file path: "%LIST_FILE_PATH%".
+  exit /b 255
+) >&2
+
+if %FLAG_FORCE% EQU 0 ^
+if exist "\\?\%FILE_OUT%" (
+  echo;%?~%: error: output file does exists: "%FILE_OUT%".
+  exit /b 255
+) >&2
+
+if not exist "\\?\%FILE_OUT_DIR%\*" (
+  echo;%?~%: error: output file directory does not exists: "%FILE_OUT_DIR%".
+  exit /b 255
 ) >&2
 
 rem temporary list
 if defined SCRIPT_TEMP_CURRENT_DIR (
-  set "TEMP_FILE_LIST=%SCRIPT_TEMP_CURRENT_DIR%\tmp_list.%RANDOM%-%RANDOM%.txt"
-) else set "TEMP_FILE_LIST=%TEMP%\tmp_list.%RANDOM%-%RANDOM%.txt"
+  set "TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%"
+) else set "TEMP_DIR=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%"
+
+mkdir "%TEMP_DIR%" >nul || exit /b 255
+
+call :IMPL
+set LAST_ERROR=%ERRORLEVEL%
+
+if exist "%TEMP_DIR%\*" rmdir /S /Q "%TEMP_DIR%" >nul 2>nul
+
+exit /b %LAST_ERROR%
+
+:IMPL
+set "TEMP_FILE_LIST=%TEMP_DIR%\ffmpeg-list.txt"
 
 type nul > "%TEMP_FILE_LIST%"
 
 rem check on all files existence at first
-for /f "usebackq eol=# tokens=* delims=" %%i in ("%FILE_LIST_IN:/=\%") do (
+for /f "usebackq eol=# tokens=* delims=" %%i in ("%LIST_FILE_PATH:/=\%") do (
   set "FILE_PATH=%%i"
-  if defined FILE_PATH call :CHECK_PATH || exit /b
+  call :PROCESS_PATH || exit /b
 )
 
-call :ENCODE
-set LAST_ERROR=%ERRORLEVEL%
+goto CONCAT
 
-del /F /Q /A:-D "%TEMP_FILE_LIST%"
-
-exit /b %LAST_ERROR%
-
-:CHECK_PATH
+:PROCESS_PATH
 if not exist "%FILE_PATH%" (
   echo;%?~%: error: file not found: "%FILE_PATH%"
-  exit /b 252
+  exit /b 255
 ) >&2
 
 set "FILE_PATH=%FILE_PATH:\=/%"
@@ -133,11 +232,34 @@ for /f "tokens=* delims="eol^= %%i in ("%FILE_PATH%") do (
 
 exit /b
 
-:ENCODE
-if %NO_DEFAULT_FLAGS% NEQ 0 (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -i "%%TEMP_FILE_LIST%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
-) else if %ENABLE_REENCODE% NEQ 0 (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -map 0 -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
-) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -map 0 -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
+:CONCAT
+rem prevent from accidental overwrite
+set "BARE_FORWARD_FLAGS="
+if %FLAG_FORCE% EQU 0 (
+  set BARE_FORWARD_FLAGS=%BARE_FORWARD_FLAGS% -n
+) else set BARE_FORWARD_FLAGS=%BARE_FORWARD_FLAGS% -y
+
+if %FLAG_NO_COPY_TS% EQU 0 (
+  set FFMPEG_COPYTS_CMDLINE= -copyts"
+) else set FFMPEG_COPYTS_CMDLINE="
+
+rem NOTE:
+rem   The `-safe 0` is used to concatenate absolute paths.
+rem
+rem   See details: https://trac.ffmpeg.org/wiki/Concatenate
+rem
+rem   The `-copyts` is used to copy original timestamps.
+rem
+rem   See details: https://trac.ffmpeg.org/wiki/Seeking#Seekingwhiledoingacodeccopy
+rem
+rem   The `-map 0` is used to select all streams.
+rem
+rem   See details: https://trac.ffmpeg.org/wiki/Map
+
+if %FLAG_NO_DEFAULT_FLAGS% NEQ 0 (
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat"       start /B /WAIT "" "%%FFMPEG_EXE%%"%%BARE_FORWARD_FLAGS%% -f concat -i "%%TEMP_FILE_LIST%%"%%FFMPEG_COPYTS_CMDLINE%%%%BARE_FLAGS%% "%%FILE_OUT%%"
+) else if %FLAG_ENABLE_REENCODE% NEQ 0 (
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat"       start /B /WAIT "" "%%FFMPEG_EXE%%"%%BARE_FORWARD_FLAGS%% -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -map 0%%FFMPEG_COPYTS_CMDLINE%% -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
+) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat"  start /B /WAIT "" "%%FFMPEG_EXE%%"%%BARE_FORWARD_FLAGS%% -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -map 0 -c copy%%FFMPEG_COPYTS_CMDLINE%% -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
 
 exit /b
