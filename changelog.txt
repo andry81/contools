@@ -1,4 +1,7 @@
 2025.10.30:
+* new: scripts/tools/std/is_stdin_reopen.bat: script to test the standard input stream reopen
+
+2025.10.30:
 * changed: scripts/tests/unit/logs/*.test_all/*.test_all.log: unit tests log update
 * changed: scripts/tests/manual/logs/*.test_all/*.test_all.log: manual tests log update
 * changed: scripts/tests/bench/logs: *.test_all/*.test_all.log, *.test__all/*.test__all.log: bench test logs update
