@@ -1,4 +1,9 @@
 2025.10.30:
+* new: Scripts/Tools/wmi: print_wmi_local_last_boot_time.vbs, print_wmi_local_last_boot_time.vbs.bat, get_wmi_local_last_boot_time.vbs.bat: vbs variant of WMI last boot time getter with bat wrappers
+* new: Scripts/Tools/wmi: print_wmi_local_last_boot_uptime.vbs, print_wmi_local_last_boot_time.vbs.bat, get_wmi_local_last_boot_time.vbs.bat: vbs variant of WMI last boot up time getter with bat wrappers
+* new: Scripts/Tools/wmi: print_wmi_local_date_and_last_boot_uptime.vbs, print_wmi_local_date_and_last_boot_uptime.vbs.bat: vbs variant of WMI date and last boot up time getter with bat wrapper
+
+2025.10.30:
 * changed: scripts/tools/std/if_*.bat: performance improvement
 * refactor: scripts/tools/std/if*.bat: added documentation
 * refactor: scripts/tools/testlib/test.bat: documentation improvement
@@ -595,7 +600,7 @@
 * changed: Scripts/Tools/*.bat: switch from `wmic.exe` utility usage to a vbs script wrapper because of the issue ("`wmic.exe` does consume a console window input" : https://github.com/andry81/contools/discussions/25)
 
 2025.06.04:
-* new: Scripts/Tools/wmi: print_wmi_local_datetime.vbs, print_wmi_local_datetime.vbs.bat, get_wmi_local_datetime.vbs.bat: vbs variant if WMI date/time getter with bat wrappers
+* new: Scripts/Tools/wmi: print_wmi_local_datetime.vbs, print_wmi_local_datetime.vbs.bat, get_wmi_local_datetime.vbs.bat: vbs variant of WMI date/time getter with bat wrappers
 * new: Scripts/Tools/bench/batscripts/test_wmi*: WMI scripts bench tests
 
 2025.06.03:
