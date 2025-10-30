@@ -1,4 +1,10 @@
 2025.10.30:
+* changed: scripts/tests/__init__/script_init.bat: switched to use last boot up time in the project log
+* changed: scripts/tools/testlib/init.bat: switched to use last boot up time in a test script log
+* changed: scripts/tests/unit/bat/test_std_if_!exclusive.bat: switched to use self logging
+* changed: scripts/tests/bench/bat/test_std_if_!exclusive.bat: switched to use self logging
+
+2025.10.30:
 * changed: scripts/tools/build/init_project_log.bat: added `USE_LOG_BOOT_UP_TIME` variable to replace log time by last boot up time
 * changed: scripts/tools/build/init_project_log.bat: code refactor
 
