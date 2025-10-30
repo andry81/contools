@@ -1,4 +1,8 @@
 2025.10.30:
+* changed: scripts/tools/build/init_project_log.bat: added `USE_LOG_BOOT_UP_TIME` variable to replace log time by last boot up time
+* changed: scripts/tools/build/init_project_log.bat: code refactor
+
+2025.10.30:
 * new: Scripts/Tools/wmi: print_wmi_local_last_boot_time.vbs, print_wmi_local_last_boot_time.vbs.bat, get_wmi_local_last_boot_time.vbs.bat: vbs variant of WMI last boot time getter with bat wrappers
 * new: Scripts/Tools/wmi: print_wmi_local_last_boot_uptime.vbs, print_wmi_local_last_boot_time.vbs.bat, get_wmi_local_last_boot_time.vbs.bat: vbs variant of WMI last boot up time getter with bat wrappers
 * new: Scripts/Tools/wmi: print_wmi_local_date_and_last_boot_uptime.vbs, print_wmi_local_date_and_last_boot_uptime.vbs.bat: vbs variant of WMI date and last boot up time getter with bat wrapper

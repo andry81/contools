@@ -11,8 +11,8 @@ if defined NO_LOG set /A NO_LOG+=0
 rem Do not make a log output or stdio duplication into files
 if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 
-if %NO_GEN%0 NEQ 0 exit /b 0
-if %NO_LOG%0 NEQ 0 exit /b 0
+rem Do use last boot up time as log time
+if defined USE_LOG_BOOT_UP_TIME set /A USE_LOG_BOOT_UP_TIME+=0
 
 call "%%~dp0__init__.bat" || exit /b
 
@@ -24,8 +24,23 @@ if defined PROJECT_LOG_DIR exit /b 0
 if defined PROJECT_LOG_FILE exit /b 0
 
 rem use stdout/stderr redirection with logging
+if %USE_LOG_BOOT_UP_TIME% NEQ 0 goto USE_LOG_BOOT_UP_TIME
+
 call "%%CONTOOLS_WMI_ROOT%%\get_wmi_local_datetime.vbs.bat"
 set "PROJECT_LOG_FILE_NAME_DATE_TIME=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
+goto USE_LOG_BOOT_UP_TIME_END
+
+:USE_LOG_BOOT_UP_TIME
+call "%%CONTOOLS_WMI_ROOT%%\get_wmi_local_date_and_last_boot_uptime.vbs.bat"
+set "PROJECT_LOG_FILE_NAME_DATE_TIME=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%"
+
+for /F "tokens=1,2,* delims=,."eol^= %%i in ("%RETURN_VALUE%") do set "LAST_BOOT_UPTIME_SEC=%%j" & set "LAST_BOOT_UPTIME_SEC_FRACS=%%k"
+
+set "LAST_BOOT_UPTIME_SEC_FRACS=%LAST_BOOT_UPTIME_SEC_FRACS%000"
+
+set "PROJECT_LOG_FILE_NAME_DATE_TIME=%PROJECT_LOG_FILE_NAME_DATE_TIME%_%LAST_BOOT_UPTIME_SEC%''%LAST_BOOT_UPTIME_SEC_FRACS:~0,3%"
+
+:USE_LOG_BOOT_UP_TIME_END
 
 set "PROJECT_LOG_DIR_NAME=%PROJECT_LOG_FILE_NAME_DATE_TIME%.%SUFFIX_NAME%"
 set "PROJECT_LOG_DIR=%PROJECT_LOG_ROOT%\%PROJECT_LOG_DIR_NAME%"
@@ -40,7 +55,7 @@ set "PROJECT_LOG_FILE=%PROJECT_LOG_DIR%\%PROJECT_LOG_FILE_NAME%"
 
 :SKIP_LOG_OUTPUT
 
-if %NO_LOG%0 EQU 0 (
+if %NO_GEN%0 EQU 0 if %NO_LOG%0 EQU 0 (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%PROJECT_LOG_DIR%%" || exit /b 255
 )
 
