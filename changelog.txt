@@ -1,4 +1,7 @@
 2025.10.30:
+* fixed: scripts/tests/bench/bat: test_all.bat, test__all.bat: missed to exclude exclusive tests
+
+2025.10.30:
 * changed: scripts/tests/__init__/script_init.bat: switched to use last boot up time in the project log
 * changed: scripts/tools/testlib/init.bat: switched to use last boot up time in a test script log
 * changed: scripts/tests/unit/bat/test_std_if_!exclusive.bat: switched to use self logging
