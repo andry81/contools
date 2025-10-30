@@ -3,17 +3,17 @@ Caption                               Name
 Intel64 Family 6 Model 58 Stepping 9  Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz  
 
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\000--00--test_all"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\000--00--test_all"
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\shared\2025'10'25_18'38'18''943"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\shared\2025'10'30_836365''742"
 
 Running test_all.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\001--01--test_build"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\001--01--test_build"
 
 Running test_build.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\002--02--test_build__00_load_config"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\002--02--test_build__00_load_config"
 
 Running test_build__00_load_config.bat...
 
@@ -476,9 +476,9 @@ PASSED: 12`14: VAR=`TEST_9_VALUE_a2` RESULT=`	 1 ! 2 | 3 & 4 ^ 5 = 6 , 7 ; 8 * 9
 PASSED: 12`15: VAR=`TEST_9_VALUE_a3` RESULT=`	 1 ! 2 | 3 & 4 ^ 5 = 6 , 7 ; 8 * 9 # 0 % 1 / 2 \ 3 ? 4 > 5 < 6 " 7 	`
 
 
-Time spent: 8.990 secs (test_all.bat->test_build.bat->test_build__00_load_config.bat)
+Time spent: 8.930 secs (test_all.bat->test_build.bat->test_build__00_load_config.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\003--02--test_build__11_gen_config"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\003--02--test_build__11_gen_config"
 
 Running test_build__11_gen_config.bat...
 
@@ -489,17 +489,17 @@ config.bin "_common/00_ascii" "01_ascii_00_7F"...
 PASSED: 14`2
 
 
-Time spent: 1.620 secs (test_all.bat->test_build.bat->test_build__11_gen_config.bat)
+Time spent: 1.650 secs (test_all.bat->test_build.bat->test_build__11_gen_config.bat)
 
-Time spent: 11.270 secs (test_all.bat->test_build.bat)
+Time spent: 11.240 secs (test_all.bat->test_build.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\004--01--test_encoding"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\004--01--test_encoding"
 
 Running test_encoding.bat...
 
 Time spent: 0.110 secs (test_all.bat->test_encoding.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\005--01--test_extract_version"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\005--01--test_extract_version"
 
 Running test_extract_version.bat...
 
@@ -524,17 +524,17 @@ PASSED: 32`18: RESULT=`2009.0.0.1`
 PASSED: 33`19: RESULT=`1.2.3c.4.5`
 PASSED: 34`20: RESULT=`1.2.3.4.5`
 
-Time spent: 2.700 secs (test_all.bat->test_extract_version.bat)
+Time spent: 2.660 secs (test_all.bat->test_extract_version.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\006--01--test_math"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\006--01--test_math"
 
 Running test_math.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\007--02--test_math__01_fold"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\007--02--test_math__01_fold"
 
 Running test_math__01_fold.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\008--03--test_math__11_ufold"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\008--03--test_math__11_ufold"
 
 Running test_math__11_ufold.bat...
 
@@ -639,9 +639,9 @@ PASSED: 132`98: RET=`0` OUT=`1,0` IN=`1000`
 PASSED: 133`99: RET=`0` OUT=`100` IN=`100`
 PASSED: 134`100: RET=`0` OUT=`10` IN=`10`
 
-Time spent: 13.090 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__11_ufold.bat)
+Time spent: 13.020 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__11_ufold.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\009--03--test_math__21_ufoldpad"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\009--03--test_math__21_ufoldpad"
 
 Running test_math__21_ufoldpad.bat...
 
@@ -746,9 +746,9 @@ PASSED: 232`98: RET=`0` OUT=`1,0` IN=`1000`
 PASSED: 233`99: RET=`0` OUT=`100` IN=`100`
 PASSED: 234`100: RET=`0` OUT=`10` IN=`10`
 
-Time spent: 13.050 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__21_ufoldpad.bat)
+Time spent: 13.140 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__21_ufoldpad.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\010--03--test_math__31_ufoldpad6"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\010--03--test_math__31_ufoldpad6"
 
 Running test_math__31_ufoldpad6.bat...
 
@@ -853,9 +853,9 @@ PASSED: 332`98: RET=`0` OUT=`0,0,0,0,1,0` IN=`1000`
 PASSED: 333`99: RET=`0` OUT=`0,0,0,0,0,100` IN=`100`
 PASSED: 334`100: RET=`0` OUT=`0,0,0,0,0,10` IN=`10`
 
-Time spent: 13.080 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__31_ufoldpad6.bat)
+Time spent: 13.120 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__31_ufoldpad6.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\011--03--test_math__32_ifoldpad6"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\011--03--test_math__32_ifoldpad6"
 
 Running test_math__32_ifoldpad6.bat...
 
@@ -1073,9 +1073,9 @@ PASSED: 545`211: RET=`0` OUT=`-0,0,0,0,1,0` IN=`-1000`
 PASSED: 546`212: RET=`0` OUT=`-0,0,0,0,0,100` IN=`-100`
 PASSED: 547`213: RET=`0` OUT=`-0,0,0,0,0,10` IN=`-10`
 
-Time spent: 27.830 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__32_ifoldpad6.bat)
+Time spent: 27.740 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__32_ifoldpad6.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\012--03--test_math__41_ufoldpad6n"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\012--03--test_math__41_ufoldpad6n"
 
 Running test_math__41_ufoldpad6n.bat...
 
@@ -1180,9 +1180,9 @@ PASSED: 645`98: RET=`0` OUT=`0,0,0,0,1,0` IN=`1000`
 PASSED: 646`99: RET=`0` OUT=`0,0,0,0,0,100` IN=`100`
 PASSED: 647`100: RET=`0` OUT=`0,0,0,0,0,10` IN=`10`
 
-Time spent: 13.330 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__41_ufoldpad6n.bat)
+Time spent: 13.120 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__41_ufoldpad6n.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\013--03--test_math__42_ifoldpad6n"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\013--03--test_math__42_ifoldpad6n"
 
 Running test_math__42_ifoldpad6n.bat...
 
@@ -1400,15 +1400,15 @@ PASSED: 858`211: RET=`0` OUT=`-0,0,0,0,1,0` IN=`-1000`
 PASSED: 859`212: RET=`0` OUT=`-0,0,0,0,0,100` IN=`-100`
 PASSED: 860`213: RET=`0` OUT=`-0,0,0,0,0,10` IN=`-10`
 
-Time spent: 28.330 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__42_ifoldpad6n.bat)
+Time spent: 28.450 secs (test_all.bat->test_math.bat->test_math__01_fold.bat->test_math__42_ifoldpad6n.bat)
 
-Time spent: 110.490 secs (test_all.bat->test_math.bat->test_math__01_fold.bat)
+Time spent: 110.380 secs (test_all.bat->test_math.bat->test_math__01_fold.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\014--02--test_math__02_unfold"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\014--02--test_math__02_unfold"
 
 Running test_math__02_unfold.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\015--03--test_math__11_uunfold"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\015--03--test_math__11_uunfold"
 
 Running test_math__11_uunfold.bat...
 
@@ -1555,9 +1555,9 @@ PASSED: 1000`140: RET=`1` OUT=`235235235235235235` IN=`1234,1234,1234,1234,1234,
 PASSED: 1001`141: RET=`1` OUT=`235235235235235235` IN=`1234,1234,1234,1234,1234,1234,1998,1111`
 PASSED: 1002`142: RET=`1` OUT=`235235235235235236` IN=`1234,1234,1234,1234,1234,1234,1999,1111`
 
-Time spent: 18.700 secs (test_all.bat->test_math.bat->test_math__02_unfold.bat->test_math__11_uunfold.bat)
+Time spent: 18.710 secs (test_all.bat->test_math.bat->test_math__02_unfold.bat->test_math__11_uunfold.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\016--03--test_math__12_iunfold"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\016--03--test_math__12_iunfold"
 
 Running test_math__12_iunfold.bat...
 
@@ -1867,15 +1867,15 @@ PASSED: 1305`303: RET=`-1` OUT=`-235235235235235235` IN=`-1234,1234,1234,1234,12
 PASSED: 1306`304: RET=`-1` OUT=`-235235235235235235` IN=`-1234,1234,1234,1234,1234,1234,1998,1111`
 PASSED: 1307`305: RET=`-1` OUT=`-235235235235235236` IN=`-1234,1234,1234,1234,1234,1234,1999,1111`
 
-Time spent: 40.640 secs (test_all.bat->test_math.bat->test_math__02_unfold.bat->test_math__12_iunfold.bat)
+Time spent: 40.720 secs (test_all.bat->test_math.bat->test_math__02_unfold.bat->test_math__12_iunfold.bat)
 
-Time spent: 60.020 secs (test_all.bat->test_math.bat->test_math__02_unfold.bat)
+Time spent: 60.080 secs (test_all.bat->test_math.bat->test_math__02_unfold.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\017--02--test_math__03_add"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\017--02--test_math__03_add"
 
 Running test_math__03_add.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\018--03--test_math__11_uadd"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\018--03--test_math__11_uadd"
 
 Running test_math__11_uadd.bat...
 
@@ -2044,9 +2044,9 @@ PASSED: 1469`162: RET=`1` OUT=`235,235,236,346,346,346` L=`1234,1234,1234,1234,1
 PASSED: 1470`163: RET=`1` OUT=`235,235,236,346,346,346` L=`1234,1234,1234,1234,1234,1234,1998,1111` R=`1111111111`
 PASSED: 1471`164: RET=`1` OUT=`235,235,236,346,346,347` L=`1234,1234,1234,1234,1234,1234,1999,1111` R=`1111111111`
 
-Time spent: 21.580 secs (test_all.bat->test_math.bat->test_math__03_add.bat->test_math__11_uadd.bat)
+Time spent: 21.660 secs (test_all.bat->test_math.bat->test_math__03_add.bat->test_math__11_uadd.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\019--03--test_math__21_iadd"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\019--03--test_math__21_iadd"
 
 Running test_math__21_iadd.bat...
 
@@ -2343,9 +2343,9 @@ PASSED: 1761`290: RET=`-1` OUT=`-235,235,236,346,346,346` L=`-1234,1234,1234,123
 PASSED: 1762`291: RET=`-1` OUT=`-235,235,236,346,346,346` L=`-1234,1234,1234,1234,1234,1234,1998,1111` R=`-1111111111`
 PASSED: 1763`292: RET=`-1` OUT=`-235,235,236,346,346,347` L=`-1234,1234,1234,1234,1234,1234,1999,1111` R=`-1111111111`
 
-Time spent: 39.220 secs (test_all.bat->test_math.bat->test_math__03_add.bat->test_math__21_iadd.bat)
+Time spent: 39.630 secs (test_all.bat->test_math.bat->test_math__03_add.bat->test_math__21_iadd.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\020--03--test_math__22_iadd_fnvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\020--03--test_math__22_iadd_fnvar"
 
 Running test_math__22_iadd_fnvar.bat...
 
@@ -2872,9 +2872,9 @@ PASSED: 2283`520: RET=`-1` OUT=`-235,235,236,346,346,346` L=`-0,0,1,111,111,111`
 PASSED: 2284`521: RET=`-1` OUT=`-235,235,236,346,346,347` L=`-1234,1234,1234,1234,1234,1234,1999,1111` R=`-0,0,1,111,111,111`
 PASSED: 2285`522: RET=`-1` OUT=`-235,235,236,346,346,347` L=`-0,0,1,111,111,111` R=`-1234,1234,1234,1234,1234,1234,1999,1111`
 
-Time spent: 73.430 secs (test_all.bat->test_math.bat->test_math__03_add.bat->test_math__22_iadd_fnvar.bat)
+Time spent: 72.590 secs (test_all.bat->test_math.bat->test_math__03_add.bat->test_math__22_iadd_fnvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\021--03--test_math__23_iadd2x_fnvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\021--03--test_math__23_iadd2x_fnvar"
 
 Running test_math__23_iadd2x_fnvar.bat...
 
@@ -3473,15 +3473,15 @@ PASSED: 2877`592: RET=`-1` OUT=`-235,235,235,235,235,235,999,111,1,111,111,111` 
 PASSED: 2878`593: RET=`-1` OUT=`-235,235,235,235,235,236,0,111,1,111,111,111` L=`-1234,1234,1234,1234,1234,1234,1999,1111` R=`-0,0,0,0,0,0,0,0,1,111,111,111`
 PASSED: 2879`594: RET=`-1` OUT=`-235,235,235,235,235,236,0,111,1,111,111,111` L=`-0,0,0,0,0,0,0,0,1,111,111,111` R=`-1234,1234,1234,1234,1234,1234,1999,1111`
 
-Time spent: 88.780 secs (test_all.bat->test_math.bat->test_math__03_add.bat->test_math__23_iadd2x_fnvar.bat)
+Time spent: 99.190 secs (test_all.bat->test_math.bat->test_math__03_add.bat->test_math__23_iadd2x_fnvar.bat)
 
-Time spent: 224.260 secs (test_all.bat->test_math.bat->test_math__03_add.bat)
+Time spent: 234.330 secs (test_all.bat->test_math.bat->test_math__03_add.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\022--02--test_math__04_mul"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\022--02--test_math__04_mul"
 
 Running test_math__04_mul.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\023--03--test_math__11_umul"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\023--03--test_math__11_umul"
 
 Running test_math__11_umul.bat...
 
@@ -3648,9 +3648,9 @@ PASSED: 3039`160: RET=`1372483` OUT=`457,457,457,457,456,84` L=`1234,1234,1234,1
 PASSED: 3040`161: RET=`1372483` OUT=`457,457,457,457,457,456` L=`1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 PASSED: 3041`162: RET=`1372483` OUT=`457,457,457,457,457,457` L=`1234,1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 
-Time spent: 21.820 secs (test_all.bat->test_math.bat->test_math__04_mul.bat->test_math__11_umul.bat)
+Time spent: 24.520 secs (test_all.bat->test_math.bat->test_math__04_mul.bat->test_math__11_umul.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\024--03--test_math__21_imul"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\024--03--test_math__21_imul"
 
 Running test_math__21_imul.bat...
 
@@ -3918,9 +3918,9 @@ PASSED: 3302`261: RET=`-1372483` OUT=`-457,457,457,457,456,84` L=`-1234,1234,123
 PASSED: 3303`262: RET=`-1372483` OUT=`-457,457,457,457,457,456` L=`-1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 PASSED: 3304`263: RET=`-1372483` OUT=`-457,457,457,457,457,457` L=`-1234,1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 
-Time spent: 36.900 secs (test_all.bat->test_math.bat->test_math__04_mul.bat->test_math__21_imul.bat)
+Time spent: 39.420 secs (test_all.bat->test_math.bat->test_math__04_mul.bat->test_math__21_imul.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\025--03--test_math__22_imul2x_fnvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\025--03--test_math__22_imul2x_fnvar"
 
 Running test_math__22_imul2x_fnvar.bat...
 
@@ -4445,15 +4445,15 @@ PASSED: 3822`518: RET=`0` OUT=`-0,0,0,1,372,483,457,457,457,457,196,85` L=`0,0,0
 PASSED: 3823`519: RET=`0` OUT=`-0,0,0,1,372,483,457,457,457,457,196,85` L=`-1234,1234,1234,1234,1234,1234,1234,1234,1234` R=`0,0,0,1,111,111`
 PASSED: 3824`520: RET=`0` OUT=`-0,0,0,1,372,483,457,457,457,457,196,85` L=`0,0,0,1,111,111` R=`-1234,1234,1234,1234,1234,1234,1234,1234,1234`
 
-Time spent: 76.490 secs (test_all.bat->test_math.bat->test_math__04_mul.bat->test_math__22_imul2x_fnvar.bat)
+Time spent: 75.330 secs (test_all.bat->test_math.bat->test_math__04_mul.bat->test_math__22_imul2x_fnvar.bat)
 
-Time spent: 136.230 secs (test_all.bat->test_math.bat->test_math__04_mul.bat)
+Time spent: 140.280 secs (test_all.bat->test_math.bat->test_math__04_mul.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\026--02--test_math__05_div"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\026--02--test_math__05_div"
 
 Running test_math__05_div.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\027--03--test_math__11_udiv"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\027--03--test_math__11_udiv"
 
 Running test_math__11_udiv.bat...
 
@@ -4601,9 +4601,9 @@ PASSED: 3957`133: RET=`993333` OUT=`0,1,111,711,822,882` L=`1234,1234,1234,1234,
 PASSED: 3958`134: RET=`993333` OUT=`0,1,111,711,822,882` L=`1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 PASSED: 3959`135: RET=`993333` OUT=`0,1,111,711,822,882` L=`1234,1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 
-Time spent: 18.240 secs (test_all.bat->test_math.bat->test_math__05_div.bat->test_math__11_udiv.bat)
+Time spent: 19.680 secs (test_all.bat->test_math.bat->test_math__05_div.bat->test_math__11_udiv.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\028--03--test_math__12_udiv2x"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\028--03--test_math__12_udiv2x"
 
 Running test_math__12_udiv2x.bat...
 
@@ -4815,9 +4815,9 @@ PASSED: 4156`197: RET=`0` OUT=`0,1,111,711,822,882,894,0,0,0,0,0` L=`1234,1234,1
 PASSED: 4157`198: RET=`66679` OUT=`0,1,111,711,822,882,894,0,1,110,600,111` L=`1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 PASSED: 4158`199: RET=`190079` OUT=`0,1,111,711,822,882,894,0,1,111,710,711` L=`1234,1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 
-Time spent: 28.020 secs (test_all.bat->test_math.bat->test_math__05_div.bat->test_math__12_udiv2x.bat)
+Time spent: 30.780 secs (test_all.bat->test_math.bat->test_math__05_div.bat->test_math__12_udiv2x.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\029--03--test_math__21_idiv"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\029--03--test_math__21_idiv"
 
 Running test_math__21_idiv.bat...
 
@@ -5067,9 +5067,9 @@ PASSED: 4393`235: RET=`-993333` OUT=`-0,1,111,711,822,882` L=`-1234,1234,1234,12
 PASSED: 4394`236: RET=`-993333` OUT=`-0,1,111,711,822,882` L=`-1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 PASSED: 4395`237: RET=`-993333` OUT=`-0,1,111,711,822,882` L=`-1234,1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 
-Time spent: 33.060 secs (test_all.bat->test_math.bat->test_math__05_div.bat->test_math__21_idiv.bat)
+Time spent: 36.750 secs (test_all.bat->test_math.bat->test_math__05_div.bat->test_math__21_idiv.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\030--03--test_math__22_idiv2x"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\030--03--test_math__22_idiv2x"
 
 Running test_math__22_idiv2x.bat...
 
@@ -5419,15 +5419,15 @@ PASSED: 4730`335: RET=`0` OUT=`-0,1,111,711,822,882,894,0,0,0,0,0` L=`-1234,1234
 PASSED: 4731`336: RET=`-66679` OUT=`-0,1,111,711,822,882,894,0,1,110,600,111` L=`-1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 PASSED: 4732`337: RET=`-190079` OUT=`-0,1,111,711,822,882,894,0,1,111,710,711` L=`-1234,1234,1234,1234,1234,1234,1234,1234,1234` R=`1111111`
 
-Time spent: 49.830 secs (test_all.bat->test_math.bat->test_math__05_div.bat->test_math__22_idiv2x.bat)
+Time spent: 52.280 secs (test_all.bat->test_math.bat->test_math__05_div.bat->test_math__22_idiv2x.bat)
 
-Time spent: 130.370 secs (test_all.bat->test_math.bat->test_math__05_div.bat)
+Time spent: 140.770 secs (test_all.bat->test_math.bat->test_math__05_div.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\031--02--test_math__06_cmp"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\031--02--test_math__06_cmp"
 
 Running test_math__06_cmp.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\032--03--test_math__11_ucmp"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\032--03--test_math__11_ucmp"
 
 Running test_math__11_ucmp.bat...
 
@@ -6640,9 +6640,9 @@ PASSED: 5938`1206: RET=`0` OP=`LEQ` L=`20` R=`21`
 
 exit.bat: warning: a test setup has called without a test teardown.
 
-Time spent: 160.120 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__11_ucmp.bat)
+Time spent: 160.440 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__11_ucmp.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\033--03--test_math__12_icmp"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\033--03--test_math__12_icmp"
 
 Running test_math__12_icmp.bat...
 
@@ -9284,9 +9284,9 @@ PASSED: 8573`2635: RET=`1` OP=`LEQ` L=`-20` R=`-21`
 
 exit.bat: warning: a test setup has called without a test teardown.
 
-Time spent: 376.430 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__12_icmp.bat)
+Time spent: 350.470 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__12_icmp.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\034--03--test_math__21_ucmp_nvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\034--03--test_math__21_ucmp_nvar"
 
 Running test_math__21_ucmp_nvar.bat...
 
@@ -10515,9 +10515,9 @@ PASSED: 9795`1222: RET=`0` OP=`LEQ` L=`20` R=`21`
 
 exit.bat: warning: a test setup has called without a test teardown.
 
-Time spent: 163.230 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__21_ucmp_nvar.bat)
+Time spent: 160.890 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__21_ucmp_nvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\035--03--test_math__22_icmp_nvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\035--03--test_math__22_icmp_nvar"
 
 Running test_math__22_icmp_nvar.bat...
 
@@ -13175,9 +13175,9 @@ PASSED: 12446`2651: RET=`1` OP=`LEQ` L=`-20` R=`-21`
 
 exit.bat: warning: a test setup has called without a test teardown.
 
-Time spent: 365.510 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__22_icmp_nvar.bat)
+Time spent: 356.670 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__22_icmp_nvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\036--03--test_math__31_ucmp_fnvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\036--03--test_math__31_ucmp_fnvar"
 
 Running test_math__31_ucmp_fnvar.bat...
 
@@ -14142,9 +14142,9 @@ PASSED: 13404`958: RET=`1` OP=`GEQ` L=`0` R=`1`
 PASSED: 13405`959: RET=`0` OP=`LSS` L=`0` R=`1`
 PASSED: 13406`960: RET=`0` OP=`LEQ` L=`0` R=`1`
 
-Time spent: 133.090 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__31_ucmp_fnvar.bat)
+Time spent: 129.270 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__31_ucmp_fnvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\037--03--test_math__32_icmp_fnvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\037--03--test_math__32_icmp_fnvar"
 
 Running test_math__32_icmp_fnvar.bat...
 
@@ -16286,15 +16286,15 @@ PASSED: 15541`2135: RET=`0` OP=`GEQ` L=`-0` R=`-1`
 PASSED: 15542`2136: RET=`1` OP=`LSS` L=`-0` R=`-1`
 PASSED: 15543`2137: RET=`1` OP=`LEQ` L=`-0` R=`-1`
 
-Time spent: 336.940 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__32_icmp_fnvar.bat)
+Time spent: 300.140 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat->test_math__32_icmp_fnvar.bat)
 
-Time spent: 1537.120 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat)
+Time spent: 1459.680 secs (test_all.bat->test_math.bat->test_math__06_cmp.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\038--02--test_math__07_sign"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\038--02--test_math__07_sign"
 
 Running test_math__07_sign.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\039--03--test_math__01_sign"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\039--03--test_math__01_sign"
 
 Running test_math__01_sign.bat...
 
@@ -16330,15 +16330,15 @@ PASSED: 15572`29: RET=`-1` L=`-10`
 PASSED: 15573`30: RET=`-1` L=`-1,1`
 PASSED: 15574`31: RET=`-1` L=`-12345678901234567890`
 
-Time spent: 3.850 secs (test_all.bat->test_math.bat->test_math__07_sign.bat->test_math__01_sign.bat)
+Time spent: 3.810 secs (test_all.bat->test_math.bat->test_math__07_sign.bat->test_math__01_sign.bat)
 
-Time spent: 4.220 secs (test_all.bat->test_math.bat->test_math__07_sign.bat)
+Time spent: 4.200 secs (test_all.bat->test_math.bat->test_math__07_sign.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\040--02--test_math__08_norm"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\040--02--test_math__08_norm"
 
 Running test_math__08_norm.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\041--03--test_math__11_unorm"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\041--03--test_math__11_unorm"
 
 Running test_math__11_unorm.bat...
 
@@ -16391,9 +16391,9 @@ PASSED: 15620`46: RET=`1` OUT=`235,235,235,235,235,235,111,0,0,0,0,0` IN=`1234,1
 PASSED: 15621`47: RET=`1` OUT=`235,235,235,235,235,235,999,111,0,0,0,0` IN=`1234,1234,1234,1234,1234,1234,1998,1111`
 PASSED: 15622`48: RET=`1` OUT=`235,235,235,235,235,236,0,111,0,0,0,0` IN=`1234,1234,1234,1234,1234,1234,1999,1111`
 
-Time spent: 6.220 secs (test_all.bat->test_math.bat->test_math__08_norm.bat->test_math__11_unorm.bat)
+Time spent: 6.240 secs (test_all.bat->test_math.bat->test_math__08_norm.bat->test_math__11_unorm.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\042--03--test_math__21_inorm"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\042--03--test_math__21_inorm"
 
 Running test_math__21_inorm.bat...
 
@@ -16464,15 +16464,15 @@ PASSED: 15686`64: RET=`-1` OUT=`-235,235,235,235,235,235,111,0,0,0,0,0` IN=`-123
 PASSED: 15687`65: RET=`-1` OUT=`-235,235,235,235,235,235,999,111,0,0,0,0` IN=`-1234,1234,1234,1234,1234,1234,1998,1111`
 PASSED: 15688`66: RET=`-1` OUT=`-235,235,235,235,235,236,0,111,0,0,0,0` IN=`-1234,1234,1234,1234,1234,1234,1999,1111`
 
-Time spent: 8.540 secs (test_all.bat->test_math.bat->test_math__08_norm.bat->test_math__21_inorm.bat)
+Time spent: 8.580 secs (test_all.bat->test_math.bat->test_math__08_norm.bat->test_math__21_inorm.bat)
 
-Time spent: 15.420 secs (test_all.bat->test_math.bat->test_math__08_norm.bat)
+Time spent: 15.450 secs (test_all.bat->test_math.bat->test_math__08_norm.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\043--02--test_math__09_trim"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\043--02--test_math__09_trim"
 
 Running test_math__09_trim.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\044--03--test_math__11_ultrim_nvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\044--03--test_math__11_ultrim_nvar"
 
 Running test_math__11_ultrim_nvar.bat...
 
@@ -16505,9 +16505,9 @@ PASSED: 15714`26: RET=`0` OUT=`19999999999999999999999999999999999991000` IN=`19
 PASSED: 15715`27: RET=`0` OUT=`123000` IN=`000123000`
 PASSED: 15716`28: RET=`0` OUT=`+000123000` IN=`+000123000`
 
-Time spent: 3.600 secs (test_all.bat->test_math.bat->test_math__09_trim.bat->test_math__11_ultrim_nvar.bat)
+Time spent: 3.690 secs (test_all.bat->test_math.bat->test_math__09_trim.bat->test_math__11_ultrim_nvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\045--03--test_math__12_iltrim_nvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\045--03--test_math__12_iltrim_nvar"
 
 Running test_math__12_iltrim_nvar.bat...
 
@@ -16547,9 +16547,9 @@ PASSED: 15749`33: RET=`0` OUT=`-19999999999999999999999999999999999991000` IN=`-
 PASSED: 15750`34: RET=`0` OUT=`-123000` IN=`-000123000`
 PASSED: 15751`35: RET=`0` OUT=`123000` IN=`+000123000`
 
-Time spent: 4.480 secs (test_all.bat->test_math.bat->test_math__09_trim.bat->test_math__12_iltrim_nvar.bat)
+Time spent: 4.700 secs (test_all.bat->test_math.bat->test_math__09_trim.bat->test_math__12_iltrim_nvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\046--03--test_math__21_ultrim_fnvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\046--03--test_math__21_ultrim_fnvar"
 
 Running test_math__21_ultrim_fnvar.bat...
 
@@ -16614,9 +16614,9 @@ PASSED: 15809`58: RET=`0` OUT=`123000,0,0,0,0,0` IN=`123000`
 PASSED: 15810`59: RET=`0` OUT=`0,0,0,0,0,1` IN=`0,0,0,0,00,000,0,0,0,0,0,1`
 PASSED: 15811`60: RET=`0` OUT=`0` IN=`0,0,0,0,00,000`
 
-Time spent: 7.890 secs (test_all.bat->test_math.bat->test_math__09_trim.bat->test_math__21_ultrim_fnvar.bat)
+Time spent: 8.170 secs (test_all.bat->test_math.bat->test_math__09_trim.bat->test_math__21_ultrim_fnvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\047--03--test_math__22_iltrim_fnvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\047--03--test_math__22_iltrim_fnvar"
 
 Running test_math__22_iltrim_fnvar.bat...
 
@@ -16690,15 +16690,15 @@ PASSED: 15878`67: RET=`0` OUT=`-123000,0,0,0,0,0` IN=`-123000`
 PASSED: 15879`68: RET=`0` OUT=`-0,0,0,0,0,1` IN=`-0,0,0,0,00,000,0,0,0,0,0,1`
 PASSED: 15880`69: RET=`0` OUT=`0` IN=`-0,0,0,0,00,000`
 
-Time spent: 9.130 secs (test_all.bat->test_math.bat->test_math__09_trim.bat->test_math__22_iltrim_fnvar.bat)
+Time spent: 9.090 secs (test_all.bat->test_math.bat->test_math__09_trim.bat->test_math__22_iltrim_fnvar.bat)
 
-Time spent: 26.320 secs (test_all.bat->test_math.bat->test_math__09_trim.bat)
+Time spent: 26.900 secs (test_all.bat->test_math.bat->test_math__09_trim.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\048--02--test_math__10_digits"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\048--02--test_math__10_digits"
 
 Running test_math__10_digits.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\049--03--test_math__11_udigits_nvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\049--03--test_math__11_udigits_nvar"
 
 Running test_math__11_udigits_nvar.bat...
 
@@ -16729,9 +16729,9 @@ PASSED: 15904`24: RET=`41` IN=`19999999999999999999999999999999999991000`
 PASSED: 15905`25: RET=`6` IN=`000123000`
 PASSED: 15906`26: RET=`1` IN=`000000000`
 
-Time spent: 3.320 secs (test_all.bat->test_math.bat->test_math__10_digits.bat->test_math__11_udigits_nvar.bat)
+Time spent: 3.610 secs (test_all.bat->test_math.bat->test_math__10_digits.bat->test_math__11_udigits_nvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\050--03--test_math__12_idigits_nvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\050--03--test_math__12_idigits_nvar"
 
 Running test_math__12_idigits_nvar.bat...
 
@@ -16769,9 +16769,9 @@ PASSED: 15937`31: RET=`41` IN=`-19999999999999999999999999999999999991000`
 PASSED: 15938`32: RET=`6` IN=`-000123000`
 PASSED: 15939`33: RET=`1` IN=`+000000000`
 
-Time spent: 4.250 secs (test_all.bat->test_math.bat->test_math__10_digits.bat->test_math__12_idigits_nvar.bat)
+Time spent: 4.200 secs (test_all.bat->test_math.bat->test_math__10_digits.bat->test_math__12_idigits_nvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\051--03--test_math__21_udigits_fnvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\051--03--test_math__21_udigits_fnvar"
 
 Running test_math__21_udigits_fnvar.bat...
 
@@ -16809,9 +16809,9 @@ PASSED: 15970`31: RET=`4` IN=`0,0,0,0,001`
 PASSED: 15971`32: RET=`1` IN=`0,0,0,0,0,001`
 PASSED: 15972`33: RET=`16` IN=`0,0,0,0,0,0,001`
 
-Time spent: 4.420 secs (test_all.bat->test_math.bat->test_math__10_digits.bat->test_math__21_udigits_fnvar.bat)
+Time spent: 4.450 secs (test_all.bat->test_math.bat->test_math__10_digits.bat->test_math__21_udigits_fnvar.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\052--03--test_math__22_idigits_fnvar"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\052--03--test_math__22_idigits_fnvar"
 
 Running test_math__22_idigits_fnvar.bat...
 
@@ -16856,17 +16856,17 @@ PASSED: 16010`38: RET=`4` IN=`-0,0,0,0,001`
 PASSED: 16011`39: RET=`1` IN=`-0,0,0,0,0,001`
 PASSED: 16012`40: RET=`16` IN=`-0,0,0,0,0,0,001`
 
-Time spent: 5.360 secs (test_all.bat->test_math.bat->test_math__10_digits.bat->test_math__22_idigits_fnvar.bat)
+Time spent: 5.980 secs (test_all.bat->test_math.bat->test_math__10_digits.bat->test_math__22_idigits_fnvar.bat)
 
-Time spent: 18.580 secs (test_all.bat->test_math.bat->test_math__10_digits.bat)
+Time spent: 19.500 secs (test_all.bat->test_math.bat->test_math__10_digits.bat)
 
-Time spent: 2265.920 secs (test_all.bat->test_math.bat)
+Time spent: 2214.460 secs (test_all.bat->test_math.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\053--01--test_std"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\053--01--test_std"
 
 Running test_std.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\054--02--test_std__00_strlen"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\054--02--test_std__00_strlen"
 
 Running test_std__00_strlen.bat...
 
@@ -16894,9 +16894,9 @@ PASSED: 16033`21: STRING_LEN=1024 STRING=`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 PASSED: 16034`22: STRING_LEN=2048 STRING=`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
 PASSED: 16035`23: STRING_LEN=4096 STRING=`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`
 
-Time spent: 2.120 secs (test_all.bat->test_std.bat->test_std__00_strlen.bat)
+Time spent: 2.180 secs (test_all.bat->test_std.bat->test_std__00_strlen.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\055--02--test_std__10_allocate_temp_dir"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\055--02--test_std__10_allocate_temp_dir"
 
 Running test_std__10_allocate_temp_dir.bat...
 
@@ -16906,7 +16906,7 @@ PASSED: 16038`3: REFERENCE=`03_nested_with_task_count`
 
 Time spent: 1.140 secs (test_all.bat->test_std.bat->test_std__10_allocate_temp_dir.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\056--02--test_std__20_chcp"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\056--02--test_std__20_chcp"
 
 Running test_std__20_chcp.bat...
 
@@ -16925,9 +16925,9 @@ PASSED: 16049`11: CURRENT_CP=`437` LAST_CP=`866` CP_HISTORY_LIST=`${CP_HISTORY_L
 
 exit.bat: warning: a test setup has called without a test teardown.
 
-Time spent: 2.500 secs (test_all.bat->test_std.bat->test_std__20_chcp.bat)
+Time spent: 2.480 secs (test_all.bat->test_std.bat->test_std__20_chcp.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\057--02--test_std__30_trim_var"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\057--02--test_std__30_trim_var"
 
 Running test_std__30_trim_var.bat...
 
@@ -16937,9 +16937,9 @@ PASSED: 16052`3: RESULT=`1 ! 2 | 3 & 4 ^ 5 = 6 , 7 ; 8 * 9 # 0 % 1 / 2 \ 3 ? 4 >
 PASSED: 16053`4: RESULT=`"1 2" ! ? * & | , ; = = "=" 3`
 PASSED: 16054`5: RESULT=`$*|&(=)<>"='`^%!+?** ,;=`
 
-Time spent: 0.560 secs (test_all.bat->test_std.bat->test_std__30_trim_var.bat)
+Time spent: 0.610 secs (test_all.bat->test_std.bat->test_std__30_trim_var.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\058--02--test_std__40_get_cmdline_var_len"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\058--02--test_std__40_get_cmdline_var_len"
 
 Running test_std__40_get_cmdline_var_len.bat...
 
@@ -16970,7 +16970,7 @@ PASSED: 16074`20: RESULT=`1` CMDLINE=`$*|&(=)<>"='`^%!+?** ,;=`
 
 Time spent: 2.320 secs (test_all.bat->test_std.bat->test_std__40_get_cmdline_var_len.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\059--02--test_std__50_if_or"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\059--02--test_std__50_if_or"
 
 Running test_std__50_if_or.bat...
 
@@ -17007,9 +17007,9 @@ PASSED: 16104`30: RESULT=`0` CMDLINE=`"/i not a == a" "/i not a == a"`
 PASSED: 16105`31: RESULT=`1` CMDLINE=`"not a == a" "not A == a"`
 PASSED: 16106`32: RESULT=`0` CMDLINE=`"/i not a == a" "/i not A == a"`
 
-Time spent: 3.080 secs (test_all.bat->test_std.bat->test_std__50_if_or.bat)
+Time spent: 3.140 secs (test_all.bat->test_std.bat->test_std__50_if_or.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\060--02--test_std__51_if_and"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\060--02--test_std__51_if_and"
 
 Running test_std__51_if_and.bat...
 
@@ -17046,9 +17046,9 @@ PASSED: 16136`30: RESULT=`0` CMDLINE=`"/i not a == a" "/i not a == a"`
 PASSED: 16137`31: RESULT=`0` CMDLINE=`"not a == a" "not A == a"`
 PASSED: 16138`32: RESULT=`0` CMDLINE=`"/i not a == a" "/i not A == a"`
 
-Time spent: 3.060 secs (test_all.bat->test_std.bat->test_std__51_if_and.bat)
+Time spent: 3.130 secs (test_all.bat->test_std.bat->test_std__51_if_and.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\061--02--test_std__52_ifn_or"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\061--02--test_std__52_ifn_or"
 
 Running test_std__52_ifn_or.bat...
 
@@ -17085,9 +17085,9 @@ PASSED: 16168`30: RESULT=`0` CMDLINE=`5 /i not a "==" a 5 /i not a "==" a`
 PASSED: 16169`31: RESULT=`1` CMDLINE=`4 not a "==" a 4 not A "==" a`
 PASSED: 16170`32: RESULT=`0` CMDLINE=`5 /i not a "==" a 5 /i not A "==" a`
 
-Time spent: 3.110 secs (test_all.bat->test_std.bat->test_std__52_ifn_or.bat)
+Time spent: 3.070 secs (test_all.bat->test_std.bat->test_std__52_ifn_or.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\062--02--test_std__53_ifn_and"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\062--02--test_std__53_ifn_and"
 
 Running test_std__53_ifn_and.bat...
 
@@ -17124,11 +17124,11 @@ PASSED: 16200`30: RESULT=`0` CMDLINE=`5 /i not a "==" a 5 /i not a "==" a`
 PASSED: 16201`31: RESULT=`0` CMDLINE=`4 not a "==" a 4 not A "==" a`
 PASSED: 16202`32: RESULT=`0` CMDLINE=`5 /i not a "==" a 5 /i not A "==" a`
 
-Time spent: 3.140 secs (test_all.bat->test_std.bat->test_std__53_ifn_and.bat)
+Time spent: 3.170 secs (test_all.bat->test_std.bat->test_std__53_ifn_and.bat)
 
-Time spent: 23.630 secs (test_all.bat->test_std.bat)
+Time spent: 23.850 secs (test_all.bat->test_std.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\063--01--test_std_encode"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\063--01--test_std_encode"
 
 Running test_std_encode.bat...
 
@@ -17145,13 +17145,13 @@ PASSED: 16212`10: sys_chars_exe_cmdline: STRING_INPUT=`$*^|^&(=)^<^>"='`^%!+?** 
 PASSED: 16213`11: pathlist_chars: STRING_INPUT=`"1 2" ! ? * ^& ^| , ; = ^= "=" 3`
 PASSED: 16214`12: pathlist_chars: STRING_INPUT=`$*^|^&(=)^<^>"='`^%!+?** ,;=`
 
-Time spent: 1.390 secs (test_all.bat->test_std_encode.bat)
+Time spent: 1.470 secs (test_all.bat->test_std_encode.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\064--01--test_xml"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\064--01--test_xml"
 
 Running test_xml.bat...
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\065--02--test_xml__00_sed"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\065--02--test_xml__00_sed"
 
 Running test_xml__00_sed.bat...
 
@@ -17161,9 +17161,9 @@ PASSED: 16217`3: REFERENCE=`xpath_filter_list/12_exact`
 PASSED: 16218`4: REFERENCE=`xpath_search_list/01_empty`
 PASSED: 16219`5: REFERENCE=`xpath_search_list/02`
 
-Time spent: 1.640 secs (test_all.bat->test_xml.bat->test_xml__00_sed.bat)
+Time spent: 1.650 secs (test_all.bat->test_xml.bat->test_xml__00_sed.bat)
 
->mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'25_18'38'18''943\066--02--test_xml__10_filter_xpath_list_by_xpath_list"
+>mkdir "w:\work\MyProjects\andry81\contools\contools\_out\_tests\unit\temp\local\2025'10'30_836365''742\066--02--test_xml__10_filter_xpath_list_by_xpath_list"
 
 Running test_xml__10_filter_xpath_list_by_xpath_list.bat...
 
@@ -17175,11 +17175,11 @@ PASSED: 16224`5: REFERENCE=`22_exact_w_props`
 PASSED: 16225`6: REFERENCE=`31_inexact_ignore_props`
 PASSED: 16226`7: REFERENCE=`32_exact_ignore_props`
 
-Time spent: 3.430 secs (test_all.bat->test_xml.bat->test_xml__10_filter_xpath_list_by_xpath_list.bat)
+Time spent: 3.510 secs (test_all.bat->test_xml.bat->test_xml__10_filter_xpath_list_by_xpath_list.bat)
 
-Time spent: 5.750 secs (test_all.bat->test_xml.bat)
+Time spent: 5.870 secs (test_all.bat->test_xml.bat)
 
-Time spent: 2312.760 secs (test_all.bat)
+Time spent: 2261.650 secs (test_all.bat)
 
    16226 of 16226 tests is passed.
 
