@@ -24,7 +24,7 @@ if defined PROJECT_LOG_DIR exit /b 0
 if defined PROJECT_LOG_FILE exit /b 0
 
 rem use stdout/stderr redirection with logging
-if %USE_LOG_BOOT_UP_TIME% NEQ 0 goto USE_LOG_BOOT_UP_TIME
+if %USE_LOG_BOOT_UP_TIME%0 NEQ 0 goto USE_LOG_BOOT_UP_TIME
 
 call "%%CONTOOLS_WMI_ROOT%%\get_wmi_local_datetime.vbs.bat"
 set "PROJECT_LOG_FILE_NAME_DATE_TIME=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%_%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%RETURN_VALUE:~15,3%"
