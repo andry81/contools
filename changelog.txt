@@ -1,3 +1,6 @@
+2025.11.06:
+* changed: __init__.bat: minor refactor
+
 2025.11.02:
 * fixed: scripts/tools: build/init_project_log.bat, testlib/init.bat: execution fixup
 
