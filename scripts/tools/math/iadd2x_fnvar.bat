@@ -6,13 +6,13 @@ set "L01=%%i" & set "L02=%%j" & set "L03=%%k" & set "L04=%%l" & set "L05=%%m" & 
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!F!") do ^
 set "L07=%%i" & set "L08=%%j" & set "L09=%%k" & set "L10=%%l" & set "L11=%%m" & set "L12=%%n" & set "F=%%o" & set "LS=" ^
   & ( if defined L01 if "!L01:~0,1!" == "+" set "L01=!L01:~1!" ) & ( if defined L01 if "!L01:~0,1!" == "-" set "LS=-" & set /A "L12=-L12" & if defined F set "F=-!F!" ) ^
-  & ( if defined F call "%%~dp0inorm.bat" F F || call set /A "L12+=%%ERRORLEVEL%%" ) & ^
+  & ( if defined F call "%%~dp0inorm.bat" F F || set /A "L12+=!ERRORLEVEL!" ) & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!R!") do ^
 set "R01=%%i" & set "R02=%%j" & set "R03=%%k" & set "R04=%%l" & set "R05=%%m" & set "R06=%%n" & set "F=%%o" & ( if not defined F set "F=0" ) & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!F!") do ^
 set "R07=%%i" & set "R08=%%j" & set "R09=%%k" & set "R10=%%l" & set "R11=%%m" & set "R12=%%n" & set "F=%%o" & set "RS=" ^
   & ( if defined R01 if "!R01:~0,1!" == "+" set "R01=!R01:~1!" ) & ( if defined R01 if "!R01:~0,1!" == "-" set "RS=-" & set /A "R12=-R12" & if defined F set "F=-!F!" ) ^
-  & ( if defined F call "%%~dp0inorm.bat" F F || call set /A "R12+=%%ERRORLEVEL%%" ) & ^
+  & ( if defined F call "%%~dp0inorm.bat" F F || set /A "R12+=!ERRORLEVEL!" ) & ^
 set /A "L12+=R12" & set /A "L11=!LS!L11 + !RS!R11" & set /A "L10=!LS!L10 + !RS!R10" & set /A "L09=!LS!L09 + !RS!R09" & ^
 set /A "L08=!LS!L08 + !RS!R08" & set /A "L07=!LS!L07 + !RS!R07" & set /A "L06=!LS!L06+!RS!R06" & set /A "L05=!LS!L05 + !RS!R05" & ^
 set /A "L04=!LS!L04 + !RS!R04" & set /A "L03=!LS!L03 + !RS!R03" & set /A "L02=!LS!L02 + !RS!R02" & set /A "L01+=R01" & ^

@@ -8,15 +8,15 @@ set "L1=%%i" & set "L2=%%j" & set "L3=%%k" & set "L4=%%l" & set "L5=%%m" & set "
   & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) ^
   & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ^
 set /A "L1+=0" & set /A "L2+=0" & set /A "L3+=0" & set /A "L4+=0" & set /A "L5+=0" & set /A "L6+=0" & ^
-set "L=0" & ( if "!L1!!L2!!L3!!L4!!L5!!L6!" == "000000" call "%%~dp0udigits_fnvar.bat" F & call set /A "L+=%%ERRORLEVEL%%" & exit /b !L! ) ^
+set "L=0" & ( if "!L1!!L2!!L3!!L4!!L5!!L6!" == "000000" call "%%~dp0udigits_fnvar.bat" F & set /A "L+=!ERRORLEVEL!" & exit /b !L! ) ^
   & ( if "!L1:~2,1!" == "" set "L1=0!L1!" ) & ( if "!L1:~2,1!" == "" set "L1=0!L1!" ) ^
   & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) ^
   & ( if "!L3:~2,1!" == "" set "L3=0!L3!" ) & ( if "!L3:~2,1!" == "" set "L3=0!L3!" ) ^
   & ( if "!L4:~2,1!" == "" set "L4=0!L4!" ) & ( if "!L4:~2,1!" == "" set "L4=0!L4!" ) ^
   & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) ^
   & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & ^
-set "R=!L1!!L2!!L3!!L4!!L5!!L6!" & call "%%~dp0udigits_nvar.bat" R & call set /A "L+=%%ERRORLEVEL%%" ^
-  & ( if defined F set "F=1!F!" & call "%%~dp0udigits_fnvar.bat" F & call set /A "L+=%%ERRORLEVEL%%-1" ) & exit /b !L!
+set "R=!L1!!L2!!L3!!L4!!L5!!L6!" & call "%%~dp0udigits_nvar.bat" R & set /A "L+=!ERRORLEVEL!" ^
+  & ( if defined F set "F=1!F!" & call "%%~dp0udigits_fnvar.bat" F & set /A "L+=!ERRORLEVEL!-1" ) & exit /b !L!
 exit /b 1
 
 rem USAGE:

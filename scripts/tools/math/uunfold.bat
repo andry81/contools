@@ -7,7 +7,7 @@ set "L1=%%i" & set "L2=%%j" & set "L3=%%k" & set "L4=%%l" & set "L5=%%m" & set "
   & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) & ( if defined L4 if "!L4:~0,1!" == "0" set "L4=!L4:~1!" ) ^
   & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) & ( if defined L5 if "!L5:~0,1!" == "0" set "L5=!L5:~1!" ) ^
   & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) & ( if defined L6 if "!L6:~0,1!" == "0" set "L6=!L6:~1!" ) ^
-  & ( if defined F call "%%~0" F F || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
+  & ( if defined F call "%%~0" F F || set /A "L6+=!ERRORLEVEL!" ) & ^
 set /A "L5+=L6/1000" & set /A "L4+=L5/1000" & set /A "L3+=L4/1000" & set /A "L2+=L3/1000" & set /A "L1+=L2/1000" & set /A "F=L1/1000" & ^
 set /A "L6%%=1000" & set /A "L5%%=1000" & set /A "L4%%=1000" & set /A "L3%%=1000" & set /A "L2%%=1000" & set /A "L1%%=1000" ^
   & ( if "%%j" == "" set "L2=!L1!" & set "L1=0" ) ^

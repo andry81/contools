@@ -4,11 +4,11 @@ set "L=%%~a" & set "R=%%~b" & ( if not defined L set "L=0" ) & ( if not defined 
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!L!") do ^
 set "L1=%%i" & set "L2=%%j" & set "L3=%%k" & set "L4=%%l" & set "L5=%%m" & set "L6=%%n" & set "F=%%o" & set "LS=" ^
   & ( if defined L1 if "!L1:~0,1!" == "+" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "-" set "LS=-" & set /A "L6=-L6" & if defined F set "F=-!F!" ) ^
-  & ( if defined F call "%%~dp0inorm.bat" F F || call set /A "L6+=%%ERRORLEVEL%%" ) & ^
+  & ( if defined F call "%%~dp0inorm.bat" F F || set /A "L6+=!ERRORLEVEL!" ) & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!R!") do ^
 set "R1=%%i" & set "R2=%%j" & set "R3=%%k" & set "R4=%%l" & set "R5=%%m" & set "R6=%%n" & set "F=%%o" & set "RS=" ^
   & ( if defined R1 if "!R1:~0,1!" == "+" set "R1=!R1:~1!" ) & ( if defined R1 if "!R1:~0,1!" == "-" set "RS=-" & set /A "R6=-R6" & if defined F set "F=-!F!" ) ^
-  & ( if defined F call "%%~dp0inorm.bat" F F || call set /A "R6+=%%ERRORLEVEL%%" ) & ^
+  & ( if defined F call "%%~dp0inorm.bat" F F || set /A "R6+=!ERRORLEVEL!" ) & ^
 set /A "L6+=R6" & set /A "L5=!LS!L5 + !RS!R5" & set /A "L4=!LS!L4 + !RS!R4" & set /A "L3=!LS!L3 + !RS!R3" & set /A "L2=!LS!L2 + !RS!R2" & set /A "L1+=R1" & ^
 set /A "L5+=L6 / 1000" & set /A "L6%%=1000" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" & ^
 set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "R=L1 / 1000" & set /A "L1%%=1000" & set "LS=" ^

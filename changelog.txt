@@ -1,4 +1,7 @@
 2025.11.10:
+* changed: scripts/tools/math: `%%ERRORLEVEL%%` replaced by `!ERRORLEVEL!` in all `set /A` as a bit faster
+
+2025.11.10:
 * new: scripts/tests/bench/bat/test__set_errorlevel.bat: bench test for `ERRORLEVEL` variable assign in `set /A`
 
 2025.11.06:

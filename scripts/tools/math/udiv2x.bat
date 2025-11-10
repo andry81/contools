@@ -3,7 +3,7 @@ for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!%~2!") do ^
 set "L01=%%i" & set "L02=%%j" & set "L03=%%k" & set "L04=%%l" & set "L05=%%m" & set "L06=%%n" & set "F=%%o" & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!F!,0") do ^
 set "L07=%%i" & set "L08=%%j" & set "L09=%%k" & set "L10=%%l" & set "L11=%%m" & set "L12=%%n" & set "F=%%o" ^
-  & ( if defined F if "!F:0=!" == "" set "F=" ) & ( if defined F call "%%~dp0unorm.bat" F F || call set /A "L12+=%%ERRORLEVEL%%" ) & ^
+  & ( if defined F if "!F:0=!" == "" set "F=" ) & ( if defined F call "%%~dp0unorm.bat" F F || set /A "L12+=!ERRORLEVEL!" ) & ^
 set /A "L11+=L12 / 1000" & set /A "L12%%=1000" & set /A "L10+=L11 / 1000" & set /A "L11%%=1000" & set /A "L09+=L10 / 1000" & set /A "L10%%=1000" & ^
 set /A "L08+=L09 / 1000" & set /A "L09%%=1000" & set /A "L07+=L08 / 1000" & set /A "L08%%=1000" & set /A "L06+=L07 / 1000" & set /A "L07%%=1000" & ^
 set /A "L05+=L06 / 1000" & set /A "L06%%=1000" & set /A "L04+=L05 / 1000" & set /A "L05%%=1000" & set /A "L03+=L04 / 1000" & set /A "L04%%=1000" & ^
