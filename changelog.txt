@@ -1,3 +1,6 @@
+2025.11.10:
+* new: scripts/tests/bench/bat/test__set_errorlevel.bat: bench test for `ERRORLEVEL` variable assign in `set /A`
+
 2025.11.06:
 * changed: __init__.bat: minor refactor
 
