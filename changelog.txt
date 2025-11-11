@@ -1,3 +1,6 @@
+2025.11.12:
+* changed: scripts/tools/math/iadd*.bat: code reduction and compact
+
 2025.11.11:
 * fixed: scripts/tools/math/iadd*.bat: incomplete sign handle
 * changed: scripts/tools/math/iadd*.bat: switched to `unorm.bat` script as a bit faster

@@ -20,42 +20,23 @@ set /A "L11+=L12 / 1000" & set /A "L12%%=1000" & set /A "L10+=L11 / 1000" & set 
 set /A "L08+=L09 / 1000" & set /A "L09%%=1000" & set /A "L07+=L08 / 1000" & set /A "L08%%=1000" & set /A "L06+=L07 / 1000" & set /A "L07%%=1000" & ^
 set /A "L05+=L06 / 1000" & set /A "L06%%=1000" & set /A "L04+=L05 / 1000" & set /A "L05%%=1000" & set /A "L03+=L04 / 1000" & set /A "L04%%=1000" & ^
 set /A "L02+=L03 / 1000" & set /A "L03%%=1000" & set /A "L01+=L02 / 1000" & set /A "L02%%=1000" & set /A "R=L01 / 1000" & set /A "L01%%=1000" & set "S=" ^
-  & ( if !L01! LSS 0 ( set "S=-" ) else if !L01! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L02! LSS 0 ( set "S=-" ) else if !L02! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L03! LSS 0 ( set "S=-" ) else if !L03! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L04! LSS 0 ( set "S=-" ) else if !L04! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L05! LSS 0 ( set "S=-" ) else if !L05! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L06! LSS 0 ( set "S=-" ) else if !L06! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L07! LSS 0 ( set "S=-" ) else if !L07! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L08! LSS 0 ( set "S=-" ) else if !L08! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L09! LSS 0 ( set "S=-" ) else if !L09! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L10! LSS 0 ( set "S=-" ) else if !L10! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L11! LSS 0 ( set "S=-" ) else if !L11! GTR 0 set "S=+" ) ^
-  & ( if not defined S if !L12! LSS 0 ( set "S=-" ) else if !L12! GTR 0 set "S=+" ) ^
-  & ( if "!S!" == "+" (
-      ( if !L12! LSS 0 set /A "L12+=1000" & set /A "L11-=1" & set /A "L10+=L11 / 1000" & set /A "L11%%=1000" ) ^
-    & ( if !L11! LSS 0 set /A "L11+=1000" & set /A "L10-=1" & set /A "L09+=L10 / 1000" & set /A "L10%%=1000" ) ^
-    & ( if !L10! LSS 0 set /A "L10+=1000" & set /A "L09-=1" & set /A "L08+=L09 / 1000" & set /A "L09%%=1000" ) ^
-    & ( if !L09! LSS 0 set /A "L09+=1000" & set /A "L08-=1" & set /A "L07+=L08 / 1000" & set /A "L08%%=1000" ) ^
-    & ( if !L08! LSS 0 set /A "L08+=1000" & set /A "L07-=1" & set /A "L06+=L07 / 1000" & set /A "L07%%=1000" ) ^
-    & ( if !L07! LSS 0 set /A "L07+=1000" & set /A "L06-=1" & set /A "L05+=L06 / 1000" & set /A "L06%%=1000" ) ^
-    & ( if !L06! LSS 0 set /A "L06+=1000" & set /A "L05-=1" & set /A "L04+=L05 / 1000" & set /A "L05%%=1000" ) ^
-    & ( if !L05! LSS 0 set /A "L05+=1000" & set /A "L04-=1" & set /A "L03+=L04 / 1000" & set /A "L04%%=1000" ) ^
-    & ( if !L04! LSS 0 set /A "L04+=1000" & set /A "L03-=1" & set /A "L02+=L03 / 1000" & set /A "L03%%=1000" ) ^
-    & ( if !L03! LSS 0 set /A "L03+=1000" & set /A "L02-=1" & set /A "L01+=L02 / 1000" & set /A "L02%%=1000" ) ^
-    & ( if !L02! LSS 0 set /A "L02+=1000" & set /A "L01-=1" & set /A "R+=L01 / 1000" & set /A "L01%%=1000" ) ) else if "!S!" == "-" (
-      ( if !L12! GTR 0 set /A "L12-=1000" & set /A "L11+=1" & set /A "L10+=L11 / 1000" & set /A "L11%%=1000" ) ^
-    & ( if !L11! GTR 0 set /A "L11-=1000" & set /A "L10+=1" & set /A "L09+=L10 / 1000" & set /A "L10%%=1000" ) ^
-    & ( if !L10! GTR 0 set /A "L10-=1000" & set /A "L09+=1" & set /A "L08+=L09 / 1000" & set /A "L09%%=1000" ) ^
-    & ( if !L09! GTR 0 set /A "L09-=1000" & set /A "L08+=1" & set /A "L07+=L08 / 1000" & set /A "L08%%=1000" ) ^
-    & ( if !L08! GTR 0 set /A "L08-=1000" & set /A "L07+=1" & set /A "L06+=L07 / 1000" & set /A "L07%%=1000" ) ^
-    & ( if !L07! GTR 0 set /A "L07-=1000" & set /A "L06+=1" & set /A "L05+=L06 / 1000" & set /A "L06%%=1000" ) ^
-    & ( if !L06! GTR 0 set /A "L06-=1000" & set /A "L05+=1" & set /A "L04+=L05 / 1000" & set /A "L05%%=1000" ) ^
-    & ( if !L05! GTR 0 set /A "L05-=1000" & set /A "L04+=1" & set /A "L03+=L04 / 1000" & set /A "L04%%=1000" ) ^
-    & ( if !L04! GTR 0 set /A "L04-=1000" & set /A "L03+=1" & set /A "L02+=L03 / 1000" & set /A "L03%%=1000" ) ^
-    & ( if !L03! GTR 0 set /A "L03-=1000" & set /A "L02+=1" & set /A "L01+=L02 / 1000" & set /A "L02%%=1000" ) ^
-    & ( if !L02! GTR 0 set /A "L02-=1000" & set /A "L01+=1" & set /A "R+=L01 / 1000" & set /A "L01%%=1000" ) ) ) ^
-  & ( if defined S set "S=!S:+=!" ) & ^
+  & ( if !L01! LSS 0 ( set "S=-" ) else if !L01! GTR 0 set "S=+" ) & ( if not defined S if !L02! LSS 0 ( set "S=-" ) else if !L02! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L03! LSS 0 ( set "S=-" ) else if !L03! GTR 0 set "S=+" ) & ( if not defined S if !L04! LSS 0 ( set "S=-" ) else if !L04! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L05! LSS 0 ( set "S=-" ) else if !L05! GTR 0 set "S=+" ) & ( if not defined S if !L06! LSS 0 ( set "S=-" ) else if !L06! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L07! LSS 0 ( set "S=-" ) else if !L07! GTR 0 set "S=+" ) & ( if not defined S if !L08! LSS 0 ( set "S=-" ) else if !L08! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L09! LSS 0 ( set "S=-" ) else if !L09! GTR 0 set "S=+" ) & ( if not defined S if !L10! LSS 0 ( set "S=-" ) else if !L10! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L11! LSS 0 ( set "S=-" ) else if !L11! GTR 0 set "S=+" ) & ( if not defined S if !L12! LSS 0 ( set "S=-" ) else if !L12! GTR 0 set "S=+" ) ^
+  & ( if "!S!" == "+" ( ( if !L12! LSS 0 set /A "L12+=1000" & set /A "L11-=1" ) & ( if !L11! LSS 0 set /A "L11+=1000" & set /A "L10-=1" ) ^
+    & ( if !L10! LSS 0 set /A "L10+=1000" & set /A "L09-=1" ) & ( if !L09! LSS 0 set /A "L09+=1000" & set /A "L08-=1" ) ^
+    & ( if !L08! LSS 0 set /A "L08+=1000" & set /A "L07-=1" ) & ( if !L07! LSS 0 set /A "L07+=1000" & set /A "L06-=1" ) ^
+    & ( if !L06! LSS 0 set /A "L06+=1000" & set /A "L05-=1" ) & ( if !L05! LSS 0 set /A "L05+=1000" & set /A "L04-=1" ) ^
+    & ( if !L04! LSS 0 set /A "L04+=1000" & set /A "L03-=1" ) & ( if !L03! LSS 0 set /A "L03+=1000" & set /A "L02-=1" ) ^
+    & ( if !L02! LSS 0 set /A "L02+=1000" & set /A "L01-=1" ) ) else if "!S!" == "-" ( ( if !L12! GTR 0 set /A "L12-=1000" & set /A "L11+=1" ) ^
+    & ( if !L11! GTR 0 set /A "L11-=1000" & set /A "L10+=1" ) & ( if !L10! GTR 0 set /A "L10-=1000" & set /A "L09+=1" ) ^
+    & ( if !L09! GTR 0 set /A "L09-=1000" & set /A "L08+=1" ) & ( if !L08! GTR 0 set /A "L08-=1000" & set /A "L07+=1" ) ^
+    & ( if !L07! GTR 0 set /A "L07-=1000" & set /A "L06+=1" ) & ( if !L06! GTR 0 set /A "L06-=1000" & set /A "L05+=1" ) ^
+    & ( if !L05! GTR 0 set /A "L05-=1000" & set /A "L04+=1" ) & ( if !L04! GTR 0 set /A "L04-=1000" & set /A "L03+=1" ) ^
+    & ( if !L03! GTR 0 set /A "L03-=1000" & set /A "L02+=1" ) & ( if !L02! GTR 0 set /A "L02-=1000" & set /A "L01+=1" ) ) ) & ( if defined S set "S=!S:+=!" ) & ^
 for /F "tokens=1,* delims=," %%a in ("!R!,!S!!L01:-=!,!L02:-=!,!L03:-=!,!L04:-=!,!L05:-=!,!L06:-=!,!L07:-=!,!L08:-=!,!L09:-=!,!L10:-=!,!L11:-=!,!L12:-=!") do endlocal & set "%~1=%%b" & exit /b %%a
 exit /b 0
 
