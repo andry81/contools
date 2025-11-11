@@ -215,6 +215,101 @@ call :TEST OUT L R
 endlocal
 
 
+rem sign change cases
+for %%i in (" |-" "-| " "+|-" "-|+") do for /F "tokens=1,2 delims=|" %%a in ("%%~i") do (
+  setlocal
+  set L=%%~a1,0,0,0,0,0
+  set R=%%~b0,0,0,0,0,1
+  set OUTREF=%%~a0,999,999,999,999,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,1,0,0,0,0
+  set R=%%~b0,0,0,0,0,1
+  set OUTREF=%%~a0,0,999,999,999,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,1,0,0,0
+  set R=%%~b0,0,0,0,0,1
+  set OUTREF=%%~a0,0,0,999,999,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,1,0,0
+  set R=%%~b0,0,0,0,0,1
+  set OUTREF=%%~a0,0,0,0,999,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,1,0
+  set R=%%~b0,0,0,0,0,1
+  set OUTREF=%%~a0,0,0,0,0,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,0,1
+  set R=%%~b0,0,0,0,0,1
+  set OUTREF=0,0,0,0,0,0
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a1,0,0,0,0,1
+  set R=%%~b0,0,0,0,0,2
+  set OUTREF=%%~a0,999,999,999,999,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,1,0,0,0,1
+  set R=%%~b0,0,0,0,0,2
+  set OUTREF=%%~a0,0,999,999,999,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,1,0,0,1
+  set R=%%~b0,0,0,0,0,2
+  set OUTREF=%%~a0,0,0,999,999,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,1,0,1
+  set R=%%~b0,0,0,0,0,2
+  set OUTREF=%%~a0,0,0,0,999,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,1,1
+  set R=%%~b0,0,0,0,0,2
+  set OUTREF=%%~a0,0,0,0,0,999
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,0,1
+  set R=%%~b0,0,0,0,0,2
+  set OUTREF=%%~b0,0,0,0,0,1
+  call :TEST OUT L R
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,0,0
+  set R=%%~b0,0,0,0,0,1
+  set OUTREF=%%~b0,0,0,0,0,1
+  call :TEST OUT L R
+  endlocal
+)
+
+
 for %%a in ("" "-") do (
   setlocal
   set L=%%~a1
@@ -930,5 +1025,11 @@ set "L_=%~2"
 set "R_=%~3"
 if "%L_:~-1%" == "," exit /b 0
 if "%R_:~-1%" == "," exit /b 0
+
+if not defined OUTREF goto SKIP_OUTREF
+if "%OUTREF:~0,1%" == " " set "OUTREF=%OUTREF:~1%"
+if "%OUTREF:~0,1%" == "+" set "OUTREF=%OUTREF:~1%"
+:SKIP_OUTREF
+
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b

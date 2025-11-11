@@ -3,27 +3,34 @@ for /F "usebackq tokens=* delims="eol^= %%a in ('"!%~2!"') do for /F "usebackq t
 set "L=%%~a" & set "R=%%~b" & ( if not defined L set "L=0" ) & ( if not defined R set "R=0" ) & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!L!") do ^
 set "L1=%%i" & set "L2=%%j" & set "L3=%%k" & set "L4=%%l" & set "L5=%%m" & set "L6=%%n" & set "F=%%o" & set "LS=" ^
-  & ( if defined L1 if "!L1:~0,1!" == "+" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "-" set "LS=-" & set /A "L6=-L6" & if defined F set "F=-!F!" ) ^
-  & ( if defined F call "%%~dp0inorm.bat" F F || set /A "L6+=!ERRORLEVEL!" ) & ^
+  & ( if defined L1 if "!L1:~0,1!" == "+" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "-" set "LS=-" & set /A "L6=-L6" ) ^
+  & ( if defined F call "%%~dp0unorm.bat" F F || set /A "L6+=!LS!(!ERRORLEVEL!)" ) & ^
 for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!R!") do ^
 set "R1=%%i" & set "R2=%%j" & set "R3=%%k" & set "R4=%%l" & set "R5=%%m" & set "R6=%%n" & set "F=%%o" & set "RS=" ^
-  & ( if defined R1 if "!R1:~0,1!" == "+" set "R1=!R1:~1!" ) & ( if defined R1 if "!R1:~0,1!" == "-" set "RS=-" & set /A "R6=-R6" & if defined F set "F=-!F!" ) ^
-  & ( if defined F call "%%~dp0inorm.bat" F F || set /A "R6+=!ERRORLEVEL!" ) & ^
+  & ( if defined R1 if "!R1:~0,1!" == "+" set "R1=!R1:~1!" ) & ( if defined R1 if "!R1:~0,1!" == "-" set "RS=-" & set /A "R6=-R6" ) ^
+  & ( if defined F call "%%~dp0unorm.bat" F F || set /A "R6+=!RS!(!ERRORLEVEL!)" ) & ^
 set /A "L6+=R6" & set /A "L5=!LS!L5 + !RS!R5" & set /A "L4=!LS!L4 + !RS!R4" & set /A "L3=!LS!L3 + !RS!R3" & set /A "L2=!LS!L2 + !RS!R2" & set /A "L1+=R1" & ^
 set /A "L5+=L6 / 1000" & set /A "L6%%=1000" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" & ^
-set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "R=L1 / 1000" & set /A "L1%%=1000" & set "LS=" ^
-  & ( if !L1! LSS 0 ( set "LS=-" ) else if !L1! GTR 0 set "LS=+" ) ^
-  & ( if not defined LS if !L2! LSS 0 ( set "LS=-" ) else if !L2! GTR 0 set "LS=+" ) ^
-  & ( if not defined LS if !L3! LSS 0 ( set "LS=-" ) else if !L3! GTR 0 set "LS=+" ) ^
-  & ( if not defined LS if !L4! LSS 0 ( set "LS=-" ) else if !L4! GTR 0 set "LS=+" ) ^
-  & ( if not defined LS if !L5! LSS 0 ( set "LS=-" ) else if !L5! GTR 0 set "LS=+" ) ^
-  & ( if not defined LS if !L6! LSS 0 ( set "LS=-" ) else if !L6! GTR 0 set "LS=+" ) ^
-  & ( if "!LS!" == "+" if !L6! LSS 0 set /A "L6+=1000" & set /A "L5-=1" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" ) ^
-  & ( if "!LS!" == "+" if !L5! LSS 0 set /A "L5+=1000" & set /A "L4-=1" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" ) ^
-  & ( if "!LS!" == "+" if !L4! LSS 0 set /A "L4+=1000" & set /A "L3-=1" & set /A "L2+=L3 / 1000" & set /A "L3%%=1000" ) ^
-  & ( if "!LS!" == "+" if !L3! LSS 0 set /A "L3+=1000" & set /A "L2-=1" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" ) ^
-  & ( if "!LS!" == "+" if !L2! LSS 0 set /A "L2+=1000" & set /A "L1-=1" & set /A "R+=L1 / 1000" & set /A "L1%%=1000" ) & ( if defined LS set "LS=!LS:+=!" ) & ^
-for /F "tokens=1,* delims=," %%a in ("!R!,!LS!!L1:-=!,!L2:-=!,!L3:-=!,!L4:-=!,!L5:-=!,!L6:-=!") do endlocal & set "%~1=%%b" & exit /b %%a
+set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "R=L1 / 1000" & set /A "L1%%=1000" & set "S=" ^
+  & ( if !L1! LSS 0 ( set "S=-" ) else if !L1! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L2! LSS 0 ( set "S=-" ) else if !L2! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L3! LSS 0 ( set "S=-" ) else if !L3! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L4! LSS 0 ( set "S=-" ) else if !L4! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L5! LSS 0 ( set "S=-" ) else if !L5! GTR 0 set "S=+" ) ^
+  & ( if not defined S if !L6! LSS 0 ( set "S=-" ) else if !L6! GTR 0 set "S=+" ) ^
+  & ( if "!S!" == "+" (
+      ( if !L6! LSS 0 set /A "L6+=1000" & set /A "L5-=1" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" ) ^
+    & ( if !L5! LSS 0 set /A "L5+=1000" & set /A "L4-=1" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" ) ^
+    & ( if !L4! LSS 0 set /A "L4+=1000" & set /A "L3-=1" & set /A "L2+=L3 / 1000" & set /A "L3%%=1000" ) ^
+    & ( if !L3! LSS 0 set /A "L3+=1000" & set /A "L2-=1" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" ) ^
+    & ( if !L2! LSS 0 set /A "L2+=1000" & set /A "L1-=1" & set /A "R+=L1 / 1000" & set /A "L1%%=1000" ) ) else if "!S!" == "-" (
+      ( if !L6! GTR 0 set /A "L6-=1000" & set /A "L5+=1" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" ) ^
+    & ( if !L5! GTR 0 set /A "L5-=1000" & set /A "L4+=1" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" ) ^
+    & ( if !L4! GTR 0 set /A "L4-=1000" & set /A "L3+=1" & set /A "L2+=L3 / 1000" & set /A "L3%%=1000" ) ^
+    & ( if !L3! GTR 0 set /A "L3-=1000" & set /A "L2+=1" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" ) ^
+    & ( if !L2! GTR 0 set /A "L2-=1000" & set /A "L1+=1" & set /A "R+=L1 / 1000" & set /A "L1%%=1000" ) ) ) ^
+  & ( if defined S set "S=!S:+=!" ) & ^
+for /F "tokens=1,* delims=," %%a in ("!R!,!S!!L1:-=!,!L2:-=!,!L3:-=!,!L4:-=!,!L5:-=!,!L6:-=!") do endlocal & set "%~1=%%b" & exit /b %%a
 exit /b 0
 
 rem USAGE:

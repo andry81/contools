@@ -171,6 +171,88 @@ call :TEST OUT L -12345
 endlocal
 
 
+rem sign change cases
+for %%i in (" |-" "-| " "+|-" "-|+") do for /F "tokens=1,2 delims=|" %%a in ("%%~i") do (
+  setlocal
+  set L=%%~a1,0,0,0,0,0
+  set OUTREF=%%~a0,999,999,999,999,999
+  call :TEST OUT L %%~b1
+  endlocal
+
+  setlocal
+  set L=%%~a0,1,0,0,0,0
+  set OUTREF=%%~a0,0,999,999,999,999
+  call :TEST OUT L %%~b1
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,1,0,0,0
+  set OUTREF=%%~a0,0,0,999,999,999
+  call :TEST OUT L %%~b1
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,1,0,0
+  set OUTREF=%%~a0,0,0,0,999,999
+  call :TEST OUT L %%~b1
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,1,0
+  set OUTREF=%%~a0,0,0,0,0,999
+  call :TEST OUT L %%~b1
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,0,1
+  set OUTREF=0,0,0,0,0,0
+  call :TEST OUT L %%~b1
+  endlocal
+
+  setlocal
+  set L=%%~a1,0,0,0,0,1
+  set OUTREF=%%~a0,999,999,999,999,999
+  call :TEST OUT L %%~b2
+  endlocal
+
+  setlocal
+  set L=%%~a0,1,0,0,0,1
+  set OUTREF=%%~a0,0,999,999,999,999
+  call :TEST OUT L %%~b2
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,1,0,0,1
+  set OUTREF=%%~a0,0,0,999,999,999
+  call :TEST OUT L %%~b2
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,1,0,1
+  set OUTREF=%%~a0,0,0,0,999,999
+  call :TEST OUT L %%~b2
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,1,1
+  set OUTREF=%%~a0,0,0,0,0,999
+  call :TEST OUT L %%~b2
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,0,1
+  set OUTREF=%%~b0,0,0,0,0,1
+  call :TEST OUT L %%~b2
+  endlocal
+
+  setlocal
+  set L=%%~a0,0,0,0,0,0
+  set OUTREF=%%~b0,0,0,0,0,1
+  call :TEST OUT L %%~b1
+  endlocal
+)
+
+
 for %%a in ("" "-") do (
   setlocal
   set L=%%~a1
@@ -778,5 +860,11 @@ exit /b
 :TEST
 set "L_=%~2"
 if "%L_:~-1%" == "," exit /b 0
+
+if not defined OUTREF goto SKIP_OUTREF
+if "%OUTREF:~0,1%" == " " set "OUTREF=%OUTREF:~1%"
+if "%OUTREF:~0,1%" == "+" set "OUTREF=%OUTREF:~1%"
+:SKIP_OUTREF
+
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b

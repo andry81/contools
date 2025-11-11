@@ -1,3 +1,8 @@
+2025.11.11:
+* fixed: scripts/tools/math/iadd*.bat: incomplete sign handle
+* changed: scripts/tools/math/iadd*.bat: switched to `unorm.bat` script as a bit faster
+* changed: scripts/tests/unit/bat/test_math/test_math__*_add/test_math__*_iadd*.bat: more tests to cover the sign change
+
 2025.11.10:
 * changed: scripts/tools/math: `%%ERRORLEVEL%%` replaced by `!ERRORLEVEL!` in all `set /A` as a bit faster
 
@@ -32,9 +37,9 @@
 * changed: scripts/tools/build/init_project_log.bat: code refactor
 
 2025.10.30:
-* new: Scripts/Tools/wmi: print_wmi_local_last_boot_time.vbs, print_wmi_local_last_boot_time.vbs.bat, get_wmi_local_last_boot_time.vbs.bat: vbs variant of WMI last boot time getter with bat wrappers
-* new: Scripts/Tools/wmi: print_wmi_local_last_boot_uptime.vbs, print_wmi_local_last_boot_time.vbs.bat, get_wmi_local_last_boot_time.vbs.bat: vbs variant of WMI last boot up time getter with bat wrappers
-* new: Scripts/Tools/wmi: print_wmi_local_date_and_last_boot_uptime.vbs, print_wmi_local_date_and_last_boot_uptime.vbs.bat: vbs variant of WMI date and last boot up time getter with bat wrapper
+* new: scripts/tools/wmi: print_wmi_local_last_boot_time.vbs, print_wmi_local_last_boot_time.vbs.bat, get_wmi_local_last_boot_time.vbs.bat: vbs variant of WMI last boot time getter with bat wrappers
+* new: scripts/tools/wmi: print_wmi_local_last_boot_uptime.vbs, print_wmi_local_last_boot_time.vbs.bat, get_wmi_local_last_boot_time.vbs.bat: vbs variant of WMI last boot up time getter with bat wrappers
+* new: scripts/tools/wmi: print_wmi_local_date_and_last_boot_uptime.vbs, print_wmi_local_date_and_last_boot_uptime.vbs.bat: vbs variant of WMI date and last boot up time getter with bat wrapper
 
 2025.10.30:
 * changed: scripts/tools/std/if_*.bat: performance improvement
