@@ -1,4 +1,7 @@
 2025.11.12:
+* changed: scripts/tools/testlib: test print improvements
+
+2025.11.12:
 * changed: scripts/tests/bench/bat: switched to use self logging for directory level 1 and level 2 scripts
 
 2025.11.12:
