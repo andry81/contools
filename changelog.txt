@@ -1,3 +1,6 @@
+2025.11.13:
+* changed: scripts/tests/unit/bat/test_encoding/test_encoding__01_EOL_conversion: code cleanup, removed not needed anymore time calculation
+
 2025.11.12:
 * fixed: scripts/tools/testlib: minor fixup
 * changed: scripts/tools/testlib/*_locals.bat: improved testlib performance by rewrite test variables load/save/update scripts

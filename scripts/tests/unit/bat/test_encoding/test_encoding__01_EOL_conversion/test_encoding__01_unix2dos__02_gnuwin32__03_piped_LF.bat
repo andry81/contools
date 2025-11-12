@@ -22,14 +22,7 @@ set CONTOOLS_MSYS2_ROOT
 if not defined CONTOOLS_GNUWIN32_ROOT goto SKIP_GNUWIN32
 if not exist "%CONTOOLS_GNUWIN32_ROOT%/*" goto SKIP_GNUWIN32
 
-call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
-
 for /f "usebackq eol=# tokens=* delims=" %%i in ("%TESTS_LIST_FILE%") do call :TEST "03_LF\%%i" -fix-tail-lr
-
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
-
-echo Time spent: %TIME_INTS%.%TIME_FRACS% secs
-echo;
 
 goto END
 
