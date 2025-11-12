@@ -201,9 +201,15 @@ if not defined TEST_SCRIPT_HANDLERS_DIR (
   call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_HANDLERS_DIR "%%TEST_SCRIPT_FILE_DIR%%/%%TEST_SCRIPT_HANDLERS_DIR%%"
 )
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_DATA_OUT_ROOT%%" || exit /b
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_LOCAL_DIR%%" || exit /b
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_SHARED_DIR%%" || exit /b
+if %TESTLIB__DEBUG%0 EQU 0 (
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_DATA_OUT_ROOT%%" || exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_LOCAL_DIR%%" || exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_SHARED_DIR%%" || exit /b
+) >nul else (
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_DATA_OUT_ROOT%%" || exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_LOCAL_DIR%%" || exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_SCRIPT_SHARED_DIR%%" || exit /b
+)
 
 type nul > "%TEST_SCRIPT_INIT_VARS_FILE_PATH%"
 if exist "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" del /F /Q /A:-D "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" >nul

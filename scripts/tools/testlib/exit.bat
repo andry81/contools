@@ -104,8 +104,10 @@ if %TEST_LAST_ERROR% EQU 0 (
   if %TESTLIB__CURRENT_PASSED_TESTS% LSS %TESTLIB__CURRENT_TESTS% set /A TEST_LAST_ERROR=TESTLIB__CURRENT_PASSED_TESTS-TESTLIB__CURRENT_TESTS
 )
 
-echo    %TESTLIB__CURRENT_PASSED_TESTS% of %TESTLIB__CURRENT_TESTS% current tests is passed.
-echo;
+if %TESTLIB__MANUAL%0 EQU 0 (
+  echo    %TESTLIB__CURRENT_PASSED_TESTS% of %TESTLIB__CURRENT_TESTS% current tests is passed.
+  echo;
+)
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" "" "%%TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH%%"
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" >nul
@@ -117,7 +119,9 @@ title [%TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS%] %%i %%~j
 endlocal
 
 if %TESTLIB__INIT% EQU 0 (
-  echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% overall tests is passed.
+  if %TESTLIB__MANUAL%0 EQU 0 (
+    echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% overall tests is passed.
+  )
   echo;^
   if not defined IMPL_MODE if defined OEMCP ( call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
 )

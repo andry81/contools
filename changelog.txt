@@ -1,4 +1,8 @@
 2025.11.13:
+* changed: scripts/tools/testlib/exit.bat: print pass results for not manual tests
+* changed: scripts/tools/testlib/init.bat: print a make directory path if testlib debug enabled
+
+2025.11.13:
 * changed: scripts/tests/unit/bat/test_encoding/test_encoding__01_EOL_conversion: code cleanup, removed not needed anymore time calculation
 
 2025.11.12:
