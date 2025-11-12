@@ -1,4 +1,8 @@
 2025.11.12:
+* changed: scripts/tests/unit/logs/*.test_all/*.test_all.log: unit tests log update
+* changed: scripts/tests/bench/logs: *.test_all/*.test_all.log, *.test__all/*.test__all.log: bench test logs update
+
+2025.11.12:
 * fixed: scripts/tests/__init__/script_init.bat: print only from the first test init
 * new: scripts/tests/bench/bat/test_math_vs/test__math__*_add_vs_norm.bat: bench tests to test `?add.bat` vs `?norm.bat` scripts
 * changed: scripts/tests/unit/bat/test_math/test_math__*_add/test_math__*_?add*.bat: more tests on limits, minor refactor

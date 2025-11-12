@@ -7,82 +7,82 @@ Intel64 Family 6 Model 58 Stepping 9  Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz
 Time spent: 0.022 secs
 
 >test_build__10_load_config.bat
-Time spent: 0.370 secs
+Time spent: 0.360 secs
 
 >test_encoding__01_unix2dos.bat
-Time spent: 0.167 secs
+Time spent: 0.169 secs
 
 >test_encoding__02_unix2dos_no_fix_tail_lr.bat
-Time spent: 0.087 secs
+Time spent: 0.076 secs
 
 >test_encoding__11_dos2unix.bat
-Time spent: 0.175 secs
+Time spent: 0.154 secs
 
 >test_encoding__12_dos2unixs_no_fix_tail_lr.bat
-Time spent: 0.090 secs
+Time spent: 0.086 secs
 
 >test_math__11_ufold_18.bat
-Time spent: 4.400 msecs
+Time spent: 4.200 msecs
 
 >test_math__12_ufold_20.bat
 Time spent: 4.100 msecs
 
 >test_math__21_ufoldpad_18.bat
-Time spent: 4.200 msecs
+Time spent: 4.100 msecs
 
 >test_math__22_ufoldpad_20.bat
-Time spent: 8.100 msecs
+Time spent: 7.800 msecs
 
 >test_math__31_ufoldpad6_18.bat
 Time spent: 3.400 msecs
 
 >test_math__32_ufoldpad6_20.bat
-Time spent: 7.500 msecs
+Time spent: 7.200 msecs
 
 >test_math__33_ifoldpad6_18.bat
-Time spent: 3.500 msecs
+Time spent: 3.600 msecs
 
 >test_math__34_ifoldpad6_20.bat
-Time spent: 7.600 msecs
+Time spent: 7.500 msecs
 
 >test_math__41_ufoldpad6n_18.bat
-Time spent: 3.400 msecs
+Time spent: 3.300 msecs
 
 >test_math__42_ufoldpad6n_20.bat
-Time spent: 6.900 msecs
+Time spent: 6.700 msecs
 
 >test_math__43_ifoldpad6n_18.bat
 Time spent: 3.600 msecs
 
 >test_math__44_ifoldpad6n_20.bat
-Time spent: 7.200 msecs
+Time spent: 7.100 msecs
 
 >test_math__11_uunfold.bat
-Time spent: 4.400 msecs
+Time spent: 4.200 msecs
 
 >test_math__12_iunfold.bat
-Time spent: 4.500 msecs
+Time spent: 4.700 msecs
 
 >test_math__11_uadd.bat
-Time spent: 3.200 msecs
+Time spent: 3.300 msecs
 
 >test_math__21_iadd.bat
-Time spent: 4.100 msecs
+Time spent: 4.000 msecs
 
 >test_math__22_iadd_fnvar.bat
 Time spent: 6.100 msecs
 
 >test_math__23_iadd2x_fnvar.bat
-Time spent: 10.500 msecs
+Time spent: 10.600 msecs
 
 >test_math__11_umul.bat
 Time spent: 3.600 msecs
 
 >test_math__21_imul.bat
-Time spent: 4.300 msecs
+Time spent: 4.200 msecs
 
 >test_math__22_imul2x_fnvar.bat
-Time spent: 9.200 msecs
+Time spent: 9.300 msecs
 
 >test_math__11_udiv.bat
 Time spent: 4.700 msecs
@@ -91,52 +91,52 @@ Time spent: 4.700 msecs
 Time spent: 8.000 msecs
 
 >test_math__21_idiv.bat
-Time spent: 5.400 msecs
+Time spent: 5.300 msecs
 
 >test_math__22_idiv2x.bat
-Time spent: 8.700 msecs
+Time spent: 8.900 msecs
 
 >test_math__111_ucmp_18_equ_equ.bat
-Time spent: 5.400 msecs
+Time spent: 5.500 msecs
 
 >test_math__112_ucmp_18_equ_neq.bat
-Time spent: 5.600 msecs
+Time spent: 5.500 msecs
 
 >test_math__113_ucmp_18_neq_equ.bat
-Time spent: 5.500 msecs
+Time spent: 5.300 msecs
 
 >test_math__114_ucmp_18_neq_neq.bat
-Time spent: 5.500 msecs
+Time spent: 5.400 msecs
 
 >test_math__115_ucmp_18_gtr_equ.bat
-Time spent: 5.500 msecs
+Time spent: 5.400 msecs
 
 >test_math__116_ucmp_18_gtr_lss.bat
-Time spent: 5.600 msecs
+Time spent: 5.800 msecs
 
 >test_math__117_ucmp_18_gtr_gtr.bat
 Time spent: 5.800 msecs
 
 >test_math__118_ucmp_18_geq_equ.bat
-Time spent: 5.700 msecs
+Time spent: 5.800 msecs
 
 >test_math__119_ucmp_18_geq_lss.bat
-Time spent: 5.800 msecs
+Time spent: 5.500 msecs
 
 >test_math__11a_ucmp_18_geq_gtr.bat
 Time spent: 5.600 msecs
 
 >test_math__121_icmp_18_equ_equ.bat
-Time spent: 7.100 msecs
+Time spent: 7.200 msecs
 
 >test_math__122_icmp_18_equ_neq.bat
 Time spent: 7.200 msecs
 
 >test_math__123_icmp_18_neq_equ.bat
-Time spent: 7.200 msecs
+Time spent: 7.000 msecs
 
 >test_math__124_icmp_18_neq_neq.bat
-Time spent: 7.000 msecs
+Time spent: 7.400 msecs
 
 >test_math__125_icmp_18_gtr_equ.bat
 Time spent: 7.200 msecs
@@ -145,22 +145,22 @@ Time spent: 7.200 msecs
 Time spent: 7.200 msecs
 
 >test_math__127_icmp_18_gtr_gtr.bat
-Time spent: 7.300 msecs
+Time spent: 7.100 msecs
 
 >test_math__128_icmp_18_geq_equ.bat
-Time spent: 7.100 msecs
+Time spent: 7.500 msecs
 
 >test_math__129_icmp_18_geq_lss.bat
 Time spent: 7.300 msecs
 
 >test_math__12a_icmp_18_geq_gtr.bat
-Time spent: 7.400 msecs
+Time spent: 7.700 msecs
 
 >test_math__131_ucmp_20_equ_equ.bat
-Time spent: 12.000 msecs
+Time spent: 12.200 msecs
 
 >test_math__132_ucmp_20_equ_neq.bat
-Time spent: 5.900 msecs
+Time spent: 6.100 msecs
 
 >test_math__133_ucmp_20_neq_equ.bat
 Time spent: 12.400 msecs
@@ -169,310 +169,310 @@ Time spent: 12.400 msecs
 Time spent: 6.100 msecs
 
 >test_math__135_ucmp_20_gtr_equ.bat
-Time spent: 18.800 msecs
+Time spent: 18.500 msecs
 
 >test_math__136_ucmp_20_gtr_lss.bat
-Time spent: 19.100 msecs
+Time spent: 18.400 msecs
 
 >test_math__137_ucmp_20_gtr_gtr.bat
-Time spent: 19.100 msecs
+Time spent: 18.600 msecs
 
 >test_math__138_ucmp_20_geq_equ.bat
-Time spent: 19.800 msecs
+Time spent: 18.900 msecs
 
 >test_math__139_ucmp_20_geq_lss.bat
-Time spent: 19.500 msecs
+Time spent: 18.400 msecs
 
 >test_math__13a_ucmp_20_geq_gtr.bat
-Time spent: 19.500 msecs
+Time spent: 18.900 msecs
 
 >test_math__141_icmp_20_equ_equ.bat
-Time spent: 16.800 msecs
+Time spent: 15.900 msecs
 
 >test_math__142_icmp_20_equ_neq.bat
-Time spent: 8.300 msecs
+Time spent: 8.000 msecs
 
 >test_math__143_icmp_20_neq_equ.bat
-Time spent: 17.100 msecs
+Time spent: 16.100 msecs
 
 >test_math__144_icmp_20_neq_neq.bat
-Time spent: 9.000 msecs
+Time spent: 8.100 msecs
 
 >test_math__145_icmp_20_gtr_equ.bat
-Time spent: 27.000 msecs
+Time spent: 24.800 msecs
 
 >test_math__146_icmp_20_gtr_lss.bat
 Time spent: 24.800 msecs
 
 >test_math__147_icmp_20_gtr_gtr.bat
-Time spent: 24.500 msecs
+Time spent: 24.800 msecs
 
 >test_math__148_icmp_20_geq_equ.bat
-Time spent: 25.500 msecs
+Time spent: 25.200 msecs
 
 >test_math__149_icmp_20_geq_lss.bat
-Time spent: 25.800 msecs
+Time spent: 25.000 msecs
 
 >test_math__14a_icmp_20_geq_gtr.bat
-Time spent: 26.300 msecs
+Time spent: 24.800 msecs
 
 >test_math__211_ucmp_nvar_18_equ_equ.bat
-Time spent: 7.400 msecs
+Time spent: 7.200 msecs
 
 >test_math__212_ucmp_nvar_18_equ_neq.bat
-Time spent: 7.500 msecs
+Time spent: 7.300 msecs
 
 >test_math__213_ucmp_nvar_18_neq_equ.bat
-Time spent: 7.700 msecs
+Time spent: 7.200 msecs
 
 >test_math__214_ucmp_nvar_18_neq_neq.bat
-Time spent: 7.900 msecs
+Time spent: 7.200 msecs
 
 >test_math__215_ucmp_nvar_18_gtr_equ.bat
-Time spent: 8.100 msecs
+Time spent: 7.300 msecs
 
 >test_math__216_ucmp_nvar_18_gtr_lss.bat
-Time spent: 7.700 msecs
-
->test_math__217_ucmp_nvar_18_gtr_gtr.bat
-Time spent: 7.800 msecs
-
->test_math__218_ucmp_nvar_18_geq_equ.bat
 Time spent: 7.600 msecs
 
+>test_math__217_ucmp_nvar_18_gtr_gtr.bat
+Time spent: 7.400 msecs
+
+>test_math__218_ucmp_nvar_18_geq_equ.bat
+Time spent: 7.400 msecs
+
 >test_math__219_ucmp_nvar_18_geq_lss.bat
-Time spent: 7.900 msecs
+Time spent: 7.500 msecs
 
 >test_math__21a_ucmp_nvar_18_geq_gtr.bat
 Time spent: 7.800 msecs
 
 >test_math__221_icmp_nvar_18_equ_equ.bat
-Time spent: 10.200 msecs
+Time spent: 9.500 msecs
 
 >test_math__222_icmp_nvar_18_equ_neq.bat
-Time spent: 9.700 msecs
+Time spent: 9.600 msecs
 
 >test_math__223_icmp_nvar_18_neq_equ.bat
-Time spent: 9.900 msecs
+Time spent: 9.700 msecs
 
 >test_math__224_icmp_nvar_18_neq_neq.bat
-Time spent: 10.200 msecs
+Time spent: 9.900 msecs
 
 >test_math__225_icmp_nvar_18_gtr_equ.bat
-Time spent: 10.200 msecs
+Time spent: 9.700 msecs
 
 >test_math__226_icmp_nvar_18_gtr_lss.bat
-Time spent: 10.000 msecs
+Time spent: 9.900 msecs
 
 >test_math__227_icmp_nvar_18_gtr_gtr.bat
-Time spent: 10.200 msecs
+Time spent: 10.100 msecs
 
 >test_math__228_icmp_nvar_18_geq_equ.bat
-Time spent: 10.200 msecs
+Time spent: 9.700 msecs
 
 >test_math__229_icmp_nvar_18_geq_lss.bat
-Time spent: 10.500 msecs
+Time spent: 9.900 msecs
 
 >test_math__22a_icmp_nvar_18_geq_gtr.bat
 Time spent: 10.200 msecs
 
 >test_math__231_ucmp_nvar_20_equ_equ.bat
-Time spent: 16.700 msecs
+Time spent: 16.300 msecs
 
 >test_math__232_ucmp_nvar_20_equ_neq.bat
-Time spent: 8.500 msecs
+Time spent: 8.100 msecs
 
 >test_math__233_ucmp_nvar_20_neq_equ.bat
-Time spent: 16.900 msecs
+Time spent: 16.400 msecs
 
 >test_math__234_ucmp_nvar_20_neq_neq.bat
-Time spent: 8.600 msecs
+Time spent: 8.100 msecs
 
 >test_math__235_ucmp_nvar_20_gtr_equ.bat
-Time spent: 25.700 msecs
+Time spent: 25.000 msecs
 
 >test_math__236_ucmp_nvar_20_gtr_lss.bat
-Time spent: 25.600 msecs
+Time spent: 25.300 msecs
 
 >test_math__237_ucmp_nvar_20_gtr_gtr.bat
-Time spent: 26.300 msecs
+Time spent: 24.700 msecs
 
 >test_math__238_ucmp_nvar_20_geq_equ.bat
-Time spent: 24.800 msecs
+Time spent: 25.200 msecs
 
 >test_math__239_ucmp_nvar_20_geq_lss.bat
-Time spent: 26.200 msecs
+Time spent: 25.300 msecs
 
 >test_math__23a_ucmp_nvar_20_geq_gtr.bat
-Time spent: 26.000 msecs
+Time spent: 25.100 msecs
 
 >test_math__241_icmp_nvar_20_equ_equ.bat
-Time spent: 16.600 msecs
+Time spent: 16.900 msecs
 
 >test_math__242_icmp_nvar_20_equ_neq.bat
-Time spent: 8.400 msecs
+Time spent: 8.600 msecs
 
 >test_math__243_icmp_nvar_20_neq_equ.bat
-Time spent: 17.300 msecs
+Time spent: 17.000 msecs
 
 >test_math__244_icmp_nvar_20_neq_neq.bat
-Time spent: 9.000 msecs
+Time spent: 8.300 msecs
 
 >test_math__245_icmp_nvar_20_gtr_equ.bat
-Time spent: 27.800 msecs
-
->test_math__246_icmp_nvar_20_gtr_lss.bat
-Time spent: 26.900 msecs
-
->test_math__247_icmp_nvar_20_gtr_gtr.bat
-Time spent: 25.400 msecs
-
->test_math__248_icmp_nvar_20_geq_equ.bat
-Time spent: 25.700 msecs
-
->test_math__249_icmp_nvar_20_geq_lss.bat
-Time spent: 26.900 msecs
-
->test_math__24a_icmp_nvar_20_geq_gtr.bat
-Time spent: 29.100 msecs
-
->test_math__311_ucmp_fnvar_18_equ_equ.bat
-Time spent: 10.100 msecs
-
->test_math__312_ucmp_fnvar_18_equ_neq.bat
-Time spent: 12.400 msecs
-
->test_math__313_ucmp_fnvar_18_neq_equ.bat
-Time spent: 10.000 msecs
-
->test_math__314_ucmp_fnvar_18_neq_neq.bat
-Time spent: 10.200 msecs
-
->test_math__315_ucmp_fnvar_18_gtr_equ.bat
-Time spent: 10.200 msecs
-
->test_math__316_ucmp_fnvar_18_gtr_lss.bat
-Time spent: 14.500 msecs
-
->test_math__317_ucmp_fnvar_18_gtr_gtr.bat
-Time spent: 10.100 msecs
-
->test_math__318_ucmp_fnvar_18_geq_equ.bat
-Time spent: 10.300 msecs
-
->test_math__319_ucmp_fnvar_18_geq_lss.bat
-Time spent: 10.200 msecs
-
->test_math__31a_ucmp_fnvar_18_geq_gtr.bat
-Time spent: 11.000 msecs
-
->test_math__321_icmp_fnvar_18_equ_equ.bat
-Time spent: 12.300 msecs
-
->test_math__322_icmp_fnvar_18_equ_neq.bat
-Time spent: 12.800 msecs
-
->test_math__323_icmp_fnvar_18_neq_equ.bat
-Time spent: 16.100 msecs
-
->test_math__324_icmp_fnvar_18_neq_neq.bat
-Time spent: 12.800 msecs
-
->test_math__325_icmp_fnvar_18_gtr_equ.bat
-Time spent: 13.400 msecs
-
->test_math__326_icmp_fnvar_18_gtr_lss.bat
-Time spent: 13.800 msecs
-
->test_math__327_icmp_fnvar_18_gtr_gtr.bat
-Time spent: 14.700 msecs
-
->test_math__328_icmp_fnvar_18_geq_equ.bat
-Time spent: 17.500 msecs
-
->test_math__329_icmp_fnvar_18_geq_lss.bat
-Time spent: 13.400 msecs
-
->test_math__32a_icmp_fnvar_18_geq_gtr.bat
-Time spent: 13.200 msecs
-
->test_math__331_ucmp_fnvar_20_equ_equ.bat
-Time spent: 23.200 msecs
-
->test_math__332_ucmp_fnvar_20_equ_neq.bat
-Time spent: 23.600 msecs
-
->test_math__333_ucmp_fnvar_20_neq_equ.bat
-Time spent: 24.400 msecs
-
->test_math__334_ucmp_fnvar_20_neq_neq.bat
-Time spent: 30.400 msecs
-
->test_math__335_ucmp_fnvar_20_gtr_equ.bat
 Time spent: 25.600 msecs
 
->test_math__336_ucmp_fnvar_20_gtr_lss.bat
-Time spent: 28.300 msecs
+>test_math__246_icmp_nvar_20_gtr_lss.bat
+Time spent: 26.100 msecs
 
->test_math__337_ucmp_fnvar_20_gtr_gtr.bat
-Time spent: 24.400 msecs
-
->test_math__338_ucmp_fnvar_20_geq_equ.bat
-Time spent: 25.800 msecs
-
->test_math__339_ucmp_fnvar_20_geq_lss.bat
+>test_math__247_icmp_nvar_20_gtr_gtr.bat
 Time spent: 26.000 msecs
 
+>test_math__248_icmp_nvar_20_geq_equ.bat
+Time spent: 26.100 msecs
+
+>test_math__249_icmp_nvar_20_geq_lss.bat
+Time spent: 26.000 msecs
+
+>test_math__24a_icmp_nvar_20_geq_gtr.bat
+Time spent: 26.200 msecs
+
+>test_math__311_ucmp_fnvar_18_equ_equ.bat
+Time spent: 9.300 msecs
+
+>test_math__312_ucmp_fnvar_18_equ_neq.bat
+Time spent: 9.500 msecs
+
+>test_math__313_ucmp_fnvar_18_neq_equ.bat
+Time spent: 9.500 msecs
+
+>test_math__314_ucmp_fnvar_18_neq_neq.bat
+Time spent: 10.100 msecs
+
+>test_math__315_ucmp_fnvar_18_gtr_equ.bat
+Time spent: 9.600 msecs
+
+>test_math__316_ucmp_fnvar_18_gtr_lss.bat
+Time spent: 9.700 msecs
+
+>test_math__317_ucmp_fnvar_18_gtr_gtr.bat
+Time spent: 10.000 msecs
+
+>test_math__318_ucmp_fnvar_18_geq_equ.bat
+Time spent: 10.000 msecs
+
+>test_math__319_ucmp_fnvar_18_geq_lss.bat
+Time spent: 9.900 msecs
+
+>test_math__31a_ucmp_fnvar_18_geq_gtr.bat
+Time spent: 10.100 msecs
+
+>test_math__321_icmp_fnvar_18_equ_equ.bat
+Time spent: 12.500 msecs
+
+>test_math__322_icmp_fnvar_18_equ_neq.bat
+Time spent: 12.500 msecs
+
+>test_math__323_icmp_fnvar_18_neq_equ.bat
+Time spent: 13.100 msecs
+
+>test_math__324_icmp_fnvar_18_neq_neq.bat
+Time spent: 12.700 msecs
+
+>test_math__325_icmp_fnvar_18_gtr_equ.bat
+Time spent: 13.100 msecs
+
+>test_math__326_icmp_fnvar_18_gtr_lss.bat
+Time spent: 13.200 msecs
+
+>test_math__327_icmp_fnvar_18_gtr_gtr.bat
+Time spent: 13.100 msecs
+
+>test_math__328_icmp_fnvar_18_geq_equ.bat
+Time spent: 13.100 msecs
+
+>test_math__329_icmp_fnvar_18_geq_lss.bat
+Time spent: 13.000 msecs
+
+>test_math__32a_icmp_fnvar_18_geq_gtr.bat
+Time spent: 13.300 msecs
+
+>test_math__331_ucmp_fnvar_20_equ_equ.bat
+Time spent: 25.000 msecs
+
+>test_math__332_ucmp_fnvar_20_equ_neq.bat
+Time spent: 24.300 msecs
+
+>test_math__333_ucmp_fnvar_20_neq_equ.bat
+Time spent: 24.500 msecs
+
+>test_math__334_ucmp_fnvar_20_neq_neq.bat
+Time spent: 24.800 msecs
+
+>test_math__335_ucmp_fnvar_20_gtr_equ.bat
+Time spent: 24.900 msecs
+
+>test_math__336_ucmp_fnvar_20_gtr_lss.bat
+Time spent: 25.400 msecs
+
+>test_math__337_ucmp_fnvar_20_gtr_gtr.bat
+Time spent: 25.500 msecs
+
+>test_math__338_ucmp_fnvar_20_geq_equ.bat
+Time spent: 25.300 msecs
+
+>test_math__339_ucmp_fnvar_20_geq_lss.bat
+Time spent: 25.800 msecs
+
 >test_math__33a_ucmp_fnvar_20_geq_gtr.bat
-Time spent: 27.100 msecs
+Time spent: 26.000 msecs
 
 >test_math__341_icmp_fnvar_20_equ_equ.bat
-Time spent: 32.100 msecs
+Time spent: 31.200 msecs
 
 >test_math__342_icmp_fnvar_20_equ_neq.bat
 Time spent: 31.900 msecs
 
 >test_math__343_icmp_fnvar_20_neq_equ.bat
-Time spent: 34.200 msecs
+Time spent: 31.600 msecs
 
 >test_math__344_icmp_fnvar_20_neq_neq.bat
-Time spent: 36.600 msecs
+Time spent: 31.900 msecs
 
 >test_math__345_icmp_fnvar_20_gtr_equ.bat
-Time spent: 34.100 msecs
+Time spent: 33.000 msecs
 
 >test_math__346_icmp_fnvar_20_gtr_lss.bat
-Time spent: 38.500 msecs
+Time spent: 33.300 msecs
 
 >test_math__347_icmp_fnvar_20_gtr_gtr.bat
-Time spent: 32.700 msecs
+Time spent: 32.900 msecs
 
 >test_math__348_icmp_fnvar_20_geq_equ.bat
-Time spent: 32.700 msecs
+Time spent: 33.000 msecs
 
 >test_math__349_icmp_fnvar_20_geq_lss.bat
-Time spent: 35.800 msecs
+Time spent: 33.300 msecs
 
 >test_math__34a_icmp_fnvar_20_geq_gtr.bat
-Time spent: 32.200 msecs
+Time spent: 33.200 msecs
 
 >test_math__01_sign.bat
-Time spent: 2.500 msecs
+Time spent: 2.300 msecs
 
 >test_math__11_unorm_18.bat
-Time spent: 3.400 msecs
+Time spent: 3.200 msecs
 
 >test_math__12_unorm_36.bat
-Time spent: 6.500 msecs
+Time spent: 6.600 msecs
 
 >test_math__21_inorm_18.bat
-Time spent: 3.700 msecs
+Time spent: 4.300 msecs
 
 >test_math__22_inorm_36.bat
-Time spent: 7.700 msecs
+Time spent: 7.600 msecs
 
 >test_math__111_ultrim_nvar_18.bat
-Time spent: 1.900 msecs
+Time spent: 1.700 msecs
 
 >test_math__112_ultrim_nvar_36.bat
 Time spent: 2.100 msecs
@@ -481,10 +481,10 @@ Time spent: 2.100 msecs
 Time spent: 2.200 msecs
 
 >test_math__122_iltrim_nvar_36.bat
-Time spent: 2.000 msecs
+Time spent: 2.200 msecs
 
 >test_math__211_ultrim_fnvar_18.bat
-Time spent: 3.900 msecs
+Time spent: 4.100 msecs
 
 >test_math__212_ultrim_fnvar_36.bat
 Time spent: 3.600 msecs
@@ -499,152 +499,178 @@ Time spent: 3.900 msecs
 Time spent: 2.400 msecs
 
 >test_math__112_udigits_nvar_36.bat
-Time spent: 2.600 msecs
+Time spent: 2.700 msecs
 
 >test_math__121_idigits_nvar_18.bat
 Time spent: 2.500 msecs
 
 >test_math__122_idigits_nvar_36.bat
-Time spent: 2.800 msecs
+Time spent: 2.700 msecs
 
 >test_math__211_udigits_fnvar_18.bat
-Time spent: 7.700 msecs
+Time spent: 6.600 msecs
 
 >test_math__212_udigits_fnvar_36.bat
-Time spent: 14.900 msecs
+Time spent: 12.500 msecs
 
 >test_math__221_idigits_fnvar_18.bat
-Time spent: 7.500 msecs
+Time spent: 6.700 msecs
 
 >test_math__222_idigits_fnvar_36.bat
-Time spent: 15.300 msecs
+Time spent: 12.500 msecs
+
+>test_math_vs__01_fold_vs_add.bat
+>test_math_vs__11_ufoldpad6.bat
+Time spent: 3.300 msecs
+
+>test_math_vs__12_ifoldpad6.bat
+Time spent: 3.500 msecs
+
+>test_math_vs__21_uadd.bat
+Time spent: 3.300 msecs
+
+>test_math_vs__22_iadd.bat
+Time spent: 4.100 msecs
+
+>test_math_vs__02_add_vs_norm.bat
+>test_math_vs__11_uadd.bat
+Time spent: 3.300 msecs
+
+>test_math_vs__12_iadd.bat
+Time spent: 3.900 msecs
+
+>test_math_vs__21_unorm.bat
+Time spent: 3.100 msecs
+
+>test_math_vs__22_inorm.bat
+Time spent: 3.900 msecs
 
 >test_std__00_call.bat
-Time spent: 0.031 secs
-
->test_std__01_callshift.bat
-Time spent: 0.036 secs
-
->test_std__02_setshift.bat
-Time spent: 0.034 secs
-
->test_std__10_strlen.bat
-Time spent: 0.004 secs
-
->test_std__11_trim_var.bat
-Time spent: 0.010 secs
-
->test_std__20_echo_path_var.bat
-Time spent: 0.037 secs
-
->test_std__21_echo_pathglob_var.bat
 Time spent: 0.029 secs
 
+>test_std__01_callshift.bat
+Time spent: 0.033 secs
+
+>test_std__02_setshift.bat
+Time spent: 0.030 secs
+
+>test_std__10_strlen.bat
+Time spent: 0.003 secs
+
+>test_std__11_trim_var.bat
+Time spent: 0.011 secs
+
+>test_std__20_echo_path_var.bat
+Time spent: 0.033 secs
+
+>test_std__21_echo_pathglob_var.bat
+Time spent: 0.027 secs
+
 >test_std__31_if_or_inline.bat
-Time spent: 0.030 msecs
+Time spent: 0.028 msecs
 
 >test_std__32_if_and_inline.bat
 Time spent: 0.045 msecs
 
 >test_std__33_if_or.bat
-Time spent: 1.610 msecs
+Time spent: 1.500 msecs
 
 >test_std__34_if_and.bat
-Time spent: 1.970 msecs
+Time spent: 1.820 msecs
 
 >test_std__35_ifn_or.bat
-Time spent: 1.720 msecs
+Time spent: 1.610 msecs
 
 >test_std__36_ifn_and.bat
-Time spent: 2.320 msecs
+Time spent: 2.170 msecs
 
 >test_std_encode__00_asterisk_char.bat
-Time spent: 0.008 secs
+Time spent: 0.009 secs
 
 >test_std_encode__01_equal_char.bat
-Time spent: 0.014 secs
+Time spent: 0.013 secs
 
 >test_std_encode__10_pathlist_chars.bat
-Time spent: 0.028 secs
+Time spent: 0.030 secs
 
 >test_std_encode__11_pathlist_chars_glob.bat
-Time spent: 0.022 secs
+Time spent: 0.021 secs
 
 >test_std_encode__20_sys_chars.bat
 Time spent: 0.028 secs
 
 >test_std_encode__21_sys_chars_bat_cmdline.bat
-Time spent: 0.019 secs
+Time spent: 0.017 secs
 
 >test_std_encode__22_sys_chars_exe_cmdline.bat
-Time spent: 0.029 secs
+Time spent: 0.028 secs
 
 >test_std_sleep__000.bat
 Time spent: 0.003 secs
 
 >test_std_sleep__000_vbs.bat
-Time spent: 0.030 secs
+Time spent: 0.032 secs
 
 >test_std_sleep__000_vbs_cscript.bat
-Time spent: 0.029 secs
+Time spent: 0.028 secs
 
 >test_std_sleep__001.bat
-Time spent: 0.025 secs
+Time spent: 0.022 secs
 
 >test_std_sleep__001_vbs.bat
-Time spent: 0.036 secs
+Time spent: 0.034 secs
 
 >test_std_sleep__001_vbs_cscript.bat
 Time spent: 0.033 secs
 
 >test_std_sleep__005.bat
-Time spent: 0.024 secs
+Time spent: 0.025 secs
 
 >test_std_sleep__005_vbs.bat
-Time spent: 0.033 secs
+Time spent: 0.037 secs
 
 >test_std_sleep__005_vbs_cscript.bat
-Time spent: 0.031 secs
+Time spent: 0.032 secs
 
 >test_std_sleep__010.bat
-Time spent: 0.023 secs
+Time spent: 0.022 secs
 
 >test_std_sleep__010_vbs.bat
 Time spent: 0.033 secs
 
 >test_std_sleep__010_vbs_cscript.bat
-Time spent: 0.033 secs
+Time spent: 0.032 secs
 
 >test_std_sleep__020.bat
-Time spent: 0.044 secs
+Time spent: 0.030 secs
 
 >test_std_sleep__020_vbs.bat
-Time spent: 0.060 secs
+Time spent: 0.074 secs
 
 >test_std_sleep__020_vbs_cscript.bat
-Time spent: 0.056 secs
+Time spent: 0.050 secs
 
 >test_std_sleep__050.bat
-Time spent: 0.053 secs
+Time spent: 0.050 secs
 
 >test_std_sleep__050_vbs.bat
 Time spent: 0.110 secs
 
 >test_std_sleep__050_vbs_cscript.bat
-Time spent: 0.093 secs
+Time spent: 0.106 secs
 
 >test_std_sleep__500.bat
 Time spent: 0.543 secs
 
 >test_std_sleep__500_vbs.bat
-Time spent: 0.540 secs
+Time spent: 0.546 secs
 
 >test_std_sleep__500_vbs_cscript.bat
-Time spent: 0.540 secs
+Time spent: 0.543 secs
 
 >test_wmi__00_call__get_wmic_local_datetime.bat
-Time spent: 0.057 secs
+Time spent: 0.056 secs
 
 >test_wmi__01_call__get_wmi_local_datetime_vbs.bat
-Time spent: 0.063 secs
+Time spent: 0.065 secs
 
