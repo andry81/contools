@@ -5,7 +5,7 @@ set "L1=%%i" & set "L2=%%j" & set "L3=%%k" & set "L4=%%l" & set "L5=%%m" & set "
 set /A "L5+=L6 / 1000" & set /A "L6%%=1000" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" & ^
 set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "R=L1 / 1000" & set /A "L1%%=1000" & ^
 for /F "tokens=1,* delims=," %%a in ("!R!,!L1!,!L2!,!L3!,!L4!,!L5!,!L6!") do endlocal & set "%~1=%%b" & exit /b %%a
-endlocal & set "%~1=0,0,0,0,0,%~3" & call "%%~0" %%1 %%1 0 & if not "%~2" == "" if defined %~2 exit /b
+endlocal & set "%~1=0,0,0,0,0,%~3" & call "%%~dp0unorm.bat" %%1 %%1 & if not "%~2" == "" if defined %~2 exit /b
 exit /b 0
 
 rem USAGE:
@@ -76,6 +76,19 @@ rem <rvalue>:
 rem   An unsigned integer number with the 32-bit range limitation.
 rem   Must be less than 2147482649 for the `A6=999` excluding overflow in `Bn`.
 rem   If not defined, then is 0.
+rem
+rem   NOTE:
+rem     If <lval> is not defined or has empty variable, then <rvalue> must be
+rem     less than 2147483647.
+
+rem NOTE:
+rem   These operations are equivalent, but the normalization script is faster:
+rem
+rem   >
+rem   set a=0,0,0,0,0,2147483647
+rem   uadd.bat x a 0
+rem   >
+rem   unorm.bat x a
 
 rem Examples:
 rem

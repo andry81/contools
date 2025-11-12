@@ -68,6 +68,13 @@ for /L %%i in (25,1,27) do (
   endlocal
 )
 
+rem test on a maximum limit
+setlocal
+set IN=0,0,0,0,0,2147483647
+set OUTREF=0,0,2,147,483,647
+call :TEST OUT IN
+endlocal
+
 rem test on overflow
 setlocal
 set IN=1999,999,999,999,999,999

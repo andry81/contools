@@ -68,6 +68,20 @@ for /L %%i in (25,1,27) do (
   endlocal
 )
 
+rem test on a maximum limit
+setlocal
+set IN=0,0,0,0,0,2147483647
+set OUTREF=0,0,2,147,483,647
+call :TEST OUT IN
+endlocal
+
+rem CAUTION: L6 is still a signed integer number!
+setlocal
+set IN=-0,0,0,0,0,2147483647
+set OUTREF=-0,0,2,147,483,647
+call :TEST OUT IN
+endlocal
+
 rem test on overflow
 setlocal
 set IN=1999,999,999,999,999,999
@@ -108,6 +122,85 @@ setlocal
 set IN=-1999,999,999,999,999,999,999,999,999,999,999,999,1000
 set OUTREF=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 set RETREF=-2
+call :TEST OUT IN
+endlocal
+
+rem test on different signs in folded groups
+setlocal
+set IN=0,0,0,0,0,-2147483647
+set OUTREF=-0,0,2,147,483,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=+0,0,0,0,0,-2147483647
+set OUTREF=-0,0,2,147,483,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=-0,0,0,0,0,-2147483647
+set OUTREF=0,0,2,147,483,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=0,0,0,0,+1,-2147483647
+set OUTREF=-0,0,2,147,482,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=0,0,0,-1,+1,-2147483647
+set OUTREF=-0,0,2,148,482,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=0,0,+1,-1,+1,-2147483647
+set OUTREF=-0,0,1,148,482,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=0,-1,+1,-1,+1,-2147483647
+set OUTREF=-0,1,1,148,482,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=+1,-1,+1,-1,+1,-2147483647
+set OUTREF=0,998,998,851,517,353
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=0,0,0,0,-1,-2147483647
+set OUTREF=-0,0,2,147,484,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=0,0,0,+1,-1,-2147483647
+set OUTREF=-0,0,2,146,484,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=0,0,-1,+1,-1,-2147483647
+set OUTREF=-0,0,3,146,484,647
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=0,+1,-1,+1,-1,-2147483647
+set OUTREF=0,0,996,853,515,353
+call :TEST OUT IN
+endlocal
+
+setlocal
+set IN=-1,+1,-1,+1,-1,-2147483647
+set OUTREF=-1,0,996,853,515,353
 call :TEST OUT IN
 endlocal
 

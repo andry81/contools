@@ -14,7 +14,7 @@ set /A "L2=!S!L2 + L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & se
     & ( if !L5! GTR 0 set /A "L5-=1000" & set /A "L4+=1" ) & ( if !L4! GTR 0 set /A "L4-=1000" & set /A "L3+=1" ) ^
     & ( if !L3! GTR 0 set /A "L3-=1000" & set /A "L2+=1" ) & ( if !L2! GTR 0 set /A "L2-=1000" & set /A "L1+=1" ) ) ) & ( if defined S set "S=!S:+=!" ) & ^
 for /F "tokens=1,* delims=," %%a in ("!R!,!S!!L1:-=!,!L2:-=!,!L3:-=!,!L4:-=!,!L5:-=!,!L6:-=!") do endlocal & set "%~1=%%b" & exit /b %%a
-endlocal & set "%~1=0,0,0,0,0,%~3" & call "%%~0" %%1 %%1 0 & if not "%~2" == "" if defined %~2 exit /b
+endlocal & set "%~1=0,0,0,0,0,%~3" & call "%%~dp0inorm.bat" %%1 %%1 & if not "%~2" == "" if defined %~2 exit /b
 exit /b 0
 
 rem USAGE:
@@ -84,6 +84,26 @@ rem   in `Bn`.
 rem   Must be greater than -2147482650 for the `A6=-999`, excluding signed
 rem   overflow in `Bn`.
 rem   If not defined, then is 0.
+rem
+rem   NOTE:
+rem     If <lval> is not defined or has empty variable, then <rvalue> must be
+rem     by modulo less than 2147483647.
+
+rem NOTE:
+rem   These operations are equivalent, but the normalization script is faster:
+rem
+rem   >
+rem   set a=0,0,0,0,0,-2147483647
+rem   iadd.bat x a 0
+rem   >
+rem   inorm.bat x a
+rem
+rem   If you don't need the normalization, then a signed fold script is even
+rem   more faster (but evaluated from the right to the left):
+rem
+rem   >
+rem   set a=-2147483647
+rem   ifoldpad6.bat x a
 
 rem Examples:
 rem

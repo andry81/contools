@@ -1,6 +1,6 @@
 @echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
-for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!%~2!") do ^
-set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" ^
+for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!%~2!") do ^
+set "L1=%%i" & set "L2=%%j" & set "L3=%%k" & set "L4=%%l" & set "L5=%%m" & set "L6=%%n" & set "F=%%o" ^
   & ( if defined F call "%%~0" F F || set /A "L6+=!ERRORLEVEL!" ) & ^
 set /A "L5+=L6 / 1000" & set /A "L6%%=1000" & set /A "L4+=L5 / 1000" & set /A "L5%%=1000" & set /A "L3+=L4 / 1000" & set /A "L4%%=1000" & ^
 set /A "L2+=L3 / 1000" & set /A "L3%%=1000" & set /A "L1+=L2 / 1000" & set /A "L2%%=1000" & set /A "R=L1 / 1000" & set /A "L1%%=1000" ^
@@ -69,10 +69,19 @@ rem
 rem     999,999,999,999,999,999 is equivalent to 60-bit integer
 rem     2147483647,999,999,999,999,999 is equivalent to 81-bit integer
 
+rem NOTE:
+rem   These operations are equivalent, but the normalization script is faster:
+rem
+rem   >
+rem   set a=0,0,0,0,0,2147483647
+rem   uadd.bat x a 0
+rem   >
+rem   unorm.bat x a
+
 rem Examples:
 rem
 rem   1. >
-rem      rem 1,1002,1003,000,000,000
+rem      rem   1,1002,1003,000,000,000
 rem      set a=1,1002,1004
 rem      unorm.bat b a
 rem      rem ERRORLEVEL=0

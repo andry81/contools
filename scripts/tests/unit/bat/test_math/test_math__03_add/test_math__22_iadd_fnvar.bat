@@ -147,17 +147,32 @@ for /L %%i in (1,1,27) do (
 
 rem test on a maximum limit
 setlocal
+set L=0,0,0,0,0,2147483647
+set R=0
+set OUTREF=0,0,2,147,483,647
+call :TEST_SWAP OUT L R
+endlocal
+
+rem CAUTION: L12 is still a signed integer number!
+setlocal
+set L=-0,0,0,0,0,2147483647
+set R=0
+set OUTREF=-0,0,2,147,483,647
+call :TEST_SWAP OUT L R
+endlocal
+
+setlocal
 set L=999,999,999,999,999,999
-set R=0,0,2,147,482,648
-set OUTREF=0,0,2,147,482,647
+set R=0,0,2,147,482,647
+set OUTREF=0,0,2,147,482,646
 set RETREF=1
 call :TEST_SWAP OUT L R
 endlocal
 
 setlocal
 set L=-999,999,999,999,999,999
-set R=-0,0,2,147,482,649
-set OUTREF=-0,0,2,147,482,648
+set R=-0,0,2,147,482,648
+set OUTREF=-0,0,2,147,482,647
 set RETREF=-1
 call :TEST_SWAP OUT L R
 endlocal

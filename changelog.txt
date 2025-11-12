@@ -1,4 +1,18 @@
 2025.11.12:
+* fixed: scripts/tests/__init__/script_init.bat: print only from the first test init
+* new: scripts/tests/bench/bat/test_math_vs/test__math__*_add_vs_norm.bat: bench tests to test `?add.bat` vs `?norm.bat` scripts
+* changed: scripts/tests/unit/bat/test_math/test_math__*_add/test_math__*_?add*.bat: more tests on limits, minor refactor
+* changed: scripts/tests/unit/bat/test_math/test_math__*_norm/test_math__*_?norm.bat: more tests on limits
+* changed: scripts/tests/unit/bat/test_math/test_math__01_fold.bat: switched to use self logging
+* changed: scripts/tools/math/uadd.bat: switched to `unorm.bat` script as a bit faster
+* changed: scripts/tools/math/iadd.bat: switched to `inorm.bat` script as a bit faster
+* changed: scripts/tools/math/inorm.bat: reimplemented normalization as in `iadd.bat` script with different signs in folded groups
+* changed: scripts/tools/math/inorm.bat: switched to `unorm.bat` script as a bit faster
+* changed: scripts/tools/math/unorm.bat: minor improvement
+* refactor: scripts/tools/math: ?add.bat, ?norm.bat: minor refactor
+* refactor: scripts/tests/bench/bat/test_math_vs/test__math__*_fold_vs_add: minor refactor
+
+2025.11.12:
 * changed: scripts/tools/testlib: test print improvements
 
 2025.11.12:

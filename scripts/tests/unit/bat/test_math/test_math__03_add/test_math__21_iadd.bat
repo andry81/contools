@@ -111,6 +111,19 @@ for /L %%i in (1,1,27) do (
 
 rem test on a maximum limit
 setlocal
+set L=0,0,0,0,0,2147483647
+set OUTREF=0,0,2,147,483,647
+call :TEST OUT L 0
+endlocal
+
+rem CAUTION: L6 is still a signed integer number!
+setlocal
+set L=-0,0,0,0,0,2147483647
+set OUTREF=-0,0,2,147,483,647
+call :TEST OUT L 0
+endlocal
+
+setlocal
 set L=999,999,999,999,999,999
 set OUTREF=0,0,2,147,482,647
 set RETREF=1
@@ -119,9 +132,9 @@ endlocal
 
 setlocal
 set L=-999,999,999,999,999,999
-set OUTREF=-0,0,2,147,482,648
+set OUTREF=-0,0,2,147,482,647
 set RETREF=-1
-call :TEST OUT L -2147482649
+call :TEST OUT L -2147482648
 endlocal
 
 
