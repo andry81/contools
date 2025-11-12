@@ -126,14 +126,7 @@ exit /b %TEST_LAST_ERROR%
 
 :TEST_TEARDOWN
 rem call user teardown script
-if exist "%TEST_SCRIPT_HANDLERS_DIR%/%TEST_SCRIPT_FILE_NAME%.teardown%TEST_SCRIPT_FILE_EXT%" (
-  if %TESTLIB__TEST_TEARDOWN% EQU 0 (
-    echo;%~nx0: warning: a test teardown is going to call without a test setup.
-    echo;
-  ) >&2
-  set TESTLIB__TEST_TEARDOWN_CALLED=1
-  call "%%TEST_SCRIPT_HANDLERS_DIR%%/%%TEST_SCRIPT_FILE_NAME%%.teardown%%TEST_SCRIPT_FILE_EXT%%" || exit /b
-) else if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/teardown%TEST_SCRIPT_FILE_EXT%" (
+if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/teardown%TEST_SCRIPT_FILE_EXT%" (
   if %TESTLIB__TEST_TEARDOWN% EQU 0 (
     echo;%~nx0: warning: a test teardown is going to call without a test setup.
     echo;

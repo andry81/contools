@@ -1,4 +1,9 @@
 2025.11.12:
+* fixed: scripts/tools/testlib: minor fixup
+* changed: scripts/tools/testlib/*_locals.bat: improved testlib performance by rewrite test variables load/save/update scripts
+* changed: scripts/tools/testlib: code cleanup
+
+2025.11.12:
 * changed: scripts/tests/unit/logs/*.test_all/*.test_all.log: unit tests log update
 * changed: scripts/tests/bench/logs: *.test_all/*.test_all.log, *.test__all/*.test__all.log: bench test logs update
 
