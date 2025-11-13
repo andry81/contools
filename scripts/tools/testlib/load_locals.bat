@@ -1,5 +1,5 @@
 @echo off
-if exist "%~1" for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do set "__?VAR__=%~1" & if defined __?VAR__ call :FILTER && set "%%i=%%j"
+if exist "%~1" for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do set "__?VAR__=%%i" & if defined __?VAR__ call :FILTER && set "%%i=%%j"
 if exist "%~2" for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%~2") do set "%%i=%%j"
 set "__?VAR__="
 exit /b 0
