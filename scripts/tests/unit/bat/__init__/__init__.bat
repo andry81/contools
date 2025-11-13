@@ -10,9 +10,6 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TESTS_PROJECT_ROOT "%%~dp0.."
 
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config_dir.bat" "%%TESTS_PROJECT_ROOT%%/_config" || exit /b
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_DATA_OUT_ROOT%%" || exit /b
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEST_DATA_TEMP_ROOT%%" || exit /b
-
 rem initialize testlib "module"
 call "%%CONTOOLS_ROOT%%/testlib/__init__.bat" || exit /b
 

@@ -1,4 +1,9 @@
 2025.11.13:
+* changed: scripts/tests/*/bat: merged scripts to a common base between unit, manual and bench tests, code cleanup
+* changed: scripts/tests/manual/bat: added testlib usage in manual test scripts
+* refactor: scripts/tests/manual/bat/test_envblock_size_!exclusive.bat: moved from unit tests
+
+2025.11.13:
 * new: scripts/tools/testlib/test_entry.bat: standalone user test entry script to replace `call :TEST ...` in a long user test script
 
 2025.11.13:
