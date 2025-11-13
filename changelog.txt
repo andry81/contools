@@ -1,4 +1,7 @@
 2025.11.13:
+* new: scripts/tools/testlib/test_entry.bat: standalone user test entry script to replace `call :TEST ...` in a long user test script
+
+2025.11.13:
 * fixed: scripts/tools/testlib/load_locals.bat: execution fixup
 
 2025.11.13:
