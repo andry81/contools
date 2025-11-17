@@ -1,3 +1,7 @@
+2025.11.17:
+* changed: scripts/tests/unit/bat: unit tests global refactor to the canonical variant, replaced usage of `printf.exe` and `envvarcmp.exe` utilities
+* changed: scripts/tests/unit/bat: unit tests minor improvement
+
 2025.11.16:
 * new: scripts/tools/testlib/README_EN.txt: testlib readme
 * refactor: scripts/tools/testlib/test.bat: documentation moved to readme file

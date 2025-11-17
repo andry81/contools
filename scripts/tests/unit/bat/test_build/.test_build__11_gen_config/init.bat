@@ -4,11 +4,13 @@ set "GEN_CONFIG_FILE_NAME=%~1"
 set "TEST_DATA_FILE_IN_DIR=%~2"
 set "TEST_DATA_FILE_REF_DIR=%~3"
 
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" -num 3 0 TEST_ARGS %*
+
 if not defined GEN_CONFIG_FILE_NAME exit /b 255
 if not defined TEST_DATA_FILE_IN_DIR exit /b 255
 if not defined TEST_DATA_FILE_REF_DIR exit /b 255
 
-call "%%CONTOOLS_ROOT%%/std/setshift.bat" -skip 1 3 GEN_CONFIG_FLAGS_CMD_LINE -+ %%*
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" -skip 1 3 GEN_CONFIG_FLAGS -+ %%*
 
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_IN_FILE "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_IN_DIR%%\%%GEN_CONFIG_FILE_NAME%%.in"
 call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_REF_DIR "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_REF_DIR%%"

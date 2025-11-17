@@ -1,0 +1,13 @@
+@echo off
+
+setlocal ENABLEDELAYEDEXPANSION
+
+if !TEST_LAST_ERROR! NEQ 0 (
+  echo;FAILED: !TESTLIB__TEST_ORDER_NUMBER!: (!TEST_IMPL_ERROR! == !STRING_LEN!^) STRING=`!__STRING__!`
+  echo;
+  exit /b 0
+)
+
+echo;PASSED: !TESTLIB__TEST_ORDER_NUMBER!: LEN=`!STRING_LEN!` STRING=`!__STRING__!`
+
+exit /b 0

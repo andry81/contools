@@ -55,7 +55,5 @@ rem no code can be executed here, just in case
 exit /b
 
 :TEST
-call "%%CONTOOLS_ROOT%%/std/setshift.bat" -num 3 0 TEST_TITLE %*
-echo;%TEST_TITLE%...
 call "%%CONTOOLS_TESTLIB_ROOT%%/test.bat" %%*
 exit /b

@@ -1,6 +1,5 @@
 @echo off
 
-rem builtin commands
 (
   "%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" %TEST_DATA_SED_CMD_LINE% "%TEST_DATA_IN_FILE%"
 ) > "%TEST_TEMP_DATA_OUT_FILE%" || ( call set "TEST_IMPL_ERROR=%%ERRORLEVEL%%" & set "TEST_LAST_ERROR=20" & goto EXIT )

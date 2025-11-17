@@ -1,16 +1,6 @@
 @echo off
 
-setlocal DISABLEDELAYEDEXPANSION
-
 call "%%CONTOOLS_ROOT%%/std/get_cmdline_var_len.bat" %%FLAGS%% CMDLINE
-set ARGS_COUNT=%ERRORLEVEL%
-
-if defined CMDLINE (
-  set $CMDLINE=${CMDLINE}
-) else set "$CMDLINE="
-
-"%CONTOOLS_UTILS_BIN_ROOT%/contools/envvarcmp.exe" ARGS_COUNT ARGS_COUNT_REFERENCE "" ^
-  "PASSED: %TESTLIB__TEST_ORDER_NUMBER%: RESULT=`{0}` CMDLINE=`%$CMDLINE%`" ^
-  "FAILED: %TESTLIB__TEST_ORDER_NUMBER%: RESULT=`{0}` REFERENCE=`{1}` CMDLINE=`%$CMDLINE%`" || exit /b 1
+set TEST_IMPL_ERROR=%ERRORLEVEL%
 
 exit /b 0

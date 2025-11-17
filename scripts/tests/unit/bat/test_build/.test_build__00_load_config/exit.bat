@@ -2,4 +2,4 @@
 
 popd
 
-exit /b 0
+exit /b %TEST_IMPL_ERROR%

@@ -1,0 +1,13 @@
+@echo off
+
+setlocal ENABLEDELAYEDEXPANSION
+
+if !TEST_LAST_ERROR! NEQ 0 (
+  echo;FAILED: !TESTLIB__TEST_ORDER_NUMBER!: ERROR=`!TEST_IMPL_ERROR!`: !TEST_ARGS!
+  echo;
+  exit /b 0
+)
+
+echo;PASSED: !TESTLIB__TEST_ORDER_NUMBER!: !TEST_ARGS!
+
+exit /b 0

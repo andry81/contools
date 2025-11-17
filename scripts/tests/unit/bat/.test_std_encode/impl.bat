@@ -2,25 +2,24 @@
 
 setlocal DISABLEDELAYEDEXPANSION
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "STRING_INPUT=%%i"
+set "STRING_INPUT="
+set "STRING_ENCODED="
+set "STRING_OUTPUT="
 
-call "%%CONTOOLS_ROOT%%/std/encode/encode_%%TEST_FUNC%%.bat" || exit /b 255
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!__STRING__!"') do endlocal & set "STRING_INPUT=%%~i"
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "STRING_ENCODED=%%i"
+call "%%CONTOOLS_ROOT%%/std/encode/encode_%%TEST_FUNC%%.bat" || ( set "LAST_IMPL_ERROR=10" & goto EXIT )
 
-call "%%CONTOOLS_ROOT%%/std/encode/decode_%%TEST_FUNC%%.bat" || exit /b 255
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!__STRING__!"') do endlocal & set "STRING_ENCODED=%%~i"
 
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & set "STRING_OUTPUT=%%i"
+call "%%CONTOOLS_ROOT%%/std/encode/decode_%%TEST_FUNC%%.bat" || ( set "LAST_IMPL_ERROR=20" & goto EXIT )
 
-setlocal ENABLEDELAYEDEXPANSION
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!__STRING__!"') do endlocal & set "STRING_OUTPUT=%%~i"
 
-rem print strings can contain batch control characters
-
-if "!STRING_INPUT!" EQU "!STRING_OUTPUT!" (
-  "%CONTOOLS_UTILS_BIN_ROOT%/contools/printf.exe" "PASSED: %TESTLIB__TEST_ORDER_NUMBER%: ${TEST_FUNC}: STRING_INPUT=`${STRING_INPUT}`"
-  exit /b 0
-)
-
-"%CONTOOLS_UTILS_BIN_ROOT%/contools/printf.exe" "FAILED: %TESTLIB__TEST_ORDER_NUMBER%: ${TEST_FUNC}: STRING_INPUT=`${STRING_INPUT}` STRING_OUTPUT=`${STRING_OUTPUT}`"
-
-exit /b 1
+:EXIT
+setlocal ENABLEDELAYEDEXPANSION & ^
+for /F "usebackq tokens=* delims="eol^= %%i in ('"!STRING_INPUT!"') do ^
+for /F "usebackq tokens=* delims="eol^= %%j in ('"!STRING_ENCODED!"') do ^
+for /F "usebackq tokens=* delims="eol^= %%k in ('"!STRING_OUTPUT!"') do ^
+endlocal & endlocal & set "STRING_INPUT=%%~i" & set "STRING_ENDCODED=%%~j" & set "STRING_OUTPUT=%%~k"
+exit /b 0

@@ -4,25 +4,15 @@ setlocal
 
 if "%CMD_SCRIPT_NAME%" == "chcp" (
   call "%%CONTOOLS_ROOT%%/std/%%CMD_SCRIPT_NAME%%.bat" "%%CURRENT_CP_REF%%"
-) else (
-  call "%%CONTOOLS_ROOT%%/std/%%CMD_SCRIPT_NAME%%.bat"
-)
+) else call "%%CONTOOLS_ROOT%%/std/%%CMD_SCRIPT_NAME%%.bat"
 
-if "%CURRENT_CP_REF%" == "%CURRENT_CP%" if "%LAST_CP_REF%" == "%LAST_CP%" if "%CP_HISTORY_LIST_REF%" == "%CP_HISTORY_LIST%" (
-  "%CONTOOLS_UTILS_BIN_ROOT%/contools/printf.exe" "PASSED: %TESTLIB__TEST_ORDER_NUMBER%: CURRENT_CP=`${CURRENT_CP}` LAST_CP=`${LAST_CP}` CP_HISTORY_LIST=`${CP_HISTORY_LIST}`"
-  set TEST_LAST_ERROR=0
-  goto EXIT
-)
+set "TEST_IMPL_ERROR=%ERRORLEVEL%"
 
-"%CONTOOLS_UTILS_BIN_ROOT%/contools/printf.exe" "FAILED: %TESTLIB__TEST_ORDER_NUMBER%: CURRENT_CP=`${CURRENT_CP}`==`${CURRENT_CP_REF}` LAST_CP=`${LAST_CP}`==`${LAST_CP_REF}` CP_HISTORY_LIST=`${CP_HISTORY_LIST}`==`${CP_HISTORY_LIST_REF}`"
-set TEST_LAST_ERROR=1
-
-:EXIT
-rem return script values
 (
   endlocal
+  set "TEST_IMPL_ERROR=%TEST_IMPL_ERROR%"
   set "LAST_CP=%LAST_CP%"
   set "CURRENT_CP=%CURRENT_CP%"
   set "CP_HISTORY_LIST=%CP_HISTORY_LIST%"
-  exit /b %TEST_LAST_ERROR%
+  exit /b 0
 )
