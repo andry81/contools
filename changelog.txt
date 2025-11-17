@@ -1,3 +1,7 @@
+2025.11.16:
+* new: scripts/tools/testlib/README_EN.txt: testlib readme
+* refactor: scripts/tools/testlib/test.bat: documentation moved to readme file
+
 2025.11.13:
 * changed: scripts/tests/*/bat: merged scripts to a common base between unit, manual and bench tests, code cleanup
 * changed: scripts/tests/manual/bat: added testlib usage in manual test scripts

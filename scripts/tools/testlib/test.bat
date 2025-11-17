@@ -1,62 +1,10 @@
 @echo off & goto DOC_END
 
+rem USAGE:
+rem   test.bat <commmand-line>...
+rem
 rem Description:
-rem   Main entry point script for a user test script.
-rem
-rem   A user script must contain the handlers in separate scripts in this file
-rem   structure format (in a call order):
-rem
-rem     /<user_test_script>.bat
-rem
-rem       /.<user_test_script>/setup.bat
-rem
-rem         /.<user_test_script>/init.bat
-rem         /.<user_test_script>/impl.bat
-rem         /.<user_test_script>/exit.bat
-rem         /.<user_test_script>/report.bat
-rem
-rem       /.<user_test_script>/teardown.bat
-rem
-rem , where:
-rem
-rem     /<user_test_script>.bat
-rem       A test user script.
-rem       Calls once to `testlib/init.bat`, multiple times to
-rem       `testlib/test.bat` and once to `testlib/exit.bat` scripts.
-rem
-rem     /.<user_test_script>/setup.bat
-rem       [OPTIONAL]
-rem       A test first time setup handler, calls from `testlib/init.bat`
-rem       script.
-rem
-rem     /.<user_test_script>/teardown.bat
-rem       [OPTIONAL]
-rem       A test last time tear down handler, calls from `testlib/exit.bat`
-rem       script.
-rem
-rem     /.<user_test_script>/init.bat
-rem       [OPTIONAL]
-rem       A test initialization handler, required to process a test command
-rem       line arguments, calls from `testlib/test.bat` script.
-rem
-rem     /.<user_test_script>/impl.bat
-rem       [REQUIRED]
-rem       A test implementation handler, does not have a command line
-rem       arguments, calls from `testlib/test.bat` script.
-rem
-rem     /.<user_test_script>/exit.bat
-rem       [OPTIONAL]
-rem       A test exit handler, useful if required to copy test data out of a
-rem       test script temporary output directory, calls from `testlib/test.bat`
-rem       script.
-rem
-rem     /.<user_test_script>/report.bat
-rem       [OPTIONAL]
-rem       A test report handler to print a test result.
-rem
-rem NOTE:
-rem   The `.<user_test_script>` parent directory can be changed by using
-rem   `TEST_SCRIPT_HANDLERS_DIR` variable.
+rem   See `REDME_EN.txt` file for the details.
 rem
 rem CAUTION:
 rem   We must use an uniform code page to avoid a code page change between
@@ -123,7 +71,7 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE
 rem return code from a user test script handler
 set TEST_LAST_ERROR=0
 
-rem return code from user test script implementation (`*impl.bat`)
+rem return code from a user test script implementation (`impl.bat`)
 set TEST_IMPL_ERROR=0
 
 set /A TESTLIB__CURRENT_TESTS+=1
