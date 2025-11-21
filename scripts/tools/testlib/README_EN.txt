@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2025.11.16
+* 2025.11.21
 * contools--testlib
 
 1. DESCRIPTION
@@ -55,60 +55,60 @@ test.bat:
   A user script must contain the handlers in separate scripts in this file
   structure format (in a call order):
 
-    /<user_test_script>.bat
+    /<user-test-script>.bat
 
-      /.<user_test_script>/setup.bat
+      /.<user-test-script>/setup.bat
 
-        /.<user_test_script>/init.bat
-        /.<user_test_script>/impl.bat
-        /.<user_test_script>/exit.bat
-        /.<user_test_script>/report.bat
+        /.<user-test-script>/init.bat
+        /.<user-test-script>/impl.bat
+        /.<user-test-script>/exit.bat
+        /.<user-test-script>/report.bat
 
-      /.<user_test_script>/teardown.bat
+      /.<user-test-script>/teardown.bat
 
   , where:
 
-    /<user_test_script>.bat
+    /<user-test-script>.bat
       A test user script.
       Calls once to `testlib/init.bat`, multiple times to
       `testlib/test.bat` and once to `testlib/exit.bat` scripts.
 
-    /.<user_test_script>/setup.bat
+    /.<user-test-script>/setup.bat
       [OPTIONAL]
       A test first time setup handler, calls from `testlib/init.bat`
       script.
 
-    /.<user_test_script>/teardown.bat
+    /.<user-test-script>/teardown.bat
       [OPTIONAL]
       A test last time tear down handler, calls from `testlib/exit.bat`
       script.
 
-    /.<user_test_script>/init.bat
+    /.<user-test-script>/init.bat
       [OPTIONAL]
       A test initialization handler, required to process a test command
       line arguments, calls from `testlib/test.bat` script.
 
-    /.<user_test_script>/impl.bat
+    /.<user-test-script>/impl.bat
       [REQUIRED]
       A test implementation handler, does not have a command line
       arguments, checks a user test variables and returns exit code to trigger
       a success or a fail, sets `TEST_IMPL_ERROR` variable to store a test exit
       code, calls from `testlib/test.bat` script.
-      Does not call if `/.<user_test_script>/init.bat` has returned a not zero
+      Does not call if `/.<user-test-script>/init.bat` has returned a not zero
       exit code.
 
-    /.<user_test_script>/exit.bat
+    /.<user-test-script>/exit.bat
       [OPTIONAL]
       A test exit handler, checks a user test variables and returns exit code
       to trigger a success or a fail, useful if required to copy test data out
       of a test script temporary output directory, calls from
       `testlib/test.bat` script.
-      Always calls after the `/.<user_test_script>/impl.bat` script.
+      Always calls after the `/.<user-test-script>/impl.bat` script.
       Can use `TEST_LAST_ERROR` variable to use the exit code either of
-      `/.<user_test_script>/init.bat` or `/.<user_test_script>/impl.bat`, and
+      `/.<user-test-script>/init.bat` or `/.<user-test-script>/impl.bat`, and
       can reset it to 0.
 
-    /.<user_test_script>/report.bat
+    /.<user-test-script>/report.bat
       [OPTIONAL]
       A test report handler to print a test result.
 
@@ -124,7 +124,7 @@ test.bat:
       script `TEST_LAST_ERROR` variable only.
 
 NOTE:
-  The `.<user_test_script>` parent directory can be changed by using
+  The `.<user-test-script>` parent directory can be changed by using
   `TEST_SCRIPT_HANDLERS_DIR` variable.
 
 -------------------------------------------------------------------------------
@@ -158,18 +158,36 @@ NOTE:
  |
  +- test_all.bat
 
+NOTE:
+  This particular catalog example is a unit tests collection.
+  For each unit tests collection the `config.system.vars.in` file may be
+  different.
+
 -------------------------------------------------------------------------------
 6. TEST FILES CONTENT EXAMPLES
 -------------------------------------------------------------------------------
 
-Here is variant of test files for a unit test cases.
+Here is variant of test files mostly for unit test cases.
+
+NOTE:
+  The real test cases can be found in `tests` directory in the `contools`
+  project.
 
 
 config.system.vars.in:
 
   TEST_DATA_IN_ROOT             ="%TESTS_PROJECT_ROOT%/_testdata"
-  TEST_DATA_OUT_ROOT            ="%PROJECT_OUTPUT_ROOT%/_tests/unit/out"
-  TEST_DATA_TEMP_ROOT           ="%PROJECT_OUTPUT_ROOT%/_tests/unit/temp"
+  TEST_DATA_OUT_ROOT            ="%PROJECT_OUTPUT_ROOT%/_tests/<tests-type>/out"
+  TEST_DATA_TEMP_ROOT           ="%PROJECT_OUTPUT_ROOT%/_tests/<tests-type>/temp"
+
+  # required in case of manual tests
+  #once TESTLIB__MANUAL          =1
+
+, where <tests-type> can be:
+
+  * unit
+  * manual
+  * bench
 
 ---
 
@@ -335,7 +353,7 @@ test_01_strlen.bat:
 
 .test_01_strlen.bat/report.bat:
 
-@echo off
+  @echo off
 
   setlocal ENABLEDELAYEDEXPANSION
 
