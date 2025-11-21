@@ -1,4 +1,7 @@
 2025.11.21:
+* refactor: scripts/tools/math/iadd.bat: minor refactor
+
+2025.11.21:
 * refactor: scripts/tools/testlib/README_EN.txt: readme update
 
 2025.11.17:

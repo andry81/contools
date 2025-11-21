@@ -87,7 +87,7 @@ rem   If not defined, then is 0.
 rem
 rem   NOTE:
 rem     If <lval> is not defined or has empty variable, then <rvalue> must be
-rem     by modulo less than 2147483647.
+rem     by modulo less or equal than 2147483647.
 
 rem NOTE:
 rem   These operations are equivalent, but the normalization script is faster:
