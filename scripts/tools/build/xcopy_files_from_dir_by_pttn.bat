@@ -1,5 +1,8 @@
 @echo off & goto DOC_END
 
+rem USAGE:
+rem   xcopy_files_from_dir_by_pttn.bat <from-path> <to-path> <xcopy-flags> <file-pttn-list>...
+
 rem Description:
 rem   Script xcopy files from a source directory preserving relative paths to
 rem   each file in the target directory.
@@ -18,15 +21,18 @@ rem       3. The `%%~f` builtin variables extension and other extensions does
 rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 
-rem Usage:
-rem  <Command arguments>
+rem <from-path>:
+rem   From directory path with going to be copied files including
+rem   subdirectories.
 
-rem Command arguments:
-rem %1 - Path to source directory with going to be copied files including
-rem      subdirectories.
-rem %2 - Path to target directory.
-rem %3 - Additional arguments for `xcopy.bat` script.
-rem %4-%N - Optional file pattern list for the `dir` command, ex: `"*.txt" "*.md"
+rem <to-path>:
+rem   To directory path.
+
+rem <xcopy-flags>:
+rem   Additional arguments for `xcopy_file.bat` script.
+
+rem <file-pttn-list>:
+rem   Optional file pattern list for the `dir` command, ex: `"*.txt" "*.md"`
 :DOC_END
 
 setlocal

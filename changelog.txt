@@ -1,3 +1,7 @@
+2025.11.27:
+* changed: scripts/tools/std/xcopy_file_rename.bat: code cleanup
+* refactor: scripts/tools/build/xcopy_files_from_dir_by_pttn.bat: minor refactor
+
 2025.11.21:
 * refactor: scripts/tools/math/iadd.bat: minor refactor
 

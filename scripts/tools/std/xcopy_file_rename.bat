@@ -35,9 +35,6 @@ rem
 rem   -if_not_exist
 rem     Copy if `<to-path>/<to-file>` does not exist.
 rem
-rem   -use_xcopy
-rem     Use `xcopy` executable utility.
-rem
 rem   -use_cmd_bare_flags
 rem     Use command bare flags from `XCOPY_FILE_CMD_BARE_FLAGS` and
 rem     `COPY_CMD_BARE_FLAGS` variables.
@@ -79,7 +76,6 @@ rem script flags
 set FLAG_FLAGS_SCOPE=0
 set "FLAG_CHCP="
 set FLAG_IF_NOT_EXIST=0
-set FLAG_USE_XCOPY=0
 set FLAG_USE_CMD_BARE_FLAGS=0
 set FLAG_USE_UTILITY_FLAGS=0
 
@@ -100,8 +96,6 @@ if defined FLAG (
     shift
   ) else if "%FLAG%" == "-if_not_exist" (
     set FLAG_IF_NOT_EXIST=1
-  ) else if "%FLAG%" == "-use_xcopy" (
-    set FLAG_USE_XCOPY=1
   ) else if "%FLAG%" == "-use_cmd_bare_flags" (
     set FLAG_USE_CMD_BARE_FLAGS=1
   ) else if "%FLAG%" == "-use_utility_flags" (
