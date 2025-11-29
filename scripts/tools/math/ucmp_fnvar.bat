@@ -2,7 +2,7 @@
 setlocal DISABLEDELAYEDEXPANSION & setlocal ENABLEDELAYEDEXPANSION & ^
 for /F "usebackq tokens=* delims="eol^= %%a in ('"!%~1!"') do for /F "usebackq tokens=* delims="eol^= %%b in ('"!%~3!"') do ^
 set "L=%%~a" & set "R=%%~b" & ( if not defined L exit /b -1 ) & ( if not defined R exit /b -1 ) & ^
-for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!L!") do ^
+for /F "tokens=1,2,3,4,5,6,* delims=,.:;'" %%a in ("!L!") do ^
 set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "LR=%%g" ^
   & ( if not defined L1 set "L1=0" ) & ( if "!L1:~2,1!" == "" set "L1=0!L1!" ) & ( if "!L1:~2,1!" == "" set "L1=0!L1!" ) ^
   & ( if not defined L2 set "L2=0" ) & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) ^
@@ -10,7 +10,7 @@ set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "
   & ( if not defined L4 set "L4=0" ) & ( if "!L4:~2,1!" == "" set "L4=0!L4!" ) & ( if "!L4:~2,1!" == "" set "L4=0!L4!" ) ^
   & ( if not defined L5 set "L5=0" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) & ( if "!L5:~2,1!" == "" set "L5=0!L5!" ) ^
   & ( if not defined L6 set "L6=0" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & ( if "!L6:~2,1!" == "" set "L6=0!L6!" ) & set "L=!L1!,!L2!,!L3!,!L4!,!L5!,!L6!" & ^
-for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!R!") do ^
+for /F "tokens=1,2,3,4,5,6,* delims=,.:;'" %%a in ("!R!") do ^
 set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "RR=%%g" ^
   & ( if not defined L1 set "L1=0" ) & ( if "!L1:~2,1!" == "" set "L1=0!L1!" ) & ( if "!L1:~2,1!" == "" set "L1=0!L1!" ) ^
   & ( if not defined L2 set "L2=0" ) & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) & ( if "!L2:~2,1!" == "" set "L2=0!L2!" ) ^

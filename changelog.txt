@@ -1,4 +1,7 @@
 2025.11.29:
+* changed: scripts/tools/math: added `'` character as folded group separator
+
+2025.11.29:
 * new: scripts/tests/bench/bat/test__for_!exclusive/test__for__02_F_delims: exclusive bench tests for delimiters in `for /F` statement
 * refactor: scripts/tests/bench/bat/test__for: made all bench tests for the `for` statement an exclusive because of an accumulated slowdown effect around the `for` statement nesting
 

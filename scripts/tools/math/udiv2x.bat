@@ -1,7 +1,7 @@
 @echo off & set "D=%~3" & set /A "D=D/D - 1 + D" || exit /b -1 & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
-for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!%~2!") do ^
+for /F "tokens=1,2,3,4,5,6,* delims=,.:;'" %%i in ("!%~2!") do ^
 set "L01=%%i" & set "L02=%%j" & set "L03=%%k" & set "L04=%%l" & set "L05=%%m" & set "L06=%%n" & set "F=%%o" & ^
-for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!F!,0") do ^
+for /F "tokens=1,2,3,4,5,6,* delims=,.:;'" %%i in ("!F!,0") do ^
 set "L07=%%i" & set "L08=%%j" & set "L09=%%k" & set "L10=%%l" & set "L11=%%m" & set "L12=%%n" & set "F=%%o" ^
   & ( if defined F if "!F:0=!" == "" set "F=" ) & ( if defined F call "%%~dp0unorm.bat" F F || set /A "L12+=!ERRORLEVEL!" ) & ^
 set /A "L11+=L12 / 1000" & set /A "L12%%=1000" & set /A "L10+=L11 / 1000" & set /A "L11%%=1000" & set /A "L09+=L10 / 1000" & set /A "L10%%=1000" & ^

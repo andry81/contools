@@ -1,5 +1,5 @@
 @echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
-for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%a in ("!%~2!") do ^
+for /F "tokens=1,2,3,4,5,6,* delims=,.:;'" %%a in ("!%~2!") do ^
 set "L1=%%a" & set "L2=%%b" & set "L3=%%c" & set "L4=%%d" & set "L5=%%e" & set "L6=%%f" & set "F=%%g" & set "R=%~3" & set "S=" & set "FR=0" ^
   & ( if defined L1 if "!L1:~0,1!" == "+" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "-" set "S=-" & if defined F set "F=-!F!" ) ^
   & ( if defined F call "%%~0" F F "%%R%%" || set /A "FR=!ERRORLEVEL!" ) & ^

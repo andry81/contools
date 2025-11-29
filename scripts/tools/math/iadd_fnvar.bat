@@ -1,11 +1,11 @@
 @echo off & ( if "%~1" == "" exit /b 0 ) & setlocal ENABLEDELAYEDEXPANSION & ^
 for /F "usebackq tokens=* delims="eol^= %%a in ('"!%~2!"') do for /F "usebackq tokens=* delims="eol^= %%b in ('"!%~3!"') do ^
 set "L=%%~a" & set "R=%%~b" & ( if not defined L set "L=0" ) & ( if not defined R set "R=0" ) & ^
-for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!L!") do ^
+for /F "tokens=1,2,3,4,5,6,* delims=,.:;'" %%i in ("!L!") do ^
 set "L1=%%i" & set "L2=%%j" & set "L3=%%k" & set "L4=%%l" & set "L5=%%m" & set "L6=%%n" & set "F=%%o" & set "LS=" ^
   & ( if defined L1 if "!L1:~0,1!" == "+" set "L1=!L1:~1!" ) & ( if defined L1 if "!L1:~0,1!" == "-" set "LS=-" & set /A "L6=-L6" ) ^
   & ( if defined F call "%%~dp0unorm.bat" F F || set /A "L6+=!LS!(!ERRORLEVEL!)" ) & ^
-for /F "tokens=1,2,3,4,5,6,* delims=,.:;" %%i in ("!R!") do ^
+for /F "tokens=1,2,3,4,5,6,* delims=,.:;'" %%i in ("!R!") do ^
 set "R1=%%i" & set "R2=%%j" & set "R3=%%k" & set "R4=%%l" & set "R5=%%m" & set "R6=%%n" & set "F=%%o" & set "RS=" ^
   & ( if defined R1 if "!R1:~0,1!" == "+" set "R1=!R1:~1!" ) & ( if defined R1 if "!R1:~0,1!" == "-" set "RS=-" & set /A "R6=-R6" ) ^
   & ( if defined F call "%%~dp0unorm.bat" F F || set /A "R6+=!RS!(!ERRORLEVEL!)" ) & ^
