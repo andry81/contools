@@ -1,4 +1,7 @@
 2025.11.29:
+* new: scripts/tests/bench/bat/test__for_!exclusive: exclusive bench tests for `for` statement
+
+2025.11.29:
 * refactor: scripts/tools/ToolAdaptors/hta/cmd_admin*.bat: minor refactor
 
 2025.11.27:
