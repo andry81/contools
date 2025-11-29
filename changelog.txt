@@ -1,4 +1,8 @@
 2025.11.29:
+* new: scripts/tests/bench/bat/test__for_!exclusive/test__for__02_F_delims: exclusive bench tests for delimiters in `for /F` statement
+* refactor: scripts/tests/bench/bat/test__for: made all bench tests for the `for` statement an exclusive because of an accumulated slowdown effect around the `for` statement nesting
+
+2025.11.29:
 * new: scripts/tests/bench/bat/test__for_!exclusive: exclusive bench tests for `for` statement
 
 2025.11.29:
