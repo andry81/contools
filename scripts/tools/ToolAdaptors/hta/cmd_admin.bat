@@ -21,6 +21,13 @@ call;
 
 rem Load Windows Batch compatible command line with escapes (`\""` is a single nested `"`, `\""""` is a double nested `"` and so on).
 
+rem CAUTION:
+rem   `\""`, `\""""`, etc expressions only has meaning inside a `.bat` script.
+rem   Any attempt to use it outside a script (including a terminal command
+rem   line) will lead into incorrect expansion because of a terminal command
+rem   line or an `.exe` command line it has their own different expansion rules
+rem   including command line of the `cmd.exe` executable.
+
 rem NOTE:
 rem   The command line load code is a copy from `callshift.bat` script.
 

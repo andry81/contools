@@ -1,3 +1,6 @@
+2025.11.29:
+* refactor: scripts/tools/ToolAdaptors/hta/cmd_admin*.bat: minor refactor
+
 2025.11.27:
 * changed: scripts/tools/std/xcopy_file_rename.bat: code cleanup
 * refactor: scripts/tools/build/xcopy_files_from_dir_by_pttn.bat: minor refactor
