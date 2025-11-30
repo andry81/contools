@@ -33,3 +33,17 @@ if "%TIME_FRACS:~2,1%" == "" set "TIME_FRACS=0%TIME_FRACS%"
   set "TIME_FRACS=%TIME_FRACS%"
   exit /b 0
 )
+
+rem USAGE:
+rem   end_time.bat <time-diff-divisor>
+
+rem Description:
+rem   Script calculates time between this script call and the last call to
+rem   `begin_time.bat` script in format:
+rem
+rem     TIME_INTS.TIME_FRACS
+rem
+rem  , where TIME_FRACS=NNN - milliseconds with zero padding.
+
+rem <time-diff-divisor>:
+rem   Time difference divisor to divide the result before return.

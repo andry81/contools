@@ -1,3 +1,9 @@
+2025.11.30:
+* fixed: scripts/tests/bench/bat/test__for_!exclusive: time print
+* new: scripts/tests/bench/bat/test__for_!exclusive: test__for__13_for_Lx3_slowdown, test__for__14_for_Lx3_slowdown_with_parenthesis: more bench tests
+* refactor: scripts/tests/bench/bat/test__for_!exclusive: bench tests refactor
+* refactor: scripts/tools/time/end_time.bat: script self documentation
+
 2025.11.29:
 * changed: scripts/tools/math: added `'` character as folded group separator
 
