@@ -104,8 +104,8 @@ if not exist "\\?\%FILE_PATH%" type nul > "\\?\%FILE_PATH%" & goto CONTINUE
 rem TODO: Windows XP `robocopy` workaround
 
 rem check on long file path
-set FILE_PATH_LONG=0
-if not exist "%FILE_PATH%" set FILE_PATH_LONG=1
+set FILE_PATH_LONG=1
+if exist "%FILE_PATH%" call "%%CONTOOLS_ROOT%%/std/is_str_shorter_than.bat" 259 "%%FILE_PATH%%" && set FILE_PATH_LONG=0
 
 if %FILE_PATH_LONG% NEQ 0 if exist "%SystemRoot%\System32\robocopy.exe" goto MOVE_TO_TMP
 

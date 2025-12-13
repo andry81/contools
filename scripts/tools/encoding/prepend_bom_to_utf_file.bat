@@ -1,8 +1,14 @@
 @echo off & goto DOC_END
 
+rem USAGE:
+rem   prepend_bom_to_utf_file.bat [flags] <input-file> <bom-file> <output-file>
+
 rem Description:
 rem   Script prepends UTF BOM sequence to a text file if file does not
 rem   have it yet and output the result into another text file.
+rem
+rem   <input-file>, <bom-file> and <output-file> must be not long paths.
+rem
 :DOC_END
 
 setlocal

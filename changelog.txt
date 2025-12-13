@@ -1,4 +1,9 @@
 2025.12.13:
+* fixed: scripts/tools/std/touch_file.bat: correct selection between a builtin copy and another method
+* new: scripts/tools/std/is_str_shorter_than.bat: script to check on length shorter than
+* refactor: scripts/tools: std/copy.bat, encoding/prepend_bom_to_utf_file.bat: minor refactor
+
+2025.12.13:
 * fixed: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: conversion to dos path (-allow-dos-paths)
 * refactor: scripts/tools/std/encode: minor refactor
 

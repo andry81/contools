@@ -9,6 +9,14 @@ rem   check before call.
 rem
 rem   Does support long paths, but can not copy.
 rem
+rem   CAUTION:
+rem     `copy /B "<from>" "..."` fails to copy exactly 259 characters long
+rem     of <from> absolute path and does not print an error message, but does
+rem     print an error for paths longer than 259.
+rem     Note that the error code is not zero for paths longer than 258
+rem     characters.
+rem     To workaround use `is_str_shorter_than.bat 259 <abs-path>` script.
+rem
 rem   NOTE:
 rem     All input paths must be without `\\?\` prefix because:
 rem       1. Can be directly used in commands which does not support long paths
