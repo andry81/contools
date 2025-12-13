@@ -3,7 +3,7 @@
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__:$2A=*!") do endlocal & set "__STRING__=%%i"
 exit /b 0
 
-rem Decode `=` character.
+rem Decode `*` character.
 
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise

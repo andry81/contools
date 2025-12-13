@@ -1,3 +1,7 @@
+2025.12.13:
+* fixed: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: conversion to dos path (-allow-dos-paths)
+* refactor: scripts/tools/std/encode: minor refactor
+
 2025.11.30:
 * refactor: scripts/tools/ToolAdaptors/vbs/exec-cmdline*.vbs: scripts merge
 

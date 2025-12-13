@@ -660,7 +660,7 @@ Function RemoveWin32NamespacePathPrefix(PathAbs)
   '     * Volume: \\?\Volume{...
   '
   If Left(PathAbs, 4) = "\\?\" And Mid(PathAbs, 6, 1) = ":" Then
-    RemoveWin32NamespacePathPrefix = Mid(RemoveWin32NamespacePathPrefix, 5)
+    RemoveWin32NamespacePathPrefix = Mid(PathAbs, 5)
   Else
     RemoveWin32NamespacePathPrefix = PathAbs
   End If
