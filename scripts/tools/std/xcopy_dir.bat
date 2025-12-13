@@ -66,6 +66,12 @@ rem     copy.
 rem
 rem   -touch_file
 rem     Use `touch_file.bat` script to touch the output files before the copy.
+rem
+rem     CAUTION:
+rem       Implies file last date/time modification ignore, but does not imply
+rem       xcopy-flag `/Y`. You must use `/Y` additionally to overwrite an
+rem       existing output file, because `touch_file.bat` script implies a file
+rem       creation.
 
 rem -+:
 rem   Separator to begin flags scope to parse.
@@ -82,6 +88,10 @@ rem   To directory path.
 
 rem <xcopy-flags>:
 rem   Command line flags to pass into subsequent utilities.
+rem
+rem   Includes some generic `xcopy` utility flags like `/Y`, `/S`, `/E`, `/D`,
+rem   `/X` and etc, where `/Y` is not `robocopy` flag and `/X` has a different
+rem   meaning.
 :DOC_END
 
 echo;^>%~nx0 %*
@@ -295,6 +305,7 @@ goto USE_ROBOCOPY
 
 :USE_XCOPY
 set "XCOPY_FLAGS= "
+set XCOPY_Y_FLAG_PARSED=0
 for %%i in (%XCOPY_FLAGS_%) do (
   set XCOPY_FLAG=%%i
   call :ROBOCOPY_FLAGS_CONVERT %%XCOPY_FLAG%% || exit /b -250
@@ -385,18 +396,21 @@ if "%XCOPY_FLAG:~0,4%" == "/MOV" (
   echo;%?~%: error: /MOV and /MOVE parameters is not accepted to copy a directory.
   exit /b 1
 ) >&2
+if "%XCOPY_FLAG%" == "/Y" set XCOPY_Y_FLAG_PARSED=1
 if %XCOPY_FLAG_PARSED% EQU 0 set "XCOPY_FLAGS=%XCOPY_FLAGS% %XCOPY_FLAG%"
 exit /b 0
 
 :USE_ROBOCOPY
 call :GET_WINDOWS_VERSION
 
+set XCOPY_Y_FLAG_PARSED=0
+
 set "ROBOCOPY_FLAGS= "
-set "ROBOCOPY_ATTR_COPY=0"
-set "ROBOCOPY_COPY_FLAGS=DAT"
-set "ROBOCOPY_DCOPY_FLAGS=T"
+set ROBOCOPY_ATTR_COPY=0
+set ROBOCOPY_COPY_FLAGS=DAT
+set ROBOCOPY_DCOPY_FLAGS=T
 if %WINDOWS_MAJOR_VER% GTR 6 ( set "ROBOCOPY_DCOPY_FLAGS=DAT" ) else if %WINDOWS_MAJOR_VER% EQU 6 if %WINDOWS_MINOR_VER% GEQ 2 set "ROBOCOPY_DCOPY_FLAGS=DAT"
-set "XCOPY_Y_FLAG_PARSED=0"
+set XCOPY_Y_FLAG_PARSED=0
 for %%i in (%XCOPY_FLAGS_%) do (
   set XCOPY_FLAG=%%i
   call :XCOPY_FLAGS_CONVERT %%XCOPY_FLAG%% || exit /b -250
@@ -489,10 +503,7 @@ exit /b 0
 set "XCOPY_FLAG=%~1"
 if not defined XCOPY_FLAG exit /b 0
 set XCOPY_FLAG_PARSED=0
-if "%XCOPY_FLAG%" == "/Y" (
-  set XCOPY_Y_FLAG_PARSED=1
-  exit /b 0
-)
+if "%XCOPY_FLAG%" == "/Y" set "XCOPY_Y_FLAG_PARSED=1" & exit /b 0
 if "%XCOPY_FLAG%" == "/R" exit /b 0
 if "%XCOPY_FLAG%" == "/D" (
   if "%ROBOCOPY_FLAGS:/XO=%" == "%ROBOCOPY_FLAGS%" set ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /XO
@@ -508,7 +519,7 @@ rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/K" set "ROBOCOPY_FLAGS=
 if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/H" set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1"
 if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/K" set "XCOPY_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1"
 if "%XCOPY_FLAG%" == "/O" call :SET_ROBOCOPY_SO_FLAGS
-rem NOTE: in case of `robocopy` - use lowercase `/x`
+rem NOTE: in case of `robocopy` `/X` flag - use `ROBOCOPY_COPY_FLAGS` variable explicitly
 if "%XCOPY_FLAG%" == "/X" call :SET_ROBOCOPY_U_FLAG
 if %XCOPY_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% %XCOPY_FLAG%"
 exit /b 0

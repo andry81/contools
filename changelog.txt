@@ -1,4 +1,7 @@
 2025.12.13:
+* changed: scripts/tools/std/xcopy_*.bat: code improvement, use `/Y` as a common flag for `xcopy` and `robocopy`
+
+2025.12.13:
 * fixed: scripts/tools/std/touch_file.bat: correct selection between a builtin copy and another method
 * new: scripts/tools/std/is_str_shorter_than.bat: script to check on length shorter than
 * refactor: scripts/tools: std/copy.bat, encoding/prepend_bom_to_utf_file.bat: minor refactor
