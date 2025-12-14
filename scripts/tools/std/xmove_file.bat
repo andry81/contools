@@ -88,6 +88,14 @@ rem   To directory path.
 
 rem <xmove-flags>:
 rem   Command line flags to pass into subsequent commands and utilities.
+rem
+rem   Includes some generic `xcopy` utility flags like `/Y`, `/S`, `/E`, `/D`,
+rem   `/X`, `/H` and etc, where:
+rem     `/Y` is not `robocopy` flag, but is processed for both.
+rem     `/H` is not `robocopy` flag and must be replace by
+rem       `ROBOCOPY_BARE_FLAGS=/COPY:... /DCOPY:...` explicitly.
+rem     `/X` has a different meaning in `robocopy` and must be passed by
+rem       `ROBOCOPY_BARE_FLAGS=/X` explicitly.
 :DOC_END
 
 echo;^>%~nx0 %*
@@ -561,10 +569,10 @@ exit /b
 call :GET_WINDOWS_VERSION
 
 set XMOVE_DIR_RECUR=0
-set "ROBOCOPY_FLAGS= "
-set "ROBOCOPY_ATTR_COPY=0"
-set "ROBOCOPY_COPY_FLAGS=DAT"
-set "ROBOCOPY_DCOPY_FLAGS=T"
+set "ROBOCOPY_FLAGS=%ROBOCOPY_BARE_FLAGS% "
+set ROBOCOPY_ATTR_COPY=0
+set ROBOCOPY_COPY_FLAGS=DAT
+set ROBOCOPY_DCOPY_FLAGS=T
 if %WINDOWS_MAJOR_VER% GTR 6 ( set "ROBOCOPY_DCOPY_FLAGS=DAT" ) else if %WINDOWS_MAJOR_VER% EQU 6 if %WINDOWS_MINOR_VER% GEQ 2 set "ROBOCOPY_DCOPY_FLAGS=DAT"
 set "XMOVE_Y_FLAG_PARSED=0"
 for %%i in (%XMOVE_FLAGS_%) do (
@@ -640,7 +648,7 @@ rem if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/K" set "ROBOCOPY_FLAGS=
 if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/H" set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1"
 if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XMOVE_FLAG%" == "/K" set "XMOVE_FLAG_PARSED=1" & set "ROBOCOPY_ATTR_COPY=1"
 if "%XMOVE_FLAG%" == "/O" call :SET_ROBOCOPY_SO_FLAGS
-rem NOTE: in case of `robocopy` - use lowercase `/x`
+rem NOTE: in case of `robocopy` `/X` flag - use `ROBOCOPY_BARE_FLAGS` variable explicitly
 if "%XMOVE_FLAG%" == "/X" call :SET_ROBOCOPY_U_FLAG
 if %XMOVE_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% %XMOVE_FLAG%"
 exit /b 0

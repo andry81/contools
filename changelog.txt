@@ -1,3 +1,6 @@
+2025.12.14:
+* fixed: scripts/tools/std: xcopy_*.bat, xmove_*.bat: missed a method to explicitly pass `robocopy` flags (`ROBOCOPY_BARE_FLAGS` variable)
+
 2025.12.13:
 * changed: scripts/tools/std/xcopy_*.bat: code improvement, use `/Y` as a common flag for `xcopy` and `robocopy`
 
