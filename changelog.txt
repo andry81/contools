@@ -1,3 +1,7 @@
+2025.12.16:
+* fixed: scripts/tools/std/xmove_file.bat: source directory unexpected remove attempt on a source directory file move
+* refactor: scripts/tools/std/xmove_*.bat: minor refactor
+
 2025.12.14:
 * fixed: scripts/tools/std: xcopy_*.bat, xmove_*.bat: missed a method to explicitly pass `robocopy` flags (`ROBOCOPY_BARE_FLAGS` variable)
 

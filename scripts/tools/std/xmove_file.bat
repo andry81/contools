@@ -22,9 +22,18 @@ rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 
 rem CAUTION:
-rem   `move` has a file path limit up to 260 characters in a path. To
+rem   `move` has a file path limit up to 257 characters in a path. To
 rem   bypass that limitation we falls back to use `robocopy.exe` instead
 rem   (Windows Vista and higher ONLY) if the `move` fails.
+rem
+rem   CAUTION:
+rem     `move "<from>" "..."` fails to move 258+ characters long of <from>
+rem     absolute path and does print error message:
+rem
+rem       The system cannot accept the path
+rem       or file name requested.
+rem
+rem     To workaround use `is_str_shorter_than.bat 258 <abs-path>` script.
 rem
 rem   In case of default command line the `robocopy.exe` will move files with
 rem   all attributes and timestamps:
@@ -560,8 +569,8 @@ if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
 :EXEC_ROBOCOPY
-echo;^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
-"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOVE /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
+echo;^>^>"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOV /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
+"%SystemRoot%\System32\robocopy.exe" "%FROM_DIR_PATH_ABS%" "%TO_PATH_ABS%" "%FROM_FILE%" /R:0 /W:0 /NP /NJH /NS /NC /MOV /XX%ROBOCOPY_FLAGS:~1%%ROBOCOPY_EXCLUDES_CMD%%ROBOCOPY_FILE_BARE_FLAGS%
 if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
