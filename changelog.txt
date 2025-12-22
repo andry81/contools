@@ -1,3 +1,6 @@
+2025.12.22:
+* new: scripts/tests/bench/bat/test__group: bench tests to measure parentheses vs ampersand grouping in script performance
+
 2025.12.16:
 * fixed: scripts/tools/std/xmove_file.bat: source directory unexpected remove attempt on a source directory file move
 * refactor: scripts/tools/std/xmove_*.bat: minor refactor
