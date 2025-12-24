@@ -464,8 +464,9 @@ for /F "usebackq tokens=1,* delims=="eol^= %%i in ("%SCRIPT_TEMP_CURRENT_DIR%/sh
   call :UPDATE_SHORTCUT_TO_REPLACE
 )
 
-if %UPDATE_SHORTCUT% NEQ 0 ^
-"%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS%%UPDATE_SHORTCUT_PROP_FLAGS% -- "%LINK_FILE_PATH%"
+if %UPDATE_SHORTCUT% NEQ 0 (
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/update_shortcut.vbs"%UPDATE_SHORTCUT_BARE_FLAGS%%UPDATE_SHORTCUT_PROP_FLAGS% -- "%LINK_FILE_PATH%"
+)
 
 echo;
 

@@ -855,7 +855,7 @@ Do ' empty `Do-Loop` to emulate `Break`
     If Not AllowTargetPathReassign Then
       If LCase(ShortcutTargetPrev) = ShortcutTargetUnquotedAbsLCase Then
         PrintOrEchoErrorLine _
-          WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("TargetPath") & "` has no case equal path."
+          WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("TargetPath") & "` has case insensitive equal path."
         Exit Do
       End If
     End If
@@ -918,7 +918,7 @@ Do ' empty `Do-Loop` to emulate `Break`
       If Not AllowTargetPathReassign Then
         If ShortcutTargetLCase = LCase(ShortcutTargetShortPath) Then
           PrintOrEchoErrorLine _
-            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("TargetPath") & "` has no case equal path."
+            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("TargetPath") & "` has case insensitive equal path."
           Exit Do
         End If
       End If
@@ -997,7 +997,7 @@ Do ' empty `Do-Loop` to emulate `Break`
   If Not AllowWorkingDirectoryReassign Then
     If LCase(ShortcutWorkingDirectoryPrev) = ShortcutWorkingDirectoryAbsLCase Then
       PrintOrEchoErrorLine _
-        WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("WorkingDirectory") & "` has no case equal path."
+        WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("WorkingDirectory") & "` has case insensitive equal path."
       Exit Do
     End If
   End If
@@ -1034,7 +1034,7 @@ Do ' empty `Do-Loop` to emulate `Break`
       If Not AllowWorkingDirectoryReassign Then
         If ShortcutWorkingDirectoryLCase = LCase(ShortcutWorkingDirectoryShortPath) Then
           PrintOrEchoErrorLine _
-            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("WorkingDirectory") & "` has no case equal DOS path."
+            WScript.ScriptName & ": warning: property `" & GetShortcutPropertyNameToPrint("WorkingDirectory") & "` has case insensitive equal DOS path."
           Exit Do
         End If
       End If

@@ -1,3 +1,7 @@
+2025.12.24:
+* fixed: scripts/tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: invalid line end escape (https://github.com/andry81/contools/discussions/13#discussioncomment-15335504)
+* changed: scripts/tools/ToolAdaptors/vbs/update_shortcut.vbs: minor improvement
+
 2025.12.22:
 * new: scripts/tests/bench/bat/test__group: bench tests to measure parentheses vs ampersand grouping in script performance
 
