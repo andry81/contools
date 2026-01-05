@@ -34,7 +34,11 @@ rem   See details:
 rem     https://superuser.com/questions/1114377/does-robocopy-skip-copying-existing-files-by-default/1114381#1114381
 rem     https://superuser.com/questions/1114377/does-robocopy-skip-copying-existing-files-by-default/1347329#1347329
 rem   To avoid that you have to use `-touch_file` and/or `-touch_dir` flags to
-rem   touch the output before the copy.
+rem   touch the output before the copy and so to trigger the overwrite.
+
+rem NOTE:
+rem   `robocopy.exe` does beep for a bell character in a path on a print,
+rem   while `xcopy.exe` does not.
 
 rem <flags>:
 rem   -chcp <CodePage>
@@ -342,10 +346,7 @@ goto USE_ROBOCOPY
 set "XCOPY_FLAGS= "
 set XCOPY_Y_FLAG_PARSED=0
 set XCOPY_DIR_RECUR=0
-for %%i in (%XCOPY_FLAGS_%) do (
-  set XCOPY_FLAG=%%i
-  call :ROBOCOPY_FLAGS_CONVERT %%XCOPY_FLAG%% || exit /b -250
-)
+for %%i in (%XCOPY_FLAGS_%) do set "XCOPY_FLAG=%%i" & call :ROBOCOPY_FLAGS_CONVERT %%XCOPY_FLAG%% || exit /b -250
 
 set "XCOPY_EXCLUDES_CMD="
 set "XCOPY_EXCLUDES_LIST_TMP="
@@ -448,8 +449,11 @@ if %XCOPY_FLAG_PARSED% EQU 0 set "XCOPY_FLAGS=%XCOPY_FLAGS% %XCOPY_FLAG%"
 exit /b 0
 
 :USE_ROBOCOPY
+if defined WINDOWS_MAJOR_VER if defined WINDOWS_MINOR_VER goto SKIP_GET_WINDOWS_VERSION
+
 call :GET_WINDOWS_VERSION
 
+:SKIP_GET_WINDOWS_VERSION
 set XCOPY_Y_FLAG_PARSED=0
 set XCOPY_DIR_RECUR=0
 
@@ -459,10 +463,7 @@ set ROBOCOPY_COPY_FLAGS=DAT
 set ROBOCOPY_DCOPY_FLAGS=T
 if %WINDOWS_MAJOR_VER% GTR 6 ( set "ROBOCOPY_DCOPY_FLAGS=DAT" ) else if %WINDOWS_MAJOR_VER% EQU 6 if %WINDOWS_MINOR_VER% GEQ 2 set "ROBOCOPY_DCOPY_FLAGS=DAT"
 set XCOPY_Y_FLAG_PARSED=0
-for %%i in (%XCOPY_FLAGS_%) do (
-  set XCOPY_FLAG=%%i
-  call :XCOPY_FLAGS_CONVERT %%XCOPY_FLAG%% || exit /b -250
-)
+for %%i in (%XCOPY_FLAGS_%) do set "XCOPY_FLAG=%%i" & call :XCOPY_FLAGS_CONVERT %%XCOPY_FLAG%% || exit /b -250
 
 set "ROBOCOPY_EXCLUDES_CMD="
 

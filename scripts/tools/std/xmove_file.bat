@@ -10,6 +10,7 @@ rem   before call to move a file or file pattern in a directory to another
 rem   directory.
 rem
 rem   Does support long paths.
+rem   Does NOT support file move with rename.
 rem
 rem   NOTE:
 rem     All input paths must be without `\\?\` prefix because:
@@ -46,7 +47,11 @@ rem   See details:
 rem     https://superuser.com/questions/1114377/does-robocopy-skip-copying-existing-files-by-default/1114381#1114381
 rem     https://superuser.com/questions/1114377/does-robocopy-skip-copying-existing-files-by-default/1347329#1347329
 rem   To avoid that you have to use `-touch_file` and/or `-touch_dir` flags to
-rem   touch the output before the move.
+rem   touch the output before the movement and so to trigger the overwrite.
+
+rem NOTE:
+rem   `robocopy.exe` does beep for a bell character in a path on a print,
+rem   while `xcopy.exe` does not.
 
 rem <flags>:
 rem   -chcp <CodePage>
@@ -361,10 +366,7 @@ if %FLAG_USE_ROBOCOPY% NEQ 0 goto USE_ROBOCOPY
 set "XMOVE_FLAGS= "
 set XMOVE_Y_FLAG_PARSED=0
 set XMOVE_DIR_RECUR=0
-for %%i in (%XMOVE_FLAGS_%) do (
-  set XMOVE_FLAG=%%i
-  call :ROBOCOPY_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
-)
+for %%i in (%XMOVE_FLAGS_%) do set "XMOVE_FLAG=%%i" & call :ROBOCOPY_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
 
 if %FLAG_USE_BUILTIN_MOVE% EQU 0 call :PARSE_ROBOCOPY_FLAGS
 
@@ -443,19 +445,13 @@ exit /b
 set "XMOVE_FLAG=%~1"
 if not defined XMOVE_FLAG exit /b 0
 set XMOVE_FLAG_PARSED=0
-if "%XMOVE_FLAG%" == "/Y" (
-  set XMOVE_Y_FLAG_PARSED=1
-  exit /b 0
-)
+if "%XMOVE_FLAG%" == "/Y" set "XMOVE_Y_FLAG_PARSED=1" & exit /b 0
 if "%XMOVE_FLAG%" == "/S" (
   echo;%?~%: error: /S flag is not applicable.
   exit /b 1
 ) >&2
 rem CAUTION: /E must be used in case of file globbing including directories
-if "%XMOVE_FLAG%" == "/E" (
-  set XMOVE_DIR_RECUR=1
-  exit /b 0
-)
+if "%XMOVE_FLAG%" == "/E" set "XMOVE_DIR_RECUR=1" & exit /b 0
 if "%XMOVE_FLAG:~0,4%" == "/MOV" (
   echo;%?~%: error: /MOV and /MOVE parameters is not accepted to move a file.
   exit /b 1
@@ -542,10 +538,7 @@ rem
 set ?.=@dir "%FROM_FILE_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N 2^>nul
 
 if %XMOVE_DIR_RECUR% EQU 0 (
-  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
-    set "FROM_FILE=%%~nxi"
-    call :EXEC_ROBOCOPY_NO_DIR_REMOVE || goto BREAK
-  )
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "FROM_FILE=%%~nxi" & call :EXEC_ROBOCOPY_NO_DIR_REMOVE || goto BREAK
 ) else for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "FROM_FILE=%%~nxi"
   if exist "\\?\%FROM_DIR_PATH_ABS%\%%~nxi\*" (
@@ -575,8 +568,11 @@ if %ERRORLEVEL% LSS 8 exit /b 0
 exit /b
 
 :PARSE_ROBOCOPY_FLAGS
+if defined WINDOWS_MAJOR_VER if defined WINDOWS_MINOR_VER goto SKIP_GET_WINDOWS_VERSION
+
 call :GET_WINDOWS_VERSION
 
+:SKIP_GET_WINDOWS_VERSION
 set XMOVE_DIR_RECUR=0
 set "ROBOCOPY_FLAGS=%ROBOCOPY_BARE_FLAGS% "
 set ROBOCOPY_ATTR_COPY=0
@@ -584,10 +580,7 @@ set ROBOCOPY_COPY_FLAGS=DAT
 set ROBOCOPY_DCOPY_FLAGS=T
 if %WINDOWS_MAJOR_VER% GTR 6 ( set "ROBOCOPY_DCOPY_FLAGS=DAT" ) else if %WINDOWS_MAJOR_VER% EQU 6 if %WINDOWS_MINOR_VER% GEQ 2 set "ROBOCOPY_DCOPY_FLAGS=DAT"
 set "XMOVE_Y_FLAG_PARSED=0"
-for %%i in (%XMOVE_FLAGS_%) do (
-  set XMOVE_FLAG=%%i
-  call :XMOVE_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
-)
+for %%i in (%XMOVE_FLAGS_%) do set "XMOVE_FLAG=%%i" & call :XMOVE_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
 
 set "ROBOCOPY_EXCLUDES_CMD="
 
@@ -631,17 +624,9 @@ set "XMOVE_FLAG=%~1"
 if not defined XMOVE_FLAG exit /b 0
 set XMOVE_FLAG_PARSED=0
 rem CAUTION: /S or /E must be used in case of file globbing including directories
-if "%XMOVE_FLAG%" == "/S" (
-  set XMOVE_DIR_RECUR=1
-  exit /b 0
-) else if "%XMOVE_FLAG%" == "/E" (
-  set XMOVE_DIR_RECUR=1
-  exit /b 0
-)
-if "%XMOVE_FLAG%" == "/Y" (
-  set XMOVE_Y_FLAG_PARSED=1
-  exit /b 0
-)
+if "%XMOVE_FLAG%" == "/S" set "XMOVE_DIR_RECUR=1" & exit /b 0
+if "%XMOVE_FLAG%" == "/E" set "XMOVE_DIR_RECUR=1" & exit /b 0
+if "%XMOVE_FLAG%" == "/Y" set "XMOVE_Y_FLAG_PARSED=1" & exit /b 0
 if "%XMOVE_FLAG%" == "/R" exit /b 0
 if "%XMOVE_FLAG%" == "/D" (
   if "%ROBOCOPY_FLAGS:/XO=%" == "%ROBOCOPY_FLAGS%" set ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /XO

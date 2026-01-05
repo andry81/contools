@@ -1,3 +1,8 @@
+2026.01.05:
+* changed: scripts/tools/std: xcopy_*.bat, xmove_*.bat: skip windows version check if respective variables already exists
+* changed: scripts/tools/std: xcopy_*.bat, xmove_*.bat: minor improvement
+* refactor: scripts/tools/std: xcopy_*.bat, xmove_*.bat: minor refactor
+
 2025.12.24:
 * fixed: scripts/tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: invalid line end escape (https://github.com/andry81/contools/discussions/13#discussioncomment-15335504)
 * changed: scripts/tools/ToolAdaptors/vbs/update_shortcut.vbs: minor improvement

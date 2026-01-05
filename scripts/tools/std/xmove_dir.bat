@@ -8,6 +8,9 @@ rem   The `move`/`robocopy.exe` seamless wrapper script with xcopy
 rem   compatible command line flags/excludes, echo and some conditions check
 rem   before call to move a directory to a directory.
 rem
+rem   Moves either <from-path> directory into <to-path> parent directory or
+rem   all content of <from-path> directory into <to-path> directory.
+rem
 rem   Does support long paths.
 rem
 rem   NOTE:
@@ -35,13 +38,14 @@ rem
 rem     To workaround use `is_str_shorter_than.bat 258 <abs-path>` script.
 rem
 rem   In case of default command line the `robocopy.exe` will move files with
-rem   all attributes, but not timestamps:
+rem   all attributes, BUT NOT timestamps:
 rem     Windows Vista+: `/COPY:DAT /DCOPY:T /MOVE` (`/DCOPY` is limited)
 rem     Windows 8+:     `/COPY:DAT /DCOPY:DAT /MOVE`
 rem
 rem   This happens because `robocopy.exe` can not move not empty directories
-rem   without a directory modification timestamp change when it does shallow
-rem   copy source directories hierarchy and then does copy files into it.
+rem   without a directory modification timestamp change, because it does a
+rem   shallow copy of source directories hierarchy and then copies files into
+rem   it.
 rem
 rem   But we need to preserve timestamps and move all directories without
 rem   any timestamp modification. So we use `move` command by default and if it
@@ -53,7 +57,11 @@ rem   See details:
 rem     https://superuser.com/questions/1114377/does-robocopy-skip-copying-existing-files-by-default/1114381#1114381
 rem     https://superuser.com/questions/1114377/does-robocopy-skip-copying-existing-files-by-default/1347329#1347329
 rem   To avoid that you have to use `-touch_file` and/or `-touch_dir` flags to
-rem   touch the output before the move.
+rem   touch the output before the movement and so to trigger the overwrite.
+
+rem NOTE:
+rem   `robocopy.exe` does beep for a bell character in a path on a print,
+rem   while `xcopy.exe` does not.
 
 rem <flags>:
 rem   -chcp <CodePage>
@@ -323,10 +331,7 @@ if %FLAG_IGNORE_EXISTED% NEQ 0 if %TO_PATH_AS_DIR_EXISTS% NEQ 0 goto USE_ROBOCOP
 :USE_BUILTIN_MOVE
 set "XMOVE_FLAGS= "
 set XMOVE_Y_FLAG_PARSED=0
-for %%i in (%XMOVE_FLAGS_%) do (
-  set XMOVE_FLAG=%%i
-  call :ROBOCOPY_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
-)
+for %%i in (%XMOVE_FLAGS_%) do set "XMOVE_FLAG=%%i" & call :ROBOCOPY_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
 
 if %FLAG_TOUCH_DIR%%FLAG_TOUCH_FILE% EQU 0 goto SKIP_TOUCH
 
@@ -399,18 +404,18 @@ if %XMOVE_FLAG_PARSED% EQU 0 set "XMOVE_FLAGS=%XMOVE_FLAGS% %XMOVE_FLAG%"
 exit /b 0
 
 :USE_ROBOCOPY
+if defined WINDOWS_MAJOR_VER if defined WINDOWS_MINOR_VER goto SKIP_GET_WINDOWS_VERSION
+
 call :GET_WINDOWS_VERSION
 
+:SKIP_GET_WINDOWS_VERSION
 set "ROBOCOPY_FLAGS=%ROBOCOPY_BARE_FLAGS% "
 set ROBOCOPY_ATTR_COPY=0s
 set ROBOCOPY_COPY_FLAGS=DAT
 set ROBOCOPY_DCOPY_FLAGS=T
 if %WINDOWS_MAJOR_VER% GTR 6 ( set "ROBOCOPY_DCOPY_FLAGS=DAT" ) else if %WINDOWS_MAJOR_VER% EQU 6 if %WINDOWS_MINOR_VER% GEQ 2 set "ROBOCOPY_DCOPY_FLAGS=DAT"
 set "XMOVE_Y_FLAG_PARSED=0"
-for %%i in (%XMOVE_FLAGS_%) do (
-  set XMOVE_FLAG=%%i
-  call :XMOVE_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
-)
+for %%i in (%XMOVE_FLAGS_%) do set "XMOVE_FLAG=%%i" & call :XMOVE_FLAGS_CONVERT %%XMOVE_FLAG%% || exit /b -250
 
 set "ROBOCOPY_EXCLUDES_CMD="
 
@@ -499,10 +504,7 @@ exit /b 0
 set "XMOVE_FLAG=%~1"
 if not defined XMOVE_FLAG exit /b 0
 set XMOVE_FLAG_PARSED=0
-if "%XMOVE_FLAG%" == "/Y" (
-  set XMOVE_Y_FLAG_PARSED=1
-  exit /b 0
-)
+if "%XMOVE_FLAG%" == "/Y" set "XMOVE_Y_FLAG_PARSED=1" & exit /b 0
 if "%XMOVE_FLAG%" == "/R" exit /b 0
 if "%XMOVE_FLAG%" == "/D" (
   if "%ROBOCOPY_FLAGS:/XO=%" == "%ROBOCOPY_FLAGS%" set ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% /XO
