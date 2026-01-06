@@ -13,3 +13,10 @@ scripts/tools/ToolAdapters/vbs/reset_shortcut.vbs
   exist, then the short path version is requested. This would not work if the
   path after assignment is truncated or corrupted to a path that accidentally
   exist.
+
+-------------------------------------------------------------------------------
+scripts/tools/std: xcopy_*.bat, xmove_*.bat
+-------------------------------------------------------------------------------
+
+* Implement fall back to short paths in case of `robocopy.exe` absence or
+  direct use of `-use_xcopy` or `-use_builtin_move` flags.
