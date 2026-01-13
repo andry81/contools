@@ -115,6 +115,15 @@ rem create search list, append "/" to end of each xpath for exact/subdir match
 "%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -n -b -e "/^#/ !{ /[^\/\r]\[@/ { s/\([^\/\r]\)\[@/\1\/[@/; }; /\/\[@/ !{ /[^[:space:]\r]/ { /\/\(\r\?\)$/ !{ s/\(\r\?\)$/\/\1/; } } } }" ^
   -f "%CONTOOLS_XML_TOOLS_ROOT%/sed/convert_xpath_search_list_to_flat_findstr_search_list.sed" "%XPATH_LIST_FILE_IN%" > "%XPATH_LIST_FILE_IN_TEMP_FILE%" || exit /b
 
+rem CAUTION:
+rem   See https://stackoverflow.com/questions/8844868/what-are-the-undocumented-features-and-limitations-of-the-windows-findstr-comman
+rem   for details about `findstr.exe` bizarre escape logic around `/G` together with `/R` parameter.
+rem
+rem   TODO TO FIX:
+rem     1. Added `/I` flag to workaround a case, where a specific line of the list file under `/G` option does not match properly.
+rem     2. File under `/G` option has to be escaped for `\` and `.` characters. This avoids another search lines invalid match around `/V` parameter.
+rem        This is due to a guess logic around the file content under `/G` option, which content can be treated as regex only strings if a regex character is found in the first line of the file!
+
 rem apply filter list to search list and remove flat list prefixes, convert empty lines to special comments to save them in output, remove "/" from end of each xpath
 "%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -b -e "/[^\r]/ !{ s/^\(\r\?\)$/# :EOL\1/ }" "%XPATH_LIST_FILE_IN_TEMP_FILE%" ^
   | "%SystemRoot%\System32\findstr.exe" /R /B /G:"%XPATH_LIST_FILE_FILTER_TEMP_FILE%" /C:"#" ^

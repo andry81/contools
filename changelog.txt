@@ -1,3 +1,10 @@
+2026.01.13:
+* fixed: scripts/tools/ToolAdaptors/app/emule/print_corrupted_pending_files_from_log.bat: execution fixup
+* new: scripts/tools/ToolAdaptors/app/emule/print_orphan_pending_files.bat: script to print orphan part files not in the current download list
+* changed: scripts/tools/ToolAdaptors/app/emule/print_corrupted_pending_files_from_log.bat: removed file deletion to avoid accidental delete
+* refactor: scripts/tools/ToolAdaptors/app/emule/print_corrupted_pending_files_from_log.bat: script rename
+* refactor: scripts/tools/xml/filter_xpath_list_by_xpath_list.bat: minor refactor
+
 2026.01.06:
 * changed: TODO.txt: todo update
 
