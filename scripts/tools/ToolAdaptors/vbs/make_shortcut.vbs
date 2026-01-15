@@ -36,7 +36,7 @@
 '''     By default <ShortcutTarget> and <ShortcutWorkingDirectory> does used as
 '''     a file path. Use this flag to handle it as an object string and avoid
 '''     path functions call on it.
-'''     Can not be used together with  `-q` flag.
+'''     Can not be used together with `-q` flag.
 '''
 '''   -ignore-unexist
 '''     By default <ShortcutTarget> and <ShortcutWorkingDirectory> does check

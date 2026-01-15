@@ -113,7 +113,7 @@
 '''     By default <ShortcutTarget> does used as a file path. Use this flag to
 '''     handle it as an object string and reduce (but not avoid) path functions
 '''     call on it.
-'''     Can not be used together with  `-q` flag.
+'''     Can not be used together with `-q` flag.
 '''
 '''   -ignore-unexist
 '''     By default TargetPath and WorkingDirectory does check on existence

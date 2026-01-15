@@ -21,7 +21,7 @@ rem   the input configuration file in case if these lines are not equal.
 rem
 rem   If the first line of the `<InputDir>/<ConfigFileName>.in` does not begin
 rem   by the `#%% version:`, then the first line of the
-rem   `<OutputDir>/<ConfigFileName>` does ignore.
+rem   `<OutputDir>/<ConfigFileName>` does not check.
 
 rem <flags>:
 rem   -s

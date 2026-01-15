@@ -25,6 +25,10 @@ rem   Additionally the `#%% version: ...` line is searched in both files and
 rem   compared to force the user to manually update the output configuration
 rem   file from the input configuration file in case if are not equal.
 rem
+rem   If the first line of the `<InputDir>/<ConfigFileName>.in` does not begin
+rem   by the `#%% version:`, then the first line of the
+rem   `<OutputDir>/<ConfigFileName>` does not check.
+rem
 rem   By default the script does load the input configuration from the
 rem   `<ConfigFileName>` file.
 rem

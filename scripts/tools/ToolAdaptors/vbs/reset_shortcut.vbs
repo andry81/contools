@@ -46,7 +46,7 @@
 '''     By default the target path does used as a file path. Use this flag to
 '''     handle it as an object string and reduce (but not avoid) path functions
 '''     call on it.
-'''     Can not be used together with  `-q` flag.
+'''     Can not be used together with `-q` flag.
 '''     Has no effect in case of `-reset-*` or `-allow-auto-recover` flags.
 '''
 '''   -ignore-unexist

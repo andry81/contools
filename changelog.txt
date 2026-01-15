@@ -1,3 +1,6 @@
+2026.01.15:
+* refactor: scripts/tools/build/*_config*.bat, scripts/tools/ToolAdaptors/vbs/*_shortcut.vbs: minor refactor
+
 2026.01.13:
 * fixed: scripts/tools/ToolAdaptors/app/emule/print_corrupted_pending_files_from_log.bat: execution fixup
 * new: scripts/tools/ToolAdaptors/app/emule/print_orphan_pending_files.bat: script to print orphan part files not in the current download list

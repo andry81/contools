@@ -15,7 +15,7 @@ rem   to force the user to manually update the output configuration file from
 rem   the input configuration file in case if these lines are not equal.
 rem
 rem   If the first line of the `<InputFile>` does not begin by the
-rem   `#%% version:`, then the first line of the `<OutputFile>` does ignore.
+rem   `#%% version:`, then the first line of the `<OutputFile>` does not check.
 
 rem <flags>:
 rem   -optional_compare
