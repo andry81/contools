@@ -1,3 +1,6 @@
+2026.01.17:
+* new: .externals: `ugrep` - `grep` alternative implementation with Unicode support to workaround `findstr.exe` Unicode limitation
+
 2026.01.15:
 * refactor: scripts/tools/build/*_config*.bat, scripts/tools/ToolAdaptors/vbs/*_shortcut.vbs: minor refactor
 
