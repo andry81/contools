@@ -13,7 +13,7 @@ rem   set.
 
 setlocal
 
-call "%%~dp0__init__.bat" || exit /b
+call "%%~dp0__init__\__init__.bat" || exit /b
 
 set "?~dp0=%~dp0"
 

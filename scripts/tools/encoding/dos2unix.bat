@@ -15,13 +15,13 @@ rem   stdout.
 rem
 rem -fix-tail-lr
 rem   Fix the last line return.
-rem   Uses multiple calls to `sed` to query the file and slow downs the
+rem   Uses multiple calls to `sed` to query the file and so slow downs the
 rem   execution.
 :DOC_END
 
 setlocal
 
-call "%%~dp0__init__.bat" || exit /b
+call "%%~dp0__init__\__init__.bat" || exit /b
 
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
