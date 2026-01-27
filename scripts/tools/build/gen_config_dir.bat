@@ -5,16 +5,20 @@ rem   gen_config_dir.bat [-+] [<flags>] [--] <InputDir> <OutputDir> <ConfigFiles
 
 rem Description:
 rem   Script to generate a list of configuration files in the output directory
-rem   using the input directory and the `gen_Config.bat` script.
+rem   using the input directory and the `gen_config.bat` script.
 rem
-rem   Script ignores these set of files:
-rem     * config.system.vars.in
-rem     * config.0.vars.in
-rem     * ...
-rem     * config.N.vars.in
+rem   NOTE:
+rem     Script is designed to generate any text files by replacing text place
+rem     holders in them using file globbing pattern as input file filter.
+rem     It is NOT designed to generate from these configuration files:
 rem
-rem   To specifically generate these files you must use `load_config*.bat`
-rem   scripts instead.
+rem       * config.system.vars.in
+rem       * config.0.vars.in
+rem       * ...
+rem       * config.N.vars.in
+rem
+rem     To specifically generate from or load using these files you must use
+rem     `load_config*.bat` scripts instead.
 rem
 rem   NOTE:
 rem     All the rest description is in the `gen_config.bat` script.
