@@ -1,4 +1,8 @@
 2026.01.27:
+* fixed: scripts/tools/hash/__init__/__init__.bat: recursion
+* refactor: scripts/tools/unix/ugrep/ugrep.bat: cleanup
+
+2026.01.27:
 * changed: scripts/tools/build/load_cmdline.bat: code refactor, added `-notrim` to not trim arguments from the left as by default
 * refactor: scripts/tools/build/gen_config_dir.bat: minor refactor
 
