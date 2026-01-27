@@ -12,11 +12,12 @@ if %~1 <nul ( exit /b 0 ) else shift
 if "%~1" == "" exit /b 255
 goto LOOP
 
-rem USAGE: if_or.bat <if-expr0> [...<if-exprN>]
+rem USAGE:
+rem   if_or.bat <if-expr>...
 
 rem Description:
-rem   The `if` script with multiple fixed length expressions in a command line
-rem   using an expression per argument chained by the `OR` operator.
+rem   The `if` script with multiple fixed length expressions in the command
+rem   line using an expression per argument chained by the `OR` operator.
 rem   The script can be chained by the `&&` and `||` operators.
 
 rem <if-expr>:

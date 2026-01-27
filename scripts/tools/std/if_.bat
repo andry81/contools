@@ -2,10 +2,11 @@
 if %* <nul ( exit /b 0 )
 exit /b 255
 
-rem USAGE: if_.bat <if-expr>...
+rem USAGE:
+rem   if_.bat <if-expr>...
 
 rem Description:
-rem   The `if` script with a single expression in a command line.
+rem   The `if` script with multiple expressions in the command line.
 rem   The script can be chained by the `&&` and `||` operators.
 
 rem <if-expr>:

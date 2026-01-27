@@ -1,7 +1,8 @@
 @if "%~1" == "" exit /b %ERRORLEVEL%
 @exit /b %~1
 
-rem USAGE: errlvl.bat [<exit-code>]
+rem USAGE:
+rem   errlvl.bat [<exit-code>]
 
 rem Description:
 rem   Script returns error level passed as first argument. If first argument is

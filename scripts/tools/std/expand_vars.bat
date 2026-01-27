@@ -1,10 +1,10 @@
 @echo off & ( for %%i in (%*) do setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%j in ('"!%%i!"') do endlocal & call set "%%i=%%~j" ) & exit /b %ERRORLEVEL%
 
 rem USAGE:
-rem   expand_vars.bat <var0> ... <varN>
+rem   expand_vars.bat <var>...
 
 rem Description:
-rem   Expand variables from the command line.
+rem   Expand variables script with a variable list in the command line.
 rem   Does not change the error level.
 
 rem CAUTION:

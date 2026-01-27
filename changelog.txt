@@ -1,3 +1,7 @@
+2026.01.27:
+* changed: scripts/tools/std: code improvement
+* refactor: scripts/tools/std: code refactor
+
 2026.01.19:
 * new: scripts/tools/encoding/prepend_bom_to_utf_file.bat: flag parse global code improvement, added `-+`/`--` flags to begin/end flags scope
 * changed: scripts/tools/encoding: refactor for common `__init__` format in a subdirectory

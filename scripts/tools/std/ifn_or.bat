@@ -61,15 +61,16 @@ if %~2 %3 %~4 %5 <nul ( exit /b 0 ) else shift & shift & shift & shift & shift
 if %~2 %~3 %4 %~5 %6 <nul ( exit /b 0 ) else shift & shift & shift & shift & shift & shift
 ( if "%~1" == "" exit /b 255 ) & goto IF%~1 || exit /b -1
 
-rem USAGE: ifn_or.bat <if-expt0-len> <if-expr0> [...<if-exptN-len> <if-exprN>]
+rem USAGE:
+rem   ifn_or.bat <if-expr0-len> <if-expr0>... [<if-exprN-len> <if-exprN>...]...
 
 rem Description:
-rem   The `if` script with multiple variable length expressions in a command
+rem   The `if` script with multiple variable length expressions in the command
 rem   line using an expression per multiple arguments chained by the `OR`
 rem   operator.
 rem   The script can be chained by the `&&` and `||` operators.
 
-rem <if-expt-len>:
+rem <if-expr-len>:
 rem   Length of the following expression as number of a command line arguments.
 rem
 rem <if-expr>:

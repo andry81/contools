@@ -1,5 +1,4 @@
-@echo off
-if "%~1" == "" (call)
+@echo off & if "%~1" == "" (call)
 if not "%~1" == "" goto SKIP_IF
 (
   if 0
@@ -19,17 +18,13 @@ rem USAGE:
 rem   assert_if_def.bat <var> <message>
 
 rem Description:
-rem   Tests `<var>` and if is not empty and defined, then stops an outer script
-rem   execution with the error message:
+rem   Stops an outer script execution with the error message:
 rem     `"assert_if_def.bat: <var>: <message>" was unexpected at this time.`
-rem   If `<var>` is empty, then stops an outer script execution
-rem   with the error message:
-rem     `The syntax of the command is incorrect.`
 rem   If `<var>` is empty or defined, then returns not zero error level.
 
 rem Examples:
 rem   1. >assert_if_def.bat
-rem      The syntax of the command is incorrect.
+rem      "assert_if_def.bat: " was unexpected at this time.
 rem
 rem   2. >assert_if_def.bat a b c
 rem      >set "a="
