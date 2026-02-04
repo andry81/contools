@@ -1,3 +1,6 @@
+2026.02.04:
+* changed: *.sh: switched to portable version of shebang line
+
 2026.01.27:
 * fixed: scripts/tools/hash/__init__/__init__.bat: recursion
 * refactor: scripts/tools/unix/ugrep/ugrep.bat: cleanup
