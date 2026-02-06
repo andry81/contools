@@ -7,6 +7,13 @@ rem Description:
 rem   Converts mixed line endings text file into Windows text format.
 rem   Msys2 tries to be used at first if `CONTOOLS_MSYS2_USR_ROOT` is defined,
 rem   otherwise falls back to GnuWin32 if `CONTOOLS_GNUWIN32_ROOT` is defined.
+rem
+rem   Example:
+rem     CR CRLF LF CR -> CRLF CRLF CRLF CRLF
+
+rem NOTE:
+rem   See details:
+rem   https://superuser.com/questions/71507/convert-unix-line-endings-to-windows/1915710#1915710
 
 rem -i
 rem   Use in place conversion instead of read <file> and print result into
