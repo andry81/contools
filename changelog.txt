@@ -1,4 +1,7 @@
 2026.02.06:
+* refactor: *.bat: minor refactor
+
+2026.02.06:
 * fixed: scripts/tools/encoding/unix2dos.bat: accident line returns change
 * refactor: scripts/tools/encoding: dos2unix.bat, unix2dos.bat: minor refactor
 

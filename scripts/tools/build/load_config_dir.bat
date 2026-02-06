@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   load_config_dir.bat [-+] [<Flags>] [--] <InputDir> <OutputDir> [<Param0> [<Param1>]]
+rem   load_config_dir.bat [-+] [<flags>] [--] <InputDir> <OutputDir> [<Param0> [<Param1>]]
 
 rem Description:
 rem   Script to load input and output directory with configuration files using
@@ -22,7 +22,7 @@ rem
 rem   NOTE:
 rem     All the rest description is in the `load_config.bat` script.
 
-rem <Flags>:
+rem <flags>:
 rem   -gen_system_config
 rem     Generates the system configuration file.
 rem     Implies `-load_system_output_config` flag.

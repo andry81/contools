@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   load_cmdline.bat [-+] [<Flags>] [--] <outvar> <cmdline-file>
+rem   load_cmdline.bat [-+] [<flags>] [--] <outvar> <cmdline-file>
 
 rem Description:
 rem   Script to load a command line from a text file into a variable.
@@ -10,7 +10,7 @@ rem   To insert `#` as the line first raw character use the space character.
 rem   All spaces in each line in a text file by default does trim from the
 rem   left.
 
-rem <Flags>:
+rem <flags>:
 rem   -notrim
 rem     Disables command line arguments trim.
 

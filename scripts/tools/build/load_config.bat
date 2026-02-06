@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   load_config.bat [-+] [<Flags>] [--] <InputDir> <OutputDir> <ConfigFileName> [<Param0> [<Param1>]]
+rem   load_config.bat [-+] [<flags>] [--] <InputDir> <OutputDir> <ConfigFileName> [<Param0> [<Param1>]]
 
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
@@ -35,7 +35,7 @@ rem
 rem   If `-gen_config` or `-load_output_config` flag is used, then the
 rem   input configuration file name is used as `<ConfigFileName>.in`.
 
-rem <Flags>:
+rem <flags>:
 rem   -gen_config
 rem     Generates the output configuration file from the input configuration
 rem     file if the output configuration file does not exist, otherwise skips
