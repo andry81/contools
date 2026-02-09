@@ -1,4 +1,4 @@
-@echo off & type nul > "%~1" & if not exist "%~2" goto SKIP_USER_VARS
+@echo off & call;> "%~1" & if not exist "%~2" goto SKIP_USER_VARS
 
 (
   for /F "usebackq tokens=1,* delims=="eol^= %%i in ("%~2") do (

@@ -86,9 +86,9 @@ set "DIR_PATH_TEMP_FILE_NAME=.%?~n0%.%RANDOM%-%RANDOM%.tmp"
 set "DIR_PATH_TEMP_FILE=%DIR_PATH%\%DIR_PATH_TEMP_FILE_NAME%"
 
 rem CAUTION:
-rem   If the file were deleted before, then the creation date will be set by `type nul >> ...` from the previously deleted file!
+rem   If the file were deleted before, then the creation date will be set by `... >> ...` from the previously deleted file!
 
-type nul > "\\?\%DIR_PATH_TEMP_FILE%"
+call;> "\\?\%DIR_PATH_TEMP_FILE%"
 
 call "%%?~dp0%%xremove_file.bat" "%%DIR_PATH_TEMP_FILE%%"
 

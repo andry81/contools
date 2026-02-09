@@ -187,6 +187,6 @@ rem echo;"%FILES_PATH_PREFIX%%INSTDIR_SUBDIR_SUFFIX%/%ARCHIVE_LIST_FILE_PATH:\=/
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%TEMP_FILE_DIR%%" >nul || exit /b 1
 
 rem create empty file
-if defined TEMP_FILE_PATH type nul > "%TEMP_FILE_PATH%"
+if defined TEMP_FILE_PATH call;> "%TEMP_FILE_PATH%"
 
 exit /b

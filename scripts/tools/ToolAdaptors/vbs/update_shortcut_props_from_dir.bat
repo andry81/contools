@@ -396,7 +396,7 @@ if %FLAG_MATCH_STRING% NEQ 0 (
   if "%CURRENT_CP%" == "65001" (
     type "%CONTOOLS_ROOT:/=\%\encoding\boms\efbbbf.bin" > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
   ) else (
-    type nul > "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
+    call;> "%SCRIPT_TEMP_CURRENT_DIR%/shortcut_props.lst"
   )
 
   for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@type "%%READ_SHORTCUT_PROP_TEMP_STDOUT_FILE%%"`) do (

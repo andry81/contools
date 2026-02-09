@@ -101,7 +101,7 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
   set "TEMP_FILE_LIST=%SCRIPT_TEMP_CURRENT_DIR%\tmp_list.%RANDOM%-%RANDOM%.txt"
 ) else set "TEMP_FILE_LIST=%TEMP%\tmp_list.%RANDOM%-%RANDOM%.txt"
 
-type nul > "%TEMP_FILE_LIST%"
+call;> "%TEMP_FILE_LIST%"
 
 rem check on all files existence at first
 for /f "usebackq eol=# tokens=* delims=" %%i in ("%FILE_LIST_IN:/=\%") do (

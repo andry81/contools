@@ -19,7 +19,7 @@ if not exist "%TO_LIST_FILE_DIR_HEX_UCP%" (
   exit /b 2
 ) >&2
 
-type nul > "%TO_LIST_FILE_HEX_UCP%"
+call;> "%TO_LIST_FILE_HEX_UCP%"
 
 setlocal ENABLEDELAYEDEXPANSION
 

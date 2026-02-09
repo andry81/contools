@@ -1,4 +1,7 @@
 2026.02.09:
+* changed: *.bat: global code refactor, `type nul >` replaced by `call;>` as a bit faster
+
+2026.02.09:
 * new: scripts/tests/bench/bat/test__type_vs: bench tests to measure `type` vs `call` performance
 
 2026.02.09:

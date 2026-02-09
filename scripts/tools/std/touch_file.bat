@@ -92,14 +92,14 @@ if not exist "\\?\%FILE_DIR%\*" (
 ) >&2
 
 rem CAUTION:
-rem   The `type nul >> \\?\...` nor `copy \\?\...` does not support long file paths to an existed file.
+rem   The `... >> \\?\...` nor `copy \\?\...` does not support long file paths to an existed file.
 rem   So we test on a long file path existence and if a long path, then move the file to a temporary directory,
 rem   touch it and move back.
 
 rem CAUTION:
-rem   If the file were deleted before, then the creation date will be set by `type nul >> ...` from the previously deleted file!
+rem   If the file were deleted before, then the creation date will be set by `... >> ...` from the previously deleted file!
 
-if not exist "\\?\%FILE_PATH%" type nul > "\\?\%FILE_PATH%" & goto CONTINUE
+if not exist "\\?\%FILE_PATH%" call;> "\\?\%FILE_PATH%" & goto CONTINUE
 
 rem TODO: Windows XP `robocopy` workaround
 
@@ -120,7 +120,7 @@ if %FILE_PATH_LONG% EQU 0 (
     "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
   )
 ) else (
-  rem CAUTION: `type nul >> ...` does not work as expected on Windows XP
+  rem CAUTION: `... >> ...` does not work as expected on Windows XP
   if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
     "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0touch_file.vbs" "\\?\%FILE_PATH%"
   ) else (
