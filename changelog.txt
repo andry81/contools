@@ -1,4 +1,7 @@
 2026.02.09:
+* new: scripts/tests/bench/bat/test__type_vs: bench tests to measure `type` vs `call` performance
+
+2026.02.09:
 * fixed: tests: inappropriate default behavior of the `fc.exe`, by default it does ignore line returns difference, switched to always use the binary mode comparison
 * fixed: tests: line endings fixup
 * changed: ISSUES.txt: issues update
