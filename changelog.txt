@@ -1,3 +1,8 @@
+2026.02.09:
+* fixed: tests: inappropriate default behavior of the `fc.exe`, by default it does ignore line returns difference, switched to always use the binary mode comparison
+* fixed: tests: line endings fixup
+* changed: ISSUES.txt: issues update
+
 2026.02.06:
 * refactor: *.bat: minor refactor
 

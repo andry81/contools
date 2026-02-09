@@ -48,3 +48,19 @@ scripts/tests/manual/bat/test_all.bat
   test_all
 
 * Log print race condition between stdout and stderr
+
+-------------------------------------------------------------------------------
+scripts/tests
+-------------------------------------------------------------------------------
+
+* wrong last `current tests` number of tests:
+
+Time spent: 3.290 secs (test_xml.bat->test_xml__10_filter_xpath_list_by_xpath_list.bat)
+
+   7 of 7 current tests is passed.
+
+Time spent: 5.450 secs (test_xml.bat)
+
+   7 of 7 current tests is passed.
+
+   12 of 12 overall tests is passed.
