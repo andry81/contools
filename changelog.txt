@@ -1,3 +1,6 @@
+2026.02.10:
+* new: scripts/tests/bench/bat/test__exit_vs: bench tests to measure performance of `errlvl.bat` script vs `call;|exit /b` command
+
 2026.02.09:
 * changed: *.bat: global code refactor, `type nul >` replaced by `call;>` as a bit faster
 
