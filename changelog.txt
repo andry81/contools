@@ -1,3 +1,6 @@
+2026.02.11:
+* new: scripts/tests/bench/bat/test__busy_wait: bench tests to measure performance of different `busy wait` expressions
+
 2026.02.10:
 * new: scripts/tests/bench/bat/test__exit_vs: bench tests to measure performance of `errlvl.bat` script vs `call;|exit /b` command
 
