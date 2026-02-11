@@ -1,4 +1,20 @@
-@echo off
+@echo off & goto DOC_END
+
+rem USAGE:
+rem   restorecp.bat [-p]
+
+rem CAUTION:
+rem   The `chcp.com` does reset the standard input.
+rem   See for the details:
+rem     "`chcp.com` and `fc.exe` does reset the standard input" :
+rem     https://github.com/andry81/contools/discussions/35
+
+rem CAUTION:
+rem   The double redirection has an issue versus `callf` utility.
+rem   See for details:
+rem     "`set /p` skips the input after `callf` call with the elevation" :
+rem     https://github.com/andry81/contools/discussions/37
+:DOC_END
 
 setlocal
 
@@ -55,14 +71,6 @@ if not defined __?CHCP_FILE (
 if defined SCRIPT_TEMP_CURRENT_DIR (
   set "__?CHCP_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%.txt"
 ) else set "__?CHCP_TEMP_FILE=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%.txt"
-
-rem CAUTION:
-rem   Windows XP/7 implementation has an issue with stdin+stdout/stderr double redirection:
-rem     `call <nul >nul & call <nul >nul` or `call <nul 2>nul & call <nul 2>nul`
-rem     which breaks standard input handle.
-rem   To workaround that we need to separate stdin redirection from stdout/stderr redirections:
-rem     `(... >nul 2>nul) <nul`
-rem
 
 set "LAST_CP=%CURRENT_CP%"
 if not defined LAST_CP (

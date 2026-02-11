@@ -1,5 +1,8 @@
 @echo off & goto DOC_END
 
+rem USAGE:
+rem   pause.bat [-chcp <code-page>]
+
 rem DESCRIPTION:
 rem   Sets the code page to the last known (`%LAST_CP%`) after a code page restore routine (basically after a call to the
 rem   `restorecp.bat` script). That is required in cases where the code page before a call to the `chcp.bat` was different
@@ -9,6 +12,17 @@ rem
 rem NOTE:
 rem   Script does not change the error level because restores it internally
 rem
+rem CAUTION:
+rem   The `chcp.com` does reset the standard input.
+rem   See for the details:
+rem     "`chcp.com` and `fc.exe` does reset the standard input" :
+rem     https://github.com/andry81/contools/discussions/35
+
+rem CAUTION:
+rem   The double redirection has an issue versus `callf` utility.
+rem   See for details:
+rem     "`set /p` skips the input after `callf` call with the elevation" :
+rem     https://github.com/andry81/contools/discussions/37
 :DOC_END
 
 setlocal & set "LAST_ERROR=%ERRORLEVEL%"
