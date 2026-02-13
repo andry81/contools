@@ -1,3 +1,6 @@
+2026.02.13:
+* new: scripts/tests/bench/bat/test__exit_vs: more bench tests
+
 2026.02.11:
 * refactor: scripts/tools/std: *cp.bat, pause.bat: documentation
 
