@@ -7,20 +7,20 @@ rem Examples:
 rem   1. >call is_stdin_reopen.bat && echo YES || echo NO
 rem      NO
 rem
-rem   2. call is_stdin_reopen.bat <nul && echo YES || echo NO
+rem   2. >call is_stdin_reopen.bat <nul && echo YES || echo NO
 rem      YES
 rem
-rem   3. echo; | is_stdin_reopen.bat && echo YES || echo NO
+rem   3. >echo; | call is_stdin_reopen.bat && echo YES || echo NO
 rem      YES
 rem
-rem   4. ( is_stdin_reopen.bat && echo YES || echo NO ) <nul
+rem   4. >( call is_stdin_reopen.bat && echo YES || echo NO ) <nul
 rem      YES
 rem
-rem   5. echo; | ( is_stdin_reopen.bat && echo YES || echo NO )
+rem   5. >echo; | ( call is_stdin_reopen.bat && echo YES || echo NO )
 rem      YES
 rem
-rem   6. cmd.exe /c call is_stdin_reopen.bat ^&^& echo YES ^|^| echo NO
+rem   6. >cmd.exe /c call is_stdin_reopen.bat ^&^& echo YES ^|^| echo NO
 rem      NO
 rem
-rem   7. cmd.exe /c call is_stdin_reopen.bat ^&^& echo YES ^|^| echo NO <nul
+rem   7. >cmd.exe /c call is_stdin_reopen.bat ^&^& echo YES ^|^| echo NO <nul
 rem      YES

@@ -1,3 +1,8 @@
+2026.02.14:
+* new: scripts/tools/std/is_std_reopen.bat: script to test the standard input/output/error stream reopen
+* new: scripts/tools/std/is_stdout_reopen.bat: script to test the standard output/error stream reopen
+* refactor: scripts/tools/std/is_stdin_reopen.bat: minor refactor
+
 2026.02.13:
 * new: scripts/tests/bench/bat/test__exit_vs: more bench tests
 
