@@ -1,7 +1,12 @@
-@"%SystemRoot%\System32\timeout.exe" /T 0 >nul 2>&1 && exit /b 255 & exit /b 0
+@call; >nul 2>nul & "%SystemRoot%\System32\timeout.exe" /T 0 >nul 2>&1 && exit /b 255 & exit /b 0
 
 rem Description:
 rem   Script tests the standard input stream reopen.
+rem
+rem   Windows XP x64 variant of the script.
+rem   See details:
+rem     `Redirection of stdin and stdout can break stdin` :
+rem     https://github.com/andry81/contools/discussions/38
 
 rem Examples:
 rem   1. >call is_stdin_reopen.bat && echo YES || echo NO
