@@ -1,3 +1,6 @@
+2026.02.18:
+* changed: README_EN.txt: readme update
+
 2026.02.16:
 * new: scripts/tests/bench/bat/test_std/test_std__*_is_std*_reopen.bat: bench tests for `is_std*_reopen.bat` scripts
 

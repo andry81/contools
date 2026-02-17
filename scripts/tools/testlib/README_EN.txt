@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2025.11.21
+* 2026.02.18
 * contools--testlib
 
 1. DESCRIPTION
@@ -71,29 +71,27 @@ test.bat:
     /<user-test-script>.bat
       A test user script.
       Calls once to `testlib/init.bat`, multiple times to
-      `testlib/test.bat` and once to `testlib/exit.bat` scripts.
+      `testlib/test.bat` and once to `testlib/exit.bat`.
 
     /.<user-test-script>/setup.bat
       [OPTIONAL]
-      A test first time setup handler, calls from `testlib/init.bat`
-      script.
+      A test first time setup handler, calls from `testlib/init.bat`.
 
     /.<user-test-script>/teardown.bat
       [OPTIONAL]
-      A test last time tear down handler, calls from `testlib/exit.bat`
-      script.
+      A test last time tear down handler, calls from `testlib/exit.bat`.
 
     /.<user-test-script>/init.bat
       [OPTIONAL]
       A test initialization handler, required to process a test command
-      line arguments, calls from `testlib/test.bat` script.
+      line arguments, calls from `testlib/test.bat`.
 
     /.<user-test-script>/impl.bat
       [REQUIRED]
       A test implementation handler, does not have a command line
       arguments, checks a user test variables and returns exit code to trigger
       a success or a fail, sets `TEST_IMPL_ERROR` variable to store a test exit
-      code, calls from `testlib/test.bat` script.
+      code, calls from `testlib/test.bat`.
       Does not call if `/.<user-test-script>/init.bat` has returned a not zero
       exit code.
 
@@ -102,8 +100,8 @@ test.bat:
       A test exit handler, checks a user test variables and returns exit code
       to trigger a success or a fail, useful if required to copy test data out
       of a test script temporary output directory, calls from
-      `testlib/test.bat` script.
-      Always calls after the `/.<user-test-script>/impl.bat` script.
+      `testlib/test.bat`.
+      Always calls after `/.<user-test-script>/impl.bat`.
       Can use `TEST_LAST_ERROR` variable to use the exit code either of
       `/.<user-test-script>/init.bat` or `/.<user-test-script>/impl.bat`, and
       can reset it to 0.
@@ -121,14 +119,14 @@ test.bat:
       just a return code from `init.bat`, `impl.bat` or `exit.bat` script,
       which one has called the last and so may not be checked at all.
       If you want a consistent result, then you must use in the `report.bat`
-      script `TEST_LAST_ERROR` variable only.
+      script the `TEST_LAST_ERROR` variable only.
 
 NOTE:
-  The `.<user-test-script>` parent directory can be changed by using
+  The `.<user-test-script>` parent directory can be changed by using the
   `TEST_SCRIPT_HANDLERS_DIR` variable.
 
 -------------------------------------------------------------------------------
-5. TESTS CARALOG EXAMPLE
+5. TESTS CATALOG EXAMPLE
 -------------------------------------------------------------------------------
 <root>
  |
@@ -188,8 +186,12 @@ config.system.vars.in:
   * unit
   * manual
   * bench
+  * ...
 
 ---
+
+A directory initialization script. Basically a child directory `__init__.bat`
+calls to a parent directory `__init__.bat` at first.
 
 __init__.bat:
 
@@ -211,6 +213,9 @@ __init__.bat:
   exit /b 0
 
 ---
+
+A scripts group common initialization. Does not call to a parent scripts group
+initialization script.
 
 script_init.bat:
 
@@ -255,6 +260,8 @@ script_init.bat:
   exit /b 0
 
 ---
+
+A script to run all tests in a directory based on a file pattern.
 
 test_all.bat:
 
