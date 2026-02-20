@@ -1,10 +1,14 @@
 @echo off & goto DOC_END
 
-rem Another variant of a configuration file variables read and set script.
-rem The script must stay as simple as possible, so for this task it uses these parameters:
-rem 1. path where to lock a lock file
-rem 2. path where to read a file with variable names (each per line)
-rem 3. path where to read a file with variable values (each per line, must be the same quantity of lines with the variable names file)
+rem USAGE:
+rem   set_vars_from_locked_file_pair.bat <lock-file> <var-names-file> <var-values-file> [<print-set-flag>]
+
+rem Description:
+rem   Another variant of a configuration file variables read and set script.
+rem   The script must stay as simple as possible, so for this task it uses these parameters:
+rem   1. path where to lock a lock file
+rem   2. path where to read a file with variable names (each per line)
+rem   3. path where to read a file with variable values (each per line, must be the same quantity of lines with the variable names file)
 :DOC_END
 
 rem disable alternative variables expansion to avoid `!` character consumption
@@ -13,10 +17,8 @@ setlocal DISABLEDELAYEDEXPANSION
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
-set "FILE_LOCK_PATH=%~1"
 set "FILE_VAR_NAMES_PATH=%~2"
 set "FILE_VAR_VALUES_PATH=%~3"
-set "PRINT_VARS_SET=%~4"
 
 set "FILE_LOCK_DIR=%~d1"
 
@@ -53,7 +55,7 @@ rem exclusive acquire of the lock file
 ) 2>nul
 
 rem Busy wait: with external call significantly reduces CPU consumption while in a waiting state
-"%SystemRoot%\System32\pathping.exe" localhost -n -q 1 -p 20 >nul 2>nul
+"%SystemRoot%\System32\pathping.exe" 127.0.0.1 -n -q 1 -p 20 >nul 2>nul
 goto REPEAT_LOCK_LOOP
 
 :EXIT

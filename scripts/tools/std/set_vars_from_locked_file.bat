@@ -1,5 +1,8 @@
 @echo off & goto DOC_END
 
+rem USAGE:
+rem   set_vars_from_locked_file.bat <lock-file> <vars-file> [<print-set-flag>]
+
 rem Description:
 rem   Another variant of a configuration file variables read and set script.
 rem   Loads variables from a file using exclusion list with builtin and
@@ -16,9 +19,7 @@ setlocal DISABLEDELAYEDEXPANSION
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
-set "FILE_LOCK_PATH=%~1"
 set "FILE_VARS_PATH=%~2"
-set "PRINT_VARS_SET=%~3"
 
 set "FILE_LOCK_DIR=%~d1"
 
@@ -50,7 +51,7 @@ rem exclusive acquire of the lock file
 ) 2>nul
 
 rem Busy wait: with external call significantly reduces CPU consumption while in a waiting state
-"%SystemRoot%\System32\pathping.exe" localhost -n -q 1 -p 20 >nul 2>nul
+"%SystemRoot%\System32\pathping.exe" 127.0.0.1 -n -q 1 -p 20 >nul 2>nul
 goto REPEAT_LOCK_LOOP
 
 :EXIT

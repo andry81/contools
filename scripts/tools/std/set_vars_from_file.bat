@@ -1,23 +1,26 @@
 @echo off & goto DOC_END
 
+rem USAGE:
+rem   set_vars_from_file.bat <vars-file>
+
 rem Description:
-rem   Loads variables from a file using exclusion list with builtin and
-rem   specific custom variables.
+rem   Script sets variables by reading them from a file using exclusion list
+rem   with builtin and specific custom variables.
 rem   Additionally filters out internal variables beginning by `?` prefix.
+
+rem CAUTION:
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
 :DOC_END
 
-for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do call :FILTER "%%i" && set "%%i=%%j"
+for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%~1") do call :FILTER && set "%%i=%%j"
 exit /b 0
 
 :FILTER
-setlocal
-
-set "__?VAR__=%~1"
-
-if not defined __?VAR__ exit /b 1
-
+setlocal DISABLEDELAYEDEXPANSION
+for %%a in (:) do set "__?VAR__=%%i"
 rem safe check, drop all internal variables beginning by `?`
 if ^%__?VAR__:~0,1%/ == ^?/ exit /b 1
-
-for /F "usebackq eol=# tokens=* delims=" %%k in ("%~dp0.set_vars_from_file\exclusion.vars") do if /i "%__?VAR__%" == "%%k" exit /b 1
+for /F "usebackq eol=# tokens=* delims=" %%i in ("%~dp0.set_vars_from_file\exclusion.vars") do if /i "%__?VAR__%" == "%%i" exit /b 1
 exit /b 0
