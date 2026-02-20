@@ -1,0 +1,19 @@
+255|call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" && exit 0 || exit 255
+0  |call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" <nul && exit 0 || exit 255
+0  |call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" >nul && exit 0 || exit 255
+0  |call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" 2>nul && exit 0 || exit 255
+0  |echo; | call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" && exit 0 || exit 255
+0  |( call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" && exit 0 || exit 255 ) <nul
+0  |( call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" && exit 0 || exit 255 ) >nul
+0  |( call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" && exit 0 || exit 255 ) 2>nul
+0  |echo; | ( call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" && exit 0 || exit 255 )
+255|"%SystemRoot%\System32\cmd.exe" /c call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" ^&^& exit 0 ^|^| exit 255
+0  |"%SystemRoot%\System32\cmd.exe" /c call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" ^&^& exit 0 ^|^| exit 255 <nul
+
+# not work
+255|"%SystemRoot%\System32\cmd.exe" /c call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" ^&^& exit 0 ^|^| exit 255 >nul
+255|"%SystemRoot%\System32\cmd.exe" /c call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" ^&^& exit 0 ^|^| exit 255 2>nul
+
+# work
+0  |"%SystemRoot%\System32\cmd.exe" /c call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" ^>nul ^&^& exit 0 ^|^| exit 255
+0  |"%SystemRoot%\System32\cmd.exe" /c call "%%CONTOOLS_ROOT%%/std/is_std_reopen.bat" 2^>nul^&^& exit 0 ^|^| exit 255

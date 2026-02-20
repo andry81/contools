@@ -1,4 +1,7 @@
 2026.02.20:
+* new: scripts/tests/unit/bat/test_std/test_std__60_is_stdio_reopen.bat: isolated singleton unit tests for `std/is_std*_reopen.bat` scripts
+
+2026.02.20:
 * fixed: scripts/tools/testlib/test.bat: execution fixup
 * new: scripts/tools/testlib/set_test_*.bat: scripts to manually set a test case pass/fail out of `testlib/test.bat` call
 * changed: scripts/tools/testlib/README_EN.txt: readme update

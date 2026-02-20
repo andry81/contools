@@ -1,0 +1,15 @@
+@echo off
+
+rem singleton implementation to run
+
+set "CONTOOLS_ROOT={{CONTOOLS_ROOT}}"
+set "CONTOOLS_PROJECT_EXTERNALS_ROOT={{CONTOOLS_PROJECT_EXTERNALS_ROOT}}"
+
+call "%%CONTOOLS_ROOT%%/std/assert_if_def.bat" __CTRL_SETLOCAL "error: cmd.exe is broken, please restart it!" && set "__CTRL_SETLOCAL=1"
+
+rem reset environment to default
+call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/userbin/scripts/bat/reset-env.bat" -d >nul || exit
+
+set "CONTOOLS_ROOT={{CONTOOLS_ROOT}}"
+
+{{SCRIPT}}
