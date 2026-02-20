@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.02.18
+* 2026.02.20
 * contools--testlib
 
 1. DESCRIPTION
@@ -39,8 +39,16 @@ https://github.com/andry81/externals
  |    # A test or a tests group initialization script.
  |
  +- /`exit.bat`
+ |    #
+ |    # A test or a tests group exit script.
+ |
+ +- /`set_test_passed.bat`
+ |    #
+ |    # To manually set (increment) a test pass out of `testlib/test.bat` call.
+ |
+ +- /`set_test_failed.bat`
       #
-      # A test or a tests group exit script.
+      # To manually set (increment) a test fail out of `testlib/test.bat` call.
 
 All other scripts in the root are internal.
 
@@ -52,78 +60,87 @@ test.bat:
 
   Main entry point script to a user test script.
 
-  A user script must contain the handlers in separate scripts in this file
-  structure format (in a call order):
+A user script must contain the handlers in separate scripts in this file
+structure format (in a call order):
 
-    /<user-test-script>.bat
-
-      /.<user-test-script>/setup.bat
-
-        /.<user-test-script>/init.bat
-        /.<user-test-script>/impl.bat
-        /.<user-test-script>/exit.bat
-        /.<user-test-script>/report.bat
-
-      /.<user-test-script>/teardown.bat
-
-  , where:
-
-    /<user-test-script>.bat
-      A test user script.
-      Calls once to `testlib/init.bat`, multiple times to
-      `testlib/test.bat` and once to `testlib/exit.bat`.
+  /<user-test-script>.bat
 
     /.<user-test-script>/setup.bat
-      [OPTIONAL]
-      A test first time setup handler, calls from `testlib/init.bat`.
+
+      /.<user-test-script>/init.bat
+      /.<user-test-script>/impl.bat
+      /.<user-test-script>/exit.bat
+      /.<user-test-script>/report.bat
 
     /.<user-test-script>/teardown.bat
-      [OPTIONAL]
-      A test last time tear down handler, calls from `testlib/exit.bat`.
 
-    /.<user-test-script>/init.bat
-      [OPTIONAL]
-      A test initialization handler, required to process a test command
-      line arguments, calls from `testlib/test.bat`.
+, where:
 
-    /.<user-test-script>/impl.bat
-      [REQUIRED]
-      A test implementation handler, does not have a command line
-      arguments, checks a user test variables and returns exit code to trigger
-      a success or a fail, sets `TEST_IMPL_ERROR` variable to store a test exit
-      code, calls from `testlib/test.bat`.
-      Does not call if `/.<user-test-script>/init.bat` has returned a not zero
-      exit code.
+  /<user-test-script>.bat
+    A test user script.
+    Calls once to `testlib/init.bat`, multiple times to
+    `testlib/test.bat` and once to `testlib/exit.bat`.
 
-    /.<user-test-script>/exit.bat
-      [OPTIONAL]
-      A test exit handler, checks a user test variables and returns exit code
-      to trigger a success or a fail, useful if required to copy test data out
-      of a test script temporary output directory, calls from
-      `testlib/test.bat`.
-      Always calls after `/.<user-test-script>/impl.bat`.
-      Can use `TEST_LAST_ERROR` variable to use the exit code either of
-      `/.<user-test-script>/init.bat` or `/.<user-test-script>/impl.bat`, and
-      can reset it to 0.
+  /.<user-test-script>/setup.bat
+    [OPTIONAL]
+    A test first time setup handler, calls from `testlib/init.bat`.
 
-    /.<user-test-script>/report.bat
-      [OPTIONAL]
-      A test report handler to print a test result.
+  /.<user-test-script>/teardown.bat
+    [OPTIONAL]
+    A test last time tear down handler, calls from `testlib/exit.bat`.
 
-    NOTE:
-      The `test.bat` script does rely only on `TEST_LAST_ERROR` variable to
-      count the succeeded tests, when the `exit.bat` does rely on multiple
-      custom conditions which basically includes `TEST_IMPL_ERROR` together
-      with a test internal variables from the `init.bat` script or an external
-      scope. The `TEST_LAST_ERROR` variable inside the `report.bat` script is
-      just a return code from `init.bat`, `impl.bat` or `exit.bat` script,
-      which one has called the last and so may not be checked at all.
-      If you want a consistent result, then you must use in the `report.bat`
-      script the `TEST_LAST_ERROR` variable only.
+  /.<user-test-script>/init.bat
+    [OPTIONAL]
+    A test initialization handler, required to process a test command
+    line arguments, calls from `testlib/test.bat`.
+
+  /.<user-test-script>/impl.bat
+    [REQUIRED]
+    A test implementation handler, does not have a command line
+    arguments, checks a user test variables and returns exit code to trigger
+    a success or a fail, sets `TEST_IMPL_ERROR` variable to store a test exit
+    code, calls from `testlib/test.bat`.
+    Does not call if `/.<user-test-script>/init.bat` has returned a not zero
+    exit code.
+
+  /.<user-test-script>/exit.bat
+    [OPTIONAL]
+    A test exit handler, checks a user test variables and returns exit code
+    to trigger a success or a fail, useful if required to copy test data out
+    of a test script temporary output directory, calls from
+    `testlib/test.bat`.
+    Always calls after `/.<user-test-script>/impl.bat`.
+    Can use `TEST_LAST_ERROR` variable to use the exit code either of
+    `/.<user-test-script>/init.bat` or `/.<user-test-script>/impl.bat`, and
+    can reset it to 0.
+
+  /.<user-test-script>/report.bat
+    [OPTIONAL]
+    A test report handler to print a test result.
+
+  NOTE:
+    The `test.bat` script does rely only on `TEST_LAST_ERROR` variable to
+    count the succeeded tests, when the `exit.bat` does rely on multiple
+    custom conditions which basically includes `TEST_IMPL_ERROR` together
+    with a test internal variables from the `init.bat` script or an external
+    scope. The `TEST_LAST_ERROR` variable inside the `report.bat` script is
+    just a return code from `init.bat`, `impl.bat` or `exit.bat` script,
+    which one has called the last and so may not be checked at all.
+    If you want a consistent result, then you must use in the `report.bat`
+    script the `TEST_LAST_ERROR` variable only.
 
 NOTE:
   The `.<user-test-script>` parent directory can be changed by using the
   `TEST_SCRIPT_HANDLERS_DIR` variable.
+
+In case if a user test is isolated and can not be called from the
+`testlib/test.bat` for some reason, then you can use only `testlib/init.bat`
+and `testlib/exit.bat`, and set a test run status by `testlib/set_test_*.bat`
+functions.
+
+CAUTION:
+  You must not call to `testlib/init.bat`, `testlib/test.bat`,
+  `testlib/exit.bat` from a handler script.
 
 -------------------------------------------------------------------------------
 5. TESTS CATALOG EXAMPLE

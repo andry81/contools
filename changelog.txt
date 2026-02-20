@@ -1,4 +1,9 @@
 2026.02.20:
+* fixed: scripts/tools/testlib/test.bat: execution fixup
+* new: scripts/tools/testlib/set_test_*.bat: scripts to manually set a test case pass/fail out of `testlib/test.bat` call
+* changed: scripts/tools/testlib/README_EN.txt: readme update
+
+2026.02.20:
 * fixed: .externals-tests: missed dependency
 * fixed: scripts/tools/build/gen_config.bat: missed `&` character escape
 * new: scripts/tools/build/gen_config.bat: added `-r!*` flags to control `-r*` options delayed expansion

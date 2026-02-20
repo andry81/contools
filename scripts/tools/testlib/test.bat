@@ -58,6 +58,7 @@ rem Drop internal variables but use some changed value(s) for the return
   set "TESTLIB__OVERALL_TESTS=%TESTLIB__OVERALL_TESTS%"
   set "TESTLIB__CURRENT_PASSED_TESTS=%TESTLIB__CURRENT_PASSED_TESTS%"
   set "TESTLIB__CURRENT_TESTS=%TESTLIB__CURRENT_TESTS%"
+  set "TESTLIB__TEST_ORDER_NUMBER=%TESTLIB__TEST_ORDER_NUMBER%"
 
   rem return user declared variables
   %TESTLIB__EXEC_ON_ENDLOCAL%
