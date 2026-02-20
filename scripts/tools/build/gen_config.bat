@@ -28,6 +28,16 @@ rem   -s
 rem     Replace in the entire file as a single instead of in each line as by
 rem     default.
 rem
+rem   -r!+
+rem     Enables the delayed expansion for the entire `sed` command line.
+rem     Enables the delayed expansion for the following `-r*` script flags.
+rem     Useful if some values in the script command line has !-variable(s) to
+rem     be able to contain escaped values like double quote character.
+rem
+rem   -r!-
+rem     Disables delayed expansion for the following `-r*` script flags.
+rem     Does not disable delayed expansion for the `sed` command line.
+rem
 rem   -r <sed_replace_from> <sed_replace_to>
 rem     The expression to replace for the sed in form:
 rem       `s|<sed_replace_from>|<sed_replace_to>|mg`
@@ -165,11 +175,15 @@ if not defined SED_BARE_FLAGS (
 rem initialize only in case of the sed usage
 call "%%?~dp0%%__init__.bat" || exit /b
 
+setlocal ENABLEDELAYEDEXPANSION
+
 rem Based on: https://unix.stackexchange.com/questions/182153/sed-read-whole-file-into-pattern-space-without-failing-on-single-line-input/182154#182154
 rem
 rem NOTE:
 rem   Reads portably whole file into pattern space.
 rem
-if %FLAG_SINGLE% NEQ 0 set SED_BARE_FLAGS= -e "H;1h;$!d;x"%SED_BARE_FLAGS%
+if %FLAG_SINGLE% NEQ 0 set SED_BARE_FLAGS= -e "H;1h;$^!d;x"!SED_BARE_FLAGS!
 
-type "%CONFIG_IN_DIR%\%CONFIG_FILE%.in" | "%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -r -b%SED_BARE_FLAGS% > "%CONFIG_OUT_DIR%\%CONFIG_FILE%"
+type "!CONFIG_IN_DIR!\!CONFIG_FILE!.in" | "!CONTOOLS_MSYS2_USR_ROOT!/bin/sed.exe" -r -b!SED_BARE_FLAGS! > "!CONFIG_OUT_DIR!\!CONFIG_FILE!"
+
+endlocal

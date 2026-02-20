@@ -156,33 +156,14 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars" (
   call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_RETURN_VARS_FILE_PATH%%" "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/return.vars"
   copy /Y /B "%TEST_SCRIPT_RETURN_VARS_FILE_PATH%" + "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" >nul
   move /Y "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" >nul
-  for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars") do (
-    set "__?RETURN_VAR_NAME=%%i"
-    call :SET_EXEC_ON_ENDLOCAL
-  )
+  call "%%CONTOOLS_ROOT%%/std/set_vars_from_file_as_cmdline.bat" TESTLIB__EXEC_ON_ENDLOCAL "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars"
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/return.vars" (
     call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_RETURN_VARS_FILE_PATH%%" "%%TEST_SCRIPT_HANDLERS_DIR%%/return.vars"
     copy /Y /B "%TEST_SCRIPT_RETURN_VARS_FILE_PATH%" + "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" >nul
     move /Y "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" >nul
-    for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%TEST_SCRIPT_HANDLERS_DIR%/return.vars") do (
-      set "__?RETURN_VAR_NAME=%%i"
-      call :SET_EXEC_ON_ENDLOCAL
-    )
+    call "%%CONTOOLS_ROOT%%/std/set_vars_from_file_as_cmdline.bat" TESTLIB__EXEC_ON_ENDLOCAL "%TEST_SCRIPT_HANDLERS_DIR%/return.vars"
   )
-)
-
-exit /b 0
-
-:SET_EXEC_ON_ENDLOCAL
-if defined TESTLIB__EXEC_ON_ENDLOCAL (
-  setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=1,* delims=|"eol^= %%i in ("!TESTLIB__EXEC_ON_ENDLOCAL!|!%__?RETURN_VAR_NAME%!") do (
-    endlocal
-    set TESTLIB__EXEC_ON_ENDLOCAL=%%i ^& set "%__?RETURN_VAR_NAME%=%%j"
-  )
-) else setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=1,* delims=|"eol^= %%i in (".|!%__?RETURN_VAR_NAME%!") do (
-  endlocal
-  set TESTLIB__EXEC_ON_ENDLOCAL=set "%__?RETURN_VAR_NAME%=%%j"
 )
 
 exit /b 0

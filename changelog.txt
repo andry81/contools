@@ -1,4 +1,11 @@
 2026.02.20:
+* fixed: .externals-tests: missed dependency
+* fixed: scripts/tools/build/gen_config.bat: missed `&` character escape
+* new: scripts/tools/build/gen_config.bat: added `-r!*` flags to control `-r*` options delayed expansion
+* changed: scripts/tools/testlib/test.bat: switched to `set_vars_from_file_as_cmdline.bat` script
+* changed: scripts/tools/build/gen_config.bat: code improvement
+
+2026.02.20:
 * new: scripts/tools/std/set_var_as_cmdline.bat: script to set a variable as a command line to execute
 * new: scripts/tools/std/set_vars_from_file_as_cmdline.bat: script to set variables from a file as a command line to execute
 * changed: scripts/tools/std/set_vars_*.bat: code improvement and reduction
