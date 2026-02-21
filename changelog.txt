@@ -1,3 +1,6 @@
+2026.02.21:
+* changed: scripts/tools/std/gen_config.bat: flags parse loop speed improvement
+
 2026.02.20:
 * new: scripts/tests/unit/bat/test_std/test_std__60_is_stdio_reopen.bat: isolated singleton unit tests for `std/is_std*_reopen.bat` scripts
 
