@@ -1,4 +1,9 @@
 2026.02.21:
+* fixed: scripts/tools/build/gen_config.bat: execution fixup
+* new: scripts/tools/build/gen_config.bat: `-esc_dbl_quote` to escape double quote character
+* changed: scripts/tools/build/.gen_config/*.bat: code cleanup
+
+2026.02.21:
 * changed: scripts/tools/std/gen_config.bat: flags parse loop speed improvement
 
 2026.02.20:

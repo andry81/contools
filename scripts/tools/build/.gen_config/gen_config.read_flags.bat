@@ -7,11 +7,13 @@ set FLAG_SINGLE=0
 set FLAG_IF_NOTEXIST=0
 set FLAG_DETECT_EXPIRATION=1
 set FLAG_SKIP_CHECKS=0
+set FLAG_RE_DELAYED_EXPANSION=0
+set FLAG_ESC_DBL_QUOTE=0
+
 set "SED_BARE_FLAGS="
 set "SED_REPLACE_FROM="
 set "SED_REPLACE_TO="
 set "SED_REMOVE_FROM="
-set SED_RE_DELAYED_EXPANSION=0
 
 :FLAGS_LOOP
 
@@ -40,14 +42,14 @@ if defined FLAG (
   ) else if "%FLAG%" == "-skip_checks" (
     set FLAG_SKIP_CHECKS=1
   ) else if "%FLAG%" == "-r!+" (
-    set SED_RE_DELAYED_EXPANSION=1
+    set FLAG_RE_DELAYED_EXPANSION=1
   ) else if "%FLAG%" == "-r!-" (
-    set SED_RE_DELAYED_EXPANSION=0
+    set FLAG_RE_DELAYED_EXPANSION=0
   ) else if "%FLAG%" == "-r" (
-    if %SED_RE_DELAYED_EXPANSION% NEQ 0 setlocal ENABLEDELAYEDEXPANSION
+    if %FLAG_RE_DELAYED_EXPANSION% NEQ 0 setlocal ENABLEDELAYEDEXPANSION
     set "SED_REPLACE_FROM=%~2"
     set "SED_REPLACE_TO=%~3"
-    if %SED_RE_DELAYED_EXPANSION% NEQ 0 (
+    if %FLAG_RE_DELAYED_EXPANSION% NEQ 0 (
       for /F "usebackq tokens=* delims="eol^= %%i in ('"!SED_REPLACE_FROM!"') do call; ^
       & for /F "usebackq tokens=* delims="eol^= %%j in ('"!SED_REPLACE_TO!"') do endlocal ^
       & set "SED_REPLACE_FROM=%%~i" ^
@@ -57,14 +59,16 @@ if defined FLAG (
     shift
     set /A FLAG_SHIFT+=2
   ) else if "%FLAG%" == "-rm" (
-    if %SED_RE_DELAYED_EXPANSION% NEQ 0 setlocal ENABLEDELAYEDEXPANSION
+    if %FLAG_RE_DELAYED_EXPANSION% NEQ 0 setlocal ENABLEDELAYEDEXPANSION
     set "SED_REMOVE_FROM=%~2"
-    if %SED_RE_DELAYED_EXPANSION% NEQ 0 (
+    if %FLAG_RE_DELAYED_EXPANSION% NEQ 0 (
       for /F "usebackq tokens=* delims="eol^= %%i in ('"!SED_REMOVE_FROM!"') do endlocal ^
       & set "SED_REMOVE_FROM=%%~i"
     )
     shift
     set /A FLAG_SHIFT+=1
+  ) else if "%FLAG%" == "-esc_dbl_quote" (
+    set FLAG_ESC_DBL_QUOTE=1
   ) else if not "%FLAG%" == "-+" if not "%FLAG%" == "--" (
     echo;%?~%: error: invalid flag: %FLAG%
     exit /b -255

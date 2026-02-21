@@ -2,14 +2,23 @@
 
 if not defined SED_REPLACE_FROM goto SKIP_SED_REPLACE_FROM
 
+rem replace double quotes at first
+if %FLAG_ESC_DBL_QUOTE% EQU 0 goto SKIP_ESC_DBL_QUOTE
+
+setlocal ENABLEDELAYEDEXPANSION ^
+  & set "SED_REPLACE_FROM=!SED_REPLACE_FROM:"=$/\x22!"
+for /F "tokens=* delims="eol^= %%i in ("!SED_REPLACE_FROM!") do ^
+endlocal ^
+  & set "SED_REPLACE_FROM=%%i"
+
+:SKIP_ESC_DBL_QUOTE
+
 setlocal ENABLEDELAYEDEXPANSION ^
   & set "SED_REPLACE_FROM=!SED_REPLACE_FROM:$=$24!" ^
   & set "__STRING__=!SED_REPLACE_FROM:\=\\\!" & ^
-for /F "tokens=* delims="eol^= %%i in ("!SED_REPLACE_FROM!") do ^
-for /F "tokens=* delims="eol^= %%j in ("!__STRING__!") do ^
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do ^
 endlocal ^
-  & set "SED_REPLACE_FROM=%%i" ^
-  & set "__STRING__=%%j"
+  & set "__STRING__=%%i"
 
 for %%i in ({ } [ ] ( ^) ^^ . +) do ^
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%j in ("!__STRING__:%%i=\%%i!") do endlocal & set "__STRING__=%%j"
@@ -23,11 +32,9 @@ setlocal ENABLEDELAYEDEXPANSION ^
   & set "SED_REPLACE_FROM=!SED_REPLACE_FROM:|=[|]!" ^
   & set "SED_REPLACE_FROM=!SED_REPLACE_FROM:&=[&]!" ^
   & set "__STRING__=!SED_REPLACE_FROM:$24=$!" & ^
-for /F "tokens=* delims="eol^= %%i in ("!SED_REPLACE_FROM!") do ^
-for /F "tokens=* delims="eol^= %%j in ("!__STRING__!") do ^
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do ^
 endlocal ^
-  & set "SED_REPLACE_FROM=%%i" ^
-  & set "__STRING__=%%j"
+  & set "__STRING__=%%i"
 
 rem we must replace `\xNN` sequence for the all control characters, except these characters: `.`
 for %%i in (7B:{ 7D:} 5B:[ 5D:] 28:( 29:^) 5E:^^ 2B:+) do ^
@@ -54,6 +61,17 @@ endlocal ^
 
 if not defined SED_REPLACE_TO goto SKIP_SED_REPLACE_TO
 
+rem replace double quotes at first
+if %FLAG_ESC_DBL_QUOTE% EQU 0 goto SKIP_ESC_DBL_QUOTE
+
+setlocal ENABLEDELAYEDEXPANSION ^
+  & set "SED_REPLACE_TO=!SED_REPLACE_TO:"=$/\x22!"
+for /F "tokens=* delims="eol^= %%i in ("!SED_REPLACE_TO!") do ^
+endlocal ^
+  & set "SED_REPLACE_TO=%%i"
+
+:SKIP_ESC_DBL_QUOTE
+
 setlocal ENABLEDELAYEDEXPANSION ^
   & set "SED_REPLACE_TO=!SED_REPLACE_TO:\=\\\!" ^
   & set "SED_REPLACE_TO=!SED_REPLACE_TO:|=\|!" ^
@@ -66,14 +84,23 @@ endlocal ^
 
 if not defined SED_REMOVE_FROM goto SKIP_SED_REMOVE_FROM
 
+rem replace double quotes at first
+if %FLAG_ESC_DBL_QUOTE% EQU 0 goto SKIP_ESC_DBL_QUOTE
+
+setlocal ENABLEDELAYEDEXPANSION ^
+  & set "SED_REMOVE_FROM=!SED_REMOVE_FROM:"=$/\x22!"
+for /F "tokens=* delims="eol^= %%i in ("!SED_REMOVE_FROM!") do ^
+endlocal ^
+  & set "SED_REMOVE_FROM=%%i"
+
+:SKIP_ESC_DBL_QUOTE
+
 setlocal ENABLEDELAYEDEXPANSION ^
   & set "SED_REMOVE_FROM=!SED_REMOVE_FROM:$=$24!" ^
   & set "__STRING__=!SED_REMOVE_FROM:\=\\\!" & ^
-for /F "tokens=* delims="eol^= %%i in ("!SED_REMOVE_FROM!") do ^
-for /F "tokens=* delims="eol^= %%j in ("!__STRING__!") do ^
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do ^
 endlocal ^
-  & set "SED_REMOVE_FROM=%%i" ^
-  & set "__STRING__=%%j"
+  & set "__STRING__=%%i"
 
 for %%i in ({ } [ ] ( ^) ^^ . +) do ^
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%j in ("!__STRING__:%%i=\%%i!") do endlocal & set "__STRING__=%%j"
@@ -86,12 +113,10 @@ setlocal ENABLEDELAYEDEXPANSION ^
   & set "SED_REMOVE_FROM=!SED_REMOVE_FROM:?=\?!" ^
   & set "SED_REMOVE_FROM=!SED_REMOVE_FROM:|=[|]!" ^
   & set "SED_REMOVE_FROM=!SED_REMOVE_FROM:&=[&]!" 
-  & set "__STRING__=%SED_REMOVE_FROM:$24=$%" & ^
-for /F "tokens=* delims="eol^= %%i in ("!SED_REMOVE_FROM!") do ^
-for /F "tokens=* delims="eol^= %%j in ("!__STRING__!") do ^
+  & set "__STRING__=!SED_REMOVE_FROM:$24=$!" & ^
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do ^
 endlocal ^
-  & set "SED_REMOVE_FROM=%%i" ^
-  & set "__STRING__=%%j"
+  & set "__STRING__=%%i"
 
 rem we must replace `\xNN` sequence for the all control characters, except these characters: `.`
 for %%i in (7B:{ 7D:} 5B:[ 5D:] 28:( 29:^) 5E:^^ 2B:+) do ^

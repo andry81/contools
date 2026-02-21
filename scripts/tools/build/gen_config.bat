@@ -61,6 +61,15 @@ rem     Disables output file expiration detection as by default.
 rem
 rem   -skip_checks
 rem     Skip checks for faster execution.
+rem
+rem   -esc_dbl_quote
+rem     Builtin double quote escape to let pass a double quote character into
+rem     `-r*` options as is:
+rem       "     ->    $/\x22
+rem
+rem     NOTE:
+rem       The `-r!*` flags and the delayed expansion feature must be used to
+rem       avoid a command line parse break.
 
 rem -+:
 rem   Separator to begin flags scope to parse.
@@ -94,7 +103,7 @@ rem     NUL   ->    $/\x00
 rem     LF    ->    $/\x0A
 rem     CR    ->    $/\x0D
 rem     SUB   ->    $/\x1A
-rem     "     ->    $/\x22
+rem     "     ->    $/\x22 (builtin by `-esc_dbl_quote` flag)
 rem
 rem   These characters can be used directly but has side effects and has to be
 rem   escaped with the `$/\xNN` sequence:
@@ -111,6 +120,28 @@ rem   `$/\xNN` sequence.
 rem
 rem   The unicode characters can be escaped by `$/\uNNNN` sequence.
 
+rem NOTE:
+rem   You can alternatively escape the `-r*` options by surrounding it by
+rem   `-r!*` flags:
+rem
+rem     >
+rem     rem required to avoid an accident expansion of the `!` character
+rem     setlocal DISABLEDELAYEDEXPANSION
+rem     ...
+rem     setlocal ENABLEDELAYEDEXPANSION
+rem     rem must be in a separate line
+rem     set "CMDLINE_ESCAPED=!CMDLINE:"=\"!"
+rem     for /F "tokens=* delims="eol^= %%i in ("!CMDLINE_ESCAPED!") do endlocal ^
+rem       & set "CMDLINE_ESCAPED=%%i"
+rem     ...
+rem     .../gen_config.bat ^
+rem       -+ ... -r!+ -r "{{SCRIPT}}" "!CMDLINE_ESCAPED!" -r!- ... -- ...
+rem
+rem   But better to use the builtin escape flag - `-esc_dbl_quote`.
+rem
+rem   NOTE:
+rem     Both methods are generally incompatible and you have to choose which
+rem     one to use.
 :DOC_END
 
 setlocal DISABLEDELAYEDEXPANSION
