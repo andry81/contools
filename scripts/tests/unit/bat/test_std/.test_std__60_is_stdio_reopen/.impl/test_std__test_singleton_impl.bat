@@ -27,12 +27,16 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/gen_config.bat" ^
   -- "%%TEST_SCRIPT_FILE_DIR%%/.impl" "%%TEST_TEMP_DIR_PATH%%" "test_std__run_singleton_script.bat" >nul ^
   || ( set "TEST_LAST_ERROR=255" & goto SKIP_TEST )
 
+if %TEST_DEBUG% EQU 0 (
+  set CALLF_DEBUG_FLAGS=/create-child-console /no-window
+) else set CALLF_DEBUG_FLAGS=/create-console
+
 rem NOTE:
 rem   To debug use `/create-console` instead.
 
-rem isolated test
+rem isolated single test
 start "" /I /B /WAIT "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" ^
-  /no-expand-env /no-subst-pos-vars /create-child-console /no-window /ret-child-exit // ^
+  /no-expand-env /no-subst-pos-vars %CALLF_DEBUG_FLAGS% /ret-child-exit // ^
   "%COMSPEC%" "/D /C \"@\"%TEST_TEMP_DIR_PATH%/test_std__run_singleton_script.bat\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
   %*
 

@@ -17,7 +17,7 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TESTS_LIST_FILE       "%%TESTS_P
 
 set TEST_DEBUG=0
 
-call "%%TESTS_PROJECT_ROOT%%/test_std/.test_std__60_is_stdio_reopen/.impl/test_std__test_singleton_impl.bat" %%*
+call "%%TESTS_PROJECT_ROOT%%/test_std/.test_std__60_is_stdio_reopen/.impl/test_std__test_shared_impl.bat" %%*
 
 echo;
 

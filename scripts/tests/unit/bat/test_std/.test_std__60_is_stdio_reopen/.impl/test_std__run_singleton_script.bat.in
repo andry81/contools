@@ -1,5 +1,7 @@
 @echo off
 
+setlocal DISABLEDELAYEDEXPANSION
+
 rem singleton implementation to run
 
 set "CONTOOLS_ROOT={{CONTOOLS_ROOT}}"

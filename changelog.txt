@@ -1,4 +1,9 @@
 2026.02.21:
+* fixed: scripts/tests/unit/bat/test_std/.test_std__60_is_stdio_reopen: execution fixup
+* new: scripts/tests/unit/bat/test_std/.test_std__60_is_stdio_reopen: isolated shared unit tests for `std/is_std*_reopen.bat` scripts with a second pass
+* changed: scripts/tests/unit/bat/test_std/.test_std__60_is_stdio_reopen: code improvement
+
+2026.02.21:
 * new: scripts/tools/testlib/*_test_locals.bat: to manual load/save a test local variables in an isolated environment
 * changed: scripts/tools/testlib/README_EN.txt: readme update
 

@@ -1,0 +1,84 @@
+@echo off
+
+setlocal DISABLEDELAYEDEXPANSION
+
+rem shared implementation to run
+
+set "CONTOOLS_ROOT={{CONTOOLS_ROOT}}"
+set "CONTOOLS_PROJECT_EXTERNALS_ROOT={{CONTOOLS_PROJECT_EXTERNALS_ROOT}}"
+
+call "%%CONTOOLS_ROOT%%/std/assert_if_def.bat" __CTRL_SETLOCAL "error: cmd.exe is broken, please restart it!" && set "__CTRL_SETLOCAL=1"
+
+rem reset environment to default
+call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/userbin/scripts/bat/reset-env.bat" -d >nul || exit
+
+set "TEST_LOG={{TEST_LOG}}"
+set "CONTOOLS_ROOT={{CONTOOLS_ROOT}}"
+set "CONTOOLS_TESTLIB_ROOT={{CONTOOLS_TESTLIB_ROOT}}"
+set "TESTLIB__INIT={{TESTLIB__INIT}}"
+set "TESTLIB__CHCP_EXE={{TESTLIB__CHCP_EXE}}"
+set "TEST_SCRIPT_SHARED_VARS_FILE_PATH={{TEST_SCRIPT_SHARED_VARS_FILE_PATH}}"
+set "TEST_SCRIPT_TEST_VARS_FILE_PATH={{TEST_SCRIPT_TEST_VARS_FILE_PATH}}"
+set "TESTS_LIST_FILE={{TESTS_LIST_FILE}}"
+set "TEST_TEMP_DIR_PATH={{TEST_TEMP_DIR_PATH}}"
+
+rem load test locals
+call "%%CONTOOLS_TESTLIB_ROOT%%/load_test_locals.bat"
+
+rem run 2 times
+for /L %%n in (1,1,2) do ^
+for /F "usebackq eol=# tokens=1,* delims=|" %%i in ("%TESTS_LIST_FILE%") do call :TEST %%*
+exit /b 0
+
+:TEST
+for %%a in (:) do for /F "usebackq tokens=1 delims=	 "eol^= %%k in ('"%%i"') do set "RETURN_REFERENCE=%%~k"
+for %%a in (:) do for /F "usebackq tokens=* delims=	 "eol^= %%l in ('"%%j"') do set "CMDLINE=%%~l"
+
+set TEST_LAST_ERROR=0
+set TEST_IMPL_ERROR=0
+
+if not defined RETURN_REFERENCE set "TEST_LAST_ERROR=255" & goto SKIP_TEST
+if not defined CMDLINE set "TEST_LAST_ERROR=255" & goto SKIP_TEST
+
+rem fix script
+setlocal ENABLEDELAYEDEXPANSION
+
+set "CMDLINE=!CMDLINE: exit = exit /b !"
+
+for /F "tokens=* delims="eol^= %%i in ("!CMDLINE!") do endlocal ^
+  & set "CMDLINE=%%i" ^
+  & (echo;@%%i) > "%TEST_TEMP_DIR_PATH%/test_impl.bat"
+
+rem run test
+call "%%TEST_TEMP_DIR_PATH%%/test_impl.bat" %%*
+
+set "TEST_IMPL_ERROR=%ERRORLEVEL%"
+
+call "%%CONTOOLS_ROOT%%/std/cmp_nvar.bat" TEST_IMPL_ERROR EQU RETURN_REFERENCE || set TEST_LAST_ERROR=255
+
+:SKIP_TEST
+if %TEST_LAST_ERROR% NEQ 0 (
+  call "%%CONTOOLS_ROOT%%/testlib/set_test_failed.bat"
+  setlocal ENABLEDELAYEDEXPANSION
+  set "__LOG__=FAILED: !TESTLIB__TEST_ORDER_NUMBER!: RESULT=`!TEST_IMPL_ERROR!` REFERENCE=`!RETURN_REFERENCE!` CMDLINE=`!CMDLINE!`"
+  call :LOG
+  call :LOG
+  exit /b 1
+)
+
+call "%%CONTOOLS_ROOT%%/testlib/set_test_passed.bat"
+
+setlocal ENABLEDELAYEDEXPANSION
+set "__LOG__=PASSED: !TESTLIB__TEST_ORDER_NUMBER!: RESULT=`!TEST_IMPL_ERROR!` CMDLINE=`!CMDLINE!`"
+call :LOG
+
+exit /b 0
+
+:LOG
+setlocal ENABLEDELAYEDEXPANSION & ^
+for /F "usebackq tokens=* delims="eol^= %%i in ('!__LOG__!') do (
+  echo;%%~i
+  (echo;%%~i) >> "%TEST_LOG%"
+)
+endlocal
+set "__LOG__="
