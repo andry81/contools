@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.02.20
+* 2026.02.21
 * contools--testlib
 
 1. DESCRIPTION
@@ -47,8 +47,16 @@ https://github.com/andry81/externals
  |    # To manually set (increment) a test pass out of `testlib/test.bat` call.
  |
  +- /`set_test_failed.bat`
+ |    #
+ |    # To manually set (increment) a test fail out of `testlib/test.bat` call.
+ |
+ +- /`load_test_locals.bat`
+ |    #
+ |    # To manually load a test local variables out of `testlib/test.bat` call.
+ |
+ +- /`save_test_locals.bat`
       #
-      # To manually set (increment) a test fail out of `testlib/test.bat` call.
+      # To manually save a test local variables out of `testlib/test.bat` call.
 
 All other scripts in the root are internal.
 
@@ -134,9 +142,13 @@ NOTE:
   `TEST_SCRIPT_HANDLERS_DIR` variable.
 
 In case if a user test is isolated and can not be called from the
-`testlib/test.bat` for some reason, then you can use only `testlib/init.bat`
-and `testlib/exit.bat`, and set a test run status by `testlib/set_test_*.bat`
-functions.
+`testlib/test.bat` for some reason, then you can:
+
+  1. Use `testlib/init.bat` and `testlib/exit.bat` to manual init/exit.
+  2. Use `testlib/load_test_locals.bat` and `testlib/save_test_locals.bat`
+     to load/save test local variables in an isolated environment.
+  3. Use `testlib/set_test_*.bat` to set a test run status which includes a
+     test local variables save.
 
 CAUTION:
   You must not call to `testlib/init.bat`, `testlib/test.bat`,
