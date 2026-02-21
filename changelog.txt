@@ -1,4 +1,7 @@
 2026.02.21:
+* new: scripts/tests/bench/bat/test_build/test_build__20_gen_config*.bat: `gen_config.bat` bench tests
+
+2026.02.21:
 * fixed: scripts/tests/unit/bat/test_std/test_std__60_is_stdio_reopen.bat: execution fixup
 * changed: scripts/tests/unit/bat/test_std/.test_std__60_is_stdio_reopen: switched to use `-esc_dbl_quote` flag
 
