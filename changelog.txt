@@ -1,4 +1,8 @@
 2026.02.21:
+* fixed: scripts/tests/unit/bat/test_std/test_std__60_is_stdio_reopen.bat: execution fixup
+* changed: scripts/tests/unit/bat/test_std/.test_std__60_is_stdio_reopen: switched to use `-esc_dbl_quote` flag
+
+2026.02.21:
 * fixed: scripts/tools/build/gen_config.bat: execution fixup
 * new: scripts/tools/build/gen_config.bat: `-esc_dbl_quote` to escape double quote character
 * changed: scripts/tools/build/.gen_config/*.bat: code cleanup

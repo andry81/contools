@@ -15,19 +15,17 @@ set TEST_IMPL_ERROR=0
 if not defined RETURN_REFERENCE set "TEST_LAST_ERROR=255" & goto SKIP_TEST
 if not defined CMDLINE set "TEST_LAST_ERROR=255" & goto SKIP_TEST
 
-rem explicitly escape double quotes for the `sed` command line
-setlocal ENABLEDELAYEDEXPANSION
-set "CMDLINE_ESCAPED=!CMDLINE:"=\"!"
-for /F "tokens=* delims="eol^= %%i in ("!CMDLINE_ESCAPED!") do endlocal ^
-  & set "CMDLINE_ESCAPED=%%i"
-
+rem NOTE:
+rem   The `CMDLINE` value has double quotes so explicitly enable delayed
+rem   expansion to pass it through the Windows Batch command line.
+rem   The `-esc_dbl_quote` flag automatically escapes all double quotes.
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/gen_config.bat" ^
-  -+ -noexpire -skip_checks ^
+  -+ -noexpire -skip_checks -esc_dbl_quote ^
   -r "{{CONTOOLS_ROOT}}" "%%CONTOOLS_ROOT%%" ^
   -r "{{CONTOOLS_PROJECT_EXTERNALS_ROOT}}" "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%" ^
-  -r!+ -r "{{SCRIPT}}" "!CMDLINE_ESCAPED!" -r!- ^
+  -r!+ -r "{{SCRIPT}}" "!CMDLINE!" -r!- ^
   -- "%%TEST_SCRIPT_FILE_DIR%%/.impl" "%%TEST_TEMP_DIR_PATH%%" "test_std__run_singleton_script.bat" >nul ^
-  || ( set "LAST_ERROR=255" & goto SKIP_TEST )
+  || ( set "TEST_LAST_ERROR=255" & goto SKIP_TEST )
 
 rem NOTE:
 rem   To debug use `/create-console` instead.
