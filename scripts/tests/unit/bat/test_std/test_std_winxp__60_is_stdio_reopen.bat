@@ -7,7 +7,7 @@ if %IMPL_MODE%0 EQU 0 exit /b
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
-for %%i in ("%TESTS_PROJECT_ROOT%\test_std\test_std__is_stdio_reopen\test_std__*.bat") do (
+for %%i in ("%TESTS_PROJECT_ROOT%\test_std\test_std__is_stdio_reopen\test_std_winxp__*.bat") do (
   set "SCRIPT_NAME=%%~ni"
   set "SCRIPT_FILE=%%i"
   call "%%CONTOOLS_ROOT%%/std/if_.bat" ^

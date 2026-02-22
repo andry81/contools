@@ -1,3 +1,8 @@
+2026.02.22:
+* new: scripts/tests/unit/bat/test_std/test_std__is_stdio_reopen: isolated singleton unit tests for `std/winxp/is_std*_reopen.bat` scripts
+* new: scripts/tests/unit/bat/test_std/test_std__is_stdio_reopen: isolated shared unit tests for `std/winxp/is_std*_reopen.bat` scripts with a second pass
+* refactor: scripts/tests/unit/bat/test_std: tests refactor
+
 2026.02.21:
 * fixed: scripts/tests/unit/bat/test_std/.test_std__60_is_stdio_reopen: execution fixup
 * new: scripts/tests/unit/bat/test_std/.test_std__60_is_stdio_reopen: isolated shared unit tests for `std/is_std*_reopen.bat` scripts with a second pass

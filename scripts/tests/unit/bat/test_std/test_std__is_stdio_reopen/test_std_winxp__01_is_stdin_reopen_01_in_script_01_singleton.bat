@@ -13,14 +13,21 @@ call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%"
 set "TEST_TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
 rem initialize setup parameters
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TESTS_LIST_FILE       "%%TESTS_PROJECT_ROOT%%/test_std/.test_std__60_is_stdio_reopen/.tests/03_stdio/input.lst"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TESTS_LIST_FILE       "%%TESTS_PROJECT_ROOT%%/test_std/test_std__is_stdio_reopen/.tests/01_stdin/input.lst"
+
+type "%TESTS_LIST_FILE:/=\%" ^
+  | "%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -r -b -e "s|/std/is_stdin_reopen.bat|/std/winxp/is_stdin_reopen.bat|mg" > "%TEST_TEMP_DIR_PATH%/test_input.lst" ^
+  || goto SKIP_TESTS
+
+set "TESTS_LIST_FILE=%TEST_TEMP_DIR_PATH%/test_input.lst"
 
 set TEST_DEBUG=0
 
-call "%%TESTS_PROJECT_ROOT%%/test_std/.test_std__60_is_stdio_reopen/.impl/test_std__test_shared_impl.bat" %%*
+call "%%TESTS_PROJECT_ROOT%%/test_std/test_std__is_stdio_reopen/.impl/test_std__test_singleton_impl.bat" %%*
 
 echo;
 
+:SKIP_TESTS
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
