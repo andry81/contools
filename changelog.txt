@@ -1,4 +1,7 @@
 2026.02.22:
+* new: scripts/tests/bench/bat/test_std/test_std_winxp__*_is_std*_reopen.bat: bench tests for `std/winxp/is_std*_reopen.bat` scripts
+
+2026.02.22:
 * new: scripts/tests/unit/bat/test_std/test_std__is_stdio_reopen: isolated singleton unit tests for `std/winxp/is_std*_reopen.bat` scripts
 * new: scripts/tests/unit/bat/test_std/test_std__is_stdio_reopen: isolated shared unit tests for `std/winxp/is_std*_reopen.bat` scripts with a second pass
 * refactor: scripts/tests/unit/bat/test_std: tests refactor
@@ -51,7 +54,7 @@
 * changed: README_EN.txt: readme update
 
 2026.02.16:
-* new: scripts/tests/bench/bat/test_std/test_std__*_is_std*_reopen.bat: bench tests for `is_std*_reopen.bat` scripts
+* new: scripts/tests/bench/bat/test_std/test_std__*_is_std*_reopen.bat: bench tests for `std/is_std*_reopen.bat` scripts
 
 2026.02.16:
 * new: scripts/tools/std/winxp/is_std*_reopen.bat: Windows XP (x64) variant of scripts with a workaround
