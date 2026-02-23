@@ -1,3 +1,6 @@
+2026.02.23:
+* changed: scripts/tests/unit/bat/test_std/.test_std__10_allocate_temp_dir/init.bat: minor test improvement
+
 2026.02.22:
 * new: scripts/tests/bench/bat/test_std/test_std_winxp__*_is_std*_reopen.bat: bench tests for `std/winxp/is_std*_reopen.bat` scripts
 
