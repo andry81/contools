@@ -1,4 +1,7 @@
 2026.02.23:
+* fixed: scripts/tests/bench/bat/_testdata/test_build__check_config_expiration/01_config.vars*: accidental line returns change
+
+2026.02.23:
 * changed: scripts/tests/unit/bat/test_std/.test_std__10_allocate_temp_dir/init.bat: minor test improvement
 
 2026.02.22:
