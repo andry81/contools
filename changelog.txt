@@ -1,4 +1,7 @@
 2026.02.24:
+* new: ._install/install_system64.bat: system x64 dependency install script, required in case of Windows XP x64
+
+2026.02.24:
 * changed: scripts/tests/bench/logs: bench tests log update
 
 2026.02.24:
