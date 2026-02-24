@@ -19,19 +19,27 @@ rem   expanded.
 if "%~1" == "" exit /b 255
 
 for /F "tokens=* delims="eol^= %%i in ("%~1") do ^
-for /F "usebackq eol=# tokens=1,* delims==" %%j in ("%~2") do call :FILTER && (
-  setlocal DISABLEDELAYEDEXPANSION & set "__?VALUE__=%%k" & setlocal ENABLEDELAYEDEXPANSION & if defined __?VALUE__ set "__?VALUE__=!__?VALUE__:"=!"
+for /F "usebackq eol=# tokens=* delims=" %%j in ("%~2") do for /F "tokens=1,* delims=="eol^= %%k in ("%%j") do call :FILTER && ^
+if "%%j" == "%%k=%%l" (
+  setlocal DISABLEDELAYEDEXPANSION & set "__?VALUE__=%%l" & setlocal ENABLEDELAYEDEXPANSION & if defined __?VALUE__ set "__?VALUE__=!__?VALUE__:"=!"
   if defined %~1 (
-    for /F "usebackq tokens=* delims="eol^= %%l in ('"!%~1!"') do for /F "usebackq tokens=* delims="eol^= %%v in ('"!__?VALUE__!"') do endlocal & endlocal ^
-    & set %~1=%%~l^& set "%%j=%%~v"
-  ) else for /F "usebackq tokens=* delims="eol^= %%v in ('"!__?VALUE__!"') do endlocal & endlocal & set %~1=set "%%j=%%~v"
+    for /F "usebackq tokens=* delims="eol^= %%m in ('"!%~1!"') do for /F "usebackq tokens=* delims="eol^= %%v in ('"!__?VALUE__!"') do endlocal & endlocal ^
+    & set %~1=%%~m^& set "%%k=%%~v"
+  ) else for /F "usebackq tokens=* delims="eol^= %%v in ('"!__?VALUE__!"') do endlocal & endlocal & set %~1=set "%%k=%%~v"
+) else (
+  setlocal DISABLEDELAYEDEXPANSION & setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%v in ('"!%%k!"') do endlocal ^
+  & set "__?VALUE__=%%~v" & setlocal ENABLEDELAYEDEXPANSION & if defined __?VALUE__ set "__?VALUE__=!__?VALUE__:"=!"
+  if defined %~1 (
+    for /F "usebackq tokens=* delims="eol^= %%m in ('"!%~1!"') do for /F "usebackq tokens=* delims="eol^= %%v in ('"!__?VALUE__!"') do endlocal & endlocal ^
+    & set %~1=%%~m^& set "%%k=%%~v"
+  ) else for /F "usebackq tokens=* delims="eol^= %%v in ('"!__?VALUE__!"') do endlocal & endlocal & set %~1=set "%%k=%%~v"
 )
 exit /b 0
 
 :FILTER
 setlocal DISABLEDELAYEDEXPANSION
-for %%a in (:) do set "__?VAR__=%%j"
+for %%a in (:) do set "__?VAR__=%%k"
 rem safe check, drop all internal variables beginning by `?`
 if ^%__?VAR__:~0,1%/ == ^?/ exit /b 1
-for /F "usebackq eol=# tokens=* delims=" %%l in ("%~dp0.set_vars_from_file\exclusion.vars") do if /i "%__?VAR__%" == "%%l" exit /b 1
+for /F "usebackq eol=# tokens=* delims=" %%i in ("%~dp0.set_vars_from_file\exclusion.vars") do if /i "%__?VAR__%" == "%%i" exit /b 1
 exit /b 0

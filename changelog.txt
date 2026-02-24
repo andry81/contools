@@ -1,3 +1,7 @@
+2026.02.24:
+* fixed: scripts/tools/std/set_vars_from_file.bat: avoid assignment in case of absence of an equals character
+* fixed: scripts/tools/std/set_vars_from_file_as_cmdline.bat: assign from a variable's environment value in case of absence of an equals character
+
 2026.02.23:
 * fixed: scripts/tests/bench/bat/_testdata/test_build__check_config_expiration/01_config.vars*: accidental line returns change
 
