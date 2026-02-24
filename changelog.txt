@@ -1,4 +1,7 @@
 2026.02.24:
+* changed: scripts/tests/manual/logs: manual tests log update
+
+2026.02.24:
 * fixed: scripts/tests/unit/bat/test_std/.test_std__20_chcp: execution fixup
 * new: scripts/tools/testlib/load_outer_cp.bat: explicit load of the saved outer code page variable
 * changed: scripts/tools/testlib: scripts RRR (Refactor, Rework, Refine), variables rename

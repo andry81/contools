@@ -3,6 +3,10 @@ Caption                               Name
 Intel64 Family 6 Model 58 Stepping 9  Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz  
 
 
+Running test_all.bat...
+
+Running test_build.bat...
+
 >test_build__00_load_config.bat
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=A
 BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=B1$/{{A}}
@@ -37,6 +41,10 @@ Environment variable TEST12 not defined
 TEST13=1
 TEST14=TEST6
 Environment variable TEST15 not defined
+
+Time spent: 0.540 secs (test_all.bat->test_build.bat)
+
+Running test_std.bat...
 
 >test_std__00_call.bat
 call.bat  echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
@@ -530,6 +538,10 @@ ARGS_COUNT(exe)=1
 CMDLINE=$*^|^&^(=^)^<^>"='`^%!+?** ,;=
 ---
 
+Time spent: 5.540 secs (test_all.bat->test_std.bat)
+
+Running test_std_encode.bat...
+
 >test_std_encode__00_asterisk_char.bat
 __STRING__="1 2" ! ? * & | , ; = ^= "=" 3
 __STRING__="1 2" ! ? $2A & | , ; = ^= "=" 3
@@ -652,3 +664,8 @@ __STRING__=$24$2A$7C$26$28$3D$29$3C$3E"$3D$27$60$5E$25$21$2B$3F$2A$2A $2C$3B$3D
 __STRING__=$*|&(=)<>"='`^%!+?** ,;=
 ---
 
+Time spent: 1.240 secs (test_all.bat->test_std_encode.bat)
+
+Time spent: 8.140 secs (test_all.bat)
+
+
