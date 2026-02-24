@@ -3,131 +3,140 @@ Caption                               Name
 Intel64 Family 6 Model 58 Stepping 9  Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz  
 
 
+>test__busy_wait__01_chcp.bat
+Time spent: 6.350 msecs
+
+>test__busy_wait__02_more.bat
+Time spent: 6.250 msecs
+
+>test__busy_wait__03_user.bat
+Time spent: 4.150 msecs
+
+>test__busy_wait__04_help.bat
+Time spent: 8.650 msecs
+
+>test__busy_wait__11_empty_pipe_01.bat
+Time spent: 6.700 msecs
+
+>test__busy_wait__12_empty_pipe_02.bat
+Time spent: 6.700 msecs
+
+>test__busy_wait__13_empty_pipe_03.bat
+Time spent: 6.100 msecs
+
+>test__busy_wait__14_empty_pipe_04.bat
+Time spent: 6.100 msecs
+
 >test__call__01_colon.bat
-Time spent: 0.022 msecs
+Time spent: 0.026 msecs
 
 >test__call__02_empty.bat
-Time spent: 0.015 msecs
+Time spent: 0.019 msecs
 
 >test__copy__01_nul_tempfile_redir_inner.bat
-Time spent: 0.232 msecs
+Time spent: 0.260 msecs
 
 >test__copy__02_nul_tempfile_redir_for.bat
-Time spent: 0.226 msecs
+Time spent: 0.254 msecs
 
 >test__copy__03_nul_tempfile_redir_outter.bat
-Time spent: 0.200 msecs
+Time spent: 0.225 msecs
 
 >test__echo__01_space.bat
-Time spent: 0.022 msecs
+Time spent: 0.023 msecs
 
 >test__echo__02_semicolon.bat
 Time spent: 0.023 msecs
 
 >test__echo__03_period.bat
-Time spent: 0.033 msecs
+Time spent: 0.034 msecs
 
 >test__echo__04_colon.bat
-Time spent: 0.034 msecs
+Time spent: 0.039 msecs
 
 >test__echo__05_slash.bat
 Time spent: 0.022 msecs
 
 >test__echo__06_backslash.bat
-Time spent: 0.037 msecs
+Time spent: 0.038 msecs
 
 >test__echo__07_plus.bat
-Time spent: 0.022 msecs
+Time spent: 0.023 msecs
 
 >test__echo__08_parenthesis.bat
-Time spent: 0.021 msecs
+Time spent: 0.022 msecs
 
 >test__exit__111_exit_b_84x100.bat
-Time spent: 1.540 msecs
+Time spent: 1.680 msecs
 
 >test__exit__112_exit_b_84x1000.bat
-Time spent: 1.540 msecs
+Time spent: 1.860 msecs
 
 >test__exit__121_goto_eof_84x100.bat
-Time spent: 1.520 msecs
+Time spent: 1.700 msecs
 
 >test__exit__122_goto_eof_84x1000.bat
-Time spent: 1.520 msecs
+Time spent: 1.670 msecs
 
 >test__exit__131_goto_end_84x100.bat
-Time spent: 2.050 msecs
+Time spent: 2.360 msecs
 
 >test__exit__132_goto_end_84x1000.bat
-Time spent: 6.770 msecs
+Time spent: 7.370 msecs
 
 >test__exit__211_exit_b_86x100_parentheses.bat
-Time spent: 1.540 msecs
+Time spent: 1.740 msecs
 
 >test__exit__212_exit_b_86x1000_parentheses.bat
-Time spent: 1.510 msecs
+Time spent: 1.780 msecs
 
 >test__exit__221_goto_eof_86x100_parentheses.bat
-Time spent: 1.530 msecs
+Time spent: 1.680 msecs
 
 >test__exit__222_goto_eof_86x1000_parentheses.bat
-Time spent: 1.510 msecs
+Time spent: 1.710 msecs
 
 >test__exit__231_goto_end_86x100_parentheses.bat
-Time spent: 2.060 msecs
+Time spent: 2.360 msecs
 
 >test__exit__232_goto_end_86x1000_parentheses.bat
-Time spent: 6.920 msecs
+Time spent: 7.280 msecs
 
 >test__exit__311_last_call_84x100.bat
-Time spent: 3.110 msecs
+Time spent: 3.460 msecs
 
 >test__exit__312_last_call_84x1000.bat
-Time spent: 3.140 msecs
+Time spent: 3.470 msecs
 
->test__for__11_for_range_9.bat
-Time spent: 0.033 msecs
+>test__exit_vs__01_errlvl.bat
+Time spent: 1.510 msecs
 
->test__for__12_for_range_10.bat
-Time spent: 0.037 msecs
+>test__exit_vs__02_pipe_to_exit_b.bat
+Time spent: 6.600 msecs
 
->test__for__13_for_range_100.bat
-Time spent: 0.140 msecs
-
->test__for__14_for_range_10x10.bat
-Time spent: 0.500 msecs
-
->test__for__21_for_in_9.bat
-Time spent: 0.050 msecs
-
->test__for__22_for_in_10.bat
-Time spent: 0.058 msecs
-
->test__for__23_for_in_100.bat
-Time spent: 0.142 msecs
-
->test__for__24_for_in_10x10.bat
-Time spent: 0.787 msecs
+>test__exit_vs__03_pipe_to_exit.bat
+Time spent: 6.800 msecs
 
 >test__read__01_by_for_string_using_tmp_file_no_del.bat
 Time spent: 0.420 msecs
 
 >test__read__02_by_set_using_tmp_file_no_del.bat
-Time spent: 0.390 msecs
+Time spent: 0.430 msecs
 
 >test__read__11_by_for_string_using_tmp_file_w_del.bat
-Time spent: 0.620 msecs
+Time spent: 0.670 msecs
 
 >test__read__12_by_set_using_tmp_file_w_del.bat
-Time spent: 0.630 msecs
+Time spent: 0.660 msecs
 
 >test__read__21_by_for_file_using_exec_to_tmp_file_no_del.bat
-Time spent: 6.530 msecs
+Time spent: 7.060 msecs
 
 >test__read__22_by_for_file_using_exec_to_tmp_file_w_del.bat
-Time spent: 6.800 msecs
+Time spent: 7.330 msecs
 
 >test__read__23_by_for_exec_to_var.bat
-Time spent: 18.000 msecs
+Time spent: 21.200 msecs
 
 >test__read_dir__01_dir_A-D_B_ON.bat
 @dir "*_*_*.lst" /A:-D /B /O:N 2>nul
@@ -138,7 +147,7 @@ Time spent: 18.000 msecs
 06_02_win8.lst
 06_03_win81.lst
 10_00_win10.lst
-Time spent: 0.014 secs
+Time spent: 0.018 secs
 
 >test__read_dir__11_for_dir_files.bat
 05_00_win2k.lst
@@ -148,86 +157,92 @@ Time spent: 0.014 secs
 06_02_win8.lst
 06_03_win81.lst
 10_00_win10.lst
-Time spent: 0.030 msecs
+Time spent: 0.010 msecs
 
 >test__rem__01_80x10.bat
-Time spent: 2.330 msecs
+Time spent: 2.560 msecs
 
 >test__rem__02_80x10_parentheses.bat
-Time spent: 1.650 msecs
+Time spent: 1.900 msecs
 
 >test__rem__03_80x10_goto.bat
-Time spent: 1.580 msecs
+Time spent: 1.780 msecs
 
 >test__set__01_1x10.bat
-Time spent: 2.820 msecs
+Time spent: 3.020 msecs
 
 >test__set__02_10x1_with_parentheses.bat
-Time spent: 2.050 msecs
+Time spent: 2.260 msecs
 
 >test__set__03_1x10_with_postfix_lr_and.bat
-Time spent: 2.050 msecs
+Time spent: 2.190 msecs
 
 >test__set__04_1x10_with_prefix_lr_and.bat
-Time spent: 2.060 msecs
+Time spent: 2.210 msecs
 
 >test__set__05_10x1_with_and.bat
-Time spent: 1.990 msecs
+Time spent: 2.130 msecs
 
 >test__setlocal__01_setlocal.bat
-Time spent: 0.330 msecs
+Time spent: 0.350 msecs
 
 >test__setlocal__02_setlocal_DISABLEDELAYEDEXPANSION.bat
-Time spent: 0.330 msecs
+Time spent: 0.350 msecs
 
 >test__setlocal__03_setlocal_ENABLEDELAYEDEXPANSION.bat
-Time spent: 0.330 msecs
+Time spent: 0.360 msecs
 
 >test__set_errorlevel__01_call_set_a.bat
-Time spent: 2.280 msecs
+Time spent: 2.700 msecs
 
 >test__set_errorlevel__02_delayedvar_set_a.bat
-Time spent: 1.610 msecs
+Time spent: 1.810 msecs
 
 >test__type__01_nul_stdout_nul_redir.bat
 Time spent: 0.050 msecs
 
 >test__type__02_nul_stdout_nul_redir_inner.bat
-Time spent: 0.050 msecs
+Time spent: 0.052 msecs
 
 >test__type__03_nul_stdout_nul_redir_inner2.bat
-Time spent: 0.050 msecs
+Time spent: 0.051 msecs
 
 >test__type__04_nul_stdout_nul_redir_outter.bat
-Time spent: 0.038 msecs
+Time spent: 0.039 msecs
 
 >test__type__11_nul_stdout_tempfile_redir.bat
-Time spent: 0.107 msecs
+Time spent: 0.116 msecs
 
 >test__type__12_nul_stdout_tempfile_redir_inner.bat
-Time spent: 0.108 msecs
+Time spent: 0.127 msecs
 
 >test__type__13_nul_stdout_tempfile_redir_inner2.bat
-Time spent: 0.107 msecs
+Time spent: 0.125 msecs
 
 >test__type__14_nul_stdout_tempfile_redir_outter.bat
-Time spent: 0.036 msecs
+Time spent: 0.038 msecs
 
 >test__type__21_none_stderr_nul_redir.bat
-Time spent: 0.044 msecs
+Time spent: 0.047 msecs
 
 >test__type__22_none_stderr_nul_redir_inner.bat
-Time spent: 0.045 msecs
+Time spent: 0.046 msecs
 
 >test__type__23_none_stderr_nul_redir_inner2.bat
-Time spent: 0.045 msecs
+Time spent: 0.047 msecs
 
 >test__type__24_none_stderr_nul_redir_outter.bat
-Time spent: 0.028 msecs
+Time spent: 0.032 msecs
+
+>test__type_vs__01_type_nul_stdout_nul.bat
+Time spent: 0.052 msecs
+
+>test__type_vs__02_call_stdout_nul.bat
+Time spent: 0.037 msecs
 
 >test__which__01.bat
-Time spent: 1.560 msecs
+Time spent: 1.770 msecs
 
 >test__which__02_where.bat
-Time spent: 76.000 msecs
+Time spent: 81.000 msecs
 

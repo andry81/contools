@@ -1,8 +1,11 @@
 2026.02.24:
+* changed: scripts/tests/bench/logs: bench tests log update
+
+2026.02.24:
 * fixed: scripts/tests/script_init.bat: `__init__.bat` must be called before the parent `script_init.bat`, `SCRIPT_INIT` variable is used instead of `TESTLIB__INIT` in case of a light weight script init w/o call to `testlib/init.bat`
 
 2026.02.24:
-* changed: scripts/tests/manual/logs: unit tests log update
+* changed: scripts/tests/unit/logs: unit tests log update
 
 2026.02.24:
 * changed: scripts/tests/manual/logs: manual tests log update
