@@ -30,9 +30,10 @@ rem call "%%CONTOOLS_ROOT%%/std/get_cmdline.bat" %%*
 rem call "%%CONTOOLS_ROOT%%/std/echo_var.bat" RETURN_VALUE ">"
 rem echo;
 
-if 0%TESTLIB__INIT% EQU 0 (
+if 0%SCRIPT_INIT% EQU 0 (
   rem CPU name to compare bench tests
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\wbem\wmic.exe" cpu get Caption,Name
+  set SCRIPT_INIT=1
 )
 
 rem The caller can continue after this exit.
