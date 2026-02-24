@@ -1,4 +1,7 @@
 2026.02.24:
+* changed: scripts/tests/manual/logs: unit tests log update
+
+2026.02.24:
 * changed: scripts/tests/manual/logs: manual tests log update
 
 2026.02.24:
