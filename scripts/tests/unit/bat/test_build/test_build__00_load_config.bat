@@ -9,7 +9,7 @@ call "%%CONTOOLS_ROOT%%/std/assert_if_def.bat" __CTRL_SETLOCAL "error: cmd.exe i
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
 rem to make not printable characters visible
-chcp 437
+"%CONTOOLS_PROJECT_ROOT%/tools/chcp.bat" 437
 
 setlocal
 set "REFERENCE_1_VALUE_01="

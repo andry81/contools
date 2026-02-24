@@ -1,4 +1,8 @@
 2026.02.24:
+* fixed: scripts/tests/unit/bat: tests execution fixup under Windows XP x64
+* new: tools/chcp.bat: script to call `System64\chcp.com` variant of the executable if `System32\chcp.com` is not found, has meaning in Windows XP x64
+
+2026.02.24:
 * new: ._install/install_system64.bat: system x64 dependency install script, required in case of Windows XP x64
 
 2026.02.24:
