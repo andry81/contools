@@ -1,13 +1,14 @@
 * README_EN.txt
-* 2026.02.21
+* 2026.02.23
 * contools--testlib
 
 1. DESCRIPTION
 2. EXTERNALS
 3. CATALOG CONTENT DESCRIPTION
-4. LIBRARY SCRIPTS DESCRIPTION
-5. TESTS CATALOG EXAMPLE
-6. TEST FILES CONTENT EXAMPLE
+4. VARIABLES
+5. SCRIPTS
+6. TESTS CATALOG EXAMPLE
+7. TEST FILES CONTENT EXAMPLE
 
 -------------------------------------------------------------------------------
 1. DESCRIPTION
@@ -61,7 +62,32 @@ https://github.com/andry81/externals
 All other scripts in the root are internal.
 
 -------------------------------------------------------------------------------
-4. LIBRARY SCRIPTS DESCRIPTION
+4. VARIABLES
+-------------------------------------------------------------------------------
+
+* TESTLIB__OUTER_CP
+
+  An outer code page after `std/init.bat` call.
+  Defined if `SETUP_CP` defined.
+
+* TESTLIB__PREV_CP
+
+  A previous code page after `testlib/set_inner_cp.bat` call.
+  Defined if `SETUP_CP` defined.
+
+* TESTLIB__CURRENT_CP
+
+  A current code page after `testlib/getcp.bat` call.
+  Defined if `SETUP_CP` defined.
+
+* SETUP_CP
+
+  If defined, then enables `testlib/set_inner_cp.bat`,
+  `testlib/set_prev_cp.bat` and `testlib/set_outer_cp.bat` to be used in all
+  `testlib` functions.
+
+-------------------------------------------------------------------------------
+5. SCRIPTS
 -------------------------------------------------------------------------------
 
 test.bat:
@@ -155,7 +181,7 @@ CAUTION:
   `testlib/exit.bat` from a handler script.
 
 -------------------------------------------------------------------------------
-5. TESTS CATALOG EXAMPLE
+6. TESTS CATALOG EXAMPLE
 -------------------------------------------------------------------------------
 <root>
  |
@@ -191,7 +217,7 @@ NOTE:
   different.
 
 -------------------------------------------------------------------------------
-6. TEST FILES CONTENT EXAMPLES
+7. TEST FILES CONTENT EXAMPLES
 -------------------------------------------------------------------------------
 
 Here is variant of test files mostly for unit test cases.

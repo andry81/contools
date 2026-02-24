@@ -1,4 +1,12 @@
 2026.02.24:
+* fixed: scripts/tests/unit/bat/test_std/.test_std__20_chcp: execution fixup
+* new: scripts/tools/testlib/load_outer_cp.bat: explicit load of the saved outer code page variable
+* changed: scripts/tools/testlib: scripts RRR (Refactor, Rework, Refine), variables rename
+* changed: scripts/tools/testlib/load_*.bat: skip load code page variables, they must be always processed explicitly due to a dependency on the output of the `chcp.com` utility
+* changed: scripts/tools/testlib: removed dependency on `CHCP` variable and explicitly set the inner code page dependent on the OS
+* changed: scripts/tools/testlib/README_EN.txt: readme update
+
+2026.02.24:
 * fixed: scripts/tools/std/set_vars_from_file.bat: avoid assignment in case of absence of an equals character
 * fixed: scripts/tools/std/set_vars_from_file_as_cmdline.bat: assign from a variable's environment value in case of absence of an equals character
 

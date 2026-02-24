@@ -15,4 +15,3 @@ rem   load_locals.bat [<local-vars-file> [<nest-lvl-vars-file>]]
 rem CAUTION:
 rem   We must use a uniform code page to avoid a code page change between
 rem   calls and so accidental recode on a file read/write.
-rem

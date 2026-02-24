@@ -1,4 +1,4 @@
-@echo off & if defined SETUP_CP if defined CHCP if %NO_CHCP%0 EQU 0 call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
+@echo off & if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
 ( call :UPDATE %%* ) >> "%~1" & exit /b
 
