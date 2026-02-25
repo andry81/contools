@@ -40,9 +40,6 @@ setlocal
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
-rem log into current directory
-if not defined PROJECT_LOG_ROOT set PROJECT_LOG_ROOT=.log
-
 call "%%~dp0../__init__/script_init.bat" %%0 %%* || exit /b
 if %IMPL_MODE%0 EQU 0 exit /b
 

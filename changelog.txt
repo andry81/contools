@@ -1,3 +1,6 @@
+2026.02.25:
+* changed: scripts/tools/build: removed logging into current directory by default
+
 2026.02.24:
 * fixed: scripts/tests/unit/bat: tests execution fixup under Windows XP x64
 * new: tools/chcp.bat: script to call `System64\chcp.com` variant of the executable if `System32\chcp.com` is not found, has meaning in Windows XP x64

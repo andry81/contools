@@ -20,9 +20,6 @@ rem 1. call extract_files_from_archive.bat c:\path_for_unpack\app release\x86\ap
 
 setlocal
 
-rem log into current directory
-if not defined PROJECT_LOG_ROOT set PROJECT_LOG_ROOT=.log
-
 call "%%~dp0../__init__/script_init.bat" %%0 %%* || exit /b
 if %IMPL_MODE%0 EQU 0 exit /b
 
