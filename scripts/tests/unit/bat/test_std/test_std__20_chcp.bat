@@ -9,14 +9,15 @@ call "%%CONTOOLS_ROOT%%/std/assert_if_def.bat" __CTRL_SETLOCAL "error: cmd.exe i
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
 rem avoid use UTF code pages in Windows XP
-if %WINDOWS_MAJOR_VER% LSS 6 goto SKIP_UTF
+if %WINDOWS_MAJOR_VER% LSS 6 set TEST_IMPL_SKIP=1
 
 call :TEST 0 chcp 65000 "%%SETUP_CP%%" "%%SETUP_CP%%|"
 call :TEST 0 chcp 65001 65000 "65000|%%SETUP_CP%%|"
 call :TEST 0 restorecp 65000 65001 "%%SETUP_CP%%|"
 call :TEST 0 restorecp "%%SETUP_CP%%" 65000 ""
 
-:SKIP_UTF
+if %WINDOWS_MAJOR_VER% LSS 6 set TEST_IMPL_SKIP=0
+
 call :TEST 0 chcp 866 "%%SETUP_CP%%" "%%SETUP_CP%%|"
 call :TEST 0 chcp 866 866 "866|%%SETUP_CP%%|"
 call :TEST 0 chcp 437 866 "866|866|%%SETUP_CP%%|"

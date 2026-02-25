@@ -28,6 +28,8 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
 
 :SKIP_SETUP_CP
 
+set "TESTLIB__TEST_STATUS_MSG=FAILED"
+
 set /A TESTLIB__CURRENT_TESTS+=1
 set /A TESTLIB__OVERALL_TESTS+=1
 
@@ -45,6 +47,8 @@ if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/set_prev_cp.bat"
 rem Drop internal variables but use some changed value(s) for the return
 (
   endlocal
+
+  set "TESTLIB__TEST_STATUS_MSG=%TESTLIB__TEST_STATUS_MSG%"
 
   rem set "TESTLIB__OVERALL_PASSED_TESTS=%TESTLIB__OVERALL_PASSED_TESTS%"
   set "TESTLIB__OVERALL_TESTS=%TESTLIB__OVERALL_TESTS%"

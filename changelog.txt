@@ -1,4 +1,14 @@
 2026.02.25:
+* fixed: scripts/tests/unit/bat/test_std/test_std__is_stdio_reopen/.impl/test_std__run_shared_script.bat.in: missed to print empty string after a failed test
+* new: scripts/tools/testlib: test skip logic
+* new: scripts/tools/testlib/set_test_skipped.bat: test skip script to manual test skip in an isolated environment
+* changed: scripts/tests/unit/bat/test_std/test_std__20_chcp.bat: tests skip logic in Windows XP to avoid test order number shift
+* changed: scripts/tests: a test status message variable instead a static text
+* changed: scripts/tests/unit/bat/test_xml: code improvement
+* changed: scripts/tools/testlib/README_EN.txt: readme update
+* refactor: scripts/test/unit/bat: minors cleanup
+
+2026.02.25:
 * changed: scripts/tools/build: removed logging into current directory by default
 
 2026.02.24:

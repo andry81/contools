@@ -107,6 +107,9 @@ set /A "TESTLIB__INIT+=0"       & rem nest level
 set /A "TESTLIB__INIT_INDEX+=0" & rem init index
 set /A "TESTLIB__TEST_SETUP+=0" & rem bitmask, 31 bits
 
+set "TEST_IMPL_SKIP=0"          & rem reset test skipping
+set "TESTLIB__TEST_STATUS_MSG="
+
 set "TEST_SCRIPT_FILE_PATH_=%~1"
 set "TEST_SCRIPT_HANDLERS_DIR=%~2"
 
@@ -217,9 +220,11 @@ if exist "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" del /F /Q /A:-D "%TEST_SCRIPT_TEST_
 if exist "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" del /F /Q /A:-D "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" >nul
 
 rem case to integer
+set /A TESTLIB__OVERALL_SKIPPED_TESTS+=0
 set /A TESTLIB__OVERALL_PASSED_TESTS+=0
 set /A TESTLIB__OVERALL_TESTS+=0
 
+set TESTLIB__CURRENT_SKIPPED_TESTS=0
 set TESTLIB__CURRENT_PASSED_TESTS=0
 set TESTLIB__CURRENT_TESTS=0
 
@@ -239,7 +244,9 @@ echo;
 setlocal DISABLEDELAYEDEXPANSION & setlocal ENABLEDELAYEDEXPANSION & ^
 for /F "tokens=* delims="eol^= %%i in ("!TEST_SCRIPT_FILE!") do ^
 for /F "usebackq tokens=* delims="eol^= %%j in ('"!TEST_SCRIPT_INIT_CMDLINE!"') do endlocal & ^
-title [%TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS%] %%i %%~j
+if %TESTLIB__OVERALL_SKIPPED_TESTS% EQU 0 (
+  title [%TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS%] %%i %%~j
+) else title [%TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS%] ^(~%TESTLIB__OVERALL_SKIPPED_TESTS%^) %%i %%~j
 endlocal
 
 set "TESTLIB__INITING="

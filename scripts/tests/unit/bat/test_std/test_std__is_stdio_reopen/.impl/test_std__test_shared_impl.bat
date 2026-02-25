@@ -4,10 +4,6 @@ setlocal DISABLEDELAYEDEXPANSION
 
 set "TEST_LOG=%TEST_TEMP_DIR_PATH%/test_impl.log"
 
-rem NOTE:
-rem   The `CMDLINE` value has double quotes so explicitly enable delayed
-rem   expansion to pass it through the Windows Batch command line.
-rem   The `-esc_dbl_quote` flag automatically escapes all double quotes.
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/gen_config.bat" ^
   -+ -noexpire -skip_checks ^
   -r "{{CONTOOLS_ROOT}}" "%%CONTOOLS_ROOT%%" ^

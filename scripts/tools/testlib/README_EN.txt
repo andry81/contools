@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.02.23
+* 2026.02.25
 * contools--testlib
 
 1. DESCRIPTION
@@ -47,6 +47,10 @@ https://github.com/andry81/externals
  |    #
  |    # To manually set (increment) a test pass out of `testlib/test.bat` call.
  |
+ +- /`set_test_skipped.bat`
+ |    #
+ |    # To manually set (increment) a test skip out of `testlib/test.bat` call.
+ |
  +- /`set_test_failed.bat`
  |    #
  |    # To manually set (increment) a test fail out of `testlib/test.bat` call.
@@ -85,6 +89,23 @@ All other scripts in the root are internal.
   If defined, then enables `testlib/set_inner_cp.bat`,
   `testlib/set_prev_cp.bat` and `testlib/set_outer_cp.bat` to be used in all
   `testlib` functions.
+
+* TEST_IMPL_ERROR
+
+  The `/.<user-test-script>/impl.bat` script internal return code.
+  Oppositely to `TEST_LAST_ERROR` does not store the error code between test
+  handler scripts.
+
+* TEST_LAST_ERROR
+
+  The return code of each test handler script in the `/.<user-test-script>`
+  directory. The `/.<user-test-script>/report.bat` script handler must use it
+  to detect a test fail or pass.
+
+* TEST_IMPL_SKIP
+
+  State variable to skip tests in a group. Each `testlib/init.bat` call does
+  reset it. The `TEST_IMPL_ERROR` variable does set to `-1` in case of a skip.
 
 -------------------------------------------------------------------------------
 5. SCRIPTS

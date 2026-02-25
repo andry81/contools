@@ -60,7 +60,7 @@ call "%%CONTOOLS_ROOT%%/std/cmp_nvar.bat" TEST_IMPL_ERROR EQU RETURN_REFERENCE |
 if %TEST_LAST_ERROR% NEQ 0 (
   call "%%CONTOOLS_ROOT%%/testlib/set_test_failed.bat"
   setlocal ENABLEDELAYEDEXPANSION
-  set "__LOG__=FAILED: !TESTLIB__TEST_ORDER_NUMBER!: RESULT=`!TEST_IMPL_ERROR!` REFERENCE=`!RETURN_REFERENCE!` CMDLINE=`!CMDLINE!`"
+  set "__LOG__=!TESTLIB__TEST_STATUS_MSG!: !TESTLIB__TEST_ORDER_NUMBER!: RESULT=`!TEST_IMPL_ERROR!` REFERENCE=`!RETURN_REFERENCE!` CMDLINE=`!CMDLINE!`"
   call :LOG
   call :LOG
   exit /b 1
@@ -69,14 +69,14 @@ if %TEST_LAST_ERROR% NEQ 0 (
 call "%%CONTOOLS_ROOT%%/testlib/set_test_passed.bat"
 
 setlocal ENABLEDELAYEDEXPANSION
-set "__LOG__=PASSED: !TESTLIB__TEST_ORDER_NUMBER!: RESULT=`!TEST_IMPL_ERROR!` CMDLINE=`!CMDLINE!`"
+set "__LOG__=!TESTLIB__TEST_STATUS_MSG!: !TESTLIB__TEST_ORDER_NUMBER!: RESULT=`!TEST_IMPL_ERROR!` CMDLINE=`!CMDLINE!`"
 call :LOG
 
 exit /b 0
 
 :LOG
 setlocal ENABLEDELAYEDEXPANSION & ^
-for /F "usebackq tokens=* delims="eol^= %%i in ('!__LOG__!') do (
+for /F "usebackq tokens=* delims="eol^= %%i in ('"!__LOG__!"') do (
   echo;%%~i
   (echo;%%~i) >> "%TEST_LOG%"
 )

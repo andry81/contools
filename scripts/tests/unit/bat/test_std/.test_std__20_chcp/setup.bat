@@ -24,6 +24,6 @@ if %WINDOWS_MAJOR_VER% GEQ 6 (
 ) else set SETUP_CP=437
 
 rem explicitly set initial code page for tests
-"%CONTOOLS_PROJECT_ROOT%/tools/chcp.bat" %SETUP_CP%
+"%SystemRoot%\System32\chcp.com" %SETUP_CP%
 
 exit /b 0

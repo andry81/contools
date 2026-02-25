@@ -106,7 +106,9 @@ if %TEST_LAST_ERROR% EQU 0 (
 )
 
 if %TESTLIB__MANUAL%0 EQU 0 (
-  echo    %TESTLIB__CURRENT_PASSED_TESTS% of %TESTLIB__CURRENT_TESTS% current tests is passed.
+  if %TESTLIB__CURRENT_SKIPPED_TESTS% EQU 0 (
+    echo    %TESTLIB__CURRENT_PASSED_TESTS% of %TESTLIB__CURRENT_TESTS% current tests is passed.
+  ) else echo    %TESTLIB__CURRENT_PASSED_TESTS% ^(~%TESTLIB__CURRENT_SKIPPED_TESTS%^) of %TESTLIB__CURRENT_TESTS% current tests is passed ^(~skipped^).
   echo;
 )
 
@@ -116,12 +118,16 @@ copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_EXIT_VARS_FILE_PA
 setlocal DISABLEDELAYEDEXPANSION & setlocal ENABLEDELAYEDEXPANSION & ^
 for /F "tokens=* delims="eol^= %%i in ("!TEST_SCRIPT_FILE!") do ^
 for /F "usebackq tokens=* delims="eol^= %%j in ('"!TEST_SCRIPT_INIT_CMDLINE!"') do endlocal & ^
-title [%TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS%] %%i %%~j
+if %TESTLIB__OVERALL_SKIPPED_TESTS% EQU 0 (
+  title [%TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS%] %%i %%~j
+) else title [%TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS%] ^(~%TESTLIB__OVERALL_SKIPPED_TESTS%^) %%i %%~j
 endlocal
 
 if %TESTLIB__INIT% EQU 0 (
   if %TESTLIB__MANUAL%0 EQU 0 (
-    echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% overall tests is passed.
+    if %TESTLIB__OVERALL_SKIPPED_TESTS% EQU 0 (
+      echo    %TESTLIB__OVERALL_PASSED_TESTS% of %TESTLIB__OVERALL_TESTS% overall tests is passed.
+    ) else echo    %TESTLIB__OVERALL_PASSED_TESTS% ^(~%TESTLIB__OVERALL_SKIPPED_TESTS%^) of %TESTLIB__OVERALL_TESTS% overall tests is passed ^(~skipped^).
   )
   echo;^
   if not defined IMPL_MODE if defined OEMCP ( call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
