@@ -1,4 +1,8 @@
 2026.02.26:
+* fixed: scripts/tools/wmi: print_wmi_local_date_and_last_boot_uptime.vbs, print_wmi_local_last_boot_uptime.vbs: locale independent decimal separator support
+* changed: scripts/tools: build/init_project_log.bat, testlib/init.bat: locale independent decimal separator support
+
+2026.02.26:
 * fixed: scripts/tests/unit/bat/test_std/.test_std__20_chcp/setup.bat: execution fixup under Windows XP x64
 * new: scripts/tools/build/load_config*.bat: `-use_os_params` to use OS parameterization values for empty `<Param0>` and `<Param1>`
 * changed: __init__/__init__.bat: switched to use `-use_os_params` flag

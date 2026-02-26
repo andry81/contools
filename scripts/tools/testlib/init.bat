@@ -171,7 +171,8 @@ set "TEST_SCRIPT_ROOT_INIT_DATE_TIME=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RE
 
 setlocal
 
-for /F "tokens=1,2,* delims=,."eol^= %%i in ("%RETURN_VALUE%") do set "LAST_BOOT_UPTIME_SEC=%%j" & set "LAST_BOOT_UPTIME_SEC_FRACS=%%k"
+for /F "tokens=1,* delims=;"eol^= %%i in ("%RETURN_VALUE%") do ^
+for /F "tokens=1,* delims=,."eol^= %%k in ("%%j") do set "LAST_BOOT_UPTIME_SEC=%%k" & set "LAST_BOOT_UPTIME_SEC_FRACS=%%l"
 
 set "LAST_BOOT_UPTIME_SEC_FRACS=%LAST_BOOT_UPTIME_SEC_FRACS%000"
 

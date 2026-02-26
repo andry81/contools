@@ -34,7 +34,8 @@ goto USE_LOG_BOOT_UP_TIME_END
 call "%%CONTOOLS_WMI_ROOT%%\get_wmi_local_date_and_last_boot_uptime.vbs.bat"
 set "PROJECT_LOG_FILE_NAME_DATE_TIME=%RETURN_VALUE:~0,4%'%RETURN_VALUE:~4,2%'%RETURN_VALUE:~6,2%"
 
-for /F "tokens=1,2,* delims=,."eol^= %%i in ("%RETURN_VALUE%") do set "LAST_BOOT_UPTIME_SEC=%%j" & set "LAST_BOOT_UPTIME_SEC_FRACS=%%k"
+for /F "tokens=1,* delims=;"eol^= %%i in ("%RETURN_VALUE%") do ^
+for /F "tokens=1,* delims=,."eol^= %%k in ("%%j") do set "LAST_BOOT_UPTIME_SEC=%%k" & set "LAST_BOOT_UPTIME_SEC_FRACS=%%l"
 
 set "LAST_BOOT_UPTIME_SEC_FRACS=%LAST_BOOT_UPTIME_SEC_FRACS%000"
 
