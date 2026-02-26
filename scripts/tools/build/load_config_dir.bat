@@ -50,6 +50,9 @@ rem   -no_load_user_config
 rem     Skips load the user configuration file(s).
 rem     Has priority over `-gen_user_config` and `-load_user_output_config`
 rem     flags.
+rem
+rem   -use_os_params
+rem     See details in `load_config.bat` script.
 
 rem -+:
 rem   Separator to begin flags scope to parse.
@@ -65,6 +68,10 @@ rem   Must be not empty and exist.
 rem <OutputDir>:
 rem   Output configuration file directory.
 rem   Can be empty, then `<InputDir>` is used instead.
+
+rem <Param0>, <Param1>
+rem   Custom variables filter parameters.
+rem   See details in `load_config.bat` script.
 
 rem NOTE:
 rem   All the rest parameters is in the `load_config.bat` script.
@@ -112,6 +119,32 @@ for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@set __? 2^>nul`) do set "%%
 exit /b
 
 :MAIN
+set __?PARAM0=%~3"
+set __?PARAM1=%~4"
+
+if not defined WINDOWS_MAJOR_VER goto SKIP_PARAM0
+if not defined WINDOWS_MINOR_VER goto SKIP_PARAM0
+
+if not defined __?PARAM0 (
+  if %WINDOWS_MAJOR_VER% LSS 6 set "__?PARAM0=OSWINXP"
+  if %WINDOWS_MAJOR_VER% EQU 6 (
+    if %WINDOWS_MINOR_VER% LSS 2 set "__?PARAM0=OSWIN7"
+    if %WINDOWS_MINOR_VER% LSS 4 set "__?PARAM0=OSWIN8"
+    if %WINDOWS_MINOR_VER% GEQ 4 set "__?PARAM0=OSWIN10"
+  ) else if %WINDOWS_MAJOR_VER% GTR 6 set "__?PARAM0=OSWIN10"
+)
+
+:SKIP_PARAM0
+
+if not defined COMSPEC_X64_VER goto SKIP_PARAM1
+
+if not defined __?PARAM1 (
+  if %COMSPEC_X64_VER% NEQ 0 set "__?PARAM1=OS64"
+  if %COMSPEC_X64_VER% EQU 0 set "__?PARAM1=OS32"
+)
+
+:SKIP_PARAM1
+
 if %__?FLAG_NO_LOAD_SYSTEM_CONFIG% NEQ 0 goto LOAD_SYSTEM_CONFIG_END
 
 call :CMD "%%__?~dp0%%load_config.bat" -+%%__?BARE_SYSTEM_FLAGS%% -- %%1 %%2 "config.system.vars%%__?SYSTEM_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
@@ -131,14 +164,11 @@ if %__?LOAD_USER_CONFIG_IN% NEQ 0 (
   if not exist "%~1/config.%__?CONFIG_INDEX%.vars%__?USER_CONFIG_FILE_EXT%" if not exist "%~1/config.%__?CONFIG_INDEX%.vars.in" goto LOAD_USER_CONFIG_END
 ) else if not exist "%~2/config.%__?CONFIG_INDEX%.vars%__?USER_CONFIG_FILE_EXT%" if not exist "%~1/config.%__?CONFIG_INDEX%.vars.in" goto LOAD_USER_CONFIG_END
 
-call :LOAD_CONFIG %%* || exit /b
+call :CMD "%%__?~dp0%%load_config.bat" -+%%__?BARE_USER_FLAGS%% -- %%1 %%2 "config.%%__?CONFIG_INDEX%%.vars%%__?USER_CONFIG_FILE_EXT%%" "%%__?PARAM0%%" "%%__?PARAM1%%" || exit /b
 
 set /A __?CONFIG_INDEX+=1
 
 goto LOAD_CONFIG_LOOP
-
-:LOAD_CONFIG
-call :CMD "%%__?~dp0%%load_config.bat" -+%%__?BARE_USER_FLAGS%% -- %%1 %%2 "config.%%__?CONFIG_INDEX%%.vars%%__?USER_CONFIG_FILE_EXT%%" %%3 %%4 || exit /b
 
 :LOAD_USER_CONFIG_END
 

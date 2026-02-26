@@ -1,3 +1,10 @@
+2026.02.26:
+* fixed: scripts/tests/unit/bat/test_std/.test_std__20_chcp/setup.bat: execution fixup under Windows XP x64
+* new: scripts/tools/build/load_config*.bat: `-use_os_params` to use OS parameterization values for empty `<Param0>` and `<Param1>`
+* changed: __init__/__init__.bat: switched to use `-use_os_params` flag
+* changed: tools/load_config_dir.bat: removed as not needed anymore
+* refactor: scripts: tools/encoding/chcp.bat, tests/unit/bat/test_build/test_build__00_load_config.bat: moved from `tools` directory
+
 2026.02.25:
 * fixed: scripts/tests/unit/bat/test_std/test_std__is_stdio_reopen/.impl/test_std__run_shared_script.bat.in: missed to print empty string after a failed test
 * new: scripts/tools/testlib: test skip logic

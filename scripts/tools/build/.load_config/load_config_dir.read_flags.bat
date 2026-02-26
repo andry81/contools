@@ -9,6 +9,7 @@ set __?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG=0
 set __?FLAG_LOAD_USER_OUTPUT_CONFIG=0
 set __?FLAG_NO_LOAD_SYSTEM_CONFIG=0
 set __?FLAG_NO_LOAD_USER_CONFIG=0
+set __?FLAG_USE_OS_PARAMS=0
 set "__?BARE_SYSTEM_FLAGS="
 set "__?BARE_USER_FLAGS="
 
@@ -42,6 +43,8 @@ if defined __?FLAG (
     set __?FLAG_NO_LOAD_SYSTEM_CONFIG=1
   ) else if "%__?FLAG%" == "-no_load_user_config" (
     set __?FLAG_NO_LOAD_USER_CONFIG=1
+  ) else if "%__?FLAG%" == "-use_os_params" (
+    set __?FLAG_USE_OS_PARAMS=1
   ) else if not "%__?FLAG%" == "-+" if not "%__?FLAG%" == "--" (
     set __?BARE_SYSTEM_FLAGS=%__?BARE_SYSTEM_FLAGS% %__?FLAG%
     set __?BARE_USER_FLAGS=%__?BARE_USER_FLAGS% %__?FLAG%

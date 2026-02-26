@@ -48,6 +48,18 @@ rem     file as by default.
 rem
 rem   -noexpand
 rem     Disables expansion of %-variables.
+rem
+rem   -use_os_params
+rem     If <Param0> is empty, then use these values for <Param0>:
+rem       * OSWINXP if WINDOWS_MAJOR_VER < 6
+rem       * OSWIN7  if WINDOWS_MAJOR_VER = 6 and WINDOWS_MINOR_VER = 0,1
+rem       * OSWIN8  if WINDOWS_MAJOR_VER = 6 and WINDOWS_MINOR_VER = 2,3
+rem       * OSWIN10 if WINDOWS_MAJOR_VER = 6 and WINDOWS_MINOR_VER >= 4 or
+rem                    WINDOWS_MAJOR_VER > 7
+rem
+rem     If <Param1> is empty, then use these values for <Param1>:
+rem       * OS64    if COMSPEC_X64_VER = 1
+rem       * OS32    if COMSPEC_X64_VER = 0
 
 rem -+:
 rem   Separator to begin flags scope to parse.
@@ -173,6 +185,29 @@ goto PARAMS_OK
 ) >&2
 
 :PARAMS_OK
+
+if not defined WINDOWS_MAJOR_VER goto SKIP_PARAM0
+if not defined WINDOWS_MINOR_VER goto SKIP_PARAM0
+
+if not defined __?PARAM0 (
+  if %WINDOWS_MAJOR_VER% LSS 6 set "__?PARAM0=OSWINXP"
+  if %WINDOWS_MAJOR_VER% EQU 6 (
+    if %WINDOWS_MINOR_VER% LSS 2 set "__?PARAM0=OSWIN7"
+    if %WINDOWS_MINOR_VER% LSS 4 set "__?PARAM0=OSWIN8"
+    if %WINDOWS_MINOR_VER% GEQ 4 set "__?PARAM0=OSWIN10"
+  ) else if %WINDOWS_MAJOR_VER% GTR 6 set "__?PARAM0=OSWIN10"
+)
+
+:SKIP_PARAM0
+
+if not defined COMSPEC_X64_VER goto SKIP_PARAM1
+
+if not defined __?PARAM1 (
+  if %COMSPEC_X64_VER% NEQ 0 set "__?PARAM1=OS64"
+  if %COMSPEC_X64_VER% EQU 0 set "__?PARAM1=OS32"
+)
+
+:SKIP_PARAM1
 
 for /F "tokens=* delims="eol^= %%i in ("%__?CONFIG_IN_DIR%\.") do set "__?CONFIG_IN_DIR=%%~fi"
 for /F "tokens=* delims="eol^= %%i in ("%__?CONFIG_OUT_DIR%\.") do set "__?CONFIG_OUT_DIR=%%~fi"

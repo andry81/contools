@@ -6,6 +6,7 @@ set __?FLAG_FLAGS_SCOPE=0
 set __?FLAG_GEN_CONFIG=0
 set __?FLAG_LOAD_OUTPUT_CONFIG=0
 set __?FLAG_NO_EXPAND=0
+set __?FLAG_USE_OS_PARAMS=0
 
 :FLAGS_LOOP
 
@@ -25,6 +26,8 @@ if defined __?FLAG (
     set __?FLAG_LOAD_OUTPUT_CONFIG=1
   ) else if "%__?FLAG%" == "-noexpand" (
     set __?FLAG_NO_EXPAND=1
+  ) else if "%__?FLAG%" == "-use_os_params" (
+    set __?FLAG_USE_OS_PARAMS=1
   ) else if not "%__?FLAG%" == "-+" if not "%__?FLAG%" == "--" (
     echo;%__?~%: error: invalid flag: %__?FLAG%
     exit /b -255

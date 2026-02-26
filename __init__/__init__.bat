@@ -59,8 +59,8 @@ rem NOTE:
 rem   After the config load, all the variables additionally to the `CONTOOLS_ROOT` variable would be available from here.
 rem
 if %NO_GEN%0 EQU 0 (
-  call "%%CONTOOLS_PROJECT_ROOT%%/tools/load_config_dir.bat" %%* -gen_user_config -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
-) else call "%%CONTOOLS_PROJECT_ROOT%%/tools/load_config_dir.bat" %%* -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
+  call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -gen_user_config -use_os_params -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
+) else call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" %%* -use_os_params -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
 rem init external projects
 
