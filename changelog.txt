@@ -1,4 +1,7 @@
 2026.02.27:
+* changed: .gitmodules, .gitignore: git modules has removed because must be used at least outside of the main branch
+
+2026.02.27:
 * fixed: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: binary file write
 * new: ._install/install_system32.vbs: script to install absent components for `%SystemRoot%\System32` directory under Windows XP x32
 
