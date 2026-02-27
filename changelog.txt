@@ -1,3 +1,7 @@
+2026.02.27:
+* fixed: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: binary file write
+* new: ._install/install_system32.vbs: script to install absent components for `%SystemRoot%\System32` directory under Windows XP x32
+
 2026.02.26:
 * fixed: scripts/tools/wmi: print_wmi_local_date_and_last_boot_uptime.vbs, print_wmi_local_last_boot_uptime.vbs: locale independent decimal separator support
 * changed: scripts/tools: build/init_project_log.bat, testlib/init.bat: locale independent decimal separator support

@@ -751,27 +751,31 @@ Function MakeShortcut(ShortcutFilePathToOpen)
     '   The `ParseName` still requires a shortcut file existence, but `CreateShortcut` can not handle unknown unicode characters in the path.
     '   Use empty shortcut binary file to open it through `ShellLinkObject` interface.
 
-    ' create empty shortcut to open in `ParseName`
-    Dim EmptyLnk : EmptyLnk = "4C0000000114020000000000C000000000000046800000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000"
-
     ' CAUTION:
     '   `WriteFile` is broken for binary writes, DO NOT USE!
     '
     'Dim objSCFile : Set objSCFile = CreateTextFileEx(ShortcutFilePathToOpen, True, False)
 
-    Const TypeBinary = 1, TypeText = 2
-    Const ForReading = 1, ForWriting = 2, ForAppending = 8
+    Const TypeBinary = 1
+    Const ForWriting = 2
 
+    Dim objXmlNode : Set objXmlNode = CreateObject("MSXML2.DOMDocument").createElement("bin")
     Dim objSCFile : Set objSCFile = CreateObject("ADODB.Stream")
 
-    objSCFile.Type = TypeText
-    objSCFile.Charset = "x-ansi"
+    objXmlNode.dataType = "bin.hex"
+
+    objSCFile.Type = TypeBinary
     objSCFile.Open()
 
-    Dim i
-    For i = 1 To Len(EmptyLnk) Step 2
-      objSCFile.WriteText Chr(CLng("&H" & Mid(EmptyLnk, i, 2)))
-    Next
+    ' create empty shortcut to open in `ParseName`
+    objXmlNode.text = "4C0000000114020000000000C000000000000046800000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000"
+
+    'Dim i
+    'For i = 1 To Len(EmptyLnk) Step 2
+    '  objSCFile.Write Chr(CInt("&H" & Mid(EmptyLnk, i, 2)))
+    'Next
+
+    objSCFile.Write objXmlNode.nodeTypedValue
 
     objSCFile.SaveToFile ShortcutFilePathToOpen, ForWriting
  
