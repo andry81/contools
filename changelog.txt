@@ -1,3 +1,6 @@
+2026.03.02:
+* fixed: _externals: missed to remove git modules in the cache using `git rm -r --cache _externals`
+
 2026.02.27:
 * changed: .gitmodules, .gitignore: git modules has removed because must be used at least outside of the main branch
 
