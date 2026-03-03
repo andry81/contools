@@ -3,8 +3,10 @@
 rem Description:
 rem   Script installs x64 dependency the `System64` sub directory symbolic
 rem   link.
-rem   Requires in case of Windows XP x64, because x32 `chcp.com` is absent
-rem   there.
+rem
+rem   NOTE:
+rem     In case of Windows XP 64, where 32-bit variant of `chcp.com` is absent,
+rem     use `encoding/chcp.bat` as a replacement.
 
 setlocal
 
@@ -26,7 +28,7 @@ call "%%CONTOOLS_ROOT%%/std/is_admin_elevated.bat" || (
 
 rem Under WOW64 (32-bit process in 64-bit Windows) restart script in 64-bit mode
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
-if not defined PROCESSOR_ARCHITEW6432 goto X32
+if defined PROCESSOR_ARCHITEW6432 goto WOW64
 
 rem restart in x64
 if exist "%SystemRoot%\Sysnative\*" (
@@ -35,14 +37,14 @@ if exist "%SystemRoot%\Sysnative\*" (
 )
 
 (
-  echo;%?~%: error: run script in 64-bit console ONLY (in administrative mode)!
+  echo;%?~%: error: run script in 64-bit console ONLY ^(in administrative mode^)!
   exit /b 255
 ) >&2
 
 :X64
-:X32
+:WOW64
 
-if exist "\\?\%SystemRoot%\System64\*" goto IGNORE_MKLINK_SYSTEM64
+if exist "\\?\%SystemRoot%\System64\*" exit /b 1
 
 call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/install_system64_link.bat"
 
@@ -53,4 +55,4 @@ if not exist "\\?\%SystemRoot%\System64\*" (
 
 echo;
 
-:IGNORE_MKLINK_SYSTEM64
+exit /b 0

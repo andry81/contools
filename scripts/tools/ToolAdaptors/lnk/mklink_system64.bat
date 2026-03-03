@@ -46,33 +46,29 @@ if %ERRORLEVEL% EQU 0 goto MKLINK
 if exist "linkd.exe" goto LINKD
 
 (
-  echo;%?~%: error: can not create `%SYSTEMROOT%\System64` directory
+  echo;%?~%: error: can not create `%SystemRoot%\System64` directory
   exit /b 255
 ) >&2
 
 
 :MKLINK
-if not exist "%SYSTEMROOT%\System64\*" (
-  if /i "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-    rem already in the 64-bit mode
-    call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @mklink /D "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
-  ) else if defined PROCESSOR_ARCHITEW6432 (
-    rem in WOW64 mode
-    call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_wow64_admin.lnk" /C @mklink /D "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
-  )
+if /i "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
+  rem already in the 64-bit mode
+  call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @mklink /D "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
+) else if defined PROCESSOR_ARCHITEW6432 (
+  rem in WOW64 mode
+  call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_wow64_admin.lnk" /C @mklink /D "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
 )
 
 exit /b 0
 
 :LINKD
-if not exist "%SYSTEMROOT%\System64\*" (
-  if /i "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-    rem already in the 64-bit mode
-    call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @linkd.exe "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
-  ) else if defined PROCESSOR_ARCHITEW6432 (
-    rem in WOW64 mode
-    call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_wow64_admin.lnk" /C @linkd.exe "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
-  )
+if /i "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
+  rem already in the 64-bit mode
+  call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_admin.lnk" /C @linkd.exe "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
+) else if defined PROCESSOR_ARCHITEW6432 (
+  rem in WOW64 mode
+  call "%%CONTOOLS_ROOT%%/ToolAdaptors/lnk/cmd_wow64_admin.lnk" /C @linkd.exe "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
 )
 
 exit /b 0

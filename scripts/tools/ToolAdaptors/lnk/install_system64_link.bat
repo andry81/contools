@@ -55,5 +55,12 @@ exit /b
 
 :INSTALL_WINXP
 rem Sysinternals junction utility
-"%CONTOOLS_SYSINTERNALS_ROOT%/junction.exe" -nobanner -accepteula "%SystemRoot%\System64" "%SystemRoot%\System32"
+if /i "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
+  rem already in the 64-bit mode
+  "%CONTOOLS_SYSINTERNALS_ROOT%/junction.exe" -nobanner -accepteula "%SystemRoot%\System64" "%SystemRoot%\System32"
+) else if defined PROCESSOR_ARCHITEW6432 (
+  rem in WOW64 mode
+  "%CONTOOLS_SYSINTERNALS_ROOT%/junction.exe" -nobanner -accepteula "%SystemRoot%\System64" "%SystemRoot%\System32"
+)
+
 exit /b
