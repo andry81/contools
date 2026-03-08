@@ -16,4 +16,8 @@ rem minimal set of sensitive control characters
 set ?22=^"
 set "?26=&" & set "?5E=^" & set "?7C=|"
 
+rem Line Feed character to set and print multi line values
+set ?0A=^^^
+
+
 exit /b 0
