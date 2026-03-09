@@ -1,4 +1,8 @@
 2026.03.09:
+* changed: scripts/tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: code cleanup
+* refactor: scripts/tools/ToolAdaptors/lnk/mklink_system64.bat: script self documentation
+
+2026.03.09:
 * new: scripts/tests/bench/bat/test_testlib/test_testlib__00_empty_hadlers.bat: bench tests for `testlib`
 * changed: scripts/tools/testlib/exit.bat: `TESTLIB__NO_PAUSE_ON_EXIT` variable to skip the pause
 

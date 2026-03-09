@@ -155,9 +155,7 @@ if %FLAG_FLAGS_SCOPE% GTR 0 (
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
-if defined FLAG_CHCP (
-  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
-) else call "%%CONTOOLS_ROOT%%/std/getcp.bat"
+if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
 
 call :MAIN %%*
 set LAST_ERROR=%ERRORLEVEL%
