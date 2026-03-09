@@ -1,3 +1,7 @@
+2026.03.09:
+* new: scripts/tests/bench/bat/test_testlib/test_testlib__00_empty_hadlers.bat: bench tests for `testlib`
+* changed: scripts/tools/testlib/exit.bat: `TESTLIB__NO_PAUSE_ON_EXIT` variable to skip the pause
+
 2026.03.08:
 * new: scripts/tools/std/declare_builtins.bat: `?0A` variable to set and print multi line values
 

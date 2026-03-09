@@ -130,7 +130,8 @@ if %TESTLIB__INIT% EQU 0 (
     ) else echo    %TESTLIB__OVERALL_PASSED_TESTS% ^(~%TESTLIB__OVERALL_SKIPPED_TESTS%^) of %TESTLIB__OVERALL_TESTS% overall tests is passed ^(~skipped^).
   )
   echo;^
-  if not defined IMPL_MODE if defined OEMCP ( call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
+  if %TESTLIB__NO_PAUSE_ON_EXIT%0 EQU 0 if not defined IMPL_MODE if defined OEMCP (
+    call "%%CONTOOLS_ROOT%%/std/pause.bat" -chcp "%%OEMCP%%" ) else call "%%CONTOOLS_ROOT%%/std/pause.bat"
 )
 
 exit /b %TEST_LAST_ERROR%
