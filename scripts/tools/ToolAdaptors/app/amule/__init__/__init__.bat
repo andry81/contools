@@ -16,7 +16,7 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path_if_ndef.bat" AMULE_ADAPTOR_PROJECT_OU
 
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config_dir.bat" -gen_user_config "%%AMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config_dir.bat" -+ -gen_user_config -- "%%AMULE_ADAPTOR_PROJECT_INPUT_CONFIG_ROOT%%" "%%AMULE_ADAPTOR_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
 call "%%CONTOOLS_ROOT%%/std/canonical_file_vars.bat" AMULE_CMD_EXECUTABLE AMULE_GUI_EXECUTABLE || exit /b
 call "%%CONTOOLS_ROOT%%/std/canonical_dir_vars.bat" APPDATA LOCALAPPDATA AMULE_CONFIG_DIR AMULE_LOG_DIR AMULE_ADAPTOR_BACKUP_DIR || exit /b

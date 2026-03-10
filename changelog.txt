@@ -1,4 +1,7 @@
 2026.03.10:
+* changed: __init__: minor improvement
+
+2026.03.10:
 * changed: *.bat, *.vars.in: `TOOLS_VERBOSE` variable replaced by `CONTOOLS_VERBOSE`
 
 2026.03.09:
