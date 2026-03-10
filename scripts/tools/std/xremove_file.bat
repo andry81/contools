@@ -23,7 +23,7 @@ rem <path>
 rem   Single file path.
 :DOC_END
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
+if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 
 setlocal
 
@@ -92,7 +92,7 @@ if not exist "\\?\%FILE_PATH%" (
 
 rem check on long file path
 if exist "%FILE_PATH%" (
-  if %TOOLS_VERBOSE%0 NEQ 0 echo;^>^>del /F /Q /A:-D "%FILE_PATH%"
+  if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>^>del /F /Q /A:-D "%FILE_PATH%"
   del /F /Q /A:-D "%FILE_PATH%" >nul 2>nul
   exit /b
 )
@@ -105,13 +105,13 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
   set "FILE_PATH_TEMP_DIR=%SCRIPT_TEMP_CURRENT_DIR%\%?~n0%.%RANDOM%-%RANDOM%"
 ) else set "FILE_PATH_TEMP_DIR=%TEMP%\%?~n0%.%RANDOM%-%RANDOM%"
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV
+if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV
 "%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
 
 rmdir /S /Q "%FILE_PATH_TEMP_DIR%" >nul 2>nul
 exit /b
 
 :DELETE_FILE_VBS
-if %TOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%"
+if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%"
 "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%"
 exit /b

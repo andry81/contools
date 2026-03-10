@@ -339,7 +339,7 @@ echo;^>^>touch "%TO_PATH_ABS%\*"
 
 setlocal
 
-set TOOLS_VERBOSE=0
+set CONTOOLS_VERBOSE=0
 
 set "BUILTIN_DIR_CMD_BARE_FLAGS="
 if %FLAG_TOUCH_DIR% EQU 0 (
@@ -448,7 +448,7 @@ echo;^>^>touch "%TO_PATH_ABS%\*"
 
 setlocal
 
-set TOOLS_VERBOSE=0
+set CONTOOLS_VERBOSE=0
 
 set "BUILTIN_DIR_CMD_BARE_FLAGS="
 if %FLAG_TOUCH_DIR% EQU 0 (

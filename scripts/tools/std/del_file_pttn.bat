@@ -119,7 +119,7 @@ if not exist "\\?\%FILE_PATH%" (
 rem CAUTION: we must override `/A` flag for a file removement ONLY
 call "%%~dp0setshift.bat" 3 DEL_FLAGS_ %%* /A:-D
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo;^>^>del %DEL_FLAGS_% "%FILE_PATH%"
+if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>^>del %DEL_FLAGS_% "%FILE_PATH%"
 del %DEL_FLAGS_% "%FILE_PATH%"
 
 exit /b

@@ -26,7 +26,7 @@ rem <path>...
 rem   File path list.
 :DOC_END
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
+if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 
 setlocal
 

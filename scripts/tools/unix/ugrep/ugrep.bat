@@ -15,7 +15,7 @@ if defined PROCESSOR_ARCHITEW6432 goto NOTX64
 goto X64
 
 :NOTX64
-if %TOOLS_VERBOSE%0 NEQ 0 (
+if %CONTOOLS_VERBOSE%0 NEQ 0 (
   echo;^>^>"%CONTOOLS_UGREP_ROOT%\bin\win32\ugrep.exe" %*
   echo;
 )
@@ -24,7 +24,7 @@ if %TOOLS_VERBOSE%0 NEQ 0 (
 exit /b
 
 :X64
-if %TOOLS_VERBOSE%0 NEQ 0 (
+if %CONTOOLS_VERBOSE%0 NEQ 0 (
   echo;^>^>"%CONTOOLS_UGREP_ROOT%\bin\win64\ugrep.exe" %*
   echo;
 )

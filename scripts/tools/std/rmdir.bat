@@ -17,7 +17,7 @@ rem <rmdir-flags>:
 rem   Command line flags to pass into builtin `rmdir` command.
 :DOC_END
 
-if %TOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
+if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 
 setlocal
 

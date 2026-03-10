@@ -1,3 +1,6 @@
+2026.03.10:
+* changed: *.bat, *.vars.in: `TOOLS_VERBOSE` variable replaced by `CONTOOLS_VERBOSE`
+
 2026.03.09:
 * changed: scripts/tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: code cleanup
 * refactor: scripts/tools/ToolAdaptors/lnk/mklink_system64.bat: script self documentation
