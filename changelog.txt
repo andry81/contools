@@ -1,4 +1,8 @@
 2026.03.10:
+* changed: scripts/tools/vars: removed unused directory
+* changed: README.md: update and cleanup
+
+2026.03.10:
 * changed: __init__: minor improvement
 
 2026.03.10:

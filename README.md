@@ -1,41 +1,13 @@
 > [!NOTE]
 > To checkout externals read the details here: https://github.com/andry81/externals
 
-<p align="center">A wide range of scripts for Windows interpreter (cmd.exe) and other
-interpreters such as bash shell (.sh), visual basic (.vbs), python (.py) and so on.
-Plus some set of standalone console utilities and tools aside other utilities and tools from cygwin, msys and mingw.</p>
+<p align="center">A wide range of scripts for Windows interpreter (cmd.exe) and other interpreters</p>
 
 <p align="center">
   <a href="https://www.codefactor.io/repository/github/andry81/contools">
     <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codefactor-grade.svg" valign="middle" alt="codefactor.io|quality" /></a>
 • <a href="https://app.codacy.com/gh/andry81/contools/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=andry81/contools&amp;utm_campaign=Badge_Grade">
     <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codacy-grade.svg" valign="middle" alt="codacy.com|quality" /></a>
-<!-- - ->
-• <a href="https://lgtm.com/projects/g/andry81/contools/context:python">
-    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/lgtm-grade-python.svg" valign="middle" alt="lgtm.com|quality|python" /></a>
-  <a href="https://lgtm.com/projects/g/andry81/contools/alerts">
-    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/lgtm-alerts.svg" valign="middle" alt="lgtm.com|alerts" /></a>
-<!-- -->
-</p>
-
-<!-- now requires invite to log in - ->
-<p align="center">
-  <a href="https://codeclimate.com/github/andry81/contools/maintainability">
-    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codeclimate-maintainability.svg" valign="middle" alt="codeclimate.com|maintainability" /></a>
-  <a href="https://codeclimate.com/github/andry81/contools/issues">
-    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codeclimate-issues.svg" valign="middle" alt="codeclimate.com|issues" /></a>
-  <a href="https://codeclimate.com/github/andry81/contools/trends/technical_debt">
-    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/codeclimate-tech-debt.svg" valign="middle" alt="codeclimate.com|debt" /></a>
-</p>
-<!-- -->
-
-<p align="center">
-  <a href="#">
-    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/shields-repo-size.svg" valign="middle" alt="GitHub repo size in bytes" /></a>
-• <a href="#">
-    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/shields-code-size.svg" valign="middle" alt="code size in bytes" /></a>
-• <a href="https://github.com/XAMPPRocky/tokei">
-    <img src="https://github.com/andry81-cache/andry81--gh-content-cache/raw/master/repo/andry81/contools/badges/metrics/tokei-lines-of-code.svg" valign="middle" alt="lines of code by tokei.rs" /></a>
 </p>
 
 <p align="center">
