@@ -1,7 +1,35 @@
-@echo off
+@echo off & goto DOC_END
+
+rem USAGE:
+rem   spawn_tasks.bat <max-spawn-tasks> <max-busy-tasks> <min-busy-tasks-to-unlock-spawn-next> <cmdline>...
 
 rem Description:
 rem   Script to spawn tasks in parallel but not greater than maximum.
+
+rem <max-spawn-tasks>:
+rem   Overall tasks to spawn, exit when reached.
+
+rem <max-busy-tasks>:
+rem   Maximum permitted tasks to run together, otherwise wait.
+
+rem <min-busy-tasks-to-unlock-spawn-next>:
+rem   Minimum busy tasks before start to unlock spawn next tasks (if greater
+rem   than the running number), may be left empty to not lock to spawn next
+rem   immediately after exit at least one task.
+
+rem <cmdline>:
+rem   Command line to run and spawn as a task.
+
+rem Examples:
+rem   1.
+rem     1. The inner `start /WAIT ""` opens a standalone console attached to the last child cmd.exe process.
+rem     2. The outer `start /B /WAIT ""` attaches the parent process console instead of open a new one.
+rem     3. The `<nul` is to avoid the user input await around the `Terminate Batch Job` message in case of a child console window close using UI.
+rem     4. The double start with wait hides the `Terminate Batch Job` message, but does not hide `^C` print into the parent console window.
+rem     5. The `2>nul start ...` suppresses `^C` prints into the parent console window.
+rem     >
+rem     spawn_tasks.bat 5 3 2 ^<nul 2^>nul start /B /WAIT "" cmd.exe /c @start /WAIT "" cmd.exe /k @echo close me
+:DOC_END
 
 setlocal
 
@@ -10,14 +38,9 @@ set "?~dp0=%~dp0"
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
-rem overall tasks to spawn, exit when reached
 set "MAX_SPAWN_TASKS=%~1"
-
-rem max permitted tasks to run together, otherwise wait
 set "MAX_BUSY_TASKS=%~2"
-
-rem min busy tasks to unlock spawn new tasks, may be left empty to not lock to spawn
-set "MIN_BUSY_TASKS_TO_UNLOCK_SPAWN=%~3"
+set "MIN_BUSY_TASKS_TO_UNLOCK_SPAWN_NEXT=%~3"
 
 if not defined MAX_SPAWN_TASKS (
   echo;%?~%: error: max spawn tasks is not defined.
@@ -58,7 +81,7 @@ set LOCK_FILE0_ACQUIRE=0
 (
   (
     rem if lock is acquired, then we are in...
-    set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
+    set /P RUNNING_TASKS_COUNTER=<"%RUNNING_TASKS_COUNTER_FILE%"
     set /A RUNNING_TASKS_COUNTER+=0
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
@@ -75,12 +98,12 @@ if %LOCK_FILE0_ACQUIRE% EQU 0 (
 :REPEAT_SPAWN_LOOP
 
 rem can run more tasks?
-if not defined MIN_BUSY_TASKS_TO_UNLOCK_SPAWN (
+if not defined MIN_BUSY_TASKS_TO_UNLOCK_SPAWN_NEXT (
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 ) else if %IS_TASK_SPAWN_LOCKED% EQU 0 (
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
   set IS_TASK_SPAWN_LOCKED=1
-) else if %MIN_BUSY_TASKS_TO_UNLOCK_SPAWN% GEQ %RUNNING_TASKS_COUNTER% (
+) else if %MIN_BUSY_TASKS_TO_UNLOCK_SPAWN_NEXT% GTR %RUNNING_TASKS_COUNTER% (
   set IS_TASK_SPAWN_LOCKED=0
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 )
@@ -93,7 +116,7 @@ call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
 goto REPEAT_READ_LOOP
 
 :SPAWN_TASK
-rem the task spawner CAN decrement the counter to the negative value, this is not critical here
+rem call without wait, the task spawner CAN decrement the counter to the negative value, this is not critical here
 start /B "" "%COMSPEC%" /c @"%%CONTOOLS_ROOT%%/std/callshift.bat" 3 "%%?~dp0%%task_spawner.bat" %*
 
 set /A SPAWN_TASK_INDEX+=1
@@ -108,7 +131,7 @@ set LOCK_FILE0_ACQUIRE=0
   (
     rem if lock is acquired, then we are in...
     rem reread the counter
-    set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
+    set /P RUNNING_TASKS_COUNTER=<"%RUNNING_TASKS_COUNTER_FILE%"
     set /A RUNNING_TASKS_COUNTER+=1
     (call echo;%%RUNNING_TASKS_COUNTER%%) > "%RUNNING_TASKS_COUNTER_FILE%"
 
@@ -126,12 +149,12 @@ if %LOCK_FILE0_ACQUIRE% EQU 0 (
 if %SPAWN_TASK_INDEX% GEQ %MAX_SPAWN_TASKS% goto MAX_SPAWN_REACHED
 
 rem can run more tasks?
-if not defined MIN_BUSY_TASKS_TO_UNLOCK_SPAWN (
+if not defined MIN_BUSY_TASKS_TO_UNLOCK_SPAWN_NEXT (
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 ) else if %IS_TASK_SPAWN_LOCKED% EQU 0 (
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
   set IS_TASK_SPAWN_LOCKED=1
-) else if %MIN_BUSY_TASKS_TO_UNLOCK_SPAWN% GEQ %RUNNING_TASKS_COUNTER% (
+) else if %MIN_BUSY_TASKS_TO_UNLOCK_SPAWN_NEXT% GTR %RUNNING_TASKS_COUNTER% (
   set IS_TASK_SPAWN_LOCKED=0
   if %RUNNING_TASKS_COUNTER% LSS %MAX_BUSY_TASKS% goto SPAWN_TASK
 )
@@ -156,7 +179,7 @@ set LOCK_FILE0_ACQUIRE=0
 (
   (
     rem if lock is acquired, then we are in...
-    set /P RUNNING_TASKS_COUNTER= < "%RUNNING_TASKS_COUNTER_FILE%"
+    set /P RUNNING_TASKS_COUNTER=<"%RUNNING_TASKS_COUNTER_FILE%"
     set /A RUNNING_TASKS_COUNTER+=0
 
     rem Drop error level to 0 to avoid interference with the error level from the redirection command below.

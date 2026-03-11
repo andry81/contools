@@ -32,8 +32,8 @@ rem           ex: `"*.7z" "*.zip" "*.rar"`
 rem           Has no effect if %1 is a file path.
 
 rem Examples:
-rem   1. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives
-rem   2. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives "" "*.7z"
+rem   1. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives -y
+rem   2. call extract_files_from_archives.bat c:\path_with_archives * c:\path_with_content_from_all_archives -y "*.7z"
 rem   3. call extract_files_from_archives.bat c:\path_with_archives\app_release_x86.7z release\x86\app.exe c:\path_for_unpack\app
 rem   4. call extract_files_from_archives.bat c:\path_with_archives\app_release_x86.7z * c:\path_for_unpack\app
 :DOC_END

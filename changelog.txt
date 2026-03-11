@@ -1,4 +1,10 @@
 2026.03.10:
+* fixed: scripts/tools/tasks/spawn_tasks.bat: wrong check on minimal busy tasks to spawn next tasks
+* changed: scripts/tools/tasks: spawn_tasks.bat, task_spawner.bat: minor cleanup
+* refactor: scripts/tools/tasks/spawn_tasks.bat: script self documentation
+* refactor: scripts/tools/build/extract_files_from_archives.bat: minor refactor
+
+2026.03.10:
 * changed: scripts/tools/vars: removed unused directory
 * changed: README.md: update and cleanup
 
