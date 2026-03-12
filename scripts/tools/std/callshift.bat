@@ -31,9 +31,11 @@ rem   if `-trylock` flag is not defined. Otherwise just ignores and the script
 rem   returns a negative error code (-1024).
 rem   The lock file directory must exist before the call.
 rem   The lock file will be removed on script exit.
-
-rem -lockfile <lock-file>
-rem   Lock file path to lock the call.
+rem
+rem   CAUTION:
+rem     If <cmdline> is malformed, for example, as `if 0 _`, then it will lead
+rem     to the command process early exit and will left the <lock-file> not
+rem     removed.
 
 rem -trylock
 rem   Try to lock and if not, then exit immediately (-1024) instead of waiting

@@ -1,4 +1,7 @@
 2026.03.12:
+* refactor: scripts/tools/std/*shift.bat: script self documentation
+
+2026.03.12:
 * changed: scripts/tools/std/declare_builtins.bat: minor improvement
 * refactor: scripts/tools/std/*shift.bat: script self documentation
 
