@@ -99,6 +99,8 @@ rem       b  c  d
 rem  12. >callshift.bat 0 echo;^>cmd param0 param1
 rem      >cmd param0 param1
 rem  13. >callshift.bat -lockfile "%TEMP%\lock0.myscript" 0 echo;Exclusive print
+rem  14. >callshift.bat 1 ^; echo echo 123
+rem      123
 
 rem Examples (in script):
 rem   1. set "$5E$3E=^>"

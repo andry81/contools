@@ -77,6 +77,9 @@ rem      x= b  c  d
 rem   9. >setshift.bat 0 x ^>cmd param0 param1
 rem      >set x
 rem      x=>cmd param0 param1
+rem  10. >setshift.bat 1 x ^; echo echo 123
+rem      >set x
+rem      x=echo 123
 
 rem Examples (in script):
 rem   1. set "$5E$3E=^>"

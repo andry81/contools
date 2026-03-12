@@ -14,7 +14,7 @@ set "?~x0=%~x1"
 
 rem minimal set of sensitive control characters
 set ?22=^"
-set "?26=&" & set "?5E=^" & set "?7C=|"
+set "?26=&" & set "?3C=<" & set "?3E=>" & set "?5E=^" & set "?7C=|"
 
 rem Line Feed character to set and print multi line values
 set ?0A=^^^
