@@ -19,8 +19,8 @@ set "OLD_LOCK_DIR=%LOCK_DIR%.%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
 :PRE_LOCK_LOOP
 rem prelock via redirection to file
 set PRE_LOCK_ACQUIRE=0
-(
-  (
+( ( rem if lock is acquired, then we are in...
+    set PRE_LOCK_ACQUIRE=1
     rem clean up if leaked by crash or ctrl-c, won't be removed if already acquired because of lock by current directory in a process of lock_dir_impl.bat
     rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOCK_PATH%\%OLD_LOCK_DIR%" >nul 2>nul
 
@@ -30,13 +30,7 @@ set PRE_LOCK_ACQUIRE=0
     )
     echo;%UNLOCK_DIR%_%LOCK_NAME% > "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%\%UNLOCK_FILE%"
     popd
-
-    rem Drop error level to 0 to avoid accidental exit by error from above commands.
-    rem Error must be raised ONLY by the redirection command!
-    call;
-
-  ) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%" && set PRE_LOCK_ACQUIRE=1
-) 2>nul
+) 9> "%LOCK_PATH%\%PRE_LOCK_FILE%" ) 2>nul
 
 rem could not prelock operations over the lock directory - somebody is already processing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% NEQ 0 (

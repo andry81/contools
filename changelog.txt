@@ -1,4 +1,7 @@
 2026.03.12:
+* changed: scripts/tools/locks/*.bat: lock code reduction
+
+2026.03.12:
 * changed: scripts/tools/std/*shift.bat: avoid lock file remove in case of `-trylock` flag
 
 2026.03.12:

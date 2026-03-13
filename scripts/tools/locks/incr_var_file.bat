@@ -29,15 +29,10 @@ if not exist "%__READWRITE_FILE0%" (
 
 rem lock via redirection to file
 set __LOCK_FILE0_ACQUIRE=0
-(
-  (
-    rem if lock is acquired, then we are in...
+( ( rem if lock is acquired, then we are in...
+    set __LOCK_FILE0_ACQUIRE=1
     call :INCR
-
-    rem Drop error level to 0 to avoid interference with the error level from the redirection command below.
-    call;
-  ) 9> "%__LOCK_FILE0%" && set __LOCK_FILE0_ACQUIRE=1
-) 2>nul
+) 9> "%__LOCK_FILE0%" ) 2>nul
 
 rem has lock been acquired and counter updated?
 if %__LOCK_FILE0_ACQUIRE% NEQ 0 goto EXIT
