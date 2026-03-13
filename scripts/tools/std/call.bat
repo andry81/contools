@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   call.bat [-exe] [-lockfile <lock-file> [-trylock] [-lock-sleep-cmdline <lock-sleep-cmdline>]] [--] <cmdline>...
+rem   call.bat [-exe] [-lockfile <lock-file> [-trylock] [-lock-busy-wait-cmdline <lock-busy-wait-cmdline>]] [--] <cmdline>...
 
 rem Description:
 rem   Script calls `<cmdline>` as is.
@@ -33,9 +33,9 @@ rem   Try to lock and if not, then exit immediately (-1024) instead of waiting
 rem   the lock. The lock file does not delete.
 rem   Has no effect if `-lockfile` is not defined.
 
-rem -lock-sleep-cmdline <lock-sleep-cmdline>
-rem   The command line for the `sleep.bat` script to call on before attempt to
-rem   acquire another lock.
+rem -lock-busy-wait-cmdline <lock-busy-wait-cmdline>
+rem   The command line for the `busy_wait.bat` script to call on before attempt
+rem   to acquire another lock.
 rem   Has no effect if `-lockfile` is not defined.
 rem   If not defined, then `50` (ms) is used by default.
 
@@ -142,7 +142,7 @@ rem script flags
 set FLAG_SHIFT=0
 set FLAG_EXE=0
 set "FLAG_LOCK_FILE="
-set "FLAG_LOCK_SLEEP_CMDLINE= 50"
+set "FLAG_LOCK_BUSY_WAIT_CMDLINE= 50"
 set FLAG_TRYLOCK=0
 
 rem flags always at first
@@ -166,8 +166,8 @@ if defined FLAG if "%FLAG%" == "-lockfile" (
   set /A FLAG_SHIFT+=2
 )
 
-if defined FLAG if "%FLAG%" == "-lock-sleep-cmdline" (
-  set "FLAG_LOCK_SLEEP_CMDLINE= %~2"
+if defined FLAG if "%FLAG%" == "-lock-busy-wait-cmdline" (
+  set "FLAG_LOCK_BUSY_WAIT_CMDLINE= %~2"
   shift
   shift
   call set "FLAG=%%~1"
@@ -209,7 +209,7 @@ set LAST_ERROR=%ERRORLEVEL%
 if %LOCK_ACQUIRE% EQU 0 (
   if %FLAG_TRYLOCK% NEQ 0 exit /b -1024
 
-  call "%%?~dp0%%sleep.bat"%%FLAG_LOCK_SLEEP_CMDLINE%%
+  call "%%~dp0busy_wait.bat"%%FLAG_LOCK_BUSY_WAIT_CMDLINE%%
 
   goto CALL_LOCK_LOOP
 )

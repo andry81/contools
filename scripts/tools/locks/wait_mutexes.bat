@@ -4,8 +4,6 @@ setlocal
 
 set "LOCK_NAMES=%~1"
 
-call "%%~dp0__init__.bat" || exit /b
-
 if defined SCRIPT_TEMP_CURRENT_DIR (
   set "LOCK_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 ) else set "LOCK_PATH=%TEMP%"
@@ -37,7 +35,7 @@ goto PREPARE_LOCK_WAITERS_IMPL
 set "PRE_LOCK_FILE=prelock_mutex0.%LOCK_NAME%"
 set "LOCK_DIR=lock_mutex0.%LOCK_NAME%"
 
-set "RAND=%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
+set "RAND=%RANDOM%-%RANDOM%"
 
 set "WAITER_FILE=waiter.%RAND%"
 set "WAITER_FILE_%LOCK_WAITER_INDEX%="
@@ -73,7 +71,8 @@ set PRE_LOCK_ACQUIRE=0
 rem could not prelock operations over the lock directory - somebody is already processing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% NEQ 0 exit /b 0
 
-rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+rem rem busy wait for 20 msec
+rem call "%%~dp0busy_wait.bat" 20
 
 goto PRE_LOCK_LOOP0
 
@@ -83,14 +82,15 @@ call :CLEANUP_PRELOCK
 :WAIT_LOOP
 call :LOCK_WAITING && exit /b 0
 
-call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+rem busy wait for 20 msec
+call "%%~dp0busy_wait.bat" 20
 
 goto WAIT_LOOP
 
 :LOCK_WAITING
 set LOCK_WAITER_INDEX=1
 for /L %%i in (%LOCK_WAITER_INDEX%,1,%NUM_LOCK_WAITERS%) do call :WAIT_LOCK "%%i"
-set /A NUM_WAITERS_OVERALL=%NUM_WAITERS_UNEXISTED%+%NUM_WAITERS_COMPLETE%
+set /A "NUM_WAITERS_OVERALL=NUM_WAITERS_UNEXISTED+NUM_WAITERS_COMPLETE"
 goto EXIT
 
 :WAIT_LOCK
@@ -103,7 +103,7 @@ call set "LOCK_NAME=%%LOCK_NAME_%LOCK_WAITER_INDEX%%%"
 call set "PRE_LOCK_FILE=%%PRE_LOCK_FILE_%LOCK_WAITER_INDEX%%%"
 call set "LOCK_DIR=%%LOCK_DIR_%LOCK_WAITER_INDEX%%%"
 
-set "OLD_LOCK_DIR=%LOCK_DIR%.%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RANDOM%-%RANDOM%"
 
 rem prelock via redirection to file
 ( ( rem if lock is acquired, then we are in...

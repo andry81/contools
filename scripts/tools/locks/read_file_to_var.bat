@@ -6,8 +6,6 @@ rem   Script to exclusively read a file into a variable.
 
 setlocal
 
-call "%%~dp0__init__.bat" || exit /b
-
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
@@ -45,8 +43,8 @@ set __LOCK_FILE0_ACQUIRE=0
 rem has lock been acquired and counter updated?
 if %__LOCK_FILE0_ACQUIRE% NEQ 0 goto EXIT
 
-rem improvised sleep of 20 msec wait
-call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+rem busy wait for 20 msec
+call "%%~dp0busy_wait.bat" 20
 
 goto REPEAT_READ_LOOP
 

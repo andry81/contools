@@ -4,9 +4,7 @@ setlocal
 
 set "LOCK_NAME=%~1"
 
-call "%%~dp0__init__.bat" || exit /b
-
-set "RAND=%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
+set "RAND=%RANDOM%-%RANDOM%"
 
 if defined SCRIPT_TEMP_CURRENT_DIR (
   set "LOCK_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
@@ -39,7 +37,8 @@ set PRE_LOCK_ACQUIRE=0
 
 rem could not prelock operations over the lock directory - somebody is already processing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% EQU 0 (
-  rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+  rem rem busy wait for 20 msec
+  rem call "%%~dp0busy_wait.bat" 20
 
   goto PRE_LOCK_LOOP
 )
@@ -50,7 +49,8 @@ call :CLEANUP_PRELOCK
 :WAIT_LOOP
 if not exist "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%\%WAITER_FILE%" goto EXIT
 
-call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+rem busy wait for 20 msec
+call "%%~dp0busy_wait.bat" 20
 
 goto WAIT_LOOP
 

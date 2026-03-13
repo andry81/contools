@@ -1,4 +1,11 @@
 2026.03.13:
+* new: scripts/tools/locks/busy_wait.bat, scripts/tools/std/busy_wait.bat, scripts/tools/tasks/busy_wait.bat: standalone script to make a busy wait in milliseconds
+* new: scripts/tools/locks/timestamp.bat, scripts/tools/std/timestamp.bat, scripts/tools/tasks/timestamp.bat: standalone script to evaluate timestamp integer from a `TIME` variable format string in format HH:MM:SS.NN
+* changed: scripts/tools/std: call*.bat, sleep.bat: switched to use `busy_wait.bat` script
+* changed: scripts/tools/std: call*.bat, sleep.bat: code improvement and reduction
+* changed: scripts/tools/locks/*.bat: removed dependency on other directories, code improvement and reduction
+
+2026.03.13:
 * new: scripts/tests/unit/bat/test_std_time: unit tests for `time` scripts
 * new: scripts/tests/bench/bat/test_std_time: bench tests for `time` scripts
 * changed: scripts/tools/time/timestamp.bat: code improvement and reduction

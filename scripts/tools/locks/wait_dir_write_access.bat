@@ -20,7 +20,7 @@ rem     already has an exclusive not inherited write access privilege.
 rem   * Does not wait on a path if has permissions to read a path as a
 rem     file.
 rem   * Does support long paths.
-rem   * Can sleep on a specified timeout in milliseconds between checks.
+rem   * Can busy wait on a specified timeout in milliseconds between checks.
 
 rem Cons:
 rem   * Does not support directories in nested directories including
@@ -46,15 +46,6 @@ if not "%~2" == "" if %~20 LSS 0 (
 )
 
 :FILE_WRITE_LOOP
-( call;> "\\?\%FILE_PATH%\%FILE_NAME_TMP%" ) 2>nul || ( call :SLEEP %%2 & goto FILE_WRITE_LOOP )
+( call;> "\\?\%FILE_PATH%\%FILE_NAME_TMP%" ) 2>nul || ( call "%%~dp0busy_wait.bat" %%2 & goto FILE_WRITE_LOOP )
 "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%\%FILE_NAME_TMP%"
 exit /b 0
-
-:SLEEP
-set "TIME_SLEEP_MSEC=%~1"
-
-rem minimum wait timeout
-if not defined TIME_SLEEP_MSEC set TIME_SLEEP_MSEC=20
-if %TIME_SLEEP_MSEC% LEQ 20 set TIME_SLEEP_MSEC=20
-
-"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0sleep.vbs" "%TIME_SLEEP_MSEC%"

@@ -11,9 +11,7 @@ set "UNLOCK_DIR=%~4"
 set "UNLOCK_FILE=%~5"
 set "WAITERS_DIR=%~6"
 
-call "%%~dp0__init__.bat" || exit /b
-
-set "RAND=%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
+set "RAND=%RANDOM%-%RANDOM%"
 
 set "OLD_LOCK_DIR=%LOCK_DIR%.%RAND%"
 set "OLD_UNLOCK_DIR=%UNLOCK_DIR%.%RAND%"
@@ -22,7 +20,8 @@ set "OLD_WAITERS_DIR=%WAITERS_DIR%.%RAND%"
 :WAIT_LOOP
 if exist "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%\%UNLOCK_FILE%" goto EXIT
 
-call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+rem busy wait for 20 msec
+call "%%~dp0busy_wait.bat" 20
 
 goto WAIT_LOOP
 
@@ -68,7 +67,8 @@ if %PRE_LOCK_ACQUIRE% NEQ 0 (
   exit /b 0
 )
 
-rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+rem rem busy wait for 20 msec
+rem call "%%~dp0busy_wait.bat" 20
 
 goto EXIT_PRE_LOCK_LOOP
 
@@ -83,6 +83,7 @@ rename "%LOCK_PATH%\%LOCK_DIR%" "%OLD_LOCK_DIR%" >nul 2>nul && rmdir /S /Q "%LOC
 if not exist "%LOCK_PATH%\%LOCK_DIR%" exit /b 0
 
 rem we should not exit until the lock directory would not be cleaned up
-rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+rem rem busy wait for 20 msec
+rem call "%%~dp0busy_wait.bat" 20
 
 goto RELEASE_AND_CLEANUP_LOCK_LOOP

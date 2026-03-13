@@ -24,7 +24,7 @@ rem     directory already has an exclusive not inherited write access
 rem     privilege.
 rem   * Does not wait on a path if has permissions to read a path as a
 rem     file.
-rem   * Can sleep on a specified timeout in milliseconds between checks.
+rem   * Can busy wait on a specified timeout in milliseconds between checks.
 
 rem Cons:
 rem   * Does not support empty directory. At least one file must exist.
@@ -46,14 +46,5 @@ if /i not "%FILE_PATH_ATTR:~0,1%" == "d" exit /b 255
 if not "%~2" == "" if %~20 LSS 0 move /Y "%~1\*" "%~1" >nul 2>nul & exit /b
 
 :FILE_MOVE_LOOP
-move /Y "%~1\*" "%~1" >nul 2>nul || ( call :SLEEP %%2 & goto FILE_MOVE_LOOP )
+move /Y "%~1\*" "%~1" >nul 2>nul || ( call "%%~dp0busy_wait.bat" %%2 & goto FILE_MOVE_LOOP )
 exit /b 0
-
-:SLEEP
-set "TIME_SLEEP_MSEC=%~1"
-
-rem minimum wait timeout
-if not defined TIME_SLEEP_MSEC set TIME_SLEEP_MSEC=20
-if %TIME_SLEEP_MSEC% LEQ 20 set TIME_SLEEP_MSEC=20
-
-"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0sleep.vbs" "%TIME_SLEEP_MSEC%"

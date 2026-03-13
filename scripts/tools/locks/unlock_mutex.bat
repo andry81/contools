@@ -4,8 +4,6 @@ setlocal
 
 set "LOCK_NAME=%~1"
 
-call "%%~dp0__init__.bat" || exit /b
-
 if defined SCRIPT_TEMP_CURRENT_DIR (
   set "LOCK_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 ) else set "LOCK_PATH=%TEMP%"
@@ -14,7 +12,7 @@ set "LOCK_DIR=lock_mutex0.%LOCK_NAME%"
 set "UNLOCK_DIR=unlock0"
 set "UNLOCK_FILE=unlock0"
 
-set "OLD_LOCK_DIR=%LOCK_DIR%.%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
+set "OLD_LOCK_DIR=%LOCK_DIR%.%RANDOM%-%RANDOM%"
 
 :PRE_LOCK_LOOP
 rem prelock via redirection to file
@@ -39,7 +37,8 @@ if %PRE_LOCK_ACQUIRE% NEQ 0 (
   exit /b 0
 )
 
-rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+rem rem busy wait for 20 msec
+rem call "%%~dp0busy_wait.bat" 20
 
 goto PRE_LOCK_LOOP
 

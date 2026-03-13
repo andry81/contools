@@ -4,8 +4,6 @@ setlocal
 
 set "LOCK_NAME=%~1"
 
-call "%%~dp0__init__.bat" || exit /b
-
 if defined SCRIPT_TEMP_CURRENT_DIR (
   set "LOCK_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 ) else set "LOCK_PATH=%TEMP%"
@@ -15,7 +13,7 @@ set "UNLOCK_DIR=unlock0"
 set "UNLOCK_FILE=unlock0"
 set "WAITERS_DIR=waiters"
 
-set "OLD_LOCK_DIR=%LOCK_DIR%.%RANDOM%.%RANDOM%.%RANDOM%.%RANDOM%"
+set "OLD_LOCK_DIR=%LOCK_DIR%-%RANDOM%-%RANDOM%"
 
 :PRE_LOCK_LOOP
 rem prelock via redirection to file
@@ -39,7 +37,8 @@ set PRE_LOCK_ACQUIRE=0
 
 rem could not prelock operations over the lock directory - somebody is already processing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% EQU 0 (
-  rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+  rem rem busy wait for 20 msec
+  rem call "%%~dp0busy_wait.bat" 20
 
   goto PRE_LOCK_LOOP
 )
@@ -55,7 +54,8 @@ mkdir "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%"
 start "" /D "%LOCK_PATH%\%LOCK_DIR%" /B cmd.exe /c call "%~dp0lock_dir_impl.bat" "%LOCK_PATH%" "%PRE_LOCK_FILE%" "%LOCK_DIR%" "%UNLOCK_DIR%" "%UNLOCK_FILE%" "%WAITERS_DIR%"
 
 rem just in case
-rem call "%%CONTOOLS_ROOT%%/std/sleep.bat" 20
+rem rem busy wait for 20 msec
+rem call "%%~dp0busy_wait.bat" 20
 
 popd
 
