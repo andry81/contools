@@ -1,4 +1,7 @@
 2026.03.12:
+* new: scripts/tests/bench/bat/test__call/test__call__03_break.bat: `break` bench test versus `call`
+
+2026.03.12:
 * changed: scripts/tools/locks/*.bat: lock code reduction
 
 2026.03.12:
