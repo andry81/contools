@@ -30,7 +30,7 @@ rem     removed.
 
 rem -trylock
 rem   Try to lock and if not, then exit immediately (-1024) instead of waiting
-rem   the lock.
+rem   the lock. The lock file does not delete.
 rem   Has no effect if `-lockfile` is not defined.
 
 rem -lock-sleep-cmdline <lock-sleep-cmdline>
@@ -207,10 +207,7 @@ set LOCK_ACQUIRE=0
 set LAST_ERROR=%ERRORLEVEL%
 
 if %LOCK_ACQUIRE% EQU 0 (
-  if %FLAG_TRYLOCK% NEQ 0 (
-    del /F /Q /A:-D "%FLAG_LOCK_FILE%" >nul 2>nul
-    exit /b -1024
-  )
+  if %FLAG_TRYLOCK% NEQ 0 exit /b -1024
 
   call "%%?~dp0%%sleep.bat"%%FLAG_LOCK_SLEEP_CMDLINE%%
 
