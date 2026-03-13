@@ -1,10 +1,15 @@
-2026.03.12:
+2026.03.13:
+* new: scripts/tests/unit/bat/test_std_time: unit tests for `time` scripts
+* new: scripts/tests/bench/bat/test_std_time: bench tests for `time` scripts
+* changed: scripts/tools/time/timestamp.bat: code improvement and reduction
+
+2026.03.13:
 * new: scripts/tests/bench/bat/test__call/test__call__03_break.bat: `break` bench test versus `call`
 
-2026.03.12:
+2026.03.13:
 * changed: scripts/tools/locks/*.bat: lock code reduction
 
-2026.03.12:
+2026.03.13:
 * changed: scripts/tools/std/*shift.bat: avoid lock file remove in case of `-trylock` flag
 
 2026.03.12:
