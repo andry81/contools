@@ -1,10 +1,10 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   setshift.bat [-exe] [-notrim] [-skip <skip-num>] [-num <num-args>] <shift> <var> [<cmdline>...]
+rem   setshift.bat [-exe] [-notrim] [-skip <skip-num>] [-num <num-args>] <shift> <out-var> [<cmdline>...]
 
 rem Description:
-rem   Script sets `<var>` variable to skipped and shifted `<cmdline>`.
+rem   Script sets `<out-var>` variable to partially shifted `<cmdline>`.
 
 rem -exe
 rem   Use exe command line encoder instead of the batch as by default.
@@ -29,7 +29,7 @@ rem   If >=0, then shifts by `<shift>` beginning from `<skip-num>` argument.
 rem   If < 0, then shifts by `|<shift>|` beginning from `<skip-num>+|<shift>|`
 rem   argument.
 
-rem <var>:
+rem <out-var>:
 rem   Variable to set.
 
 rem CAUTION:
@@ -153,11 +153,7 @@ if not defined __STRING__ exit /b %LAST_ERROR%
 set "?~dp0=%~dp0"
 
 rem script flags
-set FLAG_SHIFT=0
-set FLAG_EXE=0
-set FLAG_NO_TRIM=0
-set FLAG_SKIP=0
-set FLAG_NUM_ARGS=65536
+set "FLAG_SHIFT=0" & set "FLAG_EXE=0" & set "FLAG_NO_TRIM=0" & set "FLAG_SKIP=0" & set "FLAG_NUM_ARGS=65536"
 
 rem flags always at first
 set "FLAG=%~1"
@@ -165,39 +161,12 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if defined FLAG if "%FLAG%" == "-exe" (
-  set FLAG_EXE=1
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=1
-)
+if defined FLAG if "%FLAG%" == "-exe"     set "FLAG_EXE=1"        & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+if defined FLAG if "%FLAG%" == "-notrim"  set "FLAG_NO_TRIM=1"    & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+if defined FLAG if "%FLAG%" == "-skip"    set "FLAG_SKIP=%~2"     & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-num"     set "FLAG_NUM_ARGS=%~2" & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
 
-if defined FLAG if "%FLAG%" == "-notrim" (
-  set FLAG_NO_TRIM=1
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=1
-)
-
-if defined FLAG if "%FLAG%" == "-skip" (
-  set "FLAG_SKIP=%~2"
-  shift
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=2
-)
-
-if defined FLAG if "%FLAG%" == "-num" (
-  set "FLAG_NUM_ARGS=%~2"
-  shift
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=2
-)
-
-set "SHIFT=%~1"
-set "VAR="
-set "CMDLINE="
+set "SHIFT=%~1" & set "OUTVAR=" & set "CMDLINE="
 
 rem test on invalid flag
 if not defined SHIFT exit /b %LAST_ERROR%
@@ -210,21 +179,11 @@ set /A SHIFT+=0
 if not "%SHIFT%" == "%SHIFT_%" exit /b %LAST_ERROR%
 
 rem cast to integer
-set /A FLAG_SKIP+=0
-
-set /A VAR_INDEX=FLAG_SHIFT+1
-set /A ARG0_INDEX=FLAG_SHIFT+2
-
-set /A SKIP=FLAG_SHIFT+2+FLAG_SKIP
+set /A "FLAG_SKIP+=0", "OUTVAR_INDEX=FLAG_SHIFT+1", "ARG0_INDEX=FLAG_SHIFT+2", "SKIP=FLAG_SHIFT+2+FLAG_SKIP"
 
 if %SHIFT% GEQ 0 (
-  set /A SHIFT+=SKIP
-  set /A ARGS_END=FLAG_NUM_ARGS+SHIFT
-) else (
-  set /A ARGS_END=SKIP+FLAG_NUM_ARGS-SHIFT
-  set /A SKIP+=-SHIFT
-  set /A SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2
-)
+  set /A "SHIFT+=SKIP", "ARGS_END=FLAG_NUM_ARGS+SHIFT"
+) else set /A "ARGS_END=SKIP+FLAG_NUM_ARGS-SHIFT", "SKIP+=-SHIFT", "SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2"
 
 rem encode specific command line characters
 if %FLAG_EXE% EQU 0 (
@@ -255,17 +214,17 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STR
         ) else endlocal & set "CMDLINE=%%j"
       ) else endlocal
     ) else endlocal
-  ) else if !INDEX! EQU !VAR_INDEX! (
-    endlocal & set "VAR=%%j"
+  ) else if !INDEX! EQU !OUTVAR_INDEX! (
+    endlocal & set "OUTVAR=%%j"
   ) else endlocal
   set /A INDEX+=1
 )
 
-if not defined VAR endlocal & exit /b %LAST_ERROR%
+if not defined OUTVAR endlocal & exit /b %LAST_ERROR%
 setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!CMDLINE!" & if %FLAG_NO_TRIM% NEQ 0 set "__STRING__=!__STRING__:$20= !" & set "__STRING__=!__STRING__:$09=	!"
-if not defined __STRING__ for /F "tokens=* delims="eol^= %%i in ("!VAR!") do endlocal & endlocal & set "%%i=" & exit /b %LAST_ERROR%
+if not defined __STRING__ for /F "tokens=* delims="eol^= %%i in ("!OUTVAR!") do endlocal & endlocal & set "%%i=" & exit /b %LAST_ERROR%
 
-for /F "tokens=* delims="eol^= %%i in ("!VAR!") do (
+for /F "tokens=* delims="eol^= %%i in ("!OUTVAR!") do (
   setlocal DISABLEDELAYEDEXPANSION & if %FLAG_EXE% EQU 0 (
     call "%%?~dp0%%encode\decode_sys_chars_bat_cmdline.bat"
   ) else call "%%?~dp0%%encode\decode_sys_chars_exe_cmdline.bat"

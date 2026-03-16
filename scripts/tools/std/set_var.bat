@@ -1,10 +1,10 @@
 @echo off & setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!%~2!"') do endlocal & set "%~1=%%~i" & exit /b %ERRORLEVEL%
 
 rem USAGE:
-rem   set_var.bat <outvar> <var>
+rem   set_var.bat <out-var> <var>
 
 rem Description:
-rem   Sets variable into another variable.
+rem   Sets `<var>` variable into `<out-var>` variable.
 rem   Does not change the error level.
 
 rem CAUTION:

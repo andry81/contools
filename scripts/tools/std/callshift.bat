@@ -1,10 +1,10 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   callshift.bat [-exe] [-notrim] [-skip <skip-num>] [-num <num-args>] [-lockfile <lock-file> [-trylock] [-lock-busy-wait-cmdline <lock-busy-wait-cmdline>]] [<shift> [<command> [<cmdline>...]]]
+rem   callshift.bat [-exe] [-notrim] [-skip <skip-num>] [-num <num-args>] [-lockfile <lock-file> [-trylock] [-lock-busy-wait-cmdline <lock-busy-wait-cmdline>]] <shift> <command> [<cmdline>...]
 
 rem Description:
-rem   Script calls `<command>` with skipped and shifted `<cmdline>`.
+rem   Script calls `<command>` with partially shifted `<cmdline>`.
 rem   The `call` prefix is not required to call batch scripts.
 
 rem -exe
@@ -69,7 +69,7 @@ rem   2. >callshift.bat -exe 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | , ; = = "=" 3
 rem   3. >callshift.bat 2 echo:"1 2" 3 4 5
 rem      "1 2" 5
-rem   4. >callshift.bat . set | sort
+rem   4. >callshift.bat 0 set | sort
 rem   5. >errlvl.bat 123
 rem      >callshift.bat
 rem      >callshift.bat 0 echo:
@@ -180,14 +180,8 @@ if not defined __STRING__ exit /b %LAST_ERROR%
 set "?~dp0=%~dp0"
 
 rem script flags
-set FLAG_SHIFT=0
-set FLAG_EXE=0
-set FLAG_NO_TRIM=0
-set FLAG_SKIP=0
-set FLAG_NUM_ARGS=65536
-set "FLAG_LOCK_FILE="
-set "FLAG_LOCK_BUSY_WAIT_CMDLINE= 50"
-set FLAG_TRYLOCK=0
+set "FLAG_SHIFT=0" & set "FLAG_EXE=0" & set "FLAG_NO_TRIM=0" & set "FLAG_SKIP=0" & set "FLAG_NUM_ARGS=65536" & ^
+set "FLAG_LOCK_FILE=" & set "FLAG_LOCK_BUSY_WAIT_CMDLINE= 50" & set "FLAG_TRYLOCK=0"
 
 rem flags always at first
 set "FLAG=%~1"
@@ -195,62 +189,15 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if defined FLAG if "%FLAG%" == "-exe" (
-  set FLAG_EXE=1
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=1
-)
+if defined FLAG if "%FLAG%" == "-exe"                     set "FLAG_EXE=1"                        & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+if defined FLAG if "%FLAG%" == "-notrim"                  set "FLAG_NO_TRIM=1"                    & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+if defined FLAG if "%FLAG%" == "-skip"                    set "FLAG_SKIP=%~2"                     & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-num"                     set "FLAG_NUM_ARGS=%~2"                 & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-lockfile"                set "FLAG_LOCK_FILE=%~2"                & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-lock-busy-wait-cmdline"  set "FLAG_LOCK_BUSY_WAIT_CMDLINE= %~2"  & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-trylock"                 set "FLAG_TRYLOCK=1"                    & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
 
-if defined FLAG if "%FLAG%" == "-notrim" (
-  set FLAG_NO_TRIM=1
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=1
-)
-
-if defined FLAG if "%FLAG%" == "-skip" (
-  set "FLAG_SKIP=%~2"
-  shift
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=2
-)
-
-if defined FLAG if "%FLAG%" == "-num" (
-  set "FLAG_NUM_ARGS=%~2"
-  shift
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=2
-)
-
-if defined FLAG if "%FLAG%" == "-lockfile" (
-  set "FLAG_LOCK_FILE=%~2"
-  shift
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=2
-)
-
-if defined FLAG if "%FLAG%" == "-lock-busy-wait-cmdline" (
-  set "FLAG_LOCK_BUSY_WAIT_CMDLINE= %~2"
-  shift
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=2
-)
-
-if defined FLAG if "%FLAG%" == "-trylock" (
-  set FLAG_TRYLOCK=1
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=1
-)
-
-set "SHIFT=%~1"
-set "COMMAND="
-set "CMDLINE="
+set "SHIFT=%~1" & set "COMMAND=" & set "CMDLINE="
 
 rem test on invalid flag
 if not defined SHIFT exit /b %LAST_ERROR%
@@ -296,21 +243,11 @@ exit /b %LAST_ERROR%
 :LOCKED_CALL
 
 rem cast to integer
-set /A FLAG_SKIP+=0
-
-set /A COMMAND_INDEX=FLAG_SHIFT+1
-set /A ARG0_INDEX=FLAG_SHIFT+2
-
-set /A SKIP=FLAG_SHIFT+2+FLAG_SKIP
+set /A "FLAG_SKIP+=0", "COMMAND_INDEX=FLAG_SHIFT+1", "ARG0_INDEX=FLAG_SHIFT+2", "SKIP=FLAG_SHIFT+2+FLAG_SKIP"
 
 if %SHIFT% GEQ 0 (
-  set /A SHIFT+=SKIP
-  set /A ARGS_END=FLAG_NUM_ARGS+SHIFT
-) else (
-  set /A ARGS_END=SKIP+FLAG_NUM_ARGS-SHIFT
-  set /A SKIP+=-SHIFT
-  set /A SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2
-)
+  set /A "SHIFT+=SKIP", "ARGS_END=FLAG_NUM_ARGS+SHIFT"
+) else set /A "ARGS_END=SKIP+FLAG_NUM_ARGS-SHIFT", "SKIP+=-SHIFT", "SHIFT=FLAG_SHIFT+2+FLAG_SKIP-SHIFT*2"
 
 rem encode specific command line characters
 if %FLAG_EXE% EQU 0 (

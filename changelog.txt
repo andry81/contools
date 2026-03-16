@@ -1,3 +1,9 @@
+2026.03.17:
+* new: scripts/tools/std/setshift_var.bat: script to shift command line in a variable into another variable
+* new: scripts/tests/bench/bat/test_std/test_std__03_setshift_var.bat: bench test for `setshift_var.bat` script
+* changed: scripts/tools/std: call*.bat, setshift.bat: code compacting and speedup
+* refactor: scripts/tools/std: minor refactor
+
 2026.03.16:
 * refactor: scripts/std/*.bat: minor refactor
 
