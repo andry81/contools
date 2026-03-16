@@ -1,4 +1,7 @@
 2026.03.16:
+* refactor: scripts/std/*.bat: minor refactor
+
+2026.03.16:
 * refactor: scripts/std/*.bat: cleanup a last empty `rem` line
 
 2026.03.13:

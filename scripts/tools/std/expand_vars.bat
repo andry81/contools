@@ -8,8 +8,9 @@ rem   Expand variables script with a variable list in the command line.
 rem   Does not change the error level.
 
 rem CAUTION:
-rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
-rem   the `!` character will be expanded.
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
 
 rem CAUTION:
 rem   The `for %%i in (%*)` statement still can expand the globbing characters

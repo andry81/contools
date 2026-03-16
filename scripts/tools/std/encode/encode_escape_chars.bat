@@ -15,8 +15,9 @@ rem Encode these characters:
 rem  "'`^%!+    - escape or sequence expand characters (`+` is a unicode codepoint sequence character in 65000 code page)
 
 rem CAUTION:
-rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
-rem   the `!` character will be expanded.
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
 
 rem CAUTION:
 rem   Character `$` must be encoded separately BEFORE this script call!

@@ -21,8 +21,9 @@ rem  ?*<>       - globbing characters in the `for ... %%i in (...)` expression o
 rem  ,;=        - separator characters in the `for ... %%i in (...)` expression or in a command line
 
 rem CAUTION:
-rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
-rem   the `!` character will be expanded.
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
 
 rem CAUTION:
 rem   Character `$` must be decoded separately AFTER this script call!

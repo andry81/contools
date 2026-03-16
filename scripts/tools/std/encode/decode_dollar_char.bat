@@ -6,8 +6,9 @@ exit /b 0
 rem Decode `$` character.
 
 rem CAUTION:
-rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
-rem   the `!` character will be expanded.
+rem   The delayed expansion feature must be disabled before this script call:
+rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
+rem   expanded.
 
 rem CAUTION:
 rem   Keep comments at the end of the script to speed up the parsing times!
