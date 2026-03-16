@@ -36,7 +36,6 @@ rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
 rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem   expanded.
-rem
 
 rem Examples:
 rem   1. >callshift.bat 0 echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
@@ -81,7 +80,7 @@ del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
 rem WORKAROUND:
 rem   In case if `echo` is turned off externally.
-rem
+
 if not defined __STRING__ exit /b 0
 
 setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (

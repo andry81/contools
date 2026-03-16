@@ -311,7 +311,7 @@ call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XCOPY_FLAGS_ %%*
 
 rem CAUTION:
 rem   You must switch code page into English compatible locale.
-rem
+
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 
 call :MAIN %%*
@@ -394,7 +394,7 @@ rem      `for /F "usebackq ..." %%i in (`<inner-expression>`) do ...`
 rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
-rem
+
 set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
@@ -516,7 +516,7 @@ rem      `for /F "usebackq ..." %%i in (`<inner-expression>`) do ...`
 rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
-rem
+
 set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (

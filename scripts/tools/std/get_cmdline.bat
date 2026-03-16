@@ -15,7 +15,6 @@ rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
 rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem   expanded.
-rem
 
 rem NOTE:
 rem   To skip or shift the arguments do use the `setshift.bat` script instead.
@@ -59,7 +58,7 @@ del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
 rem WORKAROUND:
 rem   In case if `echo` is turned off externally.
-rem
+
 if not defined __STRING__ endlocal & set "RETURN_VALUE=" & exit /b %LAST_ERROR%
 
 setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (

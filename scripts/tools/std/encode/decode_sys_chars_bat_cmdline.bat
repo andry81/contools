@@ -26,12 +26,9 @@ rem  ?*<>       - globbing characters in the `for ... %%i in (...)` expression o
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call: `setlocal DISABLEDELAYEDEXPANSION`, otherwise
 rem   the `!` character will be expanded.
-rem
 
 rem NOTE:
 rem   Character `$` already does decode.
-rem
 
 rem CAUTION:
 rem   Keep comments at the end of the script to speed up the parsing times!
-rem

@@ -10,7 +10,6 @@ rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
 rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem   expanded.
-rem
 :DOC_END
 
 rem drop the output variable value

@@ -60,7 +60,7 @@ del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
 rem WORKAROUND:
 rem   In case if `echo` is turned off externally.
-rem
+
 if not defined __STRING__ exit /b 0
 
 setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
@@ -113,7 +113,7 @@ for /F "tokens=* delims="eol^= %%i in ("%DIR_PATH%\.") do set "DIR_PATH=%%~fi" &
 
 rem CAUTION:
 rem   The drive still must exist even if the path is not. If path exists, the path directory still can be in a disconnected state.
-rem
+
 if not exist "%DIR_DRIVE%" (
   echo;%?~%: error: the directory path drive is not exist: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
   exit /b -254
@@ -124,7 +124,7 @@ rem   The `mklink` command can create symbolic directory link and in the disconn
 rem   report existence of a directory without the trailing back slash:
 rem     `x:\<path-to-dir-without-trailing-back-slash>`
 rem   So we must test the path with the trailing back slash to check existence of the link AND it's connection state.
-rem
+
 if not exist "\\?\%DIR_PATH%" (
   set DIR_PATHS=%DIR_PATHS% %1
 ) else if not exist "\\?\%DIR_PATH%\*" (

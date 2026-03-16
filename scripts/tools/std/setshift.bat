@@ -36,7 +36,6 @@ rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
 rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem   expanded.
-rem
 
 rem Examples (in console):
 rem   1. >setshift.bat 0 x "1 2" ! ? * ^& ^| , ; = ^= "=" 3
@@ -142,7 +141,7 @@ del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
 rem WORKAROUND:
 rem   In case if `echo` is turned off externally.
-rem
+
 if not defined __STRING__ exit /b %LAST_ERROR%
 
 setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
@@ -234,7 +233,7 @@ if %FLAG_EXE% EQU 0 (
 
 rem CAUTION:
 rem   Encodes ALL tabulation characters.
-rem
+
 if %FLAG_NO_TRIM% NEQ 0 setlocal ENABLEDELAYEDEXPANSION & ^
 set "__STRING__=!__STRING__:  = $20!" & set "__STRING__=!__STRING__:$20 =$20$20!" & ^
 set "__STRING__=!__STRING__:		=	$09!" & set "__STRING__=!__STRING__:$09	=$09$09!" & ^

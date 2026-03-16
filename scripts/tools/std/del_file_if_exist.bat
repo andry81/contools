@@ -78,7 +78,7 @@ rem   The `mklink` command can create symbolic directory link and in the disconn
 rem   report existence of a directory without the trailing back slash:
 rem     `x:\<path-to-dir-without-trailing-back-slash>`
 rem   So we must test the path with the trailing back slash to check existence of the link AND it's connection state.
-rem
+
 if not exist "\\?\%FROM_PATH%" (
   exit /b 0
 ) >&2 else if exist "\\?\%FROM_PATH%\*" (
