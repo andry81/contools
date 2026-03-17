@@ -1,4 +1,7 @@
 2026.03.17:
+* changed: scripts/tools/std/del_file.bat: `del /Q ""` case workaround (`del /Q "" silently deletes everything in the current directory` : https://github.com/andry81/contools/discussions/42)
+
+2026.03.17:
 * fixed: scripts/tools/std/is_dir_exist.bat: execution fixup
 * changed: scripts/tools/std/is_dir_exist.bat: changed return codes to -1 - exist but not a directory, 1 - not exist
 
