@@ -44,15 +44,12 @@ endlocal
 rem exclusive acquire of the lock file
 :REPEAT_LOCK_LOOP
 
-(
-  (
-    rem if lock is acquired, then we are in...
+( ( rem if lock is acquired, then we are in...
     call :MAIN "%%~2" "%%~3" "%%~4"
     call set "LAST_ERROR=%%ERRORLEVEL%%"
 
-    rem exit with return code from the MAIN
-  ) 9> "%~1" && (del /F /Q /A:-D "%~1" & goto EXIT)
-) 2>nul
+    rem exit with return code from the MAIN, check on empty variable to avoid accidental `del /Q ""` case
+) 9> "%~1" && (if not "%~1" == "" del /F /Q /A:-D "%~1" & goto EXIT) ) 2>nul
 
 rem Busy wait: with external call significantly reduces CPU consumption while in a waiting state
 "%SystemRoot%\System32\pathping.exe" 127.0.0.1 -n -q 1 -p 20 >nul 2>nul

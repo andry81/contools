@@ -66,5 +66,6 @@ call :CLEANUP_PRELOCK
 exit /b %LAST_ERROR%
 
 :CLEANUP_PRELOCK
-del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>nul
+rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
+if defined LOCK_PATH if defined PRE_LOCK_FILE del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>nul
 exit /b

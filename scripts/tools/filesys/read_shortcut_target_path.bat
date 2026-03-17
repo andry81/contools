@@ -134,6 +134,7 @@ if not defined TARGET_PATH_STDERR_FILE set "TARGET_PATH_STDERR_FILE=%TARGET_PATH
 call :MAIN %%*
 set LAST_ERROR=%ERRORLEVEL%
 
+rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
 if defined TARGET_PATH_TEMP_STDOUT_FILE del /F /Q /A:-D "%TARGET_PATH_TEMP_STDOUT_FILE%" >nul 2>nul
 if defined TARGET_PATH_TEMP_STDERR_FILE del /F /Q /A:-D "%TARGET_PATH_TEMP_STDERR_FILE%" >nul 2>nul
 

@@ -54,7 +54,8 @@ rem redirect command line into temporary file to print it correctly
 
 set "__STRING__=" & for /F "usebackq tokens=* delims="eol^= %%i in ("%CMDLINE_TEMP_FILE%") do set "__STRING__=%%i"
 
-del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
+rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
+if defined CMDLINE_TEMP_FILE del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 
 rem WORKAROUND:
 rem   In case if `echo` is turned off externally.

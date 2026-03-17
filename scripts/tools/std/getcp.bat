@@ -36,7 +36,8 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
 (
   "%__?CHCP_FILE%" 2>nul > "%__?CHCP_TEMP_FILE%"
   for /F "usebackq tokens=1,* delims=:"eol^= %%i in ("%__?CHCP_TEMP_FILE%") do set "__?CURRENT_CP=%%j"
-  del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>nul
+  rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
+  if defined __?CHCP_TEMP_FILE del /F /Q /A:-D "%__?CHCP_TEMP_FILE%" >nul 2>nul
 ) <nul
 
 if defined __?CURRENT_CP set "__?CURRENT_CP=%__?CURRENT_CP: =%"

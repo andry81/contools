@@ -92,8 +92,9 @@ if not exist "\\?\%FILE_PATH%" (
 
 rem check on long file path
 if exist "%FILE_PATH%" (
+  rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
   if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>^>del /F /Q /A:-D "%FILE_PATH%"
-  del /F /Q /A:-D "%FILE_PATH%" >nul 2>nul
+  if defined FILE_PATH del /F /Q /A:-D "%FILE_PATH%" >nul 2>nul
   exit /b
 )
 

@@ -112,7 +112,8 @@ for /f "usebackq eol=# tokens=* delims=" %%i in ("%FILE_LIST_IN:/=\%") do (
 call :ENCODE
 set LAST_ERROR=%ERRORLEVEL%
 
-del /F /Q /A:-D "%TEMP_FILE_LIST%"
+rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
+if defined TEMP_FILE_LIST del /F /Q /A:-D "%TEMP_FILE_LIST%"
 
 exit /b %LAST_ERROR%
 

@@ -11,6 +11,7 @@ if exist "%INIT_VARS_FILE%" (
     call "%%~dp0cleanup_file.bat" "%%INIT_VARS_FILE%%"
 
     rem delete sed in place backups (just in case, not required for `Msys2`, required for `GnuWin32`)
+    rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
     del /F /Q /A:-D "sed*" 2>nul
 
     popd
@@ -18,6 +19,7 @@ if exist "%INIT_VARS_FILE%" (
     call "%%~dp0cleanup_file.bat" "%%INIT_VARS_FILE%%"
 
     rem delete sed in place backups (just in case, not required for `Msys2`, required for `GnuWin32`)
+    rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
     del /F /Q /A:-D "sed*" 2>nul
 
     popd

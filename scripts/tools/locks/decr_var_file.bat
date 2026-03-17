@@ -50,5 +50,5 @@ rem safe echo call
 exit /b 0
 
 :EXIT
-rem cleanup files
-del /F /Q /A:-D "%__LOCK_FILE0%" >nul 2>nul
+rem cleanup files, check on empty variable to avoid accidental `del /Q ""` case
+if defined __LOCK_FILE0 del /F /Q /A:-D "%__LOCK_FILE0%" >nul 2>nul

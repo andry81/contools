@@ -19,7 +19,8 @@ for /L %%i in (1,1,1000) do (
   set "TEMP_FILE=%TEMP_DIR%\tmp-!RANDOM!-!RANDOM!.txt"
   "%SystemRoot%\system32\chcp.com" > "!TEMP_FILE!"
   for /F "usebackq tokens=* delims="eol^= %%i in ("!TEMP_FILE!") do set "VALUE=%%i"
-  del /F /Q /A:-D "!TEMP_FILE!" >nul 2>nul
+  rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
+  if defined TEMP_FILE del /F /Q /A:-D "!TEMP_FILE!" >nul 2>nul
 )
 
 endlocal

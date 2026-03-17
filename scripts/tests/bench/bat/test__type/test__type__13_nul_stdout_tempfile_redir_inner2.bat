@@ -19,6 +19,7 @@ call "%%CONTOOLS_ROOT%%/time/end_time.bat" 10
 echo Time spent: %TIME_INTS%.%TIME_FRACS% msecs
 echo;
 
-del /F /Q /A:-D "%TEMP_FILE%" >nul 2>nul
+rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
+if defined TEMP_FILE del /F /Q /A:-D "%TEMP_FILE%" >nul 2>nul
 
 exit /b 0

@@ -217,6 +217,7 @@ if %TESTLIB__DEBUG%0 EQU 0 (
 )
 
 call;> "%TEST_SCRIPT_INIT_VARS_FILE_PATH%"
+rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
 if exist "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" del /F /Q /A:-D "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" >nul
 if exist "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" del /F /Q /A:-D "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" >nul
 

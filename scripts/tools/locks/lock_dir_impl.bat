@@ -62,7 +62,8 @@ set PRE_LOCK_ACQUIRE=0
 rem if could not prelock operations over the lock directory - somebody is already processing it for locking/unlocking
 if %PRE_LOCK_ACQUIRE% NEQ 0 (
   rem directory lock is released and cleaned up under the prelock, now is safe to remove the prelock file
-  del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>nul
+  rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
+  if defined LOCK_PATH if defined PRE_LOCK_FILE del /F /Q /A:-D "%LOCK_PATH%\%PRE_LOCK_FILE%" >nul 2>nul
 
   exit /b 0
 )

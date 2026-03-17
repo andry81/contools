@@ -8,7 +8,8 @@ if %TEST_LAST_ERROR% NEQ 0 (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%TEST_TEMP_DIR%%"           "%%TEST_DATA_OUTPUT_FILE_NAME%%" "%%TEST_DATA_OUT_ROOT%%\%%TEST_TEMP_DIR_NAME%%" /Y /H /E
 )
 
-del /F /Q /A:-D "%TEST_TEMP_DIR%\output*.txt" 2>nul
+rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
+if defined TEST_TEMP_DIR del /F /Q /A:-D "%TEST_TEMP_DIR%\output*.txt" 2>nul
 
 rem CAUTION:
 rem   1. If a variable is empty, then it would not be expanded in the `cmd.exe`

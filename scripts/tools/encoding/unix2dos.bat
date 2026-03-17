@@ -113,5 +113,6 @@ if %ERRORLEVEL% EQU 2 set SED_APPEND_LF_EXPR= -e "/$/s/$/\n/g"
 
 if defined CONTOOLS_GNUWIN32_ROOT if %FLAG_INPLACE% NEQ 0 (
   rem delete sed in place backups (required for `GnuWin32`)
+  rem CAUTION: must check on empty variable to avoid accidental `del /Q ""` case
   del /F /Q /A:-D "sed??????" 2>nul
 )

@@ -43,7 +43,7 @@ call "%%~dp0busy_wait.bat" 20
 goto REPEAT_READ_LOOP
 
 :EXIT
-rem cleanup files
-del /F /Q /A:-D "%__LOCK_FILE0%" >nul 2>nul
+rem cleanup files, check on empty variable to avoid accidental `del /Q ""` case
+if defined __LOCK_FILE0 del /F /Q /A:-D "%__LOCK_FILE0%" >nul 2>nul
 
 exit /b 0
