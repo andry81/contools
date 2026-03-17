@@ -32,11 +32,9 @@ if "%~1" == "" (
 
 for /F "tokens=* delims="eol^= %%i in ("%~1\.") do set "FILE_PATH=%%~fi"
 
-if not exist "\\?\%FILE_PATH%\*" exit /b 1
-
 for /F "tokens=* delims="eol^= %%i in ("\\?\%FILE_PATH%") do set "FILE_PATH_ATTR=%%~ai"
-if not defined FILE_PATH_ATTR exit /b 255
+if not defined FILE_PATH_ATTR exit /b 1
 
-if /i "%FILE_PATH_ATTR:d=%" == "%FILE_PATH_ATTR%" exit /b 2
+if /i "%FILE_PATH_ATTR:d=%" == "%FILE_PATH_ATTR%" exit /b -1
 
 exit /b 0

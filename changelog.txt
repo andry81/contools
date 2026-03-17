@@ -1,4 +1,8 @@
 2026.03.17:
+* fixed: scripts/tools/std/is_dir_exist.bat: execution fixup
+* changed: scripts/tools/std/is_dir_exist.bat: changed return codes to -1 - exist but not a directory, 1 - not exist
+
+2026.03.17:
 * new: scripts/tools/std/setshift_var.bat: script to shift command line in a variable into another variable
 * new: scripts/tests/bench/bat/test_std/test_std__03_setshift_var.bat: bench test for `setshift_var.bat` script
 * changed: scripts/tools/std: call*.bat, setshift.bat: code compacting and speedup
