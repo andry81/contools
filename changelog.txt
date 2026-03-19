@@ -1,4 +1,7 @@
 2026.03.20:
+* fixed: scripts/tools/std/*.bat: workaround to prevent use flags as positional arguments
+
+2026.03.20:
 * fixed: scripts/tools/std/get_cmdline_*len.bat: execution fixup
 * changed: scripts/tools/std/get_cmdline_*len.bat: code rework
 * changed: scripts/tools/std: call*.bat, setshift*.bat: code improvement

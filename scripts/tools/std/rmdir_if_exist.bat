@@ -86,5 +86,8 @@ if not exist "\\?\%DIR_PATH%" (
 
 call "%%~dp0setshift.bat" 1 RMDIR_FLAGS_ %%*
 
+rem WORKAROUND: replace all quotes in flags to avoid accidental use as positional arguments
+if defined RMDIR_FLAGS_ set "RMDIR_FLAGS_=%RMDIR_FLAGS_:"=%"
+
 echo;^>^>rmdir "%DIR_PATH%" %RMDIR_FLAGS_%
 rmdir "%DIR_PATH%" %RMDIR_FLAGS_%

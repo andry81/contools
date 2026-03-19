@@ -335,6 +335,9 @@ set /A FLAG_SHIFT+=3
 
 call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XMOVE_FLAGS_ %%*
 
+rem WORKAROUND: replace all quotes in flags to avoid accidental use as positional arguments
+if defined XMOVE_FLAGS_ set "XMOVE_FLAGS_=%XMOVE_FLAGS_:"=%"
+
 rem CAUTION:
 rem   You must switch code page into English compatible locale.
 

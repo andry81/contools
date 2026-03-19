@@ -278,6 +278,9 @@ set /A FLAG_SHIFT+=2
 
 call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XCOPY_FLAGS_ %%*
 
+rem WORKAROUND: replace all quotes in flags to avoid accidental use as positional arguments
+if defined XCOPY_FLAGS_ set "XCOPY_FLAGS_=%XCOPY_FLAGS_:"=%"
+
 rem CAUTION:
 rem   You must switch code page into English compatible locale.
 

@@ -181,6 +181,9 @@ if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 
 call "%%?~dp0%%setshift.bat" 2 COPY_FLAGS_ %%*
 
+rem WORKAROUND: replace all quotes in flags to avoid accidental use as positional arguments
+if defined COPY_FLAGS_ set "COPY_FLAGS_=%COPY_FLAGS_:"=%"
+
 if defined COPY_FLAGS_ (
   echo;^>^>copy %COPY_FLAGS_% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
   copy %COPY_FLAGS_% "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
