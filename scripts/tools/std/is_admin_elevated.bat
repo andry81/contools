@@ -23,4 +23,4 @@ rem
 rem   Based on: https://superuser.com/questions/557387/pipe-not-working-in-cmd-exe-on-windows-7/1869422#1869422
 
 rem CAUTION:
-rem   In Windowx XP an elevated call under data protection flag will block the wmic tool, so we have to use `ver` command instead!
+rem   In Windows XP an elevated call under data protection flag will block the wmic tool, so we have to use `ver` command instead!

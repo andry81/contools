@@ -75,7 +75,7 @@ rem
 rem   Based on: https://superuser.com/questions/557387/pipe-not-working-in-cmd-exe-on-windows-7/1869422#1869422
 
 rem CAUTION:
-rem   In Windowx XP an elevated call under data protection flag will block the wmic tool, so we have to use `ver` command instead!
+rem   In Windows XP an elevated call under data protection flag will block the wmic tool, so we have to use `ver` command instead!
 
 :IS_ADMIN_ELEVATED
 set "WINDOWS_VER_STR=" & set "WINDOWS_MAJOR_VER=0" & for /F "usebackq tokens=1,2,* delims=[]" %%i in (`@ver 2^>nul`) do set "WINDOWS_VER_STR=%%j"

@@ -1,4 +1,8 @@
 2026.03.19:
+* fixed: scripts/tools/ToolAdaptors/lnk/install_system64_link.bat: minor fixup
+* refactor: scripts/tools/*.bat: minor refactor
+
+2026.03.19:
 * change: scripts/tools/std/get_windows_version.bat: added `WINDOWS_X32_VER` and full bitness detection OS vs `cmd.exe`
 
 2026.03.17:

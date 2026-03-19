@@ -36,7 +36,7 @@ rem   Based on:
 rem     https://superuser.com/questions/898017/windows-command-to-get-all-information-properties-of-a-file
 
 rem CAUTION:
-rem   In Windowx XP an elevated call under data protection flag will block the wmic tool!
+rem   In Windows XP an elevated call under data protection flag will block the wmic tool!
 
 rem CAUTION:
 rem   The `wmic` executable has an issue with different output codepage:
