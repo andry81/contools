@@ -181,8 +181,8 @@ if not defined __STRING__ exit /b %LAST_ERROR%
 set "?~dp0=%~dp0"
 
 rem script flags
-set "FLAG_SHIFT=0" & set "FLAG_EXE=0" & set "FLAG_NO_TRIM=0" & set "FLAG_SKIP=0" & set "FLAG_NUM_ARGS=65536" & ^
-set "FLAG_LOCK_FILE=" & set "FLAG_LOCK_BUSY_WAIT_CMDLINE= 50" & set "FLAG_TRYLOCK=0"
+set /A "FLAG_SHIFT=0", "FLAG_EXE=0", "FLAG_NO_TRIM=0", "FLAG_SKIP=0", "FLAG_NUM_ARGS=65536", "FLAG_LOCK_BUSY_WAIT_CMDLINE=50", "FLAG_TRYLOCK=0"
+set "FLAG_LOCK_FILE="
 
 rem flags always at first
 set "FLAG=%~1"
@@ -190,13 +190,17 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if defined FLAG if "%FLAG%" == "-exe"                     set "FLAG_EXE=1"                        & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
-if defined FLAG if "%FLAG%" == "-notrim"                  set "FLAG_NO_TRIM=1"                    & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
-if defined FLAG if "%FLAG%" == "-skip"                    set "FLAG_SKIP=%~2"                     & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
-if defined FLAG if "%FLAG%" == "-num"                     set "FLAG_NUM_ARGS=%~2"                 & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
-if defined FLAG if "%FLAG%" == "-lockfile"                set "FLAG_LOCK_FILE=%~2"                & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
-if defined FLAG if "%FLAG%" == "-lock-busy-wait-cmdline"  set "FLAG_LOCK_BUSY_WAIT_CMDLINE= %~2"  & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
-if defined FLAG if "%FLAG%" == "-trylock"                 set "FLAG_TRYLOCK=1"                    & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+if defined FLAG if "%FLAG%" == "-exe"                     set "FLAG_EXE=1"                          & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+if defined FLAG if "%FLAG%" == "-notrim"                  set "FLAG_NO_TRIM=1"                      & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+if defined FLAG if "%FLAG%" == "-skip"                    set /A "FLAG_SKIP=%~2"                    & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-num"                     set /A "FLAG_NUM_ARGS=%~2"                & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-lockfile"                set "FLAG_LOCK_FILE=%~2"                  & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-lock-busy-wait-cmdline"  set /A "FLAG_LOCK_BUSY_WAIT_CMDLINE=%~2"  & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-trylock"                 set "FLAG_TRYLOCK=1"                      & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+
+if %FLAG_SKIP% LSS 0 set /A "FLAG_SKIP=0"
+if %FLAG_NUM_ARGS% LSS 0 set /A "FLAG_NUM_ARGS=0"
+if %FLAG_LOCK_BUSY_WAIT_CMDLINE% LSS 0 set /A "FLAG_LOCK_BUSY_WAIT_CMDLINE=0"
 
 set "SHIFT=%~1" & set "COMMAND=" & set "CMDLINE="
 
@@ -231,7 +235,7 @@ set LAST_ERROR=%ERRORLEVEL%
 if %LOCK_ACQUIRE% EQU 0 (
   if %FLAG_TRYLOCK% NEQ 0 exit /b -1024
 
-  call "%%~dp0busy_wait.bat"%%FLAG_LOCK_BUSY_WAIT_CMDLINE%%
+  call "%%~dp0busy_wait.bat" %%FLAG_LOCK_BUSY_WAIT_CMDLINE%%
 
   goto CALL_LOCK_LOOP
 )

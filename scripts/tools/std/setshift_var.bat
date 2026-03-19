@@ -114,7 +114,7 @@ set "?~dp0=%~dp0"
 shift & shift & shift
 
 rem script flags
-set "FLAG_EXE=0" & set "FLAG_NO_TRIM=0" & set "FLAG_SKIP=0" & set "FLAG_NUM_ARGS=65536"
+set /A "FLAG_EXE=0", "FLAG_NO_TRIM=0", "FLAG_SKIP=0", "FLAG_NUM_ARGS=65536"
 
 rem flags always at first
 set "FLAG=%~1"
@@ -122,15 +122,16 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if defined FLAG if "%FLAG%" == "-exe"     set "FLAG_EXE=1"        & shift         & call set "FLAG=%%~1"
-if defined FLAG if "%FLAG%" == "-notrim"  set "FLAG_NO_TRIM=1"    & shift         & call set "FLAG=%%~1"
-if defined FLAG if "%FLAG%" == "-skip"    set "FLAG_SKIP=%~2"     & shift & shift & call set "FLAG=%%~1"
-if defined FLAG if "%FLAG%" == "-num"     set "FLAG_NUM_ARGS=%~2" & shift & shift & call set "FLAG=%%~1"
+if defined FLAG if "%FLAG%" == "-exe"     set "FLAG_EXE=1"            & shift         & call set "FLAG=%%~1"
+if defined FLAG if "%FLAG%" == "-notrim"  set "FLAG_NO_TRIM=1"        & shift         & call set "FLAG=%%~1"
+if defined FLAG if "%FLAG%" == "-skip"    set /A "FLAG_SKIP=%~2"      & shift & shift & call set "FLAG=%%~1"
+if defined FLAG if "%FLAG%" == "-num"     set /A "FLAG_NUM_ARGS=%~2"  & shift & shift & call set "FLAG=%%~1"
+
+if %FLAG_SKIP% LSS 0 set /A "FLAG_SKIP=0"
+if %FLAG_NUM_ARGS% LSS 0 set /A "FLAG_NUM_ARGS=0"
 
 set "CMDLINE="
-
-rem cast to integer
-set /A "FLAG_SKIP+=0", "SKIP=FLAG_SKIP"
+set /A "SKIP=FLAG_SKIP"
 
 if %SHIFT% GEQ 0 (
   set /A "SHIFT+=SKIP", "ARGS_END=FLAG_NUM_ARGS+SHIFT"

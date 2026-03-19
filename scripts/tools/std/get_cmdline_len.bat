@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   get_cmdline_len.bat [<flags>] [--] <cmdline>...
+rem   get_cmdline_len.bat [-exe] [-skip <skip-num>] [-shift <shift>] [--] <cmdline>...
 
 rem Description:
 rem   Script counts the number of a command line arguments based on flags and
@@ -10,21 +10,20 @@ rem
 rem   NOTE:
 rem     All the rest description is in the `callshift.bat` script.
 
-rem <flags>:
-rem   -exe
-rem     Use exe command line encoder instead of the batch as by default.
-rem     An executable command line does not use `,;=` characters as command
-rem     line arguments separator.
+rem -exe:
+rem   Use exe command line encoder instead of the batch as by default.
+rem   An executable command line does not use `,;=` characters as command
+rem   line arguments separator.
 rem
-rem   -skip <skip-num>
-rem     Number of `<cmdline>` arguments to skip before shift.
-rem     If not defined, then 0.
+rem -skip <skip-num>:
+rem   Number of `<cmdline>` arguments to skip before shift.
+rem   If not defined, then 0.
 rem
-rem   -shift <shift>:
-rem     Number of `<cmdline>` arguments to skip and shift.
-rem     If >=0, then shifts by `<shift>` beginning from `<skip-num>` argument.
-rem     If < 0, then shifts by `|<shift>|` beginning from
-rem     `<skip-num>+|<shift>|` argument.
+rem -shift <shift>:
+rem   Number of `<cmdline>` arguments to skip and shift.
+rem   If >=0, then shifts by `<shift>` beginning from `<skip-num>` argument.
+rem   If < 0, then shifts by `|<shift>|` beginning from
+rem   `<skip-num>+|<shift>|` argument.
 
 rem --:
 rem   Separator to stop parse flags.
@@ -93,9 +92,7 @@ if not defined __STRING__ exit /b 0
 set "?~dp0=%~dp0"
 
 rem script flags
-set FLAG_SHIFT=0
-set FLAG_EXE=0
-set FLAG_SKIP=0
+set /A "FLAG_SHIFT=0", "FLAG_EXE=0", "FLAG_SKIP=0", "SHIFT=0"
 
 rem flags always at first
 set "FLAG=%~1"
@@ -103,46 +100,14 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if defined FLAG if "%FLAG%" == "-exe" (
-  set FLAG_EXE=1
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=1
-)
+if defined FLAG if "%FLAG%" == "-exe"   set "FLAG_EXE=1"        & shift         & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+if defined FLAG if "%FLAG%" == "-skip"  set /A "FLAG_SKIP=%~2"  & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "-shift" set /A "SHIFT=%~2"      & shift & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=2
+if defined FLAG if "%FLAG%" == "--" shift & set /A FLAG_SHIFT+=1
 
-if defined FLAG if "%FLAG%" == "-skip" (
-  set "FLAG_SKIP=%~2"
-  shift
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=2
-)
+if %FLAG_SKIP% LSS 0 set /A "FLAG_SKIP=0"
 
-set SHIFT=0
-
-if defined FLAG if "%FLAG%" == "-shift" (
-  set "SHIFT=%~2"
-  shift
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=2
-)
-
-if defined FLAG if "%FLAG%" == "--" (
-  shift
-  call set "FLAG=%%~1"
-  set /A FLAG_SHIFT+=1
-)
-
-rem cast to integer
-set /A SHIFT+=0
-set /A FLAG_SKIP+=0
-
-if %SHIFT% GEQ 0 (
-  set /A FLAG_SHIFT+=SHIFT
-) else (
-  set /A FLAG_SHIFT+=-SHIFT*2
-)
+if %SHIFT% LSS 0 set /A "SHIFT=-SHIFT", "FLAG_SKIP+=SHIFT"
 
 rem encode specific command line characters
 if %FLAG_EXE% EQU 0 (
@@ -153,8 +118,14 @@ set COUNT=0
 
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do set /A COUNT+=1
 
-set /A COUNT-=FLAG_SHIFT+FLAG_SKIP
+set /A "COUNT-=FLAG_SHIFT", "COUNT_LEFT=COUNT", "COUNT=0"
 
-if %COUNT% LSS 0 set COUNT=0
+if %COUNT_LEFT% LSS 0 set /A "COUNT_LEFT=0"
+
+if %COUNT_LEFT% GEQ %FLAG_SKIP% (
+  set /A "COUNT_LEFT-=FLAG_SKIP", "COUNT+=FLAG_SKIP"
+) else set /A "COUNT+=COUNT_LEFT"
+
+if %SHIFT% LSS %COUNT_LEFT% set /A "COUNT_LEFT-=SHIFT", "COUNT+=COUNT_LEFT"
 
 endlocal & exit /b %COUNT%
