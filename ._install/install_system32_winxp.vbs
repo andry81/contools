@@ -2,14 +2,6 @@
 '''   Script to install absent components for `%SystemRoot%\System32` directory
 '''   under Windows XP x32.
 
-Function CreateTextFileEx(FilePathAbs, IsOverwrite, IsUnicode)
-  If Not Left(FilePathAbs, 2) = "\\" Then
-    Set CreateTextFileEx = objFS.CreateTextFile("\\?\" & FilePathAbs, IsOverwrite, IsUnicode)
-  Else
-    Set CreateTextFileEx = objFS.CreateTextFile(FilePathAbs, IsOverwrite, IsUnicode)
-  End If
-End Function
-
 Function FileExists(PathAbs)
   ' WORKAROUND:
   '   We use `\\?\` to bypass `FileExists` error: `File not found`.

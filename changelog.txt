@@ -1,4 +1,9 @@
 2026.03.19:
+* new: _install.bat: explicit installation script
+* changed: ._install: installation tweaks
+* changed: README_EN.txt: readme update
+
+2026.03.19:
 * fixed: scripts/tools/ToolAdaptors/lnk/install_system64_link.bat: minor fixup
 * refactor: scripts/tools/*.bat: minor refactor
 

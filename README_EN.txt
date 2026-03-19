@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2025.07.31
+* 2026.03.19
 * contools
 
 1. DESCRIPTION
@@ -87,8 +87,11 @@ Second mirror:
 -------------------------------------------------------------------------------
 5. PREREQUISITES
 -------------------------------------------------------------------------------
-Currently used these set of OS platforms, compilers, interpreters, modules,
-IDE's, applications and patches to run with or from:
+Currently used these set of prerequisites to run with or from:
+
+1. OS platforms
+2. Interpreters
+3. Applications
 
 1. OS platforms:
 
@@ -158,7 +161,10 @@ https://github.com/andry81/externals
 -------------------------------------------------------------------------------
 8. DEPLOY
 -------------------------------------------------------------------------------
-To run bash shell scripts (`.sh` file extension) you should copy these scripts:
+Before use the project you have to deploy some files from it.
+
+1. To run bash shell scripts (`.sh` file extension) you should either copy
+   these scripts:
 
 * /_externals/tacklelib/bash/tacklelib/bash_entry
 * /_externals/tacklelib/bash/tacklelib/bash_tacklelib
@@ -171,6 +177,13 @@ In pure Linux you have additional step to make scripts executable or readable:
 sudo chmod ug+x /bin/bash_entry
 sudo chmod o+r  /bin/bash_entry
 sudo chmod a+r  /bin/bash_tacklelib
+
+Or add `/_externals/tacklelib/bash/tacklelib` directory into `PATH` variable.
+
+2. To run specific Windows Shell scripts (`.bat` file extension) you should run
+   the installation script:
+
+* /_install.bat`
 
 -------------------------------------------------------------------------------
 9. TESTS
