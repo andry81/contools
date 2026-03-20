@@ -155,9 +155,9 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
 rem redirect command line into temporary file to print it correctly
 (
   setlocal DISABLEEXTENSIONS
-  (set PROMPT=$_)
+  (PROMPT=$_)
   echo on
-  for %%z in (%%z) do rem * %*#
+  for %%z in (%%z) do rem |%*|
   @echo off
   endlocal
 ) > "%CMDLINE_TEMP_FILE%"
@@ -172,9 +172,7 @@ rem   In case if `echo` is turned off externally.
 
 if not defined __STRING__ exit /b %LAST_ERROR%
 
-setlocal ENABLEDELAYEDEXPANSION & if not "!__STRING__:~6!" == "# " (
-  for /F "tokens=* delims="eol^= %%i in ("!__STRING__:~6,-2!") do endlocal & set "__STRING__=%%i"
-) else endlocal & set "__STRING__="
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!__STRING__:~5,-2!"') do endlocal & set "__STRING__=%%~i"
 
 if not defined __STRING__ exit /b %LAST_ERROR%
 
