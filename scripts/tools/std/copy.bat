@@ -10,7 +10,7 @@ rem
 rem   Does support long paths, but can not copy.
 rem
 rem   CAUTION:
-rem     `copy /B "<from>" "..."` fails to copy exactly 259 characters long
+rem     The `copy /B "<from>" "..."` fails to copy exactly 259 characters long
 rem     of <from> absolute path and does not print an error message, but does
 rem     print an error for paths longer than 259.
 rem     Note that the error code is not zero for paths longer than 258
@@ -28,7 +28,7 @@ rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 
 rem <flags>:
-rem   -chcp <CodePage>
+rem   -chcp <code-page>
 rem     Set explicit code page.
 
 rem -+:

@@ -11,7 +11,7 @@ rem     replace. If not defined, then does match all.
 rem   -d[elete]
 rem     Remove `<REPLACE_FROM>` string from a property value.
 rem     The `<REPLACE_TO>` must be not defined.
-rem   -chcp <CodePage>
+rem   -chcp <code-page>
 rem     Set explicit code page.
 rem   -ignore-unexist
 rem     By default TargetPath and WorkingDirectory does check on existence.

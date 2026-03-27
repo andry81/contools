@@ -29,7 +29,7 @@ rem
 rem   Can use utility flags from `XCOPY_FILE_FLAGS` and `COPY_FLAGS` variables.
 
 rem <flags>:
-rem   -chcp <CodePage>
+rem   -chcp <code-page>
 rem     Set explicit code page.
 rem
 rem   -if_not_exist

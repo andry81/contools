@@ -4,7 +4,7 @@ rem USAGE:
 rem   reset_shortcut_from_dir.bat [-+] [<flags>] [--] <LINKS_DIR>
 
 rem <flags>:
-rem   -chcp <CodePage>
+rem   -chcp <code-page>
 rem     Set explicit code page.
 rem
 rem   -reset-wd[-from-target-path]
