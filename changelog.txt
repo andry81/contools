@@ -1,3 +1,6 @@
+2026.03.28:
+* changed: scripts/tools/std/encode: code cleanup
+
 2026.03.27:
 * fixed: scripts/tools/std/xmove_dir.bat: move directory content instead of a source directory in case if target directory exists and `-use_builtin_move -ignore_existed` flags is used
 * fixed: scripts/tools/std: xcopy_*.bat, xmove_*.bat: bare flags parse from environment variables
