@@ -7,17 +7,19 @@ rem Description:
 rem   Script runs `cmd.exe` under UAC promotion using `mshta.exe` executable
 rem   and command line to `COMSPEC` executable.
 
-rem Example: cmd_admin.bat /k echo 123
+rem CAUTION:
+rem   If you pass a parameter or set of parameters starting the first argument,
+rem   then these may be skipped, due to the internal `cmd.exe` command line
+rem   parse logic. The command line does not ignored if started using the slash
+rem   character with the known option - `/k`, `/c` and etc.
+rem   To change the path to the `cmd.exe`, use `runas_admin*.bat` instead.
+
+rem Examples:
+rem   1. >cmd_admin.bat /k echo 123
 :DOC_END
 
-rem with save of previous error level
-setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
-
-rem to drop locals in case of already elevated environment
-setlocal
-
-rem drop last error level
-call;
+rem with save of previous error level, second `setlocal` to drop locals before a command line execution
+setlocal DISABLEDELAYEDEXPANSION & setlocal & set LAST_ERROR=%ERRORLEVEL%
 
 rem Load Windows Batch compatible command line with escapes (`\""` is a single nested `"`, `\""""` is a double nested `"` and so on).
 
@@ -29,14 +31,13 @@ rem   line or an `.exe` command line it has their own different expansion rules
 rem   including command line of the `cmd.exe` executable.
 
 rem NOTE:
-rem   The command line load code is a copy from `callshift.bat` script.
+rem   The command line load and parse code is a copy from `callshift.bat`
+rem   script.
 
-:LOAD_CMDLINE
 if defined SCRIPT_TEMP_CURRENT_DIR (
   set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%.txt"
 ) else set "CMDLINE_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
 
-rem redirect command line into temporary file to print it correctly
 (
   setlocal DISABLEEXTENSIONS
   (PROMPT=$_)
@@ -60,10 +61,10 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in
 
 if not defined ?. exit /b %LAST_ERROR%
 
-call :IS_ADMIN_ELEVATED || ( call :CALL_ELEVATE & exit /b )
+call :IS_ADMIN_ELEVATED || goto CALL_ELEVATE_AND_EXIT
 
 rem with locals drop
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in (""!COMSPEC!" !?.!") do endlocal & endlocal & %%i
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!COMSPEC!" !?.!') do endlocal & endlocal & %%i
 exit /b
 
 rem CAUTION:
@@ -86,7 +87,7 @@ if %WINDOWS_MAJOR_VER% GEQ 6 (
 ) else if exist "%SystemRoot%\System32\fltmc.exe" "%SystemRoot%\System32\fltmc.exe" >nul 2>nul & exit /b
 exit /b 255
 
-:CALL_ELEVATE
+:CALL_ELEVATE_AND_EXIT
 rem translate Windows Batch compatible escapes into escape placeholders
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$=$0!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""""=$4!") do endlocal & set "?.=%%i"
@@ -104,5 +105,10 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0
 
 rem CAUTION: ShellExecute does not wait a child process close!
 rem NOTE: `ExecuteGlobal` is used as a workaround, because the `mshta.exe` first argument must not be used with the surrounded quotes
-start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%COMSPEC%"", ""%?.%"", """", ""runas"", 1))")
+
+rem with locals drop
+setlocal ENABLEDELAYEDEXPANSION & ^
+for /F "usebackq tokens=* delims="eol^= %%i in ('"!COMSPEC!"') do ^
+for /F "usebackq tokens=* delims="eol^= %%j in ('"!?.!"') do endlocal & endlocal & ^
+start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%%~i"", ""%%~j"", """", ""runas"", 1))")
 exit /b

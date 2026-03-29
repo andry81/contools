@@ -8,20 +8,30 @@ rem   Script runs `psexec.exe` under UAC promotion using `mshta.exe`
 rem   executable and command line to `COMSPEC` executable.
 rem   Requires `psexec.exe` in the `PATH` or in the `PSEXEC` variable.
 
-rem Example: cmd_admin_system.bat /k echo 123
+rem CAUTION:
+rem   If you pass a parameter or set of parameters starting the first argument,
+rem   then these may be skipped, due to the internal `cmd.exe` command line
+rem   parse logic. The command line does not ignored if started using the slash
+rem   character with the known option - `/k`, `/c` and etc.
+rem   To change the path to the `cmd.exe`, use `runas_admin*.bat` instead.
+
+rem CAUTION:
+rem   Opposite to `cmd_admin.bat` script the
+rem   `cmd_admin_system.bat ...` command will start a 64-bit variant of
+rem   `cmd.exe` process even if run from 32-bit `cmd.exe` process.
+rem   You have to use
+rem   `runas_admin_system.bat "%SystemRoot%\SysWOW64\cmd.exe" ..` command
+rem   instead to directly run 32-bit `cmd.exe` process.
+
+rem Examples:
+rem   1. >cmd_admin_system.bat /k echo 123
 :DOC_END
 
-rem with save of previous error level
-setlocal DISABLEDELAYEDEXPANSION & set LAST_ERROR=%ERRORLEVEL%
-
-rem to drop locals in case of already elevated environment
-setlocal
+rem with save of previous error level, second `setlocal` to drop locals before a command line execution
+setlocal DISABLEDELAYEDEXPANSION & setlocal & set LAST_ERROR=%ERRORLEVEL%
 
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
-
-rem drop last error level
-call;
 
 if not defined PSEXEC set "PSEXEC=psexec.exe"
 
@@ -42,14 +52,13 @@ rem   line or an `.exe` command line it has their own different expansion rules
 rem   including command line of the `cmd.exe` executable.
 
 rem NOTE:
-rem   The command line load code is a copy from `callshift.bat` script.
+rem   The command line load and parse code is a copy from `callshift.bat`
+rem   script.
 
-:LOAD_CMDLINE
 if defined SCRIPT_TEMP_CURRENT_DIR (
   set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%.txt"
 ) else set "CMDLINE_TEMP_FILE=%TEMP%\%~n0.%RANDOM%-%RANDOM%.txt"
 
-rem redirect command line into temporary file to print it correctly
 (
   setlocal DISABLEEXTENSIONS
   (PROMPT=$_)
@@ -73,10 +82,10 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in
 
 if not defined ?. exit /b %LAST_ERROR%
 
-call :IS_ADMIN_ELEVATED || ( call :CALL_ELEVATE & exit /b )
+call :IS_ADMIN_ELEVATED || goto CALL_ELEVATE_AND_EXIT
 
 rem with locals drop
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in (""!PSEXEC!" -i -s -d "!COMSPEC!" !?.!") do endlocal & endlocal & %%i
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!PSEXEC!" -i -s -d "!COMSPEC!" !?.!') do endlocal & endlocal & %%i
 exit /b
 
 rem CAUTION:
@@ -99,7 +108,7 @@ if %WINDOWS_MAJOR_VER% GEQ 6 (
 ) else if exist "%SystemRoot%\System32\fltmc.exe" "%SystemRoot%\System32\fltmc.exe" >nul 2>nul & exit /b
 exit /b 255
 
-:CALL_ELEVATE
+:CALL_ELEVATE_AND_EXIT
 rem translate Windows Batch compatible escapes into escape placeholders
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$=$0!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""""=$4!") do endlocal & set "?.=%%i"
@@ -117,5 +126,11 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0
 
 rem CAUTION: ShellExecute does not wait a child process close!
 rem NOTE: `ExecuteGlobal` is used as a workaround, because the `mshta.exe` first argument must not be used with the surrounded quotes
-start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%PSEXEC%"", ""-i -s -d """"%COMSPEC%"""" %?.%"", """", ""runas"", 0))")
+
+rem with locals drop
+setlocal ENABLEDELAYEDEXPANSION & ^
+for /F "usebackq tokens=* delims="eol^= %%i in ('"!PSEXEC!"') do ^
+for /F "usebackq tokens=* delims="eol^= %%j in ('"!COMSPEC!"') do ^
+for /F "usebackq tokens=* delims="eol^= %%k in ('"!?.!"') do endlocal & endlocal & ^
+start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%%~i"", ""-i -s -d """"%%~j"""" %%~k"", """", ""runas"", 0))")
 exit /b

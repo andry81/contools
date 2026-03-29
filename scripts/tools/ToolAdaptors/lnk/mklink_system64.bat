@@ -3,10 +3,15 @@
 rem Description:
 rem   Script creates `System64` directory additionally to the `Sysnative`,
 rem   because:
-rem     1. The `Sysnative/cmd.exe` can not be run under the Administrator user.
-rem     2. The `Sysnative` directory visible ONLY from 64-bit applications.
-rem     3. The `Sysnative` directory doesn't exist on the Windows XP x64 and
+rem     1. The `Sysnative` directory visible ONLY from 32-bit applications on
+rem        64-bit OS and ONLY if accessed as a directory
+rem        (`\` or `\*` at the end):
+rem           >
+rem           if exist "%SystemRoot%\Sysnative\*" ...
+rem     2. The `Sysnative` directory doesn't exist on the Windows XP x64 and
 rem        lower.
+rem     3. If the directory is visible the `Sysnative/cmd.exe` can not be run
+rem        under the Administrator user.
 rem
 rem   For above reasons we should create another directory additionally to the
 rem   `Sysnative` one which is:
