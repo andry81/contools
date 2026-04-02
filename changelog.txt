@@ -1,3 +1,6 @@
+2026.04.02:
+* changed: scripts/tools/ToolAdaptors/hta/Samples/mshta_cmd_elevate.bat: code rework and cleanup
+
 2026.03.29:
 * new: scripts/tools/ToolAdaptors/hta/runas_admin*.bat: scripts to elevate an arbitrary executable
 * changed: scripts/tools/ToolAdaptors/hta/cmd_admin*.bat: code improvement
