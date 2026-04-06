@@ -1,3 +1,6 @@
+2026.04.06:
+* new: scripts/tests/bench/bat/test__rem: more bench tests
+
 2026.04.02:
 * changed: scripts/tools/ToolAdaptors/hta/Samples/mshta_cmd_elevate.bat: code rework and cleanup
 
