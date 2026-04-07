@@ -1,3 +1,10 @@
+2026.04.07:
+* fixed: scripts/tools/ToolAdaptors/hta: cmd_admin*.bat, runas_admin*.bat: execution fixup
+* new: scripts/tests/manual/bat/test_tooladaptors_!exclusive/test_hta: manual tests for `cmd_admin*.bat` and `runas_admin*.bat` scripts
+* changed: scripts/tools/ToolAdaptors/hta: cmd_admin*.bat, runas_admin*.bat: code rework and cleanup
+* changed: .externals-tests: use `userbin` project for manual tests
+* refactor: scripts/tools/ToolAdaptors/hta: cmd_admin*.bat, runas_admin*.bat: script self documentation
+
 2026.04.06:
 * new: scripts/tests/bench/bat/test__rem: more bench tests
 

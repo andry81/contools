@@ -5,7 +5,28 @@ rem   cmd_admin.bat <cmdline>...
 
 rem Description:
 rem   Script runs `cmd.exe` under UAC promotion using `mshta.exe` executable
-rem   and command line to `COMSPEC` executable.
+rem   and <cmdline> to `COMSPEC` executable.
+rem
+rem   The <cmdline> can contain an even number of double quotes prefixed by the
+rem   `\` character. It will be replaced by N/2 number of quotes without the
+rem   prefix:
+rem     \"" -> "
+rem     \"""" -> ""
+rem     \"""""" -> """
+rem     etc
+rem   The meaning is to always use an even number of quotes to insert an
+rem   arbitrary number of quotes.
+
+rem CAUTION:
+rem   `\""`, `\""""`, etc expressions only has meaning inside a `.bat` script.
+rem   Any attempt to use it outside of a script (including a terminal command
+rem   line) will lead into incorrect expansion because a terminal command
+rem   line or an `.exe` command line has their own different expansion rules
+rem   including command line of the `cmd.exe` executable.
+
+rem NOTE:
+rem   The command line load and parse code is a copy from `callshift.bat`
+rem   script.
 
 rem CAUTION:
 rem   If you pass a parameter or set of parameters starting the first argument,
@@ -14,25 +35,42 @@ rem   parse logic. The command line does not ignored if started using the slash
 rem   character with the known option - `/k`, `/c` and etc.
 rem   To change the path to the `cmd.exe`, use `runas_admin*.bat` instead.
 
-rem Examples:
-rem   1. >cmd_admin.bat /k echo 123
+rem Examples (in script):
+rem   1. >
+rem      cmd_admin.bat /k echo 123
+rem
+rem   2. Without Windows Batch compatible double quotes escapes
+rem      >
+rem      set CMDLINE=print-args-as-splitted-exe-cmdline.bat "123 & 456" "654 | 321"
+rem      
+rem      call is-admin-elevated.bat && (
+rem        set CMDLINE=/c %CMDLINE%
+rem        call;
+rem      ) || set CMDLINE=/k %CMDLINE%
+rem      
+rem      cmd_admin.bat %CMDLINE%
+rem      
+rem      <
+rem      rem |"123 & 456"|
+rem      rem |"654 | 321"|
+rem
+rem   3. >
+rem      set "CMDLINE=print-args-as-splitted-exe-cmdline.bat \""123 & 456\"" \""654 | 321\"""
+rem      
+rem      call is-admin-elevated.bat && (
+rem        set CMDLINE=/S /c "%CMDLINE%"
+rem        call;
+rem      ) || set CMDLINE=/S /k "%CMDLINE%"
+rem      
+rem      cmd_admin.bat %CMDLINE%
+rem      
+rem      <
+rem      rem |"123 & 456"|
+rem      rem |"654 | 321"|
 :DOC_END
 
 rem with save of previous error level, second `setlocal` to drop locals before a command line execution
 setlocal DISABLEDELAYEDEXPANSION & setlocal & set LAST_ERROR=%ERRORLEVEL%
-
-rem Load Windows Batch compatible command line with escapes (`\""` is a single nested `"`, `\""""` is a double nested `"` and so on).
-
-rem CAUTION:
-rem   `\""`, `\""""`, etc expressions only has meaning inside a `.bat` script.
-rem   Any attempt to use it outside a script (including a terminal command
-rem   line) will lead into incorrect expansion because of a terminal command
-rem   line or an `.exe` command line it has their own different expansion rules
-rem   including command line of the `cmd.exe` executable.
-
-rem NOTE:
-rem   The command line load and parse code is a copy from `callshift.bat`
-rem   script.
 
 if defined SCRIPT_TEMP_CURRENT_DIR (
   set "CMDLINE_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%.txt"
@@ -61,10 +99,27 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in
 
 if not defined ?. exit /b %LAST_ERROR%
 
-call :IS_ADMIN_ELEVATED || goto CALL_ELEVATE_AND_EXIT
+call :IS_ADMIN_ELEVATED || goto CALL_ADMIN_ELEVATE_AND_EXIT
+
+rem translate Windows Batch compatible double quotes escapes into escape placeholders
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$=$0!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""=$3!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""=$2!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""=$1!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:"^=$1!"") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:~0,-1!") do endlocal & set "?.=%%i"
+
+rem translate escape placeholders into an arbitrary number of double quotes
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$3="""!"") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:~0,-1!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$2=""!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$1="!"") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:~0,-1!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0=$!") do endlocal & set "?.=%%i"
 
 rem with locals drop
-setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!COMSPEC!" !?.!') do endlocal & endlocal & %%i
+setlocal ENABLEDELAYEDEXPANSION & ^
+for /F "usebackq tokens=* delims="eol^= %%i in ('"!COMSPEC!" !?.!') do endlocal & endlocal & %%i
 exit /b
 
 rem CAUTION:
@@ -87,18 +142,17 @@ if %WINDOWS_MAJOR_VER% GEQ 6 (
 ) else if exist "%SystemRoot%\System32\fltmc.exe" "%SystemRoot%\System32\fltmc.exe" >nul 2>nul & exit /b
 exit /b 255
 
-:CALL_ELEVATE_AND_EXIT
-rem translate Windows Batch compatible escapes into escape placeholders
+:CALL_ADMIN_ELEVATE_AND_EXIT
+rem translate Windows Batch compatible double quotes escapes into escape placeholders
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$=$0!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""""=$4!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""=$3!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""=$2!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""=$3!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""=$2!") do endlocal & set "?.=%%i"
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""=$1!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:"^=$1!"") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:~0,-1!") do endlocal & set "?.=%%i"
 
-rem translate escape placeholders into `mshta.exe` (vbs) escapes (`""` is a single nested `"`, `""""` is a double nested `"` and so on)
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$4=""""""""""""""""""""""""""""""""!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$3=""""""""""""""""!") do endlocal & set "?.=%%i"
+rem translate escape placeholders into an arbitrary number of double quotes in `mshta.exe` (vbs) format
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$3=""""""""""""!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$2=""""""""!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$1=""""!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0=$!") do endlocal & set "?.=%%i"
