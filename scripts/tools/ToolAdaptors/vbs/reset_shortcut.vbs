@@ -976,12 +976,12 @@ If AllowAutoRecover Then
 End If
 
 If ShortcutTargetAssigned Then
-  If PrintAssign Then
-    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTargetToAssign
-  End If
-
   If AlwaysQuote And InStr(ShortcutTargetToAssign, Chr(34)) = 0 Then
     ShortcutTargetToAssign = Chr(34) & ShortcutTargetToAssign & Chr(34)
+  End If
+
+  If PrintAssign Then
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTargetToAssign
   End If
 
   SetShortcutProperty "TargetPath", ShortcutTargetToAssign
@@ -996,7 +996,7 @@ ElseIf AllowTargetPathReassign Then
   If Not ShortcutTargetObj Then
     If ShortcutTargetExist Or IgnoreUnexist Then
       If PrintAssign Then
-        PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(reassign)=" & ShortcutTargetUnquoted
+        PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(reassign)=" & ShortcutTarget
       End If
 
       SetShortcutProperty "TargetPath", ShortcutTarget ' reassign

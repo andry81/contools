@@ -1,3 +1,7 @@
+2026.04.11:
+* changed: scripts/tools/ToolAdaptors/vbs/*_shortcut.vbs: always print exact string to assign (flag `-p`)
+* refactor: scripts/tools/ToolAdaptors/vbs/*_shortcut.vbs: script self documentation
+
 2026.04.07:
 * fixed: scripts/tools/ToolAdaptors/hta: cmd_admin*.bat, runas_admin*.bat: execution fixup
 * new: scripts/tests/manual/bat/test_tooladaptors_!exclusive/test_hta: manual tests for `cmd_admin*.bat` and `runas_admin*.bat` scripts

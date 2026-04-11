@@ -861,7 +861,7 @@ Do ' empty `Do-Loop` to emulate `Break`
     End If
 
     If PrintAssign Then
-      PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTargetUnquotedAbs
+      PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTarget
     End If
 
     SetShortcutProperty "TargetPath", ShortcutTarget
@@ -887,7 +887,7 @@ Do ' empty `Do-Loop` to emulate `Break`
     End If
 
     If PrintAssign Then
-      PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTargetUnquotedAbs
+      PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTarget
     End If
 
     SetShortcutProperty "TargetPath", ShortcutTarget
@@ -923,14 +923,14 @@ Do ' empty `Do-Loop` to emulate `Break`
         End If
       End If
 
-      If PrintAssign Then
-        PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(short)=" & ShortcutTargetShortPath
-      End If
-
       If Not AlwaysQuote Then
         ShortcutTarget = ShortcutTargetShortPath
       Else
         ShortcutTarget = Chr(34) & ShortcutTargetShortPath & Chr(34)
+      End If
+
+      If PrintAssign Then
+        PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(short)=" & ShortcutTarget
       End If
 
       SetShortcutProperty "TargetPath", ShortcutTarget

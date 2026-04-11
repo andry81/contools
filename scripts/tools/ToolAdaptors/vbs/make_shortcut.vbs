@@ -196,13 +196,13 @@
 ''' Example to create a minimalistic and clean version of a shortcut:
 '''   >
 '''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
-'''   make_shortcut.bat -CD "%WINDIR%\System32" -q cmd_system32.lnk "%SystemRoot%\System32\cmd.exe"
-'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
+'''   make_shortcut.bat -CD "%WINDIR%\System32" -q "%CD%\cmd_system32.lnk" "%SystemRoot%\System32\cmd.exe"
+'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q "%CD%\cmd_system32.lnk"
 ''' Or
 '''   >
 '''   del /F /Q "%WINDIR%\System32\cmd_system32.lnk"
-'''   make_shortcut.bat -CD "%WINDIR%\System32" -u -Et cmd_system32.lnk "%22%25SystemRoot%25\System32\cmd.exe%22"
-'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q cmd_system32.lnk
+'''   make_shortcut.bat -CD "%WINDIR%\System32" -u -Et "%CD%\cmd_system32.lnk" "%22%25SystemRoot%25\System32\cmd.exe%22"
+'''   reset_shortcut.bat -CD "%WINDIR%\System32" -allow-target-path-reassign -q "%CD%\cmd_system32.lnk"
 '''
 ''' NOTE:
 '''   A difference in above examples between call to `make_shortcut.vbs` and
@@ -1032,7 +1032,7 @@ On Error Goto 0
 ' ShortcutTarget
 
 If PrintAssign Then
-  PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTargetUnquotedAbs
+  PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "=" & ShortcutTarget
 End If
 
 SetShortcutProperty "TargetPath", ShortcutTarget
@@ -1059,14 +1059,14 @@ Do ' empty `Do-Loop` to emulate `Break`
     Exit Do
   End If
 
-  If PrintAssign Then
-    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(short)=" & ShortcutTargetShortPath
-  End If
-
   If Not AlwaysQuote Then
     ShortcutTarget = ShortcutTargetShortPath
   Else
     ShortcutTarget = Chr(34) & ShortcutTargetShortPath & Chr(34)
+  End If
+
+  If PrintAssign Then
+    PrintOrEchoLine GetShortcutPropertyNameToPrint("TargetPath") & "(short)=" & ShortcutTarget
   End If
 
   SetShortcutProperty "TargetPath", ShortcutTarget
