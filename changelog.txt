@@ -1,3 +1,6 @@
+2026.04.17:
+* changed: scripts/tools/locks: moved implementation detail scripts into `.impl` sub directory
+
 2026.04.11:
 * changed: scripts/tools/ToolAdaptors/vbs/*_shortcut.vbs: always print exact string to assign (flag `-p`)
 * refactor: scripts/tools/ToolAdaptors/vbs/*_shortcut.vbs: script self documentation

@@ -41,11 +41,11 @@ set "FILE_NAME_TMP=.%~n0.%RANDOM%-%RANDOM%.tmp"
 
 if not "%~2" == "" if %~20 LSS 0 (
   ( call;> "\\?\%FILE_PATH%\%FILE_NAME_TMP%" ) 2>nul || exit /b 1
-  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%\%FILE_NAME_TMP%"
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\delete_file.vbs" "\\?\%FILE_PATH%\%FILE_NAME_TMP%"
   exit /b 0
 )
 
 :FILE_WRITE_LOOP
 ( call;> "\\?\%FILE_PATH%\%FILE_NAME_TMP%" ) 2>nul || ( call "%%~dp0busy_wait.bat" %%2 & goto FILE_WRITE_LOOP )
-"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%\%FILE_NAME_TMP%"
+"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\delete_file.vbs" "\\?\%FILE_PATH%\%FILE_NAME_TMP%"
 exit /b 0

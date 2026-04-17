@@ -11,7 +11,7 @@ set /A "TIME_WAIT_MSEC=%~1--0"
 
 if %TIME_WAIT_MSEC% LEQ 0 exit /b 0
 
-call "%%~dp0timestamp.bat" "%%TIME%%"
+call "%%~dp0.impl\timestamp.bat" "%%TIME%%"
 set BEGIN_TIMESTAMP=%TIMESTAMP%
 set BEGIN_HOURS=%HOURS%
 
@@ -20,7 +20,7 @@ rem echo %TIME%
 rem call an external small executable to trigger OS scheduler and reduce a processor time consumption
 "%SystemRoot%\System32\more.com" nul >nul 2>nul
 
-call "%%~dp0timestamp.bat" "%%TIME%%"
+call "%%~dp0.impl\timestamp.bat" "%%TIME%%"
 set END_TIMESTAMP=%TIMESTAMP%
 set END_HOURS=%HOURS%
 

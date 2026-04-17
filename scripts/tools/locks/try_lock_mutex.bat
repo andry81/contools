@@ -51,7 +51,7 @@ rem Create nested directories to enable mutex commands.
 mkdir "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%"
 mkdir "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%"
 
-start "" /D "%LOCK_PATH%\%LOCK_DIR%" /B cmd.exe /c call "%~dp0lock_dir_impl.bat" "%LOCK_PATH%" "%PRE_LOCK_FILE%" "%LOCK_DIR%" "%UNLOCK_DIR%" "%UNLOCK_FILE%" "%WAITERS_DIR%"
+start "" /D "%LOCK_PATH%\%LOCK_DIR%" /B cmd.exe /c call "%~dp0.impl\lock_dir_impl.bat" "%LOCK_PATH%" "%PRE_LOCK_FILE%" "%LOCK_DIR%" "%UNLOCK_DIR%" "%UNLOCK_FILE%" "%WAITERS_DIR%"
 
 rem just in case
 rem rem busy wait for 20 msec
