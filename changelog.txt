@@ -1,3 +1,6 @@
+2026.04.21:
+* fixed: scripts/tests/bench/bat/test__for_!exclusive: missed scripts
+
 2026.04.17:
 * changed: scripts/tools/locks: moved implementation detail scripts into `.impl` sub directory
 
