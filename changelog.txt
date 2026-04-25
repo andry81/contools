@@ -1,4 +1,7 @@
 2026.04.25:
+* new: scripts/tools/std/declare_func_vars.bat: script for functions in variables
+
+2026.04.25:
 * changed: scripts/tests/bench/bat/test__for_!exclusive/test__for__31_loop_exit: added `%%#` variable retain code
 
 2026.04.23:
