@@ -17,7 +17,8 @@ goto END
 
 :TEST
 for /L %%# in (1,1,32) do for /L %%# in (1,1,32) do for /L %%# in (1,1,32) do ^
-for /L %%# in (1,1,32) do for /L %%# in (1,1,32) do for /L %%# in (1,1,32) do exit /b 0
+for /L %%# in (1,1,32) do for /L %%# in (1,1,32) do for /L %%# in (1,1,32) do ^
+for %%# in (%%) do for %%# in (%%##) do exit /b 0
 
 :END
 

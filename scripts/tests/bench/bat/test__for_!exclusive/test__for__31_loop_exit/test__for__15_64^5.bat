@@ -16,7 +16,8 @@ for /L %%i in (1,1,1000) do call :TEST
 goto END
 
 :TEST
-for /L %%# in (1,1,64) do for /L %%# in (1,1,64) do for /L %%# in (1,1,64) do for /L %%# in (1,1,64) do for /L %%# in (1,1,64) do exit /b 0
+for /L %%# in (1,1,64) do for /L %%# in (1,1,64) do for /L %%# in (1,1,64) do for /L %%# in (1,1,64) do for /L %%# in (1,1,64) do ^
+for %%# in (%%) do for %%# in (%%##) do exit /b 0
 
 :END
 
