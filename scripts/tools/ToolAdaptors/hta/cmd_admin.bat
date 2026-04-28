@@ -39,7 +39,7 @@ rem Examples (in script):
 rem   1. >
 rem      cmd_admin.bat /k echo 123
 rem
-rem   2. Without Windows Batch compatible double quotes escapes
+rem   2. Without Windows Batch compatible double quote escapes
 rem      >
 rem      set CMDLINE=print-args-as-splitted-exe-cmdline.bat "123 & 456" "654 | 321"
 rem      
@@ -54,7 +54,8 @@ rem      <
 rem      rem |"123 & 456"|
 rem      rem |"654 | 321"|
 rem
-rem   3. >
+rem   3. With Windows Batch compatible double quote escapes
+rem      >
 rem      set "CMDLINE=print-args-as-splitted-exe-cmdline.bat \""123 & 456\"" \""654 | 321\"""
 rem      
 rem      call is-admin-elevated.bat && (
@@ -101,7 +102,7 @@ if not defined ?. exit /b %LAST_ERROR%
 
 call :IS_ADMIN_ELEVATED || goto CALL_ADMIN_ELEVATE_AND_EXIT
 
-rem translate Windows Batch compatible double quotes escapes into escape placeholders
+rem translate Windows Batch compatible double quote escapes into escape placeholders
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$=$0!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""=$3!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""=$2!") do endlocal & set "?.=%%i"
@@ -143,7 +144,7 @@ if %WINDOWS_MAJOR_VER% GEQ 6 (
 exit /b 255
 
 :CALL_ADMIN_ELEVATE_AND_EXIT
-rem translate Windows Batch compatible double quotes escapes into escape placeholders
+rem translate Windows Batch compatible double quote escapes into escape placeholders
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$=$0!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""=$3!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""=$2!") do endlocal & set "?.=%%i"

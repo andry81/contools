@@ -1,3 +1,6 @@
+2026.04.28:
+* refactor: scripts/tools/ToolAdaptors/hta: minor refactor
+
 2026.04.25:
 * new: scripts/tools/std/declare_func_vars.bat: `Terminate Batch Job` skip code
 

@@ -45,7 +45,7 @@ rem      set "PSEXEC=.../psexec.exe"
 rem      runas_admin_system.bat "%SystemRoot%\System32\cmd.exe" /k echo 123
 rem      runas_admin_system.bat "%SystemRoot%\SysWOW64\cmd.exe" /k echo 123
 rem
-rem   2. Without Windows Batch compatible double quotes escapes
+rem   2. Without Windows Batch compatible double quote escapes
 rem      >
 rem      set "PSEXEC=.../psexec.exe"
 rem      set CMDLINE=print-args-as-splitted-exe-cmdline.bat "123 & 456" "654 | 321"
@@ -61,7 +61,8 @@ rem      <
 rem      rem |"123 & 456"|
 rem      rem |"654 | 321"|
 rem
-rem   3. >
+rem   3. With Windows Batch compatible double quote escapes
+rem      >
 rem      set "PSEXEC=.../psexec.exe"
 rem      set "CMDLINE=print-args-as-splitted-exe-cmdline.bat \""123 & 456\"" \""654 | 321\"""
 rem      
@@ -117,7 +118,7 @@ rem   account.
 
 call :IS_SYSTEM_ELEVATED || goto CALL_ADMIN_ELEVATE_AND_EXIT
 
-rem translate Windows Batch compatible double quotes escapes into escape placeholders
+rem translate Windows Batch compatible double quote escapes into escape placeholders
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$=$0!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""=$3!") do endlocal & set "?.=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""=$2!") do endlocal & set "?.=%%i"
@@ -170,7 +171,7 @@ if not exist "%PSEXEC%" (
 
 call :SPLIT_COMMAND_LINE
 
-rem translate Windows Batch compatible double quotes escapes into escape placeholders
+rem translate Windows Batch compatible double quote escapes into escape placeholders
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!COMMAND:$=$0!") do endlocal & set "COMMAND=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!COMMAND:\""""""=$3!") do endlocal & set "COMMAND=%%i"
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!COMMAND:\""""=$2!") do endlocal & set "COMMAND=%%i"
@@ -185,7 +186,7 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!COMMA
 setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!COMMAND:$0=$!") do endlocal & set "COMMAND=%%i"
 
 if defined ARGS (
-  rem translate Windows Batch compatible double quotes escapes into escape placeholders
+  rem translate Windows Batch compatible double quote escapes into escape placeholders
   setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!ARGS:$=$0!") do endlocal & set "ARGS=%%i"
   setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!ARGS:\""""""=$3!") do endlocal & set "ARGS=%%i"
   setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!ARGS:\""""=$2!") do endlocal & set "ARGS=%%i"
