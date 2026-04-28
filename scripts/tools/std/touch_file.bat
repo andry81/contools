@@ -122,9 +122,9 @@ if %FILE_PATH_LONG% EQU 0 (
 ) else (
   rem CAUTION: `... >> ...` does not work as expected on Windows XP
   if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
-    "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0touch_file.vbs" "\\?\%FILE_PATH%"
+    "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\touch_file.vbs" "\\?\%FILE_PATH%"
   ) else (
-    "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0touch_file.vbs" "\\?\%FILE_PATH%" & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
+    "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\touch_file.vbs" "\\?\%FILE_PATH%" & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
   )
 )
 

@@ -113,6 +113,6 @@ rmdir /S /Q "%FILE_PATH_TEMP_DIR%" >nul 2>nul
 exit /b
 
 :DELETE_FILE_VBS
-if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%"
-"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0delete_file.vbs" "\\?\%FILE_PATH%"
+if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\delete_file.vbs" "\\?\%FILE_PATH%"
+"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\delete_file.vbs" "\\?\%FILE_PATH%"
 exit /b
