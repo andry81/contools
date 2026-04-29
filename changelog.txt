@@ -1,3 +1,6 @@
+2026.04.29:
+* fixed: scripts/tools/std: sleep.bat, touch_file.bat: execution fixup
+
 2026.04.28:
 * changed: scripts/tools/std: moved implementation detail scripts into `.impl` sub directory
 
