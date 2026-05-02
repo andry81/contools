@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.02.25
+* 2026.05.02
 * contools--testlib
 
 1. DESCRIPTION
@@ -327,9 +327,10 @@ script_init.bat:
   rem call "%%CONTOOLS_ROOT%%/std/echo_var.bat" RETURN_VALUE ">"
   rem echo;
 
-  rem if 0%TESTLIB__INIT% EQU 0 (
+  rem if 0%SCRIPT_INIT% EQU 0 (
   rem   rem CPU name to compare bench tests
   rem   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\wbem\wmic.exe" cpu get Caption,Name
+  куь   set SCRIPT_INIT=1
   rem )
 
   rem The caller can continue after this exit.

@@ -1,3 +1,8 @@
+2026.05.02:
+* fixed: _install.bat: execution fixup
+* new: __init__: logging and elevation by default
+* changed: scripts/tools/testlib/README_EN.txt: readme update
+
 2026.04.29:
 * fixed: scripts/tools/std: sleep.bat, touch_file.bat: execution fixup
 
