@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.05.02
+* 2026.05.08
 * contools--testlib
 
 1. DESCRIPTION
@@ -62,8 +62,6 @@ https://github.com/andry81/externals
  +- /`save_test_locals.bat`
       #
       # To manually save a test local variables out of `testlib/test.bat` call.
-
-All other scripts in the root are internal.
 
 -------------------------------------------------------------------------------
 4. VARIABLES

@@ -30,10 +30,10 @@ rem reread current code page for each test, before exit and after exit
 if not defined SETUP_CP goto SKIP_SETUP_CP
 
 rem reads the current code page into `TESTLIB__CURRENT_CP` variable
-call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/getcp.bat"
 
 rem calls to `set_inner_cp.bat` at the beginning
-call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" TESTLIB__PREV_CP TESTLIB__CURRENT_CP
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" TESTLIB__PREV_CP TESTLIB__CURRENT_CP
 
 :SKIP_SETUP_CP
 
@@ -43,24 +43,24 @@ set TEST_LAST_ERROR=%ERRORLEVEL%
 if %TESTLIB__TEST_TEARDOWN_CALLED% EQU 0 goto SKIP_UPDATE_CURRENT_CP
 
 rem reads the current code page into `TESTLIB__CURRENT_CP` variable
-if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
+if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/getcp.bat"
 
 :SKIP_UPDATE_CURRENT_CP
 
 rem explicitly load outer code page from the shared file
-call "%%CONTOOLS_TESTLIB_ROOT%%/load_outer_cp.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/load_outer_cp.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
 
 rem calls to `set_inner_cp.bat` at the beginning
-call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" TEST_LAST_ERROR TESTLIB__INIT TESTLIB__PREV_CP TESTLIB__CURRENT_CP
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" TEST_LAST_ERROR TESTLIB__INIT TESTLIB__PREV_CP TESTLIB__CURRENT_CP
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" >nul
 
 rem restores an outer code page before the init (`TESTLIB__OUTER_CP`) if is different with an outer code page (`TESTLIB__CURRENT_CP`)
-if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/set_outer_cp.bat"
+if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/set_outer_cp.bat"
 
 exit /b %TEST_LAST_ERROR%
 
 :MAIN
-call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/load_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
 
 rem cast to integer
 set /A "TESTLIB__INIT+=0" & rem nest level
@@ -82,7 +82,7 @@ call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_NEST_LVL_VARS_FILE_P
 
 setlocal DISABLEDELAYEDEXPANSION
 
-call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat" "" "%%TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH%%"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/load_locals.bat" "" "%%TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH%%"
 
 set "BEGIN_TIME=%TESTLIB__BEGIN_TIME%"
 
@@ -112,7 +112,7 @@ if %TESTLIB__MANUAL%0 EQU 0 (
   echo;
 )
 
-call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" "" "%%TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH%%"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" "" "%%TEST_SCRIPT_NEST_LVL_VARS_FILE_PATH%%"
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_EXIT_VARS_FILE_PATH%" >nul
 
 setlocal DISABLEDELAYEDEXPANSION & setlocal ENABLEDELAYEDEXPANSION & ^

@@ -28,10 +28,10 @@ if not defined SETUP_CP goto SKIP_SETUP_CP
 rem reread current code page for each test, before run and after run
 
 rem reads the current code page into `TESTLIB__CURRENT_CP` variable
-call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/getcp.bat"
 
 rem calls to `set_inner_cp.bat` at the beginning
-call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" TESTLIB__PREV_CP TESTLIB__CURRENT_CP
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" TESTLIB__PREV_CP TESTLIB__CURRENT_CP
 
 :SKIP_SETUP_CP
 
@@ -40,12 +40,12 @@ set "TESTLIB__EXEC_ON_ENDLOCAL="
 call :MAIN %%*
 set TEST_LAST_ERROR=%ERRORLEVEL%
 
-call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
-call "%%CONTOOLS_TESTLIB_ROOT%%/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" TEST_LAST_ERROR TEST_IMPL_ERROR
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/save_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/update_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%" TEST_LAST_ERROR TEST_IMPL_ERROR
 copy /Y /B "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_TEST_VARS_FILE_PATH%" >nul
 
 rem restores a previous code page (`TESTLIB__PREV_CP`) if is different with the inner code page
-if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/set_prev_cp.bat"
+if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/set_prev_cp.bat"
 
 rem Drop internal variables but use some changed value(s) for the return
 (
@@ -67,7 +67,7 @@ rem Drop internal variables but use some changed value(s) for the return
 exit /b %TEST_LAST_ERROR%
 
 :MAIN
-call "%%CONTOOLS_TESTLIB_ROOT%%/load_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/load_locals.bat" "%%TEST_SCRIPT_SHARED_VARS_FILE_PATH%%"
 
 rem return code from a user test script handler
 set TEST_LAST_ERROR=0
@@ -94,7 +94,7 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/init%TEST_SCRIPT_F
 )
 
 rem restores a previous code page (`TESTLIB__PREV_CP`) if is different with the inner code page
-if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/set_prev_cp.bat"
+if defined SETUP_CP call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/set_prev_cp.bat"
 
 if %TEST_IMPL_SKIP% NEQ 0 goto TEST_EXIT
 
@@ -131,10 +131,10 @@ if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/exit%TEST_SCRIPT_F
 if not defined SETUP_CP goto SKIP_SETUP_CP
 
 rem reads the current code page into `TESTLIB__CURRENT_CP` variable
-call "%%CONTOOLS_TESTLIB_ROOT%%/getcp.bat"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/getcp.bat"
 
 rem assigns the inner code page if is different with a current code page (`TESTLIB__CURRENT_CP`)
-call "%%CONTOOLS_TESTLIB_ROOT%%/set_inner_cp.bat"
+call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/set_inner_cp.bat"
 
 :SKIP_SETUP_CP
 
@@ -162,13 +162,13 @@ rem reset after load
 set "TESTLIB__EXEC_ON_ENDLOCAL="
 
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars" (
-  call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_RETURN_VARS_FILE_PATH%%" "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/return.vars"
+  call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/save_locals.bat" "%%TEST_SCRIPT_RETURN_VARS_FILE_PATH%%" "%%TEST_SCRIPT_HANDLERS_DIR%%/.%%TEST_SCRIPT_FILE_NAME%%/return.vars"
   copy /Y /B "%TEST_SCRIPT_RETURN_VARS_FILE_PATH%" + "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" >nul
   move /Y "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" >nul
   call "%%CONTOOLS_ROOT%%/std/set_vars_from_file_as_cmdline.bat" TESTLIB__EXEC_ON_ENDLOCAL "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/return.vars"
 ) else if not "%TEST_SCRIPT_HANDLERS_DIR%" == "%TEST_SCRIPT_FILE_DIR%" (
   if exist "%TEST_SCRIPT_HANDLERS_DIR%/return.vars" (
-    call "%%CONTOOLS_TESTLIB_ROOT%%/save_locals.bat" "%%TEST_SCRIPT_RETURN_VARS_FILE_PATH%%" "%%TEST_SCRIPT_HANDLERS_DIR%%/return.vars"
+    call "%%CONTOOLS_TESTLIB_ROOT%%/.impl/save_locals.bat" "%%TEST_SCRIPT_RETURN_VARS_FILE_PATH%%" "%%TEST_SCRIPT_HANDLERS_DIR%%/return.vars"
     copy /Y /B "%TEST_SCRIPT_RETURN_VARS_FILE_PATH%" + "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" >nul
     move /Y "%TEST_SCRIPT_SHARED_VARS_FILE_PATH_TMP%" "%TEST_SCRIPT_SHARED_VARS_FILE_PATH%" >nul
     call "%%CONTOOLS_ROOT%%/std/set_vars_from_file_as_cmdline.bat" TESTLIB__EXEC_ON_ENDLOCAL "%TEST_SCRIPT_HANDLERS_DIR%/return.vars"
