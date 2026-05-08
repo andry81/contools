@@ -1,4 +1,7 @@
 2026.05.08:
+* changed: scripts/tests/bench/bat/test__for: moved from exclusion group
+
+2026.05.08:
 * changed: scripts/tools/testlib: moved implementation detail scripts into `.impl` sub directory
 * changed: scripts/tools/testlib/README_EN.txt: readme update
 
