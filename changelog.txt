@@ -1,3 +1,9 @@
+2026.05.08:
+* fixed: scripts/tests/unit/bat: test_build/test_build__00_load_config.bat, test_std/.test_std__20_chcp/setup.bat: execution fixup
+* fixed: scripts/tests/*.bat: execution speedup (missed to remove `std/call.bat` script call)
+* changed: scripts/tools/testlib/init.bat: added `TESTLIB__TEST_STATUS_MSG_*` static variables to use in the `impl.bat` script
+* changed: scripts/tests/*.bat: code cleanup
+
 2026.05.02:
 * fixed: _install.bat: execution fixup
 * new: __init__: logging and elevation by default

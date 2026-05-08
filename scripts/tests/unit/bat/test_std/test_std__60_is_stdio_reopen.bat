@@ -12,7 +12,7 @@ for %%i in ("%TESTS_PROJECT_ROOT%\test_std\test_std__is_stdio_reopen\test_std__*
   set "SCRIPT_FILE=%%i"
   call "%%CONTOOLS_ROOT%%/std/if_.bat" ^
     "%%SCRIPT_NAME:!=%%" == "%%SCRIPT_NAME%%" ^
-      && call "%%CONTOOLS_ROOT%%/std/call.bat" "%%SCRIPT_FILE%%"
+      && call "%%SCRIPT_FILE%%"
 )
 
 rem WARNING: must be called without the call prefix!

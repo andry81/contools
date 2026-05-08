@@ -14,7 +14,7 @@ for %%i in ("%TESTS_PROJECT_ROOT%\test_*.bat") do (
     "%%SCRIPT_NAME:!=%%" == "%%SCRIPT_NAME%%" ^
     if not "%%SCRIPT_FILE:*\%~nx0=%%" == "" ^
     if "%%SCRIPT_FILE:*\test__=%%" == "%%SCRIPT_FILE%%" ^
-      && call "%%CONTOOLS_ROOT%%/std/call.bat" "%%SCRIPT_FILE%%"
+      && call "%%SCRIPT_FILE%%"
 )
 
 rem WARNING: must be called without the call prefix!
