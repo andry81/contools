@@ -1,3 +1,7 @@
+2026.05.11:
+* changed: ._install/script_init.bat: minor change
+* refactor: scripts/tools/std: xcopy_*.bat, xmove_*.bat: minor refactor
+
 2026.05.08:
 * changed: scripts/tests/bench/bat/test__for: moved from exclusion group
 

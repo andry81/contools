@@ -327,6 +327,7 @@ set "XCOPY_FLAGS="
 if defined XCOPY_BARE_FLAGS set "XCOPY_FLAGS=%XCOPY_FLAGS% %XCOPY_BARE_FLAGS%"
 if defined XCOPY_DIR_BARE_FLAGS set "XCOPY_FLAGS=%XCOPY_FLAGS% %XCOPY_DIR_BARE_FLAGS%"
 
+rem CAUTION: must start and end by space character because is used in match expressions through replace to empty: `"%X: /<option> =%" == "%X%"`
 set "XCOPY_FLAGS=%XCOPY_FLAGS% "
 
 set XCOPY_Y_FLAG_PARSED=0
@@ -432,6 +433,7 @@ if "%XCOPY_FLAG:~0,4%" == "/MOV" (
   exit /b 1
 ) >&2
 if "%XCOPY_FLAG%" == "/Y" set XCOPY_Y_FLAG_PARSED=1
+rem CAUTION: must start and end by space character because is used in match expressions through replace to empty: `"%X: /<option> =%" == "%X%"`
 if %XCOPY_FLAG_PARSED% EQU 0 set "XCOPY_FLAGS=%XCOPY_FLAGS%%XCOPY_FLAG% "
 exit /b 0
 
@@ -446,6 +448,7 @@ set "ROBOCOPY_FLAGS="
 if defined ROBOCOPY_BARE_FLAGS set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% %ROBOCOPY_BARE_FLAGS%"
 if defined ROBOCOPY_DIR_BARE_FLAGS set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% %ROBOCOPY_DIR_BARE_FLAGS%"
 
+rem CAUTION: must start and end by space character because is used in match expressions through replace to empty: `"%X: /<option> =%" == "%X%"`
 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS% "
 
 set XCOPY_Y_FLAG_PARSED=0
@@ -487,6 +490,7 @@ set ROBOCOPY_EXCLUDES_CMD=%RETURN_VALUE%
 :IGNORE_ROBOCOPY_EXCLUDES
 
 rem NOTE: does not copy a file in case of equal timestamps and size, even if `/IS` and/or `/IT` is used
+rem CAUTION: must start and end by space character because is used in match expressions through replace to empty: `"%X: /<option> =%" == "%X%"`
 if %XCOPY_Y_FLAG_PARSED% EQU 0 if "%ROBOCOPY_FLAGS: /XO =%" == "%ROBOCOPY_FLAGS%" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/XO "
 if %XCOPY_Y_FLAG_PARSED% EQU 0 if "%ROBOCOPY_FLAGS: /XC =%" == "%ROBOCOPY_FLAGS%" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/XC "
 if %XCOPY_Y_FLAG_PARSED% EQU 0 if "%ROBOCOPY_FLAGS: /XN =%" == "%ROBOCOPY_FLAGS%" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/XN "
@@ -494,6 +498,7 @@ if %XCOPY_Y_FLAG_PARSED% EQU 0 if "%ROBOCOPY_FLAGS: /XN =%" == "%ROBOCOPY_FLAGS%
 if %XCOPY_Y_FLAG_PARSED% NEQ 0 if "%ROBOCOPY_FLAGS: /IS =%" == "%ROBOCOPY_FLAGS%" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/IS "
 if %XCOPY_Y_FLAG_PARSED% NEQ 0 if "%ROBOCOPY_FLAGS: /IT =%" == "%ROBOCOPY_FLAGS%" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/IT "
 
+rem CAUTION: must start and end by space character because is used in match expressions through replace to empty: `"%X: /<option> =%" == "%X%"`
 if "%ROBOCOPY_FLAGS: /COPY:=%" == "%ROBOCOPY_FLAGS%" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/COPY:%ROBOCOPY_COPY_FLAGS% "
 if "%ROBOCOPY_FLAGS: /DCOPY:=%" == "%ROBOCOPY_FLAGS%" set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%/DCOPY:%ROBOCOPY_DCOPY_FLAGS% "
 
@@ -576,6 +581,7 @@ if %ROBOCOPY_ATTR_COPY% EQU 0 if "%XCOPY_FLAG%" == "/K" set "XCOPY_FLAG_PARSED=1
 if "%XCOPY_FLAG%" == "/O" call :SET_ROBOCOPY_SO_FLAGS
 rem NOTE: in case of `robocopy.exe` `/X` flag - use `ROBOCOPY_BARE_FLAGS` variable explicitly
 if "%XCOPY_FLAG%" == "/X" call :SET_ROBOCOPY_U_FLAG
+rem CAUTION: must start and end by space character because is used in match expressions through replace to empty: `"%X: /<option> =%" == "%X%"`
 if %XCOPY_FLAG_PARSED% EQU 0 set "ROBOCOPY_FLAGS=%ROBOCOPY_FLAGS%%XCOPY_FLAG% "
 exit /b 0
 
