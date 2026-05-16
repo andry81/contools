@@ -1,3 +1,7 @@
+2026.05.17:
+* changed: scripts/tools/ToolAdaptors/hta: cmd_admin*.bat, runas_admin*.bat: scripts moved to `userbin` project
+* changed: scripts/tools/ToolAdaptors/hta/README_EN.txt: readme moved to `userbin` project
+
 2026.05.11:
 * changed: ._install/script_init.bat: minor change
 * refactor: scripts/tools/std: xcopy_*.bat, xmove_*.bat: minor refactor
