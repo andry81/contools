@@ -1,4 +1,9 @@
 2026.05.18:
+* changed: scripts/tools/std/encode/asc_utf.bat: code improvement, moved implementation detail scripts into `.impl` sub directory
+* changed: scripts/tests/manual/bat/test_std_encode/test_std_encode__60_asc.bat: code improvement, moved from exclusion group
+* refactor: scripts/tools/std/encode/asc_utf.bat, scripts/tests/manual/bat/test_std_encode/test_std_encode__60_asc.bat: moved tests into sub directory
+
+2026.05.18:
 * new: scripts/tests/unit/bat/test_std/test_std__70_set_var.bat: unit tests for `set_var.bat` script
 * changed: scripts/tools/std/set_var.bat: script improved to set sub strings
 * changed: scripts/tools/testlib/test*.bat: save initial `ERRORLEVEL` into `TEST_PREV_ERROR` variable
