@@ -1,3 +1,6 @@
+2026.05.18:
+* fixed: scripts/tools/std/declare_func_vars.bat: variables beginning by `:` can not be correctly expanded
+
 2026.05.17:
 * changed: scripts/tools/ToolAdaptors/hta: cmd_admin*.bat, runas_admin*.bat: scripts moved to `userbin` project
 * changed: scripts/tools/ToolAdaptors/hta/README_EN.txt: readme moved to `userbin` project
