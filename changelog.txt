@@ -1,3 +1,6 @@
+2026.05.19:
+* changed: script_init.bat: update to a common form
+
 2026.05.18:
 * changed: scripts/tools/std/encode/asc_utf.bat: code improvement, moved implementation detail scripts into `.impl` sub directory
 * changed: scripts/tests/manual/bat/test_std_encode/test_std_encode__60_asc.bat: code improvement, moved from exclusion group
