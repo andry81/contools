@@ -1,4 +1,10 @@
 2026.05.18:
+* new: scripts/tests/unit/bat/test_std/test_std__70_set_var.bat: unit tests for `set_var.bat` script
+* changed: scripts/tools/std/set_var.bat: script improved to set sub strings
+* changed: scripts/tools/testlib/test*.bat: save initial `ERRORLEVEL` into `TEST_PREV_ERROR` variable
+* changed: scripts/tools/testlib/README_EN.txt: readme update
+
+2026.05.18:
 * fixed: scripts/tools/std/declare_func_vars.bat: variables beginning by `:` can not be correctly expanded
 
 2026.05.17:

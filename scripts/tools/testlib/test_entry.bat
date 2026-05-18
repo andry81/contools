@@ -1,4 +1,4 @@
-@echo off
+@echo off & set "TEST_PREV_ERROR=%ERRORLEVEL%"
 
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/entry\*" (
   if defined TEST_ENTRY (

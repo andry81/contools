@@ -11,7 +11,7 @@ rem   We must use an uniform code page to avoid a code page change between
 rem   calls and so accidental recode on a file read/write.
 :DOC_END
 
-setlocal DISABLEDELAYEDEXPANSION
+setlocal DISABLEDELAYEDEXPANSION & set "TEST_PREV_ERROR=%ERRORLEVEL%"
 
 if %TESTLIB__INIT%0 EQU 0 (
   echo;%~nx0: error: test is not initialized.

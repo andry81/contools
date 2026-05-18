@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.05.08
+* 2026.05.18
 * contools--testlib
 
 1. DESCRIPTION
@@ -88,17 +88,23 @@ https://github.com/andry81/externals
   `testlib/set_prev_cp.bat` and `testlib/set_outer_cp.bat` to be used in all
   `testlib` functions.
 
-* TEST_IMPL_ERROR
+* TEST_PREV_ERROR
 
-  The `/.<user-test-script>/impl.bat` script internal return code.
-  Oppositely to `TEST_LAST_ERROR` does not store the error code between test
-  handler scripts.
+  The previous exit code before enter the `testlib/test*.bat` script.
+  Does not reset at the end of `testlib/test*.bat` or `testlib/set_test_*.bat`
+  scripts. The user is responsible to save or reset it in each test explicitly.
 
 * TEST_LAST_ERROR
 
   The return code of each test handler script in the `/.<user-test-script>`
   directory. The `/.<user-test-script>/report.bat` script handler must use it
   to detect a test fail or pass.
+
+* TEST_IMPL_ERROR
+
+  The `/.<user-test-script>/impl.bat` script internal return code.
+  Opposed to `TEST_LAST_ERROR` does not store the error code between test
+  handler scripts.
 
 * TEST_IMPL_SKIP
 
