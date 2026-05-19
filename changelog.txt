@@ -1,4 +1,7 @@
 2026.05.19:
+* changed: scripts/tests/manual: manual tests for `scripts/tools/ToolAdaptors/hta` scripts moved to `userbin` project
+
+2026.05.19:
 * changed: script_init.bat: update to a common form
 
 2026.05.18:
