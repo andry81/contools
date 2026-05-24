@@ -1,3 +1,6 @@
+2026.05.24:
+* changed: scripts/tools/cleanup/cleanup_file.bat: new GitHub tokens support
+
 2026.05.19:
 * changed: scripts/tests/manual: manual tests for `scripts/tools/ToolAdaptors/hta` scripts moved to `userbin` project
 
@@ -67,6 +70,11 @@
 
 2026.04.21:
 * fixed: scripts/tests/bench/bat/test__for_!exclusive: missed scripts
+
+2026.04.17:
+* fixed: scripts/tools/tasks: avoid a dead lock on a spawned child process abnormal exit
+* changed: scripts/tools/tasks: moved implementation detail scripts into `.impl` sub directory
+* changed: scripts/tools/tasks: implementation reworked and improved
 
 2026.04.17:
 * changed: scripts/tools/locks: moved implementation detail scripts into `.impl` sub directory
