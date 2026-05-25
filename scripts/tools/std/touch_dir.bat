@@ -90,7 +90,7 @@ rem   If the file were deleted before, then the creation date will be set by `..
 
 call;> "\\?\%DIR_PATH_TEMP_FILE%"
 
-call "%%?~dp0%%xremove_file.bat" "%%DIR_PATH_TEMP_FILE%%"
+call "%%?~dp0%%xremove_file.bat" -- "%%DIR_PATH_TEMP_FILE%%"
 
 :CONTINUE
 

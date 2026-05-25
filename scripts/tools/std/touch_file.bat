@@ -1,3 +1,5 @@
+<!-- : bat in wsf skip
+
 @echo off & goto DOC_END
 
 rem USAGE:
@@ -35,7 +37,7 @@ set "?~n0=%~n0"
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
-set "?~dp0=%~dp0%"
+set "?~f0=%~f0%"
 
 set "FILE_PATH=%~1"
 set FILE_COUNT=1
@@ -122,9 +124,9 @@ if %FILE_PATH_LONG% EQU 0 (
 ) else (
   rem CAUTION: `... >> ...` does not work as expected on Windows XP
   if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
-    "%SystemRoot%\System32\cscript.exe" //NOLOGO "%?~dp0%.impl\touch_file.vbs" "\\?\%FILE_PATH%"
+    "%SystemRoot%\System32\cscript.exe" //NOLOGO //JOB:TOUCH_FILE "%?~f0%?.wsf" "\\?\%FILE_PATH%"
   ) else (
-    "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & "%SystemRoot%\System32\cscript.exe" //NOLOGO "%?~dp0%.impl\touch_file.vbs" "\\?\%FILE_PATH%" & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
+    "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & "%SystemRoot%\System32\cscript.exe" //NOLOGO //JOB:TOUCH_FILE "%?~f0%?.wsf" "\\?\%FILE_PATH%" & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
   )
 )
 
@@ -159,3 +161,24 @@ if "%FILE_PATH%" == "" exit /b 0
 set /A FILE_COUNT+=1
 
 goto TOUCH_FILE_LOOP
+
+rem end of bat -->
+
+<package>
+  <job id="TOUCH_FILE">
+    <script language="VBScript">
+      ' Description:
+      '   Shell based script to be able to touch file by paths longer than 260+ characters.
+      '
+      ' USAGE:
+      '   ... "\\?\<absolute-canonical-file-path-to-file>"
+      '
+      '   , where (!) <absolute-canonical-file-path-to-file>: is an absolute file path separated with the backslash character ONLY - `\`
+      '
+
+      Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
+      Dim objFile : Set objFile = objFS.OpenTextFile(WScript.Arguments(0), 2)
+      objFile.Close
+    </script>
+  </job>
+</package>

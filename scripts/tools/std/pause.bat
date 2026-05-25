@@ -1,13 +1,15 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   pause.bat [-chcp <code-page>]
+rem   pause.bat [-vbs] [-chcp <code-page>]
 
-rem DESCRIPTION:
-rem   Sets the code page to the last known (`%LAST_CP%`) after a code page restore routine (basically after a call to the
-rem   `restorecp.bat` script). That is required in cases where the code page before a call to the `chcp.bat` was different
-rem   when the after and so the `pause` command does print unreadable text in the log.
-rem   This is it, all output into a log file must be made under the same code page!
+rem Description:
+rem   Sets the code page to the last known (`%LAST_CP%`) after a code page
+rem   restore routine (basically after a call to the `restorecp.bat` script).
+rem   That is required in cases where the code page before a call to the
+rem   `chcp.bat` was different when the after and so the `pause` command does
+rem   print unreadable text in the log. This is it, all output into a log file
+rem   must be made under the same code page!
 rem
 rem NOTE:
 rem   Script does not change the error level because restores it internally

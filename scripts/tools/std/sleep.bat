@@ -1,3 +1,5 @@
+<!-- : bat in wsf skip
+
 @echo off & goto DOC_END
 
 rem USAGE:
@@ -6,22 +8,34 @@ rem   sleep.bat [-vbs] <timeout-msec>
 
 setlocal
 
+set "?~f0=%~f0"
 set "?~dp0=%~dp0"
 
 set VBS_SLEEP=0
-if "%~1" == "-vbs" (
-  set VBS_SLEEP=1
-  shift
-)
+
+if "%~1" == "-vbs" set "VBS_SLEEP=1" & shift
 
 set /A "TIME_SLEEP_MSEC=%~1--0"
 
 if %TIME_SLEEP_MSEC% LEQ 0 exit /b 0
 
-if %VBS_SLEEP% NEQ 0 "%SystemRoot%\System32\cscript.exe" //nologo "%?~dp0%.impl\sleep.vbs" "%TIME_SLEEP_MSEC%" & exit /b 0
+if %VBS_SLEEP% NEQ 0 "%SystemRoot%\System32\cscript.exe" //nologo //JOB:SLEEP "%?~f0%?.wsf" "%TIME_SLEEP_MSEC%" & exit /b 0
 
 rem use pingpath to wait longer than 500 msec
 if %TIME_SLEEP_MSEC% GEQ 500 "%SystemRoot%\System32\pathping.exe" 127.0.0.1 -n -q 1 -p %TIME_SLEEP_MSEC% >nul 2>nul & exit /b 0
 
 rem no code after this line
-"%~dp0busy_wait.bat" "%TIME_SLEEP_MSEC%"
+"%?~dp0%busy_wait.bat" "%TIME_SLEEP_MSEC%"
+
+exit /b
+
+rem end of bat -->
+
+<package>
+  <job id="SLEEP">
+    <script language="VBScript">
+      Dim objShell : Set objShell = CreateObject("WScript.Shell")
+      WScript.Sleep WScript.Arguments(0)
+    </script>
+  </job>
+</package>

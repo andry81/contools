@@ -1,4 +1,10 @@
 2026.05.25:
+* changed: scripts/tools/std/busy_wait.bat: remove dependency to `timestamp.bat` script
+* changed: scripts/tools: std/sleep.bat, std/touch_file.bat: vbs code is combined into bat script to eliminate an external vbs script dependency
+* changed: scripts/tools/std/touch_dir.bat: minor improvement
+* refactor: scripts/tools/std/pause.bat: minor refactor
+
+2026.05.25:
 * changed: scripts/tools: locks/wait_dir_write_access.bat, std/xremove_file.bat: vbs code is combined into bat script to eliminate an external vbs script dependency
 
 2026.05.24:
@@ -73,11 +79,6 @@
 
 2026.04.21:
 * fixed: scripts/tests/bench/bat/test__for_!exclusive: missed scripts
-
-2026.04.17:
-* fixed: scripts/tools/tasks: avoid a dead lock on a spawned child process abnormal exit
-* changed: scripts/tools/tasks: moved implementation detail scripts into `.impl` sub directory
-* changed: scripts/tools/tasks: implementation reworked and improved
 
 2026.04.17:
 * changed: scripts/tools/locks: moved implementation detail scripts into `.impl` sub directory
