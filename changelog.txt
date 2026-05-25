@@ -1,3 +1,6 @@
+2026.05.25:
+* changed: scripts/tools: locks/wait_dir_write_access.bat, std/xremove_file.bat: vbs code is combined into bat script to eliminate an external vbs script dependency
+
 2026.05.24:
 * changed: scripts/tools/cleanup/cleanup_file.bat: new GitHub tokens support
 

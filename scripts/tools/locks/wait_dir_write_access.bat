@@ -1,3 +1,5 @@
+<!-- : bat in wsf skip
+
 @echo off & goto DOC_END
 
 rem USAGE:
@@ -41,11 +43,31 @@ set "FILE_NAME_TMP=.%~n0.%RANDOM%-%RANDOM%.tmp"
 
 if not "%~2" == "" if %~20 LSS 0 (
   ( call;> "\\?\%FILE_PATH%\%FILE_NAME_TMP%" ) 2>nul || exit /b 1
-  "%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\delete_file.vbs" "\\?\%FILE_PATH%\%FILE_NAME_TMP%"
+  "%SystemRoot%\System32\cscript.exe" //NOLOGO //JOB:DELETE_FILE "%~f0?.wsf" "\\?\%FILE_PATH%\%FILE_NAME_TMP%"
   exit /b 0
 )
 
 :FILE_WRITE_LOOP
 ( call;> "\\?\%FILE_PATH%\%FILE_NAME_TMP%" ) 2>nul || ( call "%%~dp0busy_wait.bat" %%2 & goto FILE_WRITE_LOOP )
-"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\delete_file.vbs" "\\?\%FILE_PATH%\%FILE_NAME_TMP%"
+"%SystemRoot%\System32\cscript.exe" //NOLOGO //JOB:DELETE_FILE "%~f0?.wsf" "\\?\%FILE_PATH%\%FILE_NAME_TMP%"
 exit /b 0
+
+rem end of bat -->
+
+<package>
+  <job id="DELETE_FILE">
+    <script language="VBScript">
+      ' Description:
+      '   Shell based script to be able to delete file by paths longer than 260+ characters.
+      '
+      ' USAGE:
+      '   ... "\\?\<absolute-canonical-file-path-to-file>"
+      '
+      '   , where (!) <absolute-canonical-file-path-to-file>: is an absolute file path separated with the backslash character ONLY - `\`
+      '
+
+      Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
+      objFS.DeleteFile WScript.Arguments(0)
+    </script>
+  </job>
+</package>

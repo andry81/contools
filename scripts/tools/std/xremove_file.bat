@@ -1,7 +1,9 @@
+<!-- : bat in wsf skip
+
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   xremove_file.bat <path>
+rem   xremove_file.bat [-vbs] [--] <path>
 
 rem Description:
 rem   A file path delete script with echo and some conditions check before
@@ -19,6 +21,12 @@ rem       3. The `%%~f` builtin variables extension and other extensions does
 rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 
+rem -vbs:
+rem   Use VBS built-in script to remove the file.
+
+rem --:
+rem   Separator to stop parse flags.
+
 rem <path>
 rem   Single file path.
 :DOC_END
@@ -27,10 +35,23 @@ if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 
 setlocal
 
+set "?~f0=%~f0"
 set "?~n0=%~n0"
 
 rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
+
+rem script flags
+set /A "FLAG_SHIFT=0", "FLAG_VBS=0"
+
+rem flags always at first
+set "FLAG=%~1"
+
+if defined FLAG ^
+if not "%FLAG:~0,1%" == "-" set "FLAG="
+
+if defined FLAG if "%FLAG%" == "-vbs" set "FLAG_VBS=1" & shift & call set "FLAG=%%~1" & set /A FLAG_SHIFT+=1
+if defined FLAG if "%FLAG%" == "--" shift & set /A FLAG_SHIFT+=1
 
 set "FROM_PATH=%~1"
 
@@ -98,6 +119,8 @@ if exist "%FILE_PATH%" (
   exit /b
 )
 
+if %FLAG_VBS% NEQ 0 goto DELETE_FILE_VBS
+
 rem check on `robocopy` existence
 if not exist "%SystemRoot%\System32\robocopy.exe" goto DELETE_FILE_VBS
 
@@ -113,6 +136,26 @@ rmdir /S /Q "%FILE_PATH_TEMP_DIR%" >nul 2>nul
 exit /b
 
 :DELETE_FILE_VBS
-if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\delete_file.vbs" "\\?\%FILE_PATH%"
-"%SystemRoot%\System32\cscript.exe" //NOLOGO "%~dp0.impl\delete_file.vbs" "\\?\%FILE_PATH%"
+if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>^>"%SystemRoot%\System32\cscript.exe" //NOLOGO //JOB:DELETE_FILE "%?~f0%?.wsf" "\\?\%FILE_PATH%"
+"%SystemRoot%\System32\cscript.exe" //NOLOGO //JOB:DELETE_FILE "%?~f0%?.wsf" "\\?\%FILE_PATH%"
 exit /b
+
+rem end of bat -->
+
+<package>
+  <job id="DELETE_FILE">
+    <script language="VBScript">
+      ' Description:
+      '   Shell based script to be able to delete file by paths longer than 260+ characters.
+      '
+      ' USAGE:
+      '   ... "\\?\<absolute-canonical-file-path-to-file>"
+      '
+      '   , where (!) <absolute-canonical-file-path-to-file>: is an absolute file path separated with the backslash character ONLY - `\`
+      '
+
+      Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
+      objFS.DeleteFile WScript.Arguments(0)
+    </script>
+  </job>
+</package>
