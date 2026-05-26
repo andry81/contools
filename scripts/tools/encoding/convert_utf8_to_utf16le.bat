@@ -21,4 +21,5 @@ if not exist "%TO_FILE_DIR_PATH%" (
   exit /b 2
 ) >&2
 
-"%CONTOOLS_MSYS2_USR_ROOT%/bin/iconv.exe" -c -f UTF-16LE -t UTF-8 "%FROM_FILE_PATH%" > "%TO_FILE_PATH%"
+rem without BOM
+"%CONTOOLS_MSYS2_USR_ROOT%/bin/iconv.exe" -c -f UTF-8 -t UTF-16LE "%FROM_FILE_PATH%" > "%TO_FILE_PATH%"

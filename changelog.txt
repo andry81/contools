@@ -1,4 +1,8 @@
 2026.05.26:
+* fixed: scripts/tools/encoding/convert_utf16le_to_utf8.bat: execution fixup
+* new: scripts/tools/encoding/convert_*.bat: more direct conversion scripts
+
+2026.05.26:
 * fixed: scripts/tools/*.bat: use `SysWOW64\chcp.com` variant of the executable if all the rest is not found, has meaning in Windows XP x64
 
 2026.05.26:
