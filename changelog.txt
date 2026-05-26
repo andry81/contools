@@ -1,3 +1,7 @@
+2026.05.26:
+* fixed: scripts/tools/std/pause.bat: execution fixup
+* changed: scripts/tools/std/pause.bat: code improvement
+
 2026.05.25:
 * changed: scripts/tools/std/busy_wait.bat: remove dependency to `timestamp.bat` script
 * changed: scripts/tools: std/sleep.bat, std/touch_file.bat: vbs code is combined into bat script to eliminate an external vbs script dependency
