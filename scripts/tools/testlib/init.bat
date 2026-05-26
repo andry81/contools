@@ -36,6 +36,7 @@ rem reread current code page for each test, before init and after init
 set "TESTLIB__CHCP_EXE="
 if exist "%SystemRoot%\System32\chcp.com" set "TESTLIB__CHCP_EXE=%SystemRoot%\System32\chcp.com"
 if not defined TESTLIB__CHCP_EXE if exist "%SystemRoot%\System64\chcp.com" set "TESTLIB__CHCP_EXE=%SystemRoot%\System64\chcp.com"
+if not defined TESTLIB__CHCP_EXE if exist "%SystemRoot%\SysWOW64\chcp.com" set "TESTLIB__CHCP_EXE=%SystemRoot%\SysWOW64\chcp.com"
 
 if not defined TESTLIB__CHCP_EXE  (
   echo;%~nx0: error: `chcp.com` is not found.

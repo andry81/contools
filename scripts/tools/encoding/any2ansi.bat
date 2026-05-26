@@ -93,6 +93,7 @@ exit /b
 set "CHCP_FILE="
 if exist "%SystemRoot%\System32\chcp.com" set "CHCP_FILE=%SystemRoot%\System32\chcp.com"
 if not defined CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "CHCP_FILE=%SystemRoot%\System64\chcp.com"
+if not defined CHCP_FILE if exist "%SystemRoot%\SysWOW64\chcp.com" set "CHCP_FILE=%SystemRoot%\SysWOW64\chcp.com"
 
 for /F "usebackq tokens=2 delims=:"eol^= %%i in (`@"%CHCP_FILE%" 2^>nul`) do set CURRENT_CODE_PAGE=%%i
 

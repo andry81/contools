@@ -1,4 +1,7 @@
 2026.05.26:
+* fixed: scripts/tools/*.bat: use `SysWOW64\chcp.com` variant of the executable if all the rest is not found, has meaning in Windows XP x64
+
+2026.05.26:
 * fixed: scripts/tools/std/pause.bat: execution fixup
 * changed: scripts/tools/std/pause.bat: code improvement
 

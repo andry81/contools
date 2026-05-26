@@ -28,6 +28,7 @@ if not defined __?VAR_NAME set "__?VAR_NAME=CURRENT_CP"
 set "__?CHCP_FILE="
 if exist "%SystemRoot%\System32\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System32\chcp.com"
 if not defined __?CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System64\chcp.com"
+if not defined __?CHCP_FILE if exist "%SystemRoot%\SysWOW64\chcp.com" set "__?CHCP_FILE=%SystemRoot%\SysWOW64\chcp.com"
 
 if defined SCRIPT_TEMP_CURRENT_DIR (
   set "__?CHCP_TEMP_FILE=%SCRIPT_TEMP_CURRENT_DIR%\%~n0.%RANDOM%-%RANDOM%.txt"

@@ -69,6 +69,7 @@ if not defined CODE_PAGE (
 set "__?CHCP_FILE="
 if exist "%SystemRoot%\System32\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System32\chcp.com"
 if not defined __?CHCP_FILE if exist "%SystemRoot%\System64\chcp.com" set "__?CHCP_FILE=%SystemRoot%\System64\chcp.com"
+if not defined __?CHCP_FILE if exist "%SystemRoot%\SysWOW64\chcp.com" set "__?CHCP_FILE=%SystemRoot%\SysWOW64\chcp.com"
 
 if not defined __?CHCP_FILE (
   echo;%?~%: error: `chcp.com` is not found.
