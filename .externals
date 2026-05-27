@@ -1,5 +1,16 @@
 repositories:
 
+  _externals/contools--admin:
+    type:         git
+    url:          https://github.com/andry81/contools--admin
+    version:      master
+    subpaths:
+      - __init__
+      - _config
+      - scripts/__init__
+      - scripts/Windows/__init__
+      - scripts/Windows/Perm
+
   _externals/contools--utils:
     type:         git
     url:          https://github.com/andry81/contools--utils
@@ -8,6 +19,15 @@ repositories:
       - __init__
       - _config
       - bin
+
+  _externals/userbin:
+    type:         git
+    url:          https://github.com/andry81/userbin
+    version:      master
+    subpaths:
+      - __init__
+      - _config
+      - scripts/bat
 
   _externals/tacklelib:
     type:         git
