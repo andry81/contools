@@ -1,3 +1,10 @@
+2026.05.28:
+* new: scripts/tests/bench/bat/test__rem: test__rem__*_80x10_exit_b_before.bat, test__rem__*_80x10_exit_b_after.bat: bench tests for comments in the header and the footer of a script
+
+2026.05.27:
+* new: ._install/install_system*.bat: new Windows x32/x64 installation scripts
+* changed: .externals: use `contools--admin` and `userbin` projects
+
 2026.05.26:
 * fixed: scripts/tools/encoding/convert_utf16le_to_utf8.bat: execution fixup
 * new: scripts/tools/encoding/convert_*.bat: more direct conversion scripts
