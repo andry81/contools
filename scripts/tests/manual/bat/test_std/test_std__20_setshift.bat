@@ -67,6 +67,20 @@ echo;---
 
 setlocal
 set ARGS=1 2 3 4 5 6 7
+call :SETSHIFT -0 x
+set x
+endlocal
+echo;---
+
+setlocal
+set ARGS=1 2 3 4 5 6 7
+call :SETSHIFT +0 x
+set x
+endlocal
+echo;---
+
+setlocal
+set ARGS=1 2 3 4 5 6 7
 call :SETSHIFT 1 x
 set x
 endlocal

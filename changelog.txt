@@ -1,4 +1,9 @@
 2026.05.28:
+* new: scripts/tests/manual/bat/test_std/test_std__*_setshift_var*.bat: manual test for `setshift_var.bat` script
+* new: scripts/tests/manual/bat/test_std/test_std___*shift.bat: more manual tests
+* refactor: scripts/tests/manual/bat: minor refactor
+
+2026.05.28:
 * changed: scripts/tools/std/*shift*.bat: better test on an integer in the shift parameter
 
 2026.05.28:
@@ -275,7 +280,7 @@
 * changed: scripts/tests: a test status message variable instead a static text
 * changed: scripts/tests/unit/bat/test_xml: code improvement
 * changed: scripts/tools/testlib/README_EN.txt: readme update
-* refactor: scripts/test/unit/bat: minors cleanup
+* refactor: scripts/test/unit/bat: minor cleanup
 
 2026.02.25:
 * changed: scripts/tools/build: removed logging into current directory by default

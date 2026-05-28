@@ -86,6 +86,18 @@ echo;---
 
 setlocal
 set ARGS=echo 1 2 3 4 5 6 7
+call :CALLSHIFT -0
+endlocal
+echo;---
+
+setlocal
+set ARGS=echo 1 2 3 4 5 6 7
+call :CALLSHIFT +0
+endlocal
+echo;---
+
+setlocal
+set ARGS=echo 1 2 3 4 5 6 7
 call :CALLSHIFT 1
 endlocal
 echo;---
