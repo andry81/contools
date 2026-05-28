@@ -1,4 +1,7 @@
 2026.05.28:
+* changed: scripts/tools/std/*shift*.bat: better test on an integer in the shift parameter
+
+2026.05.28:
 * new: scripts/tests/bench/bat/test__rem: test__rem__*_80x10_exit_b_before.bat, test__rem__*_80x10_exit_b_after.bat: bench tests for comments in the header and the footer of a script
 
 2026.05.27:

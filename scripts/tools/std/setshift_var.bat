@@ -103,7 +103,14 @@ set "SHIFT_=%SHIFT%"
 rem cast to integer
 set /A SHIFT+=0
 
-if not "%SHIFT%" == "%SHIFT_%" exit /b %LAST_ERROR%
+(
+  rem test on an integer
+  setlocal ENABLEDELAYEDEXPANSION
+  for %%i in (0 1 2 3 4 5 6 7 8 9) do if defined SHIFT_ set "SHIFT_=!SHIFT_:%%i=!"
+  if defined SHIFT_ for %%i in (- +) do if defined SHIFT_ if "!SHIFT_:~0,1!" == "%%i" set "SHIFT_=!SHIFT_:~1!"
+  if defined SHIFT_ exit /b %LAST_ERROR%
+  endlocal
+)
 
 set "OUTVAR=%~2"
 
