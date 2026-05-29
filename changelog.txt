@@ -1,3 +1,6 @@
+2026.05.29:
+* new: scripts/tests/bench/bat/test__setlocal: more bench tests
+
 2026.05.28:
 * new: scripts/tests/manual/bat/test_std/test_std__*_setshift_var*.bat: manual test for `setshift_var.bat` script
 * new: scripts/tests/manual/bat/test_std/test_std___*shift.bat: more manual tests
