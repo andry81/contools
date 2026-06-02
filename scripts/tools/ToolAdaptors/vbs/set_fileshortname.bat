@@ -1,4 +1,8 @@
-@echo off
+@echo off & goto DOC_END
+
+rem CAUTION:
+rem   The `set_fileshortname.vbs` script must be a 32-bit process to create `jcb.tools` object.
+:DOC_END
 
 setlocal DISABLEDELAYEDEXPANSION
 
@@ -42,34 +46,46 @@ rem CAUTION:
 rem   The `cd "%CD%" ^& %CD:~0,2%` must be before the command, otherwise the system root will be the current directory!
 rem
 
+rem CAUTION:
+rem   Avoid a back slash before the double quote in an executable (`.exe`)
+rem   command line, otherwise a command line parse will be broken
+rem   (a trailing double quote will be escaped).
+
+for /F "tokens=* delims="eol^= %%i in ("%CD%\.") do set "CWD=%%~fi"
+
+if "%CWD:~-1%" == "\" set "CWD=%CWD%."
+
 rem Windows Batch compatible command line with escapes (`\""` is a single nested `"`, `\""""` is a double nested `"` and so on).
-set ?.=set "IMPL_MODE=1" ^& cd "%CD%" ^& %CD:~0,2% ^& "%~f0" %* ^& pause
+set ?.=set "IMPL_MODE=1" ^& cd "%CWD%" ^& %CWD:~0,2% ^& "%~f0" %* ^& pause
 
-rem translate Windows Batch compatible escapes into escape placeholders
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$=$0!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""""=$4!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""=$3!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""=$2!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:"^=$1!"") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:~0,-1!") do endlocal & set "?.=%%i"
+(
+  setlocal ENABLEDELAYEDEXPANSION
 
-rem translate escape placeholders into `mshta.exe` (vbs) escapes (`""` is a single nested `"`, `""""` is a double nested `"` and so on)
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$4=""""""""""""""""""""""""""""""""!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$3=""""""""""""""""!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$2=""""""""!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$1=""""!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0=$!") do endlocal & set "?.=%%i"
+  rem translate Windows Batch compatible escapes into escape placeholders
+  set "?.=!?.:$=$0!"
+  set "?.=!?.:\""""""""=$4!"
+  set "?.=!?.:\""""=$3!"
+  set "?.=!?.:\""=$2!"
+  set "?.=!?.:"^=$1!"
+
+  rem translate escape placeholders into `mshta.exe` (vbs) escapes (`""` is a single nested `"`, `""""` is a double nested `"` and so on)
+  set "?.=!?.:$4=""""""""""""""""""""""""""""""""!"
+  set "?.=!?.:$3=""""""""""""""""!"
+  set "?.=!?.:$2=""""""""!"
+  set "?.=!?.:$1=""""!"
+  for /F "tokens=* delims="eol^= %%i in ("!?.:$0=$!") do endlocal & set "?.=%%i"
+)
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto X86
 
-if not exist "%SystemRoot%\Syswow64\*" (
-  echo;%?~%: error: not x86 system without Syswow64 system directory.
+if not exist "%SystemRoot%\SysWOW64\*" (
+  echo;%?~%: error: not x86 system or without SysWOW64 system directory.
   exit /b 255
 ) >&2
 
 rem CAUTION: ShellExecute does not wait a child process close!
 rem NOTE: `ExecuteGlobal` is used as a workaround, because the `mshta.exe` first argument must not be used with the surrounded quotes
-start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%SystemRoot%\Syswow64\cmd.exe"", ""/c @%?.%"", """", ""runas"", 1))")
+start /B /WAIT "" "%SystemRoot%\System32\mshta.exe" vbscript:ExecuteGlobal("Close(CreateObject(""Shell.Application"").ShellExecute(""%SystemRoot%\SysWOW64\cmd.exe"", ""/c @%?.%"", """", ""runas"", 1))")
 exit /b
 
 :X86
@@ -84,13 +100,13 @@ set IMPL_MODE=1
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" goto IMPL
 
-if not exist "%SystemRoot%\Syswow64\*" (
-  echo;%?~%: error: not x86 system without Syswow64 system directory.
+if not exist "%SystemRoot%\SysWOW64\*" (
+  echo;%?~%: error: not x86 system or without SysWOW64 system directory.
   exit /b 255
 ) >&2
 
 rem CAUTION: ShellExecute does not wait a child process close!
-"%SystemRoot%\Syswow64\cmd.exe" /c @"%~f0" %*
+"%SystemRoot%\SysWOW64\cmd.exe" /c @"%~f0" %*
 exit /b
 
 :IMPL
@@ -99,5 +115,5 @@ if %ELEVATED% EQU 0 call :IS_ADMIN_ELEVATED || (
   exit /b 255
 ) >&2
 
-echo;^>cscript.exe //nologo "%~dp0set_fileshortname.vbs" %*
-cscript.exe //nologo "%~dp0set_fileshortname.vbs" %*
+echo;^>"%SystemRoot%\System32\cscript.exe" //nologo "%~dpn0.vbs" %*
+"%SystemRoot%\System32\cscript.exe" //nologo "%~dpn0.vbs" %*

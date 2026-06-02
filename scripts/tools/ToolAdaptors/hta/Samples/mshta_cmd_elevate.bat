@@ -24,7 +24,16 @@ rem   The `\""` sequence always have has an even number of double quotes to
 rem   always quote a string in between because the `set` command argument
 rem   is started by a quote.
 
-set "__QARG0__=vbscript:ExecuteGlobal(\""Close(CreateObject(\""""Shell.Application\"""").ShellExecute(\""""%COMSPEC%\"""", \""""/k @cd \""""""%CD%\"""""" & %CD:~0,2% & \""""""%CONTOOLS_UTILS_BIN_ROOT%/contools/printargs.exe\"""""" \""""""123 456\""""""\"""", \""""\"""", \""""runas\"""", 1))\"")"
+rem CAUTION:
+rem   Avoid a back slash before the double quote in an executable (`.exe`)
+rem   command line, otherwise a command line parse will be broken
+rem   (a trailing double quote will be escaped).
+
+for /F "tokens=* delims="eol^= %%i in ("%CD%\.") do set "CWD=%%~fi"
+
+if "%CWD:~-1%" == "\" set "CWD=%CWD%."
+
+set "__QARG0__=vbscript:ExecuteGlobal(\""Close(CreateObject(\""""Shell.Application\"""").ShellExecute(\""""%COMSPEC%\"""", \""""/k @cd \""""""%CWD%\"""""" & %CWD:~0,2% & \""""""%CONTOOLS_UTILS_BIN_ROOT%/contools/printargs.exe\"""""" \""""""123 456\""""""\"""", \""""\"""", \""""runas\"""", 1))\"")"
 
 rem the input to translate
 set __QARG0__
@@ -36,20 +45,21 @@ rem Command line variant for the executable with C runtime command line parser
 echo Translated into C runtime command line format:
 echo;
 
-rem translate Windows Batch compatible escapes into escape placeholders
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__QARG0__:$=$0!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""=$3!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""=$2!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""=$1!") do endlocal & set "?.=%%i"
+(
+  setlocal ENABLEDELAYEDEXPANSION
 
-rem translate escape placeholders into C runtime command line escapes
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$3=\\\\\\\"!"") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:~0,-1!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$2=\\\"!"") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:~0,-1!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$1=\"!"") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:~0,-1!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0=$!") do endlocal & set "?.=%%i"
+  rem translate Windows Batch compatible escapes into escape placeholders
+  set "?.=!__QARG0__:$=$0!"
+  set "?.=!?.:\""""""=$3!"
+  set "?.=!?.:\""""=$2!"
+  set "?.=!?.:\""=$1!"
+
+  rem translate escape placeholders into C runtime command line escapes
+  set "?.=!?.:$3=\\\\\\\"!"
+  set "?.=!?.:$2=\\\"!"
+  set "?.=!?.:$1=\"!"
+  for /F "tokens=* delims="eol^= %%i in ("!?.:$0=$!") do endlocal & set "?.=%%i"
+)
 
 set ?.
 
@@ -68,18 +78,21 @@ echo;
 
 rem Command line variant for `mshta.exe` executable
 
-rem translate Windows Batch compatible escapes into escape placeholders
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__QARG0__:$=$0!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""""=$3!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""""=$2!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:\""=$1!") do endlocal & set "?.=%%i"
+(
+  setlocal ENABLEDELAYEDEXPANSION
 
-rem translate escape placeholders into `mshta.exe` (vbs) escapes (`""` is a single nested `"`, `""""` is a double nested `"` and so on)
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$3=""""!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$2=""!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$1="!"") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:~0,-1!") do endlocal & set "?.=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!?.:$0=$!") do endlocal & set "?.=%%i"
+  rem translate Windows Batch compatible escapes into escape placeholders
+  set "?.=!__QARG0__:$=$0!"
+  set "?.=!?.:\""""""=$3!"
+  set "?.=!?.:\""""=$2!"
+  set "?.=!?.:\""=$1!"
+
+  rem translate escape placeholders into `mshta.exe` (vbs) escapes (`""` is a single nested `"`, `""""` is a double nested `"` and so on)
+  set "?.=!?.:$3=""""!"
+  set "?.=!?.:$2=""!"
+  set "?.=!?.:$1="!"
+  for /F "tokens=* delims="eol^= %%i in ("!?.:$0=$!") do endlocal & set "?.=%%i"
+)
 
 set ?.
 

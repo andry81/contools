@@ -1,7 +1,7 @@
 ''' Sets short file name.
 
 ''' USAGE:
-'''   set_shortfilename.vbs <path> <short-file-name>
+'''   set_fileshortname.vbs <path> <short-file-name>
 
 ''' CAUTION:
 '''   This script requires the Administrator privileges to request below privileges.
