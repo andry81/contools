@@ -1,4 +1,7 @@
 2026.06.03:
+* changed: scripts/tools/ToolAdaptors/hta/Samples: samples moved to `userbin` project
+
+2026.06.03:
 * fixed: .externals: minor fixup
 * changed: README_EN.txt: minor update
 
