@@ -1,3 +1,7 @@
+2026.06.03:
+* fixed: .externals: minor fixup
+* changed: README_EN.txt: minor update
+
 2026.06.02:
 * changed: scripts/tools/ToolAdaptors: hta/Samples/mshta_cmd_elevate.bat, vbs/set_fileshortname*.bat: code improvement and reduction
 * refactor: scripts/tools/ToolAdaptors/vbs/set_fileshortname.vbs: minor refactor

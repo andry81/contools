@@ -47,7 +47,7 @@ repositories:
     subpaths:
       - __init__
       - _config
-      - Scripts
+      - scripts
 
   _externals/7zip:
     type:         git

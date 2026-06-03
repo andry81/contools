@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.03.19
+* 2026.06.02
 * contools
 
 1. DESCRIPTION
@@ -64,7 +64,7 @@ Second mirror:
  |
  +- /`_config`
  |  | #
- |  | # Directory with build input configuration files.
+ |  | # Directory with input configuration files.
  |  |
  |  +- `config.system.vars.in`
  |  |   #
