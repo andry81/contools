@@ -25,10 +25,10 @@ fi
 [[ -n "$CONTOOLS_PROJECT_INPUT_CONFIG_ROOT" ]] ||   tkl_export_path -a -s CONTOOLS_PROJECT_INPUT_CONFIG_ROOT  "$CONTOOLS_PROJECT_ROOT/_config"
 [[ -n "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" ]] ||  tkl_export_path -a -s CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT "$PROJECT_OUTPUT_ROOT/config/contools"
 
-# retarget externals of an external project
-
-[[ -n "$TACKLELIB_PROJECT_EXTERNALS_ROOT" ]] ||     tkl_export_path -a -s TACKLELIB_PROJECT_EXTERNALS_ROOT    "$CONTOOLS_PROJECT_EXTERNALS_ROOT"
-[[ -n "$SVNCMD_PROJECT_EXTERNALS_ROOT" ]] ||        tkl_export_path -a -s SVNCMD_PROJECT_EXTERNALS_ROOT       "$CONTOOLS_PROJECT_EXTERNALS_ROOT"
+# # retarget externals of an external project
+# 
+# [[ -n "$TACKLELIB_PROJECT_EXTERNALS_ROOT" ]] ||     tkl_export_path -a -s TACKLELIB_PROJECT_EXTERNALS_ROOT    "$CONTOOLS_PROJECT_EXTERNALS_ROOT"
+# [[ -n "$SVNCMD_PROJECT_EXTERNALS_ROOT" ]] ||        tkl_export_path -a -s SVNCMD_PROJECT_EXTERNALS_ROOT       "$CONTOOLS_PROJECT_EXTERNALS_ROOT"
 
 # config loader must be included before any external project init and has using only init variables (declared here and not by the config)
 
@@ -48,15 +48,15 @@ else
   tkl_load_config_dir --expand-all-configs-bat-vars -- "$CONTOOLS_PROJECT_INPUT_CONFIG_ROOT" "$CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT" || tkl_abort
 fi
 
-# init external projects
-
-if [[ -f "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/__init__/__init__.sh" ]]; then
-  tkl_include_or_abort "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/__init__/__init__.sh"
-fi
-
-if [[ -f "$CONTOOLS_PROJECT_EXTERNALS_ROOT/svncmd/__init__/__init__.sh" ]]; then
-  tkl_include_or_abort "$CONTOOLS_PROJECT_EXTERNALS_ROOT/svncmd/__init__/__init__.sh"
-fi
+# # init external projects
+# 
+# if [[ -f "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/__init__/__init__.sh" ]]; then
+#   tkl_include_or_abort "$CONTOOLS_PROJECT_EXTERNALS_ROOT/tacklelib/__init__/__init__.sh"
+# fi
+# 
+# if [[ -f "$CONTOOLS_PROJECT_EXTERNALS_ROOT/svncmd/__init__/__init__.sh" ]]; then
+#   tkl_include_or_abort "$CONTOOLS_PROJECT_EXTERNALS_ROOT/svncmd/__init__/__init__.sh"
+# fi
 
 tkl_include_or_abort "$TACKLELIB_BASH_ROOT/tacklelib/buildlib.sh"
 
