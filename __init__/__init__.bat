@@ -7,6 +7,9 @@ set "CONTOOLS_PROJECT_ROOT_INIT0_DIR=%~dp0"
 rem cast to integer
 set /A NEST_LVL+=0
 
+rem Initialize externals
+if defined INIT_EXTERNALS set /A INIT_EXTERNALS+=0
+
 rem Initialize with verbose
 if defined INIT_VERBOSE set /A INIT_VERBOSE+=0
 
@@ -36,11 +39,13 @@ call "%%~dp0canonical_path_if_ndef.bat" PROJECT_LOG_ROOT                        
 call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_PROJECT_INPUT_CONFIG_ROOT      "%%CONTOOLS_PROJECT_ROOT%%/_config"
 call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT     "%%PROJECT_OUTPUT_ROOT%%/config/contools"
 
-rem rem retarget externals of an external project
-rem 
-rem call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_UTILS_PROJECT_EXTERNALS_ROOT   "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
-rem call "%%~dp0canonical_path_if_ndef.bat" TACKLELIB_PROJECT_EXTERNALS_ROOT        "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
-rem call "%%~dp0canonical_path_if_ndef.bat" SVNCMD_PROJECT_EXTERNALS_ROOT           "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
+rem retarget externals of an external project
+
+if %INIT_EXTERNALS%0 NEQ 0 (
+  call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_UTILS_PROJECT_EXTERNALS_ROOT   "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
+  call "%%~dp0canonical_path_if_ndef.bat" TACKLELIB_PROJECT_EXTERNALS_ROOT        "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
+  call "%%~dp0canonical_path_if_ndef.bat" SVNCMD_PROJECT_EXTERNALS_ROOT           "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
+)
 
 rem CAUTION:
 rem   Only `CONTOOLS_ROOT` variable is available from here.
@@ -65,28 +70,13 @@ if %NO_GEN%0 EQU 0 (
   call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -+ %%* -gen_user_config -use_os_params -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 ) else call "%%CONTOOLS_ROOT%%/build/load_config_dir.bat" -+ %%* -use_os_params -- "%%CONTOOLS_PROJECT_INPUT_CONFIG_ROOT%%" "%%CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT%%" || exit /b
 
-rem rem init external projects
-rem 
-rem if exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%/contools--utils/__init__/__init__.bat" (
-rem   rem disable code page change in nested __init__
-rem   set /A NO_CHCP+=1
-rem   call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/contools--utils/__init__/__init__.bat" %%* || exit /b
-rem   set /A NO_CHCP-=1
-rem )
-rem 
-rem if exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%/tacklelib/__init__/__init__.bat" (
-rem   rem disable code page change in nested __init__
-rem   set /A NO_CHCP+=1
-rem   call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/tacklelib/__init__/__init__.bat" %%* || exit /b
-rem   set /A NO_CHCP-=1
-rem )
-rem 
-rem if exist "%CONTOOLS_PROJECT_EXTERNALS_ROOT%/svncmd/__init__/__init__.bat" (
-rem   rem disable code page change in nested __init__
-rem   set /A NO_CHCP+=1
-rem   call "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/svncmd/__init__/__init__.bat" %%* || exit /b
-rem   set /A NO_CHCP-=1
-rem )
+rem init external projects
+
+if %INIT_EXTERNALS%0 NEQ 0 (
+  call "%%CONTOOLS_ROOT%%/std/call_if_exist.bat" "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/contools--utils/__init__/__init__.bat" %%* || exit /b
+  call "%%CONTOOLS_ROOT%%/std/call_if_exist.bat" "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/tacklelib/__init__/__init__.bat" %%* || exit /b
+  call "%%CONTOOLS_ROOT%%/std/call_if_exist.bat" "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/svncmd/__init__/__init__.bat" %%* || exit /b
+)
 
 if %NO_GEN%0 EQU 0 (
   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir_if_notexist.bat" "%%PROJECT_OUTPUT_ROOT%%" || exit /b

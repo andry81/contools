@@ -1,4 +1,7 @@
 2026.06.06:
+* changed: __init__/__init__.bat, ._install/__init__.bat: use `INIT_EXTERNALS` variable to explicitly initialize externals in case of an installation script call
+
+2026.06.06:
 * changed: scripts/tools/std/call_if_exist.bat: code cleanup
 
 2026.06.06:
