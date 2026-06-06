@@ -1,4 +1,7 @@
 2026.06.06:
+* fixed: _install.bat: skip Windows XP install on not Windows XP systems
+
+2026.06.06:
 * changed: __init__/__init__.bat, ._install/__init__.bat: use `INIT_EXTERNALS` variable to explicitly initialize externals in case of an installation script call
 
 2026.06.06:
