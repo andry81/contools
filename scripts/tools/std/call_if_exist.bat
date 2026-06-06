@@ -13,4 +13,4 @@ if "%~1" == "" (
   exit /b 255
 ) >&2
 
-endlocal & if exist "%~1" call "%%~dp0callshift.bat" 1 "%%~1" %%*
+endlocal & if exist "%~1" call %%*
