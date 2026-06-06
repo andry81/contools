@@ -7,6 +7,9 @@ set "CONTOOLS_PROJECT_ROOT_INIT0_DIR=%~dp0"
 rem cast to integer
 set /A NEST_LVL+=0
 
+rem Initialize with verbose
+if defined INIT_VERBOSE set /A INIT_VERBOSE+=0
+
 rem Do not make a file or a directory
 if defined NO_GEN set /A NO_GEN+=0
 
@@ -16,8 +19,8 @@ if defined NO_LOG set /A NO_LOG+=0
 rem Do not make a log output or stdio duplication into files
 if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 
-rem Do not change code page
-if defined NO_CHCP set /A NO_CHCP+=0
+rem Do change code page
+if defined USE_CHCP set /A USE_CHCP+=0
 
 call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_PROJECT_ROOT                   "%%~dp0.."
 call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_PROJECT_EXTERNALS_ROOT         "%%CONTOOLS_PROJECT_ROOT%%/_externals"
@@ -94,7 +97,7 @@ if defined CHCP if %CHCP% EQU 65000 (
   exit /b 255
 ) >&2
 
-if %NO_CHCP%0 EQU 0 (
+if %USE_CHCP%0 NEQ 0 (
   if defined CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CHCP%%
 )
 

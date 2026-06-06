@@ -1,4 +1,7 @@
 2026.06.06:
+* changed: __init__/__init__.bat: turned off the code page implicit change, use `USE_CHCP` variable to explicitly use the code page from the configuration file
+
+2026.06.06:
 * changed: __init__/__init__.bat: dropped initialization of all external projects due to redundant initialization, now each user script is required to initialize each external project it is using directly or indirectly through this project
 
 2026.06.03:
