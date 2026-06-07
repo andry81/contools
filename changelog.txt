@@ -1,3 +1,8 @@
+2026.06.07:
+* fixed: scripts/tools/ToolAdaptors/__init__/__init__.bat: tool adaptor scripts initialization fixup
+* changed: *.bat: code improvement and cleanup
+* refactor: *.bat: documentation refactor
+
 2026.06.06:
 * fixed: _install.bat: skip Windows XP install on not Windows XP systems
 

@@ -15,11 +15,11 @@ if %IMPL_MODE% NEQ 0 (
 ) >&2
 
 rem CAUTION:
-rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
-rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
+rem   The `& exit` is required to workaround `cmd.exe` not zero exit code issue.
+rem   See the `KNOWN ISSUES` section in the `README_EN.txt` from `contools--utils` project.
 rem
 endlocal & "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%MINTTY_CALLF_BARE_FLAGS% /v IMPL_MODE 1 // ^
-  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
+  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& exit\"" ^
   %*
 
 call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"

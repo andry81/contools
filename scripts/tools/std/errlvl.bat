@@ -14,20 +14,25 @@ rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=10
 
 rem CAUTION:
-rem   The `exit /b %ERRORLEVEL%` is required as is to workaround the issue with
+rem   The trailing `exit` command is required as a workaround to the issue with
 rem   not zero error code return:
 rem
-rem   ```1.bat
-rem   @echo off
-rem   
-rem   setlocal
-rem   
-rem   call :TEST || exit /b
-rem   exit /b 0
-rem   
-rem   :TEST
-rem   exit /b 123
-rem   ```
+rem   `Invalid exit code from script call in ``cmd.exe`` command line` :
+rem   https://github.com/andry81/contools/discussions/34
+rem
+rem   Example:
+rem
+rem     ```1.bat
+rem     @echo off
+rem     
+rem     setlocal
+rem     
+rem     call :TEST || exit /b
+rem     exit /b 0
+rem     
+rem     :TEST
+rem     exit /b 123
+rem     ```
 rem
 rem   where:
 rem
@@ -44,14 +49,14 @@ rem
 rem     Or
 rem
 rem     >
-rem     cmd.exe /c "1.bat & call exit /b %%ERRORLEVEL%%"
+rem     cmd.exe /c "1.bat & exit"
 rem
-rem     Or
+rem   To workaround with an external script:
 rem
 rem     >
 rem     cmd.exe /c "1.bat & "%%CONTOOLS_ROOT%%/std/errlvl.bat""
 rem
-rem     Or
+rem   To workaround with an external script in case of `callf.exe` utility:
 rem
 rem     NOTE: The `1.bat` is not quoted here, because `cmd.exe` will remove first and last quotes after the `/c`.
 rem     >
@@ -79,10 +84,10 @@ rem
 rem     Cons:
 rem       1. The part of a command line after the `cmd.exe` still does expand by the `cmd.exe` itself.
 rem          To bypass that you can use additional `callf` options: `/ra "%%" "%%?25%%" /v "?25" "%%"`
-rem       2. To disable the rest `callf` features: `/no-subst-pos-vars /no-esc`
+rem       2. To disable the rest `callf` features: `/no-expand-env /no-subst-vars /no-esc`
 rem
 rem     >
-rem     "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" /ret-child-exit /no-subst-pos-vars /no-esc "" "cmd.exe /c @\"1.bat\" & \"${CONTOOLS_ROOT}/std/errlvl.bat\"\""
+rem     "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" /ret-child-exit /no-expand-env /no-subst-vars /no-esc "" "cmd.exe /c @\"1.bat\" & exit\""
 
 rem CAUTION:
 rem   The `call` operator will expand environment variables twice:

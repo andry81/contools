@@ -141,14 +141,14 @@ if %USE_MINTTY%0 EQU 0 goto SKIP_USE_MINTTY
 set MINTTY_CALLF_BARE_FLAGS=%CALLF_BARE_FLAGS%
 
 rem CAUTION:
-rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
-rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
+rem   The `& exit` is required to workaround `cmd.exe` not zero exit code issue.
+rem   See the `KNOWN ISSUES` section in the `README_EN.txt` from `contools--utils` project.
 rem
 rem CAUTION:
 rem   The MinTTY must call to `cmd.exe` script at first, not to `callf.exe`, to bypass weird MinTTY escape rules over backslash - `\`.
 
 rem The `start` exists here just in case the MinTTY would not close immediately after the start.
-start "" /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_ROOT:/=\%/exec/exec_mintty_prefix.bat" %* & "%CONTOOLS_ROOT:/=\%/std/errlvl.bat"
+start "" /B /WAIT %MINTTY_TERMINAL_PREFIX% -e "%CONTOOLS_ROOT:/=\%/exec/exec_mintty_prefix.bat" %* ^& exit
 
 rem to drop local variables
 setlocal & set LAST_ERROR=%ERRORLEVEL%
@@ -170,11 +170,11 @@ if /i "%CONEMU_INTERACT_MODE%" == "attach" %CONEMU_CMDLINE_ATTACH_PREFIX%
 if /i not "%CONEMU_INTERACT_MODE%" == "run" goto SKIP_USE_CONEMU
 
 rem CAUTION:
-rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
-rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
+rem   The `& exit` is required to workaround `cmd.exe` not zero exit code issue.
+rem   See the `KNOWN ISSUES` section in the `README_EN.txt` from `contools--utils` project.
 rem
 endlocal & %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
-  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" -cur_console:n ^
+  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& exit\"" -cur_console:n ^
   %*
 
 rem to drop local variables
@@ -187,11 +187,11 @@ exit /b %LAST_ERROR%
 :SKIP_USE_CONEMU
 
 rem CAUTION:
-rem   The `& "%CONTOOLS_ROOT%/std/errlvl.bat"` is required to workaround `cmd.exe` not zero exit code issue.
-rem   See the `KNOWN ISSUES` section in the `README_EN.txt`.
+rem   The `& exit` is required to workaround `cmd.exe` not zero exit code issue.
+rem   See the `KNOWN ISSUES` section in the `README_EN.txt` from `contools--utils` project.
 rem
 endlocal & "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
-  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
+  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& exit\"" ^
   %*
 
 rem to drop local variables
