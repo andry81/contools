@@ -28,7 +28,7 @@ set PRE_LOCK_ACQUIRE=0
       goto EXIT_FROM_PRELOCK
     )
 
-    rem make pushd to lock directory remove until start /D will be executed
+    rem make `pushd` to lock directory remove until `start /D` will be executed
     pushd "%LOCK_PATH%\%LOCK_DIR%" >nul 2>nul || (
       rem do not leave lock directory in case of push error
       rmdir /S /Q "%LOCK_PATH%\%LOCK_DIR%" >nul 2>nul
@@ -46,7 +46,7 @@ if %PRE_LOCK_ACQUIRE% EQU 0 (
 rem directory lock is executed successfully under the prelock, now is safe to remove the prelock file
 call :CLEANUP_PRELOCK
 
-rem Make pushd to lock directory remove until "start /D" will be executed.
+rem Make `pushd` to lock directory remove until `start /D` will be executed.
 rem Create nested directories to enable mutex commands.
 mkdir "%LOCK_PATH%\%LOCK_DIR%\%UNLOCK_DIR%"
 mkdir "%LOCK_PATH%\%LOCK_DIR%\%WAITERS_DIR%"

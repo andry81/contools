@@ -1,4 +1,7 @@
 2026.06.08:
+* changed: *.bat: `start` command call documented format
+
+2026.06.08:
 * refactor: scripts/tools/std/chcp.bat: minor documentation refactor
 
 2026.06.07:

@@ -136,9 +136,9 @@ exit /b
 
 :ENCODE
 if %NO_DEFAULT_FLAGS% NEQ 0 (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -i "%%TEMP_FILE_LIST%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start "" /B /WAIT "%%FFMPEG_TOOL_EXE%%" -f concat -i "%%TEMP_FILE_LIST%%"%%BARE_FLAGS%% "%%FILE_OUT%%"
 ) else if %ENABLE_REENCODE% NEQ 0 (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -map 0 -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
-) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -map 0 -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start "" /B /WAIT "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -map 0 -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
+) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start "" /B /WAIT "%%FFMPEG_TOOL_EXE%%" -f concat -safe 0 -i "%%TEMP_FILE_LIST%%" -c copy -map 0 -bsf:a aac_adtstoasc%%BARE_FLAGS%% "%%FILE_OUT%%"
 
 exit /b

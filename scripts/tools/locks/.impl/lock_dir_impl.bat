@@ -1,6 +1,6 @@
 @echo off
 
-rem external process script to lock directory by start /D command
+rem external process script to lock directory by `start /D` command
 
 setlocal
 

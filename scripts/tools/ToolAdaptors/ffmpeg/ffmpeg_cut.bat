@@ -97,7 +97,7 @@ if not exist "%FILE_IN%" (
 if %ENABLE_REENCODE% NEQ 0 set NO_DEFAULT_FLAGS=1
 
 if %NO_DEFAULT_FLAGS% NEQ 0 (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -i "%%FILE_IN%%"%%BARE_FLAGS%% -ss "%%TIME_START%%" -to "%%TIME_END%%" "%%FILE_OUT%%"
-) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start /B /WAIT "" "%%FFMPEG_TOOL_EXE%%" -i "%%FILE_IN%%" -map 0 -c copy%%BARE_FLAGS%% -ss "%%TIME_START%%" -to "%%TIME_END%%" "%%FILE_OUT%%"
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start "" /B /WAIT "%%FFMPEG_TOOL_EXE%%" -i "%%FILE_IN%%"%%BARE_FLAGS%% -ss "%%TIME_START%%" -to "%%TIME_END%%" "%%FILE_OUT%%"
+) else call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" start "" /B /WAIT "%%FFMPEG_TOOL_EXE%%" -i "%%FILE_IN%%" -map 0 -c copy%%BARE_FLAGS%% -ss "%%TIME_START%%" -to "%%TIME_END%%" "%%FILE_OUT%%"
 
 exit /b
