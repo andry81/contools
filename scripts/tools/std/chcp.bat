@@ -4,11 +4,10 @@ rem USAGE:
 rem   chcp.bat [-p] <code-page>
 
 rem CAUTION:
-rem   When the 65000 codepage is used then some of characters DOES BECOME
-rem   CONTROL CHARACTERS!
-rem   For example, the plus character (`+`) becomes the unicode codepoint
-rem   prefix character and expressions which contain this character like
-rem   `set BLABLA=1+1` WILL FAIL!
+rem   The `+` is affected by `65000` (UTF-7) code page because is the Unicode
+rem   shift character (See RFC 2152).
+rem   For example, the expressions like set /A X=1+1 and any other including
+rem   the plus character will be malformed.
 
 rem CAUTION:
 rem   The `chcp.com` does reset the standard input.

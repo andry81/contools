@@ -1,3 +1,6 @@
+2026.06.08:
+* refactor: scripts/tools/std/chcp.bat: minor documentation refactor
+
 2026.06.07:
 * fixed: scripts/tools/ToolAdaptors/__init__/__init__.bat: tool adaptor scripts initialization fixup
 * changed: *.bat: code improvement and cleanup
