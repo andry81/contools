@@ -130,7 +130,8 @@ rem redirect command line into temporary file to print it correctly
   setlocal DISABLEEXTENSIONS
   (PROMPT=$_)
   echo on
-  for %%z in (%%z) do rem |%*|
+  for %%z in (%%z) do ^
+rem |%*|
   @echo off
   endlocal
 ) > "%CMDLINE_TEMP_FILE%"
