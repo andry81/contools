@@ -1,4 +1,8 @@
 2026.06.19:
+* new: scripts/tests/unit/bat/test__safe_set_var_to_var.bat: unit tests for a safe variable to variable assign using %-syntax
+* new: scripts/tools/testlib/echo_*.bat: scripts to enable a script command line only echo without a prompt echo
+
+2026.06.19:
 * fixed: scripts/tests/__init__/__init__.bat: test scripts initialization fixup
 
 2026.06.16:
