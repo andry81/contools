@@ -1,3 +1,6 @@
+2026.06.19:
+* fixed: scripts/tests/__init__/__init__.bat: test scripts initialization fixup
+
 2026.06.16:
 * fixed: scripts/tools/std/*.bat: `The syntax of the command is incorrect.` in case of a very long command line
 
