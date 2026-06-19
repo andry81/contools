@@ -1,4 +1,7 @@
 2026.06.19:
+* changed: scripts/tests/*.bat: use `setlocal DISABLEDELAYEDEXPANSION` instead of `setlocal`
+
+2026.06.19:
 * new: scripts/tests/unit/bat/test__safe_set_var_to_var.bat: unit tests for a safe variable to variable assign using %-syntax
 * new: scripts/tools/testlib/echo_*.bat: scripts to enable a script command line only echo without a prompt echo
 

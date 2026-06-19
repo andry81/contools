@@ -1,6 +1,6 @@
 @echo off
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 if %TEST_LAST_ERROR% NEQ 0 (
   rem copy workingset on error

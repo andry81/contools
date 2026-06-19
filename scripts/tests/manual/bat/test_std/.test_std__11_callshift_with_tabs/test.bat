@@ -1,6 +1,6 @@
 @echo off
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 echo;	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
 
