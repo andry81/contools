@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.05.18
+* 2026.06.20
 * contools--testlib
 
 1. DESCRIPTION
@@ -45,27 +45,41 @@ https://github.com/andry81/externals
  |
  +- /`set_test_passed.bat`
  |    #
- |    # To manually set (increment) a test pass out of `testlib/test.bat` call.
+ |    # To manually set (increment) a test pass out of `test.bat` call.
  |
  +- /`set_test_skipped.bat`
  |    #
- |    # To manually set (increment) a test skip out of `testlib/test.bat` call.
+ |    # To manually set (increment) a test skip out of `test.bat` call.
  |
  +- /`set_test_failed.bat`
  |    #
- |    # To manually set (increment) a test fail out of `testlib/test.bat` call.
+ |    # To manually set (increment) a test fail out of `test.bat` call.
  |
  +- /`load_test_locals.bat`
  |    #
- |    # To manually load a test local variables out of `testlib/test.bat` call.
+ |    # To manually load a test local variables out of `test.bat` call.
  |
  +- /`save_test_locals.bat`
+ |    #
+ |    # To manually save a test local variables out of `test.bat` call.
+ |
+ +- /`echo_on.bat`
+ |    #
+ |    # To call `echo on` with empty prompt and a command call at the end.
+ |    # Enables to echo a test commands out to the console as is until the
+ |    # `echo_off.bat` script (with the `@` prefix before the `call` if
+ |    # required) is called.
+ |
+ +- /`echo_off.bat`
       #
-      # To manually save a test local variables out of `testlib/test.bat` call.
+      # To call `echo off` with previous prompt restore and a command call at
+      # the end.
 
 -------------------------------------------------------------------------------
 4. VARIABLES
 -------------------------------------------------------------------------------
+
+Most notable variables:
 
 * TESTLIB__OUTER_CP
 
@@ -74,24 +88,23 @@ https://github.com/andry81/externals
 
 * TESTLIB__PREV_CP
 
-  A previous code page after `testlib/set_inner_cp.bat` call.
+  A previous code page after `set_inner_cp.bat` call.
   Defined if `SETUP_CP` defined.
 
 * TESTLIB__CURRENT_CP
 
-  A current code page after `testlib/getcp.bat` call.
+  A current code page after `getcp.bat` call.
   Defined if `SETUP_CP` defined.
 
 * SETUP_CP
 
-  If defined, then enables `testlib/set_inner_cp.bat`,
-  `testlib/set_prev_cp.bat` and `testlib/set_outer_cp.bat` to be used in all
-  `testlib` functions.
+  If defined, then enables `set_inner_cp.bat`, `set_prev_cp.bat` and
+  `set_outer_cp.bat` script inner calls in all library functions.
 
 * TEST_PREV_ERROR
 
-  The previous exit code before enter the `testlib/test*.bat` script.
-  Does not reset at the end of `testlib/test*.bat` or `testlib/set_test_*.bat`
+  The previous exit code before enter the `test*.bat` script.
+  Does not reset at the end of `test*.bat` or `set_test_*.bat`
   scripts. The user is responsible to save or reset it in each test explicitly.
 
 * TEST_LAST_ERROR
@@ -108,8 +121,12 @@ https://github.com/andry81/externals
 
 * TEST_IMPL_SKIP
 
-  State variable to skip tests in a group. Each `testlib/init.bat` call does
-  reset it. The `TEST_IMPL_ERROR` variable does set to `-1` in case of a skip.
+  State variable to skip tests in a group. Each `init.bat` call does reset it.
+  The `TEST_IMPL_ERROR` variable does set to `-1` in case of a skip.
+
+NOTE:
+  The rest of variables can be found using the `TESTLIB__` and `TEST_`
+  prefixes.
 
 -------------------------------------------------------------------------------
 5. SCRIPTS
@@ -137,37 +154,38 @@ structure format (in a call order):
 
   /<user-test-script>.bat
     A test user script.
-    Calls once to `testlib/init.bat`, multiple times to
-    `testlib/test.bat` and once to `testlib/exit.bat`.
+    Must call once to the library `init.bat` script, multiple times to
+    `test.bat` script in the middle and once to `exit.bat` script.
 
   /.<user-test-script>/setup.bat
     [OPTIONAL]
-    A test first time setup handler, calls from `testlib/init.bat`.
+    A test first time setup handler, calls from the library `init.bat` script.
 
   /.<user-test-script>/teardown.bat
     [OPTIONAL]
-    A test last time tear down handler, calls from `testlib/exit.bat`.
+    A test last time tear down handler, calls from the library `exit.bat`
+    script.
 
   /.<user-test-script>/init.bat
     [OPTIONAL]
-    A test initialization handler, required to process a test command
-    line arguments, calls from `testlib/test.bat`.
+    A test initialization handler, required to process a test command line
+    arguments, calls from the library `test.bat` script.
 
   /.<user-test-script>/impl.bat
     [REQUIRED]
     A test implementation handler, does not have a command line
     arguments, checks a user test variables and returns exit code to trigger
-    a success or a fail, sets `TEST_IMPL_ERROR` variable to store a test exit
-    code, calls from `testlib/test.bat`.
+    a success, a skip or a fail, sets `TEST_IMPL_ERROR` variable to store a
+    test exit code, calls from the library `test.bat` script.
     Does not call if `/.<user-test-script>/init.bat` has returned a not zero
     exit code.
 
   /.<user-test-script>/exit.bat
     [OPTIONAL]
     A test exit handler, checks a user test variables and returns exit code
-    to trigger a success or a fail, useful if required to copy test data out
-    of a test script temporary output directory, calls from
-    `testlib/test.bat`.
+    to trigger a success, a skip or a fail, useful if required to copy test
+    data out of a test script temporary output directory, calls from the
+    library `test.bat` script.
     Always calls after `/.<user-test-script>/impl.bat`.
     Can use `TEST_LAST_ERROR` variable to use the exit code either of
     `/.<user-test-script>/init.bat` or `/.<user-test-script>/impl.bat`, and
@@ -192,18 +210,18 @@ NOTE:
   The `.<user-test-script>` parent directory can be changed by using the
   `TEST_SCRIPT_HANDLERS_DIR` variable.
 
-In case if a user test is isolated and can not be called from the
-`testlib/test.bat` for some reason, then you can:
+In case if a user test is isolated and can not be called from the library
+`test.bat` script for some reason, then you can:
 
-  1. Use `testlib/init.bat` and `testlib/exit.bat` to manual init/exit.
-  2. Use `testlib/load_test_locals.bat` and `testlib/save_test_locals.bat`
+  1. Use the library `init.bat` and `exit.bat` scripts for a manual init/exit.
+  2. Use the library `load_test_locals.bat` and `save_test_locals.bat` scripts
      to load/save test local variables in an isolated environment.
-  3. Use `testlib/set_test_*.bat` to set a test run status which includes a
-     test local variables save.
+  3. Use the library `set_test_*.bat` scripts to set a test run status which
+     includes a test local variables save.
 
 CAUTION:
-  You must not call to `testlib/init.bat`, `testlib/test.bat`,
-  `testlib/exit.bat` from a handler script.
+  You must not call to the library `init.bat`, `test.bat`, `exit.bat` scripts
+  from a handler script.
 
 -------------------------------------------------------------------------------
 6. TESTS CATALOG EXAMPLE
@@ -279,6 +297,8 @@ __init__.bat:
 
   if defined MY_PROJECT_TESTS_INIT0_DIR if exist "%MY_PROJECT_TESTS_INIT0_DIR%\*" exit /b 0
 
+  set INIT_EXTERNALS=1
+
   call "%%~dp0..\..\__init__\__init__.bat" || exit /b
 
   set "MY_PROJECT_TESTS_INIT0_DIR=%~dp0"
@@ -334,7 +354,7 @@ script_init.bat:
   rem if 0%SCRIPT_INIT% EQU 0 (
   rem   rem CPU name to compare bench tests
   rem   call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\wbem\wmic.exe" cpu get Caption,Name
-  куь   set SCRIPT_INIT=1
+  rem   set SCRIPT_INIT=1
   rem )
 
   rem The caller can continue after this exit.
