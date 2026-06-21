@@ -1,3 +1,6 @@
+2026.06.21:
+* refactor: scripts/tools/testlib/echo_*.bat: minor refactor
+
 2026.06.20:
 * changed: scripts/tools/testlib/README_EN.txt: readme update
 
