@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
-scripts/tools/ToolAdapters/vbs/make_shortcut.vbs,
-scripts/tools/ToolAdapters/vbs/update_shortcut.vbs,
-scripts/tools/ToolAdapters/vbs/reset_shortcut.vbs
+scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs,
+scripts/tools/ToolAdaptors/vbs/update_shortcut.vbs,
+scripts/tools/ToolAdaptors/vbs/reset_shortcut.vbs
 -------------------------------------------------------------------------------
 
 * Rewrite to assign a short path version only after compare of the path before
@@ -13,6 +13,27 @@ scripts/tools/ToolAdapters/vbs/reset_shortcut.vbs
   exist, then the short path version is requested. This would not work if the
   path after assignment is truncated or corrupted to a path that accidentally
   exist.
+
+-------------------------------------------------------------------------------
+scripts/tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat,
+scripts/tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat
+-------------------------------------------------------------------------------
+
+* Try to create a shortcut previous working directory path starting a root
+  directory in a temporary directory and mount the path root directory to
+  unexisted drive letter (using `mklink` or `junction.exe`, administrator
+  permissions is required before the execution) from the previous working
+  directory. If the drive letter already exist, then replicate the unexisted
+  path using the existed drive letter to make the previous working directory
+  exist.
+
+  This will circumvent the read of a shortcut TargetPath property for unlinked
+  drive or for a partially unexisted target path.
+  The shell COM component interfaces prevent to read such paths and so to fix
+  them.
+
+  Add flags:
+    -allow_replicate_unexisted_paths
 
 -------------------------------------------------------------------------------
 scripts/tools/std: xcopy_*.bat, xmove_*.bat
