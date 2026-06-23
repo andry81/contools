@@ -1,4 +1,4 @@
-''' Call an executable through the `WScript.Shell.Run` function.
+''' Calls an executable through the `WScript.Shell.Run` function.
 
 ''' USAGE:
 '''   call.vbs
@@ -171,7 +171,6 @@
 '''     line parameters separator additionally to the space character.
 '''     You must use the `-q-sep " ,"` option to workaround the issue for the
 '''     `cmd.exe` command line.
-'''
 
 ''' CAUTION:
 '''   Windows Scripting Host version 5.8 (Windows 7, 8, 8.1) has an issue
@@ -212,7 +211,6 @@
 '''
 '''   Another workaround is to split the `Or` expression in a single `If` by a
 '''   sequence of `If`/`ElseIf` conditions.
-'''
 
 Sub GrowArr(arr, size)
     Dim reserve : reserve = UBound(arr) + 1

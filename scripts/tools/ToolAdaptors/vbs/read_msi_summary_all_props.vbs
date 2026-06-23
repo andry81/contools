@@ -1,4 +1,4 @@
-''' Read an MSI/MSP file summary all property values.
+''' Reads an MSI/MSP file summary all property values.
 
 ''' USAGE:
 '''   read_msi_summary_all_props.vbs
@@ -40,7 +40,51 @@
 '''   https://learn.microsoft.com/windows/win32/msi/summaryinfo-summaryinfo
 '''   https://learn.microsoft.com/windows/win32/msi/windows-installer-scripting-examples (`WiSumInf.vbs` script)
 '''   https://github.com/Microsoft/Windows-classic-samples/tree/HEAD/Samples/Win7Samples/sysmgmt/msi/scripts
+
+''' CAUTION:
+'''   Windows Scripting Host version 5.8 (Windows 7, 8, 8.1) has an issue
+'''   around a conditional expression:
+'''     `If Expr1 Or Expr2 ...`
+'''   , where `Expr2` does execute even if `Expr1` is `True`.
 '''
+'''   Additionally, there is another issue, when the `Expr2` can trigger the
+'''   corruption of following code.
+'''
+'''   The case is found in the `Expr2` expression, where a function does write
+'''   into it's input parameter.
+'''
+'''   To workaround that we must declare a temporary parameter in the function
+'''   of the `Expr2` and write into a temporary variable instead of an input
+'''   parameter.
+'''
+'''   Example of potentially corrupted code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       MyVar1 = ... ' write into input parameter triggers the issue
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' code here is potentially corrupted
+'''     End If
+'''
+'''   Example of workarounded code:
+'''
+'''     Dim Expr1 : Expr1 = True ' or returned from a function call
+'''     Function Expr2(MyVar1)
+'''       Dim TempVar1 : TempVar1 = MyVar1
+'''       TempVar1 = ... ' write into temporary parameter instead
+'''     End Function
+'''     If Expr1 Or Expr2 Then
+'''       ... ' workarounded
+'''     End If
+'''
+'''   Another workaround is to split the `Or` expression in a single `If` by a
+'''   sequence of `If`/`ElseIf` conditions.
+
+''' CAUTION:
+'''   The `WScript.std[out|err].WriteLine STR` functions has issue with the
+'''   last line desynchronization between streams.
+'''   To workaround use `WScript.std[out|err].Write STR & vbCrLf` instead.
 
 Function IsNothing(obj)
   If IsEmpty(obj) Then
@@ -117,9 +161,9 @@ End Function
 
 Sub PrintOrEchoLine(str)
   On Error Resume Next
-  WScript.stdout.WriteLine str
+  WScript.stdout.Write str & vbCrLf
   If err = 5 Then ' Access is denied
-    WScript.stdout.WriteLine FixStrToPrint(str)
+    WScript.stdout.Write FixStrToPrint(str) & vbCrLf
   ElseIf err = &h80070006& Then
     WScript.Echo str
   End If
@@ -128,9 +172,9 @@ End Sub
 
 Sub PrintOrEchoErrorLine(str)
   On Error Resume Next
-  WScript.stderr.WriteLine str
+  WScript.stderr.Write str & vbCrLf
   If err = 5 Then ' Access is denied
-    WScript.stderr.WriteLine FixStrToPrint(str)
+    WScript.stderr.Write FixStrToPrint(str) & vbCrLf
   ElseIf err = &h80070006& Then
     WScript.Echo str
   End If

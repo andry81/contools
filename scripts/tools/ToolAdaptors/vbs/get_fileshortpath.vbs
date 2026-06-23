@@ -5,11 +5,15 @@
 
 ''' NOTE:
 '''   This script does not require the Administrator privileges.
-'''
 
 ''' CAUTION:
 '''   The file or directory must have has the short file name otherwise the
 '''   script will return the long path.
+
+''' CAUTION:
+'''   The `WScript.std[out|err].WriteLine STR` functions has issue with the
+'''   last line desynchronization between streams.
+'''   To workaround use `WScript.std[out|err].Write STR & vbCrLf` instead.
 
 Function IsEmptyArg(args, index)
   ''' Based on: https://stackoverflow.com/questions/4466967/how-can-i-determine-if-a-dynamic-array-has-not-be-dimensioned-in-vbscript/4469121#4469121
@@ -74,9 +78,9 @@ End Function
 
 Sub PrintOrEchoLine(str)
   On Error Resume Next
-  WScript.stdout.WriteLine str
+  WScript.stdout.Write str & vbCrLf
   If err = 5 Then ' Access is denied
-    WScript.stdout.WriteLine FixStrToPrint(str)
+    WScript.stdout.Write FixStrToPrint(str) & vbCrLf
   ElseIf err = &h80070006& Then
     WScript.Echo str
   End If
@@ -85,9 +89,9 @@ End Sub
 
 Sub PrintOrEchoErrorLine(str)
   On Error Resume Next
-  WScript.stderr.WriteLine str
+  WScript.stderr.Write str & vbCrLf
   If err = 5 Then ' Access is denied
-    WScript.stderr.WriteLine FixStrToPrint(str)
+    WScript.stderr.Write FixStrToPrint(str) & vbCrLf
   ElseIf err = &h80070006& Then
     WScript.Echo str
   End If

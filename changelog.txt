@@ -1,4 +1,8 @@
 2026.06.23:
+* fixed: scripts/tools/ToolAdaptors/*.vbs: stdout and stderr line ends output mix
+* refactor: scripts/tools/ToolAdaptors/*.vbs: refactor
+
+2026.06.23:
 * changed: TODO.txt: todo update
 
 2026.06.21:

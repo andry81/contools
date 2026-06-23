@@ -45,7 +45,6 @@
 '''
 '''   Another workaround is to split the `Or` expression in a single `If` by a
 '''   sequence of `If`/`ElseIf` conditions.
-'''
 
 Const ForReading = 1
 
