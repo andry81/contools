@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.06.20
+* 2026.06.25
 * contools--testlib
 
 1. DESCRIPTION
@@ -95,6 +95,10 @@ Most notable variables:
 
   A current code page after `getcp.bat` call.
   Defined if `SETUP_CP` defined.
+
+* TESTLIB__MANUAL
+
+  If set then does not print tests pass statistic at the end.
 
 * SETUP_CP
 
@@ -283,6 +287,7 @@ config.system.vars.in:
 
   * unit
   * manual
+  * probe (mix of manual+unit)
   * bench
   * ...
 

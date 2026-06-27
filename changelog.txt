@@ -1,3 +1,13 @@
+2026.06.27:
+* fixed: scripts/tools/std/strlen.bat: improved a string length limits
+* new: scripts/tests/unit/bat/test_std/test_std__00_strlen: `strlen.bat` unit tests for string length limit
+* new: scripts/tests/bench/bat/test_std/test_std__10_strlen.bat: more `strlen.bat` bench tests
+* new: scripts/tests/probe/bat/test_std/test_std__00_strlen_limit.bat: `strlen.bat` probe tests
+* changed: scripts/tools/testlib/README_EN.txt: readme update
+* refactor: scripts/tools/std/strlen.bat: refactor
+* refactor: scripts/tests/unit/bat/test_std/test_std__00_strlen: unit tests refactor
+* refactor: scripts/tests/bench/bat/test_std: bench tests refactor
+
 2026.06.23:
 * fixed: scripts/tools/ToolAdaptors/*.vbs: stdout and stderr line ends output mix
 * refactor: scripts/tools/ToolAdaptors/*.vbs: refactor

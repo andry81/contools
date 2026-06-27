@@ -7,11 +7,13 @@ if %IMPL_MODE%0 EQU 0 exit /b
 
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
-for %%i in ("%TESTS_PROJECT_ROOT%\test_std\%~n0\test_std__*.bat") do (
+for %%i in ("%TESTS_PROJECT_ROOT%\test_*.bat") do (
   set "SCRIPT_NAME=%%~ni"
   set "SCRIPT_FILE=%%i"
   call "%%CONTOOLS_ROOT%%/std/if_.bat" ^
     "%%SCRIPT_NAME:!=%%" == "%%SCRIPT_NAME%%" ^
+    if not "%%SCRIPT_FILE:*\%~nx0=%%" == "" ^
+    if "%%SCRIPT_FILE:*\test__=%%" == "%%SCRIPT_FILE%%" ^
       && call "%%SCRIPT_FILE%%"
 )
 
