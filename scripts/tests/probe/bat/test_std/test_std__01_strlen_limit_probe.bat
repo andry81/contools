@@ -19,8 +19,6 @@ if %IMPL_MODE%0 EQU 0 exit /b
 call "%%CONTOOLS_ROOT%%/std/assert_if_def.bat" __CTRL_SETLOCAL "error: cmd.exe is broken, please restart it!" && set "__CTRL_SETLOCAL=1"
 call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" || exit /b
 
-echo;^>%~nx0
-
 rem CAUTION:
 rem   The `STR_`, `STRB` and `STRL` variable names must has the same lengths,
 rem   otherwise the algorithm would fluctuate.
@@ -87,6 +85,8 @@ set /A LEN=2+4+1+STR_LEN_LIMIT
 if !LEN! EQU 8191 (
   call "%%CONTOOLS_TESTLIB_ROOT%%/set_test_passed.bat"
 ) else call "%%CONTOOLS_TESTLIB_ROOT%%/set_test_failed.bat"
+
+endlocal
 
 echo;
 

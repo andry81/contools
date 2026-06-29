@@ -11,9 +11,6 @@ rem CAUTION:
 rem   Assignment through the delayed expansion in case of a command line buffer
 rem   overflow will drop a variable!
 
-rem NOTE:
-rem   For the trim details see the `probe` tests.
-
 setlocal DISABLEDELAYEDEXPANSION
 
 call "%%~dp0__init__/script_init.bat" %%0 %%* || exit /b
@@ -51,8 +48,6 @@ set "__QSTR3__=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 rem line length >= 8196 (crash in Windows 8.1)
 rem set "__QSTR4__=...aABCDE"
-
-setlocal ENABLEDELAYEDEXPANSION
 
 call :TEST 8180 __STR0__
 call :TEST 8181 __STR1__

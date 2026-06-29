@@ -1,4 +1,8 @@
 2026.06.29:
+* fixed: scripts/tests/probe/bat/test_std: execution fixup
+* refactor: scripts/tests/probe/bat/test_std/test_std__02_strlen_limit.bat: moved from unit tests
+
+2026.06.29:
 * changed: scripts/tools/testlib: init.bat, exit.bat, load_test_locals.bat, test_entry.bat: the delayed expansion extension must be disabled before call main `testlib` scripts
 
 2026.06.27:
