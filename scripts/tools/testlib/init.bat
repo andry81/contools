@@ -23,6 +23,11 @@ rem   If the script is returned the zero code, then you must call to `exit.bat`
 rem   respectively, otherwise the code page may be left changed.
 :DOC_END
 
+if "!!" == "" (
+  echo;%~nx0: error: delayed expansion extension must be disabled.
+  exit /b 255
+)
+
 rem initialize testlib module
 call "%%~dp0__init__.bat" || exit /b
 

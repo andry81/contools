@@ -1,3 +1,6 @@
+2026.06.29:
+* changed: scripts/tools/testlib: init.bat, exit.bat, load_test_locals.bat, test_entry.bat: the delayed expansion extension must be disabled before call main `testlib` scripts
+
 2026.06.27:
 * fixed: scripts/tools/std/strlen.bat: improved a string length limits
 * new: scripts/tests/unit/bat/test_std/test_std__00_strlen: `strlen.bat` unit tests for string length limit

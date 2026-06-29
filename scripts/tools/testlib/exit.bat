@@ -15,6 +15,11 @@ rem CAUTION:
 rem   The script can be nest called, but nesting is limited up to 31 calls.
 :DOC_END
 
+if "!!" == "" (
+  echo;%~nx0: error: delayed expansion extension must be disabled.
+  exit /b 255
+)
+
 if %TESTLIB__INIT%0 EQU 0 (
   echo;%~nx0: error: test is not initialized.
   exit /b 255

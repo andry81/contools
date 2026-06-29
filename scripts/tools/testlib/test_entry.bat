@@ -1,4 +1,11 @@
-@echo off & set "TEST_PREV_ERROR=%ERRORLEVEL%"
+@echo off
+
+if "!!" == "" (
+  echo;%~nx0: error: delayed expansion extension must be disabled.
+  exit /b 255
+)
+
+set "TEST_PREV_ERROR=%ERRORLEVEL%"
 
 if exist "%TEST_SCRIPT_HANDLERS_DIR%/.%TEST_SCRIPT_FILE_NAME%/entry\*" (
   if defined TEST_ENTRY (
