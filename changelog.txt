@@ -1,3 +1,6 @@
+2026.06.30:
+* refactor: ._install/install_system64_link.bat: minor refactor
+
 2026.06.29:
 * fixed: scripts/tests/probe/bat/test_std: execution fixup
 * refactor: scripts/tests/probe/bat/test_std/test_std__02_strlen_limit.bat: moved from unit tests

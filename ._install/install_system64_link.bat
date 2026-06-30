@@ -13,8 +13,8 @@ rem           >
 rem           if exist "%SystemRoot%\Sysnative\*" ...
 rem     2. The `Sysnative` directory doesn't exist on the Windows XP x64 and
 rem        lower.
-rem     3. If the directory is visible the `Sysnative/cmd.exe` can not be run
-rem        under the Administrator user.
+rem     3. If the directory is visible, then `ShellExecute` can not find
+rem        `.../Sysnative/cmd.exe` path to run under the Administrator user.
 rem
 rem   For above reasons we should create another directory additionally to the
 rem   `Sysnative` one which is:
@@ -23,6 +23,8 @@ rem   1. Visible from any application bitness mode and the Windows version.
 rem   2. Has no specific privilege rights restriction by the system and
 rem      `cmd.exe` executable can be run under administrator user w/o any
 rem      additional manipulations.
+rem   3. All the privileges including the owner is transferred from the target
+rem      directory to replicate the exact rights permissions.
 
 rem NOTE:
 rem   In case of a standalone usage in the Windows XP the `junction.exe`
