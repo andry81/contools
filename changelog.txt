@@ -1,4 +1,8 @@
 2026.06.30:
+* fixed: scripts/tools/ToolAdaptors/vbs/set_fileshortname.bat: `mshta.exe` command line length limitation workaround through environment variables usage
+* changed: scripts/tools/ToolAdaptors/vbs/set_fileshortname.bat: code refactor
+
+2026.06.30:
 * refactor: ._install/install_system64_link.bat: minor refactor
 
 2026.06.29:
