@@ -1,3 +1,8 @@
+2026.07.14:
+* changed: *.sh: removed all shell scrips
+* changed: scripts/tools/ToolAdaptors/sh/detect_find.sh: moved to `tacklelib` project
+* changed: README_EN.txt: readme update
+
 2026.06.30:
 * fixed: scripts/tools/ToolAdaptors/vbs/set_fileshortname.bat: `mshta.exe` command line length limitation workaround through environment variables usage
 * changed: scripts/tools/ToolAdaptors/vbs/set_fileshortname.bat: code refactor

@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.06.02
+* 2026.07.14
 * contools
 
 1. DESCRIPTION
@@ -16,10 +16,7 @@
 -------------------------------------------------------------------------------
 1. DESCRIPTION
 -------------------------------------------------------------------------------
-A wide range of scripts for Windows interpreter (cmd.exe) and other
-interpreters such as bash shell (.sh), visual basic (.vbs), python (.py) and
-so on. Plus some set of standalone console utilities and tools aside other
-utilities and tools from cygwin, msys and mingw.
+Library for Windows Batch interpreter (cmd.exe) and Visual Basic Script (.vbs).
 
 The rest is extracted into standalone repositories beginning by `contools--`.
 
@@ -91,60 +88,16 @@ Currently used these set of prerequisites to run with or from:
 
 1. OS platforms
 2. Interpreters
-3. Applications
 
 1. OS platforms:
 
 * Windows XP x86 SP3/x64 SP2
 * Windows 7+
 
-* Cygwin 1.5+ or 3.0+ (`.sh` only):
-  https://cygwin.com
-  - to run scripts under cygwin
-
-* Msys2 20190524+ (`.sh` only):
-  https://www.msys2.org
-  - to run scripts under msys2
-
-* Linux Mint 18.3 x64 (`.sh` only)
-
 2. Interpreters:
-
-* bash shell 3.2.48+
-  - to run unix shell scripts
-
-* python 3.7.3 or 3.7.5 (3.4+ or 3.5+)
-  https://python.org
-  - standard implementation to run python scripts
-  - 3.7.4 has a bug in the `pytest` module execution (see `KNOWN ISSUES`
-    section).
-  - 3.6.2+ is required due to multiple bugs in the python implementation prior
-    this version (see `KNOWN ISSUES` section).
-  - 3.5+ is required for the direct import by a file path (with any extension)
-    as noted in the documentation:
-    https://docs.python.org/3/library/importlib.html#importing-a-source-file-directly
 
 * Windows Script Host 5.8+
   - standard implementation to run vbs scripts
-
-3. Applications:
-
-* subversion 1.8+
-  https://tortoisesvn.net
-  - to run svn client
-
-* git 2.24+
-  https://git-scm.com
-  - to run git client
-
-* cygwin cygpath 1.42+
-  - to run `bash_entry` script under cygwin
-
-* msys cygpath 3.0+
-  - to run `bash_entry` script under msys2
-
-* cygwin readlink 6.10+
-  - to run specific bash script functions with `readlink` calls
 
 -------------------------------------------------------------------------------
 6. DEPENDENCIES
@@ -161,29 +114,10 @@ https://github.com/andry81/externals
 -------------------------------------------------------------------------------
 8. DEPLOY
 -------------------------------------------------------------------------------
-Before use the project you have to deploy some files from it.
+To run specific Windows Batch scripts (.bat) you should run the installation
+script:
 
-1. To run bash shell scripts (`.sh` file extension) you should either copy
-   these scripts:
-
-* /_externals/tacklelib/bash/tacklelib/bash_entry
-* /_externals/tacklelib/bash/tacklelib/bash_tacklelib
-
-into the `/bin` directory of your platform.
-
-In pure Linux you have additional step to make scripts executable or readable:
-
->
-sudo chmod ug+x /bin/bash_entry
-sudo chmod o+r  /bin/bash_entry
-sudo chmod a+r  /bin/bash_tacklelib
-
-Or add `/_externals/tacklelib/bash/tacklelib` directory into `PATH` variable.
-
-2. To run specific Windows Shell scripts (`.bat` file extension) you should run
-   the installation script:
-
-* /_install.bat`
+* _install.bat`
 
 -------------------------------------------------------------------------------
 9. TESTS
@@ -192,6 +126,7 @@ Or add `/_externals/tacklelib/bash/tacklelib` directory into `PATH` variable.
 
   ** scripts/tests/manual/bat
   ** scripts/tests/unit/bat
+  ** scripts/tests/probe/bat
   ** scripts/tests/bench/bat
 
 -------------------------------------------------------------------------------
