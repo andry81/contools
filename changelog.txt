@@ -1,3 +1,6 @@
+2026.07.15:
+* changed: README.md: readme update
+
 2026.07.14:
 * changed: *.sh: removed all shell scrips
 * changed: scripts/tools/ToolAdaptors/sh/detect_find.sh: moved to `tacklelib` project
