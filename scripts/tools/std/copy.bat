@@ -27,6 +27,10 @@ rem       3. The `%%~f` builtin variables extension and other extensions does
 rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 
+rem CAUTION:
+rem   The `copy`, `move` and `rename` commands does not process files with the
+rem   hidden attribute.
+
 rem <flags>:
 rem   -chcp <code-page>
 rem     Set explicit code page.
@@ -177,9 +181,12 @@ if not exist "\\?\%FROM_PATH_ABS%" (
   exit /b -251
 ) >&2
 
+:INIT
+call "%%?~dp0%%__init__.bat" || exit /b
+
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%FLAG_CHCP%%
 
-call "%%?~dp0%%setshift.bat" 2 COPY_FLAGS_ %%*
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" 2 COPY_FLAGS_ %%*
 
 rem WORKAROUND: replace all quotes in flags to avoid accidental use as positional arguments
 if defined COPY_FLAGS_ set "COPY_FLAGS_=%COPY_FLAGS_:"=%"
@@ -192,4 +199,4 @@ if defined COPY_FLAGS_ (
   copy "%FROM_PATH_ABS%" "%TO_PATH_ABS%"
 )
 
-if defined FLAG_CHCP call "%%?~dp0%%restorecp.bat"
+if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"

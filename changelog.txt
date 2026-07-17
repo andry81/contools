@@ -1,3 +1,11 @@
+2026.07.17:
+* fixed: scripts/tools/std: copy.bat, touch_file.bat: missed initialization
+* fixed: scripts/tools/std/touch_file.bat: missed the hidden file attribute reset
+* changed: scripts/tools/std: copy.bat, xcopy_*.bat, xmove_*.bat: reverted to `CONTOOLS_ROOT` variable usage
+* changed: scripts/tools/stdtouch_file.bat: moved file attributes reset into vbs code
+* changed: scripts/tools/std/is_str_shorter_than.bat: code refactor
+* refactor: scripts/tools/std: copy.bat, xcopy_*.bat, xmove_*.bat: code refactor
+
 2026.07.15:
 * changed: README.md: readme update
 

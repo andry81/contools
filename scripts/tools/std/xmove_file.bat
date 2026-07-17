@@ -23,6 +23,10 @@ rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 
 rem CAUTION:
+rem   The `copy`, `move` and `rename` commands does not process files with the
+rem   hidden attribute.
+
+rem CAUTION:
 rem   The `move` has a file path limit up to 257 characters in a path. To
 rem   bypass that limitation we falls back to use `robocopy.exe` instead
 rem   (Windows Vista and higher ONLY) if the `move` fails.
@@ -340,7 +344,7 @@ call "%%?~dp0%%__init__.bat" || exit /b
 
 set /A FLAG_SHIFT+=3
 
-call "%%?~dp0%%setshift.bat" %%FLAG_SHIFT%% XMOVE_FLAGS_ %%*
+call "%%CONTOOLS_ROOT%%/std/setshift.bat" %%FLAG_SHIFT%% XMOVE_FLAGS_ %%*
 
 rem WORKAROUND: replace all quotes in flags to avoid accidental use as positional arguments
 if defined XMOVE_FLAGS_ set "XMOVE_FLAGS_=%XMOVE_FLAGS_:"=%"
@@ -432,14 +436,14 @@ rem   We must expand the command line into a variable to avoid these above.
 set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "TO_PATH=%%i" & call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "TO_PATH=%%i" & call "%%CONTOOLS_ROOT%%/std/touch_file.bat" "%%TO_PATH%%"
 ) else if %XMOVE_DIR_RECUR% EQU 0 (
-  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "TO_PATH=%%i" & call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "TO_PATH=%%i" & call "%%CONTOOLS_ROOT%%/std/touch_file.bat" "%%TO_PATH%%"
 ) else for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
-    if %FLAG_TOUCH_DIR% NEQ 0 call "%%?~dp0%%touch_dir.bat" "%%TO_PATH%%"
-  ) else if %FLAG_TOUCH_FILE% NEQ 0 call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
+    if %FLAG_TOUCH_DIR% NEQ 0 call "%%CONTOOLS_ROOT%%/std/touch_dir.bat" "%%TO_PATH%%"
+  ) else if %FLAG_TOUCH_FILE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/touch_file.bat" "%%TO_PATH%%"
 )
 
 endlocal
@@ -537,14 +541,14 @@ rem   We must expand the command line into a variable to avoid these above.
 set ?.=@dir "%TO_PATH_ABS%"%BUILTIN_DIR_CMD_BARE_FLAGS% /B /O:N /S 2^>nul
 
 if %FLAG_TOUCH_DIR% EQU 0 (
-  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "TO_PATH=%%i" & call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "TO_PATH=%%i" & call "%%CONTOOLS_ROOT%%/std/touch_file.bat" "%%TO_PATH%%"
 ) else if %XMOVE_DIR_RECUR% EQU 0 (
-  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "TO_PATH=%%i" & call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
+  for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "TO_PATH=%%i" & call "%%CONTOOLS_ROOT%%/std/touch_file.bat" "%%TO_PATH%%"
 ) else for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
   set "TO_PATH=%%i"
   if exist "\\?\%TO_PATH%\*" (
-    if %FLAG_TOUCH_DIR% NEQ 0 call "%%?~dp0%%touch_dir.bat" "%%TO_PATH%%"
-  ) else if %FLAG_TOUCH_FILE% NEQ 0 call "%%?~dp0%%touch_file.bat" "%%TO_PATH%%"
+    if %FLAG_TOUCH_DIR% NEQ 0 call "%%CONTOOLS_ROOT%%/std/touch_dir.bat" "%%TO_PATH%%"
+  ) else if %FLAG_TOUCH_FILE% NEQ 0 call "%%CONTOOLS_ROOT%%/std/touch_file.bat" "%%TO_PATH%%"
 )
 
 endlocal

@@ -24,6 +24,25 @@ rem
 rem   Partially based on this:
 rem     https://superuser.com/questions/10426/windows-equivalent-of-the-linux-command-touch/764725#764725
 
+rem CAUTION:
+rem   The `copy`, `move` and `rename` commands does not process files with the
+rem   hidden attribute.
+rem   The `attrib.exe -r` does not reset the Read-Only attribute from hidden
+rem   files.
+
+rem CAUTION:
+rem   The `... >> \\?\...` nor `copy \\?\...` does not support long file paths to an existed file.
+rem   So we test on a long file path existence and if a long path, then move the file to a temporary directory,
+rem   touch it and move back.
+
+rem CAUTION:
+rem   If the file were deleted before, then the creation date will be set by `... >> ...` from the previously deleted file!
+
+rem CAUTION:
+rem   The `... >> ...` does not work as expected on Windows XP.
+
+rem TODO: Windows XP `robocopy` workaround
+
 rem <path>...
 rem   File path list.
 :DOC_END
@@ -32,6 +51,7 @@ if %CONTOOLS_VERBOSE%0 NEQ 0 echo;^>%~nx0 %*
 
 setlocal
 
+set "?~dp0=%~dp0"
 set "?~n0=%~n0"
 
 rem script names call stack
@@ -46,6 +66,8 @@ if not defined FILE_PATH (
   echo;%?~%: error: at least one file path argument must be defined.
   exit /b -255
 ) >&2
+
+call "%%?~dp0%%__init__.bat" || exit /b
 
 :TOUCH_FILE_LOOP
 
@@ -93,17 +115,13 @@ if not exist "\\?\%FILE_DIR%\*" (
   goto CONTINUE
 ) >&2
 
-rem CAUTION:
-rem   The `... >> \\?\...` nor `copy \\?\...` does not support long file paths to an existed file.
-rem   So we test on a long file path existence and if a long path, then move the file to a temporary directory,
-rem   touch it and move back.
-
-rem CAUTION:
-rem   If the file were deleted before, then the creation date will be set by `... >> ...` from the previously deleted file!
+set "FILE_ATTR=."
 
 if not exist "\\?\%FILE_PATH%" call;> "\\?\%FILE_PATH%" & goto CONTINUE
 
-rem TODO: Windows XP `robocopy` workaround
+for /F "tokens=* delims="eol^= %%i in ("\\?\%FILE_PATH%") do set "FILE_ATTR=%%~ai"
+
+if not defined FILE_ATTR set "FILE_ATTR=."
 
 rem check on long file path
 set FILE_PATH_LONG=1
@@ -111,24 +129,21 @@ if exist "%FILE_PATH%" call "%%CONTOOLS_ROOT%%/std/is_str_shorter_than.bat" 259 
 
 if %FILE_PATH_LONG% NEQ 0 if exist "%SystemRoot%\System32\robocopy.exe" goto MOVE_TO_TMP
 
-for /F "tokens=* delims="eol^= %%i in ("\\?\%FILE_PATH%") do set "FILE_ATTR=%%~ai"
-
-if not defined FILE_ATTR set "FILE_ATTR=."
-
 if %FILE_PATH_LONG% EQU 0 (
-  if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
-    copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul
+  if "%FILE_ATTR%" == "%FILE_ATTR:h=%" (
+    if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
+      copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul
+    ) else (
+      "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
+    )
   ) else (
-    "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
+    if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
+      "%SystemRoot%\System32\attrib.exe" -h "%FILE_PATH%" >nul & copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul & "%SystemRoot%\System32\attrib.exe" +h "%FILE_PATH%" >nul
+    ) else (
+      "%SystemRoot%\System32\attrib.exe" -r -h "%FILE_PATH%" >nul & copy /B "%FILE_PATH%"+,, "%FILE_PATH%" >nul & "%SystemRoot%\System32\attrib.exe" +r +h "%FILE_PATH%" >nul
+    )
   )
-) else (
-  rem CAUTION: `... >> ...` does not work as expected on Windows XP
-  if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
-    "%SystemRoot%\System32\cscript.exe" //NOLOGO //JOB:TOUCH_FILE "%?~f0%?.wsf" "\\?\%FILE_PATH%"
-  ) else (
-    "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH%" >nul & "%SystemRoot%\System32\cscript.exe" //NOLOGO //JOB:TOUCH_FILE "%?~f0%?.wsf" "\\?\%FILE_PATH%" & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH%" >nul
-  )
-)
+) else "%SystemRoot%\System32\cscript.exe" //NOLOGO //JOB:TOUCH_FILE "%?~f0%?.wsf" "\\?\%FILE_PATH%"
 
 goto CONTINUE
 
@@ -140,10 +155,18 @@ if defined SCRIPT_TEMP_CURRENT_DIR (
 
 "%SystemRoot%\System32\robocopy.exe" "%FILE_DIR%" "%FILE_PATH_TEMP_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
 
-if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
-  copy /B "%FILE_PATH_TEMP_DIR%\%FILE_NAME%"+,, "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul
+if "%FILE_ATTR%" == "%FILE_ATTR:h=%" (
+  if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
+    copy /B "%FILE_PATH_TEMP_DIR%\%FILE_NAME%"+,, "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul
+  ) else (
+    "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & copy /B "%FILE_PATH_TEMP_DIR%\%FILE_NAME%"+,, "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul
+  )
 ) else (
-  "%SystemRoot%\System32\attrib.exe" -r "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & copy /B "%FILE_PATH_TEMP_DIR%\%FILE_NAME%"+,, "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & "%SystemRoot%\System32\attrib.exe" +r "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul
+  if "%FILE_ATTR%" == "%FILE_ATTR:r=%" (
+    "%SystemRoot%\System32\attrib.exe" -h "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & copy /B "%FILE_PATH_TEMP_DIR%\%FILE_NAME%"+,, "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & "%SystemRoot%\System32\attrib.exe" +h "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul
+  ) else (
+    "%SystemRoot%\System32\attrib.exe" -r -h "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & copy /B "%FILE_PATH_TEMP_DIR%\%FILE_NAME%"+,, "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul & "%SystemRoot%\System32\attrib.exe" +r +h "%FILE_PATH_TEMP_DIR%\%FILE_NAME%" >nul
+  )
 )
 
 "%SystemRoot%\System32\robocopy.exe" "%FILE_PATH_TEMP_DIR%" "%FILE_DIR%" "%FILE_NAME%" /R:0 /W:0 /NP /NJH /NS /NC /XX /XO /XC /XN /MOV >nul
@@ -176,9 +199,43 @@ rem end of bat -->
       '   , where (!) <absolute-canonical-file-path-to-file>: is an absolute file path separated with the backslash character ONLY - `\`
       '
 
+      Function GetFile(PathAbs)
+        ' WORKAROUND:
+        '   We use `\\?\` to bypass `GetFile` error: `File not found`.
+        If Not Left(PathAbs, 2) = "\\" Then
+          Set GetFile = objFS.GetFile("\\?\" & PathAbs)
+        Else
+          Set GetFile = objFS.GetFile(PathAbs)
+        End If
+      End Function
+
       Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
-      Dim objFile : Set objFile = objFS.OpenTextFile(WScript.Arguments(0), 2)
-      objFile.Close
+      Dim PathAbs : PathAbs = objFS.GetAbsolutePathName(WScript.Arguments(0))
+
+      ' remove Read-Only and Hidden file attributes
+
+      Dim RestoreFileAttr : RestoreFileAttr = 0
+
+      Dim objFile : Set objFile = GetFile(PathAbs)
+      Dim fileAttr : fileAttr = objFile.Attributes
+
+      Const ReadOnly = 1
+      Const Hidden = 2
+
+      If objFile.Attributes And (ReadOnly Or Hidden) Then
+        RestoreFileAttr = 1
+        objFile.Attributes = objFile.Attributes And Not(ReadOnly Or Hidden)
+        On Error Resume Next ' continue on error
+      End If
+
+      Set objTextFile = objFS.OpenTextFile(WScript.Arguments(0), 2)
+
+      ' restore
+      If RestoreFileAttr Then
+        objFile.Attributes = objFile.Attributes Or fileAttr
+      End If
+
+      objTextFile.Close
     </script>
   </job>
 </package>
