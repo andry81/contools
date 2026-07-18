@@ -1,3 +1,6 @@
+2026.07.18:
+* refactor: scripts/tools/ToolAdaptors/vbs/set_fileshortname.bat: minor refactor
+
 2026.07.17:
 * fixed: scripts/tools/std: copy.bat, touch_file.bat: missed initialization
 * fixed: scripts/tools/std/touch_file.bat: missed the hidden file attribute reset
