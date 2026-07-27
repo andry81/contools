@@ -67,7 +67,7 @@ rem   For example: pushd c:\ && ( 7z.exe a -r <PathToArchive> "<SomeRelativePath
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || ( set "LAST_ERROR=255" & goto FREE_TEMP_DIR )
 
-if %_7ZIP_BARE_FLAGS_HAS_TEMP_DIR% EQU 0 set _7ZIP_BARE_FLAGS=%_7ZIP_BARE_FLAGS% "-w%SCRIPT_TEMP_CURRENT_DIR%"
+if %_7ZIP_BARE_FLAGS_HAS_TEMP_DIR% EQU 0 set _7ZIP_BARE_FLAGS=%_7ZIP_BARE_FLAGS% -w"%SCRIPT_TEMP_CURRENT_DIR%"
 
 call :MAIN %%*
 set LAST_ERROR=%ERRORLEVEL%

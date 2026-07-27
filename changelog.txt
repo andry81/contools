@@ -1,3 +1,6 @@
+2026.07.27:
+* changed: scripts/tools/build/add_files_to_archive.bat: minor improvement
+
 2026.07.18:
 * refactor: scripts/tools/ToolAdaptors/vbs/set_fileshortname.bat: minor refactor
 
