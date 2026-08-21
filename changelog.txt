@@ -1,4 +1,9 @@
 2026.08.21:
+* new: scripts/tools/std/is_int.bat: script to test numbers on integral not expression type
+* new: scripts/tests/unit/bat/test_std/test_std__80_is_int.bat: `is_int.bat` unit tests
+* new: scripts/tests/bench/bat/test_std/test_std__80_is_int.bat: `is_int.bat` bench test
+
+2026.08.21:
 * fixed: scripts/tools/std: /getcp.bat, /pause.bat: execution fixup
 
 2026.08.21:
