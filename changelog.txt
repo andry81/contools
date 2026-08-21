@@ -1,4 +1,7 @@
 2026.08.21:
+* fixed: scripts/tools/std: /getcp.bat, /pause.bat: execution fixup
+
+2026.08.21:
 * changed: scripts/tools/std/call_if_exist.bat: minor refactor
 
 2026.07.27:
