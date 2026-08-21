@@ -14,3 +14,20 @@ if "%~1" == "" (
 ) >&2
 
 endlocal & if exist "%~1" call %%*
+exit /b
+
+rem CAUTION:
+rem   The script may not call in case of a call from another script.
+rem   You must use a correct form of the command line in case of a multi line
+rem   call:
+rem
+rem     >
+rem     call call_if_exist.bat ^
+rem       THE-NEXT-QUOTED-LINE-MUST-BE-INDENTED
+rem
+rem   If the next line begins by the double quote is not indented, then the
+rem   script won't be called at all!
+rem
+rem   See for details:
+rem     `Line end escaping with ^ expression can break next line parsing` :
+rem     https://github.com/andry81/contools/discussions/13
