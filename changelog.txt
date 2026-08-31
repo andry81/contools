@@ -1,3 +1,6 @@
+2026.08.31:
+* changed: scripts/tools/ToolAdaptors/vbs/set_fileshortname.bat: switched to use `cd /d` command with drive change
+
 2026.08.21:
 * new: scripts/tools/std/is_int.bat: script to test numbers on integral not expression type
 * new: scripts/tests/unit/bat/test_std/test_std__80_is_int.bat: `is_int.bat` unit tests

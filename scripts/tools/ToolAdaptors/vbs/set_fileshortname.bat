@@ -139,11 +139,11 @@ for /F "tokens=* delims="eol^= %%i in ("%CD%\.") do set "CWD=%%~fi"
 if "%CWD:~-1%" == "\" set "CWD=%CWD%."
 
 rem CAUTION:
-rem   The `cd "%CD%" ^& %CD:~0,2%` must be before the command, otherwise the system root will be the current directory!
+rem   The `cd /d "%CD%"` must be before the command, otherwise the system root will be the current directory!
 rem
 
 rem Windows Batch compatible command line with escapes
-set "?@=/c @set \""IMPL_MODE=1\"" & cd \""%CWD%\"" & %CWD:~0,2% & \""%~f0\"" %* & pause"
+set "?@=/c @set \""IMPL_MODE=1\"" & cd /d \""%CWD%\"" & \""%~f0\"" %* & pause"
 
 rem shell code
 set "__SCRIPT__=ExecuteGlobal(\""Set objProc = CreateObject(\""""WScript.Shell\"""").Environment(\""""Process\"""") : ::"^
