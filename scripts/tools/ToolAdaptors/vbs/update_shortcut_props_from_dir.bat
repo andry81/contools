@@ -1,18 +1,34 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   update_shortcut_props_from_dir.bat [-+] [<flags>] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO> [<REPLACE_FROM> <REPLACE_TO>]...
-rem   update_shortcut_props_from_dir.bat [-+] [<flags>] -d[elete] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> ["" [<REPLACE_FROM>]...]
+rem   update_shortcut_props_from_dir.bat [-+] [<flags>]           -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO> [<REPLACE_FROM> <REPLACE_TO>]...
+rem   update_shortcut_props_from_dir.bat [-+] [<flags>] -d[elete] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> ["" [<REPLACE_FROM> ""]...]
 
 rem <flags>:
 rem   -m[atch] <MATCH_STRING>
 rem     String to case sensitive match a portion of property value before the
 rem     replace. If not defined, then does match all.
+rem
 rem   -d[elete]
 rem     Remove `<REPLACE_FROM>` string from a property value.
 rem     The `<REPLACE_TO>` must be not defined.
+rem
 rem   -chcp <code-page>
 rem     Set explicit code page.
+rem
+rem   -no-backup
+rem     Disables a shortcut backup as by default.
+rem     Backup generates a directory with a backup file in the directory with
+rem     the shortcut in form:
+rem     `YYYY'MM'DD.backup/HH'mm'ss''NNN-<ShortcutName>`
+rem     This form will reduce quantity of generated directories per each backup
+rem     file and in the same time does backup each shortcut in each call.
+rem
+rem     By default, a path to a shortcut file in a backup directory of the form
+rem     is skipped:
+rem
+rem       `*.backup`, `*.bak`
+rem
 rem   -ignore-unexist
 rem     By default TargetPath and WorkingDirectory does check on existence.
 rem     Use this flag to skip the check.
@@ -22,17 +38,21 @@ rem     Do not skip on property empty value assignment.
 rem     By default skips any property assignment by an empty value.
 rem     Has effect only if a value become empty after the replace.
 rem     Has no effect if a value was already empty.
+rem
 rem   -no-allow-dos-target-path
 rem     Do not allow target path reset by a reduced DOS path version.
+rem
 rem   -no-allow-dos-wd
 rem     Do not allow working directory reset by a reduced DOS path version.
 rem
 rem   -allow-target-path-reassign
 rem     Allow `TargetPath` property reassign if has the same path.
 rem     Path comparison depends on `-use-case-compare` flag.
+rem
 rem   -allow-wd-reassign
 rem     Allow `WorkingDirectory` property reassign if has the same path.
 rem     Path comparison depends on `-use-case-compare` flag.
+rem
 rem   -allow-paths-reassign
 rem     Implies all `-allow-*-reassign` flags.
 rem
@@ -41,10 +61,12 @@ rem     Use case sensitive compare instead of the case insensitive as by
 rem     default.
 rem     Has effect only for `TargetPath` and `WorkingDirectory` properties.
 rem     Has effect only for a replaced value to test on empty change.
+rem
 rem   -use-getlink | -g
 rem     Use `GetLink` property instead of `CreateShortcut` method.
 rem     Alternative interface to assign path properties with Unicode
 rem     characters.
+rem
 rem   -print-remapped-names | -k
 rem     Print remapped key names instead of `CreateShortcut` method object
 rem     names.
@@ -52,13 +74,17 @@ rem     Has no effect if `-use-getlink` flag is not used.
 rem
 rem   -print-read | -pr
 rem     Print property read.
+rem
 rem   -p[rint-assign]
 rem     Print property assign before assign.
+rem
 rem   -print-assigned | -pd
 rem     Reread property after assign and print.
+rem
 rem   -t-suffix <ShortcutTargetSuffix>
 rem     Shortcut target suffix value to append if <ShortcutTarget> does not
-rem     exist. Has no effect if `-ignore-unexist` is used.
+rem     exist.
+rem     Has no effect if `-ignore-unexist` is used.
 
 rem -+:
 rem   Separator to begin flags scope to parse.
@@ -324,24 +350,6 @@ for /F "tokens=* delims="eol^= %%i in ("%LINKS_DIR%\.") do set "LINKS_DIR=%%~fi"
 
 if not "%LINKS_DIR:~-1%" == "\" set "LINKS_DIR=%LINKS_DIR%\"
 
-set "BACKUP_DIR="
-
-if %FLAG_NO_BACKUP% NEQ 0 goto SKIP_BACKUP_DIR
-
-set "BACKUP_DIR=%LINKS_DIR%"
-
-rem escape for `findstr.exe`
-set "BACKUP_DIR=%BACKUP_DIR:\=\\%"
-set "BACKUP_DIR=%BACKUP_DIR:^=\^%"
-set "BACKUP_DIR=%BACKUP_DIR:$=\$%"
-set "BACKUP_DIR=%BACKUP_DIR:.=\.%"
-set "BACKUP_DIR=%BACKUP_DIR:[=\[%"
-set "BACKUP_DIR=%BACKUP_DIR:]=\]%"
-
-set "BACKUP_DIR=%BACKUP_DIR%[0-9][0-9][0-9][0-9]'[0-9][0-9]'[0-9][0-9]\.backup\\"
-
-:SKIP_BACKUP_DIR
-
 set /A CMDLINE_SHIFT=%FLAG_SHIFT%+4
 
 call "%%CONTOOLS_ROOT%%\std\setshift.bat" %%CMDLINE_SHIFT%% CMDLINE_SHIFTED %%*
@@ -360,14 +368,9 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-if defined BACKUP_DIR (
-  set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul ^| "%SystemRoot%\System32\findstr.exe" /B /R /I /V /C:"%BACKUP_DIR%\\"
-) else set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul
+set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul ^| "%SystemRoot%\System32\findstr.exe" /R /I /V /C:"\\[^/\\]*\.backup\\\\" /C:"\\[^/\\]*\.bak\\\\"
 
-for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
-  set "LINK_FILE_PATH=%%i"
-  call :UPDATE_LINK
-)
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "LINK_FILE_PATH=%%i" & call :UPDATE_LINK
 
 exit /b 0
 

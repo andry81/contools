@@ -1,4 +1,9 @@
 2026.08.31:
+* fixed: scripts/tools/ToolAdaptors/vbs/update_shortcut.vbs: `-backup-dir` option value relative path
+* fixed: scripts/tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: always skip back directories in a general form (`*.backup`, `*.bak`)
+* refactor: scripts/tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: documentation refactor
+
+2026.08.31:
 * changed: scripts/tools/ToolAdaptors/vbs/set_fileshortname.bat: switched to use `cd /d` command with drive change
 
 2026.08.21:

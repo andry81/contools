@@ -1157,19 +1157,21 @@ If ShortcutUpdated Then
     '
 
     If Len(BackupDir) > 0 Then
-      backup_dir_path_abs = objFS.GetAbsolutePathName(BackupDir)
-
       ' remove `\\?\` prefix
-      If Left(backup_dir_path_abs, 4) = "\\?\" Then
-        backup_dir_path_abs = Mid(backup_dir_path_abs, 5)
+      If Left(BackupDir, 4) = "\\?\" Then
+        BackupDir = Mid(BackupDir, 5)
       End If
 
-      If objFS.FolderExists("\\?\" & backup_dir_path_abs) Then
+      If Len(BackupDir) > 0 Then
         ' check on absolute path
         If IsPathAbsolute(BackupDir) Then
-          ShortcutFileBackupDir = backup_dir_path_abs
+          backup_dir_path_abs = objFS.GetAbsolutePathName(BackupDir)
         Else
-          ShortcutFileBackupDir = ShortcutFileDir & "\" & backup_dir_path_abs
+          backup_dir_path_abs = objFS.GetAbsolutePathName(ShortcutFileDir & "\" & BackupDir)
+        End If
+
+        If objFS.FolderExists("\\?\" & backup_dir_path_abs) Then
+          ShortcutFileBackupDir = backup_dir_path_abs
         End If
       End If
     End If
