@@ -1,4 +1,8 @@
 2026.08.31:
+* changed: scripts/tools/std/get_cmdline.bat: always reset `RETURN_VALUE` variable
+* refactor: scripts/tools/std/setshift*.bat: documentation update
+
+2026.08.31:
 * fixed: scripts/tools/ToolAdaptors/vbs/update_shortcut.vbs: `-backup-dir` option value relative path
 * fixed: scripts/tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: always skip back directories in a general form (`*.backup`, `*.bak`)
 * refactor: scripts/tools/ToolAdaptors/vbs/update_shortcut_props_from_dir.bat: documentation refactor

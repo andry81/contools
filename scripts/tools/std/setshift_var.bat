@@ -5,12 +5,17 @@ rem   setshift_var.bat <shift> <out-var> <cmdline-var> [-exe] [-notrim] [-skip <
 
 rem Description:
 rem   Script sets `<out-var>` variable to partially shifted command line from
-rem  `<cmdline-var>` variable.
+rem   `<cmdline-var>` variable.
 rem
 rem   See `setshift.bat` script for details.
 
 rem <out-var>:
 rem   Variable to set.
+rem
+rem   CAUTION:
+rem     You must reset the variable before call to the script to ensure the
+rem     variable set by the script. The variable can be not set because of the
+rem     script command line parse error.
 
 rem <cmdline-var>:
 rem   Variable with a command line.

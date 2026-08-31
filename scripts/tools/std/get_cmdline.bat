@@ -32,6 +32,9 @@ rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
 :DOC_END
 
+rem reset the return value
+set "RETURN_VALUE="
+
 rem with save of previous error level
 setlocal & set LAST_ERROR=%ERRORLEVEL%
 
@@ -61,11 +64,11 @@ if defined CMDLINE_TEMP_FILE del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 rem WORKAROUND:
 rem   In case if `echo` is turned off externally.
 
-if not defined __STRING__ endlocal & set "RETURN_VALUE=" & exit /b %LAST_ERROR%
+if not defined __STRING__ endlocal & exit /b %LAST_ERROR%
 
 setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!__STRING__:~5,-2!"') do endlocal & set "__STRING__=%%~i"
 
-if not defined __STRING__ endlocal & set "RETURN_VALUE=" & exit /b %LAST_ERROR%
+if not defined __STRING__ endlocal & exit /b %LAST_ERROR%
 
 (
   setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & endlocal & set "RETURN_VALUE=%%i"

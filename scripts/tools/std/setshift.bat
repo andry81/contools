@@ -31,6 +31,11 @@ rem   argument.
 
 rem <out-var>:
 rem   Variable to set.
+rem
+rem   CAUTION:
+rem     You must reset the variable before call to the script to ensure the
+rem     variable set by the script. The variable can be not set because of the
+rem     script command line parse error.
 
 rem CAUTION:
 rem   The delayed expansion feature must be disabled before this script call:
