@@ -1,7 +1,7 @@
 > [!NOTE]
 > To checkout externals read the details here: https://github.com/andry81/externals
 
-<p align="center">Library for Windows Batch interpreter (cmd.exe) and Visual Basic Script (.vbs).</p>
+<p align="center">Library of Windows Batch scripts (.bat, .cmd, cmd.exe) and Visual Basic scripts (.vbs).</p>
 
 <p align="center">
   <a href="https://www.codefactor.io/repository/github/andry81/contools">

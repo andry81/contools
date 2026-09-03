@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.07.14
+* 2026.09.03
 * contools
 
 1. DESCRIPTION
@@ -16,7 +16,8 @@
 -------------------------------------------------------------------------------
 1. DESCRIPTION
 -------------------------------------------------------------------------------
-Library for Windows Batch interpreter (cmd.exe) and Visual Basic Script (.vbs).
+Library of Windows Batch scripts (.bat, .cmd, cmd.exe) and Visual Basic scripts
+(.vbs).
 
 The rest is extracted into standalone repositories beginning by `contools--`.
 

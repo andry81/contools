@@ -2,7 +2,7 @@
 
 setlocal DISABLEDELAYEDEXPANSION
 
-call "%%~dp0__init__/__init__.bat"
+call "%%~dp0__init__\__init__.bat" || exit /b
 
 echo Running %~nx0...
 

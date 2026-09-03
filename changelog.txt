@@ -1,3 +1,9 @@
+2026.09.03:
+* changed: README_EN.txt, README.md: changed description to gain more relevant results in the GitHub search
+
+2026.09.01:
+* changed: *.bat: minor fixup
+
 2026.08.31:
 * changed: scripts/tools/std/get_cmdline.bat: always reset `RETURN_VALUE` variable
 * refactor: scripts/tools/std/setshift*.bat: documentation update
