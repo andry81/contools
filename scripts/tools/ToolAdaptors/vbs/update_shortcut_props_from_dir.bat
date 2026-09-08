@@ -4,6 +4,12 @@ rem USAGE:
 rem   update_shortcut_props_from_dir.bat [-+] [<flags>]           -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> <REPLACE_TO> [<REPLACE_FROM> <REPLACE_TO>]...
 rem   update_shortcut_props_from_dir.bat [-+] [<flags>] -d[elete] -m[atch] <MATCH_STRING> [--] <LINKS_DIR> <PROPS_LIST> <REPLACE_FROM> ["" [<REPLACE_FROM> ""]...]
 
+rem Description:
+rem   Script to update shortcut properties in a directory recursively.
+rem
+rem   NOTE:
+rem     For detailed parameters description see `update_shortcut.vbs` script.
+
 rem <flags>:
 rem   -m[atch] <MATCH_STRING>
 rem     String to case sensitive match a portion of property value before the
@@ -17,7 +23,7 @@ rem   -chcp <code-page>
 rem     Set explicit code page.
 rem
 rem   -no-backup
-rem     Disables a shortcut backup as by default.
+rem     Disables a shortcut backup.
 rem     Backup generates a directory with a backup file in the directory with
 rem     the shortcut in form:
 rem     `YYYY'MM'DD.backup/HH'mm'ss''NNN-<ShortcutName>`
@@ -105,9 +111,6 @@ rem   String to replace from.
 
 rem <REPLACE_TO>:
 rem   String to replace by.
-
-rem NOTE:
-rem   For detailed parameters description see `update_shortcut.vbs` script.
 
 rem CAUTION:
 rem   <MATCH_STRING> and <REPLACE_FROM> must not contain invalid characters
@@ -279,7 +282,7 @@ rem restore locale
 if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/restorecp.bat"
 
 :FREE_TEMP_DIR
-rem cleanup temporary files
+rem clean up temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"
 
 exit /b %LAST_ERROR%

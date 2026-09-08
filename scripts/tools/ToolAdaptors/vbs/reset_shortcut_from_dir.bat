@@ -3,28 +3,55 @@
 rem USAGE:
 rem   reset_shortcut_from_dir.bat [-+] [<flags>] [--] <LINKS_DIR>
 
+rem Description:
+rem   Script to reset/reassign shortcut properties in a directory recursively.
+rem
+rem   NOTE:
+rem     For detailed parameters description see `reset_shortcut.vbs` script.
+
 rem <flags>:
 rem   -chcp <code-page>
 rem     Set explicit code page.
 rem
+rem   -no-backup
+rem     Disables a shortcut backup.
+rem     Backup generates a directory with a backup file in the directory with
+rem     the shortcut in form:
+rem     `YYYY'MM'DD.backup/HH'mm'ss''NNN-<ShortcutName>`
+rem     This form will reduce quantity of generated directories per each backup
+rem     file and in the same time does backup each shortcut in each call.
+rem
+rem     By default, a path to a shortcut file in a backup directory of the form
+rem     is skipped:
+rem
+rem       `*.backup`, `*.bak`
+rem
 rem   -reset-wd[-from-target-path]
 rem     Reset WorkingDirectory from TargetPath.
 rem     Does not apply if TargetPath is empty.
+rem
 rem   -reset-target-path-from-wd
 rem     Reset TargetPath from WorkingDirectory leaving the file name as is.
-rem     Does not apply if WorkingDirectory or TargetPath is empty.
+rem     Does not apply if WorkingDirectory is empty, or TargetPath is empty and
+rem     `-allow-target-type-change` is not used.
+rem
 rem   -reset-target-path-from-desc
 rem     Reset TargetPath from Description.
 rem     Does not apply if Description is empty or not a path.
 rem     Has no effect if TargetPath is already resetted.
+rem
 rem   -reset-target-name-from-file-path
 rem     Reset TargetPath name from shortcut file name without `.lnk` extension.
+rem
 rem   -reset-target-drive-from-file-path
 rem     Reset TargetPath drive from shortcut file drive.
 rem
 rem   -allow-auto-recover
 rem     Allow to auto detect and recover broken shortcuts.
 rem     Can not be used together with `-ignore-unexist` flag.
+rem
+rem   -allow-target-type-change
+rem     Allow the target property type change on assignment.
 rem
 rem   -allow-target-path-reassign
 rem     Allow `TargetPath` property reassign if has not been assigned.
@@ -38,10 +65,12 @@ rem     path to open it by an old version application which does not support
 rem     long paths or Win32 Namespace paths, but supports open target paths by
 rem     a shortcut file.
 rem     Has no effect if path does not exist.
+rem
 rem   -allow-dos-wd
 rem     Reread working directory after assign and if it does not exist, then
 rem     reassign it by a reduced DOS path version.
 rem     Has no effect if path does not exist.
+rem
 rem   -allow-dos-paths
 rem     Implies all `-allow-dos-*` flags.
 rem
@@ -49,6 +78,7 @@ rem   -use-getlink | -g
 rem     Use `GetLink` property instead of `CreateShortcut` method.
 rem     Alternative interface to assign path properties with Unicode
 rem     characters.
+rem
 rem   -print-remapped-names | -k
 rem     Print remapped key names instead of `CreateShortcut` method object
 rem     names.
@@ -56,9 +86,9 @@ rem     Has no effect if `-use-getlink` flag is not used.
 rem
 rem   -p[rint-assign]
 rem     Print property assign before assign.
+rem
 rem   -print-assigned | -pd
 rem     Reread property after assign and print.
-rem
 
 rem -+:
 rem   Separator to begin flags scope to parse.
@@ -70,16 +100,13 @@ rem   If `-+` is used, then must be used the same quantity of times.
 rem <LINKS_DIR>:
 rem   Directory to search shortcut files from.
 
-rem NOTE:
-rem   For detailed parameters description see `reset_shortcut.vbs` script.
-
 rem CAUTION:
 rem   Base `CreateShortcut` method does not support all Unicode characters nor
 rem   `search-ms` Windows Explorer moniker path for the filter field.
 rem   Use `GetLink` property (`-use-getlink` flag) instead to workaround that.
 :DOC_END
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 call "%%~dp0__init__/script_init.bat" %%0 %%* || exit /b
 if %IMPL_MODE%0 EQU 0 exit /b
@@ -88,6 +115,7 @@ rem script flags
 set FLAG_SHIFT=0
 set FLAG_FLAGS_SCOPE=0
 set "FLAG_CHCP="
+set FLAG_NO_BACKUP=0
 set "RESET_SHORTCUT_BARE_FLAGS="
 
 :FLAGS_LOOP
@@ -106,6 +134,9 @@ if defined FLAG (
     set "FLAG_CHCP=%~2"
     shift
     set /A FLAG_SHIFT+=1
+  ) else if "%FLAG%" == "-no-backup" (
+    set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
+    set FLAG_NO_BACKUP=1
   ) else if "%FLAG%" == "-reset-wd-from-target-path" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-reset-wd" (
@@ -114,11 +145,13 @@ if defined FLAG (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-reset-target-path-from-desc" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
-  ) else if "%FLAG%" == "-reset-target-name-from-file" (
+  ) else if "%FLAG%" == "-reset-target-name-from-file-path" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-reset-target-drive-from-file-path" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-allow-auto-recover" (
+    set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
+  ) else if "%FLAG%" == "-allow-target-type-change" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
   ) else if "%FLAG%" == "-allow-target-path-reassign" (
     set RESET_SHORTCUT_BARE_FLAGS=%RESET_SHORTCUT_BARE_FLAGS% %FLAG%
@@ -155,7 +188,9 @@ if %FLAG_FLAGS_SCOPE% GTR 0 (
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%?~n0%%" || exit /b
 
-if defined FLAG_CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+if defined FLAG_CHCP (
+  call "%%CONTOOLS_ROOT%%/std/chcp.bat" "%%FLAG_CHCP%%"
+) else call "%%CONTOOLS_ROOT%%/std/getcp.bat"
 
 call :MAIN %%*
 set LAST_ERROR=%ERRORLEVEL%
@@ -174,12 +209,14 @@ if FLAG_SHIFT GTR 0 for /L %%i in (1,1,%FLAG_SHIFT%) do shift
 
 set "LINKS_DIR=%~1"
 
-if defined LINKS_DIR (
-  if not exist "%LINKS_DIR%\*" (
-    echo;%?~%: error: LINKS_DIR does not exist: "%LINKS_DIR%".
-    exit /b 255
-  ) >&2
-) else set "LINKS_DIR=."
+if not defined LINKS_DIR set "LINKS_DIR=."
+
+if defined LINKS_DIR if exist "%LINKS_DIR%\*" goto LINKS_DIR_EXIST
+
+(
+  echo;%?~%: error: LINKS_DIR does not exist: `%LINKS_DIR%`.
+  exit /b 255
+) >&2
 
 :LINKS_DIR_EXIST
 
@@ -198,20 +235,15 @@ rem      statement does expand twice.
 rem
 rem   We must expand the command line into a variable to avoid these above.
 rem
-set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul
+set ?.=@dir "%LINKS_DIR%*.lnk" /A:-D /B /O:N /S 2^>nul ^| "%SystemRoot%\System32\findstr.exe" /R /I /V /C:"\\[^/\\]*\.backup\\\\" /C:"\\[^/\\]*\.bak\\\\"
 
-for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do (
-  set "LINK_FILE_PATH=%%i"
-  call :UPDATE_LINK
-)
-
-echo;
+for /F "usebackq tokens=* delims="eol^= %%i in (`%%?.%%`) do set "LINK_FILE_PATH=%%i" & call :RESET_LINK
 
 exit /b 0
 
-:UPDATE_LINK
+:RESET_LINK
 echo;"%LINK_FILE_PATH%"
 
-"%SystemRoot%\System32\cscript.exe" //Nologo "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/reset_shortcut.vbs"%RESET_SHORTCUT_BARE_FLAGS% -- "%LINK_FILE_PATH%"
+"%SystemRoot%\System32\cscript.exe" //NOLOGO "%CONTOOLS_TOOL_ADAPTORS_ROOT%/vbs/reset_shortcut.vbs"%RESET_SHORTCUT_BARE_FLAGS% -- "%LINK_FILE_PATH%"
 
 echo;

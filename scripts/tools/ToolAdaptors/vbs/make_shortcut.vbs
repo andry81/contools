@@ -1,18 +1,5 @@
 ''' Creates new Windows shortcut file.
 
-''' CAUTION:
-'''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
-'''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
-
-''' CAUTION:
-'''   The Windows Shell COM component does not handle unlinked or unexisted
-'''   `TargetPath` or `LinkTarget` property correctly. To ensure it does read
-'''   the property, you have to replicate the path on the file system before
-'''   read the property!
-'''   To be able to do it, you can read the `WorkingDirectory` property (it is
-'''   accessible irrespective to the target path property) and use it to
-'''   replicate the target path before read the target path property.
-
 ''' USAGE:
 '''   make_shortcut.vbs
 '''     [-CD <CurrentDirectoryPath>]
@@ -30,6 +17,20 @@
 '''     [-debug]
 '''     [--]
 '''       <ShortcutFilePath> <ShortcutTarget> [<ShortcutTargetArgs>]
+
+''' CAUTION:
+'''   WScript.Shell can not handle all Unicode characters in path properties,
+'''   including characters in the path to a shortcut file.
+'''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
+
+''' CAUTION:
+'''   The Windows Shell COM component does not handle unlinked or unexisted
+'''   `TargetPath` or `LinkTarget` property correctly. To ensure it does read
+'''   the property, you have to resolve or replicate the path on the file
+'''   system before read the property!
+'''   To be able to do it, you can read the `WorkingDirectory` property (it is
+'''   accessible irrespective to the target path property) and use it to
+'''   resolve/replicate the target path before read the target path property.
 
 ''' DESCRIPTION:
 '''   --

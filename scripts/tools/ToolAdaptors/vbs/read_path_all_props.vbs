@@ -1,14 +1,5 @@
 ''' Reads a path all property values.
 
-''' CAUTION:
-'''   The Windows Shell COM component does not handle unlinked or unexisted
-'''   `TargetPath` or `LinkTarget` property correctly. To ensure it does read
-'''   the property, you have to replicate the path on the file system before
-'''   read the property!
-'''   To be able to do it, you can read the `WorkingDirectory` property (it is
-'''   accessible irrespective to the target path property) and use it to
-'''   replicate the target path before read the target path property.
-
 ''' USAGE:
 '''   read_path_all_props.vbs
 '''     [-v[al-only]]
@@ -20,6 +11,15 @@
 '''     [-line-return | -lr]
 '''     [--]
 '''       <Path>
+
+''' CAUTION:
+'''   The Windows Shell COM component does not handle unlinked or unexisted
+'''   `TargetPath` or `LinkTarget` property correctly. To ensure it does read
+'''   the property, you have to resolve or replicate the path on the file
+'''   system before read the property!
+'''   To be able to do it, you can read the `WorkingDirectory` property (it is
+'''   accessible irrespective to the target path property) and use it to
+'''   resolve/replicate the target path before read the target path property.
 
 ''' DESCRIPTION:
 '''   --

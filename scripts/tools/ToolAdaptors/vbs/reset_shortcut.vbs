@@ -1,21 +1,10 @@
 ''' Resets the Windows shortcut file using inner value(s).
 
-''' CAUTION:
-'''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
-'''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
-
-''' CAUTION:
-'''   The Windows Shell COM component does not handle unlinked or unexisted
-'''   `TargetPath` or `LinkTarget` property correctly. To ensure it does read
-'''   the property, you have to replicate the path on the file system before
-'''   read the property!
-'''   To be able to do it, you can read the `WorkingDirectory` property (it is
-'''   accessible irrespective to the target path property) and use it to
-'''   replicate the target path before read the target path property.
-
 ''' USAGE:
 '''   reset_shortcut.vbs
 '''     [-CD <CurrentDirectoryPath>]
+'''     [-no-backup] [-backup-dir]
+'''     [-no-restore-mdate]
 '''     [-obj] [-ignore-unexist]
 '''     [-reset-wd[-from-target-path]]
 '''     [-reset-target-path-from-wd]
@@ -23,7 +12,7 @@
 '''     [-reset-target-name-from-file-path]
 '''     [-reset-target-drive-from-file-path]
 '''     [-allow-auto-recover]
-'''     [-allow-target-path-reassign]
+'''     [-allow-target-type-change] [-allow-target-path-reassign]
 '''     [-allow-dos-current-dir] [-allow-dos-target-path] [-allow-dos-wd] [-allow-dos-paths]
 '''     [-use-getlink | -g] [-print-remapped-names | -k]
 '''     [-p[rint-assign]] [-print-assigned | -pd]
@@ -31,16 +20,38 @@
 '''     [--]
 '''       <ShortcutFilePath>
 
+''' CAUTION:
+'''   WScript.Shell can not handle all Unicode characters in path properties,
+'''   including characters in the path to a shortcut file.
+'''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
+
+''' CAUTION:
+'''   The Windows Shell COM component does not handle unlinked or unexisted
+'''   `TargetPath` or `LinkTarget` property correctly. To ensure it does read
+'''   the property, you have to resolve or replicate the path on the file
+'''   system before read the property!
+'''   To be able to do it, you can read the `WorkingDirectory` property (it is
+'''   accessible irrespective to the target path property) and use it to
+'''   resolve/replicate the target path before read the target path property.
+
 ''' DESCRIPTION:
-'''   By default resaves shortcut which does trigger the Windows Shell
-'''   component to validate all properties and rewrite the shortcut file even
-'''   if nothing is changed reducing the shortcut content.
-'''   Does not apply if TargetPath does not exist and `-ignore-unexist`
-'''   option is not used to avoid a shortcut accident corruption by the
-'''   Windows Shell component internal guess logic (see `-ignore-unexist`
+'''   Does save shortcut to let the Windows Shell component to validate all
+'''   properties and rewrite the shortcut file even if nothing is changed
+'''   reducing the shortcut content.
+'''
+'''   Does apply only if required to avoid a shortcut accident corruption by
+'''   the Windows Shell component internal guess logic (see `-ignore-unexist`
 '''   option description).
-'''   Has no effect if TargetPath is already changed using `-reset-*` flags or
-'''   by any other reset.
+'''
+'''   The save does not apply until at least one property is changed.
+'''   A path property assign does not apply if a path property does not exist
+'''   and `-ignore-unexist` option is not used or a new not empty path property
+'''   value already equal case insensitively to an old path property value.
+'''
+'''   If the save applies, then by default backups a shortcut before the save.
+'''
+'''   By default the File Modification timestamp does restore after the save to
+'''   to retain a shortcut sort order by the date in a folder.
 '''
 '''   --
 '''     Separator between flags and positional arguments to explicitly stop the
@@ -49,6 +60,23 @@
 '''   -CD <CurrentDirectoryPath>
 '''     Changes current directory to <CurrentDirectoryPath> before the
 '''     execution.
+'''
+'''   -no-backup
+'''     Disables a shortcut backup.
+'''     Backup generates a directory with a backup file in the directory with
+'''     the shortcut in form:
+'''     `YYYY'MM'DD.backup/HH'mm'ss''NNN-<ShortcutName>`
+'''     This form will reduce quantity of generated directories per each backup
+'''     file and in the same time does backup each shortcut in each call.
+'''
+'''   -backup-dir
+'''     Path to the directory to store backed up shortcuts. Used instead of
+'''     generated one, for example, in case of an external script call from a
+'''     loop.
+'''     Has no effect if directory does not exist.
+'''
+'''   -no-restore-mdate
+'''     Disable a shortcut file modification date restore.
 '''
 '''   -obj
 '''     By default the target path does used as a file path. Use this flag to
@@ -93,17 +121,21 @@
 '''     Reset WorkingDirectory from TargetPath.
 '''     Does not apply if TargetPath is empty.
 '''     Has effect if `-obj` flag is used.
+'''
 '''   -reset-target-path-from-wd
 '''     Reset TargetPath from WorkingDirectory leaving the file name as is.
 '''     Does not apply if WorkingDirectory or TargetPath is empty.
 '''     Has effect if `-obj` flag is used.
+'''
 '''   -reset-target-path-from-desc
 '''     Reset TargetPath from Description.
 '''     Does not apply if Description is empty or not a path.
 '''     Has no effect if TargetPath is already resetted.
 '''     Has effect if `-obj` flag is used.
+'''
 '''   -reset-target-name-from-file-path
 '''     Reset TargetPath name from shortcut file name without `.lnk` extension.
+'''
 '''   -reset-target-drive-from-file-path
 '''     Reset TargetPath drive from shortcut file drive.
 '''
@@ -128,6 +160,9 @@
 '''        1+5, 2+4, 2+5, 3+4, 3+5, 2+4+5, 3+4+5
 '''     Can not be used together with `-ignore-unexist` flag.
 '''
+'''   -allow-target-type-change
+'''     Allow the target property type change on assignment.
+'''
 '''   -allow-target-path-reassign
 '''     Allows `TargetPath` property reassign if has not been assigned.
 '''     Has no effect if `TargetPath` is already resetted.
@@ -137,6 +172,7 @@
 '''     Allows long path conversion into a reduced DOS path version for the
 '''     current directory.
 '''     Has no effect if path does not exist.
+'''
 '''   -allow-dos-target-path
 '''     Rereads target path after assign and if it does not exist, then
 '''     reassigns it by a reduced DOS path version.
@@ -146,10 +182,12 @@
 '''     a shortcut file.
 '''     Has no effect if path does not exist.
 '''     Has no effect if `-obj` flag is used.
+'''
 '''   -allow-dos-wd
 '''     Rereads working directory after assign and if it does not exist, then
 '''     reassign it by a reduced DOS path version.
 '''     Has no effect if path does not exist.
+'''
 '''   -allow-dos-paths
 '''     Implies all `-allow-dos-*` flags.
 '''
@@ -157,6 +195,7 @@
 '''     Use `GetLink` property instead of `CreateShortcut` method.
 '''     Alternative interface to assign path properties with Unicode
 '''     characters.
+'''
 '''   -print-remapped-names | -k
 '''     Print remapped key names instead of `CreateShortcut` method object
 '''     names.
@@ -164,6 +203,7 @@
 '''
 '''   -p[rint-assign]
 '''     Print property assign before assign.
+'''
 '''   -print-assigned | -pd
 '''     Rereads property after assign and prints it.
 '''
@@ -321,6 +361,10 @@ Dim ExpectFlags : ExpectFlags = True
 Dim PrintAssign : PrintAssign = False
 Dim PrintAssigned : PrintAssigned = False
 
+Dim BackupShortcut : BackupShortcut = True
+Dim BackupDir : BackupDir = ""
+Dim RestoreShortcutFileMDate : RestoreShortcutFileMDate = True
+
 Dim IgnoreUnexist : IgnoreUnexist = False
 
 Dim ResetWorkingDirFromTargetPath : ResetWorkingDirFromTargetPath = False
@@ -330,6 +374,7 @@ Dim ResetTargetNameFromFilePath : ResetTargetNameFromFilePath = False
 Dim ResetTargetDriveFromFilePath : ResetTargetDriveFromFilePath = False
 
 Dim AllowAutoRecover : AllowAutoRecover = False
+Dim AllowTargetTypeChange : AllowTargetTypeChange = False
 Dim AllowTargetPathReassign : AllowTargetPathReassign = False
 
 Dim ChangeCurrentDirectory : ChangeCurrentDirectory = ""
@@ -381,6 +426,13 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ChangeCurrentDirectory = WScript.Arguments(i)
         ChangeCurrentDirectoryExist = True
+      ElseIf arg = "-no-backup" Then
+        BackupShortcut = False
+      ElseIf arg = "-backup-dir" Then
+        i = i + 1
+        BackupDir = WScript.Arguments(i)
+      ElseIf arg = "-no-restore-mdate" Then
+       RestoreShortcutFileMDate = False
       ElseIf arg = "-obj" Then
        ShortcutTargetObj = True
       ElseIf arg = "-ignore-unexist" Then
@@ -397,6 +449,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         ResetTargetDriveFromFilePath = True
       ElseIf arg = "-allow-auto-recover" Then
         AllowAutoRecover = True
+      ElseIf arg = "-allow-target-type-change" Then
+        AllowTargetTypeChange = True
       ElseIf arg = "-allow-target-path-reassign" Then
         AllowTargetPathReassign = True
       ElseIf arg = "-allow-dos-current-dir" Then ' Allow long path conversion into DOS path for the current directory
@@ -634,6 +688,49 @@ Function IsPathExists(Path)
   End If
 End Function
 
+Function GetFileModificationDate(Path)
+  Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
+
+  Dim ParentPath : ParentPath = objFS.GetParentFolderName(Path)
+  Dim objNamespace, objFile
+
+  If Len(ParentPath) > 0 Then
+    Set objNamespace = objShellApp.Namespace(ParentPath)
+    Set objFile = objNamespace.ParseName(objFS.GetFileName(Path))
+  Else
+    Set objNamespace = objShellApp.Namespace(Path)
+    Set objFile = objNamespace.Self
+  End if
+
+  If IsNothing(objFile) Then
+    GetFileModificationDate = ""
+    Exit Function
+  End If
+
+  GetFileModificationDate = objFile.ModifyDate
+End Function
+
+Function SetFileModificationDate(Path, FileDate)
+  Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
+
+  Dim ParentPath : ParentPath = objFS.GetParentFolderName(Path)
+  Dim objNamespace, objFile
+
+  If Len(ParentPath) > 0 Then
+    Set objNamespace = objShellApp.Namespace(ParentPath)
+    Set objFile = objNamespace.ParseName(objFS.GetFileName(Path))
+  Else
+    Set objNamespace = objShellApp.Namespace(Path)
+    Set objFile = objNamespace.Self
+  End if
+
+  If IsNothing(objFile) Then
+    Exit Function
+  End If
+
+  objFile.ModifyDate = FileDate
+End Function
+
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
 ' change current directory before any file system request because of relative paths
@@ -656,10 +753,10 @@ If ChangeCurrentDirectoryExist Then
 
   ' test on long path existence
   If (Not AllowDOSCurrentDirectory) Or objFS.FolderExists(ChangeCurrentDirectoryAbs) Then
-    ' is not long path
+    ' doesn't care or is not long path
     objShell.CurrentDirectory = ChangeCurrentDirectoryAbs
-  ElseIf AllowDOSCurrentDirectory Then
-    ' translate into short path
+  Else
+    ' translate into short path unconditionally
     objShell.CurrentDirectory = GetExistedFolderShortPath(ChangeCurrentDirectoryAbs)
   End If
 End If
@@ -682,6 +779,7 @@ If Not IsShortcutFileExist Then
   WScript.Quit 10
 End If
 
+Dim ShortcutFileModificationDate
 Dim ShortcutFilePathToOpen
 
 ' test on long path existence
@@ -691,6 +789,11 @@ If objFS.FileExists(ShortcutFilePathAbs) Then
 Else
   ' translate into short path
   ShortcutFilePathToOpen = GetExistedFileShortPath(ShortcutFilePathAbs)
+End If
+
+If RestoreShortcutFileMDate Then
+  ' get shortcut file modification date before open it
+  ShortcutFileModificationDate = GetFileModificationDate(ShortcutFilePathToOpen)
 End If
 
 Dim objSC : Set objSC = GetShortcut(ShortcutFilePathToOpen)
@@ -810,7 +913,7 @@ End If
 ' 2
 
 If ResetTargetPathFromWorkingDir Then
-  If ShortcutTargetEmpty Then
+  If ShortcutTargetEmpty And Not AllowTargetTypeChange Then
     PrintOrEchoErrorLine WScript.ScriptName & ": error: shortcut target path is empty."
     WScript.Quit 10
   End If
@@ -820,22 +923,20 @@ If ResetTargetPathFromWorkingDir Then
     WScript.Quit 11
   End If
 
-  If Not ShortcutTargetEmpty Then
-    ShortcutTargetToAssign = ShortcutWorkingDirectoryUnquoted & "\" & objFS.GetFileName(ShortcutTargetUnquoted)
+  ShortcutTargetToAssign = ShortcutWorkingDirectoryUnquoted & "\" & objFS.GetFileName(ShortcutTargetUnquoted)
 
-    If Not IgnoreUnexist Then
-      ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
+  If Not IgnoreUnexist Then
+    ShortcutTargetToAssignExist = objFS.FileExists(ShortcutTargetToAssign)
 
-      If Not ShortcutTargetToAssignExist Then
-        PrintOrEchoErrorLine _
-          WScript.ScriptName & ": error: shortcut target path to assign does not exist:" & vbCrLf & _
-          WScript.ScriptName & ": info: TargetPath=`" & ShortcutTargetToAssign & "`"
-        WScript.Quit 20
-      End If
+    If Not ShortcutTargetToAssignExist Then
+      PrintOrEchoErrorLine _
+        WScript.ScriptName & ": error: shortcut target path to assign does not exist:" & vbCrLf & _
+        WScript.ScriptName & ": info: TargetPath=`" & ShortcutTargetToAssign & "`"
+      WScript.Quit 20
     End If
-
-    ShortcutTargetAssigned = True
   End If
+
+  ShortcutTargetAssigned = True
 End If
 
 ' 3
@@ -1144,4 +1245,159 @@ If ShortcutWorkingDirectoryAssigned Then
   End If
 End If
 
-objSC.Save
+If ShortcutTargetAssigned Or ShortcutWorkingDirectoryAssigned Then
+  If BackupShortcut Then
+    Dim NowDateTime : NowDateTime = Now ' copy
+    Dim t : t = Timer ' copy for milliseconds resolution
+
+    Dim HH : HH = Right("0" & DatePart("h", NowDateTime), 2)
+    Dim mm_ : mm_ = Right("0" & DatePart("n", NowDateTime), 2)
+    Dim ss : ss = Right("0" & DatePart("s", NowDateTime), 2)
+    Dim ms : ms = Right("0" & Int((t - Int(t)) * 1000), 3)
+
+    Dim BackupTimeName : BackupTimeName = HH & "'" & mm_ & "'" & ss & "''" & ms
+
+    Dim ShortcutFileDir : ShortcutFileDir = objFS.GetParentFolderName(ShortcutFilePathToOpen)
+
+    Dim ShortcutFileBackupDir
+    Dim backup_dir_path_abs
+
+    ' NOTE:
+    '   The `*Exists` methods will return False on a long path without `\\?\` prefix.
+    '
+
+    If Len(BackupDir) > 0 Then
+      ' remove `\\?\` prefix
+      If Left(BackupDir, 4) = "\\?\" Then
+        BackupDir = Mid(BackupDir, 5)
+      End If
+
+      If Len(BackupDir) > 0 Then
+        ' check on absolute path
+        If IsPathAbsolute(BackupDir) Then
+          backup_dir_path_abs = objFS.GetAbsolutePathName(BackupDir)
+        Else
+          backup_dir_path_abs = objFS.GetAbsolutePathName(ShortcutFileDir & "\" & BackupDir)
+        End If
+
+        If objFS.FolderExists("\\?\" & backup_dir_path_abs) Then
+          ShortcutFileBackupDir = backup_dir_path_abs
+        End If
+      End If
+    End If
+
+    If Not (Len(ShortcutFileBackupDir) > 0) Then
+      ' YYYY'MM'DD.backup
+      Dim YYYY : YYYY = DatePart("yyyy", NowDateTime)
+      Dim MM : MM = Right("0" & DatePart("m", NowDateTime), 2)
+      Dim DD : DD = Right("0" & DatePart("d", NowDateTime), 2)
+
+      Dim BackupDateName : BackupDateName = YYYY & "'" & MM & "'" & DD
+
+      ShortcutFileBackupDir = ShortcutFileDir & "\" & BackupDateName & ".backup"
+    End If
+
+    If Not objFS.FolderExists("\\?\" & ShortcutFileBackupDir) Then
+      objFS.CreateFolder "\\?\" & ShortcutFileBackupDir
+
+      If (err <> 0) And err <> &h800A003A& Then ' File already exists
+        PrintOrEchoErrorLine _
+          WScript.ScriptName & ": error: could not create a shortcut file backup directory:" & vbCrLf & _
+          WScript.ScriptName & ": info: BackupFilePath=`" & ShortcutFileBackupDir & "`" & vbCrLf & _
+          WScript.ScriptName & ": info: err=" & err
+        WScript.Quit 100
+      End If
+    End If
+
+    ' YYYY'MM'DD.backup/HH'mm'ss''NNN-<ShortcutName>
+    Dim ShortcutBackupFilePath : ShortcutBackupFilePath = _
+      ShortcutFileBackupDir & "\" & BackupTimeName & "-" & objFS.GetFileName(ShortcutFilePathAbs)
+
+    ' a copy from `tacklelib` script: `vbs/tacklelib/tools/shell/copy_file.vbs`
+    Sub CopyFile(from_file_str, to_file_str)
+      Dim fs_obj : Set fs_obj = CreateObject("Scripting.FileSystemObject")
+
+      Dim from_file_path_abs : from_file_path_abs = objFS.GetAbsolutePathName(from_file_str)
+      Dim to_file_path_abs : to_file_path_abs = objFS.GetAbsolutePathName(to_file_str)
+
+      ' NOTE:
+      '   The `*Exists` methods will return False on a long path without `\\?\` prefix.
+      '
+
+      ' remove `\\?\` prefix
+      If Left(from_file_path_abs, 4) = "\\?\" Then
+        from_file_path_abs = Mid(from_file_path_abs, 5)
+      End If
+
+      If Not objFS.FileExists("\\?\" & from_file_path_abs) Then
+        PrintOrEchoErrorLine _
+          WScript.ScriptName & ": error: input file path does not exist:" & vbCrLf & _
+          WScript.ScriptName & ": info: InputPath=`" & from_file_path_abs & "`"
+        WScript.Quit 1
+      End If
+
+      ' remove `\\?\` prefix
+      If Left(to_file_path_abs, 4) = "\\?\" Then
+        to_file_path_abs = Mid(to_file_path_abs, 5)
+      End If
+
+      Dim to_file_path_abs_last_back_slash_offset : to_file_path_abs_last_back_slash_offset = InStrRev(to_file_path_abs, "\")
+
+      Dim to_file_parent_dir_path_abs
+      Dim to_file_name
+      If to_file_path_abs_last_back_slash_offset > 0 Then
+        to_file_parent_dir_path_abs = Left(to_file_path_abs, to_file_path_abs_last_back_slash_offset - 1)
+        to_file_name = Mid(to_file_path_abs, to_file_path_abs_last_back_slash_offset + 1)
+      Else
+        to_file_parent_dir_path_abs = to_file_path_abs
+        to_file_name = ""
+      End If
+
+      ' test on path existence including long path
+      If Not objFS.FolderExists("\\?\" & to_file_parent_dir_path_abs) Then
+        PrintOrEchoErrorLine _
+          WScript.ScriptName & ": error: output parent directory path does not exist:" & vbCrLf & _
+          WScript.ScriptName & ": info: OutputPath=`" & to_file_path_abs & "`"
+        WScript.Quit 2
+      End If
+
+      ' test on long path existence
+      If Not objFS.FileExists(from_file_path_abs) Then
+        ' translate into short path
+        from_file_path_abs = GetExistedFileShortPath(from_file_path_abs)
+      End If
+
+      ' test on long path existence
+      If Not objFS.FolderExists(to_file_parent_dir_path_abs) Then
+        ' translate into short path
+        to_file_parent_dir_path_abs = GetExistedFolderShortPath(to_file_parent_dir_path_abs)
+      End If
+
+      to_file_path_abs = to_file_parent_dir_path_abs & "\" & to_file_name
+
+      objFS.CopyFile from_file_path_abs, to_file_path_abs
+    End Sub
+
+    CopyFile ShortcutFilePathToOpen, ShortcutBackupFilePath
+
+    If Err Then
+      PrintOrEchoErrorLine _
+        WScript.ScriptName & ": error: could not backup a shortcut file:" & vbCrLf & _
+        WScript.ScriptName & ": info: ShortcutFilePath=`" & ShortcutFilePathToOpen & "`" & vbCrLf & _
+        WScript.ScriptName & ": info: BackupFilePath=`" & ShortcutBackupFilePath & "`" & vbCrLf & _
+        WScript.ScriptName & ": info: err=" & err
+      WScript.Quit 101
+    End If
+  End If
+
+  objSC.Save
+
+  Set objSC = Nothing ' close the reference
+
+  If RestoreShortcutFileMDate And Len(ShortcutFileModificationDate) > 0 Then
+    ' restore the file modification date
+    SetFileModificationDate ShortcutFilePathToOpen, ShortcutFileModificationDate
+  End If
+Else
+  WScript.Quit -1
+End If

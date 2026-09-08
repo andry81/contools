@@ -1,23 +1,11 @@
 ''' Updates existing Windows shortcut file using outer value(s).
 
-''' CAUTION:
-'''   WScript.Shell can not handle all Unicode characters in path properties, including characters in the path to a shortcut file.
-'''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
-
-''' CAUTION:
-'''   The Windows Shell COM component does not handle unlinked or unexisted
-'''   `TargetPath` or `LinkTarget` property correctly. To ensure it does read
-'''   the property, you have to replicate the path on the file system before
-'''   read the property!
-'''   To be able to do it, you can read the `WorkingDirectory` property (it is
-'''   accessible irrespective to the target path property) and use it to
-'''   replicate the target path before read the target path property.
-
 ''' USAGE:
 '''   update_shortcut.vbs
 '''     [-CD <CurrentDirectoryPath>]
 '''     [-showas <ShowWindowAsNumber>]
 '''     [-no-backup] [-backup-dir]
+'''     [-no-restore-mdate]
 '''     [-obj] [-ignore-unexist]
 '''     [-allow-target-path-reassign] [-allow-wd-reassign] [-allow-paths-reassign]
 '''     [-allow-dos-current-dir] [-allow-dos-target-path] [-allow-dos-wd] [-allow-dos-paths]
@@ -32,20 +20,36 @@
 '''     [--]
 '''       <ShortcutFilePath>
 
+''' CAUTION:
+'''   WScript.Shell can not handle all Unicode characters in path properties,
+'''   including characters in the path to a shortcut file.
+'''   Details: https://stackoverflow.com/questions/39365489/how-do-you-keep-diacritics-in-shortcut-paths
+
+''' CAUTION:
+'''   The Windows Shell COM component does not handle unlinked or unexisted
+'''   `TargetPath` or `LinkTarget` property correctly. To ensure it does read
+'''   the property, you have to resolve or replicate the path on the file
+'''   system before read the property!
+'''   To be able to do it, you can read the `WorkingDirectory` property (it is
+'''   accessible irrespective to the target path property) and use it to
+'''   resolve/replicate the target path before read the target path property.
+
 ''' DESCRIPTION:
-'''   Script to update a shortcut with a property value.
+'''   Does update shortcut properties.
 '''
-'''   By default without any flags does NOT save a shortcut to avoid trigger
-'''   the Windows Shell component to validate all properties and rewrites the
-'''   shortcut file even if nothing is changed reducing the shortcut content.
-'''   This additionally avoids a shortcut accident corruption by the Windows
-'''   Shell component internal guess logic (see `-ignore-unexist` option
-'''   description).
+'''   Does apply only if required to avoid a shortcut accident corruption by
+'''   the Windows Shell component internal guess logic (see `-ignore-unexist`
+'''   option description).
 '''
 '''   The save does not apply until at least one property is changed.
 '''   A path property assign does not apply if a path property does not exist
 '''   and `-ignore-unexist` option is not used or a new not empty path property
 '''   value already equal case insensitively to an old path property value.
+'''
+'''   If the save applies, then by default backups a shortcut before the save.
+'''
+'''   By default the File Modification timestamp does restore after the save to
+'''   to retain a shortcut sort order by the date in a folder.
 '''
 '''   --
 '''     Separator between flags and positional arguments to explicitly stop the
@@ -104,7 +108,7 @@
 '''      See detailed documentation in MSDN for the function `ShowWindow`.
 '''
 '''   -no-backup
-'''     Disables a shortcut backup as by default.
+'''     Disables a shortcut backup.
 '''     Backup generates a directory with a backup file in the directory with
 '''     the shortcut in form:
 '''     `YYYY'MM'DD.backup/HH'mm'ss''NNN-<ShortcutName>`
@@ -116,6 +120,9 @@
 '''     generated one, for example, in case of an external script call from a
 '''     loop.
 '''     Has no effect if directory does not exist.
+'''
+'''   -no-restore-mdate
+'''     Disable a shortcut file modification date restore.
 '''
 '''   -obj
 '''     By default <ShortcutTarget> does used as a file path. Use this flag to
@@ -159,10 +166,12 @@
 '''     equal.
 '''     Has no effect if path does not exist.
 '''     Has effect if `-obj` flag is used.
+'''
 '''   -allow-wd-reassign
 '''     Allows `WorkingDirectory` property reassign if path is case
 '''     insensitively equal.
 '''     Has no effect if path does not exist.
+'''
 '''   -allow-paths-reassign
 '''     Implies all `-allow-*-reassign` flags.
 '''
@@ -170,6 +179,7 @@
 '''     Allows long path conversion into a reduced DOS path version for the
 '''     current directory.
 '''     Has no effect if path does not exist.
+'''
 '''   -allow-dos-target-path
 '''     Rereads target path after assign and if is not changed, then reassigns
 '''     it by a reduced DOS path version.
@@ -179,10 +189,12 @@
 '''     a shortcut file.
 '''     Has no effect if path does not exist.
 '''     Has no effect if `-obj` flag is used.
+'''
 '''   -allow-dos-wd
 '''     Rereads working directory after assign and if is not changed, then
 '''     reassign it by a reduced DOS path version.
 '''     Has no effect if path does not exist.
+'''
 '''   -allow-dos-paths
 '''     Implies all `-allow-dos-*` flags.
 '''
@@ -190,6 +202,7 @@
 '''     Use `GetLink` property instead of `CreateShortcut` method.
 '''     Alternative interface to assign path properties with Unicode
 '''     characters.
+'''
 '''   -print-remapped-names | -k
 '''     Print remapped key names instead of `CreateShortcut` method object
 '''     names.
@@ -197,34 +210,44 @@
 '''
 '''   -p[rint-assign]
 '''     Print property assign before assign.
+'''
 '''   -print-assigned | -pd
 '''     Rereads property after assign and prints it.
 '''
 '''   -u
 '''     Unescape %xx or %uxxxx sequences.
+'''
 '''   -q
 '''     Always quote target path argument if has no quote characters.
 '''     Can not be used together with  `-obj` flag.
+'''
 '''   -E
 '''     Expand environment variables in all shortcut arguments.
+'''
 '''   -E0
 '''     Expand environment variables only in the first argument.
+'''
 '''   -Et
 '''     Expand environment variables only in the shortcut target path argument.
+'''
 '''   -Ea
 '''     Expand environment variables only in the shortcut target object
 '''     arguments.
+'''
 '''   -Ewd
 '''     Expand environment variables only in the shortcut working directory
 '''     argument.
 '''
 '''   -t <ShortcutTarget>
 '''     Shortcut target value to assign. Must be not empty.
+'''
 '''   -t-suffix <ShortcutTargetSuffix>
 '''     Shortcut target suffix value to append if <ShortcutTarget> does not
 '''     exist. Has no effect if `-ignore-unexist` is used.
+'''
 '''   -args <ShortcutTargetArgs>
 '''     Shortcut arguments value to assign.
+'''
 '''   -wd <ShortcutWorkingDirectory>
 '''     Working directory value to assign.
 
@@ -380,6 +403,7 @@ Dim PrintAssigned : PrintAssigned = False
 
 Dim BackupShortcut : BackupShortcut = True
 Dim BackupDir : BackupDir = ""
+Dim RestoreShortcutFileMDate : RestoreShortcutFileMDate = True
 
 Dim IgnoreUnexist : IgnoreUnexist = False
 
@@ -444,6 +468,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
       ElseIf arg = "-backup-dir" Then
         i = i + 1
         BackupDir = WScript.Arguments(i)
+      ElseIf arg = "-no-restore-mdate" Then
+       RestoreShortcutFileMDate = False
       ElseIf arg = "-obj" Then
        ShortcutTargetObj = True
       ElseIf arg = "-ignore-unexist" Then
@@ -739,6 +765,49 @@ Function IsPathAbsolute(Path)
   End If
 End Function
 
+Function GetFileModificationDate(Path)
+  Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
+
+  Dim ParentPath : ParentPath = objFS.GetParentFolderName(Path)
+  Dim objNamespace, objFile
+
+  If Len(ParentPath) > 0 Then
+    Set objNamespace = objShellApp.Namespace(ParentPath)
+    Set objFile = objNamespace.ParseName(objFS.GetFileName(Path))
+  Else
+    Set objNamespace = objShellApp.Namespace(Path)
+    Set objFile = objNamespace.Self
+  End if
+
+  If IsNothing(objFile) Then
+    GetFileModificationDate = ""
+    Exit Function
+  End If
+
+  GetFileModificationDate = objFile.ModifyDate
+End Function
+
+Function SetFileModificationDate(Path, FileDate)
+  Dim objShellApp : Set objShellApp = CreateObject("Shell.Application")
+
+  Dim ParentPath : ParentPath = objFS.GetParentFolderName(Path)
+  Dim objNamespace, objFile
+
+  If Len(ParentPath) > 0 Then
+    Set objNamespace = objShellApp.Namespace(ParentPath)
+    Set objFile = objNamespace.ParseName(objFS.GetFileName(Path))
+  Else
+    Set objNamespace = objShellApp.Namespace(Path)
+    Set objFile = objNamespace.Self
+  End if
+
+  If IsNothing(objFile) Then
+    Exit Function
+  End If
+
+  objFile.ModifyDate = FileDate
+End Function
+
 Dim objFS : Set objFS = CreateObject("Scripting.FileSystemObject")
 
 ' change current directory before any file system request because of relative paths
@@ -761,10 +830,10 @@ If ChangeCurrentDirectoryExist Then
 
   ' test on long path existence
   If (Not AllowDOSCurrentDirectory) Or objFS.FolderExists(ChangeCurrentDirectoryAbs) Then
-    ' is not long path
+    ' doesn't care or is not long path
     objShell.CurrentDirectory = ChangeCurrentDirectoryAbs
   Else
-    ' translate into short path
+    ' translate into short path unconditionally
     objShell.CurrentDirectory = GetExistedFolderShortPath(ChangeCurrentDirectoryAbs)
   End If
 End If
@@ -880,6 +949,7 @@ If ShortcutWorkingDirectoryExist Then
   End If
 End If
 
+Dim ShortcutFileModificationDate
 Dim ShortcutFilePathToOpen
 
 ' test on long path existence
@@ -889,6 +959,11 @@ If objFS.FileExists(ShortcutFilePathAbs) Then
 Else
   ' translate into short path
   ShortcutFilePathToOpen = GetExistedFileShortPath(ShortcutFilePathAbs)
+End If
+
+If RestoreShortcutFileMDate Then
+  ' get shortcut file modification date before open it
+  ShortcutFileModificationDate = GetFileModificationDate(ShortcutFilePathToOpen)
 End If
 
 Dim objSC : Set objSC = GetShortcut(ShortcutFilePathToOpen)
@@ -1281,6 +1356,13 @@ If ShortcutUpdated Then
   End If
 
   objSC.Save
+
+  Set objSC = Nothing ' close the reference
+
+  If RestoreShortcutFileMDate And Len(ShortcutFileModificationDate) > 0 Then
+    ' restore the file modification date
+    SetFileModificationDate ShortcutFilePathToOpen, ShortcutFileModificationDate
+  End If
 Else
   WScript.Quit -1
 End If

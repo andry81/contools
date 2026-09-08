@@ -1,4 +1,13 @@
 2026.09.04:
+* fixed: scripts/tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: execution fixup
+* new: scripts/tools/ToolAdaptors/vbs: /reset_shortcut_from_dir.bat, /reset_shortcut.vbs: added shortcut auto backup and `-no-backup` flag to disable shortcut backup before save
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: `-backup-dir <dir-path>` option to explicitly set directory to store backed up shortcuts
+* new: Scripts/Tools/ToolAdaptors/vbs: /reset_shortcut.vbs, /update_shortcut.vbs: added restore File Modification time on all goes to reset/update shortcuts and `-no-restore-mdate` flag to disable it
+* new: Scripts/Tools/ToolAdaptors/vbs/reset_shortcut.vbs: added prevention of the target property type change from a file path to a directory path and vice versa, and added `-allow-target-type-change` flag to allow it
+* changed: scripts/tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: merge with `update_shortcut_from_dir.bat` script, skip backup directories
+* refactor: Scripts/Tools/ToolAdaptors/vbs: /reset_shortcut_from_dir.bat, /*_shortcut.vbs, /read_path_all_*.vbs, /read_path_props.vbs: documentation refactor
+
+2026.09.04:
 * refactor: scripts/tools/ToolAdaptors/vbs/*call.vbs: minor refactor
 
 2026.09.03:
