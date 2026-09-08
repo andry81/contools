@@ -1,4 +1,7 @@
 2026.09.03:
+* new: scripts/tests/bench/bat/test__read_file.bat: read a file bench tests
+
+2026.09.03:
 * fixed: scripts/tests/bench/bat/test__read_dir/test__read_dir__*.bat: bench tests minor fixup
 
 2026.09.03:
