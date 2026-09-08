@@ -1,3 +1,6 @@
+2026.09.04:
+* refactor: scripts/tools/ToolAdaptors/vbs/*call.vbs: minor refactor
+
 2026.09.03:
 * new: scripts/tests/bench/bat/test__read_file.bat: read a file bench tests
 

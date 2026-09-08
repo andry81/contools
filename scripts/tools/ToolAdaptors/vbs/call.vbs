@@ -12,7 +12,7 @@
 '''     [-v <name> <value>]
 '''     [--]
 '''       <CommandLine>
-'''
+
 ''' DESCRIPTION:
 '''   --
 '''     Separator between flags and positional arguments to explicitly stop the
