@@ -21,6 +21,10 @@ rem          the script.
 rem
 rem   Not strict version, reports an error in case of unexisted drive, but
 rem   does not check for disconnected symbolic reference to a directory.
+rem
+rem   If all directories does exist, then skips `mkdir` command and returns 0.
+rem   If some or all directories does not exist, then returns exit code of the
+rem   `mkdir` command with only these directories.
 
 rem <path>...
 rem   Directory path list.

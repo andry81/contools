@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   mkdir_if_notexist_strict.bat <path>...
+rem   mkdir_if_notexist_and.bat <path>...
 
 rem Description:
 rem   The `mkdir` if-not-exist wrapper script with echo and some conditions
@@ -19,12 +19,25 @@ rem       3. The `%%~f` builtin variables extension and other extensions does
 rem          remove the prefix and then a path can be prefixed internally by
 rem          the script.
 rem
-rem   Strict version, reports an error in case of unexisted drive or
-rem   disconnected symbolic reference to a directory.
+rem   Not strict version, reports an error in case of unexisted drive, but
+rem   does not check for disconnected symbolic reference to a directory.
 rem
-rem   If all directories does exist, then skips `mkdir` command and returns 0.
+rem   If all directories does exist, then skips `mkdir` command and returns -1.
 rem   If some or all directories does not exist, then returns exit code of the
 rem   `mkdir` command with only these directories.
+rem
+rem   Difference with the `mkdir_if_notexist.bat` is that you can chain the
+rem   call to print the spacer line or a message on a success:
+rem
+rem     (in script)
+rem     >
+rem     call mkdir_if_notexist_and.bat ... && echo;
+rem
+rem   But must test the error level on -1 to specifically skip the exit:
+rem
+rem     (in script)
+rem     >
+rem     ( call mkdir_if_notexist_and.bat ... && echo;) || call if_pass.bat %%ERRORLEVEL%% EQU -1 || exit /b
 
 rem <path>...
 rem   Directory path list.
@@ -119,7 +132,7 @@ rem CAUTION:
 rem   The drive still must exist even if the path is not. If path exists, the path directory still can be in a disconnected state.
 
 if not exist "%DIR_DRIVE%" (
-  echo;%?~%: error: the directory path drive is not exist: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
+  echo;%?~%: error: the directory path drive is not exist: "%DIR_PATH%".
   exit /b -254
 ) >&2
 
@@ -129,12 +142,7 @@ rem   report existence of a directory without the trailing back slash:
 rem     `x:\<path-to-dir-without-trailing-back-slash>`
 rem   So we must test the path with the trailing back slash to check existence of the link AND it's connection state.
 
-if not exist "\\?\%DIR_PATH%" (
-  set DIR_PATHS=%DIR_PATHS% %1
-) else if not exist "\\?\%DIR_PATH%\*" (
-  echo;%?~%: error: path does exist but is not a directory: ARG=%DIR_COUNT% DIR_PATH="%DIR_PATH%".
-  exit /b -254
-) >&2
+if not exist "\\?\%DIR_PATH%" set DIR_PATHS=%DIR_PATHS% %1
 
 shift
 
@@ -152,7 +160,7 @@ if not defined DIR_PATH (
 goto MKDIR_LOOP
 
 :EXEC
-if not defined DIR_PATHS exit /b 0
+if not defined DIR_PATHS exit /b -1
 
 echo;^>^>mkdir%DIR_PATHS%
 mkdir%DIR_PATHS%

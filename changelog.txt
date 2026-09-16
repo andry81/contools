@@ -1,3 +1,8 @@
+2026.09.16:
+* new: scripts/tools/std/if_pass.bat: alternative command form of `if` script to not alter a not zero exit code
+* new: scripts/tools/std/mkdir_if_notexist_and.bat: alternative command form of `mkdir` scripts to chain commands on success
+* refactor: scripts/tools/std/mkdir_if_notexist*.bat: documentation refactor
+
 2026.09.04:
 * fixed: scripts/tools/ToolAdaptors/vbs/reset_shortcut_from_dir.bat: execution fixup
 * new: scripts/tools/ToolAdaptors/vbs: /reset_shortcut_from_dir.bat, /reset_shortcut.vbs: added shortcut auto backup and `-no-backup` flag to disable shortcut backup before save

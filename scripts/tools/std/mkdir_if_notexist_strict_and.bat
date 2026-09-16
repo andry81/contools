@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   mkdir_if_notexist_strict.bat <path>...
+rem   mkdir_if_notexist_strict_and.bat <path>...
 
 rem Description:
 rem   The `mkdir` if-not-exist wrapper script with echo and some conditions
@@ -22,9 +22,22 @@ rem
 rem   Strict version, reports an error in case of unexisted drive or
 rem   disconnected symbolic reference to a directory.
 rem
-rem   If all directories does exist, then skips `mkdir` command and returns 0.
+rem   If all directories does exist, then skips `mkdir` command and returns -1.
 rem   If some or all directories does not exist, then returns exit code of the
 rem   `mkdir` command with only these directories.
+rem
+rem   Difference with the `mkdir_if_notexist_strict.bat` is that you can chain
+rem   the call to print the spacer line or a message on a success:
+rem
+rem     (in script)
+rem     >
+rem     call mkdir_if_notexist_strict_and.bat ... && echo;
+rem
+rem   But must test the error level on -1 to specifically skip the exit:
+rem
+rem     (in script)
+rem     >
+rem     ( call mkdir_if_notexist_strict_and.bat ... && echo;) || call if_pass.bat %%ERRORLEVEL%% EQU -1 || exit /b
 
 rem <path>...
 rem   Directory path list.
@@ -152,7 +165,7 @@ if not defined DIR_PATH (
 goto MKDIR_LOOP
 
 :EXEC
-if not defined DIR_PATHS exit /b 0
+if not defined DIR_PATHS exit /b -1
 
 echo;^>^>mkdir%DIR_PATHS%
 mkdir%DIR_PATHS%
