@@ -1,3 +1,7 @@
+2026.09.22:
+* new: scripts/tools/std/is_input_interactive.bat: script to detect interactive input (`cmd.exe /k ...` call)
+* refactor: scripts/tools/std/if_pass.bat: documentation refactor
+
 2026.09.16:
 * new: scripts/tools/std/if_pass.bat: alternative command form of `if` script to not alter a not zero exit code
 * new: scripts/tools/std/mkdir_if_notexist_and.bat: alternative command form of `mkdir` scripts to chain commands on success

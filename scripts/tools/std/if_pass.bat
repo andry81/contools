@@ -27,10 +27,15 @@ rem      >call if_pass.bat "10" LSS "9"
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=0
 
-
-rem Examples (in script):
-rem   1. Pass the previous exit code to further processing in the call chain:
-rem      >
-rem      call errlvl.bat 123 || ( call if_pass.bat %%ERRORLEVEL%% NEQ 123 && echo not 123 ) || echo 123
-rem      echo ERRORLEVEL=%ERRORLEVEL%
+rem Examples:
+rem   Pass the previous exit code to further processing in the call chain:
+rem
+rem   1. >call errlvl.bat 123 || call if_pass.bat ^%ERRORLEVEL^% NEQ 123 && echo YES || echo NO
+rem      NO
+rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
+rem
+rem   2. >call errlvl.bat 124 || call if_pass.bat ^%ERRORLEVEL^% NEQ 123 && echo YES || echo NO
+rem      YES
+rem      >echo ERRORLEVEL=%ERRORLEVEL%
+rem      ERRORLEVEL=0
