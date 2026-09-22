@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   pause.bat [-chcp <code-page>]
+rem   pause.bat [-c] [-chcp <code-page>]
 
 rem Description:
 rem   Sets the code page to the last known (`%LAST_CP%`) after a code page
@@ -25,6 +25,13 @@ rem   The double redirection has an issue versus `callf` utility.
 rem   See for details:
 rem     "`set /p` skips the input after `callf` call with the elevation" :
 rem     https://github.com/andry81/contools/discussions/37
+
+rem -c
+rem   Pause only when `cmd.exe` is not in the interactive mode (see
+rem   `is_input_interactive.bat` script).
+
+rem -chcp <code-page>
+rem   Change the code page to <code-page> before the pause.
 :DOC_END
 
 setlocal & set "LAST_ERROR=%ERRORLEVEL%"
@@ -35,6 +42,7 @@ rem script names call stack
 if defined ?~ ( set "?~=%?~%-^>%~nx0" ) else if defined ?~nx0 ( set "?~=%?~nx0%-^>%~nx0" ) else set "?~=%~nx0"
 
 rem script flags
+set FLAG_NOT_INTERACTIVE_ONLY_PAUSE=0
 set "FLAG_CHCP="
 
 rem flags always at first
@@ -43,11 +51,14 @@ set "FLAG=%~1"
 if defined FLAG ^
 if not "%FLAG:~0,1%" == "-" set "FLAG="
 
-if defined FLAG if "%FLAG%" == "-chcp" set "FLAG_CHCP=%~2" & shift & shift & call set "FLAG=%%~1"
+if defined FLAG if "%FLAG%" == "-c"    set "FLAG_NOT_INTERACTIVE_ONLY_PAUSE=1"         & shift & call set "FLAG=%%~1"
+if defined FLAG if "%FLAG%" == "-chcp" set "FLAG_CHCP=%~2"                     & shift & shift & call set "FLAG=%%~1"
 
 if defined FLAG (
   echo;%?~%: error: invalid flag: %FLAG%
 ) >&2
+
+if %FLAG_NOT_INTERACTIVE_ONLY_PAUSE% NEQ 0 call :IS_INPUT_INTERACTIVE && exit /b %LAST_ERROR%
 
 if defined FLAG_CHCP (
   call "%%?~dp0%%chcp.bat" %%FLAG_CHCP%%
@@ -78,3 +89,29 @@ if exist "%SystemRoot%\System32\timeout.exe" (
 )
 
 exit /b %LAST_ERROR%
+
+:IS_INPUT_INTERACTIVE
+rem copy of `is_input_interactive.bat` script
+if not defined CMDCMDLINE exit /b 255
+
+setlocal DISABLEDELAYEDEXPANSION & setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!CMDCMDLINE!") do endlocal & set "__STRING__=%%i"
+
+rem encode asterisk character (copy of `encode/encode_asterisk_char.bat` script)
+setlocal ENABLEDELAYEDEXPANSION & if "!__STRING__!" == "!__STRING__:**=!" ( goto SKIP_ASTERISK_ENCODE ) else endlocal
+
+:ASTERISK_ENCODE_LOOP
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=1 delims=*"eol^= %%i in (".!__STRING__!") do for /F "tokens=* delims="eol^= %%j in ("!__STRING__:**=!.") do endlocal & set "__STRING__=%%i$2A%%j" & ^
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__:~1,-1!") do ^
+if not "!__STRING__!" == "!__STRING__:**=!" ( endlocal & set "__STRING__=%%i" & goto ASTERISK_ENCODE_LOOP ) else endlocal & set "__STRING__=%%i"
+
+:SKIP_ASTERISK_ENCODE
+
+rem encode the rest globbing characters (copy of `encode/encode_glob_char.bat` script)
+setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!__STRING__:<=$3C!" & set "__STRING__=!__STRING__:>=$3E!" & ^
+for /F "tokens=* delims="eol^= %%i in ("!__STRING__:?=$3F!") do endlocal & set "__STRING__=%%i"
+
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & for %%j in (%%i) do ^
+set "ARG=%%j" & setlocal ENABLEDELAYEDEXPANSION & ( if not "!ARG!" == "!ARG:/k=!" endlocal & goto CHECK_STDIN_REOPEN ) & ( if not "!ARG!" == "!ARG:/c=!" exit /b 255 ) & endlocal
+
+:CHECK_STDIN_REOPEN & rem copy of `is_stdin_reopen.bat` script
+"%SystemRoot%\System32\timeout.exe" /T 0 >nul 2>&1 && exit /b 0 & exit /b 255

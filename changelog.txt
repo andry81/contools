@@ -1,4 +1,8 @@
 2026.09.22:
+* change: scripts/tools/std/pause.bat: added `-c` flag to run only in the not interactive `cmd.exe` session
+* refactor: scripts/tools/std/pause.bat: documentation refactor
+
+2026.09.22:
 * new: scripts/tools/std/is_input_interactive.bat: script to detect interactive input (`cmd.exe /k ...` call)
 * refactor: scripts/tools/std/if_pass.bat: documentation refactor
 
