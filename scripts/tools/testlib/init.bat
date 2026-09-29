@@ -134,7 +134,7 @@ if defined TEST_SCRIPT_FILE_PATH_ if "%TEST_SCRIPT_FILE_PATH_:~1,1%" == ":" goto
 rem shortcuts to the user test script file name
 call "%%CONTOOLS_ROOT%%/std/declare_builtins.bat" %%* || exit /b
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path_if_def.bat" TEST_SCRIPT_FILE_PATH "%%TEST_SCRIPT_FILE_PATH%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path_if_def.bat" TEST_SCRIPT_FILE_PATH "%%TEST_SCRIPT_FILE_PATH%%" || exit /b
 
 if /i "%TEST_SCRIPT_FILE_PATH%" == "%?~f0%" (
   echo;%~nx0: error: test script file path already initialized: "%TEST_SCRIPT_FILE_PATH%".
@@ -144,7 +144,7 @@ if /i "%TEST_SCRIPT_FILE_PATH%" == "%?~f0%" (
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" 1 TEST_SCRIPT_INIT_CMDLINE %%*
 
 rem make built in canonical user script path variables
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_PATH "%%?~f0%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_PATH "%%?~f0%%" || exit /b
 
 set "TEST_SCRIPT_FILE_NAME=%?~n0%"
 set "TEST_SCRIPT_FILE_EXT=%?~x0%"
@@ -161,7 +161,7 @@ if "%TEST_SCRIPT_NEST_LVL_DIR_NAME:~1,1%" == "" set "TEST_SCRIPT_NEST_LVL_DIR_NA
 if "%TEST_SCRIPT_INDEX_DIR_NAME:~2,1%" == "" set "TEST_SCRIPT_INDEX_DIR_NAME=0%TEST_SCRIPT_INDEX_DIR_NAME%"
 if "%TEST_SCRIPT_INDEX_DIR_NAME:~2,1%" == "" set "TEST_SCRIPT_INDEX_DIR_NAME=0%TEST_SCRIPT_INDEX_DIR_NAME%"
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_DIR "%%?~dp0%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_SCRIPT_FILE_DIR "%%?~dp0%%." || exit /b
 
 if defined TEST_SCRIPT_ROOT_INIT_DATE_TIME goto SKIP_TEST_SCRIPT_ROOT_INIT_DATE_TIME
 

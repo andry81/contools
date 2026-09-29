@@ -46,6 +46,18 @@ goto FILE_PATH_OK
 
 :FILE_PATH_OK
 
-for /F "tokens=* delims="eol^= %%i in ("%FILE_PATH%\.") do endlocal & set "%~1=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%FILE_PATH%\.") do endlocal & set "%~1=%%~fi" & (
+  if not exist "%%~fi" (
+    echo;%?~%: error: path does not exist:
+    echo;  %~1="%%~fi"
+    exit /b 1
+  ) >&2
+
+  if exist "%%~fi\*" (
+    echo;%?~%: error: existed path is not a file path:
+    echo;  %~1="%%~fi"
+    exit /b 2
+  ) >&2
+)
 
 exit /b 0

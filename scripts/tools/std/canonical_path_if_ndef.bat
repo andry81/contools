@@ -15,8 +15,39 @@ if "%~2" == "" (
   exit /b 255
 ) >&2
 
+set "FILE_PATH=%~2"
+set "FILE_PATH=%FILE_PATH:/=\%"
+
+rem check on missed components...
+
+rem ...forwarding `\` character
+if "\" == "%FILE_PATH:~0,1%" goto FILE_PATH_ERROR
+
+rem ...double `\\` character
+if not "%FILE_PATH%" == "%FILE_PATH:\\=\%" goto FILE_PATH_ERROR
+
+rem ...trailing `\` character
+if "\" == "%FILE_PATH:~-1%" goto FILE_PATH_ERROR
+
+rem check on invalid characters in path
+if not "%FILE_PATH%" == "%FILE_PATH:**=%" goto FILE_PATH_ERROR
+if not "%FILE_PATH%" == "%FILE_PATH:?=%" goto FILE_PATH_ERROR
+if not "%FILE_PATH%" == "%FILE_PATH:<=%" goto FILE_PATH_ERROR
+if not "%FILE_PATH%" == "%FILE_PATH:>=%" goto FILE_PATH_ERROR
+
+goto FILE_PATH_OK
+
+:FILE_PATH_ERROR
+(
+  echo;%?~%: error: a variable path value is invalid:
+  echo;  %~1="%FILE_PATH%"
+  exit /b 254
+) >&2
+
+:FILE_PATH_OK
+
 if defined %~1 exit /b 0
 
-for /F "tokens=* delims="eol^= %%i in ("%~2\.") do endlocal & set "%~1=%%~fi"
+for /F "tokens=* delims="eol^= %%i in ("%FILE_PATH%\.") do endlocal & set "%~1=%%~fi"
 
 exit /b 0

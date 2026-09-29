@@ -1,3 +1,9 @@
+2026.09.28:
+* new: scripts/tools/std/canonical_*_path.bat: scripts with additional path checks and return codes
+* changed: scripts/tools/std: canonical_*_vars.bat, canonical_path*.bat: additional path checks and return codes
+* changed: scripts/tools/testlib/init.bat: additional validation
+* changed: scripts/tools/testlib/test.bat: skip `exit.bat` call on a not zero exit code from `init.bat`
+
 2026.09.22:
 * change: scripts/tools/std/pause.bat: added `-c` flag to run only in the not interactive `cmd.exe` session
 * refactor: scripts/tools/std/pause.bat: documentation refactor
