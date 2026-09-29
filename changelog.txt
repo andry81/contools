@@ -1,3 +1,7 @@
+2026.09.29:
+* changed: scripts/tests/unit/bat/test_std_if_!exclusive.bat: removed because `if` testes is grouped
+* refactor: scripts/tests/unit/bat/test_encoding_!exclusive.bat: use exclusively
+
 2026.09.28:
 * refactor: scripts/tests/unit/bat/test_std, scripts/tests/unit/bat/_testdata/test_std__*: reorder `std` unit tests
 
