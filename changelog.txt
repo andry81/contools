@@ -1,4 +1,7 @@
 2026.09.28:
+* refactor: scripts/tests/unit/bat/test_std, scripts/tests/unit/bat/_testdata/test_std__*: reorder `std` unit tests
+
+2026.09.28:
 * changed: scripts/tests/unit/bat/test_std/test_std__is_stdio_reopen/.impl/test_std__test_*_impl.bat: replace `errlvl.bat` script call by an equivalent `exit` command
 * changed: scripts/tests: test_*.bat: switched to new `canonical_*_path.bat` scripts
 
