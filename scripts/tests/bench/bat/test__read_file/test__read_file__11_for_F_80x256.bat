@@ -8,7 +8,7 @@ echo;^>%~nx0
 
 setlocal DISABLEDELAYEDEXPANSION
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_READ_DIR  "%%TEST_DATA_IN_ROOT%%/test_read_file"
+call "%%CONTOOLS_ROOT%%/std/canonical_dir_path.bat" TEST_READ_DIR "%%TEST_DATA_IN_ROOT%%/test_read_file" || exit /b
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 

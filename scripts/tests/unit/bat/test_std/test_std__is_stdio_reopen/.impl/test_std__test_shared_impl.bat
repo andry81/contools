@@ -31,7 +31,7 @@ rem   To debug use `/create-console` instead.
 rem isolated multiple tests (shared)
 start "" /I /B /WAIT "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe" ^
   /no-expand-env /no-subst-pos-vars %CALLF_DEBUG_FLAGS% /ret-child-exit // ^
-  "%COMSPEC%" "/D /C \"@\"%TEST_TEMP_DIR_PATH%/test_std__run_shared_script.bat\" {*} ^& \"%CONTOOLS_ROOT%/std/errlvl.bat\"\"" ^
+  "%COMSPEC%" "/D /C \"@\"%TEST_TEMP_DIR_PATH%/test_std__run_shared_script.bat\" {*} ^& exit\"" ^
   %*
 
 if %TEST_DEBUG% NEQ 0 type "%TEST_LOG:/=\%"

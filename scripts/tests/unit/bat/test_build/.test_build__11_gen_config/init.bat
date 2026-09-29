@@ -12,10 +12,10 @@ if not defined TEST_DATA_FILE_REF_DIR exit /b 255
 
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" -skip 1 3 GEN_CONFIG_FLAGS -+ %%*
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_IN_FILE "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_IN_DIR%%\%%GEN_CONFIG_FILE_NAME%%.in"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_REF_DIR "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_REF_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat" TEST_DATA_IN_FILE  "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_IN_DIR%%\%%GEN_CONFIG_FILE_NAME%%.in" || exit /b
+call "%%CONTOOLS_ROOT%%/std/canonical_dir_path.bat"  TEST_DATA_REF_DIR  "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_REF_DIR%%" || exit /b
 
-set "TEST_DATA_REF_FILE=%TEST_DATA_REF_DIR%\output.txt"
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat" TEST_DATA_REF_FILE "%%TEST_DATA_REF_DIR%%\output.txt" || exit /b
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%" "" "%%TEST_DATA_TEMP_ROOT%%" || exit /b
 

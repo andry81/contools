@@ -1,4 +1,8 @@
 2026.09.28:
+* changed: scripts/tests/unit/bat/test_std/test_std__is_stdio_reopen/.impl/test_std__test_*_impl.bat: replace `errlvl.bat` script call by an equivalent `exit` command
+* changed: scripts/tests: test_*.bat: switched to new `canonical_*_path.bat` scripts
+
+2026.09.28:
 * new: scripts/tools/std/canonical_*_path.bat: scripts with additional path checks and return codes
 * changed: scripts/tools/std: canonical_*_vars.bat, canonical_path*.bat: additional path checks and return codes
 * changed: scripts/tools/testlib/init.bat: additional validation

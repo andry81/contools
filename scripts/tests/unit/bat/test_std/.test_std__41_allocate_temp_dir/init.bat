@@ -13,9 +13,9 @@ set "TEST_TIME=%RETURN_VALUE:~8,2%'%RETURN_VALUE:~10,2%'%RETURN_VALUE:~12,2%''%R
 
 set "TEST_TEMP_DIR_NAME=%TEST_DATE%.%TEST_TIME%.%TEST_SCRIPT_FILE_NAME%.%TESTLIB__TEST_ORDER_NUMBER%"
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_TEMP_DIR           "%%TEST_DATA_TEMP_ROOT%%\%%TEST_TEMP_DIR_NAME%%"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_REF_DIR_PATH  "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_REF_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat"     TEST_TEMP_DIR           "%%TEST_DATA_TEMP_ROOT%%\%%TEST_TEMP_DIR_NAME%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_dir_path.bat" TEST_DATA_REF_DIR_PATH  "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_REF_DIR%%" || exit /b
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%TEST_TEMP_DIR%%" >nul || exit /b 127
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/mkdir.bat" "%%TEST_TEMP_DIR%%" >nul || exit /b
 
 exit /b 0

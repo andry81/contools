@@ -13,7 +13,7 @@ call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%"
 set "TEST_TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
 rem initialize setup parameters
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TESTS_LIST_FILE       "%%TESTS_PROJECT_ROOT%%/test_std/test_std__is_stdio_reopen/.tests/01_stdin/input.lst"
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat" TESTS_LIST_FILE       "%%TESTS_PROJECT_ROOT%%/test_std/test_std__is_stdio_reopen/.tests/01_stdin/input.lst" || exit /b
 
 set TEST_DEBUG=0
 

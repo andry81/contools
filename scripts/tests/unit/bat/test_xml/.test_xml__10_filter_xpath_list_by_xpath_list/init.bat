@@ -7,11 +7,11 @@ if not defined TEST_DATA_FILE_IN exit /b 255
 
 call "%%CONTOOLS_ROOT%%/std/setshift.bat" 2 TEST_DATA_CMD_LINE %%*
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_IN_FILE "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_IN%%"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_REF_DIR "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_REF_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat"  TEST_DATA_IN_FILE       "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_IN%%" || exit /b
+call "%%CONTOOLS_ROOT%%/std/canonical_dir_path.bat"   TEST_DATA_REF_DIR       "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_REF_DIR%%" || exit /b
 
-set "TEST_DATA_FILTER_FILE=%TEST_DATA_REF_DIR%\xpath_filter.txt"
-set "TEST_DATA_REF_FILE=%TEST_DATA_REF_DIR%\output.txt"
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat"  TEST_DATA_FILTER_FILE   "%%TEST_DATA_REF_DIR%%\xpath_filter.txt" || exit /b
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat"  TEST_DATA_REF_FILE      "%%TEST_DATA_REF_DIR%%\output.txt" || exit /b
 
 call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%" "" "%%TEST_DATA_TEMP_ROOT%%" || exit /b
 
@@ -19,7 +19,7 @@ set "TEST_TEMP_DIR_NAME=%SCRIPT_TEMP_DIR_NAME%"
 set "TEST_TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
 rem initialize setup parameters
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_TEMP_DATA_OUT_FILE "%%TEST_TEMP_DIR_PATH%%\output.txt"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat"       TEST_TEMP_DATA_OUT_FILE "%%TEST_TEMP_DIR_PATH%%\output.txt"
 
 rem extract path to directory
 call :GET_TEST_DATA_FILE_DIR "%%TEST_DATA_IN_FILE%%"

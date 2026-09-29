@@ -8,8 +8,8 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" ".02_inplace_handlers" || exit
 
 set TEST_DATA_DIR_NAME=test_encoding__01_unix2dos
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_CONV_SCRIPT    "%%CONTOOLS_ROOT%%/encoding/unix2dos.bat"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TESTS_LIST_FILE     "%%TESTS_PROJECT_ROOT%%/test_encoding/.tests/03_LF/01_unix2dos.lst"
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat" TEST_CONV_SCRIPT    "%%CONTOOLS_ROOT%%/encoding/unix2dos.bat" || exit /b
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat" TESTS_LIST_FILE     "%%TESTS_PROJECT_ROOT%%/test_encoding/.tests/03_LF/01_unix2dos.lst" || exit /b
 
 set "CONTOOLS_MSYS2_ROOT="
 

@@ -12,10 +12,10 @@ set "TEST_TEMP_DIR_NAME=%SCRIPT_TEMP_ROOT_DATE%.%SCRIPT_TEMP_ROOT_TIME%.%TESTLIB
 set "TEST_TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
 rem initialize setup parameters
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_TEMP_DATA_OUT_FILE "%%TEST_TEMP_DIR_PATH%%\output.txt"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_DATA_REF_DIR       "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_IN_OUT_DIR%%"
+call "%%CONTOOLS_ROOT%%/std/canonical_path.bat"       TEST_TEMP_DATA_OUT_FILE "%%TEST_TEMP_DIR_PATH%%\output.txt"
+call "%%CONTOOLS_ROOT%%/std/canonical_dir_path.bat"   TEST_DATA_REF_DIR       "%%TEST_DATA_IN_ROOT%%\%%TEST_SCRIPT_FILE_NAME%%\%%TEST_DATA_FILE_IN_OUT_DIR%%" || exit /b
 
-set "TEST_DATA_IN_FILE=%TEST_DATA_REF_DIR%\input.txt"
-set "TEST_DATA_REF_FILE=%TEST_DATA_REF_DIR%\output.txt"
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat"  TEST_DATA_IN_FILE       "%%TEST_DATA_REF_DIR%%\input.txt" || exit /b
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat"  TEST_DATA_REF_FILE      "%%TEST_DATA_REF_DIR%%\output.txt" || exit /b
 
 exit /b 0

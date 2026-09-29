@@ -8,8 +8,8 @@ call "%%CONTOOLS_TESTLIB_ROOT%%/init.bat" "%%~f0" ".01_piped_handlers" || exit /
 
 set TEST_DATA_DIR_NAME=test_encoding__02_dos2unix
 
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TEST_CONV_SCRIPT    "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat"
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TESTS_LIST_FILE     "%%TESTS_PROJECT_ROOT%%/test_encoding/.tests/01_mixed/02_dos2unix.lst"
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat" TEST_CONV_SCRIPT    "%%CONTOOLS_ROOT%%/encoding/dos2unix.bat" || exit /b
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat" TESTS_LIST_FILE     "%%TESTS_PROJECT_ROOT%%/test_encoding/.tests/01_mixed/02_dos2unix.lst" || exit /b
 
 set "CONTOOLS_MSYS2_ROOT="
 

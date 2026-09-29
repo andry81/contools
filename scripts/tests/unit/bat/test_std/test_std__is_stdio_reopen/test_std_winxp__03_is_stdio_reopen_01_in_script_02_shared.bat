@@ -13,7 +13,7 @@ call "%%CONTOOLS_ROOT%%/std/allocate_temp_dir.bat" . "%%TEST_SCRIPT_FILE_NAME%%"
 set "TEST_TEMP_DIR_PATH=%SCRIPT_TEMP_CURRENT_DIR%"
 
 rem initialize setup parameters
-call "%%CONTOOLS_ROOT%%/std/canonical_path.bat" TESTS_LIST_FILE       "%%TESTS_PROJECT_ROOT%%/test_std/test_std__is_stdio_reopen/.tests/03_stdio/input.lst"
+call "%%CONTOOLS_ROOT%%/std/canonical_file_path.bat" TESTS_LIST_FILE       "%%TESTS_PROJECT_ROOT%%/test_std/test_std__is_stdio_reopen/.tests/03_stdio/input.lst" || exit /b
 
 type "%TESTS_LIST_FILE:/=\%" ^
   | "%CONTOOLS_MSYS2_USR_ROOT%/bin/sed.exe" -r -b -e "s|/std/is_std_reopen.bat|/std/winxp/is_std_reopen.bat|mg" > "%TEST_TEMP_DIR_PATH%/test_input.lst" ^
