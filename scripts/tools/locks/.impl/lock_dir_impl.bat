@@ -75,7 +75,7 @@ goto EXIT_PRE_LOCK_LOOP
 
 :RELEASE_AND_CLEANUP_LOCK
 rem release the lock
-cd "%LOCK_PATH%"
+cd /d "%LOCK_PATH%"
 
 :RELEASE_AND_CLEANUP_LOCK_LOOP
 rem clean up the lock directory

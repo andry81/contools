@@ -17,7 +17,7 @@ call "%%CONTOOLS_ROOT%%/std/echo_var.bat" ?.
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-cd "%TEST_READ_DIR%"
+cd /d "%TEST_READ_DIR%"
 
 for /F "usebackq tokens=* delims="eol^= %%j in (`%%?.%%`) do echo;%%j
 

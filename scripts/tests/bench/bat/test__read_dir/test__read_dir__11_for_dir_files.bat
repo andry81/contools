@@ -12,7 +12,7 @@ call "%%CONTOOLS_ROOT%%/std/canonical_dir_path.bat" TEST_READ_DIR "%%TEST_DATA_I
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-cd "%TEST_READ_DIR%"
+cd /d "%TEST_READ_DIR%"
 
 for %%j in (*_*_*.lst) do echo;%%j
 

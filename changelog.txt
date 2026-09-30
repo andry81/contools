@@ -1,3 +1,6 @@
+2026.09.30:
+* fixed: *.bat: use `cd /d` instead of `cd` to avoid lock of a current directory drive
+
 2026.09.29:
 * changed: scripts/tests/unit/bat/test_std_if_!exclusive.bat: removed because `if` testes is grouped
 * refactor: scripts/tests/unit/bat/test_encoding_!exclusive.bat: use exclusively
