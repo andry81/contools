@@ -8,7 +8,7 @@ rem   `for /F` does not return a command error code
 for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@"%%SystemRoot%%\System32\wbem\wmic.exe" path Win32_OperatingSystem get LocalDateTime /VALUE 2^>nul`) do ^
 if "%%i" == "LocalDateTime" set "RETURN_VALUE=%%j"
 
-if defined RETURN_VALUE endlocal & set "RETURN_VALUE=%RETURN_VALUE:~0,18%" & exit /b 0
+if defined RETURN_VALUE set "RETURN_VALUE=%RETURN_VALUE:~0,18%" & exit /b 0
 
 exit /b 1
 

@@ -7,7 +7,7 @@ rem CAUTION:
 rem   `for /F` does not return a command error code
 for /F "usebackq tokens=* delims="eol^= %%i in (`@"%%SystemRoot%%\System32\cscript.exe" //nologo "%~dp0print_wmi_local_datetime.vbs" 2^>nul`) do set "RETURN_VALUE=%%i"
 
-if defined RETURN_VALUE endlocal & set "RETURN_VALUE=%RETURN_VALUE:~0,18%" & exit /b 0
+if defined RETURN_VALUE set "RETURN_VALUE=%RETURN_VALUE:~0,18%" & exit /b 0
 
 exit /b 1
 

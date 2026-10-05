@@ -1,3 +1,10 @@
+2026.10.05:
+* new: scripts/tools/wmi: print_wmi_class_props.*, print_wmi_class_all_obj_props.*: scripts to print all property names and values using a class name
+* new: scripts/tools/wmi: print_wmi_cpu_get.*: scripts to print all CPU property names and values
+* new: scripts/tools/wmi/get_wmi_cpu_get.vbs.bat: script to print CPU selected property names and values
+* changed: scripts/tools/wmi/*.vbs: minor improvements
+* changed: scripts/tools/wmi/*.bat: code cleanup
+
 2026.09.30:
 * fixed: *.bat: use `cd /d` instead of `cd` to avoid lock of a current directory drive
 

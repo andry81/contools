@@ -1,5 +1,6 @@
 Dim objWMI : Set objWMI = GetObject("winmgmts:")
-Dim objClasses : Set objClasses = objWMI.ExecQuery("SELECT * FROM meta_class") 
+'Dim objClasses : Set objClasses = objWMI.ExecQuery("SELECT * FROM meta_class")
+Dim objClasses: Set objClasses = objWMI.InstancesOf("meta_class")
 
 Dim objClass
 
