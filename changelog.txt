@@ -1,3 +1,7 @@
+2026.10.06:
+* changed: scripts/tools/exec/exec_callf_prefix.bat: added `-std-pause-c` flag to use `pause.bat` script call with `-c` flag (must be used instead of `/pause*` flag in the call to `callf.exe`)
+* changed: script_init.bat, scripts/tools/testlib/exit.bat: switched to a non interactive pause
+
 2026.10.05:
 * new: scripts/tools/wmi: print_wmi_class_props.*, print_wmi_class_all_obj_props.*: scripts to print all property names and values using a class name
 * new: scripts/tools/wmi: print_wmi_cpu_get.*: scripts to print all CPU property names and values

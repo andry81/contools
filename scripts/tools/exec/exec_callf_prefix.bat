@@ -37,6 +37,7 @@ set FLAG_SHIFT=0
 
 set FLAG_FLAGS_SCOPE=0
 set FLAG_NO_LOG=0
+set FLAG_STD_PAUSE_C=0
 set FLAG_ELEVATE=0
 set "ELEVATE_PREFIX_NAME="
 set "CALLF_BARE_FLAGS="
@@ -56,6 +57,8 @@ if defined FLAG if "%FLAG%" == "--" set /A FLAG_FLAGS_SCOPE-=1
 if defined FLAG (
   if "%FLAG%" == "-nolog" (
     set FLAG_NO_LOG=1
+  ) else if "%FLAG%" == "-std-pause-c" (
+    set FLAG_STD_PAUSE_C=1
   ) else if "%FLAG%" == "-elevate" (
     set FLAG_ELEVATE=1
     set "ELEVATE_PREFIX_NAME=%~2"
@@ -103,6 +106,10 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 ) >&2
 
 rem common flags for all terminals
+
+if %FLAG_STD_PAUSE_C% NEQ 0 (
+  set CALLF_BARE_CMD_SUFFIX= ^^& "%CONTOOLS_ROOT%/std/pause.bat" -c ^^& exit
+) else set CALLF_BARE_CMD_SUFFIX= ^^& exit
 
 rem CAUTION:
 rem   Because `callf.exe` may use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` and `NEST_LVL` variables into the command line.
@@ -167,7 +174,7 @@ rem   The `& exit` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt` from `contools--utils` project.
 rem
 endlocal & "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
-  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& exit\"" ^
+  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}%CALLF_BARE_CMD_SUFFIX%\"" ^
   %*
 
 rem to drop local variables
