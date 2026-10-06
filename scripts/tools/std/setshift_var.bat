@@ -108,14 +108,9 @@ set "SHIFT_=%SHIFT%"
 rem cast to integer
 set /A SHIFT+=0
 
-(
-  rem test on an integer
-  setlocal ENABLEDELAYEDEXPANSION
-  for %%i in (0 1 2 3 4 5 6 7 8 9) do if defined SHIFT_ set "SHIFT_=!SHIFT_:%%i=!"
-  if defined SHIFT_ for %%i in (- +) do if defined SHIFT_ if "!SHIFT_:~0,1!" == "%%i" set "SHIFT_=!SHIFT_:~1!"
-  if defined SHIFT_ exit /b %LAST_ERROR%
-  endlocal
-)
+rem test on an integer, copy of `std/is_int.bat` script
+setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!SHIFT_!") do for /F "tokens=* delims="eol^= %%j in ("!SHIFT!") do endlocal & ^
+if %%i NEQ %%j exit /b %LAST_ERROR%
 
 set "OUTVAR=%~2"
 
