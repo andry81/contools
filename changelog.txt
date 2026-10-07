@@ -1,4 +1,8 @@
 2026.10.07:
+* changed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: use `<prop>` list as positional arguments to print only selected property names and values
+* changed: scripts/tools/wmi/print_wmi_class_props.vbs: documentation refactor
+
+2026.10.07:
 * changed: scripts/tests/__init__/script_init.bat: switched from `wmic.exe` to wmi-in-vbs code
 * changed: scripts/tests/bench/bat/test_wmi/test_wmi__00_call__get_wmic_local_datetime.bat: skip test if `wmic.exe` is not found
 

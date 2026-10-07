@@ -3,6 +3,10 @@
 ''' USAGE:
 '''   print_wmi_class_props.vbs <ClassName>
 
+''' Examples:
+'''   >
+'''   print_wmi_class_props.vbs Win32_Volume
+
 ''' CAUTION:
 '''   The `WScript.std[out|err].WriteLine STR` functions has issue with the
 '''   last line desynchronization between streams.

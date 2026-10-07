@@ -1,12 +1,31 @@
 ''' Prints property names and values of all class instances.
 
 ''' USAGE:
-'''   print_wmi_class_all_obj_props.vbs <ClassName>
+'''   print_wmi_class_all_obj_props.vbs [--] <ClassName> [<prop>...]
+
+''' Examples:
+'''   >
+'''   print_wmi_class_all_obj_props.vbs Win32_Volume BlockSize
 
 ''' CAUTION:
 '''   The `WScript.std[out|err].WriteLine STR` functions has issue with the
 '''   last line desynchronization between streams.
 '''   To workaround use `WScript.std[out|err].Write STR & vbCrLf` instead.
+
+Function NumArgs(args)
+  ''' Based on: https://stackoverflow.com/questions/4466967/how-can-i-determine-if-a-dynamic-array-has-not-be-dimensioned-in-vbscript/4469121#4469121
+  On Error Resume Next
+  Dim args_ubound : args_ubound = UBound(args)
+  If Err = 0 Then
+    NumArgs = args_ubound + 1
+  Else
+    ' Workaround for `WScript.Arguments`
+    Err.Clear
+    NumArgs = args.count
+    If Err <> 0 Then NumArgs = 0
+  End If
+  On Error Goto 0
+End Function
 
 Function FixStrToPrint(str)
   Dim new_str : new_str = ""
@@ -39,6 +58,51 @@ Sub PrintOrEchoLine(str)
   On Error Goto 0
 End Sub
 
+Sub PrintOrEchoErrorLine(str)
+  On Error Resume Next
+  WScript.stderr.Write str & vbCrLf
+  If err = 5 Then ' Access is denied
+    WScript.stderr.Write FixStrToPrint(str) & vbCrLf
+  ElseIf err = &h80070006& Then
+    WScript.Echo str
+  End If
+  On Error Goto 0
+End Sub
+
+ReDim cmd_args(WScript.Arguments.Count - 1)
+
+Dim ExpectFlags : ExpectFlags = True
+
+Dim arg
+Dim i, j : j = 0
+
+For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Continue`
+  arg = WScript.Arguments(i)
+
+  If ExpectFlags Then
+    If arg <> "--" And Left(arg, 1) = "-" Then
+      PrintOrEchoErrorLine WScript.ScriptName & ": error: unknown flag: `" & arg & "`"
+      WScript.Quit 255
+    Else
+      ExpectFlags = False
+
+      If arg = "--" Then Exit Do
+    End If
+  End If
+
+  If Not ExpectFlags Then
+    cmd_args(j) = arg
+
+    j = j + 1
+  End If
+Loop While False : Next
+
+ReDim Preserve cmd_args(j - 1)
+
+' MsgBox Join(cmd_args, " ")
+
+Dim num_args : num_args = NumArgs(cmd_args)
+
 ' On Error Resume Next
 
 Dim ClassName : ClassName = WScript.Arguments(0)
@@ -48,12 +112,28 @@ Dim objWMI : Set objWMI = GetObject("winmgmts:")
 Dim objSet : Set objSet = objWMI.InstancesOf(ClassName)
 
 Dim obj, objClassProp
+Dim DoPrintProp
 
 For Each obj in objSet
   PrintOrEchoLine "[" & obj.Name & "]"
 
   For Each objClassProp In objClass.Properties_
-    PrintOrEchoLine objClassProp.Name & "=" & Eval("obj." & objClassProp.Name)
+    If num_args > 1 Then
+      DoPrintProp = False
+
+      For i = 1 To num_args-1
+        If cmd_args(i) = objClassProp.Name Then
+          DoPrintProp = True
+          Exit For
+        End If
+      Next
+    Else
+      DoPrintProp = True
+    End If
+
+    If DoPrintProp Then
+      PrintOrEchoLine objClassProp.Name & "=" & Eval("obj." & objClassProp.Name)
+    End If
   Next
 
   PrintOrEchoLine ""
