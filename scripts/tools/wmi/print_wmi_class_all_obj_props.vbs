@@ -45,7 +45,7 @@ Dim ClassName : ClassName = WScript.Arguments(0)
 
 Dim objClass : Set objClass = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2:" & ClassName)
 Dim objWMI : Set objWMI = GetObject("winmgmts:")
-Dim objSet: Set objSet = objWMI.InstancesOf(ClassName)
+Dim objSet : Set objSet = objWMI.InstancesOf(ClassName)
 
 Dim obj, objClassProp
 

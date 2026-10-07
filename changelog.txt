@@ -1,4 +1,8 @@
 2026.10.07:
+* changed: scripts/tools/ToolAdaptors/vbs/*.vbs: minor improvement
+* refactor: scripts/tools/ToolAdaptors/vbs/*.vbs: minor refactor
+
+2026.10.07:
 * refactor: scripts/tools/wmi: *.bat, *.vbs: scripts refactor
 
 2026.10.06:

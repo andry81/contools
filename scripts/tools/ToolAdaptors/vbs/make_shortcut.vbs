@@ -514,7 +514,7 @@ Dim DebugMode : DebugMode = False
 Dim objShell : Set objShell = WScript.CreateObject("WScript.Shell")
 
 Dim arg
-Dim j : j = 0
+Dim i, j : j = 0
 
 For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Continue`
   arg = WScript.Arguments(i)
@@ -811,7 +811,7 @@ Function MakeShortcut(ShortcutFilePathToOpen)
     '   Use empty shortcut binary file to open it through `ShellLinkObject` interface.
 
     ' CAUTION:
-    '   `WriteFile` is broken for binary writes, DO NOT USE!
+    '   `WriteFile` is broken for binary writes in case of `CreateTextFileEx`, DO NOT USE!
     '
     'Dim objSCFile : Set objSCFile = CreateTextFileEx(ShortcutFilePathToOpen, True, False)
 

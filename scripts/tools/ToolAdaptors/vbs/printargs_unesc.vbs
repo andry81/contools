@@ -1,6 +1,7 @@
 Dim args_str : args_str = ""
 
-Dim arg
+Dim i, arg
+
 For i = 0 To WScript.Arguments.Count-1
   arg = Unescape(WScript.Arguments(i))
   args_str = args_str & Len(arg) & "|" & arg & "|" & vbCrLf

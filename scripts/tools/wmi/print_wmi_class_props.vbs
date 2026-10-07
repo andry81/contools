@@ -46,6 +46,7 @@ Dim ClassName : ClassName = WScript.Arguments(0)
 Dim objClass : Set objClass = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2:" & ClassName)
 
 Dim objClassProp
+
 For Each objClassProp In objClass.Properties_
   PrintOrEchoLine objClassProp.Name
 Next

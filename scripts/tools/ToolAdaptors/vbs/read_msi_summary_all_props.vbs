@@ -217,7 +217,7 @@ Dim LineReturn : LineReturn = False
 Dim OpenAsMSP : OpenAsMSP = False
 
 Dim arg
-Dim j : j = 0
+Dim i, j : j = 0
 
 For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Continue`
   arg = WScript.Arguments(i)

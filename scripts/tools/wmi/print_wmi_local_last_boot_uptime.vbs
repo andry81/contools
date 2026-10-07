@@ -13,9 +13,10 @@ Function CDbl_(str)
 End Function
 
 Dim objWMI : Set objWMI = GetObject("winmgmts:")
-Dim objSet: Set objSet = objWMI.InstancesOf("Win32_OperatingSystem")
+Dim objSet : Set objSet = objWMI.InstancesOf("Win32_OperatingSystem")
 
 Dim obj
+
 For Each obj in objSet
   WScript.Echo CDbl_(Left(obj.LocalDateTime, 21)) - CDbl_(Left(obj.LastBootUpTime, 21))
   Exit For

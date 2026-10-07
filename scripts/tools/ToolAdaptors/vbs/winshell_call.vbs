@@ -241,17 +241,17 @@
 '''   sequence of `If`/`ElseIf` conditions.
 
 Sub GrowArr(arr, size)
-    Dim reserve : reserve = UBound(arr) + 1
-    If reserve < size Then
-        Do
-            If reserve <> 0 Then
-                reserve = reserve * 2
-            Else
-                reserve = 16
-            End If
-        Loop While reserve < size
-        ReDim Preserve arr(reserve - 1) ' upper bound instead of reserve size
-    End If
+  Dim reserve : reserve = UBound(arr) + 1
+  If reserve < size Then
+    Do
+      If reserve <> 0 Then
+        reserve = reserve * 2
+      Else
+        reserve = 16
+      End If
+    Loop While reserve < size
+    ReDim Preserve arr(reserve - 1) ' upper bound instead of reserve size
+  End If
 End Sub
 
 Function ReplaceStringArr(str, str_len, str_replace_arr_size, from_str_replace_arr, to_str_replace_arr)
