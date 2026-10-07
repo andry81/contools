@@ -1,4 +1,8 @@
 2026.10.07:
+* changed: scripts/tests/__init__/script_init.bat: switched from `wmic.exe` to wmi-in-vbs code
+* changed: scripts/tests/bench/bat/test_wmi/test_wmi__00_call__get_wmic_local_datetime.bat: skip test if `wmic.exe` is not found
+
+2026.10.07:
 * fixed: scripts/tools/exec/exec_callf_prefix.bat: execution fixup
 * fixed: script_init.bat: missed to test `cmd.exe` interactivity inheritance (`cmd.exe /k ...` -> `cmd.exe /c ...`)
 

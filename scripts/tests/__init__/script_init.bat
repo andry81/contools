@@ -37,7 +37,7 @@ rem echo;
 
 if 0%SCRIPT_INIT% EQU 0 (
   rem CPU name to compare bench tests
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\wbem\wmic.exe" cpu get Caption,Name
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_WMI_ROOT%%/print_wmi_cpu_get.vbs.bat" -- Caption
   set SCRIPT_INIT=1
 )
 
