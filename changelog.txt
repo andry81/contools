@@ -1,3 +1,6 @@
+2026.10.07:
+* refactor: scripts/tools/wmi: *.bat, *.vbs: scripts refactor
+
 2026.10.06:
 * changed: scripts/tools/std: callshift.bat, setshift*.bat: switched to code from `is_int.bat` script
 
