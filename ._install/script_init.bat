@@ -19,8 +19,10 @@ rem cast to integer
 set /A EXEC_CALLF_PREFIX_NO_PAUSE_ON_EXIT+=0
 
 if %EXEC_CALLF_PREFIX_NO_PAUSE_ON_EXIT% EQU 0 (
-  set EXEC_CALLF_PREFIX_BARE_FLAGS=%EXEC_CALLF_PREFIX_BARE_FLAGS% -std-pause-c
-  set /A EXEC_CALLF_FLAG_SKIP+=1
+  call "%%CONTOOLS_ROOT%%/std/is_input_interactive.bat" || (
+    set EXEC_CALLF_PREFIX_BARE_FLAGS=%EXEC_CALLF_PREFIX_BARE_FLAGS% -std-pause-c
+    set /A EXEC_CALLF_FLAG_SKIP+=1
+  )
 )
 
 call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip %%EXEC_CALLF_FLAG_SKIP%% 1 "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -+%%EXEC_CALLF_PREFIX_BARE_FLAGS%% -- %%* || exit /b

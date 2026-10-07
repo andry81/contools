@@ -15,7 +15,11 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_project_log.bat" "%%?~n0%%" || exit /b
 rem call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/init_vars_file.bat" || exit /b
 
 rem call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 3 1 "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -X /pause-on-exit -- %%* || exit /b
-call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 2 1 "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -std-pause-c -- %%* || exit /b
+
+call "%%CONTOOLS_ROOT%%/std/is_input_interactive.bat" && (
+  call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 1 1 "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -- %%* || exit /b
+  call;
+) || call "%%CONTOOLS_ROOT%%/std/callshift.bat" -skip 2 1 "%%CONTOOLS_ROOT%%/exec/exec_callf_prefix.bat" -std-pause-c -- %%* || exit /b
 
 rem The caller must exit after this exit.
 exit /b 0

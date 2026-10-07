@@ -1,4 +1,8 @@
 2026.10.07:
+* fixed: scripts/tools/exec/exec_callf_prefix.bat: execution fixup
+* fixed: script_init.bat: missed to test `cmd.exe` interactivity inheritance (`cmd.exe /k ...` -> `cmd.exe /c ...`)
+
+2026.10.07:
 * changed: scripts/tools/wmi/print_wmi_cpu_get.vbs: use `<prop>` list as positional arguments to print only selected property names and values
 
 2026.10.07:

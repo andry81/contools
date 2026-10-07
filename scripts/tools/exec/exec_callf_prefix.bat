@@ -108,8 +108,8 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 rem common flags for all terminals
 
 if %FLAG_STD_PAUSE_C% NEQ 0 (
-  set CALLF_BARE_CMD_SUFFIX= ^^& "%CONTOOLS_ROOT%/std/pause.bat" -c ^^& exit
-) else set CALLF_BARE_CMD_SUFFIX= ^^& exit
+  set CALLF_BARE_CMD_SUFFIX= ^^^& "%CONTOOLS_ROOT%/std/pause.bat" -c ^^^& exit
+) else set CALLF_BARE_CMD_SUFFIX= ^^^& exit
 
 rem CAUTION:
 rem   Because `callf.exe` may use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` and `NEST_LVL` variables into the command line.
