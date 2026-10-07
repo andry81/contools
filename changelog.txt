@@ -1,4 +1,7 @@
 2026.10.07:
+* changed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: always print index due to not unique `Name` property
+
+2026.10.07:
 * fixed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: use index if `Name` property does not exist
 * fixed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: print `<error>` value on value query error and continue print
 

@@ -138,7 +138,7 @@ Next
 
 For Each obj in objSet
   If HasNameProp Then
-    PrintOrEchoLine "[" & obj.Name & "]"
+    PrintOrEchoLine "[" & index & "][" & obj.Name & "]"
   Else
     PrintOrEchoLine "[" & index & "]"
   End If
