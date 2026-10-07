@@ -1,4 +1,8 @@
 2026.10.07:
+* fixed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: use index if `Name` property does not exist
+* fixed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: print `<error>` value on value query error and continue print
+
+2026.10.07:
 * changed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: use `<prop>` list as positional arguments to print only selected property names and values
 * changed: scripts/tools/wmi/print_wmi_class_props.vbs: documentation refactor
 

@@ -69,6 +69,20 @@ Sub PrintOrEchoErrorLine(str)
   On Error Goto 0
 End Sub
 
+Function HasProperty(obj, PropName)
+  On Error Resume Next
+
+  Dim Value : Value = Eval("obj." & PropName)
+
+  If Err.Number = 0 Then
+    HasProperty = True
+  Else
+    HasProperty = False
+  End If
+
+  On Error GoTo 0
+End Function
+
 ReDim cmd_args(WScript.Arguments.Count - 1)
 
 Dim ExpectFlags : ExpectFlags = True
@@ -103,8 +117,6 @@ ReDim Preserve cmd_args(j - 1)
 
 Dim num_args : num_args = NumArgs(cmd_args)
 
-' On Error Resume Next
-
 Dim ClassName : ClassName = WScript.Arguments(0)
 
 Dim objClass : Set objClass = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2:" & ClassName)
@@ -112,10 +124,24 @@ Dim objWMI : Set objWMI = GetObject("winmgmts:")
 Dim objSet : Set objSet = objWMI.InstancesOf(ClassName)
 
 Dim obj, objClassProp
-Dim DoPrintProp
+Dim index, DoPrintProp : index = 0
+Dim HasNameProp : HasNameProp = False
+
+For Each objClassProp In objClass.Properties_
+  If objClassProp.Name = "Name" Then
+    HasNameProp = True
+    Exit For
+  End If
+Next
+
+' On Error Resume Next
 
 For Each obj in objSet
-  PrintOrEchoLine "[" & obj.Name & "]"
+  If HasNameProp Then
+    PrintOrEchoLine "[" & obj.Name & "]"
+  Else
+    PrintOrEchoLine "[" & index & "]"
+  End If
 
   For Each objClassProp In objClass.Properties_
     If num_args > 1 Then
@@ -132,9 +158,22 @@ For Each obj in objSet
     End If
 
     If DoPrintProp Then
+      On Error Resume Next
+
+      Err.Clear
+
       PrintOrEchoLine objClassProp.Name & "=" & Eval("obj." & objClassProp.Name)
+
+      If Err.Number <> 0 Then
+        ' print `<error>` on value query error
+        PrintOrEchoLine objClassProp.Name & "=<error>"
+      End If
+
+      On Error GoTo 0
     End If
   Next
 
   PrintOrEchoLine ""
+
+  index = index + 1
 Next
