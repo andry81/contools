@@ -1,4 +1,7 @@
 2026.10.07:
+* changed: scripts/tools/wmi/print_wmi_cpu_get.vbs: use `<prop>` list as positional arguments to print only selected property names and values
+
+2026.10.07:
 * changed: scripts/tools/ToolAdaptors/vbs/*.vbs: minor improvement
 * refactor: scripts/tools/ToolAdaptors/vbs/*.vbs: minor refactor
 
