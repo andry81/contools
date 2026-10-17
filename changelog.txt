@@ -1,3 +1,9 @@
+2026.10.17:
+* new: scripts/tools/std/is_delayedexpansion_enabled.bat: script to detect the delayed expansion extension (`setlocal ENABLEDELAYEDEXPANSION` call)
+
+2026.10.09:
+* refactor: scripts/tools/std/*.bat: minor refactor
+
 2026.10.07:
 * changed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: always print index due to not unique `Name` property
 
