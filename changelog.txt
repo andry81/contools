@@ -1,3 +1,10 @@
+2026.10.21:
+* fixed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: minor fixup
+* new: scripts/tools/wmi/get_wmi_class_all_obj_props.vbs.bat: script to read output from the respective `print_wmi_class_all_obj_props.vbs` script into `RETURN_VALUES[...` variables
+* changed: scripts/tests/__init__/script_init.bat: switched to use uniform `print_wmi_class_all_obj_props.vbs.bat` script
+* changed: scripts/tools/wmi/get_wmi_cpu_get.vbs.bat: removed because replaced by uniform `get_wmi_class_all_obj_props.vbs.bat` script
+* changed: scripts/tools/wmi/print_wmi_cpu_get.vbs: removed because replaced by uniform `print_wmi_class_all_obj_props.vbs` script
+
 2026.10.17:
 * new: scripts/tools/std/is_delayedexpansion_enabled.bat: script to detect the delayed expansion extension (`setlocal ENABLEDELAYEDEXPANSION` call)
 

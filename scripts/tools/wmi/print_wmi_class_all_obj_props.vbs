@@ -6,6 +6,8 @@
 ''' Examples:
 '''   >
 '''   print_wmi_class_all_obj_props.vbs Win32_Volume BlockSize
+'''   >
+'''   print_wmi_class_all_obj_props.vbs Win32_Processor Caption
 
 ''' CAUTION:
 '''   The `WScript.std[out|err].WriteLine STR` functions has issue with the
@@ -117,7 +119,7 @@ ReDim Preserve cmd_args(j - 1)
 
 Dim num_args : num_args = NumArgs(cmd_args)
 
-Dim ClassName : ClassName = WScript.Arguments(0)
+Dim ClassName : ClassName = cmd_args(0)
 
 Dim objClass : Set objClass = GetObject("winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2:" & ClassName)
 Dim objWMI : Set objWMI = GetObject("winmgmts:")
