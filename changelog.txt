@@ -1,3 +1,7 @@
+2026.10.22:
+* changed: scripts/tools/hash/print_hash_lst.bat: added hash list reformat support
+* refactor: scripts/tools/hash/print_hash_lst.bat: documentation
+
 2026.10.21:
 * fixed: scripts/tools/wmi/print_wmi_class_all_obj_props.vbs: minor fixup
 * new: scripts/tools/wmi/get_wmi_class_all_obj_props.vbs.bat: script to read output from the respective `print_wmi_class_all_obj_props.vbs` script into `RETURN_VALUES[...` variables
