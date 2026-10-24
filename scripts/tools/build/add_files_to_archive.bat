@@ -86,6 +86,6 @@ rem remove arguments trailing back slashes to avoid exe command line parse old b
 if "%ARCHIVE_PATH:~-1%" == "\" set "ARCHIVE_PATH=%ARCHIVE_PATH:~0,-1%"
 if "%REL_PATH:~-1%" == "\" set "REL_PATH=%REL_PATH:~0,-1%"
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" a -r%%_7ZIP_BARE_FLAGS%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%CONTOOLS_ROOT%%/arc/7zip/7z.bat" a -r%%_7ZIP_BARE_FLAGS%% "%%ARCHIVE_PATH%%" "%%REL_PATH%%"
 
 exit /b

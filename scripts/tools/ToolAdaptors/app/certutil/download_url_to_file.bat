@@ -140,7 +140,7 @@ if exist "%OUT_FILE_PATH%" (
 )
 
 pushd "%OUT_FILE_DIR%" && (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\certutil.exe" -urlcache -split -f "%%URL%%" "%%OUT_FILE_PATH%%"
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\certutil.exe" -urlcache -split -f "%%URL%%" "%%OUT_FILE_PATH%%"
   popd
   exit /b
 )

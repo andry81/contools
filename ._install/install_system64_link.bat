@@ -114,21 +114,21 @@ rem copy permissions with reset
 set "ACL_OLD_FILE=%TEMP_DIR%\system32.acl"
 set "ACL_NEW_FILE=%TEMP_DIR%\system64.acl"
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System32" /save "%%ACL_OLD_FILE%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System32" /save "%%ACL_OLD_FILE%%" || exit /b
 
 call "%%CONTOOLS_ADMIN_PROJECT_ROOT%%/scripts/Windows/Perm/patch_acl_file.bat" -+ -replace-path System32 System64 -- "%%ACL_OLD_FILE%%" "%%ACL_NEW_FILE%%" || exit /b
 
 rem CAUTION: the owner reset to `*S-1-5-32-544` is required before the `/reset`, otherwise error: `C:\WINDOWS\System64: Access is denied.`
-rem call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%USERBIN_SCRIPTS_BAT_ROOT%%/runas/hta/runas-admin-system.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /setowner "*S-1-5-32-544" || exit /b
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_UTILS_BIN_ROOT%%/contools/retakeowner.exe" "%%SystemRoot%%\System64" "*S-1-5-32-544" || exit /b
+rem call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%USERBIN_SCRIPTS_BAT_ROOT%%/runas/hta/runas-admin-system.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /setowner "*S-1-5-32-544" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%CONTOOLS_UTILS_BIN_ROOT%%/contools/retakeowner.exe" "%%SystemRoot%%\System64" "*S-1-5-32-544" || exit /b
 
 rem CAUTION: the `/reset` is required before the `/restore` in case if the junction point is already existed
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /reset /c || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /reset /c || exit /b
 
 rem CAUTION: the `/setowner` is required before the `/restore`, otherwise error: `C:\WINDOWS\System64: Access is denied.`
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /setowner "NT SERVICE\TrustedInstaller" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /setowner "NT SERVICE\TrustedInstaller" || exit /b
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%" /restore "%%ACL_NEW_FILE%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%" /restore "%%ACL_NEW_FILE%%" || exit /b
 
 exit /b 0
 
@@ -136,11 +136,11 @@ exit /b 0
 rem test mklink command existence
 call; & mklink /? >nul 2>nul
 if %ERRORLEVEL% EQU 0 (
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" mklink /J "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" mklink /J "%%SystemRoot%%\System64" "%%SystemRoot%%\System32" || exit /b
 ) else exit /b 255
 
 exit /b 0
 
 :MAKE_LINK_WINXP
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_SYSINTERNALS_ROOT%%/junction.exe" -nobanner -accepteula "%%SystemRoot%%\System64" "%%SystemRoot%%\System32"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%CONTOOLS_SYSINTERNALS_ROOT%%/junction.exe" -nobanner -accepteula "%%SystemRoot%%\System64" "%%SystemRoot%%\System32"
 exit /b

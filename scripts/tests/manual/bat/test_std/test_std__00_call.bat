@@ -106,5 +106,5 @@ exit /b
 :CALL
 setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!ARGS!"') do endlocal & set "ECHO_ARGS=%%~i"
 if defined ECHO_ARGS setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!ECHO_ARGS:%CONTOOLS_PROJECT_ROOT%=!") do endlocal & set "ECHO_ARGS=%%i"
-setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!ECHO_ARGS!"') do endlocal & echo call.bat %* %%~i
-call "%%CONTOOLS_ROOT%%/std/call.bat" %%* %%ARGS%%
+setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!ECHO_ARGS!"') do endlocal & echo call_.bat %* %%~i
+call "%%CONTOOLS_ROOT%%/std/call_.bat" %%* %%ARGS%%

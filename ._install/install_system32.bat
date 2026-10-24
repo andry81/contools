@@ -41,7 +41,7 @@ rem x64 is an option to continue
 
 if %WINDOWS_MAJOR_VER% EQU 5 (
   rem Windows XP
-  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO "%%~dpn0_winxp.vbs" %%* || exit /b
+  call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\cscript.exe" //NOLOGO "%%~dpn0_winxp.vbs" %%* || exit /b
 )
 
 exit /b 0

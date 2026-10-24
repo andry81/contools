@@ -1,7 +1,7 @@
 @echo off & goto DOC_END
 
 rem USAGE:
-rem   call.bat [-exe] [-lockfile <lock-file> [-trylock] [-lock-busy-wait-cmdline <lock-busy-wait-cmdline>]] [--] <cmdline>...
+rem   call_.bat [-exe] [-lockfile <lock-file> [-trylock] [-lock-busy-wait-cmdline <lock-busy-wait-cmdline>]] [--] <cmdline>...
 
 rem Description:
 rem   Script calls `<cmdline>` as is.
@@ -45,34 +45,34 @@ rem   `setlocal DISABLEDELAYEDEXPANSION`, otherwise the `!` character will be
 rem   expanded.
 
 rem Examples (in console):
-rem   1. >call.bat echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+rem   1. >call_.bat echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | "=" 3
-rem   2. >call.bat -exe echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+rem   2. >call_.bat -exe echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 rem      "1 2" ! ? * & | , ; = = "=" 3
-rem   3. >call.bat set | sort
+rem   3. >call_.bat set | sort
 rem   4. >errlvl.bat 123
-rem      >call.bat
-rem      >call.bat echo:
-rem      >call.bat echo 1 2 3
+rem      >call_.bat
+rem      >call_.bat echo:
+rem      >call_.bat echo 1 2 3
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=123
-rem   5. >call.bat exit /b 321
+rem   5. >call_.bat exit /b 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
 rem   6. >errlvl.bat 123
-rem      >call.bat errlvl.bat 321
+rem      >call_.bat errlvl.bat 321
 rem      >echo ERRORLEVEL=%ERRORLEVEL%
 rem      ERRORLEVEL=321
-rem   7. >call.bat echo;^>cmd param0 param1
+rem   7. >call_.bat echo;^>cmd param0 param1
 rem      >cmd param0 param1
-rem   8. >call.bat -lockfile "%TEMP%\lock0.myscript" 0 echo;Exclusive print
+rem   8. >call_.bat -lockfile "%TEMP%\lock0.myscript" 0 echo;Exclusive print
 
 rem Examples (in script):
 rem   1. set "$5E$3E=^>"
-rem      call call.bat echo;%%$5E$3E%%cmd param0 param1
+rem      call call_.bat echo;%%$5E$3E%%cmd param0 param1
 rem   2. set "TAB=	"
-rem      call call.bat echo;cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
-rem   3. call call.bat %%*
+rem      call call_.bat echo;cmd %%TAB%% %%TAB%% param0  %%TAB%%%%TAB%%  %%TAB%%%%TAB%%  param1 %%TAB%% %%TAB%%param2 %%TAB%%param3
+rem   3. call call_.bat %%*
 
 rem Pros:
 rem

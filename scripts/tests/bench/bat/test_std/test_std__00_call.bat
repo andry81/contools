@@ -10,7 +10,7 @@ setlocal DISABLEDELAYEDEXPANSION
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-for /L %%i in (1,1,10) do call "%%CONTOOLS_ROOT%%/std/call.bat" rem
+for /L %%i in (1,1,10) do call "%%CONTOOLS_ROOT%%/std/call_.bat" rem
 
 call "%%CONTOOLS_ROOT%%/time/end_time.bat" 10
 

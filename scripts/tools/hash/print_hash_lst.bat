@@ -62,7 +62,7 @@ set REMAPPED_ALPHA_INDEX=1
 for /L %%i in (1,1,26) do call set "FOR_VAR=%%FOR_VARS_ALPHA:~%%i,1%%" & call call :IF "%%%%FOR_VARS_REMAPPED_LIST:$%%FOR_VAR%%=%%%%" NEQ "%%%%FOR_VARS_REMAPPED_LIST%%%%" && (
   call call set "FOR_REMAPPED_VAR=%%%%FOR_VARS_ALPHA:~%%REMAPPED_ALPHA_INDEX%%,1%%%%"
   call call set "FOR_VARS_REMAPPED_LIST=%%%%FOR_VARS_REMAPPED_LIST:$%%FOR_VAR%%=,%%FOR_REMAPPED_VAR%%%%%%"
-  set /A  REMAPPED_ALPHA_INDEX+=1
+  set /A REMAPPED_ALPHA_INDEX+=1
 )
 
 goto IF_END
@@ -124,7 +124,7 @@ set REMAPPED_ALPHA_INDEX=1
 for /L %%i in (1,1,26) do call set "FOR_VAR=%%FOR_VARS_ALPHA:~%%i,1%%" & call call :IF "%%%%FOR_VARS_REMAPPED_LIST:$%%FOR_VAR%%=%%%%" NEQ "%%%%FOR_VARS_REMAPPED_LIST%%%%" && (
   call call set "FOR_REMAPPED_VAR=%%%%FOR_VARS_ALPHA:~%%REMAPPED_ALPHA_INDEX%%,1%%%%"
   call call set "FOR_VARS_REMAPPED_LIST=%%%%FOR_VARS_REMAPPED_LIST:$%%FOR_VAR%%=,%%FOR_REMAPPED_VAR%%%%%%"
-  set /A  REMAPPED_ALPHA_INDEX+=1
+  set /A REMAPPED_ALPHA_INDEX+=1
 )
 
 goto IF_END

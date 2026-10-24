@@ -64,7 +64,7 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/xcopy_file.bat" "%%CONTOOLS_UTILS_BIN_ROOT%%
 rem NOTE: In the `callf.exe` the backslash character escaping requires only in case of conjunction with the double quote character escaping: `\\\"`.
 rem
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call.bat" "%%CONTOOLS_DIR_TMP%%/callf.exe" ^
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%CONTOOLS_DIR_TMP%%/callf.exe" ^
   /elevate{ /no-window }{ /attach-parent-console } ^
   /ret-child-exit /no-subst-pos-vars /no-esc ^
   /ra "%%%%" "%%%%?25%%%%" /v "?25" "%%%%" ^
