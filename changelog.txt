@@ -1,3 +1,9 @@
+2026.10.24:
+* new: scripts/tests/bench/bat/test_build/test_build__30_extract_version*.bat: more `extract_version.bat` bench tests
+* changed: scripts/tools/build/extract_version.bat: performance improvements
+* refactor: scripts/tools/build/extract_version.bat: moved to `build` subdirectory
+* refactor: scripts/tests/unit/bat/test_build: unit tests refactor
+
 2026.10.22:
 * changed: scripts/tools/hash/print_hash_lst.bat: added hash list reformat support
 * refactor: scripts/tools/hash/print_hash_lst.bat: documentation
