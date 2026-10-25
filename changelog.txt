@@ -1,3 +1,6 @@
+2026.10.25:
+* fixed: scripts/tools/std/canonical_*_vars.bat: minor fixup
+
 2026.10.24:
 * fixed: scripts/tools: build/call_.bat, std/call_.bat: renamed to avoid collision with the builtin `call` command in case of `call call ...` prefix (`call call ...` does parse into `call call.bat ...` if `call.bat` file is found in a directory from the `PATH` variable or in the current directory)
 * changed: *.bat: switched to use `call_.bat` script

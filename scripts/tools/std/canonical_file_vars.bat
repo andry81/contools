@@ -42,7 +42,7 @@ goto FILE_PATH_OK
 
 :FILE_PATH_ERROR
 (
-  echo;%?~%: error: a variable path value is invalid:
+  echo;%__?~%: error: a variable path value is invalid:
   echo;  %~1="%__?FILE_PATH%"
   set __?LAST_ERROR=254
   goto EXIT
@@ -52,14 +52,14 @@ goto FILE_PATH_OK
 
 for /F "tokens=* delims="eol^= %%i in ("%__?FILE_PATH%\.") do (
   if not exist "%%~fi" (
-    echo;%?~%: error: path does not exist:
+    echo;%__?~%: error: path does not exist:
     echo;  %~1="%%~fi"
     set __?LAST_ERROR=1
     goto EXIT
   ) >&2
 
   if exist "%%~fi\*" (
-    echo;%?~%: error: existed path is not a file path:
+    echo;%__?~%: error: existed path is not a file path:
     echo;  %~1="%%~fi"
     set __?LAST_ERROR=2
     goto EXIT
