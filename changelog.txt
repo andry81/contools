@@ -1,3 +1,6 @@
+2026.10.26:
+* changed: scripts/tools/std/trim_var.bat: minor speedup without string recode
+
 2026.10.25:
 * fixed: scripts/tools/std/canonical_*_vars.bat: minor fixup
 
