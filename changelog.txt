@@ -1,4 +1,10 @@
 2026.10.29:
+* fixed: scripts/tests/probe/bat/test__ascii_!exclusive/test_print_ascii.bat: double endlocal call because of `LF` character
+* new: scripts/tests/probe/bat/test__ascii_!exclusive: test_mkdir_ascii.bat, test_print_ascii.bat: moved from `contools--debug` project
+* changed: scripts/tests/probe/bat/test__ascii_!exclusive: test_mkdir_ascii.bat, test_print_ascii.bat: minor improvement
+* refactor: scripts/tests/probe/bat/_testdata: minor refactor
+
+2026.10.29:
 * new: scripts/tests/probe/bat/test__ascii_!exclusive: exclusive probe tests for ASCII characters
 * new: scripts/tests/probe/bat/test__ascii_!exclusive/test_for_eols.bat: moved from `contools--debug` project
 * changed: scripts/tests/probe/bat/test__ascii_!exclusive/test_for_eols.bat: minor improvement

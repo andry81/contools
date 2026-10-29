@@ -14,7 +14,7 @@ set /A NEXT_INDEX=1
 
 rem not read characters:
 rem 00 - NUL
-for /F "usebackq tokens=* delims="eol^= %%i in ("%TEST_DATA_IN_ROOT%/%TEST_SCRIPT_FILE_NAME%/eols.txt") do (
+for /F "usebackq tokens=* delims="eol^= %%i in ("%TEST_DATA_IN_ROOT%/test__ascii/eols.txt") do (
   set "LINE=%%i"
 
   setlocal ENABLEDELAYEDEXPANSION
