@@ -1,4 +1,10 @@
 2026.10.29:
+* new: scripts/tests/probe/bat/test__ascii_!exclusive: exclusive probe tests for ASCII characters
+* new: scripts/tests/probe/bat/test__ascii_!exclusive/test_for_eols.bat: moved from `contools--debug` project
+* changed: scripts/tests/probe/bat/test__ascii_!exclusive/test_for_eols.bat: minor improvement
+* refactor: scripts/tests/probe/bat/test__*: minor refactor
+
+2026.10.29:
 * new: scripts/tests/probe/bat/test_chcp_!exclusive: exclusive probe tests for `chcp.com` utility
 * new: scripts/tests/probe/bat/test_chcp_!exclusive/test_for_chcp.bat: moved from `contools--debug` project
 
