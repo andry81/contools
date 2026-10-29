@@ -1,4 +1,8 @@
 2026.10.29:
+* new: scripts/tests/probe/bat/test__mshta_!exclusive: exclusive probe tests for `mshta.exe` utility
+* new: scripts/tests/probe/bat/test__mshta_!exclusive/test_mshta_cmdline_length_limit.bat: moved from `contools--debug` project
+
+2026.10.29:
 * fixed: scripts/tests/probe/bat/test__ascii_!exclusive/test_print_ascii.bat: double endlocal call because of `LF` character
 * new: scripts/tests/probe/bat/test__ascii_!exclusive: test_mkdir_ascii.bat, test_print_ascii.bat: moved from `contools--debug` project
 * changed: scripts/tests/probe/bat/test__ascii_!exclusive: test_mkdir_ascii.bat, test_print_ascii.bat: minor improvement
