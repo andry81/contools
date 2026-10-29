@@ -1,0 +1,730 @@
+# https://en.wikipedia.org/wiki/Code_page
+# https://en.wikipedia.org/wiki/Windows_code_page
+# https://www.computerhope.com/chcphlp.htm
+# https://djangocas.dev/blog/codepages/#all-codepage-list
+
+
+# IBM code pages
+
+## EBCDIC-based code pages
+
+1       | USA WP, Original
+2       | USA
+3       | USA Accounting, Version A
+4       | USA
+5       | USA
+6       | Latin America
+7       | Germany F.R. / Austria
+8       | Germany F.R.
+9       | France, Belgium
+10      | Canada (English)
+11      | Canada (French)
+12      | Italy
+13      | Netherlands
+14      | Spain
+15      | Switzerland (French)
+16      | Switzerland (French / German)
+17      | Switzerland (German)
+18      | Sweden / Finland
+19      | Sweden / Finland WP, version 2
+20      | Denmark/Norway
+21      | Brazil
+22      | Portugal
+23      | United Kingdom
+24      | United Kingdom
+25      | Japan (Latin)
+26      | Japan (Latin)
+27      | Greece (Latin)
+29      | Iceland
+30      | Turkey
+31      | South Africa
+32      | Czechoslovakia (Czech / Slovak)
+33      | Czechoslovakia
+34      | Czechoslovakia
+35      | Romania
+36      | Romania
+!37      | USA/Canada - CECP (same with euro: 1140)
+!37-2    | The real 3279 APL codepage, as used by C/370. This is very close to 1047, except for caret and not-sign inverted. It is not officially recognized by IBM,
+        | even though SHARE has pointed out its existence.[14]
+38      | USA ASCII
+39      | United Kingdom / Israel
+40      | United Kingdom
+251     | China
+252     | Poland
+254     | Hungary
+256     | International #1 (superseded by 500)
+257     | International #2
+258     | International #3
+259     | Symbols, Set 7
+260     | Canadian French - 116
+264     | Print Train & Text processing extended
+273     | Germany F.R./Austria - CECP (same with euro: 1141)
+274     | Old Belgium Code Page
+275     | Brazil - CECP
+276     | Canada (French) - 94
+277     | Denmark, Norway - CECP (same with euro: 1142)
+278     | Finland, Sweden - CECP (same with euro: 1143)
+279     | French - 94[14]
+280     | Italy - CECP (same with euro: 1144)
+281     | Japan (Latin) - CECP
+282     | Portugal - CECP
+283     | Spain - 190[14]
+284     | Spain/Latin America - CECP (same with euro: 1145)
+285     | United Kingdom - CECP (same with euro: 1146)
+286     | Austria / Germany F.R. Alternate
+287     | Denmark / Norway Alternate
+288     | Finland / Sweden Alternate
+289     | Spain Alternate
+290     | Japanese (Katakana) Extended
+293     | APL
+297     | France (same with euro: 1147)[14]
+298     | Japan (Katakana)
+300     | Japan (Kanji) DBCS (For JIS X 0213)
+310     | Graphic Escape APL/TN
+320     | Hungary
+321     | Yugoslavia
+322     | Turkey
+330     | International #4
+340     | EBCDIC, OCR (same as 893, superseded by 892 and 893)
+351     | GDDM default
+352     | Printing and publishing option
+353     | BCDIC-A
+354     | BCDIC-B
+355     | PTTC/BCD standard option
+357     | PTTC/BCD H option
+358     | PTTC/BCD Correspondence option
+359     | PTTC/BCD Monocase option
+360     | PTTC/BCD Duocase option
+361     | EBCDIC Publishing International
+363     | Symbols, set 8
+382     | EBCDIC Publishing Austria, Germany F.R. Alternate
+383     | EBCDIC Publishing Belgium
+384     | EBCDIC Publishing Brazil
+385     | EBCDIC Publishing Canada (French)
+386     | EBCDIC Publishing Denmark, Norway
+387     | EBCDIC Publishing Finland, Sweden
+388     | EBCDIC Publishing France
+389     | EBCDIC Publishing Italy
+390     | EBCDIC Publishing Japan (Latin)
+391     | EBCDIC Publishing Portugal
+392     | EBCDIC Publishing Spain, Philippines
+393     | EBCDIC Publishing Latin America (Spanish Speaking)
+394     | EBCDIC Publishing China (Hong Kong), UK, Ireland
+395     | EBCDIC Publishing Australia, New Zealand, USA, Canada (English)
+396     | BookMaster Specials
+410     | Cyrillic (revisions: 880, 1025, 1154)
+420     | Arabic
+421     | Maghreb/French
+423     | Greek (superseded by 875)
+424     | Hebrew (Bulletin Code)
+425     | Arabic / Latin for OS/390 Open Edition
+435     | Teletext Isomorphic
+!500     | International #5 (ECECP; supersedes 256) (same with euro: 1148)
+803     | Hebrew Character Set A (Old Code)
+829     | Host Math Symbols- Publishing
+830     | Math Format
+831     | Portugal (Alternate) (same as 37)
+833     | Korean Extended (SBCS)
+834     | Korean Hangul (KSC5601; DBCS with UDCs)
+835     | Traditional Chinese DBCS
+836     | Simplified Chinese Extended
+837     | Simplified Chinese DBCS
+838     | Thai with Low Marks & Accented Characters (same with euro: 1160)
+839     | Thai DBCS
+!870     | Latin 2 (same with euro: 1153) (revision: 1110)
+871     | Iceland (same with euro: 1149)[14]
+!875     | Greek (supersedes 423)
+880     | Cyrillic (revision of 410) (revisions: 1025, 1154)
+881     | United States - 5080 Graphics System
+882     | United Kingdom - 5080 Graphics System
+883     | Sweden - 5080 Graphics System
+884     | Germany - 5080 Graphics System
+885     | France - 5080 Graphics System
+886     | Italy - 5080 Graphics System
+887     | Japan - 5080 Graphics System
+888     | France AZERTY - 5080 Graphics System
+889     | Thailand
+890     | Yugoslavia
+892     | EBCDIC, OCR A
+893     | EBCDIC, OCR B
+905     | Latin 3
+918     | Urdu Bilingual
+924     | Latin 9
+930     | Japan MIX (290 + 300) (same with euro: 1390)
+931     | Japan MIX (37 + 300)
+933     | Korea MIX (833 + 834) (same with euro: 1364)
+935     | Simplified Chinese MIX (836 + 837) (same with euro: 1388)
+937     | Traditional Chinese MIX (37 + 835) (same with euro: 1371)
+939     | Japan MIX (1027 + 300) (same with euro: 1399)
+1001    | MICR
+1002    | EBCDIC DCF Release 2 Compatibility
+1003    | EBCDIC DCF, US Text subset
+1005    | EBCDIC Isomorphic Text Communication
+1007    | EBCDIC Arabic (XCOM2)
+1024    | EBCDIC T.61
+1025    | Cyrillic, Multilingual (same with euro: 1154) (Revision of 880)
+!1026    | EBCDIC Turkey (Latin 5) (same with euro: 1155) (supersedes 905 in that country)
+1027    | Japanese (Latin) Extended (JIS X 0201 Extended)
+1028    | EBCDIC Publishing Hebrew
+1030    | Japanese (Katakana) Extended
+1031    | Japanese (Latin) Extended
+1032    | MICR, E13-B Combined
+1033    | MICR, CMC-7 Combined
+1037    | Korea - 5080/6090 Graphics System
+1039    | GML Compatibility
+!1047    | Latin 1/Open Systems[14]
+1068    | DCF Compatibility
+1069    | Latin 4
+1070    | USA / Canada Version 0 (Code page 37 Version 0)
+1071    | Germany F.R. / Austria (Code page 273 Version 0)
+1072    | Belgium (Code page 274 Version 0)
+1073    | Brazil (Code page 275 Version 0)
+1074    | Denmark, Norway (Code page 277 Version 0)
+1075    | Finland, Sweden (Code page 278 Version 0)
+1076    | Italy (Code page 280 Version 0)
+1077    | Japan (Latin) (Code page 281 Version 0)
+1078    | Portugal (Code page 282 Version 0)
+1079    | Spain / Latin America Version 0 (Code page 284 Version 0)
+1080    | United Kingdom (Code page 285 Version 0)
+1081    | France Version 0 (Code page 297 Version 0)
+1082    | Israel (Hebrew)
+1083    | Israel (Hebrew)
+1084    | International#5 Version 0 (Code page 500 Version 0)
+1085    | Iceland (Code page 871 Version 0)
+1087    | Symbol Set
+1091    | Modified Symbols, Set 7
+1093    | IBM Logo[15]
+1097    | Farsi Bilingual
+1110    | Latin 2 (Revision of 870)
+1112    | Baltic Multilingual (same with euro: 1156)
+1113    | Latin 6
+1122    | Estonia (same with euro: 1157)
+1123    | Cyrillic, Ukraine (same with euro: 1158)
+1130    | Vietnamese (same with euro: 1164)
+1132    | Lao EBCDIC
+1136    | Hitachi Katakana
+1137    | Devanagari EBCDIC
+!1140    | USA, Canada, etc. ECECP (same without euro: 37) (Traditional Chinese version: 1159)
+!1141    | Austria, Germany ECECP (same without euro: 273)
+!1142    | Denmark, Norway ECECP (same without euro: 277)
+!1143    | Finland, Sweden ECECP (same without euro: 278)
+!1144    | Italy ECECP (same without euro: 280)
+!1145    | Spain, Latin America (Spanish) ECECP (same without euro: 284)
+!1146    | UK ECECP (same without euro: 285)
+!1147    | France ECECP with euro (same without euro: 297)
+!1148    | International ECECP with euro (same without euro: 500)
+!1149    | Icelandic ECECP with euro (same without euro: 871)
+1150    | Korean Extended with box characters
+1151    | Simplified Chinese Extended with box characters
+1152    | Traditional Chinese Extended with box characters
+1153    | Latin 2 Multilingual with euro (same without euro: 870)
+1154    | Cyrillic, Multilingual with euro (same without euro: 1025; an older version is * 1166)
+1155    | Turkey with euro (same without euro: 1026) (same with lira: 1175)
+1156    | Baltic Multi with euro (same without euro: 1112)
+1157    | Estonia with euro (same without euro: 1122)
+1158    | Cyrillic, Ukraine with euro (same without euro: 1123)
+1159    | T-Chinese EBCDIC (Traditional Chinese euro update of * 1140)
+1160    | Thai with Low Marks & Accented Characters with euro (same without euro: 838)
+1164    | Vietnamese with euro (same without euro: 1130)
+1165    | Latin 2/Open Systems
+1166    | Cyrillic Kazakh
+1175    | Turkey with euro and lira (same without lira: 1155)
+1278    | EBCDIC Adobe (PostScript) Standard Encoding
+1279    | Hitachi Japanese Katakana Host[6]
+1300    | Generic Bar Code/OCR-B
+1301    | Zip + 4 POSTNET Bar Code
+1302    | Facing Identification Marks
+1303    | EBCDIC Bar Code
+1364    | Korea MIX (833 + 834 + euro) (same without euro: 933)
+1371    | Traditional Chinese MIX (1159 + 835) (same without euro: 937)
+1376    | Traditional Chinese DBCS Host extension for HKSCS
+1377    | Mixed Host HKSCS Growing (37 + 1376)
+1378    | Traditional Chinese DBCS Host extension for HKSCS and Simplified Chinese (superset of 1376)
+1379    | Mixed Host HKSCS and Simplified Chinese Growing (37 + 1378) (superset of 1377)
+1388    | Simplified Chinese MIX (same without euro: 935) (836 + 837 + euro)
+1390    | Simplified Chinese MIX Japan MIX (same without euro: 930) (290 + 300 + euro)
+1399    | Japan MIX (1027 + 300 + euro) (same without euro: 939)
+
+
+## DOS code pages
+
+301     | IBM-PC Japan (Kanji) DBCS
+437     | Original IBM PC hardware code page
+720     | Arabic (Transparent ASMO)
+737     | Greek
+775     | Latin-7
+808     | Russian with euro (same without euro: 866)
+848     | Ukrainian with euro (same without euro: 1125)
+849     | Belarusian with euro (same without euro: 1131)
+850     | Latin-1
+851     | Greek
+852     | Latin-2
+853     | Latin-3
+855     | Cyrillic (same with euro: 872)
+856     | Hebrew
+857     | Latin-5
+858     | Latin-1 with euro symbol
+859     | Latin-9
+860     | Portuguese
+861     | Icelandic
+862     | Hebrew
+863     | Canadian French
+864     | Arabic
+865     | Danish/Norwegian
+866     | Belarusian, Russian, Ukrainian (same with euro: 808)
+867     | Hebrew + euro (based on CP862) (conflictive ID: NEC Czech (Kamenický), which was created before this codepage)
+868     | Urdu
+869     | Greek
+872     | Cyrillic with euro (same without euro: 855)
+874     | Thai with Low Tone Marks & Ancient Chars (conflictive ID with Windows 874; version with euro: 1161 Windows version: is IBM 1162)
+876     | OCR A
+877     | OCR B
+878     | KOI8-R
+891     | Korean PC SBCS
+898     | IBM-PC WP Multilingual
+899     | IBM-PC Symbol
+903     | Simplified Chinese PC SBCS
+904     | Traditional Chinese PC SBCS
+906     | International Set #5 3812/3820
+907     | ASCII APL (3812)
+909     | IBM-PC APL2 Extended
+910     | IBM-PC APL2
+911     | IBM-PC Japan #1
+926     | Korean PC DBCS
+927     | Traditional Chinese PC DBCS
+928     | Simplified Chinese PC DBCS
+929     | Thai PC DBCS
+932     | IBM-PC Japan MIX (DOS/V) (DBCS) (897 + 301) (conflictive ID with Windows 932; Windows version is IBM 943)
+934     | IBM-PC Korea MIX (DOS/V) (DBCS) (891 + 926)
+936     | IBM-PC Simplified Chinese MIX (gb2312) (DOS/V) (DBCS) (903 + 928) (conflictive ID with Windows 936; Windows version is IBM 1386)
+938     | IBM-PC Traditional Chinese MIX (DOS/V, OS/2) (904 + 927)
+942     | IBM-PC Japan MIX (Japanese SAA (OS/2)) (1041 + 301)
+943     | IBM-PC Japan OPEN (897 + 941) (Windows CP 932)
+944     | IBM-PC Korea MIX (Korean SAA (OS/2)) (1040 + 926)
+946     | IBM-PC Simplified Chinese (Simplified Chinese SAA (OS/2)) (1042 + 928)
+948     | IBM-PC Traditional Chinese (Traditional Chinese SAA (OS/2)) (1043 + 927)
+949     | Korean (Extended Wansung (ks_c_5601-1987)) (1088 + 951) (conflictive ID with Windows 949 (Unified Hangul Code); Windows version is IBM 1363)
+951     | Korean DBCS (IBM KS Code) (conflictive ID with Windows 951, a hack of Windows 950 with Unicode mappings for some PUA Unicode characters found in HKSCS, based on the file name)
+1034    | Printer Application - Shipping Label, Set #2
+1040    | Korean Extended
+1041    | Japanese Extended (JIS X 0201 Extended)
+1042    | Simplified Chinese Extended
+1043    | Traditional Chinese Extended
+1044    | Printer Application - Shipping Label, Set #1
+1086    | IBM-PC Japan #1
+1088    | Revised Korean (SBCS)
+1092    | IBM-PC Modified Symbols
+1098    | Farsi
+1108    | DITROFF Base Compatibility
+1109    | DITROFF Specials Compatibility
+1115    | IBM-PC People's Republic of China
+1116    | Estonian
+1117    | Latvian
+1118    | Lithuanian (IBM's implementation of Lika's code page 774)
+1119    | Lithuanian and Russian (IBM's implementation of Lika's code page 772)
+1125    | Cyrillic, Ukrainian (same with euro: 848) (IBM modification of RUSCII)
+1127    | IBM-PC Arabic / French
+1131    | IBM-PC Data, Cyrillic, Belarusian (same with euro: 849)
+1139    | Japan Alphanumeric Katakana
+1161    | Thai with Low Tone Marks & Ancient Chars with euro (same without euro: 874)
+1167    | KOI8-RU
+1168    | KOI8-U
+1370    | Traditional Chinese MIX (Big5 encoding) (1114 + 947 + euro) (same without euro: 950)
+1380    | IBM-PC Simplified Chinese GB PC-DATA (DBCS PC IBM GB 2312-80)
+1381    | IBM-PC Simplified Chinese (1115 + 1380)
+1393    | Japanese JIS X 0213 DBCS
+1394    | IBM-PC Japan (JIS X 0213) (897 + 1393)
+
+
+## IBM AIX code pages
+
+367     | 7-bit US-ASCII
+371     | 7-bit US-ASCII APL
+806     | ISCII
+813     | ISO 8859-7
+819     | ISO 8859-1
+895     | 7-bit Japan Latin
+896     | 7-bit Japan Katakana Extended
+901     | ISO 8859-13 with euro (later extended) (same without euro: 921)
+902     | ISO Estonian with euro (same without euro: 922)
+912     | ISO 8859-2 (extended in 1999)
+913     | ISO 8859-3
+914     | ISO 8859-4
+915     | ISO 8859-5 (extended after 1995)
+916     | ISO 8859-8
+919     | ISO 8859-10
+920     | ISO 8859-9
+921     | ISO 8859-13 (extended after 1995) (same with euro: 901)
+922     | ISO Estonian (same with euro: 902)
+923     | ISO 8859-15
+952     | EUC Japanese for JIS X 0208
+953     | EUC Japanese for JIS X 0212
+954     | EUC Japanese (895 + 952 + 896 + 953)
+955     | TCP Japanese, JIS X 0208-1978
+956     | TCP Japanese (895 + 952 + 896 + 953)
+957     | TCP Japanese (895 + 955 + 896 + 953)
+958     | TCP Japanese (367 + 952 + 896 + 953)
+959     | TCP Japanese (367 + 955 + 896 + 953)
+960     | Traditional Chinese DBCS-EUC SICGCC Primary Set (1st plane)
+961     | Traditional Chinese DBCS-EUC SICGCC Full Set + IBM Select + UDC
+963     | Traditional Chinese TCP, CNS 11643 plane 2 only
+964     | EUC Traditional Chinese (367 + 960 + 961)
+965     | TCP Traditional Chinese (367 + 960 + 963)
+970     | EUC Korean (367 + 971)
+971     | EUC Korean DBCS (G1, KSC 5601 1989 (including 188 UDC))
+1006    | ISO 8-bit Urdu
+1008    | ISO 8-bit Arabic
+1009    | 7-bit ISO IRV
+1010    | 7-bit France
+1011    | 7-bit Germany F.R.
+1012    | 7-bit Italy
+1013    | 7-bit United Kingdom
+1014    | 7-bit Spain
+1015    | 7-bit Portugal
+1016    | 7-bit Norway
+1017    | 7-bit Denmark
+1018    | 7-bit Finland/Sweden
+1019    | 7-bit Netherlands
+1029    | Arabic Extended
+1036    | CCITT T.61
+1046    | Arabic Extended (Euro)
+1089    | ISO 8859-6
+1111    | Variant of ISO 8859-2
+1124    | ISO Ukrainian, similar to ISO 8859-5
+1129    | ISO Vietnamese (same with euro: 1163)
+1133    | ISO Lao
+1163    | ISO Vietnamese with euro (same without euro: 1129)
+1350    | EUC Japanese (JISeucJP) (367 + 952 + 896 + 953)
+1382    | EUC Simplified Chinese (DBCS PC GB 2312-80)
+1383    | EUC Simplified Chinese (367 + 1382)
+
+
+## IBM OS/2 code pages
+
+1004    | Latin-1 Extended, Desk Top Publishing/Windows[21]
+
+
+## Windows emulation code pages
+
+897     | IBM-PC SBCS Japanese (JIS X 0201-1976)
+941     | IBM-PC Japanese DBCS for Open environment
+947     | IBM-PC DBCS for (Big5 encoding)
+950     | Traditional Chinese MIX (Big5 encoding) (1114 + 947) (same with euro: 1370)
+1114    | IBM-PC SBCS (Simplified Chinese; GBK; Traditional Chinese; Big5 encoding)
+1126    | IBM-PC Korean SBCS
+1162    | Windows Thai (Extension of 874; but still called that in Windows)
+1169    | Windows Cyrillic Asian
+1174    | Windows Kazakh[22]
+1250    | Windows Central Europe
+1251    | Windows Cyrillic
+1252    | Windows Western
+1253    | Windows Greek
+1254    | Windows Turkish
+1255    | Windows Hebrew
+1256    | Windows Arabic
+1257    | Windows Baltic
+1258    | Windows Vietnamese
+1360    | Korean JOHAB DBCS
+1361    | Korean (JOHAB)
+1362    | Korean Hangul DBCS
+1363    | Windows Korean (1126 + 1362) (Windows CP 949)
+1372    | IBM-PC MS T Chinese Big5 encoding (Special for DB2)
+1373    | Windows Traditional Chinese (extension of 950)
+1374    | IBM-PC DB Big5 encoding extension for HKSCS
+1375    | Mixed Big5 encoding extension for HKSCS (intended to match 950)
+1385    | IBM-PC Simplified Chinese DBCS (Growing CS for GB18030, also used for GBK PC-DATA.)
+1386    | IBM-PC Simplified Chinese GBK (1114 + 1385) (Windows CP 936)
+1391    | Simplified Chinese 4 Byte (Growing CS for GB18030, also used for GBK PC-DATA.)
+1392    | IBM-PC Simplified Chinese MIX (1252 + 1385 + 1391)
+
+
+## Macintosh emulation code pages
+
+1275    | Apple Roman
+1280    | Apple Greek
+1281    | Apple Turkish
+1282    | Apple Central European
+1283    | Apple Cyrillic
+1284    | Apple Croatian
+1285    | Apple Romanian
+1286    | Apple Icelandic
+
+
+## Adobe emulation code pages
+
+1038    | Adobe Symbol Encoding
+1276    | Adobe (PostScript) Standard Encoding
+1277    | Adobe (PostScript) Latin 1
+
+
+## HP emulation code pages
+
+1050    | HP Roman Extension
+1051    | HP Roman-8
+1052    | HP Gothic Legal
+1053    | HP Gothic-1 (almost the same as ISO 8859-1)
+1054    | HP ASCII
+1055    | HP PC-Line
+1056    | HP Line Draw
+1057    | HP PC-8 (almost the same as code page 437)
+1058    | HP PC-8DN (not the same as code page 865)
+1351    | Japanese DBCS HP character set
+5039    | Japanese MIX (1041 + 1351)
+
+
+## DEC emulation code pages
+
+1020    | 7-bit Canadian (French) NRC Set
+1021    | 7-bit Switzerland NRC Set
+1023    | 7-bit Spanish NRC Set
+1090    | Special Characters and Line Drawing Set
+1100    | DEC Multinational
+1101    | 7-bit British NRC Set
+1102    | 7-bit Dutch NRC Set
+1103    | 7-bit Finnish NRC Set
+1104    | 7-bit French NRC Set
+1105    | 7-bit Norwegian/Danish NRC Set
+1106    | 7-bit Swedish NRC Set
+1107    | 7-bit Norwegian/Danish NRC Alternate
+1287    | DEC Greek
+1288    | DEC Turkish
+
+
+## IBM Unicode code pages
+
+1200    | UTF-16BE Unicode (big-endian) with IBM Private Use Area (PUA)[23]
+1201    | UTF-16BE Unicode (big-endian)[23]
+1202    | UTF-16LE Unicode (little-endian) with IBM PUA[23]
+1203    | UTF-16LE Unicode (little-endian)[23]
+1208    | UTF-8 Unicode with IBM PUA[23]
+1209    | UTF-8 Unicode[23]
+1400    | ISO 10646 UCS-BMP (Based on Unicode 6.0)[23]
+1401    | ISO 10646 UCS-SMP (Based on Unicode 6.0)[23]
+1402    | ISO 10646 UCS-SIP (Based on Unicode 6.0)[23]
+1414    | ISO 10646 UCS-SSP (Based on Unicode 4.0)[23]
+1445    | IBM AFP PUA No. 1
+1446    | ISO 10646 UCS-PUP15 (Based on Unicode 4.0)[23]
+1447    | ISO 10646 UCS-PUP16 (Based on Unicode 4.0)[23]
+1448    | UCS-BMP (Generic UDC)
+1449    | IBM default PUA
+
+
+# Microsoft code pages
+
+## Windows code pages
+
+42      | Windows Symbol
+874     | Windows Thai
+1250    | Windows Central Europe
+1251    | Windows Cyrillic
+1252    | Windows Western
+1253    | Windows Greek
+1254    | Windows Turkish
+1255    | Windows Hebrew
+1256    | Windows Arabic
+1257    | Windows Baltic
+1258    | Windows Vietnamese
+
+
+## DBCS code pages
+
+932     | Supports Japanese Shift-JIS
+936     | Supports Simplified Chinese GB2312 or GBK
+949     | Supports Korean Unified Hangul Code
+950     | Supports Traditional Chinese Big5
+951     | Supports Traditional Chinese Big5 with HKSCS
+
+
+## MS-DOS code pages
+
+708     | Arabic (ASMO 708)
+720     | Arabic (Transparent ASMO)
+737     | Greek
+850     | Latin-1
+851     | Greek
+852     | Latin-2
+855     | Cyrillic
+857     | Latin-5
+858     | Latin-1 with euro symbol
+859     | Latin-9
+860     | Portuguese
+861     | Icelandic
+862     | Hebrew
+863     | Canadian French
+864     | Arabic
+865     | Danish/Norwegian
+866     | Belarusian, Russian, Ukrainian
+869     | Greek
+
+
+## Macintosh emulation code pages
+
+10000   | Apple Macintosh Roman
+10001   | Apple Japanese
+10002   | Apple Traditional Chinese (Big5)
+10003   | Apple Korean
+10004   | Apple Arabic
+10005   | Apple Hebrew
+10006   | Apple Greek
+10007   | Apple Macintosh Cyrillic
+10008   | Apple Simplified Chinese (GB 2312)
+10010   | Apple Romanian
+10017   | Apple Ukrainian
+10021   | Apple Thai
+10029   | Apple Macintosh Central Europe
+10079   | Apple Icelandic
+10081   | Apple Turkish
+10082   | Apple Croatian
+
+
+## Various other Microsoft code pages
+
+20000   | Traditional Chinese CNS
+20001   | Traditional Chinese TCA
+20002   | Traditional Chinese ETEN
+20003   | Traditional Chinese IBM5500
+20004   | Traditional Chinese TeleText
+20005   | Traditional Chinese Wang
+!20105   | 7-bit IA5 IRV[27][28][29] (CP 1009)
+!20106   | 7-bit IA5 German (DIN 66003)[27][28][30]
+!20107   | 7-bit IA5 Swedish (SEN 850200 C)[27][28][31]
+!20108   | 7-bit IA5 Norwegian (NS 4551-2)[27][28][32]
+20127   | 7-bit US-ASCII[27][28][33]
+!20261   | CCITT T.61
+20269   | ISO 6937
+!20273   |
+!20277   |
+!20278   |
+!20284   |
+!20285   |
+!20290   | Japanese language in EBCDIC
+!20297   |
+!20420   |
+!20423   |
+!20424   |
+!20833   |
+!20838   |
+20866   | KOI8-R
+!20871   |
+!20880   | EBCDIC Cyrillic (880)
+!20905   |
+!20924   |
+20932   | EUC-JP
+20936   |
+20949   |
+!21025   | EBCDIC Cyrillic (1025)
+!21027   |
+21866   | KOI8-U
+28591   | ISO-8859-1
+28592   | ISO-8859-2
+28593   | ISO-8859-3
+28594   | ISO-8859-4
+28595   | ISO-8859-5
+28596   | ISO-8859-6
+28597   | ISO-8859-7
+28598   | ISO-8859-8
+28599   | ISO-8859-9
+28600   | ISO-8859-10
+28601   | ISO-8859-11
+28602   | not used (reserved for ISO-8859-12)
+28603   | ISO-8859-13
+28604   | ISO-8859-14
+28605   | ISO-8859-15
+28606   | ISO-8859-16
+38596   | ISO-8859-6
+38598   | ISO-8859-8
+
+
+## Microsoft Unicode code pages
+
+1200    | UTF-16LE Unicode (little-endian)
+1201    | UTF-16BE Unicode (big-endian)
+12000   | UTF-32LE Unicode (little-endian)
+12001   | UTF-32BE Unicode (big-endian)
+65000   | UTF-7 Unicode
+65001   | UTF-8 Unicode
+65520   | Empty Unicode Plane
+
+
+# Code pages from other vendors
+
+100     | DOS Hebrew hardware fontpage (Not from IBM; HDOS)[34]
+111     | DOS Greek (Not from IBM; AST Premium Exec DOS 5.0[35][36][37])
+112     | DOS Turkish (Not from IBM; AST Premium Exec DOS 5.0[35][36][37])
+113     | DOS Yugoslavian (Not from IBM; AST Premium Exec DOS 5.0[35][36][37])
+151     | DOS Nafitha Arabic (Not from IBM; ADOS)
+152     | DOS Nafitha Arabic (Not from IBM; ADOS)
+161     | DOS Arabic (Not from IBM; ADOS)[34]
+162     | DOS Arabic with vowel diacritics (Not from IBM; ADOS)
+163     | DOS Arabic and French (Not from IBM; ADOS)[34]
+164     | DOS Arabic and French with vowel diacritics (Not from IBM; ADOS)
+165     | DOS Arabic (864 Extended) (Not from IBM; ADOS)[34]
+166     | IBM Arabic PC (ADOS)[34]
+190     | DEC DOS German (appears to be identical to Code page 437)
+210     | DEC DOS Greek (NEC Jetmate printers)
+220     | DEC DOS Spanish (Not from IBM)
+489     | Czechoslovakian [OCR software 1993]
+620     | DOS Polish (Mazovia) (Not from IBM)
+667     | DOS Polish (Mazovia) (Not from IBM)
+668     | DOS Polish (Not from IBM)
+706     | MS-DOS Server Arabic Sakhr (Not from IBM; Sakhr Software from MSX Computers)
+707     | MS-DOS Arabic Sakhr (Not from IBM; Sakhr Software from MSX Computers)
+709     | MS-DOS Arabic (ASMO 449+/BCON V4)
+710     | MS-DOS Arabic (Transparent Arabic)
+711     | MS-DOS Arabic Nafitha Enhanced (Not from IBM)
+714     | MS-DOS Arabic Sakr (Not from IBM)
+715     | MS-DOS Arabic APTEC (Not from IBM)
+721     | MS-DOS Arabic Nafitha International (Not from IBM)
+768     | Arabic Al-Arabi (Not from IBM)
+770     | DOS Estonian, Latvian, Lithuanian[38] (From Lithuanian Lika Software;[39] Lithuanian RST 1095-89 National Standard)
+771     | DOS Lithuanian/Cyrillic — KBL[40] (From Lithuanian Lika Software[39])
+772     | DOS Lithuanian/Cyrillic[41] (From Lithuanian Lika Software;[39] Lithuanian LST 1284:1993 National Standard; adopted by IBM as code page 1119)
+773     | DOS Latin-7 — KBL (From Lithuanian Lika Software)
+774     | DOS Lithuanian[42] (From Lithuanian Lika Software;[39] Lithuanian LST 1283:1993 National Standard; adopted by IBM as code page 1118)
+775     | DOS Latin-7 Baltic Rim (From Lithuanian Lika Software;[39] Lithuanian LST 1590-1 National Standard; adopted by IBM and Microsoft as code page 775)
+776     | DOS Lithuanian (extended CP770)[43] (From Lithuanian Lika Software[39])
+777     | DOS Accented Lithuanian (old) (extended CP773) — KBL[43] (From Lithuanian Lika Software[39])
+778     | DOS Accented Lithuanian (extended CP775)[43] (From Lithuanian Lika Software[39])
+790     | DOS Polish (Mazovia) with curly quotation marks
+854     | Spanish[44][6]
+881     | Latin 1 (Not from IBM; AST Premium Exec DOS 5.0[35][36][37]) (conflictive ID with IBM EBCDIC 881)
+882     | Latin 2 (ISO 8859-2) (Not from IBM; same as Code page 912; AST Premium Exec DOS 5.0[35][36][37]) (conflictive ID with IBM EBCDIC 882)
+883     | Latin 3 (Not from IBM; AST Premium Exec DOS 5.0[35][36][37]) (conflictive ID with IBM EBCDIC 883)
+884     | Latin 4 (Not from IBM; AST Premium Exec DOS 5.0[35][36][37]) (conflictive ID with IBM EBCDIC 884)
+885     | Latin 5 (Not from IBM; AST Premium Exec DOS 5.0[35][36][37]) (conflictive ID with IBM EBCDIC 885)
+895     | Czech (Kamenický), (Not from IBM; conflictive ID with IBM CP895 — 7-bit EUC Japanese Roman)
+896     | DOS Polish (Mazovia) (Not from IBM; conflictive ID with IBM CP896 — 7-bit EUC Japanese Katakana)
+900     | DOS Russian (Russian MS-DOS 5.0 LCD.CPI)
+928     | Greek (on Star[45] printers); same as Greek National Standard ELOT 928 (Not from IBM; conflictive ID with IBM CP928 — Simplified Chinese PC DBCS)
+966     | Saudi Arabian (Not from IBM)
+972     | Hebrew (VT100) (Not from IBM)
+991     | DOS Polish (Mazovia) (Not from IBM)
+999     | DOS Serbo-Croatian I (Not from IBM); also known as PC Nova and CroSCII; lower part is JUSI.B1.002, upper part is code page 437; supports Slovenian and Serbo-Croatian (Latin script)
+1001    | Arabic (on Star[45] printers) (Not from IBM; conflictive ID with IBM CP1001 — MICR)
+1261    | Windows Korean IBM-1261 LMBCS-17, similar to 1363
+1270    | Windows Sámi
+1300    | ANSI [PTS-DOS 6.70, not 6.51] (Not from IBM; conflictive ID with IBM EBCDIC 1300 — Generic Bar Code/OCR-B)
+2001    | Lithuanian KBL (on Star[45] printers); same as code page 771
+3001    | Estonian 1 (on Star[45] printers); same as code page 1116
+3002    | Estonian 2 (on Star[45] printers); same as code page 922
+3011    | Latvian 1 (on Star[45] printers); same as code page 437-Latvian
+3012    | Latvian-2 (on Star[45] printers); same as code page 866-Latvian (Latvian RST 1040-90 National Standard)
+3021    | Bulgarian (on Star[45] printers); same as MIK
+3031    | Hebrew (on Star[45] printers); same as code page 862
+3041    | Maltese (on Star[45] printers); same as ISO 646 Maltese
+3840    | IBM-Russian (on Star[45] printers); nearly the same as CP 866
+3841    | Gost-Russian (on Star[45] printers); GOST 13052 plus characters for Central Asian languages
+3843    | Polish (on Star[45] printers); same as Mazovia
+3844    | CS2 (on Star[45] printers); same as Kamenický
+3845    | Hungarian (on Star[45] printers); same as CWI
+3846    | Turkish (on Star[45] printers); same as PC-8 Turkish + old Turkish Lira sign (Tʟ) at code point A8
+3847    | Brazil-ABNT (on Star[45] printers); same as the Brazilian National Standard NBR-9614:1986
+3848    | Brazil-ABICOMP (on Star[45] printers); same as ABICOMP
+3850    | Standard KU (on Star[45] printers); variation of the Kasetsart University encoding for Thai
+3860    | Rajvitee KU (on Star[45] printers); variation of the Kasetsart University encoding for Thai
+3861    | Microwiz KU (on Star[45] printers); variation of the Kasetsart University encoding for Thai
+3863    | STD988 TIS (on Star[45] printers); variation of the TIS 620 encoding for Thai
+3864    | Popular TIS (on Star[45] printers); variation of the TIS 620 encoding for Thai
+3865    | Newsic TIS (on Star[45] printers); variation of the TIS 620 encoding for Thai
+28799   | FOCAL (on Star[45] printers); same as FOCAL character set
+28800   | HP RPL (on Star[45] printers); same as RPL
