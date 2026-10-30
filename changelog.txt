@@ -1,4 +1,7 @@
 2026.10.30:
+* new: scripts/tests/bench/bat/test__for/test__for__31_do_loop_macro.bat: bench tests for `for` loop expressions in variables from `declare_func_vars.bat` script
+
+2026.10.30:
 * fixed: scripts/tests/bench/bat/test__for/test__for__00_single_loop: minor fixup
 * new: scripts/tests/bench/bat/test__for/test__for__00_single_loop: more bench tests
 * changed: scripts/tests/bench/bat/test__for/test__for__00_single_loop: slow bench tests is removed
