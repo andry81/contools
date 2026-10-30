@@ -1,4 +1,10 @@
 2026.10.30:
+* fixed: scripts/tests/bench/bat/test__for/test__for__00_single_loop: minor fixup
+* new: scripts/tests/bench/bat/test__for/test__for__00_single_loop: more bench tests
+* changed: scripts/tests/bench/bat/test__for/test__for__00_single_loop: slow bench tests is removed
+* refactor: scripts/tests/bench/bat/test__for: refactor
+
+2026.10.30:
 * new: scripts/tests/bench/bat/test__for/test__for__00_empty_loop.bat: bench tests for an empty `for` loop
 
 2026.10.30:

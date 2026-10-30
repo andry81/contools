@@ -10,11 +10,12 @@ setlocal DISABLEDELAYEDEXPANSION
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-for /L %%i in (1,1,100000) do rem
+for /L %%i in (1,1,1000000) do goto EXIT
+:EXIT
 
 call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
 
-echo Time spent: %TIME_INTS%.%TIME_FRACS% msecs
+echo Time spent: %TIME_INTS%.%TIME_FRACS% secs
 echo;
 
 exit /b 0
