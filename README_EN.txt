@@ -1,5 +1,5 @@
 * README_EN.txt
-* 2026.09.03
+* 2026.10.30
 * contools
 
 1. DESCRIPTION
@@ -126,9 +126,47 @@ script:
 * bat scripts tests:
 
   ** scripts/tests/manual/bat
+
+    Can form a log file meaning that it must be compared to a previous log file
+    to detect a test pass, failure or change.
+
   ** scripts/tests/unit/bat
+
+    Does an automatic test pass, failure or change detection.
+    A test can be skipped depending on the OS version.
+
   ** scripts/tests/probe/bat
+
+    Probes a different limits or calculates a value.
+    Has the same meaning as a manual test, but additionally does output values
+    to be registered to compare with later.
+
   ** scripts/tests/bench/bat
+
+    Benches a script, an expression or a built-in performance.
+
+All categories of test does form a log if is ran from the `all` script.
+
+Tests sub categories:
+
+* Tests for regular scripts.
+
+  Format:
+
+    test_<scope>__<name>[_!exclusive]/     (directory)
+    test_<scope>__<name>[_!exclusive].bat  (file)
+
+* Tests for generics or built-ins.
+
+  Format:
+
+    test__<name>[_!exclusive]/     (directory)
+    test__<name>[_!exclusive].bat  (file)
+
+The `_!exclusive` suffix does use to exclude a test (a directory or a file)
+from run by `all` scripts.
+
+An exclusive test must run manually and can form a standalone log file.
 
 -------------------------------------------------------------------------------
 10. AUTHOR
