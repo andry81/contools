@@ -1,3 +1,7 @@
+2026.10.30:
+* changed: scripts/tests/unit/bat/test_encoding_!exclusive.bat: minor refactor
+* refactor: scripts/tests/unit/bat/test_encoding/test_encoding: minor refactor
+
 2026.10.29:
 * new: scripts/tests/probe/bat/test__mshta_!exclusive: exclusive probe tests for `mshta.exe` utility
 * new: scripts/tests/probe/bat/test__mshta_!exclusive/test_mshta_cmdline_length_limit.bat: moved from `contools--debug` project

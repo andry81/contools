@@ -14,7 +14,7 @@ for %%i in ("%TESTS_PROJECT_ROOT%\%TEST_GROUP_NAME%\%TEST_GROUP_NAME%__*.bat") d
   set "SCRIPT_NAME=%%~ni"
   set "SCRIPT_FILE=%%i"
   call "%%CONTOOLS_ROOT%%/std/if_.bat" ^
-    not "%%SCRIPT_NAME:!=%%" == "%%SCRIPT_NAME%%" ^
+    "%%SCRIPT_NAME:!=%%" == "%%SCRIPT_NAME%%" ^
       && call "%%SCRIPT_FILE%%"
 )
 
