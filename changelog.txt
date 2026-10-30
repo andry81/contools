@@ -1,4 +1,10 @@
 2026.10.30:
+* new: scripts/tools/time/recalc_time.bat: script for time difference recalculation
+* new: scripts/tools/time/declare_func_vars.bat: script to declare time macro variables
+* changed: scripts/tools/time/end_time.bat: added `<time-diff-to-add>` parameter
+* changed: scripts/tools/time: code refactor
+
+2026.10.30:
 * new: scripts/tests/bench/bat/test__for/test__for__31_do_loop_macro.bat: bench tests for `for` loop expressions in variables from `declare_func_vars.bat` script
 
 2026.10.30:

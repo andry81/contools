@@ -1,4 +1,4 @@
-@echo off & setlocal & set "BEGIN_TIME=%~1 " & setlocal ENABLEDELAYEDEXPANSION & (
+@echo off & setlocal DISABLEDELAYEDEXPANSION & set "BEGIN_TIME=%~1 " & setlocal ENABLEDELAYEDEXPANSION & (
   set "BEGIN_TIME=!BEGIN_TIME::= !"
   set "BEGIN_TIME=!BEGIN_TIME:/= !"
   set "BEGIN_TIME=!BEGIN_TIME:-= !"
