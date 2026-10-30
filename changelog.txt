@@ -1,4 +1,7 @@
 2026.10.30:
+* new: scripts/tests/bench/bat/test__for/test__for__00_empty_loop.bat: bench tests for an empty `for` loop
+
+2026.10.30:
 * new: scripts/tests/unit/bat/test__for.bat: unit tests for `for` loop expressions in variables from `declare_func_vars.bat` script
 * changed: README_EN.txt: readme update
 
