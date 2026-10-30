@@ -1,5 +1,10 @@
 @echo off
 
+if "!!" == "" (
+  echo;%~nx0: error: delayed expansion must be disable before the call
+  exit /b 255
+) >&2
+
 set @DO_LOOP_16x8@=^
 for /L %%# in (1,1,16) do for /L %%# in (1,1,16) do for /L %%# in (1,1,16) do for /L %%# in (1,1,16) do ^
 for /L %%# in (1,1,16) do for /L %%# in (1,1,16) do for /L %%# in (1,1,16) do for /L %%# in (1,1,16) do ^

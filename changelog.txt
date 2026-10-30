@@ -1,4 +1,7 @@
 2026.10.30:
+* changed: scripts/tools/std/declare_func_vars.bat: minor improvement
+
+2026.10.30:
 * new: scripts/tools/time/recalc_time.bat: script for time difference recalculation
 * new: scripts/tools/time/declare_func_vars.bat: script to declare time macro variables
 * changed: scripts/tools/time/end_time.bat: added `<time-diff-to-add>` parameter
