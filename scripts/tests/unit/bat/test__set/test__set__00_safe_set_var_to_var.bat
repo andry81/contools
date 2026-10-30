@@ -1,8 +1,11 @@
 @echo off
 
 rem Description:
-rem   Tests demonstrates assignment of any variable's value using only %-syntax
-rem   (no need a `setlocal ENABLEDELAYEDEXPANSION`).
+rem   Tests demonstrates assignment of any variable's value using only
+rem   %-syntax.
+rem
+rem   The `setlocal ENABLEDELAYEDEXPANSION` does not need for the first
+rem   variable assignment, but still requires to restore the value later.
 rem
 rem   NOTE:
 rem     Does not include the case with the `setlocal ENABLEDELAYEDEXPANSION`

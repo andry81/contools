@@ -1,4 +1,8 @@
 2026.10.30:
+* changed: scripts/tests/unit/bat/test__set_!exclusive.bat: minor refactor
+* refactor: scripts/tests/unit/bat/test__set/test_encoding: minor refactor
+
+2026.10.30:
 * changed: scripts/tests/unit/bat/test_encoding_!exclusive.bat: minor refactor
 * refactor: scripts/tests/unit/bat/test_encoding/test_encoding: minor refactor
 
