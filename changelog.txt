@@ -1,4 +1,8 @@
 2026.10.30:
+* new: scripts/tests/unit/bat/test__for.bat: unit tests for `for` loop expressions in variables from `declare_func_vars.bat` script
+* changed: README_EN.txt: readme update
+
+2026.10.30:
 * changed: README_EN.txt: readme update
 
 2026.10.30:

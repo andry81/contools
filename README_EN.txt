@@ -145,7 +145,7 @@ script:
 
     Benches a script, an expression or a built-in performance.
 
-All categories of test does form a log if is ran from the `all` script.
+All categories of tests does form a log if is ran from the `all` scripts.
 
 Tests sub categories:
 
