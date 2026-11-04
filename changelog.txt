@@ -1,3 +1,6 @@
+2026.11.04:
+* new: scripts/tests/bench/bat/test__for/test__for__00_single_loop: more bench tests
+
 2026.10.30:
 * changed: scripts/tools/std/declare_func_vars.bat: minor improvement
 
