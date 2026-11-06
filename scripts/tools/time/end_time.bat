@@ -1,15 +1,12 @@
 @echo off
 
-set END_TIME=0
-set TIME_DIFF=0
-set TIME_INTS=0
-set TIME_FRACS=0
+set /A "END_TIME=0", "TIME_DIFF=0", "TIME_INTS=0", "TIME_FRACS=0"
 
 if not defined BEGIN_TIME exit /b 255
 
 setlocal DISABLEDELAYEDEXPANSION
 
-set "END_TIME=%TIME%"
+if "%~3" == "" ( set "END_TIME=%TIME%" ) else set "END_TIME=%~3"
 
 call "%%~dp0timediff.bat" "%%BEGIN_TIME%%" "%%END_TIME%%"
 
@@ -36,7 +33,7 @@ if "%TIME_FRACS:~2,1%" == "" set "TIME_FRACS=0%TIME_FRACS%"
 )
 
 rem USAGE:
-rem   end_time.bat [<time-diff-divisor>] [<time-diff-to-add>]
+rem   end_time.bat [<time-diff-divisor>] [<time-diff-to-add>] [<end-time>]
 
 rem Description:
 rem   Script calculates time between this script call and the last call to
@@ -53,3 +50,6 @@ rem   1 is not defined.
 rem <time-diff-to-add>:
 rem   Time difference to add (after division of the current different).
 rem   0 if not defined.
+
+rem <end-time>:
+rem   External end time.
