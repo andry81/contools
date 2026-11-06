@@ -1,4 +1,7 @@
 2026.11.06:
+* new: scripts/tests/bench/bat/test__time.bat: bench tests for `*_time.bat` scripts
+
+2026.11.06:
 * changed: scripts/tools/time/end_time.bat: added `<end-time>` parameter as an external end time
 
 2026.11.06:
