@@ -1,4 +1,8 @@
 2026.11.06:
+* new: scripts/tests/bench/bat/test__prompt.bat: bench tests of `PROMPT` variable set and `prompt` command call
+* new: scripts/tests/bench/bat/test__print_cmdline.bat: bench tests of command line generic print
+
+2026.11.06:
 * changed: scripts/tests/bench/bat/test__*.bat: minor code refactor
 
 2026.11.04:
