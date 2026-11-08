@@ -1,4 +1,7 @@
 2026.11.06:
+* fixed: scripts/tests/unit/bat/_testdata/test_build__10_gen_config: unit tests run
+
+2026.11.06:
 * new: scripts/tests/bench/bat/test__time: more bench tests
 
 2026.11.06:
