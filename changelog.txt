@@ -1,3 +1,7 @@
+2026.11.08:
+* fixed: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: shortcut file by long path using a temporary text file
+* new: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: `-wd+` flag to use the directory path of shortcut target path as the working directory to assign
+
 2026.11.06:
 * fixed: scripts/tests/unit/bat/_testdata/test_build__10_gen_config: unit tests run
 

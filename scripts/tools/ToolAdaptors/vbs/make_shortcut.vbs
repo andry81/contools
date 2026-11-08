@@ -164,6 +164,12 @@
 '''
 '''   -wd <ShortcutWorkingDirectory>
 '''     Working directory value to assign.
+'''     Has priority over `-wd+` flag.
+'''
+'''   -wd+
+'''     Use the directory path of <ShortcutTarget> as the working directory to
+'''     assign.
+'''     Has no effect if `-wd` option is used.
 '''
 '''   -desc <ShortcutDescription>
 '''     Description string to assign.
@@ -476,6 +482,7 @@ Dim ShortcutTargetArgsExist : ShortcutTargetArgsExist = False
 Dim ShortcutWorkingDirectory : ShortcutWorkingDirectory = ""
 Dim ShortcutWorkingDirectoryUnquoted : ShortcutWorkingDirectoryUnquoted = ""
 Dim ShortcutWorkingDirectoryExist : ShortcutWorkingDirectoryExist = False
+Dim ShortcutWorkingDirectoryFromTargetPath : ShortcutWorkingDirectoryFromTargetPath = False
 
 Dim ShortcutDescription : ShortcutDescription = ""
 Dim ShortcutDescriptionExist : ShortcutDescriptionExist = False
@@ -541,6 +548,8 @@ For i = 0 To WScript.Arguments.Count-1 : Do ' empty `Do-Loop` to emulate `Contin
         i = i + 1
         ShortcutWorkingDirectory = WScript.Arguments(i)
         ShortcutWorkingDirectoryExist = True
+      ElseIf arg = "-wd+" Then
+        ShortcutWorkingDirectoryFromTargetPath = True
       ElseIf arg = "-desc" Then ' Shortcut description
         i = i + 1
         ShortcutDescription = WScript.Arguments(i)
@@ -735,8 +744,21 @@ Function GetExistedFolderShortPath(FolderPathAbs)
   GetExistedFolderShortPath = RemoveWin32NamespacePathPrefix(Folder.ShortPath)
 End Function
 
-Function CreateTextFile(FilePathAbs)
-  Set CreateTextFile = CreateTextFileEx(FilePathAbs, True, False)
+' CAUTION: user must delete the test file after the function call!
+Function TestCreateTextFileLongOrShort(FilePathAbs)
+  Dim ShortcutEmptyFile
+  On Error Resume Next
+  Set ShortcutEmptyFile = objFS.CreateTextFile(FilePathAbs, IsOverwrite, IsUnicode)
+  On Error Goto 0
+  If Not IsNothing(ShortcutEmptyFile) Then
+    ' close handle immediately to be able to delete the file later
+    ShortcutEmptyFile.Close()
+    TestCreateTextFileLongOrShort = True
+  Else
+    TestCreateTextFileLongOrShort = False
+  End If
+
+  Set ShortcutEmptyFile = Nothing
 End Function
 
 Function DeleteFile(FilePathAbs)
@@ -1052,23 +1074,21 @@ End If
 Dim ShortcutFilePathToOpen
 
 ' test on long path existence by temporary empty text file
-Dim ShortcutEmptyFile : Set ShortcutEmptyFile = CreateTextFile(ShortcutFilePathAbs)
-' close handle immediately to be able to delete the file later
-ShortcutEmptyFile.Close()
-Set ShortcutEmptyFile = Nothing
-
-If FileExists(ShortcutFilePathAbs) Then
-  ' is not long path
+If TestCreateTextFileLongOrShort(ShortcutFilePathAbs) Then
   DeleteFile(ShortcutFilePathAbs)
   ShortcutFilePathToOpen = ShortcutFilePathAbs
 Else
+  Dim ShortcutEmptyFile : Set ShortcutEmptyFile = CreateTextFileEx(ShortcutFilePathAbs, False, False)
+
   ' translate into short path
   Dim ShortcutFileShortPath : ShortcutFileShortPath = GetExistedFileShortPath(ShortcutFilePathAbs)
 
-  DeleteFile(ShortcutFilePathAbs)
-
   ' construct path from short path parent directory and long path file name
   ShortcutFilePathToOpen = objFS.GetParentFolderName(ShortcutFileShortPath) & "\" & objFS.GetFileName(ShortcutFilePathAbs)
+
+  ShortcutEmptyFile.Close()
+  DeleteFile(ShortcutFilePathAbs)
+  Set ShortcutEmptyFile = Nothing
 End If
 
 Dim objSC
@@ -1170,20 +1190,26 @@ Dim ShortcutWorkingDirectoryAbsLCase
 Dim ShortcutWorkingDirectoryLCase
 Dim ShortcutWorkingDirectoryShortPath
 
-If ShortcutWorkingDirectoryExist Then
+If ShortcutWorkingDirectoryExist Or ShortcutWorkingDirectoryFromTargetPath Then
 Do ' empty `Do-Loop` to emulate `Break`
-  If ExpandAllArgs Or ExpandShortcutWorkingDirectory Then
-    ShortcutWorkingDirectory = objShell.ExpandEnvironmentStrings(ShortcutWorkingDirectory)
+  Dim ShortcutWorkingDirectoryAbs
+
+  If ShortcutWorkingDirectoryExist Then
+    If ExpandAllArgs Or ExpandShortcutWorkingDirectory Then
+      ShortcutWorkingDirectory = objShell.ExpandEnvironmentStrings(ShortcutWorkingDirectory)
+    End If
+
+    If UnescapeAllArgs Then
+      ShortcutWorkingDirectory = Unescape(ShortcutWorkingDirectory)
+    End If
+
+    ShortcutWorkingDirectoryAbs = objFS.GetAbsolutePathName(ShortcutWorkingDirectory) ' CAUTION: can alter a path character case if path exists
+
+    ' remove `\\?\` Win32 Namespace prefix
+    ShortcutWorkingDirectoryAbs = RemoveWin32NamespacePathPrefix(ShortcutWorkingDirectoryAbs)
+  Else
+    ShortcutWorkingDirectoryAbs = ShortcutFileDir
   End If
-
-  If UnescapeAllArgs Then
-    ShortcutWorkingDirectory = Unescape(ShortcutWorkingDirectory)
-  End If
-
-  Dim ShortcutWorkingDirectoryAbs : ShortcutWorkingDirectoryAbs = objFS.GetAbsolutePathName(ShortcutWorkingDirectory) ' CAUTION: can alter a path character case if path exists
-
-  ' remove `\\?\` Win32 Namespace prefix
-  ShortcutWorkingDirectoryAbs = RemoveWin32NamespacePathPrefix(ShortcutWorkingDirectoryAbs)
 
   If Not IgnoreUnexist Then
     Dim IsShortcutWorkingDirectoryExist : IsShortcutWorkingDirectoryExist = False
