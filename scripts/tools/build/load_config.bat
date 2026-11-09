@@ -257,12 +257,13 @@ set "__?VAR_PREFIX=__?:%RANDOM%-%RANDOM%:"
 
 for /F "usebackq eol=# tokens=1,* delims==" %%i in ("%__?CONFIG_FILE_NAME_DIR%/%__?CONFIG_FILE_NAME%") do set "__?VALUE=%%j" & call :PARSE "%%__?FLAG_NO_EXPAND%%" "%%__?PARAM0%%" "%%__?PARAM1%%" %%i
 
+rem variable values post process, excessive `endlocal` does ignore
 for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@set "%%__?VAR_PREFIX%%" 2^>nul`) do ^
-for /F "tokens=3 delims=:"eol^= %%k in ("%%i") do endlocal & set "__?VALUE=%%j" & setlocal ENABLEDELAYEDEXPANSION & ^
-set "__?VALUE=!__?VALUE:~1!" & if defined __?VALUE (
+for /F "tokens=3,* delims=:"eol^= %%k in ("%%i") do endlocal & set "__?VALUE=%%j" & setlocal ENABLEDELAYEDEXPANSION & ^
+if "%%k" == "s" (
   set "__?VALUE=!__?VALUE:="!"
-  for /F "tokens=* delims="eol^= %%l in ("!__?VALUE!") do endlocal & set "%%k=%%l"
-) else set "%%k="
+  for /F "tokens=* delims="eol^= %%m in ("!__?VALUE:~1!") do endlocal & set "%%l=%%m"
+) else endlocal & set "%%l="
 
 set "__?VALUE="
 
@@ -312,10 +313,10 @@ if defined __?P1 if not "%~6" == "" ( if not "%__?P1%" == "%~6" exit /b 1 ) else
 
 :PARSE_VALUE
 set "__?ATTR=%~7"
-if not "!__?ATTR:|once|=!" == "!__?ATTR!" if defined %~1 exit /b 0
-if not defined __?VALUE endlocal & set "%~1=" & exit /b 0
+if not "!__?ATTR:|once|=!" == "!__?ATTR!" ( if defined %~1 exit /b 0 ) & if defined %__?VAR_PREFIX%s:%~1 exit /b 0
+if not defined __?VALUE endlocal & set "%__?VAR_PREFIX%u:%~1=." & set "%~1=" & exit /b 0
 
-rem safe set
-if not "!__?ATTR:|upath|=!" == "!__?ATTR!" ( for /F "tokens=* delims="eol^= %%i in ("!__?VALUE:\=/!") do endlocal & set "%__?VAR_PREFIX%%~1=.%%i" & set "%~1=%%i"
-) else for /F "tokens=* delims="eol^= %%i in ("!__?VALUE!") do endlocal & set "%__?VAR_PREFIX%%~1=.%%i" & set "%~1=%%i"
+rem safe set, `.` before the value is required to avoid consumption of `=` in the beginning while being splitted by `=`
+if not "!__?ATTR:|upath|=!" == "!__?ATTR!" set "__?VALUE=!__?VALUE:\=/!"
+for /F "tokens=* delims="eol^= %%i in ("!__?VALUE!") do endlocal & set "%__?VAR_PREFIX%s:%~1=.%%i" & set "%~1=%%i"
 exit /b 0

@@ -1,4 +1,8 @@
 2026.11.09:
+* fixed: scripts/tools/build/load_config.bat: a variable empty assignment
+* new: scripts/tests/unit/bat: test_build/test_build__00_load_config.bat, _testdata/test_build__00_load_config/test_0_clear.vars: test for a variable empty assignment
+
+2026.11.09:
 * changed: scripts/tests/bench/bat/*.bat: test code minimization and cleanup
 
 2026.11.08:

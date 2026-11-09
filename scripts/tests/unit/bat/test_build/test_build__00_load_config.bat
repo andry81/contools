@@ -12,6 +12,12 @@ rem to make not printable characters visible
 call "%CONTOOLS_ROOT%/encoding/chcp.bat" 437
 
 setlocal
+set "REFERENCE_0_VALUE_00="
+set "TEST_0_VALUE_00=123"
+call :TEST test_0_clear.vars TEST_0_VALUE_ REFERENCE_0_VALUE_ 00
+endlocal
+
+setlocal
 set "REFERENCE_1_VALUE_01="
 set "REFERENCE_1_VALUE_02=	 "
 set "REFERENCE_1_VALUE_03="
