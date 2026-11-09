@@ -144,11 +144,7 @@ if %NO_GEN%0 NEQ 0 if %__?FLAG_GEN_CONFIG% NEQ 0 (
 
 if %__?FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%__?FLAG_SHIFT%) do shift
 
-set "__?CONFIG_IN_DIR=%~1"
-set "__?CONFIG_OUT_DIR=%~2"
-set "__?CONFIG_FILE_NAME=%~3"
-set "__?PARAM0=%~4"
-set "__?PARAM1=%~5"
+set "__?CONFIG_IN_DIR=%~1" & set "__?CONFIG_OUT_DIR=%~2" & set "__?CONFIG_FILE_NAME=%~3" & set "__?PARAM0=%~4" & set "__?PARAM1=%~5"
 
 if not defined __?CONFIG_IN_DIR (
   echo;%__?~%: error: input config directory is not defined.
@@ -161,14 +157,18 @@ if not defined __?CONFIG_OUT_DIR (
 ) >&2
 
 rem check on invalid characters in params
-if defined __?PARAM0 if not "%__?PARAM0%" == "%__?PARAM0:**=%" goto PARAM0_ERROR
-if defined __?PARAM0 if not "%__?PARAM0%" == "%__?PARAM0:?=%" goto PARAM0_ERROR
-if defined __?PARAM0 if not "%__?PARAM0%" == "%__?PARAM0:<=%" goto PARAM0_ERROR
-if defined __?PARAM0 if not "%__?PARAM0%" == "%__?PARAM0:>=%" goto PARAM0_ERROR
-if defined __?PARAM1 if not "%__?PARAM1%" == "%__?PARAM1:**=%" goto PARAM1_ERROR
-if defined __?PARAM1 if not "%__?PARAM1%" == "%__?PARAM1:?=%" goto PARAM1_ERROR
-if defined __?PARAM1 if not "%__?PARAM1%" == "%__?PARAM1:<=%" goto PARAM1_ERROR
-if defined __?PARAM1 if not "%__?PARAM1%" == "%__?PARAM1:>=%" goto PARAM1_ERROR
+if defined __?PARAM0 (
+  if not "%__?PARAM0%" == "%__?PARAM0:**=%" goto PARAM0_ERROR
+  if not "%__?PARAM0%" == "%__?PARAM0:?=%" goto PARAM0_ERROR
+  if not "%__?PARAM0%" == "%__?PARAM0:<=%" goto PARAM0_ERROR
+  if not "%__?PARAM0%" == "%__?PARAM0:>=%" goto PARAM0_ERROR
+)
+if defined __?PARAM1 (
+  if not "%__?PARAM1%" == "%__?PARAM1:**=%" goto PARAM1_ERROR
+  if not "%__?PARAM1%" == "%__?PARAM1:?=%" goto PARAM1_ERROR
+  if not "%__?PARAM1%" == "%__?PARAM1:<=%" goto PARAM1_ERROR
+  if not "%__?PARAM1%" == "%__?PARAM1:>=%" goto PARAM1_ERROR
+)
 
 goto PARAMS_OK
 
@@ -231,12 +231,10 @@ set __?CONFIG_FILE_NAME_GENERATED=0
 set "__?CONFIG_FILE_NAME_DIR=%__?CONFIG_OUT_DIR%"
 if %__?FLAG_GEN_CONFIG% EQU 0 (
   if %__?FLAG_LOAD_OUTPUT_CONFIG% EQU 0 set "__?CONFIG_FILE_NAME_DIR=%__?CONFIG_IN_DIR%"
-) else (
-  if not exist "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE_NAME%" if exist "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" (
-    echo;"%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" -^> "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE_NAME%"
-    type "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" > "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE_NAME%"
-    set __?CONFIG_FILE_NAME_GENERATED=1
-  )
+) else if not exist "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE_NAME%" if exist "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" (
+  echo;"%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" -^> "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE_NAME%"
+  type "%__?CONFIG_IN_DIR%\%__?CONFIG_FILE_NAME%.in" > "%__?CONFIG_OUT_DIR%\%__?CONFIG_FILE_NAME%"
+  set __?CONFIG_FILE_NAME_GENERATED=1
 )
 
 rem load configuration files

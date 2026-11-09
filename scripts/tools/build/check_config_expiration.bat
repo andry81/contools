@@ -50,8 +50,7 @@ call "%%?~dp0%%.check_config_expiration/check_config_expiration.read_flags.bat" 
 
 if %FLAG_SHIFT% GTR 0 for /L %%i in (1,1,%FLAG_SHIFT%) do shift
 
-set "VARS_FILE_IN=%~1"
-set "VARS_FILE=%~2"
+set "VARS_FILE_IN=%~1" & set "VARS_FILE=%~2"
 
 if not defined VARS_FILE_IN (
   echo;%?~%: error: input config file is not defined.

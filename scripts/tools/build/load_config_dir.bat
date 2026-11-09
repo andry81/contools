@@ -99,15 +99,10 @@ if %NO_GEN%0 NEQ 0 (
   ) >&2
 )
 
-set __?LOAD_USER_CONFIG_IN=0
-set "__?SYSTEM_CONFIG_FILE_EXT="
-set "__?USER_CONFIG_FILE_EXT="
+set "__?LOAD_USER_CONFIG_IN=0" & set "__?SYSTEM_CONFIG_FILE_EXT=" & set "__?USER_CONFIG_FILE_EXT="
 
 if %__?FLAG_LOAD_SYSTEM_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_SYSTEM_CONFIG% EQU 0 set "__?SYSTEM_CONFIG_FILE_EXT=.in"
-if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_USER_CONFIG% EQU 0 (
-  set __?LOAD_USER_CONFIG_IN=1
-  set "__?USER_CONFIG_FILE_EXT=.in"
-)
+if %__?FLAG_LOAD_USER_OUTPUT_CONFIG% EQU 0 if %__?FLAG_GEN_USER_CONFIG% EQU 0 set "__?LOAD_USER_CONFIG_IN=1" & set "__?USER_CONFIG_FILE_EXT=.in"
 
 if "%~2" == "" (
   call :MAIN "%%~1" "%%~1" "%%~3" "%%~4"
@@ -119,8 +114,7 @@ for /F "usebackq tokens=1,* delims=="eol^= %%i in (`@set __? 2^>nul`) do set "%%
 exit /b
 
 :MAIN
-set __?PARAM0=%~3"
-set __?PARAM1=%~4"
+set "__?PARAM0=%~3" & set "__?PARAM1=%~4"
 
 if not defined WINDOWS_MAJOR_VER goto SKIP_PARAM0
 if not defined WINDOWS_MINOR_VER goto SKIP_PARAM0

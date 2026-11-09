@@ -1,6 +1,5 @@
-2026.11.06:
-* new: scripts/tests/bench/bat/test__for: more bench tests
-* changed: scripts/tests/bench/bat/test__for/*.bat: test code minimization and cleanup
+2026.11.10:
+* changed: scripts/tools/build: load_config*.bat, check_config_expiration.bat: minor optimizations
 
 2026.11.09:
 * fixed: scripts/tools/build/load_config.bat: a variable empty assignment
@@ -12,6 +11,10 @@
 2026.11.08:
 * fixed: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: shortcut file by long path using a temporary text file
 * new: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: `-wd+` flag to use the directory path of shortcut target path as the working directory to assign
+
+2026.11.06:
+* new: scripts/tests/bench/bat/test__for: more bench tests
+* changed: scripts/tests/bench/bat/test__for/*.bat: test code minimization and cleanup
 
 2026.11.06:
 * new: scripts/tests/bench/bat/test__for/test__for__31_do_loop_macro: more bench tests
