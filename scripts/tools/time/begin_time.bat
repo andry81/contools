@@ -1,1 +1,1 @@
-@set "BEGIN_TIME=%TIME%" & set /A "TIME_DIFF+=0"
+@set "BEGIN_TIME=%TIME%" & set "TIME_DIFF=0"
