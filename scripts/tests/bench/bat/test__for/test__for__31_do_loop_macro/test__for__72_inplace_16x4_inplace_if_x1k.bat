@@ -11,24 +11,23 @@ call "%%CONTOOLS_ROOT%%/std/echo_var.bat" ?~nx0 ">"
 setlocal DISABLEDELAYEDEXPANSION
 
 call "%%CONTOOLS_ROOT%%/std/declare_func_vars.bat" || exit /b
+call "%%CONTOOLS_ROOT%%/time/declare_func_vars.bat" || exit /b
+
+setlocal ENABLEDELAYEDEXPANSION
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-for /L %%i in (1,1,100) do call :FOR
-
-goto END
-
-:FOR
 set INDEX=0
-%@DO_LOOP_16x8@% (
+%@DO_LOOP_16x4@% (
   set /A INDEX+=1
-  call "%%CONTOOLS_ROOT%%/std/if_.bat" %%INDEX%% GEQ 10 && exit /b
+  if !INDEX! GEQ 1000 goto :EXIT
 )
-exit /b
 
-:END
+:EXIT
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
+
+%@ENDLOCAL_AND_RECALC_TIME@%
 
 echo Time spent: %TIME_INTS%.%TIME_FRACS% secs
 echo;

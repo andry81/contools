@@ -19,12 +19,12 @@ for /L %%i in (1,1,1000) do call :FOR
 goto END
 
 :FOR
-%@DO_LOOP_16x8@% exit /b
+%@DO_LOOP_16x2@% exit /b
 exit /b
 
 :END
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 echo Time spent: %TIME_INTS%.%TIME_FRACS% msecs
 echo;

@@ -5,6 +5,10 @@ if "!!" == "" (
   exit /b 255
 ) >&2
 
+set @ENDLOCAL_AND_RETURN_ADD_TIME_DIFF@=setlocal ENABLEDELAYEDEXPANSION ^& for /F "usebackq tokens=* delims="eol^^= %%i in ('"!TIME_DIFF!"') do endlocal ^& endlocal ^& set /A "TIME_DIFF+=%%~i"
+
+set @ENDLOCAL_AND_RETURN_SET_TIME_DIFF@=setlocal ENABLEDELAYEDEXPANSION ^& for /F "usebackq tokens=* delims="eol^^= %%i in ('"!TIME_DIFF!"') do endlocal ^& endlocal ^& set "TIME_DIFF=%%~i"
+
 set @ENDLOCAL_AND_RECALC_TIME@=setlocal ENABLEDELAYEDEXPANSION ^& for /F "usebackq tokens=* delims="eol^^= %%i in ('"!TIME_DIFF!"') do endlocal ^& endlocal ^& call "%%CONTOOLS_ROOT%%/time/recalc_time.bat" 1 "%%~i"
 
 exit /b 0

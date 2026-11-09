@@ -14,6 +14,12 @@
 * new: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: `-wd+` flag to use the directory path of shortcut target path as the working directory to assign
 
 2026.11.06:
+* new: scripts/tests/bench/bat/test__for/test__for__31_do_loop_macro: more bench tests
+* changed: scripts/tools/std/declare_func_vars.bat: more generic macros and code improvement
+* changed: scripts/tools/time/declare_func_vars.bat: more generic macros
+* changed: scripts/tests/bench/bat/test__for/test__for__31_do_loop_macro/*.bat: test code minimization and cleanup
+
+2026.11.06:
 * changed: scripts/tools/time/begin_time.bat: reset `TIME_DIFF` variable to 0 instead of cast to integer
 
 2026.11.06:

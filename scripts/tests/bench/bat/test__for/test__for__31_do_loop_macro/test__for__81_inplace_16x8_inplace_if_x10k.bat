@@ -13,19 +13,19 @@ setlocal DISABLEDELAYEDEXPANSION
 call "%%CONTOOLS_ROOT%%/std/declare_func_vars.bat" || exit /b
 call "%%CONTOOLS_ROOT%%/time/declare_func_vars.bat" || exit /b
 
-call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
-
 setlocal ENABLEDELAYEDEXPANSION
+
+call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
 set INDEX=0
 %@DO_LOOP_16x8@% (
   set /A INDEX+=1
-  if !INDEX! GEQ 1000 goto :EXIT
+  if !INDEX! GEQ 10000 goto :EXIT
 )
 
 :EXIT
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 %@ENDLOCAL_AND_RECALC_TIME@%
 

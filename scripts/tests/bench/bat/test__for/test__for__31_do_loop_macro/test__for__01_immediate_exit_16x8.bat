@@ -14,17 +14,19 @@ call "%%CONTOOLS_ROOT%%/std/declare_func_vars.bat" || exit /b
 
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
-set INDEX=0
-%@DO_LOOP_16x8@% (
-  set /A INDEX+=1
-  call "%%CONTOOLS_ROOT%%/std/if_.bat" %%INDEX%% GEQ 2000 && goto :EXIT
-)
+for /L %%i in (1,1,1000) do call :FOR
 
-:EXIT
+goto END
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+:FOR
+%@DO_LOOP_16x8@% exit /b
+exit /b
 
-echo Time spent: %TIME_INTS%.%TIME_FRACS% secs
+:END
+
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
+
+echo Time spent: %TIME_INTS%.%TIME_FRACS% msecs
 echo;
 
 exit /b 0

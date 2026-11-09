@@ -20,7 +20,7 @@ goto END
 
 :FOR
 set INDEX=0
-%@DO_LOOP_16x8@% (
+%@DO_LOOP_16x4@% (
   set /A INDEX+=1
   call "%%CONTOOLS_ROOT%%/std/if_.bat" %%INDEX%% GEQ 100 && exit /b
 )
@@ -28,7 +28,7 @@ exit /b
 
 :END
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 echo Time spent: %TIME_INTS%.%TIME_FRACS% secs
 echo;
