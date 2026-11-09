@@ -21,7 +21,7 @@ for %%# in (%%) do for %%# in (%%##) do exit /b 0
 
 :END
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 echo Time spent: %TIME_INTS%.%TIME_FRACS% msecs
 echo;
