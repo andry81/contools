@@ -15,7 +15,7 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/load_config.bat" "%%TEST_DATA_IN_ROOT%%/test
   exit /b 255
 ) >&2
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 echo Time spent: %TIME_INTS%.%TIME_FRACS% secs
 echo;

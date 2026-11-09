@@ -23,7 +23,7 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in
 setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!VAR!"') do endlocal & set "VAR=%%~i" & ^
 setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!VAR!"') do endlocal & set "VAR=%%~i"
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 echo Time spent: %TIME_INTS%.%TIME_FRACS% msecs
 echo;

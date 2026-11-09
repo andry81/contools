@@ -16,9 +16,7 @@ call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
 call "%%CONTOOLS_ROOT%%/time/end_time.bat" 2
 
-if %TIME_INTS% EQU 0 set "TIME_INTS="
-
-echo Time spent: %TIME_INTS%%TIME_FRACS:~0,1%.%TIME_FRACS:~1%0 msecs
+echo Time spent: %TIME_INTS:*0=%%TIME_FRACS:~0,1%.%TIME_FRACS:~1%0 msecs
 echo;
 
 exit /b 0

@@ -23,7 +23,7 @@ for /L %%i in (1,1,1000) do (
 
 endlocal
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 rmdir /S /Q "%TEMP_DIR%"
 

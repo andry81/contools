@@ -15,7 +15,7 @@ call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 )
 :EXIT
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 echo Time spent: %TIME_INTS%.%TIME_FRACS% secs
 echo;

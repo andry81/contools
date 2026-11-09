@@ -14,7 +14,7 @@ call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
 for /L %%i in (1,1,1000) do call "%%CONTOOLS_ROOT%%/std/if_or.bat" "%%A%% EQU 1" "%%B%% EQU 2"
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 echo Time spent: %TIME_INTS%.%TIME_FRACS% msecs
 echo;

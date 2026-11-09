@@ -14,9 +14,9 @@ for /L %%i in (1,1,100) do (
   for /F "usebackq tokens=* delims="eol^= %%i in (`@"%SystemRoot%\system32\chcp.com"`) do set "VALUE=%%i"
 )
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
-echo Time spent: %TIME_INTS%%TIME_FRACS:~0,1%.%TIME_FRACS:~1%0 msecs
+echo Time spent: %TIME_INTS:*0=%%TIME_FRACS:~0,1%.%TIME_FRACS:~1%0 msecs
 echo;
 
 exit /b 0

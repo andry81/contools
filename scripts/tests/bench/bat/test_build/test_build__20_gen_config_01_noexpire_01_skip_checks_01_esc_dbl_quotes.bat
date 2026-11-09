@@ -26,7 +26,7 @@ call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/gen_config.bat" ^
   exit /b 255
 ) >&2
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 rem cleanup temporary files
 call "%%CONTOOLS_ROOT%%/std/free_temp_dir.bat"

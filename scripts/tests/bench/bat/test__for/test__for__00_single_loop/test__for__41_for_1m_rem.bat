@@ -12,7 +12,7 @@ call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
 for /L %%i in (1,1,1000000) do rem
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 echo Time spent: %TIME_INTS%.%TIME_FRACS% secs
 echo;

@@ -283,7 +283,7 @@ call :TEST 253 "э"
 call :TEST 254 "ю"
 call :TEST 255 "я"
 
-call "%%CONTOOLS_ROOT%%/time/end_time.bat" 1
+call "%%CONTOOLS_ROOT%%/time/end_time.bat"
 
 chcp
 
