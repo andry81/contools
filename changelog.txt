@@ -1,4 +1,7 @@
 2026.11.13:
+* changed: scripts/tests/__init__/script_init.bat: enable environment variables save into the log directory
+
+2026.11.13:
 * refactor: scripts/tests/bench/bat/test_time: moved bench tests into a single directory
 
 2026.11.13:
