@@ -33,15 +33,9 @@ rem   The `FLAG_SHIFT` now drops unconditionally because must not interfere with
 rem   If you want to pass the shift value into `callf` utility, then you must explicitly use the `-X /shift-N` option.
 rem   Otherwise use `callshift.bat` script to explicitly shift the rest of the command line before call to this script.
 rem
-set FLAG_SHIFT=0
 
-set FLAG_FLAGS_SCOPE=0
-set FLAG_NO_LOG=0
-set FLAG_STD_PAUSE_C=0
-set FLAG_ELEVATE=0
-set "ELEVATE_PREFIX_NAME="
-set "CALLF_BARE_FLAGS="
-set "CALLF_PROMOTE_PARENT_FLAGS="
+set /A "FLAG_SHIFT=0", "FLAG_FLAGS_SCOPE=0", "FLAG_NO_LOG=0", "FLAG_STD_PAUSE_C=0", "FLAG_ELEVATE=0"
+set "ELEVATE_PREFIX_NAME=" & set "CALLF_BARE_FLAGS=" & set "CALLF_PROMOTE_PARENT_FLAGS="
 
 :FLAGS_LOOP
 
