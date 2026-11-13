@@ -1,4 +1,7 @@
 2026.11.13:
+* changed: scripts/tools/time: end_time.bat, timediff.bat: code inline
+
+2026.11.13:
 * refactor: scripts/tests/unit/bat/test_time: moved unit tests into a single directory
 
 2026.11.13:
