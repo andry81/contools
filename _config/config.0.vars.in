@@ -30,4 +30,7 @@ once INIT_VERBOSE                         =0
 once CONTOOLS_VERBOSE                     =0
 once PRINT_VARS_SET                       =0
 
+# directly use `/D` in `cmd.exe` command line
+NO_CMD_AUTORUN                            =1
+
 CLINK_NOAUTORUN                           =1

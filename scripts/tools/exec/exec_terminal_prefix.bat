@@ -26,6 +26,12 @@ if defined NO_LOG set /A NO_LOG+=0
 rem Do not make a log output or stdio duplication into files
 if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 
+rem Do not use `callf*.exe` to test slow down in bench tests
+if defined NO_CALLF set /A NO_CALLF+=0
+
+rem Disable `Autorun` in `cmd.exe` command line
+if defined NO_CMD_AUTORUN set /A NO_CMD_AUTORUN+=1
+
 rem script flags
 
 rem NOTE:
@@ -35,7 +41,7 @@ rem   Otherwise use `callshift.bat` script to explicitly shift the rest of the c
 rem
 
 set /A "FLAG_SHIFT=0", "FLAG_FLAGS_SCOPE=0", "FLAG_NO_LOG=0", "FLAG_LOG_STDIN=0"
-set "CALLF_BARE_FLAGS="
+set "CMD_BARE_FLAGS=" & set "CALLF_BARE_FLAGS="
 
 :FLAGS_LOOP
 
@@ -91,6 +97,8 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 ) >&2
 
 rem common flags for all terminals
+
+if %NO_CMD_AUTORUN%0 NEQ 0 set "CMD_BARE_FLAGS=%CMD_BARE_FLAGS%/D "
 
 rem CAUTION:
 rem   Because `callf.exe` may use flag `/load-parent-proc-init-env-vars`, then we must always pass `IMPL_MODE` and `NEST_LVL` variables into the command line.
@@ -152,7 +160,7 @@ setlocal & set LAST_ERROR=%ERRORLEVEL%
 
 rem CAUTION:
 rem   DO NOT CLEANUP because mintty restarts itself and mintty parent process does exit immediately!
-rem   Instead do cleap in a child process.
+rem   Instead do cleanup in a child process.
 rem
 rem call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
@@ -169,14 +177,23 @@ if /i not "%CONEMU_INTERACT_MODE%" == "run" goto SKIP_USE_CONEMU
 rem CAUTION:
 rem   The `& exit` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt` from `contools--utils` project.
-rem
+
+if %NO_CALLF%0 NEQ 0 goto NO_CALLF
+
 endlocal & %CONEMU_CMDLINE_RUN_PREFIX% "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
-  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {@} ^& exit\"" -cur_console:n ^
+  "%COMSPECLNK%" "%CMD_BARE_FLAGS%/c \"@\"%?~f0%\" {@} ^& exit\"" -cur_console:n ^
   %*
 
 rem to drop local variables
 setlocal & set LAST_ERROR=%ERRORLEVEL%
 
+goto CLEANUP
+
+:NO_CALLF
+endlocal & setlocal & set "IMPL_MODE=1" & %CONEMU_CMDLINE_RUN_PREFIX% -cur_console:n "%COMSPECLNK%" %CMD_BARE_FLAGS%/c @"%?~f0%" %* ^& exit
+set LAST_ERROR=%ERRORLEVEL%
+
+:CLEANUP
 call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
 exit /b %LAST_ERROR%
@@ -186,14 +203,23 @@ exit /b %LAST_ERROR%
 rem CAUTION:
 rem   The `& exit` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt` from `contools--utils` project.
-rem
+
+if %NO_CALLF%0 NEQ 0 goto NO_CALLF
+
 endlocal & "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
-  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*} ^& exit\"" ^
+  "%COMSPECLNK%" "%CMD_BARE_FLAGS%/c \"@\"%?~f0%\" {*} ^& exit\"" ^
   %*
 
 rem to drop local variables
 setlocal & set LAST_ERROR=%ERRORLEVEL%
 
+goto CLEANUP
+
+:NO_CALLF
+endlocal & setlocal & set "IMPL_MODE=1" & "%COMSPECLNK%" %CMD_BARE_FLAGS%/c @"%?~f0%" %* ^& exit
+set LAST_ERROR=%ERRORLEVEL%
+
+:CLEANUP
 call "%%CONTOOLS_ROOT%%/exec/exec_terminal_cleanup.bat"
 
 exit /b %LAST_ERROR%

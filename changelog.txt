@@ -1,4 +1,10 @@
 2026.11.13:
+* new: scripts/tools/exec/exec_callf_cleanup.bat: stand alone clean up code for `callf*` scripts
+* changed: scripts/tools/exec/exec_*_prefix.bat: added `NO_CALLF` variable to turn off `callf*.exe` usage and use `cmd.exe` directly for the debug purposes
+* changed: scripts/tools/exec/exec_*_prefix.bat: added `NO_CMD_AUTORUN` variable to run `cmd.exe` with `/D` flag
+* changed: _config/config.0.vars.in: use `NO_CMD_AUTORUN=1` by default
+
+2026.11.13:
 * changed: scripts/tests/__init__/script_init.bat: enable environment variables save into the log directory
 
 2026.11.13:

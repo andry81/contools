@@ -26,6 +26,12 @@ if defined NO_LOG set /A NO_LOG+=0
 rem Do not make a log output or stdio duplication into files
 if defined NO_LOG_OUTPUT set /A NO_LOG_OUTPUT+=0
 
+rem Do not use `callf*.exe` to test slow down in bench tests
+if defined NO_CALLF set /A NO_CALLF+=0
+
+rem Disable `Autorun` in `cmd.exe` command line
+if defined NO_CMD_AUTORUN set /A NO_CMD_AUTORUN+=1
+
 rem script flags
 
 rem NOTE:
@@ -35,7 +41,7 @@ rem   Otherwise use `callshift.bat` script to explicitly shift the rest of the c
 rem
 
 set /A "FLAG_SHIFT=0", "FLAG_FLAGS_SCOPE=0", "FLAG_NO_LOG=0", "FLAG_STD_PAUSE_C=0", "FLAG_ELEVATE=0"
-set "ELEVATE_PREFIX_NAME=" & set "CALLF_BARE_FLAGS=" & set "CALLF_PROMOTE_PARENT_FLAGS="
+set "ELEVATE_PREFIX_NAME=" & set "CMD_BARE_FLAGS=" & set "CALLF_BARE_FLAGS=" & set "CALLF_PROMOTE_PARENT_FLAGS="
 
 :FLAGS_LOOP
 
@@ -100,6 +106,8 @@ if defined INIT_VARS_FILE if not exist "%INIT_VARS_FILE%" (
 ) >&2
 
 rem common flags for all terminals
+
+if %NO_CMD_AUTORUN%0 NEQ 0 set "CMD_BARE_FLAGS=%CMD_BARE_FLAGS%/D "
 
 if %FLAG_STD_PAUSE_C% NEQ 0 (
   set CALLF_BARE_CMD_SUFFIX= ^^^& "%CONTOOLS_ROOT%/std/pause.bat" -c ^^^& exit
@@ -166,17 +174,25 @@ if not defined COMSPECLNK set "COMSPECLNK=%COMSPEC%"
 rem CAUTION:
 rem   The `& exit` is required to workaround `cmd.exe` not zero exit code issue.
 rem   See the `KNOWN ISSUES` section in the `README_EN.txt` from `contools--utils` project.
-rem
-endlocal & "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
-  "%COMSPECLNK%" "/c \"@\"%?~f0%\" {*}%CALLF_BARE_CMD_SUFFIX%\"" ^
-  %*
+
+if %NO_CALLF%0 NEQ 0 goto NO_CALLF
+
+endlocal & if %NO_CMD_AUTORUN%0 NEQ 0 (
+  "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
+    "%COMSPECLNK%" "%CMD_BARE_FLAGS%/c \"@\"%?~f0%\" {*}%CALLF_BARE_CMD_SUFFIX%\"" ^
+    %*
+)
 
 rem to drop local variables
 setlocal & set LAST_ERROR=%ERRORLEVEL%
 
-if %NEST_LVL%0 EQU 0 (
-  call "%%CONTOOLS_ROOT%%/cleanup/cleanup_log.bat"
-  call "%%CONTOOLS_ROOT%%/cleanup/cleanup_init_vars.bat"
-)
+goto CLEANUP
+
+:NO_CALLF
+endlocal & setlocal & set "IMPL_MODE=1" & "%COMSPECLNK%" %CMD_BARE_FLAGS%/D /c @"%?~f0%" %* ^& exit
+set LAST_ERROR=%ERRORLEVEL%
+
+:CLEANUP
+call "%%CONTOOLS_ROOT%%/exec/exec_callf_cleanup.bat"
 
 exit /b %LAST_ERROR%
