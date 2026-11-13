@@ -1,9 +1,7 @@
 @echo off
 
 rem script flags
-set FLAG_SHIFT=0
-set FLAG_FLAGS_SCOPE=0
-set HAS_SED_FLAGS=0
+set /A "FLAG_SHIFT=0", "FLAG_FLAGS_SCOPE=0", "HAS_SED_FLAGS=0"
 set "GEN_CONFIG_FLAGS="
 
 :FLAGS_LOOP

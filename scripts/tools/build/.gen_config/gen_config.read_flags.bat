@@ -1,27 +1,16 @@
 @echo off
 
 rem script flags
-set FLAG_SHIFT=0
-set FLAG_FLAGS_SCOPE=0
-set FLAG_SINGLE=0
-set FLAG_IF_NOTEXIST=0
-set FLAG_DETECT_EXPIRATION=1
-set FLAG_SKIP_CHECKS=0
-set FLAG_RE_DELAYED_EXPANSION=0
-set FLAG_ESC_DBL_QUOTE=0
+set /A "FLAG_SHIFT=0", "FLAG_FLAGS_SCOPE=0", "FLAG_SINGLE=0", "FLAG_IF_NOTEXIST=0", "FLAG_DETECT_EXPIRATION=1",^
+  "FLAG_SKIP_CHECKS=0", "FLAG_RE_DELAYED_EXPANSION=0", "FLAG_ESC_DBL_QUOTE=0"
 
-set "SED_BARE_FLAGS="
-set "SED_REPLACE_FROM="
-set "SED_REPLACE_TO="
-set "SED_REMOVE_FROM="
+set "SED_BARE_FLAGS=" & set "SED_REPLACE_FROM=" & set "SED_REPLACE_TO=" & set "SED_REMOVE_FROM="
 
 :FLAGS_LOOP
 
 call "%%?~dp0%%.gen_config/gen_config.escape_options.bat" || exit /b
 
-set "SED_REPLACE_FROM="
-set "SED_REPLACE_TO="
-set "SED_REMOVE_FROM="
+set "SED_REPLACE_FROM=" & set "SED_REPLACE_TO=" & set "SED_REMOVE_FROM="
 
 rem flags always at first
 set "FLAG=%~1"

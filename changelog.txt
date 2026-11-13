@@ -1,3 +1,6 @@
+2026.11.13:
+* changed: scripts/tools/build/*.bat: minor optimizations
+
 2026.11.10:
 * changed: scripts/tools/build: load_config*.bat, check_config_expiration.bat: minor optimizations
 
