@@ -1,4 +1,7 @@
 2026.11.13:
+* changed: scripts/tools/ToolAdaptors/vbs/make_shortcut.vbs: `-obj` and `-wd+` flags mix check
+
+2026.11.13:
 * changed: scripts/tools/build/*.bat: minor optimizations
 
 2026.11.10:

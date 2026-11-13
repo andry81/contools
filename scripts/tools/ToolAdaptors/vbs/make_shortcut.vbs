@@ -45,7 +45,7 @@
 '''     By default <ShortcutTarget> and <ShortcutWorkingDirectory> does used as
 '''     a file path. Use this flag to handle it as an object string and avoid
 '''     path functions call on it.
-'''     Can not be used together with `-q` flag.
+'''     Can not be used together with `-q`, `-wd+` flags.
 '''
 '''   -ignore-unexist
 '''     By default <ShortcutTarget> and <ShortcutWorkingDirectory> does check
@@ -170,6 +170,7 @@
 '''     Use the directory path of <ShortcutTarget> as the working directory to
 '''     assign.
 '''     Has no effect if `-wd` option is used.
+'''     Can not be used together with `-obj` flag.
 '''
 '''   -desc <ShortcutDescription>
 '''     Description string to assign.
@@ -636,6 +637,11 @@ ReDim Preserve cmd_args(j - 1)
 
 If ShortcutTargetObj And AlwaysQuote Then
   PrintOrEchoErrorLine WScript.ScriptName & ": error: flags is mixed: -obj <-> -q"
+  WScript.Quit 255
+End If
+
+If ShortcutTargetObj And ShortcutWorkingDirectoryFromTargetPath Then
+  PrintOrEchoErrorLine WScript.ScriptName & ": error: flags is mixed: -obj <-> -wd+"
   WScript.Quit 255
 End If
 
