@@ -1,3 +1,6 @@
+2026.11.15:
+* changed: __init__.bat, .install/*.bat: `INIT_EXTERNALS` renamed to `CONTOOLS_INIT_EXTERNALS` to skip initialization the project as a leaf project in another project with externals
+
 2026.11.14:
 * changed: scripts/tools/std/declare_func_vars.bat: minor improvement
 

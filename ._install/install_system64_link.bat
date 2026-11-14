@@ -28,8 +28,8 @@ rem      directory to replicate the exact rights permissions.
 
 rem NOTE:
 rem   In case of a standalone usage in the Windows XP the `junction.exe`
-rem   utility must be available on the PATH for the Administrator otherwise the
-rem   script won't work.
+rem   utility must be reachable from the `CONTOOLS_SYSINTERNALS_ROOT` variable,
+rem   otherwise the script won't work.
 
 rem NOTE:
 rem   Because we have to attempt to create a directory in the system directory,

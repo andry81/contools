@@ -8,7 +8,7 @@ rem cast to integer
 set /A NEST_LVL+=0
 
 rem Initialize externals
-if defined INIT_EXTERNALS set /A INIT_EXTERNALS+=0
+if defined CONTOOLS_INIT_EXTERNALS set /A CONTOOLS_INIT_EXTERNALS+=0
 
 rem Initialize with verbose
 if defined INIT_VERBOSE set /A INIT_VERBOSE+=0
@@ -41,7 +41,7 @@ call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_PROJECT_OUTPUT_CONFIG_ROOT     
 
 rem retarget externals of an external project
 
-if %INIT_EXTERNALS%0 NEQ 0 (
+if %CONTOOLS_INIT_EXTERNALS%0 NEQ 0 (
   call "%%~dp0canonical_path_if_ndef.bat" CONTOOLS_UTILS_PROJECT_EXTERNALS_ROOT   "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
   call "%%~dp0canonical_path_if_ndef.bat" TACKLELIB_PROJECT_EXTERNALS_ROOT        "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
   call "%%~dp0canonical_path_if_ndef.bat" SVNCMD_PROJECT_EXTERNALS_ROOT           "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%"
@@ -72,7 +72,7 @@ if %NO_GEN%0 EQU 0 (
 
 rem init external projects
 
-if %INIT_EXTERNALS%0 NEQ 0 (
+if %CONTOOLS_INIT_EXTERNALS%0 NEQ 0 (
   call "%%CONTOOLS_ROOT%%/std/call_if_exist.bat" "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/contools--utils/__init__/__init__.bat" %%* || exit /b
   call "%%CONTOOLS_ROOT%%/std/call_if_exist.bat" "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/tacklelib/__init__/__init__.bat" %%* || exit /b
   call "%%CONTOOLS_ROOT%%/std/call_if_exist.bat" "%%CONTOOLS_PROJECT_EXTERNALS_ROOT%%/svncmd/__init__/__init__.bat" %%* || exit /b
