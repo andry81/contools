@@ -1,3 +1,7 @@
+2026.11.14:
+* changed: scripts/tools/build/check_config_expiration.bat: minor output improvement
+* changed: scripts/tools/build/.gen_config/gen_config.read_flags.bat: minor refactor
+
 2026.11.13:
 * changed: scripts/tools/time: end_time.bat, timediff.bat: code inline
 

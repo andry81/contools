@@ -39,7 +39,7 @@ if defined FLAG (
     set "SED_REPLACE_FROM=%~2"
     set "SED_REPLACE_TO=%~3"
     if %FLAG_RE_DELAYED_EXPANSION% NEQ 0 (
-      for /F "usebackq tokens=* delims="eol^= %%i in ('"!SED_REPLACE_FROM!"') do call; ^
+      for /F "usebackq tokens=* delims="eol^= %%i in ('"!SED_REPLACE_FROM!"') do break ^
       & for /F "usebackq tokens=* delims="eol^= %%j in ('"!SED_REPLACE_TO!"') do endlocal ^
       & set "SED_REPLACE_FROM=%%~i" ^
       & set "SED_REPLACE_TO=%%~j"

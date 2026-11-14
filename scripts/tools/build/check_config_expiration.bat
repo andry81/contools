@@ -73,8 +73,8 @@ for /F "tokens=* delims="eol^= %%i in ("%VARS_FILE%\.") do set "VARS_FILE=%%~fi"
 
 if /i "%VARS_FILE_IN%" == "%VARS_FILE%" (
   echo;%?~%: error: input and output config file paths must be different.
-  echo;%?~nx0%: info: input config file : "%VARS_FILE_IN%"
-  echo;%?~nx0%: info: output config file: "%VARS_FILE%"
+  echo;  Input path : "%VARS_FILE_IN%"
+  echo;  Output path: "%VARS_FILE%"
   exit /b 99
 ) >&2
 
@@ -97,10 +97,10 @@ setlocal ENABLEDELAYEDEXPANSION & ^
 for /F "usebackq tokens=* delims="eol^= %%i in ('"!CONFIG_IN_FILE_VERSION_LINE!"') do ^
 for /F "usebackq tokens=* delims="eol^= %%j in ('"!CONFIG_OUT_FILE_VERSION_LINE!"') do endlocal & (
   echo;%?~%: error: output config is expired, either merge it with or regenerate it from the input config file:
-  echo;%?~nx0%: info: input config file : "%VARS_FILE_IN%"
-  echo;%?~nx0%: info: output config file: "%VARS_FILE%"
-  echo;%?~nx0%: info: input config file first line : "%%~i"
-  echo;%?~nx0%: info: output config file first line: "%%~j"
+  echo;  Input file : "%VARS_FILE_IN%"
+  echo;  Output file: "%VARS_FILE%"
+  echo;  Input file first line : "%%~i"
+  echo;  Output file first line: "%%~j"
   exit /b 100
 ) >&2
 
@@ -134,10 +134,10 @@ for /F "usebackq tokens=* delims="eol^= %%l in ('"!CONFIG_OUT_FILE_VERSION_LINE_
   if not "%%~i" == "%%~j" (call) else if "%%~k" == "" (call) else if "%%~l" == "" (call) else if not "%%~k" == "%%~l" (call)
 ) || (
   echo;%?~%: error: input config file version line is empty/not found/not equal versus/in/to the output config file version line, either merge it with or regenerate it from the input config file:
-  echo;%?~nx0%: info: input config file : "%VARS_FILE_IN%"
-  echo;%?~nx0%: info: output config file: "%VARS_FILE%"
-  echo;%?~nx0%: info: input config version line : "%%~i%%~k"
-  echo;%?~nx0%: info: output config version line: "%%~j%%~l"
+  echo;  Input file : "%VARS_FILE_IN%"
+  echo;  Output file: "%VARS_FILE%"
+  echo;  Input file version line : "%%~i%%~k"
+  echo;  Output file version line: "%%~j%%~l"
   exit /b 101
 ) >&2
 
