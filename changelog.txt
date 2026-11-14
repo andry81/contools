@@ -1,4 +1,7 @@
 2026.11.14:
+* changed: scripts/tools/std/declare_func_vars.bat: minor improvement
+
+2026.11.14:
 * changed: scripts/tools/build/check_config_expiration.bat: minor output improvement
 * changed: scripts/tools/build/.gen_config/gen_config.read_flags.bat: minor refactor
 
