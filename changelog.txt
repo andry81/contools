@@ -1,3 +1,6 @@
+2026.11.17:
+* changed: TODO.txt: todo update
+
 2026.11.15:
 * changed: ._install/__init__.bat: set `CONTOOLS_PROJECT_INSTALL` variable to indicate the project installation
 

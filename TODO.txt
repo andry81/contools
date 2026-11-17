@@ -41,3 +41,10 @@ scripts/tools/std: xcopy_*.bat, xmove_*.bat
 
 * Implement fall back to short paths in case of `robocopy.exe` absence or
   direct use of `-use_xcopy` or `-use_builtin_move` flags.
+
+-------------------------------------------------------------------------------
+scripts/tools/ToolAdaptors
+-------------------------------------------------------------------------------
+
+* Extract directory into a set of standalone projects.
+
