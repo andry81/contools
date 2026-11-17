@@ -1,4 +1,7 @@
 2026.11.17:
+* changed: scripts/tools/ToolAdaptors/lnk: install_system64_link.bat, mklink_system64.bat: scripts is replaced by respective scripts from `._install` directory and moved to `contools.old` project
+
+2026.11.17:
 * changed: scripts/tools/*/busy_wait.bat: code inline
 * changed: scripts/tools/**/timestamp.bat: removed file duplication
 
