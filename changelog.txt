@@ -1,4 +1,7 @@
 2026.11.17:
+* fixed: ._install/__init__.bat: missed to pass the command line into `__init__/__init__.bat` script
+
+2026.11.17:
 * changed: TODO.txt: todo update
 
 2026.11.15:

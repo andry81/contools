@@ -5,7 +5,7 @@ if defined CONTOOLS_PROJECT_ROOT_INIT0_DIR if exist "%CONTOOLS_PROJECT_ROOT_INIT
 set CONTOOLS_PROJECT_INSTALL=1
 set CONTOOLS_INIT_EXTERNALS=1
 
-call "%%~dp0..\__init__\__init__.bat" || exit /b
+call "%%~dp0..\__init__\__init__.bat" %%* || exit /b
 
 rem retarget externals of an external project
 
