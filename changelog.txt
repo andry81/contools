@@ -1,4 +1,7 @@
 2026.11.17:
+* fixed: scripts/tools/exec/exec_callf_prefix.bat: execution fixup
+
+2026.11.17:
 * fixed: ._install/__init__.bat: missed to pass the command line into `__init__/__init__.bat` script
 
 2026.11.17:

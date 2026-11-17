@@ -177,11 +177,9 @@ rem   See the `KNOWN ISSUES` section in the `README_EN.txt` from `contools--util
 
 if %NO_CALLF%0 NEQ 0 goto NO_CALLF
 
-endlocal & if %NO_CMD_AUTORUN%0 NEQ 0 (
-  "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
-    "%COMSPECLNK%" "%CMD_BARE_FLAGS%/c \"@\"%?~f0%\" {*}%CALLF_BARE_CMD_SUFFIX%\"" ^
-    %*
-)
+endlocal & "%CONTOOLS_UTILS_BIN_ROOT%/contools/callf.exe"%CALLF_BARE_FLAGS% // ^
+  "%COMSPECLNK%" "%CMD_BARE_FLAGS%/c \"@\"%?~f0%\" {*}%CALLF_BARE_CMD_SUFFIX%\"" ^
+  %*
 
 rem to drop local variables
 setlocal & set LAST_ERROR=%ERRORLEVEL%
