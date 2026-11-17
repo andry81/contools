@@ -32,7 +32,7 @@ if %TIME_DIFF_MSEC% LSS %TIME_WAIT_MSEC% goto WAIT_LOOP
 
 exit /b 0
 
-rem `time/timestamp.bat` script copy
+rem copy of `time/timestamp.bat` script
 :TIMESTAMP
 set "BEGIN_TIME=%~1 " & setlocal ENABLEDELAYEDEXPANSION & (
   set "BEGIN_TIME=!BEGIN_TIME::= !"

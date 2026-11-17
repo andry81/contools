@@ -1,4 +1,8 @@
 2026.11.17:
+* changed: scripts/tools/*/busy_wait.bat: code inline
+* changed: scripts/tools/**/timestamp.bat: removed file duplication
+
+2026.11.17:
 * fixed: scripts/tools/exec/exec_callf_prefix.bat: execution fixup
 
 2026.11.17:
