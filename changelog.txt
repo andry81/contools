@@ -1,4 +1,7 @@
 2026.11.18:
+* new: ._install/test_system64_link.bat: script to test `System64` directory on 64-bitness
+
+2026.11.18:
 * changed: ._install/install_system64_link.bat: better a 64-bit detection behind the `PROCESSOR_ARCHITECTURE` variable
 * changed: ._install/install_system64_link.bat: better `System64` file path type detection
 * changed: ._install/install_system64_link.bat: more 64-bit checks over `System64` link
