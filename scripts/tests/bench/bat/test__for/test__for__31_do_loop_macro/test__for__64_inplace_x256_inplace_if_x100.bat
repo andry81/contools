@@ -18,7 +18,7 @@ setlocal ENABLEDELAYEDEXPANSION
 call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
 set INDEX=0
-for /L %%# in (1,1,16) do for /L %%# in (1,1,16) do for %%# in (:) do for %%# in (:) do (
+for /L %%# in (1,1,16) do for /L %%# in (1,1,16) do (
   set /A INDEX+=1
   if !INDEX! GEQ 100 goto :EXIT
 )

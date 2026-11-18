@@ -1,3 +1,6 @@
+2026.11.18:
+* changed: scripts/tests/bench/bat/test__for/test__for__31_do_loop_macro/test__for__64_inplace_x256_inplace_if_x100.bat: minor cleanup
+
 2026.11.17:
 * changed: scripts/tools/ToolAdaptors/lnk: install_system64_link.bat, mklink_system64.bat: scripts is replaced by respective scripts from `._install` directory and moved to `contools.old` project
 
