@@ -27,6 +27,10 @@ rem   3. All the privileges including the owner is transferred from the target
 rem      directory to replicate the exact rights permissions.
 
 rem NOTE:
+rem   The script currently supports only the junction point creation and the
+rem   junction link permissions update.
+
+rem NOTE:
 rem   In case of a standalone usage in the Windows XP the `junction.exe`
 rem   utility must be reachable from the `CONTOOLS_SYSINTERNALS_ROOT` variable,
 rem   otherwise the script won't work.
@@ -36,6 +40,13 @@ rem   Because we have to attempt to create a directory in the system directory,
 rem   then we have to do it with administrative permissions only.
 rem   Because the `System32` directory should not be redirected at the moment
 rem   of creation (linkage), then we have to do it in the 64-bit mode only.
+
+rem NOTE:
+rem   All the `mklink /J`, `mklink /D` built ins and both `junction.exe` and
+rem   `junction64.exe` utilities, for the "%SystemRoot%\System64" to the
+rem   "%SystemRoot%\System32"` mapping, being run under 32-bit `cmd.exe` in
+rem   64-bit Windows does create the unredirected link to the 64-bit `System32`
+rem   directory (no need to run it under 64-bit `cmd.exe` process).
 :DOC_END
 
 rem call "%%~dp0script_init.bat" %%0 %%* || exit /b
@@ -58,8 +69,13 @@ call "%%CONTOOLS_ROOT%%/std/is_admin_elevated.bat" || (
   exit /b 255
 ) >&2
 
+if not defined PROCESSOR_ARCHITECTURE (
+  echo;%?~%: error: PROCESSOR_ARCHITECTURE is not defined.
+  exit /b 255
+) >&2
+
 rem Under WOW64 (32-bit process in 64-bit Windows) restart script in 64-bit mode
-if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
+if not "%PROCESSOR_ARCHITECTURE:64=%" == "%PROCESSOR_ARCHITECTURE%" goto X64
 
 if not defined PROCESSOR_ARCHITEW6432 (
   echo;%?~%: error: script must be run only for Windows x64.
@@ -80,14 +96,43 @@ rem x64 is a requirement to continue
 
 :X64
 
-if not exist "\\?\%SystemRoot%\System64\*" goto DIR_UNEXIST
+if exist "\\?\%SystemRoot%\System64" (
+  if not exist "\\?\%SystemRoot%\System64\*" (
+    echo;%?~%: error: not a directory path must not exist: "%SystemRoot%\System64"
+    exit /b 99
+  ) >&2
+) else if not exist "\\?\%SystemRoot%\System64\*" goto DIR_UNEXIST
 
-dir "%SystemRoot%\System64>" /A:DL 2>nul | "%SystemRoot%\System32\findstr.exe" /R /C:"[^ ][^ ]*  *[^ ][^ ]*  *\<JUNCTION\>" >nul || (
-  echo;%?~%: error: directory exist and is not a junction point: "%SystemRoot%\System64"
+set "LINK_PATH="
+for /F "usebackq tokens=2* delims=["eol^= %%i in (`@dir "%SystemRoot%\System64>" /A:DL 2^>nul ^| "%SystemRoot%\System32\findstr.exe" /R /C:"[^ ][^ ]*  *[^ ][^ ]*  *\<JUNCTION\>"`) do set "LINK_PATH=%%~i"
+
+if not defined LINK_PATH goto SKIP_UNDEFINED
+
+if "%LINK_PATH:~-1%" == "]" set "LINK_PATH=%LINK_PATH:~0,-1%"
+
+:SKIP_UNDEFINED
+
+if not defined LINK_PATH (
+  echo;%?~%: error: directory path exist and is not a junction point: "%SystemRoot%\System64"
   exit /b 100
 ) >&2
 
+if /i not "%LINK_PATH%" == "%SystemRoot%\System32" (
+  echo;%?~%: error: junction point is linked with different directory: "%SystemRoot%\System64" ^<-^> "%LINK_PATH%"
+  exit /b 101
+) >&2
+
+rem NOTE:
+rem   The above check must be enough to go, but here is an additional second
+rem   check to test the `cmd.exe` process on 64-bitness using the link.
+
+"%SystemRoot%\System64\cmd.exe" /D /c ( if defined PROCESSOR_ARCHITECTURE if not "%%PROCESSOR_ARCHITECTURE:64=%%" == "%%PROCESSOR_ARCHITECTURE%%" exit /b 0 ) ^& exit /b 255 || (
+  echo;%?~%: error: junction point is linked with `System32` directory, but `cmd.exe` is not a 64-bit process: "%SystemRoot%\System64\cmd.exe"
+  exit /b 102
+) >&2
+
 :DIR_UNEXIST
+
 if %WINDOWS_MAJOR_VER% GTR 5 ( call :MAKE_LINK_DEFAULT ) else call :MAKE_LINK_WINXP
 
 :SKIP_LINK
@@ -123,12 +168,12 @@ rem call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%USERBIN_SCRIPTS_BAT_ROOT%%
 call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%CONTOOLS_UTILS_BIN_ROOT%%/contools/retakeowner.exe" "%%SystemRoot%%\System64" "*S-1-5-32-544" || exit /b
 
 rem CAUTION: the `/reset` is required before the `/restore` in case if the junction point is already existed
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /reset /c || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /reset /c /l || exit /b
 
 rem CAUTION: the `/setowner` is required before the `/restore`, otherwise error: `C:\WINDOWS\System64: Access is denied.`
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /setowner "NT SERVICE\TrustedInstaller" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%\System64" /setowner "NT SERVICE\TrustedInstaller" /l || exit /b
 
-call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%" /restore "%%ACL_NEW_FILE%%" || exit /b
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/call_.bat" "%%SystemRoot%%\System32\icacls.exe" "%%SystemRoot%%" /restore "%%ACL_NEW_FILE%%" /l || exit /b
 
 exit /b 0
 
