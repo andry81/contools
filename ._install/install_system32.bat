@@ -26,8 +26,13 @@ call "%%CONTOOLS_ROOT%%/std/is_admin_elevated.bat" || (
   exit /b 255
 ) >&2
 
+if not defined PROCESSOR_ARCHITECTURE (
+  echo;%?~%: error: PROCESSOR_ARCHITECTURE is not defined.
+  exit /b 255
+) >&2
+
 rem Under WOW64 (32-bit process in 64-bit Windows) restart script in 64-bit mode
-if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto X64
+if not "%PROCESSOR_ARCHITECTURE:64=%" == "%PROCESSOR_ARCHITECTURE%" goto X64
 
 rem restart in x64
 if exist "%SystemRoot%\Sysnative\*" (

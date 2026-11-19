@@ -118,7 +118,7 @@ if not defined LINK_PATH (
 ) >&2
 
 if /i not "%LINK_PATH%" == "%SystemRoot%\System32" (
-  echo;%?~%: error: junction point is linked with different directory: "%SystemRoot%\System64" ^<-^> "%LINK_PATH%"
+  echo;%?~%: error: junction point is linked with different directory: "%SystemRoot%\System64" -^> "%LINK_PATH%"
   exit /b 101
 ) >&2
 

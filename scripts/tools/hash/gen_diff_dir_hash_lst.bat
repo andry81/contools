@@ -34,16 +34,18 @@ if not exist "%HASH_LIST_FILE%" (
 
 call "%%~dp0__init__\__init__.bat" || exit /b
 
-rem use 64-bit application in 64-bit OS
-if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
-rem in case of wrong PROCESSOR_ARCHITECTURE value
-if defined PROCESSOR_ARCHITEW6432 goto NOTX64
-goto X64
+if not defined PROCESSOR_ARCHITECTURE (
+  echo;%?~%: error: PROCESSOR_ARCHITECTURE is not defined.
+  exit /b 255
+) >&2
+
+rem Under WOW64 (32-bit process in 64-bit Windows) restart script in 64-bit mode
+if not "%PROCESSOR_ARCHITECTURE:64=%" == "%PROCESSOR_ARCHITECTURE%" goto X64
 
 :NOTX64
-"%CONTOOLS_HASHDEEP_ROOT%/hashdeep.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" "%%CONTOOLS_HASHDEEP_ROOT%%/hashdeep.exe" -x -k "%%HASH_LIST_FILE%%" -r "%%DIR_PATH_FROM%%"
 exit /b
 
 :X64
-"%CONTOOLS_HASHDEEP_ROOT%/hashdeep64.exe" -x -k "%HASH_LIST_FILE%" -r "%DIR_PATH_FROM%"
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" "%%CONTOOLS_HASHDEEP_ROOT%%/hashdeep64.exe" -x -k "%%HASH_LIST_FILE%%" -r "%%DIR_PATH_FROM%%"
 exit /b

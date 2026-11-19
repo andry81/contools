@@ -8,28 +8,20 @@ setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b
 
-rem use 64-bit application in 64-bit OS
-if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
-rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
-if defined PROCESSOR_ARCHITEW6432 goto NOTX64
-goto X64
+if not defined PROCESSOR_ARCHITECTURE (
+  echo;%~nx0: error: PROCESSOR_ARCHITECTURE is not defined.
+  exit /b 255
+) >&2
+
+rem Under WOW64 (32-bit process in 64-bit Windows) restart script in 64-bit mode
+if not "%PROCESSOR_ARCHITECTURE:64=%" == "%PROCESSOR_ARCHITECTURE%" goto X64
 
 :NOTX64
 rem WORKAROUND: The last slash must be backward otherwise "Unknown algorithm" error will be thrown.
-if %CONTOOLS_VERBOSE%0 NEQ 0 (
-  echo;^>^>"%CONTOOLS_7ZIP_ROOT%\x86\7z.exe" %*
-  echo;
-)
-"%CONTOOLS_7ZIP_ROOT%\x86\7z.exe" %* >nul
-
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" "%%CONTOOLS_7ZIP_ROOT%%\x86\7z.exe" %%* >nul
 exit /b
 
 :X64
 rem WORKAROUND: The last slash must be backward otherwise "Unknown algorithm" error will be thrown.
-if %CONTOOLS_VERBOSE%0 NEQ 0 (
-  echo;^>^>"%CONTOOLS_7ZIP_ROOT%\x64\7z.exe" %*
-  echo;
-)
-"%CONTOOLS_7ZIP_ROOT%\x64\7z.exe" %* >nul
-
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" "%%CONTOOLS_7ZIP_ROOT%%\x64\7z.exe" %%* >nul
 exit /b

@@ -8,26 +8,18 @@ setlocal
 
 call "%%~dp0__init__\__init__.bat" || exit /b
 
-rem use 64-bit application in 64-bit OS
-if not "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto NOTX64
-rem To avoid potential recursion in case of wrong PROCESSOR_ARCHITECTURE value
-if defined PROCESSOR_ARCHITEW6432 goto NOTX64
-goto X64
+if not defined PROCESSOR_ARCHITECTURE (
+  echo;%~nx0: error: PROCESSOR_ARCHITECTURE is not defined.
+  exit /b 255
+) >&2
+
+rem Under WOW64 (32-bit process in 64-bit Windows) restart script in 64-bit mode
+if not "%PROCESSOR_ARCHITECTURE:64=%" == "%PROCESSOR_ARCHITECTURE%" goto X64
 
 :NOTX64
-if %CONTOOLS_VERBOSE%0 NEQ 0 (
-  echo;^>^>"%CONTOOLS_UGREP_ROOT%\bin\win32\ugrep.exe" %*
-  echo;
-)
-"%CONTOOLS_UGREP_ROOT%\bin\win32\ugrep.exe" %*
-
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" "%%CONTOOLS_UGREP_ROOT%%\bin\win32\ugrep.exe" %%*
 exit /b
 
 :X64
-if %CONTOOLS_VERBOSE%0 NEQ 0 (
-  echo;^>^>"%CONTOOLS_UGREP_ROOT%\bin\win64\ugrep.exe" %*
-  echo;
-)
-"%CONTOOLS_UGREP_ROOT%\bin\win64\ugrep.exe" %*
-
+call "%%CONTOOLS_BUILD_TOOLS_ROOT%%/callsub.bat" "%%CONTOOLS_UGREP_ROOT%%\bin\win64\ugrep.exe" %%*
 exit /b
