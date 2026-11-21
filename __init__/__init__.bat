@@ -91,4 +91,16 @@ if %USE_CHCP%0 NEQ 0 (
   if defined CHCP call "%%CONTOOLS_ROOT%%/std/chcp.bat" %%CHCP%%
 )
 
+rem installation checks
+
+if %CONTOOLS_PROJECT_INSTALL%0 NEQ 0 goto IGNORE_CONTOOLS_PROJECT_INSTALLATION_CHECK
+
+if not exist "\\?\%SystemRoot%\System64\*" (
+  echo;%~nx0: error: `System64` directory link is not installed: "%SystemToot%\System64"
+  echo;%~nx0: info: run `_install.bat` from `contools` project to install.
+  exit /b 255
+) >&2
+
+:IGNORE_CONTOOLS_PROJECT_INSTALLATION_CHECK
+
 exit /b 0

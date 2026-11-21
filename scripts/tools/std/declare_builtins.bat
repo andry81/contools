@@ -21,3 +21,8 @@ set ?0A=^^^
 
 
 exit /b 0
+
+rem Examples:
+
+rem backspace capture
+rem for /F %%# in ('"prompt $H&for %%# in (:) do rem"') do set "?08=%%#"

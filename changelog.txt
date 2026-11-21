@@ -1,3 +1,7 @@
+2026.11.21:
+* changed: __init__/__init__.bat: `System64` directory link existence check on non install initialization
+* refactor: scripts/tools/std/declare_builtins.bat: backspace character capture example
+
 2026.11.19:
 * changed: *.bat: unification Windows and process bitness detection using `PROCESSOR_ARCHITECTURE` environment variable, code cleanup
 
