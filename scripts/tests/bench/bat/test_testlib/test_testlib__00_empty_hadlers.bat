@@ -21,7 +21,8 @@ echo Time spent: %TIME_INTS%.%TIME_FRACS% secs
 echo;
 
 rem WARNING: must be called without the call prefix!
-"%CONTOOLS_TESTLIB_ROOT%/exit.bat" >nul
+rem CAUTION: `>nul` without `call` will break stdout!
+( "%CONTOOLS_TESTLIB_ROOT%/exit.bat" ) >nul
 
 rem no code can be executed here, just in case
 exit /b
