@@ -1,4 +1,8 @@
 2026.11.23:
+* new: scripts/tests/bench/bat/test__for/test__for__*_composite_empty_loop: bench tests for composite empty loop
+* refactor: scripts/tests/bench/bat/test__for: bench tests minor refactor
+
+2026.11.23:
 * changed: scripts/tests: tests minor code refactor and cleanup
 
 2026.11.23:
