@@ -1,0 +1,153 @@
+>"%PROJECTS_ROOT%/andry81/contools/contools/scripts/tools/wmi/print_wmi_class_all_obj_props.vbs.bat" -- Win32_Processor Caption
+[0][Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz]
+Caption=Intel64 Family 6 Model 58 Stepping 9
+
+Running test_all.bat...
+
+Running test_std.bat...
+
+Running test_std__01_strlen_limit_probe.bat...
+
+STR_BASE_LEN=0
+1 NEQ 1
+2 NEQ 2
+4 NEQ 4
+8 NEQ 8
+16 NEQ 16
+32 NEQ 32
+64 NEQ 64
+128 NEQ 128
+256 NEQ 256
+512 NEQ 512
+1024 NEQ 1024
+2048 NEQ 2048
+4096 NEQ 4096
+4096 NEQ 8192
+STR_BASE_LEN=4096
+4097 NEQ 4097
+4098 NEQ 4098
+4100 NEQ 4100
+4104 NEQ 4104
+4112 NEQ 4112
+4128 NEQ 4128
+4160 NEQ 4160
+4224 NEQ 4224
+4352 NEQ 4352
+4608 NEQ 4608
+5120 NEQ 5120
+6144 NEQ 6144
+6144 NEQ 8192
+STR_BASE_LEN=6144
+6145 NEQ 6145
+6146 NEQ 6146
+6148 NEQ 6148
+6152 NEQ 6152
+6160 NEQ 6160
+6176 NEQ 6176
+6208 NEQ 6208
+6272 NEQ 6272
+6400 NEQ 6400
+6656 NEQ 6656
+7168 NEQ 7168
+7168 NEQ 8192
+STR_BASE_LEN=7168
+7169 NEQ 7169
+7170 NEQ 7170
+7172 NEQ 7172
+7176 NEQ 7176
+7184 NEQ 7184
+7200 NEQ 7200
+7232 NEQ 7232
+7296 NEQ 7296
+7424 NEQ 7424
+7680 NEQ 7680
+7680 NEQ 8192
+STR_BASE_LEN=7680
+7681 NEQ 7681
+7682 NEQ 7682
+7684 NEQ 7684
+7688 NEQ 7688
+7696 NEQ 7696
+7712 NEQ 7712
+7744 NEQ 7744
+7808 NEQ 7808
+7936 NEQ 7936
+7936 NEQ 8192
+STR_BASE_LEN=7936
+7937 NEQ 7937
+7938 NEQ 7938
+7940 NEQ 7940
+7944 NEQ 7944
+7952 NEQ 7952
+7968 NEQ 7968
+8000 NEQ 8000
+8064 NEQ 8064
+8064 NEQ 8192
+STR_BASE_LEN=8064
+8065 NEQ 8065
+8066 NEQ 8066
+8068 NEQ 8068
+8072 NEQ 8072
+8080 NEQ 8080
+8096 NEQ 8096
+8128 NEQ 8128
+8128 NEQ 8192
+STR_BASE_LEN=8128
+8129 NEQ 8129
+8130 NEQ 8130
+8132 NEQ 8132
+8136 NEQ 8136
+8144 NEQ 8144
+8160 NEQ 8160
+8160 NEQ 8192
+STR_BASE_LEN=8160
+8161 NEQ 8161
+8162 NEQ 8162
+8164 NEQ 8164
+8168 NEQ 8168
+8176 NEQ 8176
+8176 NEQ 8192
+STR_BASE_LEN=8176
+8177 NEQ 8177
+8178 NEQ 8178
+8180 NEQ 8180
+8184 NEQ 8184
+8184 NEQ 8192
+STR_BASE_LEN=8184
+8184 NEQ 8185
+---
+Expression format:      `set "XXXX=STRING"`
+A variable name length: 4
+STRING max length:      8184
+Overall length:         2+4+1+8184=8191
+
+Time spent: 1.100 secs (test_all.bat->test_std.bat->test_std__01_strlen_limit_probe.bat)
+
+   1 of 1 current tests is passed.
+
+Running test_std__02_strlen_limit.bat...
+
+PASSED: 2'1: LEN=`8180`: __STR0__=`aaaaa...aaaaA`
+PASSED: 3'2: LEN=`8181`: __STR1__=`aaaaa...aaaAB`
+PASSED: 4'3: LEN=`8181`: __STR2__=`aaaaa...aaaAB`
+PASSED: 5'4: LEN=`8182`: __STR3__=`aaaaa...aaABD`
+PASSED: 6'5: LEN=`8183`: __STR4__=`aaaaa...aABDE`
+PASSED: 7'6: LEN=`8179`: __QSTR0__=`aaaaa...aaaaA`
+PASSED: 8'7: LEN=`8179`: __QSTR1__=`aaaaa...aaaaA`
+PASSED: 9'8: LEN=`8180`: __QSTR2__=`aaaaa...aaaAC`
+PASSED: 10'9: LEN=`8181`: __QSTR3__=`aaaaa...aaACD`
+
+Time spent: 1.080 secs (test_all.bat->test_std.bat->test_std__02_strlen_limit.bat)
+
+   9 of 9 current tests is passed.
+
+Time spent: 2.840 secs (test_all.bat->test_std.bat)
+
+   9 of 9 current tests is passed.
+
+Time spent: 3.200 secs (test_all.bat)
+
+   9 of 9 current tests is passed.
+
+   10 of 10 overall tests is passed.
+

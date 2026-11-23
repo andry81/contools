@@ -1,0 +1,11 @@
+>"%PROJECTS_ROOT%/andry81/contools/contools/scripts/tools/wmi/print_wmi_class_all_obj_props.vbs.bat" -- Win32_Processor Caption
+[0][Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz]
+Caption=Intel64 Family 6 Model 58 Stepping 9
+
+Running test_mshta_cmdline_length_limit.bat...
+
+Shows a popup:
+Script length: 498
+Does not show anything:
+Script length: 499
+Script length: 500
