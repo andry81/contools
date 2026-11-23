@@ -1,4 +1,7 @@
 2026.11.23:
+* new: scripts/tests/unit/logs: new unit test logs
+
+2026.11.23:
 * fixed: scripts/tests/bench/bat/test_testlib/test_testlib__00_empty_hadlers.bat: stdout breakage
 
 2026.11.23:

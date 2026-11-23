@@ -1,0 +1,28 @@
+>"%PROJECTS_ROOT%/andry81/contools/contools/scripts/tools/wmi/print_wmi_class_all_obj_props.vbs.bat" -- Win32_Processor Caption
+[0][Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz]
+Caption=Intel64 Family 6 Model 58 Stepping 9
+
+Running test__all.bat...
+
+Running test__for.bat...
+
+Running test__for__00_do_loop_macro.bat...
+
+PASSED: 1: INDEX=`0`
+PASSED: 2: INDEX=`10`
+PASSED: 3: INDEX=`10`
+
+Time spent: 0.340 secs (test__all.bat->test__for.bat->test__for__00_do_loop_macro.bat)
+
+   3 of 3 current tests is passed.
+
+Time spent: 0.720 secs (test__all.bat->test__for.bat)
+
+   3 of 3 current tests is passed.
+
+Time spent: 1.080 secs (test__all.bat)
+
+   3 of 3 current tests is passed.
+
+   3 of 3 overall tests is passed.
+
