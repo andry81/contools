@@ -1,4 +1,7 @@
 2026.11.23:
+* fixed: scripts/tests/bench/bat/test_std_sleep/test_std_sleep_*_vbs_cscript.bat: removed obsolete bench tests
+
+2026.11.23:
 * changed: scripts/tools/cleanup/cleanup_file.bat: replace `PROJECTS_ROOT` environment variable value by `%PROJECTS_ROOT%` place holder
 * changed: scripts/tools/cleanup: minor code refactor
 
