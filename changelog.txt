@@ -1,3 +1,7 @@
+2026.11.23:
+* new: scripts/tests/bench/bat: test__call, test__for, test__read_file: bench tests for empty `@` operator
+* refactor: scripts/tests/bench/bat: test__call, test__for, test__read_file: bench tests minor refactor
+
 2026.11.21:
 * changed: __init__/__init__.bat: `System64` directory link existence check on non install initialization
 * refactor: scripts/tools/std/declare_builtins.bat: backspace character capture example

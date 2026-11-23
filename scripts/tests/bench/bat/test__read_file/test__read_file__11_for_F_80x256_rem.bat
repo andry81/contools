@@ -14,10 +14,8 @@ call "%%CONTOOLS_ROOT%%/time/begin_time.bat"
 
 cd /d "%TEST_READ_DIR%"
 
-(
-  for /L %%i in (1,1,100) do (
-    for /F "usebackq tokens=* delims="eol^= %%j in ("test_file_80x256.txt ") do break
-  )
+for /L %%i in (1,1,100) do (
+  for /F "usebackq tokens=* delims="eol^= %%j in ("test_file_80x256.txt ") do rem
 )
 
 call "%%CONTOOLS_ROOT%%/time/end_time.bat"
