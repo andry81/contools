@@ -1,6 +1,6 @@
 @echo off
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 rem in case if relative
 for /F "tokens=* delims="eol^= %%i in ("%INIT_VARS_FILE%") do set "INIT_VARS_FILE=%%~fi"
