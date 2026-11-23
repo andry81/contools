@@ -1,10 +1,11 @@
 @echo off
 
+rem CAUTION:
+rem   The encode and decode scripts must be called with the expansion feature disabled.
+
 setlocal DISABLEDELAYEDEXPANSION
 
-set "STRING_INPUT="
-set "STRING_ENCODED="
-set "STRING_OUTPUT="
+set "STRING_INPUT=" & set "STRING_ENCODED=" & set "STRING_OUTPUT="
 
 setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!__STRING__!"') do endlocal & set "STRING_INPUT=%%~i"
 

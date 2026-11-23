@@ -31,8 +31,8 @@ for /F "usebackq eol=# tokens=1,* delims=|" %%i in ("%TESTS_LIST_FILE%") do call
 exit /b 0
 
 :TEST
-for %%a in (:) do for /F "usebackq tokens=1 delims=	 "eol^= %%k in ('"%%i"') do set "RETURN_REFERENCE=%%~k"
-for %%a in (:) do for /F "usebackq tokens=* delims=	 "eol^= %%l in ('"%%j"') do set "CMDLINE=%%~l"
+for %%# in (:) do for /F "usebackq tokens=1 delims=	 "eol^= %%k in ('"%%i"') do set "RETURN_REFERENCE=%%~k"
+for %%# in (:) do for /F "usebackq tokens=* delims=	 "eol^= %%l in ('"%%j"') do set "CMDLINE=%%~l"
 
 set TEST_LAST_ERROR=0
 set TEST_IMPL_ERROR=0
@@ -60,7 +60,7 @@ call "%%CONTOOLS_ROOT%%/std/cmp_nvar.bat" TEST_IMPL_ERROR EQU RETURN_REFERENCE |
 if %TEST_LAST_ERROR% NEQ 0 (
   call "%%CONTOOLS_ROOT%%/testlib/set_test_failed.bat"
   setlocal ENABLEDELAYEDEXPANSION
-  set "__LOG__=!TESTLIB__TEST_STATUS_MSG!: !TESTLIB__TEST_ORDER_NUMBER!: RESULT=`!TEST_IMPL_ERROR!` REFERENCE=`!RETURN_REFERENCE!` CMDLINE=`!CMDLINE!`"
+  set "__LOG__=!TESTLIB__TEST_STATUS_MSG!: !TESTLIB__TEST_ORDER_NUMBER!: RESULT=`!TEST_IMPL_ERROR!` REF=`!RETURN_REFERENCE!` CMDLINE=`!CMDLINE!`"
   call :LOG
   call :LOG
   exit /b 1

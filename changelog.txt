@@ -1,4 +1,7 @@
 2026.11.23:
+* changed: scripts/tests: tests minor code refactor and cleanup
+
+2026.11.23:
 * new: scripts/tests/bench/bat: test__call, test__for, test__read_file: bench tests for empty `@` operator
 * refactor: scripts/tests/bench/bat: test__call, test__for, test__read_file: bench tests minor refactor
 
