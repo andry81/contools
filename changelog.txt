@@ -1,4 +1,7 @@
 2026.11.23:
+* new: scripts/tests/manual/logs: new manual test logs
+
+2026.11.23:
 * new: scripts/tests/probe/logs: new probe test logs
 
 2026.11.23:

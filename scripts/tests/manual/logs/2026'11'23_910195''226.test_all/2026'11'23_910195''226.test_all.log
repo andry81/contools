@@ -1,7 +1,6 @@
->"C:\WINDOWS\System32\wbem\wmic.exe" cpu get Caption,Name
-Caption                               Name                                       
-Intel64 Family 6 Model 58 Stepping 9  Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz  
-
+>"%PROJECTS_ROOT%/andry81/contools/contools/scripts/tools/wmi/print_wmi_class_all_obj_props.vbs.bat" -- Win32_Processor Caption
+[0][Intel(R) Core(TM) i7-3630QM CPU @ 2.40GHz]
+Caption=Intel64 Family 6 Model 58 Stepping 9
 
 Running test_all.bat...
 
@@ -42,55 +41,55 @@ TEST13=1
 TEST14=TEST6
 Environment variable TEST15 not defined
 
-Time spent: 0.540 secs (test_all.bat->test_build.bat)
+Time spent: 0.520 secs (test_all.bat->test_build.bat)
 
 Running test_std.bat...
 
 >test_std__00_call.bat
-call.bat  echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+call_.bat  echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 "1 2" ! ? * & | "=" 3
 ---
-call.bat -exe -- echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
+call_.bat -exe -- echo "1 2" ! ? * ^& ^| , ; = ^= "=" 3
 "1 2" ! ? * & | , ; = = "=" 3
 ---
-call.bat  echo $*^|^&(=)^<^>"='`^%!+?** ,;=
+call_.bat  echo $*^|^&(=)^<^>"='`^%!+?** ,;=
 $*|&( )<>"='`^%!+?** ,;=
 ---
-call.bat -exe -- echo $*^|^&(=)^<^>"='`^%!+?** ,;=
+call_.bat -exe -- echo $*^|^&(=)^<^>"='`^%!+?** ,;=
 $*|&(=)<>"='`^%!+?** ,;=
 ---
-call.bat  echo:"1 2" 3 4 5
+call_.bat  echo:"1 2" 3 4 5
 "1 2" 3 4 5
 ---
-call.bat  echo;"1 2" 3 4 5
+call_.bat  echo;"1 2" 3 4 5
 "1 2" 3 4 5
 ---
-call.bat  echo("1 2" 3 4 5
+call_.bat  echo("1 2" 3 4 5
 'echo("1 2"' is not recognized as an internal or external command,
 operable program or batch file.
 ---
-call.bat  
-call.bat  echo:
+call_.bat  
+call_.bat  echo:
 
-call.bat  echo;
+call_.bat  echo;
 ECHO is off.
-call.bat -exe echo;
+call_.bat -exe echo;
 
-call.bat  echo 1 2 3
+call_.bat  echo 1 2 3
 1 2 3
-call.bat  echo 1;2,3=
+call_.bat  echo 1;2,3=
 1 2 3
-call.bat -exe echo 1;2,3=
+call_.bat -exe echo 1;2,3=
 1;2,3=
 ERRORLEVEL=0
 ---
-call.bat  exit /b 321
+call_.bat  exit /b 321
 ERRORLEVEL=321
 ---
-call.bat  "\scripts\tools/std/errlvl.bat" 321
+call_.bat  "\scripts\tools/std/errlvl.bat" 321
 ERRORLEVEL=321
 ---
-call.bat  echo;^>cmd param0 param1
+call_.bat  echo;^>cmd param0 param1
 >cmd param0 param1
 ---
 
@@ -150,6 +149,12 @@ ERRORLEVEL=123
 callshift.bat -exe 0 echo 1;2,3= 
 1;2,3=
 ERRORLEVEL=123
+---
+callshift.bat -0 echo 1 2 3 4 5 6 7 
+1 2 3 4 5 6 7
+---
+callshift.bat +0 echo 1 2 3 4 5 6 7 
+1 2 3 4 5 6 7
 ---
 callshift.bat 1 echo 1 2 3 4 5 6 7 
 2 3 4 5 6 7
@@ -304,6 +309,12 @@ setshift.bat 0 x 1;2,3=
 ERRORLEVEL=123
 x=1 2 3
 ---
+setshift.bat -0 x 1 2 3 4 5 6 7 
+x=1 2 3 4 5 6 7
+---
+setshift.bat +0 x 1 2 3 4 5 6 7 
+x=1 2 3 4 5 6 7
+---
 setshift.bat 1 x 1 2 3 4 5 6 7 
 x=2 3 4 5 6 7
 ---
@@ -419,7 +430,262 @@ o	10
 
 ---
 
->test_std__30_echo_path_var.bat
+>test_std__30_setshift_var.bat
+CMDLINE="1 2" ! ? * ^& ^| , ; = ^= "=" 3
+setshift_var.bat 0 x CMDLINE 
+x="1 2" ! ? * ^& ^| ^ "=" 3
+---
+CMDLINE="1 2" ! ? * ^& ^| , ; = ^= "=" 3
+setshift_var.bat 0 x CMDLINE -exe 
+x="1 2" ! ? * ^& ^| , ; = ^= "=" 3
+---
+CMDLINE=$*^|^&(=)^<^>"='`^%!+?** ,;=
+setshift_var.bat 0 x CMDLINE 
+x=$*^|^&( )^<^>"='`^%!+?** ,;=
+---
+CMDLINE=$*^|^&(=)^<^>"='`^%!+?** ,;=
+setshift_var.bat 0 x CMDLINE -exe 
+x=$*^|^&(=)^<^>"='`^%!+?** ,;=
+---
+CMDLINE="1 2" 3 4 5
+setshift_var.bat 2 x CMDLINE 
+x=4 5
+---
+Environment variable x not defined
+ERRORLEVEL=123
+CMDLINE=
+setshift_var.bat  
+ERRORLEVEL=123
+CMDLINE=
+setshift_var.bat 0 x 
+ERRORLEVEL=123
+CMDLINE=
+setshift_var.bat 0 y CMDLINE 
+ERRORLEVEL=123
+Environment variable x  not defined
+Environment variable y  not defined
+CMDLINE=1 2 3
+setshift_var.bat 0 x 
+ERRORLEVEL=123
+CMDLINE=1 2 3
+setshift_var.bat 0 y CMDLINE 
+ERRORLEVEL=123
+Environment variable x  not defined
+y=1 2 3
+CMDLINE=1;2,3=
+setshift_var.bat 0 x 
+ERRORLEVEL=123
+CMDLINE=1;2,3=
+setshift_var.bat 0 y CMDLINE 
+ERRORLEVEL=123
+Environment variable x  not defined
+y=1 2 3
+---
+CMDLINE=1 2 3 4 5 6 7
+setshift_var.bat -0 x CMDLINE 
+x=1 2 3 4 5 6 7
+---
+CMDLINE=1 2 3 4 5 6 7
+setshift_var.bat +0 x CMDLINE 
+x=1 2 3 4 5 6 7
+---
+CMDLINE=1 2 3 4 5 6 7
+setshift_var.bat 1 x CMDLINE 
+x=2 3 4 5 6 7
+---
+CMDLINE=1 2 3 4 5 6 7
+setshift_var.bat 1 x CMDLINE -num 3 
+x=2 3 4
+---
+CMDLINE=1 2 3 4 5 6 7
+setshift_var.bat 1 x CMDLINE -skip 2 -num 3 
+x=1 2 4 5 6
+---
+CMDLINE=1 2 3 4 5 6 7
+setshift_var.bat -3 x CMDLINE 
+x=1 2 3 7
+---
+CMDLINE=a b 1 2 3 4 5 6 7
+setshift_var.bat -3 x CMDLINE -skip 2 
+x=a b 1 2 3 7
+---
+CMDLINE=a b 1 2 3 4 5 6 7 8
+setshift_var.bat -3 x CMDLINE -skip 2 -num 4 
+x=a b 1 2 3 7
+---
+CMDLINE= a  b  c  d
+setshift_var.bat 1 x CMDLINE -notrim 
+x= b  c  d
+---
+CMDLINE=^>cmd param0 param1
+setshift_var.bat 0 x CMDLINE 
+x=^>cmd param0 param1
+---
+
+>test_std__31_setshift_var_with_tabs.bat
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+cmdo	o	oparam0oo		oo		ooparam1o	o	param2o	param3
+x=cmd 	 	 param0  		  		  param1 	 	param2 	param3
+x=cmd 	 	 param0  		  		  param1 	 	param2 	param3
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+---
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+0	1		2			3	o4	oo5	o	6		o7	o8o		o9oo	10
+x=0	1		2			3	 4	  5	 	6		 7	 8 		 9  	10
+x=0	1		2			3	 4	  5	 	6		 7	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+---
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+0o	1o		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+0 	1 		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=0=1=2=3=4=5=6=7=8=9=10=
+-0-1-2-3-4-5-6-7-8-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	1o		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+	1 		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=1=2=3=4=5=6=7=8=9=10=
+-1-2-3-4-5-6-7-8-9-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=2=3=4=5=6=7=8=9=10=
+-2-3-4-5-6-7-8-9-10-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=3=4=5=6=7=8=9=10=
+-3-4-5-6-7-8-9-10--
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=4=5=6=7=8=9=10=
+-4-5-6-7-8-9-10---
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	oo5o	o	6o		o7o	o8o		o9oo	10
+	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=5=6=7=8=9=10=
+-5-6-7-8-9-10----
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	o	6o		o7o	o8o		o9oo	10
+	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=6=7=8=9=10=
+-6-7-8-9-10-----
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+		o7o	o8o		o9oo	10
+		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=7=8=9=10=
+-7-8-9-10------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	o8o		o9oo	10
+	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=8=9=10=
+-8-9-10-------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+		o9oo	10
+		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=9=10=
+-9-10--------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+o	10
+ 	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=10=
+-10---------
+
+---
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	1o		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+	1 		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=1=2=3=4=5=6=7=8=9=10=
+-1-2-3-4-5-6-7-8-9-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+		2o			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+		2 			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=2=3=4=5=6=7=8=9=10=
+-2-3-4-5-6-7-8-9-10-
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+			3o	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+			3 	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=3=4=5=6=7=8=9=10=
+-3-4-5-6-7-8-9-10--
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	o4o	oo5o	o	6o		o7o	o8o		o9oo	10
+	 4 	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=4=5=6=7=8=9=10=
+-4-5-6-7-8-9-10---
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	oo5o	o	6o		o7o	o8o		o9oo	10
+	  5 	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=5=6=7=8=9=10=
+-5-6-7-8-9-10----
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	o	6o		o7o	o8o		o9oo	10
+	 	6 		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=6=7=8=9=10=
+-6-7-8-9-10-----
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+		o7o	o8o		o9oo	10
+		 7 	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=7=8=9=10=
+-7-8-9-10------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+	o8o		o9oo	10
+	 8 		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=8=9=10=
+-8-9-10-------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+		o9oo	10
+		 9  	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=9=10=
+-9-10--------
+
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+o	10
+ 	10
+	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.	.
+=10=
+-10---------
+
+---
+
+>test_std__40_echo_path_var.bat
 __LIST__="1 2" ! ? * & | , ; = ^= "=" 3
  "1 2" ! ? * & | , |
   = ^= "=" 3|
@@ -467,7 +733,7 @@ __STRING__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
   h h|
 ---
 
->test_std__31_echo_pathglob_var.bat
+>test_std__41_echo_pathglob_var.bat
 __LIST__="1 2";3 4;5,6;7=8;9!*?0
  "1 2"|
  3 4|
@@ -497,11 +763,11 @@ __STRING__="?a/b/%c%!" ;	 "!d! ^; e ; f" ; ; ; !AAA! ^; g,g ;;; h h
   h h|
 ---
 
->test_std__40_trim_var.bat
+>test_std__50_trim_var.bat
 - 	 	 	 1 ! 2 | 3 & 4 ^ 5 = 6 , 7 ; 8 * 9 # 0 % 1 / 2 \ 3 ? 4 > 5 < 6 " 7 	 	 	 -
 -1 ! 2 | 3 & 4 ^ 5 = 6 , 7 ; 8 * 9 # 0 % 1 / 2 \ 3 ? 4 > 5 < 6 " 7-
 
->test_std__50_get_cmdline.bat
+>test_std__60_get_cmdline.bat
 Environment variable RETURN_VALUE not defined
 ---
 CMDLINE=  	 		  	 
@@ -517,7 +783,7 @@ CMDLINE=$*^|^&^(=^)^<^>"='`^%!+?** ,;=
 RETURN_VALUE=$*|&(=)<>"='`^%!+?** ,;=
 ---
 
->test_std__51_get_cmdline_len.bat
+>test_std__61_get_cmdline_len.bat
 ARGS_COUNT(bat)=0
 ARGS_COUNT(exe)=0
 ---
@@ -538,7 +804,7 @@ ARGS_COUNT(exe)=1
 CMDLINE=$*^|^&^(=^)^<^>"='`^%!+?** ,;=
 ---
 
-Time spent: 5.540 secs (test_all.bat->test_std.bat)
+Time spent: 7.310 secs (test_all.bat->test_std.bat)
 
 Running test_std_encode.bat...
 
@@ -664,8 +930,269 @@ __STRING__=$24$2A$7C$26$28$3D$29$3C$3E"$3D$27$60$5E$25$21$2B$3F$2A$2A $2C$3B$3D
 __STRING__=$*|&(=)<>"='`^%!+?** ,;=
 ---
 
-Time spent: 1.240 secs (test_all.bat->test_std_encode.bat)
+>test_std_encode__60_asc.bat
+Active code page: 65001
+OK : <001>[001] ||
+OK : <002>[002] ||
+OK : <003>[003] ||
+OK : <004>[004] ||
+OK : <005>[005] ||
+OK : <006>[006] ||
+OK : <007>[007] ||
+OK : <008>[008] ||
+OK : <009>[009] |	|
+ERR: <010>[---] | |
+OK : <011>[011] ||
+OK : <012>[012] ||
+ERR: <013>[---] | |
+OK : <014>[014] ||
+OK : <015>[015] ||
+OK : <016>[016] ||
+OK : <017>[017] ||
+OK : <018>[018] ||
+OK : <019>[019] ||
+OK : <020>[020] ||
+OK : <021>[021] ||
+OK : <022>[022] ||
+OK : <023>[023] ||
+OK : <024>[024] ||
+OK : <025>[025] ||
+OK : <027>[027] ||
+OK : <028>[028] ||
+OK : <029>[029] ||
+OK : <030>[030] ||
+OK : <031>[031] ||
+OK : <032>[032] | |
+OK : <033>[033] |!|
+OK : <034>[034] |"|
+OK : <035>[035] |#|
+OK : <036>[036] |$|
+OK : <037>[037] |%|
+OK : <038>[038] |&|
+OK : <039>[039] |'|
+OK : <040>[040] |(|
+OK : <041>[041] |)|
+OK : <042>[042] |*|
+OK : <043>[043] |+-|
+OK : <043>[043] |+|
+OK : <044>[044] |,|
+OK : <045>[045] |-|
+OK : <046>[046] |.|
+OK : <047>[047] |/|
+OK : <048>[048] |0|
+OK : <049>[049] |1|
+OK : <050>[050] |2|
+OK : <051>[051] |3|
+OK : <052>[052] |4|
+OK : <053>[053] |5|
+OK : <054>[054] |6|
+OK : <055>[055] |7|
+OK : <056>[056] |8|
+OK : <057>[057] |9|
+OK : <058>[058] |:|
+OK : <059>[059] |;|
+OK : <060>[060] |<|
+OK : <061>[061] |=|
+OK : <062>[062] |>|
+OK : <063>[063] |?|
+OK : <064>[064] |@|
+OK : <065>[065] |A|
+OK : <066>[066] |B|
+OK : <067>[067] |C|
+OK : <068>[068] |D|
+OK : <069>[069] |E|
+OK : <070>[070] |F|
+OK : <071>[071] |G|
+OK : <072>[072] |H|
+OK : <073>[073] |I|
+OK : <074>[074] |J|
+OK : <075>[075] |K|
+OK : <076>[076] |L|
+OK : <077>[077] |M|
+OK : <078>[078] |N|
+OK : <079>[079] |O|
+OK : <080>[080] |P|
+OK : <081>[081] |Q|
+OK : <082>[082] |R|
+OK : <083>[083] |S|
+OK : <084>[084] |T|
+OK : <085>[085] |U|
+OK : <086>[086] |V|
+OK : <087>[087] |W|
+OK : <088>[088] |X|
+OK : <089>[089] |Y|
+OK : <090>[090] |Z|
+OK : <091>[091] |[|
+OK : <092>[092] |\|
+OK : <093>[093] |]|
+OK : <094>[094] |^|
+OK : <095>[095] |_|
+OK : <096>[096] |`|
+OK : <097>[097] |a|
+OK : <098>[098] |b|
+OK : <099>[099] |c|
+OK : <100>[100] |d|
+OK : <101>[101] |e|
+OK : <102>[102] |f|
+OK : <103>[103] |g|
+OK : <104>[104] |h|
+OK : <105>[105] |i|
+OK : <106>[106] |j|
+OK : <107>[107] |k|
+OK : <108>[108] |l|
+OK : <109>[109] |m|
+OK : <110>[110] |n|
+OK : <111>[111] |o|
+OK : <112>[112] |p|
+OK : <113>[113] |q|
+OK : <114>[114] |r|
+OK : <115>[115] |s|
+OK : <116>[116] |t|
+OK : <117>[117] |u|
+OK : <118>[118] |v|
+OK : <119>[119] |w|
+OK : <120>[120] |x|
+OK : <121>[121] |y|
+OK : <122>[122] |z|
+OK : <123>[123] |{|
+OK : <124>[124] |||
+OK : <125>[125] |}|
+OK : <126>[126] |~|
+OK : <127>[127] ||
+OK : <128>[128] |Ђ|
+OK : <129>[129] |Ѓ|
+OK : <130>[130] |‚|
+OK : <131>[131] |ѓ|
+OK : <132>[132] |„|
+OK : <133>[133] |…|
+OK : <134>[134] |†|
+OK : <135>[135] |‡|
+OK : <136>[136] |€|
+OK : <137>[137] |‰|
+OK : <138>[138] |Љ|
+OK : <139>[139] |‹|
+OK : <140>[140] |Њ|
+OK : <141>[141] |Ќ|
+OK : <142>[142] |Ћ|
+OK : <143>[143] |Џ|
+OK : <144>[144] |ђ|
+OK : <145>[145] |‘|
+OK : <146>[146] |’|
+OK : <147>[147] |“|
+OK : <148>[148] |”|
+OK : <149>[149] |•|
+OK : <150>[150] |–|
+OK : <151>[151] |—|
+OK : <152>[152] ||
+OK : <153>[153] |™|
+OK : <154>[154] |љ|
+OK : <155>[155] |›|
+OK : <156>[156] |њ|
+OK : <157>[157] |ќ|
+OK : <158>[158] |ћ|
+OK : <159>[159] |џ|
+OK : <160>[160] | |
+OK : <161>[161] |Ў|
+OK : <162>[162] |ў|
+OK : <163>[163] |Ј|
+OK : <164>[164] |¤|
+OK : <165>[165] |Ґ|
+OK : <166>[166] |¦|
+OK : <167>[167] |§|
+OK : <168>[168] |Ё|
+OK : <169>[169] |©|
+OK : <170>[170] |Є|
+OK : <171>[171] |«|
+OK : <172>[172] |¬|
+OK : <173>[173] |­|
+OK : <174>[174] |®|
+OK : <175>[175] |Ї|
+OK : <176>[176] |°|
+OK : <177>[177] |±|
+OK : <178>[178] |І|
+OK : <179>[179] |і|
+OK : <180>[180] |ґ|
+OK : <181>[181] |µ|
+OK : <182>[182] |¶|
+OK : <183>[183] |·|
+OK : <184>[184] |ё|
+OK : <185>[185] |№|
+OK : <186>[186] |є|
+OK : <187>[187] |»|
+OK : <188>[188] |ј|
+OK : <189>[189] |Ѕ|
+OK : <190>[190] |ѕ|
+OK : <191>[191] |ї|
+OK : <192>[192] |А|
+OK : <193>[193] |Б|
+OK : <194>[194] |В|
+OK : <195>[195] |Г|
+OK : <196>[196] |Д|
+OK : <197>[197] |Е|
+OK : <198>[198] |Ж|
+OK : <199>[199] |З|
+OK : <200>[200] |И|
+OK : <201>[201] |Й|
+OK : <202>[202] |К|
+OK : <203>[203] |Л|
+OK : <204>[204] |М|
+OK : <205>[205] |Н|
+OK : <206>[206] |О|
+OK : <207>[207] |П|
+OK : <208>[208] |Р|
+OK : <209>[209] |С|
+OK : <210>[210] |Т|
+OK : <211>[211] |У|
+OK : <212>[212] |Ф|
+OK : <213>[213] |Х|
+OK : <214>[214] |Ц|
+OK : <215>[215] |Ч|
+OK : <216>[216] |Ш|
+OK : <217>[217] |Щ|
+OK : <218>[218] |Ъ|
+OK : <219>[219] |Ы|
+OK : <220>[220] |Ь|
+OK : <221>[221] |Э|
+OK : <222>[222] |Ю|
+OK : <223>[223] |Я|
+OK : <224>[224] |а|
+OK : <225>[225] |б|
+OK : <226>[226] |в|
+OK : <227>[227] |г|
+OK : <228>[228] |д|
+OK : <229>[229] |е|
+OK : <230>[230] |ж|
+OK : <231>[231] |з|
+OK : <232>[232] |и|
+OK : <233>[233] |й|
+OK : <234>[234] |к|
+OK : <235>[235] |л|
+OK : <236>[236] |м|
+OK : <237>[237] |н|
+OK : <238>[238] |о|
+OK : <239>[239] |п|
+OK : <240>[240] |р|
+OK : <241>[241] |с|
+OK : <242>[242] |т|
+OK : <243>[243] |у|
+OK : <244>[244] |ф|
+OK : <245>[245] |х|
+OK : <246>[246] |ц|
+OK : <247>[247] |ч|
+OK : <248>[248] |ш|
+OK : <249>[249] |щ|
+OK : <250>[250] |ъ|
+OK : <251>[251] |ы|
+OK : <252>[252] |ь|
+OK : <253>[253] |э|
+OK : <254>[254] |ю|
+OK : <255>[255] |я|
+Active code page: 65001
+Errors: 2
+Time spent: 19.840 secs
 
-Time spent: 8.140 secs (test_all.bat)
+Time spent: 20.860 secs (test_all.bat->test_std_encode.bat)
+
+Time spent: 29.580 secs (test_all.bat)
 
 
