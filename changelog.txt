@@ -1,4 +1,7 @@
 2026.11.23:
+* new: scripts/tests/bench/bat/test__for/test__for__*_for_F_eol: more bench tests for empty `@` operator
+
+2026.11.23:
 * new: scripts/tests/bench/bat/test__for/test__for__*_composite_empty_loop: bench tests for composite empty loop
 * refactor: scripts/tests/bench/bat/test__for: bench tests minor refactor
 
