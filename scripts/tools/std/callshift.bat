@@ -291,7 +291,7 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STR
   set /A INDEX+=1
 )
 
-if not defined COMMAND endlocal & exit /b %LAST_ERROR%
+if not defined COMMAND exit /b %LAST_ERROR%
 setlocal ENABLEDELAYEDEXPANSION & if defined CMDLINE (
   set "__STRING__=!COMMAND! !CMDLINE!"
 ) else set "__STRING__=!COMMAND!"

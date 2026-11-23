@@ -64,11 +64,11 @@ if defined CMDLINE_TEMP_FILE del /F /Q /A:-D "%CMDLINE_TEMP_FILE%" >nul 2>nul
 rem WORKAROUND:
 rem   In case if `echo` is turned off externally.
 
-if not defined __STRING__ endlocal & exit /b %LAST_ERROR%
+if not defined __STRING__ exit /b %LAST_ERROR%
 
 setlocal ENABLEDELAYEDEXPANSION & for /F "usebackq tokens=* delims="eol^= %%i in ('"!__STRING__:~5,-2!"') do endlocal & set "__STRING__=%%~i"
 
-if not defined __STRING__ endlocal & exit /b %LAST_ERROR%
+if not defined __STRING__ exit /b %LAST_ERROR%
 
 (
   setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STRING__!") do endlocal & endlocal & set "RETURN_VALUE=%%i"

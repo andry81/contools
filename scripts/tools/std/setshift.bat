@@ -230,7 +230,7 @@ setlocal ENABLEDELAYEDEXPANSION & for /F "tokens=* delims="eol^= %%i in ("!__STR
   set /A INDEX+=1
 )
 
-if not defined OUTVAR endlocal & exit /b %LAST_ERROR%
+if not defined OUTVAR exit /b %LAST_ERROR%
 setlocal ENABLEDELAYEDEXPANSION & set "__STRING__=!CMDLINE!" & if %FLAG_NO_TRIM% NEQ 0 set "__STRING__=!__STRING__:$20= !" & set "__STRING__=!__STRING__:$09=	!"
 if not defined __STRING__ for /F "tokens=* delims="eol^= %%i in ("!OUTVAR!") do endlocal & endlocal & set "%%i=" & exit /b %LAST_ERROR%
 

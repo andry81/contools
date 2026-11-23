@@ -114,7 +114,7 @@ if %%i NEQ %%j exit /b %LAST_ERROR%
 
 set "OUTVAR=%~2"
 
-if not defined OUTVAR endlocal & exit /b %LAST_ERROR%
+if not defined OUTVAR exit /b %LAST_ERROR%
 
 set "?~dp0=%~dp0"
 

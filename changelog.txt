@@ -1,4 +1,8 @@
 2026.11.23:
+* changed: scripts/tools/std: call*.bat, setshift*.bat, get_cmdline.bat: minor code cleanup
+* changed: scripts/tests/bench/bat/test_std_call_vs: minor code cleanup
+
+2026.11.23:
 * fixed: scripts/tests/bench/bat/test_std_call_vs: restored the slowdown issue
 * new: scripts/tests/bench/bat/test_std_call_vs: extracted bench tests with the slowdown issue into standalone sub directory
 * refactor: scripts/tests/bench/bat/test__for: bench tests minor refactor
