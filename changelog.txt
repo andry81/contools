@@ -1,4 +1,9 @@
 2026.11.23:
+* fixed: scripts/tests/bench/bat/test_std_call_vs: restored the slowdown issue
+* new: scripts/tests/bench/bat/test_std_call_vs: extracted bench tests with the slowdown issue into standalone sub directory
+* refactor: scripts/tests/bench/bat/test__for: bench tests minor refactor
+
+2026.11.23:
 * new: scripts/tests/bench/bat/test__for/test__for__*_for_F_eol: more bench tests for empty `@` operator
 
 2026.11.23:
