@@ -1,3 +1,9 @@
+2026.11.25:
+* new: scripts/tools/std/flush_conin.bat: script to flush console (keyboard) input
+* changed: scripts/tools/std/sleep.bat: `-flash_conin` flag to flush console (keyboard) input on exit
+* changed: scripts/tools/std/sleep.bat: minor improvements
+* refactor: scripts/tools/std/sleep.bat: documentation
+
 2026.11.24:
 * changed: scripts/tools: busy_wait.bat, time: minor improvement
 
