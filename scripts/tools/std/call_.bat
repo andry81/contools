@@ -178,7 +178,7 @@ set LAST_ERROR=%ERRORLEVEL%
 if %LOCK_ACQUIRE% EQU 0 (
   if %FLAG_TRYLOCK% NEQ 0 exit /b -1024
 
-  call "%%~dp0busy_wait.bat" %%FLAG_LOCK_BUSY_WAIT_CMDLINE%%
+  call "%%?~dp0%%busy_wait.bat" %%FLAG_LOCK_BUSY_WAIT_CMDLINE%%
 
   goto CALL_LOCK_LOOP
 )

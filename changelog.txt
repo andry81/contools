@@ -1,3 +1,6 @@
+2026.11.24:
+* fixed: scripts/tools/std/call*.bat: execution fixup
+
 2026.11.23:
 * new: scripts/tests/bench/logs: new bench test logs
 
