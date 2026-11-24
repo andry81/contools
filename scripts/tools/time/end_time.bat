@@ -1,4 +1,7 @@
-@echo off
+@echo off & goto DOC_END
+
+rem copy of `time/timediff.bat` script
+:DOC_END
 
 set /A "END_TIME=0", "TIME_DIFF=0", "TIME_INTS=0", "TIME_FRACS=0"
 
@@ -8,18 +11,15 @@ setlocal DISABLEDELAYEDEXPANSION
 
 if "%~3" == "" ( set "END_TIME=%TIME%" ) else set "END_TIME=%~3"
 
-rem copy of `timediff.bat` script
 call :TIMESTAMP "%%BEGIN_TIME%%"
-set BEGIN_TIMESTAMP=%TIMESTAMP%
-set BEGIN_HOURS=%HOURS%
+set "BEGIN_TIMESTAMP=%TIMESTAMP%" & set "BEGIN_HOURS=%HOURS%"
 
 call :TIMESTAMP "%%END_TIME%%"
-set END_TIMESTAMP=%TIMESTAMP%
-set END_HOURS=%HOURS%
+set "END_TIMESTAMP=%TIMESTAMP%" & set "END_HOURS=%HOURS%"
 
 goto TIMESTAMP_END
 
-rem copy of `timestamp.bat` script
+rem copy of `time/timestamp.bat` script
 :TIMESTAMP
 set "BEGIN_TIME=%~1 " & setlocal ENABLEDELAYEDEXPANSION & (
   set "BEGIN_TIME=!BEGIN_TIME::= !"

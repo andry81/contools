@@ -1,4 +1,7 @@
 2026.11.24:
+* changed: scripts/tools: busy_wait.bat, time: minor improvement
+
+2026.11.24:
 * fixed: scripts/tools/std/call*.bat: execution fixup
 
 2026.11.23:

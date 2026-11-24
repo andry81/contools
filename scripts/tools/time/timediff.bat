@@ -3,16 +3,14 @@
 setlocal DISABLEDELAYEDEXPANSION
 
 call :TIMESTAMP "%%~1"
-set BEGIN_TIMESTAMP=%TIMESTAMP%
-set BEGIN_HOURS=%HOURS%
+set "BEGIN_TIMESTAMP=%TIMESTAMP%" & set "BEGIN_HOURS=%HOURS%"
 
 call :TIMESTAMP "%%~2"
-set END_TIMESTAMP=%TIMESTAMP%
-set END_HOURS=%HOURS%
+set "END_TIMESTAMP=%TIMESTAMP%" & set "END_HOURS=%HOURS%"
 
 goto TIMESTAMP_END
 
-rem copy of `timestamp.bat` script
+rem copy of `time/timestamp.bat` script
 :TIMESTAMP
 set "BEGIN_TIME=%~1 " & setlocal ENABLEDELAYEDEXPANSION & (
   set "BEGIN_TIME=!BEGIN_TIME::= !"
