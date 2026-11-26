@@ -34,7 +34,7 @@ rem -chcp <code-page>
 rem   Change the code page to <code-page> before the pause.
 :DOC_END
 
-setlocal & set "LAST_ERROR=%ERRORLEVEL%"
+setlocal DISABLEDELAYEDEXPANSION & set "LAST_ERROR=%ERRORLEVEL%"
 
 set "?~dp0=%~dp0"
 

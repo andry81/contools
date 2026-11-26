@@ -22,52 +22,52 @@
 '''     execution.
 '''
 '''   -showas <ShowWindowAsNumber>
-''''     Handles a child process window show state.
+'''     Handles a child process window show state.
 '''
-'''      CreateProcess or ShellExecute
-'''        0 = SW_HIDE
-'''          Don't show window.
-'''        1 = SW_SHOWNORMAL
-'''          Activates and displays a window. If the window is minimized or
-'''          maximized, the system restores it to its original size and
-'''          position. An application should specify this flag when displaying
-'''          the window for the first time.
-'''        2 = SW_SHOWMINIMIZED
-'''          Activates the window and displays it as a minimized window.
-'''        3 = SW_SHOWMAXIMIZED
-'''          Activates the window and displays it as a maximized window.
-'''        4 = SW_SHOWNOACTIVATE
-'''          Displays a window in its most recent size and position. This value
-'''          is similar to SW_SHOWNORMAL, except that the window is not
-'''          activated.
-'''        5 = SW_SHOW
-'''          Activates the window and displays it in its current size and
-'''          position.
-'''        6 = SW_MINIMIZE
-'''          Minimizes the specified window and activates the next top-level
-'''          window in the Z order.
-'''        7 = SW_SHOWMINNOACTIVE
-'''          Displays the window as a minimized window. This value is similar
-'''          to SW_SHOWMINIMIZED, except the window is not activated.
-'''        8 = SW_SHOWNA
-'''          Displays the window in its current size and position. This value
-'''          is similar to SW_SHOW, except that the window is not activated.
-'''        9 = SW_RESTORE
-'''          Activates and displays the window. If the window is minimized or
-'''          maximized, the system restores it to its original size and
-'''          position. An application should specify this flag when restoring
-'''          a minimized window.
-'''        11 = SW_FORCEMINIMIZE
-'''          Minimizes a window, even if the thread that owns the window is not
-'''          responding. This flag should only be used when minimizing windows
-'''          from a different thread.
+'''     CreateProcess or ShellExecute
+'''       0 = SW_HIDE
+'''         Don't show window.
+'''       1 = SW_SHOWNORMAL
+'''         Activates and displays a window. If the window is minimized or
+'''         maximized, the system restores it to its original size and
+'''         position. An application should specify this flag when displaying
+'''         the window for the first time.
+'''       2 = SW_SHOWMINIMIZED
+'''         Activates the window and displays it as a minimized window.
+'''       3 = SW_SHOWMAXIMIZED
+'''         Activates the window and displays it as a maximized window.
+'''       4 = SW_SHOWNOACTIVATE
+'''         Displays a window in its most recent size and position. This value
+'''         is similar to SW_SHOWNORMAL, except that the window is not
+'''         activated.
+'''       5 = SW_SHOW
+'''         Activates the window and displays it in its current size and
+'''         position.
+'''       6 = SW_MINIMIZE
+'''         Minimizes the specified window and activates the next top-level
+'''         window in the Z order.
+'''       7 = SW_SHOWMINNOACTIVE
+'''         Displays the window as a minimized window. This value is similar
+'''         to SW_SHOWMINIMIZED, except the window is not activated.
+'''       8 = SW_SHOWNA
+'''         Displays the window in its current size and position. This value
+'''         is similar to SW_SHOW, except that the window is not activated.
+'''       9 = SW_RESTORE
+'''         Activates and displays the window. If the window is minimized or
+'''         maximized, the system restores it to its original size and
+'''         position. An application should specify this flag when restoring
+'''         a minimized window.
+'''       11 = SW_FORCEMINIMIZE
+'''         Minimizes a window, even if the thread that owns the window is not
+'''         responding. This flag should only be used when minimizing windows
+'''         from a different thread.
 '''
-'''      The flags that specify how an application is to be displayed when it
-'''      is opened. If the first argument of <CommandLine> specifies a document
-'''      file, the flag is simply passed to the associated application. It is
-'''      up to the application to decide how to handle it.
+'''     The flags that specify how an application is to be displayed when it
+'''     is opened. If the first argument of <CommandLine> specifies a document
+'''     file, the flag is simply passed to the associated application. It is
+'''     up to the application to decide how to handle it.
 '''
-'''      See detailed documentation in MSDN for the function `ShowWindow`.
+'''     See detailed documentation in MSDN for the function `ShowWindow`.
 '''
 '''   -s
 '''     Enable variables substitution in the `WScript.Shell.Run` function, by
@@ -104,29 +104,29 @@
 '''     Expand environment variables only in the <N>th argument, where N >= 0.
 '''   -r <from> <to>
 '''     Replace <from> string to <to> string in all arguments.
-'''     The replace does execute after %-unescape and $-environment variables
+'''     The replace does execute after %-unescape and %-environment variables
 '''     expand.
 '''   -re <from> <to>
 '''     Replace early <from> string to <to> string in all arguments.
-'''     The replace does execute before %-unescape and $-environment variables
+'''     The replace does execute before %-unescape and %-environment variables
 '''     expand.
 '''   -ra <from> <to>
 '''     Replace <from> string to <to> string in tail arguments.
-'''     The replace does execute after %-unescape and $-environment variables
+'''     The replace does execute after %-unescape and %-environment variables
 '''     expand.
 '''   -rea <from> <to>
 '''     Replace early <from> string to <to> string in tail arguments.
-'''     The replace does execute before %-unescape and $-environment variables
+'''     The replace does execute before %-unescape and %-environment variables
 '''     expand.
 '''   -r<N> <from> <to>
 '''     Replace <from> string to <to> string only in the <N>th argument, where
 '''     N >= 0.
-'''     The replace does execute after %-unescape and $-environment variables
+'''     The replace does execute after %-unescape and %-environment variables
 '''     expand.
 '''   -re<N> <from> <to>
 '''     Replace early <from> string to <to> string only in the <N>th argument,
 '''     where N >= 0.
-'''     The replace does execute after %-unescape and $-environment variables
+'''     The replace does execute after %-unescape and %-environment variables
 '''     expand.
 '''   -v <name> <value>
 '''     Create environment variable with name <name> and value <value>.
@@ -495,7 +495,7 @@ For i = 0 To WScript.Arguments.Count - 1 : Do ' empty `Do-Loop` to emulate `Cont
       Next
     End If
 
-    ''' $-environment variables expand
+    ''' %-environment variables expand
     If ExpandAllArgs Then
       arg = shell_obj.ExpandEnvironmentStrings(arg)
     ElseIf ExpandTailArgs And j > 0 Then

@@ -3,7 +3,7 @@
 if "!!" == "" (
   echo;%~nx0: error: delayed expansion extension must be disabled.
   exit /b 255
-)
+) >&2
 
 set "TEST_PREV_ERROR=%ERRORLEVEL%"
 

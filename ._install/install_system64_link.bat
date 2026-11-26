@@ -49,6 +49,8 @@ rem   64-bit Windows does create the unredirected link to the 64-bit `System32`
 rem   directory (no need to run it under 64-bit `cmd.exe` process).
 :DOC_END
 
+setlocal
+
 rem call "%%~dp0script_init.bat" %%0 %%* || exit /b
 rem if %IMPL_MODE%0 EQU 0 exit /b
 rem goto IMPL

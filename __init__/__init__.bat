@@ -1,5 +1,10 @@
 @echo off
 
+if "!!" == "" (
+  echo;%~nx0: error: delayed expansion extension must be disabled.
+  exit /b 255
+) >&2
+
 if /i "%CONTOOLS_PROJECT_ROOT_INIT0_DIR%" == "%~dp0" exit /b 0
 
 set "CONTOOLS_PROJECT_ROOT_INIT0_DIR=%~dp0"

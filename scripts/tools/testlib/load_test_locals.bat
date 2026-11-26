@@ -7,7 +7,7 @@ rem   load_test_locals.bat
 if "!!" == "" (
   echo;%~nx0: error: delayed expansion extension must be disabled.
   exit /b 255
-)
+) >&2
 
 if not defined SETUP_CP goto SKIP_SETUP_CP
 

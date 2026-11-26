@@ -26,7 +26,7 @@ rem   respectively, otherwise the code page may be left changed.
 if "!!" == "" (
   echo;%~nx0: error: delayed expansion extension must be disabled.
   exit /b 255
-)
+) >&2
 
 rem initialize testlib module
 call "%%~dp0__init__.bat" || exit /b

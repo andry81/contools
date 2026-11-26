@@ -37,7 +37,7 @@ rem   Message before the input echo;
 rem   Leave empty if you want to echo input on the next line.
 :DOC_END
 
-setlocal
+setlocal DISABLEDELAYEDEXPANSION
 
 rem drop last error level
 call;

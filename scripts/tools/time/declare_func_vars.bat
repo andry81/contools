@@ -1,7 +1,7 @@
 @echo off
 
 if "!!" == "" (
-  echo;%~nx0: error: delayed expansion must be disable before the call
+  echo;%~nx0: error: delayed expansion extension must be disabled.
   exit /b 255
 ) >&2
 

@@ -1,3 +1,7 @@
+2026.11.26:
+* changed: *.bat: code minor improvement
+* refactor: scripts/tools/ToolAdaptors/vbs/*call.vbs: minor refactor
+
 2026.11.25:
 * new: scripts/tools/std/flush_conin.bat: script to flush console (keyboard) input
 * changed: scripts/tools/std/sleep.bat: `-flash_conin` flag to flush console (keyboard) input on exit
